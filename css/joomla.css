@@ -294,10 +294,6 @@ br.clear {
 /* Joomla Admin Menu alterations */
 /* Moved from civicrm.css in v3.2 */
 
-ul#civicrm-menu {
-  position:relative;
-  z-index: 1;
-}
 
 div#toolbar-box div.m {
   padding: 0px !important;
@@ -310,9 +306,6 @@ div#toolbar-box, div#toolbar-box div.m{
   height: auto;
 }
 
-ul#civicrm-menu li#crm-qsearch {
-  height:0px;
-}
 .crm-tab-button,
 .ui-tabs .ui-tabs-nav li {
   border: 1px;
@@ -390,25 +383,12 @@ body.admin.com_civicrm .container-fluid.container-main {
 	padding: 0;
 	border-top: 1px solid #787878;
 }
+body.admin.com_civicrm.task-civicrmupgrade .container-fluid.container-main {
+	padding: 10px 25px 25px;
+}
 body.admin.com_civicrm #crm-nav-menu-container {
 	padding-bottom: 0 !important;
 }
 body.admin.com_civicrm #content-right {
 	padding: 12px;
-}
-body.admin.com_civicrm #civicrm-menu #crm-qsearch {
-  padding-left: 20px;
-}
-body.admin.com_civicrm #root-menu-div div.outerbox:first-of-type {
-	margin-left: 20px;
-} 
-body.admin.com_civicrm div.outerbox {
-	z-index: 1000;
-}
-
-/* Shoreditch-specific */
-
-body.admin.com_civicrm {
-	padding-top: 0px !important;
-	margin-top: 30px !important; 
 }

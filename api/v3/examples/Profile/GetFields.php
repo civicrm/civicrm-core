@@ -8,10 +8,10 @@
  *   API result array
  */
 function profile_getfields_example() {
-  $params = array(
+  $params = [
     'action' => 'submit',
     'profile_id' => 27,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Profile', 'getfields', $params);
@@ -21,12 +21,12 @@ function profile_getfields_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -40,12 +40,12 @@ function profile_getfields_example() {
  */
 function profile_getfields_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 9,
-    'values' => array(
-      'custom_1' => array(
+    'values' => [
+      'custom_1' => [
         'label' => '_addCustomFieldToProfile',
         'groupTitle' => '_addCustomFie',
         'data_type' => 'String',
@@ -74,9 +74,9 @@ function profile_getfields_expectedresult() {
         'help_post' => '',
         'entity' => 'contact',
         'weight' => '1',
-        'api.aliases' => array(),
-      ),
-      'postal_code-1' => array(
+        'api.aliases' => [],
+      ],
+      'postal_code-1' => [
         'name' => 'postal_code',
         'type' => 2,
         'title' => 'State Province',
@@ -91,18 +91,18 @@ function profile_getfields_expectedresult() {
         'table_name' => 'civicrm_address',
         'entity' => 'address',
         'bao' => 'CRM_Core_BAO_Address',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 64,
           'size' => 6,
-        ),
+        ],
         'api.required' => 0,
         'help_pre' => '',
         'help_post' => '',
         'weight' => '2',
-        'api.aliases' => array(),
-      ),
-      'state_province-1' => array(
+        'api.aliases' => [],
+      ],
+      'state_province-1' => [
         'name' => 'state_province_id',
         'type' => 1,
         'title' => 'State Province',
@@ -111,24 +111,24 @@ function profile_getfields_expectedresult() {
         'entity' => 'address',
         'bao' => 'CRM_Core_BAO_Address',
         'FKClassName' => 'CRM_Core_DAO_StateProvince',
-        'html' => array(
+        'html' => [
           'type' => 'ChainSelect',
           'size' => 6,
           'maxlength' => 14,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'table' => 'civicrm_state_province',
           'keyColumn' => 'id',
           'labelColumn' => 'name',
-        ),
+        ],
         'FKApiName' => 'StateProvince',
         'api.required' => '1',
         'help_pre' => '',
         'help_post' => '',
         'weight' => '3',
-        'api.aliases' => array(),
-      ),
-      'country-1' => array(
+        'api.aliases' => [],
+      ],
+      'country-1' => [
         'name' => 'country_id',
         'type' => 1,
         'title' => 'Country',
@@ -137,25 +137,25 @@ function profile_getfields_expectedresult() {
         'entity' => 'address',
         'bao' => 'CRM_Core_BAO_Address',
         'FKClassName' => 'CRM_Core_DAO_Country',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'size' => 6,
           'maxlength' => 14,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'table' => 'civicrm_country',
           'keyColumn' => 'id',
           'labelColumn' => 'name',
           'nameColumn' => 'iso_code',
-        ),
+        ],
         'FKApiName' => 'Country',
         'api.required' => '1',
         'help_pre' => '',
         'help_post' => '',
         'weight' => '4',
-        'api.aliases' => array(),
-      ),
-      'phone-1-1' => array(
+        'api.aliases' => [],
+      ],
+      'phone-1-1' => [
         'name' => 'phone',
         'type' => 2,
         'title' => 'Phone',
@@ -170,18 +170,18 @@ function profile_getfields_expectedresult() {
         'table_name' => 'civicrm_phone',
         'entity' => 'phone',
         'bao' => 'CRM_Core_BAO_Phone',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 32,
           'size' => 20,
-        ),
+        ],
         'api.required' => '1',
         'help_pre' => '',
         'help_post' => '',
         'weight' => '5',
-        'api.aliases' => array(),
-      ),
-      'email-primary' => array(
+        'api.aliases' => [],
+      ],
+      'email-primary' => [
         'name' => 'email',
         'type' => 2,
         'title' => 'Email',
@@ -197,20 +197,20 @@ function profile_getfields_expectedresult() {
         'table_name' => 'civicrm_email',
         'entity' => 'email',
         'bao' => 'CRM_Core_BAO_Email',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 254,
           'size' => 30,
-        ),
+        ],
         'api.required' => '1',
         'help_pre' => '',
         'help_post' => '',
         'weight' => '6',
-        'api.aliases' => array(
+        'api.aliases' => [
           '0' => 'email-Primary',
-        ),
-      ),
-      'last_name' => array(
+        ],
+      ],
+      'last_name' => [
         'name' => 'last_name',
         'type' => 2,
         'title' => 'Last Name',
@@ -225,18 +225,18 @@ function profile_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 64,
           'size' => 30,
-        ),
+        ],
         'api.required' => '1',
         'help_pre' => '',
         'help_post' => '',
         'weight' => '7',
-        'api.aliases' => array(),
-      ),
-      'first_name' => array(
+        'api.aliases' => [],
+      ],
+      'first_name' => [
         'name' => 'first_name',
         'type' => 2,
         'title' => 'First Name',
@@ -251,24 +251,24 @@ function profile_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 64,
           'size' => 30,
-        ),
+        ],
         'api.required' => '1',
         'help_pre' => '',
         'help_post' => '',
         'weight' => '8',
-        'api.aliases' => array(),
-      ),
-      'profile_id' => array(
+        'api.aliases' => [],
+      ],
+      'profile_id' => [
         'api.required' => TRUE,
         'title' => 'Profile ID',
         'name' => 'profile_id',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

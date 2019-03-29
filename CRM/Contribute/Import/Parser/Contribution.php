@@ -177,49 +177,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     $errorMessage = NULL;
 
     //for date-Formats
-    $session = CRM_Core_Session::singleton();
-    $dateType = $session->get('dateTypes');
-    foreach ($params as $key => $val) {
-      if ($val) {
-        switch ($key) {
-          case 'receive_date':
-            if ($dateValue = CRM_Utils_Date::formatDate($params[$key], $dateType)) {
-              $params[$key] = $dateValue;
-            }
-            else {
-              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Receive Date', $errorMessage);
-            }
-            break;
-
-          case 'cancel_date':
-            if ($dateValue = CRM_Utils_Date::formatDate($params[$key], $dateType)) {
-              $params[$key] = $dateValue;
-            }
-            else {
-              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Cancel Date', $errorMessage);
-            }
-            break;
-
-          case 'receipt_date':
-            if ($dateValue = CRM_Utils_Date::formatDate($params[$key], $dateType)) {
-              $params[$key] = $dateValue;
-            }
-            else {
-              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Receipt date', $errorMessage);
-            }
-            break;
-
-          case 'thankyou_date':
-            if ($dateValue = CRM_Utils_Date::formatDate($params[$key], $dateType)) {
-              $params[$key] = $dateValue;
-            }
-            else {
-              CRM_Contact_Import_Parser_Contact::addToErrorMsg('Thankyou Date', $errorMessage);
-            }
-            break;
-        }
-      }
-    }
+    $errorMessage = implode('; ', $this->formatDateFields($params));
     //date-Format part ends
 
     $params['contact_type'] = 'Contribution';
@@ -257,42 +215,12 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
     $params = &$this->getActiveFieldParams();
     $formatted = ['version' => 3, 'skipRecentView' => TRUE, 'skipCleanMoney' => FALSE];
-    $dateType = CRM_Core_Session::singleton()->get('dateTypes');
-
-    $customDataType = !empty($params['contact_type']) ? $params['contact_type'] : 'Contribution';
-    $customFields = CRM_Core_BAO_CustomField::getFields($customDataType);
 
     //CRM-10994
     if (isset($params['total_amount']) && $params['total_amount'] == 0) {
       $params['total_amount'] = '0.00';
     }
-    foreach ($params as $key => $val) {
-      if ($val) {
-        switch ($key) {
-          case 'receive_date':
-          case 'cancel_date':
-          case 'receipt_date':
-          case 'thankyou_date':
-            $params[$key] = CRM_Utils_Date::formatDate($params[$key], $dateType);
-            break;
-
-          case 'pledge_payment':
-            $params[$key] = CRM_Utils_String::strtobool($val);
-            break;
-
-        }
-        if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-          if ($customFields[$customFieldID]['data_type'] == 'Date') {
-            CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
-            unset($params[$key]);
-          }
-          elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
-            $params[$key] = CRM_Utils_String::strtoboolstr($val);
-          }
-        }
-      }
-    }
-    //date-Format part ends
+    $this->formatInput($params);
 
     static $indieFields = NULL;
     if ($indieFields == NULL) {
@@ -600,6 +528,107 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * The initializer code, called before the processing.
    */
   public function fini() {
+  }
+
+  /**
+   * Format date fields from input to mysql.
+   *
+   * @param array $params
+   *
+   * @return array
+   *   Error messages, if any.
+   */
+  public function formatDateFields(&$params) {
+    $errorMessage = [];
+    $dateType = CRM_Core_Session::singleton()->get('dateTypes');
+    foreach ($params as $key => $val) {
+      if ($val) {
+        switch ($key) {
+          case 'receive_date':
+            if ($dateValue = CRM_Utils_Date::formatDate($params[$key], $dateType)) {
+              $params[$key] = $dateValue;
+            }
+            else {
+              $errorMessage[] = ts('Receive Date');
+            }
+            break;
+
+          case 'cancel_date':
+            if ($dateValue = CRM_Utils_Date::formatDate($params[$key], $dateType)) {
+              $params[$key] = $dateValue;
+            }
+            else {
+              $errorMessage[] = ts('Cancel Date');
+            }
+            break;
+
+          case 'receipt_date':
+            if ($dateValue = CRM_Utils_Date::formatDate($params[$key], $dateType)) {
+              $params[$key] = $dateValue;
+            }
+            else {
+              $errorMessage[] = ts('Receipt date');
+            }
+            break;
+
+          case 'thankyou_date':
+            if ($dateValue = CRM_Utils_Date::formatDate($params[$key], $dateType)) {
+              $params[$key] = $dateValue;
+            }
+            else {
+              $errorMessage[] = ts('Thankyou Date');
+            }
+            break;
+        }
+      }
+    }
+    return $errorMessage;
+  }
+
+  /**
+   * Format input params to suit api handling.
+   *
+   * Over time all the parts of  _civicrm_api3_deprecated_formatted_param
+   * and all the parts of the import function on this class that relate to
+   * reformatting input should be moved here and tests should be added in
+   * CRM_Contribute_Import_Parser_ContributionTest.
+   *
+   * @param array $params
+   */
+  public function formatInput(&$params) {
+    $dateType = CRM_Core_Session::singleton()->get('dateTypes');
+    $customDataType = !empty($params['contact_type']) ? $params['contact_type'] : 'Contribution';
+    $customFields = CRM_Core_BAO_CustomField::getFields($customDataType);
+    // @todo call formatDateFields & move custom data handling there.
+    // Also note error handling for dates is currently in  _civicrm_api3_deprecated_formatted_param
+    // we should use the error handling in formatDateFields.
+    foreach ($params as $key => $val) {
+      // @todo - call formatDateFields instead.
+      if ($val) {
+        switch ($key) {
+          case 'receive_date':
+          case 'cancel_date':
+          case 'receipt_date':
+          case 'thankyou_date':
+            $params[$key] = CRM_Utils_Date::formatDate($params[$key], $dateType);
+            break;
+
+          case 'pledge_payment':
+            $params[$key] = CRM_Utils_String::strtobool($val);
+            break;
+
+        }
+        if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
+          if ($customFields[$customFieldID]['data_type'] == 'Date') {
+            CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $params, $dateType, $key);
+            unset($params[$key]);
+          }
+          elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
+            $params[$key] = CRM_Utils_String::strtoboolstr($val);
+          }
+        }
+      }
+    }
   }
 
 }

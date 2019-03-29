@@ -39,9 +39,9 @@ class XDebugSubscriber implements EventSubscriberInterface {
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::RESPOND => array('onApiRespond', Events::W_LATE),
-    );
+    return [
+      Events::RESPOND => ['onApiRespond', Events::W_LATE],
+    ];
   }
 
   /**

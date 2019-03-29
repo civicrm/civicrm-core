@@ -354,7 +354,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'trxn_date' => array(
             'title' => ts('Transaction Date'),
             'default' => TRUE,
-            'type' => CRM_Utils_Type::T_DATE,
+            'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           ),
           'trxn_id' => array(
             'title' => ts('Trans #'),
@@ -381,7 +381,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'trxn_date' => array(
             'title' => ts('Transaction Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Utils_Type::T_DATE,
+            'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           ),
           'status_id' => array(
             'title' => ts('Financial Transaction Status'),
@@ -602,7 +602,6 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
    */
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
-    $tempTableName = CRM_Core_DAO::createTempTableName('civicrm_contribution');
     $financialSelect = "CASE WHEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.entity_id IS NOT NULL
             THEN {$this->_aliases['civicrm_entity_financial_trxn']}_item.amount
             ELSE {$this->_aliases['civicrm_entity_financial_trxn']}.amount
@@ -618,9 +617,8 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
 
     $this->groupBy();
 
-    $tempQuery = "CREATE TEMPORARY TABLE {$tempTableName} {$this->_databaseAttributes} AS
-                  {$select} {$this->_from} {$this->_where} {$this->_groupBy} ";
-    CRM_Core_DAO::executeQuery($tempQuery);
+    $tempTableName = $this->createTemporaryTable('tempTable', "
+                  {$select} {$this->_from} {$this->_where} {$this->_groupBy} ");
 
     $sql = "SELECT COUNT(trxnID) as count, SUM(amount) as amount, currency
             FROM {$tempTableName}

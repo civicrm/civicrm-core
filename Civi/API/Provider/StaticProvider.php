@@ -44,14 +44,14 @@ class StaticProvider extends AdhocProvider {
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::RESOLVE => array(
-        array('onApiResolve', Events::W_MIDDLE),
-      ),
-      Events::AUTHORIZE => array(
-        array('onApiAuthorize', Events::W_MIDDLE),
-      ),
-    );
+    return [
+      Events::RESOLVE => [
+        ['onApiResolve', Events::W_MIDDLE],
+      ],
+      Events::AUTHORIZE => [
+        ['onApiAuthorize', Events::W_MIDDLE],
+      ],
+    ];
   }
 
   /**
@@ -66,21 +66,21 @@ class StaticProvider extends AdhocProvider {
    * @param array $records
    *   List of mock records to be read/updated by API calls.
    */
-  public function __construct($version, $entity, $fields, $perms = array(), $records = array()) {
+  public function __construct($version, $entity, $fields, $perms = [], $records = []) {
     parent::__construct($version, $entity);
 
-    $perms = array_merge(array(
+    $perms = array_merge([
       'create' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
       'get' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
       'delete' => \CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION,
-    ), $perms);
+    ], $perms);
 
-    $this->records = \CRM_Utils_Array::index(array('id'), $records);
+    $this->records = \CRM_Utils_Array::index(['id'], $records);
     $this->fields = $fields;
 
-    $this->addAction('create', $perms['create'], array($this, 'doCreate'));
-    $this->addAction('get', $perms['get'], array($this, 'doGet'));
-    $this->addAction('delete', $perms['delete'], array($this, 'doDelete'));
+    $this->addAction('create', $perms['create'], [$this, 'doCreate']);
+    $this->addAction('get', $perms['get'], [$this, 'doGet']);
+    $this->addAction('delete', $perms['delete'], [$this, 'doDelete']);
   }
 
   /**
@@ -111,7 +111,7 @@ class StaticProvider extends AdhocProvider {
     }
     else {
       $id = max(array_keys($this->records)) + 1;
-      $this->records[$id] = array();
+      $this->records[$id] = [];
     }
 
     if (!isset($this->records[$id])) {
@@ -150,7 +150,7 @@ class StaticProvider extends AdhocProvider {
     if ($id && isset($this->records[$id])) {
       unset($this->records[$id]);
     }
-    return civicrm_api3_create_success(array());
+    return civicrm_api3_create_success([]);
   }
 
 }

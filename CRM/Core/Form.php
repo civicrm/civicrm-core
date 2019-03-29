@@ -641,6 +641,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public function addButtons($params) {
     $prevnext = $spacing = array();
     foreach ($params as $button) {
+      if (!empty($button['submitOnce'])) {
+        $button['js']['onclick'] = "return submitOnce(this,'{$this->_name}','" . ts('Processing') . "');";
+      }
+
       $attrs = array('class' => 'crm-form-submit') + (array) CRM_Utils_Array::value('js', $button);
 
       if (!empty($button['class'])) {
@@ -748,6 +752,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function setTitle($title) {
     $this->_title = $title;
+    CRM_Utils_System::setTitle($title);
   }
 
   /**
@@ -1291,11 +1296,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @param string $fieldName
    * @param string $label
+   * @param bool $isDateTime
+   *   Is this a date-time field (not just date).
    * @param bool $required
    * @param string $fromLabel
    * @param string $toLabel
    */
-  public function addDatePickerRange($fieldName, $label, $required = FALSE, $fromLabel = 'From', $toLabel = 'To') {
+  public function addDatePickerRange($fieldName, $label, $isDateTime = FALSE, $required = FALSE, $fromLabel = 'From', $toLabel = 'To') {
 
     $options = array(
       '' => ts('- any -'),
@@ -1310,7 +1317,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       NULL
     );
     $attributes = ['format' => 'searchDate'];
-    $extra = ['time' => FALSE];
+    $extra = ['time' => $isDateTime];
     $this->add('datepicker', $fieldName . '_low', ts($fromLabel), $attributes, $required, $extra);
     $this->add('datepicker', $fieldName . '_high', ts($toLabel), $attributes, $required, $extra);
   }
@@ -1328,6 +1335,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
     if ($action & (CRM_Core_Action::VIEW + CRM_Core_Action::BROWSE + CRM_Core_Action::BASIC + CRM_Core_Action::ADVANCED + CRM_Core_Action::PREVIEW)) {
       return 'get';
+    }
+    if ($action & (CRM_Core_Action::DELETE)) {
+      return 'delete';
     }
     // If you get this exception try adding more cases above.
     throw new Exception("Cannot determine api action for " . get_class($this) . '.' . 'CRM_Core_Action "' . CRM_Core_Action::description($action) . '" not recognized.');
@@ -1929,10 +1939,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param array $props
    *   Mix of html and widget properties, including:.
    *   - select - params to give to select2 widget
-   *   - entity - defaults to contact
+   *   - entity - defaults to Contact
    *   - create - can the user create a new entity on-the-fly?
    *             Set to TRUE if entity is contact and you want the default profiles,
-   *             or pass in your own set of links. @see CRM_Core_BAO_UFGroup::getCreateLinks for format
+   *             or pass in your own set of links. @see CRM_Campaign_BAO_Campaign::getEntityRefCreateLinks for format
    *             note that permissions are checked automatically
    *   - api - array of settings for the getlist api wrapper
    *          note that it accepts a 'params' setting which will be passed to the underlying api
@@ -1944,18 +1954,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return HTML_QuickForm_Element
    */
   public function addEntityRef($name, $label = '', $props = array(), $required = FALSE) {
-    require_once "api/api.php";
-    $config = CRM_Core_Config::singleton();
     // Default properties
     $props['api'] = CRM_Utils_Array::value('api', $props, array());
-    $props['entity'] = _civicrm_api_get_entity_name_from_camel(CRM_Utils_Array::value('entity', $props, 'contact'));
+    $props['entity'] = CRM_Utils_String::convertStringToCamel(CRM_Utils_Array::value('entity', $props, 'Contact'));
     $props['class'] = ltrim(CRM_Utils_Array::value('class', $props, '') . ' crm-form-entityref');
 
-    if (isset($props['create']) && $props['create'] === TRUE) {
-      require_once "api/v3/utils.php";
-      $baoClass = _civicrm_api3_get_BAO($props['entity']);
-      $props['create'] = $baoClass && is_callable([$baoClass, 'entityRefCreateLinks']) ? $baoClass::entityRefCreateLinks() : FALSE;
-    }
     if (array_key_exists('create', $props) && empty($props['create'])) {
       unset($props['create']);
     }

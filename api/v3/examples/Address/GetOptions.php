@@ -6,9 +6,9 @@
  *   API result array
  */
 function address_getoptions_example() {
-  $params = array(
+  $params = [
     'field' => 'location_type_id',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Address', 'getoptions', $params);
@@ -18,12 +18,12 @@ function address_getoptions_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,18 +37,18 @@ function address_getoptions_example() {
  */
 function address_getoptions_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 5,
-    'values' => array(
+    'values' => [
       '5' => 'Billing',
       '1' => 'Home',
       '3' => 'Main',
       '4' => 'Other',
       '2' => 'Work',
-    ),
-  );
+    ],
+  ];
 
   return $expectedResult;
 }

@@ -47,14 +47,14 @@
  */
 function civicrm_api3_file_create($params) {
 
-  civicrm_api3_verify_mandatory($params, 'CRM_Core_DAO_File', array('uri'));
+  civicrm_api3_verify_mandatory($params, 'CRM_Core_DAO_File', ['uri']);
 
   if (!isset($params['upload_date'])) {
     $params['upload_date'] = date("Ymd");
   }
 
   $fileDAO = new CRM_Core_DAO_File();
-  $properties = array(
+  $properties = [
     'id',
     'file_type_id',
     'mime_type',
@@ -62,7 +62,7 @@ function civicrm_api3_file_create($params) {
     'document',
     'description',
     'upload_date',
-  );
+  ];
 
   foreach ($properties as $name) {
     if (array_key_exists($name, $params)) {
@@ -72,7 +72,7 @@ function civicrm_api3_file_create($params) {
 
   $fileDAO->save();
 
-  $file = array();
+  $file = [];
   _civicrm_api3_object_to_array($fileDAO, $file);
 
   return civicrm_api3_create_success($file, $params, 'File', 'create', $fileDAO);
@@ -114,7 +114,7 @@ function civicrm_api3_file_update($params) {
     }
     $fileDAO->save();
   }
-  $file = array();
+  $file = [];
   $cloneDAO = clone($fileDAO);
   _civicrm_api3_object_to_array($cloneDAO, $file);
   return $file;
@@ -130,7 +130,7 @@ function civicrm_api3_file_update($params) {
  */
 function civicrm_api3_file_delete($params) {
 
-  civicrm_api3_verify_mandatory($params, NULL, array('id'));
+  civicrm_api3_verify_mandatory($params, NULL, ['id']);
   if (CRM_Core_BAO_File::deleteEntityFile('*', $params['id'])) {
     return civicrm_api3_create_success();
   }

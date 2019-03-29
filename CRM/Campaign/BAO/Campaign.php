@@ -93,7 +93,6 @@ class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
         $dao->entity_id = $entityId;
         $dao->group_type = 'Include';
         $dao->save();
-        $dao->free();
       }
     }
 
@@ -600,8 +599,9 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
     if ($connectedCampaignId || ($isCampaignEnabled && $hasAccessCampaign)) {
       $showAddCampaign = TRUE;
       $campaign = $form->addEntityRef('campaign_id', ts('Campaign'), [
-        'entity' => 'campaign',
+        'entity' => 'Campaign',
         'create' => TRUE,
+        'select' => ['minimumInputLength' => 0],
       ]);
       //lets freeze when user does not has access or campaign is disabled.
       if (!$isCampaignEnabled || !$hasAccessCampaign) {
@@ -666,11 +666,49 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
   }
 
   /**
+   * @return array
+   */
+  public static function getEntityRefFilters() {
+    return [
+      ['key' => 'campaign_type_id', 'value' => ts('Campaign Type')],
+      ['key' => 'status_id', 'value' => ts('Status')],
+      [
+        'key' => 'start_date',
+        'value' => ts('Start Date'),
+        'options' => [
+          ['key' => '{">":"now"}', 'value' => ts('Upcoming')],
+          [
+            'key' => '{"BETWEEN":["now - 3 month","now"]}',
+            'value' => ts('Past 3 Months'),
+          ],
+          [
+            'key' => '{"BETWEEN":["now - 6 month","now"]}',
+            'value' => ts('Past 6 Months'),
+          ],
+          [
+            'key' => '{"BETWEEN":["now - 1 year","now"]}',
+            'value' => ts('Past Year'),
+          ],
+        ],
+      ],
+      [
+        'key' => 'end_date',
+        'value' => ts('End Date'),
+        'options' => [
+          ['key' => '{">":"now"}', 'value' => ts('In the future')],
+          ['key' => '{"<":"now"}', 'value' => ts('In the past')],
+          ['key' => '{"IS NULL":"1"}', 'value' => ts('Not set')],
+        ],
+      ],
+    ];
+  }
+
+  /**
    * Links to create new campaigns from entityRef widget
    *
    * @return array|bool
    */
-  public static function entityRefCreateLinks() {
+  public static function getEntityRefCreateLinks() {
     if (CRM_Core_Permission::check([['administer CiviCampaign', 'manage campaign']])) {
       return [
         [

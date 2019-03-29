@@ -45,8 +45,6 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     'bar_3dChart' => 'Bar Chart',
   );
 
-  public $campaignEnabled = FALSE;
-
   /**
    * Class constructor.
    */
@@ -297,23 +295,8 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
         ),
       ),
     );
-    $config = CRM_Core_Config::singleton();
-    $this->campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
-    if ($this->campaignEnabled) {
-      $this->_columns['civicrm_campaign'] = array(
-        'dao' => 'CRM_Campaign_DAO_Campaign',
-        'fields' => array(
-          'title' => array(
-            'title' => ts('Campaign Name'),
-          ),
-        ),
-        'filters' => array(
-          'title' => array(
-            'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
-      );
-    }
+    // If we have campaigns enabled, add those elements to both the fields, filters.
+    $this->addCampaignFields('civicrm_mailing');
     parent::__construct();
   }
 
@@ -428,12 +411,6 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
         LEFT JOIN civicrm_mailing_group {$this->_aliases['civicrm_mailing_group']}
     ON {$this->_aliases['civicrm_mailing_group']}.mailing_id = {$this->_aliases['civicrm_mailing']}.id";
     }
-    if ($this->campaignEnabled) {
-      $this->_from .= "
-        LEFT JOIN civicrm_campaign {$this->_aliases['civicrm_campaign']}
-        ON {$this->_aliases['civicrm_campaign']}.id = {$this->_aliases['civicrm_mailing']}.campaign_id";
-    }
-
     // need group by and order by
 
     //print_r($this->_from);
@@ -676,6 +653,13 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
         }
         if (array_key_exists('civicrm_mailing_event_opened_open_count', $row)) {
           $rows[$rowNum]['civicrm_mailing_event_opened_open_count'] = CRM_Mailing_Event_BAO_Opened::getTotalCount($row['civicrm_mailing_id']);
+          $entryFound = TRUE;
+        }
+      }
+      // convert campaign_id to campaign title
+      if (array_key_exists('civicrm_mailing_campaign_id', $row)) {
+        if ($value = $row['civicrm_mailing_campaign_id']) {
+          $rows[$rowNum]['civicrm_mailing_campaign_id'] = $this->campaigns[$value];
           $entryFound = TRUE;
         }
       }

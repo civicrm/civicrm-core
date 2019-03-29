@@ -322,8 +322,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    */
   public function testGetActivitiesCountForAdminDashboard() {
     $this->setUpForActivityDashboardTests();
-    $activityCount = CRM_Activity_BAO_Activity::deprecatedGetActivitiesCount($this->_params);
-    $this->assertEquals(8, $activityCount);
     $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($this->_params);
     $this->assertEquals(8, $activityCount);
   }
@@ -351,12 +349,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'sort' => NULL,
     );
 
-    $activityCount = CRM_Activity_BAO_Activity::deprecatedGetActivitiesCount($params);
-
     //since we are loading activities from dataset, we know total number of activities for this contact
     // 5 activities ( 2 scheduled, 3 Completed ), note that dashboard shows only scheduled activities
-    $count = 2;
-    $this->assertEquals($count, $activityCount);
     $this->assertEquals(2, CRM_Activity_BAO_Activity::getActivitiesCount($params));
   }
 
@@ -381,12 +375,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'rowCount' => 0,
       'sort' => NULL,
     );
-    $activityCount = CRM_Activity_BAO_Activity::deprecatedGetActivitiesCount($params);
 
     //since we are loading activities from dataset, we know total number of activities for this contact
     // 5 activities, Contact Summary should show all activities
-    $count = 5;
-    $this->assertEquals($count, $activityCount);
     $this->assertEquals(5, CRM_Activity_BAO_Activity::getActivitiesCount($params));
   }
 
@@ -412,7 +403,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     );
     $expectedFilters = array(
       'activity_type_filter_id' => 1,
-      'activity_type_exclude_filter_id' => '',
     );
 
     list($activities, $activityFilter) = CRM_Activity_Page_AJAX::getContactActivity();
@@ -423,11 +413,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       $this->assertContains('Meeting', $value['activity_type']);
     }
     unset($_GET['activity_type_id']);
-    $expectedFilters['activity_type_filter_id'] = '';
 
     $_GET['activity_type_exclude_id'] = $expectedFilters['activity_type_exclude_filter_id'] = 1;
     list($activities, $activityFilter) = CRM_Activity_Page_AJAX::getContactActivity();
-    $this->checkArrayEquals($expectedFilters, $activityFilter);
+    $this->assertEquals(['activity_type_exclude_filter_id' => 1], $activityFilter);
     // None of the activities should be of type Meeting.
     foreach ($activities['data'] as $value) {
       $this->assertNotContains('Meeting', $value['activity_type']);
@@ -455,11 +444,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'rowCount' => 0,
       'sort' => NULL,
     );
-    $activityCount = CRM_Activity_BAO_Activity::deprecatedGetActivitiesCount($params);
 
     //since we are loading activities from dataset, we know total number of activities for this contact
     // this contact does not have any activity
-    $this->assertEquals(0, $activityCount);
     $this->assertEquals(0, CRM_Activity_BAO_Activity::getActivitiesCount($params));
   }
 
@@ -468,14 +455,13 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    */
   public function testGetActivitiesForAdminDashboard() {
     $this->setUpForActivityDashboardTests();
-    $activitiesDeprecatedFn = CRM_Activity_BAO_Activity::deprecatedGetActivities($this->_params);
     $activitiesNew = CRM_Activity_BAO_Activity::getActivities($this->_params);
     // $this->assertEquals($activities, $activitiesDeprecatedFn);
 
     //since we are loading activities from dataset, we know total number of activities
     // with no contact ID and there should be 8 schedule activities shown on dashboard
     $count = 8;
-    foreach (array($activitiesNew, $activitiesDeprecatedFn) as $activities) {
+    foreach (array($activitiesNew) as $activities) {
       $this->assertEquals($count, count($activities));
 
       foreach ($activities as $key => $value) {
@@ -492,10 +478,9 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   public function testGetActivitiesForAdminDashboardNoViewContacts() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
     $this->setUpForActivityDashboardTests();
-    $activitiesDeprecated = CRM_Activity_BAO_Activity::deprecatedGetActivities($this->_params);
-    foreach (array($activitiesDeprecated, CRM_Activity_BAO_Activity::getActivities($this->_params)) as $activities) {
+    foreach (array(CRM_Activity_BAO_Activity::getActivities($this->_params)) as $activities) {
       // Skipped until we get back to the upgraded version properly.
-      //$this->assertEquals(0, count($activities));
+      $this->assertEquals(0, count($activities));
     }
   }
 
@@ -507,11 +492,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->allowedContacts = array(1, 3, 4, 5);
     $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereMultipleContacts'));
     $this->setUpForActivityDashboardTests();
-    $activitiesDeprecated = CRM_Activity_BAO_Activity::deprecatedGetActivities($this->_params);
-    foreach (array($activitiesDeprecated, CRM_Activity_BAO_Activity::getActivities($this->_params)) as $activities) {
-      //$this->assertEquals(1, count($activities));
-    }
-
+    $this->assertEquals(7, count(CRM_Activity_BAO_Activity::getActivities($this->_params)));
   }
 
   /**
@@ -537,9 +518,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'rowCount' => 0,
       'sort' => NULL,
     );
-    $activitiesDep = CRM_Activity_BAO_Activity::deprecatedGetActivities($params);
 
-    foreach (array($activitiesDep, CRM_Activity_BAO_Activity::getActivities($params)) as $activities) {
+    foreach (array(CRM_Activity_BAO_Activity::getActivities($params)) as $activities) {
       //since we are loading activities from dataset, we know total number of activities for this contact
       // 5 activities ( 2 scheduled, 3 Completed ), note that dashboard shows only scheduled activities
       $count = 2;
@@ -581,10 +561,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
       'context' => 'activity',
     );
-    $activitiesDep = CRM_Activity_BAO_Activity::deprecatedGetActivities($params);
-    foreach (array($activitiesDep, CRM_Activity_BAO_Activity::getActivities($params)) as $activities) {
+    foreach (array(CRM_Activity_BAO_Activity::getActivities($params)) as $activities) {
       //verify target count
       $this->assertEquals($targetCount, $activities[1]['target_contact_counter']);
+      $this->assertEquals([$targetContactIDs[0] => 'Anderson, Anthony'], $activities[1]['target_contact_name']);
     }
 
   }
@@ -611,12 +591,11 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'rowCount' => 0,
       'sort' => NULL,
     );
-    $activitiesDep = CRM_Activity_BAO_Activity::deprecatedGetActivities($params);
 
     //since we are loading activities from dataset, we know total number of activities for this contact
     // 5 activities, Contact Summary should show all activities
     $count = 5;
-    foreach (array($activitiesDep, CRM_Activity_BAO_Activity::getActivities($params)) as $activities) {
+    foreach (array(CRM_Activity_BAO_Activity::getActivities($params)) as $activities) {
 
       $this->assertEquals($count, count($activities));
 
@@ -723,11 +702,10 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     );
 
     foreach ($testCases as $caseName => $testCase) {
-      $activitiesDep = CRM_Activity_BAO_Activity::deprecatedGetActivities($testCase['params']);
-      $activityCount = CRM_Activity_BAO_Activity::deprecatedGetActivitiesCount($testCase['params']);
+      $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($testCase['params']);
       $activitiesNew = CRM_Activity_BAO_Activity::getActivities($testCase['params']);
 
-      foreach (array($activitiesDep, $activitiesNew) as $activities) {
+      foreach (array($activitiesNew) as $activities) {
         //$this->assertEquals($activityCount, CRM_Activity_BAO_Activity::getActivitiesCount($testCase['params']));
         if ($caseName == 'with-no-activity') {
           $this->assertEquals(0, count($activities));
@@ -781,6 +759,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * CRM-20793 : Test getActivities by using activity date and status filter
    */
   public function testByActivityDateAndStatus() {
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view all contacts', 'access CiviCRM'];
     $op = new PHPUnit_Extensions_Database_Operation_Insert();
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
@@ -828,7 +807,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',
-          'activity_date_relative' => 'this.day',
+          'activity_date_time_relative' => 'this.day',
           'activity_type_id' => NULL,
           'offset' => 0,
           'rowCount' => 0,
@@ -841,8 +820,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',
-          'activity_date_low' => date('Y/m/d', strtotime('yesterday')),
-          'activity_date_high' => date('Y/m/d'),
+          'activity_date_time_low' => date('Y/m/d', strtotime('yesterday')),
+          'activity_date_time_high' => date('Y/m/d'),
           'activity_type_id' => NULL,
           'offset' => 0,
           'rowCount' => 0,
@@ -855,7 +834,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',
-          'activity_date_relative' => 'previous.week',
+          'activity_date_time_relative' => 'previous.week',
           'activity_type_id' => NULL,
           'offset' => 0,
           'rowCount' => 0,
@@ -868,7 +847,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
           'admin' => TRUE,
           'caseId' => NULL,
           'context' => 'activity',
-          'activity_date_relative' => 'this.quarter',
+          'activity_date_time_relative' => 'this.quarter',
           'activity_type_id' => NULL,
           'offset' => 0,
           'rowCount' => 0,
@@ -891,34 +870,37 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     );
 
     foreach ($testCases as $caseName => $testCase) {
-      $activitiesDep = CRM_Activity_BAO_Activity::deprecatedGetActivities($testCase['params']);
-      $activityCount = CRM_Activity_BAO_Activity::deprecatedGetActivitiesCount($testCase['params']);
-      asort($activitiesDep);
-      $activityIDs = array_keys($activitiesDep);
+      CRM_Utils_Date::convertFormDateToApiFormat($testCase['params'], 'activity_date_time', FALSE);
+      $activities = CRM_Activity_BAO_Activity::getActivities($testCase['params']);
+      $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($testCase['params']);
+      asort($activities);
+      $activityIDs = array_keys($activities);
 
       if ($caseName == 'todays-activity' || $caseName == 'todays-activity-filtered-by-range') {
-        $this->assertEquals(count($todayActivities), $activityCount);
-        $this->assertEquals(count($todayActivities), count($activitiesDep));
-        $this->checkArrayEquals($todayActivities, $activityIDs);
+        // Only one of the 4 activities today relates to contact id 1.
+        $this->assertEquals(1, $activityCount);
+        $this->assertEquals(1, count($activities));
+        $this->assertEquals([7], array_keys($activities));
       }
       elseif ($caseName == 'last-week-activity') {
-        $this->assertEquals(count($lastWeekActivities), $activityCount);
-        $this->assertEquals(count($lastWeekActivities), count($activitiesDep));
-        $this->checkArrayEquals($lastWeekActivities, $activityIDs);
+        // Only one of the 3 activities today relates to contact id 1.
+        $this->assertEquals(1, $activityCount);
+        $this->assertEquals(1, count($activities));
+        $this->assertEquals([1], $activityIDs);
       }
       elseif ($caseName == 'lhis-quarter-activity') {
         $this->assertEquals(count($lastTwoMonthsActivities), $activityCount);
-        $this->assertEquals(count($lastTwoMonthsActivities), count($activitiesDep));
+        $this->assertEquals(count($lastTwoMonthsActivities), count($activities));
         $this->checkArrayEquals($lastTwoMonthsActivities, $activityIDs);
       }
       elseif ($caseName == 'last-or-next-year-activity') {
         $this->assertEquals(count($lastOrNextYearActivities), $activityCount);
-        $this->assertEquals(count($lastOrNextYearActivities), count($activitiesDep));
+        $this->assertEquals(count($lastOrNextYearActivities), count($activities));
         $this->checkArrayEquals($lastOrNextYearActivities, $activityIDs);
       }
       elseif ($caseName == 'activity-of-all-statuses') {
-        $this->assertEquals(16, $activityCount);
-        $this->assertEquals(16, count($activitiesDep));
+        $this->assertEquals(3, $activityCount);
+        $this->assertEquals(3, count($activities));
       }
     }
   }
@@ -939,8 +921,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     foreach ($dates as $date) {
       $this->activityCreate(['activity_date_time' => $date]);
     }
-    $activitiesDep = CRM_Activity_BAO_Activity::deprecatedGetActivities($params);
-    $activityCount = CRM_Activity_BAO_Activity::deprecatedGetActivitiesCount($params);
+    $activitiesDep = CRM_Activity_BAO_Activity::getActivities($params);
+    $activityCount = CRM_Activity_BAO_Activity::getActivitiesCount($params);
     $this->assertEquals(count($activitiesDep), $activityCount);
     foreach ($activitiesDep as $activity) {
       $this->assertTrue(strtotime($activity['activity_date_time']) >= $expected['earliest'], $activity['activity_date_time'] . ' should be no earlier than ' . date('Y-m-d H:i:s', $expected['earliest']));

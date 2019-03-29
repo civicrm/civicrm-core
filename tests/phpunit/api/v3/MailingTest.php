@@ -195,11 +195,11 @@ class api_v3_MailingTest extends CiviUnitTestCase {
 
     // ** Pass 1: Create
     $createParams = $this->_params;
-    $createParams['groups']['include'] = array($groupIDs['a']);
-    $createParams['groups']['exclude'] = array();
-    $createParams['mailings']['include'] = array();
-    $createParams['mailings']['exclude'] = array();
-    $createParams['api.mailing_job.create'] = 1;
+    $createParams['groups']['include'] = [$groupIDs['a']];
+    $createParams['groups']['exclude'] = [];
+    $createParams['mailings']['include'] = [];
+    $createParams['mailings']['exclude'] = [];
+    $createParams['scheduled_date'] = 'now';
     $createResult = $this->callAPISuccess('Mailing', 'create', $createParams);
     $getGroup1 = $this->callAPISuccess('MailingGroup', 'get', array('mailing_id' => $createResult['id']));
     $getGroup1_ids = array_values(CRM_Utils_Array::collect('entity_id', $getGroup1['values']));
@@ -225,7 +225,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $updateParams = $createParams;
     $updateParams['id'] = $createResult['id'];
     $updateParams['groups']['include'] = array($groupIDs['b']);
-    $updateParams['api.mailing_job.create'] = 1;
+    $updateParams['scheduled_date'] = 'now';
     $this->callAPISuccess('Mailing', 'create', $updateParams);
     $getGroup3 = $this->callAPISuccess('MailingGroup', 'get', array('mailing_id' => $createResult['id']));
     $getGroup3_ids = array_values(CRM_Utils_Array::collect('entity_id', $getGroup3['values']));

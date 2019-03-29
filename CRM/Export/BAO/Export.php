@@ -124,7 +124,7 @@ class CRM_Export_BAO_Export {
    *   Group By Clause
    */
   public static function getGroupBy($processor, $returnProperties, $query) {
-    $groupBy = '';
+    $groupBy = NULL;
     $exportMode = $processor->getExportMode();
     $queryMode = $processor->getQueryMode();
     if (!empty($returnProperties['tags']) || !empty($returnProperties['groups']) ||
@@ -140,7 +140,7 @@ class CRM_Export_BAO_Export {
         $groupBy = 'civicrm_contribution.id';
         if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
           // especial group by  when soft credit columns are included
-          $groupBy = array('contribution_search_scredit_combined.id', 'contribution_search_scredit_combined.scredit_id');
+          $groupBy = ['contribution_search_scredit_combined.id', 'contribution_search_scredit_combined.scredit_id'];
         }
         break;
 
@@ -157,7 +157,7 @@ class CRM_Export_BAO_Export {
       $groupBy = "civicrm_activity.id ";
     }
 
-    return $groupBy ? ' GROUP BY ' . $groupBy : '';
+    return $groupBy ? ' GROUP BY ' . implode(', ', (array) $groupBy) : '';
   }
 
   /**
@@ -633,8 +633,8 @@ FROM   $tableName
       }
       $sqlClause[] = '(' . implode(',', $valueString) . ')';
     }
-
-    $sqlColumnString = '(id, ' . implode(',', array_keys($sqlColumns)) . ')';
+    $sqlColumns = array_merge(['id' => 1], $sqlColumns);
+    $sqlColumnString = '(' . implode(',', array_keys($sqlColumns)) . ')';
 
     $sqlValueString = implode(",\n", $sqlClause);
 
@@ -652,21 +652,18 @@ VALUES $sqlValueString
    */
   public static function createTempTable($sqlColumns) {
     //creating a temporary table for the search result that need be exported
-    $exportTempTable = CRM_Utils_SQL_TempTable::build()->setDurable()->setCategory('export')->getName();
+    $exportTempTable = CRM_Utils_SQL_TempTable::build()->setDurable()->setCategory('export')->setUtf8();
 
     // also create the sql table
-    $sql = "DROP TABLE IF EXISTS {$exportTempTable}";
-    CRM_Core_DAO::executeQuery($sql);
+    $exportTempTable->drop();
 
-    $sql = "
-CREATE TABLE {$exportTempTable} (
-     id int unsigned NOT NULL AUTO_INCREMENT,
-";
-    $sql .= implode(",\n", array_values($sqlColumns));
+    $sql = " id int unsigned NOT NULL AUTO_INCREMENT, ";
+    if (!empty($sqlColumns)) {
+      $sql .= implode(",\n", array_values($sqlColumns)) . ',';
+    }
 
-    $sql .= ",
-  PRIMARY KEY ( id )
-";
+    $sql .= "\n PRIMARY KEY ( id )";
+
     // add indexes for street_address and household_name if present
     $addIndices = array(
       'street_address',
@@ -682,12 +679,8 @@ CREATE TABLE {$exportTempTable} (
       }
     }
 
-    $sql .= "
-) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
-";
-
-    CRM_Core_DAO::executeQuery($sql);
-    return $exportTempTable;
+    $exportTempTable->createWithColumns($sql);
+    return $exportTempTable->getName();
   }
 
   /**

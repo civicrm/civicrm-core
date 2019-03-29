@@ -84,19 +84,19 @@ function civicrm_api3_case_contact_delete($params) {
  * @return array
  */
 function _civicrm_api3_case_contact_getlist_output($result, $request, $entity, $fields) {
-  $output = array();
+  $output = [];
   if (!empty($result['values'])) {
     foreach ($result['values'] as $row) {
-      $data = array(
+      $data = [
         'id' => $row[$request['id_field']],
         'label' => $row[$request['label_field']] . ' - ' . $row['case_id.case_type_id.title'],
-      );
+      ];
       $status = CRM_Core_PseudoConstant::getLabel('CRM_Case_BAO_Case', 'status_id', $row['case_id.status_id']);
       $date = CRM_Utils_Date::customFormat($row['case_id.start_date']);
-      $data['description'] = array(
-        "#{$row['case_id']}: $status " . ts('(opened %1)', array(1 => $date)),
+      $data['description'] = [
+        "#{$row['case_id']}: $status " . ts('(opened %1)', [1 => $date]),
         $row['case_id.subject'],
-      );
+      ];
       if (!empty($request['image_field'])) {
         $data['image'] = isset($row[$request['image_field']]) ? $row[$request['image_field']] : '';
       }

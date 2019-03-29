@@ -494,7 +494,7 @@ class CRM_Contact_Form_Search_Criteria {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form_Search $form
    */
   public static function demographics(&$form) {
     $form->add('hidden', 'hidden_demographics', 1);
@@ -509,11 +509,11 @@ class CRM_Contact_Form_Search_Criteria {
     }
     $form->addGroup($genderOptions, 'gender_id', ts('Gender'))->setAttribute('allowClear', TRUE);
 
-    $form->add('text', 'age_low', ts('Min Age'), array('size' => 6));
+    $form->add('number', 'age_low', ts('Min Age'), ['class' => 'four', 'min' => 0]);
     $form->addRule('age_low', ts('Please enter a positive integer'), 'positiveInteger');
-    $form->add('text', 'age_high', ts('Max Age'), array('size' => 6));
+    $form->add('number', 'age_high', ts('Max Age'), ['class' => 'four', 'min' => 0]);
     $form->addRule('age_high', ts('Please enter a positive integer'), 'positiveInteger');
-    $form->addDate('age_asof_date', ts('Age as of Date'), FALSE, array('formatType' => 'searchDate'));
+    $form->add('datepicker', 'age_asof_date', ts('As of'), NULL, FALSE, ['time' => FALSE]);
 
     CRM_Core_Form_Date::buildDateRange($form, 'birth_date', 1, '_low', '_high', ts('From'), FALSE, FALSE, 'birth');
 

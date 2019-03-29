@@ -1,4 +1,13 @@
 {
+  "uk.squiffle.kam": {
+    "obsolete": "5.12"
+  },
+  "com.aghstrategies.slicknav": {
+    "obsolete": "5.12"
+  },
+  "de.systopia.recentitems": {
+    "obsolete": "5.12"
+  },
   "com.ixiam.modules.quicksearch": {
     "obsolete": "5.8"
   }

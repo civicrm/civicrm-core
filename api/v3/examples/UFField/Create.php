@@ -6,7 +6,7 @@
  *   API result array
  */
 function uf_field_create_example() {
-  $params = array(
+  $params = [
     'field_name' => 'phone',
     'field_type' => 'Contact',
     'visibility' => 'Public Pages and Listings',
@@ -17,7 +17,7 @@ function uf_field_create_example() {
     'location_type_id' => 1,
     'phone_type_id' => 1,
     'uf_group_id' => 11,
-  );
+  ];
 
   try{
     $result = civicrm_api3('UFField', 'create', $params);
@@ -27,12 +27,12 @@ function uf_field_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -46,13 +46,13 @@ function uf_field_create_example() {
  */
 function uf_field_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'uf_group_id' => '11',
         'field_name' => 'phone',
@@ -72,9 +72,9 @@ function uf_field_create_expectedresult() {
         'field_type' => 'Contact',
         'is_reserved' => '',
         'is_multi_summary' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

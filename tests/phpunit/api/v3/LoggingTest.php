@@ -157,6 +157,11 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $this->assertEquals(array(), $spec['civicrm_contact']);
     $this->callAPISuccess('System', 'updatelogtables', array());
     $this->checkINNODBLogTableCreated();
+    // Check if API creates new indexes when they're added by hook
+    $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'innodbLogTableSpecNewIndex']);
+    $this->callAPISuccess('System', 'updatelogtables', array());
+    $this->checkINNODBLogTableCreated();
+    $this->assertContains('KEY `index_log_user_id` (`log_user_id`)', $this->checkLogTableCreated());
   }
 
   /**
@@ -196,6 +201,24 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
         'index_id' => 'id',
         'index_log_conn_id' => 'log_conn_id',
         'index_log_date' => 'log_date',
+      ),
+    );
+  }
+
+  /**
+   * Set log engine to InnoDB and add one index
+   *
+   * @param array $logTableSpec
+   */
+  public function innodbLogTableSpecNewIndex(&$logTableSpec) {
+    $logTableSpec['civicrm_contact'] = array(
+      'engine' => 'InnoDB',
+      'engine_config' => 'ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4',
+      'indexes' => array(
+        'index_id' => 'id',
+        'index_log_conn_id' => 'log_conn_id',
+        'index_log_date' => 'log_date',
+        'index_log_user_id' => 'log_user_id', // new index
       ),
     );
   }
@@ -273,6 +296,9 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   public function testRevert() {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
+    // Pause for one second here to ensure the timestamps between the first create action
+    // and the second differ.
+    sleep(1);
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'woot'");
     $timeStamp = date('Y-m-d H:i:s');
     $this->callAPISuccess('Contact', 'create', array(
@@ -292,6 +318,9 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   public function testRevertNoDate() {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
+    // Pause for one second here to ensure the timestamps between the first create action
+    // and the second differ.
+    sleep(1);
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'Wot woot'");
     $this->callAPISuccess('Contact', 'create', array(
         'id' => $contactId,
@@ -406,6 +435,9 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'wooty wop wop'");
+    // Perhaps if initialize & create are exactly the same time it can't cope.
+    // 1 second delay
+    sleep(1);
     $this->callAPISuccess('Contact', 'create', array(
         'id' => $contactId,
         'first_name' => 'Dopey',
@@ -437,7 +469,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
         return TRUE;
       }
     }
-    throw new CRM_Core_Exception("No match found for key : $expectKey with value : $expectValue");
+    throw new CRM_Core_Exception("No match found for key : $expectKey with value : $expectValue" . print_r($diffs, 1));
   }
 
   /**

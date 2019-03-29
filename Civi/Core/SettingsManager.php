@@ -70,7 +70,7 @@ class SettingsManager {
    * @var
    *   Array (int $id => SettingsBag $bag).
    */
-  protected $bagsByDomain = array(), $bagsByContact = array();
+  protected $bagsByDomain = [], $bagsByContact = [];
 
   /**
    * @var array|NULL
@@ -219,10 +219,10 @@ class SettingsManager {
     $cacheKey = 'defaults_' . $entity;
     $defaults = $this->cache->get($cacheKey);
     if (!is_array($defaults)) {
-      $specs = SettingsMetadata::getMetadata(array(
+      $specs = SettingsMetadata::getMetadata([
         'is_contact' => ($entity === 'contact' ? 1 : 0),
-      ));
-      $defaults = array();
+      ]);
+      $defaults = [];
       foreach ($specs as $key => $spec) {
         $defaults[$key] = \CRM_Utils_Array::value('default', $spec);
       }
@@ -266,12 +266,12 @@ class SettingsManager {
    * @return array
    */
   public static function parseMandatorySettings($civicrm_setting) {
-    $result = array(
-      'domain' => array(),
-      'contact' => array(),
-    );
+    $result = [
+      'domain' => [],
+      'contact' => [],
+    ];
 
-    $rewriteGroups = array(
+    $rewriteGroups = [
       //\CRM_Core_BAO_Setting::ADDRESS_STANDARDIZATION_PREFERENCES_NAME => 'domain',
       //\CRM_Core_BAO_Setting::CAMPAIGN_PREFERENCES_NAME => 'domain',
       //\CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME => 'domain',
@@ -290,7 +290,7 @@ class SettingsManager {
       //\CRM_Core_BAO_Setting::URL_PREFERENCES_NAME => 'domain',
       'domain' => 'domain',
       'contact' => 'contact',
-    );
+    ];
 
     if (is_array($civicrm_setting)) {
       foreach ($civicrm_setting as $oldGroup => $values) {
@@ -341,12 +341,12 @@ class SettingsManager {
    * @return array
    */
   private static function getSystemDefaults($entity) {
-    $defaults = array();
+    $defaults = [];
     switch ($entity) {
       case 'domain':
-        $defaults = array(
+        $defaults = [
           'installed' => FALSE,
-          'enable_components' => array('CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'),
+          'enable_components' => ['CiviEvent', 'CiviContribute', 'CiviMember', 'CiviMail', 'CiviReport', 'CiviPledge'],
           'customFileUploadDir' => '[civicrm.files]/custom/',
           'imageUploadDir' => '[civicrm.files]/persist/contribute/',
           'uploadDir' => '[civicrm.files]/upload/',
@@ -355,7 +355,7 @@ class SettingsManager {
           'extensionsURL' => '[civicrm.files]/ext/',
           'resourceBase' => '[civicrm.root]/',
           'userFrameworkResourceURL' => '[civicrm.root]/',
-        );
+        ];
         break;
 
     }

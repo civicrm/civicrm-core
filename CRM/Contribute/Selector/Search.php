@@ -181,6 +181,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
     $this->_action = $action;
     $returnProperties = CRM_Contribute_BAO_Query::selectorReturnProperties($this->_queryParams);
     $this->_includeSoftCredits = CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($this->_queryParams);
+    $this->_queryParams[] = ['contribution_id', '!=', 0, 0, 0];
     $this->_query = new CRM_Contact_BAO_Query(
       $this->_queryParams,
       $returnProperties,
@@ -563,14 +564,16 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
             'field_name' => 'contribution_status',
             'direction' => CRM_Utils_Sort::DONTCARE,
           ),
-          array(
-            'name' => ts('Premium'),
-            'sort' => 'product_name',
-            'field_name' => 'product_name',
-            'direction' => CRM_Utils_Sort::DONTCARE,
-          ),
         )
       );
+    if (CRM_Contribute_BAO_Query::isSiteHasProducts()) {
+      self::$_columnHeaders[] = [
+        'name' => ts('Premium'),
+        'sort' => 'product_name',
+        'field_name' => 'product_name',
+        'direction' => CRM_Utils_Sort::DONTCARE,
+      ];
+    }
     if (!$this->_single) {
       $pre = array(
         array(
@@ -617,7 +620,7 @@ class CRM_Contribute_Selector_Search extends CRM_Core_Selector_Base implements C
    * @return mixed
    */
   public function alphabetQuery() {
-    return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
+    return $this->_query->alphabetQuery();
   }
 
   /**

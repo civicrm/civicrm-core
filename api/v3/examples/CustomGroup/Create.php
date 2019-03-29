@@ -6,19 +6,19 @@
  *   API result array
  */
 function custom_group_create_example() {
-  $params = array(
+  $params = [
     'title' => 'Test_Group_1',
     'name' => 'test_group_1',
-    'extends' => array(
+    'extends' => [
       '0' => 'Individual',
-    ),
+    ],
     'weight' => 4,
     'collapse_display' => 1,
     'style' => 'Inline',
     'help_pre' => 'This is Pre Help For Test Group 1',
     'help_post' => 'This is Post Help For Test Group 1',
     'is_active' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('CustomGroup', 'create', $params);
@@ -28,12 +28,12 @@ function custom_group_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -47,13 +47,13 @@ function custom_group_create_example() {
  */
 function custom_group_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'name' => 'test_group_1',
         'title' => 'Test_Group_1',
@@ -74,9 +74,9 @@ function custom_group_create_expectedresult() {
         'created_id' => '',
         'created_date' => '',
         'is_reserved' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

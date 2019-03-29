@@ -29,8 +29,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
  */
 
 /**
@@ -975,6 +973,9 @@ class CRM_Core_Permission {
       'getquick' => array(
         array('access CiviCRM', 'access AJAX API'),
       ),
+      'duplicatecheck' => array(
+        'access CiviCRM',
+      ),
     );
 
     // CRM-16963 - Permissions for country.
@@ -1052,6 +1053,7 @@ class CRM_Core_Permission {
         'view all activities',
       ),
     );
+    $permissions['activity_contact'] = $permissions['activity'];
 
     // Case permissions
     $permissions['case'] = array(

@@ -165,7 +165,7 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
       );
 
       // weight
-      $this->add('text', "option_weight[$i]", ts('Order'),
+      $this->add('number', "option_weight[$i]", ts('Order'),
         $optionAttributes['weight']
       );
 

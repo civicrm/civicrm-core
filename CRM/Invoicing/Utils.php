@@ -94,4 +94,15 @@ class CRM_Invoicing_Utils {
     return CRM_Utils_Array::value('default_invoice_page', $invoiceSettings);
   }
 
+  /**
+   * Function to get the tax term.
+   *
+   * The value is nested in the contribution_invoice_settings setting - which
+   * is unsupported. Here we have a wrapper function to make later cleanup easier.
+   */
+  public static function getTaxTerm() {
+    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
+    return CRM_Utils_Array::value('tax_term', $invoiceSettings);
+  }
+
 }

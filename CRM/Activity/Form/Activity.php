@@ -159,7 +159,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         'type' => 'text',
         'label' => ts('Subject'),
         'attributes' => CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity',
-          'subject'
+          'activity_subject'
         ),
       ),
       'duration' => array(
@@ -792,31 +792,26 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       // form should be frozen for view mode
       $this->freeze();
 
-      $buttons = array();
-      $buttons[] = array(
-        'type' => 'cancel',
-        'name' => ts('Done'),
-      );
-      $this->addButtons($buttons);
+      $this->addButtons([
+        [
+          'type' => 'cancel',
+          'name' => ts('Done'),
+        ],
+      ]);
     }
     else {
-      $message = array(
-        'completed' => ts('Are you sure? This is a COMPLETED activity with the DATE in the FUTURE. Click Cancel to change the date / status. Otherwise, click OK to save.'),
-        'scheduled' => ts('Are you sure? This is a SCHEDULED activity with the DATE in the PAST. Click Cancel to change the date / status. Otherwise, click OK to save.'),
-      );
-      $js = array('onclick' => "return activityStatus(" . json_encode($message) . ");");
-      $this->addButtons(array(
-        array(
+      $this->addButtons([
+        [
           'type' => 'upload',
           'name' => ts('Save'),
-          'js' => $js,
           'isDefault' => TRUE,
-        ),
-        array(
+          'submitOnce' => TRUE,
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      ));
+        ],
+      ]);
     }
 
     if ($this->_activityTypeFile) {

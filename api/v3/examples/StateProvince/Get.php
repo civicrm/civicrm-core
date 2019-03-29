@@ -6,9 +6,9 @@
  *   API result array
  */
 function state_province_get_example() {
-  $params = array(
+  $params = [
     'name' => 'Wessex',
-  );
+  ];
 
   try{
     $result = civicrm_api3('StateProvince', 'get', $params);
@@ -18,12 +18,12 @@ function state_province_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,20 +37,20 @@ function state_province_get_example() {
  */
 function state_province_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 13949,
-    'values' => array(
-      '13949' => array(
+    'values' => [
+      '13949' => [
         'id' => '13949',
         'name' => 'Wessex',
         'abbreviation' => 'WEX',
         'country_id' => '1226',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

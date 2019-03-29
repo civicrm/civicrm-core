@@ -147,8 +147,8 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
   }
 
   public function buildTempTable() {
-    $randomNum = md5(uniqid());
-    $this->_tableName = "civicrm_temp_custom_details_{$randomNum}";
+    $table = CRM_Utils_SQL_TempTable::build()->setCategory('custom')->setMemory()->setUtf8();
+    $this->_tableName = $table->getName();
 
     $this->_tableFields = array(
       'id' => 'int unsigned NOT NULL AUTO_INCREMENT',
@@ -200,7 +200,6 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
     );
 
     $sql = "
-CREATE TEMPORARY TABLE {$this->_tableName} (
 ";
 
     foreach ($this->_tableFields as $name => $desc) {
@@ -209,21 +208,19 @@ CREATE TEMPORARY TABLE {$this->_tableName} (
 
     $sql .= "
   PRIMARY KEY ( id )
-) ENGINE=HEAP DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
 ";
-    CRM_Core_DAO::executeQuery($sql);
+    $table->createWithColumns($sql);
 
-    $this->_entityIDTableName = "civicrm_temp_custom_entityID_{$randomNum}";
+    $entityIdTable = CRM_Utils_SQL_TempTable::build()->setCategory('custom')->setMemory()->setUtf8();
+    $this->_entityIDTableName = $entityIdTable->getName();
     $sql = "
-CREATE TEMPORARY TABLE {$this->_entityIDTableName} (
   id int unsigned NOT NULL AUTO_INCREMENT,
   entity_id int unsigned NOT NULL,
 
   UNIQUE INDEX unique_entity_id ( entity_id ),
   PRIMARY KEY ( id )
-) ENGINE=HEAP DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
 ";
-    CRM_Core_DAO::executeQuery($sql);
+    $entityIdTable->createWithColumns($sql);
 
     if (!empty($this->_formValues['is_unit_test'])) {
       $this->_tableNameForTest = $this->_tableName;

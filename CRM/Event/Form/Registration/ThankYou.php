@@ -96,9 +96,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     }
     $this->assignToTemplate();
 
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $invoicing = CRM_Invoicing_Utils::isInvoicingEnabled();
     $getTaxDetails = FALSE;
     $taxAmount = 0;
 
@@ -129,7 +127,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     if ($invoicing) {
       $this->assign('getTaxDetails', $getTaxDetails);
       $this->assign('totalTaxAmount', $taxAmount);
-      $this->assign('taxTerm', $taxTerm);
+      $this->assign('taxTerm', CRM_Invoicing_Utils::getTaxTerm());
     }
     $this->assign('totalAmount', $this->_totalAmount);
 

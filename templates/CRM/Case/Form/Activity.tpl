@@ -30,10 +30,6 @@
   {if $action neq 8 and $action  neq 32768 }
   {* Include form buttons on top for new and edit modes. *}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-
-    {* added onload javascript for source contact*}
-    {include file="CRM/Activity/Form/ActivityJs.tpl" tokenContext="case_activity"}
-
   {/if}
 
   {if $action eq 8 or $action eq 32768 }

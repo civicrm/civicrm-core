@@ -273,21 +273,21 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
       $cacheKey = "civicrm search {$this->_key}";
       Civi::service('prevnext')->deleteItem(NULL, $cacheKey, 'civicrm_contact');
 
-      $sql = $this->_query->searchQuery(0, 0, $sort,
+      $sql = $this->_query->getSearchSQLParts(0, 0, $sort,
         FALSE, FALSE,
         FALSE, FALSE,
-        TRUE, $this->_campaignWhereClause,
+        $this->_campaignWhereClause,
         NULL,
         $this->_campaignFromClause
       );
-      list($select, $from) = explode(' FROM ', $sql);
+
       $selectSQL = "
-      SELECT '$cacheKey', contact_a.id, contact_a.display_name
-FROM {$from}
+      SELECT %1, contact_a.id, contact_a.display_name
+FROM {$sql['from']}
 ";
 
       try {
-        Civi::service('prevnext')->fillWithSql($cacheKey, $selectSQL);
+        Civi::service('prevnext')->fillWithSql($cacheKey, $selectSQL, [1 => [$cacheKey, 'String']]);
       }
       catch (CRM_Core_Exception $e) {
         // Heavy handed, no? Seems like this merits an explanation.

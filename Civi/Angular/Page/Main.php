@@ -76,10 +76,10 @@ class Main extends \CRM_Core_Page {
   public function registerResources() {
     $loader = new \Civi\Angular\AngularLoader();
     $loader->setPageName('civicrm/a');
-    $loader->useApp(array(
+    $loader->useApp([
       'activeRoute' => \CRM_Utils_Request::retrieve('route', 'String'),
       'defaultRoute' => NULL,
-    ));
+    ]);
     $loader->load();
 
   }

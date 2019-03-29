@@ -64,8 +64,14 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *
    * @return object
    *   The data if present in cache, else null
+   * @deprecated
    */
   public static function &getItem($group, $path, $componentID = NULL) {
+    if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
+      $value = $adapter::getItem($group, $path, $componentID);
+      return $value;
+    }
+
     if (self::$_cache === NULL) {
       self::$_cache = array();
     }
@@ -101,8 +107,13 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *
    * @return object
    *   The data if present in cache, else null
+   * @deprecated
    */
   public static function &getItems($group, $componentID = NULL) {
+    if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
+      return $adapter::getItems($group, $componentID);
+    }
+
     if (self::$_cache === NULL) {
       self::$_cache = array();
     }
@@ -121,7 +132,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
         while ($dao->fetch()) {
           $result[$dao->path] = self::decode($dao->data);
         }
-        $dao->free();
 
         self::$_cache[$argString] = $result;
         $cache->set($cleanKey, self::$_cache[$argString]);
@@ -142,8 +152,13 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *   (required) The path under which this item is stored.
    * @param int $componentID
    *   The optional component ID (so componenets can share the same name space).
+   * @deprecated
    */
   public static function setItem(&$data, $group, $path, $componentID = NULL) {
+    if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
+      return $adapter::setItem($data, $group, $path, $componentID);
+    }
+
     if (self::$_cache === NULL) {
       self::$_cache = array();
     }
@@ -186,8 +201,6 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
 
     $lock->release();
 
-    $dao->free();
-
     // cache coherency - refresh or remove dependent caches
 
     $argString = "CRM_CT_{$group}_{$path}_{$componentID}";
@@ -209,11 +222,17 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @param string $path
    *   Path of the item that needs to be deleted.
    * @param bool $clearAll clear all caches
+   * @deprecated
    */
   public static function deleteGroup($group = NULL, $path = NULL, $clearAll = TRUE) {
-    $table = self::getTableName();
-    $where = self::whereCache($group, $path, NULL);
-    CRM_Core_DAO::executeQuery("DELETE FROM $table WHERE $where");
+    if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
+      return $adapter::deleteGroup($group, $path);
+    }
+    else {
+      $table = self::getTableName();
+      $where = self::whereCache($group, $path, NULL);
+      CRM_Core_DAO::executeQuery("DELETE FROM $table WHERE $where");
+    }
 
     if ($clearAll) {
       // also reset ACL Cache

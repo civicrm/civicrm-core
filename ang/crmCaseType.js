@@ -248,12 +248,13 @@
     };
   });
 
-  crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls) {
+  crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls, crmUiHelp) {
     var defaultAssigneeDefaultValue, ts;
 
     (function init () {
 
       ts = $scope.ts = CRM.ts(null);
+      $scope.hs = crmUiHelp({file: 'CRM/Case/CaseType'});
       $scope.locks = { caseTypeName: true, activitySetName: true };
       $scope.workflows = { timeline: 'Timeline', sequence: 'Sequence' };
       defaultAssigneeDefaultValue = _.find(apiCalls.defaultAssigneeTypes.values, { is_default: '1' }) || {};
@@ -301,6 +302,8 @@
       $scope.caseType.definition.caseRoles = $scope.caseType.definition.caseRoles || [];
       $scope.caseType.definition.statuses = $scope.caseType.definition.statuses || [];
       $scope.caseType.definition.timelineActivityTypes = $scope.caseType.definition.timelineActivityTypes || [];
+      $scope.caseType.definition.restrictActivityAsgmtToCmsUser = $scope.caseType.definition.restrictActivityAsgmtToCmsUser || 0;
+      $scope.caseType.definition.activityAsgmtGrps = $scope.caseType.definition.activityAsgmtGrps || [];
 
       _.each($scope.caseType.definition.activitySets, function (set) {
         _.each(set.activityTypes, function (type, name) {
@@ -422,11 +425,12 @@
         } else {
            CRM.loadForm(CRM.url('civicrm/admin/reltype', {action: 'add', reset: 1, label_a_b: roleName}))
             .on('crmFormSuccess', function(e, data) {
+              var newType = _.values(data.relationshipType)[0];
               // Assume that the case role should be A-B but add both directions as options.
-              roles.push({name: data.relationshipType[Object.keys(data.relationshipType)[0]].label_a_b});
-              $scope.relationshipTypeOptions.push({id: data.relationshipType.label_a_b, text: data.relationshipType.label_a_b});
-              if (data.relationshipType.label_a_b != data.relationshipType.label_b_a) {
-                $scope.relationshipTypeOptions.push({id: data.relationshipType.label_b_a, text: data.relationshipType.label_b_a});
+              roles.push({name: newType['label_a_b']});
+              $scope.relationshipTypeOptions.push({id: newType['label_a_b'], text: newType['label_a_b']});
+              if (newType['label_a_b'] != newType['label_b_a']) {
+                $scope.relationshipTypeOptions.push({id: newType['label_b_a'], text: newType['label_b_a']});
               }
               $scope.$digest();
             });
@@ -518,6 +522,11 @@
       });
       // Ignore if ALL or NONE selected
       $scope.caseType.definition.statuses = selectedStatuses.length == _.size($scope.selectedStatuses) ? [] : selectedStatuses;
+
+      if ($scope.caseType.definition.activityAsgmtGrps) {
+        $scope.caseType.definition.activityAsgmtGrps = $scope.caseType.definition.activityAsgmtGrps.toString().split(",");
+      }
+
       var result = crmApi('CaseType', 'create', $scope.caseType, true);
       result.then(function(data) {
         if (data.is_error === 0 || data.is_error == '0') {

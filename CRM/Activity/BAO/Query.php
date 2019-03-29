@@ -288,8 +288,10 @@ class CRM_Activity_BAO_Query {
       case 'activity_date':
       case 'activity_date_low':
       case 'activity_date_high':
+      case 'activity_date_time_low':
+      case 'activity_date_time_high':
         $query->dateQueryBuilder($values,
-          'civicrm_activity', 'activity_date', 'activity_date_time', ts('Activity Date')
+          'civicrm_activity', str_replace(['_high', '_low'], '', $name), 'activity_date_time', ts('Activity Date')
         );
         break;
 
@@ -440,7 +442,7 @@ class CRM_Activity_BAO_Query {
    * rather than a static function.
    */
   public static function getSearchFieldMetadata() {
-    $fields = ['activity_type_id'];
+    $fields = ['activity_type_id', 'activity_date_time'];
     $metadata = civicrm_api3('Activity', 'getfields', [])['values'];
     return array_intersect_key($metadata, array_flip($fields));
   }
@@ -453,10 +455,6 @@ class CRM_Activity_BAO_Query {
   public static function buildSearchForm(&$form) {
     $form->addSearchFieldMetadata(['Activity' => self::getSearchFieldMetadata()]);
     $form->addFormFieldsFromMetadata();
-
-    CRM_Core_Form_Date::buildDateRange($form, 'activity_date', 1, '_low', '_high', ts('From'), FALSE, FALSE);
-    $form->addElement('hidden', 'activity_date_range_error');
-    $form->addFormRule(array('CRM_Activity_BAO_Query', 'formRule'), $form);
 
     $followUpActivity = array(
       1 => ts('Yes'),
@@ -629,27 +627,6 @@ class CRM_Activity_BAO_Query {
     );
 
     return $properties;
-  }
-
-  /**
-   * Custom form rules.
-   *
-   * @param array $fields
-   * @param array $files
-   * @param CRM_Core_Form $form
-   *
-   * @return bool|array
-   */
-  public static function formRule($fields, $files, $form) {
-    $errors = array();
-
-    if (empty($fields['activity_date_low']) || empty($fields['activity_date_high'])) {
-      return TRUE;
-    }
-
-    CRM_Utils_Rule::validDateRange($fields, 'activity_date', $errors, ts('Activity Date'));
-
-    return empty($errors) ? TRUE : $errors;
   }
 
   /**

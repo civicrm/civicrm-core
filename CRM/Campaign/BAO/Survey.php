@@ -504,7 +504,6 @@ SELECT  survey.id    as id,
         );
         $voterDetails[$contact->contactId]['contact_type'] = $image;
       }
-      $contact->free();
     }
 
     return $voterDetails;

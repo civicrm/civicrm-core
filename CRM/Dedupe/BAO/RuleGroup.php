@@ -63,6 +63,8 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    */
   var $noRules = FALSE;
 
+  protected $temporaryTables = [];
+
   /**
    * Return a structure holding the supported tables, fields and their titles
    *
@@ -72,7 +74,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
    * @return array
    *   a table-keyed array of field-keyed arrays holding supported fields' titles
    */
-  public static function &supportedFields($requestedType) {
+  public static function supportedFields($requestedType) {
     static $fields = NULL;
     if (!$fields) {
       // this is needed, as we're piggy-backing importableFields() below
@@ -114,6 +116,13 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
             $fields[$ctype][$table][$field] = $iField['title'];
           }
         }
+        // Note that most of the fields available come from 'importable fields' -
+        // I thought about making this field 'importable' but it felt like there might be unknown consequences
+        // so I opted for just adding it in & securing it with a unit test.
+        // Example usage of sort_name - It is possible to alter sort name via hook so 2 organization names might differ as in
+        // Justice League vs The Justice League but these could have the same sort_name if 'the the'
+        // exension is installed (https://github.com/eileenmcnaughton/org.wikimedia.thethe)
+        $fields[$ctype]['civicrm_contact']['sort_name'] = ts('Sort Name');
         // add custom data fields
         foreach (CRM_Core_BAO_CustomGroup::getTree($ctype, NULL, NULL, -1) as $key => $cg) {
           if (!is_int($key)) {
@@ -126,7 +135,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
       }
     }
     CRM_Utils_Hook::dupeQuery(CRM_Core_DAO::$_nullObject, 'supportedFields', $fields);
-    return $fields[$requestedType];
+    return !empty($fields[$requestedType]) ? $fields[$requestedType] : [];
   }
 
   /**
@@ -194,24 +203,25 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     $tableQueries = $this->tableQuery();
 
     if ($this->params && !$this->noRules) {
-      $tempTableQuery = "CREATE TEMPORARY TABLE dedupe (id1 int, weight int, UNIQUE UI_id1 (id1)) ENGINE=InnoDB";
-      $insertClause = "INSERT INTO dedupe (id1, weight)";
+      $this->temporaryTables['dedupe'] = CRM_Utils_SQL_TempTable::build()
+        ->setCategory('dedupe')
+        ->createWithColumns("id1 int, weight int, UNIQUE UI_id1 (id1)")->getName();
+      $insertClause = "INSERT INTO {$this->temporaryTables['dedupe']}  (id1, weight)";
       $groupByClause = "GROUP BY id1, weight";
       $dupeCopyJoin = " JOIN dedupe_copy ON dedupe_copy.id1 = t1.column WHERE ";
     }
     else {
-      $tempTableQuery = "CREATE TEMPORARY TABLE dedupe (id1 int, id2 int, weight int, UNIQUE UI_id1_id2 (id1, id2)) ENGINE=InnoDB";
-      $insertClause = "INSERT INTO dedupe (id1, id2, weight)";
+      $this->temporaryTables['dedupe'] = CRM_Utils_SQL_TempTable::build()
+        ->setCategory('dedupe')
+        ->createWithColumns("id1 int, id2 int, weight int, UNIQUE UI_id1_id2 (id1, id2)")->getName();
+      $insertClause = "INSERT INTO {$this->temporaryTables['dedupe']}  (id1, id2, weight)";
       $groupByClause = "GROUP BY id1, id2, weight";
       $dupeCopyJoin = " JOIN dedupe_copy ON dedupe_copy.id1 = t1.column AND dedupe_copy.id2 = t2.column WHERE ";
     }
     $patternColumn = '/t1.(\w+)/';
     $exclWeightSum = array();
 
-    // create temp table
     $dao = new CRM_Core_DAO();
-    $dao->query($tempTableQuery);
-
     CRM_Utils_Hook::dupeQuery($this, 'table', $tableQueries);
 
     while (!empty($tableQueries)) {
@@ -233,7 +243,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
           if ($searchWithinDupes) {
             // get prepared to search within already found dupes if $searchWithinDupes flag is set
             $dao->query("DROP TEMPORARY TABLE IF EXISTS dedupe_copy");
-            $dao->query("CREATE TEMPORARY TABLE dedupe_copy SELECT * FROM dedupe WHERE weight >= {$weightSum}");
+            $dao->query("CREATE TEMPORARY TABLE dedupe_copy SELECT * FROM {$this->temporaryTables['dedupe']} WHERE weight >= {$weightSum}");
             $dao->free();
 
             preg_match($patternColumn, $query, $matches);
@@ -244,7 +254,7 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
             if (preg_match('/dedupe_copy[\S\s]*(union)[\S\s]*dedupe_copy/i', $query, $matches, PREG_OFFSET_CAPTURE)) {
               // Make a second temp table:
               $dao->query("DROP TEMPORARY TABLE IF EXISTS dedupe_copy_2");
-              $dao->query("CREATE TEMPORARY TABLE dedupe_copy_2 SELECT * FROM dedupe WHERE weight >= {$weightSum}");
+              $dao->query("CREATE TEMPORARY TABLE dedupe_copy_2 SELECT * FROM {$this->temporaryTables['dedupe']} WHERE weight >= {$weightSum}");
               $dao->free();
               // After the union, use that new temp table:
               $part1 = substr($query, 0, $matches[1][1]);
@@ -378,8 +388,8 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
         list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause('civicrm_contact');
         $this->_aclWhere = $this->_aclWhere ? "AND {$this->_aclWhere}" : '';
       }
-      $query = "SELECT dedupe.id1 as id
-                FROM dedupe JOIN civicrm_contact ON dedupe.id1 = civicrm_contact.id {$this->_aclFrom}
+      $query = "SELECT {$this->temporaryTables['dedupe']}.id1 as id
+                FROM {$this->temporaryTables['dedupe']} JOIN civicrm_contact ON {$this->temporaryTables['dedupe']}.id1 = civicrm_contact.id {$this->_aclFrom}
                 WHERE contact_type = '{$this->contact_type}' {$this->_aclWhere}
                 AND weight >= {$this->threshold}";
     }
@@ -389,11 +399,11 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
         list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause(array('c1', 'c2'));
         $this->_aclWhere = $this->_aclWhere ? "AND {$this->_aclWhere}" : '';
       }
-      $query = "SELECT IF(dedupe.id1 < dedupe.id2, dedupe.id1, dedupe.id2) as id1,
-                IF(dedupe.id1 < dedupe.id2, dedupe.id2, dedupe.id1) as id2, dedupe.weight
-                FROM dedupe JOIN civicrm_contact c1 ON dedupe.id1 = c1.id
-                            JOIN civicrm_contact c2 ON dedupe.id2 = c2.id {$this->_aclFrom}
-                       LEFT JOIN civicrm_dedupe_exception exc ON dedupe.id1 = exc.contact_id1 AND dedupe.id2 = exc.contact_id2
+      $query = "SELECT IF({$this->temporaryTables['dedupe']}.id1 < {$this->temporaryTables['dedupe']}.id2, {$this->temporaryTables['dedupe']}.id1, {$this->temporaryTables['dedupe']}.id2) as id1,
+                IF({$this->temporaryTables['dedupe']}.id1 < {$this->temporaryTables['dedupe']}.id2, {$this->temporaryTables['dedupe']}.id2, {$this->temporaryTables['dedupe']}.id1) as id2, {$this->temporaryTables['dedupe']}.weight
+                FROM {$this->temporaryTables['dedupe']} JOIN civicrm_contact c1 ON {$this->temporaryTables['dedupe']}.id1 = c1.id
+                            JOIN civicrm_contact c2 ON {$this->temporaryTables['dedupe']}.id2 = c2.id {$this->_aclFrom}
+                       LEFT JOIN civicrm_dedupe_exception exc ON {$this->temporaryTables['dedupe']}.id1 = exc.contact_id1 AND {$this->temporaryTables['dedupe']}.id2 = exc.contact_id2
                 WHERE c1.contact_type = '{$this->contact_type}' AND
                       c2.contact_type = '{$this->contact_type}' {$this->_aclWhere}
                       AND weight >= {$this->threshold} AND exc.contact_id1 IS NULL";

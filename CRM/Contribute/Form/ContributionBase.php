@@ -472,15 +472,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       CRM_Utils_Array::value('cancelSubscriptionUrl', $this->_values)
     );
 
-    // assigning title to template in case someone wants to use it, also setting CMS page title
-    if ($this->_pcpId) {
-      $this->assign('title', $this->_pcpInfo['title']);
-      CRM_Utils_System::setTitle($this->_pcpInfo['title']);
-    }
-    else {
-      $this->assign('title', $this->_values['title']);
-      CRM_Utils_System::setTitle($this->_values['title']);
-    }
+    $this->setTitle(($this->_pcpId ? $this->_pcpInfo['title'] : $this->_values['title']));
     $this->_defaults = array();
 
     $this->_amount = $this->get('amount');
@@ -1203,6 +1195,18 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         $membershipTypeValues = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, $membershipTypeIds);
         $this->_membershipTypeValues = $membershipTypeValues;
         $endDate = NULL;
+
+        // Check if we support auto-renew on this contribution page
+        // FIXME: If any of the payment processors do NOT support recurring you cannot setup an
+        //   auto-renew payment even if that processor is not selected.
+        $allowAutoRenewOpt = TRUE;
+        if (is_array($this->_paymentProcessors)) {
+          foreach ($this->_paymentProcessors as $id => $val) {
+            if ($id && !$val['is_recur']) {
+              $allowAutoRenewOpt = FALSE;
+            }
+          }
+        }
         foreach ($membershipTypeIds as $value) {
           $memType = $membershipTypeValues[$value];
           if ($selectedMembershipTypeID != NULL) {
@@ -1225,22 +1229,15 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             }
           }
           elseif ($memType['is_active']) {
-            $javascriptMethod = NULL;
-            $allowAutoRenewOpt = (int) $memType['auto_renew'];
-            if (is_array($this->_paymentProcessors)) {
-              foreach ($this->_paymentProcessors as $id => $val) {
-                if ($id && !$val['is_recur']) {
-                  $allowAutoRenewOpt = 0;
-                  continue;
-                }
-              }
-            }
-
-            $javascriptMethod = array('onclick' => "return showHideAutoRenew( this.value );");
-            $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = (int) $allowAutoRenewOpt * CRM_Utils_Array::value($value, CRM_Utils_Array::value('auto_renew', $this->_membershipBlock));;
 
             if ($allowAutoRenewOpt) {
+              $javascriptMethod = array('onclick' => "return showHideAutoRenew( this.value );");
+              $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = (int) $memType['auto_renew'] * CRM_Utils_Array::value($value, CRM_Utils_Array::value('auto_renew', $this->_membershipBlock));
               $allowAutoRenewMembership = TRUE;
+            }
+            else {
+              $javascriptMethod = NULL;
+              $autoRenewMembershipTypeOptions["autoRenewMembershipType_{$value}"] = 0;
             }
 
             //add membership type.
@@ -1391,6 +1388,19 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         );
       }
     }
+  }
+
+
+  /**
+   * Get the payment processor object for the submission, returning the manual one for offline payments.
+   *
+   * @return CRM_Core_Payment
+   */
+  protected function getPaymentProcessorObject() {
+    if (!empty($this->_paymentProcessor)) {
+      return $this->_paymentProcessor['object'];
+    }
+    return new CRM_Core_Payment_Manual();
   }
 
 }

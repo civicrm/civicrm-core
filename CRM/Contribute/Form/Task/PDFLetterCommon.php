@@ -39,6 +39,9 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         'subject' => CRM_Utils_Array::value('subject', $formValues),
         'from' => CRM_Utils_Array::value('from_email_address', $formValues),
       );
+
+      $emailParams['from'] = CRM_Utils_Mail::formatFromAddress($emailParams['from']);
+
       // We need display_name for emailLetter() so add to returnProperties here
       $returnProperties['display_name'] = 1;
       if (stristr($formValues['email_options'], 'pdfemail')) {

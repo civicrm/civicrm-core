@@ -1298,6 +1298,29 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * Check for duplicate contacts
+   *
+   * @param array $dedupeParams
+   *   Array of params for finding duplicates: [
+   *    '{parameters returned by CRM_Dedupe_Finder::formatParams}
+   *    'check_permission' => TRUE/FALSE;
+   *    'contact_type' => $contactType;
+   *    'rule' = $rule;
+   *    'rule_group_id' => $ruleGroupID;
+   *    'excludedContactIDs' => $excludedContactIDs;
+   * @param array $dedupeResults
+   *   Array of results ['handled' => TRUE/FALSE, 'ids' => array of IDs of duplicate contacts]
+   * @param array $contextParams
+   *   The context if relevant, eg. ['event_id' => X]
+   *
+   * @return mixed
+   */
+  public static function findDuplicates($dedupeParams, &$dedupeResults, $contextParams) {
+    return self::singleton()
+      ->invoke(array('dedupeParams', 'dedupeResults', 'contextParams'), $dedupeParams, $dedupeResults, $contextParams, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_findDuplicates');
+  }
+
+  /**
    * This hook is called AFTER EACH email has been processed by the script bin/EmailProcessor.php
    *
    * @param string $type

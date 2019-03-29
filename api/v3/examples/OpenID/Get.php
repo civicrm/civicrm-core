@@ -6,11 +6,11 @@
  *   API result array
  */
 function open_i_d_get_example() {
-  $params = array(
+  $params = [
     'contact_id' => 4,
     'openid' => 'My OpenID handle',
     'location_type_id' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('OpenID', 'get', $params);
@@ -20,12 +20,12 @@ function open_i_d_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -39,22 +39,22 @@ function open_i_d_get_example() {
  */
 function open_i_d_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 2,
-    'values' => array(
-      '2' => array(
+    'values' => [
+      '2' => [
         'id' => '2',
         'contact_id' => '4',
         'location_type_id' => '1',
         'openid' => 'My OpenID handle',
         'allowed_to_login' => 0,
         'is_primary' => 0,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

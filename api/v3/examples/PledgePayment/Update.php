@@ -6,10 +6,10 @@
  *   API result array
  */
 function pledge_payment_update_example() {
-  $params = array(
+  $params = [
     'id' => 1,
     'status_id' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('PledgePayment', 'update', $params);
@@ -19,12 +19,12 @@ function pledge_payment_update_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -38,13 +38,13 @@ function pledge_payment_update_example() {
  */
 function pledge_payment_update_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'pledge_id' => '1',
         'contribution_id' => '1',
@@ -55,9 +55,9 @@ function pledge_payment_update_expectedresult() {
         'reminder_date' => '',
         'reminder_count' => 0,
         'status_id' => '1',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

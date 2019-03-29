@@ -1634,12 +1634,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'currency' => 1,
       'cancel_reason' => 1,
       'receipt_date' => 1,
-      'product_name' => 1,
-      'sku' => 1,
-      'product_option' => 1,
-      'fulfilled_date' => 1,
-      'contribution_start_date' => 1,
-      'contribution_end_date' => 1,
       'is_test' => 1,
       'is_pay_later' => 1,
       'contribution_status' => 1,
@@ -1649,7 +1643,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'contribution_batch' => 1,
       'contribution_campaign_title' => 1,
       'contribution_campaign_id' => 1,
-      'contribution_product_id' => 1,
       'contribution_soft_credit_name' => 1,
       'contribution_soft_credit_amount' => 1,
       'contribution_soft_credit_type' => 1,
@@ -1694,6 +1687,18 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     );
     $this->assertEquals($expected, $result[1]);
     $this->assertEquals($expectedHeaders, $result[2]);
+  }
+
+  /**
+   * Test exported with data entry mis-fire.
+   *
+   * Not fatal error if data incomplete.
+   *
+   * https://lab.civicrm.org/dev/core/issues/819
+   */
+  public function testExportIncompleteSubmission() {
+    $this->setUpContactExportData();
+    $this->doExport([['Individual', '']], $this->contactIDs[1]);
   }
 
   /**
@@ -2192,7 +2197,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       85 => 'Cancel Date',
       86 => 'Total Amount',
       87 => 'Accounting Code',
-      88 => 'payment_instrument',
+      88 => 'Payment Methods',
       89 => 'Payment Method ID',
       90 => 'Check Number',
       91 => 'Non-deductible Amount',
@@ -2204,22 +2209,15 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       97 => 'Currency',
       98 => 'Cancellation / Refund Reason',
       99 => 'Receipt Date',
-      100 => 'Product Name',
-      101 => 'SKU',
-      102 => 'Product Option',
-      103 => 'Fulfilled Date',
-      104 => 'Start date for premium',
-      105 => 'End date for premium',
       106 => 'Test',
       107 => 'Is Pay Later',
-      108 => 'contribution_status',
+      108 => 'Contribution Status',
       109 => 'Recurring Contribution ID',
       110 => 'Amount Label',
       111 => 'Contribution Note',
       112 => 'Batch Name',
       113 => 'Campaign Title',
       114 => 'Campaign ID',
-      115 => 'Premium',
       116 => 'Soft Credit For',
       117 => 'Soft Credit Amount',
       118 => 'Soft Credit Type',
@@ -2593,14 +2591,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'world_region' => 'world_region varchar(128)',
       'url' => 'url varchar(128)',
       'phone_type_id' => 'phone_type_id varchar(16)',
-      'financial_type' => 'financial_type varchar(64)',
+      'financial_type' => 'financial_type varchar(255)',
       'contribution_source' => 'contribution_source varchar(255)',
       'receive_date' => 'receive_date varchar(32)',
       'thankyou_date' => 'thankyou_date varchar(32)',
       'cancel_date' => 'cancel_date varchar(32)',
       'total_amount' => 'total_amount varchar(32)',
       'accounting_code' => 'accounting_code varchar(64)',
-      'payment_instrument' => 'payment_instrument text',
+      'payment_instrument' => 'payment_instrument varchar(255)',
       'payment_instrument_id' => 'payment_instrument_id varchar(16)',
       'contribution_check_number' => 'contribution_check_number varchar(255)',
       'non_deductible_amount' => 'non_deductible_amount varchar(32)',
@@ -2612,22 +2610,15 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'currency' => 'currency varchar(3)',
       'cancel_reason' => 'cancel_reason longtext',
       'receipt_date' => 'receipt_date varchar(32)',
-      'product_name' => 'product_name varchar(255)',
-      'sku' => 'sku varchar(50)',
-      'product_option' => 'product_option varchar(255)',
-      'fulfilled_date' => 'fulfilled_date varchar(32)',
-      'contribution_start_date' => 'contribution_start_date varchar(32)',
-      'contribution_end_date' => 'contribution_end_date varchar(32)',
       'is_test' => 'is_test varchar(16)',
       'is_pay_later' => 'is_pay_later varchar(16)',
-      'contribution_status' => 'contribution_status text',
+      'contribution_status' => 'contribution_status varchar(255)',
       'contribution_recur_id' => 'contribution_recur_id varchar(16)',
       'amount_level' => 'amount_level longtext',
       'contribution_note' => 'contribution_note text',
       'contribution_batch' => 'contribution_batch text',
       'contribution_campaign_title' => 'contribution_campaign_title varchar(255)',
       'contribution_campaign_id' => 'contribution_campaign_id varchar(128)',
-      'contribution_product_id' => 'contribution_product_id varchar(255)',
       'contribution_soft_credit_name' => 'contribution_soft_credit_name varchar(255)',
       'contribution_soft_credit_amount' => 'contribution_soft_credit_amount varchar(255)',
       'contribution_soft_credit_type' => 'contribution_soft_credit_type varchar(255)',

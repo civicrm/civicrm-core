@@ -467,6 +467,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
       'operator',
       'component_mode',
       'display_relationship_type',
+      'uf_group_id',
     );
     foreach ($specialElements as $element) {
       if (!empty($formValues[$element])) {

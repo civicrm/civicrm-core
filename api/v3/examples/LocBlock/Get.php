@@ -8,10 +8,10 @@
  *   API result array
  */
 function loc_block_get_example() {
-  $params = array(
+  $params = [
     'id' => 3,
     'return' => 'all',
-  );
+  ];
 
   try{
     $result = civicrm_api3('LocBlock', 'get', $params);
@@ -21,12 +21,12 @@ function loc_block_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -40,27 +40,27 @@ function loc_block_get_example() {
  */
 function loc_block_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 3,
-    'values' => array(
-      '3' => array(
+    'values' => [
+      '3' => [
         'id' => '3',
         'address_id' => '3',
         'email_id' => '4',
         'phone_id' => '3',
         'phone_2_id' => '4',
-        'address' => array(
+        'address' => [
           'id' => '3',
           'location_type_id' => '1',
           'is_primary' => 0,
           'is_billing' => 0,
           'street_address' => '987654321',
           'manual_geo_code' => 0,
-        ),
-        'email' => array(
+        ],
+        'email' => [
           'id' => '4',
           'location_type_id' => '1',
           'email' => 'test2@loc.block',
@@ -68,26 +68,26 @@ function loc_block_get_expectedresult() {
           'is_billing' => 0,
           'on_hold' => 0,
           'is_bulkmail' => 0,
-        ),
-        'phone' => array(
+        ],
+        'phone' => [
           'id' => '3',
           'location_type_id' => '1',
           'is_primary' => 0,
           'is_billing' => 0,
           'phone' => '987654321',
           'phone_numeric' => '987654321',
-        ),
-        'phone_2' => array(
+        ],
+        'phone_2' => [
           'id' => '4',
           'location_type_id' => '1',
           'is_primary' => 0,
           'is_billing' => 0,
           'phone' => '456-7890',
           'phone_numeric' => '4567890',
-        ),
-      ),
-    ),
-  );
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

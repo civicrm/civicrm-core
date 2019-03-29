@@ -456,7 +456,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    * @return mixed
    */
   public function alphabetQuery() {
-    return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
+    return $this->_query->alphabetQuery();
   }
 
   /**

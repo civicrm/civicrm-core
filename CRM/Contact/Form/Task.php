@@ -153,12 +153,10 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     $form->assign('taskName', CRM_Utils_Array::value($form->_task, $crmContactTaskTasks));
 
     if ($useTable) {
-      $form->_componentTable = CRM_Utils_SQL_TempTable::build()->setCategory('tskact')->setDurable()->setId($qfKey)->getName();
-      $sql = " DROP TABLE IF EXISTS {$form->_componentTable}";
-      CRM_Core_DAO::executeQuery($sql);
-
-      $sql = "CREATE TABLE {$form->_componentTable} ( contact_id int primary key) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci";
-      CRM_Core_DAO::executeQuery($sql);
+      $tempTable = CRM_Utils_SQL_TempTable::build()->setCategory('tskact')->setDurable()->setId($qfKey)->setUtf8();
+      $form->_componentTable = $tempTable->getName();
+      $tempTable->drop();
+      $tempTable->createWithColumns('contact_id int primary key');
     }
 
     // all contacts or action = save a search
@@ -544,7 +542,9 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
       $ssId = $this->get('ssID');
       $hiddenSmartParams = array(
         'group_type' => array('2' => 1),
-        'form_values' => $this->get('formValues'),
+        // queryParams have been preprocessed esp WRT any entity reference fields - see +
+        // https://github.com/civicrm/civicrm-core/pull/13250
+        'form_values' => $this->get('queryParams'),
         'saved_search_id' => $ssId,
         'search_custom_id' => $this->get('customSearchID'),
         'search_context' => $this->get('context'),

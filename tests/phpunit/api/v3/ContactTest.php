@@ -1017,7 +1017,26 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'last_name' => "O'Connor",
       'sequential' => 1,
     ));
-    $this->assertEquals("O'Connor", $result['last_name'], 'in line' . __LINE__);
+    $this->assertEquals("O'Connor", $result['last_name']);
+  }
+
+  /**
+   * Test between accepts zero.
+   *
+   * In the past it incorrectly required !empty.
+   */
+  public function testGetBetweenZeroWorks() {
+    $this->callAPISuccess($this->_entity, 'get', [
+      'contact_id' => ['BETWEEN' => [0, 9]],
+    ]);
+    $this->callAPISuccess($this->_entity, 'get', [
+      'contact_id' => [
+        'BETWEEN' => [
+          (0 - 9),
+          0,
+        ],
+      ],
+    ]);
   }
 
   /**
@@ -2514,6 +2533,38 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that we can set the sort name via the api or alter it via a hook.
+   *
+   * As of writing this is being fixed for Organization & Household but it makes sense to do for individuals too.
+   */
+  public function testCreateAlterSortName() {
+    $organizationID = $this->organizationCreate(['organization_name' => 'The Justice League', 'sort_name' => 'Justice League, The']);
+    $organization = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name'], 'id' => $organizationID]);
+    $this->assertEquals('Justice League, The', $organization['sort_name']);
+    $this->assertEquals('The Justice League', $organization['display_name']);
+    $this->hookClass->setHook('civicrm_pre', array($this, 'killTheJusticeLeague'));
+    $this->organizationCreate(['id' => $organizationID, 'sort_name' => 'Justice League, The']);
+    $organization = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name', 'is_deceased'], 'id' => $organizationID]);
+    $this->assertEquals('Steppenwolf wuz here', $organization['display_name']);
+    $this->assertEquals('Steppenwolf wuz here', $organization['sort_name']);
+    $this->assertEquals(1, $organization['is_deceased']);
+
+    $householdID = $this->householdCreate();
+    $household = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name'], 'id' => $householdID]);
+    $this->assertEquals('Steppenwolf wuz here', $household['display_name']);
+    $this->assertEquals('Steppenwolf wuz here', $household['sort_name']);
+  }
+
+  /**
+   * Implements hook_pre().
+   */
+  public function killTheJusticeLeague($op, $entity, $id, &$params) {
+    $params['sort_name'] = 'Steppenwolf wuz here';
+    $params['display_name'] = 'Steppenwolf wuz here';
+    $params['is_deceased'] = 1;
+  }
+
+  /**
    * Test Single Entity format.
    */
   public function testContactGetSingleEntityArray() {
@@ -3842,6 +3893,31 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(array('external_identifier'), $result['values']['UI_external_identifier']);
   }
 
+  /**
+   * API test to retrieve contact from group having different group title and name.
+   */
+  public function testContactGetFromGroup() {
+    $groupId = $this->groupCreate([
+      'name' => 'Test_Group',
+      'domain_id' => 1,
+      'title' => 'New Test Group Created',
+      'description' => 'New Test Group Created',
+      'is_active' => 1,
+      'visibility' => 'User and User Admin Only',
+    ]);
+    $contact = $this->callAPISuccess('contact', 'create', $this->_params);
+    $groupContactCreateParams = array(
+      'contact_id' => $contact['id'],
+      'group_id' => $groupId,
+      'status' => 'Pending',
+    );
+    $groupContact = $this->callAPISuccess('groupContact', 'create', $groupContactCreateParams);
+    $groupGetContact = $this->CallAPISuccess('groupContact', 'get', $groupContactCreateParams);
+    $this->CallAPISuccess('Contact', 'getcount', [
+      'group' => "Test_Group",
+    ]);
+  }
+
   public function testSmartGroupsForRelatedContacts() {
     $rtype1 = $this->callAPISuccess('relationship_type', 'create', array(
       "name_a_b" => uniqid() . " Child of",
@@ -3927,6 +4003,71 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($note['values'][$note['id']]['note'], "Test note created by API Call as array");
     $note = $this->callAPISuccess('Note', 'get', ['entity_id' => $contact2['id']]);
     $this->assertEquals($note['values'][$note['id']]['note'], "Test note created by API Call as array");
+  }
+
+  /**
+   * Verify that passing tag IDs to Contact.get works
+   *
+   * Tests the following formats
+   * - Contact.get tag='id1'
+   * - Contact.get tag='id1,id2'
+   * - Contact.get tag='id1, id2'
+   */
+  public function testContactGetWithTag() {
+    $contact = $this->callApiSuccess('Contact', 'create', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Test',
+      'last_name' => 'Tagged',
+      'email' => 'test@example.org',
+    ]);
+    $tags = [];
+    foreach (['Tag A', 'Tag B'] as $name) {
+      $tags[] = $this->callApiSuccess('Tag', 'create', [
+        'name' => $name
+      ]);
+    }
+
+    // assign contact to "Tag B"
+    $this->callApiSuccess('EntityTag', 'create', [
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $contact['id'],
+      'tag_id' => $tags[1]['id'],
+    ]);
+
+    // test format Contact.get tag='id1'
+    $contact_get = $this->callAPISuccess('Contact', 'get', [
+      'tag' => $tags[1]['id'],
+      'return' => 'tag',
+    ]);
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($contact['id'], $contact_get['id']);
+    $this->assertEquals('Tag B', $contact_get['values'][$contact['id']]['tags']);
+
+    // test format Contact.get tag='id1,id2'
+    $contact_get = $this->callAPISuccess('Contact', 'get', [
+      'tag' => $tags[0]['id'] . ',' . $tags[1]['id'],
+      'return' => 'tag',
+    ]);
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($contact['id'], $contact_get['id']);
+    $this->assertEquals('Tag B', $contact_get['values'][$contact['id']]['tags']);
+
+    // test format Contact.get tag='id1, id2'
+    $contact_get = $this->callAPISuccess('Contact', 'get', [
+      'tag' => $tags[0]['id'] . ', ' . $tags[1]['id'],
+      'return' => 'tag',
+    ]);
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($contact['id'], $contact_get['id']);
+    $this->assertEquals('Tag B', $contact_get['values'][$contact['id']]['tags']);
+
+    foreach ($tags as $tag) {
+      $this->callAPISuccess('Tag', 'delete', ['id' => $tag['id']]);
+    }
+    $this->callAPISuccess('Contact', 'delete', [
+      'id' => $contact['id'],
+      'skip_undelete' => TRUE
+    ]);
   }
 
 }

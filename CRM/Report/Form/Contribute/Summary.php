@@ -81,6 +81,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             ),
           )
         ),
+        'filters' => $this->getBasicContactFilters(array('deceased' => NULL)),
         'grouping' => 'contact-fields',
         'group_bys' => array(
           'id' => array('title' => ts('Contact ID')),
@@ -148,6 +149,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         'grouping' => 'contri-fields',
         'filters' => array(
           'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
+          'thankyou_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
@@ -648,10 +650,8 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
       FROM (SELECT {$this->_aliases['civicrm_contribution']}.total_amount as amount,
     {$contriQuery} {$groupBy} {$orderBy}) as mode GROUP BY currency";
 
-    $mode = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);
-
-    $medianSQL = "{$this->_from} {$this->_where}";
-    $median = CRM_Contribute_BAO_Contribution::computeStats('median', $medianSQL, $this->_aliases['civicrm_contribution']);
+    $mode = $this->calculateMode($modeSQL);
+    $median = $this->calculateMedian();
 
     if ($softCredit) {
       $softDAO = CRM_Core_DAO::executeQuery($softSQL);
@@ -958,6 +958,73 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
         break;
       }
     }
+  }
+
+  /**
+   * Calculate mode.
+   *
+   * Note this is a slow query. Alternative is extended reports.
+   *
+   * @param string $sql
+   * @return array|null
+   */
+  protected function calculateMode($sql) {
+    $mode = [];
+    $modeDAO = CRM_Core_DAO::executeQuery($sql);
+    while ($modeDAO->fetch()) {
+      if ($modeDAO->civicrm_contribution_total_amount_count > 1) {
+        $mode[] = CRM_Utils_Money::format($modeDAO->amount, $modeDAO->currency);
+      }
+      else {
+        $mode[] = 'N/A';
+      }
+    }
+    return $mode;
+  }
+
+  /**
+   * Calculate mode.
+   *
+   * Note this is a slow query. Alternative is extended reports.
+   *
+   * @return array|null
+   */
+  protected function calculateMedian() {
+    $sql = "{$this->_from} {$this->_where}";
+    $currencies = CRM_Core_OptionGroup::values('currencies_enabled');
+    $median = [];
+    foreach ($currencies as $currency => $val) {
+      $midValue = 0;
+      $where = "AND {$this->_aliases['civicrm_contribution']}.currency = '{$currency}'";
+      $rowCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) as count {$sql} {$where}");
+
+      $even = FALSE;
+      $offset = 1;
+      $medianRow = floor($rowCount / 2);
+      if ($rowCount % 2 == 0 && !empty($medianRow)) {
+        $even = TRUE;
+        $offset++;
+        $medianRow--;
+      }
+
+      $medianValue = "SELECT {$this->_aliases['civicrm_contribution']}.total_amount as median
+             {$sql} {$where}
+             ORDER BY median LIMIT {$medianRow},{$offset}";
+      $medianValDAO = CRM_Core_DAO::executeQuery($medianValue);
+      while ($medianValDAO->fetch()) {
+        if ($even) {
+          $midValue = $midValue + $medianValDAO->median;
+        }
+        else {
+          $median[] = CRM_Utils_Money::format($medianValDAO->median, $currency);
+        }
+      }
+      if ($even) {
+        $midValue = $midValue / 2;
+        $median[] = CRM_Utils_Money::format($midValue, $currency);
+      }
+    }
+    return $median;
   }
 
 }

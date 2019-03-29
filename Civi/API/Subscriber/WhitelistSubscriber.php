@@ -46,10 +46,10 @@ class WhitelistSubscriber implements EventSubscriberInterface {
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::AUTHORIZE => array('onApiAuthorize', Events::W_EARLY),
-      Events::RESPOND => array('onApiRespond', Events::W_MIDDLE),
-    );
+    return [
+      Events::AUTHORIZE => ['onApiAuthorize', Events::W_EARLY],
+      Events::RESPOND => ['onApiRespond', Events::W_MIDDLE],
+    ];
   }
 
   /**
@@ -73,7 +73,7 @@ class WhitelistSubscriber implements EventSubscriberInterface {
    * @throws \CRM_Core_Exception
    */
   public function __construct($rules) {
-    $this->rules = array();
+    $this->rules = [];
     foreach ($rules as $rule) {
       /** @var WhitelistRule $rule */
       if ($rule->isValid()) {

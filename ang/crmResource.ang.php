@@ -3,8 +3,8 @@
 // in CiviCRM. See also:
 // http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_angularModules
 
-return array(
+return [
   'ext' => 'civicrm',
   // 'js' => array('js/angular-crmResource/byModule.js'), // One HTTP request per module.
-  'js' => array('js/angular-crmResource/all.js'), // One HTTP request for all modules.
-);
+  'js' => ['js/angular-crmResource/all.js'], // One HTTP request for all modules.
+];

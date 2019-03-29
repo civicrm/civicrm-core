@@ -782,10 +782,10 @@ SELECT g.*
         while ($dao->fetch()) {
           $groupIDs[] = $dao->id;
 
-          if (($dao->saved_search_id || $dao->children || $dao->parents) &&
-            $dao->cache_date == NULL
-          ) {
-            CRM_Contact_BAO_GroupContactCache::load($dao);
+          if (($dao->saved_search_id || $dao->children || $dao->parents)) {
+            if ($dao->cache_date == NULL) {
+              CRM_Contact_BAO_GroupContactCache::load($dao);
+            }
             $groupContactCacheClause = " UNION SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id IN (" . implode(', ', $groupIDs) . ")";
           }
 
@@ -838,6 +838,10 @@ SELECT g.*
     }
     if (!empty(Civi::$statics[__CLASS__]['permissioned_groups'][$userCacheKey])) {
       return Civi::$statics[__CLASS__]['permissioned_groups'][$userCacheKey];
+    }
+
+    if ($allGroups == NULL) {
+      $allGroups = CRM_Contact_BAO_Contact::buildOptions('group_id', NULL, ['onlyActive' => FALSE]);
     }
 
     $acls = CRM_ACL_BAO_Cache::build($contactID);

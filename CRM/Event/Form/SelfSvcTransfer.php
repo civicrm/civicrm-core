@@ -337,10 +337,17 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     }
     else {
       //cancel 'from' participant row
-      $query = "select contact_id from civicrm_email where email = '" . $params['email'] . "'";
-      $dao = CRM_Core_DAO::executeQuery($query);
-      while ($dao->fetch()) {
-        $contact_id  = $dao->contact_id;
+      $contact_id_result = civicrm_api3('Contact', 'get', array(
+        'sequential' => 1,
+        'return' => array("id"),
+        'email' => $params['email'],
+        'options' => array('limit' => 1),
+      ));
+      $contact_id_result = $contact_id_result['values'][0];
+      $contact_id = $contact_id_result['contact_id'];
+      $contact_is_deleted = $contact_id_result['contact_is_deleted'];
+      if ($contact_is_deleted || !is_numeric($contact_id)) {
+        CRM_Core_Error::statusBounce(ts('Contact does not exist.'));
       }
     }
     $from_participant = $params = array();

@@ -377,7 +377,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       $row['campaign_id'] = $result->member_campaign_id;
 
       if (!empty($row['member_is_test'])) {
-        $row['membership_type'] = $row['membership_type'] . " (test)";
+        $row['membership_type'] = CRM_Core_TestEntity::appendTestText($row['membership_type']);
       }
 
       $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->membership_id;
@@ -543,7 +543,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    * @return mixed
    */
   public function alphabetQuery() {
-    return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
+    return $this->_query->alphabetQuery();
   }
 
   /**

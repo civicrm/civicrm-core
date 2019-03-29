@@ -3,9 +3,9 @@
 // in CiviCRM. See also:
 // http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_angularModules
 
-return array(
+return [
   'ext' => 'civicrm',
-  'js' => array('ang/crmExample.js'),
-  'partials' => array('ang/crmExample'),
-  'requires' => array('crmUtil', 'ngRoute', 'ui.utils', 'crmUi', 'crmResource'),
-);
+  'js' => ['ang/crmExample.js'],
+  'partials' => ['ang/crmExample'],
+  'requires' => ['crmUtil', 'ngRoute', 'ui.utils', 'crmUi', 'crmResource'],
+];

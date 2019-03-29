@@ -215,7 +215,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
       $taxAmount = 0;
       foreach ($this->_params as $k => $v) {
-        $this->cleanMoneyFields($v);
         if ($v == 'skip') {
           continue;
         }
@@ -223,6 +222,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         //display tax amount on confirmation page
         $taxAmount += $v['tax_amount'];
         if (is_array($v)) {
+          $this->cleanMoneyFields($v);
           foreach (array(
                      'first_name',
                      'last_name',
@@ -527,8 +527,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       // transactions etc
       // for things like tell a friend
       if (!$this->getContactID() && !empty($value['is_primary'])) {
-        $session = CRM_Core_Session::singleton();
-        $session->set('transaction.userID', $contactID);
+        CRM_Core_Session::singleton()->set('transaction.userID', $contactID);
       }
 
       $value['description'] = ts('Online Event Registration') . ': ' . $this->_values['event']['title'];
@@ -1017,19 +1016,12 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $contribParams['is_test'] = 1;
     }
 
-    $contribID = NULL;
     if (!empty($contribParams['invoice_id'])) {
-      $contribID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
+      $contribParams['id'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution',
         $contribParams['invoice_id'],
         'id',
         'invoice_id'
       );
-    }
-
-    $ids = array();
-    if ($contribID) {
-      $ids['contribution'] = $contribID;
-      $contribParams['id'] = $contribID;
     }
 
     if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {

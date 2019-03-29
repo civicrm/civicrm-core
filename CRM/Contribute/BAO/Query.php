@@ -48,7 +48,8 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    */
   public static function getFields($checkPermission = TRUE) {
     if (!isset(\Civi::$statics[__CLASS__]) || !isset(\Civi::$statics[__CLASS__]['fields']) || !isset(\Civi::$statics[__CLASS__]['contribution'])) {
-      $fields  = CRM_Contribute_BAO_Contribution::exportableFields($checkPermission);
+      $fields = CRM_Contribute_BAO_Contribution::exportableFields($checkPermission);
+      CRM_Contribute_BAO_Contribution::appendPseudoConstantsToFields($fields);
       unset($fields['contribution_contact_id']);
       \Civi::$statics[__CLASS__]['fields']['contribution'] = $fields;
     }
@@ -66,14 +67,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $query->_select['contribution_id'] = "civicrm_contribution.id as contribution_id";
       $query->_element['contribution_id'] = 1;
       $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
-    }
-
-    // get financial_type
-    if (!empty($query->_returnProperties['financial_type'])) {
-      $query->_select['financial_type'] = "civicrm_financial_type.name as financial_type";
-      $query->_element['financial_type'] = 1;
-      $query->_tables['civicrm_contribution'] = 1;
-      $query->_tables['civicrm_financial_type'] = 1;
     }
 
     // get accounting code
@@ -155,8 +148,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $quoteValue = "\"$value\"";
     }
 
-    $strtolower = function_exists('mb_strtolower') ? 'mb_strtolower' : 'strtolower';
-
     $recurrringFields = CRM_Contribute_BAO_ContributionRecur::getRecurringFields();
     unset($recurrringFields['contribution_recur_payment_made']);
     foreach ($recurrringFields as $dateField => $dateFieldTitle) {
@@ -174,8 +165,12 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       'contribution_payment_instrument' => 'contribution_payment_instrument_id',
       'contribution_status' => 'contribution_status_id',
     );
+
     $name = isset($fieldAliases[$name]) ? $fieldAliases[$name] : $name;
     $qillName = $name;
+    if (in_array($name, $fieldAliases)) {
+      $qillName = array_search($name, $fieldAliases);
+    }
     $pseudoExtraParam = array();
 
     switch ($name) {
@@ -239,9 +234,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'financial_type_id':
-        // @todo we need to make this resemble a hook approach.
-        CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.$name", 'IN', array_keys($financialTypes), 'String');
       case 'invoice_id':
       case 'invoice_number':
       case 'payment_instrument_id':
@@ -281,7 +273,9 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.$name", $op, $value, $dataType);
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contribute_DAO_Contribution', $name, $value, $op, $pseudoExtraParam);
-        $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $op, 3 => $value));
+        if (!($name == 'id' && $value == 0)) {
+          $query->_qill[$grouping][] = ts('%1 %2 %3', array(1 => $fields[$qillName]['title'], 2 => $op, 3 => $value));
+        }
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
@@ -418,14 +412,12 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'contribution_note':
-        $value = $strtolower(CRM_Core_DAO::escapeString($value));
+        $value = CRM_Core_DAO::escapeString($value);
         if ($wildcard) {
           $value = "%$value%";
           $op = 'LIKE';
         }
-        // LOWER roughly translates to 'hurt my database without deriving any benefit' See CRM-19811.
-        $wc = ($op != 'LIKE') ? "LOWER(civicrm_note.note)" : "civicrm_note.note";
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($wc, $op, $value, "String");
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause('civicrm_note.note', $op, $value, "String");
         $query->_qill[$grouping][] = ts('Contribution Note %1 %2', array(1 => $op, 2 => $quoteValue));
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = $query->_whereTables['contribution_note'] = 1;
         return;
@@ -777,21 +769,31 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       'contribution_status_id' => 1,
       // @todo return this & fix query to do pseudoconstant thing.
       'contribution_status' => 1,
-      // @todo the product field got added because it suited someone's use case.
-      // ideally we would have some configurability here because I think 90% of sites would
-      // disagree this is the right field to show - but they wouldn't agree with each other
-      // on what field to show instead.
-      'contribution_product_id' => 1,
-      'product_name' => 1,
       'currency' => 1,
       'cancel_date' => 1,
       'contribution_recur_id' => 1,
     );
+    if (self::isSiteHasProducts()) {
+      $properties['product_name'] = 1;
+      $properties['contribution_product_id'] = 1;
+    }
     if (self::isSoftCreditOptionEnabled($queryParams)) {
       $properties = array_merge($properties, self::softCreditReturnProperties());
     }
 
     return $properties;
+  }
+
+  /**
+   * Do any products exist in this site's database.
+   *
+   * @return bool
+   */
+  public static function isSiteHasProducts() {
+    if (!isset(\Civi::$statics[__CLASS__]['has_products'])) {
+      \Civi::$statics[__CLASS__]['has_products'] = (bool) CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_contribution_product LIMIT 1');
+    }
+    return \Civi::$statics[__CLASS__]['has_products'];
   }
 
   /**
@@ -858,17 +860,11 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         //every
         'receipt_date' => 1,
         // query
-        'product_name' => 1,
         //whether
-        'sku' => 1,
         // or
-        'product_option' => 1,
         // not
-        'fulfilled_date' => 1,
         // the
-        'contribution_start_date' => 1,
         // field
-        'contribution_end_date' => 1,
         // is
         'is_test' => 1,
         // actually
@@ -890,9 +886,17 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         // on
         'contribution_campaign_id' => 1,
         // calling
-        'contribution_product_id' => 1,
         //function
       );
+      if (self::isSiteHasProducts()) {
+        $properties['fulfilled_date'] = 1;
+        $properties['product_name'] = 1;
+        $properties['contribution_product_id'] = 1;
+        $properties['product_option'] = 1;
+        $properties['sku'] = 1;
+        $properties['contribution_start_date'] = 1;
+        $properties['contribution_end_date'] = 1;
+      }
       if (self::isSoftCreditOptionEnabled()) {
         $properties = array_merge($properties, self::softCreditReturnProperties());
       }
@@ -1018,12 +1022,18 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       'autocomplete' => 'off',
     ));
 
-    // CRM-16713 - contribution search by premiums on 'Find Contribution' form.
-    $form->add('select', 'contribution_product_id',
-      ts('Premium'),
-      CRM_Contribute_PseudoConstant::products(),
-      FALSE, array('class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -'))
-    );
+    if (CRM_Contribute_BAO_Query::isSiteHasProducts()) {
+      // CRM-16713 - contribution search by premiums on 'Find Contribution' form.
+      $form->add('select', 'contribution_product_id',
+        ts('Premium'),
+        CRM_Contribute_PseudoConstant::products(),
+        FALSE, [
+          'class' => 'crm-select2',
+          'multiple' => 'multiple',
+          'placeholder' => ts('- any -')
+        ]
+      );
+    }
 
     self::addCustomFormFields($form, array('Contribution'));
 

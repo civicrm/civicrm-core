@@ -8,9 +8,9 @@
  *   API result array
  */
 function pledge_get_example() {
-  $params = array(
+  $params = [
     'pledge_start_date_high' => '20170205024740',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Pledge', 'get', $params);
@@ -20,12 +20,12 @@ function pledge_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -39,13 +39,13 @@ function pledge_get_example() {
  */
 function pledge_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 2,
-    'values' => array(
-      '2' => array(
+    'values' => [
+      '2' => [
         'contact_id' => '8',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
@@ -68,9 +68,9 @@ function pledge_get_expectedresult() {
         'pledge_campaign_id' => '',
         'pledge_currency' => 'USD',
         'id' => '2',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

@@ -387,12 +387,12 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
     );
     $params = array_merge($defaults, $params);
 
-    CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
-
     // Core#644 - handle contact ID passed as "From".
     if (isset($params['from'])) {
       $params['from'] = CRM_Utils_Mail::formatFromAddress($params['from']);
     }
+
+    CRM_Utils_Hook::alterMailParams($params, 'messageTemplate');
 
     if ((!$params['groupName'] ||
         !$params['valueName']

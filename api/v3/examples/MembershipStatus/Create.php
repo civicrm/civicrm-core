@@ -6,9 +6,9 @@
  *   API result array
  */
 function membership_status_create_example() {
-  $params = array(
+  $params = [
     'name' => 'test membership status',
-  );
+  ];
 
   try{
     $result = civicrm_api3('MembershipStatus', 'create', $params);
@@ -18,12 +18,12 @@ function membership_status_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,13 +37,13 @@ function membership_status_create_example() {
  */
 function membership_status_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 15,
-    'values' => array(
-      '15' => array(
+    'values' => [
+      '15' => [
         'id' => '15',
         'name' => 'test membership status',
         'label' => 'test membership status',
@@ -59,9 +59,9 @@ function membership_status_create_expectedresult() {
         'is_default' => '',
         'is_active' => '',
         'is_reserved' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

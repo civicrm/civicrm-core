@@ -71,6 +71,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_noFees;
 
   /**
+   * @var array Fee Block
+   */
+  public $_feeBlock;
+
+  /**
    * Array of payment related fields to potentially display on this form (generally credit card or debit card fields).
    *
    * This is rendered via billingBlock.tpl.
@@ -83,19 +88,18 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * Get the contact id for the registration.
    *
    * @param array $fields
-   * @param CRM_Core_Form $self
+   * @param CRM_Event_Form_Registration $form
    * @param bool $isAdditional
    *
    * @return int|null
    */
-  public static function getRegistrationContactID($fields, $self, $isAdditional) {
-
+  public static function getRegistrationContactID($fields, $form, $isAdditional) {
     $contactID = NULL;
     if (!$isAdditional) {
-      $contactID = $self->getContactID();
+      $contactID = $form->getContactID();
     }
     if (!$contactID && is_array($fields) && $fields) {
-      $contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($fields, 'Individual', 'Unsupervised', array(), FALSE, CRM_Utils_Array::value('dedupe_rule_group_id', $self->_values['event']));
+      $contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($fields, 'Individual', 'Unsupervised', [], FALSE, CRM_Utils_Array::value('dedupe_rule_group_id', $form->_values['event']), ['event_id' => CRM_Utils_Array::value('id', $form->_values['event'])]);
     }
     return $contactID;
   }
@@ -497,7 +501,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   /**
    * Build the radio/text form elements for the amount field
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Event_Form_Registration_Register $form
    *   Form object.
    * @param bool $required
    *   True if you want to add formRule.
@@ -661,7 +665,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Event_Form_Registration $form
    */
   public static function formatFieldsForOptionFull(&$form) {
     $priceSet = $form->get('priceSet');
@@ -770,40 +774,40 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param $self
+   * @param CRM_Event_Form_Registration $form
    *
    *
    * @return bool|array
    *   true if no errors, else array of errors
    */
-  public static function formRule($fields, $files, $self) {
+  public static function formRule($fields, $files, $form) {
     $errors = array();
     //check that either an email or firstname+lastname is included in the form(CRM-9587)
-    self::checkProfileComplete($fields, $errors, $self->_eventId);
+    self::checkProfileComplete($fields, $errors, $form->_eventId);
     //To check if the user is already registered for the event(CRM-2426)
-    if (!$self->_skipDupeRegistrationCheck) {
-      self::checkRegistration($fields, $self);
+    if (!$form->_skipDupeRegistrationCheck) {
+      self::checkRegistration($fields, $form);
     }
     //check for availability of registrations.
-    if (!$self->_allowConfirmation && empty($fields['bypass_payment']) &&
-      is_numeric($self->_availableRegistrations) &&
-      CRM_Utils_Array::value('additional_participants', $fields) >= $self->_availableRegistrations
+    if (!$form->_allowConfirmation && empty($fields['bypass_payment']) &&
+      is_numeric($form->_availableRegistrations) &&
+      CRM_Utils_Array::value('additional_participants', $fields) >= $form->_availableRegistrations
     ) {
-      $errors['additional_participants'] = ts("There is only enough space left on this event for %1 participant(s).", array(1 => $self->_availableRegistrations));
+      $errors['additional_participants'] = ts("There is only enough space left on this event for %1 participant(s).", array(1 => $form->_availableRegistrations));
     }
 
     // during confirmation don't allow to increase additional participants, CRM-4320
-    if ($self->_allowConfirmation && !empty($fields['additional_participants']) &&
-      is_array($self->_additionalParticipantIds) &&
-      $fields['additional_participants'] > count($self->_additionalParticipantIds)
+    if ($form->_allowConfirmation && !empty($fields['additional_participants']) &&
+      is_array($form->_additionalParticipantIds) &&
+      $fields['additional_participants'] > count($form->_additionalParticipantIds)
     ) {
-      $errors['additional_participants'] = ts("Oops. It looks like you are trying to increase the number of additional people you are registering for. You can confirm registration for a maximum of %1 additional people.", array(1 => count($self->_additionalParticipantIds)));
+      $errors['additional_participants'] = ts("Oops. It looks like you are trying to increase the number of additional people you are registering for. You can confirm registration for a maximum of %1 additional people.", array(1 => count($form->_additionalParticipantIds)));
     }
 
     //don't allow to register w/ waiting if enough spaces available.
-    if (!empty($fields['bypass_payment']) && $self->_allowConfirmation) {
-      if (!is_numeric($self->_availableRegistrations) ||
-        (empty($fields['priceSetId']) && CRM_Utils_Array::value('additional_participants', $fields) < $self->_availableRegistrations)
+    if (!empty($fields['bypass_payment']) && $form->_allowConfirmation) {
+      if (!is_numeric($form->_availableRegistrations) ||
+        (empty($fields['priceSetId']) && CRM_Utils_Array::value('additional_participants', $fields) < $form->_availableRegistrations)
       ) {
         $errors['bypass_payment'] = ts("Oops. There are enough available spaces in this event. You can not add yourself to the waiting list.");
       }
@@ -817,13 +821,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
     // priceset validations
     if (!empty($fields['priceSetId']) &&
-     !$self->_requireApproval && !$self->_allowWaitlist
+     !$form->_requireApproval && !$form->_allowWaitlist
      ) {
       //format params.
-      $formatted = self::formatPriceSetParams($self, $fields);
+      $formatted = self::formatPriceSetParams($form, $fields);
       $ppParams = array($formatted);
-      $priceSetErrors = self::validatePriceSet($self, $ppParams);
-      $primaryParticipantCount = self::getParticipantCount($self, $ppParams);
+      $priceSetErrors = self::validatePriceSet($form, $ppParams);
+      $primaryParticipantCount = self::getParticipantCount($form, $ppParams);
 
       //get price set fields errors in.
       $errors = array_merge($errors, CRM_Utils_Array::value(0, $priceSetErrors, array()));
@@ -834,15 +838,15 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
 
       if (empty($fields['bypass_payment']) &&
-        !$self->_allowConfirmation &&
-        is_numeric($self->_availableRegistrations) &&
-        $self->_availableRegistrations < $totalParticipants
+        !$form->_allowConfirmation &&
+        is_numeric($form->_availableRegistrations) &&
+        $form->_availableRegistrations < $totalParticipants
       ) {
-        $errors['_qf_default'] = ts("Only %1 Registrations available.", array(1 => $self->_availableRegistrations));
+        $errors['_qf_default'] = ts("Only %1 Registrations available.", array(1 => $form->_availableRegistrations));
       }
 
       $lineItem = array();
-      CRM_Price_BAO_PriceSet::processAmount($self->_values['fee'], $fields, $lineItem);
+      CRM_Price_BAO_PriceSet::processAmount($form->_values['fee'], $fields, $lineItem);
 
       $minAmt = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $fields['priceSetId'], 'min_amount');
       if ($fields['amount'] < 0) {
@@ -856,8 +860,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     // @todo - can we remove the 'is_monetary' concept?
-    if ($self->_values['event']['is_monetary']) {
-      if (empty($self->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 &&
+    if ($form->_values['event']['is_monetary']) {
+      if (empty($form->_requireApproval) && !empty($fields['amount']) && $fields['amount'] > 0 &&
         !isset($fields['payment_processor_id'])) {
         $errors['payment_processor_id'] = ts('Please select a Payment Method');
       }
@@ -869,28 +873,28 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         }
       }
       elseif (!empty($fields['amount']) &&
-        (isset($self->_values['discount'][$fields['amount']])
-          && CRM_Utils_Array::value('value', $self->_values['discount'][$fields['amount']]) == 0
+        (isset($form->_values['discount'][$fields['amount']])
+          && CRM_Utils_Array::value('value', $form->_values['discount'][$fields['amount']]) == 0
         )
       ) {
         $isZeroAmount = TRUE;
       }
       elseif (!empty($fields['amount']) &&
-        (isset($self->_values['fee'][$fields['amount']])
-          && CRM_Utils_Array::value('value', $self->_values['fee'][$fields['amount']]) == 0
+        (isset($form->_values['fee'][$fields['amount']])
+          && CRM_Utils_Array::value('value', $form->_values['fee'][$fields['amount']]) == 0
         )
       ) {
         $isZeroAmount = TRUE;
       }
 
-      if ($isZeroAmount && !($self->_forcePayement && !empty($fields['additional_participants']))) {
+      if ($isZeroAmount && !($form->_forcePayement && !empty($fields['additional_participants']))) {
         $skipPaymentValidation = TRUE;
       }
 
       // also return if zero fees for valid members
       if (!empty($fields['bypass_payment']) ||
         $skipPaymentValidation ||
-        (!$self->_allowConfirmation && ($self->_requireApproval || $self->_allowWaitlist))
+        (!$form->_allowConfirmation && ($form->_requireApproval || $form->_allowWaitlist))
       ) {
         return empty($errors) ? TRUE : $errors;
       }
@@ -898,7 +902,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $fields['payment_processor_id'],
         $fields,
         $errors,
-        (!$self->_isBillingAddressRequiredForPayLater ? NULL : 'billing')
+        (!$form->_isBillingAddressRequiredForPayLater ? NULL : 'billing')
       );
     }
 
@@ -1143,7 +1147,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $this->handlePreApproval($params);
       }
       elseif ($this->_paymentProcessor &&
-        $this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_NOTIFY
+        (int) $this->_paymentProcessor['billing_mode'] & CRM_Core_Payment::BILLING_MODE_NOTIFY
       ) {
         // The concept of contributeMode is deprecated - but still needs removal from the message templates.
         $this->set('contributeMode', 'notify');
@@ -1177,58 +1181,58 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *
    * @param array $fields
    *   The input form values(anonymous user).
-   * @param CRM_Event_Form_Registration_Register $self
+   * @param CRM_Event_Form_Registration_Register $form
    *   Event data.
    * @param bool $isAdditional
    *   Treat isAdditional participants a bit differently.
    *
    * @return int
    */
-  public static function checkRegistration($fields, &$self, $isAdditional = FALSE) {
+  public static function checkRegistration($fields, $form, $isAdditional = FALSE) {
     // CRM-3907, skip check for preview registrations
     // CRM-4320 participant need to walk wizard
     if (
-      ($self->_mode == 'test' || $self->_allowConfirmation)
+      ($form->_mode == 'test' || $form->_allowConfirmation)
     ) {
       return FALSE;
     }
 
-    $contactID = self::getRegistrationContactID($fields, $self, $isAdditional);
+    $contactID = self::getRegistrationContactID($fields, $form, $isAdditional);
 
     if ($contactID) {
       $participant = new CRM_Event_BAO_Participant();
       $participant->contact_id = $contactID;
-      $participant->event_id = $self->_values['event']['id'];
+      $participant->event_id = $form->_values['event']['id'];
       if (!empty($fields['participant_role']) && is_numeric($fields['participant_role'])) {
         $participant->role_id = $fields['participant_role'];
       }
       else {
-        $participant->role_id = $self->_values['event']['default_role_id'];
+        $participant->role_id = $form->_values['event']['default_role_id'];
       }
       $participant->is_test = 0;
       $participant->find();
       $statusTypes = CRM_Event_PseudoConstant::participantStatus(NULL, 'is_counted = 1');
       while ($participant->fetch()) {
         if (array_key_exists($participant->status_id, $statusTypes)) {
-          if (!$isAdditional && !$self->_values['event']['allow_same_participant_emails']) {
+          if (!$isAdditional && !$form->_values['event']['allow_same_participant_emails']) {
             $registerUrl = CRM_Utils_System::url('civicrm/event/register',
-              "reset=1&id={$self->_values['event']['id']}&cid=0"
+              "reset=1&id={$form->_values['event']['id']}&cid=0"
             );
-            if ($self->_pcpId) {
-              $registerUrl .= '&pcpId=' . $self->_pcpId;
+            if ($form->_pcpId) {
+              $registerUrl .= '&pcpId=' . $form->_pcpId;
             }
 
             $status = ts("It looks like you are already registered for this event. If you want to change your registration, or you feel that you've received this message in error, please contact the site administrator.") . ' ' . ts('You can also <a href="%1">register another participant</a>.', array(1 => $registerUrl));
             CRM_Core_Session::singleton()->setStatus($status, ts('Oops.'), 'alert');
             $url = CRM_Utils_System::url('civicrm/event/info',
-              "reset=1&id={$self->_values['event']['id']}&noFullMsg=true"
+              "reset=1&id={$form->_values['event']['id']}&noFullMsg=true"
             );
-            if ($self->_action & CRM_Core_Action::PREVIEW) {
+            if ($form->_action & CRM_Core_Action::PREVIEW) {
               $url .= '&action=preview';
             }
 
-            if ($self->_pcpId) {
-              $url .= '&pcpId=' . $self->_pcpId;
+            if ($form->_pcpId) {
+              $url .= '&pcpId=' . $form->_pcpId;
             }
 
             CRM_Utils_System::redirect($url);

@@ -23,7 +23,7 @@ class CRM_Case_Form_AddToCaseAsRole extends CRM_Contact_Form_Task {
     $this->addEntityRef(
       'assign_to',
       ts('Assign to'),
-      array('entity' => 'case'),
+      array('entity' => 'Case'),
       TRUE
     );
 

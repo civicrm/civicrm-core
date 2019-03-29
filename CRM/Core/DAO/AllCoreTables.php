@@ -198,7 +198,7 @@ class CRM_Core_DAO_AllCoreTables {
    * @return bool
    */
   public static function isCoreTable($tableName) {
-    return FALSE !== array_search($tableName, self::tables());
+    return array_key_exists($tableName, self::tables());
   }
 
   /**

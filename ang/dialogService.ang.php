@@ -5,7 +5,7 @@
 
 // https://github.com/jwstadler/angular-jquery-dialog-service
 
-return array(
+return [
   'ext' => 'civicrm',
-  'js' => array('bower_components/angular-jquery-dialog-service/dialog-service.js'),
-);
+  'js' => ['bower_components/angular-jquery-dialog-service/dialog-service.js'],
+];

@@ -118,7 +118,7 @@ class CRM_Event_Form_ParticipantView extends CRM_Core_Form {
     }
 
     if ($values[$participantID]['is_test']) {
-      $values[$participantID]['status'] .= ' (test) ';
+      $values[$participantID]['status'] = CRM_Core_TestEntity::appendTestText($values[$participantID]['status']);
     }
 
     // Get Note

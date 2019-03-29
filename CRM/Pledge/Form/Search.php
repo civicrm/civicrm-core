@@ -71,7 +71,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
-    $this->defaults = array();
 
     $this->loadStandardSearchOptionsFromUrl();
 
@@ -312,24 +311,6 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    */
   public function addRules() {
     $this->addFormRule(array('CRM_Pledge_Form_Search', 'formRule'));
-  }
-
-  /**
-   * Global validation rules for the form.
-   *
-   * @param array $fields
-   *   Posted values of the form.
-   *
-   * @return array|bool
-   */
-  public static function formRule($fields) {
-    $errors = array();
-
-    if (!empty($errors)) {
-      return $errors;
-    }
-
-    return TRUE;
   }
 
   /**

@@ -309,7 +309,6 @@ class CRM_Activity_Page_AJAX {
     $mainActivity->save();
     $mainActivityId = $mainActivity->id;
     CRM_Activity_BAO_Activity::logActivityAction($mainActivity);
-    $mainActivity->free();
 
     // Mark previous activity as deleted. If it was a non-case activity
     // then just change the subject.
@@ -330,9 +329,7 @@ class CRM_Activity_Page_AJAX {
       }
       $otherActivity->save();
 
-      $caseActivity->free();
     }
-    $otherActivity->free();
 
     $targetContacts = array();
     if (!empty($params['targetContactIds'])) {
@@ -385,7 +382,6 @@ class CRM_Activity_Page_AJAX {
     $params['mainActivityId'] = $mainActivityId;
     CRM_Activity_BAO_Activity::copyExtendedActivityData($params);
     CRM_Utils_Hook::post('create', 'CaseActivity', $caseActivity->id, $caseActivity);
-    $caseActivity->free();
 
     return (array('error_msg' => $error_msg, 'newId' => $mainActivity->id));
   }
@@ -405,9 +401,9 @@ class CRM_Activity_Page_AJAX {
       'activity_type_id' => 'Integer',
       'activity_type_exclude_id' => 'Integer',
       'activity_status_id' => 'String',
-      'activity_date_relative' => 'String',
-      'activity_date_low' => 'String',
-      'activity_date_high' => 'String',
+      'activity_date_time_relative' => 'String',
+      'activity_date_time_low' => 'String',
+      'activity_date_time_high' => 'String',
     );
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
@@ -441,16 +437,13 @@ class CRM_Activity_Page_AJAX {
           $formSearchField = 'activity_type_exclude_filter_id';
         }
         if (!empty($params[$searchField])) {
-          $activityFilter[$formSearchField] = CRM_Utils_Type::escape($params[$searchField], $dataType);
-          if (in_array($searchField, array('activity_date_low', 'activity_date_high'))) {
-            $activityFilter['activity_date_relative'] = 0;
+          $activityFilter[$formSearchField] = $params[$searchField];
+          if (in_array($searchField, array('activity_date_time_low', 'activity_date_time_high'))) {
+            $activityFilter['activity_date_time_relative'] = 0;
           }
           elseif ($searchField == 'activity_status_id') {
             $activityFilter['status_id'] = explode(',', $activityFilter[$searchField]);
           }
-        }
-        elseif (in_array($searchField, array('activity_type_id', 'activity_type_exclude_id'))) {
-          $activityFilter[$formSearchField] = '';
         }
       }
 

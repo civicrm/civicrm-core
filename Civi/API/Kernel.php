@@ -55,7 +55,7 @@ class Kernel {
    * @param array $apiProviders
    *   Array of ProviderInterface.
    */
-  public function __construct($dispatcher, $apiProviders = array()) {
+  public function __construct($dispatcher, $apiProviders = []) {
     $this->apiProviders = $apiProviders;
     $this->dispatcher = $dispatcher;
   }
@@ -223,7 +223,7 @@ class Kernel {
     if (!$resolveEvent->getApiProvider()) {
       throw new \Civi\API\Exception\NotImplementedException("API (" . $apiRequest['entity'] . ", " . $apiRequest['action'] . ") does not exist (join the API team and implement it!)");
     }
-    return array($resolveEvent->getApiProvider(), $apiRequest);
+    return [$resolveEvent->getApiProvider(), $apiRequest];
   }
 
   /**
@@ -285,7 +285,7 @@ class Kernel {
    */
   public function getEntityNames($version) {
     // Question: Would it better to eliminate $this->apiProviders and just use $this->dispatcher?
-    $entityNames = array();
+    $entityNames = [];
     foreach ($this->getApiProviders() as $provider) {
       /** @var ProviderInterface $provider */
       $entityNames = array_merge($entityNames, $provider->getEntityNames($version));
@@ -305,7 +305,7 @@ class Kernel {
    */
   public function getActionNames($version, $entity) {
     // Question: Would it better to eliminate $this->apiProviders and just use $this->dispatcher?
-    $actionNames = array();
+    $actionNames = [];
     foreach ($this->getApiProviders() as $provider) {
       /** @var ProviderInterface $provider */
       $actionNames = array_merge($actionNames, $provider->getActionNames($version, $entity));
@@ -324,7 +324,7 @@ class Kernel {
    *   API response.
    */
   public function formatException($e, $apiRequest) {
-    $data = array();
+    $data = [];
     if (!empty($apiRequest['params']['debug'])) {
       $data['trace'] = $e->getTraceAsString();
     }
@@ -362,7 +362,7 @@ class Kernel {
    *   API response.
    */
   public function formatPearException($e, $apiRequest) {
-    $data = array();
+    $data = [];
     $error = $e->getCause();
     if ($error instanceof \DB_Error) {
       $data["error_code"] = \DB::errorMessage($error->getCode());

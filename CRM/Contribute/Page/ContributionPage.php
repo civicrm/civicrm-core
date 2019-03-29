@@ -420,8 +420,10 @@ AND         cp.page_type = 'contribute'
     $params = array();
 
     $whereClause = $this->whereClause($params, FALSE);
-    $this->pagerAToZ($whereClause, $params);
-
+    $config = CRM_Core_Config::singleton();
+    if ($config->includeAlphabeticalPager) {
+      $this->pagerAToZ($whereClause, $params);
+    }
     $params = array();
     $whereClause = $this->whereClause($params, TRUE);
     $this->pager($whereClause, $params);

@@ -5,10 +5,10 @@
 
 // ODDITY: This only loads if CiviCase is active.
 
-return array(
+return [
   'ext' => 'civicrm',
-  'js' => array('ang/crmCaseType.js'),
-  'css' => array('ang/crmCaseType.css'),
-  'partials' => array('ang/crmCaseType'),
-  'requires' => array('ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges', 'crmUtil', 'crmResource'),
-);
+  'js' => ['ang/crmCaseType.js'],
+  'css' => ['ang/crmCaseType.css'],
+  'partials' => ['ang/crmCaseType'],
+  'requires' => ['ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges', 'crmUtil', 'crmResource'],
+];

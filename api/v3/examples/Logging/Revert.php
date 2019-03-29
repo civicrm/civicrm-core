@@ -6,10 +6,10 @@
  *   API result array
  */
 function logging_revert_example() {
-  $params = array(
+  $params = [
     'log_conn_id' => 'woot',
     'log_date' => '2017-02-07 02:35:06',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Logging', 'revert', $params);
@@ -19,12 +19,12 @@ function logging_revert_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -38,12 +38,12 @@ function logging_revert_example() {
  */
 function logging_revert_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'values' => 1,
-  );
+  ];
 
   return $expectedResult;
 }

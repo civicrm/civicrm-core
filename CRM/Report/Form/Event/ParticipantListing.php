@@ -30,7 +30,7 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2019
  */
-class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
+class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
@@ -180,7 +180,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form_Event {
             'operatorType' => CRM_Report_Form::OP_ENTITYREF,
             'type' => CRM_Utils_Type::T_INT,
             'attributes' => array(
-              'entity' => 'event',
+              'entity' => 'Event',
               'select' => array('minimumInputLength' => 0),
             ),
           ),
@@ -730,19 +730,6 @@ ORDER BY  cv.label
             ts('View') . "</a></span>";
         }
         $entryFound = TRUE;
-      }
-
-      // Handle employer id
-      if (array_key_exists('civicrm_contact_employer_id', $row)) {
-        $employerId = $row['civicrm_contact_employer_id'];
-        if ($employerId) {
-          $rows[$rowNum]['civicrm_contact_employer_id'] = CRM_Contact_BAO_Contact::displayName($employerId);
-          $url = CRM_Utils_System::url('civicrm/contact/view',
-            'reset=1&cid=' . $employerId, $this->_absoluteUrl
-          );
-          $rows[$rowNum]['civicrm_contact_employer_id_link'] = $url;
-          $rows[$rowNum]['civicrm_contact_employer_id_hover'] = ts('View Contact Summary for this Contact.');
-        }
       }
 
       // Convert campaign_id to campaign title

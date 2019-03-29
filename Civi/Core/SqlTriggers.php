@@ -53,7 +53,7 @@ class SqlTriggers {
    * @see CRM-9716
    */
   public function rebuild($tableName = NULL, $force = FALSE) {
-    $info = array();
+    $info = [];
 
     $logging = new \CRM_Logging_Schema();
     $logging->triggerInfo($info, $tableName, $force);
@@ -82,7 +82,7 @@ class SqlTriggers {
       return;
     }
 
-    $triggers = array();
+    $triggers = [];
 
     // now enumerate the tables and the events and collect the same set in a different format
     foreach ($info as $value) {
@@ -98,14 +98,14 @@ class SqlTriggers {
       }
 
       if (is_string($value['table']) == TRUE) {
-        $tables = array($value['table']);
+        $tables = [$value['table']];
       }
       else {
         $tables = $value['table'];
       }
 
       if (is_string($value['event']) == TRUE) {
-        $events = array(strtolower($value['event']));
+        $events = [strtolower($value['event'])];
       }
       else {
         $events = array_map('strtolower', $value['event']);
@@ -115,12 +115,12 @@ class SqlTriggers {
 
       foreach ($tables as $tableName) {
         if (!isset($triggers[$tableName])) {
-          $triggers[$tableName] = array();
+          $triggers[$tableName] = [];
         }
 
         foreach ($events as $eventName) {
-          $template_params = array('{tableName}', '{eventName}');
-          $template_values = array($tableName, $eventName);
+          $template_params = ['{tableName}', '{eventName}'];
+          $template_values = [$tableName, $eventName];
 
           $sql = str_replace($template_params,
             $template_values,
@@ -132,17 +132,17 @@ class SqlTriggers {
           );
 
           if (!isset($triggers[$tableName][$eventName])) {
-            $triggers[$tableName][$eventName] = array();
+            $triggers[$tableName][$eventName] = [];
           }
 
           if (!isset($triggers[$tableName][$eventName][$whenName])) {
             // We're leaving out cursors, conditions, and handlers for now
             // they are kind of dangerous in this context anyway
             // better off putting them in stored procedures
-            $triggers[$tableName][$eventName][$whenName] = array(
-              'variables' => array(),
-              'sql' => array(),
-            );
+            $triggers[$tableName][$eventName][$whenName] = [
+              'variables' => [],
+              'sql' => [],
+            ];
           }
 
           if ($variables) {
@@ -181,7 +181,7 @@ class SqlTriggers {
    *   the specific table requiring a rebuild; or NULL to rebuild all tables.
    */
   public function dropTriggers($tableName = NULL) {
-    $info = array();
+    $info = [];
 
     $logging = new \CRM_Logging_Schema();
     $logging->triggerInfo($info, $tableName);
@@ -201,17 +201,17 @@ class SqlTriggers {
    * @param array $params
    *   Optional parameters to interpolate into the string.
    */
-  public function enqueueQuery($triggerSQL, $params = array()) {
+  public function enqueueQuery($triggerSQL, $params = []) {
     if (\Civi::settings()->get('logging_no_trigger_permission')) {
 
       if (!file_exists($this->getFile())) {
         // Ugh. Need to let user know somehow. This is the first change.
-        \CRM_Core_Session::setStatus(ts('The mysql commands you need to run are stored in %1', array(
+        \CRM_Core_Session::setStatus(ts('The mysql commands you need to run are stored in %1', [
             1 => $this->getFile(),
-          )),
+          ]),
           '',
           'alert',
-          array('expires' => 0)
+          ['expires' => 0]
         );
       }
 

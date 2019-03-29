@@ -30,6 +30,8 @@
   CRM.config.userFramework = {$config->userFramework|@json_encode};
   CRM.config.resourceBase = {$config->userFrameworkResourceURL|@json_encode};
   CRM.config.lcMessages = {$config->lcMessages|@json_encode};
+  CRM.config.locale = {$locale|@json_encode};
+  CRM.config.cid = {$cid|@json_encode};
   $.datepicker._defaults.dateFormat = CRM.config.dateInputFormat = {$config->dateInputFormat|@json_encode};
   CRM.config.timeIs24Hr = {if $config->timeInputFormat eq 2}true{else}false{/if};
   CRM.config.ajaxPopupsEnabled = {$ajaxPopupsEnabled|@json_encode};

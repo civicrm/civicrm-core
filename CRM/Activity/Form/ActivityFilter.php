@@ -40,14 +40,9 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
     $activityOptions = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE);
     asort($activityOptions);
 
-    $this->add('select', 'activity_type_filter_id', ts('Include'), array('' => ts('- all activity type(s) -')) + $activityOptions);
-    $this->add('select', 'activity_type_exclude_filter_id', ts('Exclude'), array('' => ts('- select activity type -')) + $activityOptions);
-    CRM_Core_Form_Date::buildDateRange(
-      $this, 'activity_date', 1,
-      '_low', '_high', ts('From:'),
-      FALSE, array(), 'searchDate',
-      FALSE, array('class' => 'crm-select2 medium')
-    );
+    $this->add('select', 'activity_type_filter_id', ts('Include'), $activityOptions, FALSE, ['class' => 'crm-select2', 'multiple' => TRUE, 'placeholder' => ts('- all activity type(s) -')]);
+    $this->add('select', 'activity_type_exclude_filter_id', ts('Exclude'), $activityOptions, FALSE, ['class' => 'crm-select2', 'multiple' => TRUE, 'placeholder' => ts('- no types excluded -')]);
+    $this->addDatePickerRange('activity_date_time', ts('Date'));
     $this->addSelect('status_id',
       array('entity' => 'activity', 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
     );

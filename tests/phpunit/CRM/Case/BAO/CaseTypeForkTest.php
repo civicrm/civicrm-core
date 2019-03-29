@@ -16,6 +16,31 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
   }
 
+  /**
+   * Test Manager contact is correctly assigned via case type def.
+   */
+  public function testManagerContact() {
+    $caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', 'ForkableCaseType', 'id', 'name');
+    $this->assertTrue(is_numeric($caseTypeId) && $caseTypeId > 0);
+
+    $this->callAPISuccess('CaseType', 'create', [
+      'id' => $caseTypeId,
+      'definition' => [
+        'caseRoles' => [
+          ['name' => 'First role', 'manager' => 0],
+          ['name' => 'Second role', 'creator' => 1, 'manager' => 1],
+        ],
+      ],
+    ]);
+    $relTypeID = $this->callAPISuccessGetValue('RelationshipType', [
+      'return' => "id",
+      'name_b_a' => "Second role",
+    ]);
+    //Check if manager is correctly retrieved from xml processor.
+    $xmlProcessor = new CRM_Case_XMLProcessor_Process();
+    $this->assertEquals($relTypeID, $xmlProcessor->getCaseManagerRoleId('ForkableCaseType'));
+  }
+
 
   /**
    * Edit the definition of ForkableCaseType.

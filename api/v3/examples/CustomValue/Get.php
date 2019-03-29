@@ -8,10 +8,10 @@
  *   API result array
  */
 function custom_value_get_example() {
-  $params = array(
+  $params = [
     'id' => 2,
     'entity_id' => 2,
-  );
+  ];
 
   try{
     $result = civicrm_api3('CustomValue', 'get', $params);
@@ -21,11 +21,11 @@ function custom_value_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'error' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -39,60 +39,60 @@ function custom_value_get_example() {
  */
 function custom_value_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 7,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'entity_id' => '2',
         'latest' => 'value 1',
         'id' => '1',
-      ),
-      '2' => array(
+      ],
+      '2' => [
         'entity_id' => '2',
         'latest' => 'value 3',
         'id' => '2',
         '1' => 'value 2',
         '2' => 'value 3',
-      ),
-      '3' => array(
+      ],
+      '3' => [
         'entity_id' => '2',
         'latest' => '',
         'id' => '3',
         '1' => 'warm beer',
         '2' => '',
-      ),
-      '4' => array(
+      ],
+      '4' => [
         'entity_id' => '2',
         'latest' => '',
         'id' => '4',
         '1' => 'fl* w*',
         '2' => '',
-      ),
-      '5' => array(
+      ],
+      '5' => [
         'entity_id' => '2',
         'latest' => 'coffee',
         'id' => '5',
         '1' => 'defaultValue',
         '2' => 'coffee',
-      ),
-      '6' => array(
+      ],
+      '6' => [
         'entity_id' => '2',
         'latest' => 'value 4',
         'id' => '6',
         '1' => '',
         '2' => 'value 4',
-      ),
-      '7' => array(
+      ],
+      '7' => [
         'entity_id' => '2',
         'latest' => '',
         'id' => '7',
         '1' => 'vegemite',
         '2' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

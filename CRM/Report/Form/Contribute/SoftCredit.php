@@ -535,21 +535,10 @@ GROUP BY   {$this->_aliases['civicrm_contribution']}.currency
     $this->buildACLClause(array('constituentname', 'contact_civireport'));
     $sql = $this->buildQuery();
 
-    $dao = CRM_Core_DAO::executeQuery($sql);
     $rows = $graphRows = array();
-    $count = 0;
-    while ($dao->fetch()) {
-      $row = array();
-      foreach ($this->_columnHeaders as $key => $value) {
-        $row[$key] = $dao->$key;
-      }
-      $rows[] = $row;
-    }
-    $this->formatDisplay($rows);
+    $this->buildRows($sql, $rows);
 
-    // to hide the contact ID field from getting displayed
-    unset($this->_columnHeaders['civicrm_contact_id_constituent']);
-    unset($this->_columnHeaders['civicrm_contact_id_creditor']);
+    $this->formatDisplay($rows);
 
     // assign variables to templates
     $this->doTemplateAssignment($rows);

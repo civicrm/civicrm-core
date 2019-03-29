@@ -14,7 +14,7 @@ class Arrays {
    * @return array
    */
   public static function collect($arr, $col) {
-    $r = array();
+    $r = [];
     foreach ($arr as $k => $item) {
       $r[$k] = $item[$col];
     }

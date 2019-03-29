@@ -917,7 +917,19 @@ HTACCESS;
     else {
       $path = $url = $imageURL;
     }
-    $mimeType = 'image/' . strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    $fileExtension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    //According to (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types),
+    // there are some extensions that would need translating.:
+    $translateMimeTypes = [
+      'tif' => 'tiff',
+      'jpg' => 'jpeg',
+      'svg' => 'svg+xml',
+    ];
+    $mimeType = 'image/' . CRM_Utils_Array::value(
+      $fileExtension,
+      $translateMimeTypes,
+      $fileExtension
+    );
 
     return self::getFileURL($path, $mimeType, $url);
   }
@@ -1032,6 +1044,25 @@ HTACCESS;
       }
     }
     return $iconClasses['*'];
+  }
+
+  /**
+   * Is the filename a safe and valid filename passed in from URL
+   *
+   * @param string $fileName
+   * @return bool
+   */
+  public static function isValidFileName($fileName = NULL) {
+    if ($fileName) {
+      $check = $fileName !== basename($fileName) ? FALSE : TRUE;
+      if ($check) {
+        if (substr($fileName, 0, 1) == '/' || substr($fileName, 0, 1) == '.' || substr($fileName, 0, 1) == DIRECTORY_SEPARATOR) {
+          $check = FALSE;
+        }
+      }
+      return $check;
+    }
+    return FALSE;
   }
 
 }

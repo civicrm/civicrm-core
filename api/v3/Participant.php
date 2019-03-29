@@ -49,7 +49,7 @@ function civicrm_api3_participant_create($params) {
     }
   }
 
-  $values = $participant = array();
+  $values = $participant = [];
   _civicrm_api3_custom_format_params($params, $values, 'Participant');
   $params = array_merge($values, $params);
 
@@ -104,14 +104,14 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant) {
       where ps.id is not null and pfv.label = %2
     ";
 
-    $qParams = array(
-      1 => array($params['event_id'], 'Integer'),
-      2 => array($label, 'String'),
-    );
+    $qParams = [
+      1 => [$params['event_id'], 'Integer'],
+      2 => [$label, 'String'],
+    ];
 
     $dao = CRM_Core_DAO::executeQuery($sql, $qParams);
     if ($dao->fetch()) {
-      $lineItemParams = array(
+      $lineItemParams = [
         'price_field_id' => $dao->priceFieldID,
         'price_field_value_id' => $dao->priceFieldValueID,
         'entity_table' => 'civicrm_participant',
@@ -121,7 +121,7 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant) {
         'participant_count' => 0,
         'unit_price' => $dao->amount,
         'line_total' => $qty * $dao->amount,
-      );
+      ];
       civicrm_api3('line_item', 'create', $lineItemParams);
     }
 
@@ -143,8 +143,8 @@ function _civicrm_api3_participant_create_spec(&$params) {
   $params['event_id']['api.required'] = 1;
   $params['contact_id']['api.required'] = 1;
   // These are for the sake of search builder options - can be removed if that is fixed
-  $params['role_id']['api.aliases'] = array('participant_role');
-  $params['status_id']['api.aliases'] = array('participant_status');
+  $params['role_id']['api.aliases'] = ['participant_role'];
+  $params['status_id']['api.aliases'] = ['participant_status'];
 }
 
 /**
@@ -161,7 +161,7 @@ function civicrm_api3_participant_get($params) {
 
   list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, 'Participant');
 
-  $participant = array();
+  $participant = [];
   while ($dao->fetch()) {
     $query->convertToPseudoNames($dao, FALSE, TRUE);
     $participant[$dao->participant_id] = $query->store($dao);
@@ -181,11 +181,11 @@ function civicrm_api3_participant_get($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_participant_get_spec(&$params) {
-  $params['participant_test'] = array(
+  $params['participant_test'] = [
     'api.default' => 0,
     'title' => 'Get Test Participants',
     'type' => CRM_Utils_Type::T_BOOLEAN,
-  );
+  ];
 }
 
 /**

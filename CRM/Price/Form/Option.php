@@ -176,7 +176,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
           '' => ' ',
         ) + $membershipTypes, FALSE,
         array('onClick' => "calculateRowValues( );"));
-        $this->add('text', 'membership_num_terms', ts('Number of Terms'), $attributes['membership_num_terms']);
+        $this->add('number', 'membership_num_terms', ts('Number of Terms'), $attributes['membership_num_terms']);
       }
       else {
         $allComponents = explode(CRM_Core_DAO::VALUE_SEPARATOR, $extendComponentId);
@@ -184,10 +184,10 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         if (in_array($eventComponentId, $allComponents)) {
           $this->isEvent = TRUE;
           // count
-          $this->add('text', 'count', ts('Participant Count'));
+          $this->add('number', 'count', ts('Participant Count'));
           $this->addRule('count', ts('Please enter a valid Max Participants.'), 'positiveInteger');
 
-          $this->add('text', 'max_value', ts('Max Participants'));
+          $this->add('number', 'max_value', ts('Max Participants'));
           $this->addRule('max_value', ts('Please enter a valid Max Participants.'), 'positiveInteger');
         }
 
@@ -232,7 +232,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       $this->add('textarea', 'help_post', ts('Post Option Help'));
 
       // weight
-      $this->add('text', 'weight', ts('Order'), NULL, TRUE);
+      $this->add('number', 'weight', ts('Order'), NULL, TRUE);
       $this->addRule('weight', ts('is a numeric field'), 'numeric');
 
       // is active ?

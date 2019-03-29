@@ -199,13 +199,13 @@ class CRM_Upgrade_Incremental_Base {
    * Do any relevant smart group updates.
    *
    * @param CRM_Queue_TaskContext $ctx
-   * @param string $version
+   * @param array $actions
    *
    * @return bool
    */
-  public function updateSmartGroups($ctx, $version) {
-    $groupUpdateObject = new CRM_Upgrade_Incremental_SmartGroups($version);
-    $groupUpdateObject->updateGroups();
+  public function updateSmartGroups($ctx, $actions) {
+    $groupUpdateObject = new CRM_Upgrade_Incremental_SmartGroups();
+    $groupUpdateObject->updateGroups($actions);
     return TRUE;
   }
 

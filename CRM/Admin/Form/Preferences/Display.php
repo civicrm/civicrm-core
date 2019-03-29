@@ -51,6 +51,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     'ajaxPopupsEnabled' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'display_name_format' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'sort_name_format' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'menubar_position' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
   );
 
   /**

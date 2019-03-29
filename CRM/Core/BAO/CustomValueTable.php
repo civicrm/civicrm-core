@@ -124,7 +124,6 @@ class CRM_Core_BAO_CustomValueTable {
 
             case 'Country':
               $type = 'Integer';
-              $mulValues = explode(',', $value);
               if (is_array($value)) {
                 $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR, $value) . CRM_Core_DAO::VALUE_SEPARATOR;
                 $type = 'String';
@@ -219,7 +218,7 @@ class CRM_Core_BAO_CustomValueTable {
             default:
               break;
           }
-          if (strtolower($value) === "null") {
+          if ($value === 'null') {
             // when unsetting a value to null, we don't need to validate the type
             // https://projectllr.atlassian.net/browse/VGQBMP-20
             $set[$field['column_name']] = $value;

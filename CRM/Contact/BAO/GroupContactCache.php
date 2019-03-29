@@ -555,15 +555,12 @@ WHERE  id IN ( $groupIDs )
           );
         $query->_useDistinct = FALSE;
         $query->_useGroupBy = FALSE;
-        $searchSQL
-          = $query->searchQuery(
+        $sqlParts = $query->getSearchSQLParts(
             0, 0, NULL,
             FALSE, FALSE,
-            FALSE, TRUE,
-            TRUE,
-            NULL, NULL, NULL,
-            TRUE
+            FALSE, TRUE
           );
+        $searchSQL = "{$sqlParts['select']} {$sqlParts['from']} {$sqlParts['where']} {$sqlParts['having']} {$sqlParts['group_by']}";
       }
       $groupID = CRM_Utils_Type::escape($groupID, 'Integer');
       $sql = $searchSQL . " AND contact_a.id NOT IN (

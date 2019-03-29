@@ -136,8 +136,6 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
 
     $participantBAO->save();
 
-    $session = CRM_Core_Session::singleton();
-
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
 
     if (!empty($params['id'])) {
@@ -203,9 +201,12 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
       return $participant;
     }
 
-    if ((!CRM_Utils_Array::value('id', $params)) ||
+    // Log activity when creating new participant or changing status
+    if (empty($params['id']) ||
       (isset($params['status_id']) && $params['status_id'] != $status)
     ) {
+      // Default status if not specified
+      $participant->status_id = $participant->status_id ?: self::fields()['participant_status_id']['default'];
       CRM_Activity_BAO_Activity::addActivity($participant);
     }
 

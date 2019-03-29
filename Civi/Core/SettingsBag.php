@@ -89,7 +89,7 @@ class SettingsBag {
   public function __construct($domainId, $contactId) {
     $this->domainId = $domainId;
     $this->contactId = $contactId;
-    $this->values = array();
+    $this->values = [];
     $this->combined = NULL;
   }
 
@@ -128,7 +128,7 @@ class SettingsBag {
     // Note: Don't use DAO child classes. They require fields() which require
     // translations -- which are keyed off settings!
 
-    $this->values = array();
+    $this->values = [];
     $this->combined = NULL;
 
     // Ordinarily, we just load values from `civicrm_setting`. But upgrades require care.
@@ -141,7 +141,7 @@ class SettingsBag {
 
     if ($isUpgradeMode && empty($this->contactId) && \CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_domain', 'config_backend', FALSE)) {
       $config_backend = \CRM_Core_DAO::singleValueQuery('SELECT config_backend FROM civicrm_domain WHERE id = %1',
-        array(1 => array($this->domainId, 'Positive')));
+        [1 => [$this->domainId, 'Positive']]);
       $oldSettings = \CRM_Upgrade_Incremental_php_FourSeven::convertBackendToSettings($this->domainId, $config_backend);
       \CRM_Utils_Array::extend($this->values, $oldSettings);
     }
@@ -180,7 +180,7 @@ class SettingsBag {
   public function all() {
     if ($this->combined === NULL) {
       $this->combined = $this->combine(
-        array($this->defaults, $this->values, $this->mandatory)
+        [$this->defaults, $this->values, $this->mandatory]
       );
     }
     return $this->combined;
@@ -281,16 +281,16 @@ class SettingsBag {
   protected function createQuery() {
     $select = \CRM_Utils_SQL_Select::from('civicrm_setting')
       ->select('id, name, value, domain_id, contact_id, is_domain, component_id, created_date, created_id')
-      ->where('domain_id = #id', array(
+      ->where('domain_id = #id', [
         'id' => $this->domainId,
-      ));
+      ]);
     if ($this->contactId === NULL) {
       $select->where('is_domain = 1');
     }
     else {
-      $select->where('contact_id = #id', array(
+      $select->where('contact_id = #id', [
         'id' => $this->contactId,
-      ));
+      ]);
       $select->where('is_domain = 0');
     }
     return $select;
@@ -306,7 +306,7 @@ class SettingsBag {
    * @return array
    */
   protected function combine($arrays) {
-    $combined = array();
+    $combined = [];
     foreach ($arrays as $array) {
       foreach ($array as $k => $v) {
         if ($v !== NULL) {
@@ -326,8 +326,8 @@ class SettingsBag {
    *   The new value of the setting.
    */
   protected function setDb($name, $value) {
-    $fields = array();
-    $fieldsToSet = \CRM_Core_BAO_Setting::validateSettingsInput(array($name => $value), $fields);
+    $fields = [];
+    $fieldsToSet = \CRM_Core_BAO_Setting::validateSettingsInput([$name => $value], $fields);
     //We haven't traditionally validated inputs to setItem, so this breaks things.
     //foreach ($fieldsToSet as $settingField => &$settingValue) {
     //  self::validateSetting($settingValue, $fields['values'][$settingField]);

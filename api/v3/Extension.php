@@ -69,17 +69,17 @@ function civicrm_api3_extension_install($params) {
  * @param $fields
  */
 function _civicrm_api3_extension_install_spec(&$fields) {
-  $fields['keys'] = array(
+  $fields['keys'] = [
     'title' => 'Extension Key(s)',
-    'api.aliases' => array('key'),
+    'api.aliases' => ['key'],
     'type' => CRM_Utils_Type::T_STRING,
     'description' => 'Fully qualified name of one or more extensions',
-  );
-  $fields['path'] = array(
+  ];
+  $fields['path'] = [
     'title' => 'Extension Path',
     'type' => CRM_Utils_Type::T_STRING,
     'description' => 'The path to the extension. May use wildcard ("*").',
-  );
+  ];
 }
 
 /**
@@ -91,11 +91,11 @@ function _civicrm_api3_extension_install_spec(&$fields) {
 function civicrm_api3_extension_upgrade() {
   CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
   $queue = CRM_Extension_Upgrades::createQueue();
-  $runner = new CRM_Queue_Runner(array(
+  $runner = new CRM_Queue_Runner([
     'title' => 'Extension Upgrades',
     'queue' => $queue,
     'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
-  ));
+  ]);
 
   try {
     $result = $runner->runAll();
@@ -255,7 +255,7 @@ function civicrm_api3_extension_download($params) {
   CRM_Extension_System::singleton()->getCache()->flush();
   CRM_Extension_System::singleton(TRUE);
   if (CRM_Utils_Array::value('install', $params, TRUE)) {
-    CRM_Extension_System::singleton()->getManager()->install(array($params['key']));
+    CRM_Extension_System::singleton()->getManager()->install([$params['key']]);
   }
 
   return civicrm_api3_create_success();
@@ -266,23 +266,23 @@ function civicrm_api3_extension_download($params) {
  * @param $fields
  */
 function _civicrm_api3_extension_download_spec(&$fields) {
-  $fields['key'] = array(
+  $fields['key'] = [
     'title' => 'Extension Key',
     'api.required' => 1,
     'type' => CRM_Utils_Type::T_STRING,
     'description' => 'Fully qualified name of the extension',
-  );
-  $fields['url'] = array(
+  ];
+  $fields['url'] = [
     'title' => 'Download URL',
     'type' => CRM_Utils_Type::T_STRING,
     'description' => 'Optional as the system can determine the url automatically for public extensions',
-  );
-  $fields['install'] = array(
+  ];
+  $fields['install'] = [
     'title' => 'Auto-install',
     'type' => CRM_Utils_Type::T_STRING,
     'description' => 'Automatically install the downloaded extension',
     'api.default' => TRUE,
-  );
+  ];
 }
 
 /**
@@ -319,18 +319,18 @@ function civicrm_api3_extension_refresh($params) {
  * @param $fields
  */
 function _civicrm_api3_extension_refresh_spec(&$fields) {
-  $fields['local'] = array(
+  $fields['local'] = [
     'title' => 'Rescan Local',
     'api.default' => 1,
     'type' => CRM_Utils_Type::T_BOOLEAN,
     'description' => 'Whether to rescan the local filesystem (default TRUE)',
-  );
-  $fields['remote'] = array(
+  ];
+  $fields['remote'] = [
     'title' => 'Rescan Remote',
     'api.default' => 1,
     'type' => CRM_Utils_Type::T_BOOLEAN,
     'description' => 'Whether to rescan the remote repository (default TRUE)',
-  );
+  ];
 }
 
 /**
@@ -347,14 +347,14 @@ function civicrm_api3_extension_get($params) {
   $keys = array_merge($full_names, $keys);
   $statuses = CRM_Extension_System::singleton()->getManager()->getStatuses();
   $mapper = CRM_Extension_System::singleton()->getMapper();
-  $result = array();
+  $result = [];
   $id = 0;
   foreach ($statuses as $key => $status) {
     try {
       $obj = $mapper->keyToInfo($key);
     }
     catch (CRM_Extension_Exception $ex) {
-      CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', array(1 => $key)));
+      CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', [1 => $key]));
       continue;
     }
     $info = CRM_Extension_System::createExtendedInfo($obj);
@@ -374,7 +374,7 @@ function civicrm_api3_extension_get($params) {
   unset($params['keys']);
   unset($params['full_name']);
 
-  $filterableFields = array('id', 'type', 'status', 'path');
+  $filterableFields = ['id', 'type', 'status', 'path'];
   return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', $filterableFields);
 }
 
@@ -388,15 +388,15 @@ function civicrm_api3_extension_get($params) {
  */
 function civicrm_api3_extension_getremote($params) {
   $extensions = CRM_Extension_System::singleton()->getBrowser()->getExtensions();
-  $result = array();
+  $result = [];
   $id = 0;
   foreach ($extensions as $key => $obj) {
-    $info = array();
+    $info = [];
     $info['id'] = $id++; // backward compatibility with indexing scheme
     $info = array_merge($info, (array) $obj);
     $result[] = $info;
   }
-  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', CRM_Utils_Array::value('return', $params, array()));
+  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', CRM_Utils_Array::value('return', $params, []));
 }
 
 /**
@@ -419,11 +419,11 @@ function _civicrm_api3_getKeys($params, $key = 'keys') {
       return $params[$key];
     }
     if ($params[$key] == '') {
-      return array();
+      return [];
     }
     return explode(API_V3_EXTENSION_DELIMITER, $params[$key]);
   }
   else {
-    return array();
+    return [];
   }
 }

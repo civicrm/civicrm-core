@@ -165,8 +165,11 @@ class CRM_Contact_Form_Edit_Address {
       $form->addElement('checkbox', "address[$blockId][use_shared_address]", NULL, ts('Use another contact\'s address'));
 
       // Override the default profile links to add address form
-      $profileLinks = CRM_Contact_BAO_Contact::entityRefCreateLinks() ? CRM_Core_BAO_UFGroup::getCreateLinks('', 'shared_address') : FALSE;
-      $form->addEntityRef("address[$blockId][master_contact_id]", ts('Share With'), array('create' => $profileLinks));
+      $profileLinks = CRM_Contact_BAO_Contact::getEntityRefCreateLinks('shared_address');
+      $form->addEntityRef("address[$blockId][master_contact_id]", ts('Share With'), ['create' => $profileLinks, 'api' => ['extra' => ['contact_type']]]);
+
+      // do we want to update employer for shared address
+      $form->addElement('checkbox', "address[$blockId][update_current_employer]", NULL, ts('Set this organization as current employer'));
     }
   }
 

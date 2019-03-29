@@ -55,12 +55,12 @@ function _civicrm_api3_uf_field_create_spec(&$params) {
   $params['field_name']['api.required'] = TRUE;
   $params['uf_group_id']['api.required'] = TRUE;
 
-  $params['option.autoweight'] = array(
+  $params['option.autoweight'] = [
     'title' => "Auto Weight",
     'description' => "Automatically adjust weights in UFGroup to align with UFField",
     'type' => CRM_Utils_Type::T_BOOLEAN,
     'api.default' => TRUE,
-  );
+  ];
   $params['is_active']['api.default'] = TRUE;
 }
 
@@ -108,5 +108,5 @@ function civicrm_api3_uf_field_delete($params) {
  */
 function _civicrm_api3_uf_field_delete_spec(&$params) {
   // legacy support for field_id
-  $params['id']['api.aliases'] = array('field_id');
+  $params['id']['api.aliases'] = ['field_id'];
 }

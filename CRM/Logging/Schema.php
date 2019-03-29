@@ -299,7 +299,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    * Update log tables structure.
    *
    * This function updates log tables to have the log_conn_id type of varchar
-   * and also implements any engine change to INNODB defined by the hooks.
+   * and also implements the engine change defined by the hook (i.e. INNODB).
    *
    * Note changing engine & adding hook-defined indexes, but not changing back
    * to ARCHIVE if engine has not been deliberately set (by hook) and not dropping
@@ -312,15 +312,15 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       $tableSpec = $this->logTableSpec[$mainTable];
       if (isset($tableSpec['engine']) && strtoupper($tableSpec['engine']) != $this->getEngineForLogTable($logTable)) {
         $alterSql[] = "ENGINE=" . $tableSpec['engine'] . " " . CRM_Utils_Array::value('engine_config', $tableSpec);
-        if (!empty($tableSpec['indexes'])) {
-          $indexes = $this->getIndexesForTable($logTable);
-          foreach ($tableSpec['indexes'] as $indexName => $indexSpec) {
-            if (!in_array($indexName, $indexes)) {
-              if (is_array($indexSpec)) {
-                $indexSpec = implode(" , ", $indexSpec);
-              }
-              $alterSql[] = "ADD INDEX {$indexName}($indexSpec)";
+      }
+      if (!empty($tableSpec['indexes'])) {
+        $indexes = $this->getIndexesForTable($logTable);
+        foreach ($tableSpec['indexes'] as $indexName => $indexSpec) {
+          if (!in_array($indexName, $indexes)) {
+            if (is_array($indexSpec)) {
+              $indexSpec = implode(" , ", $indexSpec);
             }
+            $alterSql[] = "ADD INDEX {$indexName}($indexSpec)";
           }
         }
       }
@@ -363,12 +363,22 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    * @return array
    */
   public function getIndexesForTable($table) {
-    return CRM_Core_DAO::executeQuery("
-      SELECT constraint_name
-      FROM information_schema.key_column_usage
-      WHERE table_schema = %2 AND table_name = %1",
+    $indexes = [];
+    $result = CRM_Core_DAO::executeQuery("
+        SELECT constraint_name AS index_name
+        FROM information_schema.key_column_usage
+        WHERE table_schema = %2 AND table_name = %1
+      UNION
+        SELECT index_name AS index_name
+        FROM information_schema.statistics
+        WHERE table_schema = %2 AND table_name = %1
+      ",
       array(1 => array($table, 'String'), 2 => array($this->db, 'String'))
-    )->fetchAll();
+    );
+    while ($result->fetch()) {
+      $indexes[] = $result->index_name;
+    }
+    return $indexes;
   }
 
   /**
@@ -597,9 +607,20 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
           'EXTRA' => $dao->EXTRA,
         );
         if (($first = strpos($dao->COLUMN_TYPE, '(')) != 0) {
-          \Civi::$statics[__CLASS__]['columnSpecs'][$dao->TABLE_NAME][$dao->COLUMN_NAME]['LENGTH'] = substr(
-            $dao->COLUMN_TYPE, $first, strpos($dao->COLUMN_TYPE, ')')
+          // this extracts the value between parentheses after the column type.
+          // it could be the column length, i.e. "int(8)", "decimal(20,2)")
+          // or the permitted values of an enum (e.g. "enum('A','B')")
+          $parValue = substr(
+            $dao->COLUMN_TYPE, $first + 1, strpos($dao->COLUMN_TYPE, ')') - $first - 1
           );
+          if (strpos($parValue, "'") === FALSE) {
+            // no quote in value means column length
+            \Civi::$statics[__CLASS__]['columnSpecs'][$dao->TABLE_NAME][$dao->COLUMN_NAME]['LENGTH'] = $parValue;
+          }
+          else {
+            // single quote means enum permitted values
+            \Civi::$statics[__CLASS__]['columnSpecs'][$dao->TABLE_NAME][$dao->COLUMN_NAME]['ENUM_VALUES'] = $parValue;
+          }
         }
       }
     }
@@ -637,6 +658,12 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
           || CRM_Utils_Array::value('LENGTH', $civiTableSpecs[$col]) > CRM_Utils_Array::value('LENGTH', $logTableSpecs[$col])
           ) {
             // if data-type is different, surely consider the column
+            $diff['MODIFY'][] = $col;
+          }
+          elseif ($civiTableSpecs[$col]['DATA_TYPE'] == 'enum' &&
+            CRM_Utils_Array::value('ENUM_VALUES', $civiTableSpecs[$col]) != CRM_Utils_Array::value('ENUM_VALUES', $logTableSpecs[$col])
+          ) {
+            // column is enum and the permitted values have changed
             $diff['MODIFY'][] = $col;
           }
           elseif ($civiTableSpecs[$col]['IS_NULLABLE'] != CRM_Utils_Array::value('IS_NULLABLE', $logTableSpecs[$col]) &&
@@ -858,7 +885,11 @@ COLS;
       foreach ($columns as $column) {
         $tableExceptions = array_key_exists('exceptions', $this->logTableSpec[$table]) ? $this->logTableSpec[$table]['exceptions'] : array();
         // ignore modified_date changes
-        if ($column != 'modified_date' && !in_array($column, $tableExceptions)) {
+        $tableExceptions[] = 'modified_date';
+        // exceptions may be provided with or without backticks
+        $excludeColumn = in_array($column, $tableExceptions) ||
+          in_array(str_replace('`', '', $column), $tableExceptions);
+        if (!$excludeColumn) {
           $cond[] = "IFNULL(OLD.$column,'') <> IFNULL(NEW.$column,'')";
         }
       }
