@@ -36,7 +36,7 @@ class Api3SelectQuery extends SelectQuery {
    * @inheritDoc
    */
   protected function buildWhereClause() {
-    $filters = array();
+    $filters = [];
     foreach ($this->where as $key => $value) {
       $table_name = NULL;
       $column_name = NULL;
@@ -45,7 +45,7 @@ class Api3SelectQuery extends SelectQuery {
         // Legacy support for old filter syntax per the test contract.
         // (Convert the style to the later one & then deal with them).
         $filterArray = explode('.', $key);
-        $value = array($filterArray[1] => $value);
+        $value = [$filterArray[1] => $value];
         $key = 'filters';
       }
 
@@ -54,12 +54,12 @@ class Api3SelectQuery extends SelectQuery {
         foreach ($value as $filterKey => $filterValue) {
           if (substr($filterKey, -4, 4) == 'high') {
             $key = substr($filterKey, 0, -5);
-            $value = array('<=' => $filterValue);
+            $value = ['<=' => $filterValue];
           }
 
           if (substr($filterKey, -3, 3) == 'low') {
             $key = substr($filterKey, 0, -4);
-            $value = array('>=' => $filterValue);
+            $value = ['>=' => $filterValue];
           }
 
           if ($filterKey == 'is_current' || $filterKey == 'isCurrent') {
@@ -110,7 +110,7 @@ class Api3SelectQuery extends SelectQuery {
       }
       $operator = is_array($value) ? \CRM_Utils_Array::first(array_keys($value)) : NULL;
       if (!in_array($operator, \CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-        $value = array('=' => $value);
+        $value = ['=' => $value];
       }
       $filters[$key] = \CRM_Core_DAO::createSQLFilter("{$table_name}.{$column_name}", $value);
     }
@@ -121,10 +121,10 @@ class Api3SelectQuery extends SelectQuery {
         $orGroups = array_map('trim', explode(',', $orGroups));
       }
       if (!is_array(\CRM_Utils_Array::first($orGroups))) {
-        $orGroups = array($orGroups);
+        $orGroups = [$orGroups];
       }
       foreach ($orGroups as $orGroup) {
-        $orClause = array();
+        $orClause = [];
         foreach ($orGroup as $key) {
           if (!isset($filters[$key])) {
             throw new \CiviCRM_API3_Exception("'$key' specified in OR group but not added to params");
@@ -147,11 +147,11 @@ class Api3SelectQuery extends SelectQuery {
   protected function getFields() {
     require_once 'api/v3/Generic.php';
     // Call this function directly instead of using the api wrapper to force unique field names off
-    $apiSpec = \civicrm_api3_generic_getfields(array(
+    $apiSpec = \civicrm_api3_generic_getfields([
       'entity' => $this->entity,
       'version' => 3,
-      'params' => array('action' => 'get'),
-    ), FALSE);
+      'params' => ['action' => 'get'],
+    ], FALSE);
     return $apiSpec['values'];
   }
 
@@ -174,7 +174,7 @@ class Api3SelectQuery extends SelectQuery {
     foreach ($this->apiFieldSpec as $field) {
       if (
         $fieldName == \CRM_Utils_Array::value('uniqueName', $field) ||
-        array_search($fieldName, \CRM_Utils_Array::value('api.aliases', $field, array())) !== FALSE
+        array_search($fieldName, \CRM_Utils_Array::value('api.aliases', $field, [])) !== FALSE
       ) {
         return $field;
       }

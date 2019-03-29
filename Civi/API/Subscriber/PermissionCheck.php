@@ -40,11 +40,11 @@ class PermissionCheck implements EventSubscriberInterface {
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::AUTHORIZE => array(
-        array('onApiAuthorize', Events::W_LATE),
-      ),
-    );
+    return [
+      Events::AUTHORIZE => [
+        ['onApiAuthorize', Events::W_LATE],
+      ],
+    ];
   }
 
   /**
@@ -122,8 +122,8 @@ class PermissionCheck implements EventSubscriberInterface {
       case 'ActionSchedule':
         $events = \CRM_Event_BAO_Event::getEvents();
         $aclEdit = \CRM_ACL_API::group(\CRM_Core_Permission::EDIT, NULL, 'civicrm_event', $events);
-        $param = array('id' => $apiRequest['params']['id']);
-        $eventId = \CRM_Core_BAO_ActionSchedule::retrieve($param, $value = array());
+        $param = ['id' => $apiRequest['params']['id']];
+        $eventId = \CRM_Core_BAO_ActionSchedule::retrieve($param, $value = []);
         if (in_array($eventId->entity_value, $aclEdit)) {
           return TRUE;
         }

@@ -37,7 +37,7 @@ class Events {
    *
    * We do not want to fire case-change events recursively.
    */
-  static $isActive = array();
+  static $isActive = [];
 
   /**
    * Following a change to an activity or case, fire the case-change event.
@@ -73,8 +73,8 @@ class Events {
           $tx = new \CRM_Core_Transaction();
           \CRM_Core_Transaction::addCallback(
             \CRM_Core_Transaction::PHASE_POST_COMMIT,
-            array(__CLASS__, 'fireCaseChangeForRealz'),
-            array($caseId),
+            [__CLASS__, 'fireCaseChangeForRealz'],
+            [$caseId],
             "Civi_CCase_Events::fire::{$caseId}"
           );
         }

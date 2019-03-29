@@ -54,9 +54,9 @@ class ChainSubscriber implements EventSubscriberInterface {
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::RESPOND => array('onApiRespond', Events::W_EARLY),
-    );
+    return [
+      Events::RESPOND => ['onApiRespond', Events::W_EARLY],
+    ];
   }
 
   /**
@@ -93,7 +93,7 @@ class ChainSubscriber implements EventSubscriberInterface {
 
     // We don't need to worry about nested api in the getfields/getoptions
     // actions, so just return immediately.
-    if (in_array($action, array('getfields', 'getfield', 'getoptions'))) {
+    if (in_array($action, ['getfields', 'getfield', 'getoptions'])) {
       return;
     }
 
@@ -102,7 +102,7 @@ class ChainSubscriber implements EventSubscriberInterface {
       // $result to be a recursive array
       // $result['values'][0] = $result;
       $oldResult = $result;
-      $result = array('values' => array(0 => $oldResult));
+      $result = ['values' => [0 => $oldResult]];
     }
     foreach ($params as $field => $newparams) {
       if ((is_array($newparams) || $newparams === 1) && $field <> 'api.has_parent' && substr($field, 0, 3) == 'api') {
@@ -110,7 +110,7 @@ class ChainSubscriber implements EventSubscriberInterface {
         // 'api.participant.delete' => 1 is a valid options - handle 1
         // instead of an array
         if ($newparams === 1) {
-          $newparams = array('version' => $version);
+          $newparams = ['version' => $version];
         }
         // can be api_ or api.
         $separator = $field[3];
@@ -120,18 +120,18 @@ class ChainSubscriber implements EventSubscriberInterface {
         $subAPI = explode($separator, $field);
 
         $subaction = empty($subAPI[2]) ? $action : $subAPI[2];
-        $subParams = array(
+        $subParams = [
           'debug' => \CRM_Utils_Array::value('debug', $params),
-        );
+        ];
         $subEntity = _civicrm_api_get_entity_name_from_camel($subAPI[1]);
 
         // Hard coded list of entitys that have fields starting api_ and shouldn't be automatically
         // deemed to be chained API calls
-        $skipList = array(
-          'SmsProvider' => array('type', 'url', 'params'),
-          'Job' => array('prefix', 'entity', 'action'),
-          'Contact' => array('key'),
-        );
+        $skipList = [
+          'SmsProvider' => ['type', 'url', 'params'],
+          'Job' => ['prefix', 'entity', 'action'],
+          'Contact' => ['key'],
+        ];
         if (isset($skipList[$entity]) && in_array($subEntity, $skipList[$entity])) {
           continue;
         }

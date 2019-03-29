@@ -44,7 +44,7 @@ class Manager {
   /**
    * @var array<Frame> stack of SQL transactions/savepoints
    */
-  private $frames = array();
+  private $frames = [];
 
   /**
    * @var int
@@ -131,7 +131,7 @@ class Manager {
     // internal state of each frame is consistent with its outcome
 
     $oldFrames = $this->frames;
-    $this->frames = array();
+    $this->frames = [];
     foreach ($oldFrames as $oldFrame) {
       $oldFrame->forceRollback();
     }

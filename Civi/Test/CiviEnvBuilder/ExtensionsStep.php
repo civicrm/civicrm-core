@@ -20,7 +20,7 @@ class ExtensionsStep implements StepInterface {
   }
 
   public function isValid() {
-    if (!in_array($this->action, array('install', 'uninstall'))) {
+    if (!in_array($this->action, ['install', 'uninstall'])) {
       return FALSE;
     }
     foreach ($this->names as $name) {

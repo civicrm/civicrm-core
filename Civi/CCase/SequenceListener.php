@@ -54,7 +54,7 @@ class SequenceListener implements CaseChangeListener {
     $actTypes = array_flip(\CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate'));
     $actStatuses = array_flip(\CRM_Activity_BAO_Activity::getStatusesByType(\CRM_Activity_BAO_Activity::COMPLETED));
 
-    $actIndex = $analyzer->getActivityIndex(array('activity_type_id', 'status_id'));
+    $actIndex = $analyzer->getActivityIndex(['activity_type_id', 'status_id']);
 
     foreach ($activitySetXML->ActivityTypes->ActivityType as $actTypeXML) {
       $actTypeId = $actTypes[(string) $actTypeXML->name];
@@ -78,10 +78,10 @@ class SequenceListener implements CaseChangeListener {
     }
 
     // OK, the all activities have completed
-    civicrm_api3('Case', 'create', array(
+    civicrm_api3('Case', 'create', [
       'id' => $analyzer->getCaseId(),
       'status_id' => 'Closed',
-    ));
+    ]);
     $analyzer->flush();
   }
 
@@ -114,12 +114,12 @@ class SequenceListener implements CaseChangeListener {
    * @param \SimpleXMLElement $actXML the <ActivityType> tag which describes the new activity
    */
   public function createActivity(Analyzer $analyzer, \SimpleXMLElement $actXML) {
-    $params = array(
+    $params = [
       'activity_type_id' => (string) $actXML->name,
       'status_id' => 'Scheduled',
       'activity_date_time' => \CRM_Utils_Time::getTime('YmdHis'),
       'case_id' => $analyzer->getCaseId(),
-    );
+    ];
     $case = $analyzer->getCase();
     if (!empty($case['contact_id'])) {
       $params['target_id'] = \CRM_Utils_Array::first($case['contact_id']);

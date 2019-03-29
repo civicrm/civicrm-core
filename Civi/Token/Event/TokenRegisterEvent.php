@@ -57,10 +57,10 @@ class TokenRegisterEvent extends TokenEvent {
       $params = $paramsOrField;
     }
     else {
-      $params = array(
+      $params = [
         'field' => $paramsOrField,
         'label' => $label,
-      );
+      ];
     }
     $params = array_merge($this->defaults, $params);
     $this->tokenProcessor->addToken($params);

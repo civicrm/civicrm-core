@@ -48,7 +48,7 @@ namespace Civi\API;
  */
 class WhitelistRule {
 
-  static $IGNORE_FIELDS = array(
+  static $IGNORE_FIELDS = [
     'check_permissions',
     'debug',
     'offset',
@@ -61,7 +61,7 @@ class WhitelistRule {
     'sequential',
     'sort',
     'version',
-  );
+  ];
 
   /**
    * Create a batch of rules from an array.
@@ -70,7 +70,7 @@ class WhitelistRule {
    * @return array
    */
   public static function createAll($rules) {
-    $whitelist = array();
+    $whitelist = [];
     foreach ($rules as $rule) {
       $whitelist[] = new WhitelistRule($rule);
     }
@@ -126,7 +126,7 @@ class WhitelistRule {
       $this->actions = '*';
     }
     else {
-      $this->actions = array();
+      $this->actions = [];
       foreach ((array) $ruleSpec['actions'] as $action) {
         $this->actions[] = Request::normalizeActionName($action, $ruleSpec['version']);
       }
@@ -197,7 +197,7 @@ class WhitelistRule {
         // Kind'a silly we need to (re(re))parse here for each rule; would be more
         // performant if pre-parsed by Request::create().
         $options = _civicrm_api3_get_options_from_params($apiRequest['params'], TRUE, $apiRequest['entity'], 'get');
-        $return = \CRM_Utils_Array::value('return', $options, array());
+        $return = \CRM_Utils_Array::value('return', $options, []);
         $activatedFields = array_merge($activatedFields, array_keys($return));
       }
 
@@ -267,7 +267,7 @@ class WhitelistRule {
    *   List of acceptable keys.
    */
   protected function filterFields($keys) {
-    $r = array();
+    $r = [];
     foreach ($keys as $key) {
       if (in_array($key, $this->fields)) {
         $r[] = $key;
