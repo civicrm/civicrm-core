@@ -18,10 +18,6 @@ describe('crmCaseType', function() {
     CRM.resourceUrls = {
       'civicrm': ''
     };
-    // CRM_Case_XMLProcessor::REL_TYPE_CNAME
-    CRM.crmCaseType = {
-      'REL_TYPE_CNAME': 'label_b_a'
-    };
     module('crmCaseType');
     module('crmJsonComparator');
     inject(function(crmJsonComparator) {

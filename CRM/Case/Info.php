@@ -144,7 +144,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     elseif ($dao instanceof CRM_Contact_DAO_RelationshipType) {
       /** @var $dao CRM_Contact_DAO_RelationshipType */
       $count = CRM_Case_XMLRepository::singleton()
-        ->getRelationshipReferenceCount($dao->{CRM_Case_XMLProcessor::REL_TYPE_CNAME});
+        ->getRelationshipReferenceCount($dao->label_a_b);
       if ($count > 0) {
         $result[] = array(
           'name' => 'casetypexml:relationships',
