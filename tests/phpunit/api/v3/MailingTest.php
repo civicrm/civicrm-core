@@ -54,7 +54,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->_params = array(
       'subject' => 'Hello {contact.display_name}',
       'body_text' => "This is {contact.display_name}.\nhttps://civicrm.org\n{domain.address}{action.optOutUrl}",
-      'body_html' => "<p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
+      'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
       'name' => 'mailing name',
       'created_id' => $this->_contactID,
       'header_id' => '',
@@ -897,6 +897,10 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
 
     $url = CRM_Mailing_Event_BAO_TrackableURLOpen::track($dao->queue_id, $dao->url_id);
     $this->assertContains('https://civicrm.org', $url);
+
+    // Ensure that Google CSS link is not tracked.
+    $sql = "SELECT id FROM civicrm_mailing_trackable_url where url = 'https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700'";
+    $this->assertEquals([], CRM_Core_DAO::executeQuery($sql)->fetchAll());
   }
 
   /**
