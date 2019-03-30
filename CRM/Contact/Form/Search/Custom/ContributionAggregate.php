@@ -200,11 +200,17 @@ civicrm_contact AS contact_a {$this->_aclFrom}
       "contrib.is_test = 0",
     );
 
-    $dateParams = array(
-      'contribution_date_relative' => $this->_formValues['contribution_date_relative'],
-      'contribution_date_low' => $this->_formValues['contribution_date_low'],
-      'contribution_date_high' => $this->_formValues['contribution_date_high'],
-    );
+    foreach ([
+      'contribution_date_relative',
+      'contribution_date_low',
+      'contribution_date_high',
+    ] as $dateFieldName) {
+      $dateParams[$dateFieldName] = CRM_Utils_Array::value(
+        $dateFieldName,
+        $this->_formValues
+      );
+    }
+
     foreach (CRM_Contact_BAO_Query::convertFormValues($dateParams) as $values) {
       list($name, $op, $value) = $values;
       if (strstr($name, '_low')) {
