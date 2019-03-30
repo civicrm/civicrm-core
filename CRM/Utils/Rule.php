@@ -488,6 +488,8 @@ class CRM_Utils_Rule {
    */
   public static function commaSeparatedIntegers($value) {
     foreach (explode(',', $value) as $val) {
+      // Remove any Whitespace around the key.
+      $val = trim($val);
       if (!self::positiveInteger($val)) {
         return FALSE;
       }

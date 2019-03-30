@@ -479,4 +479,47 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($expectState, $created['state_province_id']);
   }
 
+  public function testBuildStateProvinceOptionsWithDodgyProvinceLimit() {
+    $provinceLimit = [1228, "abcd;ef"];
+    $this->callAPISuccess('setting', 'create', [
+     'provinceLimit' => $provinceLimit,
+    ]);
+    $result = $this->callAPIFailure('address', 'getoptions', ['field' => 'state_province_id']);
+    // confirm that we hit our error not a SQLI.
+    $this->assertEquals('Province limit or default country setting is incorrect', $result['error_message']);
+    $this->callAPISuccess('setting', 'create', [
+     'provinceLimit' => [1228],
+    ]);
+    // Now confirm with a correct province setting it works fine
+    $this->callAPISuccess('address', 'getoptions', ['field' => 'state_province_id']);
+  }
+
+  public function testBuildCountryWithDodgyCountryLimitSetting() {
+    $countryLimit = [1228, "abcd;ef"];
+    $this->callAPISuccess('setting', 'create', [
+     'countryLimit' => $countryLimit,
+    ]);
+    $result = $this->callAPIFailure('address', 'getoptions', ['field' => 'country_id']);
+    // confirm that we hit our error not a SQLI.
+    $this->assertEquals('Available Country setting is incorrect', $result['error_message']);
+    $this->callAPISuccess('setting', 'create', [
+     'countryLimit' => [1228],
+    ]);
+    // Now confirm with a correct province setting it works fine
+    $this->callAPISuccess('address', 'getoptions', ['field' => 'country_id']);
+  }
+
+  public function testBuildCountyWithDodgeStateProvinceFiltering() {
+    $result = $this->callAPIFailure('Address', 'getoptions', [
+      'field' => 'county_id',
+      'state_province_id' => "abcd;ef",
+    ]);
+    $this->assertEquals('Can only accept Integers for state_province_id filtering', $result['error_message']);
+    $goodResult = $this->callAPISuccess('Address', 'getoptions', [
+      'field' => 'county_id',
+      'state_province_id' => 1004,
+    ]);
+    $this->assertEquals('San Francisco', $goodResult['values'][4]);
+  }
+
 }
