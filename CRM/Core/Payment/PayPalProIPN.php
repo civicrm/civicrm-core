@@ -426,7 +426,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     CRM_Core_Error::debug_var('POST', $_POST, TRUE, TRUE);
     if ($this->_isPaymentExpress) {
       $this->handlePaymentExpress();
-      return FALSE;
+      return;
     }
     $objects = $ids = $input = array();
     $this->_component = $input['component'] = self::getValue('m');
@@ -557,6 +557,10 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     $objects = $ids = $input = array();
     $isFirst = FALSE;
     $input['invoice'] = self::getValue('i', FALSE);
+    //Avoid return in case of unit test.
+    if (empty($input['invoice']) && empty($this->_inputParameters['is_unit_test'])) {
+      return;
+    }
     $input['txnType'] = $this->retrieve('txn_type', 'String');
     $contributionRecur = civicrm_api3('contribution_recur', 'getsingle', array(
       'return' => 'contact_id, id, payment_processor_id',
