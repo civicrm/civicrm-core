@@ -10,18 +10,19 @@ Subject: [PATCH] Ensure that entity_loader disable variable is re-set back to
  3 files changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/src/PhpWord/Shared/Html.php b/src/PhpWord/Shared/Html.php
-index 89881822ca..f25cf5f4a6 100644
+index 89881822ca..f2710ea168 100644
 --- a/src/PhpWord/Shared/Html.php
 +++ b/src/PhpWord/Shared/Html.php
-@@ -72,6 +72,7 @@ public static function addHtml($element, $html, $fullHTML = false, $preserveWhit
+@@ -72,7 +72,7 @@ public static function addHtml($element, $html, $fullHTML = false, $preserveWhit
          }
  
          // Load DOM
-+        $orignalLibEntityLoader = libxml_disable_entity_loader();
-         libxml_disable_entity_loader(true);
+-        libxml_disable_entity_loader(true);
++        $orignalLibEntityLoader = libxml_disable_entity_loader(true);
          $dom = new \DOMDocument();
          $dom->preserveWhiteSpace = $preserveWhiteSpace;
-@@ -80,6 +81,7 @@ public static function addHtml($element, $html, $fullHTML = false, $preserveWhit
+         $dom->loadXML($html);
+@@ -80,6 +80,7 @@ public static function addHtml($element, $html, $fullHTML = false, $preserveWhit
          $node = $dom->getElementsByTagName('body');
  
          self::parseNode($node->item(0), $element);
@@ -30,18 +31,19 @@ index 89881822ca..f25cf5f4a6 100644
  
      /**
 diff --git a/src/PhpWord/TemplateProcessor.php b/src/PhpWord/TemplateProcessor.php
-index 0f685bc45b..fa605b19c5 100644
+index 0f685bc45b..7efc0f1ac8 100644
 --- a/src/PhpWord/TemplateProcessor.php
 +++ b/src/PhpWord/TemplateProcessor.php
-@@ -170,6 +170,7 @@ protected function readPartWithRels($fileName)
+@@ -170,7 +170,7 @@ protected function readPartWithRels($fileName)
       */
      protected function transformSingleXml($xml, $xsltProcessor)
      {
-+        $orignalLibEntityLoader = libxml_disable_entity_loader();
-         libxml_disable_entity_loader(true);
+-        libxml_disable_entity_loader(true);
++        $orignalLibEntityLoader = libxml_disable_entity_loader(true);
          $domDocument = new \DOMDocument();
          if (false === $domDocument->loadXML($xml)) {
-@@ -180,6 +181,7 @@ protected function transformSingleXml($xml, $xsltProcessor)
+             throw new Exception('Could not load the given XML document.');
+@@ -180,6 +180,7 @@ protected function transformSingleXml($xml, $xsltProcessor)
          if (false === $transformedXml) {
              throw new Exception('Could not transform the given XML document.');
          }
