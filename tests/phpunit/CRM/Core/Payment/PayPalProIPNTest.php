@@ -250,6 +250,7 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'payment_gross' => '200.00',
       'shipping' => '0.00',
       'ipn_track_id' => '5r27c2e31rl7c',
+      'is_unit_test' => TRUE,
     );
   }
 

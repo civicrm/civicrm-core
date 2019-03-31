@@ -557,7 +557,8 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     $objects = $ids = $input = array();
     $isFirst = FALSE;
     $input['invoice'] = self::getValue('i', FALSE);
-    if (empty($input['invoice'])) {
+    //Avoid return in case of unit test.
+    if (empty($input['invoice']) && empty($this->_inputParameters['is_unit_test'])) {
       return;
     }
     $input['txnType'] = $this->retrieve('txn_type', 'String');
