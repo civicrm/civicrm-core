@@ -47,6 +47,21 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   protected $_crid = NULL;
 
   /**
+   * The recurring contribution id, used when editing the recurring contribution.
+   *
+   * For historical reasons this duplicates _crid & since the name is more meaningful
+   * we should probably deprecate $_crid.
+   *
+   * @var int
+   */
+  protected $contributionRecurID = NULL;
+
+  /**
+   * @var int Membership ID
+   */
+  protected $_mid = NULL;
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -58,6 +73,16 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    */
   public function getDefaultContext() {
     return 'create';
+  }
+
+  /**
+   * Set variables up before form is built.
+   */
+  public function preProcess() {
+    $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
+    $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
+    $this->contributionRecurID = $this->_crid;
+    $this->_coid = CRM_Utils_Request::retrieve('coid', 'Integer', $this, FALSE);
   }
 
 }
