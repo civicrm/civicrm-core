@@ -148,6 +148,18 @@
     </html>
   </field>
   <field>
+    <name>cancel_reason</name>
+    <type>text</type>
+    <title>Cancellation Reason</title>
+    <uniqueName>contribution_recur_cancel_reason</uniqueName>
+    <comment>Free text field for a reason for cancelling</comment>
+    <html>
+      <type>Text</type>
+      <size>40</size>
+    </html>
+    <add>5.13</add>
+  </field>
+  <field>
     <name>end_date</name>
     <title>Recurring Contribution End Date</title>
     <type>datetime</type>
