@@ -118,7 +118,7 @@ AND    co.id IN ( $contribIDs )";
     $this->_rows = array();
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
     $defaults = array();
-    $now = date("m/d/Y");
+    $now = date("Y-m-d");
     $paidByOptions = array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument();
 
     while ($dao->fetch()) {
@@ -140,9 +140,7 @@ AND    co.id IN ( $contribIDs )";
       $this->addRule("fee_amount_{$row['contribution_id']}", ts('Please enter a valid amount.'), 'money');
       $defaults["fee_amount_{$row['contribution_id']}"] = 0.0;
 
-      $row['trxn_date'] = $this->addDate("trxn_date_{$row['contribution_id']}", FALSE,
-        ts('Receipt Date'), array('formatType' => 'activityDate')
-      );
+      $row['trxn_date'] = $this->add('datepicker', "trxn_date_{$row['contribution_id']}", ts('Transaction Date'), [], FALSE, ['time' => FALSE]);
       $defaults["trxn_date_{$row['contribution_id']}"] = $now;
 
       $this->add("text", "check_number_{$row['contribution_id']}", ts('Check Number'));
@@ -294,7 +292,7 @@ AND    co.id IN ( $contribIDs )";
       else {
         $input['trxn_id'] = $contribution->invoice_id;
       }
-      $input['trxn_date'] = CRM_Utils_Date::processDate($params["trxn_date_{$row['contribution_id']}"], date('H:i:s'));
+      $input['trxn_date'] = $params["trxn_date_{$row['contribution_id']}"] . ' ' .  date('H:i:s');
 
       // @todo calling baseIPN like this is a pattern in it's last gasps. Call contribute.completetransaction api.
       $baseIPN->completeTransaction($input, $ids, $objects, $transaction, FALSE);
