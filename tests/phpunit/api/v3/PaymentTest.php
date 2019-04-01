@@ -197,17 +197,19 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
       'total_amount' => -30,
       'trxn_date' => '2018-11-13 12:01:56',
-    ]);
+      'sequential' => TRUE,
+    ])['values'][0];
 
-    $this->checkPaymentResult($payment, [
-      $payment['id'] => [
-        'from_financial_account_id' => 7,
-        'to_financial_account_id' => 6,
-        'total_amount' => -30,
-        'status_id' => 1,
-        'is_payment' => 1,
-      ],
-    ]);
+    $expected = [
+      'from_financial_account_id' => 7,
+      'to_financial_account_id' => 6,
+      'total_amount' => -30,
+      'status_id' => 1,
+      'is_payment' => 1,
+    ];
+    foreach ($expected as $key => $value) {
+      $this->assertEquals($expected[$key], $payment[$key], 'mismatch on key ' . $key);
+    }
 
     $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
     $mut->assertSubjects(['Refund Notification - Annual CiviCRM meet']);
