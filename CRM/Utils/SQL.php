@@ -78,7 +78,7 @@ class CRM_Utils_SQL {
    */
   public static function supportsFullGroupBy() {
     // CRM-21455 MariaDB 10.2 does not support ANY_VALUE
-    $version = CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
+    $version = self::getDatabaseVersion();
 
     if (stripos($version, 'mariadb') !== FALSE) {
       return FALSE;
@@ -132,6 +132,44 @@ class CRM_Utils_SQL {
       return TRUE;
     }
     return FALSE;
+  }
+
+  /**
+   * Does the DB version support mutliple locks per
+   *
+   * https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html#function_get-lock
+   *
+   * As an interim measure we ALSO require CIVICRM_SUPPORT_MULTIPLE_LOCKS to be defined.
+   *
+   * This is a conservative measure to introduce the change which we expect to deprecate later.
+   *
+   * @todo we only check mariadb & mysql right now but maybe can add percona.
+   */
+  public static function supportsMultipleLocks() {
+    if (!defined('CIVICRM_SUPPORT_MULTIPLE_LOCKS')) {
+      return FALSE;
+    }
+    static $isSupportLocks = NULL;
+    if (!isset($isSupportLocks)) {
+      $version = self::getDatabaseVersion();
+      if (stripos($version, 'mariadb') !== FALSE) {
+        $isSupportLocks = version_compare($version, '10.0.2', '>=');
+      }
+      else {
+        $isSupportLocks = version_compare($version, '5.7.5', '>=');
+      }
+    }
+
+    return $isSupportLocks;
+  }
+
+  /**
+   * Get the version string for the database.
+   *
+   * @return string
+   */
+  public static function getDatabaseVersion() {
+    return CRM_Core_DAO::singleValueQuery('SELECT VERSION()');
   }
 
 }
