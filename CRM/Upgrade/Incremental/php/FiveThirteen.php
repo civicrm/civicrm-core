@@ -68,21 +68,15 @@ class CRM_Upgrade_Incremental_php_FiveThirteen extends CRM_Upgrade_Incremental_B
    * (change the x in the function name):
    */
 
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
-
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
-  //   return TRUE;
-  // }
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_13_alpha1($rev) {
+    $this->addTask('Add cancel reason column to civicrm_contribution_recur', 'addColumn',
+      'civicrm_contribution_recur', 'cancel_reason', "text COMMENT 'Free text field for a reason for cancelling'", FALSE
+    );
+  }
 
 }
