@@ -412,7 +412,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
         $defaults['product_name'] = array($this->_productDAO->product_id);
       }
       if ($this->_productDAO->fulfilled_date) {
-        list($defaults['fulfilled_date']) = CRM_Utils_Date::setDateDefaults($this->_productDAO->fulfilled_date);
+        $defaults['fulfilled_date'] = $this->_productDAO->fulfilled_date;
       }
     }
 

@@ -81,7 +81,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     $js .= "</script>\n";
     $form->assign('initHideBoxes', $js);
 
-    $form->addDate('fulfilled_date', ts('Fulfilled'), FALSE, array('formatType' => 'activityDate'));
+    $form->add('datepicker', 'fulfilled_date', ts('Fulfilled'), [], FALSE, array('time' => FALSE));
     $form->addElement('text', 'min_amount', ts('Minimum Contribution Amount'));
   }
 
@@ -192,7 +192,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     $dao = new CRM_Contribute_DAO_ContributionProduct();
     $dao->contribution_id = $contributionID;
     $dao->product_id = $selectedProductID;
-    $dao->fulfilled_date = CRM_Utils_Date::processDate($params['fulfilled_date'], NULL, TRUE);
+    $dao->fulfilled_date = $params['fulfilled_date'];
     $isDeleted = FALSE;
 
     //CRM-11106
@@ -369,9 +369,8 @@ class CRM_Contribute_Form_AdditionalInfo {
           $params['product_option'] = $form->_options[$productDAO->id][$productOptionID];
         }
       }
-
       if (!empty($params['fulfilled_date'])) {
-        $form->assign('fulfilled_date', CRM_Utils_Date::processDate($params['fulfilled_date']));
+        $form->assign('fulfilled_date', $params['fulfilled_date']);
       }
     }
 
