@@ -34,7 +34,7 @@
 /**
  * This class provides support for canceling recurring subscriptions.
  */
-class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
+class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_ContributionRecur {
   protected $_paymentProcessorObj = NULL;
 
   protected $_userContext = NULL;
@@ -42,10 +42,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
   protected $_mode = NULL;
 
   protected $_mid = NULL;
-
-  protected $_coid = NULL;
-
-  protected $_crid = NULL;
 
   protected $_selfService = FALSE;
 
