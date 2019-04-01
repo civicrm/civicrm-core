@@ -152,7 +152,7 @@ class CRM_Event_Cart_Form_Cart extends CRM_Core_Form {
     $no_fields = array();
     $contact_id = CRM_Contact_BAO_Contact::createProfileContact($contact_params, $no_fields, NULL);
     if (!$contact_id) {
-      CRM_Core_Error::displaySessionError("Could not create or match a contact with that email address.  Please contact the webmaster.");
+      CRM_Core_Session::setStatus(ts("Could not create or match a contact with that email address. Please contact the webmaster."), '', 'error');
     }
     return $contact_id;
   }
