@@ -295,36 +295,19 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * The post processing of the form gets done here.
-   *
-   * Key things done during post processing are
-   *      - check for reset or next request. if present, skip post procesing.
-   *      - now check if user requested running a saved search, if so, then
-   *        the form values associated with the saved search are used for searching.
-   *      - if user has done a submit with new values the regular post submissing is
-   *        done.
-   * The processing consists of using a Selector / Controller framework for getting the
-   * search results.
-   *
-   * @param
-   *
-   * @return void
+   * Test submit the form.
+   * @param $formValues
    */
-  public function postProcess() {
-    if ($this->_done) {
-      return;
-    }
+  public function testSubmit($formValues) {
+    $this->submit($formValues);
+  }
 
-    $this->_done = TRUE;
-
-    if (!empty($_POST)) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-      CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, array('participant_status_id'));
-    }
-
-    if (empty($this->_formValues)) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-    }
+  /**
+   * Submit the search form with given values.
+   * @param $formValues
+   */
+  private function submit($formValues) {
+    $this->_formValues = $formValues;
 
     $this->fixFormValues();
 
@@ -398,6 +381,42 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $query->setSkipPermission(TRUE);
     }
     $controller->run();
+  }
+
+  /**
+   * The post processing of the form gets done here.
+   *
+   * Key things done during post processing are
+   *      - check for reset or next request. if present, skip post procesing.
+   *      - now check if user requested running a saved search, if so, then
+   *        the form values associated with the saved search are used for searching.
+   *      - if user has done a submit with new values the regular post submissing is
+   *        done.
+   * The processing consists of using a Selector / Controller framework for getting the
+   * search results.
+   *
+   * @param
+   *
+   * @return void
+   */
+  public function postProcess() {
+    if ($this->_done) {
+      return;
+    }
+
+    $this->_done = TRUE;
+    $formValues = array();
+
+    if (!empty($_POST)) {
+      $formValues = $this->controller->exportValues($this->_name);
+      CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, array('participant_status_id'));
+    }
+
+    if (empty($this->_formValues)) {
+      $formValues = $this->controller->exportValues($this->_name);
+    }
+
+    $this->submit($formValues);
   }
 
   /**
