@@ -111,18 +111,27 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
 
     $groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($select, 'civicrm_event.id');
     $sql = "
-            SELECT  " . implode(', ', $select) . ",
-                    SUM(civicrm_participant.fee_amount) as total,
-                    COUNT(civicrm_participant.id)       as participant
-
-            FROM       civicrm_event
-            LEFT JOIN  civicrm_option_value
-                   ON  ( civicrm_event.event_type_id = civicrm_option_value.value AND
-                         civicrm_option_value.option_group_id = {$optionGroupId} )
-            LEFT JOIN  civicrm_participant ON ( civicrm_event.id = civicrm_participant.event_id
-                       {$activeParticipantClause} AND civicrm_participant.is_test  = 0 )
-
-            WHERE      civicrm_event.id IN( {$eventID}) {$groupBy}";
+      SELECT " . implode(', ', $select) . ",
+        SUM(civicrm_participant.fee_amount) as total,
+        COUNT(civicrm_participant.id) as participant
+      FROM civicrm_event
+      LEFT JOIN civicrm_option_value
+        ON civicrm_event.event_type_id = civicrm_option_value.value 
+        AND civicrm_option_value.option_group_id = {$optionGroupId}
+      LEFT JOIN (
+        SELECT civicrm_participant.*
+        FROM civicrm_participant
+        JOIN civicrm_contact
+          ON civicrm_participant.contact_id = civicrm_contact.id
+          AND civicrm_contact.is_deleted = 0
+        WHERE civicrm_participant.event_id IN ({$eventID})
+          {$activeParticipantClause}
+          AND civicrm_participant.is_test = 0
+        ) civicrm_participant
+        ON civicrm_participant.event_id = civicrm_event.id
+      WHERE civicrm_event.id IN ({$eventID})
+      {$groupBy}
+    ";
 
     $eventDAO = $this->executeReportQuery($sql);
     $currency = array();
@@ -138,37 +147,40 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
     }
     $this->assign_by_ref('summary', $eventSummary);
 
-    //Total Participant Registerd for the Event
-    $pariticipantCount = "
-            SELECT COUNT(civicrm_participant.id ) as count, civicrm_participant.event_id as event_id
+    //Total Participants Registered for the Event
+    $participantCount = "
+      SELECT COUNT(civicrm_participant.id) as count, civicrm_participant.event_id as event_id
+      FROM civicrm_participant
+      JOIN civicrm_contact c
+        ON civicrm_participant.contact_id = c.id
+        AND c.is_deleted = 0
+      WHERE civicrm_participant.event_id IN ({$eventID})
+        AND civicrm_participant.is_test = 0
+        {$activeParticipantClause}
+      GROUP BY civicrm_participant.event_id
+    ";
 
-            FROM     civicrm_participant
-
-            WHERE    civicrm_participant.event_id IN( {$eventID}) AND
-                     civicrm_participant.is_test  = 0
-                     {$activeParticipantClause}
-            GROUP BY civicrm_participant.event_id
-             ";
-
-    $counteDAO = $this->executeReportQuery($pariticipantCount);
+    $counteDAO = $this->executeReportQuery($participantCount);
     while ($counteDAO->fetch()) {
       $count[$counteDAO->event_id] = $counteDAO->count;
     }
 
     // Count the Participant by Role ID for Event.
     $role = "
-            SELECT civicrm_participant.role_id         as ROLEID,
-                   COUNT( civicrm_participant.id )     as participant,
-                   SUM(civicrm_participant.fee_amount) as amount,
-                   civicrm_participant.event_id        as event_id,
-                   civicrm_participant.fee_currency    as currency
-            FROM     civicrm_participant
-
-            WHERE    civicrm_participant.event_id IN ( {$eventID}) AND
-                     civicrm_participant.is_test  = 0
-                     {$activeParticipantClause}
-            GROUP BY civicrm_participant.role_id, civicrm_participant.event_id, civicrm_participant.fee_currency
-            ";
+      SELECT civicrm_participant.role_id as ROLEID,
+        COUNT(civicrm_participant.id) as participant,
+        SUM(civicrm_participant.fee_amount) as amount,
+        civicrm_participant.event_id as event_id,
+        civicrm_participant.fee_currency as currency
+      FROM civicrm_participant
+      JOIN civicrm_contact c
+        ON civicrm_participant.contact_id = c.id
+        AND c.is_deleted = 0
+      WHERE civicrm_participant.event_id IN ({$eventID})
+        AND civicrm_participant.is_test = 0
+        {$activeParticipantClause}
+      GROUP BY civicrm_participant.role_id, civicrm_participant.event_id, civicrm_participant.fee_currency
+    ";
 
     $roleDAO = $this->executeReportQuery($role);
 
@@ -201,18 +213,19 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
 
     // Count the Participant by status ID for Event.
     $status = "
-            SELECT civicrm_participant.status_id       as STATUSID,
-                   COUNT( civicrm_participant.id )     as participant,
-                   SUM(civicrm_participant.fee_amount) as amount,
-                   civicrm_participant.event_id        as event_id
-
-            FROM     civicrm_participant
-
-            WHERE    civicrm_participant.event_id IN ({$eventID}) AND
-                     civicrm_participant.is_test  = 0
-                     {$activeParticipantClause}
-            GROUP BY civicrm_participant.status_id, civicrm_participant.event_id
-            ";
+      SELECT civicrm_participant.status_id as STATUSID,
+        COUNT(civicrm_participant.id) as participant,
+        SUM(civicrm_participant.fee_amount) as amount,
+        civicrm_participant.event_id as event_id
+      FROM civicrm_participant
+      JOIN civicrm_contact c
+        ON civicrm_participant.contact_id = c.id
+        AND c.is_deleted = 0
+      WHERE civicrm_participant.event_id IN ({$eventID})
+        AND civicrm_participant.is_test = 0
+        {$activeParticipantClause}
+      GROUP BY civicrm_participant.status_id, civicrm_participant.event_id
+    ";
 
     $statusDAO = $this->executeReportQuery($status);
 
@@ -227,22 +240,24 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
     //Count the Participant by payment instrument ID for Event
     //e.g. Credit Card, Check,Cash etc
     $paymentInstrument = "
-            SELECT c.payment_instrument_id               as INSTRUMENT,
-                   COUNT( civicrm_participant.id )       as participant,
-                   SUM( civicrm_participant.fee_amount ) as amount,
-                   civicrm_participant.event_id          as event_id
-
-            FROM      civicrm_participant,
-            civicrm_participant_payment pp
-            LEFT JOIN civicrm_contribution c ON ( pp.contribution_id = c.id)
-
-            WHERE     civicrm_participant.event_id IN ( {$eventID} )
-                      AND civicrm_participant.is_test  = 0
-                      {$activeParticipantClause}
-                      AND ((pp.participant_id = civicrm_participant.id )
-                           OR (pp.participant_id = civicrm_participant.registered_by_id ))
-            GROUP BY  c.payment_instrument_id, civicrm_participant.event_id
-            ";
+      SELECT c.payment_instrument_id as INSTRUMENT,
+        COUNT(civicrm_participant.id) as participant,
+        SUM(civicrm_participant.fee_amount) as amount,
+        civicrm_participant.event_id as event_id
+      FROM civicrm_participant
+      JOIN civicrm_participant_payment pp
+        ON (pp.participant_id = civicrm_participant.id
+          OR pp.participant_id = civicrm_participant.registered_by_id)
+      LEFT JOIN civicrm_contribution c
+        ON pp.contribution_id = c.id
+      JOIN civicrm_contact ct
+        ON civicrm_participant.contact_id = ct.id
+        AND ct.is_deleted = 0
+      WHERE civicrm_participant.event_id IN ({$eventID})
+        AND civicrm_participant.is_test  = 0
+        {$activeParticipantClause}
+      GROUP BY c.payment_instrument_id, civicrm_participant.event_id
+    ";
 
     $instrumentDAO = $this->executeReportQuery($paymentInstrument);
 
