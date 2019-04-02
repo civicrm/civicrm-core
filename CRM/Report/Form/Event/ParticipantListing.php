@@ -157,7 +157,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
           ),
           'registered_by_name' => array(
             'title' => ts('Registered by Participant Name'),
-            'name' => 'registered_by_id'
+            'name' => 'registered_by_id',
           ),
           'source' => array(
             'title' => ts('Source'),
