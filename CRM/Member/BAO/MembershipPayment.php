@@ -69,6 +69,9 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
       $dao->save();
     }
     CRM_Utils_Hook::post($hook, 'MembershipPayment', $dao->id, $dao);
+    if (!empty($params['donot_update_line_item'])) {
+      return $dao;
+    }
     // CRM-14197 we are in the process on phasing out membershipPayment in favour of storing both contribution_id & entity_id (membership_id) on the line items
     // table. However, at this stage we have both - there is still quite a bit of refactoring to do to set the line_iten entity_id right the first time
     // however, we can assume at this stage that any contribution id will have only one line item with that membership type in the line item table

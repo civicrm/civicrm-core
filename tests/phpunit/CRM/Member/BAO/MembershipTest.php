@@ -777,4 +777,165 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals(1, $membershipAfterProcess['is_override']);
   }
 
+  public function testMembershipPaymentForSingleContributionMultipleMembership() {
+    $membershipTypeID1 = $this->membershipTypeCreate(array('name' => 'Parent'));
+    $membershipTypeID2 = $this->membershipTypeCreate(array('name' => 'Child'));
+    $financialTypeId = $this->getFinancialTypeId('Member Dues');
+
+    $priceSet = $this->callAPISuccess('price_set', 'create', [
+      'is_quick_config' => 0,
+      'extends' => 'CiviMember',
+      'financial_type_id' => $financialTypeId,
+      'title' => 'Family Membership',
+    ]);
+    $priceSetID = $priceSet['id'];
+
+    $priceField = $this->callAPISuccess('price_field', 'create', [
+      'price_set_id' => $priceSetID,
+      'label' => 'Memberships',
+      'html_type' => 'Radio',
+    ]);
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', [
+      'price_set_id' => $priceSetID,
+      'price_field_id' => $priceField['id'],
+      'label' => 'Parent',
+      'amount' => 100,
+      'financial_type_id' => $financialTypeId,
+      'membership_type_id' => $membershipTypeID1,
+      'membership_num_terms' => 1,
+    ]);
+
+    $priceFieldValueId = [1 => $priceFieldValue['id']];
+    $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', [
+      'price_set_id' => $priceSetID,
+      'price_field_id' => $priceField['id'],
+      'label' => 'Child',
+      'amount' => 50,
+      'financial_type_id' => $financialTypeId,
+      'membership_type_id' => $membershipTypeID2,
+      'membership_num_terms' => 1,
+    ]);
+    $priceFieldValueId[2] = $priceFieldValue['id'];
+
+    $parentContactId = $this->individualCreate();
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
+      'contact_id' => $parentContactId,
+      'amount' => 200,
+      'frequency_unit' => 'day',
+      'frequency_interval' => 1,
+      'installments' => 2,
+      'start_date' => 'yesterday',
+      'create_date' => 'yesterday',
+      'modified_date' => 'yesterday',
+      'cancel_date' => NULL,
+      'end_date' => '+ 2 weeks',
+      'processor_id' => '643411460836',
+      'trxn_id' => 'e0d0808e26f3e661c6c18eb7c039d363',
+      'invoice_id' => 'e0d0808e26f3e661c6c18eb7c039d363',
+      'contribution_status_id' => 'In Progress',
+      'cycle_day' => 1,
+      'next_sched_contribution_date' => '+ 1 week',
+      'auto_renew' => 0,
+      'currency' => 'USD',
+      'payment_processor_id' => $this->paymentProcessorCreate(),
+      'financial_type_id' => $financialTypeId,
+      'payment_instrument_id' => 'Credit Card',
+    ]);
+    $contribution = $this->callAPISuccess('contribution', 'create', [
+      'total_amount' => 200,
+      'contribution_recur_id' => $contributionRecur['id'],
+      'currency' => 'USD',
+      'contact_id' => $parentContactId,
+      'financial_type_id' => $financialTypeId,
+      'contribution_status_id' => 'Completed',
+      'skipLineItem' => TRUE,
+      'is_recur' => TRUE,
+    ]);
+
+    $params[] = [
+      'contact_id' => $parentContactId,
+      'membership_type_id' => $membershipTypeID1,
+      'contribution_recur_id' => $contributionRecur['id'],
+      'join_date' => date('Ymd', time()),
+      'start_date' => date('Ymd', time()),
+      'end_date' => date('Ymd', strtotime('+1 year')),
+      'source' => 'Payment',
+      'line_item' => [
+        $priceSetID => [
+          $priceField['id'] => [
+            'price_field_id' => $priceField['id'],
+            'price_field_value_id' => $priceFieldValueId[1],
+            'label' => 'Parent',
+            'contribution_id' => $contribution['id'],
+            'membership_type_id' => $membershipTypeID1,
+            'qty' => 1,
+            'unit_price' => 100,
+            'line_total' => 100,
+            'financial_type_id' => $financialTypeId,
+          ]
+        ],
+      ]
+    ];
+    $params[] = [
+      'contact_id' => $this->individualCreate(),
+      'membership_type_id' => $membershipTypeID2,
+      'contribution_recur_id' => $contributionRecur['id'],
+      'join_date' => date('Ymd', time()),
+      'start_date' => date('Ymd', time()),
+      'end_date' => date('Ymd', strtotime('+1 year')),
+      'source' => 'Payment',
+      'line_item' => [
+        $priceSetID => [
+          $priceField['id'] => [
+            'price_field_id' => $priceField['id'],
+            'price_field_value_id' => $priceFieldValueId[2],
+            'label' => 'Child',
+            'contribution_id' => $contribution['id'],
+            'qty' => 1,
+            'unit_price' => 50,
+            'line_total' => 50,
+            'membership_type_id' => $membershipTypeID2,
+            'financial_type_id' => $financialTypeId,
+          ]
+        ],
+      ]
+    ];
+    $params[] = [
+      'contact_id' => $this->individualCreate(),
+      'membership_type_id' => $membershipTypeID2,
+      'contribution_recur_id' => $contributionRecur['id'],
+      'join_date' => date('Ymd', time()),
+      'start_date' => date('Ymd', time()),
+      'end_date' => date('Ymd', strtotime('+1 year')),
+      'source' => 'Payment',
+      'line_item' => [
+        $priceSetID => [
+          $priceField['id'] => [
+            'price_field_id' => $priceField['id'],
+            'price_field_value_id' => $priceFieldValueId[2],
+            'label' => 'Child',
+            'contribution_id' => $contribution['id'],
+            'qty' => 1,
+            'membership_type_id' => $membershipTypeID2,
+            'unit_price' => 50,
+            'line_total' => 50,
+            'financial_type_id' => $financialTypeId,
+          ]
+        ],
+      ]
+    ];
+    $membershipIds = [];
+    foreach ($params as $key => $param) {
+      $membership = $this->callAPISuccess('membership', 'create', $param);
+      $membershipIds[$key] = $membership['id'];
+    }
+
+    $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'original_contribution_id' => $contribution['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => uniqid(),
+    ));
+    exit;
+  }
+
 }

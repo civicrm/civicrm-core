@@ -85,9 +85,11 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
 
     $return = $lineItemBAO->save();
     if ($lineItemBAO->entity_table == 'civicrm_membership' && $lineItemBAO->contribution_id && $lineItemBAO->entity_id) {
+      $updateLineItemInRecordMembershipPayment = self::checkIfLineItemsNeedsUpdate($lineItemBAO);
       $membershipPaymentParams = array(
         'membership_id' => $lineItemBAO->entity_id,
         'contribution_id' => $lineItemBAO->contribution_id,
+        'donot_update_line_item' => $updateLineItemInRecordMembershipPayment,
       );
       if (!civicrm_api3('MembershipPayment', 'getcount', $membershipPaymentParams)) {
         civicrm_api3('MembershipPayment', 'create', $membershipPaymentParams);
@@ -105,6 +107,32 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
     }
 
     return $return;
+  }
+
+  /**
+   * Check if line items needs an update when membership payment is added.
+   *
+   */
+  public static function checkIfLineItemsNeedsUpdate($lineItemBAO) {
+    $membershipTypeId = property_exists($lineItemBAO, 'membership_type_id') ? $lineItemBAO->membership_type_id : NULL;
+    if (empty($membershipTypeId)) {
+      $membershipTypeId = civicrm_api3('PriceFieldValue', 'getvalue', [
+        'return' => "membership_type_id",
+        'id' => $lineItemBAO->price_field_value_id,
+      ]);
+    }
+    try {
+       return civicrm_api3('Membership', 'getvalue', [
+        'return' => 'id',
+        'id' => $lineItemBAO->entity_id,
+        'membership_type_id' => $membershipTypeId,
+      ]);
+    }
+    catch (Exception $e) {
+      // line item entity id doesn't match with membership id hence the line item
+      // needs update when membership payment is created.
+    }
+    return FALSE;
   }
 
   /**
