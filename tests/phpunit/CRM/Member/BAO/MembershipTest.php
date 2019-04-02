@@ -859,21 +859,19 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'join_date' => date('Ymd', time()),
       'start_date' => date('Ymd', time()),
       'end_date' => date('Ymd', strtotime('+1 year')),
+      'skipLineItem' => TRUE,
       'source' => 'Payment',
-      'line_item' => [
-        $priceSetID => [
-          $priceField['id'] => [
-            'price_field_id' => $priceField['id'],
-            'price_field_value_id' => $priceFieldValueId[1],
-            'label' => 'Parent',
-            'contribution_id' => $contribution['id'],
-            'membership_type_id' => $membershipTypeID1,
-            'qty' => 1,
-            'unit_price' => 100,
-            'line_total' => 100,
-            'financial_type_id' => $financialTypeId,
-          ]
-        ],
+      'line_items' => [
+        'price_field_id' => $priceField['id'],
+        'price_field_value_id' => $priceFieldValueId[1],
+        'label' => 'Parent',
+        'contribution_id' => $contribution['id'],
+        'membership_type_id' => $membershipTypeID1,
+        'qty' => 1,
+        'unit_price' => 100,
+        'line_total' => 100,
+        'financial_type_id' => $financialTypeId,
+        'entity_table' => 'civicrm_membership',
       ]
     ];
     $params[] = [
@@ -883,21 +881,19 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'join_date' => date('Ymd', time()),
       'start_date' => date('Ymd', time()),
       'end_date' => date('Ymd', strtotime('+1 year')),
+      'skipLineItem' => TRUE,
       'source' => 'Payment',
-      'line_item' => [
-        $priceSetID => [
-          $priceField['id'] => [
-            'price_field_id' => $priceField['id'],
-            'price_field_value_id' => $priceFieldValueId[2],
-            'label' => 'Child',
-            'contribution_id' => $contribution['id'],
-            'qty' => 1,
-            'unit_price' => 50,
-            'line_total' => 50,
-            'membership_type_id' => $membershipTypeID2,
-            'financial_type_id' => $financialTypeId,
-          ]
-        ],
+      'line_items' => [
+        'price_field_id' => $priceField['id'],
+        'price_field_value_id' => $priceFieldValueId[2],
+        'label' => 'Child',
+        'contribution_id' => $contribution['id'],
+        'qty' => 1,
+        'unit_price' => 50,
+        'line_total' => 50,
+        'membership_type_id' => $membershipTypeID2,
+        'financial_type_id' => $financialTypeId,
+        'entity_table' => 'civicrm_membership',
       ]
     ];
     $params[] = [
@@ -906,36 +902,50 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'contribution_recur_id' => $contributionRecur['id'],
       'join_date' => date('Ymd', time()),
       'start_date' => date('Ymd', time()),
+      'skipLineItem' => TRUE,
       'end_date' => date('Ymd', strtotime('+1 year')),
       'source' => 'Payment',
-      'line_item' => [
-        $priceSetID => [
-          $priceField['id'] => [
-            'price_field_id' => $priceField['id'],
-            'price_field_value_id' => $priceFieldValueId[2],
-            'label' => 'Child',
-            'contribution_id' => $contribution['id'],
-            'qty' => 1,
-            'membership_type_id' => $membershipTypeID2,
-            'unit_price' => 50,
-            'line_total' => 50,
-            'financial_type_id' => $financialTypeId,
-          ]
-        ],
+      'line_items' => [
+        'price_field_id' => $priceField['id'],
+        'price_field_value_id' => $priceFieldValueId[2],
+        'label' => 'Child',
+        'contribution_id' => $contribution['id'],
+        'qty' => 1,
+        'membership_type_id' => $membershipTypeID2,
+        'unit_price' => 50,
+        'line_total' => 50,
+        'financial_type_id' => $financialTypeId,
+        'entity_table' => 'civicrm_membership',
       ]
     ];
     $membershipIds = [];
     foreach ($params as $key => $param) {
       $membership = $this->callAPISuccess('membership', 'create', $param);
-      $membershipIds[$key] = $membership['id'];
-    }
 
+      $param['line_items']['entity_id'] = $membership['id'];
+      $memPayments = new CRM_Member_BAO_MembershipPayment();
+      $paymentParams = [
+        'membership_id' => $membership['id'],
+        'contribution_id' => $contribution['id'],
+      ];
+      $memPayments->copyValues($paymentParams);
+      $memPayments->save();
+
+      $lineItemBAO = new CRM_Price_BAO_LineItem();
+      $lineItemBAO->copyValues($param['line_items']);
+
+      $lineItemBAO->save();
+    }
     $this->callAPISuccess('contribution', 'repeattransaction', array(
       'original_contribution_id' => $contribution['id'],
       'contribution_status_id' => 'Completed',
       'trxn_id' => uniqid(),
     ));
-    exit;
+    $this->callAPISuccessGetCount('Contribution', [], 2);
+    $this->callAPISuccessGetCount('LineItem', [], 6);
+
+    $this->membershipTypeDelete(['id' => $membershipTypeID1]);
+    $this->membershipTypeDelete(['id' => $membershipTypeID2]);
   }
 
 }
