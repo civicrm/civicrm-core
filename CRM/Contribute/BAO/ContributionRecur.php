@@ -167,18 +167,28 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * Get the payment processor (array) for a recurring processor.
    *
    * @param int $id
-   * @param string $mode
-   *   - Test or NULL - all other variants are ignored.
    *
    * @return array|null
    */
-  public static function getPaymentProcessor($id, $mode = NULL) {
+  public static function getPaymentProcessor($id) {
     $paymentProcessorID = self::getPaymentProcessorID($id);
-    if (!$paymentProcessorID) {
-      return NULL;
-    }
+    return CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID);
+  }
 
-    return CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID, $mode);
+
+  /**
+   * Get the processor object for the recurring contribution record.
+   *
+   * @param int $id
+   *
+   * @return CRM_Core_Payment|NULL
+   *   Returns a processor object or NULL if the processor is disabled.
+   *   Note this returns the 'Manual' processor object if no processor is attached
+   *   (since it still makes sense to update / cancel
+   */
+  public static function getPaymentProcessorObject($id) {
+    $processor = self::getPaymentProcessor($id);
+    return is_array($processor) ? $processor['object'] : NULL;
   }
 
   /**
