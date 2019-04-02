@@ -62,6 +62,21 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   protected $_mid = NULL;
 
   /**
+   * Payment processor object.
+   *
+   * @var \CRM_Core_Payment
+   */
+  protected $_paymentProcessorObj = NULL;
+
+  /**
+   * @var array
+   *
+   * Current payment processor including a copy of the object in 'object' key for
+   * legacy reasons.
+   */
+  public $_paymentProcessor = [];
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -83,6 +98,23 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
     $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
     $this->contributionRecurID = $this->_crid;
     $this->_coid = CRM_Utils_Request::retrieve('coid', 'Integer', $this, FALSE);
+    $this->setPaymentProcessor();
+  }
+
+  /**
+   * Set the payment processor object up.
+   *
+   * This is a function that needs to be better consolidated between the inheriting forms
+   * but this is good choice of function to call.
+   */
+  protected function setPaymentProcessor() {
+    if ($this->_crid) {
+      $this->_paymentProcessor = CRM_Contribute_BAO_ContributionRecur::getPaymentProcessor($this->contributionRecurID);
+      if (!$this->_paymentProcessor) {
+        CRM_Core_Error::statusBounce(ts('There is no valid processor for this subscription so it cannot be updated'));
+      }
+      $this->_paymentProcessorObj = $this->_paymentProcessor['object'];
+    }
   }
 
 }

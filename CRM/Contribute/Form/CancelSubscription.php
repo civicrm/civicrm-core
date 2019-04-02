@@ -35,7 +35,6 @@
  * This class provides support for canceling recurring subscriptions.
  */
 class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_ContributionRecur {
-  protected $_paymentProcessorObj = NULL;
 
   protected $_userContext = NULL;
 
@@ -49,7 +48,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
   public function preProcess() {
     parent::preProcess();
     if ($this->_crid) {
-      $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'obj');
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_crid);
       $this->assign('frequency_unit', $this->_subscriptionDetails->frequency_unit);
       $this->assign('frequency_interval', $this->_subscriptionDetails->frequency_interval);
