@@ -34,9 +34,7 @@
 /**
  * This class generates form components for processing a contribution.
  */
-class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
-  protected $_crid = NULL;
-  protected $_coid = NULL;
+class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_ContributionRecur {
   protected $_mode = NULL;
 
   protected $_subscriptionDetails = NULL;
