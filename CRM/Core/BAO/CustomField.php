@@ -1216,8 +1216,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $value = CRM_Utils_Array::explodePadded($value);
     }
     // CRM-12989 fix
-    if ($field['html_type'] == 'CheckBox') {
-      CRM_Utils_Array::formatArrayKeys($value);
+    if ($field['html_type'] == 'CheckBox' && $value) {
+      $value = CRM_Utils_Array::convertCheckboxFormatToArray($value);
     }
 
     $display = is_array($value) ? implode(', ', $value) : (string) $value;
