@@ -122,7 +122,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
       ]);
     }
     try {
-       return civicrm_api3('Membership', 'getvalue', [
+      return civicrm_api3('Membership', 'getvalue', [
         'return' => 'id',
         'id' => $lineItemBAO->entity_id,
         'membership_type_id' => $membershipTypeId,
