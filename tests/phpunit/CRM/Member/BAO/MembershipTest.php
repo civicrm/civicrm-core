@@ -777,4 +777,90 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals(1, $membershipAfterProcess['is_override']);
   }
 
+  public function testMembershipPaymentForSingleContributionMultipleMembershipInvalidLineItem() {
+    $membershipTypeID1 = $this->membershipTypeCreate(array('name' => 'Parent'));
+    $membershipTypeID2 = $this->membershipTypeCreate(array('name' => 'Child'));
+    $financialTypeId = $this->getFinancialTypeId('Member Dues');
+
+    $parentContactId = $this->individualCreate();
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', [
+      'contact_id' => $parentContactId,
+      'amount' => 200,
+      'frequency_unit' => 'day',
+      'frequency_interval' => 1,
+      'installments' => 2,
+      'processor_id' => '643411460836',
+      'trxn_id' => 'e0d0808e26f3e661c6c18eb7c039d363',
+      'invoice_id' => 'e0d0808e26f3e661c6c18eb7c039d363',
+      'contribution_status_id' => 'In Progress',
+      'currency' => 'USD',
+      'payment_processor_id' => $this->paymentProcessorCreate(),
+      'financial_type_id' => $financialTypeId,
+      'payment_instrument_id' => 'Credit Card',
+    ]);
+    $contribution = $this->callAPISuccess('contribution', 'create', [
+      'total_amount' => 200,
+      'contribution_recur_id' => $contributionRecur['id'],
+      'currency' => 'USD',
+      'contact_id' => $parentContactId,
+      'financial_type_id' => $financialTypeId,
+      'contribution_status_id' => 'Completed',
+      'skipLineItem' => TRUE,
+      'is_recur' => TRUE,
+    ]);
+    $params[] = [
+      'contact_id' => $parentContactId,
+      'membership_type_id' => $membershipTypeID1,
+      'contribution_recur_id' => $contributionRecur['id'],
+      'join_date' => date('Ymd', time()),
+      'start_date' => date('Ymd', time()),
+      'end_date' => date('Ymd', strtotime('+1 year')),
+      'source' => 'Payment',
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 100,
+      'financial_type_id' => $financialTypeId,
+    ];
+    $params[] = [
+      'contact_id' => $this->individualCreate(),
+      'membership_type_id' => $membershipTypeID2,
+      'contribution_recur_id' => $contributionRecur['id'],
+      'join_date' => date('Ymd', time()),
+      'start_date' => date('Ymd', time()),
+      'end_date' => date('Ymd', strtotime('+1 year')),
+      'source' => 'Payment',
+      'total_amount' => 100,
+      'financial_type_id' => $financialTypeId,
+    ];
+
+    $membershipIds = [];
+    foreach ($params as $key => $param) {
+      CRM_Price_BAO_LineItem::getLineItemArray(
+        $param,
+        NULL,
+        'membership',
+        $param['membership_type_id']
+      );
+      $param['contribution'] = (object) $contribution['values'][$contribution['id']];
+      $membership = $this->callAPISuccess('membership', 'create', $param);
+      $membershipIds[] = $membership['id'];
+    }
+    $this->callAPISuccess('contribution', 'repeattransaction', array(
+      'original_contribution_id' => $contribution['id'],
+      'contribution_status_id' => 'Completed',
+      'trxn_id' => uniqid(),
+    ));
+    $this->callAPISuccessGetCount('Contribution', [], 2);
+    $this->callAPISuccessGetCount('LineItem', [
+      'entity_id' => $membershipIds[0],
+      'entity_table' => 'civicrm_membership',
+    ], 2);
+    $this->callAPISuccessGetCount('LineItem', [
+      'entity_id' => $membershipIds[1],
+      'entity_table' => 'civicrm_membership',
+    ], 2);
+
+    $this->membershipTypeDelete(['id' => $membershipTypeID1]);
+    $this->membershipTypeDelete(['id' => $membershipTypeID2]);
+  }
+
 }
