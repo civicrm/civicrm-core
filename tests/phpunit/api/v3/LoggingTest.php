@@ -414,6 +414,8 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate();
     $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'wooty woot'");
+    // Add delay so the update is actually enough after the create that the timestamps differ
+    sleep(1);
     $timeStamp = date('Y-m-d H:i:s');
     $this->callAPISuccess('Contact', 'create', array(
         'id' => $contactId,
