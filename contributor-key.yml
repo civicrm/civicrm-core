@@ -998,6 +998,9 @@
   organization: CompuCorp
   jira        : mukesh
 
+- github      : mwestergaard
+  name        : Mark Westergaard
+
 - github      : nbrettell
   name        : Nathan Brettell
   jira        : nathan_b
@@ -1148,6 +1151,10 @@
 
 - github      : ray-wright
   name        : Ray Wright
+
+- github      : reecebenson
+  name        : Reece Benson
+  organization: Circle Interactive
 
 - name        : Renaee Churches
   organization: Play Australia
