@@ -113,12 +113,11 @@ class CRM_Mailing_Form_Optout extends CRM_Core_Form {
     }
     elseif ($result == FALSE) {
       // Email address not verified
-
       $statusMsg = ts('The email address: %1 you have entered does not match the email associated with this opt out request.',
         array(1 => $values['email_confirm'])
       );
 
-      CRM_Core_Session::setStatus($statusMsg, '', 'fail');
+      CRM_Core_Session::setStatus($statusMsg, '', 'error');
     }
 
   }
