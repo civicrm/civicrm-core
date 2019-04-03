@@ -2070,8 +2070,11 @@ function _civicrm_api3_validate_integer(&$params, $fieldName, &$fieldInfo, $enti
     }
     if (!empty($fieldInfo['pseudoconstant']) || !empty($fieldInfo['options'])) {
       $additional_lookup_params = [];
-      if (strtolower($entity) == 'address' && $fieldName == 'state_province_id' && !empty($params['country_id'])) {
-        $additional_lookup_params = ['country_id' => $params['country_id']];
+      if (strtolower($entity) == 'address' && $fieldName == 'state_province_id') {
+        $country_id = _civicrm_api3_resolve_country_id($params);
+        if (!empty($country_id)) {
+          $additional_lookup_params = ['country_id' => $country_id];
+        }
       }
       _civicrm_api3_api_match_pseudoconstant($fieldValue, $entity, $fieldName, $fieldInfo, $op, $additional_lookup_params);
     }
@@ -2098,6 +2101,50 @@ function _civicrm_api3_validate_integer(&$params, $fieldName, &$fieldInfo, $enti
   else {
     $params[$fieldName] = $fieldValue;
   }
+}
+
+/**
+ * Helper function to determine country_id given the myriad of values for country_id or country that are supported
+ * @param $params
+ *
+ * @return int|null
+ */
+function _civicrm_api3_resolve_country_id($params) {
+  if (!empty($params['country_id'])) {
+    if (is_numeric($params['country_id'])) {
+      $country_id = $params['country_id'];
+    }
+    else {
+      $country = new CRM_Core_DAO_Country();
+      $country->name = $params['country_id'];
+      if (!$country->find(TRUE)) {
+        $country->name = NULL;
+        $country->iso_code = $params['country_id'];
+        $country->find(TRUE);
+      }
+      if (!empty($country->id)) {
+        $country_id = $country->id;
+      }
+    }
+  }
+  elseif (!empty($params['country'])) {
+    if (is_numeric($params['country'])) {
+      $country_id = $params['country'];
+    }
+    else {
+      $country = new CRM_Core_DAO_Country();
+      $country->name = $params['country'];
+      if (!$country->find(TRUE)) {
+        $country->name = NULL;
+        $country->iso_code = $params['country'];
+        $country->find(TRUE);
+      }
+      if (!empty($country->id)) {
+        $country_id = $country->id;
+      }
+    }
+  }
+  return !empty($country_id) ? $country_id : NULL;
 }
 
 /**
