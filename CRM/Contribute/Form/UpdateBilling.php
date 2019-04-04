@@ -52,8 +52,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
    * Set variables up before form is built.
    */
   public function preProcess() {
-    $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
-    $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
+    parent::preProcess();
     if ($this->_crid) {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'info');
       $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'obj');
@@ -65,7 +64,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
       }
     }
 
-    $this->_coid = CRM_Utils_Request::retrieve('coid', 'Integer', $this, FALSE);
     if ($this->_coid) {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'info');
       $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');

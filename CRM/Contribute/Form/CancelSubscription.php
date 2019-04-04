@@ -41,17 +41,13 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
 
   protected $_mode = NULL;
 
-  protected $_mid = NULL;
-
   protected $_selfService = FALSE;
 
   /**
    * Set variables up before form is built.
    */
   public function preProcess() {
-    $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
-
-    $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
+    parent::preProcess();
     if ($this->_crid) {
       $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'obj');
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_crid);
@@ -80,7 +76,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
       $this->assign('membershipType', CRM_Utils_Array::value($membershipTypeId, $membershipTypes));
     }
 
-    $this->_coid = CRM_Utils_Request::retrieve('coid', 'Integer', $this, FALSE);
     if ($this->_coid) {
       if (CRM_Contribute_BAO_Contribution::isSubscriptionCancelled($this->_coid)) {
         CRM_Core_Error::fatal(ts('The recurring contribution looks to have been cancelled already.'));
