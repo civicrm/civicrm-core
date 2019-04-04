@@ -1085,7 +1085,7 @@ WHERE  id IN $groupIdString
           'visibility' => $dao->visibility,
           'description' => $dao->description,
           'icon' => empty($dao->saved_search_id) ? NULL : 'fa-lightbulb-o',
-        );
+        ];
       }
       else {
         $roots[] = [
@@ -1094,7 +1094,7 @@ WHERE  id IN $groupIdString
           'visibility' => $dao->visibility,
           'description' => $dao->description,
           'icon' => empty($dao->saved_search_id) ? NULL : 'fa-lightbulb-o',
-        );
+        ];
       }
     }
 
@@ -1122,7 +1122,8 @@ WHERE  id IN $groupIdString
     $spaces = str_repeat($spacer, $level);
 
     if ($titleOnly) {
-      $hierarchy[$group['id']] = $spaces . $group['title'];
+      $icon = $group['icon'] ? '* ' : '';
+      $hierarchy[$group['id']] = $icon . $spaces . $group['title'];
     }
     else {
       $hierarchy[] = array(
