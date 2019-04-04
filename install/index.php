@@ -517,6 +517,17 @@ class InstallRequirements {
         $onlyRequire
       );
       if ($dbName != 'Drupal' && $dbName != 'Backdrop') {
+        $this->requireNoExistingData(
+          $databaseConfig['server'],
+          $databaseConfig['username'],
+          $databaseConfig['password'],
+          $databaseConfig['database'],
+          array(
+            ts("MySQL %1 Configuration", array(1 => $dbName)),
+            ts("Does database has data from previous installation?"),
+            ts("CiviCRM data from previous installation exists in '%1'.", array(1 => $databaseConfig['database'])),
+          )
+        );
         $this->requireMySQLInnoDB($databaseConfig['server'],
           $databaseConfig['username'],
           $databaseConfig['password'],
@@ -1275,6 +1286,37 @@ class InstallRequirements {
         $this->error($testDetails);
       }
     }
+  }
+
+  /**
+   * @param $server
+   * @param $username
+   * @param $password
+   * @param $database
+   * @param $testDetails
+   */
+  public function requireNoExistingData(
+    $server,
+    $username,
+    $password,
+    $database,
+    $testDetails
+  ) {
+    $this->testing($testDetails);
+    $conn = $this->connect($server, $username, $password);
+
+    @mysqli_select_db($conn, $database);
+    $contactRecords = mysqli_query($conn, "SELECT count(*) as contactscount FROM civicrm_contact");
+    if ($contactRecords) {
+      $contactRecords = mysqli_fetch_object($contactRecords);
+      if ($contactRecords->contactscount > 0) {
+        $this->error($testDetails);
+        return;
+      }
+    }
+
+    $testDetails[3] = ts('CiviCRM data from previous installation does not exists in %1.', array(1 => $database));
+    $this->testing($testDetails);
   }
 
   /**
