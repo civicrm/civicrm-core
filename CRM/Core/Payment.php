@@ -337,6 +337,15 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Does this payment processor support refund?
+   *
+   * @return bool
+   */
+  public function supportsRefund() {
+    return FALSE;
+  }
+
+  /**
    * Should the first payment date be configurable when setting up back office recurring payments.
    *
    * We set this to false for historical consistency but in fact most new processors use tokens for recurring and can support this
@@ -1257,6 +1266,17 @@ abstract class CRM_Core_Payment {
     }
     return $result;
   }
+
+  /**
+   * Refunds payment
+   *
+   * Payment processors should set payment_status_id if it set the status to Refunded in case the transaction is successful
+   *
+   * @param array $params
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   */
+  public function doRefund(&$params) {}
 
   /**
    * Query payment processor for details about a transaction.
