@@ -77,6 +77,9 @@ class CRM_Upgrade_Incremental_php_FiveThirteen extends CRM_Upgrade_Incremental_B
     $this->addTask('Add cancel reason column to civicrm_contribution_recur', 'addColumn',
       'civicrm_contribution_recur', 'cancel_reason', "text COMMENT 'Free text field for a reason for cancelling'", FALSE
     );
+    $this->addTask('Add title to civicrm_payment_processor', 'addColumn',
+      'civicrm_payment_processor', 'title', "text COMMENT 'Payment Processor Descriptive Name.'", FALSE
+    );
   }
 
 }
