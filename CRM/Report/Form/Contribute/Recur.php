@@ -179,6 +179,9 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
           'failure_retry_date' => array(
             'title' => ts('Failure Retry Date'),
           ),
+          'payment_processor_id' => array(
+            'title' => ts('Payment Processor'),
+          ),
         ),
         'filters' => array(
           'contribution_status_id' => array(
@@ -244,6 +247,13 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
             'description' => "does this work?",
             'operatorType' => CRM_Report_Form::OP_DATE,
             'pseudofield' => TRUE,
+          ),
+          'payment_processor_id' => array(
+            'title' => ts('Payment Processor'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contribute_BAO_ContributionRecur::buildOptions('payment_processor_id', 'get'),
+            'default' => NULL,
+            'type' => CRM_Utils_Type::T_INT,
           ),
         ),
       ),
@@ -389,6 +399,10 @@ class CRM_Report_Form_Contribute_Recur extends CRM_Report_Form {
 
       if (!empty($row['civicrm_financial_trxn_card_type_id'])) {
         $rows[$rowNum]['civicrm_financial_trxn_card_type_id'] = $this->getLabels($row['civicrm_financial_trxn_card_type_id'], 'CRM_Financial_DAO_FinancialTrxn', 'card_type_id');
+      }
+
+      if (!empty($row['civicrm_contribution_recur_payment_processor_id'])) {
+        $rows[$rowNum]['civicrm_contribution_recur_payment_processor_id'] = $this->getLabels($row['civicrm_contribution_recur_payment_processor_id'], 'CRM_Contribute_BAO_ContributionRecur', 'payment_processor_id');
       }
     }
   }
