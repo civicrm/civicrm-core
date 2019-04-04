@@ -128,5 +128,11 @@
     params: {},
     functions: []
   };
+
+  // Load polyfill
+  if (!('Promise' in window)) {
+    CRM.loadScript(CRM.config.resourceBase + 'bower_components/es6-promise/es6-promise.auto.min.js');
+  }
+
 })(jQuery);
 {/literal}

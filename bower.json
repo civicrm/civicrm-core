@@ -31,7 +31,8 @@
     "angular-bootstrap": "^2.5.0",
     "angular-sanitize": "~1.5.0",
     "smartmenus": "~1.1",
-    "phantomjs-polyfill": "^0.0.2"
+    "phantomjs-polyfill": "^0.0.2",
+    "es6-promise": "^4.2.4"
   },
   "resolutions": {
     "angular": "~1.5.11"
