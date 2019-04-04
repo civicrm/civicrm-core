@@ -66,7 +66,7 @@ abstract class CRM_Utils_Check_Component {
    * @return bool
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
-  public function fileExists($url, $timeout = 0.25) {
+  public function fileExists($url, $timeout = 0.50) {
     $fileExists = FALSE;
     try {
       $guzzleClient = new GuzzleHttp\Client();
