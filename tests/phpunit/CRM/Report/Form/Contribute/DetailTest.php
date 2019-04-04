@@ -152,4 +152,64 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
     $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
   }
 
+  /**
+   * Make sure the total amount of a contribution doesn't multiply by the number
+   * of soft credits.
+   */
+  public function testMultipleSoftCredits() {
+    $this->quickCleanup($this->_tablesToTruncate);
+
+    $solParams = array(
+      'first_name' => 'Solicitor 1',
+      'last_name' => 'User ' . rand(),
+      'contact_type' => 'Individual',
+    );
+    $solicitor1Id = $this->individualCreate($solParams);
+    $solParams['first_name'] = 'Solicitor 2';
+    $solicitor2Id = $this->individualCreate($solParams);
+    $solParams['first_name'] = 'Donor';
+    $donorId = $this->individualCreate($solParams);
+
+    $contribParams = [
+      'total_amount' => 150,
+      'contact_id' => $donorId,
+      // TODO: We're getting a "DB Error: already exists" when inserting a line
+      // item, but that's beside the point for this test, so skipping.
+      'skipLineItem' => 1,
+    ];
+    $contribId = $this->contributionCreate($contribParams);
+
+    // Add two soft credits on the same contribution.
+    $softParams = [
+      'contribution_id' => $contribId,
+      'amount' => 150,
+      'contact_id' => $solicitor1Id,
+      'soft_credit_type_id' => 1,
+    ];
+    $this->callAPISuccess('ContributionSoft', 'create', $softParams);
+    $softParams['contact_id'] = $solicitor2Id;
+    $softParams['amount'] = 100;
+    $this->callAPISuccess('ContributionSoft', 'create', $softParams);
+
+    $input = [
+      'filters' => [
+        'contribution_or_soft_op' => 'eq',
+        'contribution_or_soft_value' => 'contributions_only',
+      ],
+      'fields' => [
+        'sort_name',
+        'email',
+        'phone',
+        'financial_type_id',
+        'receive_date',
+        'total_amount',
+        'soft_credits',
+      ],
+    ];
+    $obj = $this->getReportObject('CRM_Report_Form_Contribute_Detail', $input);
+    $rows = $obj->getResultSet();
+    $this->assertEquals(1, count($rows));
+    $this->assertEquals('$ 150.00', $rows[0]['civicrm_contribution_total_amount']);
+  }
+
 }
