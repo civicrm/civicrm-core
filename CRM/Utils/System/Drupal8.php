@@ -635,6 +635,16 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
+   * @inheritDoc
+   */
+  public function setMessage($message) {
+    // CiviCRM sometimes includes markup in messages (ex: Event Cart)
+    // it needs to be rendered before being displayed.
+    $message = \Drupal\Core\Render\Markup::create($message);
+    \Drupal::messenger()->addMessage($message);
+  }
+
+  /**
    * Drupal 8 has a different function to get current path, hence
    * overriding the postURL function
    *
