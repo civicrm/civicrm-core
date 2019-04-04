@@ -102,16 +102,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   protected $_membershipIDs = array();
 
   /**
-   * An array to hold a list of date fields on the form
-   * so that they can be converted to ISO in a consistent manner
-   *
-   * @var array
-   */
-  protected $_dateFields = array(
-    'receive_date' => array('default' => 'now'),
-  );
-
-  /**
    * Set entity fields to be assigned to the form.
    */
   protected function setEntityFields() {
@@ -323,10 +313,8 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $defaults = parent::setDefaultValues();
 
     //setting default join date and receive date
-    list($now, $currentTime) = CRM_Utils_Date::setDateDefaults();
     if ($this->_action == CRM_Core_Action::ADD) {
-      $defaults['receive_date'] = $now;
-      $defaults['receive_date_time'] = $currentTime;
+      $defaults['receive_date'] = date('Y-m-d H:i:s');
     }
 
     $defaults['num_terms'] = 1;
@@ -364,10 +352,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
       //get back original object campaign id.
       $defaults['campaign_id'] = $memberCampaignId;
-
-      if (!empty($defaults['receive_date'])) {
-        list($defaults['receive_date']) = CRM_Utils_Date::setDateDefaults($defaults['receive_date']);
-      }
 
       // Contribution::getValues() over-writes the membership record's source field value - so we need to restore it.
       if (!empty($defaults['membership_source'])) {
@@ -633,7 +617,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       $this->add('text', 'total_amount', ts('Amount'));
       $this->addRule('total_amount', ts('Please enter a valid amount.'), 'money');
 
-      $this->addDate('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
+      $this->add('datepicker', 'receive_date', ts('Received'), [], FALSE, ['time' => TRUE]);
 
       $this->add('select', 'payment_instrument_id',
         ts('Payment Method'),
@@ -1043,7 +1027,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     else {
       $form->assign('receiptType', 'membership signup');
     }
-    $form->assign('receive_date', CRM_Utils_Date::processDate(CRM_Utils_Array::value('receive_date', $formValues)));
+    $form->assign('receive_date', CRM_Utils_Array::value('receive_date', $formValues));
     $form->assign('formValues', $formValues);
 
     if (empty($lineItem)) {
@@ -1138,9 +1122,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
 
     $config = CRM_Core_Config::singleton();
-
-    // @todo this is no longer required if we convert some date fields.
-    $this->convertDateFieldsToMySQL($formValues);
 
     $membershipTypeValues = array();
     foreach ($this->_memTypeSelected as $memType) {
@@ -1486,7 +1467,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
       $now = date('YmdHis');
-      $params['receive_date'] = date('YmdHis');
+      $params['receive_date'] = date('Y-m-d H:i:s');
       $params['invoice_id'] = $formValues['invoiceID'];
       $params['contribution_source'] = ts('%1 Membership Signup: Credit card or direct debit (by %2)',
         array(1 => $membershipType, 2 => $userName)
@@ -1618,6 +1599,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             $membershipTypeValues[$memType]['relate_contribution_id'] = $relateContribution;
           }
 
+          // @todo figure out why recieve_date isn't being set right here.
+          if (empty($params['receive_date'])) {
+            $params['receive_date'] = date('Y-m-d H:i:s');
+          }
           $membershipParams = array_merge($params, $membershipTypeValues[$memType]);
           if (!empty($formValues['int_amount'])) {
             $init_amount = array();

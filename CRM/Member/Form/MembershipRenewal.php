@@ -110,16 +110,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   protected $membershipTypeName = '';
 
   /**
-   * An array to hold a list of datefields on the form
-   * so that they can be converted to ISO in a consistent manner
-   *
-   * @var array
-   */
-  protected $_dateFields = array(
-    'receive_date' => array('default' => 'now'),
-  );
-
-  /**
    * Set entity fields to be assigned to the form.
    */
   protected function setEntityFields() {}
@@ -190,10 +180,9 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $defaults = parent::setDefaultValues();
 
     // set renewal_date and receive_date to today in correct input format (setDateDefaults uses today if no value passed)
-    list($now, $currentTime) = CRM_Utils_Date::setDateDefaults();
+    $now = date('Y-m-d');
     $defaults['renewal_date'] = $now;
-    $defaults['receive_date'] = $now;
-    $defaults['receive_date_time'] = $currentTime;
+    $defaults['receive_date'] = $now . ' ' . date('H:i:s');
 
     if ($defaults['id']) {
       $defaults['record_contribution'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment',
@@ -223,9 +212,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $scTypes = CRM_Core_OptionGroup::values("soft_credit_type");
     $defaults['soft_credit_type_id'] = CRM_Utils_Array::value(ts('Gift'), array_flip($scTypes));
 
-    $renewalDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('renewal_date', $defaults),
-      NULL, NULL, 'Y-m-d'
-    );
+    $renewalDate = CRM_Utils_Array::value('renewal_date', $defaults);
     $this->assign('renewalDate', $renewalDate);
     $this->assign('member_is_test', CRM_Utils_Array::value('member_is_test', $defaults));
 
@@ -339,7 +326,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     $this->applyFilter('__ALL__', 'trim');
 
-    $this->addDate('renewal_date', ts('Date Renewal Entered'), FALSE, array('formatType' => 'activityDate'));
+    $this->add('datepicker', 'renewal_date', ts('Date Renewal Entered'), [], FALSE, ['time' => FALSE]);
 
     $this->add('select', 'financial_type_id', ts('Financial Type'),
       array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::financialType()
@@ -354,7 +341,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->add('text', 'total_amount', ts('Amount'));
       $this->addRule('total_amount', ts('Please enter a valid amount.'), 'money');
 
-      $this->addDate('receive_date', ts('Received'), FALSE, array('formatType' => 'activityDateTime'));
+      $this->add('datepicker', 'receive_date', ts('Received'), [], FALSE, ['time' => TRUE]);
 
       $this->add('select', 'payment_instrument_id', ts('Payment Method'),
         array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::paymentInstrument(),
@@ -436,7 +423,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     // The fields in Renewal form come into this routine in $params array. 'renewal_date' is in the form
     // We process both the dates before comparison using CRM utils so that they are in same date format
     if (isset($params['renewal_date'])) {
-      if (CRM_Utils_Date::processDate($params['renewal_date']) < CRM_Utils_Date::processDate($joinDate)) {
+      if ($params['renewal_date'] < $joinDate) {
         $errors['renewal_date'] = ts('Renewal date must be the same or later than Member since (Join Date).');
       }
     }
@@ -502,8 +489,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->storeContactFields($this->_params);
     $this->beginPostProcess();
     $now = CRM_Utils_Date::getToday(NULL, 'YmdHis');
-    $this->convertDateFieldsToMySQL($this->_params);
-    $this->assign('receive_date', $this->_params['receive_date']);
+    $this->assign('receive_date', CRM_Utils_Array::value('receive_date', $this->_params, date('Y-m-d H:i:s')));
     $this->processBillingAddress();
     list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
     $this->_params['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params,
@@ -570,7 +556,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
       $this->assign('trxn_id', $result['trxn_id']);
     }
 
-    $renewalDate = !empty($this->_params['renewal_date']) ? $renewalDate = CRM_Utils_Date::processDate($this->_params['renewal_date']) : NULL;
+    $renewalDate = !empty($this->_params['renewal_date']) ? $renewalDate = $this->_params['renewal_date'] : NULL;
 
     // check for test membership.
     $isTestMembership = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_membershipId, 'is_test');
