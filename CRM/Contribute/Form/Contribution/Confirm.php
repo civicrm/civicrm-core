@@ -412,7 +412,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
             }
 
             $isPrimary = 1;
-            if (isset ($this->_params['onbehalf_location'][$blockName])
+            if (isset($this->_params['onbehalf_location'][$blockName])
               && count($this->_params['onbehalf_location'][$blockName]) > 0
             ) {
               $isPrimary = 0;
@@ -511,15 +511,20 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // Make a copy of line items array to use for display only
     $tplLineItems = $this->_lineItem;
     if (CRM_Invoicing_Utils::isInvoicingEnabled()) {
-      list($getTaxDetails, $tplLineItems) = $this->alterLineItemsForTemplate($tplLineItems);
-      $this->assign('getTaxDetails', $getTaxDetails);
-      $this->assign('taxTerm', CRM_Invoicing_Utils::getTaxTerm());
+      // @todo $params seems like exactly the wrong place to get totalTaxAmount from
+      // this is a calculated variable so we it should be transparent how we
+      // calculated it rather than coming from 'params'
       $this->assign('totalTaxAmount', $params['tax_amount']);
     }
-    if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
-      $this->assign('lineItem', $tplLineItems);
-    }
-    else {
+    $this->assignLineItemsToTemplate($tplLineItems);
+
+    $isDisplayLineItems = $this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config');
+
+    $this->assign('isDisplayLineItems', $isDisplayLineItems);
+
+    if (!$isDisplayLineItems) {
+      // quickConfig is deprecated in favour of isDisplayLineItems. Lots of logic has been harnessed to quick config
+      // whereas isDisplayLineItems is specific & clear.
       $this->assign('is_quick_config', 1);
       $this->_params['is_quick_config'] = 1;
     }
@@ -1811,8 +1816,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     // The concept of contributeMode is deprecated.
     // the is_monetary concept probably should be too as it can be calculated from
     // the existence of 'amount' & seems fragile.
-    if (((isset($this->_contributeMode)) || !empty
-        ($this->_params['is_pay_later'])
+    if (((isset($this->_contributeMode)) || !empty($this->_params['is_pay_later'])
       ) &&
       (($this->_values['is_monetary'] && $this->_amount > 0.0))
     ) {
