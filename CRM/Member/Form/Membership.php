@@ -1467,7 +1467,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
       $now = date('YmdHis');
-      $params['receive_date'] = $now;
+      $params['receive_date'] = date('Y-m-d H:i:s');
       $params['invoice_id'] = $formValues['invoiceID'];
       $params['contribution_source'] = ts('%1 Membership Signup: Credit card or direct debit (by %2)',
         array(1 => $membershipType, 2 => $userName)
@@ -1599,6 +1599,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
             $membershipTypeValues[$memType]['relate_contribution_id'] = $relateContribution;
           }
 
+          // @todo figure out why recieve_date isn't being set right here.
+          if (empty($params['receive_date'])) {
+            $params['receive_date'] = date('Y-m-d H:i:s');
+          }
           $membershipParams = array_merge($params, $membershipTypeValues[$memType]);
           if (!empty($formValues['int_amount'])) {
             $init_amount = array();
