@@ -580,56 +580,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $locTypeId = array_keys($this->_params['onbehalf_location']['email']);
       $this->assign('onBehalfEmail', $this->_params['onbehalf_location']['email'][$locTypeId[0]]['email']);
     }
-
-    //fix for CRM-3767
-    $isMonetary = FALSE;
-    if ($this->_amount > 0.0) {
-      $isMonetary = TRUE;
-    }
-    elseif (!empty($this->_params['selectMembership'])) {
-      $memFee = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_params['selectMembership'], 'minimum_fee');
-      if ($memFee > 0.0) {
-        $isMonetary = TRUE;
-      }
-    }
-
-    // The concept of contributeMode is deprecated.
-    // The payment processor object can provide info about the fields it shows.
-    if ($isMonetary && is_a($this->_paymentProcessor['object'], 'CRM_Core_Payment')) {
-      /** @var  $paymentProcessorObject \CRM_Core_Payment */
-      $paymentProcessorObject = $this->_paymentProcessor['object'];
-
-      $paymentFields = $paymentProcessorObject->getPaymentFormFields();
-      foreach ($paymentFields as $index => $paymentField) {
-        if (!isset($this->_params[$paymentField])) {
-          unset($paymentFields[$index]);
-          continue;
-        }
-        if ($paymentField === 'credit_card_exp_date') {
-          $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $this->_params));
-          $date = CRM_Utils_Date::mysqlToIso($date);
-          $this->assign('credit_card_exp_date', $date);
-        }
-        elseif ($paymentField === 'credit_card_number') {
-          $this->assign('credit_card_number',
-            CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $this->_params))
-          );
-        }
-        elseif ($paymentField === 'credit_card_type') {
-          $this->assign('credit_card_type', CRM_Core_PseudoConstant::getLabel(
-            'CRM_Core_BAO_FinancialTrxn',
-            'card_type_id',
-            CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->_params['credit_card_type'])
-          ));
-        }
-        else {
-          $this->assign($paymentField, $this->_params[$paymentField]);
-        }
-      }
-      $this->assign('paymentFieldsetLabel', CRM_Core_Payment_Form::getPaymentLabel($paymentProcessorObject));
-      $this->assign('paymentFields', $paymentFields);
-
-    }
+    $this->assignPaymentFields();
 
     $this->assign('email',
       $this->controller->exportValue('Main', "email-{$this->_bltID}")
@@ -803,6 +754,58 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     if ($captcha->hasSettingsAvailable()) {
       $captcha->add($this);
       $this->assign('isCaptcha', TRUE);
+    }
+  }
+
+  public function assignPaymentFields() {
+    //fix for CRM-3767
+    $isMonetary = FALSE;
+    if ($this->_amount > 0.0) {
+      $isMonetary = TRUE;
+    }
+    elseif (!empty($this->_params['selectMembership'])) {
+      $memFee = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_params['selectMembership'], 'minimum_fee');
+      if ($memFee > 0.0) {
+        $isMonetary = TRUE;
+      }
+    }
+
+    // The concept of contributeMode is deprecated.
+    // The payment processor object can provide info about the fields it shows.
+    if ($isMonetary && is_a($this->_paymentProcessor['object'], 'CRM_Core_Payment')) {
+      /** @var  $paymentProcessorObject \CRM_Core_Payment */
+      $paymentProcessorObject = $this->_paymentProcessor['object'];
+
+      $paymentFields = $paymentProcessorObject->getPaymentFormFields();
+      foreach ($paymentFields as $index => $paymentField) {
+        if (!isset($this->_params[$paymentField])) {
+          unset($paymentFields[$index]);
+          continue;
+        }
+        if ($paymentField === 'credit_card_exp_date') {
+          $date = CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $this->_params));
+          $date = CRM_Utils_Date::mysqlToIso($date);
+          $this->assign('credit_card_exp_date', $date);
+        }
+        elseif ($paymentField === 'credit_card_number') {
+          $this->assign('credit_card_number',
+            CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $this->_params))
+          );
+        }
+        elseif ($paymentField === 'credit_card_type') {
+          $this->assign('credit_card_type', CRM_Core_PseudoConstant::getLabel(
+            'CRM_Core_BAO_FinancialTrxn',
+            'card_type_id',
+            CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $this->_params['credit_card_type'])
+          ));
+        }
+        else {
+          $this->assign($paymentField, $this->_params[$paymentField]);
+        }
+      }
+      $this->assign('paymentFieldsetLabel', CRM_Core_Payment_Form::getPaymentLabel($paymentProcessorObject));
+      $this->assign('paymentFields', $paymentFields);
+
     }
   }
 
