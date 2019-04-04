@@ -47,6 +47,7 @@ function civicrm_api3_exception_get($params) {
 function civicrm_api3_exception_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Exception');
 }
+
 /**
  * Delete an existing Exception.
  *

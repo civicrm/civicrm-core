@@ -35,44 +35,6 @@
  * Main page for viewing contact.
  */
 class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
-
-  /**
-   * Heart of the viewing process.
-   *
-   * The runner gets all the meta data for the contact and calls the appropriate type of page to view.
-   */
-  public function preProcess() {
-    //fetch the dedupe exception contacts.
-    $dedupeExceptions = array();
-
-    $exception = new CRM_Dedupe_DAO_Exception();
-    $exception->find();
-    $contactIds = array();
-    while ($exception->fetch()) {
-      $key = "{$exception->contact_id1}_{$exception->contact_id2}";
-      $contactIds[$exception->contact_id1] = $exception->contact_id1;
-      $contactIds[$exception->contact_id2] = $exception->contact_id2;
-      $dedupeExceptions[$key] = array(
-        'main' => array('id' => $exception->contact_id1),
-        'other' => array('id' => $exception->contact_id2),
-      );
-    }
-    //get the dupe contacts display names.
-    if (!empty($dedupeExceptions)) {
-      $sql = 'select id, display_name from civicrm_contact where id IN ( ' . implode(', ', $contactIds) . ' )';
-      $contact = CRM_Core_DAO::executeQuery($sql);
-      $displayNames = array();
-      while ($contact->fetch()) {
-        $displayNames[$contact->id] = $contact->display_name;
-      }
-      foreach ($dedupeExceptions as $key => & $values) {
-        $values['main']['name'] = CRM_Utils_Array::value($values['main']['id'], $displayNames);
-        $values['other']['name'] = CRM_Utils_Array::value($values['other']['id'], $displayNames);
-      }
-    }
-    $this->assign('dedupeExceptions', $dedupeExceptions);
-  }
-
   /**
    * the main function that is called when the page loads,
    * it decides the which action has to be taken for the page.
@@ -80,8 +42,72 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
    * @return null
    */
   public function run() {
-    $this->preProcess();
+    $this->initializePager();
+    $this->assign('exceptions', $this->getExceptions());
     return parent::run();
+  }
+
+  /**
+   * Method to initialize pager
+   *
+   * @access protected
+   */
+  protected function initializePager() {
+    $params = array();
+
+    $contactOneQ = CRM_Utils_Request::retrieve('crmContact1Q', 'String');
+
+    if ($contactOneQ) {
+      $params['contact_id1.display_name'] = array('LIKE' => '%' . $contactOneQ . '%');
+      $params['contact_id2.display_name'] = array('LIKE' => '%' . $contactOneQ . '%');
+
+      $params['options']['or'] = [["contact_id1.display_name", "contact_id2.display_name"]];
+    }
+
+    $totalitems = civicrm_api3('Exception', "getcount", $params);
+    $params           = array(
+      'total' => $totalitems,
+      'rowCount' => CRM_Utils_Pager::ROWCOUNT,
+      'status' => ts('Dedupe Exceptions %%StatusMessage%%'),
+      'buttonBottom' => 'PagerBottomButton',
+      'buttonTop' => 'PagerTopButton',
+      'pageID' => $this->get(CRM_Utils_Pager::PAGE_ID),
+    );
+    $this->_pager = new CRM_Utils_Pager($params);
+    $this->assign_by_ref('pager', $this->_pager);
+  }
+
+  /**
+   * Function to get the exceptions
+   *
+   * @return array $exceptions
+   * @access protected
+   */
+  protected function getExceptions() {
+    list($offset, $limit) = $this->_pager->getOffsetAndRowCount();
+    $contactOneQ = CRM_Utils_Request::retrieve('crmContact1Q', 'String');
+
+    if (!$contactOneQ) {
+      $contactOneQ = '';
+    }
+
+    $this->assign('searchcontact1', $contactOneQ);
+
+    $params = array(
+      "options"     => array('limit' => $limit, 'offset' => $offset),
+      'return' => ["contact_id1.display_name", "contact_id2.display_name", "contact_id1", "contact_id2"],
+    );
+
+    if ($contactOneQ != '') {
+      $params['contact_id1.display_name'] = array('LIKE' => '%' . $contactOneQ . '%');
+      $params['contact_id2.display_name'] = array('LIKE' => '%' . $contactOneQ . '%');
+
+      $params['options']['or'] = [["contact_id1.display_name", "contact_id2.display_name"]];
+    }
+
+    $exceptions = civicrm_api3("Exception", "get", $params);
+    $exceptions = $exceptions["values"];
+    return $exceptions;
   }
 
 }
