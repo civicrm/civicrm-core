@@ -80,8 +80,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
 
     if ($recurID) {
       $links = self::$_links;
-      $paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($recurID, 'recur', 'obj');
-      if (!is_object($paymentProcessorObj)) {
+      $paymentProcessorObj = CRM_Contribute_BAO_ContributionRecur::getPaymentProcessorObject($recurID);
+      if (!$paymentProcessorObj) {
         unset($links[CRM_Core_Action::DISABLE]);
         unset($links[CRM_Core_Action::UPDATE]);
         return $links;
