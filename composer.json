@@ -47,7 +47,7 @@
     "tecnickcom/tcpdf" : "6.2.*",
     "totten/ca-config": "~17.05",
     "zetacomponents/base": "1.9.*",
-    "zetacomponents/mail": "dev-1.8-civi",
+    "zetacomponents/mail": "dev-master",
     "marcj/topsort": "~1.1",
     "phpoffice/phpword": "^0.15.0",
     "pear/validate_finance_creditcard": "dev-master",
@@ -63,12 +63,6 @@
     "pear/log": "1.13.1",
     "ezyang/htmlpurifier": "4.10"
   },
-  "repositories": [
-    {
-      "type": "git",
-      "url": "https://github.com/civicrm/zetacomponents-mail.git"
-    }
-  ],
   "scripts": {
     "post-install-cmd": [
       "bash tools/scripts/composer/dompdf-cleanup.sh",
@@ -94,6 +88,9 @@
       },
       "phpoffice/phpword": {
         "Fix handling of libxml_disable_entity_loader": "tools/scripts/composer/patches/phpword-libxml-fix-global-handling.patch"
+      },
+      "zetacomponents/mail": {
+        "CiviCRM Custom Patches for ZetaCompoents mail": "tools/scripts/composer/patches/civicrm-custom-patches-zetacompoents-mail.patch"
       }
     }
   }
