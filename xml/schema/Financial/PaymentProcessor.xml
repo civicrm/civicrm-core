@@ -48,6 +48,17 @@
     </html>
   </field>
   <field>
+    <name>title</name>
+    <title>Payment Processor Title</title>
+    <type>varchar</type>
+    <length>127</length>
+    <html>
+      <type>Text</type>
+    </html>
+    <comment>Payment Processor Descriptive Name.</comment>
+    <add>5.13</add>
+  </field>
+  <field>
     <name>description</name>
     <title>Processor Description</title>
     <type>varchar</type>
