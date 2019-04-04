@@ -86,8 +86,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
         if (count($log_path) > 1) {
           $url[] = $log_path[1];
           $log_url = implode($filePathMarker, $url);
-          $headers = @get_headers($log_url);
-          if (stripos($headers[0], '200')) {
+          if ($this->fileExists($log_url)) {
             $docs_url = $this->createDocUrl('checkLogFileIsNotAccessible');
             $msg = 'The <a href="%1">CiviCRM debug log</a> should not be downloadable.'
               . '<br />' .
@@ -145,9 +144,9 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
               2 => $privateDir,
               3 => $heuristicUrl,
             )),
-          ts('Private Files Readable'),
-          \Psr\Log\LogLevel::WARNING,
-          'fa-lock'
+            ts('Private Files Readable'),
+            \Psr\Log\LogLevel::WARNING,
+            'fa-lock'
         );
       }
     }
@@ -365,8 +364,7 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
       return FALSE;
     }
 
-    $headers = @get_headers("$url/$file");
-    if (stripos($headers[0], '200')) {
+    if ($this->fileExists("$url/$file")) {
       $content = @file_get_contents("$url/$file");
       if (preg_match('/delete me/', $content)) {
         $result = TRUE;
