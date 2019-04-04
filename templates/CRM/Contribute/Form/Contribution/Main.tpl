@@ -415,5 +415,9 @@
 {/if}
 
 {* jQuery validate *}
-{* disabled because more work needs to be done to conditionally require credit card fields *}
-{*include file="CRM/Form/validate.tpl"*}
+{* disabled because originally this caused problems with some credit cards.
+Likely it no longer has an problems but allowing conditional
+ inclusion by extensions / payment processors for now in order to add in a conservative way *}
+{if $isJsValidate}
+  {include file="CRM/Form/validate.tpl"}
+{/if}
