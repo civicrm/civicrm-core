@@ -47,9 +47,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
             1 => $phpVersion,
             2 => CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER,
           )),
-        ts('PHP Up-to-Date'),
-        \Psr\Log\LogLevel::INFO,
-        'fa-server'
+          ts('PHP Up-to-Date'),
+          \Psr\Log\LogLevel::INFO,
+          'fa-server'
       );
     }
     elseif (version_compare($phpVersion, CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER) >= 0) {
@@ -60,9 +60,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
             1 => $phpVersion,
             2 => CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER,
           )),
-        ts('PHP Out-of-Date'),
-        \Psr\Log\LogLevel::NOTICE,
-        'fa-server'
+          ts('PHP Out-of-Date'),
+          \Psr\Log\LogLevel::NOTICE,
+          'fa-server'
       );
     }
     elseif (version_compare($phpVersion, CRM_Upgrade_Incremental_General::MIN_INSTALL_PHP_VER) >= 0) {
@@ -74,9 +74,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
             2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
             3 => CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER,
           )),
-        ts('PHP Out-of-Date'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-server'
+          ts('PHP Out-of-Date'),
+          \Psr\Log\LogLevel::WARNING,
+          'fa-server'
       );
     }
     else {
@@ -88,9 +88,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
             2 => CRM_Upgrade_Incremental_General::MIN_RECOMMENDED_PHP_VER,
             3 => CRM_Upgrade_Incremental_General::RECOMMENDED_PHP_VER,
           )),
-        ts('PHP Out-of-Date'),
-        \Psr\Log\LogLevel::ERROR,
-        'fa-server'
+          ts('PHP Out-of-Date'),
+          \Psr\Log\LogLevel::ERROR,
+          'fa-server'
       );
     }
 
@@ -111,9 +111,9 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
             1 => 'https://civicrm.org/blog/totten/psa-please-verify-php-extension-mysqli',
             2 => 'mysqli',
           )),
-        ts('Forward Compatibility: Enable "mysqli"'),
-        \Psr\Log\LogLevel::WARNING,
-        'fa-server'
+          ts('Forward Compatibility: Enable "mysqli"'),
+          \Psr\Log\LogLevel::WARNING,
+          'fa-server'
       );
     }
 
@@ -883,9 +883,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     // Does arrow.png exist where we expect it?
     $arrowUrl = CRM_Core_Config::singleton()->userFrameworkResourceURL . 'packages/jquery/css/images/arrow.png';
-    $headers = get_headers($arrowUrl);
-    $fileExists = stripos($headers[0], "200 OK") ? 1 : 0;
-    if ($fileExists === FALSE) {
+    if ($this->fileExists($arrowUrl) === FALSE) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         ts('The Resource URL is not set correctly. Please set the <a href="%1">CiviCRM Resource URL</a>.',

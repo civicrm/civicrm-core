@@ -25,6 +25,8 @@
  +--------------------------------------------------------------------+
  */
 
+use GuzzleHttp\Client;
+
 /**
  *
  * @package CRM
@@ -55,6 +57,28 @@ abstract class CRM_Utils_Check_Component {
       }
     }
     return $messages;
+  }
+
+  /**
+   * Check if file exists on given URL.
+   *
+   * @param $url
+   * @return bool
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public function fileExists($url, $timeout = 0.50) {
+    $fileExists = FALSE;
+    try {
+      $guzzleClient = new GuzzleHttp\Client();
+      $guzzleResponse = $guzzleClient->request('GET', $url, array(
+        'timeout' => $timeout,
+      ));
+      $fileExists = ($guzzleResponse->getStatusCode() == 200);
+    }
+    catch (Exception $e) {
+      echo $e->getMessage();
+    }
+    return $fileExists;
   }
 
 }
