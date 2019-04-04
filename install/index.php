@@ -524,7 +524,7 @@ class InstallRequirements {
           $databaseConfig['database'],
           array(
             ts("MySQL %1 Configuration", array(1 => $dbName)),
-            ts("Does database has data from previous installation?"),
+            ts("Does the database have data from a previous installation?"),
             ts("CiviCRM data from previous installation exists in '%1'.", array(1 => $databaseConfig['database'])),
           )
         );
@@ -1315,7 +1315,7 @@ class InstallRequirements {
       }
     }
 
-    $testDetails[3] = ts('CiviCRM data from previous installation does not exists in %1.', array(1 => $database));
+    $testDetails[3] = ts('CiviCRM data from previous installation does not exist in %1.', array(1 => $database));
     $this->testing($testDetails);
   }
 
