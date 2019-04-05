@@ -78,7 +78,6 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
 
     $eventID = implode(',', $eventIDs);
 
-    $participantStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1", "label");
     $participantRole = CRM_Event_PseudoConstant::participantRole();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
 
@@ -90,15 +89,8 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
     if ($optionGroupDAO->find(TRUE)) {
       $optionGroupId = $optionGroupDAO->id;
     }
-    //show the income of active participant status (Counted = filter = 1)
-    $activeParticipantStatusIDArray = $activeParticipantStatusLabelArray = [];
-    foreach ($participantStatus as $id => $label) {
-      $activeParticipantStatusIDArray[] = $id;
-      $activeParticipantStatusLabelArray[] = $label;
-    }
-    $activeParticipantStatus = implode(',', $activeParticipantStatusIDArray);
-    $activeparticipnatStutusLabel = implode(', ', $activeParticipantStatusLabelArray);
-    $activeParticipantClause = " AND civicrm_participant.status_id IN ( $activeParticipantStatus ) ";
+
+    $activeParticipantClause = " AND civicrm_participant.status_id IN ( " . implode(',', array_keys($this->getActiveParticipantStatuses())) . " ) ";
     $select = [
       "civicrm_event.id as event_id",
       "civicrm_event.title as event_title",
@@ -133,7 +125,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
       $eventSummary[$eventDAO->event_id][ts('End Date')] = CRM_Utils_Date::customFormat($eventDAO->end_date);
       $eventSummary[$eventDAO->event_id][ts('Event Type')] = $eventDAO->event_type;
       $eventSummary[$eventDAO->event_id][ts('Event Income')] = CRM_Utils_Money::format($eventDAO->total, $eventDAO->currency);
-      $eventSummary[$eventDAO->event_id][ts('Registered Participant')] = "{$eventDAO->participant} ({$activeparticipnatStutusLabel})";
+      $eventSummary[$eventDAO->event_id][ts('Registered Participant')] = "{$eventDAO->participant} ({" . implode(', ', $this->getActiveParticipantStatuses()) . ")";
       $currency[$eventDAO->event_id] = $eventDAO->currency;
     }
     $this->assign_by_ref('summary', $eventSummary);
@@ -216,6 +208,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
 
     $statusDAO = $this->executeReportQuery($status);
 
+    $participantStatus = $this->getActiveParticipantStatuses();
     while ($statusDAO->fetch()) {
       $statusRows[$statusDAO->event_id][$participantStatus[$statusDAO->STATUSID]]['total'] = $statusDAO->participant;
       $statusRows[$statusDAO->event_id][$participantStatus[$statusDAO->STATUSID]]['round'] = round(($statusDAO->participant / $count[$statusDAO->event_id]) * 100, 2);
@@ -380,6 +373,15 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form {
     }
 
     parent::endPostProcess();
+  }
+
+  /**
+   * Get statuses with the counted filter set to TRUE.
+   *
+   * @return array
+   */
+  protected function getActiveParticipantStatuses() {
+    return CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1", "label");
   }
 
 }
