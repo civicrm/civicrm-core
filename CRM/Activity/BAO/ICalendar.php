@@ -86,14 +86,14 @@ class CRM_Activity_BAO_ICalendar {
         $calendar = $template->fetch('CRM/Activity/Calendar/ICal.tpl');
         if (file_put_contents($this->icsfile, $calendar) !== FALSE) {
           if (empty($attachments)) {
-            $attachments = array();
+            $attachments = [];
           }
-          $attachments['activity_ics'] = array(
+          $attachments['activity_ics'] = [
             'mime_type' => 'text/calendar',
             'fileName' => $icsFileName,
             'cleanName' => $icsFileName,
             'fullPath' => $this->icsfile,
-          );
+          ];
           return 'activity_ics';
         }
       }
@@ -105,7 +105,7 @@ class CRM_Activity_BAO_ICalendar {
    * Remove temp file.
    */
   public function cleanup() {
-    if (!empty ($this->icsfile)) {
+    if (!empty($this->icsfile)) {
       @unlink($this->icsfile);
     }
   }
