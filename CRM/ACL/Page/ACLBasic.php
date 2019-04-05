@@ -57,20 +57,20 @@ class CRM_ACL_Page_ACLBasic extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/acl/basic',
           'qs' => 'reset=1&action=update&id=%%id%%',
           'title' => ts('Edit ACL'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/acl/basic',
           'qs' => 'reset=1&action=delete&id=%%id%%',
           'title' => ts('Delete ACL'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -86,12 +86,12 @@ class CRM_ACL_Page_ACLBasic extends CRM_Core_Page_Basic {
     $id = $this->getIdAndAction();
 
     // set breadcrumb to append to admin/access
-    $breadCrumb = array(
-      array(
+    $breadCrumb = [
+      [
         'title' => ts('Access Control'),
         'url' => CRM_Utils_System::url('civicrm/admin/access', 'reset=1'),
-      ),
-    );
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
     // what action to take ?
@@ -112,7 +112,7 @@ class CRM_ACL_Page_ACLBasic extends CRM_Core_Page_Basic {
   public function browse() {
 
     // get all acl's sorted by weight
-    $acl = array();
+    $acl = [];
     $query = "
   SELECT *
     FROM civicrm_acl
@@ -126,7 +126,7 @@ ORDER BY entity_id
     $permissions = CRM_Core_Permission::basicPermissions();
     while ($dao->fetch()) {
       if (!array_key_exists($dao->entity_id, $acl)) {
-        $acl[$dao->entity_id] = array();
+        $acl[$dao->entity_id] = [];
         $acl[$dao->entity_id]['name'] = $dao->name;
         $acl[$dao->entity_id]['entity_id'] = $dao->entity_id;
         $acl[$dao->entity_id]['entity_table'] = $dao->entity_table;
@@ -146,7 +146,7 @@ ORDER BY entity_id
         $acl[$dao->entity_id]['action'] = CRM_Core_Action::formLink(
           self::links(),
           $action,
-          array('id' => $dao->entity_id),
+          ['id' => $dao->entity_id],
           ts('more'),
           FALSE,
           'aclRole.manage.action',

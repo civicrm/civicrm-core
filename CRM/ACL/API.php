@@ -125,16 +125,12 @@ class CRM_ACL_API {
       return $deleteClause;
     }
 
-    $where = implode(' AND ',
-      array(
-        CRM_ACL_BAO_ACL::whereClause($type,
-          $tables,
-          $whereTables,
-          $contactID
-        ),
-        $deleteClause,
-      )
+    $whereClause = CRM_ACL_BAO_ACL::whereClause($type,
+      $tables,
+      $whereTables,
+      $contactID
     );
+    $where = implode(' AND ', [$whereClause, $deleteClause]);
 
     // Add permission on self if we really hate our server or have hardly any contacts.
     if (!$skipOwnContactClause && $contactID && (CRM_Core_Permission::check('edit my contact') ||
@@ -203,7 +199,7 @@ class CRM_ACL_API {
   ) {
 
     if (!isset(Civi::$statics[__CLASS__]) || !isset(Civi::$statics[__CLASS__]['group_permission'])) {
-      Civi::$statics[__CLASS__]['group_permission'] = array();
+      Civi::$statics[__CLASS__]['group_permission'] = [];
     }
 
     if (!$contactID) {
