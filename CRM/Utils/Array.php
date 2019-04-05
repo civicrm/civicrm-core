@@ -1058,16 +1058,20 @@ class CRM_Utils_Array {
     if (!is_array($array)) {
       return;
     }
-    $keys = array_keys($array, 1);
-    if (count($keys) > 1 ||
-      (count($keys) == 1 &&
-        (current($keys) > 1 ||
-          is_string(current($keys)) ||
-          (current($keys) == 1 && $array[1] == 1) // handle (0 => 4), (1 => 1)
-        )
-      )
-    ) {
-      $array = $keys;
+
+    $hasSequentialKeysStartingWithZero = array_keys($array) === range(0, count($array) - 1);
+    $hasAllValuesAsNumberOne = array_unique(array_values($array)) === ['1'];
+    $hasMoreThanOneElement = count($array) > 1;
+    $isAssociative = !$hasSequentialKeysStartingWithZero || ($hasMoreThanOneElement && $hasAllValuesAsNumberOne);
+
+    if ($isAssociative) {
+      $tempArr = [];
+
+      foreach ($array as $key => $val) {
+        array_push($tempArr, (string)$key);
+      }
+
+      $array = $tempArr;
     }
   }
 

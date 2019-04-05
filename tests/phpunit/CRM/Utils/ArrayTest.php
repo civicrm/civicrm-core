@@ -367,4 +367,52 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
     $this->assertEquals($flat, $expected);
   }
 
+  public function testFormatArrayKeysTransformsAssociativeArrayToSequential() {
+    $tests = [
+      [
+        'object' => [
+          '5' => '1',
+          '1' => '1',
+          '4' => '1'
+        ],
+        'expectation' => ['5', '1', '4']
+      ],
+      [
+        'object' => ['5', '1', '4'],
+        'expectation' => ['5', '1', '4']
+      ],
+      [
+        'object' => ['0', '1'],
+        'expectation' => ['0', '1']
+      ],
+      [
+        'object' => [
+          '0' => '1',
+          '1' => '1'
+        ],
+        'expectation' => ['0', '1']
+      ],
+      [
+        'object' => 'not an array',
+        'expectation' => 'not an array'
+      ],
+      [
+        'object' => [
+          '5' => '1',
+          '1' => '1',
+          '4' => '1',
+          '1' => '1',
+          '4' => '1',
+          '5' => '1',
+          '1' => '1'
+        ],
+        'expectation' => ['5', '1', '4']
+      ],
+    ];
+
+    foreach ($tests as $test) {
+      CRM_Utils_Array::formatArrayKeys($test['object']);
+      $this->assertEquals($test['expectation'], $test['object']);
+    }
+  }
 }
