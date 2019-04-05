@@ -24,7 +24,8 @@ class CRM_Admin_Page_ExtensionsUpgrade extends CRM_Core_Page {
     ]);
 
     CRM_Core_Error::debug_log_message('CRM_Admin_Page_ExtensionsUpgrade: Start upgrades');
-    $runner->runAllViaWeb(); // does not return
+    // does not return
+    $runner->runAllViaWeb();
   }
 
   /**

@@ -110,8 +110,7 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
       '' => ts('- select -'),
       '0' => ts('Yes'),
       '1' => ts('No'),
-        ]
-    );
+    ]);
 
     //build the array of all search params.
     $this->_searchParams = [];

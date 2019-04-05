@@ -716,7 +716,8 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
           'url' => CRM_Utils_System::url('civicrm/campaign/add', "reset=1",
             NULL, NULL, FALSE, FALSE, TRUE),
           'type' => 'Campaign',
-        ]];
+        ],
+      ];
     }
     return FALSE;
   }

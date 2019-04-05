@@ -131,21 +131,20 @@ class CRM_Badge_Form_Layout extends CRM_Admin_Form {
     $this->addRule('width_participant_image', ts('Enter valid height'), 'positiveInteger');
 
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'refresh',
-          'name' => ts('Save and Preview'),
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'refresh',
+        'name' => ts('Save and Preview'),
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**

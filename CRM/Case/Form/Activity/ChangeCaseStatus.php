@@ -208,10 +208,9 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     foreach ($form->_oldCaseStatus as $statuskey => $statusval) {
       if ($activity->subject == 'null') {
         $activity->subject = ts('Case status changed from %1 to %2', [
-            1 => CRM_Utils_Array::value($statusval, $form->_caseStatus),
-            2 => CRM_Utils_Array::value($params['case_status_id'], $form->_caseStatus),
-          ]
-        );
+          1 => CRM_Utils_Array::value($statusval, $form->_caseStatus),
+          2 => CRM_Utils_Array::value($params['case_status_id'], $form->_caseStatus),
+        ]);
         $activity->save();
       }
     }

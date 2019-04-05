@@ -158,9 +158,9 @@ class CRM_Campaign_Page_AJAX {
 
     //format multi-select group and contact types.
     foreach ([
-               'group',
-               'contact_type',
-             ] as $param) {
+      'group',
+      'contact_type',
+    ] as $param) {
       $paramValue = CRM_Utils_Array::value($param, $params);
       if ($paramValue) {
         unset($params[$param]);
@@ -173,10 +173,10 @@ class CRM_Campaign_Page_AJAX {
 
     $voterClauseParams = [];
     foreach ([
-               'campaign_survey_id',
-               'survey_interviewer_id',
-               'campaign_search_voter_for',
-             ] as $fld) {
+      'campaign_survey_id',
+      'survey_interviewer_id',
+      'campaign_search_voter_for',
+    ] as $fld) {
       $voterClauseParams[$fld] = CRM_Utils_Array::value($fld, $params);
     }
 
@@ -602,11 +602,11 @@ class CRM_Campaign_Page_AJAX {
       }
     }
     foreach ([
-               'sort',
-               'offset',
-               'rowCount',
-               'sortOrder',
-             ] as $sortParam) {
+      'sort',
+      'offset',
+      'rowCount',
+      'sortOrder',
+    ] as $sortParam) {
       $params[$sortParam] = $$sortParam;
     }
 
@@ -707,11 +707,11 @@ class CRM_Campaign_Page_AJAX {
       }
     }
     foreach ([
-               'sort',
-               'offset',
-               'rowCount',
-               'sortOrder',
-             ] as $sortParam) {
+      'sort',
+      'offset',
+      'rowCount',
+      'sortOrder',
+    ] as $sortParam) {
       $params[$sortParam] = $$sortParam;
     }
 
@@ -807,11 +807,11 @@ class CRM_Campaign_Page_AJAX {
       }
     }
     foreach ([
-               'sort',
-               'offset',
-               'rowCount',
-               'sortOrder',
-             ] as $sortParam) {
+      'sort',
+      'offset',
+      'rowCount',
+      'sortOrder',
+    ] as $sortParam) {
       $params[$sortParam] = $$sortParam;
     }
 

@@ -297,13 +297,12 @@ class CRM_Campaign_Form_Petition_Signature extends CRM_Core_Form {
     }
     // add buttons
     $this->addButtons([
-        [
-          'type' => 'upload',
-          'name' => ts('Sign the Petition'),
-          'isDefault' => TRUE,
-        ],
-      ]
-    );
+      [
+        'type' => 'upload',
+        'name' => ts('Sign the Petition'),
+        'isDefault' => TRUE,
+      ],
+    ]);
   }
 
   /**

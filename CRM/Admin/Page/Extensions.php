@@ -160,7 +160,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     $mapper = CRM_Extension_System::singleton()->getMapper();
     $manager = CRM_Extension_System::singleton()->getManager();
 
-    $localExtensionRows = []; // array($pseudo_id => extended_CRM_Extension_Info)
+    // array($pseudo_id => extended_CRM_Extension_Info)
+    $localExtensionRows = [];
     $keys = array_keys($manager->getStatuses());
     sort($keys);
     foreach ($keys as $key) {
