@@ -189,11 +189,21 @@ class CRM_Core_BAO_Cache_Psr16 {
       'custom data',
 
       // Universe
-      'dashboard', // be.chiro.civi.atomfeeds
-      'lineitem-editor', // biz.jmaconsulting.lineitemedit
-      'HRCore_Info', // civihr/uk.co.compucorp.civicrm.hrcore
-      'CiviCRM setting Spec', // nz.co.fuzion.entitysetting
-      'descendant groups for an org', // org.civicrm.multisite
+
+      // be.chiro.civi.atomfeeds
+      'dashboard',
+
+      // biz.jmaconsulting.lineitemedit
+      'lineitem-editor',
+
+      // civihr/uk.co.compucorp.civicrm.hrcore
+      'HRCore_Info',
+
+      // nz.co.fuzion.entitysetting
+      'CiviCRM setting Spec',
+
+      // org.civicrm.multisite
+      'descendant groups for an org',
     ];
   }
 

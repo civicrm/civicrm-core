@@ -181,9 +181,9 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
   public static function initializeDashlets() {
     $dashlets = [];
     $getDashlets = civicrm_api3("Dashboard", "get", [
-        'domain_id' => CRM_Core_Config::domainID(),
-        'option.limit' => 0,
-      ]);
+      'domain_id' => CRM_Core_Config::domainID(),
+      'option.limit' => 0,
+    ]);
     $contactID = CRM_Core_Session::getLoggedInContactID();
     $allDashlets = CRM_Utils_Array::index(['name'], $getDashlets['values']);
     $defaultDashlets = [];
@@ -271,10 +271,8 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         }
 
         // hack to handle case permissions
-        if (!$componentName && in_array($key, [
-            'access my cases and activities',
-            'access all cases and activities',
-          ])
+        if (!$componentName
+          && in_array($key, ['access my cases and activities', 'access all cases and activities'])
         ) {
           $componentName = 'CiviCase';
         }

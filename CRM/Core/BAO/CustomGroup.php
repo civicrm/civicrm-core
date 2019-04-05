@@ -303,7 +303,8 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     if (self::hasCustomGroup('Activity', NULL, $activityTypeId)) {
       return TRUE;
     }
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE, FALSE); // everything
+    // everything
+    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE, FALSE);
     $params = [
       'version' => 3,
       'extends' => 'Activity',
@@ -484,7 +485,7 @@ LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicr
       foreach ($subTypes as $key => $subType) {
         $subTypeClauses[] = self::whereListHas("civicrm_custom_group.extends_entity_column_value", self::validateSubTypeByEntity($entityType, $subType));
       }
-      $subTypeClause = '(' .  implode(' OR ', $subTypeClauses) . ')';
+      $subTypeClause = '(' . implode(' OR ', $subTypeClauses) . ')';
       if (!$onlySubType) {
         $subTypeClause = '(' . $subTypeClause . '  OR civicrm_custom_group.extends_entity_column_value IS NULL )';
       }
@@ -716,7 +717,8 @@ ORDER BY civicrm_custom_group.weight,
    *   SQL condition.
    */
   static private function whereListHas($column, $value, $delimiter = CRM_Core_DAO::VALUE_SEPARATOR) {
-    $bareValue = trim($value, $delimiter); // ?
+    // ?
+    $bareValue = trim($value, $delimiter);
     $escapedValue = CRM_Utils_Type::escape("%{$delimiter}{$bareValue}{$delimiter}%", 'String', FALSE);
     return "($column LIKE \"$escapedValue\")";
   }

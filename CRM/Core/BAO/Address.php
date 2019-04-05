@@ -360,12 +360,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     );
 
     if ($parseStreetAddress && !empty($params['street_address'])) {
-      foreach ([
-                 'street_number',
-                 'street_name',
-                 'street_unit',
-                 'street_number_suffix',
-               ] as $fld) {
+      foreach (['street_number', 'street_name', 'street_unit', 'street_number_suffix'] as $fld) {
         unset($params[$fld]);
       }
       // main parse string.
@@ -494,12 +489,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     while ($address->fetch()) {
       // deprecate reference.
       if ($count > 1) {
-        foreach ([
-                   'state',
-                   'state_name',
-                   'country',
-                   'world_region',
-                 ] as $fld) {
+        foreach (['state', 'state_name', 'country', 'world_region'] as $fld) {
           if (isset($address->$fld)) {
             unset($address->$fld);
           }
@@ -733,10 +723,8 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
     $streetAddress = trim($streetAddress);
 
     $matches = [];
-    if (in_array($locale, [
-        'en_CA',
-        'fr_CA',
-      ]) && preg_match('/^([A-Za-z0-9]+)[ ]*\-[ ]*/', $streetAddress, $matches)
+    if (in_array($locale, ['en_CA', 'fr_CA'])
+      && preg_match('/^([A-Za-z0-9]+)[ ]*\-[ ]*/', $streetAddress, $matches)
     ) {
       $parseFields['street_unit'] = $matches[1];
       // unset from rest of street address
