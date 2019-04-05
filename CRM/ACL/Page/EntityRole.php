@@ -59,30 +59,30 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/acl/entityrole',
           'qs' => 'action=update&id=%%id%%',
           'title' => ts('Edit ACL Role Assignment'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable ACL Role Assignment'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable ACL Role Assignment'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/acl/entityrole',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete ACL Role Assignment'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -98,14 +98,12 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
     $id = $this->getIdAndAction();
 
     // set breadcrumb to append to admin/access
-    $breadCrumb = array(
-      array(
+    $breadCrumb = [
+      [
         'title' => ts('Access Control'),
-        'url' => CRM_Utils_System::url('civicrm/admin/access',
-          'reset=1'
-        ),
-      ),
-    );
+        'url' => CRM_Utils_System::url('civicrm/admin/access', 'reset=1'),
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     CRM_Utils_System::setTitle(ts('Assign Users to Roles'));
 
@@ -134,7 +132,7 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
   public function browse() {
 
     // get all acl's sorted by weight
-    $entityRoles = array();
+    $entityRoles = [];
     $dao = new CRM_ACL_DAO_EntityRole();
     $dao->find();
 
@@ -142,7 +140,7 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
     $groups = CRM_Core_PseudoConstant::staticGroup();
 
     while ($dao->fetch()) {
-      $entityRoles[$dao->id] = array();
+      $entityRoles[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $entityRoles[$dao->id]);
 
       $entityRoles[$dao->id]['acl_role'] = CRM_Utils_Array::value($dao->acl_role_id, $aclRoles);
@@ -160,7 +158,7 @@ class CRM_ACL_Page_EntityRole extends CRM_Core_Page_Basic {
       $entityRoles[$dao->id]['action'] = CRM_Core_Action::formLink(
         self::links(),
         $action,
-        array('id' => $dao->id),
+        ['id' => $dao->id],
         ts('more'),
         FALSE,
         'entityRole.manage.action',

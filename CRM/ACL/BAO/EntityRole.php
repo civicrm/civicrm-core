@@ -44,10 +44,10 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
    */
   public static function entityTable() {
     if (!self::$_entityTable) {
-      self::$_entityTable = array(
+      self::$_entityTable = [
         'civicrm_contact' => ts('Contact'),
         'civicrm_group' => ts('Group'),
-      );
+      ];
     }
     return self::$_entityTable;
   }
