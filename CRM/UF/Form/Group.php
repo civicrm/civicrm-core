@@ -70,10 +70,32 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     $this->entityFields = [
       'title' => ['name' => 'title'],
       'frontend_title' => ['name' => 'frontend_title'],
-      'description' => ['name' => 'description', 'help' => ['id' => 'id-description', 'file' => 'CRM/UF/Form/Group.hlp']],
-      'uf_group_type' => ['name' => 'uf_group_type', 'not-auto-addable' => TRUE, 'help' => ['id' => 'id-used_for', 'file' => 'CRM/UF/Form/Group.hlp'], 'post_html_text' => ' ' . $this->getOtherModuleString()],
-      'cancel_button_text' => ['name' => 'cancel_button_text', 'help' => ['id' => 'id-cancel_button_text', 'file' => 'CRM/UF/Form/Group.hlp'], 'class' => 'cancel_button_section'],
-      'submit_button_text' => ['name' => 'submit_button_text', 'help' => ['id' => 'id-submit_button_text', 'file' => 'CRM/UF/Form/Group.hlp'], 'class' => ''],
+      'description' => [
+        'name' => 'description',
+        'help' => ['id' => 'id-description', 'file' => 'CRM/UF/Form/Group.hlp'],
+      ],
+      'uf_group_type' => [
+        'name' => 'uf_group_type',
+        'not-auto-addable' => TRUE,
+        'help' => ['id' => 'id-used_for', 'file' => 'CRM/UF/Form/Group.hlp'],
+        'post_html_text' => ' ' . $this->getOtherModuleString(),
+      ],
+      'cancel_button_text' => [
+        'name' => 'cancel_button_text',
+        'help' => [
+          'id' => 'id-cancel_button_text',
+          'file' => 'CRM/UF/Form/Group.hlp',
+        ],
+        'class' => 'cancel_button_section',
+      ],
+      'submit_button_text' => [
+        'name' => 'submit_button_text',
+        'help' => [
+          'id' => 'id-submit_button_text',
+          'file' => 'CRM/UF/Form/Group.hlp',
+        ],
+        'class' => '',
+      ],
     ];
   }
 
@@ -163,23 +185,23 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       else {
         $display = 'Delete Profile';
       }
-      $this->addButtons(array(
-        array(
+      $this->addButtons([
+        [
           'type' => 'next',
           'name' => $display,
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      ));
+        ],
+      ]);
       return;
     }
 
     //add checkboxes
-    $uf_group_type = array();
+    $uf_group_type = [];
     $UFGroupType = CRM_Core_SelectValues::ufGroupTypes();
     foreach ($UFGroupType as $key => $value) {
       $uf_group_type[] = $this->createElement('checkbox', $key, NULL, $value);
@@ -197,7 +219,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     // is this group active ?
     $this->addElement('checkbox', 'is_active', ts('Is this CiviCRM Profile active?'));
 
-    $paneNames = array('Advanced Settings' => 'buildAdvanceSetting');
+    $paneNames = ['Advanced Settings' => 'buildAdvanceSetting'];
 
     foreach ($paneNames as $name => $type) {
       if ($this->_id) {
@@ -207,37 +229,35 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
         $dataURL = "&reset=1&action=add&snippet=4&formType={$type}";
       }
 
-      $allPanes[$name] = array(
-        'url' => CRM_Utils_System::url('civicrm/admin/uf/group/setting',
-          $dataURL
-        ),
+      $allPanes[$name] = [
+        'url' => CRM_Utils_System::url('civicrm/admin/uf/group/setting', $dataURL),
         'open' => 'false',
         'id' => $type,
-      );
+      ];
 
       CRM_UF_Form_AdvanceSetting::$type($this);
     }
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'next',
         'name' => ts('Save'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ),
-    ));
+      ],
+    ]);
 
     // views are implemented as frozen form
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
-      $this->addElement('button', 'done', ts('Done'), array('onclick' => "location.href='civicrm/admin/uf/group?reset=1&action=browse'"));
+      $this->addElement('button', 'done', ts('Done'), ['onclick' => "location.href='civicrm/admin/uf/group?reset=1&action=browse'"]);
     }
 
-    $this->addFormRule(array('CRM_UF_Form_Group', 'formRule'), $this);
+    $this->addFormRule(['CRM_UF_Form_Group', 'formRule'], $this);
   }
 
   /**
@@ -248,7 +268,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    * @return void
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     $showHide = new CRM_Core_ShowHideBlocks();
 
     if ($this->_action == CRM_Core_Action::ADD) {
@@ -265,7 +285,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
 
       $defaults['weight'] = CRM_Core_BAO_UFGroup::getWeight($this->_id);
 
-      $params = array('id' => $this->_id);
+      $params = ['id' => $this->_id];
       CRM_Core_BAO_UFGroup::retrieve($params, $defaults);
       $defaults['group'] = CRM_Utils_Array::value('limit_listings_group_id', $defaults);
       $defaults['add_contact_to_group'] = CRM_Utils_Array::value('add_to_group_id', $defaults);
@@ -277,7 +297,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       $defaults['uf_group_type'] = isset($checked) ? $checked : "";
 
       $showAdvanced = 0;
-      $advFields = array(
+      $advFields = [
         'group',
         'post_URL',
         'cancel_URL',
@@ -288,7 +308,7 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
         'is_update_dupe',
         'is_cms_user',
         'is_proximity_search',
-      );
+      ];
       foreach ($advFields as $key) {
         if (!empty($defaults[$key])) {
           $showAdvanced = 1;
@@ -326,19 +346,19 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
 
     //validate profile title as well as name.
     $title = $fields['title'];
     $name = CRM_Utils_String::munge($title, '_', 56);
     $name .= $self->_id ? '_' . $self->_id : '';
     $query = 'select count(*) from civicrm_uf_group where ( name like %1 ) and id != %2';
-    $pCnt = CRM_Core_DAO::singleValueQuery($query, array(
-      1 => array($name, 'String'),
-      2 => array((int) $self->_id, 'Integer'),
-    ));
+    $pCnt = CRM_Core_DAO::singleValueQuery($query, [
+      1 => [$name, 'String'],
+      2 => [(int) $self->_id, 'Integer'],
+    ]);
     if ($pCnt) {
-      $errors['title'] = ts('Profile \'%1\' already exists in Database.', array(1 => $title));
+      $errors['title'] = ts('Profile \'%1\' already exists in Database.', [1 => $title]);
     }
 
     return empty($errors) ? TRUE : $errors;
@@ -353,17 +373,17 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::DELETE) {
       $title = CRM_Core_BAO_UFGroup::getTitle($this->_id);
       CRM_Core_BAO_UFGroup::del($this->_id);
-      CRM_Core_Session::setStatus(ts("Your CiviCRM Profile '%1' has been deleted.", array(1 => $title)), ts('Profile Deleted'), 'success');
+      CRM_Core_Session::setStatus(ts("Your CiviCRM Profile '%1' has been deleted.", [1 => $title]), ts('Profile Deleted'), 'success');
     }
     elseif ($this->_action & CRM_Core_Action::DISABLE) {
-      $ufJoinParams = array('uf_group_id' => $this->_id);
+      $ufJoinParams = ['uf_group_id' => $this->_id];
       CRM_Core_BAO_UFGroup::delUFJoin($ufJoinParams);
 
       CRM_Core_BAO_UFGroup::setIsActive($this->_id, 0);
     }
     else {
       // get the submitted form values.
-      $ids = array();
+      $ids = [];
       $params = $this->controller->exportValues($this->_name);
 
       if (!array_key_exists('is_active', $params)) {
@@ -390,20 +410,20 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
       }
       elseif ($this->_id) {
         // this profile has been set to inactive, delete all corresponding UF Join's
-        $ufJoinParams = array('uf_group_id' => $this->_id);
+        $ufJoinParams = ['uf_group_id' => $this->_id];
         CRM_Core_BAO_UFGroup::delUFJoin($ufJoinParams);
       }
 
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $url = CRM_Utils_System::url('civicrm/admin/uf/group', 'reset=1&action=browse');
-        CRM_Core_Session::setStatus(ts("Your CiviCRM Profile '%1' has been saved.", array(1 => $ufGroup->title)), ts('Profile Saved'), 'success');
+        CRM_Core_Session::setStatus(ts("Your CiviCRM Profile '%1' has been saved.", [1 => $ufGroup->title]), ts('Profile Saved'), 'success');
       }
       else {
         // Jump directly to adding a field if popups are disabled
         $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? '' : '/add';
         $url = CRM_Utils_System::url("civicrm/admin/uf/group/field$action", 'reset=1&new=1&gid=' . $ufGroup->id . '&action=' . ($action ? 'add' : 'browse'));
         CRM_Core_Session::setStatus(ts('Your CiviCRM Profile \'%1\' has been added. You can add fields to this profile now.',
-          array(1 => $ufGroup->title)
+          [1 => $ufGroup->title]
         ), ts('Profile Added'), 'success');
       }
       $session = CRM_Core_Session::singleton();
@@ -419,7 +439,8 @@ class CRM_UF_Form_Group extends CRM_Core_Form {
    *
    * We do this from the constructor in order to do a translation.
    */
-  public function setDeleteMessage() {}
+  public function setDeleteMessage() {
+  }
 
   /**
    * Get the string to display next to the used for field indicating unchangeable uses.
