@@ -41,7 +41,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    *
    * @var array
    */
-  static $csv = array('contact_type', 'group', 'tag');
+  static $csv = ['contact_type', 'group', 'tag'];
 
   /**
    * Build the form object.
@@ -54,12 +54,12 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     );
 
     if (!empty($searchOptions['contactType'])) {
-      $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements();
+      $contactTypes = ['' => ts('- any contact type -')] + CRM_Contact_BAO_ContactType::getSelectElements();
       $this->add('select', 'contact_type',
         ts('is...'),
         $contactTypes,
         FALSE,
-        array('class' => 'crm-select2')
+        ['class' => 'crm-select2']
       );
     }
 
@@ -67,22 +67,22 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     // Get hierarchical listing of groups, respecting ACLs for CRM-16836.
     $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($this->_group, NULL, '&nbsp;&nbsp;', TRUE);
     if (!empty($searchOptions['groups'])) {
-      $this->addField('group', array(
+      $this->addField('group', [
           'entity' => 'group_contact',
           'label' => ts('in'),
           'placeholder' => ts('- any group -'),
           'options' => $groupHierarchy,
-        ));
+        ]);
     }
 
     if (!empty($searchOptions['tags'])) {
       // tag criteria
       if (!empty($this->_tag)) {
-        $this->addField('tag', array(
+        $this->addField('tag', [
             'entity' => 'entity_tag',
             'label' => ts('with'),
             'placeholder' => ts('- any tag -'),
-          ));
+          ]);
       }
     }
 
@@ -97,7 +97,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    *   the default array reference
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     $defaults['sort_name'] = CRM_Utils_Array::value('sort_name', $this->_formValues);
     foreach (self::$csv as $v) {
@@ -125,7 +125,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * Add local and global form rules.
    */
   public function addRules() {
-    $this->addFormRule(array('CRM_Contact_Form_Search_Basic', 'formRule'));
+    $this->addFormRule(['CRM_Contact_Form_Search_Basic', 'formRule']);
   }
 
   /**
@@ -204,7 +204,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     // check actionName and if next, then do not repeat a search, since we are going to the next page
     if (array_key_exists('_qf_Search_next', $fields)) {
       if (empty($fields['task'])) {
-        return array('task' => 'Please select a valid action.');
+        return ['task' => 'Please select a valid action.'];
       }
 
       if (CRM_Utils_Array::value('task', $fields) == CRM_Contact_Task::SAVE_SEARCH) {
@@ -222,7 +222,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
           return TRUE;
         }
       }
-      return array('task' => 'Please select one or more checkboxes to perform the action on.');
+      return ['task' => 'Please select one or more checkboxes to perform the action on.'];
     }
     return TRUE;
   }

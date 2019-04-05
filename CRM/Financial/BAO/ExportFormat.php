@@ -185,8 +185,8 @@ abstract class CRM_Financial_BAO_ExportFormat {
    */
   public static function createActivityExport($batchIds, $fileName) {
     $session = CRM_Core_Session::singleton();
-    $values = array();
-    $params = array('id' => $batchIds);
+    $values = [];
+    $params = ['id' => $batchIds];
     CRM_Batch_BAO_Batch::retrieve($params, $values);
     $createdBy = CRM_Contact_BAO_Contact::displayName($values['created_id']);
     $modifiedBy = CRM_Contact_BAO_Contact::displayName($values['modified_id']);
@@ -208,7 +208,7 @@ abstract class CRM_Financial_BAO_ExportFormat {
     // create activity.
     $subject .= ' ' . ts('Batch') . '[' . $values['title'] . ']';
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
-    $activityParams = array(
+    $activityParams = [
       'activity_type_id' => array_search('Export Accounting Batch', $activityTypes),
       'subject' => $subject,
       'status_id' => 2,
@@ -217,13 +217,13 @@ abstract class CRM_Financial_BAO_ExportFormat {
       'source_record_id' => $values['id'],
       'target_contact_id' => $session->get('userID'),
       'details' => $details,
-      'attachFile_1' => array(
+      'attachFile_1' => [
         'uri' => $fileName,
         'type' => 'text/csv',
         'location' => $fileName,
         'upload_date' => date('YmdHis'),
-      ),
-    );
+      ],
+    ];
 
     CRM_Activity_BAO_Activity::create($activityParams);
   }
@@ -235,12 +235,12 @@ abstract class CRM_Financial_BAO_ExportFormat {
    *
    * @return bool
    */
-  public function createZip($files = array(), $destination = NULL, $overwrite = FALSE) {
+  public function createZip($files = [], $destination = NULL, $overwrite = FALSE) {
     // if the zip file already exists and overwrite is false, return false
     if (file_exists($destination) && !$overwrite) {
       return FALSE;
     }
-    $valid_files = array();
+    $valid_files = [];
     if (is_array($files)) {
       foreach ($files as $file) {
         // make sure the file exists

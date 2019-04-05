@@ -47,7 +47,7 @@ class CRM_Mailing_ActionTokens extends \Civi\Token\AbstractTokenSubscriber {
    */
   public function __construct() {
     // TODO: Think about supporting dynamic tokens like "{action.subscribe.\d+}"
-    parent::__construct('action', array(
+    parent::__construct('action', [
       'subscribeUrl' => ts('Subscribe URL (Action)'),
       'forward' => ts('Forward URL (Action)'),
       'optOut' => ts('Opt-Out (Action)'),
@@ -58,7 +58,7 @@ class CRM_Mailing_ActionTokens extends \Civi\Token\AbstractTokenSubscriber {
       'resubscribe' => ts('Resubscribe (Action)'),
       'resubscribeUrl' => ts('Resubscribe URL (Action)'),
       'eventQueueId' => ts('Event Queue ID'),
-    ));
+    ]);
   }
 
   /**

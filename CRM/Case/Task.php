@@ -53,44 +53,44 @@ class CRM_Case_Task extends CRM_Core_Task {
    */
   public static function tasks() {
     if (!self::$_tasks) {
-      self::$_tasks = array(
-        self::TASK_DELETE => array(
+      self::$_tasks = [
+        self::TASK_DELETE => [
           'title' => ts('Delete cases'),
           'class' => 'CRM_Case_Form_Task_Delete',
           'result' => FALSE,
-        ),
-        self::TASK_PRINT => array(
+        ],
+        self::TASK_PRINT => [
           'title' => ts('Print selected rows'),
           'class' => 'CRM_Case_Form_Task_Print',
           'result' => FALSE,
-        ),
-        self::TASK_EXPORT => array(
+        ],
+        self::TASK_EXPORT => [
           'title' => ts('Export cases'),
-          'class' => array(
+          'class' => [
             'CRM_Export_Form_Select_Case',
             'CRM_Export_Form_Map',
-          ),
+          ],
           'result' => FALSE,
-        ),
-        self::RESTORE_CASES => array(
+        ],
+        self::RESTORE_CASES => [
           'title' => ts('Restore cases'),
           'class' => 'CRM_Case_Form_Task_Restore',
           'result' => FALSE,
-        ),
-        self::PDF_LETTER => array(
+        ],
+        self::PDF_LETTER => [
           'title' => ts('Print/merge document'),
           'class' => 'CRM_Case_Form_Task_PDF',
           'result' => FALSE,
-        ),
-        self::BATCH_UPDATE => array(
+        ],
+        self::BATCH_UPDATE => [
           'title' => ts('Update multiple cases'),
-          'class' => array(
+          'class' => [
             'CRM_Case_Form_Task_PickProfile',
             'CRM_Case_Form_Task_Batch',
-          ),
+          ],
           'result' => FALSE,
-        ),
-      );
+        ],
+      ];
 
       //CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete in CiviCase')) {
@@ -113,7 +113,7 @@ class CRM_Case_Task extends CRM_Core_Task {
    * @return array
    *   set of tasks that are valid for the user
    */
-  public static function permissionedTaskTitles($permission, $params = array()) {
+  public static function permissionedTaskTitles($permission, $params = []) {
     if (($permission == CRM_Core_Permission::EDIT)
       || CRM_Core_Permission::check('access all cases and activities')
       || CRM_Core_Permission::check('access my cases and activities')
@@ -121,9 +121,9 @@ class CRM_Case_Task extends CRM_Core_Task {
       $tasks = self::taskTitles();
     }
     else {
-      $tasks = array(
+      $tasks = [
         self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
-      );
+      ];
       //CRM-4418,
       if (CRM_Core_Permission::check('delete in CiviCase')) {
         $tasks[self::TASK_DELETE] = self::$_tasks[self::TASK_DELETE]['title'];
@@ -149,10 +149,10 @@ class CRM_Case_Task extends CRM_Core_Task {
       $value = self::TASK_PRINT;
     }
 
-    return array(
+    return [
       self::$_tasks[$value]['class'],
       self::$_tasks[$value]['result'],
-    );
+    ];
   }
 
 }

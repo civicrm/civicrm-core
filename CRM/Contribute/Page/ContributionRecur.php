@@ -51,9 +51,9 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
     }
 
     try {
-      $contributionRecur = civicrm_api3('ContributionRecur', 'getsingle', array(
+      $contributionRecur = civicrm_api3('ContributionRecur', 'getsingle', [
         'id' => $this->_id,
-      ));
+      ]);
     }
     catch (Exception $e) {
       CRM_Core_Error::statusBounce('Recurring contribution not found (ID: ' . $this->_id);
@@ -62,7 +62,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
     $contributionRecur['payment_processor'] = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorName(
       CRM_Utils_Array::value('payment_processor_id', $contributionRecur)
     );
-    $idFields = array('contribution_status_id', 'campaign_id', 'financial_type_id');
+    $idFields = ['contribution_status_id', 'campaign_id', 'financial_type_id'];
     foreach ($idFields as $idField) {
       if (!empty($contributionRecur[$idField])) {
         $contributionRecur[substr($idField, 0, -3)] = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_ContributionRecur', $idField, $contributionRecur[$idField]);
@@ -70,9 +70,9 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
     }
 
     // Add linked membership
-    $membership = civicrm_api3('Membership', 'get', array(
+    $membership = civicrm_api3('Membership', 'get', [
       'contribution_recur_id' => $contributionRecur['id'],
-    ));
+    ]);
     if (!empty($membership['count'])) {
       $membershipDetails = reset($membership['values']);
       $contributionRecur['membership_id'] = $membershipDetails['id'];

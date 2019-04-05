@@ -103,7 +103,7 @@ class CRM_Core_Permission_Temp {
    *   Array(string $permName => bool $granted).
    */
   protected function index($grants) {
-    $idx = array();
+    $idx = [];
     foreach ($grants as $grant) {
       foreach ($grant as $perm) {
         $idx[$perm] = 1;

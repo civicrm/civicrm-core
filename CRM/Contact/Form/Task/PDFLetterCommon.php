@@ -43,13 +43,13 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    *   Array(string $machineName => string $label).
    */
   public static function getLoggingOptions() {
-    return array(
+    return [
       'none' => ts('Do not record'),
       'multiple' => ts('Multiple activities (one per contact)'),
       'combined' => ts('One combined activity'),
       'combined-attached' => ts('One combined activity plus one file attachment'),
       // 'multiple-attached' <== not worth the work
-    );
+    ];
   }
 
   /**
@@ -59,8 +59,8 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    */
   public static function preProcess(&$form) {
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($form);
-    $messageText = array();
-    $messageSubject = array();
+    $messageText = [];
+    $messageSubject = [];
     $dao = new CRM_Core_BAO_MessageTemplate();
     $dao->is_active = 1;
     $dao->find();
@@ -82,7 +82,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
     $form->_contactIds = explode(',', $cid);
     // put contact display name in title for single contact mode
     if (count($form->_contactIds) === 1) {
-      CRM_Utils_System::setTitle(ts('Print/Merge Document for %1', array(1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name'))));
+      CRM_Utils_System::setTitle(ts('Print/Merge Document for %1', [1 => CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name')]));
     }
   }
 
@@ -106,14 +106,14 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
 
     $messageToken = CRM_Utils_Token::getTokens($html_message);
 
-    $returnProperties = array();
+    $returnProperties = [];
     if (isset($messageToken['contact'])) {
       foreach ($messageToken['contact'] as $key => $value) {
         $returnProperties[$value] = 1;
       }
     }
 
-    return array($formValues, $categories, $html_message, $messageToken, $returnProperties);
+    return [$formValues, $categories, $html_message, $messageToken, $returnProperties];
   }
 
   /**
@@ -129,7 +129,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
     $buttonName = $form->controller->getButtonName();
     $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
-    $html = $activityIds = array();
+    $html = $activityIds = [];
 
     // CRM-21255 - Hrm, CiviCase 4+5 seem to report buttons differently...
     $c = $form->controller->container();
@@ -146,7 +146,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
 
     foreach ($form->_contactIds as $item => $contactId) {
       $caseId = NULL;
-      $params = array('contact_id' => $contactId);
+      $params = ['contact_id' => $contactId];
 
       list($contact) = CRM_Utils_Token::getTokenDetails($params,
         $returnProperties,
@@ -216,15 +216,15 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
         throw new \CRM_Core_Exception("Failed to capture document content (type=$type)!");
       }
       foreach ($activityIds as $activityId) {
-        civicrm_api3('Attachment', 'create', array(
+        civicrm_api3('Attachment', 'create', [
           'entity_table' => 'civicrm_activity',
           'entity_id' => $activityId,
           'name' => $fileName,
           'mime_type' => $mimeType,
-          'options' => array(
+          'options' => [
             'move-file' => $tee->getFileName(),
-          ),
-        ));
+          ],
+        ]);
       }
     }
 
@@ -248,31 +248,31 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    *
    * @throws CRM_Core_Exception
    */
-  public static function createActivities($form, $html_message, $contactIds, $subject, $campaign_id, $perContactHtml = array()) {
+  public static function createActivities($form, $html_message, $contactIds, $subject, $campaign_id, $perContactHtml = []) {
 
-    $activityParams = array(
+    $activityParams = [
       'subject' => $subject,
       'campaign_id' => $campaign_id,
       'source_contact_id' => CRM_Core_Session::singleton()->getLoggedInContactID(),
       'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Print PDF Letter'),
       'activity_date_time' => date('YmdHis'),
       'details' => $html_message,
-    );
+    ];
     if (!empty($form->_activityId)) {
-      $activityParams += array('id' => $form->_activityId);
+      $activityParams += ['id' => $form->_activityId];
     }
 
-    $activityIds = array();
+    $activityIds = [];
     switch (Civi::settings()->get('recordGeneratedLetters')) {
       case 'none':
-        return array();
+        return [];
 
       case 'multiple':
         // One activity per contact.
         foreach ($contactIds as $i => $contactId) {
-          $fullParams = array(
+          $fullParams = [
             'target_contact_id' => $contactId,
-          ) + $activityParams;
+          ] + $activityParams;
           if (!empty($form->_caseId)) {
             $fullParams['case_id'] = $form->_caseId;
           }
@@ -292,9 +292,9 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
       case 'combined':
       case 'combined-attached':
         // One activity with all contacts.
-        $fullParams = array(
+        $fullParams = [
           'target_contact_id' => $contactIds,
-        ) + $activityParams;
+        ] + $activityParams;
         if (!empty($form->_caseId)) {
           $fullParams['case_id'] = $form->_caseId;
         }
@@ -320,12 +320,12 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    * @throws \CRM_Core_Exception
    */
   private static function getMimeType($type) {
-    $mimeTypes = array(
+    $mimeTypes = [
       'pdf' => 'application/pdf',
       'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'odt' => 'application/vnd.oasis.opendocument.text',
       'html' => 'text/html',
-    );
+    ];
     if (isset($mimeTypes[$type])) {
       return $mimeTypes[$type];
     }
@@ -341,7 +341,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
    */
   protected static function getTokenCategories() {
     if (!isset(Civi::$statics[__CLASS__]['token_categories'])) {
-      $tokens = array();
+      $tokens = [];
       CRM_Utils_Hook::tokens($tokens);
       Civi::$statics[__CLASS__]['token_categories'] = array_keys($tokens);
     }

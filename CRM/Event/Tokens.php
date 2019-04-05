@@ -45,7 +45,7 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    */
   public function __construct() {
     parent::__construct('event', array_merge(
-      array(
+      [
         'event_type' => ts('Event Type'),
         'title' => ts('Event Title'),
         'event_id' => ts('Event ID'),
@@ -60,7 +60,7 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
         'contact_email' => ts('Event Contact (Email)'),
         'contact_phone' => ts('Event Contact (Phone)'),
         'balance' => ts('Event Balance'),
-      ),
+      ],
       CRM_Utils_Token::getCustomFieldTokens('Event')
     ));
   }
@@ -105,7 +105,7 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
     $actionSearchResult = $row->context['actionSearchResult'];
 
     if ($field == 'location') {
-      $loc = array();
+      $loc = [];
       $stateProvince = \CRM_Core_PseudoConstant::stateProvince();
       $loc['street_address'] = $actionSearchResult->street_address;
       $loc['city'] = $actionSearchResult->city;
@@ -122,7 +122,7 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
       $row
         ->tokens($entity, $field, \CRM_Utils_System::url('civicrm/event/register', 'reset=1&id=' . $actionSearchResult->event_id, TRUE, NULL, FALSE));
     }
-    elseif (in_array($field, array('start_date', 'end_date'))) {
+    elseif (in_array($field, ['start_date', 'end_date'])) {
       $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($actionSearchResult->$field));
     }
     elseif ($field == 'balance') {

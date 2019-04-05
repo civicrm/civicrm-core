@@ -164,7 +164,7 @@ class CRM_Core_Selector_Controller {
    *
    * @var array
    */
-  public static $_properties = array('columnHeaders', 'rows', 'rowsEmpty');
+  public static $_properties = ['columnHeaders', 'rows', 'rowsEmpty'];
 
   /**
    * Should we compute actions dynamically (since they are quite verbose)
@@ -209,9 +209,9 @@ class CRM_Core_Selector_Controller {
       $this->_sortID .= '_u';
     }
 
-    $params = array(
+    $params = [
       'pageID' => $this->_pageID,
-    );
+    ];
 
     // let the constructor initialize this, should happen only once
     if (!isset(self::$_template)) {
@@ -339,8 +339,8 @@ class CRM_Core_Selector_Controller {
       // output requires paging/sorting capability
       $rows = self::getRows($this);
       CRM_Utils_Hook::searchColumns($contextName, $columnHeaders, $rows, $this);
-      $reorderedHeaders = array();
-      $noWeightHeaders = array();
+      $reorderedHeaders = [];
+      $noWeightHeaders = [];
       foreach ($columnHeaders as $key => $columnHeader) {
         // So far only contribution selector sets weight, so just use key if not.
         // Extension writers will need to fix other getColumnHeaders (or add a wrapper)

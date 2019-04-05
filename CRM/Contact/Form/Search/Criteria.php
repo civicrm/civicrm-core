@@ -43,7 +43,7 @@ class CRM_Contact_Form_Search_Criteria {
 
       if ($contactTypes) {
         $form->add('select', 'contact_type', ts('Contact Type(s)'), $contactTypes, FALSE,
-          array('id' => 'contact_type', 'multiple' => 'multiple', 'class' => 'crm-select2', 'style' => 'width: 100%;')
+          ['id' => 'contact_type', 'multiple' => 'multiple', 'class' => 'crm-select2', 'style' => 'width: 100%;']
         );
       }
     }
@@ -55,11 +55,11 @@ class CRM_Contact_Form_Search_Criteria {
         $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($form->_group, NULL, '&nbsp;&nbsp;', TRUE);
 
         $form->add('select', 'group', ts('Groups'), $groupHierarchy, FALSE,
-          array('id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2')
+          ['id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2']
         );
         $groupOptions = CRM_Core_BAO_OptionValue::getOptionValuesAssocArrayFromName('group_type');
         $form->add('select', 'group_type', ts('Group Types'), $groupOptions, FALSE,
-          array('id' => 'group_type', 'multiple' => 'multiple', 'class' => 'crm-select2')
+          ['id' => 'group_type', 'multiple' => 'multiple', 'class' => 'crm-select2']
         );
         $form->add('hidden', 'group_search_selected', 'group');
       }
@@ -71,7 +71,7 @@ class CRM_Contact_Form_Search_Criteria {
 
       if ($contactTags) {
         $form->add('select', 'contact_tags', ts('Select Tag(s)'), $contactTags, FALSE,
-          array('id' => 'contact_tags', 'multiple' => 'multiple', 'class' => 'crm-select2', 'style' => 'width: 100%;')
+          ['id' => 'contact_tags', 'multiple' => 'multiple', 'class' => 'crm-select2', 'style' => 'width: 100%;']
         );
       }
 
@@ -79,7 +79,7 @@ class CRM_Contact_Form_Search_Criteria {
       CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_contact', NULL, TRUE, FALSE);
 
       $used_for = CRM_Core_OptionGroup::values('tag_used_for');
-      $tagsTypes = array();
+      $tagsTypes = [];
       $showAllTagTypes = FALSE;
       foreach ($used_for as $key => $value) {
         //check tags for every type and find if there are any defined
@@ -94,7 +94,7 @@ class CRM_Contact_Form_Search_Criteria {
       }
       $tagTypesText = implode(" or ", $tagsTypes);
       if ($showAllTagTypes) {
-        $form->add('checkbox', 'all_tag_types', ts('Include tags used for %1', array(1 => $tagTypesText)));
+        $form->add('checkbox', 'all_tag_types', ts('Include tags used for %1', [1 => $tagTypesText]));
         $form->add('hidden', 'tag_types_text', $tagTypesText);
       }
     }
@@ -112,7 +112,7 @@ class CRM_Contact_Form_Search_Criteria {
     $form->addElement('text', 'job_title', ts('Job Title'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'job_title'));
 
     //added internal ID
-    $form->add('number', 'contact_id', ts('Contact ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'id') + array('min' => 1));
+    $form->add('number', 'contact_id', ts('Contact ID'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'id') + ['min' => 1]);
     $form->addRule('contact_id', ts('Please enter valid Contact ID'), 'positiveInteger');
 
     //added external ID
@@ -132,16 +132,16 @@ class CRM_Contact_Form_Search_Criteria {
 
     // FIXME: This is probably a part of profiles - need to be
     // FIXME: eradicated from here when profiles are reworked.
-    $types = array('Participant', 'Contribution', 'Membership');
+    $types = ['Participant', 'Contribution', 'Membership'];
 
     // get component profiles
-    $componentProfiles = array();
+    $componentProfiles = [];
     $componentProfiles = CRM_Core_BAO_UFGroup::getProfiles($types);
 
     $ufGroups = CRM_Core_BAO_UFGroup::getModuleUFGroup('Search Profile', 1);
     $accessibleUfGroups = CRM_Core_Permission::ufGroup(CRM_Core_Permission::VIEW);
 
-    $searchProfiles = array();
+    $searchProfiles = [];
     foreach ($ufGroups as $key => $var) {
       if (!array_key_exists($key, $componentProfiles) && in_array($key, $accessibleUfGroups)) {
         $searchProfiles[$key] = $var['title'];
@@ -151,11 +151,11 @@ class CRM_Contact_Form_Search_Criteria {
     $form->add('select',
       'uf_group_id',
       ts('Views For Display Contacts'),
-      array(
+      [
         '0' => ts('- default view -'),
-      ) + $searchProfiles,
+      ] + $searchProfiles,
       FALSE,
-      array('class' => 'crm-select2')
+      ['class' => 'crm-select2']
     );
 
     $componentModes = CRM_Contact_Form_Search::getModeSelect();
@@ -166,23 +166,23 @@ class CRM_Contact_Form_Search_Criteria {
         ts('Display Results As'),
         $componentModes,
         FALSE,
-        array('class' => 'crm-select2')
+        ['class' => 'crm-select2']
       );
     }
 
     $form->addRadio(
       'operator',
       ts('Search Operator'),
-      array(
+      [
         CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND => ts('AND'),
         CRM_Contact_BAO_Query::SEARCH_OPERATOR_OR => ts('OR'),
-      ),
-      array('allowClear' => FALSE)
+      ],
+      ['allowClear' => FALSE]
     );
 
     // add the option to display relationships
     $rTypes = CRM_Core_PseudoConstant::relationshipType();
-    $rSelect = array('' => ts('- Select Relationship Type-'));
+    $rSelect = ['' => ts('- Select Relationship Type-')];
     foreach ($rTypes as $rid => $rValue) {
       if ($rValue['label_a_b'] == $rValue['label_b_a']) {
         $rSelect[$rid] = $rValue['label_a_b'];
@@ -197,7 +197,7 @@ class CRM_Contact_Form_Search_Criteria {
       'display_relationship_type',
       ts('Display Results as Relationship'),
       $rSelect,
-      array('class' => 'crm-select2')
+      ['class' => 'crm-select2']
     );
 
     // checkboxes for DO NOT phone, email, mail
@@ -208,49 +208,49 @@ class CRM_Contact_Form_Search_Criteria {
       ts('Privacy'),
       $t,
       FALSE,
-      array(
+      [
         'id' => 'privacy_options',
         'multiple' => 'multiple',
         'class' => 'crm-select2',
-      )
+      ]
     );
 
     $form->addElement('select',
       'privacy_operator',
       ts('Operator'),
-      array(
+      [
         'OR' => ts('OR'),
         'AND' => ts('AND'),
-      )
+      ]
     );
 
-    $options = array(
+    $options = [
       1 => ts('Exclude'),
       2 => ts('Include by Privacy Option(s)'),
-    );
-    $form->addRadio('privacy_toggle', ts('Privacy Options'), $options, array('allowClear' => FALSE));
+    ];
+    $form->addRadio('privacy_toggle', ts('Privacy Options'), $options, ['allowClear' => FALSE]);
 
     // preferred communication method
     if (Civi::settings()->get('civimail_multiple_bulk_emails')) {
       $form->addSelect('email_on_hold',
-        array('entity' => 'email', 'multiple' => 'multiple', 'label' => ts('Email On Hold'), 'options' => CRM_Core_PseudoConstant::emailOnHoldOptions()));
+        ['entity' => 'email', 'multiple' => 'multiple', 'label' => ts('Email On Hold'), 'options' => CRM_Core_PseudoConstant::emailOnHoldOptions()]);
     }
     else {
       $form->add('advcheckbox', 'email_on_hold', ts('Email On Hold'));
     }
 
     $form->addSelect('preferred_communication_method',
-      array('entity' => 'contact', 'multiple' => 'multiple', 'label' => ts('Preferred Communication Method'), 'option_url' => NULL, 'placeholder' => ts('- any -')));
+      ['entity' => 'contact', 'multiple' => 'multiple', 'label' => ts('Preferred Communication Method'), 'option_url' => NULL, 'placeholder' => ts('- any -')]);
 
     //CRM-6138 Preferred Language
-    $form->addSelect('preferred_language', array('class' => 'twenty', 'context' => 'search'));
+    $form->addSelect('preferred_language', ['class' => 'twenty', 'context' => 'search']);
 
     // Phone search
     $form->addElement('text', 'phone_numeric', ts('Phone'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Phone', 'phone'));
     $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $phoneType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
-    $form->add('select', 'phone_location_type_id', ts('Phone Location'), array('' => ts('- any -')) + $locationType, FALSE, array('class' => 'crm-select2'));
-    $form->add('select', 'phone_phone_type_id', ts('Phone Type'), array('' => ts('- any -')) + $phoneType, FALSE, array('class' => 'crm-select2'));
+    $form->add('select', 'phone_location_type_id', ts('Phone Location'), ['' => ts('- any -')] + $locationType, FALSE, ['class' => 'crm-select2']);
+    $form->add('select', 'phone_phone_type_id', ts('Phone Type'), ['' => ts('- any -')] + $phoneType, FALSE, ['class' => 'crm-select2']);
   }
 
   /**
@@ -343,21 +343,21 @@ class CRM_Contact_Form_Search_Criteria {
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_Address');
 
-    $elements = array(
-      'street_address' => array(ts('Street Address'), $attributes['street_address'], NULL, NULL),
-      'supplemental_address_1' => array(ts('Supplemental Address 1'), $attributes['supplemental_address_1'], NULL, NULL),
-      'supplemental_address_2' => array(ts('Supplemental Address 2'), $attributes['supplemental_address_2'], NULL, NULL),
-      'supplemental_address_3' => array(ts('Supplemental Address 3'), $attributes['supplemental_address_3'], NULL, NULL),
-      'city' => array(ts('City'), $attributes['city'], NULL, NULL),
-      'postal_code' => array(ts('Postal Code'), $attributes['postal_code'], NULL, NULL),
-      'country' => array(ts('Country'), $attributes['country_id'], 'country', FALSE),
-      'state_province' => array(ts('State/Province'), $attributes['state_province_id'], 'stateProvince', TRUE),
-      'county' => array(ts('County'), $attributes['county_id'], 'county', TRUE),
-      'address_name' => array(ts('Address Name'), $attributes['address_name'], NULL, NULL),
-      'street_number' => array(ts('Street Number'), $attributes['street_number'], NULL, NULL),
-      'street_name' => array(ts('Street Name'), $attributes['street_name'], NULL, NULL),
-      'street_unit' => array(ts('Apt/Unit/Suite'), $attributes['street_unit'], NULL, NULL),
-    );
+    $elements = [
+      'street_address' => [ts('Street Address'), $attributes['street_address'], NULL, NULL],
+      'supplemental_address_1' => [ts('Supplemental Address 1'), $attributes['supplemental_address_1'], NULL, NULL],
+      'supplemental_address_2' => [ts('Supplemental Address 2'), $attributes['supplemental_address_2'], NULL, NULL],
+      'supplemental_address_3' => [ts('Supplemental Address 3'), $attributes['supplemental_address_3'], NULL, NULL],
+      'city' => [ts('City'), $attributes['city'], NULL, NULL],
+      'postal_code' => [ts('Postal Code'), $attributes['postal_code'], NULL, NULL],
+      'country' => [ts('Country'), $attributes['country_id'], 'country', FALSE],
+      'state_province' => [ts('State/Province'), $attributes['state_province_id'], 'stateProvince', TRUE],
+      'county' => [ts('County'), $attributes['county_id'], 'county', TRUE],
+      'address_name' => [ts('Address Name'), $attributes['address_name'], NULL, NULL],
+      'street_number' => [ts('Street Number'), $attributes['street_number'], NULL, NULL],
+      'street_name' => [ts('Street Name'), $attributes['street_name'], NULL, NULL],
+      'street_unit' => [ts('Apt/Unit/Suite'), $attributes['street_unit'], NULL, NULL],
+    ];
 
     $parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', $addressOptions, 0);
     $form->assign('parseStreetAddress', $parseStreetAddress);
@@ -365,7 +365,7 @@ class CRM_Contact_Form_Search_Criteria {
       list($title, $attributes, $select, $multiSelect) = $v;
 
       if (in_array($name,
-        array('street_number', 'street_name', 'street_unit')
+        ['street_number', 'street_name', 'street_unit']
       )) {
         if (!$parseStreetAddress) {
           continue;
@@ -384,8 +384,8 @@ class CRM_Contact_Form_Search_Criteria {
           $element = $form->addChainSelect($name);
         }
         else {
-          $selectElements = array('' => ts('- any -')) + CRM_Core_PseudoConstant::$select();
-          $element = $form->add('select', $name, $title, $selectElements, FALSE, array('class' => 'crm-select2'));
+          $selectElements = ['' => ts('- any -')] + CRM_Core_PseudoConstant::$select();
+          $element = $form->add('select', $name, $title, $selectElements, FALSE, ['class' => 'crm-select2']);
         }
         if ($multiSelect) {
           $element->setMultiple(TRUE);
@@ -396,34 +396,34 @@ class CRM_Contact_Form_Search_Criteria {
       }
 
       if ($addressOptions['postal_code']) {
-        $attr = array('class' => 'six') + (array) CRM_Utils_Array::value('postal_code', $attributes);
-        $form->addElement('text', 'postal_code_low', NULL, $attr + array('placeholder' => ts('From')));
-        $form->addElement('text', 'postal_code_high', NULL, $attr + array('placeholder' => ts('To')));
+        $attr = ['class' => 'six'] + (array) CRM_Utils_Array::value('postal_code', $attributes);
+        $form->addElement('text', 'postal_code_low', NULL, $attr + ['placeholder' => ts('From')]);
+        $form->addElement('text', 'postal_code_high', NULL, $attr + ['placeholder' => ts('To')]);
       }
     }
 
     // extend addresses with proximity search
     if (CRM_Utils_GeocodeProvider::getUsableClassName()) {
-      $form->addElement('text', 'prox_distance', ts('Find contacts within'), array('class' => 'six'));
-      $form->addElement('select', 'prox_distance_unit', NULL, array(
+      $form->addElement('text', 'prox_distance', ts('Find contacts within'), ['class' => 'six']);
+      $form->addElement('select', 'prox_distance_unit', NULL, [
         'miles' => ts('Miles'),
         'kilos' => ts('Kilometers'),
-      ));
+      ]);
       $form->addRule('prox_distance', ts('Please enter positive number as a distance'), 'numeric');
     }
 
-    $form->addSelect('world_region', array('entity' => 'address', 'context' => 'search'));
+    $form->addSelect('world_region', ['entity' => 'address', 'context' => 'search']);
 
     // select for location type
     $locationType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
-    $form->add('select', 'location_type', ts('Address Location'), $locationType, FALSE, array(
+    $form->add('select', 'location_type', ts('Address Location'), $locationType, FALSE, [
       'multiple' => TRUE,
       'class' => 'crm-select2',
       'placeholder' => ts('Primary'),
-    ));
+    ]);
 
     // custom data extending addresses
-    CRM_Core_BAO_Query::addCustomFormFields($form, array('Address'));
+    CRM_Core_BAO_Query::addCustomFormFields($form, ['Address']);
   }
 
   /**
@@ -443,8 +443,8 @@ class CRM_Contact_Form_Search_Criteria {
     // block for change log
     $form->addElement('text', 'changed_by', ts('Modified By'), NULL);
 
-    $dates = array(1 => ts('Added'), 2 => ts('Modified'));
-    $form->addRadio('log_date', NULL, $dates, array('allowClear' => TRUE));
+    $dates = [1 => ts('Added'), 2 => ts('Modified')];
+    $form->addRadio('log_date', NULL, $dates, ['allowClear' => TRUE]);
 
     CRM_Core_Form_Date::buildDateRange($form, 'log_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
   }
@@ -462,23 +462,23 @@ class CRM_Contact_Form_Search_Criteria {
   public static function relationship(&$form) {
     $form->add('hidden', 'hidden_relationship', 1);
 
-    $allRelationshipType = array();
+    $allRelationshipType = [];
     $allRelationshipType = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, NULL, TRUE);
-    $form->add('select', 'relation_type_id', ts('Relationship Type'), array('' => ts('- select -')) + $allRelationshipType, FALSE, array('multiple' => TRUE, 'class' => 'crm-select2'));
+    $form->add('select', 'relation_type_id', ts('Relationship Type'), ['' => ts('- select -')] + $allRelationshipType, FALSE, ['multiple' => TRUE, 'class' => 'crm-select2']);
     $form->addElement('text', 'relation_target_name', ts('Target Contact'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
     // relation status
-    $relStatusOption = array(ts('Active'), ts('Inactive'), ts('All'));
+    $relStatusOption = [ts('Active'), ts('Inactive'), ts('All')];
     $form->addRadio('relation_status', ts('Relationship Status'), $relStatusOption);
-    $form->setDefaults(array('relation_status' => 0));
+    $form->setDefaults(['relation_status' => 0]);
     // relation permission
     $allRelationshipPermissions = CRM_Contact_BAO_Relationship::buildOptions('is_permission_a_b');
     $form->add('select', 'relation_permission', ts('Permissioned Relationship'),
-     array('' => ts('- select -')) + $allRelationshipPermissions, FALSE, array('multiple' => TRUE, 'class' => 'crm-select2'));
+     ['' => ts('- select -')] + $allRelationshipPermissions, FALSE, ['multiple' => TRUE, 'class' => 'crm-select2']);
 
     //add the target group
     if ($form->_group) {
       $form->add('select', 'relation_target_group', ts('Target Contact(s) in Group'), $form->_group, FALSE,
-        array('id' => 'relation_target_group', 'multiple' => 'multiple', 'class' => 'crm-select2')
+        ['id' => 'relation_target_group', 'multiple' => 'multiple', 'class' => 'crm-select2']
       );
     }
     CRM_Core_Form_Date::buildDateRange($form, 'relation_start_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
@@ -490,7 +490,7 @@ class CRM_Contact_Form_Search_Criteria {
     CRM_Core_Form_Date::buildDateRange($form, 'relation_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
 
     // add all the custom  searchable fields
-    CRM_Core_BAO_Query::addCustomFormFields($form, array('Relationship'));
+    CRM_Core_BAO_Query::addCustomFormFields($form, ['Relationship']);
   }
 
   /**
@@ -499,12 +499,12 @@ class CRM_Contact_Form_Search_Criteria {
   public static function demographics(&$form) {
     $form->add('hidden', 'hidden_demographics', 1);
     // radio button for gender
-    $genderOptions = array();
+    $genderOptions = [];
     $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
     foreach ($gender as $key => $var) {
       $genderOptions[$key] = $form->createElement('radio', NULL,
         ts('Gender'), $var, $key,
-        array('id' => "civicrm_gender_{$var}_{$key}")
+        ['id' => "civicrm_gender_{$var}_{$key}"]
       );
     }
     $form->addGroup($genderOptions, 'gender_id', ts('Gender'))->setAttribute('allowClear', TRUE);
@@ -529,16 +529,16 @@ class CRM_Contact_Form_Search_Criteria {
   public static function notes(&$form) {
     $form->add('hidden', 'hidden_notes', 1);
 
-    $options = array(
+    $options = [
       2 => ts('Body Only'),
       3 => ts('Subject Only'),
       6 => ts('Both'),
-    );
+    ];
     $form->addRadio('note_option', '', $options);
 
     $form->addElement('text', 'note', ts('Note Text'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
-    $form->setDefaults(array('note_option' => 6));
+    $form->setDefaults(['note_option' => 6]);
   }
 
   /**
@@ -548,7 +548,7 @@ class CRM_Contact_Form_Search_Criteria {
    */
   public static function custom(&$form) {
     $form->add('hidden', 'hidden_custom', 1);
-    $extends = array_merge(array('Contact', 'Individual', 'Household', 'Organization'),
+    $extends = array_merge(['Contact', 'Individual', 'Household', 'Organization'],
       CRM_Contact_BAO_ContactType::subTypes()
     );
     $groupDetails = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, TRUE,

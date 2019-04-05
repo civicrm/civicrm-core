@@ -81,9 +81,9 @@ class CRM_Utils_Signer {
    * @return string, the full public token representing the signature
    */
   public function sign($params, $salt = NULL) {
-    $message = array();
+    $message = [];
     $message['secret'] = $this->secret;
-    $message['payload'] = array();
+    $message['payload'] = [];
     if (empty($salt)) {
       $message['salt'] = $this->createSalt();
     }

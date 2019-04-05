@@ -100,12 +100,12 @@ class CRM_Contribute_BAO_Contribution_Utils {
     }
 
     if ($isPaymentTransaction) {
-      $contributionParams = array(
+      $contributionParams = [
         'id' => CRM_Utils_Array::value('contribution_id', $paymentParams),
         'contact_id' => $contactID,
         'is_test' => $isTest,
         'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
-      );
+      ];
 
       // CRM-21200: Don't overwrite contribution details during 'Pay now' payment
       if (empty($form->_params['contribution_id'])) {
@@ -116,10 +116,10 @@ class CRM_Contribute_BAO_Contribution_Utils {
       else {
         // contribution.source only allows 255 characters so we are using ellipsify(...) to ensure it.
         $contributionParams['source'] = CRM_Utils_String::ellipsify(
-          ts('Paid later via page ID: %1. %2', array(
+          ts('Paid later via page ID: %1. %2', [
             1 => $form->_id,
             2 => $contributionParams['source'],
-          )),
+          ]),
           220 // eventually activity.description append price information to source text so keep it 220 to ensure string length doesn't exceed 255 characters.
         );
       }
@@ -152,7 +152,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
       if ($paymentParams['skipLineItem']) {
         // We are not processing the line item here because we are processing a membership.
         // Do not continue with contribution processing in this function.
-        return array('contribution' => $contribution);
+        return ['contribution' => $contribution];
       }
 
       $paymentParams['contributionID'] = $contribution->id;
@@ -229,11 +229,11 @@ class CRM_Contribute_BAO_Contribution_Utils {
       // This is kind of a back-up for pay-later $0 transactions.
       // In other flows they pick up the manual processor & get dealt with above (I
       // think that might be better...).
-      return array(
+      return [
         'payment_status_id' => 1,
         'contribution' => $contribution,
         'payment_processor_id' => 0,
-      );
+      ];
     }
 
     CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
@@ -266,11 +266,11 @@ class CRM_Contribute_BAO_Contribution_Utils {
    */
   public static function contributionChartMonthly($param) {
     if ($param) {
-      $param = array(1 => array($param, 'Integer'));
+      $param = [1 => [$param, 'Integer']];
     }
     else {
       $param = date("Y");
-      $param = array(1 => array($param, 'Integer'));
+      $param = [1 => [$param, 'Integer']];
     }
 
     $query = "
@@ -385,12 +385,12 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
       $params['address'][1]['location_type_id'] = $billingLocTypeId;
     }
     if (!CRM_Utils_System::isNull($params['email'])) {
-      $params['email'] = array(
-        1 => array(
+      $params['email'] = [
+        1 => [
           'email' => $params['email'],
           'location_type_id' => $billingLocTypeId,
-        ),
-      );
+        ],
+      ];
     }
 
     if (isset($transaction['trxn_id'])) {
@@ -420,7 +420,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     }
 
     $source = ts('ContributionProcessor: %1 API',
-      array(1 => ucfirst($type))
+      [1 => ucfirst($type)]
     );
     if (isset($transaction['source'])) {
       $transaction['source'] = $source . ':: ' . $transaction['source'];
@@ -441,7 +441,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     static $_cache;
 
     if (!$_cache) {
-      $_cache = array();
+      $_cache = [];
     }
 
     if (!isset($_cache[$contactID])) {
@@ -452,28 +452,28 @@ WHERE    contact_id = %1
 ORDER BY receive_date ASC
 LIMIT 1
 ";
-      $params = array(1 => array($contactID, 'Integer'));
+      $params = [1 => [$contactID, 'Integer']];
 
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
-      $details = array(
+      $details = [
         'first' => NULL,
         'last' => NULL,
-      );
+      ];
       if ($dao->fetch()) {
-        $details['first'] = array(
+        $details['first'] = [
           'total_amount' => $dao->total_amount,
           'receive_date' => $dao->receive_date,
-        );
+        ];
       }
 
       // flip asc and desc to get the last query
       $sql = str_replace('ASC', 'DESC', $sql);
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
       if ($dao->fetch()) {
-        $details['last'] = array(
+        $details['last'] = [
           'total_amount' => $dao->total_amount,
           'receive_date' => $dao->receive_date,
-        );
+        ];
       }
 
       $_cache[$contactID] = $details;
@@ -499,9 +499,9 @@ LIMIT 1
    *
    */
   public static function calculateTaxAmount($amount, $taxRate, $ugWeDoNotKnowIfItNeedsCleaning_Help = FALSE) {
-    $taxAmount = array();
+    $taxAmount = [];
     if ($ugWeDoNotKnowIfItNeedsCleaning_Help) {
-      Civi::log()->warning('Deprecated function, make sure money is in usable format before calling this.', array('civi.tag' => 'deprecated'));
+      Civi::log()->warning('Deprecated function, make sure money is in usable format before calling this.', ['civi.tag' => 'deprecated']);
       $amount = CRM_Utils_Rule::cleanMoney($amount);
     }
     // There can not be any rounding at this stage - as this is prior to quantity multiplication
@@ -544,35 +544,35 @@ LIMIT 1
       $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
     }
 
-    $statusNamesToUnset = array();
+    $statusNamesToUnset = [];
     // on create fetch statuses on basis of component
     if (!$id) {
-      $statusNamesToUnset = array(
+      $statusNamesToUnset = [
         'Refunded',
         'Chargeback',
         'Pending refund',
-      );
+      ];
 
       // Event registration and New Membership backoffice form support partially paid payment,
       //  so exclude this status only for 'New Contribution' form
       if ($usedFor == 'contribution') {
-        $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+        $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'In Progress',
           'Overdue',
           'Partially paid',
-        ));
+        ]);
       }
       elseif ($usedFor == 'participant') {
-        $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+        $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'Cancelled',
           'Failed',
-        ));
+        ]);
       }
       elseif ($usedFor == 'membership') {
-        $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+        $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'In Progress',
           'Overdue',
-        ));
+        ]);
       }
     }
     else {
@@ -581,40 +581,40 @@ LIMIT 1
       switch ($name) {
         case 'Completed':
           // [CRM-17498] Removing unsupported status change options.
-          $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+          $statusNamesToUnset = array_merge($statusNamesToUnset, [
             'Pending',
             'Failed',
             'Partially paid',
             'Pending refund',
-          ));
+          ]);
           break;
 
         case 'Cancelled':
         case 'Chargeback':
         case 'Refunded':
-          $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+          $statusNamesToUnset = array_merge($statusNamesToUnset, [
             'Pending',
             'Failed',
-          ));
+          ]);
           break;
 
         case 'Pending':
         case 'In Progress':
-          $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+          $statusNamesToUnset = array_merge($statusNamesToUnset, [
             'Refunded',
             'Chargeback',
-          ));
+          ]);
           break;
 
         case 'Failed':
-          $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+          $statusNamesToUnset = array_merge($statusNamesToUnset, [
             'Pending',
             'Refunded',
             'Chargeback',
             'Completed',
             'In Progress',
             'Cancelled',
-          ));
+          ]);
           break;
       }
     }

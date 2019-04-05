@@ -40,7 +40,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * the code does not need to keep retrieving from the http request
    * @var array
    */
-  protected $_inputParameters = array();
+  protected $_inputParameters = [];
 
   /**
    * Constructor function.
@@ -116,7 +116,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $now = date('YmdHis');
 
     // fix dates that already exist
-    $dates = array('create', 'start', 'end', 'cancel', 'modified');
+    $dates = ['create', 'start', 'end', 'cancel', 'modified'];
     foreach ($dates as $date) {
       $name = "{$date}_date";
       if ($recur->$name) {
@@ -308,7 +308,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
    * @throws \CiviCRM_API3_Exception
    */
   public function main() {
-    $objects = $ids = $input = array();
+    $objects = $ids = $input = [];
     $component = $this->retrieve('module', 'String');
     $input['component'] = $component;
 
@@ -372,7 +372,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $input['reasonCode'] = $this->retrieve('ReasonCode', 'String', FALSE);
 
     $billingID = $ids['billing'];
-    $lookup = array(
+    $lookup = [
       "first_name" => 'first_name',
       "last_name" => 'last_name',
       "street_address-{$billingID}" => 'address_street',
@@ -380,7 +380,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       "state-{$billingID}" => 'address_state',
       "postal_code-{$billingID}" => 'address_zip',
       "country-{$billingID}" => 'address_country_code',
-    );
+    ];
     foreach ($lookup as $name => $paypalName) {
       $value = $this->retrieve($paypalName, 'String', FALSE);
       $input[$name] = $value ? $value : NULL;
@@ -424,10 +424,10 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
     // Then we try and get it from recurring contribution ID
     if (!empty($ids['contributionRecur'])) {
-      $contributionRecur = civicrm_api3('ContributionRecur', 'getsingle', array(
+      $contributionRecur = civicrm_api3('ContributionRecur', 'getsingle', [
         'id' => $ids['contributionRecur'],
         'return' => ['payment_processor_id'],
-      ));
+      ]);
       if (!empty($contributionRecur['payment_processor_id'])) {
         return $contributionRecur['payment_processor_id'];
       }

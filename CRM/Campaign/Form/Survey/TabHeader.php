@@ -52,11 +52,11 @@ class CRM_Campaign_Form_Survey_TabHeader {
     $form->assign_by_ref('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
-      ->addSetting(array(
-        'tabSettings' => array(
+      ->addSetting([
+        'tabSettings' => [
           'active' => self::getCurrentTab($tabs),
-        ),
-      ));
+        ],
+      ]);
     return $tabs;
   }
 
@@ -70,29 +70,29 @@ class CRM_Campaign_Form_Survey_TabHeader {
       return NULL;
     }
 
-    $tabs = array(
-      'main' => array(
+    $tabs = [
+      'main' => [
         'title' => ts('Main Information'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
-      ),
-      'questions' => array(
+      ],
+      'questions' => [
         'title' => ts('Questions'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
-      ),
-      'results' => array(
+      ],
+      'results' => [
         'title' => ts('Results'),
         'link' => NULL,
         'valid' => FALSE,
         'active' => FALSE,
         'current' => FALSE,
-      ),
-    );
+      ],
+    ];
 
     $surveyID = $form->getVar('_surveyId');
     $class = $form->getVar('_name');

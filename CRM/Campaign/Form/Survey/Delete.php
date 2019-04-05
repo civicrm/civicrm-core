@@ -60,7 +60,7 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
     }
 
     $this->_surveyId = CRM_Utils_Request::retrieve('id', 'Positive', $this, FALSE);
-    $params = array('id' => $this->_surveyId);
+    $params = ['id' => $this->_surveyId];
     CRM_Campaign_BAO_Survey::retrieve($params, $surveyInfo);
     $this->_surveyTitle = $surveyInfo['title'];
     $this->assign('surveyTitle', $this->_surveyTitle);
@@ -71,17 +71,17 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'next',
           'name' => ts('Delete'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
   }
 
@@ -91,7 +91,7 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
   public function postProcess() {
     if ($this->_surveyId) {
       CRM_Campaign_BAO_Survey::del($this->_surveyId);
-      CRM_Core_Session::setStatus('', ts("'%1' survey has been deleted.", array(1 => $this->_surveyTitle)), 'success');
+      CRM_Core_Session::setStatus('', ts("'%1' survey has been deleted.", [1 => $this->_surveyTitle]), 'success');
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey'));
     }
     else {

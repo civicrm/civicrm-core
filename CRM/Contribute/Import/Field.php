@@ -152,7 +152,7 @@ class CRM_Contribute_Import_Field {
         return CRM_Utils_Rule::money($this->_value);
 
       case 'trxn_id':
-        static $seenTrxnIds = array();
+        static $seenTrxnIds = [];
         if (in_array($this->_value, $seenTrxnIds)) {
           return FALSE;
         }

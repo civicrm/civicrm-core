@@ -64,31 +64,31 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
    * Store "to" contact details.
    * @var array
    */
-  public $_toContactDetails = array();
+  public $_toContactDetails = [];
 
   /**
    * Store all selected contact id's, that includes to, cc and bcc contacts
    * @var array
    */
-  public $_allContactIds = array();
+  public $_allContactIds = [];
 
   /**
    * Store only "to" contact ids.
    * @var array
    */
-  public $_toContactIds = array();
+  public $_toContactIds = [];
 
   /**
    * Store only "cc" contact ids.
    * @var array
    */
-  public $_ccContactIds = array();
+  public $_ccContactIds = [];
 
   /**
    * Store only "bcc" contact ids.
    * @var array
    */
-  public $_bccContactIds = array();
+  public $_bccContactIds = [];
 
   /**
    * Build all the data structures needed to build the form.
@@ -103,7 +103,7 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
     // Allow request to specify email id rather than contact id
     $toEmailId = CRM_Utils_Request::retrieve('email_id', 'String', $this);
     if ($toEmailId) {
-      $toEmail = civicrm_api('email', 'getsingle', array('version' => 3, 'id' => $toEmailId));
+      $toEmail = civicrm_api('email', 'getsingle', ['version' => 3, 'id' => $toEmailId]);
       if (!empty($toEmail['email']) && !empty($toEmail['contact_id'])) {
         $this->_toEmail = $toEmail;
       }
@@ -115,7 +115,7 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
 
     if ($cid) {
       $cid = explode(',', $cid);
-      $displayName = array();
+      $displayName = [];
 
       foreach ($cid as $val) {
         $displayName[] = CRM_Contact_BAO_Contact::displayName($val);

@@ -41,7 +41,7 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral extends CRM_Dedupe_BAO_Query
       $query .= " AND (contact1.middle_name IS NULL or contact1.middle_name = '$middle_name')\n";
     }
 
-    return array("civicrm_contact.{$rg->name}.{$rg->threshold}" => $query);
+    return ["civicrm_contact.{$rg->name}.{$rg->threshold}" => $query];
   }
 
   /**
@@ -66,7 +66,7 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualGeneral extends CRM_Dedupe_BAO_Query
               AND (contact1.middle_name IS NULL OR contact2.middle_name IS NULL OR contact1.middle_name = contact2.middle_name)
               AND (contact1.birth_date IS NULL OR contact2.birth_date IS NULL OR contact1.birth_date = contact2.birth_date)
               AND " . self::internalFilters($rg);
-    return array("civicrm_contact.{$rg->name}.{$rg->threshold}" => $query);
+    return ["civicrm_contact.{$rg->name}.{$rg->threshold}" => $query];
   }
 
 }

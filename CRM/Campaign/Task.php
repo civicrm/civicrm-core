@@ -55,35 +55,35 @@ class CRM_Campaign_Task extends CRM_Core_Task {
    */
   public static function tasks() {
     if (!(self::$_tasks)) {
-      self::$_tasks = array(
-        self::INTERVIEW => array(
+      self::$_tasks = [
+        self::INTERVIEW => [
           'title' => ts('Record Respondents Interview'),
-          'class' => array(
+          'class' => [
             'CRM_Campaign_Form_Task_Interview',
             'CRM_Campaign_Form_Task_Release',
-          ),
+          ],
           'result' => FALSE,
-        ),
-        self::RESERVE => array(
+        ],
+        self::RESERVE => [
           'title' => ts('Reserve Respondents'),
-          'class' => array(
+          'class' => [
             'CRM_Campaign_Form_Task_Reserve',
             'CRM_Campaign_Form_Task_Interview',
             'CRM_Campaign_Form_Task_Release',
-          ),
+          ],
           'result' => FALSE,
-        ),
-        self::RELEASE => array(
+        ],
+        self::RELEASE => [
           'title' => ts('Release Respondents'),
           'class' => 'CRM_Campaign_Form_Task_Release',
           'result' => FALSE,
-        ),
-        self::TASK_PRINT => array(
+        ],
+        self::TASK_PRINT => [
           'title' => ts('Print Respondents'),
           'class' => 'CRM_Campaign_Form_Task_Print',
           'result' => FALSE,
-        ),
-      );
+        ],
+      ];
 
       parent::tasks();
     }
@@ -101,7 +101,7 @@ class CRM_Campaign_Task extends CRM_Core_Task {
    * @return array
    *   set of tasks that are valid for the user
    */
-  public static function permissionedTaskTitles($permission, $params = array()) {
+  public static function permissionedTaskTitles($permission, $params = []) {
     $tasks = self::taskTitles();
 
     $tasks = parent::corePermissionedTaskTitles($tasks, $permission, $params);
@@ -124,10 +124,10 @@ class CRM_Campaign_Task extends CRM_Core_Task {
       $value = self::INTERVIEW;
     }
 
-    return array(
+    return [
       self::$_tasks[$value]['class'],
       self::$_tasks[$value]['result'],
-    );
+    ];
   }
 
 }

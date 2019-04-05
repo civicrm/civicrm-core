@@ -57,77 +57,77 @@ class CRM_Event_Task extends CRM_Core_Task {
    */
   public static function tasks() {
     if (!self::$_tasks) {
-      self::$_tasks = array(
-        self::TASK_DELETE => array(
+      self::$_tasks = [
+        self::TASK_DELETE => [
           'title' => ts('Delete participants from event'),
           'class' => 'CRM_Event_Form_Task_Delete',
           'result' => FALSE,
-        ),
-        self::TASK_PRINT => array(
+        ],
+        self::TASK_PRINT => [
           'title' => ts('Print selected rows'),
           'class' => 'CRM_Event_Form_Task_Print',
           'result' => FALSE,
-        ),
-        self::TASK_EXPORT => array(
+        ],
+        self::TASK_EXPORT => [
           'title' => ts('Export participants'),
-          'class' => array(
+          'class' => [
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
-          ),
+          ],
           'result' => FALSE,
-        ),
-        self::BATCH_UPDATE => array(
+        ],
+        self::BATCH_UPDATE => [
           'title' => ts('Update multiple participants'),
-          'class' => array(
+          'class' => [
             'CRM_Event_Form_Task_PickProfile',
             'CRM_Event_Form_Task_Batch',
-          ),
+          ],
           'result' => TRUE,
-        ),
-        self::CANCEL_REGISTRATION => array(
+        ],
+        self::CANCEL_REGISTRATION => [
           'title' => ts('Cancel registration'),
           'class' => 'CRM_Event_Form_Task_Cancel',
           'result' => FALSE,
-        ),
-        self::TASK_EMAIL => array(
-          'title' => ts('Email - send now (to %1 or less)', array(
+        ],
+        self::TASK_EMAIL => [
+          'title' => ts('Email - send now (to %1 or less)', [
             1 => Civi::settings()
               ->get('simple_mail_limit'),
-          )),
+          ]),
           'class' => 'CRM_Event_Form_Task_Email',
           'result' => TRUE,
-        ),
-        self::SAVE_SEARCH => array(
+        ],
+        self::SAVE_SEARCH => [
           'title' => ts('Group - create smart group'),
           'class' => 'CRM_Event_Form_Task_SaveSearch',
           'result' => TRUE,
-        ),
-        self::SAVE_SEARCH_UPDATE => array(
+        ],
+        self::SAVE_SEARCH_UPDATE => [
           'title' => ts('Group - update smart group'),
           'class' => 'CRM_Event_Form_Task_SaveSearch_Update',
           'result' => TRUE,
-        ),
-        self::PARTICIPANT_STATUS => array(
+        ],
+        self::PARTICIPANT_STATUS => [
           'title' => ts('Participant status - change'),
           'class' => 'CRM_Event_Form_Task_ParticipantStatus',
           'result' => TRUE,
-        ),
-        self::LABEL_CONTACTS => array(
+        ],
+        self::LABEL_CONTACTS => [
           'title' => ts('Name badges - print'),
           'class' => 'CRM_Event_Form_Task_Badge',
           'result' => FALSE,
-        ),
-        self::PDF_LETTER => array(
+        ],
+        self::PDF_LETTER => [
           'title' => ts('PDF letter - print for participants'),
           'class' => 'CRM_Event_Form_Task_PDF',
           'result' => TRUE,
-        ),
-        self::GROUP_ADD => array(
+        ],
+        self::GROUP_ADD => [
           'title' => ts('Group - add contacts'),
           'class' => 'CRM_Event_Form_Task_AddToGroup',
           'result' => FALSE,
-        ),
-      );
+        ],
+      ];
 
       //CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete in CiviEvent')) {
@@ -154,17 +154,17 @@ class CRM_Event_Task extends CRM_Core_Task {
    * @return array
    *   set of tasks that are valid for the user
    */
-  public static function permissionedTaskTitles($permission, $params = array()) {
+  public static function permissionedTaskTitles($permission, $params = []) {
     if (($permission == CRM_Core_Permission::EDIT)
       || CRM_Core_Permission::check('edit event participants')
     ) {
       $tasks = self::taskTitles();
     }
     else {
-      $tasks = array(
+      $tasks = [
         self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
         self::TASK_EMAIL => self::$_tasks[self::TASK_EMAIL]['title'],
-      );
+      ];
 
       //CRM-4418,
       if (CRM_Core_Permission::check('delete in CiviEvent')) {

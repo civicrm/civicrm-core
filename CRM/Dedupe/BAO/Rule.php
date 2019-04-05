@@ -42,12 +42,12 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
   /**
    * Ids of the contacts to limit the SQL queries (whole-database queries otherwise)
    */
-  var $contactIds = array();
+  var $contactIds = [];
 
   /**
    * Params to dedupe against (queries against the whole contact set otherwise)
    */
-  var $params = array();
+  var $params = [];
 
   /**
    * Return the SQL query for the given rule - either for finding matching
@@ -70,8 +70,8 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
     // extend them; $where is an array of required conditions, $on and
     // $using are arrays of required field matchings (for substring and
     // full matches, respectively)
-    $where = array();
-    $on = array("SUBSTR(t1.{$this->rule_field}, 1, {$this->rule_length}) = SUBSTR(t2.{$this->rule_field}, 1, {$this->rule_length})");
+    $where = [];
+    $on = ["SUBSTR(t1.{$this->rule_field}, 1, {$this->rule_length}) = SUBSTR(t2.{$this->rule_field}, 1, {$this->rule_length})"];
     $entity = CRM_Core_DAO_AllCoreTables::getBriefName(CRM_Core_DAO_AllCoreTables::getClassForTable($this->rule_table));
     $fields = civicrm_api3($entity, 'getfields', ['action' => 'create'])['values'];
 
@@ -187,7 +187,7 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
     }
     $query = "SELECT $select FROM $from WHERE " . implode(' AND ', $where);
     if ($this->contactIds) {
-      $cids = array();
+      $cids = [];
       foreach ($this->contactIds as $cid) {
         $cids[] = CRM_Utils_Type::escape($cid, 'Integer');
       }
@@ -223,7 +223,7 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
     $ruleBao = new CRM_Dedupe_BAO_Rule();
     $ruleBao->dedupe_rule_group_id = $rgBao->id;
     $ruleBao->find();
-    $ruleFields = array();
+    $ruleFields = [];
     while ($ruleBao->fetch()) {
       $ruleFields[] = $ruleBao->rule_field;
     }

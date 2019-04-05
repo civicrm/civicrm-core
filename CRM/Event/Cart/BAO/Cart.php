@@ -6,7 +6,7 @@
 class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   public $associations_loaded = FALSE;
   /* event_in_cart_id => $event_in_cart */
-  public $events_in_carts = array();
+  public $events_in_carts = [];
 
   /**
    * @param array $params
@@ -32,10 +32,10 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
       return $event_in_cart;
     }
 
-    $params = array(
+    $params = [
       'event_id' => $event_id,
       'event_cart_id' => $this->id,
-    );
+    ];
     $event_in_cart = CRM_Event_Cart_BAO_EventInCart::create($params);
     $event_in_cart->load_associations($this);
     $this->events_in_carts[$event_in_cart->event_id] = $event_in_cart;
@@ -81,7 +81,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    * @return bool|CRM_Event_Cart_BAO_Cart
    */
   public static function find_by_id($id) {
-    return self::find_by_params(array('id' => $id));
+    return self::find_by_params(['id' => $id]);
   }
 
   /**
@@ -127,12 +127,12 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     }
     if ($cart === FALSE) {
       if (is_null($userID)) {
-        $cart = self::create(array());
+        $cart = self::create([]);
       }
       else {
         $cart = self::find_uncompleted_by_user_id($userID);
         if ($cart === FALSE) {
-          $cart = self::create(array('user_id' => $userID));
+          $cart = self::create(['user_id' => $userID]);
         }
       }
       $session->set('event_cart_id', $cart->id);
@@ -146,7 +146,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    * @return bool|CRM_Event_Cart_BAO_Cart
    */
   public static function find_uncompleted_by_id($id) {
-    return self::find_by_params(array('id' => $id, 'completed' => 0));
+    return self::find_by_params(['id' => $id, 'completed' => 0]);
   }
 
   /**
@@ -155,7 +155,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    * @return bool|CRM_Event_Cart_BAO_Cart
    */
   public static function find_uncompleted_by_user_id($user_id) {
-    return self::find_by_params(array('user_id' => $user_id, 'completed' => 0));
+    return self::find_by_params(['user_id' => $user_id, 'completed' => 0]);
   }
 
   /**
@@ -163,7 +163,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    */
   public function get_main_events_in_carts() {
     //return CRM_Event_Cart_BAO_EventInCart::find_all_by_params( array('main_conference_event_id'
-    $all = array();
+    $all = [];
     foreach ($this->events_in_carts as $event_in_cart) {
       if (!$event_in_cart->is_child_event()) {
         $all[] = $event_in_cart;
@@ -178,7 +178,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    * @return array
    */
   public function get_events_in_carts_by_main_event_id($main_conference_event_id) {
-    $all = array();
+    $all = [];
     if (!$main_conference_event_id) {
       return $all;
     }
@@ -215,7 +215,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    * @return array
    */
   public function get_subparticipants($main_participant) {
-    $subparticipants = array();
+    $subparticipants = [];
     foreach ($this->events_in_carts as $event_in_cart) {
       if ($event_in_cart->is_child_event($main_participant->event_id)) {
         foreach ($event_in_cart->participants as $participant) {
@@ -256,7 +256,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    * @return array
    */
   public function get_main_event_participants() {
-    $participants = array();
+    $participants = [];
     foreach ($this->get_main_events_in_carts() as $event_in_cart) {
       $participants = array_merge($participants, $event_in_cart->participants);
     }
@@ -321,7 +321,7 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   public static function retrieve(&$params, &$values) {
     $cart = self::find_by_params($params);
     if ($cart === FALSE) {
-      CRM_Core_Error::fatal(ts('Could not find cart matching %1', array(1 => var_export($params, TRUE))));
+      CRM_Core_Error::fatal(ts('Could not find cart matching %1', [1 => var_export($params, TRUE)]));
     }
     CRM_Core_DAO::storeValues($cart, $values);
     return $values;
@@ -332,10 +332,10 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
    * @param int $from_cart_id
    */
   public function adopt_participants($from_cart_id) {
-    $params = array(
-      1 => array($this->id, 'Integer'),
-      2 => array($from_cart_id, 'Integer'),
-    );
+    $params = [
+      1 => [$this->id, 'Integer'],
+      2 => [$from_cart_id, 'Integer'],
+    ];
     $sql = "UPDATE civicrm_participant SET cart_id='%1' WHERE cart_id='%2'";
 
     CRM_Core_DAO::executeQuery($sql, $params);

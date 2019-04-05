@@ -66,7 +66,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
 
     $pjpgCustInfo->setEmail($params['email']);
 
-    $billing = array(
+    $billing = [
       "logon" => $logon,
       "password" => $password,
       "url_site" => $url_site,
@@ -77,7 +77,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
       "province" => $params['state_province'],
       "postal_code" => $params['postal_code'],
       "country" => $params['country'],
-    );
+    ];
     $pjpgCustInfo->setBilling($billing);
 
     // create pjpgTransaction object
@@ -85,7 +85,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
 
     $expiry_string = sprintf('%04d%02d', $params['year'], $params['month']);
 
-    $txnArray = array(
+    $txnArray = [
       'type' => 'purchase',
       'order_id' => $my_orderid,
       'amount' => sprintf('%01.2f', $params['amount']),
@@ -94,7 +94,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
       'crypt_type' => '7',
       'cavv' => $params['cvv2'],
       'cust_id' => $params['contact_id'],
-    );
+    ];
 
     // Allow further manipulation of params via custom hooks
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $txnArray);
@@ -126,7 +126,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
 
       $numRecurs = $params['installments'];
 
-      $recurArray = array(
+      $recurArray = [
         'dc_schedule_create' => $dc_schedule_create,
         // (day | week | month)
         'recur_unit' => $recurUnit,
@@ -137,7 +137,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
         'period' => $recurInterval,
         'dc_schedule_start' => $dc_schedule_start,
         'amount' => sprintf('%01.2f', $params['amount']),
-      );
+      ];
 
       $pjpgRecur = new pjpgRecur($recurArray);
 
@@ -265,7 +265,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
    *   the error message if any
    */
   public function checkConfig() {
-    $error = array();
+    $error = [];
     if (empty($this->_paymentProcessor['user_name'])) {
       $error[] = ts('Username is not set for this payment processor');
     }

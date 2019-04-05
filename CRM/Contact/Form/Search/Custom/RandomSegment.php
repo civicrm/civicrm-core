@@ -44,12 +44,12 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
   public function __construct(&$formValues) {
     parent::__construct($formValues);
 
-    $this->_columns = array(
+    $this->_columns = [
       ts('Contact ID') => 'contact_id',
       ts('Contact Type') => 'contact_type',
       ts('Name') => 'sort_name',
       ts('Email') => 'email',
-    );
+    ];
 
     $this->initialize();
   }
@@ -87,12 +87,12 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
 
     $groups = CRM_Core_PseudoConstant::nestedGroup();
 
-    $select2style = array(
+    $select2style = [
       'multiple' => TRUE,
       'style' => 'width: 100%; max-width: 60em;',
       'class' => 'crm-select2',
       'placeholder' => ts('- select -'),
-    );
+    ];
 
     $form->add('select', 'includeGroups',
       ts('Include Group(s)'),
@@ -114,7 +114,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
      * if you are using the standard template, this array tells the template what elements
      * are part of the search criteria
      */
-    $form->assign('elements', array('segmentSize', 'includeGroups', 'excludeGroups'));
+    $form->assign('elements', ['segmentSize', 'includeGroups', 'excludeGroups']);
   }
 
   /**
@@ -162,7 +162,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     $this->_tableName = "civicrm_temp_custom_{$randomNum}";
 
     //block for Group search
-    $smartGroup = array();
+    $smartGroup = [];
     $group = new CRM_Contact_DAO_Group();
     $group->is_active = 1;
     $group->find();

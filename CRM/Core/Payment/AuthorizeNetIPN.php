@@ -55,7 +55,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     //we only get invoice num as a key player from payment gateway response.
     //for ARB we get x_subscription_id and x_subscription_paynum
     $x_subscription_id = $this->retrieve('x_subscription_id', 'String');
-    $ids = $objects = $input = array();
+    $ids = $objects = $input = [];
 
     if ($x_subscription_id) {
       // Presence of the id means it is approved.
@@ -81,19 +81,19 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
         $paymentProcessorTypeID = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
           'AuthNet', 'id', 'name'
         );
-        $paymentProcessorID = (int) civicrm_api3('PaymentProcessor', 'getvalue', array(
+        $paymentProcessorID = (int) civicrm_api3('PaymentProcessor', 'getvalue', [
           'is_test' => 0,
-          'options' => array('limit' => 1),
+          'options' => ['limit' => 1],
           'payment_processor_type_id' => $paymentProcessorTypeID,
            'return' => 'id',
-        ));
+        ]);
       }
 
       if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
         return FALSE;
       }
       if (!empty($ids['paymentProcessor']) && $objects['contributionRecur']->payment_processor_id != $ids['paymentProcessor']) {
-        Civi::log()->warning('Payment Processor does not match the recurring processor id.', array('civi.tag' => 'deprecated'));
+        Civi::log()->warning('Payment Processor does not match the recurring processor id.', ['civi.tag' => 'deprecated']);
       }
 
       if ($component == 'contribute' && $ids['contributionRecur']) {
@@ -135,7 +135,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
     $now = date('YmdHis');
 
     // fix dates that already exist
-    $dates = array('create_date', 'start_date', 'end_date', 'cancel_date', 'modified_date');
+    $dates = ['create_date', 'start_date', 'end_date', 'cancel_date', 'modified_date'];
     foreach ($dates as $name) {
       if ($recur->$name) {
         $recur->$name = CRM_Utils_Date::isoToMysql($recur->$name);
@@ -192,7 +192,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       $recur->cancel_date = $now;
       $recur->save();
 
-      $message = ts("Subscription payment failed - %1", array(1 => htmlspecialchars($input['response_reason_text'])));
+      $message = ts("Subscription payment failed - %1", [1 => htmlspecialchars($input['response_reason_text'])]);
       CRM_Core_Error::debug_log_message($message);
 
       // the recurring contribution has declined a payment or has failed
@@ -257,7 +257,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       return FALSE;
     }
     $billingID = $ids['billing'];
-    $params = array(
+    $params = [
       'first_name' => 'x_first_name',
       'last_name' => 'x_last_name',
       "street_address-{$billingID}" => 'x_address',
@@ -266,7 +266,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
       "postal_code-{$billingID}" => 'x_zip',
       "country-{$billingID}" => 'x_country',
       "email-{$billingID}" => 'x_email',
-    );
+    ];
     foreach ($params as $civiName => $resName) {
       $input[$civiName] = $this->retrieve($resName, 'String', FALSE);
     }
@@ -296,14 +296,14 @@ INNER JOIN civicrm_contribution co ON co.contribution_recur_id = cr.id
     $contRecur->fetch();
     $ids['contributionRecur'] = $contRecur->id;
     if ($ids['contact'] != $contRecur->contact_id) {
-      $message = ts("Recurring contribution appears to have been re-assigned from id %1 to %2, continuing with %2.", array(1 => $ids['contact'], 2 => $contRecur->contact_id));
+      $message = ts("Recurring contribution appears to have been re-assigned from id %1 to %2, continuing with %2.", [1 => $ids['contact'], 2 => $contRecur->contact_id]);
       CRM_Core_Error::debug_log_message($message);
       $ids['contact'] = $contRecur->contact_id;
     }
     if (!$ids['contributionRecur']) {
       $message = ts("Could not find contributionRecur id");
       $log = new CRM_Utils_SystemLogger();
-      $log->error('payment_notification', array('message' => $message, 'ids' => $ids, 'input' => $input));
+      $log->error('payment_notification', ['message' => $message, 'ids' => $ids, 'input' => $input]);
       throw new CRM_Core_Exception($message);
     }
 

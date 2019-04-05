@@ -12,9 +12,9 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
   public function generateInstallLangs() {
     // CRM-7161: generate install/langs.php from the languages template
     // grep it for enabled languages and create a 'xx_YY' => 'Language name' $langs mapping
-    $matches = array();
+    $matches = [];
     preg_match_all('/, 1, \'([a-z][a-z]_[A-Z][A-Z])\', \'..\', \{localize\}\'\{ts escape="sql"\}(.+)\{\/ts\}\'\{\/localize\}, /', file_get_contents('templates/languages.tpl'), $matches);
-    $langs = array();
+    $langs = [];
     for ($i = 0; $i < count($matches[0]); $i++) {
       $langs[$matches[1][$i]] = $matches[2][$i];
     }
@@ -23,13 +23,13 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
 
   public function generateSchemaStructure() {
     echo "Generating CRM_Core_I18n_SchemaStructure...\n";
-    $columns = array();
-    $indices = array();
-    $widgets = array();
+    $columns = [];
+    $indices = [];
+    $widgets = [];
     foreach ($this->tables as $table) {
       if ($table['localizable']) {
-        $columns[$table['name']] = array();
-        $widgets[$table['name']] = array();
+        $columns[$table['name']] = [];
+        $widgets[$table['name']] = [];
       }
       else {
         continue;

@@ -59,7 +59,7 @@ class CRM_Batch_BAO_EntityBatch extends CRM_Batch_DAO_EntityBatch {
    */
   public static function del($params) {
     if (!is_array($params)) {
-      $params = array('id' => $params);
+      $params = ['id' => $params];
     }
     $entityBatch = new CRM_Batch_DAO_EntityBatch();
     $entityId = CRM_Utils_Array::value('id', $params);

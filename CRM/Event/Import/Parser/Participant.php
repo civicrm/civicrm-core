@@ -82,7 +82,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
       $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
     }
 
-    $this->_newParticipants = array();
+    $this->_newParticipants = [];
     $this->setActiveFields($this->_mapperKeys);
 
     // FIXME: we should do this in one place together with Form/MapField.php
@@ -284,7 +284,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
     $params = &$this->getActiveFieldParams();
     $session = CRM_Core_Session::singleton();
     $dateType = $session->get('dateTypes');
-    $formatted = array('version' => 3);
+    $formatted = ['version' => 3];
     $customFields = CRM_Core_BAO_CustomField::getFields('Participant');
 
     // don't add to recent items, CRM-4399
@@ -314,7 +314,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
       }
       else {
         $eventTitle = $params['event_title'];
-        $qParams = array();
+        $qParams = [];
         $dao = new CRM_Core_DAO();
         $params['participant_role_id'] = $dao->singleValueQuery("SELECT default_role_id FROM civicrm_event WHERE title = '$eventTitle' ",
           $qParams
@@ -328,7 +328,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
       $indieFields = CRM_Event_BAO_Participant::import();
     }
 
-    $formatValues = array();
+    $formatValues = [];
     foreach ($params as $key => $field) {
       if ($field == NULL || $field === '') {
         continue;
@@ -365,11 +365,11 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
           'Participant'
         );
         if ($dao->find(TRUE)) {
-          $ids = array(
+          $ids = [
             'participant' => $formatValues['participant_id'],
             'userId' => $session->get('userID'),
-          );
-          $participantValues = array();
+          ];
+          $participantValues = [];
           //@todo calling api functions directly is not supported
           $newParticipant = _civicrm_api3_deprecated_participant_check_params($formatted, $participantValues, FALSE);
           if ($newParticipant['error_message']) {
@@ -378,10 +378,10 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
           }
           $newParticipant = CRM_Event_BAO_Participant::create($formatted, $ids);
           if (!empty($formatted['fee_level'])) {
-            $otherParams = array(
+            $otherParams = [
               'fee_label' => $formatted['fee_level'],
               'event_id' => $newParticipant->event_id,
-            );
+            ];
             CRM_Price_BAO_LineItem::syncLineItems($newParticipant->id, 'civicrm_participant', $newParticipant->fee_amount, $otherParams);
           }
 
@@ -410,10 +410,10 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
       }
       else {
         // Using new Dedupe rule.
-        $ruleParams = array(
+        $ruleParams = [
           'contact_type' => $this->_contactType,
           'used' => 'Unsupervised',
-        );
+        ];
         $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
 
         $disp = '';
@@ -531,7 +531,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
         if ($type == 'CheckBox' || $type == 'Multi-Select') {
           $mulValues = explode(',', $value);
           $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-          $values[$key] = array();
+          $values[$key] = [];
           foreach ($mulValues as $v1) {
             foreach ($customOption as $customValueID => $customLabel) {
               $customValue = $customLabel['value'];
@@ -590,7 +590,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
             return civicrm_api3_create_error("Event ID is not valid: $value");
           }
           $dao = new CRM_Core_DAO();
-          $qParams = array();
+          $qParams = [];
           $svq = $dao->singleValueQuery("SELECT id FROM civicrm_event WHERE id = $value",
             $qParams
           );
@@ -640,7 +640,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
     // status_id and source. So, if $values contains
     // participant_register_date, participant_status_id or participant_source,
     // convert it to register_date, status_id or source
-    $changes = array(
+    $changes = [
       'participant_register_date' => 'register_date',
       'participant_source' => 'source',
       'participant_status_id' => 'status_id',
@@ -648,7 +648,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
       'participant_fee_level' => 'fee_level',
       'participant_fee_amount' => 'fee_amount',
       'participant_id' => 'id',
-    );
+    ];
 
     foreach ($changes as $orgVal => $changeVal) {
       if (isset($values[$orgVal])) {

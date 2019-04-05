@@ -139,7 +139,7 @@ class CRM_Utils_SQL_TempTable {
       $this->utf8 ? self::UTF8 : '',
       ($selectQuery instanceof CRM_Utils_SQL_Select ? $selectQuery->toSQL() : $selectQuery)
     );
-    CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, TRUE, FALSE);
+    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
     $this->createSql = $sql;
     return $this;
   }
@@ -159,7 +159,7 @@ class CRM_Utils_SQL_TempTable {
       $this->memory ? self::MEMORY : self::INNODB,
       $this->utf8 ? self::UTF8 : ''
     );
-    CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, TRUE, FALSE);
+    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
     $this->createSql = $sql;
     return $this;
   }
@@ -171,7 +171,7 @@ class CRM_Utils_SQL_TempTable {
    */
   public function drop() {
     $sql = $this->toSQL('DROP', 'IF EXISTS');
-    CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, TRUE, FALSE);
+    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
     return $this;
   }
 

@@ -70,7 +70,7 @@ class CRM_Case_Form_Activity_LinkCases {
    * @return array
    */
   public static function setDefaultValues(&$form) {
-    $defaults = array();
+    $defaults = [];
     if (!empty($_GET['link_to_case_id']) && CRM_Utils_Rule::positiveInteger($_GET['link_to_case_id'])) {
       $defaults['link_to_case_id'] = $_GET['link_to_case_id'];
     }
@@ -86,16 +86,16 @@ class CRM_Case_Form_Activity_LinkCases {
     if (is_array($relatedCases) && !empty($relatedCases)) {
       $excludeCaseIds = array_merge($excludeCaseIds, array_keys($relatedCases));
     }
-    $form->addEntityRef('link_to_case_id', ts('Link To Case'), array(
+    $form->addEntityRef('link_to_case_id', ts('Link To Case'), [
       'entity' => 'Case',
-      'api' => array(
-        'extra' => array('case_id.case_type_id.title', 'contact_id.sort_name'),
-        'params' => array(
-          'case_id' => array('NOT IN' => $excludeCaseIds),
+      'api' => [
+        'extra' => ['case_id.case_type_id.title', 'contact_id.sort_name'],
+        'params' => [
+          'case_id' => ['NOT IN' => $excludeCaseIds],
           'case_id.is_deleted' => 0,
-        ),
-      ),
-    ), TRUE);
+        ],
+      ],
+    ], TRUE);
   }
 
   /**
@@ -111,7 +111,7 @@ class CRM_Case_Form_Activity_LinkCases {
    *   list of errors to be posted back to the form
    */
   public static function formRule($values, $files, $form) {
-    $errors = array();
+    $errors = [];
 
     $linkCaseId = CRM_Utils_Array::value('link_to_case_id', $values);
     assert('is_numeric($linkCaseId)');
@@ -152,10 +152,10 @@ class CRM_Case_Form_Activity_LinkCases {
 
     //create a link between two cases.
     if ($activityId && $linkCaseID) {
-      $caseParams = array(
+      $caseParams = [
         'case_id' => $linkCaseID,
         'activity_id' => $activityId,
-      );
+      ];
       CRM_Case_BAO_Case::processCaseActivity($caseParams);
     }
   }

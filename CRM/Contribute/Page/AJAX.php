@@ -40,14 +40,14 @@ class CRM_Contribute_Page_AJAX {
    * Get Soft credit to list in DT
    */
   public static function getSoftContributionRows() {
-    $requiredParameters = array(
+    $requiredParameters = [
       'cid' => 'Integer',
       'context' => 'String',
-    );
-    $optionalParameters = array(
+    ];
+    $optionalParameters = [
       'entityID' => 'Integer',
       'isTest' => 'Integer',
-    );
+    ];
 
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
     $params += CRM_Core_Page_AJAX::validateParams($requiredParameters, $optionalParameters);

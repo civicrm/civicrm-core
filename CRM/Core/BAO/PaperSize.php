@@ -45,25 +45,25 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Paper Size fields stored in the 'value' field of the Option Value table.
    */
-  private static $optionValueFields = array(
-    'metric' => array(
+  private static $optionValueFields = [
+    'metric' => [
       'name' => 'metric',
       'type' => CRM_Utils_Type::T_STRING,
       'default' => 'mm',
-    ),
-    'width' => array(
+    ],
+    'width' => [
       'name' => 'width',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 612,
-    ),
-    'height' => array(
+    ],
+    'height' => [
       'name' => 'height',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 792,
-    ),
-  );
+    ],
+  ];
 
   /**
    * Get Option Group ID for Paper Sizes.
@@ -104,7 +104,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *   (reference)   Paper Size list
    */
   public static function &getList($namesOnly = FALSE) {
-    static $list = array();
+    static $list = [];
     if (self::_getGid()) {
       // get saved Paper Sizes from Option Value table
       $dao = new CRM_Core_DAO_OptionValue();
@@ -131,13 +131,13 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *   Name/value pairs containing the default Paper Size values.
    */
   public static function &getDefaultValues() {
-    $params = array('is_active' => 1, 'is_default' => 1);
-    $defaults = array();
+    $params = ['is_active' => 1, 'is_default' => 1];
+    $defaults = [];
     if (!self::retrieve($params, $defaults)) {
       foreach (self::$optionValueFields as $name => $field) {
         $defaults[$name] = $field['default'];
       }
-      $filter = array('option_group_id' => self::_getGid());
+      $filter = ['option_group_id' => self::_getGid()];
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue', $filter);
     }
     return $defaults;
@@ -155,8 +155,8 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *   (reference) associative array of name/value pairs
    */
   public static function &getPaperFormat($field, $val) {
-    $params = array('is_active' => 1, $field => $val);
-    $paperFormat = array();
+    $params = ['is_active' => 1, $field => $val];
+    $paperFormat = [];
     if (self::retrieve($params, $paperFormat)) {
       return $paperFormat;
     }
@@ -314,7 +314,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
     $this->save();
 
     // fix duplicate weights
-    $filter = array('option_group_id' => self::_getGid());
+    $filter = ['option_group_id' => self::_getGid()];
     CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_OptionValue', $filter);
   }
 
@@ -331,7 +331,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
       $dao->id = $id;
       if ($dao->find(TRUE)) {
         if ($dao->option_group_id == self::_getGid()) {
-          $filter = array('option_group_id' => self::_getGid());
+          $filter = ['option_group_id' => self::_getGid()];
           CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $id, $filter);
           $dao->delete();
           return;

@@ -38,18 +38,18 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
 
   protected $_phoneField = FALSE;
 
-  protected $_customGroupExtends = array(
+  protected $_customGroupExtends = [
     'Contact',
     'Individual',
     'Household',
     'Organization',
-  );
+  ];
 
-  protected $_charts = array(
+  protected $_charts = [
     '' => 'Tabular',
     'barChart' => 'Bar Chart',
     'pieChart' => 'Pie Chart',
-  );
+  ];
 
   /**
    * This report has not been optimised for group filtering.
@@ -69,143 +69,143 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
    */
   public function __construct() {
     $this->optimisedForOnlyFullGroupBy = FALSE;
-    $this->_columns = array();
+    $this->_columns = [];
 
-    $this->_columns['civicrm_contact'] = array(
+    $this->_columns['civicrm_contact'] = [
       'dao' => 'CRM_Contact_DAO_Contact',
-      'fields' => array(
-        'id' => array(
+      'fields' => [
+        'id' => [
           'title' => ts('Contact ID'),
           'required' => TRUE,
-        ),
-        'sort_name' => array(
+        ],
+        'sort_name' => [
           'title' => ts('Contact Name'),
           'required' => TRUE,
-        ),
-      ),
-      'filters' => array(
-        'sort_name' => array(
+        ],
+      ],
+      'filters' => [
+        'sort_name' => [
           'title' => ts('Contact Name'),
-        ),
-        'source' => array(
+        ],
+        'source' => [
           'title' => ts('Contact Source'),
           'type' => CRM_Utils_Type::T_STRING,
-        ),
-        'id' => array(
+        ],
+        'id' => [
           'title' => ts('Contact ID'),
           'no_display' => TRUE,
-        ),
-      ),
-      'order_bys' => array(
-        'sort_name' => array(
+        ],
+      ],
+      'order_bys' => [
+        'sort_name' => [
           'title' => ts('Contact Name'),
           'default' => TRUE,
           'default_order' => 'ASC',
-        ),
-      ),
+        ],
+      ],
       'grouping' => 'contact-fields',
-    );
+    ];
 
-    $this->_columns['civicrm_mailing'] = array(
+    $this->_columns['civicrm_mailing'] = [
       'dao' => 'CRM_Mailing_DAO_Mailing',
-      'fields' => array(
-        'mailing_name' => array(
+      'fields' => [
+        'mailing_name' => [
           'name' => 'name',
           'title' => ts('Mailing Name'),
           'default' => TRUE,
-        ),
-        'mailing_name_alias' => array(
+        ],
+        'mailing_name_alias' => [
           'name' => 'name',
           'required' => TRUE,
           'no_display' => TRUE,
-        ),
-        'mailing_subject' => array(
+        ],
+        'mailing_subject' => [
           'name' => 'subject',
           'title' => ts('Mailing Subject'),
           'default' => TRUE,
-        ),
-      ),
-      'filters' => array(
-        'mailing_id' => array(
+        ],
+      ],
+      'filters' => [
+        'mailing_id' => [
           'name' => 'id',
           'title' => ts('Mailing Name'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'type' => CRM_Utils_Type::T_INT,
           'options' => CRM_Mailing_BAO_Mailing::getMailingsList(),
           'operator' => 'like',
-        ),
-        'mailing_subject' => array(
+        ],
+        'mailing_subject' => [
           'name' => 'subject',
           'title' => ts('Mailing Subject'),
           'type' => CRM_Utils_Type::T_STRING,
           'operator' => 'like',
-        ),
-      ),
-      'order_bys' => array(
-        'mailing_name' => array(
+        ],
+      ],
+      'order_bys' => [
+        'mailing_name' => [
           'name' => 'name',
           'title' => ts('Mailing Name'),
-        ),
-        'mailing_subject' => array(
+        ],
+        'mailing_subject' => [
           'name' => 'subject',
           'title' => ts('Mailing Subject'),
-        ),
-      ),
+        ],
+      ],
       'grouping' => 'mailing-fields',
-    );
+    ];
 
-    $this->_columns['civicrm_email'] = array(
+    $this->_columns['civicrm_email'] = [
       'dao' => 'CRM_Core_DAO_Email',
-      'fields' => array(
-        'email' => array(
+      'fields' => [
+        'email' => [
           'title' => ts('Email'),
           'no_repeat' => TRUE,
-        ),
-      ),
-      'order_bys' => array(
-        'email' => array('title' => ts('Email'), 'default_order' => 'ASC'),
-      ),
+        ],
+      ],
+      'order_bys' => [
+        'email' => ['title' => ts('Email'), 'default_order' => 'ASC'],
+      ],
       'grouping' => 'contact-fields',
-    );
+    ];
 
-    $this->_columns['civicrm_phone'] = array(
+    $this->_columns['civicrm_phone'] = [
       'dao' => 'CRM_Core_DAO_Phone',
-      'fields' => array('phone' => NULL),
+      'fields' => ['phone' => NULL],
       'grouping' => 'contact-fields',
-    );
+    ];
 
-    $this->_columns['civicrm_mailing_event_opened'] = array(
+    $this->_columns['civicrm_mailing_event_opened'] = [
       'dao' => 'CRM_Mailing_Event_DAO_Opened',
-      'fields' => array(
-        'id' => array(
+      'fields' => [
+        'id' => [
           'required' => TRUE,
           'no_display' => TRUE,
           'dbAlias' => CRM_Utils_SQL::supportsFullGroupBy() ? 'ANY_VALUE(mailing_event_opened_civireport.id)' : NULL,
-        ),
-        'time_stamp' => array(
+        ],
+        'time_stamp' => [
           'title' => ts('Open Date'),
           'default' => TRUE,
-        ),
-      ),
-      'filters' => array(
-        'time_stamp' => array(
+        ],
+      ],
+      'filters' => [
+        'time_stamp' => [
           'title' => ts('Open Date'),
           'operatorType' => CRM_Report_Form::OP_DATE,
           'type' => CRM_Utils_Type::T_DATE,
-        ),
-        'unique_opens' => array(
+        ],
+        'unique_opens' => [
           'title' => ts('Unique Opens'),
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'pseudofield' => TRUE,
-        ),
-      ),
-      'order_bys' => array(
-        'time_stamp' => array(
+        ],
+      ],
+      'order_bys' => [
+        'time_stamp' => [
           'title' => ts('Open Date'),
-        ),
-      ),
+        ],
+      ],
       'grouping' => 'mailing-fields',
-    );
+    ];
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
@@ -218,8 +218,8 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
   }
 
   public function select() {
-    $select = array();
-    $this->_columnHeaders = array();
+    $select = [];
+    $this->_columnHeaders = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
@@ -259,7 +259,7 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
    * @return array
    */
   public static function formRule($fields, $files, $self) {
-    $errors = $grouping = array();
+    $errors = $grouping = [];
     return $errors;
   }
 
@@ -289,11 +289,11 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
   }
 
   public function groupBy() {
-    $groupBys = array();
+    $groupBys = [];
     // Do not use group by clause if distinct = 0 mentioned in url params. flag is used in mailing report screen, default value is TRUE
     // this report is used to show total opened and unique opened
     if (CRM_Utils_Request::retrieve('distinct', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, TRUE)) {
-      $groupBys = empty($this->_params['charts']) ? array("civicrm_mailing_event_queue.email_id") : array("{$this->_aliases['civicrm_mailing']}.id");
+      $groupBys = empty($this->_params['charts']) ? ["civicrm_mailing_event_queue.email_id"] : ["{$this->_aliases['civicrm_mailing']}.id"];
       if (!empty($this->_params['unique_opens_value'])) {
         $groupBys[] = "civicrm_mailing_event_queue.id";
       }
@@ -312,7 +312,7 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
 
     $sql = $this->buildQuery(TRUE);
 
-    $rows = $graphRows = array();
+    $rows = $graphRows = [];
     $this->buildRows($sql, $rows);
 
     $this->formatDisplay($rows);
@@ -328,13 +328,13 @@ class CRM_Report_Form_Mailing_Opened extends CRM_Report_Form {
       return;
     }
 
-    $chartInfo = array(
+    $chartInfo = [
       'legend' => ts('Mail Opened Report'),
       'xname' => ts('Mailing'),
       'yname' => ts('Opened'),
       'xLabelAngle' => 20,
-      'tip' => ts('Mail Opened: %1', array(1 => '#val#')),
-    );
+      'tip' => ts('Mail Opened: %1', [1 => '#val#']),
+    ];
     foreach ($rows as $row) {
       $chartInfo['values'][$row['civicrm_mailing_mailing_name_alias']] = $row['civicrm_mailing_opened_count'];
     }

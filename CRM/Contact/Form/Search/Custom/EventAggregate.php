@@ -44,12 +44,12 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
    */
   public function __construct(&$formValues) {
     $this->_formValues = self::formatSavedSearchFields($formValues);
-    $this->_permissionedComponent = array('CiviContribute', 'CiviEvent');
+    $this->_permissionedComponent = ['CiviContribute', 'CiviEvent'];
 
     /**
      * Define the columns for search result rows
      */
-    $this->_columns = array(
+    $this->_columns = [
       ts('Event') => 'event_name',
       ts('Type') => 'event_type',
       ts('Number of<br />Participant') => 'participant_count',
@@ -57,7 +57,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
       ts('Fee') => 'fee',
       ts('Net Payment') => 'net_payment',
       ts('Participant') => 'participant',
-    );
+    ];
   }
 
   /**
@@ -83,7 +83,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
       $form->addElement('checkbox', "event_type_id[$eventId]", 'Event Type', $eventName);
     }
     $events = CRM_Event_BAO_Event::getEvents(1);
-    $form->add('select', 'event_id', ts('Event Name'), array('' => ts('- select -')) + $events);
+    $form->add('select', 'event_id', ts('Event Name'), ['' => ts('- select -')] + $events);
 
     $form->add('datepicker', 'start_date', ts('Payments Date From'), [], FALSE, ['time' => FALSE]);
     $form->add('datepicker', 'end_date', ts('...through'), [], FALSE, ['time' => FALSE]);
@@ -92,14 +92,14 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
      * If you are using the sample template, this array tells the template fields to render
      * for the search form.
      */
-    $form->assign('elements', array(
+    $form->assign('elements', [
         'paid_online',
         'start_date',
         'end_date',
         'show_payees',
         'event_type_id',
         'event_id',
-      ));
+      ]);
   }
 
   /**
@@ -226,7 +226,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    $clauses = array();
+    $clauses = [];
 
     $clauses[] = "civicrm_participant.status_id in ( 1 )";
     $clauses[] = "civicrm_contribution.is_test = 0";
@@ -251,7 +251,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
     }
 
     if ($includeContactIDs) {
-      $contactIDs = array();
+      $contactIDs = [];
       foreach ($this->_formValues as $id => $value) {
         if ($value &&
           substr($id, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX
@@ -309,7 +309,7 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
     $dao = CRM_Core_DAO::executeQuery($sql,
       CRM_Core_DAO::$_nullArray
     );
-    $totals = array();
+    $totals = [];
     while ($dao->fetch()) {
       $totals['payment_amount'] = $dao->payment_amount;
       $totals['fee'] = $dao->fee;
@@ -384,10 +384,10 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
    * @return array
    */
   public static function formatSavedSearchFields($formValues) {
-    $dateFields = array(
+    $dateFields = [
       'start_date',
       'end_date',
-    );
+    ];
     foreach ($formValues as $element => $value) {
       if (in_array($element, $dateFields) && !empty($value)) {
         $formValues[$element] = date('Y-m-d', strtotime($value));

@@ -61,7 +61,7 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array();
+      self::$_links = [];
     }
     return self::$_links;
   }

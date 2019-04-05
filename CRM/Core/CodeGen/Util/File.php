@@ -85,7 +85,7 @@ class CRM_Core_CodeGen_Util_File {
    *   Array of file paths
    */
   public static function findManyFiles($pairs) {
-    $files = array();
+    $files = [];
     foreach ($pairs as $pair) {
       list ($dir, $pattern) = $pair;
       $files = array_merge($files, CRM_Utils_File::findFiles($dir, $pattern));

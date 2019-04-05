@@ -81,18 +81,18 @@ class CRM_Campaign_Form_Task_Print extends CRM_Campaign_Form_Task {
     //
     // just need to add a javacript to popup the window for printing
     //
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'next',
           'name' => ts('Print Respondents'),
-          'js' => array('onclick' => 'window.print()'),
+          'js' => ['onclick' => 'window.print()'],
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'back',
           'name' => ts('Done'),
-        ),
-      )
+        ],
+      ]
     );
   }
 

@@ -62,24 +62,24 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => CRM_Utils_System::currentPath(),
           'qs' => 'action=update&id=%%id%%',
           'title' => ts('Edit Mailing Component'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Mailing Component'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Mailing Component'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }

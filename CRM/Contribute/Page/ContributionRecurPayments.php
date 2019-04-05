@@ -38,15 +38,15 @@ class CRM_Contribute_Page_ContributionRecurPayments extends CRM_Core_Page {
    * viewed.
    */
   private function loadRelatedContributions() {
-    $relatedContributions = array();
+    $relatedContributions = [];
 
-    $relatedContributionsResult = civicrm_api3('Contribution', 'get', array(
+    $relatedContributionsResult = civicrm_api3('Contribution', 'get', [
       'sequential' => 1,
       'contribution_recur_id' => $this->id,
       'contact_id' => $this->contactId,
-      'options' => array('limit' => 0),
+      'options' => ['limit' => 0],
       'contribution_test' => '',
-    ));
+    ]);
 
     foreach ($relatedContributionsResult['values'] as $contribution) {
       $this->insertAmountExpandingPaymentsControl($contribution);
@@ -78,14 +78,14 @@ class CRM_Contribute_Page_ContributionRecurPayments extends CRM_Core_Page {
     $amount = CRM_Utils_Money::format($contribution['total_amount'], $contribution['currency']);
 
     $expandPaymentsUrl = CRM_Utils_System::url('civicrm/payment',
-      array(
+      [
         'view' => 'transaction',
         'component' => 'contribution',
         'action' => 'browse',
         'cid' => $this->contactId,
         'id' => $contribution['contribution_id'],
         'selector' => 1,
-      ),
+      ],
       FALSE, NULL, TRUE
     );
 
@@ -140,11 +140,11 @@ class CRM_Contribute_Page_ContributionRecurPayments extends CRM_Core_Page {
     $contribution['action'] = CRM_Core_Action::formLink(
       $this->buildContributionLinks($contribution),
       $this->getContributionPermissionsMask(),
-      array(
+      [
         'id' => $contribution['contribution_id'],
         'cid' => $contribution['contact_id'],
         'cxt' => 'contribution',
-      ),
+      ],
       ts('more'),
       FALSE,
       'contribution.selector.row',
@@ -172,34 +172,34 @@ class CRM_Contribute_Page_ContributionRecurPayments extends CRM_Core_Page {
     if ($contribution['is_pay_later'] && CRM_Utils_Array::value('contribution_status', $contribution) == 'Pending') {
       $isPayLater = TRUE;
 
-      $links[CRM_Core_Action::ADD] = array(
+      $links[CRM_Core_Action::ADD] = [
         'name' => ts('Pay with Credit Card'),
         'url' => 'civicrm/contact/view/contribution',
         'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%&mode=live',
         'title' => ts('Pay with Credit Card'),
-      );
+      ];
     }
 
-    if (in_array($contribution['contribution_status'], array('Partially paid', 'Pending refund')) || $isPayLater) {
+    if (in_array($contribution['contribution_status'], ['Partially paid', 'Pending refund']) || $isPayLater) {
       $buttonName = ts('Record Payment');
 
       if ($contribution['contribution_status'] == 'Pending refund') {
         $buttonName = ts('Record Refund');
       }
       elseif (CRM_Core_Config::isEnabledBackOfficeCreditCardPayments()) {
-        $links[CRM_Core_Action::BASIC] = array(
+        $links[CRM_Core_Action::BASIC] = [
           'name' => ts('Submit Credit Card payment'),
           'url' => 'civicrm/payment/add',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution&mode=live',
           'title' => ts('Submit Credit Card payment'),
-        );
+        ];
       }
-      $links[CRM_Core_Action::ADD] = array(
+      $links[CRM_Core_Action::ADD] = [
         'name' => $buttonName,
         'url' => 'civicrm/payment',
         'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=contribution',
         'title' => $buttonName,
-      );
+      ];
     }
 
     return $links;
@@ -211,7 +211,7 @@ class CRM_Contribute_Page_ContributionRecurPayments extends CRM_Core_Page {
    * @return int
    */
   private function getContributionPermissionsMask() {
-    $permissions = array(CRM_Core_Permission::VIEW);
+    $permissions = [CRM_Core_Permission::VIEW];
     if (CRM_Core_Permission::check('edit contributions')) {
       $permissions[] = CRM_Core_Permission::EDIT;
     }

@@ -46,7 +46,7 @@ class CRM_Mailing_Page_Preview extends CRM_Core_Page {
     $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', CRM_Core_DAO::$_nullObject, FALSE, 'text');
     $type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject, FALSE, 'text');
 
-    $options = array();
+    $options = [];
     $session->getVars($options, "CRM_Mailing_Controller_Send_$qfKey");
 
     // get the options if control come from search context, CRM-3711
@@ -74,7 +74,7 @@ class CRM_Mailing_Page_Preview extends CRM_Core_Page {
 
     // get details of contact with token value including Custom Field Token Values.CRM-3734
     $returnProperties = $mailing->getReturnProperties();
-    $params = array('contact_id' => $session->get('userID'));
+    $params = ['contact_id' => $session->get('userID')];
 
     $details = CRM_Utils_Token::getTokenDetails($params,
       $returnProperties,

@@ -46,7 +46,7 @@ class CRM_Event_Form_Task_SearchTaskHookSample extends CRM_Event_Form_Task {
    */
   public function preProcess() {
     parent::preProcess();
-    $rows = array();
+    $rows = [];
     // display name and participation details of participants
     $participantIDs = implode(',', $this->_participantIds);
 
@@ -61,12 +61,12 @@ class CRM_Event_Form_Task_SearchTaskHookSample extends CRM_Event_Form_Task {
 
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      $rows[] = array(
+      $rows[] = [
         'display_name' => $dao->display_name,
         'amount' => $dao->amount,
         'register_date' => CRM_Utils_Date::customFormat($dao->register_date),
         'source' => $dao->source,
-      );
+      ];
     }
     $this->assign('rows', $rows);
   }
@@ -77,13 +77,13 @@ class CRM_Event_Form_Task_SearchTaskHookSample extends CRM_Event_Form_Task {
    * @return void
    */
   public function buildQuickForm() {
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'done',
           'name' => ts('Done'),
           'isDefault' => TRUE,
-        ),
-      )
+        ],
+      ]
     );
   }
 

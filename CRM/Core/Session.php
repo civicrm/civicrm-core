@@ -120,7 +120,7 @@ class CRM_Core_Session {
           if (!(isset($GLOBALS['lazy_session']) && $GLOBALS['lazy_session'] == TRUE)) {
             drupal_session_start();
           }
-          $_SESSION = array();
+          $_SESSION = [];
         }
         else {
           session_start();
@@ -136,7 +136,7 @@ class CRM_Core_Session {
     if (!isset($this->_session[$this->_key]) ||
       !is_array($this->_session[$this->_key])
     ) {
-      $this->_session[$this->_key] = array();
+      $this->_session[$this->_key] = [];
     }
   }
 
@@ -150,11 +150,11 @@ class CRM_Core_Session {
       $this->initialize();
 
       // to make certain we clear it, first initialize it to empty
-      $this->_session[$this->_key] = array();
+      $this->_session[$this->_key] = [];
       unset($this->_session[$this->_key]);
     }
     else {
-      $this->_session = array();
+      $this->_session = [];
     }
 
   }
@@ -175,7 +175,7 @@ class CRM_Core_Session {
     }
 
     if (empty($this->_session[$this->_key][$prefix])) {
-      $this->_session[$this->_key][$prefix] = array();
+      $this->_session[$this->_key][$prefix] = [];
     }
   }
 
@@ -465,7 +465,7 @@ class CRM_Core_Session {
    *                 defaults to 10 seconds for most messages, 5 if it has a title but no body,
    *                 or 0 for errors or messages containing links
    */
-  public static function setStatus($text, $title = '', $type = 'alert', $options = array()) {
+  public static function setStatus($text, $title = '', $type = 'alert', $options = []) {
     // make sure session is initialized, CRM-8120
     $session = self::singleton();
     $session->initialize();
@@ -475,10 +475,10 @@ class CRM_Core_Session {
     $title = CRM_Utils_String::purifyHTML($title);
 
     // default options
-    $options += array('unique' => TRUE);
+    $options += ['unique' => TRUE];
 
     if (!isset(self::$_singleton->_session[self::$_singleton->_key]['status'])) {
-      self::$_singleton->_session[self::$_singleton->_key]['status'] = array();
+      self::$_singleton->_session[self::$_singleton->_key]['status'] = [];
     }
     if ($text || $title) {
       if ($options['unique']) {
@@ -489,12 +489,12 @@ class CRM_Core_Session {
         }
       }
       unset($options['unique']);
-      self::$_singleton->_session[self::$_singleton->_key]['status'][] = array(
+      self::$_singleton->_session[self::$_singleton->_key]['status'][] = [
         'text' => $text,
         'title' => $title,
         'type' => $type,
         'options' => $options ? $options : NULL,
-      );
+      ];
     }
   }
 
@@ -505,7 +505,7 @@ class CRM_Core_Session {
    */
   public static function registerAndRetrieveSessionObjects($names) {
     if (!is_array($names)) {
-      $names = array($names);
+      $names = [$names];
     }
 
     if (!self::$_managedNames) {
@@ -561,7 +561,7 @@ class CRM_Core_Session {
     if (!$userContactID) {
       return '';
     }
-    return civicrm_api3('Contact', 'getvalue', array('id' => $userContactID, 'return' => 'display_name'));
+    return civicrm_api3('Contact', 'getvalue', ['id' => $userContactID, 'return' => 'display_name']);
   }
 
   /**

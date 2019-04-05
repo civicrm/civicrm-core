@@ -46,13 +46,13 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getInfo() {
-    return array(
+    return [
       'name' => 'CiviCase',
       'translatedName' => ts('CiviCase'),
       'title' => ts('CiviCase Engine'),
       'search' => 1,
       'showActivitiesInCore' => 0,
-    );
+    ];
   }
 
   /**
@@ -61,7 +61,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
   public function getAngularModules() {
     global $civicrm_root;
 
-    $result = array();
+    $result = [];
     $result['crmCaseType'] = include "$civicrm_root/ang/crmCaseType.ang.php";
     return $result;
   }
@@ -89,28 +89,28 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
-    $permissions = array(
-      'delete in CiviCase' => array(
+    $permissions = [
+      'delete in CiviCase' => [
         ts('delete in CiviCase'),
         ts('Delete cases'),
-      ),
-      'administer CiviCase' => array(
+      ],
+      'administer CiviCase' => [
         ts('administer CiviCase'),
         ts('Define case types, access deleted cases'),
-      ),
-      'access my cases and activities' => array(
+      ],
+      'access my cases and activities' => [
         ts('access my cases and activities'),
         ts('View and edit only those cases managed by this user'),
-      ),
-      'access all cases and activities' => array(
+      ],
+      'access all cases and activities' => [
         ts('access all cases and activities'),
         ts('View and edit all cases (for visible contacts)'),
-      ),
-      'add cases' => array(
+      ],
+      'add cases' => [
         ts('add cases'),
         ts('Open a new case'),
-      ),
-    );
+      ],
+    ];
 
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
@@ -125,7 +125,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @inheritDoc
    */
   public function getReferenceCounts($dao) {
-    $result = array();
+    $result = [];
     if ($dao instanceof CRM_Core_DAO_OptionValue) {
       /** @var $dao CRM_Core_DAO_OptionValue */
       $activity_type_gid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'activity_type', 'id', 'name');
@@ -133,11 +133,11 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
         $count = CRM_Case_XMLRepository::singleton()
           ->getActivityReferenceCount($dao->name);
         if ($count > 0) {
-          $result[] = array(
+          $result[] = [
             'name' => 'casetypexml:activities',
             'type' => 'casetypexml',
             'count' => $count,
-          );
+          ];
         }
       }
     }
@@ -146,11 +146,11 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       $count = CRM_Case_XMLRepository::singleton()
         ->getRelationshipReferenceCount($dao->{CRM_Case_XMLProcessor::REL_TYPE_CNAME});
       if ($count > 0) {
-        $result[] = array(
+        $result[] = [
           'name' => 'casetypexml:relationships',
           'type' => 'casetypexml',
           'count' => $count,
-        );
+        ];
       }
     }
     return $result;
@@ -161,7 +161,7 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getUserDashboardElement() {
-    return array();
+    return [];
   }
 
   /**
@@ -169,11 +169,11 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function registerTab() {
-    return array(
+    return [
       'title' => ts('Cases'),
       'url' => 'case',
       'weight' => 50,
-    );
+    ];
   }
 
   /**
@@ -189,10 +189,10 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function registerAdvancedSearchPane() {
-    return array(
+    return [
       'title' => ts('Cases'),
       'weight' => 50,
-    );
+    ];
   }
 
   /**
@@ -213,14 +213,14 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     ) {
       $activityType = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
       if ($activityType) {
-        $shortCuts = array_merge($shortCuts, array(
-          array(
+        $shortCuts = array_merge($shortCuts, [
+          [
             'path' => 'civicrm/case/add',
             'query' => "reset=1&action=add&atype={$activityType}&context=standalone",
             'ref' => 'new-case',
             'title' => ts('Case'),
-          ),
-        ));
+          ],
+        ]);
       }
     }
   }
@@ -258,11 +258,11 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    *   Array(string $value => string $label).
    */
   public static function getRedactOptions() {
-    return array(
+    return [
       'default' => ts('Default'),
       '0' => ts('Do not redact emails'),
       '1' => ts('Redact emails'),
-    );
+    ];
   }
 
   /**
@@ -270,11 +270,11 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    *   Array(string $value => string $label).
    */
   public static function getMultiClientOptions() {
-    return array(
+    return [
       'default' => ts('Default'),
       '0' => ts('Single client per case'),
       '1' => ts('Multiple client per case'),
-    );
+    ];
   }
 
   /**
@@ -282,11 +282,11 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
    *   Array(string $value => string $label).
    */
   public static function getSortOptions() {
-    return array(
+    return [
       'default' => ts('Default'),
       '0' => ts('Definition order'),
       '1' => ts('Alphabetical order'),
-    );
+    ];
   }
 
 }

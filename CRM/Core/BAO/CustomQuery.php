@@ -107,7 +107,7 @@ class CRM_Core_BAO_CustomQuery {
    *
    * @var array
    */
-  static $extendsMap = array(
+  static $extendsMap = [
     'Contact' => 'civicrm_contact',
     'Individual' => 'civicrm_contact',
     'Household' => 'civicrm_contact',
@@ -126,7 +126,7 @@ class CRM_Core_BAO_CustomQuery {
     'Address' => 'civicrm_address',
     'Campaign' => 'civicrm_campaign',
     'Survey' => 'civicrm_survey',
-  );
+  ];
 
   /**
    * Class constructor.
@@ -140,19 +140,19 @@ class CRM_Core_BAO_CustomQuery {
    * @param bool $contactSearch
    * @param array $locationSpecificFields
    */
-  public function __construct($ids, $contactSearch = FALSE, $locationSpecificFields = array()) {
+  public function __construct($ids, $contactSearch = FALSE, $locationSpecificFields = []) {
     $this->_ids = &$ids;
     $this->_locationSpecificCustomFields = $locationSpecificFields;
 
-    $this->_select = array();
-    $this->_element = array();
-    $this->_tables = array();
-    $this->_whereTables = array();
-    $this->_where = array();
-    $this->_qill = array();
-    $this->_options = array();
+    $this->_select = [];
+    $this->_element = [];
+    $this->_tables = [];
+    $this->_whereTables = [];
+    $this->_where = [];
+    $this->_qill = [];
+    $this->_options = [];
 
-    $this->_fields = array();
+    $this->_fields = [];
     $this->_contactSearch = $contactSearch;
 
     if (empty($this->_ids)) {
@@ -187,7 +187,7 @@ SELECT f.id, f.label, f.data_type,
         // if $extends is a subtype, refer contact table
         $extendsTable = self::$extendsMap['Contact'];
       }
-      $this->_fields[$dao->id] = array(
+      $this->_fields[$dao->id] = [
         'id' => $dao->id,
         'label' => $dao->label,
         'extends' => $extendsTable,
@@ -197,18 +197,18 @@ SELECT f.id, f.label, f.data_type,
         'column_name' => $dao->column_name,
         'table_name' => $dao->table_name,
         'option_group_id' => $dao->option_group_id,
-      );
+      ];
 
       // Deprecated (and poorly named) cache of field attributes
-      $this->_options[$dao->id] = array(
-        'attributes' => array(
+      $this->_options[$dao->id] = [
+        'attributes' => [
           'label' => $dao->label,
           'data_type' => $dao->data_type,
           'html_type' => $dao->html_type,
-        ),
-      );
+        ],
+      ];
 
-      $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $dao->id, array(), 'search');
+      $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', 'custom_' . $dao->id, [], 'search');
       if ($options) {
         $this->_options[$dao->id] += $options;
       }
@@ -338,7 +338,7 @@ SELECT f.id, f.label, f.data_type,
                 elseif ($value) {
                   $value = CRM_Utils_Type::escape($value, 'Integer');
                 }
-                $value = str_replace(array('[', ']', ','), array('\[', '\]', '[:comma:]'), $value);
+                $value = str_replace(['[', ']', ','], ['\[', '\]', '[:comma:]'], $value);
                 $value = str_replace('|', '[:separator:]', $value);
               }
               elseif ($isSerialized) {
@@ -349,7 +349,7 @@ SELECT f.id, f.label, f.data_type,
                 // CRM-19006: escape characters like comma, | before building regex pattern
                 $value = (array) $value;
                 foreach ($value as $key => $val) {
-                  $value[$key] = str_replace(array('[', ']', ','), array('\[', '\]', '[:comma:]'), $val);
+                  $value[$key] = str_replace(['[', ']', ','], ['\[', '\]', '[:comma:]'], $val);
                   $value[$key] = str_replace('|', '[:separator:]', $value[$key]);
                 }
                 $value = implode(',', $value);
@@ -359,7 +359,7 @@ SELECT f.id, f.label, f.data_type,
               if ($isSerialized && !CRM_Utils_System::isNull($value) && !strstr($op, 'NULL') && !strstr($op, 'LIKE')) {
                 $sp = CRM_Core_DAO::VALUE_SEPARATOR;
                 $value = str_replace(",", "$sp|$sp", $value);
-                $value = str_replace(array('[:comma:]', '(', ')'), array(',', '[(]', '[)]'), $value);
+                $value = str_replace(['[:comma:]', '(', ')'], [',', '[(]', '[)]'], $value);
 
                 $op = (strstr($op, '!') || strstr($op, 'NOT')) ? 'NOT RLIKE' : 'RLIKE';
                 $value = $sp . $value . $sp;
@@ -390,7 +390,7 @@ SELECT f.id, f.label, f.data_type,
 
           case 'Int':
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Integer');
-            $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));;
+            $this->_qill[$grouping][] = ts("%1 %2 %3", [1 => $field['label'], 2 => $qillOp, 3 => $qillValue]);;
             break;
 
           case 'Boolean':
@@ -405,13 +405,13 @@ SELECT f.id, f.label, f.data_type,
               $qillValue = $value ? 'Yes' : 'No';
             }
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Integer');
-            $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));
+            $this->_qill[$grouping][] = ts("%1 %2 %3", [1 => $field['label'], 2 => $qillOp, 3 => $qillValue]);
             break;
 
           case 'Link':
           case 'Memo':
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'String');
-            $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));
+            $this->_qill[$grouping][] = ts("%1 %2 %3", [1 => $field['label'], 2 => $qillOp, 3 => $qillValue]);
             break;
 
           case 'Money':
@@ -433,12 +433,12 @@ SELECT f.id, f.label, f.data_type,
 
           case 'Float':
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Float');
-            $this->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $field['label'], 2 => $qillOp, 3 => $qillValue));
+            $this->_qill[$grouping][] = ts("%1 %2 %3", [1 => $field['label'], 2 => $qillOp, 3 => $qillValue]);
             break;
 
           case 'Date':
             $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Date');
-            list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, array(), CRM_Utils_Type::T_DATE);
+            list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, [], CRM_Utils_Type::T_DATE);
             $this->_qill[$grouping][] = "{$field['label']} $qillOp '$qillVal'";
             break;
 
@@ -476,7 +476,7 @@ SELECT f.id, f.label, f.data_type,
 
     $whereStr = NULL;
     if (!empty($this->_where)) {
-      $clauses = array();
+      $clauses = [];
       foreach ($this->_where as $grouping => $values) {
         if (!empty($values)) {
           $clauses[] = ' ( ' . implode(' AND ', $values) . ' ) ';
@@ -487,11 +487,11 @@ SELECT f.id, f.label, f.data_type,
       }
     }
 
-    return array(
+    return [
       implode(' , ', $this->_select),
       implode(' ', $this->_tables),
       $whereStr,
-    );
+    ];
   }
 
 }

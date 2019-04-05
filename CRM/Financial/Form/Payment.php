@@ -38,7 +38,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   protected $_paymentProcessorID;
   protected $currency;
 
-  public $_values = array();
+  public $_values = [];
 
   /**
    * @var array
@@ -96,7 +96,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    *
    * @return string
    */
-  public function getCurrency($submittedValues = array()) {
+  public function getCurrency($submittedValues = []) {
     return $this->currency;
   }
 

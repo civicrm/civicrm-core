@@ -50,7 +50,7 @@ abstract class CRM_Utils_Check_Component {
    *   [CRM_Utils_Check_Message]
    */
   public function checkAll() {
-    $messages = array();
+    $messages = [];
     foreach (get_class_methods($this) as $method) {
       if ($method !== 'checkAll' && strpos($method, 'check') === 0) {
         $messages = array_merge($messages, $this->$method());

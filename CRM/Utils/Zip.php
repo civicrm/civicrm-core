@@ -79,7 +79,7 @@ class CRM_Utils_Zip {
    */
   static public function findBaseDirs(ZipArchive $zip) {
     $cnt = $zip->numFiles;
-    $basedirs = array();
+    $basedirs = [];
 
     for ($i = 0; $i < $cnt; $i++) {
       $filename = $zip->getNameIndex($i);

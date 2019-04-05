@@ -40,7 +40,7 @@ class CRM_Mailing_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    * Class constructor.
    */
   public function __construct() {
-    parent::__construct('mailing', array(
+    parent::__construct('mailing', [
       'id' => ts('Mailing ID'),
       'name' => ts('Mailing Name'),
       'group' => ts('Mailing Group(s)'),
@@ -54,7 +54,7 @@ class CRM_Mailing_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       'approveUrl' => ts('Mailing Approval URL'),
       'creator' => ts('Mailing Creator (Name)'),
       'creatorEmail' => ts('Mailing Creator (Email)'),
-    ));
+    ]);
   }
 
   /**
@@ -78,9 +78,9 @@ class CRM_Mailing_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       ? $processor->context['mailing']
       : CRM_Mailing_BAO_Mailing::findById($processor->context['mailingId']);
 
-    return array(
+    return [
       'mailing' => $mailing,
-    );
+    ];
   }
 
   /**

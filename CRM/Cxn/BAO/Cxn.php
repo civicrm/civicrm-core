@@ -71,10 +71,10 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
    */
   public static function updateAppMeta($appMeta) {
     \Civi\Cxn\Rpc\AppMeta::validate($appMeta);
-    CRM_Core_DAO::executeQuery('UPDATE civicrm_cxn SET app_meta = %1 WHERE app_guid = %2', array(
-      1 => array(json_encode($appMeta), 'String'),
-      2 => array($appMeta['appId'], 'String'),
-    ));
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_cxn SET app_meta = %1 WHERE app_guid = %2', [
+      1 => [json_encode($appMeta), 'String'],
+      2 => [$appMeta['appId'], 'String'],
+    ]);
   }
 
   /**
@@ -160,7 +160,7 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
     $apiServer->setLog(new CRM_Utils_SystemLogger());
     $apiServer->setCertValidator(self::createCertificateValidator());
     $apiServer->setHttp(CRM_Cxn_CiviCxnHttp::singleton());
-    $apiServer->setRouter(array('CRM_Cxn_ApiRouter', 'route'));
+    $apiServer->setRouter(['CRM_Cxn_ApiRouter', 'route']);
     return $apiServer;
   }
 

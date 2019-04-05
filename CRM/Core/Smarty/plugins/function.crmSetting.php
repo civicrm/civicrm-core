@@ -43,7 +43,7 @@
  */
 function smarty_function_crmSetting($params, &$smarty) {
 
-  $errorScope = CRM_Core_TemporaryErrorScope::create(array('CRM_Utils_REST', 'fatal'));
+  $errorScope = CRM_Core_TemporaryErrorScope::create(['CRM_Utils_REST', 'fatal']);
   unset($params['method']);
   unset($params['assign']);
   $params['version'] = 3;

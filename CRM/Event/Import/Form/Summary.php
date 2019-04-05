@@ -93,7 +93,7 @@ class CRM_Event_Import_Form_Summary extends CRM_Import_Form_Summary {
     }
     $this->assign('dupeActionString', $dupeActionString);
 
-    $properties = array(
+    $properties = [
       'totalRowCount',
       'validRowCount',
       'invalidRowCount',
@@ -105,7 +105,7 @@ class CRM_Event_Import_Form_Summary extends CRM_Import_Form_Summary {
       'downloadMismatchRecordsUrl',
       'groupAdditions',
       'unMatchCount',
-    );
+    ];
     foreach ($properties as $property) {
       $this->assign($property, $this->get($property));
     }

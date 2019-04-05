@@ -64,7 +64,7 @@ class CRM_Mailing_Controller_Send extends CRM_Core_Controller {
       CRM_Utils_System::redirect($redirect);
     }
     if ($mid && !$continue) {
-      $clone = civicrm_api3('Mailing', 'clone', array('id' => $mid));
+      $clone = civicrm_api3('Mailing', 'clone', ['id' => $mid]);
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/a/', NULL, TRUE, '/mailing/' . $clone['id']));
     }
   }

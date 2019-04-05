@@ -87,7 +87,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    *
    * @return object
    */
-  public static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = []) {
     if (empty($params['id']) && !empty($ids['optionGroup'])) {
       CRM_Core_Error::deprecatedFunctionWarning('no $ids array');
       $params['id'] = $ids['optionGroup'];
@@ -161,10 +161,10 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    *   ID of the option group.
    */
   public static function ensureOptionGroupExists($params) {
-    $existingValues = civicrm_api3('OptionGroup', 'get', array(
+    $existingValues = civicrm_api3('OptionGroup', 'get', [
       'name' => $params['name'],
       'return' => 'id',
-    ));
+    ]);
     if (!$existingValues['count']) {
       $result = civicrm_api3('OptionGroup', 'create', $params);
       return $result['id'];
@@ -218,16 +218,16 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    *   e.g. array("en_CA","fr_CA")
    */
   public static function setActiveValues($optionGroupName, $activeValues) {
-    $params = array(
-      1 => array($optionGroupName, 'String'),
-    );
+    $params = [
+      1 => [$optionGroupName, 'String'],
+    ];
 
     // convert activeValues into placeholders / params in the query
-    $placeholders = array();
+    $placeholders = [];
     $i = count($params) + 1;
     foreach ($activeValues as $value) {
       $placeholders[] = "%{$i}";
-      $params[$i] = array($value, 'String');
+      $params[$i] = [$value, 'String'];
       $i++;
     }
     $placeholders = implode(', ', $placeholders);

@@ -143,15 +143,15 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     }
 
     if (!$this->_caseId) {
-      $caseAttributes = array(
+      $caseAttributes = [
         'case_type_id' => ts('Case Type'),
         'status_id' => ts('Case Status'),
         'medium_id' => ts('Activity Medium'),
-      );
+      ];
 
       foreach ($caseAttributes as $key => $label) {
         if (!CRM_Case_BAO_Case::buildOptions($key, 'create')) {
-          CRM_Core_Error::fatal(ts('You do not have any active %1', array(1 => $label)));
+          CRM_Core_Error::fatal(ts('You do not have any active %1', [1 => $label]));
         }
       }
     }
@@ -192,7 +192,7 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       $contact = new CRM_Contact_DAO_Contact();
       $contact->id = $this->_currentlyViewedContactId;
       if (!$contact->find(TRUE)) {
-        CRM_Core_Error::statusBounce(ts('Client contact does not exist: %1', array(1 => $this->_currentlyViewedContactId)));
+        CRM_Core_Error::statusBounce(ts('Client contact does not exist: %1', [1 => $this->_currentlyViewedContactId]));
       }
       $this->assign('clientName', $contact->display_name);
     }
@@ -238,18 +238,18 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       if ($this->_action & CRM_Core_Action::RENEW) {
         $title = ts('Restore');
       }
-      $this->addButtons(array(
-          array(
+      $this->addButtons([
+          [
             'type' => 'next',
             'name' => $title,
             'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
             'isDefault' => TRUE,
-          ),
-          array(
+          ],
+          [
             'type' => 'cancel',
             'name' => ts('Cancel'),
-          ),
-        )
+          ],
+        ]
       );
       return;
     }
@@ -262,19 +262,19 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
     $s = CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity', 'subject');
     if (!is_array($s)) {
-      $s = array();
+      $s = [];
     }
     $this->add('text', 'activity_subject', ts('Subject'),
-      array_merge($s, array(
+      array_merge($s, [
         'maxlength' => '128',
-      )), TRUE
+      ]), TRUE
     );
 
     $tags = CRM_Core_BAO_Tag::getColorTags('civicrm_case');
 
     if (!empty($tags)) {
       $this->add('select2', 'tag', ts('Tags'), $tags, FALSE,
-        array('class' => 'huge', 'multiple' => 'multiple')
+        ['class' => 'huge', 'multiple' => 'multiple']
       );
     }
 
@@ -282,18 +282,18 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_case');
     CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_case', NULL, FALSE, TRUE);
 
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'next',
           'name' => ts('Save'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
 
     $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
@@ -310,8 +310,8 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       return TRUE;
     }
     $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
-    $this->addFormRule(array($className, 'formRule'), $this);
-    $this->addFormRule(array('CRM_Case_Form_Case', 'formRule'), $this);
+    $this->addFormRule([$className, 'formRule'], $this);
+    $this->addFormRule(['CRM_Case_Form_Case', 'formRule'], $this);
   }
 
   /**
@@ -384,9 +384,9 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
     unset($params['id'], $params['custom']);
 
     // add tags if exists
-    $tagParams = array();
+    $tagParams = [];
     if (!empty($params['tag'])) {
-      $tagParams = array();
+      $tagParams = [];
       if (!is_array($params['tag'])) {
         $params['tag'] = explode(',', $params['tag']);
       }

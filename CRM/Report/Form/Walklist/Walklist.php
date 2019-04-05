@@ -34,59 +34,59 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
-  public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
+  public $_drilldownReport = ['contact/detail' => 'Link to Detail Report'];
 
-  protected $_customGroupExtends = array(
+  protected $_customGroupExtends = [
     'Contact',
     'Individual',
     'Household',
     'Organization',
-  );
+  ];
 
   /**
    * Class constructor.
    */
   public function __construct() {
-    $this->_columns = array(
-      'civicrm_contact' => array(
+    $this->_columns = [
+      'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'id' => array(
+        'fields' => [
+          'id' => [
             'title' => ts('Contact ID'),
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'sort_name' => array(
+          ],
+          'sort_name' => [
             'title' => ts('Contact Name'),
             'required' => TRUE,
             'no_repeat' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'sort_name' => array(
+          ],
+        ],
+        'filters' => [
+          'sort_name' => [
             'title' => ts('Contact Name'),
             'operator' => 'like',
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-        'order_bys' => array(
-          'sort_name' => array(
+        'order_bys' => [
+          'sort_name' => [
             'title' => ts('Contact Name'),
             'required' => TRUE,
-          ),
-        ),
-      ),
-      'civicrm_email' => array(
+          ],
+        ],
+      ],
+      'civicrm_email' => [
         'dao' => 'CRM_Core_DAO_Email',
-        'fields' => array('email' => array('default' => TRUE)),
+        'fields' => ['email' => ['default' => TRUE]],
         'grouping' => 'location-fields',
-      ),
-      'civicrm_phone' => array(
+      ],
+      'civicrm_phone' => [
         'dao' => 'CRM_Core_DAO_Phone',
-        'fields' => array('phone' => NULL),
+        'fields' => ['phone' => NULL],
         'grouping' => 'location-fields',
-      ),
-    ) + $this->getAddressColumns(array('group_bys' => FALSE));
+      ],
+    ] + $this->getAddressColumns(['group_bys' => FALSE]);
     parent::__construct();
   }
 
@@ -96,9 +96,9 @@ class CRM_Report_Form_Walklist_Walklist extends CRM_Report_Form {
 
   public function select() {
     // @todo remove this function & use parent.
-    $select = array();
+    $select = [];
 
-    $this->_columnHeaders = array();
+    $this->_columnHeaders = [];
     foreach ($this->_columns as $tableName => $table) {
       foreach ($table['fields'] as $fieldName => $field) {
         if (!empty($field['required']) ||
@@ -128,7 +128,7 @@ FROM       civicrm_contact {$this->_aliases['civicrm_contact']} {$this->_aclFrom
   }
 
   public function where() {
-    $clauses = array();
+    $clauses = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {

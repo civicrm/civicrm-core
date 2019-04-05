@@ -254,8 +254,8 @@ class CRM_Core_Permission {
    */
   public static function customGroup($type = CRM_Core_Permission::VIEW, $reset = FALSE) {
     $customGroups = CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id',
-      array('fresh' => $reset));
-    $defaultGroups = array();
+      ['fresh' => $reset]);
+    $defaultGroups = [];
 
     // check if user has all powerful permission
     // or administer civicrm permission (CRM-1905)
@@ -380,7 +380,7 @@ class CRM_Core_Permission {
       }
     }
     $events = CRM_Event_PseudoConstant::event(NULL, TRUE);
-    $includeEvents = array();
+    $includeEvents = [];
 
     // check if user has all powerful permission
     if (self::check('register for events')) {
@@ -477,7 +477,7 @@ class CRM_Core_Permission {
       $permissionName = "delete in $module";
     }
     else {
-      $editPermissions = array(
+      $editPermissions = [
         'CiviEvent' => 'edit event participants',
         'CiviMember' => 'edit memberships',
         'CiviPledge' => 'edit pledges',
@@ -485,7 +485,7 @@ class CRM_Core_Permission {
         'CiviGrant' => 'edit grants',
         'CiviMail' => 'access CiviMail',
         'CiviAuction' => 'add auction items',
-      );
+      ];
       $permissionName = CRM_Utils_Array::value($module, $editPermissions);
     }
 
@@ -585,7 +585,7 @@ class CRM_Core_Permission {
    * @return array
    */
   public static function basicPermissions($all = FALSE, $descriptions = FALSE) {
-    $cacheKey = implode('-', array($all, $descriptions));
+    $cacheKey = implode('-', [$all, $descriptions]);
     if (empty(Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey])) {
       Civi::$statics[__CLASS__][__FUNCTION__][$cacheKey] = self::assembleBasicPermissions($all, $descriptions);
     }
@@ -605,7 +605,7 @@ class CRM_Core_Permission {
     $permissions = self::getCorePermissions($descriptions);
 
     if (self::isMultisiteEnabled()) {
-      $permissions['administer Multiple Organizations'] = array($prefix . ts('administer Multiple Organizations'));
+      $permissions['administer Multiple Organizations'] = [$prefix . ts('administer Multiple Organizations')];
     }
 
     if (!$descriptions) {
@@ -627,7 +627,7 @@ class CRM_Core_Permission {
         foreach ($perm as $p => $attr) {
 
           if (!is_array($attr)) {
-            $attr = array($attr);
+            $attr = [$attr];
           }
 
           $attr[0] = $info['translatedName'] . ': ' . $attr[0];
@@ -653,11 +653,11 @@ class CRM_Core_Permission {
    * @return array
    */
   public static function getAnonymousPermissionsWarnings() {
-    static $permissions = array();
+    static $permissions = [];
     if (empty($permissions)) {
-      $permissions = array(
+      $permissions = [
         'administer CiviCRM',
-      );
+      ];
       $components = CRM_Core_Component::getComponents();
       foreach ($components as $comp) {
         if (!method_exists($comp, 'getAnonymousPermissionWarnings')) {
@@ -685,236 +685,236 @@ class CRM_Core_Permission {
    */
   public static function getCorePermissions() {
     $prefix = ts('CiviCRM') . ': ';
-    $permissions = array(
-      'add contacts' => array(
+    $permissions = [
+      'add contacts' => [
         $prefix . ts('add contacts'),
         ts('Create a new contact record in CiviCRM'),
-      ),
-      'view all contacts' => array(
+      ],
+      'view all contacts' => [
         $prefix . ts('view all contacts'),
         ts('View ANY CONTACT in the CiviCRM database, export contact info and perform activities such as Send Email, Phone Call, etc.'),
-      ),
-      'edit all contacts' => array(
+      ],
+      'edit all contacts' => [
         $prefix . ts('edit all contacts'),
         ts('View, Edit and Delete ANY CONTACT in the CiviCRM database; Create and edit relationships, tags and other info about the contacts'),
-      ),
-      'view my contact' => array(
+      ],
+      'view my contact' => [
         $prefix . ts('view my contact'),
-      ),
-      'edit my contact' => array(
+      ],
+      'edit my contact' => [
         $prefix . ts('edit my contact'),
-      ),
-      'delete contacts' => array(
+      ],
+      'delete contacts' => [
         $prefix . ts('delete contacts'),
-      ),
-      'access deleted contacts' => array(
+      ],
+      'access deleted contacts' => [
         $prefix . ts('access deleted contacts'),
         ts('Access contacts in the trash'),
-      ),
-      'import contacts' => array(
+      ],
+      'import contacts' => [
         $prefix . ts('import contacts'),
         ts('Import contacts and activities'),
-      ),
-      'import SQL datasource' => array(
+      ],
+      'import SQL datasource' => [
         $prefix . ts('import SQL datasource'),
         ts('When importing, consume data directly from a SQL datasource'),
-      ),
-      'edit groups' => array(
+      ],
+      'edit groups' => [
         $prefix . ts('edit groups'),
         ts('Create new groups, edit group settings (e.g. group name, visibility...), delete groups'),
-      ),
-      'administer CiviCRM' => array(
+      ],
+      'administer CiviCRM' => [
         $prefix . ts('administer CiviCRM'),
         ts('Perform all tasks in the Administer CiviCRM control panel and Import Contacts'),
-      ),
-      'skip IDS check' => array(
+      ],
+      'skip IDS check' => [
         $prefix . ts('skip IDS check'),
         ts('Warning: Give to trusted roles only; this permission has security implications. IDS system is bypassed for users with this permission. Prevents false errors for admin users.'),
-      ),
-      'access uploaded files' => array(
+      ],
+      'access uploaded files' => [
         $prefix . ts('access uploaded files'),
         ts('View / download files including images and photos'),
-      ),
-      'profile listings and forms' => array(
+      ],
+      'profile listings and forms' => [
         $prefix . ts('profile listings and forms'),
         ts('Warning: Give to trusted roles only; this permission has privacy implications. Add/edit data in online forms and access public searchable directories.'),
-      ),
-      'profile listings' => array(
+      ],
+      'profile listings' => [
         $prefix . ts('profile listings'),
         ts('Warning: Give to trusted roles only; this permission has privacy implications. Access public searchable directories.'),
-      ),
-      'profile create' => array(
+      ],
+      'profile create' => [
         $prefix . ts('profile create'),
         ts('Add data in a profile form.'),
-      ),
-      'profile edit' => array(
+      ],
+      'profile edit' => [
         $prefix . ts('profile edit'),
         ts('Edit data in a profile form.'),
-      ),
-      'profile view' => array(
+      ],
+      'profile view' => [
         $prefix . ts('profile view'),
         ts('View data in a profile.'),
-      ),
-      'access all custom data' => array(
+      ],
+      'access all custom data' => [
         $prefix . ts('access all custom data'),
         ts('View all custom fields regardless of ACL rules'),
-      ),
-      'view all activities' => array(
+      ],
+      'view all activities' => [
         $prefix . ts('view all activities'),
         ts('View all activities (for visible contacts)'),
-      ),
-      'delete activities' => array(
+      ],
+      'delete activities' => [
         $prefix . ts('Delete activities'),
-      ),
-      'edit inbound email basic information' => array(
+      ],
+      'edit inbound email basic information' => [
         $prefix . ts('edit inbound email basic information'),
         ts('Edit all inbound email activities (for visible contacts) basic information. Content editing not allowed.'),
-      ),
-      'edit inbound email basic information and content' => array(
+      ],
+      'edit inbound email basic information and content' => [
         $prefix . ts('edit inbound email basic information and content'),
         ts('Edit all inbound email activities (for visible contacts) basic information and content.'),
-      ),
-      'access CiviCRM' => array(
+      ],
+      'access CiviCRM' => [
         $prefix . ts('access CiviCRM backend and API'),
         ts('Master control for access to the main CiviCRM backend and API. Give to trusted roles only.'),
-      ),
-      'access Contact Dashboard' => array(
+      ],
+      'access Contact Dashboard' => [
         $prefix . ts('access Contact Dashboard'),
         ts('View Contact Dashboard (for themselves and visible contacts)'),
-      ),
-      'translate CiviCRM' => array(
+      ],
+      'translate CiviCRM' => [
         $prefix . ts('translate CiviCRM'),
         ts('Allow User to enable multilingual'),
-      ),
-      'manage tags' => array(
+      ],
+      'manage tags' => [
         $prefix . ts('manage tags'),
         ts('Create and rename tags'),
-      ),
-      'administer reserved groups' => array(
+      ],
+      'administer reserved groups' => [
         $prefix . ts('administer reserved groups'),
         ts('Edit and disable Reserved Groups (Needs Edit Groups)'),
-      ),
-      'administer Tagsets' => array(
+      ],
+      'administer Tagsets' => [
         $prefix . ts('administer Tagsets'),
-      ),
-      'administer reserved tags' => array(
+      ],
+      'administer reserved tags' => [
         $prefix . ts('administer reserved tags'),
-      ),
-      'administer dedupe rules' => array(
+      ],
+      'administer dedupe rules' => [
         $prefix . ts('administer dedupe rules'),
         ts('Create and edit rules, change the supervised and unsupervised rules'),
-      ),
-      'merge duplicate contacts' => array(
+      ],
+      'merge duplicate contacts' => [
         $prefix . ts('merge duplicate contacts'),
         ts('Delete Contacts must also be granted in order for this to work.'),
-      ),
-      'force merge duplicate contacts' => array(
+      ],
+      'force merge duplicate contacts' => [
         $prefix . ts('force merge duplicate contacts'),
         ts('Delete Contacts must also be granted in order for this to work.'),
-      ),
-      'view debug output' => array(
+      ],
+      'view debug output' => [
         $prefix . ts('view debug output'),
         ts('View results of debug and backtrace'),
-      ),
+      ],
 
-      'view all notes' => array(
+      'view all notes' => [
         $prefix . ts('view all notes'),
         ts("View notes (for visible contacts) even if they're marked admin only"),
-      ),
-      'add contact notes' => array(
+      ],
+      'add contact notes' => [
         $prefix . ts('add contact notes'),
         ts("Create notes for contacts"),
-      ),
-      'access AJAX API' => array(
+      ],
+      'access AJAX API' => [
         $prefix . ts('access AJAX API'),
         ts('Allow API access even if Access CiviCRM is not granted'),
-      ),
-      'access contact reference fields' => array(
+      ],
+      'access contact reference fields' => [
         $prefix . ts('access contact reference fields'),
         ts('Allow entering data into contact reference fields'),
-      ),
-      'create manual batch' => array(
+      ],
+      'create manual batch' => [
         $prefix . ts('create manual batch'),
         ts('Create an accounting batch (with Access to CiviContribute and View Own/All Manual Batches)'),
-      ),
-      'edit own manual batches' => array(
+      ],
+      'edit own manual batches' => [
         $prefix . ts('edit own manual batches'),
         ts('Edit accounting batches created by user'),
-      ),
-      'edit all manual batches' => array(
+      ],
+      'edit all manual batches' => [
         $prefix . ts('edit all manual batches'),
         ts('Edit all accounting batches'),
-      ),
-      'close own manual batches' => array(
+      ],
+      'close own manual batches' => [
         $prefix . ts('close own manual batches'),
         ts('Close accounting batches created by user (with Access to CiviContribute)'),
-      ),
-      'close all manual batches' => array(
+      ],
+      'close all manual batches' => [
         $prefix . ts('close all manual batches'),
         ts('Close all accounting batches (with Access to CiviContribute)'),
-      ),
-      'reopen own manual batches' => array(
+      ],
+      'reopen own manual batches' => [
         $prefix . ts('reopen own manual batches'),
         ts('Reopen accounting batches created by user (with Access to CiviContribute)'),
-      ),
-      'reopen all manual batches' => array(
+      ],
+      'reopen all manual batches' => [
         $prefix . ts('reopen all manual batches'),
         ts('Reopen all accounting batches (with Access to CiviContribute)'),
-      ),
-      'view own manual batches' => array(
+      ],
+      'view own manual batches' => [
         $prefix . ts('view own manual batches'),
         ts('View accounting batches created by user (with Access to CiviContribute)'),
-      ),
-      'view all manual batches' => array(
+      ],
+      'view all manual batches' => [
         $prefix . ts('view all manual batches'),
         ts('View all accounting batches (with Access to CiviContribute)'),
-      ),
-      'delete own manual batches' => array(
+      ],
+      'delete own manual batches' => [
         $prefix . ts('delete own manual batches'),
         ts('Delete accounting batches created by user'),
-      ),
-      'delete all manual batches' => array(
+      ],
+      'delete all manual batches' => [
         $prefix . ts('delete all manual batches'),
         ts('Delete all accounting batches'),
-      ),
-      'export own manual batches' => array(
+      ],
+      'export own manual batches' => [
         $prefix . ts('export own manual batches'),
         ts('Export accounting batches created by user'),
-      ),
-      'export all manual batches' => array(
+      ],
+      'export all manual batches' => [
         $prefix . ts('export all manual batches'),
         ts('Export all accounting batches'),
-      ),
-      'administer payment processors' => array(
+      ],
+      'administer payment processors' => [
         $prefix . ts('administer payment processors'),
         ts('Add, Update, or Disable Payment Processors'),
-      ),
-      'edit message templates' => array(
+      ],
+      'edit message templates' => [
         $prefix . ts('edit message templates'),
-      ),
-      'edit system workflow message templates' => array(
+      ],
+      'edit system workflow message templates' => [
         $prefix . ts('edit system workflow message templates'),
-      ),
-      'edit user-driven message templates' => array(
+      ],
+      'edit user-driven message templates' => [
         $prefix . ts('edit user-driven message templates'),
-      ),
-      'view my invoices' => array(
+      ],
+      'view my invoices' => [
         $prefix . ts('view my invoices'),
         ts('Allow users to view/ download their own invoices'),
-      ),
-      'edit api keys' => array(
+      ],
+      'edit api keys' => [
         $prefix . ts('edit api keys'),
         ts('Edit API keys'),
-      ),
-      'edit own api keys' => array(
+      ],
+      'edit own api keys' => [
         $prefix . ts('edit own api keys'),
         ts('Edit user\'s own API keys'),
-      ),
-      'send SMS' => array(
+      ],
+      'send SMS' => [
         $prefix . ts('send SMS'),
         ts('Send an SMS'),
-      ),
-    );
+      ],
+    ];
 
     return $permissions;
   }
@@ -938,62 +938,62 @@ class CRM_Core_Permission {
    * @return array of permissions
    */
   public static function getEntityActionPermissions() {
-    $permissions = array();
+    $permissions = [];
     // These are the default permissions - if any entity does not declare permissions for a given action,
     // (or the entity does not declare permissions at all) - then the action will be used from here
-    $permissions['default'] = array(
+    $permissions['default'] = [
       // applies to getfields, getoptions, etc.
-      'meta' => array('access CiviCRM'),
+      'meta' => ['access CiviCRM'],
       // catch-all, applies to create, get, delete, etc.
       // If an entity declares it's own 'default' action it will override this one
-      'default' => array('administer CiviCRM'),
-    );
+      'default' => ['administer CiviCRM'],
+    ];
 
     // Note: Additional permissions in DynamicFKAuthorization
-    $permissions['attachment'] = array(
-      'default' => array(
-        array('access CiviCRM', 'access AJAX API'),
-      ),
-    );
+    $permissions['attachment'] = [
+      'default' => [
+        ['access CiviCRM', 'access AJAX API'],
+      ],
+    ];
 
     // Contact permissions
-    $permissions['contact'] = array(
-      'create' => array(
+    $permissions['contact'] = [
+      'create' => [
         'access CiviCRM',
         'add contacts',
-      ),
-      'delete' => array(
+      ],
+      'delete' => [
         'access CiviCRM',
         'delete contacts',
-      ),
+      ],
       // managed by query object
-      'get' => array(),
+      'get' => [],
       // managed by _civicrm_api3_check_edit_permissions
-      'update' => array(),
-      'getquick' => array(
-        array('access CiviCRM', 'access AJAX API'),
-      ),
-      'duplicatecheck' => array(
+      'update' => [],
+      'getquick' => [
+        ['access CiviCRM', 'access AJAX API'],
+      ],
+      'duplicatecheck' => [
         'access CiviCRM',
-      ),
-    );
+      ],
+    ];
 
     // CRM-16963 - Permissions for country.
-    $permissions['country'] = array(
-      'get' => array(
+    $permissions['country'] = [
+      'get' => [
         'access CiviCRM',
-      ),
-      'default' => array(
+      ],
+      'default' => [
         'administer CiviCRM',
-      ),
-    );
+      ],
+    ];
 
     // Contact-related data permissions.
-    $permissions['address'] = array(
+    $permissions['address'] = [
       // get is managed by BAO::addSelectWhereClause
       // create/delete are managed by _civicrm_api3_check_edit_permissions
-      'default' => array(),
-    );
+      'default' => [],
+    ];
     $permissions['email'] = $permissions['address'];
     $permissions['phone'] = $permissions['address'];
     $permissions['website'] = $permissions['address'];
@@ -1001,496 +1001,496 @@ class CRM_Core_Permission {
     $permissions['open_i_d'] = $permissions['address'];
 
     // Also managed by ACLs - CRM-19448
-    $permissions['entity_tag'] = array('default' => array());
+    $permissions['entity_tag'] = ['default' => []];
     $permissions['note'] = $permissions['entity_tag'];
 
     // Allow non-admins to get and create tags to support tagset widget
     // Delete is still reserved for admins
-    $permissions['tag'] = array(
-      'get' => array('access CiviCRM'),
-      'create' => array('access CiviCRM'),
-      'update' => array('access CiviCRM'),
-    );
+    $permissions['tag'] = [
+      'get' => ['access CiviCRM'],
+      'create' => ['access CiviCRM'],
+      'update' => ['access CiviCRM'],
+    ];
 
     //relationship permissions
-    $permissions['relationship'] = array(
+    $permissions['relationship'] = [
       // get is managed by BAO::addSelectWhereClause
-      'get' => array(),
-      'delete' => array(
+      'get' => [],
+      'delete' => [
         'access CiviCRM',
         'edit all contacts',
-      ),
-      'default' => array(
+      ],
+      'default' => [
         'access CiviCRM',
         'edit all contacts',
-      ),
-    );
+      ],
+    ];
 
     // CRM-17741 - Permissions for RelationshipType.
-    $permissions['relationship_type'] = array(
-      'get' => array(
+    $permissions['relationship_type'] = [
+      'get' => [
         'access CiviCRM',
-      ),
-      'default' => array(
+      ],
+      'default' => [
         'administer CiviCRM',
-      ),
-    );
+      ],
+    ];
 
     // Activity permissions
-    $permissions['activity'] = array(
-      'delete' => array(
+    $permissions['activity'] = [
+      'delete' => [
         'access CiviCRM',
         'delete activities',
-      ),
-      'get' => array(
+      ],
+      'get' => [
         'access CiviCRM',
         // Note that view all activities is also required within the api
         // if the id is not passed in. Where the id is passed in the activity
         // specific check functions are used and tested.
-      ),
-      'default' => array(
+      ],
+      'default' => [
         'access CiviCRM',
         'view all activities',
-      ),
-    );
+      ],
+    ];
     $permissions['activity_contact'] = $permissions['activity'];
 
     // Case permissions
-    $permissions['case'] = array(
-      'create' => array(
+    $permissions['case'] = [
+      'create' => [
         'access CiviCRM',
         'add cases',
-      ),
-      'delete' => array(
+      ],
+      'delete' => [
         'access CiviCRM',
         'delete in CiviCase',
-      ),
-      'restore' => array(
+      ],
+      'restore' => [
         'administer CiviCase',
-      ),
-      'merge' => array(
+      ],
+      'merge' => [
         'administer CiviCase',
-      ),
-      'default' => array(
+      ],
+      'default' => [
         // At minimum the user needs one of the following. Finer-grained access is controlled by CRM_Case_BAO_Case::addSelectWhereClause
-        array('access my cases and activities', 'access all cases and activities'),
-      ),
-    );
+        ['access my cases and activities', 'access all cases and activities'],
+      ],
+    ];
     $permissions['case_contact'] = $permissions['case'];
 
-    $permissions['case_type'] = array(
-      'default' => array('administer CiviCase'),
-      'get' => array(
+    $permissions['case_type'] = [
+      'default' => ['administer CiviCase'],
+      'get' => [
         // nested array = OR
-        array('access my cases and activities', 'access all cases and activities'),
-      ),
-    );
+        ['access my cases and activities', 'access all cases and activities'],
+      ],
+    ];
 
     // Campaign permissions
-    $permissions['campaign'] = array(
-      'get' => array('access CiviCRM'),
-      'default' => array(
+    $permissions['campaign'] = [
+      'get' => ['access CiviCRM'],
+      'default' => [
         // nested array = OR
-        array('administer CiviCampaign', 'manage campaign'),
-      ),
-    );
+        ['administer CiviCampaign', 'manage campaign'],
+      ],
+    ];
     $permissions['survey'] = $permissions['campaign'];
 
     // Financial permissions
-    $permissions['contribution'] = array(
-      'get' => array(
+    $permissions['contribution'] = [
+      'get' => [
         'access CiviCRM',
         'access CiviContribute',
-      ),
-      'delete' => array(
+      ],
+      'delete' => [
         'access CiviCRM',
         'access CiviContribute',
         'delete in CiviContribute',
-      ),
-      'completetransaction' => array(
+      ],
+      'completetransaction' => [
         'edit contributions',
-      ),
-      'default' => array(
+      ],
+      'default' => [
         'access CiviCRM',
         'access CiviContribute',
         'edit contributions',
-      ),
-    );
+      ],
+    ];
     $permissions['line_item'] = $permissions['contribution'];
 
     // Payment permissions
-    $permissions['payment'] = array(
-      'get' => array(
+    $permissions['payment'] = [
+      'get' => [
         'access CiviCRM',
         'access CiviContribute',
-      ),
-      'delete' => array(
+      ],
+      'delete' => [
         'access CiviCRM',
         'access CiviContribute',
         'delete in CiviContribute',
-      ),
-      'cancel' => array(
+      ],
+      'cancel' => [
         'access CiviCRM',
         'access CiviContribute',
         'edit contributions',
-      ),
-      'create' => array(
+      ],
+      'create' => [
         'access CiviCRM',
         'access CiviContribute',
         'edit contributions',
-      ),
-      'default' => array(
+      ],
+      'default' => [
         'access CiviCRM',
         'access CiviContribute',
         'edit contributions',
-      ),
-    );
+      ],
+    ];
     $permissions['contribution_recur'] = $permissions['payment'];
 
     // Custom field permissions
-    $permissions['custom_field'] = array(
-      'default' => array(
+    $permissions['custom_field'] = [
+      'default' => [
         'administer CiviCRM',
         'access all custom data',
-      ),
-    );
+      ],
+    ];
     $permissions['custom_group'] = $permissions['custom_field'];
 
     // Event permissions
-    $permissions['event'] = array(
-      'create' => array(
+    $permissions['event'] = [
+      'create' => [
         'access CiviCRM',
         'access CiviEvent',
         'edit all events',
-      ),
-      'delete' => array(
+      ],
+      'delete' => [
         'access CiviCRM',
         'access CiviEvent',
         'delete in CiviEvent',
-      ),
-      'get' => array(
+      ],
+      'get' => [
         'access CiviCRM',
         'access CiviEvent',
         'view event info',
-      ),
-      'update' => array(
+      ],
+      'update' => [
         'access CiviCRM',
         'access CiviEvent',
         'edit all events',
-      ),
-    );
+      ],
+    ];
     // Loc block is only used for events
     $permissions['loc_block'] = $permissions['event'];
 
-    $permissions['state_province'] = array(
-      'get' => array(
+    $permissions['state_province'] = [
+      'get' => [
         'access CiviCRM',
-      ),
-    );
+      ],
+    ];
 
     // Price sets are shared by several components, user needs access to at least one of them
-    $permissions['price_set'] = array(
-      'default' => array(
-        array('access CiviEvent', 'access CiviContribute', 'access CiviMember'),
-      ),
-      'get' => array(
-        array('access CiviCRM', 'view event info', 'make online contributions'),
-      ),
-    );
+    $permissions['price_set'] = [
+      'default' => [
+        ['access CiviEvent', 'access CiviContribute', 'access CiviMember'],
+      ],
+      'get' => [
+        ['access CiviCRM', 'view event info', 'make online contributions'],
+      ],
+    ];
 
     // File permissions
-    $permissions['file'] = array(
-      'default' => array(
+    $permissions['file'] = [
+      'default' => [
         'access CiviCRM',
         'access uploaded files',
-      ),
-    );
+      ],
+    ];
     $permissions['files_by_entity'] = $permissions['file'];
 
     // Group permissions
-    $permissions['group'] = array(
-      'get' => array(
+    $permissions['group'] = [
+      'get' => [
         'access CiviCRM',
-      ),
-      'default' => array(
+      ],
+      'default' => [
         'access CiviCRM',
         'edit groups',
-      ),
-    );
+      ],
+    ];
 
     $permissions['group_nesting'] = $permissions['group'];
     $permissions['group_organization'] = $permissions['group'];
 
     //Group Contact permission
-    $permissions['group_contact'] = array(
-      'get' => array(
+    $permissions['group_contact'] = [
+      'get' => [
         'access CiviCRM',
-      ),
-      'default' => array(
+      ],
+      'default' => [
         'access CiviCRM',
         'edit all contacts',
-      ),
-    );
+      ],
+    ];
 
     // CiviMail Permissions
-    $civiMailBasePerms = array(
+    $civiMailBasePerms = [
       // To get/preview/update, one must have least one of these perms:
       // Mailing API implementations enforce nuances of create/approve/schedule permissions.
       'access CiviMail',
       'create mailings',
       'schedule mailings',
       'approve mailings',
-    );
-    $permissions['mailing'] = array(
-      'get' => array(
+    ];
+    $permissions['mailing'] = [
+      'get' => [
         'access CiviCRM',
         $civiMailBasePerms,
-      ),
-      'delete' => array(
+      ],
+      'delete' => [
         'access CiviCRM',
         $civiMailBasePerms,
         'delete in CiviMail',
-      ),
-      'submit' => array(
+      ],
+      'submit' => [
         'access CiviCRM',
-        array('access CiviMail', 'schedule mailings'),
-      ),
-      'default' => array(
+        ['access CiviMail', 'schedule mailings'],
+      ],
+      'default' => [
         'access CiviCRM',
         $civiMailBasePerms,
-      ),
-    );
+      ],
+    ];
     $permissions['mailing_group'] = $permissions['mailing'];
     $permissions['mailing_job'] = $permissions['mailing'];
     $permissions['mailing_recipients'] = $permissions['mailing'];
 
-    $permissions['mailing_a_b'] = array(
-      'get' => array(
+    $permissions['mailing_a_b'] = [
+      'get' => [
         'access CiviCRM',
         'access CiviMail',
-      ),
-      'delete' => array(
+      ],
+      'delete' => [
         'access CiviCRM',
         'access CiviMail',
         'delete in CiviMail',
-      ),
-      'submit' => array(
+      ],
+      'submit' => [
         'access CiviCRM',
-        array('access CiviMail', 'schedule mailings'),
-      ),
-      'default' => array(
+        ['access CiviMail', 'schedule mailings'],
+      ],
+      'default' => [
         'access CiviCRM',
         'access CiviMail',
-      ),
-    );
+      ],
+    ];
 
     // Membership permissions
-    $permissions['membership'] = array(
-      'get' => array(
+    $permissions['membership'] = [
+      'get' => [
         'access CiviCRM',
         'access CiviMember',
-      ),
-      'delete' => array(
+      ],
+      'delete' => [
         'access CiviCRM',
         'access CiviMember',
         'delete in CiviMember',
-      ),
-      'default' => array(
+      ],
+      'default' => [
         'access CiviCRM',
         'access CiviMember',
         'edit memberships',
-      ),
-    );
+      ],
+    ];
     $permissions['membership_status'] = $permissions['membership'];
     $permissions['membership_type'] = $permissions['membership'];
-    $permissions['membership_payment'] = array(
-      'create' => array(
+    $permissions['membership_payment'] = [
+      'create' => [
         'access CiviCRM',
         'access CiviMember',
         'edit memberships',
         'access CiviContribute',
         'edit contributions',
-      ),
-      'delete' => array(
+      ],
+      'delete' => [
         'access CiviCRM',
         'access CiviMember',
         'delete in CiviMember',
         'access CiviContribute',
         'delete in CiviContribute',
-      ),
-      'get' => array(
+      ],
+      'get' => [
         'access CiviCRM',
         'access CiviMember',
         'access CiviContribute',
-      ),
-      'update' => array(
+      ],
+      'update' => [
         'access CiviCRM',
         'access CiviMember',
         'edit memberships',
         'access CiviContribute',
         'edit contributions',
-      ),
-    );
+      ],
+    ];
 
     // Participant permissions
-    $permissions['participant'] = array(
-      'create' => array(
+    $permissions['participant'] = [
+      'create' => [
         'access CiviCRM',
         'access CiviEvent',
         'register for events',
-      ),
-      'delete' => array(
+      ],
+      'delete' => [
         'access CiviCRM',
         'access CiviEvent',
         'edit event participants',
-      ),
-      'get' => array(
+      ],
+      'get' => [
         'access CiviCRM',
         'access CiviEvent',
         'view event participants',
-      ),
-      'update' => array(
+      ],
+      'update' => [
         'access CiviCRM',
         'access CiviEvent',
         'edit event participants',
-      ),
-    );
-    $permissions['participant_payment'] = array(
-      'create' => array(
+      ],
+    ];
+    $permissions['participant_payment'] = [
+      'create' => [
         'access CiviCRM',
         'access CiviEvent',
         'register for events',
         'access CiviContribute',
         'edit contributions',
-      ),
-      'delete' => array(
+      ],
+      'delete' => [
         'access CiviCRM',
         'access CiviEvent',
         'edit event participants',
         'access CiviContribute',
         'delete in CiviContribute',
-      ),
-      'get' => array(
+      ],
+      'get' => [
         'access CiviCRM',
         'access CiviEvent',
         'view event participants',
         'access CiviContribute',
-      ),
-      'update' => array(
+      ],
+      'update' => [
         'access CiviCRM',
         'access CiviEvent',
         'edit event participants',
         'access CiviContribute',
         'edit contributions',
-      ),
-    );
+      ],
+    ];
 
     // Pledge permissions
-    $permissions['pledge'] = array(
-      'create' => array(
+    $permissions['pledge'] = [
+      'create' => [
         'access CiviCRM',
         'access CiviPledge',
         'edit pledges',
-      ),
-      'delete' => array(
+      ],
+      'delete' => [
         'access CiviCRM',
         'access CiviPledge',
         'delete in CiviPledge',
-      ),
-      'get' => array(
+      ],
+      'get' => [
         'access CiviCRM',
         'access CiviPledge',
-      ),
-      'update' => array(
+      ],
+      'update' => [
         'access CiviCRM',
         'access CiviPledge',
         'edit pledges',
-      ),
-    );
+      ],
+    ];
 
     //CRM-16777: Disable schedule reminder for user that have 'edit all events' and 'administer CiviCRM' permission.
-    $permissions['action_schedule'] = array(
-      'update' => array(
-        array(
+    $permissions['action_schedule'] = [
+      'update' => [
+        [
           'access CiviCRM',
           'edit all events',
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
-    $permissions['pledge_payment'] = array(
-      'create' => array(
+    $permissions['pledge_payment'] = [
+      'create' => [
         'access CiviCRM',
         'access CiviPledge',
         'edit pledges',
         'access CiviContribute',
         'edit contributions',
-      ),
-      'delete' => array(
+      ],
+      'delete' => [
         'access CiviCRM',
         'access CiviPledge',
         'delete in CiviPledge',
         'access CiviContribute',
         'delete in CiviContribute',
-      ),
-      'get' => array(
+      ],
+      'get' => [
         'access CiviCRM',
         'access CiviPledge',
         'access CiviContribute',
-      ),
-      'update' => array(
+      ],
+      'update' => [
         'access CiviCRM',
         'access CiviPledge',
         'edit pledges',
         'access CiviContribute',
         'edit contributions',
-      ),
-    );
+      ],
+    ];
 
     // Profile permissions
-    $permissions['profile'] = array(
-      'get' => array(), // the profile will take care of this
-    );
+    $permissions['profile'] = [
+      'get' => [], // the profile will take care of this
+    ];
 
-    $permissions['uf_group'] = array(
-      'create' => array(
+    $permissions['uf_group'] = [
+      'create' => [
         'access CiviCRM',
-        array(
+        [
           'administer CiviCRM',
           'manage event profiles',
-        ),
-      ),
-      'get' => array(
+        ],
+      ],
+      'get' => [
         'access CiviCRM',
-      ),
-      'update' => array(
+      ],
+      'update' => [
         'access CiviCRM',
-        array(
+        [
           'administer CiviCRM',
           'manage event profiles',
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
     $permissions['uf_field'] = $permissions['uf_join'] = $permissions['uf_group'];
-    $permissions['uf_field']['delete'] = array(
+    $permissions['uf_field']['delete'] = [
       'access CiviCRM',
-      array(
+      [
         'administer CiviCRM',
         'manage event profiles',
-      ),
-    );
+      ],
+    ];
     $permissions['option_value'] = $permissions['uf_group'];
     $permissions['option_group'] = $permissions['option_value'];
 
-    $permissions['custom_value'] = array(
-      'gettree' => array('access CiviCRM'),
-    );
+    $permissions['custom_value'] = [
+      'gettree' => ['access CiviCRM'],
+    ];
 
-    $permissions['message_template'] = array(
-      'get' => array('access CiviCRM'),
-      'create' => array(array('edit message templates', 'edit user-driven message templates', 'edit system workflow message templates')),
-      'update' => array(array('edit message templates', 'edit user-driven message templates', 'edit system workflow message templates')),
-    );
+    $permissions['message_template'] = [
+      'get' => ['access CiviCRM'],
+      'create' => [['edit message templates', 'edit user-driven message templates', 'edit system workflow message templates']],
+      'update' => [['edit message templates', 'edit user-driven message templates', 'edit system workflow message templates']],
+    ];
 
     $permissions['report_template']['update'] = 'save Report Criteria';
     $permissions['report_template']['create'] = 'save Report Criteria';
@@ -1544,17 +1544,17 @@ class CRM_Core_Permission {
 
     //check for acl.
     $aclPermission = self::getPermission();
-    if (in_array($aclPermission, array(
+    if (in_array($aclPermission, [
       CRM_Core_Permission::EDIT,
       CRM_Core_Permission::VIEW,
-    ))
+    ])
     ) {
       return TRUE;
     }
 
     // run acl where hook and see if the user is supplying an ACL clause
     // that is not false
-    $tables = $whereTables = array();
+    $tables = $whereTables = [];
     $where = NULL;
 
     CRM_Utils_Hook::aclWhereClause(CRM_Core_Permission::VIEW,
@@ -1579,7 +1579,7 @@ class CRM_Core_Permission {
       return $componentName;
     }
 
-    static $allCompPermissions = array();
+    static $allCompPermissions = [];
     if (empty($allCompPermissions)) {
       $components = CRM_Core_Component::getComponents();
       foreach ($components as $name => $comp) {

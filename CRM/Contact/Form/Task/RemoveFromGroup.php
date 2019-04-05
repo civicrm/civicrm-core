@@ -43,8 +43,8 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
    */
   public function buildQuickForm() {
     // add select for groups
-    $group = array('' => ts('- select group -')) + CRM_Core_PseudoConstant::nestedGroup();
-    $groupElement = $this->add('select', 'group_id', ts('Select Group'), $group, TRUE, array('class' => 'crm-select2 huge'));
+    $group = ['' => ts('- select group -')] + CRM_Core_PseudoConstant::nestedGroup();
+    $groupElement = $this->add('select', 'group_id', ts('Select Group'), $group, TRUE, ['class' => 'crm-select2 huge']);
 
     CRM_Utils_System::setTitle(ts('Remove Contacts from Group'));
     $this->addDefaultButtons(ts('Remove from Group'));
@@ -58,7 +58,7 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
    *   the default array reference
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     if ($this->get('context') === 'smog') {
       $defaults['group_id'] = $this->get('gid');
@@ -75,24 +75,24 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
 
     list($total, $removed, $notRemoved) = CRM_Contact_BAO_GroupContact::removeContactsFromGroup($this->_contactIds, $groupId);
 
-    $status = array(
-      ts("%count contact removed from '%2'", array(
+    $status = [
+      ts("%count contact removed from '%2'", [
         'count' => $removed,
         'plural' => "%count contacts removed from '%2'",
         2 => $group[$groupId],
-      )),
-    );
+      ]),
+    ];
     if ($notRemoved) {
-      $status[] = ts('1 contact was already not in this group', array(
+      $status[] = ts('1 contact was already not in this group', [
           'count' => $notRemoved,
           'plural' => '%count contacts were already not in this group',
-        ));
+        ]);
     }
     $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-    CRM_Core_Session::setStatus($status, ts("Removed Contact From Group", array(
+    CRM_Core_Session::setStatus($status, ts("Removed Contact From Group", [
           'plural' => "Removed Contacts From Group",
           'count' => $removed,
-        )), 'success', array('expires' => 0));
+        ]), 'success', ['expires' => 0]);
   }
 
 }

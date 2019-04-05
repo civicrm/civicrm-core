@@ -74,18 +74,18 @@ class CRM_Contact_Form_Task_ProximityCommon {
 
     $form->add('text', 'prox_postal_code', ts('Postal Code'), NULL, FALSE);
 
-    $form->addChainSelect('prox_state_province_id', array('required' => $proxRequired));
+    $form->addChainSelect('prox_state_province_id', ['required' => $proxRequired]);
 
-    $country = array('' => ts('- select -')) + CRM_Core_PseudoConstant::country();
+    $country = ['' => ts('- select -')] + CRM_Core_PseudoConstant::country();
     $form->add('select', 'prox_country_id', ts('Country'), $country, $proxRequired);
 
     $form->add('text', 'prox_distance', ts('Distance'), NULL, $proxRequired);
 
-    $proxUnits = array('km' => ts('km'), 'miles' => ts('miles'));
+    $proxUnits = ['km' => ts('km'), 'miles' => ts('miles')];
     $form->add('select', 'prox_distance_unit', ts('Units'), $proxUnits, $proxRequired);
     // prox_distance_unit
 
-    $form->addFormRule(array('CRM_Contact_Form_Task_ProximityCommon', 'formRule'), $form);
+    $form->addFormRule(['CRM_Contact_Form_Task_ProximityCommon', 'formRule'], $form);
   }
 
   /**
@@ -101,7 +101,7 @@ class CRM_Contact_Form_Task_ProximityCommon {
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $form) {
-    $errors = array();
+    $errors = [];
     // If Distance is present, make sure state, country and city or postal code are populated.
     if (!empty($fields['prox_distance'])) {
       if (empty($fields['prox_state_province_id']) || empty($fields['prox_country_id'])) {
@@ -126,7 +126,7 @@ class CRM_Contact_Form_Task_ProximityCommon {
    *   the default array reference
    */
   static public function setDefaultValues($form) {
-    $defaults = array();
+    $defaults = [];
     $config = CRM_Core_Config::singleton();
     $countryDefault = $config->defaultContactCountry;
 

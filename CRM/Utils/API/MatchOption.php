@@ -93,7 +93,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
         $keys = $apiRequest['params']['options']['match'];
       }
       if (is_string($keys)) {
-        $keys = array($keys);
+        $keys = [$keys];
       }
     }
 
@@ -184,7 +184,7 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
    *   APIv3 $params
    */
   public function createGetParams($origParams, $keys) {
-    $params = array('version' => 3);
+    $params = ['version' => 3];
     foreach ($keys as $key) {
       $params[$key] = CRM_Utils_Array::value($key, $origParams, '');
     }

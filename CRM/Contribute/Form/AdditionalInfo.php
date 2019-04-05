@@ -46,12 +46,12 @@ class CRM_Contribute_Form_AdditionalInfo {
   public static function buildPremium(&$form) {
     //premium section
     $form->add('hidden', 'hidden_Premium', 1);
-    $sel1 = $sel2 = array();
+    $sel1 = $sel2 = [];
 
     $dao = new CRM_Contribute_DAO_Product();
     $dao->is_active = 1;
     $dao->find();
-    $min_amount = array();
+    $min_amount = [];
     $sel1[0] = ts('-select product-');
     while ($dao->fetch()) {
       $sel1[$dao->id] = $dao->name . " ( " . $dao->sku . " )";
@@ -77,11 +77,11 @@ class CRM_Contribute_Form_AdditionalInfo {
       }
     }
 
-    $sel->setOptions(array($sel1, $sel2));
+    $sel->setOptions([$sel1, $sel2]);
     $js .= "</script>\n";
     $form->assign('initHideBoxes', $js);
 
-    $form->add('datepicker', 'fulfilled_date', ts('Fulfilled'), [], FALSE, array('time' => FALSE));
+    $form->add('datepicker', 'fulfilled_date', ts('Fulfilled'), [], FALSE, ['time' => FALSE]);
     $form->addElement('text', 'min_amount', ts('Minimum Contribution Amount'));
   }
 
@@ -96,7 +96,7 @@ class CRM_Contribute_Form_AdditionalInfo {
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution');
 
-    $form->addField('thankyou_date', array('entity' => 'contribution'), FALSE, FALSE);
+    $form->addField('thankyou_date', ['entity' => 'contribution'], FALSE, FALSE);
 
     // add various amounts
     $nonDeductAmount = &$form->add('text', 'non_deductible_amount', ts('Non-deductible Amount'),
@@ -125,7 +125,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       $form->addRule('invoice_id',
         ts('This Invoice ID already exists in the database.'),
         'objectExists',
-        array('CRM_Contribute_DAO_Contribution', $form->_id, 'invoice_id')
+        ['CRM_Contribute_DAO_Contribution', $form->_id, 'invoice_id']
       );
     }
     $element = $form->add('text', 'creditnote_id', ts('Credit Note ID'),
@@ -138,19 +138,19 @@ class CRM_Contribute_Form_AdditionalInfo {
       $form->addRule('creditnote_id',
         ts('This Credit Note ID already exists in the database.'),
         'objectExists',
-        array('CRM_Contribute_DAO_Contribution', $form->_id, 'creditnote_id')
+        ['CRM_Contribute_DAO_Contribution', $form->_id, 'creditnote_id']
       );
     }
 
     $form->add('select', 'contribution_page_id',
       ts('Online Contribution Page'),
-      array(
+      [
         '' => ts('- select -'),
-      ) +
+      ] +
       CRM_Contribute_PseudoConstant::contributionPage()
     );
 
-    $form->add('textarea', 'note', ts('Notes'), array("rows" => 4, "cols" => 60));
+    $form->add('textarea', 'note', ts('Notes'), ["rows" => 4, "cols" => 60]);
 
     $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     if ($form->_id && $form->_values['contribution_status_id'] == array_search('Cancelled', $statusName)) {
@@ -169,11 +169,11 @@ class CRM_Contribute_Form_AdditionalInfo {
   public static function buildPaymentReminders(&$form) {
     //PaymentReminders section
     $form->add('hidden', 'hidden_PaymentReminders', 1);
-    $form->add('text', 'initial_reminder_day', ts('Send Initial Reminder'), array('size' => 3));
+    $form->add('text', 'initial_reminder_day', ts('Send Initial Reminder'), ['size' => 3]);
     $form->addRule('initial_reminder_day', ts('Please enter a valid reminder day.'), 'positiveInteger');
-    $form->add('text', 'max_reminders', ts('Send up to'), array('size' => 3));
+    $form->add('text', 'max_reminders', ts('Send up to'), ['size' => 3]);
     $form->addRule('max_reminders', ts('Please enter a valid No. of reminders.'), 'positiveInteger');
-    $form->add('text', 'additional_reminder_day', ts('Send additional reminders'), array('size' => 3));
+    $form->add('text', 'additional_reminder_day', ts('Send additional reminders'), ['size' => 3]);
     $form->addRule('additional_reminder_day', ts('Please enter a valid additional reminder day.'), 'positiveInteger');
   }
 
@@ -185,7 +185,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param int $premiumID
    * @param array $options
    */
-  public static function processPremium($params, $contributionID, $premiumID = NULL, $options = array()) {
+  public static function processPremium($params, $contributionID, $premiumID = NULL, $options = []) {
     $selectedProductID = $params['product_name'][0];
     $selectedProductOptionID = CRM_Utils_Array::value(1, $params['product_name']);
 
@@ -196,11 +196,11 @@ class CRM_Contribute_Form_AdditionalInfo {
     $isDeleted = FALSE;
 
     //CRM-11106
-    $premiumParams = array(
+    $premiumParams = [
       'id' => $selectedProductID,
-    );
+    ];
 
-    $productDetails = array();
+    $productDetails = [];
     CRM_Contribute_BAO_Product::retrieve($premiumParams, $productDetails);
     $dao->financial_type_id = CRM_Utils_Array::value('financial_type_id', $productDetails);
     if (!empty($options[$selectedProductID])) {
@@ -222,12 +222,12 @@ class CRM_Contribute_Form_AdditionalInfo {
     $dao->save();
     //CRM-11106
     if ($premiumID == NULL || $isDeleted) {
-      $premiumParams = array(
+      $premiumParams = [
         'cost' => CRM_Utils_Array::value('cost', $productDetails),
         'currency' => CRM_Utils_Array::value('currency', $productDetails),
         'financial_type_id' => CRM_Utils_Array::value('financial_type_id', $productDetails),
         'contributionId' => $contributionID,
-      );
+      ];
       if ($isDeleted) {
         $premiumParams['oldPremium']['product_id'] = $ContributionProduct->product_id;
         $premiumParams['oldPremium']['contribution_id'] = $ContributionProduct->contribution_id;
@@ -251,15 +251,15 @@ class CRM_Contribute_Form_AdditionalInfo {
       return;
     }
     //process note
-    $noteParams = array(
+    $noteParams = [
       'entity_table' => 'civicrm_contribution',
       'note' => $params['note'],
       'entity_id' => $contributionID,
       'contact_id' => $contactID,
-    );
-    $noteID = array();
+    ];
+    $noteID = [];
     if ($contributionNoteID) {
-      $noteID = array("id" => $contributionNoteID);
+      $noteID = ["id" => $contributionNoteID];
       $noteParams['note'] = $noteParams['note'] ? $noteParams['note'] : "null";
     }
     CRM_Core_BAO_Note::add($noteParams, $noteID);
@@ -273,7 +273,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    * @param CRM_Core_Form $form
    */
   public static function postProcessCommon(&$params, &$formatted, &$form) {
-    $fields = array(
+    $fields = [
       'non_deductible_amount',
       'total_amount',
       'fee_amount',
@@ -282,7 +282,7 @@ class CRM_Contribute_Form_AdditionalInfo {
       'creditnote_id',
       'campaign_id',
       'contribution_page_id',
-    );
+    ];
     foreach ($fields as $f) {
       $formatted[$f] = CRM_Utils_Array::value($f, $params);
     }
@@ -339,12 +339,12 @@ class CRM_Contribute_Form_AdditionalInfo {
 
     // retrieve individual prefix value for honoree
     if (isset($params['soft_credit'])) {
-      $softCreditTypes = $softCredits = array();
+      $softCreditTypes = $softCredits = [];
       foreach ($params['soft_credit'] as $key => $softCredit) {
-        $softCredits[$key] = array(
+        $softCredits[$key] = [
           'Name' => $softCredit['contact_name'],
           'Amount' => CRM_Utils_Money::format($softCredit['amount'], $softCredit['currency']),
-        );
+        ];
         $softCreditTypes[$key] = $softCredit['soft_credit_type_label'];
       }
       $form->assign('softCreditTypes', $softCreditTypes);
@@ -408,16 +408,16 @@ class CRM_Contribute_Form_AdditionalInfo {
 
     //handle custom data
     if (!empty($params['hidden_custom'])) {
-      $contribParams = array(array('contribution_id', '=', $params['contribution_id'], 0, 0));
+      $contribParams = [['contribution_id', '=', $params['contribution_id'], 0, 0]];
       if ($form->_mode == 'test') {
-        $contribParams[] = array('contribution_test', '=', 1, 0, 0);
+        $contribParams[] = ['contribution_test', '=', 1, 0, 0];
       }
 
       //retrieve custom data
-      $customGroup = array();
+      $customGroup = [];
 
       foreach ($form->_groupTree as $groupID => $group) {
-        $customFields = $customValues = array();
+        $customFields = $customValues = [];
         if ($groupID == 'info') {
           continue;
         }
@@ -462,7 +462,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     }
 
     list($sendReceipt, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
-      array(
+      [
         'groupName' => 'msg_tpl_workflow_contribution',
         'valueName' => 'contribution_offline_receipt',
         'contactId' => $params['contact_id'],
@@ -473,7 +473,7 @@ class CRM_Contribute_Form_AdditionalInfo {
         'isTest' => $form->_mode == 'test',
         'PDFFilename' => ts('receipt') . '.pdf',
         'isEmailPdf' => $isEmailPdf,
-      )
+      ]
     );
 
     return $sendReceipt;

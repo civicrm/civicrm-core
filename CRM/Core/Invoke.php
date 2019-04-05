@@ -109,7 +109,7 @@ class CRM_Core_Invoke {
    * @void
    */
   static public function hackMenuRebuild($args) {
-    if (array('civicrm', 'menu', 'rebuild') == $args || array('civicrm', 'clearcache') == $args) {
+    if (['civicrm', 'menu', 'rebuild'] == $args || ['civicrm', 'clearcache'] == $args) {
       // ensure that the user has a good privilege level
       if (CRM_Core_Permission::check('administer CiviCRM')) {
         self::rebuildMenuAndCaches();
@@ -328,12 +328,12 @@ class CRM_Core_Invoke {
    *
    */
   public static function form($action, $contact_type, $contact_sub_type) {
-    CRM_Utils_System::setUserContext(array('civicrm/contact/search/basic', 'civicrm/contact/view'));
+    CRM_Utils_System::setUserContext(['civicrm/contact/search/basic', 'civicrm/contact/view']);
     $wrapper = new CRM_Utils_Wrapper();
 
     $properties = CRM_Core_Component::contactSubTypeProperties($contact_sub_type, 'Edit');
     if ($properties) {
-      $wrapper->run($properties['class'], ts('New %1', array(1 => $contact_sub_type)), $action, TRUE);
+      $wrapper->run($properties['class'], ts('New %1', [1 => $contact_sub_type]), $action, TRUE);
     }
     else {
       $wrapper->run('CRM_Contact_Form_Contact', ts('New Contact'), $action, TRUE);

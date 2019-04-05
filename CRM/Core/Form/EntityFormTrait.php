@@ -133,27 +133,27 @@ trait CRM_Core_Form_EntityFormTrait {
    */
   protected function addFormButtons() {
     if ($this->isViewContext() || $this->_action & CRM_Core_Action::PREVIEW) {
-      $this->addButtons(array(
-          array(
+      $this->addButtons([
+          [
             'type' => 'cancel',
             'name' => ts('Done'),
             'isDefault' => TRUE,
-          ),
-        )
+          ],
+        ]
       );
     }
     else {
-      $this->addButtons(array(
-          array(
+      $this->addButtons([
+          [
             'type' => 'next',
             'name' => $this->isDeleteContext() ? ts('Delete') : ts('Save'),
             'isDefault' => TRUE,
-          ),
-          array(
+          ],
+          [
             'type' => 'cancel',
             'name' => ts('Cancel'),
-          ),
-        )
+          ],
+        ]
       );
     }
   }

@@ -39,7 +39,7 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
   /**
    * Websitess of the contact that is been viewed.
    */
-  private $_websites = array();
+  private $_websites = [];
 
   /**
    * No of website blocks for inline edit.
@@ -53,8 +53,8 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
     parent::preProcess();
 
     //get all the existing websites
-    $params = array('contact_id' => $this->_contactId);
-    $values = array();
+    $params = ['contact_id' => $this->_contactId];
+    $values = [];
     $this->_websites = CRM_Core_BAO_Website::getValues($params, $values);
   }
 
@@ -87,7 +87,7 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
       CRM_Contact_Form_Edit_Website::buildQuickForm($this, $blockId, TRUE);
     }
 
-    $this->addFormRule(array('CRM_Contact_Form_Inline_Website', 'formRule'), $this);
+    $this->addFormRule(['CRM_Contact_Form_Inline_Website', 'formRule'], $this);
 
   }
 
@@ -97,7 +97,7 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (!empty($this->_websites)) {
       foreach ($this->_websites as $id => $value) {
         $defaults['website'][$id] = $value;
@@ -142,9 +142,9 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
    * @return array
    */
   public static function formRule($fields, $errors, $form) {
-    $hasData = $errors = array();
+    $hasData = $errors = [];
     if (!empty($fields['website']) && is_array($fields['website'])) {
-      $types = array();
+      $types = [];
       foreach ($fields['website'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
 

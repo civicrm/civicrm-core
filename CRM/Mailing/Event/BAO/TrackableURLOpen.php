@@ -64,9 +64,9 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
         "SELECT url
            FROM $turl
           WHERE $turl.id = %1",
-        array(
-          1 => array($url_id, 'Integer'),
-        )
+        [
+          1 => [$url_id, 'Integer'],
+        ]
       );
 
       if (!$search->fetch()) {
@@ -82,10 +82,10 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
         INNER JOIN $job ON $turl.mailing_id = $job.mailing_id
         INNER JOIN $eq ON $job.id = $eq.job_id
         WHERE $eq.id = %1 AND $turl.id = %2",
-      array(
-        1 => array($queue_id, 'Integer'),
-        2 => array($url_id, 'Integer'),
-      )
+      [
+        1 => [$queue_id, 'Integer'],
+        2 => [$url_id, 'Integer'],
+      ]
     );
 
     if (!$search->fetch()) {
@@ -95,9 +95,9 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
         "SELECT $turl.url as url
            FROM $turl
           WHERE $turl.id = %1",
-        array(
-          1 => array($url_id, 'Integer'),
-        )
+        [
+          1 => [$url_id, 'Integer'],
+        ]
       );
 
       if (!$search->fetch()) {
@@ -194,7 +194,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    */
   public static function getMailingTotalCount($mailingIDs) {
     $dao = new CRM_Core_DAO();
-    $clickCount = array();
+    $clickCount = [];
 
     $click = self::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
@@ -234,7 +234,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    */
   public static function getMailingContactCount($mailingIDs, $contactID) {
     $dao = new CRM_Core_DAO();
-    $clickCount = array();
+    $clickCount = [];
 
     $click = self::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
@@ -367,18 +367,18 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
     CRM_Core_DAO::disableFullGroupByMode();
     $dao->query($query);
     CRM_Core_DAO::reenableFullGroupByMode();
-    $results = array();
+    $results = [];
 
     while ($dao->fetch()) {
       $url = CRM_Utils_System::url('civicrm/contact/view',
         "reset=1&cid={$dao->contact_id}"
       );
-      $results[] = array(
+      $results[] = [
         'name' => "<a href=\"$url\">{$dao->display_name}</a>",
         'email' => $dao->email,
         'url' => $dao->url,
         'date' => CRM_Utils_Date::customFormat($dao->date),
-      );
+      ];
     }
     return $results;
   }

@@ -51,7 +51,7 @@ class CRM_Contribute_Form_SoftCredit {
       if ($ufJoinDAO->find(TRUE)) {
         $jsonData = CRM_Contribute_BAO_ContributionPage::formatModuleData($ufJoinDAO->module_data, TRUE, 'soft_credit');
         if ($jsonData) {
-          foreach (array('honor_block_title', 'honor_block_text') as $name) {
+          foreach (['honor_block_title', 'honor_block_text'] as $name) {
             $form->assign($name, $jsonData[$name]);
           }
 
@@ -96,15 +96,15 @@ class CRM_Contribute_Form_SoftCredit {
     }
 
     for ($rowNumber = 1; $rowNumber <= $item_count; $rowNumber++) {
-      $form->addEntityRef("soft_credit_contact_id[{$rowNumber}]", ts('Contact'), array('create' => TRUE));
+      $form->addEntityRef("soft_credit_contact_id[{$rowNumber}]", ts('Contact'), ['create' => TRUE]);
 
       $form->addMoney("soft_credit_amount[{$rowNumber}]", ts('Amount'), FALSE, NULL, FALSE);
 
-      $form->addSelect("soft_credit_type[{$rowNumber}]", array(
+      $form->addSelect("soft_credit_type[{$rowNumber}]", [
           'entity' => 'contribution_soft',
           'field' => 'soft_credit_type_id',
           'label' => ts('Type'),
-        ));
+        ]);
       if (!empty($form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id'])) {
         $form->add('hidden', "soft_credit_id[{$rowNumber}]",
           $form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id']);
@@ -117,7 +117,7 @@ class CRM_Contribute_Form_SoftCredit {
     $form->assign('rowCount', $item_count);
     $form->addElement('hidden', 'sct_default_id',
       CRM_Core_OptionGroup::getDefaultValue("soft_credit_type"),
-      array('id' => 'sct_default_id')
+      ['id' => 'sct_default_id']
     );
   }
 
@@ -135,7 +135,7 @@ class CRM_Contribute_Form_SoftCredit {
     if (!CRM_Utils_Array::crmIsEmptyArray($siteHasPCPs)) {
       $form->assign('siteHasPCPs', 1);
       // Fixme: Not a true entityRef field. Relies on PCP.js.tpl
-      $form->add('text', "pcp_made_through_id$suffix", ts('Credit to a Personal Campaign Page'), array('class' => 'twenty', 'placeholder' => ts('- select -')));
+      $form->add('text', "pcp_made_through_id$suffix", ts('Credit to a Personal Campaign Page'), ['class' => 'twenty', 'placeholder' => ts('- select -')]);
       // stores the label
       $form->add('hidden', "pcp_made_through$suffix");
       $form->addElement('checkbox', "pcp_display_in_roll$suffix", ts('Display in Honor Roll?'), NULL);
@@ -191,7 +191,7 @@ class CRM_Contribute_Form_SoftCredit {
    *   Array of errors
    */
   public static function formRule($fields, $errors, $self) {
-    $errors = array();
+    $errors = [];
 
     // if honor roll fields are populated but no PCP is selected
     if (empty($fields['pcp_made_through_id'])) {

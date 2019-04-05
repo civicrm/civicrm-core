@@ -47,11 +47,11 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    */
   public function setDefaultValues() {
     $config = CRM_Core_Config::singleton();
-    $defaults = array(
+    $defaults = [
       'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
       'fieldSeparator' => $config->fieldSeparator,
       'multipleCustomData' => $this->_id,
-    );
+    ];
 
     if ($loadeMapping = $this->get('loadedMapping')) {
       $this->assign('loadedMapping', $loadeMapping);
@@ -70,7 +70,7 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
     parent::buildQuickForm();
 
     $multipleCustomData = CRM_Core_BAO_CustomGroup::getMultipleFieldGroup();
-    $this->add('select', 'multipleCustomData', ts('Multi-value Custom Data'), array('' => ts('- select -')) + $multipleCustomData, TRUE);
+    $this->add('select', 'multipleCustomData', ts('Multi-value Custom Data'), ['' => ts('- select -')] + $multipleCustomData, TRUE);
 
     $this->addContactTypeSelector();
   }
@@ -81,12 +81,12 @@ class CRM_Custom_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    * @return void
    */
   public function postProcess() {
-    $this->storeFormValues(array(
+    $this->storeFormValues([
       'contactType',
       'dateFormats',
       'savedMapping',
       'multipleCustomData',
-    ));
+    ]);
 
     $this->submitFileForMapping('CRM_Custom_Import_Parser_Api', 'multipleCustomData');
   }

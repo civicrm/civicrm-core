@@ -84,7 +84,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
     //append breadcrumb to survey dashboard.
     if (CRM_Campaign_BAO_Campaign::accessCampaign()) {
       $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
-      CRM_Utils_System::appendBreadCrumb(array(array('title' => ts('Survey(s)'), 'url' => $url)));
+      CRM_Utils_System::appendBreadCrumb([['title' => ts('Survey(s)'), 'url' => $url]]);
     }
 
     //set the form title.
@@ -103,7 +103,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
     CRM_Campaign_BAO_Query::buildSearchForm($this);
 
     //build the array of all search params.
-    $this->_searchParams = array();
+    $this->_searchParams = [];
     foreach ($this->_elements as $element) {
       $name = $element->_attributes['name'];
       if ($name == 'qfKey') {
@@ -114,7 +114,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
     $this->set('searchParams', $this->_searchParams);
     $this->assign('searchParams', json_encode($this->_searchParams));
 
-    $defaults = array();
+    $defaults = [];
 
     if (!$this->_surveyId) {
       $this->_surveyId = key(CRM_Campaign_BAO_Survey::getSurveys(TRUE, TRUE));
@@ -142,7 +142,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
   }
 
   public function validateIds() {
-    $errorMessages = array();
+    $errorMessages = [];
     //check for required permissions.
     if (!CRM_Core_Permission::check('manage campaign') &&
       !CRM_Core_Permission::check('administer CiviCampaign') &&
@@ -153,7 +153,7 @@ class CRM_Campaign_Form_Gotv extends CRM_Core_Form {
 
     $surveys = CRM_Campaign_BAO_Survey::getSurveys();
     if (empty($surveys)) {
-      $errorMessages[] = ts("Oops. It looks like no surveys have been created. <a href='%1'>Click here to create a new survey.</a>", array(1 => CRM_Utils_System::url('civicrm/survey/add', 'reset=1&action=add')));
+      $errorMessages[] = ts("Oops. It looks like no surveys have been created. <a href='%1'>Click here to create a new survey.</a>", [1 => CRM_Utils_System::url('civicrm/survey/add', 'reset=1&action=add')]);
     }
 
     if ($this->_force && !$this->_surveyId) {

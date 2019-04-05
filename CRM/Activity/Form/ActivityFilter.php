@@ -44,7 +44,7 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
     $this->add('select', 'activity_type_exclude_filter_id', ts('Exclude'), $activityOptions, FALSE, ['class' => 'crm-select2', 'multiple' => TRUE, 'placeholder' => ts('- no types excluded -')]);
     $this->addDatePickerRange('activity_date_time', ts('Date'));
     $this->addSelect('status_id',
-      array('entity' => 'activity', 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -'))
+      ['entity' => 'activity', 'multiple' => 'multiple', 'option_url' => NULL, 'placeholder' => ts('- any -')]
     );
 
     $this->assign('suppressForm', TRUE);
@@ -61,7 +61,7 @@ class CRM_Activity_Form_ActivityFilter extends CRM_Core_Form {
    */
   public function setDefaultValues() {
     // CRM-11761 retrieve user's activity filter preferences
-    $defaults = array();
+    $defaults = [];
     if (Civi::settings()->get('preserve_activity_tab_filter') && (CRM_Core_Session::getLoggedInContactID())) {
       $defaults = Civi::contactSettings()->get('activity_tab_filter');
     }

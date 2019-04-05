@@ -71,7 +71,7 @@ class CRM_Core_ClassLoader {
    */
   protected function __construct() {
     $this->_registered = FALSE;
-    $this->civiTestClasses = array(
+    $this->civiTestClasses = [
       'CiviCaseTestCase',
       'CiviDBAssert',
       'CiviMailUtils',
@@ -87,7 +87,7 @@ class CRM_Core_ClassLoader {
       'Membership',
       'Participant',
       'PaypalPro',
-    );
+    ];
   }
 
   /**
@@ -133,16 +133,16 @@ class CRM_Core_ClassLoader {
     // CRM-11304
     // TODO Remove this autoloader. For civicrm-core and civicrm-packages, the composer autoloader works fine.
     // Extensions rely on include_path-based autoloading
-    spl_autoload_register(array($this, 'loadClass'), TRUE, $prepend);
+    spl_autoload_register([$this, 'loadClass'], TRUE, $prepend);
     $this->initHtmlPurifier($prepend);
 
     $this->_registered = TRUE;
-    $packages_path = implode(DIRECTORY_SEPARATOR, array($civicrm_base_path, 'packages'));
-    $include_paths = array(
+    $packages_path = implode(DIRECTORY_SEPARATOR, [$civicrm_base_path, 'packages']);
+    $include_paths = [
       '.',
       $civicrm_base_path,
       $packages_path,
-    );
+    ];
     $include_paths = implode(PATH_SEPARATOR, $include_paths);
     set_include_path($include_paths . PATH_SEPARATOR . get_include_path());
     // @todo Why do we need to load this again?
@@ -167,7 +167,7 @@ class CRM_Core_ClassLoader {
       return;
     }
     require_once $htmlPurifierPath;
-    spl_autoload_register(array('HTMLPurifier_Bootstrap', 'autoload'), TRUE, $prepend);
+    spl_autoload_register(['HTMLPurifier_Bootstrap', 'autoload'], TRUE, $prepend);
   }
 
   /**

@@ -113,7 +113,7 @@ class CRM_Case_XMLProcessor {
     if (self::$relationshipTypes === NULL) {
       $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE);
 
-      self::$relationshipTypes = array();
+      self::$relationshipTypes = [];
       foreach ($relationshipInfo as $id => $info) {
         self::$relationshipTypes[$id] = $info[CRM_Case_XMLProcessor::REL_TYPE_CNAME];
       }

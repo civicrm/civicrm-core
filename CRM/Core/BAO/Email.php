@@ -151,25 +151,25 @@ LEFT JOIN civicrm_email ON ( civicrm_email.contact_id = civicrm_contact.id )
 LEFT JOIN civicrm_location_type ON ( civicrm_email.location_type_id = civicrm_location_type.id )
 WHERE     civicrm_contact.id = %1
 ORDER BY  civicrm_email.is_primary DESC, email_id ASC ";
-    $params = array(
-      1 => array(
+    $params = [
+      1 => [
         $id,
         'Integer',
-      ),
-    );
+      ],
+    ];
 
-    $emails = $values = array();
+    $emails = $values = [];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $count = 1;
     while ($dao->fetch()) {
-      $values = array(
+      $values = [
         'locationType' => $dao->locationType,
         'is_primary' => $dao->is_primary,
         'on_hold' => $dao->on_hold,
         'id' => $dao->email_id,
         'email' => $dao->email,
         'locationTypeId' => $dao->locationTypeId,
-      );
+      ];
 
       if ($updateBlankLocInfo) {
         $emails[$count++] = $values;
@@ -207,24 +207,24 @@ AND   e.id IN (loc.email_id, loc.email_2_id)
 AND   ltype.id = e.location_type_id
 ORDER BY e.is_primary DESC, email_id ASC ";
 
-    $params = array(
-      1 => array(
+    $params = [
+      1 => [
         $entityId,
         'Integer',
-      ),
-    );
+      ],
+    ];
 
-    $emails = array();
+    $emails = [];
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     while ($dao->fetch()) {
-      $emails[$dao->email_id] = array(
+      $emails[$dao->email_id] = [
         'locationType' => $dao->locationType,
         'is_primary' => $dao->is_primary,
         'on_hold' => $dao->on_hold,
         'id' => $dao->email_id,
         'email' => $dao->email,
         'locationTypeId' => $dao->locationTypeId,
-      );
+      ];
     }
 
     return $emails;
@@ -249,7 +249,7 @@ ORDER BY e.is_primary DESC, email_id ASC ";
 
     //check for update mode
     if ($email->id) {
-      $params = array(1 => array($email->id, 'Integer'));
+      $params = [1 => [$email->id, 'Integer']];
       if ($email->on_hold) {
         $sql = "
 SELECT id
@@ -291,7 +291,7 @@ AND    reset_date IS NULL
    * @return array $domainEmails;
    */
   public static function domainEmails() {
-    $domainEmails = array();
+    $domainEmails = [];
     $domainFrom = (array) CRM_Core_OptionGroup::values('from_email_address');
     foreach (array_keys($domainFrom) as $k) {
       $domainEmail = $domainFrom[$k];

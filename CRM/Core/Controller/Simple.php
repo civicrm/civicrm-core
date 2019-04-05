@@ -67,7 +67,7 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
 
     $this->_stateMachine = new CRM_Core_StateMachine($this);
 
-    $params = array($path => NULL);
+    $params = [$path => NULL];
 
     $savedAction = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, NULL);
     if (!empty($savedAction) &&
@@ -98,7 +98,7 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
         );
       }
       elseif ($imageUpload) {
-        $this->addActions($config->imageUploadDir, array('uploadFile'));
+        $this->addActions($config->imageUploadDir, ['uploadFile']);
       }
       else {
         $this->addActions();

@@ -41,7 +41,7 @@ class CRM_Cxn_ApiRouter {
    * @return mixed
    */
   public static function route($cxn, $entity, $action, $params) {
-    $SUPER_PERM = array('administer CiviCRM');
+    $SUPER_PERM = ['administer CiviCRM'];
 
     require_once 'api/v3/utils.php';
 

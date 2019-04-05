@@ -57,7 +57,7 @@ class CRM_Activity_Form_Task extends CRM_Core_Form_Task {
    * @param CRM_Core_Form $form
    */
   public static function preProcessCommon(&$form) {
-    $form->_activityHolderIds = array();
+    $form->_activityHolderIds = [];
 
     $values = $form->controller->exportValues($form->get('searchFormName'));
 
@@ -65,7 +65,7 @@ class CRM_Activity_Form_Task extends CRM_Core_Form_Task {
     $activityTasks = CRM_Activity_Task::tasks();
     $form->assign('taskName', $activityTasks[$form->_task]);
 
-    $ids = array();
+    $ids = [];
     if ($values['radio_ts'] == 'ts_sel') {
       foreach ($values as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
@@ -85,7 +85,7 @@ class CRM_Activity_Form_Task extends CRM_Core_Form_Task {
       $activityClause = NULL;
 
       $components = CRM_Core_Component::getNames();
-      $componentClause = array();
+      $componentClause = [];
       foreach ($components as $componentID => $componentName) {
         if ($componentName != 'CiviCase' && !CRM_Core_Permission::check("access $componentName")) {
           $componentClause[] = " (activity_type.component_id IS NULL OR activity_type.component_id <> {$componentID}) ";
@@ -163,17 +163,17 @@ WHERE  activity_id IN ( $IDs ) AND
    * @param bool $submitOnce
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => $nextType,
         'name' => $title,
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => $backType,
         'name' => ts('Cancel'),
-      ),
-    ));
+      ],
+    ]);
   }
 
 }

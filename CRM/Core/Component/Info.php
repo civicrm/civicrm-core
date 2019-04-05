@@ -113,7 +113,7 @@ abstract class CRM_Core_Component_Info {
    * @see CRM_Utils_Hook::angularModules
    */
   public function getAngularModules() {
-    return array();
+    return [];
   }
 
   /**
@@ -134,7 +134,7 @@ abstract class CRM_Core_Component_Info {
    * @see CRM_Utils_Hook::managedEntities
    */
   public function getManagedEntities() {
-    return array();
+    return [];
   }
 
   /**
@@ -145,7 +145,7 @@ abstract class CRM_Core_Component_Info {
    * @see CRM_Component_Info::getPermissions
    */
   public function getAnonymousPermissionWarnings() {
-    return array();
+    return [];
   }
 
   /**
@@ -175,7 +175,7 @@ abstract class CRM_Core_Component_Info {
    *   - count: int, eg "5" if there are 5 email addresses that refer to $dao
    */
   public function getReferenceCounts($dao) {
-    return array();
+    return [];
   }
 
   /**

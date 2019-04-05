@@ -39,12 +39,12 @@ class CRM_Mailing_BAO_Query {
    */
   public static function &getFields() {
     if (!self::$_mailingFields) {
-      self::$_mailingFields = array();
-      $_mailingFields['mailing_id'] = array(
+      self::$_mailingFields = [];
+      $_mailingFields['mailing_id'] = [
         'name' => 'mailing_id',
         'title' => ts('Mailing ID'),
         'where' => 'civicrm_mailing.id',
-      );
+      ];
     }
     return self::$_mailingFields;
   }
@@ -211,7 +211,7 @@ class CRM_Mailing_BAO_Query {
 
     $properties = NULL;
     if ($mode & CRM_Contact_BAO_Query::MODE_MAILING) {
-      $properties = array(
+      $properties = [
         'mailing_id' => 1,
         'mailing_campaign_id' => 1,
         'mailing_name' => 1,
@@ -225,7 +225,7 @@ class CRM_Mailing_BAO_Query {
         'contact_type' => 1,
         'contact_sub_type' => 1,
         'mailing_recipients_id' => 1,
-      );
+      ];
     }
     return $properties;
   }
@@ -295,7 +295,7 @@ class CRM_Mailing_BAO_Query {
         }
         elseif ($value == 'N') {
           $options['Y'] = $options['N'];
-          $values = array($name, $op, 'Y', $grouping, $wildcard);
+          $values = [$name, $op, 'Y', $grouping, $wildcard];
           self::mailingEventQueryBuilder($query, $values,
             'civicrm_mailing_event_bounce',
             'mailing_delivery_status',
@@ -307,15 +307,15 @@ class CRM_Mailing_BAO_Query {
 
       case 'mailing_bounce_types':
         $op = 'IN';
-        $values = array($name, $op, $value, $grouping, $wildcard);
+        $values = [$name, $op, $value, $grouping, $wildcard];
         self::mailingEventQueryBuilder($query, $values,
           'civicrm_mailing_event_bounce',
           'bounce_type_id',
           ts('Bounce type(s)'),
-          CRM_Core_PseudoConstant::get('CRM_Mailing_Event_DAO_Bounce', 'bounce_type_id', array(
+          CRM_Core_PseudoConstant::get('CRM_Mailing_Event_DAO_Bounce', 'bounce_type_id', [
               'keyColumn' => 'id',
               'labelColumn' => 'name',
-            ))
+            ])
         );
         return;
 
@@ -338,7 +338,7 @@ class CRM_Mailing_BAO_Query {
         return;
 
       case 'mailing_optout':
-        $valueTitle = array(1 => ts('Opt-out Requests'));
+        $valueTitle = [1 => ts('Opt-out Requests')];
         // include opt-out events only
         $query->_where[$grouping][] = "civicrm_mailing_event_unsubscribe.org_unsubscribe = 1";
         self::mailingEventQueryBuilder($query, $values,
@@ -348,7 +348,7 @@ class CRM_Mailing_BAO_Query {
         return;
 
       case 'mailing_unsubscribe':
-        $valueTitle = array(1 => ts('Unsubscribe Requests'));
+        $valueTitle = [1 => ts('Unsubscribe Requests')];
         // exclude opt-out events
         $query->_where[$grouping][] = "civicrm_mailing_event_unsubscribe.org_unsubscribe = 0";
         self::mailingEventQueryBuilder($query, $values,
@@ -358,7 +358,7 @@ class CRM_Mailing_BAO_Query {
         return;
 
       case 'mailing_forward':
-        $valueTitle = array('Y' => ts('Forwards'));
+        $valueTitle = ['Y' => ts('Forwards')];
         // since its a checkbox
         $values[2] = 'Y';
         self::mailingEventQueryBuilder($query, $values,
@@ -385,7 +385,7 @@ class CRM_Mailing_BAO_Query {
         $name = 'campaign_id';
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_mailing.$name", $op, $value, 'Integer');
         list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Mailing_DAO_Mailing', $name, $value, $op);
-        $query->_qill[$grouping][] = ts('Campaign %1 %2', array(1 => $op, 2 => $value));
+        $query->_qill[$grouping][] = ts('Campaign %1 %2', [1 => $op, 2 => $value]);
         $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
         $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
         return;
@@ -404,36 +404,36 @@ class CRM_Mailing_BAO_Query {
 
     if (!empty($mailings)) {
       $form->add('select', 'mailing_id', ts('Mailing Name(s)'), $mailings, FALSE,
-        array('id' => 'mailing_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
+        ['id' => 'mailing_id', 'multiple' => 'multiple', 'class' => 'crm-select2']
       );
     }
 
     CRM_Core_Form_Date::buildDateRange($form, 'mailing_date', 1, '_low', '_high', ts('From'), FALSE);
     $form->addElement('hidden', 'mailing_date_range_error');
-    $form->addFormRule(array('CRM_Mailing_BAO_Query', 'formRule'), $form);
+    $form->addFormRule(['CRM_Mailing_BAO_Query', 'formRule'], $form);
 
-    $mailingJobStatuses = array(
+    $mailingJobStatuses = [
       '' => ts('- select -'),
       'Complete' => 'Complete',
       'Scheduled' => 'Scheduled',
       'Running' => 'Running',
       'Canceled' => 'Canceled',
-    );
+    ];
     $form->addElement('select', 'mailing_job_status', ts('Mailing Job Status'), $mailingJobStatuses, FALSE);
 
     $mailingBounceTypes = CRM_Core_PseudoConstant::get(
       'CRM_Mailing_Event_DAO_Bounce', 'bounce_type_id',
-      array('keyColumn' => 'id', 'labelColumn' => 'name')
+      ['keyColumn' => 'id', 'labelColumn' => 'name']
     );
     $form->add('select', 'mailing_bounce_types', ts('Bounce Types'), $mailingBounceTypes, FALSE,
-      array('id' => 'mailing_bounce_types', 'multiple' => 'multiple', 'class' => 'crm-select2')
+      ['id' => 'mailing_bounce_types', 'multiple' => 'multiple', 'class' => 'crm-select2']
     );
 
     // event filters
-    $form->addRadio('mailing_delivery_status', ts('Delivery Status'), CRM_Mailing_PseudoConstant::yesNoOptions('delivered'), array('allowClear' => TRUE));
-    $form->addRadio('mailing_open_status', ts('Trackable Opens'), CRM_Mailing_PseudoConstant::yesNoOptions('open'), array('allowClear' => TRUE));
-    $form->addRadio('mailing_click_status', ts('Trackable URLs'), CRM_Mailing_PseudoConstant::yesNoOptions('click'), array('allowClear' => TRUE));
-    $form->addRadio('mailing_reply_status', ts('Trackable Replies'), CRM_Mailing_PseudoConstant::yesNoOptions('reply'), array('allowClear' => TRUE));
+    $form->addRadio('mailing_delivery_status', ts('Delivery Status'), CRM_Mailing_PseudoConstant::yesNoOptions('delivered'), ['allowClear' => TRUE]);
+    $form->addRadio('mailing_open_status', ts('Trackable Opens'), CRM_Mailing_PseudoConstant::yesNoOptions('open'), ['allowClear' => TRUE]);
+    $form->addRadio('mailing_click_status', ts('Trackable URLs'), CRM_Mailing_PseudoConstant::yesNoOptions('click'), ['allowClear' => TRUE]);
+    $form->addRadio('mailing_reply_status', ts('Trackable Replies'), CRM_Mailing_PseudoConstant::yesNoOptions('reply'), ['allowClear' => TRUE]);
 
     $form->add('checkbox', 'mailing_unsubscribe', ts('Unsubscribe Requests'));
     $form->add('checkbox', 'mailing_optout', ts('Opt-out Requests'));
@@ -508,7 +508,7 @@ class CRM_Mailing_BAO_Query {
    * @return bool|array
    */
   public static function formRule($fields, $files, $form) {
-    $errors = array();
+    $errors = [];
 
     if (empty($fields['mailing_date_high']) || empty($fields['mailing_date_low'])) {
       return TRUE;

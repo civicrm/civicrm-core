@@ -53,26 +53,26 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
    */
   public function buildQuickForm() {
 
-    $groupList = array('' => ts('- All Contacts -')) + CRM_Core_PseudoConstant::nestedGroup();
+    $groupList = ['' => ts('- All Contacts -')] + CRM_Core_PseudoConstant::nestedGroup();
 
-    $this->add('select', 'group_id', ts('Select Group'), $groupList, FALSE, array('class' => 'crm-select2 huge'));
+    $this->add('select', 'group_id', ts('Select Group'), $groupList, FALSE, ['class' => 'crm-select2 huge']);
     if (Civi::settings()->get('dedupe_default_limit')) {
       $this->add('text', 'limit', ts('No of contacts to find matches for '));
     }
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'next',
           'name' => ts('Continue'),
           'isDefault' => TRUE,
-        ),
+        ],
         //hack to support cancel button functionality
-        array(
+        [
           'type' => 'submit',
           'class' => 'cancel',
           'icon' => 'fa-times',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
   }
 

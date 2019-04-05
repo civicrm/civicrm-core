@@ -32,180 +32,180 @@
  */
 class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
 
-  protected $_customGroupExtends = array(
+  protected $_customGroupExtends = [
     'Contact',
     'Individual',
     'Household',
     'Organization',
     'Grant',
-  );
+  ];
 
   /**
    * Class constructor.
    */
   public function __construct() {
-    $contactCols = $this->getColumns('Contact', array(
-      'order_bys_defaults' => array('sort_name' => 'ASC '),
+    $contactCols = $this->getColumns('Contact', [
+      'order_bys_defaults' => ['sort_name' => 'ASC '],
       'fields_defaults' => ['sort_name'],
       'fields_excluded' => ['id'],
       'fields_required' => ['id'],
-      'filters_defaults' => array('is_deleted' => 0),
+      'filters_defaults' => ['is_deleted' => 0],
       'no_field_disambiguation' => TRUE,
-    ));
-    $specificCols = array(
-      'civicrm_email' => array(
+    ]);
+    $specificCols = [
+      'civicrm_email' => [
         'dao' => 'CRM_Core_DAO_Email',
-        'fields' => array(
-          'email' => array(
+        'fields' => [
+          'email' => [
             'title' => ts('Email'),
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_phone' => array(
+      ],
+      'civicrm_phone' => [
         'dao' => 'CRM_Core_DAO_Phone',
-        'fields' => array(
-          'phone' => array(
+        'fields' => [
+          'phone' => [
             'title' => ts('Phone'),
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_grant' => array(
+      ],
+      'civicrm_grant' => [
         'dao' => 'CRM_Grant_DAO_Grant',
-        'fields' => array(
-          'grant_type_id' => array(
+        'fields' => [
+          'grant_type_id' => [
             'name' => 'grant_type_id',
             'title' => ts('Grant Type'),
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'name' => 'status_id',
             'title' => ts('Grant Status'),
-          ),
-          'amount_total' => array(
+          ],
+          'amount_total' => [
             'name' => 'amount_total',
             'title' => ts('Amount Requested'),
             'type' => CRM_Utils_Type::T_MONEY,
-          ),
-          'amount_granted' => array(
+          ],
+          'amount_granted' => [
             'name' => 'amount_granted',
             'title' => ts('Amount Granted'),
-          ),
-          'application_received_date' => array(
+          ],
+          'application_received_date' => [
             'name' => 'application_received_date',
             'title' => ts('Application Received'),
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'money_transfer_date' => array(
+          ],
+          'money_transfer_date' => [
             'name' => 'money_transfer_date',
             'title' => ts('Money Transfer Date'),
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'grant_due_date' => array(
+          ],
+          'grant_due_date' => [
             'name' => 'grant_due_date',
             'title' => ts('Grant Report Due'),
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'decision_date' => array(
+          ],
+          'decision_date' => [
             'name' => 'decision_date',
             'title' => ts('Grant Decision Date'),
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'rationale' => array(
+          ],
+          'rationale' => [
             'name' => 'rationale',
             'title' => ts('Rationale'),
-          ),
-          'grant_report_received' => array(
+          ],
+          'grant_report_received' => [
             'name' => 'grant_report_received',
             'title' => ts('Grant Report Received'),
-          ),
-        ),
-        'filters' => array(
-          'grant_type' => array(
+          ],
+        ],
+        'filters' => [
+          'grant_type' => [
             'name' => 'grant_type_id',
             'title' => ts('Grant Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'grant_type_id'),
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'name' => 'status_id',
             'title' => ts('Grant Status'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id'),
-          ),
-          'amount_granted' => array(
+          ],
+          'amount_granted' => [
             'title' => ts('Amount Granted'),
             'operatorType' => CRM_Report_Form::OP_INT,
-          ),
-          'amount_total' => array(
+          ],
+          'amount_total' => [
             'title' => ts('Amount Requested'),
             'operatorType' => CRM_Report_Form::OP_INT,
-          ),
-          'application_received_date' => array(
+          ],
+          'application_received_date' => [
             'title' => ts('Application Received'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'money_transfer_date' => array(
+          ],
+          'money_transfer_date' => [
             'title' => ts('Money Transfer Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'grant_due_date' => array(
+          ],
+          'grant_due_date' => [
             'title' => ts('Grant Report Due'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'decision_date' => array(
+          ],
+          'decision_date' => [
             'title' => ts('Grant Decision Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-        ),
-        'group_bys' => array(
-          'grant_type_id' => array(
+          ],
+        ],
+        'group_bys' => [
+          'grant_type_id' => [
             'title' => ts('Grant Type'),
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => ts('Grant Status'),
-          ),
-          'application_received_date' => array(
+          ],
+          'application_received_date' => [
             'title' => ts('Application Received Date'),
-          ),
-          'money_transfer_date' => array(
+          ],
+          'money_transfer_date' => [
             'title' => ts('Money Transfer Date'),
-          ),
-          'decision_date' => array(
+          ],
+          'decision_date' => [
             'title' => ts('Grant Decision Date'),
-          ),
-        ),
-        'order_bys' => array(
-          'grant_type_id' => array(
+          ],
+        ],
+        'order_bys' => [
+          'grant_type_id' => [
             'title' => ts('Grant Type'),
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => ts('Grant Status'),
-          ),
-          'amount_total' => array(
+          ],
+          'amount_total' => [
             'title' => ts('Amount Requested'),
-          ),
-          'amount_granted' => array(
+          ],
+          'amount_granted' => [
             'title' => ts('Amount Granted'),
-          ),
-          'application_received_date' => array(
+          ],
+          'application_received_date' => [
             'title' => ts('Application Received Date'),
-          ),
-          'money_transfer_date' => array(
+          ],
+          'money_transfer_date' => [
             'title' => ts('Money Transfer Date'),
-          ),
-          'decision_date' => array(
+          ],
+          'decision_date' => [
             'title' => ts('Grant Decision Date'),
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
 
     $this->_columns = array_merge($contactCols, $specificCols, $this->addAddressFields(FALSE));
 

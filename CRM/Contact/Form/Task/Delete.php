@@ -89,7 +89,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
         CRM_Core_Error::fatal(ts('This contact is a special one for the contact information associated with the CiviCRM installation for this domain. No one is allowed to delete it because the information is used for special system purposes.'));
       }
 
-      $this->_contactIds = array($cid);
+      $this->_contactIds = [$cid];
       $this->_single = TRUE;
       $this->assign('totalSelectedContacts', 1);
     }
@@ -100,7 +100,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
     $this->_sharedAddressMessage = $this->get('sharedAddressMessage');
     if (!$this->_restore && !$this->_sharedAddressMessage) {
       // we check for each contact for shared contact address
-      $sharedContactList = array();
+      $sharedContactList = [];
       $sharedAddressCount = 0;
       foreach ($this->_contactIds as $contactId) {
         // check if a contact that is being deleted has any shared addresses
@@ -114,25 +114,25 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
         }
       }
 
-      $this->_sharedAddressMessage = array(
+      $this->_sharedAddressMessage = [
         'count' => $sharedAddressCount,
         'contactList' => $sharedContactList,
-      );
+      ];
 
       if ($sharedAddressCount > 0) {
         if (count($this->_contactIds) > 1) {
           // more than one contact deleted
-          $message = ts('One of the selected contacts has an address record that is shared with 1 other contact.', array(
+          $message = ts('One of the selected contacts has an address record that is shared with 1 other contact.', [
               'plural' => 'One or more selected contacts have address records which are shared with %count other contacts.',
               'count' => $sharedAddressCount,
-            ));
+            ]);
         }
         else {
           // only one contact deleted
-          $message = ts('This contact has an address record which is shared with 1 other contact.', array(
+          $message = ts('This contact has an address record which is shared with 1 other contact.', [
               'plural' => 'This contact has an address record which is shared with %count other contacts.',
               'count' => $sharedAddressCount,
-            ));
+            ]);
         }
         CRM_Core_Session::setStatus($message . ' ' . ts('Shared addresses will not be removed or altered but will no longer be shared.'), ts('Shared Addesses Owner'));
       }
@@ -168,7 +168,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       $this->addDefaultButtons($label, 'done');
     }
 
-    $this->addFormRule(array('CRM_Contact_Form_Task_Delete', 'formRule'), $this);
+    $this->addFormRule(['CRM_Contact_Form_Task_Delete', 'formRule'], $this);
   }
 
   /**
@@ -186,7 +186,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
    */
   public static function formRule($fields, $files, $self) {
     // CRM-12929
-    $error = array();
+    $error = [];
     if ($self->_skipUndelete) {
       CRM_Financial_BAO_FinancialItem::checkContactPresent($self->_contactIds, $error);
     }
@@ -222,15 +222,15 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
     // Delete/Restore Contacts. Report errors.
     $deleted = 0;
-    $not_deleted = array();
+    $not_deleted = [];
     foreach ($this->_contactIds as $cid) {
       $name = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $cid, 'display_name');
       if (CRM_Contact_BAO_Contact::checkDomainContact($cid)) {
-        $session->setStatus(ts("'%1' cannot be deleted because the information is used for special system purposes.", array(1 => $name)), 'Cannot Delete Domain Contact', 'error');
+        $session->setStatus(ts("'%1' cannot be deleted because the information is used for special system purposes.", [1 => $name]), 'Cannot Delete Domain Contact', 'error');
         continue;
       }
       if ($currentUserId == $cid && !$this->_restore) {
-        $session->setStatus(ts("You are currently logged in as '%1'. You cannot delete yourself.", array(1 => $name)), 'Unable To Delete', 'error');
+        $session->setStatus(ts("You are currently logged in as '%1'. You cannot delete yourself.", [1 => $name]), 'Unable To Delete', 'error');
         continue;
       }
       if (CRM_Contact_BAO_Contact::deleteContact($cid, $this->_restore, $this->_skipUndelete)) {
@@ -245,25 +245,25 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       $title = ts('Deleted');
       if ($this->_restore) {
         $title = ts('Restored');
-        $status = ts('%1 has been restored from the trash.', array(
+        $status = ts('%1 has been restored from the trash.', [
             1 => $name,
             'plural' => '%count contacts restored from trash.',
             'count' => $deleted,
-          ));
+          ]);
       }
       elseif ($this->_skipUndelete) {
-        $status = ts('%1 has been permanently deleted.', array(
+        $status = ts('%1 has been permanently deleted.', [
             1 => $name,
             'plural' => '%count contacts permanently deleted.',
             'count' => $deleted,
-          ));
+          ]);
       }
       else {
-        $status = ts('%1 has been moved to the trash.', array(
+        $status = ts('%1 has been moved to the trash.', [
             1 => $name,
             'plural' => '%count contacts moved to trash.',
             'count' => $deleted,
-          ));
+          ]);
       }
       $session->setStatus($status, $title, 'success');
     }
@@ -283,7 +283,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       }
       $message .= '<ul><li>' . implode('</li><li>', $this->_sharedAddressMessage['contactList']) . '</li></ul>';
 
-      $session->setStatus($message, ts('Shared Addesses Owner Deleted'), 'info', array('expires' => 0));
+      $session->setStatus($message, ts('Shared Addesses Owner Deleted'), 'info', ['expires' => 0]);
 
       $this->set('sharedAddressMessage', NULL);
     }

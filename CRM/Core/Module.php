@@ -87,7 +87,7 @@ class CRM_Core_Module {
    * @see CRM_Extension_Manager::STATUS_DISABLED
    */
   public static function collectStatuses($modules) {
-    $statuses = array();
+    $statuses = [];
     foreach ($modules as $module) {
       $statuses[$module->name] = $module->is_active ? CRM_Extension_Manager::STATUS_INSTALLED : CRM_Extension_Manager::STATUS_DISABLED;
 

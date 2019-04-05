@@ -45,52 +45,52 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   /**
    * PDF Page Format fields stored in the 'value' field of the Option Value table.
    */
-  private static $optionValueFields = array(
-    'paper_size' => array(
+  private static $optionValueFields = [
+    'paper_size' => [
       'name' => 'paper_size',
       'type' => CRM_Utils_Type::T_STRING,
       'default' => 'letter',
-    ),
-    'stationery' => array(
+    ],
+    'stationery' => [
       'name' => 'stationery',
       'type' => CRM_Utils_Type::T_STRING,
       'default' => '',
-    ),
-    'orientation' => array(
+    ],
+    'orientation' => [
       'name' => 'orientation',
       'type' => CRM_Utils_Type::T_STRING,
       'default' => 'portrait',
-    ),
-    'metric' => array(
+    ],
+    'metric' => [
       'name' => 'metric',
       'type' => CRM_Utils_Type::T_STRING,
       'default' => 'in',
-    ),
-    'margin_top' => array(
+    ],
+    'margin_top' => [
       'name' => 'margin_top',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 0.75,
-    ),
-    'margin_bottom' => array(
+    ],
+    'margin_bottom' => [
       'name' => 'margin_bottom',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 0.75,
-    ),
-    'margin_left' => array(
+    ],
+    'margin_left' => [
       'name' => 'margin_left',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 0.75,
-    ),
-    'margin_right' => array(
+    ],
+    'margin_right' => [
       'name' => 'margin_right',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 0.75,
-    ),
-  );
+    ],
+  ];
 
   /**
    * Get page orientations recognized by the DOMPDF package used to create PDF letters.
@@ -99,10 +99,10 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    *   array of page orientations
    */
   public static function getPageOrientations() {
-    return array(
+    return [
       'portrait' => ts('Portrait'),
       'landscape' => ts('Landscape'),
-    );
+    ];
   }
 
   /**
@@ -112,12 +112,12 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    *   array of measurement units
    */
   public static function getUnits() {
-    return array(
+    return [
       'in' => ts('Inches'),
       'cm' => ts('Centimeters'),
       'mm' => ts('Millimeters'),
       'pt' => ts('Points'),
-    );
+    ];
   }
 
   /**
@@ -158,7 +158,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    *   (reference)   PDF Page Format list
    */
   public static function &getList($namesOnly = FALSE) {
-    static $list = array();
+    static $list = [];
     if (self::_getGid()) {
       // get saved PDF Page Formats from Option Value table
       $dao = new CRM_Core_DAO_OptionValue();
@@ -185,13 +185,13 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    *   Name/value pairs containing the default PDF Page Format values.
    */
   public static function &getDefaultValues() {
-    $params = array('is_active' => 1, 'is_default' => 1);
-    $defaults = array();
+    $params = ['is_active' => 1, 'is_default' => 1];
+    $defaults = [];
     if (!self::retrieve($params, $defaults)) {
       foreach (self::$optionValueFields as $name => $field) {
         $defaults[$name] = $field['default'];
       }
-      $filter = array('option_group_id' => self::_getGid());
+      $filter = ['option_group_id' => self::_getGid()];
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue', $filter);
 
       // also set the id to avoid NOTICES, CRM-8454
@@ -212,8 +212,8 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    *   (reference) associative array of name/value pairs
    */
   public static function &getPdfFormat($field, $val) {
-    $params = array('is_active' => 1, $field => $val);
-    $pdfFormat = array();
+    $params = ['is_active' => 1, $field => $val];
+    $pdfFormat = [];
     if (self::retrieve($params, $pdfFormat)) {
       return $pdfFormat;
     }
@@ -367,7 +367,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
     $this->save();
 
     // fix duplicate weights
-    $filter = array('option_group_id' => self::_getGid());
+    $filter = ['option_group_id' => self::_getGid()];
     CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_OptionValue', $filter);
   }
 
@@ -384,7 +384,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
       $dao->id = $id;
       if ($dao->find(TRUE)) {
         if ($dao->option_group_id == self::_getGid()) {
-          $filter = array('option_group_id' => self::_getGid());
+          $filter = ['option_group_id' => self::_getGid()];
           CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $id, $filter);
           $dao->delete();
           return;

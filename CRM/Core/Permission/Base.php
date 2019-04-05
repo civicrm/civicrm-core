@@ -240,10 +240,10 @@ class CRM_Core_Permission_Base {
    * @see CRM_Core_Permission::getCorePermissions
    */
   public static function getModulePermissions($module) {
-    $return_permissions = array();
+    $return_permissions = [];
     $fn_name = "{$module}_civicrm_permission";
     if (function_exists($fn_name)) {
-      $module_permissions = array();
+      $module_permissions = [];
       $fn_name($module_permissions);
       $return_permissions = $module_permissions;
     }
@@ -260,12 +260,12 @@ class CRM_Core_Permission_Base {
    *   Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    */
   public function getAllModulePermissions($descriptions = FALSE) {
-    $permissions = array();
+    $permissions = [];
     CRM_Utils_Hook::permission($permissions);
 
     if ($descriptions) {
       foreach ($permissions as $permission => $label) {
-        $permissions[$permission] = (is_array($label)) ? $label : array($label);
+        $permissions[$permission] = (is_array($label)) ? $label : [$label];
       }
     }
     else {

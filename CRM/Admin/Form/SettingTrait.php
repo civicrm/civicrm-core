@@ -235,7 +235,7 @@ trait CRM_Admin_Form_SettingTrait {
           $this->$add($setting, ts($props['title']), $props['entity_reference_options']);
         }
         elseif ($add === 'addYesNo' && ($props['type'] === 'Boolean')) {
-          $this->addRadio($setting, ts($props['title']), array(1 => 'Yes', 0 => 'No'), NULL, '&nbsp;&nbsp;');
+          $this->addRadio($setting, ts($props['title']), [1 => 'Yes', 0 => 'No'], NULL, '&nbsp;&nbsp;');
         }
         else {
           $this->$add($setting, ts($props['title']), $options);

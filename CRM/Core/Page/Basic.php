@@ -222,7 +222,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     $baoString = $this->getBAOName();
     $object = new $baoString();
 
-    $values = array();
+    $values = [];
 
     // lets make sure we get the stuff sorted by name if it exists
     $fields = &$object->fields();
@@ -257,7 +257,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
           $permission = $this->checkPermission($object->id, $object->$key);
         }
         if ($permission) {
-          $values[$object->id] = array();
+          $values[$object->id] = [];
           CRM_Core_DAO::storeValues($object, $values[$object->id]);
 
           if (is_a($object, 'CRM_Contact_DAO_RelationshipType')) {
@@ -305,11 +305,11 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     $newAction = $action;
     $hasDelete = $hasDisable = TRUE;
 
-    if (!empty($values['name']) && in_array($values['name'], array(
+    if (!empty($values['name']) && in_array($values['name'], [
       'encounter_medium',
       'case_type',
       'case_status',
-    ))) {
+    ])) {
       static $caseCount = NULL;
       if (!isset($caseCount)) {
         $caseCount = CRM_Case_BAO_Case::caseCount(NULL, FALSE);
@@ -326,11 +326,11 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
         $values['class'] = 'reserved';
         // check if object is relationship type
 
-        $exceptions = array(
+        $exceptions = [
           'CRM_Contact_BAO_RelationshipType',
           'CRM_Core_BAO_LocationType',
           'CRM_Badge_BAO_Layout',
-        );
+        ];
 
         if (in_array($object_type, $exceptions)) {
           $newAction = CRM_Core_Action::VIEW + CRM_Core_Action::UPDATE;
@@ -356,7 +356,7 @@ abstract class CRM_Core_Page_Basic extends CRM_Core_Page {
     }
 
     //CRM-4418, handling edit and delete separately.
-    $permissions = array($permission);
+    $permissions = [$permission];
     if ($hasDelete && ($permission == CRM_Core_Permission::EDIT)) {
       //previously delete was subset of edit
       //so for consistency lets grant delete also.

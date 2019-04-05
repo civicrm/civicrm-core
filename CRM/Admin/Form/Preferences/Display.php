@@ -36,7 +36,7 @@
  */
 class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
-  protected $_settings = array(
+  protected $_settings = [
     'contact_view_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'contact_smart_group_display' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'contact_edit_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -52,7 +52,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     'display_name_format' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'sort_name_format' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'menubar_position' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-  );
+  ];
 
   /**
    * Build the form object.
@@ -74,7 +74,7 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
     $nameFields = CRM_Core_OptionGroup::values('contact_edit_options', FALSE, FALSE, FALSE, 'AND v.filter = 2');
     $this->assign('nameFields', $nameFields);
 
-    $this->addElement('hidden', 'contact_edit_preferences', NULL, array('id' => 'contact_edit_preferences'));
+    $this->addElement('hidden', 'contact_edit_preferences', NULL, ['id' => 'contact_edit_preferences']);
 
     $optionValues = CRM_Core_OptionGroup::values('user_dashboard_options', FALSE, FALSE, FALSE, NULL, 'name');
     $invoicesKey = array_search('Invoices / Credit Notes', $optionValues);

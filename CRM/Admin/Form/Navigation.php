@@ -54,7 +54,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
     }
 
     if (isset($this->_id)) {
-      $params = array('id' => $this->_id);
+      $params = ['id' => $this->_id];
       CRM_Core_BAO_Navigation::retrieve($params, $this->_defaults);
     }
 
@@ -68,21 +68,21 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
 
     $this->add('text', 'url', ts('Url'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_Navigation', 'url'));
 
-    $this->add('text', 'icon', ts('Icon'), array('class' => 'crm-icon-picker', 'title' => ts('Choose Icon'), 'allowClear' => TRUE));
+    $this->add('text', 'icon', ts('Icon'), ['class' => 'crm-icon-picker', 'title' => ts('Choose Icon'), 'allowClear' => TRUE]);
 
-    $permissions = array();
+    $permissions = [];
     foreach (CRM_Core_Permission::basicPermissions(TRUE, TRUE) as $id => $vals) {
-      $permissions[] = array('id' => $id, 'label' => $vals[0], 'description' => (array) CRM_Utils_Array::value(1, $vals));
+      $permissions[] = ['id' => $id, 'label' => $vals[0], 'description' => (array) CRM_Utils_Array::value(1, $vals)];
     }
     $this->add('text', 'permission', ts('Permission'),
-      array('placeholder' => ts('Unrestricted'), 'class' => 'huge', 'data-select-params' => json_encode(array('data' => array('results' => $permissions, 'text' => 'label'))))
+      ['placeholder' => ts('Unrestricted'), 'class' => 'huge', 'data-select-params' => json_encode(['data' => ['results' => $permissions, 'text' => 'label']])]
     );
 
-    $operators = array('AND' => ts('AND'), 'OR' => ts('OR'));
+    $operators = ['AND' => ts('AND'), 'OR' => ts('OR')];
     $this->add('select', 'permission_operator', NULL, $operators);
 
     //make separator location configurable
-    $separator = array(ts('None'), ts('After menu element'), ts('Before menu element'));
+    $separator = [ts('None'), ts('After menu element'), ts('Before menu element')];
     $this->add('select', 'has_separator', ts('Separator'), $separator);
 
     $active = $this->add('advcheckbox', 'is_active', ts('Enabled'));
@@ -101,7 +101,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
       $homeMenuId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Navigation', 'Home', 'id', 'name');
       unset($parentMenu[$homeMenuId]);
 
-      $this->add('select', 'parent_id', ts('Parent'), array('' => ts('Top level')) + $parentMenu, FALSE, array('class' => 'crm-select2'));
+      $this->add('select', 'parent_id', ts('Parent'), ['' => ts('Top level')] + $parentMenu, FALSE, ['class' => 'crm-select2']);
     }
   }
 
@@ -147,7 +147,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
     CRM_Core_BAO_Navigation::resetNavigation();
 
     CRM_Core_Session::setStatus(ts('Menu \'%1\' has been saved.',
-      array(1 => $navigation->label)
+      [1 => $navigation->label]
     ), ts('Saved'), 'success');
   }
 

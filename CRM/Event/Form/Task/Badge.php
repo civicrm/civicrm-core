@@ -63,7 +63,7 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
 
       $participantID = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
       $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-      $this->_participantIds = array($participantID);
+      $this->_participantIds = [$participantID];
       $this->_componentClause = " civicrm_participant.id = $participantID ";
       $this->assign('totalSelectedParticipants', 1);
 
@@ -93,9 +93,9 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
     $this->add('select',
       'badge_id',
       ts('Name Badge Format'),
-      array(
+      [
         '' => ts('- select -'),
-      ) + $label, TRUE
+      ] + $label, TRUE
     );
 
     $next = 'next';

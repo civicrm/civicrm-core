@@ -66,31 +66,31 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
 
     $attachmentUrl = CRM_Core_BAO_File::attachmentInfo('civicrm_activity', $activityID);
     if ($attachmentUrl) {
-      $report['fields'][] = array(
+      $report['fields'][] = [
         'label' => 'Attachment(s)',
         'value' => $attachmentUrl,
         'type' => 'Link',
-      );
+      ];
     }
 
     $tags = CRM_Core_BAO_EntityTag::getTag($activityID, 'civicrm_activity');
     if (!empty($tags)) {
-      $allTag = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
+      $allTag = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
       foreach ($tags as $tid) {
         $tags[$tid] = $allTag[$tid];
       }
-      $report['fields'][] = array(
+      $report['fields'][] = [
         'label' => 'Tags',
         'value' => implode('<br />', $tags),
         'type' => 'String',
-      );
+      ];
     }
 
     $this->assign('report', $report);
 
     $latestRevisionID = CRM_Activity_BAO_Activity::getLatestActivityId($activityID);
 
-    $viewPriorActivities = array();
+    $viewPriorActivities = [];
     $priorActivities = CRM_Activity_BAO_Activity::getPriorAcitivities($activityID);
     foreach ($priorActivities as $activityId => $activityValues) {
       if (CRM_Case_BAO_Case::checkPermission($activityId, 'view', NULL, $contactID)) {
@@ -152,7 +152,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
 
     $title = $title . $recentContactDisplay . ' (' . $activityTypes[$activityTypeID] . ')';
 
-    $recentOther = array();
+    $recentOther = [];
     if (CRM_Case_BAO_Case::checkPermission($activityID, 'edit')) {
       $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/case/activity',
         "reset=1&action=update&id={$activityID}&cid={$recentContactId}&caseid={$caseID}&context=home"

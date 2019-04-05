@@ -64,11 +64,11 @@ class CRM_Member_StatusOverrideTypes {
    *   In ['Type 1 Value' => 'Type 1 Label'] format
    */
   public static function getSelectOptions() {
-    return array(
+    return [
       self::NO => ts('No'),
       self::PERMANENT => ts('Override Permanently'),
       self::UNTIL_DATE => ts('Override Until Selected Date'),
-    );
+    ];
   }
 
   /**

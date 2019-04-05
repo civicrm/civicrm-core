@@ -67,7 +67,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
       if ($this->_id && ($this->_action & CRM_Core_Action::VIEW)) {
         //user might have special permissions to view this case, CRM-5666
         if (!CRM_Core_Permission::check('access all cases and activities')) {
-          $userCases = CRM_Case_BAO_Case::getCases(FALSE, array('type' => 'any'));
+          $userCases = CRM_Case_BAO_Case::getCases(FALSE, ['type' => 'any']);
           if (!array_key_exists($this->_id, $userCases)) {
             CRM_Core_Error::fatal(ts('You are not authorized to access this page.'));
           }
@@ -221,21 +221,21 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
 
     if (!(self::$_links)) {
       $deleteExtra = ts('Are you sure you want to delete this case?');
-      self::$_links = array(
-        CRM_Core_Action::VIEW => array(
+      self::$_links = [
+        CRM_Core_Action::VIEW => [
           'name' => ts('Manage'),
           'url' => 'civicrm/contact/view/case',
           'qs' => 'action=view&reset=1&cid=%%cid%%&id=%%id%%',
           'class' => 'no-popup',
           'title' => ts('Manage Case'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/case',
           'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%',
           'title' => ts('Delete Case'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }

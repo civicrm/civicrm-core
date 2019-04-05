@@ -37,7 +37,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
    * @return array
    */
   public static function &getFields() {
-    $fields = array();
+    $fields = [];
     $fields = CRM_Grant_BAO_Grant::exportableFields();
     return $fields;
   }
@@ -198,7 +198,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
         $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_grant.$name", $op, $value, "Integer");
 
         list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Grant_DAO_Grant', $name, $value, $op);
-        $query->_qill[$grouping][] = ts("%1 %2 %3", array(1 => $label, 2 => $qillop, 3 => $qillVal));
+        $query->_qill[$grouping][] = ts("%1 %2 %3", [1 => $label, 2 => $qillop, 3 => $qillVal]);
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
 
         return;
@@ -214,7 +214,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
           $query->_where[$grouping][] = "civicrm_grant.grant_report_received IS NULL";
         }
 
-        $query->_qill[$grouping][] = ts('Grant Report Received = %1', array(1 => $yesNo));
+        $query->_qill[$grouping][] = ts('Grant Report Received = %1', [1 => $yesNo]);
         $query->_tables['civicrm_grant'] = $query->_whereTables['civicrm_grant'] = 1;
 
         return;
@@ -277,7 +277,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
   ) {
     $properties = NULL;
     if ($mode & CRM_Contact_BAO_Query::MODE_GRANT) {
-      $properties = array(
+      $properties = [
         'contact_type' => 1,
         'contact_sub_type' => 1,
         'sort_name' => 1,
@@ -289,7 +289,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
         'grant_report_received' => 1,
         'grant_money_transfer_date' => 1,
         'grant_note' => 1,
-      );
+      ];
     }
 
     return $properties;
@@ -332,25 +332,25 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
     $form->addFormFieldsFromMetadata();
     $form->assign('grantSearchFields', self::getTemplateHandlableSearchFields());
     $form->add('select', 'grant_type_id', ts('Grant Type'), $grantType, FALSE,
-      array('id' => 'grant_type_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
+      ['id' => 'grant_type_id', 'multiple' => 'multiple', 'class' => 'crm-select2']
     );
 
     $grantStatus = CRM_Core_OptionGroup::values('grant_status');
     $form->add('select', 'grant_status_id', ts('Grant Status'), $grantStatus, FALSE,
-      array('id' => 'grant_status_id', 'multiple' => 'multiple', 'class' => 'crm-select2')
+      ['id' => 'grant_status_id', 'multiple' => 'multiple', 'class' => 'crm-select2']
     );
     $form->addElement('checkbox', 'grant_application_received_date_notset', ts('Date is not set'), NULL);
     $form->addElement('checkbox', 'grant_money_transfer_date_notset', ts('Date is not set'), NULL);
     $form->addElement('checkbox', 'grant_due_date_notset', ts('Date is not set'), NULL);
     $form->addElement('checkbox', 'grant_decision_date_notset', ts('Date is not set'), NULL);
 
-    $form->add('text', 'grant_amount_low', ts('Minimum Amount'), array('size' => 8, 'maxlength' => 8));
-    $form->addRule('grant_amount_low', ts('Please enter a valid money value (e.g. %1).', array(1 => CRM_Utils_Money::format('9.99', ' '))), 'money');
+    $form->add('text', 'grant_amount_low', ts('Minimum Amount'), ['size' => 8, 'maxlength' => 8]);
+    $form->addRule('grant_amount_low', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('9.99', ' ')]), 'money');
 
-    $form->add('text', 'grant_amount_high', ts('Maximum Amount'), array('size' => 8, 'maxlength' => 8));
-    $form->addRule('grant_amount_high', ts('Please enter a valid money value (e.g. %1).', array(1 => CRM_Utils_Money::format('99.99', ' '))), 'money');
+    $form->add('text', 'grant_amount_high', ts('Maximum Amount'), ['size' => 8, 'maxlength' => 8]);
+    $form->addRule('grant_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
 
-    self::addCustomFormFields($form, array('Grant'));
+    self::addCustomFormFields($form, ['Grant']);
 
     $form->assign('validGrant', TRUE);
   }

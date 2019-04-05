@@ -55,22 +55,22 @@ class CRM_Mailing_MailStore_Pop3 extends CRM_Mailing_MailStore {
       print "connecting to $host and authenticating as $username\n";
     }
 
-    $options = array('ssl' => $ssl);
+    $options = ['ssl' => $ssl];
     $this->_transport = new ezcMailPop3Transport($host, NULL, $options);
     $this->_transport->authenticate($username, $password);
 
-    $this->_ignored = $this->maildir(implode(DIRECTORY_SEPARATOR, array(
+    $this->_ignored = $this->maildir(implode(DIRECTORY_SEPARATOR, [
           'CiviMail.ignored',
           date('Y'),
           date('m'),
           date('d'),
-        )));
-    $this->_processed = $this->maildir(implode(DIRECTORY_SEPARATOR, array(
+        ]));
+    $this->_processed = $this->maildir(implode(DIRECTORY_SEPARATOR, [
           'CiviMail.processed',
           date('Y'),
           date('m'),
           date('d'),
-        )));
+        ]));
   }
 
   /**

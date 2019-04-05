@@ -54,13 +54,13 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getInfo() {
-    return array(
+    return [
       'name' => 'CiviContribute',
       'translatedName' => ts('CiviContribute'),
       'title' => ts('CiviCRM Contribution Engine'),
       'search' => 1,
       'showActivitiesInCore' => 1,
-    );
+    ];
   }
 
   /**
@@ -80,23 +80,23 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    *   collection of permissions, null if none
    */
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
-    $permissions = array(
-      'access CiviContribute' => array(
+    $permissions = [
+      'access CiviContribute' => [
         ts('access CiviContribute'),
         ts('Record backend contributions (with edit contributions) and view all contributions (for visible contacts)'),
-      ),
-      'edit contributions' => array(
+      ],
+      'edit contributions' => [
         ts('edit contributions'),
         ts('Record and update contributions'),
-      ),
-      'make online contributions' => array(
+      ],
+      'make online contributions' => [
         ts('make online contributions'),
-      ),
-      'delete in CiviContribute' => array(
+      ],
+      'delete in CiviContribute' => [
         ts('delete in CiviContribute'),
         ts('Delete contributions'),
-      ),
-    );
+      ],
+    ];
 
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
@@ -118,9 +118,9 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    * @return array
    */
   public function getAnonymousPermissionWarnings() {
-    return array(
+    return [
       'access CiviContribute',
-    );
+    ];
   }
 
   /**
@@ -136,12 +136,12 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    * @return array|null
    */
   public function getUserDashboardElement() {
-    return array(
+    return [
       'name' => ts('Contributions'),
       'title' => ts('Your Contribution(s)'),
-      'perm' => array('make online contributions'),
+      'perm' => ['make online contributions'],
       'weight' => 10,
-    );
+    ];
   }
 
   /**
@@ -157,11 +157,11 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    * @return array|null
    */
   public function registerTab() {
-    return array(
+    return [
       'title' => ts('Contributions'),
       'url' => 'contribution',
       'weight' => 20,
-    );
+    ];
   }
 
   /**
@@ -185,10 +185,10 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
    * @return array|null
    */
   public function registerAdvancedSearchPane() {
-    return array(
+    return [
       'title' => ts('Contributions'),
       'weight' => 20,
-    );
+    ];
   }
 
   /**
@@ -217,20 +217,20 @@ class CRM_Contribute_Info extends CRM_Core_Component_Info {
     if (CRM_Core_Permission::check('access CiviContribute') &&
       CRM_Core_Permission::check('edit contributions')
     ) {
-      $shortCut[] = array(
+      $shortCut[] = [
         'path' => 'civicrm/contribute/add',
         'query' => "reset=1&action=add&context=standalone",
         'ref' => 'new-contribution',
         'title' => ts('Contribution'),
-      );
+      ];
       if ($newCredit) {
         $title = ts('Contribution') . '<br />&nbsp;&nbsp;(' . ts('credit card') . ')';
-        $shortCut[0]['shortCuts'][] = array(
+        $shortCut[0]['shortCuts'][] = [
           'path' => 'civicrm/contribute/add',
           'query' => "reset=1&action=add&context=standalone&mode=live",
           'ref' => 'new-contribution-cc',
           'title' => $title,
-        );
+        ];
       }
       $shortCuts = array_merge($shortCuts, $shortCut);
     }

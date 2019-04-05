@@ -70,17 +70,17 @@ class CRM_Price_Form_DeleteSet extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     $this->assign('title', $this->_title);
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'next',
         'name' => ts('Delete Price Set'),
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ),
-    ));
+      ],
+    ]);
   }
 
   /**
@@ -91,12 +91,12 @@ class CRM_Price_Form_DeleteSet extends CRM_Core_Form {
   public function postProcess() {
     if (CRM_Price_BAO_PriceSet::deleteSet($this->_sid)) {
       CRM_Core_Session::setStatus(ts('The Price Set \'%1\' has been deleted.',
-        array(1 => $this->_title), ts('Deleted'), 'success'
+        [1 => $this->_title], ts('Deleted'), 'success'
       ));
     }
     else {
       CRM_Core_Session::setStatus(ts('The Price Set \'%1\' has not been deleted! You must delete all price fields in this set prior to deleting the set.',
-        array(1 => $this->_title)
+        [1 => $this->_title]
       ), 'Unable to Delete', 'error');
     }
   }

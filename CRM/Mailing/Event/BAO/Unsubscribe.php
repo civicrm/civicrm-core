@@ -77,10 +77,10 @@ SET    on_hold = 2,
        hold_date = %1
 WHERE  email = %2
 ";
-        $sqlParams = array(
-          1 => array($now, 'Timestamp'),
-          2 => array($email->email, 'String'),
-        );
+        $sqlParams = [
+          1 => [$now, 'Timestamp'],
+          2 => [$email->email, 'String'],
+        ];
         CRM_Core_DAO::executeQuery($sql, $sqlParams);
       }
     }
@@ -97,13 +97,13 @@ WHERE  email = %2
     $ue->time_stamp = $now;
     $ue->save();
 
-    $shParams = array(
+    $shParams = [
       'contact_id' => $q->contact_id,
       'group_id' => NULL,
       'status' => 'Removed',
       'method' => 'Email',
       'tracking' => $ue->id,
-    );
+    ];
     CRM_Contact_BAO_SubscriptionHistory::create($shParams);
 
     $transaction->commit();
@@ -162,7 +162,7 @@ WHERE  email = %2
     $entity = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingGroup', $mailing_id, 'entity_table', 'mailing_id');
 
     // If $entity is null and $mailing_Type is either winner or experiment then we are deailing with an AB test
-    $abtest_types = array('experiment', 'winner');
+    $abtest_types = ['experiment', 'winner'];
     if (empty($entity) && in_array($mailing_type, $abtest_types)) {
       $mailing_id_a = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingAB', $mailing_id, 'mailing_id_a', 'mailing_id_b');
       $field = 'mailing_id_b';
@@ -198,9 +198,9 @@ WHERE  email = %2
     // Make a list of groups and a list of prior mailings that received
     // this mailing.
 
-    $groups = array();
-    $base_groups = array();
-    $mailings = array();
+    $groups = [];
+    $base_groups = [];
+    $mailings = [];
 
     while ($do->fetch()) {
       if ($do->entity_table == $group) {
@@ -227,7 +227,7 @@ WHERE  email = %2
                 WHERE       $mg.mailing_id IN (" . implode(', ', $mailings) . ")
                     AND     $mg.group_type = 'Include'");
 
-      $mailings = array();
+      $mailings = [];
 
       while ($do->fetch()) {
         if ($do->entity_table == $group) {
@@ -274,12 +274,12 @@ WHERE  email = %2
                         )");
 
     if ($return) {
-      $returnGroups = array();
+      $returnGroups = [];
       while ($do->fetch()) {
-        $returnGroups[$do->group_id] = array(
+        $returnGroups[$do->group_id] = [
           'title' => $do->title,
           'description' => $do->description,
-        );
+        ];
       }
       return $returnGroups;
     }
@@ -289,7 +289,7 @@ WHERE  email = %2
       }
     }
 
-    $contacts = array($contact_id);
+    $contacts = [$contact_id];
     foreach ($groups as $group_id => $group_name) {
       $notremoved = FALSE;
       if ($group_name) {
@@ -416,13 +416,13 @@ WHERE  email = %2
 
     $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
 
-    $headers = array(
+    $headers = [
       'Subject' => $component->subject,
       'From' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
       'To' => $eq->email,
       'Reply-To' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
-    );
+    ];
     CRM_Mailing_BAO_Mailing::addMessageIdHeader($headers, 'u', $job, $queue_id, $eq->hash);
 
     $b = CRM_Utils_Mail::setMimeParams($message);
@@ -598,19 +598,19 @@ WHERE  email = %2
 
     $dao->query($query);
 
-    $results = array();
+    $results = [];
 
     while ($dao->fetch()) {
       $url = CRM_Utils_System::url('civicrm/contact/view',
         "reset=1&cid={$dao->contact_id}"
       );
-      $results[] = array(
+      $results[] = [
         'name' => "<a href=\"$url\">{$dao->display_name}</a>",
         'email' => $dao->email,
         // Next value displays in selector under either Unsubscribe OR Optout column header, so always s/b Yes.
         'unsubOrOptout' => ts('Yes'),
         'date' => CRM_Utils_Date::customFormat($dao->date),
-      );
+      ];
     }
     return $results;
   }
@@ -641,7 +641,7 @@ SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,
       $email = $dao->email;
     }
 
-    return array($displayName, $email);
+    return [$displayName, $email];
   }
 
 }

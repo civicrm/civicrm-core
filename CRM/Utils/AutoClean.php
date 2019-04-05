@@ -87,13 +87,13 @@ class CRM_Utils_AutoClean {
   public static function swap($getter, $setter, $tmpValue) {
     $resolver = \Civi\Core\Resolver::singleton();
 
-    $origValue = $resolver->call($getter, array());
+    $origValue = $resolver->call($getter, []);
 
     $ac = new CRM_Utils_AutoClean();
     $ac->callback = $setter;
-    $ac->args = array($origValue);
+    $ac->args = [$origValue];
 
-    $resolver->call($setter, array($tmpValue));
+    $resolver->call($setter, [$tmpValue]);
 
     return $ac;
   }

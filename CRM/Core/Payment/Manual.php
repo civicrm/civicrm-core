@@ -62,7 +62,7 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
       // @todo - use profile api to retrieve this - either as pseudo-profile or (better) set up billing
       // as a reserved profile in the DB and (even better) allow the profile to be selected
       // on the form instead of just 'billing for pay=later bool'
-      return array(
+      return [
         'first_name' => 'billing_first_name',
         'middle_name' => 'billing_middle_name',
         'last_name' => 'billing_last_name',
@@ -71,10 +71,10 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
         'country' => "billing_country_id-{$billingLocationID}",
         'state_province' => "billing_state_province_id-{$billingLocationID}",
         'postal_code' => "billing_postal_code-{$billingLocationID}",
-      );
+      ];
     }
     else {
-      return array();
+      return [];
     }
   }
 
@@ -85,17 +85,17 @@ class CRM_Core_Payment_Manual extends CRM_Core_Payment {
    */
   public function getPaymentFormFields() {
     if (!$this->isBackOffice()) {
-      return array();
+      return [];
     }
 
     $paymentInstrument = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $this->getPaymentInstrumentID());
     if ($paymentInstrument === 'Credit Card') {
-      return array('credit_card_type', 'pan_truncation');
+      return ['credit_card_type', 'pan_truncation'];
     }
     elseif ($paymentInstrument === 'Check') {
-      return array('check_number');
+      return ['check_number'];
     }
-    return array();
+    return [];
   }
 
   /**

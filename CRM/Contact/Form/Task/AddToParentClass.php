@@ -46,22 +46,22 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
 
   public function buildQuickForm() {
     $contactType = $this->get('contactType');
-    CRM_Utils_System::setTitle(ts('Add Contacts to %1', array(1 => $contactType)));
-    $this->addElement('text', 'name', ts('Find Target %1', array(1 => $contactType)));
+    CRM_Utils_System::setTitle(ts('Add Contacts to %1', [1 => $contactType]));
+    $this->addElement('text', 'name', ts('Find Target %1', [1 => $contactType]));
 
     $this->add('select',
       'relationship_type_id',
       ts('Relationship Type'),
-      array(
+      [
         '' => ts('- select -'),
-      ) +
+      ] +
       CRM_Contact_BAO_Relationship::getRelationType($contactType), TRUE
     );
 
     $searchRows = $this->get('searchRows');
     $searchCount = $this->get('searchCount');
     if ($searchRows) {
-      $checkBoxes = array();
+      $checkBoxes = [];
       $chekFlag = 0;
       foreach ($searchRows as $id => $row) {
         if (!$chekFlag) {
@@ -81,19 +81,19 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
     $this->assign('searchCount', $searchCount);
     $this->assign('searchDone', $this->get('searchDone'));
     $this->assign('contact_type_display', ts($contactType));
-    $this->addElement('submit', $this->getButtonName('refresh'), ts('Search'), array('class' => 'crm-form-submit'));
-    $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), array('class' => 'crm-form-submit'));
-    $this->addButtons(array(
-        array(
+    $this->addElement('submit', $this->getButtonName('refresh'), ts('Search'), ['class' => 'crm-form-submit']);
+    $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), ['class' => 'crm-form-submit']);
+    $this->addButtons([
+        [
           'type' => 'next',
-          'name' => ts('Add to %1', array(1 => $contactType)),
+          'name' => ts('Add to %1', [1 => $contactType]),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
   }
   /**
@@ -106,10 +106,10 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
       return;
     }
     $relationshipTypeParts = explode('_', $this->params['relationship_type_id']);
-    $params = array(
+    $params = [
       'relationship_type_id' => $relationshipTypeParts[0],
       'is_active' => 1,
-    );
+    ];
     $secondaryRelationshipSide = $relationshipTypeParts[1];
     $primaryRelationshipSide = $relationshipTypeParts[2];
     $primaryFieldName = 'contact_id_' . $primaryRelationshipSide;
@@ -125,33 +125,33 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
     $relatedContactName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params[$primaryFieldName],
       'display_name');
 
-    $status = array(
-      ts('%count %2 %3 relationship created', array(
+    $status = [
+      ts('%count %2 %3 relationship created', [
         'count' => $outcome['valid'],
         'plural' => '%count %2 %3 relationships created',
         2 => $relationshipLabel,
         3 => $relatedContactName,
-      )),
-    );
+      ]),
+    ];
     if ($outcome['duplicate']) {
-      $status[] = ts('%count was skipped because the contact is already %2 %3', array(
+      $status[] = ts('%count was skipped because the contact is already %2 %3', [
         'count' => $outcome['duplicate'],
         'plural' => '%count were skipped because the contacts are already %2 %3',
         2 => $relationshipLabel,
         3 => $relatedContactName,
-      ));
+      ]);
     }
     if ($outcome['invalid']) {
-      $status[] = ts('%count relationship was not created because the contact is not of the right type for this relationship', array(
+      $status[] = ts('%count relationship was not created because the contact is not of the right type for this relationship', [
         'count' => $outcome['invalid'],
         'plural' => '%count relationships were not created because the contact is not of the right type for this relationship',
-      ));
+      ]);
     }
     $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-    CRM_Core_Session::setStatus($status, ts('Relationship created.', array(
+    CRM_Core_Session::setStatus($status, ts('Relationship created.', [
       'count' => $outcome['valid'],
       'plural' => 'Relationships created.',
-    )), 'success', array('expires' => 0));
+    ]), 'success', ['expires' => 0]);
 
   }
 
@@ -164,20 +164,20 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
    */
   public function search(&$form, &$params) {
     //max records that will be listed
-    $searchValues = array();
+    $searchValues = [];
     if (!empty($params['rel_contact'])) {
       if (isset($params['rel_contact_id']) &&
         is_numeric($params['rel_contact_id'])
       ) {
-        $searchValues[] = array('contact_id', '=', $params['rel_contact_id'], 0, 1);
+        $searchValues[] = ['contact_id', '=', $params['rel_contact_id'], 0, 1];
       }
       else {
-        $searchValues[] = array('sort_name', 'LIKE', $params['rel_contact'], 0, 1);
+        $searchValues[] = ['sort_name', 'LIKE', $params['rel_contact'], 0, 1];
       }
     }
     $contactTypeAdded = FALSE;
 
-    $excludedContactIds = array();
+    $excludedContactIds = [];
     if (isset($form->_contactId)) {
       $excludedContactIds[] = $form->_contactId;
     }
@@ -200,18 +200,18 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
         $form->set('contact_type', $type);
         $form->set('contact_sub_type', $subType);
         if ($type == 'Individual' || $type == 'Organization' || $type == 'Household') {
-          $searchValues[] = array('contact_type', '=', $type, 0, 0);
+          $searchValues[] = ['contact_type', '=', $type, 0, 0];
           $contactTypeAdded = TRUE;
         }
 
         if ($subType) {
-          $searchValues[] = array('contact_sub_type', '=', $subType, 0, 0);
+          $searchValues[] = ['contact_sub_type', '=', $subType, 0, 0];
         }
       }
     }
 
     if (!$contactTypeAdded && !empty($params['contact_type'])) {
-      $searchValues[] = array('contact_type', '=', $params['contact_type'], 0, 0);
+      $searchValues[] = ['contact_type', '=', $params['contact_type'], 0, 0];
     }
 
     // get the count of contact
@@ -224,7 +224,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
       $result = $query->searchQuery(0, 50, NULL);
 
       $config = CRM_Core_Config::singleton();
-      $searchRows = array();
+      $searchRows = [];
 
       //variable is set if only one record is foun and that record already has relationship with the contact
       $duplicateRelationship = 0;

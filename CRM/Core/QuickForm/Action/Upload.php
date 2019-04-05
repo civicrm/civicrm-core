@@ -96,19 +96,19 @@ class CRM_Core_QuickForm_Action_Upload extends CRM_Core_QuickForm_Action {
         $newName = CRM_Utils_File::makeFileName($value['name']);
         $status = $element->moveUploadedFile($this->_uploadDir, $newName);
         if (!$status) {
-          CRM_Core_Error::statusBounce(ts('We could not move the uploaded file %1 to the upload directory %2. Please verify that the \'Temporary Files\' setting points to a valid path which is writable by your web server.', array(
+          CRM_Core_Error::statusBounce(ts('We could not move the uploaded file %1 to the upload directory %2. Please verify that the \'Temporary Files\' setting points to a valid path which is writable by your web server.', [
                 1 => $value['name'],
                 2 => $this->_uploadDir,
-              )));
+              ]));
         }
         if (!empty($data['values'][$pageName][$uploadName]['name'])) {
           @unlink($this->_uploadDir . $data['values'][$pageName][$uploadName]);
         }
 
-        $value = array(
+        $value = [
           'name' => $this->_uploadDir . $newName,
           'type' => $value['type'],
-        );
+        ];
         //CRM-19460 handle brackets if present in $uploadName, similar things we do it for all other inputs.
         $value = $element->_prepareValue($value, TRUE);
         $data['values'][$pageName] = HTML_QuickForm::arrayMerge($data['values'][$pageName], $value);

@@ -108,7 +108,7 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   public function getTasks() {
     $this->init();
 
-    $tasks = array();
+    $tasks = [];
     $tasks[] = new CRM_Core_CodeGen_Config($this);
     $tasks[] = new CRM_Core_CodeGen_Reflection($this);
     $tasks[] = new CRM_Core_CodeGen_Schema($this);
@@ -127,11 +127,11 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
   public function getSourceDigest() {
     if ($this->sourceDigest === NULL) {
       $srcDir = CRM_Core_CodeGen_Util_File::findCoreSourceDir();
-      $files = CRM_Core_CodeGen_Util_File::findManyFiles(array(
-        array("$srcDir/CRM/Core/CodeGen", '*.php'),
-        array("$srcDir/xml", "*.php"),
-        array("$srcDir/xml", "*.tpl"),
-      ));
+      $files = CRM_Core_CodeGen_Util_File::findManyFiles([
+        ["$srcDir/CRM/Core/CodeGen", '*.php'],
+        ["$srcDir/xml", "*.php"],
+        ["$srcDir/xml", "*.tpl"],
+      ]);
 
       $this->sourceDigest = CRM_Core_CodeGen_Util_File::digestAll($files);
     }

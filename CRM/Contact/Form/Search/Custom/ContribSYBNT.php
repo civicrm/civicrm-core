@@ -46,32 +46,32 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Searc
     $this->_formValues = self::formatSavedSearchFields($formValues);
     $this->_permissionedComponent = 'CiviContribute';
 
-    $this->_columns = array(
+    $this->_columns = [
       ts('Contact ID') => 'contact_id',
       ts('Name') => 'display_name',
       ts('Contribution Count') => 'donation_count',
       ts('Contribution Amount') => 'donation_amount',
-    );
+    ];
 
-    $this->_amounts = array(
+    $this->_amounts = [
       'min_amount_1' => ts('Min Amount One'),
       'max_amount_1' => ts('Max Amount One'),
       'min_amount_2' => ts('Min Amount Two'),
       'max_amount_2' => ts('Max Amount Two'),
       'exclude_min_amount' => ts('Exclusion Min Amount'),
       'exclude_max_amount' => ts('Exclusion Max Amount'),
-    );
+    ];
 
-    $this->_dates = array(
+    $this->_dates = [
       'start_date_1' => ts('Start Date One'),
       'end_date_1' => ts('End Date One'),
       'start_date_2' => ts('Start Date Two'),
       'end_date_2' => ts('End Date Two'),
       'exclude_start_date' => ts('Exclusion Start Date'),
       'exclude_end_date' => ts('Exclusion End Date'),
-    );
+    ];
 
-    $this->_checkboxes = array('is_first_amount' => ts('First Donation?'));
+    $this->_checkboxes = ['is_first_amount' => ts('First Donation?')];
 
     foreach ($this->_amounts as $name => $title) {
       $this->{$name} = CRM_Utils_Array::value($name, $this->_formValues);
@@ -101,7 +101,7 @@ class CRM_Contact_Form_Search_Custom_ContribSYBNT extends CRM_Contact_Form_Searc
     }
 
     foreach ($this->_dates as $name => $title) {
-      $form->add('datepicker', $name, $title, array(), FALSE, array('time' => FALSE));
+      $form->add('datepicker', $name, $title, [], FALSE, ['time' => FALSE]);
     }
 
     foreach ($this->_checkboxes as $name => $title) {
@@ -241,25 +241,25 @@ count(contrib_1.id) AS donation_count
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    $clauses = array();
+    $clauses = [];
 
     if (!empty($this->start_date_1)) {
-      $clauses[] = CRM_Core_DAO::composeQuery('contrib_1.receive_date >= %1', array(1 => array($this->start_date_1, 'String')));
+      $clauses[] = CRM_Core_DAO::composeQuery('contrib_1.receive_date >= %1', [1 => [$this->start_date_1, 'String']]);
     }
 
     if (!empty($this->end_date_1)) {
-      $clauses[] = CRM_Core_DAO::composeQuery('contrib_1.receive_date <=  %1', array(1 => array($this->end_date_1, 'String')));
+      $clauses[] = CRM_Core_DAO::composeQuery('contrib_1.receive_date <=  %1', [1 => [$this->end_date_1, 'String']]);
     }
 
     if (!empty($this->start_date_2) || !empty($this->end_date_2)) {
       $clauses[] = "contrib_2.is_test = 0";
 
       if (!empty($this->start_date_2)) {
-        $clauses[] = CRM_Core_DAO::composeQuery('contrib_2.receive_date >= %1', array(1 => array($this->start_date_2, 'String')));
+        $clauses[] = CRM_Core_DAO::composeQuery('contrib_2.receive_date >= %1', [1 => [$this->start_date_2, 'String']]);
       }
 
       if (!empty($this->end_date_2)) {
-        $clauses[] = CRM_Core_DAO::composeQuery('contrib_2.receive_date <=  %1', array(1 => array($this->end_date_2, 'String')));
+        $clauses[] = CRM_Core_DAO::composeQuery('contrib_2.receive_date <=  %1', [1 => [$this->end_date_2, 'String']]);
       }
     }
 
@@ -275,13 +275,13 @@ count(contrib_1.id) AS donation_count
       $sql = "CREATE TEMPORARY TABLE XG_CustomSearch_SYBNT ( contact_id int primary key) ENGINE=HEAP";
       CRM_Core_DAO::executeQuery($sql);
 
-      $excludeClauses = array();
+      $excludeClauses = [];
       if ($this->exclude_start_date) {
-        $excludeClauses[] = CRM_Core_DAO::composeQuery('c.receive_date >=  %1', array(1 => array($this->exclude_start_date, 'String')));
+        $excludeClauses[] = CRM_Core_DAO::composeQuery('c.receive_date >=  %1', [1 => [$this->exclude_start_date, 'String']]);
       }
 
       if ($this->exclude_end_date) {
-        $excludeClauses[] = CRM_Core_DAO::composeQuery('c.receive_date <= %1', array(1 => array($this->exclude_end_date, 'String')));
+        $excludeClauses[] = CRM_Core_DAO::composeQuery('c.receive_date <= %1', [1 => [$this->exclude_end_date, 'String']]);
       }
 
       $excludeClause = NULL;
@@ -289,7 +289,7 @@ count(contrib_1.id) AS donation_count
         $excludeClause = ' AND ' . implode(' AND ', $excludeClauses);
       }
 
-      $having = array();
+      $having = [];
       if ($this->exclude_min_amount) {
         $having[] = "sum(c.total_amount) >= {$this->exclude_min_amount}";
       }
@@ -344,7 +344,7 @@ AND      c.receive_date < {$this->start_date_1}
    * @return string
    */
   public function having($includeContactIDs = FALSE) {
-    $clauses = array();
+    $clauses = [];
     $min = CRM_Utils_Array::value('min_amount', $this->_formValues);
     if ($min) {
       $clauses[] = "sum(contrib_1.total_amount) >= $min";
@@ -409,14 +409,14 @@ AND      c.receive_date < {$this->start_date_1}
    * @return array
    */
   public static function formatSavedSearchFields($formValues) {
-    $dateFields = array(
+    $dateFields = [
       'start_date_1',
       'end_date_1',
       'start_date_2',
       'end_date_2',
       'exclude_start_date',
       'exclude_end_date',
-    );
+    ];
     foreach ($formValues as $element => $value) {
       if (in_array($element, $dateFields) && !empty($value)) {
         $formValues[$element] = date('Y-m-d', strtotime($value));

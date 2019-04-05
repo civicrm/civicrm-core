@@ -63,8 +63,8 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
     $this->_fieldId = $this->get('fieldId');
     if ($this->_fieldId) {
       // field preview
-      $defaults = array();
-      $params = array('id' => $this->_fieldId);
+      $defaults = [];
+      $params = ['id' => $this->_fieldId];
       $fieldDAO = new CRM_Core_DAO_CustomField();
       CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $defaults);
 
@@ -75,9 +75,9 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
         CRM_Core_Error::statusBounce(ts('This field is inactive so it will not display on edit form.'));
       }
 
-      $groupTree = array();
+      $groupTree = [];
       $groupTree[$this->_groupId]['id'] = 0;
-      $groupTree[$this->_groupId]['fields'] = array();
+      $groupTree[$this->_groupId]['fields'] = [];
       $groupTree[$this->_groupId]['fields'][$this->_fieldId] = $defaults;
       $this->_groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, $this);
       $this->assign('preview_type', 'field');
@@ -96,7 +96,7 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
    *   the default array reference
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     CRM_Core_BAO_CustomGroup::setDefaults($this->_groupTree, $defaults, FALSE, FALSE);
 
@@ -117,13 +117,13 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
 
       $this->assign('groupTree', $this->_groupTree);
     }
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'cancel',
           'name' => ts('Done with Preview'),
           'isDefault' => TRUE,
-        ),
-      )
+        ],
+      ]
     );
   }
 

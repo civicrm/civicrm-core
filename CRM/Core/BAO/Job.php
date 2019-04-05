@@ -152,14 +152,14 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    *
    * @return CRM_Core_DAO
    */
-  public static function copy($id, $params = array()) {
-    $fieldsFix = array(
-      'suffix' => array(
+  public static function copy($id, $params = []) {
+    $fieldsFix = [
+      'suffix' => [
         'name' => ' - ' . ts('Copy'),
-      ),
+      ],
       'replace' => $params,
-    );
-    $copy = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_Job', array('id' => $id), NULL, $fieldsFix);
+    ];
+    $copy = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_Job', ['id' => $id], NULL, $fieldsFix);
     $copy->save();
     CRM_Utils_Hook::copy('Job', $copy);
 

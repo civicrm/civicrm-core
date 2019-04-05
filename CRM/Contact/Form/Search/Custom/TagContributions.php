@@ -49,14 +49,14 @@ class CRM_Contact_Form_Search_Custom_TagContributions extends CRM_Contact_Form_S
     /**
      * Define the columns for search result rows
      */
-    $this->_columns = array(
+    $this->_columns = [
       ts('Contact ID') => 'contact_id',
       ts('Full Name') => 'sort_name',
       ts('First Name') => 'first_name',
       ts('Last Name') => 'last_name',
       ts('Tag') => 'tag_name',
       ts('Totals') => 'amount',
-    );
+    ];
   }
 
   /**
@@ -73,16 +73,16 @@ class CRM_Contact_Form_Search_Custom_TagContributions extends CRM_Contact_Form_S
      * Define the search form fields here
      */
 
-    $form->add('datepicker', 'start_date', ts('Contribution Date From'), [], FALSE, array('time' => FALSE));
-    $form->add('datepicker', 'end_date', ts('...through'), [], FALSE, array('time' => FALSE));
-    $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
+    $form->add('datepicker', 'start_date', ts('Contribution Date From'), [], FALSE, ['time' => FALSE]);
+    $form->add('datepicker', 'end_date', ts('...through'), [], FALSE, ['time' => FALSE]);
+    $tag = ['' => ts('- any tag -')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
     $form->addElement('select', 'tag', ts('Tagged'), $tag);
 
     /**
      * If you are using the sample template, this array tells the template fields to render
      * for the search form.
      */
-    $form->assign('elements', array('start_date', 'end_date', 'tag'));
+    $form->assign('elements', ['start_date', 'end_date', 'tag']);
   }
 
   /**
@@ -175,7 +175,7 @@ WHERE  $where
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    $clauses = array();
+    $clauses = [];
 
     $clauses[] = "contact_a.contact_type = 'Individual'";
     $clauses[] = "civicrm_contribution.contact_id = contact_a.id";
@@ -198,7 +198,7 @@ WHERE  $where
     }
 
     if ($includeContactIDs) {
-      $contactIDs = array();
+      $contactIDs = [];
       foreach ($this->_formValues as $id => $value) {
         if ($value &&
           substr($id, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX
@@ -291,10 +291,10 @@ WHERE  $where
    * @return array
    */
   public static function formatSavedSearchFields($formValues) {
-    $dateFields = array(
+    $dateFields = [
       'start_date',
       'end_date',
-    );
+    ];
     foreach ($formValues as $element => $value) {
       if (in_array($element, $dateFields) && !empty($value)) {
         $formValues[$element] = date('Y-m-d', strtotime($value));

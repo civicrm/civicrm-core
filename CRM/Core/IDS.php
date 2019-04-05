@@ -35,11 +35,11 @@ class CRM_Core_IDS {
   /**
    * Define the threshold for the ids reactions.
    */
-  private $threshold = array(
+  private $threshold = [
     'log' => 25,
     'warn' => 50,
     'kick' => 75,
-  );
+  ];
 
   /**
    * @var string
@@ -62,7 +62,7 @@ class CRM_Core_IDS {
     }
 
     // lets bypass a few civicrm urls from this check
-    $skip = array('civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates');
+    $skip = ['civicrm/admin/setting/updateConfigBackend', 'civicrm/admin/messageTemplates'];
     CRM_Utils_Hook::idsException($skip);
     $this->path = $route['path'];
     if (in_array($this->path, $skip)) {
@@ -120,17 +120,17 @@ class CRM_Core_IDS {
     $tmpDir = empty($config->uploadDir) ? CIVICRM_TEMPLATE_COMPILEDIR : $config->uploadDir;
     global $civicrm_root;
 
-    return array(
-      'General' => array(
+    return [
+      'General' => [
         'filter_type' => 'xml',
         'filter_path' => "{$civicrm_root}/packages/IDS/default_filter.xml",
         'tmp_path' => $tmpDir,
         'HTML_Purifier_Path' => $civicrm_root . '/vendor/ezyang/htmlpurifier/library/HTMLPurifier.auto.php',
         'HTML_Purifier_Cache' => $tmpDir,
         'scan_keys' => '',
-        'exceptions' => array('__utmz', '__utmc'),
-      ),
-    );
+        'exceptions' => ['__utmz', '__utmc'],
+      ],
+    ];
   }
 
   /**
@@ -139,7 +139,7 @@ class CRM_Core_IDS {
    * @return array
    */
   public static function createStandardConfig() {
-    $excs = array(
+    $excs = [
       'widget_code',
       'html_message',
       'text_message',
@@ -173,7 +173,7 @@ class CRM_Core_IDS {
       'suggested_message',
       'page_text',
       'details',
-    );
+    ];
 
     $result = self::createBaseConfig();
 
@@ -191,10 +191,10 @@ class CRM_Core_IDS {
    */
   public static function createRouteConfig($route) {
     $config = \CRM_Core_IDS::createStandardConfig();
-    foreach (array('json', 'html', 'exceptions') as $section) {
+    foreach (['json', 'html', 'exceptions'] as $section) {
       if (isset($route['ids_arguments'][$section])) {
         if (!isset($config['General'][$section])) {
-          $config['General'][$section] = array();
+          $config['General'][$section] = [];
         }
         foreach ($route['ids_arguments'][$section] as $v) {
           $config['General'][$section][] = $v;
@@ -251,10 +251,10 @@ class CRM_Core_IDS {
       isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '127.0.0.1'
       );
 
-    $data = array();
+    $data = [];
     $session = CRM_Core_Session::singleton();
     foreach ($result as $event) {
-      $data[] = array(
+      $data[] = [
         'name' => $event->getName(),
         'value' => stripslashes($event->getValue()),
         'page' => $_SERVER['REQUEST_URI'],
@@ -263,7 +263,7 @@ class CRM_Core_IDS {
         'ip' => $ip,
         'reaction' => $reaction,
         'impact' => $result->getImpact(),
-      );
+      ];
     }
 
     CRM_Core_Error::debug_var('IDS Detector Details', $data);
@@ -294,18 +294,18 @@ class CRM_Core_IDS {
 
     if (in_array(
       $this->path,
-      array("civicrm/ajax/rest", "civicrm/api/json")
+      ["civicrm/ajax/rest", "civicrm/api/json"]
     )) {
       require_once "api/v3/utils.php";
       $error = civicrm_api3_create_error(
         $msg,
-        array(
+        [
           'IP' => $_SERVER['REMOTE_ADDR'],
           'error_code' => 'IDS_KICK',
           'level' => 'security',
           'referer' => $_SERVER['HTTP_REFERER'],
           'reason' => 'XSS suspected',
-        )
+        ]
       );
       CRM_Utils_JSON::output($error);
     }

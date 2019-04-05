@@ -40,7 +40,7 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
   /**
    * @param array $data
    */
-  public function __construct($data = array()) {
+  public function __construct($data = []) {
     $this->data = $data;
   }
 
@@ -72,7 +72,7 @@ class CRM_Utils_OptionBag implements ArrayAccess, IteratorAggregate, Countable {
       return $r;
     }
     else {
-      throw new \API_Exception(ts("Could not find valid value for %1 (%2)", array(1 => $key, 2 => $type)));
+      throw new \API_Exception(ts("Could not find valid value for %1 (%2)", [1 => $key, 2 => $type]));
     }
   }
 

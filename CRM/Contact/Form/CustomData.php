@@ -135,7 +135,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         $groupTitle = CRM_Core_BAO_CustomGroup::getTitle($this->_groupID);
         $mode = CRM_Utils_Request::retrieve('mode', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'GET');
         $mode = ucfirst($mode);
-        CRM_Utils_System::setTitle(ts('%1 %2 Record', array(1 => $mode, 2 => $groupTitle)));
+        CRM_Utils_System::setTitle(ts('%1 %2 Record', [1 => $mode, 2 => $groupTitle]));
 
         if (!empty($_POST['hidden_custom'])) {
           $this->assign('postedInfo', TRUE);
@@ -177,22 +177,22 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
         if ($isMultiple) {
           $this->assign('multiRecordDisplay', $this->_multiRecordDisplay);
           $saveButtonName = $this->_copyValueId ? ts('Save a Copy') : ts('Save');
-          $this->addButtons(array(
-              array(
+          $this->addButtons([
+              [
                 'type' => 'upload',
                 'name' => $saveButtonName,
                 'isDefault' => TRUE,
-              ),
-              array(
+              ],
+              [
                 'type' => 'upload',
                 'name' => ts('Save and New'),
                 'subName' => 'new',
-              ),
-              array(
+              ],
+              [
                 'type' => 'cancel',
                 'name' => ts('Cancel'),
-              ),
-            )
+              ],
+            ]
           );
         }
       }
@@ -205,17 +205,17 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
 
     // make this form an upload since we dont know if the custom data injected dynamically
     // is of type file etc
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'upload',
           'name' => ts('Save'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
   }
 
@@ -234,7 +234,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
           NULL,
           $this->_entityId,
           $this->_groupID,
-          array(),
+          [],
           NULL,
           TRUE,
           NULL,
@@ -242,7 +242,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
           TRUE,
           $this->_copyValueId
         );
-        $valueIdDefaults = array();
+        $valueIdDefaults = [];
         $groupTreeValueId = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, $this->_copyValueId, $this);
         CRM_Core_BAO_CustomGroup::setDefaults($groupTreeValueId, $valueIdDefaults, FALSE, FALSE, $this->get('action'));
         $tableId = $groupTreeValueId[$this->_groupID]['table_id'];
@@ -280,7 +280,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
 
     $this->assign('customValueCount', $customValueCount);
 
-    $defaults = array();
+    $defaults = [];
     return $defaults;
   }
 

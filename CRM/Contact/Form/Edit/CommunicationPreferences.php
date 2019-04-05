@@ -41,7 +41,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    *
    * @var array
    */
-  static $greetings = array();
+  static $greetings = [];
 
   /**
    * Build the form object elements for Communication Preferences object.
@@ -55,7 +55,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
 
     // checkboxes for DO NOT phone, email, mail
     // we take labels from SelectValues
-    $privacy = $commPreff = $commPreference = array();
+    $privacy = $commPreff = $commPreference = [];
     $privacyOptions = CRM_Core_SelectValues::privacy();
 
     // we add is_opt_out as a separate checkbox below for display and help purposes so remove it here
@@ -67,12 +67,12 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     $form->addGroup($privacy, 'privacy', ts('Privacy'), '&nbsp;<br/>');
 
     // preferred communication method
-    $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method', array('loclize' => TRUE));
+    $comm = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'preferred_communication_method', ['loclize' => TRUE]);
     foreach ($comm as $value => $title) {
       $commPreff[] = $form->createElement('advcheckbox', $value, NULL, $title);
     }
-    $form->addField('preferred_communication_method', array('entity' => 'contact', 'type' => 'CheckBoxGroup'));
-    $form->addField('preferred_language', array('entity' => 'contact'));
+    $form->addField('preferred_communication_method', ['entity' => 'contact', 'type' => 'CheckBoxGroup']);
+    $form->addField('preferred_language', ['entity' => 'contact']);
 
     if (!empty($privacyOptions)) {
       $commPreference['privacy'] = $privacyOptions;
@@ -84,27 +84,27 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
     //using for display purpose.
     $form->assign('commPreference', $commPreference);
 
-    $form->addField('preferred_mail_format', array('entity' => 'contact', 'label' => ts('Email Format')));
+    $form->addField('preferred_mail_format', ['entity' => 'contact', 'label' => ts('Email Format')]);
 
-    $form->addField('is_opt_out', array('entity' => 'contact', 'label' => ts('NO BULK EMAILS (User Opt Out)')));
+    $form->addField('is_opt_out', ['entity' => 'contact', 'label' => ts('NO BULK EMAILS (User Opt Out)')]);
 
-    $form->addField('communication_style_id', array('entity' => 'contact', 'type' => 'RadioGroup'));
+    $form->addField('communication_style_id', ['entity' => 'contact', 'type' => 'RadioGroup']);
     //check contact type and build filter clause accordingly for greeting types, CRM-4575
     $greetings = self::getGreetingFields($form->_contactType);
 
     foreach ($greetings as $greeting => $fields) {
-      $filter = array(
+      $filter = [
         'contact_type' => $form->_contactType,
         'greeting_type' => $greeting,
-      );
+      ];
 
       //add addressee in Contact form
       $greetingTokens = CRM_Core_PseudoConstant::greeting($filter);
       if (!empty($greetingTokens)) {
         $form->addElement('select', $fields['field'], $fields['label'],
-          array(
+          [
             '' => ts('- select -'),
-          ) + $greetingTokens
+          ] + $greetingTokens
         );
         //custom addressee
         $form->addElement('text', $fields['customField'], $fields['customLabel'],
@@ -134,7 +134,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
       $customizedValue = CRM_Core_PseudoConstant::getKey('CRM_Contact_BAO_Contact', $details['field'], 'Customized');
       if (CRM_Utils_Array::value($details['field'], $fields) == $customizedValue && empty($fields[$details['customField']])) {
         $errors[$details['customField']] = ts('Custom  %1 is a required field if %1 is of type Customized.',
-          array(1 => $details['label'])
+          [1 => $details['label']]
         );
       }
     }
@@ -202,36 +202,36 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    */
   public static function getGreetingFields($contactType) {
     if (empty(self::$greetings[$contactType])) {
-      self::$greetings[$contactType] = array();
+      self::$greetings[$contactType] = [];
 
-      $js = array(
+      $js = [
         'onfocus' => "if (!this.value) {  this.value='Dear ';} else return false",
         'onblur' => "if ( this.value == 'Dear') {  this.value='';} else return false",
-      );
+      ];
 
-      self::$greetings[$contactType] = array(
-        'addressee' => array(
+      self::$greetings[$contactType] = [
+        'addressee' => [
           'field' => 'addressee_id',
           'customField' => 'addressee_custom',
           'label' => ts('Addressee'),
           'customLabel' => ts('Custom Addressee'),
           'js' => NULL,
-        ),
-        'email_greeting' => array(
+        ],
+        'email_greeting' => [
           'field' => 'email_greeting_id',
           'customField' => 'email_greeting_custom',
           'label' => ts('Email Greeting'),
           'customLabel' => ts('Custom Email Greeting'),
           'js' => $js,
-        ),
-        'postal_greeting' => array(
+        ],
+        'postal_greeting' => [
           'field' => 'postal_greeting_id',
           'customField' => 'postal_greeting_custom',
           'label' => ts('Postal Greeting'),
           'customLabel' => ts('Custom Postal Greeting'),
           'js' => $js,
-        ),
-      );
+        ],
+      ];
     }
 
     return self::$greetings[$contactType];

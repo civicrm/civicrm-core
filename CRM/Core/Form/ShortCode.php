@@ -52,7 +52,7 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
    *     select => key + EntityRef params
    *   ]]
    */
-  public $components = array();
+  public $components = [];
 
   /**
    * List of radio option groups to display on the form
@@ -63,7 +63,7 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
    * @var array
    *   [key, components, options]
    */
-  public $options = array();
+  public $options = [];
 
 
   /**
@@ -72,99 +72,99 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
   public function preProcess() {
     $config = CRM_Core_Config::singleton();
 
-    $this->components['user-dashboard'] = array(
+    $this->components['user-dashboard'] = [
       'label' => ts("User Dashboard"),
       'select' => NULL,
-    );
-    $this->components['profile'] = array(
+    ];
+    $this->components['profile'] = [
       'label' => ts("Profile"),
-      'select' => array(
+      'select' => [
         'key' => 'gid',
         'entity' => 'UFGroup',
-        'select' => array('minimumInputLength' => 0),
-        'api' => array(
-          'params' => array(
+        'select' => ['minimumInputLength' => 0],
+        'api' => [
+          'params' => [
             'id' => $this->profileAccess(),
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
 
     if (in_array('CiviContribute', $config->enableComponents)) {
-      $this->components['contribution'] = array(
+      $this->components['contribution'] = [
         'label' => ts("Contribution Page"),
-        'select' => array(
+        'select' => [
           'key' => 'id',
           'entity' => 'ContributionPage',
-          'select' => array('minimumInputLength' => 0),
-        ),
-      );
+          'select' => ['minimumInputLength' => 0],
+        ],
+      ];
     }
 
     if (in_array('CiviEvent', $config->enableComponents)) {
-      $this->components['event'] = array(
+      $this->components['event'] = [
         'label' => ts("Event Page"),
-        'select' => array(
+        'select' => [
           'key' => 'id',
           'entity' => 'Event',
-          'select' => array('minimumInputLength' => 0),
-        ),
-      );
+          'select' => ['minimumInputLength' => 0],
+        ],
+      ];
     }
 
     if (in_array('CiviCampaign', $config->enableComponents)) {
-      $this->components['petition'] = array(
+      $this->components['petition'] = [
         'label' => ts("Petition"),
-        'select' => array(
+        'select' => [
           'key' => 'id',
           'entity' => 'Survey',
-          'select' => array('minimumInputLength' => 0),
-          'api' => array(
-            'params' => array(
+          'select' => ['minimumInputLength' => 0],
+          'api' => [
+            'params' => [
               'activity_type_id' => "Petition",
-            ),
-          ),
-        ),
-      );
+            ],
+          ],
+        ],
+      ];
     }
 
-    $this->options = array(
-      array(
+    $this->options = [
+      [
         'key' => 'action',
-        'components' => array('event'),
-        'options' => array(
+        'components' => ['event'],
+        'options' => [
           'info' => ts('Event Info Page'),
           'register' => ts('Event Registration Page'),
-        ),
-      ),
-      array(
+        ],
+      ],
+      [
         'key' => 'mode',
-        'components' => array('contribution', 'event'),
-        'options' => array(
+        'components' => ['contribution', 'event'],
+        'options' => [
           'live' => ts('Live Mode'),
           'test' => ts('Test Drive'),
-        ),
-      ),
-      array(
+        ],
+      ],
+      [
         'key' => 'mode',
-        'components' => array('profile'),
-        'options' => array(
+        'components' => ['profile'],
+        'options' => [
           'create' => ts('Create'),
           'edit' => ts('Edit'),
           'view' => ts('View'),
           'search' => ts('Search/Public Directory'),
-        ),
-      ),
-      array(
+        ],
+      ],
+      [
         'key' => 'hijack',
         'components' => TRUE,
         'label' => ts('If you only insert one shortcode, you can choose to override all page content with the content of the shortcode.'),
-        'options' => array(
+        'options' => [
           '0' => ts("Don't override"),
           '1' => ts('Override page content'),
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
   }
 
   /**
@@ -174,12 +174,12 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
     $components = CRM_Utils_Array::collect('label', $this->components);
     $data = CRM_Utils_Array::collect('select', $this->components);
 
-    $this->add('select', 'component', NULL, $components, FALSE, array('class' => 'crm-select2', 'data-key' => 'component', 'data-entities' => json_encode($data)));
-    $this->add('text', 'entity', NULL, array('placeholder' => ts('- select -')));
+    $this->add('select', 'component', NULL, $components, FALSE, ['class' => 'crm-select2', 'data-key' => 'component', 'data-entities' => json_encode($data)]);
+    $this->add('text', 'entity', NULL, ['placeholder' => ts('- select -')]);
 
-    $options = $defaults = array();
+    $options = $defaults = [];
     foreach ($this->options as $num => $field) {
-      $this->addRadio("option_$num", CRM_Utils_Array::value('label', $field), $field['options'], array('allowClear' => FALSE, 'data-key' => $field['key']));
+      $this->addRadio("option_$num", CRM_Utils_Array::value('label', $field), $field['options'], ['allowClear' => FALSE, 'data-key' => $field['key']]);
       if ($field['components'] === TRUE) {
         $field['components'] = array_keys($this->components);
       }
@@ -214,11 +214,11 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
       AND    j.module = 'Profile'
       ";
     $dao = CRM_Core_DAO::executeQuery($sql);
-    $ids = array();
+    $ids = [];
     while ($dao->fetch()) {
       $ids[] = $dao->id;
     }
-    return array('IN' => $ids);
+    return ['IN' => $ids];
   }
 
   // No postProccess fn; this form never gets submitted

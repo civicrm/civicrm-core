@@ -61,7 +61,7 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
     // Show the subject instead of the name here, since it's being
     // displayed to external contacts/users.
 
-    CRM_Utils_System::setTitle(ts('Forward Mailing: %1', array(1 => $mailing->subject)));
+    CRM_Utils_System::setTitle(ts('Forward Mailing: %1', [1 => $mailing->subject]));
 
     $this->set('queue_id', $queue_id);
     $this->set('job_id', $job_id);
@@ -73,28 +73,28 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     for ($i = 0; $i < 5; $i++) {
-      $this->add('text', "email_$i", ts('Email %1', array(1 => $i + 1)));
+      $this->add('text', "email_$i", ts('Email %1', [1 => $i + 1]));
       $this->addRule("email_$i", ts('Email is not valid.'), 'email');
     }
 
     //insert message Text by selecting "Select Template option"
-    $this->add('textarea', 'forward_comment', ts('Comment'), array('cols' => '80', 'rows' => '8'));
+    $this->add('textarea', 'forward_comment', ts('Comment'), ['cols' => '80', 'rows' => '8']);
     $this->add('wysiwyg', 'html_comment',
       ts('HTML Message'),
-      array('cols' => '80', 'rows' => '8')
+      ['cols' => '80', 'rows' => '8']
     );
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'next',
         'name' => ts('Forward'),
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ),
-    ));
+      ],
+    ]);
   }
 
   /**
@@ -107,12 +107,12 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
     $timeStamp = date('YmdHis');
 
     $formValues = $this->controller->exportValues($this->_name);
-    $params = array();
+    $params = [];
     $params['body_text'] = $formValues['forward_comment'];
     $html_comment = $formValues['html_comment'];
     $params['body_html'] = str_replace('%7B', '{', str_replace('%7D', '}', $html_comment));
 
-    $emails = array();
+    $emails = [];
     for ($i = 0; $i < 5; $i++) {
       $email = $this->controller->exportValue($this->_name, "email_$i");
       if (!empty($email)) {
@@ -122,7 +122,7 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
 
     $forwarded = NULL;
     foreach ($emails as $email) {
-      $params = array(
+      $params = [
         'version' => 3,
         'job_id' => $job_id,
         'event_queue_id' => $queue_id,
@@ -131,22 +131,22 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
         'time_stamp' => $timeStamp,
         'fromEmail' => $this->_fromEmail,
         'params' => $params,
-      );
+      ];
       $result = civicrm_api('Mailing', 'event_forward', $params);
       if (!civicrm_error($result)) {
         $forwarded++;
       }
     }
 
-    $status = ts('Mailing is not forwarded to the given email address.', array(
+    $status = ts('Mailing is not forwarded to the given email address.', [
         'count' => count($emails),
         'plural' => 'Mailing is not forwarded to the given email addresses.',
-      ));
+      ]);
     if ($forwarded) {
-      $status = ts('Mailing is forwarded successfully to %count email address.', array(
+      $status = ts('Mailing is forwarded successfully to %count email address.', [
           'count' => $forwarded,
           'plural' => 'Mailing is forwarded successfully to %count email addresses.',
-        ));
+        ]);
     }
 
     CRM_Utils_System::setUFMessage($status);

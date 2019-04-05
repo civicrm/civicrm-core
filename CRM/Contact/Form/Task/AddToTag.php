@@ -72,7 +72,7 @@ class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
   }
 
   public function addRules() {
-    $this->addFormRule(array('CRM_Contact_Form_Task_AddToTag', 'formRule'));
+    $this->addFormRule(['CRM_Contact_Form_Task_AddToTag', 'formRule']);
   }
 
   /**
@@ -82,7 +82,7 @@ class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
    * @return array
    */
   public static function formRule($form, $rule) {
-    $errors = array();
+    $errors = [];
     if (empty($form['tag']) && empty($form['contact_taglist'])) {
       $errors['_qf_default'] = ts("Please select at least one tag.");
     }
@@ -95,7 +95,7 @@ class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
   public function postProcess() {
     //get the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
-    $contactTags = $tagList = array();
+    $contactTags = $tagList = [];
 
     // check if contact tags exists
     if (!empty($params['tag'])) {
@@ -132,22 +132,22 @@ class CRM_Contact_Form_Task_AddToTag extends CRM_Contact_Form_Task {
     // merge contact and taglist tags
     $allTags = CRM_Utils_Array::crmArrayMerge($contactTags, $tagList);
 
-    $this->_name = array();
+    $this->_name = [];
     foreach ($allTags as $key => $dnc) {
       $this->_name[] = $this->_tags[$key];
 
       list($total, $added, $notAdded) = CRM_Core_BAO_EntityTag::addEntitiesToTag($this->_contactIds, $key,
         'civicrm_contact', FALSE);
 
-      $status = array(ts('%count contact tagged', array('count' => $added, 'plural' => '%count contacts tagged')));
+      $status = [ts('%count contact tagged', ['count' => $added, 'plural' => '%count contacts tagged'])];
       if ($notAdded) {
-        $status[] = ts('%count contact already had this tag', array(
+        $status[] = ts('%count contact already had this tag', [
             'count' => $notAdded,
             'plural' => '%count contacts already had this tag',
-          ));
+          ]);
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-      CRM_Core_Session::setStatus($status, ts("Added Tag <em>%1</em>", array(1 => $this->_tags[$key])), 'success', array('expires' => 0));
+      CRM_Core_Session::setStatus($status, ts("Added Tag <em>%1</em>", [1 => $this->_tags[$key]]), 'success', ['expires' => 0]);
     }
 
   }

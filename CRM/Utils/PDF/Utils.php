@@ -53,7 +53,7 @@ class CRM_Utils_PDF_Utils {
       $pages = &$text;
     }
     else {
-      $pages = array($text);
+      $pages = [$text];
     }
     // Get PDF Page Format
     $format = CRM_Core_BAO_PdfFormat::getDefaultValues();
@@ -69,7 +69,7 @@ class CRM_Utils_PDF_Utils {
     $paper_width = self::convertMetric($paperSize['width'], $paperSize['metric'], 'pt');
     $paper_height = self::convertMetric($paperSize['height'], $paperSize['metric'], 'pt');
     // dompdf requires dimensions in points
-    $paper_size = array(0, 0, $paper_width, $paper_height);
+    $paper_size = [0, 0, $paper_width, $paper_height];
     $orientation = CRM_Core_BAO_PdfFormat::getValue('orientation', $format);
     $metric = CRM_Core_BAO_PdfFormat::getValue('metric', $format);
     $t = CRM_Core_BAO_PdfFormat::getValue('margin_top', $format);
@@ -77,7 +77,7 @@ class CRM_Utils_PDF_Utils {
     $b = CRM_Core_BAO_PdfFormat::getValue('margin_bottom', $format);
     $l = CRM_Core_BAO_PdfFormat::getValue('margin_left', $format);
 
-    $margins = array($metric, $t, $r, $b, $l);
+    $margins = [$metric, $t, $r, $b, $l];
 
     // Add a special region for the HTML header of PDF files:
     $pdfHeaderRegion = CRM_Core_Region::instance('export-document-header', FALSE);
@@ -143,7 +143,7 @@ class CRM_Utils_PDF_Utils {
     require_once 'tcpdf/tcpdf.php';
     require_once 'FPDI/fpdi.php'; // This library is only in the 'packages' area as of version 4.5
 
-    $paper_size_arr = array($paper_size[2], $paper_size[3]);
+    $paper_size_arr = [$paper_size[2], $paper_size[3]];
 
     $pdf = new TCPDF($orientation, 'pt', $paper_size_arr);
     $pdf->Open();

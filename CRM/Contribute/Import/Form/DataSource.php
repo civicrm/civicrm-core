@@ -46,7 +46,7 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-    $duplicateOptions = array();
+    $duplicateOptions = [];
     $duplicateOptions[] = $this->createElement('radio',
       NULL, NULL, ts('Insert new contributions'), CRM_Import_Parser::DUPLICATE_SKIP
     );
@@ -57,9 +57,9 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Import_Form_DataSource {
       ts('Import mode')
     );
 
-    $this->setDefaults(array('onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP));
+    $this->setDefaults(['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
 
-    $this->addElement('submit', 'loadMapping', ts('Load Mapping'), NULL, array('onclick' => 'checkSelect()'));
+    $this->addElement('submit', 'loadMapping', ts('Load Mapping'), NULL, ['onclick' => 'checkSelect()']);
 
     $this->addContactTypeSelector();
   }
@@ -68,12 +68,12 @@ class CRM_Contribute_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    * Process the uploaded file.
    */
   public function postProcess() {
-    $this->storeFormValues(array(
+    $this->storeFormValues([
       'onDuplicate',
       'contactType',
       'dateFormats',
       'savedMapping',
-    ));
+    ]);
 
     $this->submitFileForMapping('CRM_Contribute_Import_Parser_Contribution');
   }

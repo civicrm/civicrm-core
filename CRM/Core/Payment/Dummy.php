@@ -22,8 +22,8 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
 
   protected $_mode = NULL;
 
-  protected $_params = array();
-  protected $_doDirectPaymentResult = array();
+  protected $_params = [];
+  protected $_doDirectPaymentResult = [];
 
   /**
    * Set result from do Direct Payment for test purposes.
@@ -34,7 +34,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   public function setDoDirectPaymentResult($doDirectPaymentResult) {
     $this->_doDirectPaymentResult = $doDirectPaymentResult;
     if (empty($this->_doDirectPaymentResult['trxn_id'])) {
-      $this->_doDirectPaymentResult['trxn_id'] = array();
+      $this->_doDirectPaymentResult['trxn_id'] = [];
     }
     else {
       $this->_doDirectPaymentResult['trxn_id'] = (array) $doDirectPaymentResult['trxn_id'];
@@ -104,7 +104,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     }
     if ($this->_mode == 'test') {
       $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test\\_%'";
-      $p = array();
+      $p = [];
       $trxn_id = strval(CRM_Core_Dao::singleValueQuery($query, $p));
       $trxn_id = str_replace('test_', '', $trxn_id);
       $trxn_id = intval($trxn_id) + 1;
@@ -112,7 +112,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     }
     else {
       $query = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'live_%'";
-      $p = array();
+      $p = [];
       $trxn_id = strval(CRM_Core_Dao::singleValueQuery($query, $p));
       $trxn_id = str_replace('live_', '', $trxn_id);
       $trxn_id = intval($trxn_id) + 1;
@@ -214,7 +214,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    * @return array
    */
   public function getEditableRecurringScheduleFields() {
-    return array('amount', 'next_sched_contribution_date');
+    return ['amount', 'next_sched_contribution_date'];
   }
 
   /**
@@ -223,7 +223,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    *
    * @return bool|object
    */
-  public function cancelSubscription(&$message = '', $params = array()) {
+  public function cancelSubscription(&$message = '', $params = []) {
     return TRUE;
   }
 

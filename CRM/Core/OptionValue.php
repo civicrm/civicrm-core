@@ -71,7 +71,7 @@ class CRM_Core_OptionValue {
    *
    */
   public static function getRows($groupParams, $links, $orderBy = 'weight', $skipEmptyComponents = TRUE) {
-    $optionValue = array();
+    $optionValue = [];
     $optionGroupID = NULL;
     $isGroupLocked = FALSE;
 
@@ -116,7 +116,7 @@ class CRM_Core_OptionValue {
     $componentNames = CRM_Core_Component::getNames();
     $visibilityLabels = CRM_Core_PseudoConstant::visibility();
     while ($dao->fetch()) {
-      $optionValue[$dao->id] = array();
+      $optionValue[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $optionValue[$dao->id]);
       if (!empty($optionValue[$dao->id]['component_id']) &&
         empty($componentNames[$optionValue[$dao->id]['component_id']]) &&
@@ -155,11 +155,11 @@ class CRM_Core_OptionValue {
       $optionValue[$dao->id]['order'] = $optionValue[$dao->id]['weight'];
       $optionValue[$dao->id]['icon'] = CRM_Utils_Array::value('icon', $optionValue[$dao->id], '');
       $optionValue[$dao->id]['action'] = CRM_Core_Action::formLink($links, $action,
-        array(
+        [
           'id' => $dao->id,
           'gid' => $optionGroupID,
           'value' => $dao->value,
-        ),
+        ],
         ts('more'),
         FALSE,
         'optionValue.row.actions',
@@ -214,13 +214,13 @@ class CRM_Core_OptionValue {
       if ($optionValueID) {
         $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $optionValueID, 'weight', 'id');
       }
-      $fieldValues = array('option_group_id' => $optionGroupID);
+      $fieldValues = ['option_group_id' => $optionGroupID];
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_OptionValue', $oldWeight, CRM_Utils_Array::value('weight', $params), $fieldValues);
     }
     $params['option_group_id'] = $optionGroupID;
 
     if (($action & CRM_Core_Action::ADD) && !isset($params['value'])) {
-      $fieldValues = array('option_group_id' => $optionGroupID);
+      $fieldValues = ['option_group_id' => $optionGroupID];
       // use the next available value
       /* CONVERT(value, DECIMAL) is used to convert varchar
       field 'value' to decimal->integer                    */
@@ -295,7 +295,7 @@ class CRM_Core_OptionValue {
   public static function getFields($mode = '', $contactType = 'Individual') {
     $key = "$mode $contactType";
     if (empty(self::$_fields[$key]) || !self::$_fields[$key]) {
-      self::$_fields[$key] = array();
+      self::$_fields[$key] = [];
 
       $option = CRM_Core_DAO_OptionValue::import();
 
@@ -303,48 +303,48 @@ class CRM_Core_OptionValue {
         $optionName = $option[$id];
       }
 
-      $nameTitle = array();
+      $nameTitle = [];
       if ($mode == 'contribute') {
         // This is part of a move towards standardising option values but we
         // should derive them from the fields array so am deprecating it again...
         // note that the reason this was needed was that payment_instrument_id was
         // not set to exportable.
-        $nameTitle = array(
-          'payment_instrument' => array(
+        $nameTitle = [
+          'payment_instrument' => [
             'name' => 'payment_instrument',
             'title' => ts('Payment Method'),
             'headerPattern' => '/^payment|(p(ayment\s)?instrument)$/i',
-          ),
-        );
+          ],
+        ];
       }
       elseif ($mode == '') {
         //the fields email greeting and postal greeting are meant only for Individual and Household
         //the field addressee is meant for all contact types, CRM-4575
-        if (in_array($contactType, array(
+        if (in_array($contactType, [
           'Individual',
           'Household',
           'Organization',
           'All',
-        ))) {
-          $nameTitle = array(
-            'addressee' => array(
+        ])) {
+          $nameTitle = [
+            'addressee' => [
               'name' => 'addressee',
               'title' => ts('Addressee'),
               'headerPattern' => '/^addressee$/i',
-            ),
-          );
-          $title = array(
-            'email_greeting' => array(
+            ],
+          ];
+          $title = [
+            'email_greeting' => [
               'name' => 'email_greeting',
               'title' => ts('Email Greeting'),
               'headerPattern' => '/^email_greeting$/i',
-            ),
-            'postal_greeting' => array(
+            ],
+            'postal_greeting' => [
               'name' => 'postal_greeting',
               'title' => ts('Postal Greeting'),
               'headerPattern' => '/^postal_greeting$/i',
-            ),
-          );
+            ],
+          ];
           $nameTitle = array_merge($nameTitle, $title);
         }
       }
@@ -439,7 +439,7 @@ FROM
 
     if ($groupId) {
       $where .= " AND option_group.id = %1";
-      $params[1] = array($groupId, 'Integer');
+      $params[1] = [$groupId, 'Integer'];
       if (!$groupName) {
         $groupName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
           $groupId, 'name', 'id'
@@ -449,7 +449,7 @@ FROM
 
     if ($groupName) {
       $where .= " AND option_group.name = %2";
-      $params[2] = array($groupName, 'String');
+      $params[2] = [$groupName, 'String'];
     }
 
     if (in_array($groupName, CRM_Core_OptionGroup::$_domainIDGroups)) {
@@ -461,7 +461,7 @@ FROM
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     while ($dao->fetch()) {
-      $values[$dao->id] = array(
+      $values[$dao->id] = [
         'id' => $dao->id,
         'label' => $dao->label,
         'value' => $dao->value,
@@ -470,7 +470,7 @@ FROM
         'weight' => $dao->weight,
         'is_active' => $dao->is_active,
         'is_default' => $dao->is_default,
-      );
+      ];
     }
   }
 

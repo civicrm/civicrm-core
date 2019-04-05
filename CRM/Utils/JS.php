@@ -41,7 +41,7 @@ class CRM_Utils_JS {
    *   Array of translatable strings
    */
   public static function parseStrings($jsCode) {
-    $strings = array();
+    $strings = [];
     // Match all calls to ts() in an array.
     // Note: \s also matches newlines with the 's' modifier.
     preg_match_all('~

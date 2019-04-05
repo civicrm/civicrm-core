@@ -125,11 +125,11 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $this->setLogger($log);
 
     // PEAR<=1.9.0 does not declare "static" properly.
-    if (!is_callable(array('PEAR', '__callStatic'))) {
-      $this->setDefaultCallback(array($this, 'handlePES'));
+    if (!is_callable(['PEAR', '__callStatic'])) {
+      $this->setDefaultCallback([$this, 'handlePES']);
     }
     else {
-      PEAR_ErrorStack::setDefaultCallback(array($this, 'handlePES'));
+      PEAR_ErrorStack::setDefaultCallback([$this, 'handlePES']);
     }
   }
 
@@ -142,7 +142,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
   static public function getMessages(&$error, $separator = '<br />') {
     if (is_a($error, 'CRM_Core_Error')) {
       $errors = $error->getErrors();
-      $message = array();
+      $message = [];
       foreach ($errors as $e) {
         $message[] = $e['code'] . ': ' . $e['message'];
       }
@@ -277,7 +277,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function getErrorDetails($pearError) {
     // create the error array
-    $error = array();
+    $error = [];
     $error['callback'] = $pearError->getCallback();
     $error['code'] = $pearError->getCode();
     $error['message'] = $pearError->getMessage();
@@ -328,10 +328,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @throws Exception
    */
   public static function fatal($message = NULL, $code = NULL, $email = NULL) {
-    $vars = array(
+    $vars = [
       'message' => $message,
       'code' => $code,
-    );
+    ];
 
     if (self::$modeException) {
       // CRM-11043
@@ -346,7 +346,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
 
     if (!$message) {
-      $message = ts('We experienced an unexpected error. You may have found a bug. For more information on how to provide a bug report, please read: %1', array(1 => 'https://civicrm.org/bug-reporting'));
+      $message = ts('We experienced an unexpected error. You may have found a bug. For more information on how to provide a bug report, please read: %1', [1 => 'https://civicrm.org/bug-reporting']);
     }
 
     if (php_sapi_name() == "cli") {
@@ -382,10 +382,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
     // If we are in an ajax callback, format output appropriately
     if (CRM_Utils_Array::value('snippet', $_REQUEST) === CRM_Core_Smarty::PRINT_JSON) {
-      $out = array(
+      $out = [
         'status' => 'fatal',
         'content' => '<div class="messages status no-popup"><div class="icon inform-icon"></div>' . ts('Sorry but we are not able to provide this at the moment.') . '</div>',
-      );
+      ];
       if ($config->backtrace && CRM_Core_Permission::check('view debug output')) {
         $out['backtrace'] = self::parseBacktrace(debug_backtrace());
         $message .= '<p><em>See console for backtrace</em></p>';
@@ -420,13 +420,13 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       CRM_Core_Error::debug_var('handleUnhandledException_nestedException', self::formatTextException($other));
     }
     $config = CRM_Core_Config::singleton();
-    $vars = array(
+    $vars = [
       'message' => $exception->getMessage(),
       'code' => NULL,
       'exception' => $exception,
-    );
+    ];
     if (!$vars['message']) {
-      $vars['message'] = ts('We experienced an unexpected error. You may have found a bug. For more information on how to provide a bug report, please read: %1', array(1 => 'https://civicrm.org/bug-reporting'));
+      $vars['message'] = ts('We experienced an unexpected error. You may have found a bug. For more information on how to provide a bug report, please read: %1', [1 => 'https://civicrm.org/bug-reporting']);
     }
 
     // Case A: CLI
@@ -613,7 +613,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     if (!empty(\Civi::$statics[__CLASS__]['userFrameworkLogging'])) {
       // should call $config->userSystem->logger($message) here - but I got a situation where userSystem was not an object - not sure why
       if ($config->userSystem->is_drupal and function_exists('watchdog')) {
-        watchdog('civicrm', '%message', array('%message' => $message), WATCHDOG_DEBUG);
+        watchdog('civicrm', '%message', ['%message' => $message], WATCHDOG_DEBUG);
       }
     }
 
@@ -643,7 +643,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function debug_query_result($query) {
     $results = CRM_Core_DAO::executeQuery($query)->fetchAll();
-    CRM_Core_Error::debug_var('dao result', array('query' => $query, 'results' => $results));
+    CRM_Core_Error::debug_var('dao result', ['query' => $query, 'results' => $results]);
   }
 
   /**
@@ -669,12 +669,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function generateLogFileHash($config) {
     // Use multiple (but stable) inputs for hash information.
-    $md5inputs = array(
+    $md5inputs = [
       defined('CIVICRM_SITE_KEY') ? CIVICRM_SITE_KEY : 'NO_SITE_KEY',
       $config->userFrameworkBaseURL,
       md5($config->dsn),
       $config->dsn,
-    );
+    ];
     // Trim 8 chars off the string, make it slightly easier to find
     // but reveals less information from the hash.
     return substr(md5(var_export($md5inputs, 1)), 8);
@@ -766,9 +766,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @see Exception::getTrace()
    */
   public static function parseBacktrace($backTrace, $showArgs = TRUE, $maxArgLen = 80) {
-    $ret = array();
+    $ret = [];
     foreach ($backTrace as $trace) {
-      $args = array();
+      $args = [];
       $fnName = CRM_Utils_Array::value('function', $trace);
       $className = isset($trace['class']) ? ($trace['class'] . $trace['type']) : '';
 
@@ -845,13 +845,13 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // Exception backtrace
     if ($e instanceof PEAR_Exception) {
       $ei = $e;
-      while (is_callable(array($ei, 'getCause'))) {
+      while (is_callable([$ei, 'getCause'])) {
         if ($ei->getCause() instanceof PEAR_Error) {
           $msg .= '<table class="crm-db-error">';
           $msg .= sprintf('<thead><tr><th>%s</th><th>%s</th></tr></thead>', ts('Error Field'), ts('Error Value'));
           $msg .= '<tbody>';
-          foreach (array('Type', 'Code', 'Message', 'Mode', 'UserInfo', 'DebugInfo') as $f) {
-            $msg .= sprintf('<tr><td>%s</td><td>%s</td></tr>', $f, call_user_func(array($ei->getCause(), "get$f")));
+          foreach (['Type', 'Code', 'Message', 'Mode', 'UserInfo', 'DebugInfo'] as $f) {
+            $msg .= sprintf('<tr><td>%s</td><td>%s</td></tr>', $f, call_user_func([$ei->getCause(), "get$f"]));
           }
           $msg .= '</tbody></table>';
         }
@@ -877,10 +877,10 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $msg = get_class($e) . ": \"" . $e->getMessage() . "\"\n";
 
     $ei = $e;
-    while (is_callable(array($ei, 'getCause'))) {
+    while (is_callable([$ei, 'getCause'])) {
       if ($ei->getCause() instanceof PEAR_Error) {
-        foreach (array('Type', 'Code', 'Message', 'Mode', 'UserInfo', 'DebugInfo') as $f) {
-          $msg .= sprintf(" * ERROR %s: %s\n", strtoupper($f), call_user_func(array($ei->getCause(), "get$f")));
+        foreach (['Type', 'Code', 'Message', 'Mode', 'UserInfo', 'DebugInfo'] as $f) {
+          $msg .= sprintf(" * ERROR %s: %s\n", strtoupper($f), call_user_func([$ei->getCause(), "get$f"]));
         }
       }
       $ei = $ei->getCause();
@@ -899,7 +899,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function createError($message, $code = 8000, $level = 'Fatal', $params = NULL) {
     $error = CRM_Core_Error::singleton();
-    $error->push($code, $level, array($params), $message);
+    $error->push($code, $level, [$params], $message);
     return $error;
   }
 
@@ -920,9 +920,9 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     if ($title === NULL) {
       $title = ts('Error');
     }
-    $session->setStatus($status, $title, 'alert', array('expires' => 0));
+    $session->setStatus($status, $title, 'alert', ['expires' => 0]);
     if (CRM_Utils_Array::value('snippet', $_REQUEST) === CRM_Core_Smarty::PRINT_JSON) {
-      CRM_Core_Page_AJAX::returnJsonResponse(array('status' => 'error'));
+      CRM_Core_Page_AJAX::returnJsonResponse(['status' => 'error']);
     }
     CRM_Utils_System::redirect($redirect);
   }
@@ -933,8 +933,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function reset() {
     $error = self::singleton();
-    $error->_errors = array();
-    $error->_errorsByLevel = array();
+    $error->_errors = [];
+    $error->_errorsByLevel = [];
   }
 
   /**
@@ -979,7 +979,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       throw new Exception($msg, $data);
     }
 
-    $values = array();
+    $values = [];
 
     $values['is_error'] = 1;
     $values['error_message'] = $msg;
@@ -1040,7 +1040,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $dbt = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
     $callerFunction = isset($dbt[1]['function']) ? $dbt[1]['function'] : NULL;
     $callerClass = isset($dbt[1]['class']) ? $dbt[1]['class'] : NULL;
-    Civi::log()->warning("Deprecated function $callerClass::$callerFunction, use $newMethod.", array('civi.tag' => 'deprecated'));
+    Civi::log()->warning("Deprecated function $callerClass::$callerFunction, use $newMethod.", ['civi.tag' => 'deprecated']);
   }
 
 }

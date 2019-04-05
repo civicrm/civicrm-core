@@ -95,7 +95,7 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
     );
 
     CRM_Utils_System::setTitle(ts('Custom Field Move: %1',
-      array(1 => $this->_srcFieldLabel)
+      [1 => $this->_srcFieldLabel]
     ));
 
     $session = CRM_Core_Session::singleton();
@@ -115,9 +115,9 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
       CRM_Core_Error::statusBounce(ts('You need more than one custom group to move fields'));
     }
 
-    $customGroup = array(
+    $customGroup = [
       '' => ts('- select -'),
-    ) + $customGroup;
+    ] + $customGroup;
     $this->add('select',
       'dst_group_id',
       ts('Destination'),
@@ -125,20 +125,20 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
       TRUE
     );
 
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'next',
           'name' => ts('Move Custom Field'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
 
-    $this->addFormRule(array('CRM_Custom_Form_MoveField', 'formRule'), $this);
+    $this->addFormRule(['CRM_Custom_Form_MoveField', 'formRule'], $this);
   }
 
   /**
@@ -151,7 +151,7 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
   public static function formRule($fields, $files, $self) {
     $self->_dstGID = $fields['dst_group_id'];
     $tmp = CRM_Core_BAO_CustomField::_moveFieldValidate($self->_srcFID, $self->_dstGID);
-    $errors = array();
+    $errors = [];
     if ($tmp['newGroupID']) {
       $errors['dst_group_id'] = $tmp['newGroupID'];
     }
@@ -172,11 +172,11 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
     );
     $srcUrl = CRM_Utils_System::url('civicrm/admin/custom/group/field', "reset=1&action=browse&gid={$this->_dstGID}");
     CRM_Core_Session::setStatus(ts("%1 has been moved to the custom set <a href='%3'>%2</a>.",
-      array(
+      [
         1 => $this->_srcFieldLabel,
         2 => $dstGroup,
         3 => $srcUrl,
-      )), '', 'success');
+      ]), '', 'success');
   }
 
 }

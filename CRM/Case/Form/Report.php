@@ -79,10 +79,10 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
       return;
     }
 
-    $includeActivites = array(
+    $includeActivites = [
       1 => ts('All Activities'),
       2 => ts('Exclude Completed Activities'),
-    );
+    ];
     $includeActivitesGroup = $this->addRadio('include_activities',
       NULL,
       $includeActivites,
@@ -97,17 +97,17 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
       ts('Redact (hide) Client and Service Provider Data')
     );
 
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'refresh',
           'name' => ts('Generate Report'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
     // We want this form to redirect to a full page
     $this->preventAjaxSubmit();

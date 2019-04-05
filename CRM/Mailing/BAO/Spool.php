@@ -60,7 +60,7 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
    *   true if successful
    */
   public function send($recipient, $headers, $body, $job_id = NULL) {
-    $headerStr = array();
+    $headerStr = [];
     foreach ($headers as $name => $value) {
       $headerStr[] = "$name: $value";
     }
@@ -70,7 +70,7 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
       // This is not a bulk mailing. Create a dummy job for it.
 
       $session = CRM_Core_Session::singleton();
-      $params = array();
+      $params = [];
       $params['created_id'] = $session->get('userID');
       $params['created_date'] = date('YmdHis');
       $params['scheduled_id'] = $params['created_id'];
@@ -80,7 +80,7 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
       $params['body_html'] = htmlspecialchars($headerStr) . "\n\n" . $body;
       $params['subject'] = $headers['Subject'];
       $params['name'] = $headers['Subject'];
-      $ids = array();
+      $ids = [];
       $mailing = CRM_Mailing_BAO_Mailing::create($params, $ids);
 
       if (empty($mailing) || is_a($mailing, 'CRM_Core_Error')) {
@@ -116,14 +116,14 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
 
     $session = CRM_Core_Session::singleton();
 
-    $params = array(
+    $params = [
       'job_id' => $job_id,
       'recipient_email' => $recipient,
       'headers' => $headerStr,
       'body' => $body,
       'added_at' => date("YmdHis"),
       'removed_at' => NULL,
-    );
+    ];
 
     $spoolMail = new CRM_Mailing_DAO_Spool();
     $spoolMail->copyValues($params);

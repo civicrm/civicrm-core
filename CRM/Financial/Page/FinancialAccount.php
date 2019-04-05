@@ -62,30 +62,30 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/financial/financialAccount',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Financial Type'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Financial Type'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Financial Type'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/financial/financialAccount',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Financial Type'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -95,14 +95,14 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
    */
   public function browse() {
     // get all custom groups sorted by weight
-    $contributionType = array();
+    $contributionType = [];
     $dao = new CRM_Financial_DAO_FinancialAccount();
     $dao->orderBy('financial_account_type_id, name');
     $dao->find();
     $financialAccountType = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialAccount', 'financial_account_type_id');
 
     while ($dao->fetch()) {
-      $contributionType[$dao->id] = array();
+      $contributionType[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $contributionType[$dao->id]);
       $contributionType[$dao->id]['financial_account_type_id'] = $financialAccountType[$dao->financial_account_type_id];
       // form all action links
@@ -122,7 +122,7 @@ class CRM_Financial_Page_FinancialAccount extends CRM_Core_Page_Basic {
       }
 
       $contributionType[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $dao->id),
+        ['id' => $dao->id],
         ts('more'),
         FALSE,
         'financialAccount.manage.action',

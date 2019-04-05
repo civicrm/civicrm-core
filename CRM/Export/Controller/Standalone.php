@@ -46,12 +46,12 @@ class CRM_Export_Controller_Standalone extends CRM_Core_Controller {
     $id = explode(',', CRM_Utils_Request::retrieve('id', 'CommaSeparatedIntegers', $this, TRUE));
 
     // Check permissions
-    $perm = civicrm_api3($entity, 'get', array(
+    $perm = civicrm_api3($entity, 'get', [
       'return' => 'id',
-      'options' => array('limit' => 0),
+      'options' => ['limit' => 0],
       'check_permissions' => 1,
-      'id' => array('IN' => $id),
-    ));
+      'id' => ['IN' => $id],
+    ]);
 
     $this->set('id', implode(',', array_keys($perm['values'])));
     if ($entity == 'Contact') {

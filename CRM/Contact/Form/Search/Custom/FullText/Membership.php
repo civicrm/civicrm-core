@@ -75,23 +75,23 @@ class CRM_Contact_Form_Search_Custom_FullText_Membership extends CRM_Contact_For
   public function prepareQueries($queryText, $entityIDTableName) {
     // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
 
-    $contactSQL = array();
+    $contactSQL = [];
     $contactSQL[] = "
 SELECT     distinct cm.id
 FROM       civicrm_membership cm
 INNER JOIN civicrm_contact c ON cm.contact_id = c.id
-WHERE      ({$this->matchText('civicrm_contact c', array('sort_name', 'display_name', 'nick_name'), $queryText)})
+WHERE      ({$this->matchText('civicrm_contact c', ['sort_name', 'display_name', 'nick_name'], $queryText)})
 ";
-    $tables = array(
-      'civicrm_membership' => array(
+    $tables = [
+      'civicrm_membership' => [
         'id' => 'id',
-        'fields' => array('source' => NULL),
-      ),
-      'file' => array(
+        'fields' => ['source' => NULL],
+      ],
+      'file' => [
         'xparent_table' => 'civicrm_membership',
-      ),
+      ],
       'sql' => $contactSQL,
-    );
+    ];
 
     // get the custom data info
     $this->fillCustomInfo($tables, "( 'Membership' )");
