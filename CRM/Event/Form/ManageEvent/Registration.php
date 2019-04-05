@@ -411,7 +411,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $form->registerRule('emailList', 'callback', 'emailList', 'CRM_Utils_Rule');
     $attributes = CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event');
     $form->addYesNo('is_email_confirm', ts('Send Confirmation Email?'), NULL, NULL, ['onclick' => "return showHideByValue('is_email_confirm','','confirmEmail','block','radio',false);"]);
-    $form->add('textarea', 'confirm_email_text', ts('Text'), $attributes['confirm_email_text']);
+    $form->add('wysiwyg', 'confirm_email_text', ts('Text'), $attributes['confirm_email_text'] + array('class' => 'collapsed', 'preset' => 'civievent'));
     $form->add('text', 'cc_confirm', ts('CC Confirmation To'), CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'cc_confirm'));
     $form->addRule('cc_confirm', ts('Please enter a valid list of comma delimited email addresses'), 'emailList');
     $form->add('text', 'bcc_confirm', ts('BCC Confirmation To'), CRM_Core_DAO::getAttribute('CRM_Event_DAO_Event', 'bcc_confirm'));
