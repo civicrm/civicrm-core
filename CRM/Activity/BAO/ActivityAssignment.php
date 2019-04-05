@@ -71,7 +71,7 @@ class CRM_Activity_BAO_ActivityAssignment extends CRM_Activity_DAO_ActivityConta
    * @return array
    */
   public static function retrieveAssigneeIdsByActivityId($activity_id) {
-    $assigneeArray = array();
+    $assigneeArray = [];
     if (!CRM_Utils_Rule::positiveInteger($activity_id)) {
       return $assigneeArray;
     }
@@ -87,7 +87,12 @@ WHERE      activity_id = %1
 AND        record_type_id = $assigneeID
 AND        civicrm_contact.is_deleted = 0
 ";
-    $assignment = CRM_Core_DAO::executeQuery($sql, array(1 => array($activity_id, 'Integer')));
+    $assignment = CRM_Core_DAO::executeQuery($sql, [
+      1 => [
+        $activity_id,
+        'Integer',
+      ],
+    ]);
     while ($assignment->fetch()) {
       $assigneeArray[] = $assignment->contact_id;
     }
@@ -108,7 +113,7 @@ AND        civicrm_contact.is_deleted = 0
    * @return array
    */
   public static function getAssigneeNames($activityIDs, $isDisplayName = FALSE, $skipDetails = TRUE) {
-    $assigneeNames = array();
+    $assigneeNames = [];
     if (empty($activityIDs)) {
       return $assigneeNames;
     }
