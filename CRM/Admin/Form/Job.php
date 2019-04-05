@@ -78,9 +78,9 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     );
 
     $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', [
-        'CRM_Core_DAO_Job',
-        $this->_id,
-      ]);
+      'CRM_Core_DAO_Job',
+      $this->_id,
+    ]);
 
     $this->add('text', 'description', ts('Description'),
       $attributes['description']

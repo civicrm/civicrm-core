@@ -109,7 +109,8 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
         }
       }
       else {
-        CRM_Core_Session::setStatus(ts('Not permitted to file activity %1 %2.', [
+        CRM_Core_Session::setStatus(
+          ts('Not permitted to file activity %1 %2.', [
             1 => empty($defaults['subject']) ? '' : $defaults['subject'],
             2 => $defaults['activity_date_time'],
           ]),

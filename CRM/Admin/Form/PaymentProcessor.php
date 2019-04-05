@@ -183,11 +183,11 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     );
 
     $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', [
-        'CRM_Financial_DAO_PaymentProcessor',
-        $this->_id,
-        'name',
-        CRM_Core_Config::domainID(),
-      ]);
+      'CRM_Financial_DAO_PaymentProcessor',
+      $this->_id,
+      'name',
+      CRM_Core_Config::domainID(),
+    ]);
 
     $this->add('text', 'description', ts('Description'),
       $attributes['description']

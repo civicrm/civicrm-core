@@ -95,14 +95,13 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       $cancelURL = CRM_Utils_System::url('civicrm/admin/messageTemplates', 'selectedChild=workflow&reset=1');
       $cancelURL = str_replace('&amp;', '&', $cancelURL);
       $this->addButtons([
-          [
-            'type' => 'cancel',
-            'name' => ts('Done'),
-            'js' => ['onclick' => "location.href='{$cancelURL}'; return false;"],
-            'isDefault' => TRUE,
-          ],
-        ]
-      );
+        [
+          'type' => 'cancel',
+          'name' => ts('Done'),
+          'js' => ['onclick' => "location.href='{$cancelURL}'; return false;"],
+          'isDefault' => TRUE,
+        ],
+      ]);
     }
     else {
       $this->_workflow_id = CRM_Utils_Array::value('workflow_id', $this->_values);

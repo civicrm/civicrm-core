@@ -96,9 +96,9 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       if ($isInUse) {
         $scriptURL = "<a href='" . CRM_Utils_System::docURL2('Update Greetings and Address Data for Contacts', TRUE, NULL, NULL, NULL, "wiki") . "'>" . ts('Learn more about a script that can automatically update contact addressee and greeting options.') . "</a>";
         CRM_Core_Session::setStatus(ts('The selected %1 option has <strong>not been deleted</strong> because it is currently in use. Please update these contacts to use a different format before deleting this option. %2', [
-              1 => $this->_gLabel,
-              2 => $scriptURL,
-            ]), ts('Sorry'), 'error');
+          1 => $this->_gLabel,
+          2 => $scriptURL,
+        ]), ts('Sorry'), 'error');
         $redirect = CRM_Utils_System::url($url, $params);
         CRM_Utils_System::redirect($redirect);
       }
@@ -193,11 +193,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $this->add('color', 'color', ts('Color'));
     }
 
-    if (!in_array($this->_gName, [
-        'email_greeting',
-        'postal_greeting',
-        'addressee',
-      ]) && !$isReserved
+    if (!in_array($this->_gName, ['email_greeting', 'postal_greeting', 'addressee'])
+      && !$isReserved
     ) {
       $this->addRule('label',
         ts('This Label already exists in the database for this option group. Please select a different Label.'),
@@ -323,11 +320,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
     }
 
     // get contact type for which user want to create a new greeting/addressee type, CRM-4575
-    if (in_array($this->_gName, [
-        'email_greeting',
-        'postal_greeting',
-        'addressee',
-      ]) && !$isReserved
+    if (in_array($this->_gName, ['email_greeting', 'postal_greeting', 'addressee'])
+      && !$isReserved
     ) {
       $values = [
         1 => ts('Individual'),
@@ -372,11 +366,8 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $errors['grouping'] = ts('Status class is a required field');
     }
 
-    if (in_array($self->_gName, [
-          'email_greeting',
-          'postal_greeting',
-          'addressee',
-        ]) && empty($self->_defaultValues['is_reserved'])
+    if (in_array($self->_gName, ['email_greeting', 'postal_greeting', 'addressee'])
+      && empty($self->_defaultValues['is_reserved'])
     ) {
       $label = $fields['label'];
       $condition = " AND v.label = '{$label}' ";
@@ -487,9 +478,9 @@ class CRM_Admin_Form_Options extends CRM_Admin_Form {
       $optionValue = CRM_Core_OptionValue::addOptionValue($params, $this->_gName, $this->_action, $this->_id);
 
       CRM_Core_Session::setStatus(ts('The %1 \'%2\' has been saved.', [
-            1 => $this->_gLabel,
-            2 => $optionValue->label,
-          ]), ts('Saved'), 'success');
+        1 => $this->_gLabel,
+        2 => $optionValue->label,
+      ]), ts('Saved'), 'success');
 
       $this->ajaxResponse['optionValue'] = $optionValue->toArray();
     }

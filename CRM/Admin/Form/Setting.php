@@ -74,17 +74,16 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
   public function buildQuickForm() {
     CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
     $this->addFieldsDefinedInSettingsMetadata();
 
@@ -143,7 +142,8 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     }
 
     CRM_Core_Config::clearDBCache();
-    Civi::cache('session')->clear(); // This doesn't make a lot of sense to me, but it maintains pre-existing behavior.
+    // This doesn't make a lot of sense to me, but it maintains pre-existing behavior.
+    Civi::cache('session')->clear();
     CRM_Utils_System::flushCache();
     CRM_Core_Resources::singleton()->resetCacheCode();
 

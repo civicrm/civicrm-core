@@ -1207,7 +1207,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
     }
 
     if (!isset($contactDetails) && !isset($contactIds)) {
-      Throw new CRM_Core_Exception('You must specify either $contactDetails or $contactIds');
+      throw new CRM_Core_Exception('You must specify either $contactDetails or $contactIds');
     }
     // Populate $contactDetails and $contactIds if only one is set
     if (is_array($contactIds) && !empty($contactIds) && empty($contactDetails)) {
@@ -2403,9 +2403,9 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
     $enabledComponents = self::activityComponents();
     // @todo - should we move this to activity get api.
     foreach ([
-               'case_id' => 'CiviCase',
-               'campaign_id' => 'CiviCampaign',
-             ] as $attr => $component) {
+      'case_id' => 'CiviCase',
+      'campaign_id' => 'CiviCampaign',
+    ] as $attr => $component) {
       if (!in_array($component, $enabledComponents)) {
         $activityParams[$attr] = ['IS NULL' => 1];
       }
