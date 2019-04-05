@@ -2398,12 +2398,12 @@ ORDER BY civicrm_email.is_primary DESC";
                 'prefix_id',
                 'suffix_id',
               )) &&
-            ($value == '' || !isset($value)) &&
-            ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
-            ($key == 'current_employer' && empty($params['current_employer']))) {
-            // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
-            // to avoid update with empty values
-            continue;
+              ($value == '' || !isset($value)) &&
+              ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
+              ($key == 'current_employer' && empty($params['current_employer']))) {
+                // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
+                // to avoid update with empty values
+                continue;
           }
           else {
             $data[$key] = $value;
