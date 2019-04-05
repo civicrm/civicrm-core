@@ -174,11 +174,10 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    */
   public function testFormRuleRollingEarlyStart() {
     $unixNow = time();
-    $ymdNow = date('m/d/Y', $unixNow);
     $unixYesterday = $unixNow - (24 * 60 * 60);
-    $ymdYesterday = date('m/d/Y', $unixYesterday);
+    $ymdYesterday = date('Y-m-d', $unixYesterday);
     $params = array(
-      'join_date' => $ymdNow,
+      'join_date' => date('Y-m-d'),
       'start_date' => $ymdYesterday,
       'end_date' => '',
       'membership_type_id' => array('23', '15'),
@@ -199,12 +198,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    */
   public function testFormRuleRollingEarlyEnd() {
     $unixNow = time();
-    $ymdNow = date('m/d/Y', $unixNow);
     $unixYesterday = $unixNow - (24 * 60 * 60);
-    $ymdYesterday = date('m/d/Y', $unixYesterday);
+    $ymdYesterday = date('Y-m-d', $unixYesterday);
     $params = array(
-      'join_date' => $ymdNow,
-      'start_date' => $ymdNow,
+      'join_date' => date('Y-m-d'),
+      'start_date' => date('Y-m-d'),
       'end_date' => $ymdYesterday,
       'membership_type_id' => array('23', '15'),
     );
@@ -220,11 +218,10 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    */
   public function testFormRuleRollingEndNoStart() {
     $unixNow = time();
-    $ymdNow = date('m/d/Y', $unixNow);
     $unixYearFromNow = $unixNow + (365 * 24 * 60 * 60);
-    $ymdYearFromNow = date('m/d/Y', $unixYearFromNow);
+    $ymdYearFromNow = date('Y-m-d', $unixYearFromNow);
     $params = array(
-      'join_date' => $ymdNow,
+      'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => $ymdYearFromNow,
       'membership_type_id' => array('23', '15'),
@@ -244,9 +241,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $unixNow = time();
     $unixYearFromNow = $unixNow + (365 * 24 * 60 * 60);
     $params = array(
-      'join_date' => date('m/d/Y', $unixNow),
-      'start_date' => date('m/d/Y', $unixNow),
-      'end_date' => date('m/d/Y',
+      'join_date' => date('Y-m-d'),
+      'start_date' => date('Y-m-d'),
+      'end_date' => date('Y-m-d',
         $unixYearFromNow
       ),
       'membership_type_id' => array('23', '25'),
@@ -265,7 +262,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   public function testFormRulePermanentOverrideWithNoStatus() {
     $unixNow = time();
     $params = array(
-      'join_date' => date('m/d/Y', $unixNow),
+      'join_date' => date('Y-m-d'),
       'membership_type_id' => array('23', '25'),
       'is_override' => TRUE,
     );
@@ -278,11 +275,11 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
   public function testFormRuleUntilDateOverrideWithValidOverrideEndDate() {
     $params = array(
-      'join_date' => date('m/d/Y', time()),
+      'join_date' => date('Y-m-d'),
       'membership_type_id' => array('23', '25'),
       'is_override' => TRUE,
       'status_id' => 1,
-      'status_override_end_date' => date('m/d/Y', time()),
+      'status_override_end_date' => date('Y-m-d'),
     );
     $files = array();
     $membershipForm = new CRM_Member_Form_Membership();
@@ -292,7 +289,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
   public function testFormRuleUntilDateOverrideWithNoOverrideEndDate() {
     $params = array(
-      'join_date' => date('m/d/Y', time()),
+      'join_date' => date('Y-m-d'),
       'membership_type_id' => array('23', '25'),
       'is_override' => CRM_Member_StatusOverrideTypes::UNTIL_DATE,
       'status_id' => 1,
@@ -312,7 +309,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $unixNow = time();
     $unix1MFmNow = $unixNow + (31 * 24 * 60 * 60);
     $params = array(
-      'join_date' => date('m/d/Y', $unix1MFmNow),
+      'join_date' => date('Y-m-d', $unix1MFmNow),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '15'),
@@ -330,9 +327,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    * Test CRM_Member_Form_Membership::formRule() with a join date of today and a rolling membership type.
    */
   public function testFormRuleRollingJoinToday() {
-    $unixNow = time();
     $params = array(
-      'join_date' => date('m/d/Y', $unixNow),
+      'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '15'),
@@ -353,7 +349,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $unixNow = time();
     $unix1MAgo = $unixNow - (31 * 24 * 60 * 60);
     $params = array(
-      'join_date' => date('m/d/Y', $unix1MAgo),
+      'join_date' => date('Y-m-d', $unix1MAgo),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '15'),
@@ -373,7 +369,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $unixNow = time();
     $unix6MAgo = $unixNow - (180 * 24 * 60 * 60);
     $params = array(
-      'join_date' => date('m/d/Y', $unix6MAgo),
+      'join_date' => date('Y-m-d', $unix6MAgo),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '15'),
@@ -394,7 +390,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $unixNow = time();
     $unix1YAgo = $unixNow - (370 * 24 * 60 * 60);
     $params = array(
-      'join_date' => date('m/d/Y', $unix1YAgo),
+      'join_date' => date('Y-m-d', $unix1YAgo),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '15'),
@@ -415,7 +411,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $unixNow = time();
     $unix2YAgo = $unixNow - (2 * 365 * 24 * 60 * 60);
     $params = array(
-      'join_date' => date('m/d/Y', $unix2YAgo),
+      'join_date' => date('Y-m-d', $unix2YAgo),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '15'),
@@ -436,7 +432,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $unixNow = time();
     $unix6MAgo = $unixNow - (180 * 24 * 60 * 60);
     $params = array(
-      'join_date' => date('m/d/Y', $unix6MAgo),
+      'join_date' => date('Y-m-d', $unix6MAgo),
       'start_date' => '',
       'end_date' => '',
       'membership_type_id' => array('23', '7'),
@@ -564,7 +560,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     CRM_Price_BAO_PriceSet::buildPriceSet($form);
     $params = array(
       'cid' => $this->_individualId,
-      'join_date' => date('m/d/Y', time()),
+      'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
       // This format reflects the 23 being the organisation & the 25 being the type.
@@ -612,7 +608,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $form->_action = CRM_Core_Action::UPDATE;
     $params = array(
       'cid' => $this->_individualId,
-      'join_date' => date('m/d/Y', time()),
+      'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
       // This format reflects the 23 being the organisation & the 25 being the type.
@@ -662,7 +658,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     CRM_Price_BAO_PriceSet::buildPriceSet($form);
     $params = array(
       'cid' => $this->_individualId,
-      'join_date' => date('m/d/Y', time()),
+      'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
       // This format reflects the 23 being the organisation & the 25 being the type.
@@ -829,7 +825,7 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
     $this->createLoggedInUser();
     $params = array(
       'cid' => $this->_individualId,
-      'join_date' => date('m/d/Y', time()),
+      'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
       // This format reflects the 23 being the organisation & the 25 being the type.
@@ -1116,7 +1112,7 @@ Expires: ',
     $params = array(
       'cid' => $this->_individualId,
       'price_set_id' => 0,
-      'join_date' => date('m/d/Y', time()),
+      'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
       'campaign_id' => '',
@@ -1206,7 +1202,7 @@ Expires: ',
     // register for both of these memberships via backoffice membership form submission
     $params = array(
       'cid' => $contactId,
-      'join_date' => date('m/d/Y', time()),
+      'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
       // This format reflects the 23 being the organisation & the 25 being the type.
@@ -1314,7 +1310,7 @@ Expires: ',
     $form->_priceSet = current(CRM_Price_BAO_PriceSet::getSetDetail($priceSet['id']));
     $params = array(
       'cid' => $this->_individualId,
-      'join_date' => date('m/d/Y', time()),
+      'join_date' => date('Y-m-d'),
       'start_date' => '',
       'end_date' => '',
       // This format reflects the 23 being the organisation & the 25 being the type.
