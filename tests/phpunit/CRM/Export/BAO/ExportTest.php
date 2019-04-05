@@ -1724,14 +1724,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $selectedFields = $this->getAllSpecifiableParticipantReturnFields();
     foreach ($selectedFields as $index => $field) {
       if (substr($field[1], 0, 22) === 'componentPaymentField_') {
-        unset ($selectedFields[$index]);
+        unset($selectedFields[$index]);
       }
     }
 
     $expected = $this->getAllSpecifiableParticipantReturnFields();
     foreach ($expected as $index => $field) {
       if (substr($index, 0, 22) === 'componentPaymentField_') {
-        unset ($expected[$index]);
+        unset($expected[$index]);
       }
     }
 

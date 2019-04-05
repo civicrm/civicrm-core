@@ -292,10 +292,9 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
       'return' => 'id',
     ));
 
-    $this->old_api_keys[$adminContactId] = CRM_Core_DAO::singleValueQuery('SELECT api_key FROM civicrm_contact WHERE id = %1',
-      array(
-        1 => array($adminContactId, 'Positive'),
-      ));
+    $this->old_api_keys[$adminContactId] = CRM_Core_DAO::singleValueQuery('SELECT api_key FROM civicrm_contact WHERE id = %1', [
+      1 => [$adminContactId, 'Positive'],
+    ]);
 
     //$this->old_admin_api_key = civicrm_api3('Contact', 'get', array(
     //  'id' => $adminContactId,
