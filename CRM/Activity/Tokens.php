@@ -50,14 +50,8 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    */
   public function __construct() {
     parent::__construct('activity', array_merge(
-      array(
-        'activity_id' => ts('Activity ID'),
-        'activity_type' => ts('Activity Type'),
-        'subject' => ts('Activity Subject'),
-        'details' => ts('Activity Details'),
-        'activity_date_time' => ts('Activity Date-Time'),
-      ),
-      CRM_Utils_Token::getCustomFieldTokens('Activity')
+      $this->getBasicTokens(),
+      $this->getCustomFieldTokens()
     ));
   }
 
@@ -116,6 +110,29 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     else {
       $row->tokens($entity, $field, '');
     }
+  }
+
+  /**
+   * Get the basic tokens provided.
+   *
+   * @return array token name => token label
+   */
+  protected function getBasicTokens() {
+    return [
+      'activity_id' => ts('Activity ID'),
+      'activity_type' => ts('Activity Type'),
+      'subject' => ts('Activity Subject'),
+      'details' => ts('Activity Details'),
+      'activity_date_time' => ts('Activity Date-Time'),
+    ];
+  }
+
+  /**
+   * Get the tokens for custom fields
+   * @return array token name => token label
+   */
+  protected function getCustomFieldTokens() {
+    return CRM_Utils_Token::getCustomFieldTokens('Activity');
   }
 
 }
