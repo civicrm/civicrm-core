@@ -94,14 +94,14 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       // currently, the above action is used solely for previewing default workflow templates
       $cancelURL = CRM_Utils_System::url('civicrm/admin/messageTemplates', 'selectedChild=workflow&reset=1');
       $cancelURL = str_replace('&amp;', '&', $cancelURL);
-      $this->addButtons(array(
-          array(
+      $this->addButtons([
+          [
             'type' => 'cancel',
             'name' => ts('Done'),
-            'js' => array('onclick' => "location.href='{$cancelURL}'; return false;"),
+            'js' => ['onclick' => "location.href='{$cancelURL}'; return false;"],
             'isDefault' => TRUE,
-          ),
-        )
+          ],
+        ]
       );
     }
     else {
@@ -118,23 +118,23 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
 
       $cancelURL = CRM_Utils_System::url('civicrm/admin/messageTemplates', "selectedChild={$selectedChild}&reset=1");
       $cancelURL = str_replace('&amp;', '&', $cancelURL);
-      $buttons[] = array(
+      $buttons[] = [
         'type' => 'upload',
         'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
         'isDefault' => TRUE,
-      );
+      ];
       if (!($this->_action & CRM_Core_Action::DELETE)) {
-        $buttons[] = array(
+        $buttons[] = [
           'type' => 'submit',
           'name' => ts('Save and Done'),
           'subName' => 'done',
-        );
+        ];
       }
-      $buttons[] = array(
+      $buttons[] = [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-        'js' => array('onclick' => "location.href='{$cancelURL}'; return false;"),
-      );
+        'js' => ['onclick' => "location.href='{$cancelURL}'; return false;"],
+      ];
       $this->addButtons($buttons);
     }
 
@@ -143,20 +143,18 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       return;
     }
 
-    $breadCrumb = array(
-      array(
+    $breadCrumb = [
+      [
         'title' => ts('Message Templates'),
-        'url' => CRM_Utils_System::url('civicrm/admin/messageTemplates',
-          'action=browse&reset=1'
-        ),
-      ),
-    );
+        'url' => CRM_Utils_System::url('civicrm/admin/messageTemplates', 'action=browse&reset=1'),
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
     $this->applyFilter('__ALL__', 'trim');
     $this->add('text', 'msg_title', ts('Message Title'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_MessageTemplate', 'msg_title'), TRUE);
 
-    $options = array(ts('Compose On-screen'), ts('Upload Document'));
+    $options = [ts('Compose On-screen'), ts('Upload Document')];
     $element = $this->addRadio('file_type', ts('Source'), $options);
     if ($this->_id) {
       $element->freeze();
@@ -188,12 +186,12 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     }
     else {
       $this->add('wysiwyg', 'msg_html', ts('HTML Message'),
-        array(
+        [
           'cols' => '80',
           'rows' => '8',
           'onkeyup' => "return verify(this)",
           'preset' => 'civimail',
-        )
+        ]
       );
     }
 
@@ -202,13 +200,13 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
     );
 
     $this->add('select', 'pdf_format_id', ts('PDF Page Format'),
-      array(
+      [
         'null' => ts('- default -'),
-      ) + CRM_Core_BAO_PdfFormat::getList(TRUE), FALSE
+      ] + CRM_Core_BAO_PdfFormat::getList(TRUE), FALSE
     );
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));
-    $this->addFormRule(array(__CLASS__, 'formRule'), $this);
+    $this->addFormRule([__CLASS__, 'formRule'], $this);
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->freeze();
@@ -309,7 +307,7 @@ class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
       }
 
       $messageTemplate = CRM_Core_BAO_MessageTemplate::add($params);
-      CRM_Core_Session::setStatus(ts('The Message Template \'%1\' has been saved.', array(1 => $messageTemplate->msg_title)), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('The Message Template \'%1\' has been saved.', [1 => $messageTemplate->msg_title]), ts('Saved'), 'success');
 
       if (isset($this->_submitValues['_qf_MessageTemplates_upload'])) {
         // Save button was pressed
