@@ -134,6 +134,9 @@ class System {
    */
   public function flushProcessors() {
     $this->cache = [];
+    if (isset(\Civi::$statics['CRM_Contribute_BAO_ContributionRecur'])) {
+      unset(\Civi::$statics['CRM_Contribute_BAO_ContributionRecur']);
+    }
     \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('all', TRUE);
     \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('live', TRUE);
     \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('test', TRUE);
