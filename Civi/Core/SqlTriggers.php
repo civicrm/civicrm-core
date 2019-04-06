@@ -207,8 +207,8 @@ class SqlTriggers {
       if (!file_exists($this->getFile())) {
         // Ugh. Need to let user know somehow. This is the first change.
         \CRM_Core_Session::setStatus(ts('The mysql commands you need to run are stored in %1', [
-            1 => $this->getFile(),
-          ]),
+          1 => $this->getFile(),
+        ]),
           '',
           'alert',
           ['expires' => 0]

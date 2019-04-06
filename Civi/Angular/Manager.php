@@ -44,6 +44,7 @@ class Manager {
   /**
    * @param \CRM_Core_Resources $res
    *   The resource manager.
+   * @param $cache
    */
   public function __construct($res, \CRM_Utils_Cache_Interface $cache = NULL) {
     $this->res = $res;

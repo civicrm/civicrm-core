@@ -110,7 +110,7 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
   /**
    * Register the declared tokens.
    *
-   * @param TokenRegisterEvent $e
+   * @param \Civi\Token\Event\TokenRegisterEvent $e
    *   The registration event. Add new tokens using register().
    */
   public function registerTokens(TokenRegisterEvent $e) {
@@ -133,7 +133,7 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
    * This is method is not always appropriate, but if you're specifically
    * focused on scheduled reminders, it can be convenient.
    *
-   * @param MailingQueryEvent $e
+   * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
    *   The pending query which may be modified. See discussion on
    *   MailingQueryEvent::$query.
    */
@@ -143,7 +143,7 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
   /**
    * Populate the token data.
    *
-   * @param TokenValueEvent $e
+   * @param \Civi\Token\Event\TokenValueEvent $e
    *   The event, which includes a list of rows and tokens.
    */
   public function evaluateTokens(TokenValueEvent $e) {
@@ -204,6 +204,6 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
    *   Any data that was returned by the prefetch().
    * @return mixed
    */
-  public abstract function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL);
+  abstract public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL);
 
 }

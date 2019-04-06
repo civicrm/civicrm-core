@@ -26,6 +26,7 @@
  */
 
 namespace Civi\CCase\Event;
+
 use Civi\Core\Event\GenericHookEvent;
 
 /**

@@ -119,7 +119,7 @@ class ExternalBatch {
     while (!empty($this->processes)) {
       usleep(self::POLL_INTERVAL);
       foreach (array_keys($this->processes) as $idx) {
-        /** @var Process $process */
+        /** @var \Symfony\Component\Process\Process $process */
         $process = $this->processes[$idx];
         if (!$process->isRunning()) {
           $parsed = json_decode($process->getOutput(), TRUE);
@@ -179,7 +179,7 @@ class ExternalBatch {
   /**
    * @param array $apiCall
    *   Array with keys: entity, action, params.
-   * @return Process
+   * @return \Symfony\Component\Process\Process
    * @throws \CRM_Core_Exception
    */
   public function createProcess($apiCall) {

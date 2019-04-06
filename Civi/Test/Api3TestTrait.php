@@ -16,6 +16,7 @@ trait Api3TestTrait {
 
   /**
    * Api version - easier to override than just a define
+   * @var int
    */
   protected $_apiversion = 3;
 
@@ -206,7 +207,7 @@ trait Api3TestTrait {
       throw new \Exception(
         'Invalid getsingle result' . print_r($result, TRUE)
         . "\n entity: $entity . \n params \n " . print_r($params, TRUE)
-        . "\n entities retrieved with blank params \n" .  print_r($unfilteredResult, TRUE)
+        . "\n entities retrieved with blank params \n" . print_r($unfilteredResult, TRUE)
       );
     }
     if ($checkAgainst) {

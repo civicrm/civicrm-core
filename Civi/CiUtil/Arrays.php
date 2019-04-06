@@ -7,6 +7,7 @@ namespace Civi\CiUtil;
  * @package Civi\CiUtil
  */
 class Arrays {
+
   /**
    * @param $arr
    * @param $col

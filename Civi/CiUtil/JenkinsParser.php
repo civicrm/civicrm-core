@@ -5,6 +5,7 @@ namespace Civi\CiUtil;
  * Parse Jenkins result files
  */
 class JenkinsParser {
+
   /**
    * @param string $content
    *   Xml data.

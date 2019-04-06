@@ -5,6 +5,7 @@ namespace Civi\CiUtil;
  * Parse phpunit result files
  */
 class PHPUnitParser {
+
   /**
    * @param string $content
    *   Phpunit streaming JSON.

@@ -84,6 +84,9 @@ class AssetBuilder {
     ];
   }
 
+  /**
+   * @var mixed
+   */
   protected $cacheEnabled;
 
   /**
@@ -238,8 +241,7 @@ class AssetBuilder {
   protected function getCachePath($fileName = NULL) {
     // imageUploadDir has the correct functional properties but a wonky name.
     $suffix = ($fileName === NULL) ? '' : (DIRECTORY_SEPARATOR . $fileName);
-    return
-      \CRM_Utils_File::addTrailingSlash(\CRM_Core_Config::singleton()->imageUploadDir)
+    return \CRM_Utils_File::addTrailingSlash(\CRM_Core_Config::singleton()->imageUploadDir)
       . 'dyn' . $suffix;
   }
 
@@ -255,8 +257,7 @@ class AssetBuilder {
   protected function getCacheUrl($fileName = NULL) {
     // imageUploadURL has the correct functional properties but a wonky name.
     $suffix = ($fileName === NULL) ? '' : ('/' . $fileName);
-    return
-      \CRM_Utils_File::addTrailingSlash(\CRM_Core_Config::singleton()->imageUploadURL, '/')
+    return \CRM_Utils_File::addTrailingSlash(\CRM_Core_Config::singleton()->imageUploadURL, '/')
       . 'dyn' . $suffix;
   }
 

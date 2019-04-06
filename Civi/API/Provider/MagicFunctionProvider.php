@@ -35,6 +35,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * conventions.
  */
 class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterface {
+
   /**
    * @return array
    */
@@ -285,7 +286,8 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
     }
 
     // Check for standalone action files; to match _civicrm_api_resolve(), only load the first one
-    $loaded_files = []; // array($relativeFilePath => TRUE)
+    // array($relativeFilePath => TRUE)
+    $loaded_files = [];
     $include_dirs = array_unique(explode(PATH_SEPARATOR, get_include_path()));
     foreach ($include_dirs as $include_dir) {
       foreach ([$camelName, 'Generic'] as $name) {
@@ -299,7 +301,8 @@ class MagicFunctionProvider implements EventSubscriberInterface, ProviderInterfa
         foreach ($iterator as $fileinfo) {
           $file = $fileinfo->getFilename();
           if (array_key_exists($file, $loaded_files)) {
-            continue; // action provided by an earlier item on include_path
+            // action provided by an earlier item on include_path
+            continue;
           }
 
           $parts = explode(".", $file);

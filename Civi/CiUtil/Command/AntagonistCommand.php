@@ -7,6 +7,7 @@ namespace Civi\CiUtil\Command;
  * @package Civi\CiUtil\Command
  */
 class AntagonistCommand {
+
   /**
    * @param $argv
    */

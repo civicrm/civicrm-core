@@ -31,7 +31,6 @@ use Civi\API\Event\PrepareEvent;
 use Civi\API\Event\ExceptionEvent;
 use Civi\API\Event\ResolveEvent;
 use Civi\API\Event\RespondEvent;
-use Civi\API\Provider\ProviderInterface;
 
 /**
  * @package Civi
@@ -217,7 +216,7 @@ class Kernel {
    *   Array(0 => ProviderInterface, 1 => array $apiRequest).
    */
   public function resolve($apiRequest) {
-    /** @var ResolveEvent $resolveEvent */
+    /** @var \Civi\API\Event\ResolveEvent $resolveEvent */
     $resolveEvent = $this->dispatcher->dispatch(Events::RESOLVE, new ResolveEvent($apiRequest, $this));
     $apiRequest = $resolveEvent->getApiRequest();
     if (!$resolveEvent->getApiProvider()) {
@@ -229,14 +228,14 @@ class Kernel {
   /**
    * Determine if the API request is allowed (under current policy)
    *
-   * @param ProviderInterface $apiProvider
+   * @param \Civi\API\Provider\ProviderInterface $apiProvider
    *   The API provider responsible for executing the request.
    * @param array $apiRequest
    *   The full description of the API request.
    * @throws Exception\UnauthorizedException
    */
   public function authorize($apiProvider, $apiRequest) {
-    /** @var AuthorizeEvent $event */
+    /** @var \Civi\API\Event\AuthorizeEvent $event */
     $event = $this->dispatcher->dispatch(Events::AUTHORIZE, new AuthorizeEvent($apiProvider, $apiRequest, $this));
     if (!$event->isAuthorized()) {
       throw new \Civi\API\Exception\UnauthorizedException("Authorization failed");
@@ -246,7 +245,7 @@ class Kernel {
   /**
    * Allow third-party code to manipulate the API request before execution.
    *
-   * @param ProviderInterface $apiProvider
+   * @param \Civi\API\Provider\ProviderInterface $apiProvider
    *   The API provider responsible for executing the request.
    * @param array $apiRequest
    *   The full description of the API request.
@@ -254,7 +253,7 @@ class Kernel {
    *   The revised API request.
    */
   public function prepare($apiProvider, $apiRequest) {
-    /** @var PrepareEvent $event */
+    /** @var \Civi\API\Event\PrepareEvent $event */
     $event = $this->dispatcher->dispatch(Events::PREPARE, new PrepareEvent($apiProvider, $apiRequest, $this));
     return $event->getApiRequest();
   }
@@ -262,7 +261,7 @@ class Kernel {
   /**
    * Allow third-party code to manipulate the API response after execution.
    *
-   * @param ProviderInterface $apiProvider
+   * @param \Civi\API\Provider\ProviderInterface $apiProvider
    *   The API provider responsible for executing the request.
    * @param array $apiRequest
    *   The full description of the API request.
@@ -272,7 +271,7 @@ class Kernel {
    *   The revised $result.
    */
   public function respond($apiProvider, $apiRequest, $result) {
-    /** @var RespondEvent $event */
+    /** @var \Civi\API\Event\RespondEvent $event */
     $event = $this->dispatcher->dispatch(Events::RESPOND, new RespondEvent($apiProvider, $apiRequest, $result, $this));
     return $event->getResponse();
   }
@@ -287,7 +286,7 @@ class Kernel {
     // Question: Would it better to eliminate $this->apiProviders and just use $this->dispatcher?
     $entityNames = [];
     foreach ($this->getApiProviders() as $provider) {
-      /** @var ProviderInterface $provider */
+      /** @var \Civi\API\Provider\ProviderInterface $provider */
       $entityNames = array_merge($entityNames, $provider->getEntityNames($version));
     }
     $entityNames = array_unique($entityNames);
@@ -307,7 +306,7 @@ class Kernel {
     // Question: Would it better to eliminate $this->apiProviders and just use $this->dispatcher?
     $actionNames = [];
     foreach ($this->getApiProviders() as $provider) {
-      /** @var ProviderInterface $provider */
+      /** @var \Civi\API\Provider\ProviderInterface $provider */
       $actionNames = array_merge($actionNames, $provider->getActionNames($version, $entity));
     }
     $actionNames = array_unique($actionNames);
@@ -345,7 +344,8 @@ class Kernel {
     $data['action'] = \CRM_Utils_Array::value('action', $apiRequest);
 
     if (\CRM_Utils_Array::value('debug', \CRM_Utils_Array::value('params', $apiRequest))
-      && empty($data['trace']) // prevent recursion
+      // prevent recursion
+      && empty($data['trace'])
     ) {
       $data['trace'] = $e->getTraceAsString();
     }
@@ -459,7 +459,7 @@ class Kernel {
   }
 
   /**
-   * @param ProviderInterface $apiProvider
+   * @param \Civi\API\Provider\ProviderInterface $apiProvider
    *   The API provider responsible for executing the request.
    * @return Kernel
    */

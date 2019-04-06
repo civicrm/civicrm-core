@@ -67,10 +67,17 @@ class SettingsManager {
   protected $cache;
 
   /**
-   * @var
+   * @var array
    *   Array (int $id => SettingsBag $bag).
    */
-  protected $bagsByDomain = [], $bagsByContact = [];
+  protected $bagsByDomain = [];
+
+
+  /**
+   * @var array
+   *   Array (int $id => SettingsBag $bag).
+   */
+  protected $bagsByContact = [];
 
   /**
    * @var array|NULL
@@ -310,7 +317,8 @@ class SettingsManager {
     $this->mandatory = NULL;
 
     $this->cache->flush();
-    \Civi::cache('settings')->flush(); // SettingsMetadata; not guaranteed to use same cache.
+    // SettingsMetadata; not guaranteed to use same cache.
+    \Civi::cache('settings')->flush();
 
     foreach ($this->bagsByDomain as $bag) {
       /** @var SettingsBag $bag */

@@ -50,6 +50,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * eg Amy's contact_id).
  */
 class ChainSubscriber implements EventSubscriberInterface {
+
   /**
    * @return array
    */

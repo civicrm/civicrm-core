@@ -33,7 +33,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
   /**
    * Load token data.
    *
-   * @param TokenValueEvent $e
+   * @param \Civi\Token\Event\TokenValueEvent $e
    * @throws TokenException
    */
   public function onEvaluate(TokenValueEvent $e) {
@@ -59,7 +59,8 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
           ['contact_id', '=', $contactId, 0, 0],
         ];
         list($contact, $_) = \CRM_Contact_BAO_Query::apiQuery($params);
-        $contact = reset($contact); //CRM-4524
+        //CRM-4524
+        $contact = reset($contact);
         if (!$contact || is_a($contact, 'CRM_Core_Error')) {
           // FIXME: Need to differentiate errors which kill the batch vs the individual row.
           throw new TokenException("Failed to generate token data. Invalid contact ID: " . $row->context['contactId']);
@@ -109,7 +110,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
   /**
    * Apply the various CRM_Utils_Token helpers.
    *
-   * @param TokenRenderEvent $e
+   * @param \Civi\Token\Event\TokenRenderEvent $e
    */
   public function onRender(TokenRenderEvent $e) {
     $isHtml = ($e->message['format'] == 'text/html');

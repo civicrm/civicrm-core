@@ -8,6 +8,7 @@ require_once 'api/Exception.php';
  * @package Civi\API\Exception
  */
 class UnauthorizedException extends \API_Exception {
+
   /**
    * @param string $message
    *   The human friendly error message.

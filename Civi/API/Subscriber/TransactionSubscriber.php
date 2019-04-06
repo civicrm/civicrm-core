@@ -44,6 +44,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @package Civi\API\Subscriber
  */
 class TransactionSubscriber implements EventSubscriberInterface {
+
   /**
    * @return array
    */
