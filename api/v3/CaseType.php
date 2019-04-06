@@ -52,8 +52,10 @@ function civicrm_api3_case_type_create($params) {
   }
   // This is an existing case-type.
   if (!empty($params['id']) && isset($params['definition'])
-    && !CRM_Case_BAO_CaseType::isForked($params['id']) // which is not yet forked
-    && !CRM_Case_BAO_CaseType::isForkable($params['id']) // for which new forks are prohibited
+    // which is not yet forked
+    && !CRM_Case_BAO_CaseType::isForked($params['id'])
+    // for which new forks are prohibited
+    && !CRM_Case_BAO_CaseType::isForkable($params['id'])
   ) {
     unset($params['definition']);
   }

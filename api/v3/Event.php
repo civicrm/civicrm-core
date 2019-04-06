@@ -217,7 +217,6 @@ function _civicrm_api3_event_getisfull(&$event, $event_id) {
   $event[$event_id]['is_full'] = $event[$event_id]['available_places'] == 0 ? 1 : 0;
 }
 
-
 /**
  * Get event list parameters.
  *

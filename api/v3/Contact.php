@@ -524,7 +524,6 @@ function civicrm_api3_contact_delete($params) {
   }
 }
 
-
 /**
  * Check parameters passed in.
  *
@@ -549,12 +548,11 @@ function _civicrm_api3_contact_check_params(&$params) {
 
     case 'individual':
       civicrm_api3_verify_one_mandatory($params, NULL, [
-          'first_name',
-          'last_name',
-          'email',
-          'display_name',
-        ]
-      );
+        'first_name',
+        'last_name',
+        'email',
+        'display_name',
+      ]);
       break;
   }
 
@@ -1453,7 +1451,6 @@ WHERE     $whereClause
 
   return civicrm_api3_create_success($contacts, $params, 'Contact', 'get_by_location', $dao);
 }
-
 
 /**
  * Get parameters for getlist function.

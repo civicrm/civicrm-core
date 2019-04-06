@@ -301,13 +301,15 @@ function civicrm_api3_extension_refresh($params) {
 
   if ($params['local']) {
     $system->getManager()->refresh();
-    $system->getManager()->getStatuses(); // force immediate scan
+    // force immediate scan
+    $system->getManager()->getStatuses();
   }
 
   if ($params['remote']) {
     if ($system->getBrowser()->isEnabled() && empty($system->getBrowser()->checkRequirements)) {
       $system->getBrowser()->refresh();
-      $system->getBrowser()->getExtensions(); // force immediate download
+      // force immediate download
+      $system->getBrowser()->getExtensions();
     }
   }
 
@@ -358,7 +360,8 @@ function civicrm_api3_extension_get($params) {
       continue;
     }
     $info = CRM_Extension_System::createExtendedInfo($obj);
-    $info['id'] = $id++; // backward compatibility with indexing scheme
+    // backward compatibility with indexing scheme
+    $info['id'] = $id++;
     if (!empty($keys)) {
       if (in_array($key, $keys)) {
         $result[] = $info;
@@ -392,7 +395,8 @@ function civicrm_api3_extension_getremote($params) {
   $id = 0;
   foreach ($extensions as $key => $obj) {
     $info = [];
-    $info['id'] = $id++; // backward compatibility with indexing scheme
+    // backward compatibility with indexing scheme
+    $info['id'] = $id++;
     $info = array_merge($info, (array) $obj);
     $result[] = $info;
   }

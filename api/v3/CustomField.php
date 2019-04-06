@@ -242,9 +242,8 @@ SELECT count(*)
       break;
   }
 
-  if (in_array($htmlType, [
-    'Select', 'Multi-Select', 'CheckBox', 'Radio']) &&
-    !isset($errors[$fieldName])
+  if (in_array($htmlType, ['Select', 'Multi-Select', 'CheckBox', 'Radio'])
+    && !isset($errors[$fieldName])
   ) {
     $options = CRM_Core_OptionGroup::valuesByID($fieldDetails['option_group_id']);
     if (!is_array($value)) {

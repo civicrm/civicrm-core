@@ -150,12 +150,12 @@ function civicrm_api3_payment_create(&$params) {
 function _civicrm_api3_payment_create_spec(&$params) {
   $params = [
     'contribution_id' => [
-      'api.required' => 1 ,
+      'api.required' => 1,
       'title' => 'Contribution ID',
       'type' => CRM_Utils_Type::T_INT,
     ],
     'total_amount' => [
-      'api.required' => 1 ,
+      'api.required' => 1,
       'title' => 'Total Payment Amount',
       'type' => CRM_Utils_Type::T_FLOAT,
     ],
@@ -209,7 +209,7 @@ function _civicrm_api3_payment_get_spec(&$params) {
 function _civicrm_api3_payment_delete_spec(&$params) {
   $params = [
     'id' => [
-      'api.required' => 1 ,
+      'api.required' => 1,
       'title' => 'Payment ID',
       'type' => CRM_Utils_Type::T_INT,
       'api.aliases' => ['payment_id'],
@@ -228,7 +228,7 @@ function _civicrm_api3_payment_delete_spec(&$params) {
 function _civicrm_api3_payment_cancel_spec(&$params) {
   $params = [
     'id' => [
-      'api.required' => 1 ,
+      'api.required' => 1,
       'title' => 'Payment ID',
       'type' => CRM_Utils_Type::T_INT,
       'api.aliases' => ['payment_id'],
@@ -263,7 +263,8 @@ function civicrm_api3_payment_sendconfirmation($params) {
       'subject' => $result[1],
       'message_txt' => $result[2],
       'message_html' => $result[3],
-  ]]);
+    ],
+  ]);
 }
 
 /**

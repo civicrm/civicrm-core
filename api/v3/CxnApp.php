@@ -25,8 +25,8 @@
  +--------------------------------------------------------------------+
  */
 
-use \Civi\Cxn\Rpc\Message\AppMetasMessage;
-use \Civi\Cxn\Rpc\Message\GarbledMessage;
+use Civi\Cxn\Rpc\Message\AppMetasMessage;
+use Civi\Cxn\Rpc\Message\GarbledMessage;
 
 /**
  * The CxnApp API provides a pseudo-entity for exploring the list

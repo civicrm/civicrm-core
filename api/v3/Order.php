@@ -189,7 +189,7 @@ function civicrm_api3_order_cancel($params) {
  */
 function _civicrm_api3_order_cancel_spec(&$params) {
   $params['contribution_id'] = [
-    'api.required' => 1 ,
+    'api.required' => 1,
     'title' => 'Contribution ID',
     'type' => CRM_Utils_Type::T_INT,
   ];

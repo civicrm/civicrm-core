@@ -228,6 +228,7 @@ function civicrm_api3_job_send_reminder($params) {
     return civicrm_api3_create_error($result['messages']);
   }
 }
+
 /**
  * Adjust metadata for "send_reminder" action.
  *
@@ -244,6 +245,7 @@ function _civicrm_api3_job_send_reminder(&$params) {
     'title' => 'Action Schedule ID',
   ];
 }
+
 /**
  * Execute a specific report instance and send the output via email.
  *
@@ -463,7 +465,6 @@ function civicrm_api3_job_process_participant($params) {
     return civicrm_api3_create_error('Error while processing participant statuses');
   }
 }
-
 
 /**
  * This api checks and updates the status of all membership records for a given domain.

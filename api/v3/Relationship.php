@@ -216,6 +216,6 @@ function _civicrm_api3_relationship_getoptions_spec(&$params) {
     'title' => ts('Is Form?'),
     'description' => $relationshipTypePrefix . ts('Formats the options for use'
       . ' in a form if true. The format is &lt;id&gt;_a_b => &lt;label&gt;'),
-    'type' => CRM_Utils_Type::T_BOOLEAN
+    'type' => CRM_Utils_Type::T_BOOLEAN,
   ];
 }
