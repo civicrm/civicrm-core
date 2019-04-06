@@ -3049,8 +3049,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $stateOfGrace = $this->callAPISuccess('MembershipStatus', 'getvalue', array(
       'name' => 'Grace',
       'return' => 'id',
-    )
-    );
+    ));
     $this->setUpPendingContribution($this->_ids['price_field_value'][0]);
     $membership = $this->callAPISuccess('membership', 'getsingle', array('id' => $this->_ids['membership']));
     $logs = $this->callAPISuccess('MembershipLog', 'get', array(

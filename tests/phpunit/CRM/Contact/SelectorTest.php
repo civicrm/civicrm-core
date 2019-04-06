@@ -513,13 +513,14 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
     $selector = new CRM_Contact_Selector(
       'CRM_Contact_Selector',
       ['custom_' . $createdField['id'] => ['IS NOT EMPTY' => 1]],
-      [[
-        0 => 'custom_' . $createdField['id'],
-        1 => 'IS NOT NULL',
-        2 => 1,
-        3 => 1,
-        4 => 0,
-      ],
+      [
+        [
+          0 => 'custom_' . $createdField['id'],
+          1 => 'IS NOT NULL',
+          2 => 1,
+          3 => 1,
+          4 => 0,
+        ],
       ],
       [],
       CRM_Core_Action::NONE,

@@ -6,7 +6,7 @@
  */
 class CRM_Utils_HookTest extends CiviUnitTestCase {
 
-  protected static $activeTest = NULL;
+  public static $activeTest = NULL;
 
   public $fakeModules;
 

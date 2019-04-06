@@ -607,8 +607,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
     $mut->checkMailLog(array(
       '<p>Please print this receipt for your records.</p>',
-    )
-    );
+    ));
     $mut->stop();
   }
 

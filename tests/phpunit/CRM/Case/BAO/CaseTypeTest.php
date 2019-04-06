@@ -187,9 +187,9 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
    */
   public function normalizeXml($xml) {
     return trim(
-    // tags on new lines
+      // tags on new lines
       preg_replace(":\n*<:", "\n<",
-    // no leading whitespace
+        // no leading whitespace
         preg_replace("/\n[\n ]+/", "\n",
           $xml
         )

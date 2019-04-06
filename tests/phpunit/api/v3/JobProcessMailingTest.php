@@ -222,9 +222,9 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
         'mailerJobsMax' => 1,
       ),
       array(
-      // 2 jobs which produce 0 messages
+        // 2 jobs which produce 0 messages
         0 => 2,
-      // 1 job which produces 4 messages
+        // 1 job which produces 4 messages
         4 => 1,
       ),
       4,

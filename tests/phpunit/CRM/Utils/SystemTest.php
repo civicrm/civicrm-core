@@ -85,25 +85,31 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
    */
   public function getURLs() {
     return [
-      ['https://example.com?ab=cd', [
-        'scheme' => 'https',
-        'host' => 'example.com',
-        'query' => 'ab=cd',
+      [
+        'https://example.com?ab=cd',
+        [
+          'scheme' => 'https',
+          'host' => 'example.com',
+          'query' => 'ab=cd',
+        ],
       ],
+      [
+        'http://myuser:mypass@foo.bar:123/whiz?a=b&c=d',
+        [
+          'scheme' => 'http',
+          'host' => 'foo.bar',
+          'port' => 123,
+          'user' => 'myuser',
+          'pass' => 'mypass',
+          'path' => '/whiz',
+          'query' => 'a=b&c=d',
+        ],
       ],
-      ['http://myuser:mypass@foo.bar:123/whiz?a=b&c=d', [
-        'scheme' => 'http',
-        'host' => 'foo.bar',
-        'port' => 123,
-        'user' => 'myuser',
-        'pass' => 'mypass',
-        'path' => '/whiz',
-        'query' => 'a=b&c=d',
-      ],
-      ],
-      ['/foo/bar', [
-        'path' => '/foo/bar',
-      ],
+      [
+        '/foo/bar',
+        [
+          'path' => '/foo/bar',
+        ],
       ],
     ];
   }

@@ -51,8 +51,8 @@ class test_extension_manager_searchtest extends CRM_Contact_Form_Search_Custom_B
    *
    * @return mixed
    *   - NULL or array with keys:
-   *   - summary: string
-   *   - total: numeric
+   *     - summary: string
+   *     - total: numeric
    */
   public function summary() {
     return NULL;
