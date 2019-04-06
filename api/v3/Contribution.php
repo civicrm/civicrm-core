@@ -725,8 +725,8 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
   $input['card_type_id'] = CRM_Utils_Array::value('card_type_id', $params);
   $input['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $params);
   $transaction = new CRM_Core_Transaction();
-  return CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction, !empty
-  ($contribution->contribution_recur_id), $contribution);
+  return CRM_Contribute_BAO_Contribution::completeOrder($input, $ids, $objects, $transaction,
+    !empty($contribution->contribution_recur_id), $contribution);
 }
 
 /**

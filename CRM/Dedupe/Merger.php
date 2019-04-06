@@ -472,7 +472,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
               "return" => "id",
             ]
           )
-        ));
+        )
+      );
 
       if (!empty($membershipIDs)) {
         civicrm_api3("Membership", "get", [

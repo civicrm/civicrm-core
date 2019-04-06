@@ -85,7 +85,7 @@ function civicrm_api3_domain_get($params) {
             'phone',
             $values['location']['phone'][1]
           ),
-        ];
+          ];
       }
 
       if (!empty($values['location']['address'])) {

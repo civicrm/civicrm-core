@@ -164,7 +164,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @param array $data
    * @param string $dataName
    */
-  public function __construct($name = NULL, array$data = array(), $dataName = '') {
+  public function __construct($name = NULL, array $data = array(), $dataName = '') {
     parent::__construct($name, $data, $dataName);
 
     // we need full error reporting

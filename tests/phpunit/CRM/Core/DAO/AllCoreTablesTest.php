@@ -38,7 +38,7 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
   /**
    * Implements hook_civicrm_entityTypes().
    *
-   * @param array $entityTypes
+   * @see CRM_Utils_Hook::entityTypes()
    */
   public function _hook_civicrm_entityTypes(&$entityTypes) {
     $entityTypes['CRM_Core_DAO_Email']['fields_callback'][] = function ($class, &$fields) {
