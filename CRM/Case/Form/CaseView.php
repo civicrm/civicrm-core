@@ -148,9 +148,9 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     $this->assign('hasRelatedCases', (bool) $relatedCases);
     if ($relatedCases) {
       $this->assign('relatedCaseLabel', ts('%1 Related Case', [
-            'count' => count($relatedCases),
-            'plural' => '%1 Related Cases',
-          ]));
+        'count' => count($relatedCases),
+        'plural' => '%1 Related Cases',
+      ]));
       $this->assign('relatedCaseUrl', CRM_Utils_System::url('civicrm/contact/view/case', [
         'id' => $this->_caseID,
         'cid' => $this->_contactID,
@@ -398,14 +398,13 @@ class CRM_Case_Form_CaseView extends CRM_Core_Form {
     CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_case', $this->_caseID, FALSE, TRUE);
 
     $this->addButtons([
-        [
-          'type' => 'cancel',
-          'name' => ts('Done'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ],
-      ]
-    );
+      [
+        'type' => 'cancel',
+        'name' => ts('Done'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ],
+    ]);
   }
 
   /**

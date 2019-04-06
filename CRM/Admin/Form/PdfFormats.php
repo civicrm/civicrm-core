@@ -80,9 +80,9 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
     $this->add('number', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Core_BAO_PdfFormat', 'weight'), TRUE);
 
     $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', [
-        'CRM_Core_BAO_PdfFormat',
-        $this->_id,
-      ]);
+      'CRM_Core_BAO_PdfFormat',
+      $this->_id,
+    ]);
     $this->addRule('margin_left', ts('Margin must be numeric'), 'numeric');
     $this->addRule('margin_right', ts('Margin must be numeric'), 'numeric');
     $this->addRule('margin_top', ts('Margin must be numeric'), 'numeric');

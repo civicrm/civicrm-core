@@ -130,7 +130,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
         ],
-      ]
+    ]
     );
   }
 

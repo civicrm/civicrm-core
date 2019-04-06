@@ -61,9 +61,9 @@ class CRM_Admin_Form_Mapping extends CRM_Admin_Form {
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_Mapping', 'name'), TRUE
       );
       $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', [
-          'CRM_Core_DAO_Mapping',
-          $this->_id,
-        ]);
+        'CRM_Core_DAO_Mapping',
+        $this->_id,
+      ]);
 
       $this->addElement('text', 'description', ts('Description'),
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_Mapping', 'description')

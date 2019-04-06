@@ -413,7 +413,8 @@ class CRM_Campaign_Form_Survey_Results extends CRM_Campaign_Form_Survey {
         'name' => "survey_{$survey->id}",
         'title' => $params['report_title'] ? $params['report_title'] : $this->_values['title'],
         'status_id_op' => 'eq',
-        'status_id_value' => $activityStatus['Scheduled'], // reserved status
+        // reserved status
+        'status_id_value' => $activityStatus['Scheduled'],
         'survey_id_value' => [$survey->id],
         'description' => ts('Detailed report for canvassing, phone-banking, walk lists or other surveys.'),
       ];

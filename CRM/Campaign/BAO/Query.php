@@ -398,10 +398,7 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
     $dao = CRM_Core_DAO::executeQuery($query, [1 => ['Voter_Info', 'String']]);
     $customSearchFields = [];
     while ($dao->fetch()) {
-      foreach ([
-                 'ward',
-                 'precinct',
-               ] as $name) {
+      foreach (['ward', 'precinct'] as $name) {
         if (stripos($name, $dao->label) !== FALSE) {
           $fieldId = $dao->id;
           $fieldName = 'custom_' . $dao->id;

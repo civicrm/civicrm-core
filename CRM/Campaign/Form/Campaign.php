@@ -168,17 +168,16 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     if ($this->_action & CRM_Core_Action::DELETE) {
 
       $this->addButtons([
-          [
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'isDefault' => TRUE,
-          ],
-          [
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ],
-        ]
-      );
+        [
+          'type' => 'next',
+          'name' => ts('Delete'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
       return;
     }
 

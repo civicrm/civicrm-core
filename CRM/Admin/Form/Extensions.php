@@ -137,17 +137,16 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
 
     $this->assign('title', $title);
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => $buttonName,
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => $buttonName,
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**

@@ -106,10 +106,12 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
     $this->assign('configUrl', $configUrl);
     $this->assign('revertConfirm', htmlspecialchars(ts('Are you sure you want to revert all changes?', ['escape' => 'js'])));
 
-    CRM_Utils_System::appendBreadCrumb([[
-      'url' => CRM_Utils_System::url('civicrm/admin/setting/preferences/display', 'reset=1'),
-      'title' => ts('Display Preferences'),
-    ]]);
+    CRM_Utils_System::appendBreadCrumb([
+      [
+        'url' => CRM_Utils_System::url('civicrm/admin/setting/preferences/display', 'reset=1'),
+        'title' => ts('Display Preferences'),
+      ],
+    ]);
 
     return parent::run();
   }

@@ -160,7 +160,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
               }
               break;
 
-            case 'sequence': // passthrough
+            // passthrough
+            case 'sequence':
             case 'timeline':
               if ($setVal) {
                 $xmlFile .= "<{$index}>true</{$index}>\n";

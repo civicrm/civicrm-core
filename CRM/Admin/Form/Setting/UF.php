@@ -85,7 +85,8 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
       if ($config->userFramework === 'Backdrop') {
         $tablePrefixes = '$database_prefix = array(';
       }
-      $tablePrefixes .= "\n  'default' => '$drupal_prefix',"; // add default prefix: the drupal database prefix
+      // add default prefix: the drupal database prefix
+      $tablePrefixes .= "\n  'default' => '$drupal_prefix',";
       $prefix = "";
       if ($config->dsn != $config->userFrameworkDSN) {
         $prefix = "`{$dsnArray['database']}`.";

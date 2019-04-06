@@ -123,22 +123,22 @@ ORDER BY entity_id
     $roles = CRM_Core_OptionGroup::values('acl_role');
 
     $group = [
-        '-1' => ts('- select -'),
-        '0' => ts('All Groups'),
-      ] + CRM_Core_PseudoConstant::group();
+      '-1' => ts('- select -'),
+      '0' => ts('All Groups'),
+    ] + CRM_Core_PseudoConstant::group();
     $customGroup = [
-        '-1' => ts('- select -'),
-        '0' => ts('All Custom Groups'),
-      ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
+      '-1' => ts('- select -'),
+      '0' => ts('All Custom Groups'),
+    ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
     $ufGroup = [
-        '-1' => ts('- select -'),
-        '0' => ts('All Profiles'),
-      ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+      '-1' => ts('- select -'),
+      '0' => ts('All Profiles'),
+    ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
 
     $event = [
-        '-1' => ts('- select -'),
-        '0' => ts('All Events'),
-      ] + CRM_Event_PseudoConstant::event();
+      '-1' => ts('- select -'),
+      '0' => ts('All Events'),
+    ] + CRM_Event_PseudoConstant::event();
 
     while ($dao->fetch()) {
       $acl[$dao->id] = [];

@@ -73,17 +73,16 @@ class CRM_Admin_Form_Persistent extends CRM_Core_Form {
     $this->add('text', 'name', ts('Name:'), NULL, TRUE);
     $this->add('textarea', 'data', ts('Data:'), ['rows' => 4, 'cols' => 50], TRUE);
     $this->addButtons([
-        [
-          'type' => 'submit',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'submit',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   public function postProcess() {

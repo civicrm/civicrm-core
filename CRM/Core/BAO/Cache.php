@@ -45,7 +45,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *
    * @var int, number of second
    */
-  const DEFAULT_SESSION_TTL = 172800; // Two days: 2*24*60*60
+  // Two days: 2*24*60*60
+  const DEFAULT_SESSION_TTL = 172800;
 
   /**
    * @var array ($cacheKey => $cacheValue)
@@ -174,7 +175,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     $table = self::getTableName();
     $where = self::whereCache($group, $path, $componentID);
     $dataExists = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM $table WHERE {$where}");
-    $now = date('Y-m-d H:i:s'); // FIXME - Use SQL NOW() or CRM_Utils_Time?
+    // FIXME - Use SQL NOW() or CRM_Utils_Time?
+    $now = date('Y-m-d H:i:s');
     $dataSerialized = self::encode($data);
 
     // This table has a wonky index, so we cannot use REPLACE or

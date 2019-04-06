@@ -99,17 +99,16 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     // make this form an upload since we dont know if the custom data injected dynamically
     // is of type file etc
     $this->addButtons([
-        [
-          'type' => 'upload',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'upload',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**

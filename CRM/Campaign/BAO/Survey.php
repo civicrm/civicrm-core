@@ -439,11 +439,8 @@ SELECT  survey.id    as id,
       $autocompleteContactSearch = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'contact_autocomplete_options'
       );
-      $returnProperties = array_fill_keys(array_merge([
-          'contact_type',
-          'contact_sub_type',
-          'sort_name',
-        ],
+      $returnProperties = array_fill_keys(array_merge(
+        ['contact_type', 'contact_sub_type', 'sort_name'],
         array_keys($autocompleteContactSearch)
       ), 1);
     }
@@ -913,7 +910,7 @@ INNER JOIN  civicrm_contact contact_a ON ( activityTarget.contact_id = contact_a
    *
    * @return mixed
    */
-  public Static function getReportID($surveyId) {
+  public static function getReportID($surveyId) {
     static $reportIds = [];
 
     if (!array_key_exists($surveyId, $reportIds)) {

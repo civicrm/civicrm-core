@@ -107,7 +107,8 @@ class CRM_Case_Form_Activity_OpenCase {
     else {
       $caseStatus = CRM_Core_OptionGroup::values('case_status', FALSE, FALSE, FALSE, 'AND is_default = 1');
       if (count($caseStatus) == 1) {
-        $caseStatus = key($caseStatus); //$defaults['status_id'] = key($caseStatus);
+        //$defaults['status_id'] = key($caseStatus);
+        $caseStatus = key($caseStatus);
       }
     }
     $defaults['status_id'] = $caseStatus;
@@ -153,9 +154,9 @@ class CRM_Case_Form_Activity_OpenCase {
     }
     if ($form->_context == 'standalone') {
       $form->addEntityRef('client_id', ts('Client'), [
-          'create' => TRUE,
-          'multiple' => $form->_allowMultiClient,
-        ], TRUE);
+        'create' => TRUE,
+        'multiple' => $form->_allowMultiClient,
+      ], TRUE);
     }
 
     $element = $form->addField('case_type_id', [
@@ -193,24 +194,23 @@ class CRM_Case_Form_Activity_OpenCase {
     $form->add('wysiwyg', 'activity_details', ts('Details'), ['rows' => 4, 'cols' => 60], FALSE);
 
     $form->addButtons([
-        [
-          'type' => 'upload',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-          'submitOnce' => TRUE,
-        ],
-        [
-          'type' => 'upload',
-          'name' => ts('Save and New'),
-          'subName' => 'new',
-          'submitOnce' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'upload',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+        'submitOnce' => TRUE,
+      ],
+      [
+        'type' => 'upload',
+        'name' => ts('Save and New'),
+        'subName' => 'new',
+        'submitOnce' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**

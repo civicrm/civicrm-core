@@ -177,17 +177,16 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     );
 
     $this->addButtons([
-        [
-          'type' => 'upload',
-          'name' => ts('Validate & Process the Batch'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Save & Continue Later'),
-        ],
-      ]
-    );
+      [
+        'type' => 'upload',
+        'name' => ts('Validate & Process the Batch'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Save & Continue Later'),
+      ],
+    ]);
 
     $this->assign('rowCount', $this->_batchInfo['item_count'] + 1);
 
@@ -204,9 +203,9 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     for ($rowNumber = 1; $rowNumber <= $this->_batchInfo['item_count']; $rowNumber++) {
       $this->addEntityRef("primary_contact_id[{$rowNumber}]", '', [
-          'create' => TRUE,
-          'placeholder' => ts('- select -'),
-        ]);
+        'create' => TRUE,
+        'placeholder' => ts('- select -'),
+      ]);
 
       // special field specific to membership batch udpate
       if ($this->_batchInfo['type_id'] == 2) {
@@ -254,7 +253,8 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
     // Notes: $this->_elementIndex gives an approximate count of the variables being sent
     // An offset value is set to deal with additional vars that are likely passed.
     // There may be a more accurate way to do this...
-    $offset = 50; // set an offset to account for other vars we are not counting
+    // set an offset to account for other vars we are not counting
+    $offset = 50;
     if ((count($this->_elementIndex) + $offset) > ini_get("max_input_vars")) {
       CRM_Core_Error::fatal(ts('Batch size is too large. Increase value of php.ini setting "max_input_vars" (current val = ' . ini_get("max_input_vars") . ')'));
     }

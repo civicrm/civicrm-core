@@ -80,9 +80,9 @@ SELECT object_table
 
     $label = ts('Role');
     $role = [
-        '-1' => ts('- select role -'),
-        '0' => ts('Everyone'),
-      ] + CRM_Core_OptionGroup::values('acl_role');
+      '-1' => ts('- select role -'),
+      '0' => ts('Everyone'),
+    ] + CRM_Core_OptionGroup::values('acl_role');
     $entityID = &$this->add('select', 'entity_id', $label, $role, TRUE);
 
     if ($this->_id) {

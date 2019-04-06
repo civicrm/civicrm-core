@@ -119,8 +119,7 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
             'administer CiviCampaign',
             "{$name} campaign contacts",
           ],
-        ])
-      ) {
+      ])) {
         continue;
       }
 

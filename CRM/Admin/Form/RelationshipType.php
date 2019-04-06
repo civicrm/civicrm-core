@@ -69,11 +69,11 @@ class CRM_Admin_Form_RelationshipType extends CRM_Admin_Form {
       ],
       'label_b_a' => [
         'name' => 'label_b_a',
-        'description' => ts("Label for the relationship from Contact B to Contact A. EXAMPLE: Contact B is 'Child of' Contact A. You may leave this blank for relationships where the name is the same in both directions (e.g. Spouse).")
+        'description' => ts("Label for the relationship from Contact B to Contact A. EXAMPLE: Contact B is 'Child of' Contact A. You may leave this blank for relationships where the name is the same in both directions (e.g. Spouse)."),
       ],
       'description' => [
         'name' => 'description',
-        'description' => ''
+        'description' => '',
       ],
       'contact_types_a' => ['name' => 'contact_types_a', 'not-auto-addable' => TRUE],
       'contact_types_b' => ['name' => 'contact_types_b', 'not-auto-addable' => TRUE],

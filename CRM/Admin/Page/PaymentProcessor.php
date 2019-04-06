@@ -101,9 +101,9 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
     CRM_Utils_System::setTitle(ts('Settings - Payment Processor'));
     //CRM-15546
     $paymentProcessorTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', array(
-        'labelColumn' => 'name',
-        'flip' => 1,
-      ));
+      'labelColumn' => 'name',
+      'flip' => 1,
+    ));
     $this->assign('defaultPaymentProcessorType', $paymentProcessorTypes['PayPal']);
     $breadCrumb = array(
       array(

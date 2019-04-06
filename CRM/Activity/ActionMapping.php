@@ -30,7 +30,6 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 
-use Civi\ActionSchedule\RecipientBuilder;
 
 /**
  * Class CRM_Activity_ActionMapping

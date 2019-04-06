@@ -251,7 +251,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
           'type' => 'cancel',
           'name' => ts('Cancel'),
         ],
-      ]
+    ]
     );
   }
 

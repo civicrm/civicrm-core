@@ -213,7 +213,7 @@ class CRM_Core_BAO_CMSUser {
       }
 
       // now check that the cms db does not have the user name and/or email
-      if ($isDrupal OR $isJoomla OR $isWordPress) {
+      if ($isDrupal or $isJoomla or $isWordPress) {
         $params = [
           'name' => $fields['cms_name'],
           'mail' => $fields[$emailName],

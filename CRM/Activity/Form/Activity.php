@@ -260,11 +260,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       if (CRM_Contact_Form_Search::isSearchContext($this->_context)) {
         $this->_context = 'search';
       }
-      elseif (!in_array($this->_context, [
-          'dashlet',
-          'case',
-          'dashletFullscreen',
-        ])
+      elseif (!in_array($this->_context, ['dashlet', 'case', 'dashletFullscreen'])
         && $this->_currentlyViewedContactId
       ) {
         $this->_context = 'activity';
