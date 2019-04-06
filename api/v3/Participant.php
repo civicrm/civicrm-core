@@ -128,7 +128,6 @@ function _civicrm_api3_participant_createlineitem(&$params, $participant) {
   }
 }
 
-
 /**
  * Adjust Metadata for Create action.
  *

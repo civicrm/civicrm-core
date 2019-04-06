@@ -37,7 +37,7 @@
  * @param array $params
  *
  * @return array
- *    API Success Array
+ *   API Success Array
  * @throws \API_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
@@ -88,7 +88,7 @@ function _civicrm_api3_logging_revert_spec(&$params) {
  * @param array $params
  *
  * @return array
- *    API Success Array
+ *   API Success Array
  * @throws \API_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */

@@ -317,7 +317,7 @@ function civicrm_api3_cxn_create($params) {
     return civicrm_api3_create_success($result, $params, 'Cxn', 'create');
 
   }
-  catch(Exception $ex){
+  catch (Exception $ex) {
     throw $ex;
   }
 }

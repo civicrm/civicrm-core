@@ -31,7 +31,6 @@
  * @package CiviCRM_APIv3
  */
 
-
 /**
  * Creates or updates an Activity.
  *
@@ -291,7 +290,7 @@ function _civicrm_api3_activity_get_spec(&$params) {
  * @param array $params
  *   Array per getfields documentation.
  *
- * @return array API result array
+ * @return array
  *   API result array
  *
  * @throws \API_Exception
@@ -592,7 +591,7 @@ function _civicrm_api3_activity_fill_activity_contact_names(&$activities, $param
   $typeMap = [
     $assigneeType => 'assignee',
     $sourceType => 'source',
-    $targetType => 'target'
+    $targetType => 'target',
   ];
 
   $activityContactTypes = [$sourceType];
@@ -609,7 +608,7 @@ function _civicrm_api3_activity_fill_activity_contact_names(&$activities, $param
       'activity_id',
       'record_type_id',
       'contact_id.display_name',
-      'contact_id'
+      'contact_id',
     ],
     'check_permissions' => !empty($params['check_permissions']),
   ];
@@ -630,7 +629,6 @@ function _civicrm_api3_activity_fill_activity_contact_names(&$activities, $param
     }
   }
 }
-
 
 /**
  * Delete a specified Activity.

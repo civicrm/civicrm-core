@@ -213,7 +213,7 @@ function civicrm_api3_create_success($values = 1, $params = [], $entity = NULL, 
       'option_sort',
       'options',
       'prettyprint',
-      ]);
+    ]);
     if ($undefined) {
       $result['undefined_fields'] = array_merge($undefined);
     }
@@ -432,6 +432,7 @@ function _civicrm_api3_filter_fields_for_bao($entity, &$params, &$values) {
   $fields = $fields['values'];
   _civicrm_api3_store_values($fields, $params, $values);
 }
+
 /**
  * Store values.
  *
@@ -1767,9 +1768,9 @@ function _civicrm_api3_validate_unique_key(&$params, &$fieldName) {
     return;
   }
   $existing = civicrm_api($params['entity'], 'get', [
-      'version' => $params['version'],
-      $fieldName => $fieldValue,
-    ]);
+    'version' => $params['version'],
+    $fieldName => $fieldValue,
+  ]);
   // an entry already exists for this unique field
   if ($existing['count'] == 1) {
     // question - could this ever be a security issue?
@@ -1836,9 +1837,9 @@ function _civicrm_api3_generic_replace($entity, $params) {
     );
     foreach ($staleIDs as $staleID) {
       $delete = civicrm_api($entity, 'delete', [
-          'version' => $params['version'],
-          'id' => $staleID,
-        ]);
+        'version' => $params['version'],
+        'id' => $staleID,
+      ]);
       if (civicrm_error($delete)) {
         $transaction->rollback();
         return $delete;
@@ -1847,11 +1848,11 @@ function _civicrm_api3_generic_replace($entity, $params) {
 
     return civicrm_api3_create_success($creates, $params);
   }
-  catch(PEAR_Exception $e) {
+  catch (PEAR_Exception $e) {
     $transaction->rollback();
     return civicrm_api3_create_error($e->getMessage());
   }
-  catch(Exception $e) {
+  catch (Exception $e) {
     $transaction->rollback();
     return civicrm_api3_create_error($e->getMessage());
   }
@@ -1983,7 +1984,6 @@ function _civicrm_api_get_custom_fields($entity, &$params) {
   }
   return $ret;
 }
-
 
 /**
  * Fill params array with alternate (alias) values where a field has an alias and that is filled & the main field isn't.

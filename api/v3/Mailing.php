@@ -38,7 +38,7 @@
  * @param array $params
  *
  * @return array
- *    API Success Array
+ *   API Success Array
  * @throws \API_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
@@ -440,7 +440,8 @@ function _civicrm_api3_mailing_event_reply_spec(&$params) {
   $params['hash']['api.required'] = 1;
   $params['hash']['title'] = 'Hash';
   $params['replyTo']['api.required'] = 0;
-  $params['replyTo']['title'] = 'Reply To';//doesn't really explain adequately
+  //doesn't really explain adequately
+  $params['replyTo']['title'] = 'Reply To';
 }
 
 /**
@@ -635,17 +636,17 @@ function civicrm_api3_mailing_send_test($params) {
   $testEmailParams['emails'] = array_key_exists('test_email', $testEmailParams) ? explode(',', strtolower($testEmailParams['test_email'])) : NULL;
   if (!empty($params['test_email'])) {
     $query = CRM_Utils_SQL_Select::from('civicrm_email e')
-        ->select(['e.id', 'e.contact_id', 'e.email'])
-        ->join('c', 'INNER JOIN civicrm_contact c ON e.contact_id = c.id')
-        ->where('e.email IN (@emails)', ['@emails' => $testEmailParams['emails']])
-        ->where('e.on_hold = 0')
-        ->where('c.is_opt_out = 0')
-        ->where('c.do_not_email = 0')
-        ->where('c.is_deceased = 0')
-        ->where('c.is_deleted = 0')
-        ->groupBy('e.id')
-        ->orderBy(['e.is_bulkmail DESC', 'e.is_primary DESC'])
-        ->toSQL();
+      ->select(['e.id', 'e.contact_id', 'e.email'])
+      ->join('c', 'INNER JOIN civicrm_contact c ON e.contact_id = c.id')
+      ->where('e.email IN (@emails)', ['@emails' => $testEmailParams['emails']])
+      ->where('e.on_hold = 0')
+      ->where('c.is_opt_out = 0')
+      ->where('c.do_not_email = 0')
+      ->where('c.is_deceased = 0')
+      ->where('c.is_deleted = 0')
+      ->groupBy('e.id')
+      ->orderBy(['e.is_bulkmail DESC', 'e.is_primary DESC'])
+      ->toSQL();
     $dao = CRM_Core_DAO::executeQuery($query);
     $emailDetail = [];
     // fetch contact_id and email id for all existing emails

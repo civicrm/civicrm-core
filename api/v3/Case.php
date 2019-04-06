@@ -32,7 +32,6 @@
  * @package CiviCRM_APIv3
  */
 
-
 /**
  * Open a new case, add client and manager roles, and standard timeline.
  *
@@ -67,11 +66,10 @@ function civicrm_api3_case_create($params) {
   if (empty($params['id'])) {
     // Creating a new case, so make sure we have the necessary parameters
     civicrm_api3_verify_mandatory($params, NULL, [
-        'contact_id',
-        'subject',
-        ['case_type', 'case_type_id'],
-      ]
-    );
+      'contact_id',
+      'subject',
+      ['case_type', 'case_type_id'],
+    ]);
   }
   else {
     // Update an existing case
@@ -743,7 +741,6 @@ function _civicrm_api3_case_format_params(&$params) {
     $params['case_type'] = $caseTypes[$params['case_type_id']];
   }
 }
-
 
 /**
  * It actually works a lot better to use the CaseContact api instead of the Case api

@@ -280,7 +280,6 @@ function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTyp
   return $membershipValues;
 }
 
-
 /**
  * Non-standard behaviour inherited from v2.
  *

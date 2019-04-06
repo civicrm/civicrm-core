@@ -83,7 +83,8 @@ function _civicrm_api3_mailing_contact_get_spec(&$params) {
 
   $params['type'] = [
     'api.default' => 'Delivered',
-    'title' => 'Type', // doesn't really explain the field - but not sure I understand it to explain it better
+    // doesn't really explain the field - but not sure I understand it to explain it better
+    'title' => 'Type',
     'type' => CRM_Utils_Type::T_STRING,
     'options' => [
       'Delivered' => 'Delivered',

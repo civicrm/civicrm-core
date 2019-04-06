@@ -130,7 +130,8 @@ function civicrm_api3_generic_getfields($apiRequest, $unique = TRUE) {
           'api.required' => 1,
           'api.aliases' => [$lowercase_entity . '_id'],
           'type' => CRM_Utils_Type::T_INT,
-        ]];
+        ],
+      ];
       break;
 
     // Note: adding setvalue case here instead of in a generic spec function because

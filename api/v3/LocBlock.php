@@ -86,7 +86,7 @@ function civicrm_api3_loc_block_create($params) {
     _civicrm_api3_object_to_array($dao, $values[$dao->id]);
     return civicrm_api3_create_success($values, $params, 'LocBlock', 'create', $dao);
   }
-  throw New API_Exception('Unable to create LocBlock. Please check your params.');
+  throw new API_Exception('Unable to create LocBlock. Please check your params.');
 }
 
 /**

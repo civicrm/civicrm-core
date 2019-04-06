@@ -135,7 +135,7 @@ function _civicrm_api3_report_template_getrows($params) {
     'option_group_name' => 'report_template',
     'return' => 'name',
     'value' => $params['report_id'],
-    ]
+  ]
   );
 
   $reportInstance = new $class();
@@ -154,7 +154,7 @@ function _civicrm_api3_report_template_getrows($params) {
   $reportInstance->beginPostProcessCommon();
   $sql = $reportInstance->buildQuery();
   $reportInstance->addToDeveloperTab($sql);
-  $rows = $metadata = $requiredMetadata  = [];
+  $rows = $metadata = $requiredMetadata = [];
   $reportInstance->buildRows($sql, $rows);
   $reportInstance->formatDisplay($rows);
 
@@ -191,6 +191,7 @@ function civicrm_api3_report_template_getstatistics($params) {
   $reportInstance->cleanUpTemporaryTables();
   return civicrm_api3_create_success($stats, $params, 'ReportTemplate', 'getstatistics', CRM_Core_DAO::$_nullObject, $metadata);
 }
+
 /**
  * Adjust metadata for template getrows action.
  *

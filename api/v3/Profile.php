@@ -446,7 +446,7 @@ function _civicrm_api3_profile_getbillingpseudoprofile(&$params) {
     'api.email.get.1' => ['location_type_id' => 'Billing'],
     'api.email.get.2' => ['is_billing' => TRUE],
     'return' => 'api.email.get, api.address.get, api.address.getoptions, country, state_province, email, first_name, last_name, middle_name, ' . implode($addressFields, ','),
-   ]
+  ]
   );
 
   $values = [
@@ -611,10 +611,10 @@ function _civicrm_api3_buildprofile_submitfields($profileID, $optionsBehaviour =
       }
       /**
        * putting this on hold -this would cause the api to set the default - but could have unexpected behaviour
-      if (isset($result['values'][$realName]['default_value'])) {
-      //this would be the case for a custom field with a configured default
-      $profileFields[$profileID][$entityfield]['api.default'] = $result['values'][$realName]['default_value'];
-      }
+       * if (isset($result['values'][$realName]['default_value'])) {
+       * //this would be the case for a custom field with a configured default
+       * $profileFields[$profileID][$entityfield]['api.default'] = $result['values'][$realName]['default_value'];
+       * }
        */
     }
   }

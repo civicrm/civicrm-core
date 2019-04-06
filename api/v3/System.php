@@ -230,8 +230,10 @@ function civicrm_api3_system_get($params) {
   $config = CRM_Core_Config::singleton();
   $returnValues = [
     [
-      'version' => CRM_Utils_System::version(), // deprecated in favor of civi.version
-      'uf' => CIVICRM_UF, // deprecated in favor of cms.type
+      // deprecated in favor of civi.version
+      'version' => CRM_Utils_System::version(),
+      // deprecated in favor of cms.type
+      'uf' => CIVICRM_UF,
       'php' => [
         'version' => phpversion(),
         'time' => time(),

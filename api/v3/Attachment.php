@@ -481,7 +481,8 @@ function _civicrm_api3_attachment_getfields() {
   // Would be hard to securely handle changes.
   $spec['entity_table']['title'] = CRM_Utils_Array::value('title', $spec['entity_table'], 'Entity Table') . ' (write-once)';
   $spec['entity_id'] = $entityFileFields['entity_id'];
-  $spec['entity_id']['title'] = CRM_Utils_Array::value('title', $spec['entity_id'], 'Entity ID') . ' (write-once)'; // would be hard to securely handle changes
+  // would be hard to securely handle changes
+  $spec['entity_id']['title'] = CRM_Utils_Array::value('title', $spec['entity_id'], 'Entity ID') . ' (write-once)';
   $spec['url'] = [
     'title' => 'URL (read-only)',
     'description' => 'URL for downloading the file (not searchable, expire-able)',

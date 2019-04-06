@@ -57,8 +57,7 @@ function civicrm_api3_generic_setValue($apiRequest) {
   $fields = civicrm_api($entity, 'getFields', [
     'version' => 3,
     'action' => 'create',
-    "sequential"]
-  );
+  ]);
   // getfields error, shouldn't happen.
   if ($fields['is_error']) {
     return $fields;

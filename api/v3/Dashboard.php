@@ -31,7 +31,6 @@
  * @package CiviCRM_APIv3
  */
 
-
 /**
  * Creates or updates an Dashlet.
  *
@@ -42,12 +41,11 @@
  */
 function civicrm_api3_dashboard_create($params) {
   civicrm_api3_verify_one_mandatory($params, NULL, [
-      'name',
-      'label',
-      'url',
-      'fullscreen_url',
-    ]
-  );
+    'name',
+    'label',
+    'url',
+    'fullscreen_url',
+  ]);
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Dashboard');
 }
 

@@ -135,13 +135,13 @@ function civicrm_api3_mailing_a_b_submit($params) {
         throw new API_Exception("Cannot transition to state 'Testing'");
       }
       civicrm_api3('Mailing', 'submit', $submitParams + [
-          'id' => $dao->mailing_id_a,
-          '_skip_evil_bao_auto_recipients_' => 0,
-        ]);
+        'id' => $dao->mailing_id_a,
+        '_skip_evil_bao_auto_recipients_' => 0,
+      ]);
       civicrm_api3('Mailing', 'submit', $submitParams + [
-          'id' => $dao->mailing_id_b,
-          '_skip_evil_bao_auto_recipients_' => 1,
-        ]);
+        'id' => $dao->mailing_id_b,
+        '_skip_evil_bao_auto_recipients_' => 1,
+      ]);
       CRM_Mailing_BAO_MailingAB::distributeRecipients($dao);
       break;
 
@@ -150,9 +150,9 @@ function civicrm_api3_mailing_a_b_submit($params) {
         throw new API_Exception("Cannot transition to state 'Final'");
       }
       civicrm_api3('Mailing', 'submit', $submitParams + [
-          'id' => $dao->mailing_id_c,
-          '_skip_evil_bao_auto_recipients_' => 1,
-        ]);
+        'id' => $dao->mailing_id_c,
+        '_skip_evil_bao_auto_recipients_' => 1,
+      ]);
       break;
 
     default:
