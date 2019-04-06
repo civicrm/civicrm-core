@@ -34,6 +34,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * This class defines operations for inspecting the API's metadata.
  */
 class ReflectionProvider implements EventSubscriberInterface, ProviderInterface {
+
   /**
    * @return array
    */
@@ -68,7 +69,8 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
     $this->apiKernel = $apiKernel;
     $this->actions = [
       'Entity' => ['get', 'getactions'],
-      '*' => ['getactions'], // 'getfields'
+      // 'getfields'
+      '*' => ['getactions'],
     ];
   }
 

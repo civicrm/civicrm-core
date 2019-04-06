@@ -27,7 +27,6 @@
 
 namespace Civi\Core;
 
-use Civi;
 use Civi\Core\Event\SystemInstallEvent;
 
 /**

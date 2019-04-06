@@ -21,7 +21,7 @@ class MappingRegisterEvent extends Event {
   /**
    * Register a new mapping.
    *
-   * @param MappingInterface $mapping
+   * @param \Civi\ActionSchedule\MappingInterface $mapping
    *   The new mapping.
    * @return MappingRegisterEvent
    */

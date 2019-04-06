@@ -45,7 +45,7 @@ class Test {
   /**
    * Get a connection to the test database.
    *
-   * @return PDO
+   * @return \PDO
    */
   public static function pdo() {
     if (!isset(self::$singletons['pdo'])) {
@@ -126,7 +126,6 @@ class Test {
     }
     return self::$singletons['schema'];
   }
-
 
   /**
    * @return \Civi\Test\Data

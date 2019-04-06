@@ -28,8 +28,6 @@
 
 namespace Civi\Core\SqlTrigger;
 
-use Civi\Core\Event\GenericHookEvent;
-
 /**
  * Build a set of SQL triggers for tracking timestamps on an entity.
  *

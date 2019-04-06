@@ -8,6 +8,7 @@ require_once 'api/Exception.php';
  * @package Civi\API\Exception
  */
 class NotImplementedException extends \API_Exception {
+
   /**
    * @param string $message
    *   The human friendly error message.

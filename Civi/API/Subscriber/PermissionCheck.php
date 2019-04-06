@@ -36,6 +36,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * Civi\API\Annotation\Permission.
  */
 class PermissionCheck implements EventSubscriberInterface {
+
   /**
    * @return array
    */

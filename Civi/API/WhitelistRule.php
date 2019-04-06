@@ -48,7 +48,7 @@ namespace Civi\API;
  */
 class WhitelistRule {
 
-  static $IGNORE_FIELDS = [
+  public static $IGNORE_FIELDS = [
     'check_permissions',
     'debug',
     'offset',

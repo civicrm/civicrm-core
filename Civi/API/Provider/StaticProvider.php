@@ -102,7 +102,7 @@ class StaticProvider extends AdhocProvider {
    * @param array $apiRequest
    *   The full description of the API request.
    * @return array
-   *    Formatted API result
+   *   Formatted API result
    * @throws \API_Exception
    */
   public function doCreate($apiRequest) {
@@ -131,7 +131,7 @@ class StaticProvider extends AdhocProvider {
    * @param array $apiRequest
    *   The full description of the API request.
    * @return array
-   *    Formatted API result
+   *   Formatted API result
    * @throws \API_Exception
    */
   public function doGet($apiRequest) {
@@ -142,7 +142,7 @@ class StaticProvider extends AdhocProvider {
    * @param array $apiRequest
    *   The full description of the API request.
    * @return array
-   *    Formatted API result
+   *   Formatted API result
    * @throws \API_Exception
    */
   public function doDelete($apiRequest) {

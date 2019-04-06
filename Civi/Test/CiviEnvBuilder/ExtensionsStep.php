@@ -1,5 +1,6 @@
 <?php
 namespace Civi\Test\CiviEnvBuilder;
+
 class ExtensionsStep implements StepInterface {
   private $action;
   private $names;

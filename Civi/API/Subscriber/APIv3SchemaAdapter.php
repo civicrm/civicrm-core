@@ -35,6 +35,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * and validates that the fields are provided correctly.
  */
 class APIv3SchemaAdapter implements EventSubscriberInterface {
+
   /**
    * @return array
    */

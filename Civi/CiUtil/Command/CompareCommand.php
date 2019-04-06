@@ -7,6 +7,7 @@ namespace Civi\CiUtil\Command;
  * @package Civi\CiUtil\Command
  */
 class CompareCommand {
+
   /**
    * @param $argv
    */
@@ -19,7 +20,8 @@ class CompareCommand {
 
     $parser = ['\Civi\CiUtil\PHPUnitParser', 'parseJsonResults'];
     $printerType = 'txt';
-    $suites = []; // array('file' => string, 'results' => array)
+    // array('file' => string, 'results' => array)
+    $suites = [];
     for ($i = 1; $i < count($argv); $i++) {
       switch ($argv[$i]) {
         case '--phpunit-json':
@@ -50,7 +52,8 @@ class CompareCommand {
       }
     }
 
-    $tests = []; // array(string $name)
+    // array(string $name)
+    $tests = [];
     foreach ($suites as $suite) {
       $tests = array_unique(array_merge(
         $tests,

@@ -112,7 +112,7 @@ abstract class Mapping implements MappingInterface {
   /**
    * The basic entity to query (label).
    *
-   * @var
+   * @var string
    *   Ex: 'Activity', 'Event'
    */
   private $entity_label;
@@ -339,6 +339,6 @@ abstract class Mapping implements MappingInterface {
    * @param array $defaultParams
    * @return \CRM_Utils_SQL_Select
    */
-  public abstract function createQuery($schedule, $phase, $defaultParams);
+  abstract public function createQuery($schedule, $phase, $defaultParams);
 
 }

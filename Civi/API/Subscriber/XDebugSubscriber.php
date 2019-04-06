@@ -35,6 +35,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @package Civi\API\Subscriber
  */
 class XDebugSubscriber implements EventSubscriberInterface {
+
   /**
    * @return array
    */

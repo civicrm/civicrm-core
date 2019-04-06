@@ -65,7 +65,8 @@ class TokenRow {
   public function __construct(TokenProcessor $tokenProcessor, $key) {
     $this->tokenProcessor = $tokenProcessor;
     $this->tokenRow = $key;
-    $this->format('text/plain'); // Set a default.
+    // Set a default.
+    $this->format('text/plain');
     $this->context = new TokenRowContext($tokenProcessor, $key);
   }
 
@@ -138,7 +139,7 @@ class TokenRow {
     $customFieldName = "custom_" . $customFieldID;
     $record = civicrm_api3($entity, "getSingle", [
       'return' => $customFieldName,
-       'id' => $entityID,
+      'id' => $entityID,
     ]);
     $fieldValue = \CRM_Utils_Array::value($customFieldName, $record, '');
 
@@ -305,8 +306,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    * @return bool
    */
   public function offsetExists($offset) {
-    return
-      isset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset])
+    return isset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset])
       || isset($this->tokenProcessor->context[$offset]);
   }
 

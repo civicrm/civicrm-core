@@ -23,6 +23,9 @@ class Requirements {
    */
   const REQUIREMENT_ERROR = 2;
 
+  /**
+   * @var array
+   */
   protected $system_checks = [
     'checkMemory',
     'checkServerVariables',
@@ -106,7 +109,7 @@ class Requirements {
   /**
    * Generates a mysql connection
    *
-   * @param $db_confic array
+   * @param $db_config array
    * @return object mysqli connection
    */
   protected function connect($db_config) {
@@ -488,7 +491,8 @@ class Requirements {
       return $results;
     }
 
-    $r = mysqli_query($conn, "SHOW VARIABLES LIKE 'thread_stack'"); // bytes => kb
+    // bytes => kb
+    $r = mysqli_query($conn, "SHOW VARIABLES LIKE 'thread_stack'");
     if (!$r) {
       $results['severity'] = $this::REQUIREMENT_ERROR;
       $results['details'] = 'Could not query thread_stack value';

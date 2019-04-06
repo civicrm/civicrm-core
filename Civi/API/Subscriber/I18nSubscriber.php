@@ -35,6 +35,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @package Civi\API\Subscriber
  */
 class I18nSubscriber implements EventSubscriberInterface {
+
   /**
    * @return array
    */

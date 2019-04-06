@@ -250,7 +250,8 @@ class ResolverApi {
 }
 
 class ResolverGlobalCallback {
-  private $mode, $path;
+  private $mode;
+  private $path;
 
   /**
    * Class constructor.

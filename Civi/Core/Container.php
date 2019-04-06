@@ -1,23 +1,13 @@
 <?php
 namespace Civi\Core;
 
-use Civi\API\Provider\ActionObjectProvider;
 use Civi\Core\Event\SystemInstallEvent;
 use Civi\Core\Lock\LockManager;
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\AnnotationRegistry;
-use Doctrine\Common\Annotations\FileCacheReader;
-use Doctrine\Common\Cache\FilesystemCache;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\Tools\Setup;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 
 // TODO use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -58,7 +48,7 @@ class Container {
    *   - CIVICRM_DOMAIN_ID
    *   - CIVICRM_TEMPLATE_COMPILEDIR
    *
-   * @return ContainerInterface
+   * @return \Symfony\Component\DependencyInjection\ContainerInterface
    */
   public function loadContainer() {
     // Note: The container's raison d'etre is to manage construction of other
@@ -95,7 +85,7 @@ class Container {
   /**
    * Construct a new container.
    *
-   * @var ContainerBuilder
+   * @var \Symfony\Component\DependencyInjection\ContainerBuilder
    * @return \Symfony\Component\DependencyInjection\ContainerBuilder
    */
   public function createContainer() {
@@ -309,7 +299,7 @@ class Container {
   }
 
   /**
-   * @param ContainerInterface $container
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    * @return \Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher
    */
   public function createEventDispatcher($container) {
@@ -352,7 +342,7 @@ class Container {
   }
 
   /**
-   * @return LockManager
+   * @return \Civi\Core\Lock\LockManager
    */
   public static function createLockManager() {
     // Ideally, downstream implementers could override any definitions in
@@ -424,7 +414,7 @@ class Container {
   }
 
   /**
-   * @param ContainerInterface $container
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    * @return \CRM_Core_Resources
    */
   public static function createResources($container) {
@@ -437,7 +427,7 @@ class Container {
   }
 
   /**
-   * @param ContainerInterface $container
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
    * @return \CRM_Core_PrevNextCache_Interface
    */
   public static function createPrevNextCache($container) {

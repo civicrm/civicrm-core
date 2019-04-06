@@ -32,6 +32,7 @@ namespace Civi\API\Event;
  * @package Civi\API\Event
  */
 class ResolveEvent extends Event {
+
   /**
    * @param array $apiRequest
    *   The full description of the API request.

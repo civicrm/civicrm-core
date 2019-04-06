@@ -37,7 +37,7 @@ class Events {
    *
    * We do not want to fire case-change events recursively.
    */
-  static $isActive = [];
+  public static $isActive = [];
 
   /**
    * Following a change to an activity or case, fire the case-change event.

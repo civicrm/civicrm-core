@@ -12,7 +12,6 @@ class SqlFileStep implements StepInterface {
     $this->file = $file;
   }
 
-
   public function getSig() {
     return implode(' ', [
       $this->file,

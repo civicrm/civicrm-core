@@ -25,6 +25,7 @@
  +--------------------------------------------------------------------+
  */
 namespace Civi\API;
+
 use Civi\API\Exception\UnauthorizedException;
 
 /**

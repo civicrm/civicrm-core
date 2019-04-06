@@ -227,7 +227,8 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
     $exception = NULL;
     $self = $this;
     \CRM_Core_Transaction::create(TRUE)->run(function($tx) use ($entity, $action, $entityId, &$exception, $self) {
-      $tx->rollback(); // Just to be safe.
+      // Just to be safe.
+      $tx->rollback();
 
       $params = [
         'version' => 3,

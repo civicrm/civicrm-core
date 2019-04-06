@@ -7,6 +7,7 @@ use Symfony\Component\Finder\Finder;
  * Search for PHPUnit test cases
  */
 class PHPUnitScanner {
+
   /**
    * @param $path
    * @return array <string> class names

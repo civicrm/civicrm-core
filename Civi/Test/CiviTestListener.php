@@ -98,7 +98,8 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
     \CRM_Utils_System::flushCache();
     \Civi::reset();
     \CRM_Core_Session::singleton()->set('userID', NULL);
-    $config = \CRM_Core_Config::singleton(TRUE, TRUE); // ugh, performance
+    // ugh, performance
+    $config = \CRM_Core_Config::singleton(TRUE, TRUE);
 
     if (property_exists($config->userPermissionClass, 'permissions')) {
       $config->userPermissionClass->permissions = NULL;
