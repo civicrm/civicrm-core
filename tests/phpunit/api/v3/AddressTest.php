@@ -416,7 +416,8 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   public function testCreateAddressStateProvinceIDCorrectForCountry() {
     $params = $this->_params;
     $params['sequential'] = 1;
-    $params['country_id'] = '1228'; // United States country id
+    // United States country id
+    $params['country_id'] = '1228';
     $params['state_province_id'] = 'Maryland';
     $params['city'] = 'Baltimore';
     $params['street_address'] = '600 N Charles St.';
@@ -430,7 +431,8 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     // Now try it in Liberia
     $params = $this->_params;
     $params['sequential'] = 1;
-    $params['country_id'] = '1122'; // Liberia country id
+    // Liberia country id
+    $params['country_id'] = '1122';
     $params['state_province_id'] = 'Maryland';
     $address2 = $this->callAPISuccess('address', 'create', $params);
     $this->assertEquals('3497', $address2['values'][0]['state_province_id']);
@@ -466,8 +468,10 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'location_type_id' => 1,
       'street_address' => '123 Some St',
       'city' => 'Hereville',
-      'country_id' => $inputCountry, //'US',
-      'state_province_id' => $inputState, // 'California',
+      //'US',
+      'country_id' => $inputCountry,
+      // 'California',
+      'state_province_id' => $inputState,
       'postal_code' => '94100',
     ]);
     $created = CRM_Utils_Array::first($r['values']);

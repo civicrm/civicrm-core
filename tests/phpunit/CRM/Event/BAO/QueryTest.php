@@ -15,13 +15,13 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
       'api.participant.create' => [
         'event_id' => $event['id'],
         'note'     => 'some_note',
-      ]
+      ],
     ]);
     $this->individualCreate([
       'api.participant.create' => [
         'event_id' => $event['id'],
         'note'     => 'some_other_note',
-      ]
+      ],
     ]);
     $params = [
       [
@@ -30,7 +30,7 @@ class CRM_Event_BAO_QueryTest extends CiviUnitTestCase {
         2 => 'some_note',
         3 => 1,
         4 => 0,
-      ]
+      ],
     ];
 
     $query = new CRM_Contact_BAO_Query($params, NULL, NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS);

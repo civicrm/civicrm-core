@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Extension_InfoTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
     $this->file = NULL;

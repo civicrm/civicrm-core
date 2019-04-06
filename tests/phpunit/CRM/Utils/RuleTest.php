@@ -146,7 +146,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
       '-',
       '_foo',
       'one-two',
-      'f00'
+      'f00',
     ];
     $expectFalse = [
       ' ',
@@ -157,7 +157,7 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
       "<script>alert('XSS');</script>",
       '(foo)',
       'foo;',
-      '[foo]'
+      '[foo]',
     ];
     $data = [];
     foreach ($expectTrue as $value) {

@@ -192,6 +192,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['id'], ' in line ' . __LINE__);
 
   }
+
   /*
    * Getting the id back of an event.
    * Does not work yet, bug in API
@@ -206,7 +207,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
   $result = $this->callAPISuccess('Event', 'Get', $params);
   }
    */
-
 
   /**
    * Test 'is.Current' option. Existing event is 'old' so only current should be returned
@@ -274,11 +274,11 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals(0, $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
     $this->assertEquals(1, $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
     $participant = $this->callAPISuccess('Participant', 'create', array(
-        'participant_status' => 1,
-        'role_id' => 1,
-        'contact_id' => $contactID,
-        'event_id' => $this->_eventIds[0],
-      ));
+      'participant_status' => 1,
+      'role_id' => 1,
+      'contact_id' => $contactID,
+      'event_id' => $this->_eventIds[0],
+    ));
     $currentEvent = $this->callAPIAndDocument('Event', 'getsingle', $getEventParams, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals(1, $currentEvent['is_full'], ' is full is set in line ' . __LINE__);
     $this->assertEquals(0, $currentEvent['available_places'], 'available places is set in line ' . __LINE__);
@@ -356,7 +356,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
       'id' => $result['id'],
       // this chaining request should not break things:
       'api.LocBlock.get' => array('id' => '$value.loc_block_id'),
-      ));
+    ));
     $this->assertEquals($result['id'], $check['id']);
 
     $this->callAPISuccess($this->_entity, 'Delete', array('id' => $result['id']));
@@ -378,9 +378,9 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
 
     $check = $this->callAPISuccess($this->_entity, 'get', array(
-        'return.custom_' . $ids['custom_field_id'] => 1,
-        'id' => $result['id'],
-      ));
+      'return.custom_' . $ids['custom_field_id'] => 1,
+      'id' => $result['id'],
+    ));
     $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
 
     $this->customFieldDelete($ids['custom_field_id']);
@@ -400,8 +400,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
     // Search for events having CRM-16036 as the value for this custom
     // field. This should not return anything.
     $check = $this->callAPISuccess($this->_entity, 'get', array(
-        'custom_' . $ids['custom_field_id'] => 'CRM-16036',
-      ));
+      'custom_' . $ids['custom_field_id'] => 'CRM-16036',
+    ));
 
     $this->assertEquals(0, $check['count']);
 
@@ -421,8 +421,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
     // Search for events having NULL as the value for this custom
     // field. This should return all events created in setUp.
     $check = $this->callAPISuccess($this->_entity, 'get', array(
-        'custom_' . $ids['custom_field_id'] => array('IS NULL' => 1),
-      ));
+      'custom_' . $ids['custom_field_id'] => array('IS NULL' => 1),
+    ));
 
     $this->assertGreaterThan(0, $check['count']);
 
@@ -565,7 +565,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ));
   }
 
-
   /**
    * Test that an event with a price set can be created.
    */
@@ -648,7 +647,6 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals('Annual CiviCRM meet 2', $updated['values'][$result['id']]['title']);
     $this->callAPISuccess($this->_entity, 'Delete', array('id' => $result['id']));
   }
-
 
   public function testDeleteEmptyParams() {
     $result = $this->callAPIFailure('Event', 'Delete', array());

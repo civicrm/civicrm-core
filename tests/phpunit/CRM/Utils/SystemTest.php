@@ -1,6 +1,5 @@
 <?php
 
-use Psr\Http\Message\UriInterface;
 
 /**
  * Class CRM_Utils_SystemTest
@@ -50,7 +49,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     try {
       CRM_Utils_System::redirect($url, [
         'expected' => $parsedUrl,
-        'original' => $url
+        'original' => $url,
       ]);
     }
     catch (CRM_Core_Exception $e) {
@@ -65,7 +64,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
    *
    * We do some checks here.
    *
-   * @param UriInterface $urlQuery
+   * @param \Psr\Http\Message\UriInterface $urlQuery
    * @param array $context
    *
    * @throws \CRM_Core_Exception
@@ -90,7 +89,8 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
         'scheme' => 'https',
         'host' => 'example.com',
         'query' => 'ab=cd',
-      ]],
+      ],
+      ],
       ['http://myuser:mypass@foo.bar:123/whiz?a=b&c=d', [
         'scheme' => 'http',
         'host' => 'foo.bar',
@@ -99,10 +99,12 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
         'pass' => 'mypass',
         'path' => '/whiz',
         'query' => 'a=b&c=d',
-      ]],
+      ],
+      ],
       ['/foo/bar', [
-        'path' => '/foo/bar'
-      ]],
+        'path' => '/foo/bar',
+      ],
+      ],
     ];
   }
 

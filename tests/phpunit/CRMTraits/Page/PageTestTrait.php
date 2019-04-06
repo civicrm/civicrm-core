@@ -122,7 +122,7 @@ trait CRMTraits_Page_PageTestTrait {
   protected function listenForPageContent() {
     $this->hookClass->setHook('civicrm_alterContent', [
       $this,
-      'checkPageContent'
+      'checkPageContent',
     ]);
   }
 

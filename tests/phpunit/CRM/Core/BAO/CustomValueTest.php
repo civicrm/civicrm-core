@@ -36,6 +36,7 @@
  * @group headless
  */
 class CRM_Core_BAO_CustomValueTest extends CiviUnitTestCase {
+
   public function testTypeCheckWithValidInput() {
 
     $values = array(

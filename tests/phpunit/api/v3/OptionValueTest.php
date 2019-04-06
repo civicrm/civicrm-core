@@ -329,7 +329,6 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $this->assertFalse(in_array($newOption, $fields['values']));
   }
 
-
   /**
    * Update option value with 'id' parameter and the value to update
    * and not passing option group id

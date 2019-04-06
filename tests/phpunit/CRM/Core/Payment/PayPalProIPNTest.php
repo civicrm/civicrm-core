@@ -52,12 +52,11 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $this->_paymentProcessorID = $this->paymentProcessorCreate(array('is_test' => 0));
     $this->_contactID = $this->individualCreate();
     $contributionPage = $this->callAPISuccess('contribution_page', 'create', array(
-        'title' => "Test Contribution Page",
-        'financial_type_id' => $this->_financialTypeID,
-        'currency' => 'USD',
-        'payment_processor' => $this->_paymentProcessorID,
-      )
-    );
+      'title' => "Test Contribution Page",
+      'financial_type_id' => $this->_financialTypeID,
+      'currency' => 'USD',
+      'payment_processor' => $this->_paymentProcessorID,
+    ));
     $this->_contributionPageID = $contributionPage['id'];
   }
 
@@ -90,9 +89,9 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurSubsequentTransaction());
     $paypalIPN->main();
     $contribution = $this->callAPISuccess('contribution', 'get', array(
-        'contribution_recur_id' => $this->_contributionRecurID,
-        'sequential' => 1,
-      ));
+      'contribution_recur_id' => $this->_contributionRecurID,
+      'sequential' => 1,
+    ));
     $this->assertEquals(2, $contribution['count']);
     $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
     $this->assertEquals('Debit Card', $contribution['values'][1]['payment_instrument']);
@@ -121,19 +120,19 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $renewedMembershipEndDate = $this->membershipRenewalDate($durationUnit, $membershipEndDate);
     $this->assertEquals($renewedMembershipEndDate, $this->callAPISuccessGetValue('membership', array('return' => 'end_date')));
     $contribution = $this->callAPISuccess('contribution', 'get', array(
-        'contribution_recur_id' => $this->_contributionRecurID,
-        'sequential' => 1,
-      ));
+      'contribution_recur_id' => $this->_contributionRecurID,
+      'sequential' => 1,
+    ));
     $this->assertEquals(2, $contribution['count']);
     $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
     $this->callAPISuccessGetCount('line_item', array(
-        'entity_id' => $this->ids['membership'],
-        'entity_table' => 'civicrm_membership',
-      ), 2);
+      'entity_id' => $this->ids['membership'],
+      'entity_table' => 'civicrm_membership',
+    ), 2);
     $this->callAPISuccessGetSingle('line_item', array(
-        'contribution_id' => $contribution['values'][1]['id'],
-        'entity_table' => 'civicrm_membership',
-      ));
+      'contribution_id' => $contribution['values'][1]['id'],
+      'entity_table' => 'civicrm_membership',
+    ));
     $this->callAPISuccessGetSingle('membership_payment', array('contribution_id' => $contribution['values'][1]['id']));
 
   }
@@ -161,9 +160,9 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
     $paypalIPN = new CRM_Core_Payment_PayPalProIPN($this->getPaypalProRecurSubsequentTransaction());
     $paypalIPN->main();
     $contribution = $this->callAPISuccess('contribution', 'get', array(
-        'contribution_recur_id' => $this->_contributionRecurID,
-        'sequential' => 1,
-      ));
+      'contribution_recur_id' => $this->_contributionRecurID,
+      'sequential' => 1,
+    ));
     $this->assertEquals(1, $contribution['count']);
     $this->assertEquals('secondone', $contribution['values'][0]['trxn_id']);
     $this->assertEquals(strtotime('03:59:05 Jul 14, 2013 PDT'), strtotime($contribution['values'][0]['receive_date']));
@@ -397,10 +396,10 @@ class CRM_Core_Payment_PayPalProIPNTest extends CiviUnitTestCase {
       'residence_country' => 'GB',
       'initial_payment_amount' => '0.00',
       'rp_invoice_id' => 'i=' . $this->_invoiceID
-        . '&m=&c=' . $this->_contributionID
-        . '&r=' . $this->_contributionRecurID
-        . '&b=' . $this->_contactID
-        . '&p=' . $this->_contributionPageID,
+      . '&m=&c=' . $this->_contributionID
+      . '&r=' . $this->_contributionRecurID
+      . '&b=' . $this->_contactID
+      . '&p=' . $this->_contributionPageID,
       'currency_code' => 'GBP',
       'time_created' => '12:39:01 May 09, 2018 PDT',
       'verify_sign' => 'AUg223oCjn4HgJXKkrICawXQ3fyUA2gAd1.f1IPJ4r.9sln-nWcB-EJG',

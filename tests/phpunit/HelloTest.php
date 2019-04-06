@@ -43,8 +43,11 @@
  * Class HelloTest
  */
 class HelloTest extends PHPUnit_Framework_TestCase {
-  // contains the object handle of the string class
-  var $abc;
+  /**
+   * contains the object handle of the string class
+   * @var string
+   */
+  public $abc;
 
   /**
    * @param string|null $name

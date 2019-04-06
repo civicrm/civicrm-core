@@ -6,6 +6,7 @@
  * @group headless
  */
 class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
+
   public function setUp() {
     parent::setUp();
     CRM_Core_ManagedEntities::singleton(TRUE)->reconcile();
@@ -40,7 +41,6 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
     $this->assertEquals($relTypeID, $xmlProcessor->getCaseManagerRoleId('ForkableCaseType'));
   }
-
 
   /**
    * Edit the definition of ForkableCaseType.

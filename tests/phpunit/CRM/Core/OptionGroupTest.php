@@ -91,14 +91,12 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
     }
   }
 
-
   public function emailAddressTests() {
     $tests[] = array('"Name"<email@example.com>', '"Name" <email@example.com>');
     $tests[] = array('"Name" <email@example.com>', '"Name" <email@example.com>');
     $tests[] = array('"Name"  <email@example.com>', '"Name" <email@example.com>');
     return $tests;
   }
-
 
   /**
    * @dataProvider emailAddressTests

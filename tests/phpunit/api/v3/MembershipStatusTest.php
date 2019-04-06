@@ -56,7 +56,6 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
   ///////////////// civicrm_membership_status_get methods
 
-
   /**
    * Test civicrm_membership_status_get with empty params.
    */
@@ -129,7 +128,6 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
     $this->assertEquals('renamed', $result['values'][$id]['name']);
     $this->membershipStatusDelete($result['id']);
   }
-
 
   ///////////////// civicrm_membership_status_delete methods
 

@@ -15,7 +15,12 @@ class PrevNextTest extends \CiviEndToEndTestCase {
   /**
    * @var string
    */
-  protected $cacheKey, $cacheKeyB;
+  protected $cacheKey;
+
+  /**
+   * @var string
+   */
+  protected $cacheKeyB;
 
   /**
    * @var \CRM_Core_PrevNextCache_Interface
@@ -313,12 +318,13 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     $this->assertSelections([], 'getall', $this->cacheKeyB);
   }
 
-
   /**
    * Assert that the current cacheKey has a list of selected contact IDs.
    *
    * @param array $ids
    *   Contact IDs that should be selected.
+   * @param string $action
+   * @param string|NULL $cacheKey
    */
   protected function assertSelections($ids, $action = 'get', $cacheKey = NULL) {
     if ($cacheKey === NULL) {

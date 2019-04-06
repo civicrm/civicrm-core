@@ -5,7 +5,6 @@ namespace E2E\Core;
 use Civi\Core\AssetBuilder;
 use Civi\Core\Event\GenericHookEvent;
 
-
 /**
  * Class AssetBuilderTest
  * @package E2E\Core

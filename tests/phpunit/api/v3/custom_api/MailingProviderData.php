@@ -43,13 +43,13 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_mailing_provider_data';
+  protected static $_tableName = 'civicrm_mailing_provider_data';
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var boolean
    */
-  static $_log = FALSE;
+  protected static $_log = FALSE;
   /**
    * External reference for the contact
    *
@@ -100,6 +100,7 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
     $this->__table = 'civicrm_mailing_provider_data';
     parent::__construct();
   }
+
   /**
    * Returns all the column names of this table
    *
@@ -165,7 +166,7 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
           'entity' => 'MailingProviderData',
           'bao' => 'CRM_Omnimail_DAO_MailingProviderData',
           'localizable' => 0,
-        ) ,
+        ),
         'contact_id' => array(
           'name' => 'contact_id',
           'type' => CRM_Utils_Type::T_INT,
@@ -189,6 +190,7 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
     }
     return Civi::$statics[__CLASS__]['fields'];
   }
+
   /**
    * Return a mapping from field-name to the corresponding key (as used in fields()).
    *
@@ -201,6 +203,7 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
     }
     return Civi::$statics[__CLASS__]['fieldKeys'];
   }
+
   /**
    * Returns the names of this table
    *
@@ -209,6 +212,7 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
   public static function getTableName() {
     return self::$_tableName;
   }
+
   /**
    * Returns if this table needs to be logged
    *
@@ -217,6 +221,7 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
   public function getLog() {
     return self::$_log;
   }
+
   /**
    * Returns the list of fields that can be imported
    *
@@ -228,6 +233,7 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
     $r = CRM_Core_DAO_AllCoreTables::getImports(__CLASS__, 'mailing_provider_data', $prefix, array());
     return $r;
   }
+
   /**
    * Returns the list of fields that can be exported
    *
@@ -239,6 +245,7 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
     $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'mailing_provider_data', $prefix, array());
     return $r;
   }
+
   /**
    * Returns the list of indices
    */

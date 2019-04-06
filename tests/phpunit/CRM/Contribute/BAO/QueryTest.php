@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
+
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
   }

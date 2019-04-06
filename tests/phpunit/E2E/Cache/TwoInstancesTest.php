@@ -34,7 +34,12 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
   /**
    * @var Psr\SimpleCache\CacheInterface;
    */
-  protected $a, $b;
+  protected $a;
+
+  /**
+   * @var Psr\SimpleCache\CacheInterface;
+   */
+  protected $b;
 
   protected function setUp() {
     parent::setUp();

@@ -59,9 +59,9 @@ class CRM_Case_BAO_QueryTest extends CiviUnitTestCase {
 
     $queryObj = new CRM_Contact_BAO_Query($params, NULL, NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CASE);
     $this->assertEquals(array(
-        0 => 'Activity Type = Contribution',
-        1 => 'Activity Type = Scheduled',
-        2 => 'Activity Medium = In Person',
+      0 => 'Activity Type = Contribution',
+      1 => 'Activity Type = Scheduled',
+      2 => 'Activity Medium = In Person',
     ),
     $queryObj->_qill[1]
     );

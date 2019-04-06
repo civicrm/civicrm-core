@@ -279,7 +279,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
         [NULL, ['wrong' => NULL, 'right' => ['foo' => 1, 'bar' => 2]]], [1, 'wrong'], 'nada', 'nada',
       ],
       [
-        [NULL, ['wrong' => NULL, 'right' => ['foo' => 1, 'bar' => 2]]], [1, 'right'], NULL, ['foo' => 1, 'bar' => 2]
+        [NULL, ['wrong' => NULL, 'right' => ['foo' => 1, 'bar' => 2]]], [1, 'right'], NULL, ['foo' => 1, 'bar' => 2],
       ],
       [
         [NULL, ['wrong' => NULL, 'right' => ['foo' => 1, 'bar' => 2]]], [1, 'right', 'foo'], NULL, 1,
@@ -290,6 +290,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
   /**
    * @param $array
    * @param $path
+   * @param $default
    * @param $expected
    * @dataProvider getRecursiveValueExamples
    */
@@ -318,6 +319,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
   /**
    * Test the build recursive function.
    *
+   * @param $source
    * @param $path
    * @param $expected
    *
@@ -339,13 +341,13 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
         '2' => 'boz',
       ],
       'my_complex' => [
-         'dog' => 'woof',
-         'asdf' => [
-           'my_zero' => 0,
-           'my_int' => 1,
-           'my_null' => NULL,
-           'my_empty' => '',
-         ],
+        'dog' => 'woof',
+        'asdf' => [
+          'my_zero' => 0,
+          'my_int' => 1,
+          'my_null' => NULL,
+          'my_empty' => '',
+        ],
       ],
       'my_simple' => 999,
     ];

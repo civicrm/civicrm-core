@@ -4,6 +4,7 @@
  * @group headless
  */
 class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
+
   protected function setUp() {
     $this->useTransaction();
     parent::setUp();

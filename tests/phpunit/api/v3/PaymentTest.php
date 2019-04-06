@@ -34,9 +34,6 @@
  */
 class api_v3_PaymentTest extends CiviUnitTestCase {
 
-  /**
-   * Assume empty database with just civicrm_data.
-   */
   protected $_individualId;
   protected $_financialTypeId = 1;
   protected $_apiversion;
@@ -135,7 +132,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'Dear Anthony,',
       'Total Fees: $ 300.00',
       'This Payment Amount: $ 50.00',
-      'Balance Owed: $ 100.00', //150 was paid in the 1st payment.
+      //150 was paid in the 1st payment.
+      'Balance Owed: $ 100.00',
       'Event Information and Location',
       'Paid By: Check',
       'Check Number: 345',

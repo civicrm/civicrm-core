@@ -30,7 +30,6 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
     $logging->disableLogging();
   }
 
-
   /**
    * Test creating logging schema when database is in multilingual mode.
    * Also test altering a multilingual table.

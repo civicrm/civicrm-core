@@ -47,7 +47,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->useTransaction();
-    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
+    // DGW
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
     $this->_contactID = $this->individualCreate();
     $this->_groupID = $this->groupCreate();
     $this->_email = 'test@test.test';
@@ -70,7 +71,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   public function tearDown() {
-    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
+    // DGW
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
     parent::tearDown();
   }
 
@@ -81,7 +83,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('mailing', 'create', $this->_params + array('scheduled_date' => 'now'), __FUNCTION__, __FILE__);
     $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
     $this->assertEquals(1, $jobs['count']);
-    unset($this->_params['created_id']); // return isn't working on this in getAndCheck so lets not check it for now
+    // return isn't working on this in getAndCheck so lets not check it for now
+    unset($this->_params['created_id']);
     $this->getAndCheck($this->_params, $result['id'], 'mailing');
   }
 
@@ -91,7 +94,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   public function testSkipAutoSchedule() {
     $this->callAPISuccess('Mailing', 'create', array_merge($this->_params, [
       '_skip_evil_bao_auto_schedule_' => TRUE,
-      'scheduled_date' => 'now'
+      'scheduled_date' => 'now',
     ]));
     $this->callAPISuccessGetCount('Mailing', [], 1);
     $this->callAPISuccessGetCount('MailingJob', [], 0);
@@ -107,7 +110,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $jobs = $this->callAPISuccess('mailing_job', 'get', array('mailing_id' => $result['id']));
     $this->assertEquals(1, $jobs['count']);
     $this->assertEquals('Complete', $jobs['values'][$jobs['id']]['status']);
-    unset($this->_params['created_id']); // return isn't working on this in getAndCheck so lets not check it for now
+    // return isn't working on this in getAndCheck so lets not check it for now
+    unset($this->_params['created_id']);
     $this->getAndCheck($this->_params, $result['id'], 'mailing');
   }
 
@@ -175,22 +179,22 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $groupIDs['a'] = $this->groupCreate(array('name' => 'Example include group', 'title' => 'Example include group'));
     $groupIDs['b'] = $this->groupCreate(array('name' => 'Example exclude group', 'title' => 'Example exclude group'));
     $contactIDs['a'] = $this->individualCreate(array(
-        'email' => 'include.me@example.org',
-        'first_name' => 'Includer',
-        'last_name' => 'Person',
-      ));
+      'email' => 'include.me@example.org',
+      'first_name' => 'Includer',
+      'last_name' => 'Person',
+    ));
     $contactIDs['b'] = $this->individualCreate(array(
-        'email' => 'exclude.me@example.org',
-        'last_name' => 'Excluder',
-      ));
+      'email' => 'exclude.me@example.org',
+      'last_name' => 'Excluder',
+    ));
     $this->callAPISuccess('GroupContact', 'create', array(
-        'group_id' => $groupIDs['a'],
-        'contact_id' => $contactIDs['a'],
-      ));
+      'group_id' => $groupIDs['a'],
+      'contact_id' => $contactIDs['a'],
+    ));
     $this->callAPISuccess('GroupContact', 'create', array(
-        'group_id' => $groupIDs['b'],
-        'contact_id' => $contactIDs['b'],
-      ));
+      'group_id' => $groupIDs['b'],
+      'contact_id' => $contactIDs['b'],
+    ));
     // END SAMPLE DATA
 
     // ** Pass 1: Create
@@ -257,10 +261,14 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'recipient' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_recipients'),
     );
     $result = $this->callAPISuccess('mailing', 'create', $params);
-    $this->assertDBQuery($maxIDs['mailing'], 'SELECT MAX(id) FROM civicrm_mailing'); // 'Preview should not create any mailing records'
-    $this->assertDBQuery($maxIDs['job'], 'SELECT MAX(id) FROM civicrm_mailing_job'); // 'Preview should not create any mailing_job record'
-    $this->assertDBQuery($maxIDs['group'], 'SELECT MAX(id) FROM civicrm_mailing_group'); // 'Preview should not create any mailing_group records'
-    $this->assertDBQuery($maxIDs['recipient'], 'SELECT MAX(id) FROM civicrm_mailing_recipients'); // 'Preview should not create any mailing_recipient records'
+    // 'Preview should not create any mailing records'
+    $this->assertDBQuery($maxIDs['mailing'], 'SELECT MAX(id) FROM civicrm_mailing');
+    // 'Preview should not create any mailing_job record'
+    $this->assertDBQuery($maxIDs['job'], 'SELECT MAX(id) FROM civicrm_mailing_job');
+    // 'Preview should not create any mailing_group records'
+    $this->assertDBQuery($maxIDs['group'], 'SELECT MAX(id) FROM civicrm_mailing_group');
+    // 'Preview should not create any mailing_recipient records'
+    $this->assertDBQuery($maxIDs['recipient'], 'SELECT MAX(id) FROM civicrm_mailing_recipients');
 
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
     $this->assertEquals("Hello $displayName", $previewResult['values']['subject']);
@@ -273,26 +281,26 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $groupIDs['inc'] = $this->groupCreate(array('name' => 'Example include group', 'title' => 'Example include group'));
     $groupIDs['exc'] = $this->groupCreate(array('name' => 'Example exclude group', 'title' => 'Example exclude group'));
     $contactIDs['include_me'] = $this->individualCreate(array(
-        'email' => 'include.me@example.org',
-        'first_name' => 'Includer',
-        'last_name' => 'Person',
-      ));
+      'email' => 'include.me@example.org',
+      'first_name' => 'Includer',
+      'last_name' => 'Person',
+    ));
     $contactIDs['exclude_me'] = $this->individualCreate(array(
-        'email' => 'exclude.me@example.org',
-        'last_name' => 'Excluder',
-      ));
+      'email' => 'exclude.me@example.org',
+      'last_name' => 'Excluder',
+    ));
     $this->callAPISuccess('GroupContact', 'create', array(
-        'group_id' => $groupIDs['inc'],
-        'contact_id' => $contactIDs['include_me'],
-      ));
+      'group_id' => $groupIDs['inc'],
+      'contact_id' => $contactIDs['include_me'],
+    ));
     $this->callAPISuccess('GroupContact', 'create', array(
-        'group_id' => $groupIDs['inc'],
-        'contact_id' => $contactIDs['exclude_me'],
-      ));
+      'group_id' => $groupIDs['inc'],
+      'contact_id' => $contactIDs['exclude_me'],
+    ));
     $this->callAPISuccess('GroupContact', 'create', array(
-        'group_id' => $groupIDs['exc'],
-        'contact_id' => $contactIDs['exclude_me'],
-      ));
+      'group_id' => $groupIDs['exc'],
+      'contact_id' => $contactIDs['exclude_me'],
+    ));
 
     $params = $this->_params;
     $params['groups']['include'] = array($groupIDs['inc']);
@@ -316,8 +324,10 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'group' => CRM_Core_DAO::singleValueQuery('SELECT MAX(id) FROM civicrm_mailing_group'),
     );
     $create = $this->callAPIAndDocument('Mailing', 'create', $params, __FUNCTION__, __FILE__);
-    $this->assertDBQuery($maxIDs['mailing'], 'SELECT MAX(id) FROM civicrm_mailing'); // 'Preview should not create any mailing records'
-    $this->assertDBQuery($maxIDs['group'], 'SELECT MAX(id) FROM civicrm_mailing_group'); // 'Preview should not create any mailing_group records'
+    // 'Preview should not create any mailing records'
+    $this->assertDBQuery($maxIDs['mailing'], 'SELECT MAX(id) FROM civicrm_mailing');
+    // 'Preview should not create any mailing_group records'
+    $this->assertDBQuery($maxIDs['group'], 'SELECT MAX(id) FROM civicrm_mailing_group');
 
     $preview = $create['values'][$create['id']]['api.MailingRecipients.get'];
     $previewIds = array_values(CRM_Utils_Array::collect('contact_id', $preview['values']));
@@ -335,21 +345,21 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     // BEGIN SAMPLE DATA
     $groupIDs['grp'] = $this->groupCreate(array('name' => 'Example group', 'title' => 'Example group'));
     $contactIDs['include_me'] = $this->individualCreate(array(
-        'email' => 'include.me@example.org',
-        'first_name' => 'Includer',
-        'last_name' => 'Person',
-      ));
+      'email' => 'include.me@example.org',
+      'first_name' => 'Includer',
+      'last_name' => 'Person',
+    ));
     $contactIDs['include_me_duplicate'] = $this->individualCreate(array(
-        'email' => 'include.me@example.org',
-        'first_name' => 'IncluderDuplicate',
-        'last_name' => 'Person',
-      ));
+      'email' => 'include.me@example.org',
+      'first_name' => 'IncluderDuplicate',
+      'last_name' => 'Person',
+    ));
 
     $contactIDs['include_me_onhold'] = $this->individualCreate(array(
-        'email' => 'onholdinclude.me@example.org',
-        'first_name' => 'Onhold',
-        'last_name' => 'Person',
-      ));
+      'email' => 'onholdinclude.me@example.org',
+      'first_name' => 'Onhold',
+      'last_name' => 'Person',
+    ));
     $emailId = $this->callAPISuccessGetValue('Email', array(
       'return' => 'id',
       'contact_id' => $contactIDs['include_me_onhold'],
@@ -360,17 +370,17 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     ));
 
     $this->callAPISuccess('GroupContact', 'create', array(
-        'group_id' => $groupIDs['grp'],
-        'contact_id' => $contactIDs['include_me'],
-      ));
+      'group_id' => $groupIDs['grp'],
+      'contact_id' => $contactIDs['include_me'],
+    ));
     $this->callAPISuccess('GroupContact', 'create', array(
-        'group_id' => $groupIDs['grp'],
-        'contact_id' => $contactIDs['include_me_duplicate'],
-      ));
+      'group_id' => $groupIDs['grp'],
+      'contact_id' => $contactIDs['include_me_duplicate'],
+    ));
     $this->callAPISuccess('GroupContact', 'create', array(
-        'group_id' => $groupIDs['grp'],
-        'contact_id' => $contactIDs['include_me_onhold'],
-      ));
+      'group_id' => $groupIDs['grp'],
+      'contact_id' => $contactIDs['include_me_onhold'],
+    ));
 
     $params = $this->_params;
     $params['groups']['include'] = array($groupIDs['grp']);
@@ -402,10 +412,10 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    */
   public function testMailerSendTest_email() {
     $contactIDs['alice'] = $this->individualCreate(array(
-        'email' => 'alice@example.org',
-        'first_name' => 'Alice',
-        'last_name' => 'Person',
-      ));
+      'email' => 'alice@example.org',
+      'first_name' => 'Alice',
+      'last_name' => 'Person',
+    ));
 
     $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
 
@@ -414,7 +424,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     // Per https://lab.civicrm.org/dev/mail/issues/32 test non-lowercase email
     $params['id'] = $mail['id'];
     $deliveredInfo = $this->callAPISuccess($this->_entity, 'send_test', $params);
-    $this->assertEquals(1, $deliveredInfo['count']); // verify mail has been sent to user by count
+    // verify mail has been sent to user by count
+    $this->assertEquals(1, $deliveredInfo['count']);
 
     $deliveredContacts = array_values(CRM_Utils_Array::collect('contact_id', $deliveredInfo['values']));
     $this->assertEquals(array($contactIDs['alice']), $deliveredContacts);
@@ -430,32 +441,32 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     // BEGIN SAMPLE DATA
     $groupIDs['inc'] = $this->groupCreate(array('name' => 'Example include group', 'title' => 'Example include group'));
     $contactIDs['alice'] = $this->individualCreate(array(
-        'email' => 'alice@example.org',
-        'first_name' => 'Alice',
-        'last_name' => 'Person',
-      ));
+      'email' => 'alice@example.org',
+      'first_name' => 'Alice',
+      'last_name' => 'Person',
+    ));
     $contactIDs['bob'] = $this->individualCreate(array(
-        'email' => 'bob@example.org',
-        'first_name' => 'Bob',
-        'last_name' => 'Person',
-      ));
+      'email' => 'bob@example.org',
+      'first_name' => 'Bob',
+      'last_name' => 'Person',
+    ));
     $contactIDs['carol'] = $this->individualCreate(array(
-        'email' => 'carol@example.org',
-        'first_name' => 'Carol',
-        'last_name' => 'Person',
-      ));
+      'email' => 'carol@example.org',
+      'first_name' => 'Carol',
+      'last_name' => 'Person',
+    ));
     $this->callAPISuccess('GroupContact', 'create', array(
-        'group_id' => $groupIDs['inc'],
-        'contact_id' => $contactIDs['alice'],
-      ));
+      'group_id' => $groupIDs['inc'],
+      'contact_id' => $contactIDs['alice'],
+    ));
     $this->callAPISuccess('GroupContact', 'create', array(
-        'group_id' => $groupIDs['inc'],
-        'contact_id' => $contactIDs['bob'],
-      ));
+      'group_id' => $groupIDs['inc'],
+      'contact_id' => $contactIDs['bob'],
+    ));
     $this->callAPISuccess('GroupContact', 'create', array(
-        'group_id' => $groupIDs['inc'],
-        'contact_id' => $contactIDs['carol'],
-      ));
+      'group_id' => $groupIDs['inc'],
+      'contact_id' => $contactIDs['carol'],
+    ));
     // END SAMPLE DATA
 
     $mail = $this->callAPISuccess('mailing', 'create', $this->_params);
@@ -464,7 +475,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
       'test_email' => NULL,
       'test_group' => $groupIDs['inc'],
     ));
-    $this->assertEquals(3, $deliveredInfo['count'], "in line " . __LINE__); // verify mail has been sent to user by count
+    // verify mail has been sent to user by count
+    $this->assertEquals(3, $deliveredInfo['count'], "in line " . __LINE__);
 
     $deliveredContacts = array_values(CRM_Utils_Array::collect('contact_id', $deliveredInfo['values']));
     $this->assertEquals(array($contactIDs['alice'], $contactIDs['bob'], $contactIDs['carol']), $deliveredContacts);
@@ -477,76 +489,117 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    * @return array
    */
   public function submitProvider() {
-    $cases = array(); // $useLogin, $params, $expectedFailure, $expectedJobCount
+    // $useLogin, $params, $expectedFailure, $expectedJobCount
+    $cases = array();
     $cases[] = array(
-      TRUE, //useLogin
-      array(), // createParams
-      array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
-      FALSE, // expectedFailure
-      1, // expectedJobCount
-    );
-    $cases[] = array(
-      FALSE, //useLogin
-      array(), // createParams
-      array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
-      "/Failed to determine current user/", // expectedFailure
-      0, // expectedJobCount
-    );
-    $cases[] = array(
-      TRUE, //useLogin
-      array(), // createParams
-      array('scheduled_date' => '2014-12-13 10:00:00'),
-      FALSE, // expectedFailure
-      1, // expectedJobCount
-    );
-    $cases[] = array(
-      TRUE, //useLogin
-      array(), // createParams
+      //useLogin
+      TRUE,
+      // createParams
       array(),
-      "/Missing parameter scheduled_date and.or approval_date/", // expectedFailure
-      0, // expectedJobCount
+      array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
+      // expectedFailure
+      FALSE,
+      // expectedJobCount
+      1,
     );
     $cases[] = array(
-      TRUE, //useLogin
-      array('name' => ''), // createParams
+      //useLogin
+      FALSE,
+      // createParams
+      array(),
       array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
-      "/Mailing cannot be sent. There are missing or invalid fields \\(name\\)./", // expectedFailure
-      0, // expectedJobCount
+      // expectedFailure
+      "/Failed to determine current user/",
+      // expectedJobCount
+      0,
     );
     $cases[] = array(
-      TRUE, //useLogin
-      array('body_html' => '', 'body_text' => ''), // createParams
-      array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
-      "/Mailing cannot be sent. There are missing or invalid fields \\(body\\)./", // expectedFailure
-      0, // expectedJobCount
+      //useLogin
+      TRUE,
+      // createParams
+      array(),
+      array('scheduled_date' => '2014-12-13 10:00:00'),
+      // expectedFailure
+      FALSE,
+      // expectedJobCount
+      1,
     );
     $cases[] = array(
-      TRUE, //useLogin
-      array('body_html' => 'Oops, did I leave my tokens at home?'), // createParams
-      array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
-      "/Mailing cannot be sent. There are missing or invalid fields \\(.*body_html.*optOut.*\\)./", // expectedFailure
-      0, // expectedJobCount
+      //useLogin
+      TRUE,
+      // createParams
+      array(),
+      array(),
+      // expectedFailure
+      "/Missing parameter scheduled_date and.or approval_date/",
+      // expectedJobCount
+      0,
     );
     $cases[] = array(
-      TRUE, //useLogin
-      array('body_text' => 'Oops, did I leave my tokens at home?'), // createParams
+      //useLogin
+      TRUE,
+      // createParams
+      array('name' => ''),
       array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
-      "/Mailing cannot be sent. There are missing or invalid fields \\(.*body_text.*optOut.*\\)./", // expectedFailure
-      0, // expectedJobCount
+      // expectedFailure
+      "/Mailing cannot be sent. There are missing or invalid fields \\(name\\)./",
+      // expectedJobCount
+      0,
     );
     $cases[] = array(
-      TRUE, //useLogin
-      array('body_text' => 'Look ma, magic tokens in the text!', 'footer_id' => '%FOOTER%'), // createParams
+      //useLogin
+      TRUE,
+      // createParams
+      array('body_html' => '', 'body_text' => ''),
       array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
-      FALSE, // expectedFailure
-      1, // expectedJobCount
+      // expectedFailure
+      "/Mailing cannot be sent. There are missing or invalid fields \\(body\\)./",
+      // expectedJobCount
+      0,
     );
     $cases[] = array(
-      TRUE, //useLogin
-      array('body_html' => '<p>Look ma, magic tokens in the markup!</p>', 'footer_id' => '%FOOTER%'), // createParams
+      //useLogin
+      TRUE,
+      // createParams
+      array('body_html' => 'Oops, did I leave my tokens at home?'),
       array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
-      FALSE, // expectedFailure
-      1, // expectedJobCount
+      // expectedFailure
+      "/Mailing cannot be sent. There are missing or invalid fields \\(.*body_html.*optOut.*\\)./",
+      // expectedJobCount
+      0,
+    );
+    $cases[] = array(
+      //useLogin
+      TRUE,
+      // createParams
+      array('body_text' => 'Oops, did I leave my tokens at home?'),
+      array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
+      // expectedFailure
+      "/Mailing cannot be sent. There are missing or invalid fields \\(.*body_text.*optOut.*\\)./",
+      // expectedJobCount
+      0,
+    );
+    $cases[] = array(
+      //useLogin
+      TRUE,
+      // createParams
+      array('body_text' => 'Look ma, magic tokens in the text!', 'footer_id' => '%FOOTER%'),
+      array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
+      // expectedFailure
+      FALSE,
+      // expectedJobCount
+      1,
+    );
+    $cases[] = array(
+      //useLogin
+      TRUE,
+      // createParams
+      array('body_html' => '<p>Look ma, magic tokens in the markup!</p>', 'footer_id' => '%FOOTER%'),
+      array('scheduled_date' => '2014-12-13 10:00:00', 'approval_date' => '2014-12-13 00:00:00'),
+      // expectedFailure
+      FALSE,
+      // expectedJobCount
+      1,
     );
     return $cases;
   }
@@ -645,7 +698,8 @@ class api_v3_MailingTest extends CiviUnitTestCase {
    */
   public function testMailerStats() {
     $result = $this->groupContactCreate($this->_groupID, 100);
-    $this->assertEquals(100, $result['added']); //verify if 100 contacts are added for group
+    //verify if 100 contacts are added for group
+    $this->assertEquals(100, $result['added']);
 
     //Create and send test mail first and change the mail job to live,
     //because stats api only works on live mail
@@ -683,7 +737,8 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
 
     $result = $this->callAPISuccess('mailing', 'stats', array('mailing_id' => $mail['id']));
     $expectedResult = array(
-      'Delivered' => 80, //since among 100 mails 20 has been bounced
+      //since among 100 mails 20 has been bounced
+      'Delivered' => 80,
       'Bounces' => 20,
       'Opened' => 20,
       'Unique Clicks' => 0,
@@ -830,7 +885,6 @@ SELECT event_queue_id, time_stamp FROM mail_{$type}_temp";
       'Queue event could not be found'
     );
   }
-
 
   //----------- civicrm_mailing_event_forward methods ----------
 

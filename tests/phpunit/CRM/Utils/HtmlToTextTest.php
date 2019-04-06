@@ -14,7 +14,8 @@ class CRM_Utils_HtmlToTextTest extends CiviUnitTestCase {
    * @return array
    */
   public function htmlToTextExamples() {
-    $cases = array(); // array(0 => string $html, 1 => string $text)
+    // array(0 => string $html, 1 => string $text)
+    $cases = array();
 
     $cases[] = array(
       '<br/><p>',

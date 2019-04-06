@@ -486,7 +486,6 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $this->callAPISuccess('group', 'delete', ['id' => $group2->id]);
   }
 
-
   public function testMultipleGroupWhereClause() {
     $returnProperties = array(
       'contact_type' => 1,

@@ -56,15 +56,24 @@ class CRM_Core_CodeGen_FreshnessTest extends CiviUnitTestCase {
     $path = rtrim($GLOBALS['civicrm_root'], '/');
 
     $genCode = new CRM_Core_CodeGen_Main(
-      $path . '/CRM/Core/DAO/', // $CoreDAOCodePath
-      $path . '/sql/', // $sqlCodePath
-      $path . '/', // $phpCodePath
-      $path . '/templates/', // $tplCodePath
-      NULL, // IGNORE,
-      CIVICRM_UF, // cms
-      NULL, // db version
-      $path . '/xml/schema/Schema.xml', // schema file
-      NULL  // path to digest file
+      // $CoreDAOCodePath
+      $path . '/CRM/Core/DAO/',
+      // $sqlCodePath
+      $path . '/sql/',
+      // $phpCodePath
+      $path . '/',
+      // $tplCodePath
+      $path . '/templates/',
+      // IGNORE,
+      NULL,
+      // cms
+      CIVICRM_UF,
+      // db version
+      NULL,
+      // schema file
+      $path . '/xml/schema/Schema.xml',
+      // path to digest file
+      NULL
     );
     return $genCode;
   }

@@ -43,7 +43,6 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
   protected $_params;
   protected $test_activity_type_value;
 
-
   /**
    * Test setup for every test.
    *

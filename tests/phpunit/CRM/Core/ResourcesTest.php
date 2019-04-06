@@ -77,12 +77,14 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   public function testAddScriptFile() {
     $this->res
       ->addScriptFile('com.example.ext', 'foo%20bar.js', 0, 'testAddScriptFile')
-      ->addScriptFile('com.example.ext', 'foo%20bar.js', 0, 'testAddScriptFile')// extra
+      // extra
+      ->addScriptFile('com.example.ext', 'foo%20bar.js', 0, 'testAddScriptFile')
       ->addScriptFile('civicrm', 'foo%20bar.js', 0, 'testAddScriptFile');
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testAddScriptFile}{/crmRegion}');
-    $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    $expected = ""
       . "<script type=\"text/javascript\" src=\"http://core-app/foo%20bar.js?r=resTest\">\n</script>\n"
       . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTest\">\n</script>\n";
     $this->assertEquals($expected, $actual);
@@ -108,12 +110,14 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   public function testAddScriptURL() {
     $this->res
       ->addScriptUrl('/whiz/foo%20bar.js', 0, 'testAddScriptURL')
-      ->addScriptUrl('/whiz/foo%20bar.js', 0, 'testAddScriptURL')// extra
+      // extra
+      ->addScriptUrl('/whiz/foo%20bar.js', 0, 'testAddScriptURL')
       ->addScriptUrl('/whizbang/foo%20bar.js', 0, 'testAddScriptURL');
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testAddScriptURL}{/crmRegion}');
-    $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    $expected = ""
       . "<script type=\"text/javascript\" src=\"/whiz/foo%20bar.js\">\n</script>\n"
       . "<script type=\"text/javascript\" src=\"/whizbang/foo%20bar.js\">\n</script>\n";
     $this->assertEquals($expected, $actual);
@@ -218,7 +222,8 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals('', $actual);
 
     $actual = $smarty->fetch('string:{crmRegion name=testCrmJS}{/crmRegion}');
-    $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    $expected = ""
       . "<script type=\"text/javascript\" src=\"http://ext-dir/com.example.ext/foo%20bar.js?r=resTest\">\n</script>\n"
       . "<script type=\"text/javascript\" src=\"/whiz/foo%20bar.js\">\n</script>\n";
     $this->assertEquals($expected, $actual);
@@ -227,12 +232,14 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   public function testAddStyleFile() {
     $this->res
       ->addStyleFile('com.example.ext', 'foo%20bar.css', 0, 'testAddStyleFile')
-      ->addStyleFile('com.example.ext', 'foo%20bar.css', 0, 'testAddStyleFile')// extra
+      // extra
+      ->addStyleFile('com.example.ext', 'foo%20bar.css', 0, 'testAddStyleFile')
       ->addStyleFile('civicrm', 'foo%20bar.css', 0, 'testAddStyleFile');
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testAddStyleFile}{/crmRegion}');
-    $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    $expected = ""
       . "<link href=\"http://core-app/foo%20bar.css?r=resTest\" rel=\"stylesheet\" type=\"text/css\"/>\n"
       . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTest\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     $this->assertEquals($expected, $actual);
@@ -241,12 +248,14 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
   public function testAddStyleURL() {
     $this->res
       ->addStyleUrl('/whiz/foo%20bar.css', 0, 'testAddStyleURL')
-      ->addStyleUrl('/whiz/foo%20bar.css', 0, 'testAddStyleURL')// extra
+      // extra
+      ->addStyleUrl('/whiz/foo%20bar.css', 0, 'testAddStyleURL')
       ->addStyleUrl('/whizbang/foo%20bar.css', 0, 'testAddStyleURL');
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testAddStyleURL}{/crmRegion}');
-    $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    $expected = ""
       . "<link href=\"/whiz/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n"
       . "<link href=\"/whizbang/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     $this->assertEquals($expected, $actual);
@@ -275,7 +284,8 @@ class CRM_Core_ResourcesTest extends CiviUnitTestCase {
     $this->assertEquals('', $actual);
 
     $actual = $smarty->fetch('string:{crmRegion name=testCrmCSS}{/crmRegion}');
-    $expected = "" // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    // stable ordering: alphabetical by (snippet.weight,snippet.name)
+    $expected = ""
       . "<link href=\"http://ext-dir/com.example.ext/foo%20bar.css?r=resTest\" rel=\"stylesheet\" type=\"text/css\"/>\n"
       . "<link href=\"/whiz/foo%20bar.css\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     $this->assertEquals($expected, $actual);

@@ -1078,16 +1078,16 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
     $this->assertEquals($byName, $result);
     // But we can also fetch by ID
     $result = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'contact_type', array(
-        'keyColumn' => 'id',
-        'labelColumn' => 'name',
-      ));
+      'keyColumn' => 'id',
+      'labelColumn' => 'name',
+    ));
     $this->assertEquals($byId, $result);
     // Make sure flip param works
     $result = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'contact_type', array(
-        'keyColumn' => 'id',
-        'labelColumn' => 'name',
-        'flip' => TRUE,
-      ));
+      'keyColumn' => 'id',
+      'labelColumn' => 'name',
+      'flip' => TRUE,
+    ));
     $this->assertEquals(array_flip($byId), $result);
   }
 
@@ -1099,14 +1099,14 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
       'is_active' => 1,
     ));
     $financialAccount = $this->callAPISuccess('financial_account', 'create', array(
-       'name' => 'Test Tax financial account ',
-       'contact_id' => $contact,
-       'financial_account_type_id' => 2,
-       'is_tax' => 1,
-       'tax_rate' => 5.00,
-       'is_reserved' => 0,
-       'is_active' => 1,
-       'is_default' => 0,
+      'name' => 'Test Tax financial account ',
+      'contact_id' => $contact,
+      'financial_account_type_id' => 2,
+      'is_tax' => 1,
+      'tax_rate' => 5.00,
+      'is_reserved' => 0,
+      'is_active' => 1,
+      'is_default' => 0,
     ));
     $financialTypeId = $financialType['id'];
     $financialAccountId = $financialAccount['id'];

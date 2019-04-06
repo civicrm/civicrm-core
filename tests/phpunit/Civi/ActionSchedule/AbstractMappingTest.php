@@ -95,7 +95,7 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
    *        - subject: regex
    *        - message: regex
    */
-  public abstract function createTestCases();
+  abstract public function createTestCases();
 
   // ---------------------------------------- Setup Helpers ----------------------------------------
 
@@ -193,7 +193,8 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
     $this->cronSchedule = array(
       'start' => '2015-01-20 00:00:00',
       'end' => '2015-03-01 00:00:00',
-      'interval' => 24 * 60 * 60, // seconds
+      // seconds
+      'interval' => 24 * 60 * 60,
     );
 
     $this->schedule = new \CRM_Core_DAO_ActionSchedule();

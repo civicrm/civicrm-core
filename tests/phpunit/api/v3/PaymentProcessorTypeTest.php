@@ -174,7 +174,8 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
 
     $params = array(
       'id' => $this->_ppTypeID,
-      'name' => 'API_Test_PP', // keep the same
+      // keep the same
+      'name' => 'API_Test_PP',
       'title' => 'API Test Payment Processor 2',
       'class_name' => 'CRM_Core_Payment_APITest 2',
       'billing_mode' => 2,

@@ -91,7 +91,7 @@ class CRM_Core_I18n_LocaleTest extends CiviUnitTestCase {
     $this->assertTreeEquals([
       'en_US' => 'English (United States)',
       'fr_CA' => 'French (Canada)',
-      ], $result);
+    ], $result);
 
     CRM_Core_I18n::singleton()->setLocale('en_US');
     CRM_Core_I18n_Schema::makeSinglelingual('en_US');

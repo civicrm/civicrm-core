@@ -35,9 +35,6 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_FinancialACLTrait;
 
-  /**
-   * Assume empty database with just civicrm_data.
-   */
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;

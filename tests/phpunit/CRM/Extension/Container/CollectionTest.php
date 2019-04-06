@@ -47,12 +47,12 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
   public function testGetKeys() {
     $c = $this->_createContainer();
     $this->assertEquals(array(
-        'test.conflict',
-        'test.whiz',
-        'test.whizbang',
-        'test.foo',
-        'test.foo.bar',
-      ), $c->getKeys());
+      'test.conflict',
+      'test.whiz',
+      'test.whizbang',
+      'test.foo',
+      'test.foo.bar',
+    ), $c->getKeys());
   }
 
   public function testGetPath() {
@@ -97,8 +97,10 @@ class CRM_Extension_Container_CollectionTest extends CiviUnitTestCase {
     $this->assertTrue(is_array($cache->get('ext-collection')));
 
     $cacheData = $cache->get('ext-collection');
-    $this->assertEquals('a', $cacheData['test.foo']); // 'test.foo' was defined in the 'a' container
-    $this->assertEquals('b', $cacheData['test.whiz']); // 'test.whiz' was defined in the 'b' container
+    // 'test.foo' was defined in the 'a' container
+    $this->assertEquals('a', $cacheData['test.foo']);
+    // 'test.whiz' was defined in the 'b' container
+    $this->assertEquals('b', $cacheData['test.whiz']);
   }
 
   /**

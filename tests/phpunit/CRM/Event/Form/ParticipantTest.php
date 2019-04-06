@@ -207,10 +207,9 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $this->testSubmitWithPayment($thousandSeparator);
     //Check if type is correctly populated in mails.
     $mail = $mut->checkMailLog([
-        '<p>Test event type - 1</p>',
-        $this->formatMoneyInput(1550.55),
-      ]
-    );
+      '<p>Test event type - 1</p>',
+      $this->formatMoneyInput(1550.55),
+    ]);
   }
 
   /**

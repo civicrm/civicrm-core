@@ -45,7 +45,6 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     return self::$filePrefix;
   }
 
-
   protected function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
@@ -64,7 +63,8 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
    * @return array
    */
   public function okCreateProvider() {
-    $cases = array(); // array($entityClass, $createParams, $expectedContent)
+    // array($entityClass, $createParams, $expectedContent)
+    $cases = array();
 
     $cases[] = array(
       'CRM_Activity_DAO_Activity',
@@ -108,7 +108,8 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
    * @return array
    */
   public function badCreateProvider() {
-    $cases = array(); // array($entityClass, $createParams, $expectedError)
+    // array($entityClass, $createParams, $expectedError)
+    $cases = array();
 
     $cases[] = array(
       'CRM_Activity_DAO_Activity',
@@ -172,7 +173,8 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
    * @return array
    */
   public function badUpdateProvider() {
-    $cases = array(); // array($entityClass, $createParams, $updateParams, $expectedError)
+    // array($entityClass, $createParams, $updateParams, $expectedError)
+    $cases = array();
 
     $readOnlyFields = array(
       'name' => 'newname.txt',
@@ -204,7 +206,8 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
    * @return array
    */
   public function okGetProvider() {
-    $cases = array(); // array($getParams, $expectedNames)
+    // array($getParams, $expectedNames)
+    $cases = array();
 
     // Each search runs in a DB which contains these attachments:
     // Activity #123: example_123.txt (text/plain) and example_123.csv (text/csv)
@@ -256,7 +259,8 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
    * @return array
    */
   public function badGetProvider() {
-    $cases = array(); // array($getParams, $expectedNames)
+    // array($getParams, $expectedNames)
+    $cases = array();
 
     // Each search runs in a DB which contains these attachments:
     // Activity #123: example_123.txt (text/plain) and example_123.csv (text/csv)
@@ -309,9 +313,9 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertTrue(is_numeric($entity->id));
 
     $createResult = $this->callAPISuccess('Attachment', 'create', $createParams + array(
-        'entity_table' => $entity_table,
-        'entity_id' => $entity->id,
-      ));
+      'entity_table' => $entity_table,
+      'entity_id' => $entity->id,
+    ));
     $fileId = $createResult['id'];
     $this->assertTrue(is_numeric($fileId));
     $this->assertEquals($entity_table, $createResult['values'][$fileId]['entity_table']);
@@ -355,9 +359,9 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertTrue(is_numeric($entity->id));
 
     $createResult = $this->callAPIFailure('Attachment', 'create', $createParams + array(
-        'entity_table' => $entity_table,
-        'entity_id' => $entity->id,
-      ));
+      'entity_table' => $entity_table,
+      'entity_id' => $entity->id,
+    ));
     $this->assertRegExp($expectedError, $createResult['error_message']);
   }
 
@@ -374,15 +378,15 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     $this->assertTrue(is_numeric($entity->id));
 
     $createResult = $this->callAPISuccess('Attachment', 'create', $createParams + array(
-        'entity_table' => $entity_table,
-        'entity_id' => $entity->id,
-      ));
+      'entity_table' => $entity_table,
+      'entity_id' => $entity->id,
+    ));
     $fileId = $createResult['id'];
     $this->assertTrue(is_numeric($fileId));
 
     $updateResult = $this->callAPIFailure('Attachment', 'create', $updateParams + array(
-        'id' => $fileId,
-      ));
+      'id' => $fileId,
+    ));
     $this->assertRegExp($expectedError, $updateResult['error_message']);
   }
 

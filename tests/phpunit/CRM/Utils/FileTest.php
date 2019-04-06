@@ -23,6 +23,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
       ));
     }
   }
+
   public function testStripComment() {
     $strings = array(
       "\nab\n-- cd\nef" => "\nab\nef",

@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
+
   public function testRow_twice() {
     $insert = CRM_Utils_SQL_Insert::into('foo')
       ->row(array('first' => '1', 'second' => '2'))

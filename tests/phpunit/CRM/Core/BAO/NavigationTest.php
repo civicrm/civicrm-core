@@ -290,7 +290,7 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
   public function testCheckPermissions() {
     $menuItem = [
       'permission' => 'access CiviCRM, access CiviContribute',
-      'operator' => 'AND'
+      'operator' => 'AND',
     ];
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviContribute');
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'access CiviContribute'];

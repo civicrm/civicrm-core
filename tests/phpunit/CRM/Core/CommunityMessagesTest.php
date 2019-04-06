@@ -64,8 +64,10 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
         'invalid-ttl-document' => array(
           CRM_Utils_HttpClient::STATUS_OK,
           json_encode(array(
-            'ttl' => 'z', // not an integer!
-            'retry' => 'z', // not an integer!
+            // not an integer!
+            'ttl' => 'z',
+            // not an integer!
+            'retry' => 'z',
             'messages' => array(
               array(
                 'markup' => '<h1>Invalid document</h1>',
@@ -206,7 +208,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $this->assertApproxEquals(strtotime('2013-03-01 10:10:00'), $doc2['expires'], self::APPROX_TIME_EQUALITY);
 
     // third try, $doc1 expired, update it
-    CRM_Utils_Time::setTime('2013-03-01 12:00:02'); // more than 2 hours later (DEFAULT_RETRY)
+    // more than 2 hours later (DEFAULT_RETRY)
+    CRM_Utils_Time::setTime('2013-03-01 12:00:02');
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
       $this->expectOneHttpRequest(self::$webResponses['second-valid-response'])
@@ -248,7 +251,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $this->assertEquals($doc1['expires'], $doc2['expires']);
 
     // third try, $doc1 expired, try again, get a good response
-    CRM_Utils_Time::setTime('2013-03-01 12:00:02'); // more than 2 hours later (DEFAULT_RETRY)
+    // more than 2 hours later (DEFAULT_RETRY)
+    CRM_Utils_Time::setTime('2013-03-01 12:00:02');
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
       $this->expectOneHttpRequest(self::$webResponses['first-valid-response'])
@@ -283,7 +287,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $this->assertApproxEquals(strtotime('2013-03-01 10:10:00'), $doc1['expires'], self::APPROX_TIME_EQUALITY);
 
     // second try, $doc1 has expired; bad response; keep old data
-    CRM_Utils_Time::setTime('2013-03-01 12:00:02'); // more than 2 hours later (DEFAULT_RETRY)
+    // more than 2 hours later (DEFAULT_RETRY)
+    CRM_Utils_Time::setTime('2013-03-01 12:00:02');
     $communityMessages = new CRM_Core_CommunityMessages(
       $this->cache,
       $this->expectOneHttpRequest($badWebResponse)
@@ -327,7 +332,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
 
     // randomly pick many times
     $trials = 80;
-    $freq = array(); // array($message => $count)
+    // array($message => $count)
+    $freq = array();
     for ($i = 0; $i < $trials; $i++) {
       $message = $communityMessages->pick();
       $freq[$message['markup']] = CRM_Utils_Array::value($message['markup'], $freq, 0) + 1;
@@ -354,7 +360,8 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
 
     // randomly pick many times
     $trials = 10;
-    $freq = array(); // array($message => $count)
+    // array($message => $count)
+    $freq = array();
     for ($i = 0; $i < $trials; $i++) {
       $message = $communityMessages->pick();
       $freq[$message['markup']] = CRM_Utils_Array::value($message['markup'], $freq, 0) + 1;

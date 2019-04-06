@@ -84,8 +84,10 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $this->runBatch(
       'reuse-tx',
       array(
-        array('reuse-tx', $createStyle, $commitStyle), // cid 0
-        array('reuse-tx', $createStyle, $commitStyle), // cid 1
+        // cid 0
+        array('reuse-tx', $createStyle, $commitStyle),
+        // cid 1
+        array('reuse-tx', $createStyle, $commitStyle),
       ),
       array(0 => TRUE, 1 => TRUE),
       'rollback'
@@ -110,9 +112,12 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $this->runBatch(
       'reuse-tx',
       array(
-        array('nest-tx', $createStyle, $commitStyle), // cid 0
-        array('nest-tx', $createStyle, 'rollback'), // cid 1
-        array('nest-tx', $createStyle, $commitStyle), // cid 2
+        // cid 0
+        array('nest-tx', $createStyle, $commitStyle),
+        // cid 1
+        array('nest-tx', $createStyle, 'rollback'),
+        // cid 2
+        array('nest-tx', $createStyle, $commitStyle),
       ),
       array(0 => TRUE, 1 => FALSE, 2 => TRUE),
       $commitStyle
@@ -137,9 +142,12 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $this->runBatch(
       'reuse-tx',
       array(
-        array('reuse-tx', $createStyle, $commitStyle), // cid 0
-        array('reuse-tx', $createStyle, 'rollback'), // cid 1
-        array('reuse-tx', $createStyle, $commitStyle), // cid 2
+        // cid 0
+        array('reuse-tx', $createStyle, $commitStyle),
+        // cid 1
+        array('reuse-tx', $createStyle, 'rollback'),
+        // cid 2
+        array('reuse-tx', $createStyle, $commitStyle),
       ),
       array(0 => TRUE, 1 => TRUE, 2 => TRUE),
       $commitStyle
@@ -164,9 +172,12 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $this->runBatch(
       'reuse-tx',
       array(
-        array('nest-tx', $createStyle, $commitStyle), // cid 0
-        array('nest-tx', $createStyle, 'rollback'), // cid 1
-        array('nest-tx', $createStyle, $commitStyle), // cid 2
+        // cid 0
+        array('nest-tx', $createStyle, $commitStyle),
+        // cid 1
+        array('nest-tx', $createStyle, 'rollback'),
+        // cid 2
+        array('nest-tx', $createStyle, $commitStyle),
       ),
       array(0 => TRUE, 1 => FALSE, 2 => TRUE),
       'rollback'
@@ -208,21 +219,21 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $tx = new CRM_Core_Transaction();
 
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, array($this, '_preCommit'), array(
-        'qwe',
-        'rty',
-      ));
+      'qwe',
+      'rty',
+    ));
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, array($this, '_postCommit'), array(
-        'uio',
-        'p[]',
-      ));
+      'uio',
+      'p[]',
+    ));
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, array(
-        $this,
-        '_preRollback',
-      ), array('asd', 'fgh'));
+      $this,
+      '_preRollback',
+    ), array('asd', 'fgh'));
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, array(
-        $this,
-        '_postRollback',
-      ), array('jkl', ';'));
+      $this,
+      '_postRollback',
+    ), array('jkl', ';'));
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET id = 100 WHERE id = 100');
 
@@ -236,21 +247,21 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $tx = new CRM_Core_Transaction();
 
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, array($this, '_preCommit'), array(
-        'ewq',
-        'ytr',
-      ));
+      'ewq',
+      'ytr',
+    ));
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, array($this, '_postCommit'), array(
-        'oiu',
-        '][p',
-      ));
+      'oiu',
+      '][p',
+    ));
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, array(
-        $this,
-        '_preRollback',
-      ), array('dsa', 'hgf'));
+      $this,
+      '_preRollback',
+    ), array('dsa', 'hgf'));
     CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, array(
-        $this,
-        '_postRollback',
-      ), array('lkj', ';'));
+      $this,
+      '_postRollback',
+    ), array('lkj', ';'));
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET id = 100 WHERE id = 100');
     $tx->rollback();
@@ -287,7 +298,8 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   public function testRun_exception($createStyle, $commitStyle) {
     $tx = new CRM_Core_Transaction();
     $test = $this;
-    $e = NULL; // Exception
+    // Exception
+    $e = NULL;
     try {
       CRM_Core_Transaction::create(TRUE)->run(function ($tx) use (&$test, $createStyle, $commitStyle) {
         $test->createContactWithTransaction('nest-tx', $createStyle, $commitStyle);

@@ -135,9 +135,9 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $paypalIPN = new CRM_Core_Payment_PayPalIPN($this->getPaypalRecurSubsequentTransaction());
     $paypalIPN->main();
     $contributions = $this->callAPISuccess('contribution', 'get', array(
-        'contribution_recur_id' => $this->_contributionRecurID,
-        'sequential' => 1,
-      ));
+      'contribution_recur_id' => $this->_contributionRecurID,
+      'sequential' => 1,
+    ));
     $this->assertEquals(2, $contributions['count']);
     $contribution2 = $contributions['values'][1];
     $this->assertEquals('secondone', $contribution2['trxn_id']);
@@ -177,19 +177,19 @@ class CRM_Core_Payment_PayPalIPNTest extends CiviUnitTestCase {
     $renewedMembershipEndDate = $this->membershipRenewalDate($durationUnit, $membershipEndDate);
     $this->assertEquals($renewedMembershipEndDate, $this->callAPISuccessGetValue('membership', array('return' => 'end_date')));
     $contribution = $this->callAPISuccess('contribution', 'get', array(
-        'contribution_recur_id' => $this->_contributionRecurID,
-        'sequential' => 1,
-      ));
+      'contribution_recur_id' => $this->_contributionRecurID,
+      'sequential' => 1,
+    ));
     $this->assertEquals(2, $contribution['count']);
     $this->assertEquals('secondone', $contribution['values'][1]['trxn_id']);
     $this->callAPISuccessGetCount('line_item', array(
-        'entity_id' => $this->ids['membership'],
-        'entity_table' => 'civicrm_membership',
-      ), 2);
+      'entity_id' => $this->ids['membership'],
+      'entity_table' => 'civicrm_membership',
+    ), 2);
     $this->callAPISuccessGetSingle('line_item', array(
-        'contribution_id' => $contribution['values'][1]['id'],
-        'entity_table' => 'civicrm_membership',
-      ));
+      'contribution_id' => $contribution['values'][1]['id'],
+      'entity_table' => 'civicrm_membership',
+    ));
     $this->callAPISuccessGetSingle('membership_payment', array('contribution_id' => $contribution['values'][1]['id']));
 
   }

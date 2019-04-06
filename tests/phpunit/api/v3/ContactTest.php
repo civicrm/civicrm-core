@@ -611,8 +611,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'create', array(
       'first_name' => 'Snoop',
       'last_name' => 'Dog',
-      'contact_type' => 'Individual')
-    );
+      'contact_type' => 'Individual',
+    ));
     $result = $this->callAPISuccessGetSingle('Contact', array('last_name' => 'Dog'));
     $this->assertEquals('en_US', $result['preferred_language']);
   }
@@ -637,11 +637,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testCreatePreferredLanguageNull() {
     $this->callAPISuccess('Setting', 'create', array('contact_default_language' => 'null'));
     $this->callAPISuccess('Contact', 'create', array(
-        'first_name' => 'Snoop',
-        'last_name' => 'Dog',
-        'contact_type' => 'Individual',
-        )
-    );
+      'first_name' => 'Snoop',
+      'last_name' => 'Dog',
+      'contact_type' => 'Individual',
+    ));
     $result = $this->callAPISuccessGetSingle('Contact', array('last_name' => 'Dog'));
     $this->assertEquals(NULL, $result['preferred_language']);
   }
@@ -731,7 +730,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'create', $params);
   }
 
-
   /**
    * Test creating a current employer through API.
    */
@@ -743,21 +741,18 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(0, $count);
     $employerResult = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
-        'current_employer' => 'new employer org',
-      )
-    ));
+      'current_employer' => 'new employer org',
+    )));
     // do it again as an update to check it doesn't cause an error
     $employerResult = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
-        'current_employer' => 'new employer org',
-        'id' => $employerResult['id'],
-      )
-    ));
+      'current_employer' => 'new employer org',
+      'id' => $employerResult['id'],
+    )));
     $expectedCount = 1;
     $this->callAPISuccess('contact', 'getcount', array(
-        'organization_name' => 'new employer org',
-        'contact_type' => 'Organization',
-      ),
-      $expectedCount);
+      'organization_name' => 'new employer org',
+      'contact_type' => 'Organization',
+    ), $expectedCount);
 
     $result = $this->callAPISuccess('contact', 'getsingle', array(
       'id' => $employerResult['id'],
@@ -775,8 +770,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testContactCreateDuplicateCurrentEmployerEnables() {
     // Set up  - create employer relationship.
     $employerResult = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
-        'current_employer' => 'new employer org',
-      )
+      'current_employer' => 'new employer org',
+    )
     ));
     $relationship = $this->callAPISuccess('relationship', 'get', array(
       'contact_id_a' => $employerResult['id'],
@@ -791,9 +786,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     // Re-set the current employer - thus enabling the relationship.
     $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
-        'current_employer' => 'new employer org',
-        'id' => $employerResult['id'],
-      )
+      'current_employer' => 'new employer org',
+      'id' => $employerResult['id'],
+    )
     ));
     //check is_active is now 1
     $relationship = $this->callAPISuccess('relationship', 'getsingle', array(
@@ -993,7 +988,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'options' => array(
           'limit' => '1',
           'sort' => 'start_date DESC',
-        )),
+        ),
+      ),
     );
     $get_result = $this->callAPISuccess('contact', 'getsingle', $get_params);
 
@@ -1047,7 +1043,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'skip_greeting_processing' => 1,
       'addressee_id' => 'null',
       'email_greeting_id' => 'null',
-      'postal_greeting_id' => 'null'
+      'postal_greeting_id' => 'null',
     ]);
     $individual2ID = $this->individualCreate();
 
@@ -1350,10 +1346,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     // Clean up first.
     $this->callAPISuccess('contact', 'delete', array(
       'id' => $create_result_1['id'],
-      ));
+    ));
     $this->callAPISuccess('contact', 'delete', array(
       'id' => $create_result_2['id'],
-      ));
+    ));
     $this->callAPISuccess('contact', 'delete', array(
       'id' => $create_result_2['id'],
     ));
@@ -1569,9 +1565,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $organizationID1 = $this->organizationCreate(array(), 0);
     $organizationID2 = $this->organizationCreate(array(), 1);
     $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
-        'employer_id' => $organizationID1,
-      )
-    ));
+      'employer_id' => $organizationID1,
+    )));
     $contact = $contact["values"][$contact["id"]];
 
     $membershipType = $this->createEmployerOfMembership();
@@ -1940,7 +1935,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       CRM_Core_PseudoConstant::getKey("CRM_Contact_BAO_Contact", 'preferred_communication_method', 'SMS'),
     ), $result['preferred_communication_method']);
   }
-
 
   /**
    * Test birth date parameters.
@@ -3807,7 +3801,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'create', array(
       'first_name' => 'John',
       'last_name' => 'Doe',
-      'contact_type' => 'Individual')
+      'contact_type' => 'Individual',
+    )
     );
     $result = $this->callAPISuccessGetSingle('Contact', array('last_name' => 'Doe'));
     $this->assertEquals(1, $result['communication_style_id']);
@@ -3934,37 +3929,43 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'contact_id_a' => $c1,
       'contact_id_b' => $c2,
       'is_active' => 1,
-      'relationship_type_id' => $rtype1['id'], // Child of
+      // Child of
+      'relationship_type_id' => $rtype1['id'],
     ));
     $this->callAPISuccess('relationship', 'create', array(
       'contact_id_a' => $c1,
       'contact_id_b' => $h1,
       'is_active' => 1,
-      'relationship_type_id' => $rtype2['id'], // Household Member of
+      // Household Member of
+      'relationship_type_id' => $rtype2['id'],
     ));
     $this->callAPISuccess('relationship', 'create', array(
       'contact_id_a' => $c2,
       'contact_id_b' => $h1,
       'is_active' => 1,
-      'relationship_type_id' => $rtype2['id'], // Household Member of
+      // Household Member of
+      'relationship_type_id' => $rtype2['id'],
     ));
 
     $ssParams = array(
       'formValues' => array(
-        'display_relationship_type' => $rtype1['id'] . '_a_b', // Child of
+        // Child of
+        'display_relationship_type' => $rtype1['id'] . '_a_b',
         'sort_name' => 'Adams',
       ),
     );
     $g1ID = $this->smartGroupCreate($ssParams, array('name' => uniqid(), 'title' => uniqid()));
     $ssParams = array(
       'formValues' => array(
-        'display_relationship_type' => $rtype2['id'] . '_a_b', // Household Member of
+        // Household Member of
+        'display_relationship_type' => $rtype2['id'] . '_a_b',
       ),
     );
     $g2ID = $this->smartGroupCreate($ssParams, array('name' => uniqid(), 'title' => uniqid()));
     $ssParams = array(
       'formValues' => array(
-        'display_relationship_type' => $rtype2['id'] . '_b_a', // Household Member is
+        // Household Member is
+        'display_relationship_type' => $rtype2['id'] . '_b_a',
       ),
     );
     // the reverse of g2 which adds another layer for overlap at related contact filter
@@ -4023,7 +4024,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $tags = [];
     foreach (['Tag A', 'Tag B'] as $name) {
       $tags[] = $this->callApiSuccess('Tag', 'create', [
-        'name' => $name
+        'name' => $name,
       ]);
     }
 
@@ -4066,7 +4067,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     }
     $this->callAPISuccess('Contact', 'delete', [
       'id' => $contact['id'],
-      'skip_undelete' => TRUE
+      'skip_undelete' => TRUE,
     ]);
   }
 

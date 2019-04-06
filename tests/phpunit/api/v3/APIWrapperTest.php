@@ -89,6 +89,7 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
  * Class api_v3_APIWrapperTest_Impl
  */
 class api_v3_APIWrapperTest_Impl implements API_Wrapper {
+
   /**
    * @inheritDoc
    */

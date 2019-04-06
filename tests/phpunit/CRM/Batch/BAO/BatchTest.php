@@ -66,7 +66,7 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
     ]);
     $this->contributionCreate([
       'contact_id' => $contactId,
-     'total_amount' => 1,
+      'total_amount' => 1,
       'payment_instrument_id' => 'Credit Card',
       'financial_type_id' => 'Member Dues',
       'contribution_status_id' => 'Completed',
