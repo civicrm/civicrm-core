@@ -221,7 +221,7 @@
     if (entity) {
       $selector.prop('disabled', true);
       getActions(entity)
-        .done(function(actions) {
+        .then(function(actions) {
           $selector.prop('disabled', false);
           CRM.utils.setOptions($('.api-chain-action', $row), _.transform(actions.values, function(ret, item) {ret.push({value: item, key: item});}));
         });
@@ -247,7 +247,7 @@
         apiCalls.getactions = [entity, 'getactions'];
       }
       CRM.api3(apiCalls)
-        .done(function(data) {
+        .then(function(data) {
           data.getfields.values = _.indexBy(data.getfields.values, 'name');
           getFieldsCache[entity+action] = data.getfields;
           getActionsCache[entity] = getActionsCache[entity] || data.getactions;
@@ -298,7 +298,7 @@
       renderJoinSelector();
       return;
     }
-    getMetadata(entity, action).done(function(data) {
+    getMetadata(entity, action).then(function(data) {
       if ($(changedElement).is('#api-entity')) {
         actions = getActionsCache[entity];
         populateActions();
@@ -736,7 +736,7 @@
       q.json += "\n}";
     }
     q.php += ");";
-    q.json += ").done(function(result) {\n  // do something\n});";
+    q.json += ").then(function(result) {\n  // do something with result\n}, function(error) {\n  // oops\n});";
     q.smarty += "}\n{foreach from=$result.values item=" + entity.toLowerCase() + "}\n  {$" + entity.toLowerCase() + ".some_field}\n{/foreach}";
     if (!_.includes(action, 'get')) {
       q.smarty = '{* Smarty API only works with get actions *}';
@@ -784,7 +784,7 @@
       },
       type: _.includes(action, 'get') ? 'GET' : 'POST',
       dataType: 'text'
-    }).done(function(text) {
+    }).then(function(text) {
       // There may be debug information appended to the end of the json string
       var footerPos = text.indexOf("\n}<");
       if (footerPos) {
@@ -805,7 +805,7 @@
   function getExamples() {
     CRM.utils.setOptions($('#example-action').prop('disabled', true).addClass('loading'), []);
     $.getJSON(CRM.url('civicrm/ajax/apiexample', {entity: $(this).val()}))
-      .done(function(result) {
+      .then(function(result) {
         CRM.utils.setOptions($('#example-action').prop('disabled', false).removeClass('loading'), result);
       });
   }
@@ -820,7 +820,7 @@
     if (entity && action) {
       $('#example-result').block();
       $.get(CRM.url('civicrm/ajax/apiexample', {file: entity + '/' + action}))
-        .done(function(result) {
+        .then(function(result) {
           $('#example-result').unblock().text(result);
           prettyPrint('#example-result');
         });
@@ -835,7 +835,7 @@
   function getDocEntity() {
     CRM.utils.setOptions($('#doc-action').prop('disabled', true).addClass('loading'), []);
     $.getJSON(CRM.url('civicrm/ajax/apidoc', {entity: $(this).val()}))
-      .done(function(result) {
+      .then(function(result) {
         entityDoc = result.doc;
         CRM.utils.setOptions($('#doc-action').prop('disabled', false).removeClass('loading'), result.actions);
         $('#doc-result').html(result.doc);
@@ -853,7 +853,7 @@
     if (entity && action) {
       $('#doc-result').block();
       $.get(CRM.url('civicrm/ajax/apidoc', {entity: entity, action: action}))
-        .done(function(result) {
+        .then(function(result) {
           $('#doc-result').unblock().html(result.doc);
           if (result.code) {
             $('#doc-result').append(docCodeTpl(result));
@@ -928,7 +928,7 @@
     if ($(this).is(':checked')) {
       joins[name] = ent;
       $('input.api-param-name, #api-return-value').addClass('loading');
-      getMetadata(ent, 'get').done(function() {
+      getMetadata(ent, 'get').then(function() {
         renderJoinSelector();
         populateFields(fields, entity, action, '');
         $('input.api-param-name, #api-return-value').removeClass('loading');
