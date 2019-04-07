@@ -88,6 +88,15 @@ trait CRM_Core_Form_EntityFormTrait {
   }
 
   /**
+   * Should custom data be suppressed on this form.
+   *
+   * @return bool
+   */
+  protected function isSuppressCustomData() {
+    return FALSE;
+  }
+
+  /**
    * Get the entity subtype ID being edited
    *
    * @param $subTypeId
@@ -105,6 +114,9 @@ trait CRM_Core_Form_EntityFormTrait {
    * If the custom data is in the submitted data (eg. added via ajax loaded form) add to form.
    */
   public function addCustomDataToForm() {
+    if ($this->isSuppressCustomData()) {
+      return TRUE;
+    }
     $customisableEntities = CRM_Core_SelectValues::customGroupExtends();
     if (isset($customisableEntities[$this->getDefaultEntity()])) {
       CRM_Custom_Form_CustomData::addToForm($this);

@@ -40,7 +40,25 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
 
   protected $_mode = NULL;
 
-  protected $_selfService = FALSE;
+  /**
+   * Should custom data be suppressed on this form.
+   *
+   * We override to suppress custom data because historically it has not been
+   * shown on this form & we don't want to expose it as a by-product of
+   * other change without establishing that it would be good on this form.
+   *
+   * @return bool
+   */
+  protected function isSuppressCustomData() {
+    return TRUE;
+  }
+
+  /**
+   * Is the from being accessed by a front end user to update their own recurring.
+   *
+   * @var bool
+   */
+  protected $selfService;
 
   /**
    * Set variables up before form is built.
@@ -91,22 +109,18 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
       (!$this->_crid && !$this->_coid && !$this->_mid) ||
       (!$this->_subscriptionDetails)
     ) {
-      CRM_Core_Error::fatal('Required information missing.');
+      CRM_Core_Error::statusBounce('Required information missing.');
     }
-
-    if (!CRM_Core_Permission::check('edit contributions')) {
-      if ($this->_subscriptionDetails->contact_id != $this->getContactID()) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to cancel this recurring contribution.'));
-      }
-      $this->_selfService = TRUE;
-    }
-    $this->assign('self_service', $this->_selfService);
 
     // handle context redirection
     CRM_Contribute_BAO_ContributionRecur::setSubscriptionContext();
 
     CRM_Utils_System::setTitle($this->_mid ? ts('Cancel Auto-renewal') : ts('Cancel Recurring Contribution'));
     $this->assign('mode', $this->_mode);
+
+    if ($this->isSelfService()) {
+      unset($this->entityFields['send_cancel_request'], $this->entityFields['is_notify']);
+    }
 
     if ($this->_subscriptionDetails->contact_id) {
       list($this->_donorDisplayName, $this->_donorEmail)
@@ -115,9 +129,29 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
   }
 
   /**
+   * Set entity fields for this cancellation.
+   */
+  public function setEntityFields() {
+    $this->entityFields = [
+      'cancel_reason' => ['name' => 'cancel_reason'],
+    ];
+    $this->entityFields['send_cancel_request'] = [
+      'title' => ts('Send cancellation request to %1 ?', [1 => $this->_paymentProcessorObj->_processorName]),
+      'name' => 'send_cancel_request',
+      'not-auto-addable' => TRUE,
+    ];
+    $this->entityFields['is_notify'] = [
+      'title' => ts('Notify Contributor?'),
+      'name' => 'is_notify',
+      'not-auto-addable' => TRUE,
+    ];
+  }
+
+  /**
    * Build the form object.
    */
   public function buildQuickForm() {
+    $this->buildQuickEntityForm();
     // Determine if we can cancel recurring contribution via API with this processor
     $cancelSupported = $this->_paymentProcessorObj->supports('CancelRecurring');
     if ($cancelSupported) {
@@ -145,7 +179,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     }
 
     $type = 'next';
-    if ($this->_selfService) {
+    if ($this->isSelfService()) {
       $type = 'submit';
     }
 
@@ -184,7 +218,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     $cancelSubscription = TRUE;
     $params = $this->controller->exportValues($this->_name);
 
-    if ($this->_selfService) {
+    if ($this->isSelfService()) {
       // for self service force sending-request & notify
       if ($this->_paymentProcessorObj->supports('cancelRecurring')) {
         $params['send_cancel_request'] = 1;
@@ -209,6 +243,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
           'id' => $this->_subscriptionDetails->recur_id,
           'membership_id' => $this->_mid,
           'processor_message' => $message,
+          'cancel_reason' => $params['cancel_reason'],
         ]);
 
         $tplParams = [];
@@ -306,6 +341,25 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         "reset=1&task=cancel&result=1"));
       }
     }
+  }
+
+  /**
+   * Is this being used by a front end user to update their own recurring.
+   *
+   * @return bool
+   */
+  protected function isSelfService() {
+    if (!is_null($this->selfService)) {
+      return $this->selfService;
+    }
+    $this->selfService = FALSE;
+    if (!CRM_Core_Permission::check('edit contributions')) {
+      if ($this->_subscriptionDetails->contact_id != $this->getContactID()) {
+        CRM_Core_Error::statusBounce(ts('You do not have permission to cancel this recurring contribution.'));
+      }
+      $this->selfService = TRUE;
+    }
+    return $this->selfService;
   }
 
 }

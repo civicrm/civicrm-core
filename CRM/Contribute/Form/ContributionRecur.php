@@ -115,6 +115,15 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   }
 
   /**
+   * Get the entity id being edited.
+   *
+   * @return int|null
+   */
+  public function getEntityId() {
+    return $this->contributionRecurID;
+  }
+
+  /**
    * Set variables up before form is built.
    *
    * @throws \CRM_Core_Exception
