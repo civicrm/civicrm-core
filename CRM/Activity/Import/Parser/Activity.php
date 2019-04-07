@@ -47,7 +47,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   /**
    * Array of successfully imported activity id's
    *
-   * @array
+   * @var array
    */
   protected $_newActivity;
 

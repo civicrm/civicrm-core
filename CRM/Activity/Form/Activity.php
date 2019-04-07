@@ -119,7 +119,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
   protected $unsavedWarn = TRUE;
 
-  /*
+  /**
+   *
    * Is it possible to create separate activities with this form?
    *
    * When TRUE, the form will ask whether the user wants to create separate
@@ -133,7 +134,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * behavior (e.g. in CRM_Case_Form_Activity)
    *
    * @var boolean
+   *
    */
+
   protected $supportsActivitySeparation = TRUE;
 
   /**
@@ -826,7 +829,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $doNotNotifyAssigneeFor = (array) Civi::settings()
       ->get('do_not_notify_assignees_for');
     if (($this->_activityTypeId && in_array($this->_activityTypeId, $doNotNotifyAssigneeFor)) || !Civi::settings()
-        ->get('activity_assignee_notification')) {
+      ->get('activity_assignee_notification')) {
       $this->assign('activityAssigneeNotification', FALSE);
     }
     else {

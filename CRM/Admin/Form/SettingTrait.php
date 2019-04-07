@@ -119,6 +119,7 @@ trait CRM_Admin_Form_SettingTrait {
    * e.g get 'serialize' key, if exists, for a field.
    *
    * @param $setting
+   * @param $item
    * @return mixed
    */
   protected function getSettingMetadataItem($setting, $item) {
@@ -294,6 +295,7 @@ trait CRM_Admin_Form_SettingTrait {
     ];
     return $mapping[$htmlType];
   }
+
   /**
    * Get the defaults for all fields defined in the metadata.
    *

@@ -35,6 +35,7 @@
  * This class generates form components for Activity Links.
  */
 class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
+
   public function buildQuickForm() {
     self::commonBuildQuickForm($this);
   }

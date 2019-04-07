@@ -43,21 +43,21 @@ class CRM_Activity_Selector_Search extends CRM_Core_Selector_Base implements CRM
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    */
-  static $_columnHeaders;
+  public static $_columnHeaders;
 
   /**
    * Properties of contact we're interested in displaying
    * @var array
    */
 
-  static $_properties = [
+  public static $_properties = [
     'contact_id',
     'contact_type',
     'contact_sub_type',

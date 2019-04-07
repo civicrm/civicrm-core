@@ -300,7 +300,7 @@ class CRM_Admin_Page_AJAX {
    *
    * This appears to be only used by scheduled reminders.
    */
-  static public function mappingList() {
+  public static function mappingList() {
     if (empty($_GET['mappingID'])) {
       CRM_Utils_JSON::output(['status' => 'error', 'error_msg' => 'required params missing.']);
     }
@@ -383,10 +383,10 @@ class CRM_Admin_Page_AJAX {
     }
 
     $dao = CRM_Utils_SQL_Select::from('civicrm_tag')
-            ->where($whereClauses)
-            ->groupBy('id')
-            ->orderBy($orderColumn)
-            ->execute();
+      ->where($whereClauses)
+      ->groupBy('id')
+      ->orderBy($orderColumn)
+      ->execute();
 
     while ($dao->fetch()) {
       if (!empty($substring)) {

@@ -245,6 +245,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
   }
 
   /**
+   * @param string $preset
    * @param string $contents
    */
   public static function saveConfigFile($preset, $contents) {

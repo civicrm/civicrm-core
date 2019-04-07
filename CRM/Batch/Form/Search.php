@@ -31,6 +31,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Batch_Form_Search extends CRM_Core_Form {
+
   /**
    * Set default values.
    *

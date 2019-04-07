@@ -35,7 +35,7 @@
  */
 class CRM_Activity_Task extends CRM_Core_Task {
 
-  static $objectType = 'activity';
+  public static $objectType = 'activity';
 
   /**
    * These tasks are the core set of tasks that the user can perform

@@ -147,9 +147,9 @@ AND        civicrm_contact.is_deleted = 0
    * @see DB_DataObject::getLink()
    *
    * @return array|null
-   *           array       = if there are links defined for this table.
-   *           empty array - if there is a links.ini file, but no links on this table
-   *           null        - if no links.ini exists for this database (hence try auto_links).
+   *   array if there are links defined for this table.
+   *   empty array - if there is a links.ini file, but no links on this table
+   *   null - if no links.ini exists for this database (hence try auto_links).
    */
   public function links() {
     $link = ['activity_id' => 'civicrm_activity:id'];

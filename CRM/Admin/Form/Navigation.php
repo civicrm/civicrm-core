@@ -38,6 +38,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
 
   /**
    * The parent id of the navigation menu.
+   * @var int
    */
   protected $_currentParentID = NULL;
 

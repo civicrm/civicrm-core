@@ -36,10 +36,16 @@
  * used by membership, contributions, event registrations, etc.
  */
 class CRM_Admin_Form_MessageTemplates extends CRM_Admin_Form {
-  // which (and whether) mailing workflow this template belongs to
+  /**
+   * which (and whether) mailing workflow this template belongs to
+   * @var int
+   */
   protected $_workflow_id = NULL;
 
-  // Is document file is already loaded as default value?
+  /**
+   * Is document file is already loaded as default value?
+   * @var bool
+   */
   protected $_is_document = FALSE;
 
   public function preProcess() {
