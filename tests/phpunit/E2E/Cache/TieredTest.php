@@ -35,7 +35,12 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
   /**
    * @var CRM_Utils_Cache_ArrayCache
    */
-  protected $a, $b;
+  protected $a;
+
+  /**
+   * @var CRM_Utils_Cache_ArrayCache
+   */
+  protected $b;
 
   protected function tearDown() {
     if (function_exists('timecop_return')) {
@@ -53,7 +58,7 @@ class E2E_Cache_TieredTest extends E2E_Cache_CacheTestCase {
       $this->b = CRM_Utils_Cache::create([
         'name' => 'e2e tiered test b',
         'type' => ['ArrayCache'],
-      ])
+      ]),
     ], $maxTimeouts);
   }
 

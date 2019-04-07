@@ -116,7 +116,7 @@ class CRM_Activity_Form_SearchTest extends CiviUnitTestCase {
       ],
       [
         'search_criteria' => [
-          ['activity_status_id', '=', ['IN' => ['1', '2']], 0, 0]
+          ['activity_status_id', '=', ['IN' => ['1', '2']], 0, 0],
         ],
         'expected_qill' => [['Activity Status In Scheduled, Completed']],
       ],

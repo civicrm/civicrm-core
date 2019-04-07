@@ -38,15 +38,15 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->hookClass = CRM_Utils_Hook::singleton();
     $this->createLoggedInUser();
     $this->_permissionedDisabledGroup = $this->groupCreate(array(
-        'title' => 'pick-me-disabled',
-        'is_active' => 0,
-        'name' => 'pick-me-disabled',
-      ));
+      'title' => 'pick-me-disabled',
+      'is_active' => 0,
+      'name' => 'pick-me-disabled',
+    ));
     $this->_permissionedGroup = $this->groupCreate(array(
-        'title' => 'pick-me-active',
-        'is_active' => 1,
-        'name' => 'pick-me-active',
-      ));
+      'title' => 'pick-me-active',
+      'is_active' => 1,
+      'name' => 'pick-me-active',
+    ));
     $this->groupCreate(array('title' => 'not-me-disabled', 'is_active' => 0, 'name' => 'not-me-disabled'));
     $this->groupCreate(array('title' => 'not-me-active', 'is_active' => 1, 'name' => 'not-me-active'));
   }
@@ -241,7 +241,6 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->assertEquals('pick-me-active', $groups['data'][2]['title']);
     $this->assertEquals('pick-me-disabled', $groups['data'][3]['title']);
   }
-
 
   /**
    * Retrieve groups as 'view all contacts'
@@ -442,7 +441,6 @@ class CRM_Group_Page_AjaxTest extends CiviUnitTestCase {
     $this->assertEquals(0, count($groups['data']), 'Returned groups should exclude disabled by default');
     $this->assertEquals(0, $groups['recordsTotal'], 'Total needs to be set correctly');
   }
-
 
   /**
    * ACL Group hook.

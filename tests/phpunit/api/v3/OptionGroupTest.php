@@ -124,15 +124,16 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
    */
   public function testGetOptionCreateFailRollback() {
     $countFirst = $this->callAPISuccess('OptionGroup', 'getcount', array(
-        'options' => array('limit' => 5000),
-      )
+      'options' => array('limit' => 5000),
+    )
     );
     $params = array(
       'sequential' => 1,
       'name' => 'civicrm_rolback_test',
       'is_reserved' => 1,
       'is_active' => 1,
-      'is_transactional' => 'nest', // executing within useTransactional() test case
+      // executing within useTransactional() test case
+      'is_transactional' => 'nest',
       'api.OptionValue.create' => array(
         'label' => 'invalid entry',
         'value' => 35,
@@ -143,9 +144,8 @@ class api_v3_OptionGroupTest extends CiviUnitTestCase {
     );
     $result = $this->callAPIFailure('OptionGroup', 'create', $params);
     $countAfter = $this->callAPISuccess('OptionGroup', 'getcount', array(
-        'options' => array('limit' => 5000),
-      )
-    );
+      'options' => array('limit' => 5000),
+    ));
     $this->assertEquals($countFirst, $countAfter,
       'Count of option groups should not have changed due to rollback triggered by option value In line ' . __LINE__
     );

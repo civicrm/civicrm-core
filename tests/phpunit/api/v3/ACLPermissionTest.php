@@ -510,7 +510,8 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     return [
       ['contribution'],
       ['participant'],
-    ];// @todo array('pledge' => 'pledge')
+    // @todo array('pledge' => 'pledge')
+    ];
   }
 
   /**
@@ -684,10 +685,10 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
         ],
       ]);
       foreach ([
-                 'source_contact',
-                 'target_contact',
-                 'assignee_contact',
-               ] as $roleName) {
+        'source_contact',
+        'target_contact',
+        'assignee_contact',
+      ] as $roleName) {
         $roleKey = $roleName . '_id';
         if ($role !== $roleKey) {
           $this->assertTrue(empty($result[$roleKey]), "Only contact in $role is permissioned to be returned, not $roleKey");
@@ -829,9 +830,8 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
     $contacts = [];
 
     $activityContacts = $this->callAPISuccess('ActivityContact', 'get', [
-        'activity_id' => $activity['id'],
-      ]
-    );
+      'activity_id' => $activity['id'],
+    ]);
 
     $activityRecordTypes = $this->callAPISuccess('ActivityContact', 'getoptions', ['field' => 'record_type_id']);
     foreach ($activityContacts['values'] as $activityContact) {

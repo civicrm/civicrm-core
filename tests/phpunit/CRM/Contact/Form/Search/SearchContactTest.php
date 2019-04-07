@@ -106,7 +106,7 @@ class CRM_Contact_Form_Search_SearchContactTest extends CiviUnitTestCase {
     $groupId = $this->groupCreate([
       'group_type' => [
         $groupTypes['Access Control'] => 1,
-      ]
+      ],
     ]);
     // Add random 5 contacts to a group.
     $this->groupContactCreate($groupId, 5);

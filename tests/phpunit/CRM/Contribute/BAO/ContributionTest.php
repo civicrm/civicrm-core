@@ -331,7 +331,8 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   public function testAnnualWithMultipleLineItems() {
     $contactID = $this->createLoggedInUserWithFinancialACL();
     $this->createContributionWithTwoLineItemsAgainstPriceSet([
-      'contact_id' => $contactID]
+      'contact_id' => $contactID,
+    ]
     );
     $this->enableFinancialACLs();
     $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([$contactID]);
@@ -1382,14 +1383,12 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit(array(
-       'total_amount' => $params['total_amount'],
-        'financial_type_id' => $financialType['id'],
-        'contact_id' => $contactId,
-        'contribution_status_id' => 1,
-        'price_set_id' => 0,
-      ),
-      CRM_Core_Action::ADD
-    );
+      'total_amount' => $params['total_amount'],
+      'financial_type_id' => $financialType['id'],
+      'contact_id' => $contactId,
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+    ), CRM_Core_Action::ADD);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       array(
         'contact_id' => $contactId,

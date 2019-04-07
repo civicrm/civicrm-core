@@ -265,7 +265,6 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     }
   }
 
-
   /**
    * @todo Missing tests:
    * - Ensure opt out emails are not mailed
@@ -610,9 +609,9 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       // modify the filter to include only deceased recipient(s) that is Tagged
       $criteria['is_deceased'] = CRM_Utils_SQL_Select::fragment()->where("civicrm_contact.is_deceased = 1");
       $criteria['tagged_contact'] = CRM_Utils_SQL_Select::fragment()
-                                      ->join('civicrm_entity_tag', "INNER JOIN civicrm_entity_tag et ON et.entity_id = civicrm_contact.id AND et.entity_table = 'civicrm_contact'")
-                                      ->join('civicrm_tag', "INNER JOIN civicrm_tag t ON t.id = et.tag_id")
-                                      ->where("t.name = 'Tagged'");
+        ->join('civicrm_entity_tag', "INNER JOIN civicrm_entity_tag et ON et.entity_id = civicrm_contact.id AND et.entity_table = 'civicrm_contact'")
+        ->join('civicrm_tag', "INNER JOIN civicrm_tag t ON t.id = et.tag_id")
+        ->where("t.name = 'Tagged'");
     }
     else {
       $mailingRecipients = $this->callAPISuccess('MailingRecipients', 'get', array(

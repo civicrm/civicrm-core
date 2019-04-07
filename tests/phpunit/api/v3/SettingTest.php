@@ -158,7 +158,8 @@ class api_v3_SettingTest extends CiviUnitTestCase {
         'is_contact' => 0,
         'description' => NULL,
         'help_text' => NULL,
-        'on_change' => array(// list of callbacks
+        // list of callbacks
+        'on_change' => array(
           array(__CLASS__, '_testOnChange_onChangeExample'),
         ),
       ),
@@ -365,10 +366,9 @@ class api_v3_SettingTest extends CiviUnitTestCase {
    */
   public function testGetConfigSetting() {
     $settings = $this->callAPISuccess('setting', 'get', array(
-        'name' => 'defaultCurrency',
-        'sequential' => 1,
-      )
-    );
+      'name' => 'defaultCurrency',
+      'sequential' => 1,
+    ));
     $this->assertEquals('USD', $settings['values'][0]['defaultCurrency']);
   }
 
@@ -377,20 +377,17 @@ class api_v3_SettingTest extends CiviUnitTestCase {
    */
   public function testGetSetConfigSettingMultipleDomains() {
     $settings = $this->callAPISuccess('setting', 'create', array(
-        'defaultCurrency' => 'USD',
-        'domain_id' => $this->_currentDomain,
-      )
-    );
+      'defaultCurrency' => 'USD',
+      'domain_id' => $this->_currentDomain,
+    ));
     $settings = $this->callAPISuccess('setting', 'create', array(
-        'defaultCurrency' => 'CAD',
-        'domain_id' => $this->_domainID2,
-      )
-    );
+      'defaultCurrency' => 'CAD',
+      'domain_id' => $this->_domainID2,
+    ));
     $settings = $this->callAPISuccess('setting', 'get', array(
-        'return' => 'defaultCurrency',
-        'domain_id' => 'all',
-      )
-    );
+      'return' => 'defaultCurrency',
+      'domain_id' => 'all',
+    ));
     $this->assertEquals('USD', $settings['values'][$this->_currentDomain]['defaultCurrency']);
     $this->assertEquals('CAD', $settings['values'][$this->_domainID2]['defaultCurrency'],
       "second domain (id {$this->_domainID2} ) should be set to CAD. First dom was {$this->_currentDomain} & was USD");

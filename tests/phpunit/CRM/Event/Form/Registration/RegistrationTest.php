@@ -35,7 +35,6 @@ class CRM_Event_Form_Registration_RegistrationTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
-
   /**
    * CRM-19626 - Test minimum value configured for priceset.
    */

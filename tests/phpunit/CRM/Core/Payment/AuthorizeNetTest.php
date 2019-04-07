@@ -53,7 +53,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    * Test works but not both due to some form of caching going on in the SmartySingleton
    */
   public function testCreateSingleNowDated() {
-    $firstName = 'John_' . substr(sha1(rand()), 0, 7)  . uniqid();
+    $firstName = 'John_' . substr(sha1(rand()), 0, 7) . uniqid();
     $lastName = 'Smith_' . substr(sha1(rand()), 0, 7) . uniqid();
     $nameParams = array('first_name' => $firstName, 'last_name' => $lastName);
     $contactId = $this->individualCreate($nameParams);

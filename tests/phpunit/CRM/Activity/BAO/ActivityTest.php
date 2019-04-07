@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
     $this->prepareForACLs();
@@ -343,7 +344,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'caseId' => NULL,
       'context' => 'home',
       'activity_type_id' => NULL,
-      'activity_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled'), // for dashlet the Scheduled status is set by default
+      // for dashlet the Scheduled status is set by default
+      'activity_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled'),
       'offset' => 0,
       'rowCount' => 0,
       'sort' => NULL,
@@ -513,7 +515,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'caseId' => NULL,
       'context' => 'home',
       'activity_type_id' => NULL,
-      'activity_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled'), // for dashlet the Scheduled status is set by default
+      // for dashlet the Scheduled status is set by default
+      'activity_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled'),
       'offset' => 0,
       'rowCount' => 0,
       'sort' => NULL,
@@ -958,7 +961,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
           'count' => 2,
           'earliest' => strtotime('first day of january last year'),
           'latest' => strtotime('first day of january this year'),
-        ]
+        ],
       ],
     ];
   }
@@ -1040,7 +1043,8 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'caseId' => NULL,
       'context' => 'home',
       'activity_type_id' => NULL,
-      'activity_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled'), // for dashlet the Scheduled status is set by default
+    // for dashlet the Scheduled status is set by default
+      'activity_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled'),
       'offset' => 0,
       'rowCount' => 0,
       'sort' => NULL,
@@ -1238,7 +1242,6 @@ $text
     $this->assertEquals(1, count($sent), "Expected sent should a PEAR Error");
     $this->assertEquals(0, $success, "Expected success to be 0");
   }
-
 
   /**
    * @param int $phoneType (0=no phone, phone_type option group (1=fixed, 2=mobile)

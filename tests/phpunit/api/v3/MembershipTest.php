@@ -90,11 +90,11 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanup(array(
-        'civicrm_membership',
-        'civicrm_membership_payment',
-        'civicrm_membership_log',
-        'civicrm_uf_match',
-      ),
+      'civicrm_membership',
+      'civicrm_membership_payment',
+      'civicrm_membership_log',
+      'civicrm_uf_match',
+    ),
       TRUE
     );
     $this->membershipStatusDelete($this->_membershipStatusID);
@@ -137,8 +137,10 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * Test membership deletion and with the preserve contribution param.
    */
   public function testMembershipDeletePreserveContribution() {
-    $membershipID = $this->contactMembershipCreate($this->_params); //DELETE
-    $this->assertDBRowExist('CRM_Member_DAO_Membership', $membershipID); //DELETE
+    //DELETE
+    $membershipID = $this->contactMembershipCreate($this->_params);
+    //DELETE
+    $this->assertDBRowExist('CRM_Member_DAO_Membership', $membershipID);
     $ContributionCreate = $this->callAPISuccess('Contribution', 'create', array(
       'sequential' => 1,
       'financial_type_id' => "Member Dues",
@@ -387,7 +389,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals($result['source'], 'Payment');
     $this->assertEquals($result['is_override'], 1);
   }
-
 
   /**
    * Test civicrm_membership_get with proper params.
@@ -705,6 +706,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       $this->assertEquals(array('id', 'end_date'), array_keys($membership));
     }
   }
+
   ///////////////// civicrm_membership_create methods
 
   /**
@@ -1537,7 +1539,6 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
     $this->assertEquals('2009-01-21', $result['start_date']);
     $this->assertEquals('2010-01-20', $result['end_date']);
   }
-
 
   /**
    * Test that if dates are set they not over-ridden if id is passed in

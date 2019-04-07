@@ -218,6 +218,7 @@ class api_v3_JobTestCustomDataTest extends CiviUnitTestCase {
     );
     return $data;
   }
+
   /**
    * Test the batch merge does not bork on custom date fields.
    *

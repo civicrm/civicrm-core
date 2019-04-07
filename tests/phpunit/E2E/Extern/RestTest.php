@@ -96,104 +96,122 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
 
     // entity,action: omit apiKey, valid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "entity" => "Contact",
         "action" => "get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
       ),
-      1, // is_error
+      // is_error
+      1,
     );
 
     // entity,action: valid apiKey, valid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "entity" => "Contact",
         "action" => "get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
         "api_key" => self::getApiKey(),
       ),
-      0, // is_error
+      // is_error
+      0,
     );
 
     // entity,action: bad apiKey, valid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "entity" => "Contact",
         "action" => "get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
         "api_key" => 'garbage_' . self::getApiKey(),
       ),
-      1, // is_error
+      // is_error
+      1,
     );
 
     // entity,action: valid apiKey, invalid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "entity" => "Contactses",
         "action" => "get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
         "api_key" => self::getApiKey(),
       ),
-      1, // is_error
+      // is_error
+      1,
     );
 
     // q=civicrm/entity/action: omit apiKey, valid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "q" => "civicrm/contact/get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
       ),
-      1, // is_error
+      // is_error
+      1,
     );
 
     // q=civicrm/entity/action: valid apiKey, valid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "q" => "civicrm/contact/get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
         "api_key" => self::getApiKey(),
       ),
-      0, // is_error
+      // is_error
+      0,
     );
 
     // q=civicrm/entity/action: invalid apiKey, valid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "q" => "civicrm/contact/get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
         "api_key" => 'garbage_' . self::getApiKey(),
       ),
-      1, // is_error
+      // is_error
+      1,
     );
 
     // q=civicrm/entity/action: valid apiKey, invalid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "q" => "civicrm/contactses/get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
         "api_key" => self::getApiKey(),
       ),
-      1, // is_error
+      // is_error
+      1,
     );
 
     // q=civicrm/entity/action: valid apiKey, invalid entity+action
     // XXX Actually Ping is valid, no?
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "q" => "civicrm/ping",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
         "api_key" => self::getApiKey(),
       ),
-      0, // is_error
+      // is_error
+      0,
     );
 
     return $cases;

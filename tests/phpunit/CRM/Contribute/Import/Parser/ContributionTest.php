@@ -11,12 +11,14 @@
  */
 class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   protected $_tablesToTruncate = array();
+
   /**
    * Setup function.
    */
   public function setUp() {
     parent::setUp();
   }
+
   /**
    * Test import parser will add contribution and soft contribution each for different contact.
    *

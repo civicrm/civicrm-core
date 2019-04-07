@@ -79,8 +79,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'start_date' => '20120315',
         'end_date' => '20120615',
       ),
-      'role_id' => '1', // Attendee.
-      'status_id' => '8', // No-show.
+      // Attendee.
+      'role_id' => '1',
+      // No-show.
+      'status_id' => '8',
     );
 
     $this->fixtures['phonecall'] = array(
@@ -528,12 +530,15 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'end_date' => '',
       'end_frequency_interval' => '',
       'end_frequency_unit' => '',
-      'entity_status' => '', // participant status id
-      'entity_value' => '', // event type id
+      // participant status id
+      'entity_status' => '',
+      // event type id
+      'entity_value' => '',
       'group_id' => '',
       'is_active' => 1,
       'is_repeat' => '0',
-      'mapping_id' => 2, // event type
+      // event type
+      'mapping_id' => 2,
       'msg_template_id' => '',
       'recipient' => '',
       'recipient_listing' => '',
@@ -557,12 +562,15 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'end_date' => 'event_end_date',
       'end_frequency_interval' => '3',
       'end_frequency_unit' => 'month',
-      'entity_status' => '', // participant status id
-      'entity_value' => '', // event type id
+      // participant status id
+      'entity_status' => '',
+      // event type id
+      'entity_value' => '',
       'group_id' => '',
       'is_active' => 1,
       'is_repeat' => '1',
-      'mapping_id' => 2, // event type
+      // event type
+      'mapping_id' => 2,
       'msg_template_id' => '',
       'recipient' => '',
       'recipient_listing' => '',
@@ -709,11 +717,16 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     // Some tokens - short as subject has 128char limit in DB.
     $someTokensTmpl = implode(';;', array(
-      '{contact.display_name}', // basic contact token
-      '{contact.gender}', // funny legacy contact token
-      '{contact.gender_id}', // funny legacy contact token
-      '{domain.name}', // domain token
-      '{activity.activity_type}', // action-scheduler token
+      // basic contact token
+      '{contact.display_name}',
+      // funny legacy contact token
+      '{contact.gender}',
+      // funny legacy contact token
+      '{contact.gender_id}',
+      // domain token
+      '{domain.name}',
+      // action-scheduler token
+      '{activity.activity_type}',
     ));
     // Further tokens can be tested in the body text/html.
     $manyTokensTmpl = implode(';;', array(
@@ -1051,7 +1064,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     ));
   }
 
-
   /**
    * CRM-21675: Support parent and smart group in 'Limit to' field
    */
@@ -1306,7 +1318,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       //),
     ));
   }
-
 
   /**
    * Test membership end date email.
@@ -1573,9 +1584,12 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
     $this->assertAPISuccess($result);
 
-    $actionScheduleBefore = $this->fixtures['sched_membership_end_2week'];           // Send email 2 weeks before end_date
-    $actionScheduleOn = $this->fixtures['sched_on_membership_end_date'];             // Send email on end_date/expiry date
-    $actionScheduleAfter = $this->fixtures['sched_after_1day_membership_end_date'];  // Send email 1 day after end_date/grace period
+    // Send email 2 weeks before end_date
+    $actionScheduleBefore = $this->fixtures['sched_membership_end_2week'];
+    // Send email on end_date/expiry date
+    $actionScheduleOn = $this->fixtures['sched_on_membership_end_date'];
+    // Send email 1 day after end_date/grace period
+    $actionScheduleAfter = $this->fixtures['sched_after_1day_membership_end_date'];
     $actionScheduleBefore['entity_value'] = $actionScheduleOn['entity_value'] = $actionScheduleAfter['entity_value'] = $membership->membership_type_id;
     foreach (array('actionScheduleBefore', 'actionScheduleOn', 'actionScheduleAfter') as $value) {
       $$value = CRM_Core_BAO_ActionSchedule::add($$value);
@@ -1622,17 +1636,20 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->assertApproxEquals(
       strtotime('2012-06-01 01:00:00'),
       strtotime(CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleBefore->id, 'action_date_time', 'action_schedule_id', TRUE)),
-      3 // Variation in test execution time.
+      // Variation in test execution time.
+      3
     );
     $this->assertApproxEquals(
       strtotime('2012-06-15 00:00:00'),
       strtotime(CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleOn->id, 'action_date_time', 'action_schedule_id', TRUE)),
-      3 // Variation in test execution time.
+      // Variation in test execution time.
+      3
     );
     $this->assertApproxEquals(
       strtotime('2012-06-16 01:00:00'),
       strtotime(CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleAfter->id, 'action_date_time', 'action_schedule_id', TRUE)),
-      3 // Variation in test execution time.
+      // Variation in test execution time.
+      3
     );
 
     //extend MED to 2 weeks after the current MED (that may signifies as membership renewal activity)

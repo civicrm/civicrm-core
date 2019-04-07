@@ -10,6 +10,7 @@ class CRM_Core_Page_RedirectTest extends CiviUnitTestCase {
    *
    * @return array
    */
+
   /**
    * @return array
    */

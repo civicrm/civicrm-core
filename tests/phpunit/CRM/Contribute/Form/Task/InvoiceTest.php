@@ -33,9 +33,7 @@
  * @group headless
  */
 class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
-  /**
-   * Assume empty database with just civicrm_data.
-   */
+
   protected $_individualId;
 
   /**

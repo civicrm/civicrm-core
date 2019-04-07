@@ -187,7 +187,8 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     //Create tell a friend for event
     $daoTellAFriend = new CRM_Friend_DAO_Friend();
     $daoTellAFriend->entity_table = 'civicrm_event';
-    $daoTellAFriend->entity_id = $daoEvent->id; // join with event
+    // join with event
+    $daoTellAFriend->entity_id = $daoEvent->id;
     $daoTellAFriend->title = 'Testing tell a friend';
     $daoTellAFriend->is_active = 1;
     $daoTellAFriend->save();

@@ -94,7 +94,8 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'name' => uniqid(),
       'title' => 'Parent Group B',
       'description' => 'Parent Group Two',
-      'is_active' => 0, // disable
+      // disable
+      'is_active' => 0,
     ));
     $group2 = CRM_Contact_BAO_Group::create($params);
 

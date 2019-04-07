@@ -30,6 +30,7 @@
  * @group headless
  */
 class CRM_Financial_Page_AjaxBatchSummaryTest extends CiviUnitTestCase {
+
   /**
    * Test the makeBatchSummary function.
    *

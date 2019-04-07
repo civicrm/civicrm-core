@@ -32,7 +32,16 @@
  */
 trait CRMTraits_ACL_PermissionTrait {
 
+  /**
+   * ContactID of allowed Contact
+   * @var int
+   */
   protected $allowedContactId = 0;
+
+  /**
+   * Array of allowed contactIds
+   * @var array
+   */
   protected $allowedContacts = [];
 
   /**

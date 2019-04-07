@@ -33,7 +33,6 @@ class api_v3_SurveyRespondantTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $params;
 
-
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);

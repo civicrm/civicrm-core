@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
   }

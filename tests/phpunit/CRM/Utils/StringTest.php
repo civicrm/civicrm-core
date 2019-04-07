@@ -131,7 +131,8 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    * @return array
    */
   public function booleanDataProvider() {
-    $cases = array(); // array(0 => $input, 1 => $expectedOutput)
+    // array(0 => $input, 1 => $expectedOutput)
+    $cases = array();
     $cases[] = array(TRUE, TRUE);
     $cases[] = array(FALSE, FALSE);
     $cases[] = array(1, TRUE);

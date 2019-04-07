@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Extension_Manager_SearchTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
     //if (class_exists('test_extension_manager_searchtest')) {

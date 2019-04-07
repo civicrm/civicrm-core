@@ -8,7 +8,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class TokenProcessorTest extends \CiviUnitTestCase {
 
   /**
-   * @var EventDispatcher
+   * @var \Symfony\Component\EventDispatcher\EventDispatcher
    */
   protected $dispatcher;
 
@@ -154,7 +154,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     );
 
     $expectText = array(
-      0 => 'Good morning, What. #0123 is a good number. Trickster {contact.display_name}. Bye!' ,
+      0 => 'Good morning, What. #0123 is a good number. Trickster {contact.display_name}. Bye!',
       1 => 'Good morning, Who. #0004 is a good number. Trickster {contact.display_name}. Bye!',
       2 => 'Good morning, Darth Vader. #0010 is a good number. Trickster {contact.display_name}. Bye!',
     );
@@ -168,7 +168,8 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       $rowCount++;
     }
     $this->assertEquals(3, $rowCount);
-    $this->assertEquals(0, $this->counts['onListTokens']); // This may change in the future.
+    // This may change in the future.
+    $this->assertEquals(0, $this->counts['onListTokens']);
     $this->assertEquals(1, $this->counts['onEvalTokens']);
   }
 

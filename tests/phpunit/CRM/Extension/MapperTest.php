@@ -9,17 +9,32 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
   /**
    * @var string
    */
-  protected $basedir, $basedir2;
+  protected $basedir;
+
+  /**
+   * @var string
+   */
+  protected $basedir2;
 
   /**
    * @var CRM_Extension_Container_Interface
    */
-  protected $container, $containerWithSlash;
+  protected $container;
+
+  /**
+   * @var CRM_Extension_Container_Interface
+   */
+  protected $containerWithSlash;
 
   /**
    * @var CRM_Extension_Mapper
    */
-  protected $mapper, $mapperWithSlash;
+  protected $mapper;
+
+  /**
+   * @var CRM_Extension_Mapper
+   */
+  protected $mapperWithSlash;
 
   public function setUp() {
     parent::setUp();

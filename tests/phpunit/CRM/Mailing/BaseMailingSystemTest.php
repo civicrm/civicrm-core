@@ -76,7 +76,8 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
   public function tearDown() {
     $this->_mut->stop();
     CRM_Utils_Hook::singleton()->reset();
-    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0; // DGW
+    // DGW
+    CRM_Mailing_BAO_MailingJob::$mailsProcessed = 0;
     parent::tearDown();
   }
 
@@ -125,9 +126,11 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertEquals('plain', $message->body->subType);
       $this->assertRegExp(
         ";" .
-        "Sample Header for TEXT formatted content.\n" . // Default header
+        // Default header
+        "Sample Header for TEXT formatted content.\n" .
         "BEWARE children need regular infusions of toys. Santa knows your .*\\. There is no http.*civicrm/mailing/optout.*\\.\n" .
-        "to unsubscribe: http.*civicrm/mailing/optout" . // Default footer
+        // Default footer
+        "to unsubscribe: http.*civicrm/mailing/optout" .
         ";",
         $message->body->text
       );
@@ -156,10 +159,13 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertEquals('html', $htmlPart->subType);
       $this->assertRegExp(
         ";" .
-        "Sample Header for HTML formatted content.\n" . // Default header
+        // Default header
+        "Sample Header for HTML formatted content.\n" .
         // FIXME: CiviMail puts double " after hyperlink!
-        "<p>You can go to <a href=\"http://example.net/first\\?cs=[0-9a-f_]+\"\"?>Google</a> or <a href=\"http.*civicrm/mailing/optout.*\">opt out</a>.</p>\n" . // body_html
-        "Sample Footer for HTML formatted content" . // Default footer
+        // body_html
+        "<p>You can go to <a href=\"http://example.net/first\\?cs=[0-9a-f_]+\"\"?>Google</a> or <a href=\"http.*civicrm/mailing/optout.*\">opt out</a>.</p>\n" .
+        // Default footer
+        "Sample Footer for HTML formatted content" .
         ".*\n" .
         "<img src=\".*extern/open.php.*\"" .
         ";",
@@ -169,15 +175,18 @@ abstract class CRM_Mailing_BaseMailingSystemTest extends CiviUnitTestCase {
       $this->assertEquals('plain', $textPart->subType);
       $this->assertRegExp(
         ";" .
-        "Sample Header for TEXT formatted content.\n" . // Default header
-        "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" . //  body_html, filtered
+        // Default header
+        "Sample Header for TEXT formatted content.\n" .
+        //  body_html, filtered
+        "You can go to Google \\[1\\] or opt out \\[2\\]\\.\n" .
         "\n" .
         "Links:\n" .
         "------\n" .
         "\\[1\\] http://example.net/first\\?cs=[0-9a-f_]+\n" .
         "\\[2\\] http.*civicrm/mailing/optout.*\n" .
         "\n" .
-        "to unsubscribe: http.*civicrm/mailing/optout" . // Default footer
+        // Default footer
+        "to unsubscribe: http.*civicrm/mailing/optout" .
         ";",
         $textPart->text
       );

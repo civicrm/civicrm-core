@@ -140,8 +140,8 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->ids['contact'] = $this->_contactId = $this->individualCreate(array(
       'first_name' => 'Donald',
       'last_name' => 'Duck',
-      'email' => 'the-don@duckville.com,
-    '));
+      'email' => 'the-don@duckville.com',
+    ));
     $contribution = $this->callAPISuccess('contribution', 'create', array_merge($this->_contributionParams, array('invoice_id' => 'abc')));
     $this->_contributionId = $contribution['id'];
     $this->_setUpMembershipObjects();
@@ -273,11 +273,10 @@ class CRM_Core_Payment_BaseIPNTest extends CiviUnitTestCase {
     $this->IPN->loadObjects($this->input, $this->ids, $this->objects, FALSE, $this->_processorId);
     $this->IPN->sendMail($this->input, $this->ids, $this->objects, $values, FALSE, FALSE);
     $mut->checkMailLog(array(
-        'Thank you for your participation',
-        'Annual CiviCRM meet',
-        'Mr. Anthony Anderson II',
-      )
-    );
+      'Thank you for your participation',
+      'Annual CiviCRM meet',
+      'Mr. Anthony Anderson II',
+    ));
     $mut->stop();
   }
 

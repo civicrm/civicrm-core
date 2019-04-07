@@ -71,11 +71,13 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   /**
    * Create membership type using given organization id.
    * @param $organizationId
+   * @param bool $withRelationship
    * @return array|int
    */
   private function createMembershipType($organizationId, $withRelationship = FALSE) {
     $membershipType = $this->callAPISuccess('MembershipType', 'create', array(
-      'domain_id' => 1, //Default domain ID
+      //Default domain ID
+      'domain_id' => 1,
       'member_of_contact_id' => $organizationId,
       'financial_type_id' => "Member Dues",
       'duration_unit' => "year",
@@ -111,7 +113,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     // Create relationship between organization and individual contact
     $this->callAPISuccess('Relationship', 'create', array(
-      'relationship_type_id' => 5, // Employer of relationship
+      // Employer of relationship
+      'relationship_type_id' => 5,
       'contact_id_a'         => $contactId,
       'contact_id_b'         => $organizationId,
       'is_active'            => 1,
@@ -396,7 +399,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
-
   /**
    * Get the contribution.
    * page id from the membership record
@@ -488,7 +490,6 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $this->membershipDelete($membershipId);
     $this->contactDelete($contactId);
   }
-
 
   /**
    * Checkup sort name function.

@@ -41,9 +41,6 @@
  */
 class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
-  /**
-   * Assume empty database with just civicrm_data.
-   */
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
@@ -472,7 +469,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'num_terms' => '1',
       'source' => '',
       'total_amount' => $this->formatMoneyInput(1234.56),
-      'financial_type_id' => '2', //Member dues, see data.xml
+      //Member dues, see data.xml
+      'financial_type_id' => '2',
       'soft_credit_type_id' => '',
       'soft_credit_contact_id' => '',
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
@@ -481,7 +479,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'cvv2' => '123',
       'credit_card_exp_date' => array(
         'M' => '9',
-        'Y' => '2024', // TODO: Future proof
+        // TODO: Future proof
+        'Y' => '2024',
       ),
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
@@ -570,7 +569,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'receive_date' => date('Y-m-d', time()) . ' 20:36:00',
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
-      'financial_type_id' => '2', //Member dues, see data.xml
+      //Member dues, see data.xml
+      'financial_type_id' => '2',
       'payment_processor_id' => $this->_paymentProcessorID,
     );
     $form->_contactID = $this->_individualId;
@@ -618,7 +618,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'total_amount' => 25,
       'receive_date' => date('Y-m-d', time()) . ' 20:36:00',
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
-      'financial_type_id' => '2', //Member dues, see data.xml
+      //Member dues, see data.xml
+      'financial_type_id' => '2',
       'payment_processor_id' => $this->_paymentProcessorID,
     );
     $form->_contactID = $this->_individualId;
@@ -668,7 +669,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'total_amount' => $this->formatMoneyInput($partiallyPaidAmount),
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Partially paid'),
-      'financial_type_id' => '2', //Member dues, see data.xml
+      //Member dues, see data.xml
+      'financial_type_id' => '2',
       'payment_processor_id' => $this->_paymentProcessorID,
     );
     $form->_contactID = $this->_individualId;
@@ -959,26 +961,25 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
     ), 1);
     $mut->checkMailLog(array(
-        '===========================================================
+      '===========================================================
 Billing Name and Address
 ===========================================================
 Test
 10 Test St
 Test, AR 90210
 US',
-        '===========================================================
+      '===========================================================
 Membership Information
 ===========================================================
 Membership Type: AnnualFixed
 Membership Start Date: ',
-        '===========================================================
+      '===========================================================
 Credit Card Information
 ===========================================================
 Visa
 ************1111
 Expires: ',
-      )
-    );
+    ));
     $mut->stop();
 
   }
@@ -1124,7 +1125,8 @@ Expires: ',
       'num_terms' => '1',
       'source' => '',
       'total_amount' => '77.00',
-      'financial_type_id' => '2', //Member dues, see data.xml
+      //Member dues, see data.xml
+      'financial_type_id' => '2',
       'soft_credit_type_id' => 11,
       'soft_credit_contact_id' => '',
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
@@ -1134,7 +1136,8 @@ Expires: ',
       'cvv2' => '123',
       'credit_card_exp_date' => array(
         'M' => '9',
-        'Y' => '2019', // TODO: Future proof
+        // TODO: Future proof
+        'Y' => '2019',
       ),
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
@@ -1177,26 +1180,24 @@ Expires: ',
     $priceFieldID = $priceField['id'];
     // create two price options, each represent a membership type of amount 20 and 10 respectively
     $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
-        'price_set_id' => $priceSetID,
-        'price_field_id' => $priceField['id'],
-        'label' => 'Long Haired Goat',
-        'amount' => 20,
-        'financial_type_id' => 'Donation',
-        'membership_type_id' => 15,
-        'membership_num_terms' => 1,
-      )
-    );
+      'price_set_id' => $priceSetID,
+      'price_field_id' => $priceField['id'],
+      'label' => 'Long Haired Goat',
+      'amount' => 20,
+      'financial_type_id' => 'Donation',
+      'membership_type_id' => 15,
+      'membership_num_terms' => 1,
+    ));
     $pfvIDs = array($priceFieldValue['id'] => 1);
     $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
-        'price_set_id' => $priceSetID,
-        'price_field_id' => $priceField['id'],
-        'label' => 'Shoe-eating Goat',
-        'amount' => 10,
-        'financial_type_id' => 'Donation',
-        'membership_type_id' => 35,
-        'membership_num_terms' => 2,
-      )
-    );
+      'price_set_id' => $priceSetID,
+      'price_field_id' => $priceField['id'],
+      'label' => 'Shoe-eating Goat',
+      'amount' => 10,
+      'financial_type_id' => 'Donation',
+      'membership_type_id' => 35,
+      'membership_num_terms' => 2,
+    ));
     $pfvIDs[$priceFieldValue['id']] = 1;
 
     // register for both of these memberships via backoffice membership form submission
@@ -1320,7 +1321,8 @@ Expires: ',
       'receive_date' => date('Y-m-d', time()) . ' 20:36:00',
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
-      'financial_type_id' => 2, //Member dues, see data.xml
+      //Member dues, see data.xml
+      'financial_type_id' => 2,
       'payment_processor_id' => $this->_paymentProcessorID,
     );
     $form->_contactID = $this->_individualId;

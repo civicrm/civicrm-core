@@ -51,7 +51,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->quickCleanup([
       'civicrm_relationship_type',
       'civicrm_relationship',
-      'civicrm_contact'
+      'civicrm_contact',
     ]);
 
     parent::tearDown();
@@ -120,7 +120,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
 
     $options = CRM_Contact_BAO_Relationship::buildRelationshipTypeOptions([
       'relationship_id' => (string) $relationship['id'],
-       'contact_id' => $individual['id']
+      'contact_id' => $individual['id'],
     ]);
 
     // for this relationship only individual=>organization is possible
@@ -132,7 +132,7 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     $this->assertNotContains($personToPersonReverseType, $options);
 
     $options = CRM_Contact_BAO_Relationship::buildRelationshipTypeOptions([
-      'contact_id' => $individual['id']
+      'contact_id' => $individual['id'],
     ]);
 
     // for this result we only know that "A" must be an individual

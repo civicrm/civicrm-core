@@ -101,7 +101,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       $date = CRM_Utils_Date::relativeToAbsolute($relativeString, 'fiscal_year');
       $this->assertEquals([
         'from' => $fiscalYearStartYear . '0701',
-        'to' => ($fiscalYearStartYear + 1) . '0630'
+        'to' => ($fiscalYearStartYear + 1) . '0630',
       ], $date, 'relative term is ' . $relativeString);
 
       $fiscalYearStartYear--;
@@ -182,7 +182,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       $offset = (substr($relativeString, -1, 1)) - 1;
       $this->assertEquals([
         'from' => $lastYear - $offset . '0101',
-        'to' => $lastYear  . '1231',
+        'to' => $lastYear . '1231',
       ], $date, 'relative term is ' . $relativeString);
     }
   }
@@ -205,7 +205,7 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
       $offset = (substr($relativeString, -1, 1));
       $this->assertEquals([
         'from' => $lastFiscalYearEnd - $offset . '0701',
-        'to' => $lastFiscalYearEnd  . '0630',
+        'to' => $lastFiscalYearEnd . '0630',
       ], $date, 'relative term is ' . $relativeString);
     }
   }

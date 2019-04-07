@@ -34,9 +34,6 @@
  */
 class CRM_Contribute_Form_Task_PDFLetterCommonTest extends CiviUnitTestCase {
 
-  /**
-   * Assume empty database with just civicrm_data.
-   */
   protected $_individualId;
 
   protected $_docTypes = NULL;

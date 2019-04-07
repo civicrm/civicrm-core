@@ -4,6 +4,7 @@
  * Class test_extension_manager_reporttest
  */
 class test_extension_manager_reporttest extends CRM_Core_Report {
+
   /**
    * Class constructor.
    */

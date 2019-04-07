@@ -63,12 +63,10 @@ class api_v3_CustomApiTest extends CiviUnitTestCase {
     $this->assertEquals('xyzabx2017-01-01 00:00:00', $result['id']);
     $this->assertEquals('xyzabx2017-01-01 00:00:00', $result['id']);
     $this->assertEquals(array(
-        'contact_identifier' => 'xyz',
-        'mailing_identifier' => 'abx',
-        'mailing_identifier.name' => 'CiviMail',
-      ),
-      reset($result['values'])
-    );
+      'contact_identifier' => 'xyz',
+      'mailing_identifier' => 'abx',
+      'mailing_identifier.name' => 'CiviMail',
+    ), reset($result['values']));
   }
 
   /**

@@ -40,6 +40,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
   public function tearDown() {
 
   }
+
   /**
    * Test the query from the selector class is consistent with the dataset expectation.
    *
@@ -147,11 +148,11 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
     // build cache key and use to it to fetch prev-next cache record
     $cacheKey = 'civicrm search ' . $key;
     $contacts = CRM_Utils_SQL_Select::from('civicrm_prevnext_cache')
-                  ->select(['entity_id1', 'cacheKey'])
-                  ->where("cacheKey = @key")
-                  ->param('key', $cacheKey)
-                  ->execute()
-                  ->fetchAll();
+      ->select(['entity_id1', 'cacheKey'])
+      ->where("cacheKey = @key")
+      ->param('key', $cacheKey)
+      ->execute()
+      ->fetchAll();
     $this->assertEquals(1, count($contacts));
     // check the prevNext record matches
     $expectedEntry = [
@@ -293,13 +294,15 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
    * Test the contact ID query does not fail on country search.
    */
   public function testContactIDQuery() {
-    $params = [[
-      0 => 'country-1',
-      1 => '=',
-      2 => '1228',
-      3 => 1,
-      4 => 0,
-    ]];
+    $params = [
+      [
+        0 => 'country-1',
+        1 => '=',
+        2 => '1228',
+        3 => 1,
+        4 => 0,
+      ],
+    ];
 
     $searchOBJ = new CRM_Contact_Selector(NULL);
     $searchOBJ->contactIDQuery($params, '1_u');
@@ -325,13 +328,15 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
     $selector = new CRM_Contact_Selector(
       'CRM_Contact_Selector',
       ['email' => ['IS NOT NULL' => 1]],
-      [[
-        0 => 'email-' . $locationType->id,
-        1 => 'IS NOT NULL',
-        2 => NULL,
-        3 => 1,
-        4 => 0,
-      ]],
+      [
+        [
+          0 => 'email-' . $locationType->id,
+          1 => 'IS NOT NULL',
+          2 => NULL,
+          3  => 1,
+          4 => 0,
+        ],
+      ],
       [
         'contact_type' => 1,
         'contact_sub_type' => 1,
@@ -380,23 +385,30 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
       'IN' => ['IN' => ['Adam']],
     ];
     $filtersByWhereClause = [
-      'IS NOT NULL' => '( contact_a.first_name IS NOT NULL )', // doesn't matter
-      '=' => "( contact_a.first_name = 'Adam' )", // case sensitive check
-      'LIKE' => "( contact_a.first_name LIKE '%Ad%' )", // case insensitive check
-      'RLIKE' => "(  contact_a.first_name RLIKE BINARY '^A[a-z]{3}$'  )", // case sensitive check
-      'IN' => '( contact_a.first_name IN ("Adam") )', // case sensitive check
+      // doesn't matter
+      'IS NOT NULL' => '( contact_a.first_name IS NOT NULL )',
+      // case sensitive check
+      '=' => "( contact_a.first_name = 'Adam' )",
+      // case insensitive check
+      'LIKE' => "( contact_a.first_name LIKE '%Ad%' )",
+      // case sensitive check
+      'RLIKE' => "(  contact_a.first_name RLIKE BINARY '^A[a-z]{3}$'  )",
+      // case sensitive check
+      'IN' => '( contact_a.first_name IN ("Adam") )',
     ];
     foreach ($filters as $op => $filter) {
       $selector = new CRM_Contact_Selector(
         'CRM_Contact_Selector',
         ['first_name' => [$op => $filter]],
-        [[
-          0 => 'first_name',
-          1 => $op,
-          2 => $filter,
-          3 => 1,
-          4 => 0,
-        ]],
+        [
+          [
+            0 => 'first_name',
+            1 => $op,
+            2 => $filter,
+            3 => 1,
+            4 => 0,
+          ],
+        ],
         [],
         CRM_Core_Action::NONE,
         NULL,
@@ -419,13 +431,15 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
    */
   public function testSelectorQueryOrderByCustomField() {
     //Search for any params.
-    $params = [[
-      0 => 'country-1',
-      1 => '=',
-      2 => '1228',
-      3 => 1,
-      4 => 0,
-    ]];
+    $params = [
+      [
+        0 => 'country-1',
+        1 => '=',
+        2 => '1228',
+        3 => 1,
+        4 => 0,
+      ],
+    ];
 
     //Create a test custom group and field.
     $customGroup = $this->callAPISuccess('CustomGroup', 'create', array(
@@ -499,13 +513,15 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
     $selector = new CRM_Contact_Selector(
       'CRM_Contact_Selector',
       ['custom_' . $createdField['id'] => ['IS NOT EMPTY' => 1]],
-      [[
-        0 => 'custom_' . $createdField['id'],
-        1 => 'IS NOT NULL',
-        2 => 1,
-        3 => 1,
-        4 => 0,
-      ]],
+      [
+        [
+          0 => 'custom_' . $createdField['id'],
+          1 => 'IS NOT NULL',
+          2 => 1,
+          3 => 1,
+          4 => 0,
+        ],
+      ],
       [],
       CRM_Core_Action::NONE,
       NULL,

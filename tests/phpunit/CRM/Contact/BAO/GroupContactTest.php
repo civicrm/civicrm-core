@@ -192,7 +192,6 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'delete', array('id' => $childSmartGroupContact));
   }
 
-
   /**
    *  CRM-19698: Test case for combine contact search in regular and smart group
    */

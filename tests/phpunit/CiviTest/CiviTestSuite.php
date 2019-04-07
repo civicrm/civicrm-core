@@ -119,7 +119,8 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
     }
 
     //  Pass 1:  Check all *Tests.php files
-    $addTests = array(); // array(callable)
+    // array(callable)
+    $addTests = array();
     //echo "start Pass 1 on {$dirInfo->getRealPath()}\n";
     $dir = new DirectoryIterator($dirInfo->getRealPath());
     foreach ($dir as $fileInfo) {
@@ -155,7 +156,8 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
     }
 
     //  Pass 2:  Scan all subdirectories
-    $addAllTests = array(); // array(array(0 => $suite, 1 => $file, 2 => SplFileinfo))
+    // array(array(0 => $suite, 1 => $file, 2 => SplFileinfo))
+    $addAllTests = array();
     $dir = new DirectoryIterator($dirInfo->getRealPath());
     //echo "start Pass 2 on {$dirInfo->getRealPath()}\n";
     foreach ($dir as $fileInfo) {
@@ -176,7 +178,8 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
 
     //  Pass 3:  Check all *Test.php files in this directory
     //echo "start Pass 3 on {$dirInfo->getRealPath()}\n";
-    $addTestSuites = array(); // array(className)
+    // array(className)
+    $addTestSuites = array();
     $dir = new DirectoryIterator($dirInfo->getRealPath());
     foreach ($dir as $fileInfo) {
       if ($fileInfo->isReadable() && $fileInfo->isFile()

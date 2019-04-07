@@ -9,7 +9,7 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
   /**
    * @var array
    */
-  var $noise;
+  public $noise;
 
   public function setUp() {
     parent::setUp();
@@ -108,7 +108,8 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
       'external_identifier' => '1',
     ));
 
-    $this->individualCreate(array('email' => 'ignore2@example.com')); // more noise!
+    // more noise!
+    $this->individualCreate(array('email' => 'ignore2@example.com'));
 
     // update the record by matching first/last name
     $result2 = $this->callAPISuccess('contact', 'create', array(
@@ -156,7 +157,8 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
       'external_identifier' => '2',
     ));
 
-    $this->individualCreate(array('email' => 'ignore2@example.com')); // more noise!
+    // more noise!
+    $this->individualCreate(array('email' => 'ignore2@example.com'));
 
     // Try to update - but fail due to ambiguity
     $result3 = $this->callAPIFailure('contact', 'create', array(
@@ -239,7 +241,8 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
     $this->assertEquals($createEmailValues[0]['id'], $updateEmailValues[0]['id']);
     $this->assertEquals($createEmailValues[0]['id'], $getValues[0]['id']);
     $this->assertEquals('j1-b@example.com', $getValues[0]['email']);
-    $this->assertEquals('The Dude abides.', $getValues[0]['signature_text']); // preserved from original creation; proves that we updated existing record
+    // preserved from original creation; proves that we updated existing record
+    $this->assertEquals('The Dude abides.', $getValues[0]['signature_text']);
 
     // The second email (j2@example.com) is deleted because contact_id+location_type_id doesn't appear in new list.
     // The third email (j3@example.com) is inserted (new ID#) because it doesn't match an existing contact_id+location_type_id.
@@ -324,7 +327,8 @@ class CRM_Utils_API_MatchOptionTest extends CiviUnitTestCase {
     $this->assertEquals($createAddressValues[0]['id'], $updateAddressValues[0]['id']);
     $this->assertEquals($createAddressValues[0]['id'], $getValues[0]['id']);
     $this->assertEquals('j1-b Example Ave', $getValues[0]['street_address']);
-    $this->assertEquals('The Dude abides.', $getValues[0]['supplemental_address_1']); // preserved from original creation; proves that we updated existing record
+    // preserved from original creation; proves that we updated existing record
+    $this->assertEquals('The Dude abides.', $getValues[0]['supplemental_address_1']);
 
     // The second street_address (j2 Example Ave) is deleted because contact_id+location_type_id doesn't appear in new list.
     // The third street_address (j3 Example Ave) is inserted (new ID#) because it doesn't match an existing contact_id+location_type_id.

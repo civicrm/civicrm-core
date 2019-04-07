@@ -559,8 +559,8 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'case/detail',
       'fields' => ['subject' => 1, 'client_sort_name' => 1],
-       'order_bys' => [
-         1 => [
+      'order_bys' => [
+        1 => [
           'column' => 'case_type_title',
           'order' => 'ASC',
           'section' => '1',
@@ -844,11 +844,11 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ));
 
     foreach (array(
-               $addedToBothIndividualID,
-               $removedFromBothIndividualID,
-               $addedToSmartGroupRemovedFromOtherIndividualID,
-               $removedFromSmartGroupAddedToOtherIndividualID,
-             ) as $contactID) {
+      $addedToBothIndividualID,
+      $removedFromBothIndividualID,
+      $addedToSmartGroupRemovedFromOtherIndividualID,
+      $removedFromSmartGroupAddedToOtherIndividualID,
+    ) as $contactID) {
       $this->contributionCreate(array(
         'contact_id' => $contactID,
         'invoice_id' => '',
@@ -1083,7 +1083,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
         'financial_type_id' => '1',
         'receive_date' => '1',
         'total_amount' => '1',
-       ],
+      ],
       'order_bys' => [['column' => 'sort_name', 'order' => 'ASC', 'section' => '1']],
       'options' => array('metadata' => array('sql')),
     ));
@@ -1219,7 +1219,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'fields' => [
         'amount_1' => '1',
         'soft_id' => '1',
-       ],
+      ],
     ));
     $values = $rows['values'][0];
     $this->assertEquals(100.00, $values['civicrm_contribution_soft_amount_1_sum'], "Total commited should be $100");

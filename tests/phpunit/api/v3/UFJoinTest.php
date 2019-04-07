@@ -33,7 +33,10 @@
  * @group headless
  */
 class api_v3_UFJoinTest extends CiviUnitTestCase {
-  // ids from the uf_group_test.xml fixture
+  /**
+   * ids from the uf_group_test.xml fixture
+   * @var int
+   */
   protected $_ufGroupId = 11;
   protected $_ufFieldId;
   protected $_contactId = 69;
@@ -96,7 +99,6 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
       $this->assertEquals($value['uf_group_id'], $this->_ufGroupId);
     }
   }
-
 
   public function testUFJoinEditWrongParamsType() {
     $params = 'a string';

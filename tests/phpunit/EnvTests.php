@@ -11,6 +11,7 @@
  * (eg "MyFirstTest::testFoo").
  */
 class EnvTests extends \PHPUnit_Framework_TestSuite {
+
   /**
    * @return \EnvTests
    */

@@ -112,7 +112,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $createResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->id = $createResult['id'];
     $getParams = array(
-      'amount' => '' . $this->testAmount, // 3456
+      // 3456
+      'amount' => '' . $this->testAmount,
       'currency' => 'NZD',
       'financial_type_id' => 1,
     );
@@ -132,7 +133,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create'));
     $this->assertEquals(12, $result['values']['start_date']['type']);
   }
-
 
   /**
    * Test form submission with basic price set.
@@ -438,13 +438,11 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertCount(1, $msgs);
 
     $mut->checkMailLog(array(
-         'Membership Type: General',
-         'Gruffier',
-      ),
-      array(
-        'Amount',
-      )
-    );
+      'Membership Type: General',
+      'Gruffier',
+    ), array(
+      'Amount',
+    ));
     $mut->stop();
     $mut->clearMessages();
   }
@@ -503,7 +501,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     $this->assertEquals($membership['contact_id'], $contributions['values'][$membershipPayment['contribution_id']]['contact_id']);
   }
-
 
   /**
    * Test submit with a membership block in place.
@@ -1277,23 +1274,21 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $membership = $this->callAPISuccessGetSingle('membership', array('id' => $membershipPayment['membership_id']));
     //renew it with processor setting completed - should extend membership
     $submitParams = array_merge($submitParams, array(
-        'contact_id' => $contribution['contact_id'],
-        'is_recur' => 1,
-        'frequency_interval' => 1,
-        'frequency_unit' => $this->params['recur_frequency_unit'],
-      )
-    );
+      'contact_id' => $contribution['contact_id'],
+      'is_recur' => 1,
+      'frequency_interval' => 1,
+      'frequency_unit' => $this->params['recur_frequency_unit'],
+    ));
 
     $dummyPP->setDoDirectPaymentResult(array('payment_status_id' => 2));
     $this->callAPISuccess('contribution_page', 'submit', $submitParams);
     $newContribution = $this->callAPISuccess('contribution', 'getsingle', array(
-        'id' => array(
-          'NOT IN' => array($contribution['id']),
-        ),
-        'contribution_page_id' => $this->_ids['contribution_page'],
-        'contribution_status_id' => 2,
-      )
-    );
+      'id' => array(
+        'NOT IN' => array($contribution['id']),
+      ),
+      'contribution_page_id' => $this->_ids['contribution_page'],
+      'contribution_status_id' => 2,
+    ));
     $line = $this->callAPISuccess('line_item', 'getsingle', array('contribution_id' => $newContribution['id']));
     $this->assertEquals('civicrm_membership', $line['entity_table']);
     $this->assertEquals($membership['id'], $line['entity_id']);
@@ -1338,7 +1333,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $recur = $this->callAPISuccess('contribution_recur', 'get', array());
     $this->assertEmpty($recur['count']);
   }
-
 
   /**
    * Set up membership contribution page.
@@ -1502,34 +1496,31 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     }
     if (empty($this->_ids['price_field_value'])) {
       $this->callAPISuccess('price_field_value', 'create', array(
-          'price_set_id' => $priceSetID,
-          'price_field_id' => $priceField['id'],
-          'label' => 'Long Haired Goat',
-          'financial_type_id' => 'Donation',
-          'amount' => 20,
-          'non_deductible_amount' => 15,
-        )
-      );
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Long Haired Goat',
+        'financial_type_id' => 'Donation',
+        'amount' => 20,
+        'non_deductible_amount' => 15,
+      ));
       $priceFieldValue = $this->callAPISuccess('price_field_value', 'create', array(
-          'price_set_id' => $priceSetID,
-          'price_field_id' => $priceField['id'],
-          'label' => 'Shoe-eating Goat',
-          'financial_type_id' => 'Donation',
-          'amount' => 10,
-          'non_deductible_amount' => 5,
-        )
-      );
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Shoe-eating Goat',
+        'financial_type_id' => 'Donation',
+        'amount' => 10,
+        'non_deductible_amount' => 5,
+      ));
       $this->_ids['price_field_value'] = array($priceFieldValue['id']);
 
       $this->_ids['price_field_value']['cheapskate'] = $this->callAPISuccess('price_field_value', 'create', array(
-          'price_set_id' => $priceSetID,
-          'price_field_id' => $priceField['id'],
-          'label' => 'Stingy Goat',
-          'financial_type_id' => 'Donation',
-          'amount' => 0,
-          'non_deductible_amount' => 0,
-        )
-      )['id'];
+        'price_set_id' => $priceSetID,
+        'price_field_id' => $priceField['id'],
+        'label' => 'Stingy Goat',
+        'financial_type_id' => 'Donation',
+        'amount' => 0,
+        'non_deductible_amount' => 0,
+      ))['id'];
     }
     $this->_ids['contribution_page'] = $contributionPageResult['id'];
   }
@@ -1544,7 +1535,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->_ids['contribution_page'] = $contributionPage['id'];
 
     $this->_ids['membership_type'] = $this->membershipTypeCreate(array(
-      'auto_renew' => 2, // force auto-renew
+      // force auto-renew
+      'auto_renew' => 2,
       'duration_unit' => 'month',
     ));
 
@@ -1696,7 +1688,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     // Check if contribution created.
     $contribution = $this->callAPISuccess('contribution', 'getsingle', array(
       'contribution_page_id' => $this->_ids['contribution_page'],
-      'contribution_status_id' => 'Completed', // Will be pending when actual payment processor is used (dummy processor does not support future payments).
+      // Will be pending when actual payment processor is used (dummy processor does not support future payments).
+      'contribution_status_id' => 'Completed',
     ));
 
     $this->assertEquals('create_first_success', $contribution['trxn_id']);
@@ -1714,13 +1707,15 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($pledgePayment['count'], 3);
     $this->assertEquals(date('Ymd', strtotime($pledgePayment['values'][1]['scheduled_date'])), date('Ymd', strtotime("+1 month")));
     $this->assertEquals($pledgePayment['values'][1]['scheduled_amount'], 100.00);
-    $this->assertEquals($pledgePayment['values'][1]['status_id'], 1); // Will be pending when actual payment processor is used (dummy processor does not support future payments).
+    // Will be pending when actual payment processor is used (dummy processor does not support future payments).
+    $this->assertEquals($pledgePayment['values'][1]['status_id'], 1);
 
     // Check contribution recur record.
     $recur = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $contribution['contribution_recur_id']));
     $this->assertEquals(date('Ymd', strtotime($recur['start_date'])), date('Ymd', strtotime("+1 month")));
     $this->assertEquals($recur['amount'], 100.00);
-    $this->assertEquals($recur['contribution_status_id'], 5); // In progress status.
+    // In progress status.
+    $this->assertEquals($recur['contribution_status_id'], 5);
   }
 
   /**
@@ -1911,7 +1906,6 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($lineItem['line_total'], $contribution['total_amount'], 'Contribution total should match line total');
     $this->assertEquals($lineItem_TaxAmount, round(180 * 16.95 * 0.10, 2), 'Wrong Sales Tax Amount is calculated and stored.');
   }
-
 
   /**
    * Test validating a contribution page submit.

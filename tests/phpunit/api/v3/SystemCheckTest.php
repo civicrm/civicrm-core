@@ -41,7 +41,6 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
   protected $_locationType;
   protected $_params;
 
-
   public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
