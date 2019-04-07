@@ -36,6 +36,8 @@
  */
 class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
 
+  use CRM_Core_Form_EntityFormTrait;
+
   /**
    * @var int Contribution ID
    */
@@ -77,6 +79,21 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   public $_paymentProcessor = [];
 
   /**
+   * Fields for the entity to be assigned to the template.
+   *
+   * Fields may have keys
+   *  - name (required to show in tpl from the array)
+   *  - description (optional, will appear below the field)
+   *  - not-auto-addable - this class will not attempt to add the field using addField.
+   *    (this will be automatically set if the field does not have html in it's metadata
+   *    or is not a core field on the form's entity).
+   *  - help (option) add help to the field - e.g ['id' => 'id-source', 'file' => 'CRM/Contact/Form/Contact']]
+   *  - template - use a field specific template to render this field
+   * @var array
+   */
+  protected $entityFields = [];
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -94,6 +111,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
    * Set variables up before form is built.
    */
   public function preProcess() {
+    $this->setAction(CRM_Core_Action::UPDATE);
     $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
     $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
     $this->contributionRecurID = $this->_crid;
