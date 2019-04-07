@@ -43,7 +43,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * The id of the membership being viewed.

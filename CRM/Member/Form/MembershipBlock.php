@@ -38,6 +38,7 @@ class CRM_Member_Form_MembershipBlock extends CRM_Contribute_Form_ContributionPa
 
   /**
    * Store membership price set id
+   * @var int
    */
   protected $_memPriceSetId = NULL;
 

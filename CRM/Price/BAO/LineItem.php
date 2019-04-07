@@ -799,7 +799,7 @@ WHERE li.contribution_id = %1";
    * @param array $lineItemsToUpdate
    *
    * @return array
-   *      List of formatted reverse Financial Items to be recorded
+   *   List of formatted reverse Financial Items to be recorded
    */
   protected function getAdjustedFinancialItemsToRecord($entityID, $entityTable, $contributionID, $priceFieldValueIDsToCancel, $lineItemsToUpdate) {
     $previousLineItems = CRM_Price_BAO_LineItem::getLineItems($entityID, str_replace('civicrm_', '', $entityTable));
@@ -872,7 +872,7 @@ WHERE li.contribution_id = %1";
    * @param array $feeBlock
    *
    * @return array
-   *     List of submitted line items
+   *   List of submitted line items
    */
   protected function getSubmittedLineItems($inputParams, $feeBlock) {
     $submittedLineItems = [];
@@ -896,7 +896,7 @@ WHERE li.contribution_id = %1";
    * @param string $entity
    *
    * @return array
-   *    Array of line items to alter with the following keys
+   *   Array of line items to alter with the following keys
    *   - line_items_to_add. If the line items required are new radio options that
    *     have not previously been set then we should add line items for them
    *   - line_items_to_update. If we have already been an active option and a change has
@@ -980,6 +980,7 @@ WHERE li.contribution_id = %1";
       return TRUE;
     }
   }
+
   /**
    * Add line Items as result of fee change.
    *

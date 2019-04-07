@@ -36,22 +36,26 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
 
   protected $_fileName;
 
-  /**#@+
+  /**
+   * #@+
    * @var integer
    */
 
   /**
    * Imported file size
+   * @var int
    */
   protected $_fileSize;
 
   /**
    * Seperator being used
+   * @var string
    */
   protected $_seperator;
 
   /**
    * Total number of lines in file
+   * @var int
    */
   protected $_lineCount;
 
@@ -70,6 +74,8 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
    * @param int $mode
    * @param int $contactType
    * @param int $onDuplicate
+   * @param int $statusID
+   * @param int $totalRowCount
    *
    * @return mixed
    * @throws Exception

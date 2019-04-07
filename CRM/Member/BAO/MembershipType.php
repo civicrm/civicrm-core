@@ -36,10 +36,11 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
   /**
    * Static holder for the default Membership Type.
+   * @var int
    */
-  static $_defaultMembershipType = NULL;
+  public static $_defaultMembershipType = NULL;
 
-  static $_membershipTypeInfo = [];
+  public static $_membershipTypeInfo = [];
 
   /**
    * Class constructor.
@@ -715,7 +716,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     }
     return self::$_membershipTypeInfo;
   }
-
 
   /**
    * @param array $params

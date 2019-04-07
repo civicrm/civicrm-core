@@ -57,6 +57,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
   /**
    * email of the person paying for the membership (used for receipts)
+   * @var string
    */
   protected $_memberEmail = NULL;
 
@@ -76,6 +77,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
   /**
    * email of the person paying for the membership (used for receipts)
+   * @var string
    */
   protected $_contributorEmail = NULL;
 
@@ -128,7 +130,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   public function setDeleteMessage() {
     $this->deleteMessage = '<span class="font-red bold">'
-      . ts("WARNING: Deleting this membership will also delete any related payment (contribution) records." .  ts("This action cannot be undone.")
+      . ts("WARNING: Deleting this membership will also delete any related payment (contribution) records." . ts("This action cannot be undone.")
         . '</span><p>'
         . ts("Consider modifying the membership status instead if you want to maintain an audit trail and avoid losing payment data. You can set the status to Cancelled by editing the membership and clicking the Status Override checkbox.")
           . '</p><p>'
@@ -141,7 +143,6 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    * We continue to rely on legacy handling.
    */
   public function addCustomDataToForm() {}
-
 
   /**
    * Overriding this entity trait function as not yet tested.
@@ -1730,9 +1731,12 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
    */
   protected function updateContributionOnMembershipTypeChange($inputParams, $membership) {
     if (Civi::settings()->get('update_contribution_on_membership_type_change') &&
-      ($this->_action & CRM_Core_Action::UPDATE) && // on update
-      $this->_id && // if ID is present
-      !in_array($this->_memType, $this->_memTypeSelected) // if selected membership doesn't match with earlier membership
+    // on update
+      ($this->_action & CRM_Core_Action::UPDATE) &&
+    // if ID is present
+      $this->_id &&
+    // if selected membership doesn't match with earlier membership
+      !in_array($this->_memType, $this->_memTypeSelected)
     ) {
       if (CRM_Utils_Array::value('is_recur', $inputParams)) {
         CRM_Core_Session::setStatus(ts('Associated recurring contribution cannot be updated on membership type change.', ts('Error'), 'error'));
@@ -1797,6 +1801,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       }
     }
   }
+
   /**
    * Set context in session.
    */

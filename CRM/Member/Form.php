@@ -47,7 +47,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
   /**
    * Membership Type ID
-   * @var
+   * @var int
    */
   protected $_memType;
 

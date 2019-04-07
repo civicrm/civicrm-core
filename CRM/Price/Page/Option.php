@@ -122,14 +122,14 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    */
   public function browse() {
     $priceOptions = civicrm_api3('PriceFieldValue', 'get', [
-        'price_field_id' => $this->_fid,
+      'price_field_id' => $this->_fid,
          // Explicitly do not check permissions so we are not
          // restricted by financial type, so we can change them.
-        'check_permissions' => FALSE,
-        'options' => [
-          'limit' => 0,
-          'sort' => ['weight', 'label'],
-        ],
+      'check_permissions' => FALSE,
+      'options' => [
+        'limit' => 0,
+        'sort' => ['weight', 'label'],
+      ],
     ]);
     $customOption = $priceOptions['values'];
 

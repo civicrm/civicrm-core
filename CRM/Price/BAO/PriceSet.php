@@ -42,7 +42,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    *
    * @var array
    */
-  static $_defaultPriceSet = NULL;
+  public static $_defaultPriceSet = NULL;
 
   /**
    * Class constructor.
@@ -558,7 +558,6 @@ WHERE  id = %1";
     }
     return (int) implode('_', array_keys($priceSet['fields'][$priceFieldID]['options']));
   }
-
 
   /**
    * Initiate price set such that various non-BAO things are set on the form.

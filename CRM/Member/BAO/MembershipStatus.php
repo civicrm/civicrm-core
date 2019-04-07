@@ -36,8 +36,9 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
 
   /**
    * Static holder for the default LT.
+   * @var int
    */
-  static $_defaultMembershipStatus = NULL;
+  public static $_defaultMembershipStatus = NULL;
 
   /**
    * Class constructor.
