@@ -52,6 +52,9 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    */
   const MINIMUM_PHP_VERSION = '5.6';
 
+  /**
+   * @var \CRM_Core_Config
+   */
   protected $_config;
 
   /**
@@ -208,6 +211,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    *
    * @return string
    */
+
   /**
    * @return string
    */
@@ -234,6 +238,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    *
    * @return string
    */
+
   /**
    * @return string
    */

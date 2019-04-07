@@ -148,7 +148,7 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
 
     $dao = new CRM_SMS_DAO_Provider();
     $dao->id = $providerID;
-    $dao->whereAdd = "(domain_id = " .  CRM_Core_Config::domainID() . "OR domain_id IS NULL)";
+    $dao->whereAdd = "(domain_id = " . CRM_Core_Config::domainID() . "OR domain_id IS NULL)";
     if (!$dao->find(TRUE)) {
       return NULL;
     }

@@ -80,7 +80,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'event_online_receipt', 'type' => 'text'],
           ['name' => 'event_online_receipt', 'type' => 'html'],
           ['name' => 'event_online_receipt', 'type' => 'subject'],
-        ]
+        ],
       ],
       [
         'version' => '5.7.alpha1',
@@ -88,7 +88,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
         'label' => ts('Contributions - Invoice'),
         'templates' => [
           ['name' => 'contribution_invoice_receipt', 'type' => 'html'],
-        ]
+        ],
       ],
       [
         'version' => '5.10.alpha1',
@@ -101,7 +101,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'contribution_recurring_notify', 'type' => 'html'],
           ['name' => 'membership_online_receipt', 'type' => 'text'],
           ['name' => 'membership_online_receipt', 'type' => 'html'],
-        ]
+        ],
       ],
       [
         'version' => '5.12.alpha1',
@@ -110,7 +110,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
         'templates' => [
           ['name' => 'payment_or_refund_notification', 'type' => 'text'],
           ['name' => 'payment_or_refund_notification', 'type' => 'html'],
-        ]
+        ],
       ],
     ];
   }
@@ -185,8 +185,8 @@ class CRM_Upgrade_Incremental_MessageTemplates {
 
         CRM_Core_DAO::executeQuery("
           UPDATE civicrm_msg_template SET msg_{$template['type']} = %1 WHERE id IN (" . implode(',', $templatesToUpdate) . ")", [
-            1 => [$content, 'String']
-            ]
+            1 => [$content, 'String'],
+          ]
         );
       }
     }

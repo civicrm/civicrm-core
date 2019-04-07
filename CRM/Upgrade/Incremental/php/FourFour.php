@@ -53,8 +53,8 @@ class CRM_Upgrade_Incremental_php_FourFour extends CRM_Upgrade_Incremental_Base 
       }
       if ($oversizedEntries > 0) {
         $preUpgradeMessage .= '<br/>' . ts("WARNING: There are %1 word-replacement entries which will not be valid in v4.4+ (eg with over 255 characters). They will be dropped during upgrade. For details, consult the CiviCRM log.", [
-            1 => $oversizedEntries,
-          ]);
+          1 => $oversizedEntries,
+        ]);
       }
     }
   }
@@ -86,9 +86,9 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
       $dao = CRM_Core_DAO::executeQuery($query);
       if ($dao->N) {
         $postUpgradeMessage .= '<br /><br /><strong>' . ts('Your database contains %1 financial transaction records with no payment instrument (Paid By is empty). If you use the Accounting Batches feature this may result in unbalanced transactions. If you do not use this feature, you can ignore the condition (although you will be required to select a Paid By value for new transactions). <a href="%2" target="_blank">You can review steps to correct transactions with missing payment instruments on the wiki.</a>', [
-              1 => $dao->N,
-              2 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Transactions+Missing+a+Payment+Instrument+-+4.4.3+Upgrades',
-            ]) . '</strong>';
+          1 => $dao->N,
+          2 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Transactions+Missing+a+Payment+Instrument+-+4.4.3+Upgrades',
+        ]) . '</strong>';
       }
     }
     if ($rev == '4.4.6') {
@@ -359,7 +359,8 @@ ALTER TABLE civicrm_dashboard
    */
   public function upgrade_4_4_7($rev, $originalVer, $latestVer) {
     // For WordPress/Joomla(?), cleanup broken image_URL from 4.4.6 upgrades - https://issues.civicrm.org/jira/browse/CRM-14971
-    $exBackendUrl = CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=XXX', TRUE); // URL formula from 4.4.6 upgrade
+    // URL formula from 4.4.6 upgrade
+    $exBackendUrl = CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=XXX', TRUE);
     $exFrontendUrl = CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=XXX', TRUE, NULL, TRUE, TRUE);
     if ($originalVer == '4.4.6' && $exBackendUrl != $exFrontendUrl) {
       $minId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(min(id),0) FROM civicrm_contact WHERE image_URL IS NOT NULL');
@@ -769,7 +770,6 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
     ]);
     CRM_Core_BAO_WordReplacement::rebuild();
   }
-
 
   /**
    * CRM-13998 missing alter statements for civicrm_report_instance

@@ -63,7 +63,8 @@ class CRM_Upgrade_Incremental_php_FourThree extends CRM_Upgrade_Incremental_Base
       // CRM-11823 - Make sure the D6 HTML HEAD technique will work on
       // upgrade pages ... except when we're in Drush.
       if (!function_exists('drush_main')) {
-        theme('item_list', []); // force-load theme registry
+        // force-load theme registry
+        theme('item_list', []);
         $theme_registry = theme_get_registry();
         if (!isset($theme_registry['page']['preprocess functions']) || FALSE === array_search('civicrm_preprocess_page_inject', $theme_registry['page']['preprocess functions'])) {
           CRM_Core_Error::fatal('Please reset the Drupal cache (Administer => Site Configuration => Performance => Clear cached data))');

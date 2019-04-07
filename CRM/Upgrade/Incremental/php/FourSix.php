@@ -90,8 +90,9 @@ class CRM_Upgrade_Incremental_php_FourSix extends CRM_Upgrade_Incremental_Base {
 
     // construct basic where clauses
     $where = [
+      //choose reminder older then 9 months
       'reminder.action_date_time >= DATE_SUB(reminder.action_date_time, INTERVAL 9 MONTH)',
-    ]; //choose reminder older then 9 months
+    ];
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
 

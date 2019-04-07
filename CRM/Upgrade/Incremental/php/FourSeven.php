@@ -311,6 +311,7 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Add Data Type column to civicrm_option_group', 'addDataTypeColumnToOptionGroupTable');
   }
+
   /**
    * Upgrade function.
    *
@@ -646,6 +647,9 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * Update Invoice number for all completed contribution.
    *
    * @param \CRM_Queue_TaskContext $ctx
+   * @param int $startID
+   * @param int $endID
+   * @param string $invoicePrefix
    *
    * @return bool
    */

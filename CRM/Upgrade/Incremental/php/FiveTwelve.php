@@ -85,8 +85,8 @@ class CRM_Upgrade_Incremental_php_FiveTwelve extends CRM_Upgrade_Incremental_Bas
     $this->addTask('Update smart groups where jcalendar fields have been converted to datepicker', 'updateSmartGroups', [
       'datepickerConversion' => [
         'age_asof_date',
-        'activity_date_time'
-      ]
+        'activity_date_time',
+      ],
     ]);
   }
 

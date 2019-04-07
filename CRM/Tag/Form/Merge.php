@@ -77,8 +77,7 @@ class CRM_Tag_Form_Merge extends CRM_Core_Form {
           'type' => 'cancel',
           'name' => ts('Cancel'),
         ],
-      ]
-    );
+    ]);
   }
 
   /**

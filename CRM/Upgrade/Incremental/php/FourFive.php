@@ -111,9 +111,9 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
       for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
         $endId = $startId + self::BATCH_SIZE - 1;
         $title = ts("Upgrade DB to 4.5.beta9: Fix line items for {$label} (%1 => %2)", [
-            1 => $startId,
-            2 => $endId,
-          ]);
+          1 => $startId,
+          2 => $endId,
+        ]);
         $this->addTask($title, 'task_4_5_0_fixLineItem', $startId, $endId, $label);
       }
     }
@@ -131,7 +131,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *   the first/lowest entity ID to convert.
    * @param int $endId
    *   the last/highest entity ID to convert.
-   * @param
+   * @param string $entityTable
    *
    * @return bool
    */

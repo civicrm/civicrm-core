@@ -688,7 +688,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
       $fieldTypeValues = CRM_Core_BAO_UFGroup::groupTypeValues($gid, $fieldType);
       if (empty($fieldTypeValues[$fieldType])) {
-        return;
+        return $errors;
       }
 
       $disallowedTypes = array_diff($extendsColumnValues, $fieldTypeValues[$fieldType]);
@@ -1007,9 +1007,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $message = ts('For best results, the Country field should precede the State-Province field in your Profile form. You can use the up and down arrows on field listing page for this profile to change the order of these fields or manually edit weight for Country/State-Province Field.');
 
     if (in_array($fieldName, [
-        'country',
-        'state_province',
-      ]) && count(CRM_Core_Config::singleton()->countryLimit) > 1
+      'country',
+      'state_province',
+    ]) && count(CRM_Core_Config::singleton()->countryLimit) > 1
     ) {
       // get state or country field weight if exists
       $ufFieldDAO = new CRM_Core_DAO_UFField();
