@@ -538,11 +538,10 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         foreach ($table['filters'] as $fieldName => $field) {
           $clause = NULL;
           if (in_array($fieldName, [
-               'credit_accounting_code',
-               'credit_name',
-               'credit_contact_id',
-             ]
-          )) {
+            'credit_accounting_code',
+            'credit_name',
+            'credit_contact_id',
+          ])) {
             $field['dbAlias'] = "CASE
               WHEN financial_trxn_civireport.from_financial_account_id IS NOT NULL
               THEN  financial_account_civireport_credit_1.{$field['name']}

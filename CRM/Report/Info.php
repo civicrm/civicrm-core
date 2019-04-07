@@ -37,6 +37,7 @@
 class CRM_Report_Info extends CRM_Core_Component_Info {
 
   /**
+   * @var string
    * @inheritDoc
    */
   protected $keyword = 'report';
@@ -59,7 +60,6 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
       'showActivitiesInCore' => 1,
     ];
   }
-
 
   /**
    * @inheritDoc
@@ -118,7 +118,6 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
     return $permissions;
   }
 
-
   /**
    * @inheritDoc
    * Provides information about user dashboard element
@@ -139,6 +138,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    * @return mixed
    *   component's User Dashboard applet object
    */
+
   /**
    * @return mixed
    */
@@ -156,6 +156,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    *   collection of required dashboard settings,
    *                    null if no element offered
    */
+
   /**
    * @return array|null
    */
@@ -181,6 +182,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    *   collection of required pane settings,
    *                    null if no element offered
    */
+
   /**
    * @return array|null
    */
@@ -199,6 +201,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    * @return array|null
    *   collection of activity types
    */
+
   /**
    * @return array|null
    */

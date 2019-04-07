@@ -33,6 +33,7 @@
 class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
 
   public $optimisedForOnlyFullGroupBy = FALSE;
+
   /**
    * Class constructor.
    */

@@ -66,7 +66,8 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
             'required' => TRUE,
             'no_repeat' => TRUE,
             'dbAlias' => 'contact_civireport.sort_name',
-          )),
+          ),
+        ),
           $this->getBasicContactFields(),
           array(
             'age_at_event' => array(

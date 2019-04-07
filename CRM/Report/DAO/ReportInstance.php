@@ -19,14 +19,14 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_report_instance';
+  public static $_tableName = 'civicrm_report_instance';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Report Instance ID

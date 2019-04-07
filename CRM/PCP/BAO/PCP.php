@@ -37,7 +37,7 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
    *
    * @var array
    */
-  static $_pcpLinks = NULL;
+  public static $_pcpLinks = NULL;
 
   /**
    * Class constructor.
@@ -406,7 +406,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
 
     $form->add('text', 'notify_email', ts('Notify Email'), CRM_Core_DAO::getAttribute('CRM_PCP_DAO_PCPBlock', 'notify_email'));
   }
-
 
   /**
    * Add PCP form elements to a form.

@@ -93,6 +93,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * By default most reports hide contact id.
    * Setting this to true makes it available
+   * @var bool
    */
   protected $_exposeContactID = TRUE;
 
@@ -137,11 +138,13 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Build tags filter
+   * @var bool
    */
   protected $_tagFilter = FALSE;
 
   /**
    * specify entity table for tags filter
+   * @var string
    */
   protected $_tagFilterTable = 'civicrm_contact';
 
@@ -322,6 +325,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Variables to hold the acl inner join and where clause
+   * @var string|NULL
    */
   protected $_aclFrom = NULL;
   protected $_aclWhere = NULL;
@@ -354,7 +358,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * (it's unclear if this could be merged with outputMode at this stage)
    *
-   * @var
+   * @var string|NULL
    */
   protected $_format;
 
@@ -390,6 +394,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Variable to hold the currency alias
+   * @var string|NULL
    */
   protected $_currencyColumn = NULL;
 
@@ -448,6 +453,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *  When a grand total row has calculated the status we pop it off to here.
    *
    * This allows us to access it from the stats function and avoid recalculating.
+   * @var array
    */
   protected $rollupRow = [];
 
@@ -501,6 +507,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @var bool
    */
   public $optimisedForOnlyFullGroupBy = TRUE;
+
   /**
    * Class constructor.
    */
@@ -1611,8 +1618,7 @@ class CRM_Report_Form extends CRM_Core_Form {
           'name' => $showResultsLabel,
           'isDefault' => TRUE,
         ],
-      ]
-    );
+    ]);
   }
 
   /**
@@ -3510,7 +3516,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     CRM_Utils_Array::value('report_footer', $this->_formValues);
   }
 
-
   /**
    * Post process function.
    */
@@ -3702,7 +3707,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     // We will have used an inner join instead.
     return "1";
   }
-
 
   /**
    * Create a table of the contact ids included by the group filter.
@@ -4137,13 +4141,13 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     if (!empty($prop['filters']) && $this->_customGroupFilters) {
       foreach ($prop['filters'] as $fieldAlias => $val) {
         foreach ([
-                   'value',
-                   'min',
-                   'max',
-                   'relative',
-                   'from',
-                   'to',
-                 ] as $attach) {
+          'value',
+          'min',
+          'max',
+          'relative',
+          'from',
+          'to',
+        ] as $attach) {
           if (isset($this->_params[$fieldAlias . '_' . $attach]) &&
             (!empty($this->_params[$fieldAlias . '_' . $attach])
               || ($attach != 'relative' &&
@@ -4295,7 +4299,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
 
   /**
    * Add campaign fields.
-   *
+   * @param string $entityTable
    * @param bool $groupBy
    *   Add GroupBy? Not appropriate for detail report.
    * @param bool $orderBy

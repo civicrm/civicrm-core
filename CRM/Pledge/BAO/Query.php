@@ -31,6 +31,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
+
   /**
    * Get pledge fields.
    *

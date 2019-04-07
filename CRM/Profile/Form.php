@@ -79,7 +79,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
   /**
    * Name of button for saving matching contacts.
-   * @var
+   * @var string
    */
   protected $_duplicateButtonName;
   /**
@@ -113,6 +113,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   /**
    * Dedupe using a specific rule (CRM-6131).
    * Not currently exposed in profile settings, but can be set in a buildForm hook.
+   * @var int
    */
   public $_ruleGroupID = NULL;
 
@@ -137,6 +138,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
   /**
    * Store profile ids if multiple profile ids are passed using comma separated.
    * Currently lets implement this functionality only for dialog mode.
+   * @var array
    */
   protected $_profileIds = [];
 

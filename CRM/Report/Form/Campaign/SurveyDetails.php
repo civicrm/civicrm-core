@@ -54,11 +54,15 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
   private static $_surveyRespondentStatus;
 
   // Survey Question titles are overridden when in print or pdf mode to
-  // say Q1, Q2 instead of the full title - to save space.
+  /**
+   * say Q1, Q2 instead of the full title - to save space.
+   * @var array
+   */
   private $_columnTitleOverrides = array();
 
   /**
    */
+
   /**
    */
   public function __construct() {
@@ -704,12 +708,11 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
           'alias' => "phone_civireport_{$fName}",
           'fields' => array(
             $fName => array_merge($value, array(
-                'is_required' => '1',
-                'alias' => "phone_civireport_{$fName}",
-                'dbAlias' => "phone_civireport_{$fName}.phone",
-                'no_display' => TRUE,
-              )
-            ),
+              'is_required' => '1',
+              'alias' => "phone_civireport_{$fName}",
+              'dbAlias' => "phone_civireport_{$fName}.phone",
+              'no_display' => TRUE,
+            )),
           ),
         );
         $this->_aliases["civicrm_phone_{$fName}"] = $this->_columns["civicrm_{$fName}"]['alias'];

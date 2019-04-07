@@ -284,7 +284,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       $this->_columnHeaders["{$tableName}_{$fieldName}"] = $field;
       $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $this->getLastYearColumnTitle();
       $this->_statFields[$this->getLastYearColumnTitle()] = "{$tableName}_{$fieldName}";
-      return "SUM(IF(" . $this->whereClauseLastYear('contribution_civireport.receive_date') .  ", contribution_civireport.total_amount, 0)) as {$tableName}_{$fieldName}";
+      return "SUM(IF(" . $this->whereClauseLastYear('contribution_civireport.receive_date') . ", contribution_civireport.total_amount, 0)) as {$tableName}_{$fieldName}";
     }
     if ($fieldName == 'civicrm_life_time_total') {
       $this->_columnHeaders["{$tableName}_{$fieldName}"] = $field;
@@ -420,7 +420,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     return "$fieldName BETWEEN '" . $this->getFirstDateOfCurrentRange() . "' AND '" . $this->getLastDateOfCurrentRange() . "'";
   }
 
-
   /**
    * Get the year value for the current year.
    *
@@ -482,7 +481,6 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
     return date('YmdHis', strtotime('+ 1 year - 1 second', strtotime($this->getFirstDateOfPriorRange())));
   }
 
-
   public function groupBy() {
     $this->_groupBy = "GROUP BY  {$this->_aliases['civicrm_contribution']}.contact_id ";
     $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect($this->_selectClauses, "{$this->_aliases['civicrm_contribution']}.contact_id");
@@ -518,7 +516,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
       }
       else {
         $select = "SELECT SUM({$this->_aliases['civicrm_contribution']}.total_amount) as amount,
-          SUM(IF( " . $this->whereClauseLastYear('contribution_civireport.receive_date') .  ", contribution_civireport.total_amount, 0)) as last_year
+          SUM(IF( " . $this->whereClauseLastYear('contribution_civireport.receive_date') . ", contribution_civireport.total_amount, 0)) as last_year
          ";
         $sql = "{$select} {$this->_from} {$this->_where}";
         $dao = CRM_Core_DAO::executeQuery($sql);

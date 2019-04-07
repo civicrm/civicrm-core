@@ -35,6 +35,7 @@
  * Page for invoking report instances
  */
 class CRM_Report_Page_Instance extends CRM_Core_Page {
+
   /**
    * Run this page (figure out the action needed and perform it).
    */

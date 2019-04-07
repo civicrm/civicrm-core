@@ -36,6 +36,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
 
   /**
    * Holds Deferred Financial Account
+   * @var array
    */
   protected $_deferredFinancialAccount = [];
 

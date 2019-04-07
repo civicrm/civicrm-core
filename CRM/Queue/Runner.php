@@ -59,7 +59,10 @@ class CRM_Queue_Runner {
   public $onEnd;
   public $onEndUrl;
   public $pathPrefix;
-  // queue-runner id; used for persistence
+  /**
+   * queue-runner id; used for persistence
+   * @var int
+   */
   public $qrid;
 
   /**

@@ -93,8 +93,7 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
             'type' => 'cancel',
             'name' => ts('Cancel'),
           ],
-        ]
-      );
+      ]);
       return;
     }
 
@@ -128,8 +127,7 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
           'type' => 'cancel',
           'name' => ts('Cancel'),
         ],
-      ]
-    );
+    ]);
     $this->addFormRule(['CRM_Report_Form_Register', 'formRule'], $this);
   }
 
@@ -193,9 +191,9 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
 
       $optionValue = CRM_Core_OptionValue::addOptionValue($params, 'report_template', $this->_action, $this->_id);
       CRM_Core_Session::setStatus(ts('The %1 \'%2\' has been saved.', [
-            1 => 'Report Template',
-            2 => $optionValue->label,
-          ]), ts('Saved'), 'success');
+        1 => 'Report Template',
+        2 => $optionValue->label,
+      ]), ts('Saved'), 'success');
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/report/options/report_template', "reset=1"));
     }
   }

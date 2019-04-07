@@ -173,8 +173,7 @@ class CRM_Report_Form_Instance {
           'type' => 'cancel',
           'name' => ts('Cancel'),
         ],
-      ]
-    );
+    ]);
 
     $form->addFormRule(['CRM_Report_Form_Instance', 'formRule'], $form);
   }

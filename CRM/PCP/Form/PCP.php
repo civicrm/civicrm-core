@@ -145,8 +145,7 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
             'type' => 'cancel',
             'name' => ts('Cancel'),
           ],
-        ]
-      );
+      ]);
     }
     else {
 
@@ -170,8 +169,7 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
             'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
             'isDefault' => TRUE,
           ],
-        ]
-      );
+      ]);
       parent::buildQuickForm();
     }
   }

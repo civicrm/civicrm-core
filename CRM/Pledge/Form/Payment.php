@@ -127,8 +127,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
           'type' => 'cancel',
           'name' => ts('Cancel'),
         ],
-      ]
-    );
+    ]);
   }
 
   /**

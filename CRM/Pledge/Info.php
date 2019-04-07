@@ -36,6 +36,7 @@
 class CRM_Pledge_Info extends CRM_Core_Component_Info {
 
   /**
+   * @var string
    * @inheritDoc
    */
   protected $keyword = 'pledge';
@@ -57,7 +58,6 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
       'showActivitiesInCore' => 1,
     ];
   }
-
 
   /**
    * @inheritDoc
