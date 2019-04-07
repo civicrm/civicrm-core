@@ -62,9 +62,9 @@ abstract class CRM_Utils_Check_Component {
    * Check if file exists on given URL.
    *
    * @param string $url
-   * @param int $timeout
+   * @param float $timeout
+   *
    * @return bool
-   * @throws \GuzzleHttp\Exception\GuzzleException
    */
   public function fileExists($url, $timeout = 0.50) {
     $fileExists = FALSE;
@@ -76,7 +76,8 @@ abstract class CRM_Utils_Check_Component {
       $fileExists = ($guzzleResponse->getStatusCode() == 200);
     }
     catch (Exception $e) {
-      echo $e->getMessage();
+      // At this stage we are not checking for variants of not being able to receive it.
+      // However, we might later enhance this to distinguish forbidden from a 500 error.
     }
     return $fileExists;
   }
