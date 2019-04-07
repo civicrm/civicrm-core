@@ -271,13 +271,22 @@ class CRM_Extension_Mapper {
    *
    * @param bool $fresh
    *   whether to forcibly reload extensions list from canonical store.
+   * @param bool $ignoreUpgradeMode
+   *   Should we load all, regardless of whether the site is in upgrade mode?.
+   *   For native extensions we don't load them into the list during upgrade. For historical reasons native CMS
+   *   modules ARE loaded. During the last part of the upgrade we desperately need extensions to be enabled (and
+   *   the CMS modules).
+   *   to ensure settings keep working and triggers and log tables are rebuild correctly.
+   *   This allows us to force it to reload the extension list after upgrade.
+   *   For more discussion see https://github.com/civicrm/civicrm-core/pull/13551.
+   *
    * @return array
    *   array(array('prefix' => $, 'file' => $))
    */
-  public function getActiveModuleFiles($fresh = FALSE) {
+  public function getActiveModuleFiles($fresh = FALSE, $ignoreUpgradeMode = FALSE) {
     $config = CRM_Core_Config::singleton();
-    if ($config->isUpgradeMode() || !defined('CIVICRM_DSN')) {
-      return []; // hmm, ok
+    if (($config->isUpgradeMode() && !$ignoreUpgradeMode)|| !defined('CIVICRM_DSN')) {
+      return [];
     }
 
     $moduleExtensions = NULL;

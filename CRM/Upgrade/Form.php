@@ -765,6 +765,9 @@ SET    version = '$version'
   }
 
   public static function doFinish() {
+    // Reload extensions as native extensions are excluded during upgrade mode.
+    $mapper = CRM_Extension_System::singleton()->getMapper();
+    $mapper->getActiveModuleFiles(TRUE, TRUE);
     $upgrade = new CRM_Upgrade_Form();
     list($ignore, $latestVer) = $upgrade->getUpgradeVersions();
     // Seems extraneous in context, but we'll preserve old behavior
