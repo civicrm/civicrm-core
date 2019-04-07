@@ -79,8 +79,8 @@ class CRM_Upgrade_Incremental_php_FiveEleven extends CRM_Upgrade_Incremental_Bas
         'grant_application_received_date',
         'grant_decision_date',
         'grant_money_transfer_date',
-        'grant_due_date'
-      ]
+        'grant_due_date',
+      ],
     ]);
     if (Civi::settings()->get('civimail_multiple_bulk_emails')) {
       $this->addTask('Update any on hold groups to reflect field change', 'updateOnHold', $rev);

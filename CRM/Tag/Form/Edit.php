@@ -128,9 +128,9 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'name'), TRUE
       );
       $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', [
-          'CRM_Core_DAO_Tag',
-          $this->_id,
-        ]);
+        'CRM_Core_DAO_Tag',
+        $this->_id,
+      ]);
 
       $this->add('text', 'description', ts('Description'),
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'description')

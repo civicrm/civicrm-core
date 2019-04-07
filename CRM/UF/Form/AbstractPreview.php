@@ -111,6 +111,7 @@ class CRM_UF_Form_AbstractPreview extends CRM_Core_Form {
    *
    * @return string
    */
+
   /**
    * @return string
    */

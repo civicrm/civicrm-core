@@ -36,7 +36,8 @@ class CRM_Upgrade_Headless {
    * @param bool $enablePrint
    *
    * @throws Exception
-   * @return array, with keys:
+   * @return array
+   *   - with keys:
    *   - message: string, HTML-ish blob
    */
   public function run($enablePrint = TRUE) {
@@ -71,7 +72,8 @@ class CRM_Upgrade_Headless {
       if ($enablePrint) {
         print ($errorMessage);
       }
-      throw $queueResult['exception']; // FIXME test
+      // FIXME test
+      throw $queueResult['exception'];
     }
 
     CRM_Upgrade_Form::doFinish();

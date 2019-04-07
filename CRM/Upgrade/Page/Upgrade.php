@@ -182,7 +182,8 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
       CRM_Upgrade_Form::doFinish();
     }
     else {
-      $postUpgradeMessage = ''; // Session was destroyed! Can't recover messages.
+      // Session was destroyed! Can't recover messages.
+      $postUpgradeMessage = '';
     }
 
     // do a version check - after doFinish() sets the final version

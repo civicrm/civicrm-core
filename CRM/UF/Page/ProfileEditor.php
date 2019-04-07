@@ -7,6 +7,7 @@ require_once 'CRM/Core/Page.php';
  * widgets
  */
 class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
+
   /**
    * Run page.
    *
