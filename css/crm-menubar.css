@@ -163,7 +163,7 @@ ul.crm-quickSearch-results.ui-state-disabled {
 }
 
 #civicrm-menu-nav .crm-logo-sm {
-  background: url(../i/logo_sm.png) no-repeat;
+  background: url($resourceBase/i/logo_sm.png) no-repeat;
   display: inline-block;
   width: 16px;
   height: 16px;
@@ -316,7 +316,7 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
     left: 5px;
     width: 18px;
     height: 18px;
-    background: url(../i/logo_lg.png) no-repeat;
+    background: url($resourceBase/i/logo_lg.png) no-repeat;
     background-size: 18px;
     top: 6px;
   }

@@ -24,6 +24,7 @@
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
  */
+use Civi\Core\Event\GenericHookEvent;
 
 /**
  * This class facilitates the loading of resources
@@ -581,6 +582,7 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addCoreResources($region = 'html-header') {
+    Civi::dispatcher()->addListener('hook_civicrm_buildAsset', [$this, 'renderMenubarStylesheet']);
     if (!isset($this->addedCoreResources[$region]) && !self::isAjaxMode()) {
       $this->addedCoreResources[$region] = TRUE;
       $config = CRM_Core_Config::singleton();
@@ -760,14 +762,10 @@ class CRM_Core_Resources {
       $position = Civi::settings()->get('menubar_position') ?: 'over-cms-menu';
     }
     if ($position !== 'none') {
-      $cms = strtolower($config->userFramework);
-      $cms = $cms === 'drupal' ? 'drupal7' : $cms;
       $items[] = 'bower_components/smartmenus/dist/jquery.smartmenus.min.js';
       $items[] = 'bower_components/smartmenus/dist/addons/keyboard/jquery.smartmenus.keyboard.min.js';
       $items[] = 'js/crm.menubar.js';
-      $items[] = 'bower_components/smartmenus/dist/css/sm-core-css.css';
-      $items[] = 'css/crm-menubar.css';
-      $items[] = "css/menubar-$cms.css";
+      $items[] = Civi::service('asset_builder')->getUrl('crm-menubar.css');
       $items[] = [
         'menubar' => [
           'position' => $position,
@@ -823,6 +821,35 @@ class CRM_Core_Resources {
     }
     $url = CRM_Utils_System::getUrlPath();
     return (strpos($url, 'civicrm/ajax') === 0) || (strpos($url, 'civicrm/angular') === 0);
+  }
+
+  /**
+   * @param GenericHookEvent $e
+   * @see \CRM_Utils_Hook::buildAsset()
+   */
+  public static function renderMenubarStylesheet(GenericHookEvent $e) {
+    if ($e->asset !== 'crm-menubar.css') {
+      return;
+    }
+    $e->mimeType = 'text/css';
+    $e->content = '';
+    $config = CRM_Core_Config::singleton();
+    $cms = strtolower($config->userFramework);
+    $cms = $cms === 'drupal' ? 'drupal7' : $cms;
+    $items = [
+      'bower_components/smartmenus/dist/css/sm-core-css.css',
+      'css/crm-menubar.css',
+      "css/menubar-$cms.css",
+    ];
+    foreach ($items as $item) {
+      $e->content .= file_get_contents(self::singleton()->getPath('civicrm', $item));
+    }
+    $vars = [
+      'resourceBase' => rtrim($config->resourceBase, '/'),
+    ];
+    foreach ($vars as $var => $val) {
+      $e->content = str_replace('$' . $var, $val, $e->content);
+    }
   }
 
   /**
