@@ -255,7 +255,6 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     }
   }
 
-
   /**
    * Replace available currencies by the ones provided
    *
@@ -285,7 +284,6 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     CRM_Core_OptionGroup::createAssoc('currencies_enabled', $options, $dontCare);
 
   }
-
 
   /**
    * @return array

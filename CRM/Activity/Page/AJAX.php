@@ -36,6 +36,7 @@
  * This class contains all the function that are called using AJAX (jQuery)
  */
 class CRM_Activity_Page_AJAX {
+
   public static function getCaseActivity() {
     // Should those params be passed through the validateParams method?
     $caseID = CRM_Utils_Type::validate($_GET['caseID'], 'Integer');
@@ -142,7 +143,6 @@ class CRM_Activity_Page_AJAX {
 
     CRM_Utils_JSON::output($clientRelationshipsDT);
   }
-
 
   public static function getCaseRoles() {
     $caseID = CRM_Utils_Type::escape($_GET['caseID'], 'Integer');

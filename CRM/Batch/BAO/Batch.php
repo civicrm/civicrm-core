@@ -38,14 +38,16 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
   /**
    * Cache for the current batch object.
+   * @var object
    */
-  static $_batch = NULL;
+  public static $_batch = NULL;
 
   /**
    * Not sure this is the best way to do this. Depends on how exportFinancialBatch() below gets called.
    * Maybe a parameter to that function is better.
+   * @var string
    */
-  static $_exportFormat = NULL;
+  public static $_exportFormat = NULL;
 
   /**
    * Create a new batch.
@@ -538,7 +540,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     }
     return $batches;
   }
-
 
   /**
    * Calculate sum of all entries in a batch.

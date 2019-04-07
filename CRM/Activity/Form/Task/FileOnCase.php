@@ -45,11 +45,13 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
 
   /**
    * Variable to store redirect path.
+   * @var string
    */
   protected $_userContext;
 
   /**
    * Variable to store contact Ids.
+   * @var array
    */
   public $_contacts;
 

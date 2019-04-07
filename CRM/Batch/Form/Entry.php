@@ -38,21 +38,25 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
    * Maximum profile fields that will be displayed.
+   * @var int
    */
   protected $_rowCount = 1;
 
   /**
    * Batch id.
+   * @var int
    */
   protected $_batchId;
 
   /**
    * Batch information.
+   * @var array
    */
   protected $_batchInfo = [];
 
   /**
    * Store the profile id associated with the batch type.
+   * @var int
    */
   protected $_profileId;
 
@@ -64,11 +68,13 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
   /**
    * When not to reset sort_name.
+   * @var bool
    */
   protected $_preserveDefault = TRUE;
 
   /**
    * Contact fields.
+   * @var array
    */
   protected $_contactFields = [];
 
@@ -88,6 +94,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    * These should get a standardised format in the beginPostProcess function.
    *
    * These fields are common to many forms. Some may override this.
+   * @var array
    */
   protected $submittableMoneyFields = ['total_amount', 'net_amount', 'non_deductible_amount', 'fee_amount'];
 

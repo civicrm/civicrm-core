@@ -45,11 +45,13 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
 
   /**
    * Maximum profile fields that will be displayed.
+   * @var int
    */
   protected $_maxFields = 9;
 
   /**
    * Variable to store redirect path.
+   * @var string
    */
   protected $_userContext;
 

@@ -49,14 +49,14 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *
    * @var array
    */
-  static $_exportableFields = NULL;
+  public static $_exportableFields = NULL;
 
   /**
    * Static field for all the activity information that we can potentially import.
    *
    * @var array
    */
-  static $_importableFields = NULL;
+  public static $_importableFields = NULL;
 
   /**
    * Check if there is absolute minimum of data to add the object.
@@ -901,7 +901,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    *   that this concept might be extended later. In practice most places that
    *   call this then re-add CiviCase in some way so it's all a bit... odd.
    *
-   * @return array Array of component id and name.
+   * @return array
    *   Array of component id and name.
    */
   public static function activityComponents($excludeComponentHandledActivities = TRUE) {

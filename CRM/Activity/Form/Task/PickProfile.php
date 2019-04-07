@@ -45,11 +45,13 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
 
   /**
    * Maximum Activities that should be allowed to update.
+   * @var int
    */
   protected $_maxActivities = 100;
 
   /**
    * Variable to store redirect path.
+   * @var string
    */
   protected $_userContext;
 

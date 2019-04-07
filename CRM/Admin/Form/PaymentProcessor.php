@@ -44,7 +44,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   protected $_paymentProcessorDAO;
 
   /**
-   * @var int $_paymentProcessorType Payment processor Type ID
+   * @var int
+   * Payment processor Type ID
    */
   protected $_paymentProcessorType;
 
@@ -448,7 +449,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     else {
       $creditCards = "NULL";
     }
-    $params  = array_merge([
+    $params = array_merge([
       'id' => $test ? $this->_testID : $this->_id,
       'domain_id' => $domainID,
       'is_test' => $test,

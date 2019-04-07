@@ -673,6 +673,7 @@ class CRM_Activity_BAO_Query {
    * Where/qill clause for notes
    *
    * @param array $values
+   * @param object $query
    */
   public static function whereClauseSingleActivityText(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;

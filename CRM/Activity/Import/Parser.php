@@ -36,16 +36,19 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
 
   /**
    * Imported file size.
+   * @var int
    */
   protected $_fileSize;
 
   /**
    * Separator being used.
+   * @var string
    */
   protected $_seperator;
 
   /**
    * Total number of lines in file.
+   * @var int
    */
   protected $_lineCount;
 
@@ -63,6 +66,8 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
    * @param bool $skipColumnHeader
    * @param int $mode
    * @param int $onDuplicate
+   * @param int $statusID
+   * @param int $totalRowCount
    *
    * @return mixed
    * @throws Exception
