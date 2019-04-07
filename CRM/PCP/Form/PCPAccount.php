@@ -40,6 +40,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
 
   /**
    * Variable defined for Contribution Page Id.
+   * @var int
    */
   public $_pageId = NULL;
   public $_id = NULL;
@@ -265,7 +266,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
       }
     }
 
-    $this->_contactID  = CRM_Contact_BAO_Contact::getFirstDuplicateContact($params, 'Individual', 'Unsupervised', [], FALSE);
+    $this->_contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($params, 'Individual', 'Unsupervised', [], FALSE);
 
     $contactID = CRM_Contact_BAO_Contact::createProfileContact($params, $this->_fields, $this->_contactID);
     $this->set('contactID', $contactID);

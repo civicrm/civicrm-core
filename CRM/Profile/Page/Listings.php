@@ -84,6 +84,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   /**
    * Store profile ids if multiple profile ids are passed using comma separated.
    * Currently lets implement this functionality only for dialog mode
+   * @var array
    */
   protected $_profileIds = [];
 

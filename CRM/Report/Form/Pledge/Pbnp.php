@@ -213,10 +213,10 @@ class CRM_Report_Form_Pledge_Pbnp extends CRM_Report_Form {
     $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $pendingStatus = array_search('Pending', $allStatus);
     foreach ([
-               'Pending',
-               'In Progress',
-               'Overdue',
-             ] as $statusKey) {
+      'Pending',
+      'In Progress',
+      'Overdue',
+    ] as $statusKey) {
       if ($key = CRM_Utils_Array::key($statusKey, $allStatus)) {
         $unpaidStatus[] = $key;
       }

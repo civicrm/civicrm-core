@@ -63,7 +63,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     parent::select();
   }
 
-
   /**
    * From clause build where baseTable & fromClauses are defined
    */
@@ -252,7 +251,8 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
             'title' => ts('Price Field Value Label'),
           ],
         ],
-        'group_bys' => //note that we have a requirement to group by label such that all 'Promo book' lines
+        //note that we have a requirement to group by label such that all 'Promo book' lines
+        'group_bys' =>
         // are grouped together across price sets but there may be a separate need to group
         // by id so that entries in one price set are distinct from others. Not quite sure what
         // to call the distinction for end users benefit

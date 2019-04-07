@@ -31,8 +31,13 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
-  // Primary Contacts count limitCONSTROW_COUNT_LIMIT = 10;
+  /**
+   * Primary Contacts count limitCONSTROW_COUNT_LIMIT = 10;
+   */
 
+  /**
+   * @var array
+   */
   protected $_relationshipColumns = [];
 
   protected $_customGroupExtends = [

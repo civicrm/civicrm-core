@@ -75,8 +75,7 @@ INNER JOIN civicrm_contact ct ON ( plg.contact_id = ct.id )
           'name' => ts('Done'),
           'isDefault' => TRUE,
         ],
-      ]
-    );
+    ]);
   }
 
 }

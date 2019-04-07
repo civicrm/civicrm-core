@@ -80,8 +80,7 @@ class CRM_Pledge_Form_Task_Print extends CRM_Pledge_Form_Task {
           'type' => 'back',
           'name' => ts('Done'),
         ],
-      ]
-    );
+    ]);
   }
 
   /**

@@ -36,9 +36,9 @@
  */
 class CRM_Report_Page_InstanceList extends CRM_Core_Page {
 
-  static $_links = NULL;
+  public static $_links = NULL;
 
-  static $_exceptions = ['logging/contact/detail'];
+  public static $_exceptions = ['logging/contact/detail'];
 
   /**
    * Name of component if report list is filtered.
@@ -208,7 +208,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
     $rows = $this->info();
 
     $this->assign('list', $rows);
-    if ($this->ovID OR $this->compID) {
+    if ($this->ovID or $this->compID) {
       // link to view all reports
       $reportUrl = CRM_Utils_System::url('civicrm/report/list', "reset=1");
       $this->assign('reportUrl', $reportUrl);

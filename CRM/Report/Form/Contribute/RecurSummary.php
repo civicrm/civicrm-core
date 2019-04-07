@@ -33,6 +33,7 @@
  *
  */
 class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
+
   /**
    */
   public function __construct() {

@@ -136,8 +136,7 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
         ],
-      ]
-    );
+    ]);
   }
 
 }

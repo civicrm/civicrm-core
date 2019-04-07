@@ -53,16 +53,19 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
   /**
    * The Pledge values if an existing pledge.
+   * @var array
    */
   public $_values;
 
   /**
    * The Pledge frequency Units.
+   * @var array
    */
   public $_freqUnits;
 
   /**
    * Is current pledge pending.
+   * @var bool
    */
   public $_isPending = FALSE;
 
@@ -118,7 +121,6 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
 
     $this->_fromEmails = CRM_Core_BAO_Email::getFromEmail();
   }
-
 
   /**
    * Set default values for the form.
@@ -205,16 +207,15 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
             'type' => 'cancel',
             'name' => ts('Cancel'),
           ],
-        ]
-      );
+      ]);
       return;
     }
 
     if ($this->_context == 'standalone') {
       $this->addEntityRef('contact_id', ts('Contact'), [
-          'create' => TRUE,
-          'api' => ['extra' => ['email']],
-        ], TRUE);
+        'create' => TRUE,
+        'api' => ['extra' => ['email']],
+      ], TRUE);
     }
 
     $showAdditionalInfo = FALSE;
@@ -293,10 +294,11 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     $this->addRule('frequency_day', ts('Please enter a valid payment due day.'), 'positiveInteger');
 
     $this->add('text', 'eachPaymentAmount', ts('each'), [
-        'size' => 10,
-        'style' => "background-color:#EBECE4",
-        0 => 'READONLY', // WTF, preserved because its inexplicable
-      ]);
+      'size' => 10,
+      'style' => "background-color:#EBECE4",
+      // WTF, preserved because its inexplicable
+      0 => 'READONLY',
+    ]);
 
     // add various dates
     $createDate = $this->add('datepicker', 'create_date', ts('Pledge Made'), [], TRUE, ['time' => FALSE]);
@@ -381,8 +383,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
           'type' => 'cancel',
           'name' => ts('Cancel'),
         ],
-      ]
-    );
+    ]);
 
     $this->addFormRule(['CRM_Pledge_Form_Pledge', 'formRule'], $this);
 
@@ -565,9 +566,9 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
         );
         if (count($processors) > 0) {
           $statusMsg .= ' ' . ts("If a payment is due now, you can record <a href='%1'>a check, EFT, or cash payment for this pledge</a> OR <a href='%2'>submit a credit card payment</a>.", [
-                1 => $contribURL,
-                2 => $creditURL,
-              ]);
+            1 => $contribURL,
+            2 => $creditURL,
+          ]);
         }
         else {
           $statusMsg .= ' ' . ts("If a payment is due now, you can record <a href='%1'>a check, EFT, or cash payment for this pledge</a>.", [1 => $contribURL]);

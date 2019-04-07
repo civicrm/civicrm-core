@@ -72,6 +72,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   /**
    * Store profile ids if multiple profile ids are passed using comma separated.
    * Currently lets implement this functionality only for dialog mode
+   * @var array
    */
   protected $_profileIds = [];
 
@@ -93,8 +94,10 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
 
   protected $_recordId = NULL;
 
-  /*
+  /**
+   *
    * fetch multirecord as well as non-multirecord fields
+   * @var int
    */
   protected $_allFields = NULL;
 

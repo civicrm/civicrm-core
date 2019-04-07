@@ -78,7 +78,7 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
   /**
    * The column in the contribution table that joins to the temp tables.
    *
-   * @var
+   * @var string
    */
   protected $contributionJoinTableColumn;
 

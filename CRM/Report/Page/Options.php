@@ -43,28 +43,28 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * The option group name.
    *
    * @var array
    */
-  static $_gName = NULL;
+  public static $_gName = NULL;
 
   /**
    * The option group name in display format (capitalized, without underscores...etc)
    *
    * @var array
    */
-  static $_GName = NULL;
+  public static $_GName = NULL;
 
   /**
    * The option group id.
    *
    * @var array
    */
-  static $_gId = NULL;
+  public static $_gId = NULL;
 
   /**
    * Obtains the group name from url and sets the title.

@@ -36,7 +36,7 @@
  */
 class CRM_Pledge_Task extends CRM_Core_Task {
 
-  static $objectType = 'pledge';
+  public static $objectType = 'pledge';
 
   /**
    * These tasks are the core set of tasks that the user can perform
