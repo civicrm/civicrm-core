@@ -39,8 +39,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    *
    * @var array
    */
-  static $_links = NULL;
-  static $_membershipTypesLinks = NULL;
+  public static $_links = NULL;
+  public static $_membershipTypesLinks = NULL;
 
   public $_permission = NULL;
   public $_contactId = NULL;

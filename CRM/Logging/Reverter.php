@@ -128,7 +128,7 @@ class CRM_Logging_Reverter {
         // DAO-based tables
 
         case (($tableDAO = CRM_Core_DAO_AllCoreTables::getClassForTable($table)) != FALSE):
-          $dao = new $tableDAO ();
+          $dao = new $tableDAO();
           foreach ($row as $id => $changes) {
             $dao->id = $id;
             foreach ($changes as $field => $value) {

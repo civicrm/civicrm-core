@@ -25,7 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\ActionSchedule\RecipientBuilder;
 
 /**
  * Class CRM_Member_ActionMapping

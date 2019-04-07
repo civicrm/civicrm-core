@@ -38,6 +38,7 @@
 class CRM_Member_Info extends CRM_Core_Component_Info {
 
   /**
+   * @var string
    * @inheritDoc
    */
   protected $keyword = 'member';
@@ -51,6 +52,7 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    * @return array
    *   collection of required component settings
    */
+
   /**
    * @return array
    */
@@ -63,7 +65,6 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
       'showActivitiesInCore' => 1,
     ];
   }
-
 
   /**
    * @inheritDoc
@@ -115,6 +116,7 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    *   collection of required dashboard settings,
    *                    null if no element offered
    */
+
   /**
    * @return array|null
    */
@@ -139,6 +141,7 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    *   collection of required dashboard settings,
    *                    null if no element offered
    */
+
   /**
    * @return array|null
    */
@@ -167,6 +170,7 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    *   collection of required pane settings,
    *                    null if no element offered
    */
+
   /**
    * @return array|null
    */
@@ -187,6 +191,7 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    * @return array|null
    *   collection of activity types
    */
+
   /**
    * @return array|null
    */

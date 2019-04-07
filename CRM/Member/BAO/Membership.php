@@ -37,11 +37,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *
    * @var array
    */
-  static $_importableFields = NULL;
+  public static $_importableFields = NULL;
 
-  static $_renewalActType = NULL;
+  public static $_renewalActType = NULL;
 
-  static $_signupActType = NULL;
+  public static $_signupActType = NULL;
 
   /**
    * Class constructor.
@@ -601,6 +601,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *
    * @param int $membershipId
    *   Membership id that needs to be deleted.
+   * @param bool $preserveContrib
    *
    * @return int
    *   Id of deleted Membership on success, false otherwise.
@@ -616,6 +617,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *
    * @param int $membershipId
    *   Membership id that needs to be deleted.
+   * @param bool $preserveContrib
    *
    * @return int
    *   Id of deleted Membership on success, false otherwise.
@@ -1114,7 +1116,7 @@ AND civicrm_membership.is_test = %2";
    * @param CRM_Member_DAO_Membership $membership
    * @param \CRM_Contribute_BAO_Contribution|\CRM_Contribute_DAO_Contribution $contribution
    */
-  static public function updateRecurMembership(CRM_Member_DAO_Membership $membership, CRM_Contribute_BAO_Contribution $contribution) {
+  public static function updateRecurMembership(CRM_Member_DAO_Membership $membership, CRM_Contribute_BAO_Contribution $contribution) {
 
     if (empty($contribution->contribution_recur_id)) {
       return;
@@ -1517,6 +1519,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * Delete the record that are associated with this Membership Payment.
    *
    * @param int $membershipId
+   * @param bool $preserveContrib
    *
    * @return object
    *   $membershipPayment deleted membership payment object
@@ -2192,7 +2195,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @param int $membershipId
    *   Membership id.
-   * @all bool
+   * @param bool $all
    *   if more than one payment associated with membership id need to be returned.
    *
    * @return int|int[]

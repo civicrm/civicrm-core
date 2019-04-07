@@ -59,16 +59,19 @@ abstract class CRM_Import_Parser {
 
   /**
    * Total number of non empty lines
+   * @var int
    */
   protected $_totalCount;
 
   /**
    * Running total number of valid lines
+   * @var int
    */
   protected $_validCount;
 
   /**
    * Running total number of invalid rows
+   * @var int
    */
   protected $_invalidRowCount;
 
@@ -81,41 +84,49 @@ abstract class CRM_Import_Parser {
 
   /**
    * Array of error lines, bounded by MAX_ERROR
+   * @var array
    */
   protected $_errors;
 
   /**
    * Total number of conflict lines
+   * @var int
    */
   protected $_conflictCount;
 
   /**
    * Array of conflict lines
+   * @var array
    */
   protected $_conflicts;
 
   /**
    * Total number of duplicate (from database) lines
+   * @var int
    */
   protected $_duplicateCount;
 
   /**
    * Array of duplicate lines
+   * @var array
    */
   protected $_duplicates;
 
   /**
    * Running total number of warnings
+   * @var int
    */
   protected $_warningCount;
 
   /**
    * Maximum number of warnings to store
+   * @var int
    */
   protected $_maxWarningCount = self::MAX_WARNINGS;
 
   /**
    * Array of warning lines, bounded by MAX_WARNING
+   * @var array
    */
   protected $_warnings;
 

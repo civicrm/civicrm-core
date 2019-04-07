@@ -842,7 +842,8 @@ WHERE  id IN (" . implode(',', array_keys($priceFields)) . ')';
         $error['_qf_default'] = ts('%1 amount can not be less than zero. Please select the options accordingly.', [1 => $componentName]);
       }
       elseif ($totalAmount > 0 &&
-        $totalPaymentAmountEnteredOnForm >= $totalAmount && // if total amount is equal to all selected amount in hand
+      // if total amount is equal to all selected amount in hand
+        $totalPaymentAmountEnteredOnForm >= $totalAmount &&
         (CRM_Utils_Array::value('contribution_status_id', $fields) == CRM_Core_PseudoConstant::getKey('CRM_Contribute_DAO_Contribution', 'contribution_status_id', 'Partially paid'))
       ) {
         $error['total_amount'] = ts('You have specified the status Partially Paid but have entered an amount that equals or exceeds the amount due. Please adjust the status of the payment or the amount');

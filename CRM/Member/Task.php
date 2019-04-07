@@ -40,11 +40,15 @@
  *
  */
 class CRM_Member_Task extends CRM_Core_Task {
-  const
-    // Member tasks
-    LABEL_MEMBERS = 201;
+  /**
+   * Member tasks
+   */
+  const LABEL_MEMBERS = 201;
 
-  static $objectType = 'membership';
+  /**
+   * @var string
+   */
+  public static $objectType = 'membership';
 
   /**
    * These tasks are the core set of tasks that the user can perform

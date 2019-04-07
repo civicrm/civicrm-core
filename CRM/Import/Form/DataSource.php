@@ -103,8 +103,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
           'type' => 'cancel',
           'name' => ts('Cancel'),
         ],
-      ]
-    );
+    ]);
   }
 
   /**

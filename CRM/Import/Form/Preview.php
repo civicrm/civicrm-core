@@ -38,6 +38,7 @@
  * those classes can be removed entirely and this class will not need to be abstract
  */
 abstract class CRM_Import_Form_Preview extends CRM_Core_Form {
+
   /**
    * Return a descriptive name for the page, used in wizard header.
    *
@@ -66,8 +67,7 @@ abstract class CRM_Import_Form_Preview extends CRM_Core_Form {
           'type' => 'cancel',
           'name' => ts('Cancel'),
         ],
-      ]
-    );
+    ]);
   }
 
   /**

@@ -233,7 +233,8 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
           $value = ['IN' => explode(',', $value)];
         }
       case 'membership_id':
-      case 'member_id': // CRM-18523 Updated to membership_id but kept member_id case for backwards compatibility
+        // CRM-18523 Updated to membership_id but kept member_id case for backwards compatibility
+      case 'member_id':
       case 'member_campaign_id':
 
         if (strpos($name, 'status') !== FALSE) {

@@ -64,6 +64,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
 
   /**
    * Variable is set if price set is used for membership.
+   * @var bool
    */
   protected $_useForMember;
 

@@ -61,6 +61,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Prefix for the controller.
+   * @var string
    */
   protected $_prefix = "member_";
 

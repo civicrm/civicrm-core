@@ -45,6 +45,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
   /**
    * email of the person paying for the membership (used for receipts)
+   * @var string
    */
   protected $_memberEmail = NULL;
 
@@ -65,6 +66,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
   /**
    * email of the person paying for the membership (used for receipts)
+   * @var string
    */
   protected $_contributorEmail = NULL;
 
@@ -85,6 +87,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
   /**
    * context would be set to standalone if the contact is use is being selected from
    * the form rather than in the URL
+   * @var string
    */
   public $_context;
 
@@ -402,6 +405,8 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    *
    * @param array $params
    *   (ref.) an assoc array of name/value pairs.
+   * @param $files
+   * @param $self
    *
    * @return bool|array
    *   mixed true or array of errors

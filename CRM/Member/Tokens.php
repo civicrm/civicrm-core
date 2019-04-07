@@ -63,8 +63,7 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
     // Extracted from scheduled-reminders code. See the class description.
-    return
-      !empty($processor->context['actionMapping'])
+    return !empty($processor->context['actionMapping'])
       && $processor->context['actionMapping']->getEntity() === 'civicrm_membership';
   }
 

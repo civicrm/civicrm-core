@@ -43,7 +43,7 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   public $useLivePageJS = TRUE;
 

@@ -52,7 +52,10 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   protected $altered_by;
   protected $altered_by_id;
 
-  // detail/summary report ids
+  /**
+   * detail/summary report ids
+   * @var int
+   */
   protected $detail;
   protected $summary;
 
@@ -280,7 +283,6 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   protected function calculateContactDiffs() {
     $this->diffs = $this->getAllContactChangesForConnection();
   }
-
 
   /**
    * Get an array of changes made in the mysql connection.

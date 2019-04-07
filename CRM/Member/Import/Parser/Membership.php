@@ -51,7 +51,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
   /**
    * Array of successfully imported membership id's
    *
-   * @array
+   * @var array
    */
   protected $_newMemberships;
 

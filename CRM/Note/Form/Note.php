@@ -143,8 +143,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
             'type' => 'cancel',
             'name' => ts('Cancel'),
           ],
-        ]
-      );
+      ]);
       return;
     }
 
@@ -166,7 +165,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
           'type' => 'cancel',
           'name' => ts('Cancel'),
         ],
-      ]
+    ]
     );
   }
 
