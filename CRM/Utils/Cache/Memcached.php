@@ -32,7 +32,8 @@
  */
 class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
 
-  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
+  // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveMultipleTrait;
 
   const DEFAULT_HOST = 'localhost';
   const DEFAULT_PORT = 11211;
@@ -227,7 +228,8 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
     $maxLen = self::MAX_KEY_LEN - strlen($truePrefix);
     $key = preg_replace('/\s+|\W+/', '_', $key);
     if (strlen($key) > $maxLen) {
-      $md5Key = md5($key);  // this should be 32 characters in length
+      // this should be 32 characters in length
+      $md5Key = md5($key);
       $subKeyLen = $maxLen - 1 - strlen($md5Key);
       $key = substr($key, 0, $subKeyLen) . "_" . $md5Key;
     }
@@ -256,7 +258,8 @@ class CRM_Utils_Cache_Memcached implements CRM_Utils_Cache_Interface {
       $value = $this->_cache->get($key);
       if ($this->_cache->getResultCode() === Memcached::RES_NOTFOUND) {
         $value = uniqid();
-        $this->_cache->add($key, $value, 0); // Indefinite.
+        // Indefinite.
+        $this->_cache->add($key, $value, 0);
       }
       $this->_truePrefix = [
         'value' => $value,

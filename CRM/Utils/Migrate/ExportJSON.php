@@ -434,9 +434,9 @@ AND    entity_table = 'civicrm_contact'
       $this->appendValue($dao->id, 'civicrm_relationship', $relationship);
 
       $this->addAdditionalContacts([
-          $dao->contact_id_a,
-          $dao->contact_id_b,
-        ],
+        $dao->contact_id_a,
+        $dao->contact_id_b,
+      ],
         $additionalContacts
       );
     }

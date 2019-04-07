@@ -40,51 +40,120 @@ class CRM_Utils_PDF_Label extends TCPDF {
 
   // make these properties public due to
   // CRM-5880
-  // Default label format values
+  /**
+   * Default label format values
+   * @var array
+   */
   public $defaults;
-  // Current label format values
+  /**
+   * Current label format values
+   * @var array
+   */
   public $format;
-  // Name of format
+  /**
+   * Name of format
+   * @var string
+   */
   public $formatName;
-  // Left margin of labels
+  /**
+   * Left margin of labels
+   * @var float
+   */
   public $marginLeft;
-  // Top margin of labels
+  /**
+   * Top margin of labels
+   * @var float
+   */
   public $marginTop;
-  // Horizontal space between 2 labels
+  /**
+   * Horizontal space between 2 labels
+   * @var float
+   */
   public $xSpace;
-  // Vertical space between 2 labels
+  /**
+   * Vertical space between 2 labels
+   * @var float
+   */
   public $ySpace;
-  // Number of labels horizontally
+  /**
+   * Number of labels horizontally
+   * @var float
+   */
   public $xNumber;
-  // Number of labels vertically
+  /**
+   * Number of labels vertically
+   * @var float
+   */
   public $yNumber;
-  // Width of label
+  /**
+   * Width of label
+   * @var float
+   */
   public $width;
-  // Height of label
+  /**
+   * Height of label
+   * @var float
+   */
   public $height;
-  // Line Height of label - used in event code
+  /**
+   * Line Height of label - used in event code
+   * @var float
+   */
   public $lineHeight = 0;
-  // Space between text and left edge of label
+  /**
+   * Space between text and left edge of label
+   * @var float
+   */
   public $paddingLeft;
-  // Space between text and top edge of label
+  /**
+   * Space between text and top edge of label
+   * @var float
+   */
   public $paddingTop;
-  // Character size (in points)
+  /**
+   * Character size (in points)
+   * @var float
+   */
   public $charSize;
-  // Metric used for all PDF doc measurements
+  /**
+   * Metric used for all PDF doc measurements
+   * @var string
+   */
   public $metricDoc;
-  // Name of the font
+  /**
+   * Name of the font
+   * @var string
+   */
   public $fontName;
-  // 'B' bold, 'I' italic, 'BI' bold+italic
+  /**
+   * 'B' bold, 'I' italic, 'BI' bold+italic
+   * @var string
+   */
   public $fontStyle;
-  // Paper size name
+  /**
+   * Paper size name
+   * @var string
+   */
   public $paperSize;
-  // Paper orientation
+  /**
+   * Paper orientation
+   * @var string
+   */
   public $orientation;
-  // Paper dimensions array (w, h)
+  /**
+   * Paper dimensions array (w, h)
+   * @var array
+   */
   public $paper_dimensions;
-  // Counter for positioning labels
+  /**
+   * Counter for positioning labels
+   * @var float
+   */
   public $countX = 0;
-  // Counter for positioning labels
+  /**
+   * Counter for positioning labels
+   * @var float
+   */
   public $countY = 0;
 
   /**

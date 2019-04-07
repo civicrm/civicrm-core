@@ -38,9 +38,10 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
 
   /**
    * UF container variables.
+   * @var string
    */
-  static $uf = NULL;
-  static $ufClass = NULL;
+  public static $uf = NULL;
+  public static $ufClass = NULL;
 
   /**
    * Given a permission string, check for access requirements

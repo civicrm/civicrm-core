@@ -37,12 +37,14 @@
 class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
 
   use CRM_Utils_Cache_NaiveMultipleTrait;
-  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
+  // TODO Native implementation
+  use CRM_Utils_Cache_NaiveHasTrait;
 
   const DEFAULT_TIMEOUT = 3600;
 
   /**
    * The cache storage container, an in memory array by default
+   * @var array
    */
   protected $_cache;
 

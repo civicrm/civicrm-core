@@ -36,6 +36,7 @@
 class CRM_Utils_PseudoConstant {
   /**
    * CiviCRM pseudoconstant classes for wrapper functions.
+   * @var array
    */
   private static $constantClasses = [
     'CRM_Core_PseudoConstant',

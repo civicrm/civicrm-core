@@ -40,10 +40,10 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
 
   /**
    * Does this CMS / UF support a CMS specific logging mechanism?
-   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
    * @var bool
+   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
    */
-  var $supports_UF_Logging = TRUE;
+  public $supports_UF_Logging = TRUE;
 
   /**
    */
@@ -266,10 +266,10 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
   public function getUserRecordUrl($contactID) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
     if (CRM_Core_Session::singleton()
-        ->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm([
-          'cms:administer users',
-          'cms:view user account',
-        ])
+      ->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm([
+        'cms:administer users',
+        'cms:view user account',
+      ])
     ) {
       return $this->url('user/' . $uid);
     };

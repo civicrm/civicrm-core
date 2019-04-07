@@ -618,12 +618,12 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
         case CRM_Extension_Manager::STATUS_INSTALLED:
           if (!empty($remotes[$key]) && version_compare($row['version'], $remotes[$key]->version, '<')) {
             $updates[] = ts('%1 (%2) version %3 is installed. <a %4>Upgrade to version %5</a>.', [
-                1 => CRM_Utils_Array::value('label', $row),
-                2 => $key,
-                3 => $row['version'],
-                4 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', "action=update&id=$key&key=$key") . '"',
-                5 => $remotes[$key]->version,
-              ]);
+              1 => CRM_Utils_Array::value('label', $row),
+              2 => $key,
+              3 => $row['version'],
+              4 => 'href="' . CRM_Utils_System::url('civicrm/admin/extensions', "action=update&id=$key&key=$key") . '"',
+              5 => $remotes[$key]->version,
+            ]);
           }
           else {
             if (empty($row['label'])) {
@@ -691,7 +691,6 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
 
     return $messages;
   }
-
 
   /**
    * Checks if there are pending extension upgrades.

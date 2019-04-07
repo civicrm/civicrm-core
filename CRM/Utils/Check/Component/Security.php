@@ -202,7 +202,6 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
     return $messages;
   }
 
-
   /**
    * Check that some files are not present.
    *
@@ -275,7 +274,6 @@ class CRM_Utils_Check_Component_Security extends CRM_Utils_Check_Component {
 
     return $messages;
   }
-
 
   /**
    * Check that the sysadmin has not modified the Cxn

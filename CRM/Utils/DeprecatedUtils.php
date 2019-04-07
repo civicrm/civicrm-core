@@ -780,12 +780,12 @@ function _civicrm_api3_deprecated_add_formatted_param(&$values, &$params) {
     }
 
     foreach ([
-               'Phone',
-               'Email',
-               'IM',
-               'OpenID',
-               'Phone_Ext',
-             ] as $block) {
+      'Phone',
+      'Email',
+      'IM',
+      'OpenID',
+      'Phone_Ext',
+    ] as $block) {
       $name = strtolower($block);
       if (!array_key_exists($name, $values)) {
         continue;
@@ -1062,7 +1062,6 @@ function _civicrm_api3_deprecated_validate_formatted_contact(&$params) {
 
   return civicrm_api3_create_success(TRUE);
 }
-
 
 /**
  * @deprecated - this is part of the import parser not the API & needs to be moved on out

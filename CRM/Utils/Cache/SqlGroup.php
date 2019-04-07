@@ -42,7 +42,8 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   const DEFAULT_TTL = 21600;
 
   const TS_FMT = 'Y-m-d H:i:s';
-  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
+  // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveMultipleTrait;
 
   /**
    * The host name of the memcached server.
@@ -52,7 +53,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   protected $group;
 
   /**
-   * @var int $componentID The optional component ID (so componenets can share the same name space)
+   * @var int
    */
   protected $componentID;
 

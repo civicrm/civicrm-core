@@ -146,7 +146,7 @@ class CRM_Utils_Request {
    * @param array $method - '$_GET', '$_POST' or '$_REQUEST'.
    *
    * @return mixed
-   *    The value of the variable
+   *   The value of the variable
    */
   protected static function getValue($name, $method) {
     if (isset($method[$name])) {
@@ -235,7 +235,7 @@ class CRM_Utils_Request {
    * @param array $attributes
    *   The form attributes array.
    *
-   * @return string $value
+   * @return string
    *   The desired value.
    */
   public static function retrieveComponent($attributes) {

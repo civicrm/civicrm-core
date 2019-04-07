@@ -36,11 +36,20 @@ class CRM_Utils_SQL_BaseParamQuery implements ArrayAccess {
    */
   const INTERPOLATE_AUTO = 'auto';
 
+  /**
+   * @var mixed
+   */
   protected $mode = NULL;
 
+  /**
+   * @var array
+   */
   protected $params = [];
 
-  // Public to work-around PHP 5.3 limit.
+  /**
+   * Public to work-around PHP 5.3 limit.
+   * @var bool
+   */
   public $strict = NULL;
 
   /**

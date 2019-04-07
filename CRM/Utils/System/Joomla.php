@@ -35,6 +35,7 @@
  * Joomla specific stuff goes here.
  */
 class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
+
   /**
    * Class constructor.
    */
@@ -317,8 +318,8 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
     global $database;
     $query = $db->getQuery(TRUE);
     $query->select($db->quoteName('email'))
-          ->from($db->quoteName('#__users'))
-          ->where($db->quoteName('id') . ' = ' . $user->id);
+      ->from($db->quoteName('#__users'))
+      ->where($db->quoteName('id') . ' = ' . $user->id);
     $database->setQuery($query);
     $user->email = $database->loadResult();
   }

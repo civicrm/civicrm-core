@@ -40,8 +40,10 @@ class CRM_Utils_XML {
    *   (0 => SimpleXMLElement|FALSE, 1 => errorMessage|FALSE)
    */
   public static function parseFile($file) {
-    $xml = FALSE; // SimpleXMLElement
-    $error = FALSE; // string
+    // SimpleXMLElement
+    $xml = FALSE;
+    // string
+    $error = FALSE;
 
     if (!file_exists($file)) {
       $error = 'File ' . $file . ' does not exist.';
@@ -72,8 +74,10 @@ class CRM_Utils_XML {
    *   (0 => SimpleXMLElement|FALSE, 1 => errorMessage|FALSE)
    */
   public static function parseString($string) {
-    $xml = FALSE; // SimpleXMLElement
-    $error = FALSE; // string
+    // SimpleXMLElement
+    $xml = FALSE;
+    // string
+    $error = FALSE;
 
     $oldLibXMLErrors = libxml_use_internal_errors();
     libxml_use_internal_errors(TRUE);

@@ -35,7 +35,7 @@ class CRM_Utils_Hook_UnitTests extends CRM_Utils_Hook {
   protected $mockObject;
 
   /**
-   * @var array $adhocHooks to call
+   * @var array
    */
   protected $adhocHooks;
   protected $civiModules = NULL;

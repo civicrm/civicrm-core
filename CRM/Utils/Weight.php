@@ -35,8 +35,9 @@ class CRM_Utils_Weight {
    * To reduce the size of this patch, we only sign the exploitable fields
    * which make up "$baseURL" in addOrder() (eg 'filter' or 'dao').
    * Less-exploitable fields (eg 'dir') are left unsigned.
+   * 'id','src','dst','dir'
    */
-  static $SIGNABLE_FIELDS = ['reset', 'dao', 'idName', 'url', 'filter']; // 'id','src','dst','dir'
+  public static $SIGNABLE_FIELDS = ['reset', 'dao', 'idName', 'url', 'filter'];
 
   /**
    * Correct duplicate weight entries by putting them (duplicate weights) in sequence.

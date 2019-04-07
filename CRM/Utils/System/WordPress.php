@@ -37,6 +37,7 @@
  * WordPress specific stuff goes here
  */
 class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
+
   /**
    */
   public function __construct() {
@@ -460,6 +461,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    *   Optional credentials
    *   - name: string, cms username
    *   - pass: string, cms password
+   * @param bool $loadUser
+   * @param bool $throwError
+   * @param mixed $realPath
    *
    * @return bool
    */
@@ -788,7 +792,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   public function getUserRecordUrl($contactID) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
     if (CRM_Core_Session::singleton()
-        ->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(['cms:administer users'])
+      ->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(['cms:administer users'])
     ) {
       return CRM_Core_Config::singleton()->userFrameworkBaseURL . "wp-admin/user-edit.php?user_id=" . $uid;
     }

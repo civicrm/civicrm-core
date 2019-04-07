@@ -763,7 +763,6 @@ class CRM_Utils_Date {
     }
   }
 
-
   /**
    * @param null $timeStamp
    *
@@ -901,7 +900,7 @@ class CRM_Utils_Date {
    * @return int
    *   array $results contains years or months
    */
-  static public function calculateAge($birthDate) {
+  public static function calculateAge($birthDate) {
     $results = [];
     $formatedBirthDate = CRM_Utils_Date::customFormat($birthDate, '%Y-%m-%d');
 
@@ -1858,9 +1857,9 @@ class CRM_Utils_Date {
     }
 
     foreach ([
-               'from',
-               'to',
-             ] as $item) {
+      'from',
+      'to',
+    ] as $item) {
       if (!empty($$item)) {
         $dateRange[$item] = self::format($$item);
       }
@@ -1960,7 +1959,6 @@ class CRM_Utils_Date {
     }
     return $field;
   }
-
 
   /**
    * Get the fields required for the 'extra' parameter when adding a datepicker.
@@ -2169,7 +2167,6 @@ class CRM_Utils_Date {
     }
     return $month;
   }
-
 
   /**
    * Convert a relative date format to an api field.

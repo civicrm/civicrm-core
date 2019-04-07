@@ -54,7 +54,8 @@
  */
 class CRM_Utils_Cache_FastArrayDecorator implements CRM_Utils_Cache_Interface {
 
-  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
+  // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveMultipleTrait;
 
   /**
    * @var int

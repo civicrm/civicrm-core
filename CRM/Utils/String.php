@@ -625,7 +625,6 @@ class CRM_Utils_String {
     return str_replace($search, $replace, $string);
   }
 
-
   /**
    * Use HTMLPurifier to clean up a text string and remove any potential
    * xss attacks. This is primarily used in public facing pages which

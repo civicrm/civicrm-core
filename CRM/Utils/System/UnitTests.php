@@ -37,6 +37,7 @@
  * Helper authentication class for unit tests
  */
 class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
+
   /**
    */
   public function __construct() {

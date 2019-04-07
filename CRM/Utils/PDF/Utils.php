@@ -28,6 +28,7 @@
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
+
 /**
  *
  * @package CRM
@@ -141,7 +142,8 @@ class CRM_Utils_PDF_Utils {
     // This function also uses the FPDI library documented at: http://www.setasign.com/products/fpdi/about/
     // Syntax borrowed from https://github.com/jake-mw/CDNTaxReceipts/blob/master/cdntaxreceipts.functions.inc
     require_once 'tcpdf/tcpdf.php';
-    require_once 'FPDI/fpdi.php'; // This library is only in the 'packages' area as of version 4.5
+    // This library is only in the 'packages' area as of version 4.5
+    require_once 'FPDI/fpdi.php';
 
     $paper_size_arr = [$paper_size[2], $paper_size[3]];
 

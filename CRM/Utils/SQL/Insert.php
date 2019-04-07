@@ -36,6 +36,7 @@ class CRM_Utils_SQL_Insert {
 
   /**
    * Array<string> list of column names
+   * @var array
    */
   private $columns;
 
@@ -62,7 +63,8 @@ class CRM_Utils_SQL_Insert {
     $row = [];
     foreach ((array) $dao as $key => $value) {
       if ($value === 'null') {
-        $value = NULL; // Blerg!!!
+        // Blerg!!!
+        $value = NULL;
       }
       // Skip '_foobar' and '{\u00}*_options' and 'N'.
       if (preg_match('/[a-zA-Z]/', $key{0}) && $key !== 'N') {

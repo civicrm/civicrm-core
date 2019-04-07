@@ -54,13 +54,13 @@
  */
 class CRM_Utils_System {
 
-  static $_callbacks = NULL;
+  public static $_callbacks = NULL;
 
   /**
    * @var string
    *   Page title
    */
-  static $title = '';
+  public static $title = '';
 
   /**
    * Access methods in the appropriate CMS class
@@ -103,8 +103,7 @@ class CRM_Utils_System {
       }
     }
 
-    return
-      self::url(
+    return self::url(
         $path,
         CRM_Utils_System::getLinksUrl($urlVar, $includeReset, $includeForce),
         $absolute
@@ -688,7 +687,6 @@ class CRM_Utils_System {
     return $config->userSystem->setMessage($message);
   }
 
-
   /**
    * Determine whether a value is null-ish.
    *
@@ -1168,8 +1166,7 @@ class CRM_Utils_System {
    * this function, please go and change the code in the install script as well.
    */
   public static function isSSL() {
-    return
-      (isset($_SERVER['HTTPS']) &&
+    return (isset($_SERVER['HTTPS']) &&
         !empty($_SERVER['HTTPS']) &&
         strtolower($_SERVER['HTTPS']) != 'off') ? TRUE : FALSE;
   }

@@ -1063,7 +1063,8 @@ class CRM_Utils_Array {
       (count($keys) == 1 &&
         (current($keys) > 1 ||
           is_string(current($keys)) ||
-          (current($keys) == 1 && $array[1] == 1) // handle (0 => 4), (1 => 1)
+          // handle (0 => 4), (1 => 1)
+          (current($keys) == 1 && $array[1] == 1)
         )
       )
     ) {

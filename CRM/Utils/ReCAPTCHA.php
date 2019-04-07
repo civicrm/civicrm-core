@@ -62,7 +62,6 @@ class CRM_Utils_ReCAPTCHA {
     return self::$_singleton;
   }
 
-
   /**
    * Check if reCaptcha settings is avilable to add on form.
    */
