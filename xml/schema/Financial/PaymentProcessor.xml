@@ -52,6 +52,7 @@
     <title>Payment Processor Title</title>
     <type>varchar</type>
     <length>127</length>
+    <localizable>true</localizable>
     <html>
       <type>Text</type>
     </html>
