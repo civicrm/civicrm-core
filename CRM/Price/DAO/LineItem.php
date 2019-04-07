@@ -19,14 +19,14 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_line_item';
+  public static $_tableName = 'civicrm_line_item';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Line Item
@@ -142,7 +142,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contribution_id', 'civicrm_contribution', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'price_field_id', 'civicrm_price_field', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'price_field_value_id', 'civicrm_price_field_value', 'id');

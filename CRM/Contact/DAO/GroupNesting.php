@@ -19,14 +19,14 @@ class CRM_Contact_DAO_GroupNesting extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_group_nesting';
+  public static $_tableName = 'civicrm_group_nesting';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Relationship ID
@@ -65,7 +65,7 @@ class CRM_Contact_DAO_GroupNesting extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'child_group_id', 'civicrm_group', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'parent_group_id', 'civicrm_group', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);

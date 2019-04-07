@@ -19,14 +19,14 @@ class CRM_Mailing_DAO_MailingComponent extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_mailing_component';
+  public static $_tableName = 'civicrm_mailing_component';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned

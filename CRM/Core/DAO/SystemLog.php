@@ -19,14 +19,14 @@ class CRM_Core_DAO_SystemLog extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_system_log';
+  public static $_tableName = 'civicrm_system_log';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Primary key ID

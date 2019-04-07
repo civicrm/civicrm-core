@@ -19,14 +19,14 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_acl';
+  public static $_tableName = 'civicrm_acl';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Unique table ID
@@ -217,7 +217,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
           ],
           'pseudoconstant' => [
             'callback' => 'CRM_ACL_BAO_ACL::operation',
-          ],
+          ]
         ],
         'object_table' => [
           'name' => 'object_table',

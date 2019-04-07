@@ -19,14 +19,14 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_action_mapping';
+  public static $_tableName = 'civicrm_action_mapping';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned
