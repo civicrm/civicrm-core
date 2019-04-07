@@ -19,14 +19,14 @@ class CRM_Core_DAO_Persistent extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_persistent';
+  public static $_tableName = 'civicrm_persistent';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Persistent Record Id

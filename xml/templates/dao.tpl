@@ -18,14 +18,14 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       *
       * @var string
       */
-      static $_tableName = '{$table.name}';
+      public static $_tableName = '{$table.name}';
 
       /**
        * Should CiviCRM log any modifications to this table in the civicrm_log table.
        *
        * @var bool
        */
-      static $_log = {$table.log|strtoupper};
+      public static $_log = {$table.log|strtoupper};
 
 {foreach from=$table.fields item=field}
     /**

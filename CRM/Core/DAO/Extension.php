@@ -19,14 +19,14 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_extension';
+  public static $_tableName = 'civicrm_extension';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Local Extension ID

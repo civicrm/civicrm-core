@@ -19,14 +19,14 @@ class CRM_ACL_DAO_EntityRole extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_acl_entity_role';
+  public static $_tableName = 'civicrm_acl_entity_role';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Unique table ID
