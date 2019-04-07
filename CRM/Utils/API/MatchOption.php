@@ -153,7 +153,8 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
       if ($isMandatory) {
         throw new API_Exception("Failed to match existing record");
       }
-      return $createParams; // OK, don't care
+      // OK, don't care
+      return $createParams;
     }
     elseif ($getResult['count'] == 1) {
       $item = array_shift($getResult['values']);

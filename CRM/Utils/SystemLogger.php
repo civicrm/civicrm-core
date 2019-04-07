@@ -31,6 +31,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_SystemLogger extends Psr\Log\AbstractLogger implements \Psr\Log\LoggerInterface {
+
   /**
    * Logs with an arbitrary level.
    *

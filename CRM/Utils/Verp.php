@@ -33,9 +33,11 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_Verp {
-  /* Mapping of reserved characters to hex codes */
-
-  static $encodeMap = [
+  /**
+   * Mapping of reserved characters to hex codes
+   * @var array
+   */
+  public static $encodeMap = [
     '+' => '2B',
     '@' => '40',
     ':' => '3A',
@@ -46,9 +48,11 @@ class CRM_Utils_Verp {
     ']' => '5D',
   ];
 
-  /* Mapping of hex codes to reserved characters */
-
-  static $decodeMap = [
+  /**
+   * Mapping of hex codes to reserved characters
+   * @var array
+   */
+  public static $decodeMap = [
     '40' => '@',
     '3A' => ':',
     '25' => '%',

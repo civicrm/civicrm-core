@@ -11,44 +11,44 @@ abstract class CRM_Utils_System_Base {
    * The correct method is to have functions on the UF classes for all UF specific
    * functions and leave the codebase oblivious to the type of CMS
    *
-   * @deprecated
    * @var bool
+   * @deprecated
    *   TRUE, if the CMS is Drupal.
    */
-  var $is_drupal = FALSE;
+  public $is_drupal = FALSE;
 
   /**
    * Deprecated property to check if this is a joomla install. The correct method is to have functions on the UF classes for all UF specific
    * functions and leave the codebase oblivious to the type of CMS
    *
-   * @deprecated
    * @var bool
+   * @deprecated
    *   TRUE, if the CMS is Joomla!.
    */
-  var $is_joomla = FALSE;
+  public $is_joomla = FALSE;
 
   /**
    * deprecated property to check if this is a wordpress install. The correct method is to have functions on the UF classes for all UF specific
    * functions and leave the codebase oblivious to the type of CMS
    *
-   * @deprecated
    * @var bool
+   * @deprecated
    *   TRUE, if the CMS is WordPress.
    */
-  var $is_wordpress = FALSE;
+  public $is_wordpress = FALSE;
 
   /**
    * Does this CMS / UF support a CMS specific logging mechanism?
-   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
    * @var bool
+   * @todo - we should think about offering up logging mechanisms in a way that is also extensible by extensions
    */
-  var $supports_UF_Logging = FALSE;
+  public $supports_UF_Logging = FALSE;
 
   /**
    * @var bool
    *   TRUE, if the CMS allows CMS forms to be extended by hooks.
    */
-  var $supports_form_extensions = FALSE;
+  public $supports_form_extensions = FALSE;
 
   public function initialize() {
     if (\CRM_Utils_System::isSSL()) {
@@ -56,7 +56,7 @@ abstract class CRM_Utils_System_Base {
     }
   }
 
-  public abstract function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL);
+  abstract public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL);
 
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb.
@@ -424,7 +424,7 @@ abstract class CRM_Utils_System_Base {
    * @return string
    *   loginURL for the current CMS
    */
-  public abstract function getLoginURL($destination = '');
+  abstract public function getLoginURL($destination = '');
 
   /**
    * Get the login destination string.
@@ -709,7 +709,6 @@ abstract class CRM_Utils_System_Base {
       CRM_Core_DAO::executequery($sql);
     }
   }
-
 
   /**
    * Get timezone from CMS.

@@ -35,9 +35,9 @@
  * Class to abstract token replacement.
  */
 class CRM_Utils_Token {
-  static $_requiredTokens = NULL;
+  public static $_requiredTokens = NULL;
 
-  static $_tokens = [
+  public static $_tokens = [
     'action' => [
       'forward',
       'optOut',
@@ -88,7 +88,6 @@ class CRM_Utils_Token {
     'welcome' => ['group'],
   ];
 
-
   /**
    * @deprecated
    *   This is used by CiviMail but will be made redundant by FlexMailer.
@@ -116,7 +115,7 @@ class CRM_Utils_Token {
    *   The message.
    *
    * @return bool|array
-   *    true if all required tokens are found,
+   *   true if all required tokens are found,
    *    else an array of the missing tokens
    */
   public static function requiredTokens(&$str) {
@@ -178,7 +177,7 @@ class CRM_Utils_Token {
    *   The token variable.
    * @param string $value
    *   The value to substitute for the token.
-   * @param string (reference) $str The string to replace in
+   * @param string $str (reference) The string to replace in
    *
    * @param bool $escapeSmarty
    *
@@ -1260,10 +1259,10 @@ class CRM_Utils_Token {
 
         // special case for greeting replacement
         foreach ([
-                   'email_greeting',
-                   'postal_greeting',
-                   'addressee',
-                 ] as $val) {
+          'email_greeting',
+          'postal_greeting',
+          'addressee',
+        ] as $val) {
           if (!empty($contactDetails[$contactID][$val])) {
             $contactDetails[$contactID][$val] = $contactDetails[$contactID]["{$val}_display"];
           }
@@ -1300,8 +1299,8 @@ class CRM_Utils_Token {
    *   contactDetails with hooks swapped out
    */
   public static function getAnonymousTokenDetails($contactIDs = [
-      0,
-    ],
+    0,
+  ],
                                            $returnProperties = NULL,
                                            $skipOnHold = TRUE,
                                            $skipDeceased = TRUE,
@@ -1432,6 +1431,7 @@ class CRM_Utils_Token {
    *
    * @param string $tokenString
    * @param array $contactDetails
+   * @param array $greetingTokens
    */
   private static function removeNullContactTokens(&$tokenString, $contactDetails, &$greetingTokens) {
     $greetingTokensOriginal = $greetingTokens;
@@ -1477,10 +1477,10 @@ class CRM_Utils_Token {
     $flattenTokens = [];
 
     foreach ([
-               'html',
-               'text',
-               'subject',
-             ] as $prop) {
+      'html',
+      'text',
+      'subject',
+    ] as $prop) {
       if (!isset($tokens[$prop])) {
         continue;
       }
@@ -1676,7 +1676,8 @@ class CRM_Utils_Token {
   public static function replaceContributionTokens($str, &$contribution, $html = FALSE, $knownTokens = NULL, $escapeSmarty = FALSE) {
     $key = 'contribution';
     if (!$knownTokens || !CRM_Utils_Array::value($key, $knownTokens)) {
-      return $str; //early return
+      //early return
+      return $str;
     }
     self::_buildContributionTokens();
 
@@ -1759,9 +1760,9 @@ class CRM_Utils_Token {
       case 'fee':
         try {
           $value = civicrm_api3('membership_type', 'getvalue', [
-              'id' => $membership['membership_type_id'],
-              'return' => 'minimum_fee',
-            ]);
+            'id' => $membership['membership_type_id'],
+            'return' => 'minimum_fee',
+          ]);
           $value = CRM_Utils_Money::format($value, NULL, NULL, TRUE);
         }
         catch (CiviCRM_API3_Exception $e) {
@@ -1847,7 +1848,7 @@ class CRM_Utils_Token {
    * @param string $entity
    * @param bool $usedForTokenWidget
    *
-   * @return array $customTokens
+   * @return array
    *   return custom field tokens in array('custom_N' => 'label') format
    */
   public static function getCustomFieldTokens($entity, $usedForTokenWidget = FALSE) {

@@ -44,10 +44,15 @@ abstract class CRM_Utils_Hook {
   const SUMMARY_BELOW = 1;
   // place hook content above
   const SUMMARY_ABOVE = 2;
-  // create your own summaries
+  /**
+   *create your own summaries
+   */
   const SUMMARY_REPLACE = 3;
 
-  static $_nullObject = NULL;
+  /**
+   * @var ojbect
+   */
+  public static $_nullObject = NULL;
 
   /**
    * We only need one instance of this object. So we use the singleton
@@ -123,7 +128,7 @@ abstract class CRM_Utils_Hook {
    *
    * @return mixed
    */
-  public abstract function invokeViaUF(
+  abstract public function invokeViaUF(
     $numParams,
     &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6,
     $fnSuffix
@@ -1596,6 +1601,7 @@ abstract class CRM_Utils_Hook {
       'civicrm_triggerInfo'
     );
   }
+
   /**
    * This hook allows changes to the spec of which tables to log.
    *
@@ -1862,7 +1868,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * @param CRM_Core_Exception Exception $exception
+   * @param CRM_Core_ExceptionObject $exception
    * @param mixed $request
    *   Reserved for future use.
    */
@@ -1980,7 +1986,6 @@ abstract class CRM_Utils_Hook {
     return self::singleton()
       ->invoke(['labelName', 'label', 'format', 'participant'], $labelName, $label, $format, $participant, self::$_nullObject, self::$_nullObject, 'civicrm_alterBadge');
   }
-
 
   /**
    * This hook is called before encoding data in barcode.
@@ -2290,7 +2295,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * @param array <CRM_Core_FileSearchInterface> $fileSearches
+   * @param array $fileSearches CRM_Core_FileSearchInterface
    * @return mixed
    */
   public static function fileSearches(&$fileSearches) {
@@ -2426,8 +2431,8 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called before an inbound SMS is processed.
    *
-   * @param CRM_SMS_Message Object $message
-   *   An SMS message recieved
+   * @param \CRM_SMS_MessageObject $message
+   *   An SMS message received
    * @return mixed
    */
   public static function inboundSMS(&$message) {
@@ -2438,7 +2443,7 @@ abstract class CRM_Utils_Hook {
    * This hook is called to modify api params of EntityRef form field
    *
    * @param array $params
-   *
+   * @param string $formName
    * @return mixed
    */
   public static function alterEntityRefParams(&$params, $formName) {

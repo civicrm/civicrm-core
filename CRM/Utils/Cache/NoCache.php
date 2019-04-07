@@ -32,8 +32,10 @@
  */
 class CRM_Utils_Cache_NoCache implements CRM_Utils_Cache_Interface {
 
-  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
-  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
+  // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveMultipleTrait;
+  // TODO Native implementation
+  use CRM_Utils_Cache_NaiveHasTrait;
 
   /**
    * We only need one instance of this object. So we use the singleton

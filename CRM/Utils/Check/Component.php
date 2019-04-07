@@ -25,7 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-use GuzzleHttp\Client;
 
 /**
  *
@@ -62,7 +61,8 @@ abstract class CRM_Utils_Check_Component {
   /**
    * Check if file exists on given URL.
    *
-   * @param $url
+   * @param string $url
+   * @param int $timeout
    * @return bool
    * @throws \GuzzleHttp\Exception\GuzzleException
    */

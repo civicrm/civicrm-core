@@ -470,10 +470,10 @@ class CRM_Utils_OpenFlashChart {
 
     // carry some chart params if pass.
     foreach ([
-               'xSize',
-               'ySize',
-               'divName',
-             ] as $f) {
+      'xSize',
+      'ySize',
+      'divName',
+    ] as $f) {
       if (!empty($rows[$f])) {
         $chartData[$f] = $rows[$f];
       }
@@ -510,10 +510,10 @@ class CRM_Utils_OpenFlashChart {
 
     // carry some chart params if pass.
     foreach ([
-               'xSize',
-               'ySize',
-               'divName',
-             ] as $f) {
+      'xSize',
+      'ySize',
+      'divName',
+    ] as $f) {
       if (!empty($rows[$f])) {
         $chartData[$f] = $rows[$f];
       }

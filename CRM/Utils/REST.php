@@ -35,11 +35,13 @@ class CRM_Utils_REST {
 
   /**
    * Number of seconds we should let a REST process idle
+   * @var int
    */
-  static $rest_timeout = 0;
+  public static $rest_timeout = 0;
 
   /**
    * Cache the actual UF Class
+   * @var string
    */
   public $ufClass;
 
@@ -399,8 +401,10 @@ class CRM_Utils_REST {
       CRM_Utils_System::setHttpHeader("Status", "404 Not Found");
       die("Can't find the requested template file templates/$tpl");
     }
-    if (array_key_exists('id', $_GET)) {// special treatmenent, because it's often used
-      $smarty->assign('id', (int) $_GET['id']);// an id is always positive
+    // special treatmenent, because it's often used
+    if (array_key_exists('id', $_GET)) {
+      // an id is always positive
+      $smarty->assign('id', (int) $_GET['id']);
     }
     $pos = strpos(implode(array_keys($_GET)), '<');
 
@@ -480,7 +484,8 @@ class CRM_Utils_REST {
 
     $params['check_permissions'] = TRUE;
     $params['version'] = 3;
-    $_GET['json'] = $requestParams['json'] = 1; // $requestParams is local-only; this line seems pointless unless there's a side-effect influencing other functions
+    // $requestParams is local-only; this line seems pointless unless there's a side-effect influencing other functions
+    $_GET['json'] = $requestParams['json'] = 1;
     if (!$params['sequential']) {
       $params['sequential'] = 1;
     }
@@ -597,7 +602,8 @@ class CRM_Utils_REST {
     if (!empty($q)) {
       if (count($args) == 2 && $args[1] == 'ping') {
         CRM_Utils_System::loadBootStrap([], FALSE, FALSE);
-        return NULL; // this is pretty wonky but maybe there's some reason I can't see
+        // this is pretty wonky but maybe there's some reason I can't see
+        return NULL;
       }
       if (count($args) != 3) {
         return self::error('ERROR: Malformed REST path');

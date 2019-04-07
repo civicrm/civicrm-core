@@ -32,8 +32,10 @@
  */
 class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
 
-  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
-  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
+  // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveMultipleTrait;
+  // TODO Native implementation
+  use CRM_Utils_Cache_NaiveHasTrait;
 
   const DEFAULT_TIMEOUT = 3600;
   const DEFAULT_PREFIX = '';
@@ -123,8 +125,10 @@ class CRM_Utils_Cache_APCcache implements CRM_Utils_Cache_Interface {
   public function flush() {
     $allinfo = apc_cache_info('user');
     $keys = $allinfo['cache_list'];
-    $prefix = $this->_prefix;  // Our keys follows this pattern: ([A-Za-z0-9_]+)?CRM_[A-Za-z0-9_]+
-    $lp = strlen($prefix);              // Get prefix length
+    // Our keys follows this pattern: ([A-Za-z0-9_]+)?CRM_[A-Za-z0-9_]+
+    $prefix = $this->_prefix;
+    // Get prefix length
+    $lp = strlen($prefix);
 
     foreach ($keys as $key) {
       $name = $key['info'];

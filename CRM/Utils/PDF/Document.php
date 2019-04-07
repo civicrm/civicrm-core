@@ -124,7 +124,8 @@ class CRM_Utils_PDF_Document {
       $phpWord = \PhpOffice\PhpWord\IOFactory::load($fileName, $formats[$ext]);
     }
 
-    \PhpOffice\PhpWord\Settings::setOutputEscapingEnabled(TRUE); //CRM-20015
+    //CRM-20015
+    \PhpOffice\PhpWord\Settings::setOutputEscapingEnabled(TRUE);
     $objWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, $formats[$ext]);
 
     CRM_Utils_System::setHttpHeader('Content-Type', "application/$ext");
@@ -147,7 +148,7 @@ class CRM_Utils_PDF_Document {
    * @param string $type  File type
    *
    * @return array
-   *    Return extracted content of document in HTML and document type
+   *   Return extracted content of document in HTML and document type
    */
   public static function docReader($path, $type) {
     $type = array_search($type, CRM_Core_SelectValues::documentApplicationType());

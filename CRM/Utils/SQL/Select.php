@@ -389,7 +389,6 @@ class CRM_Utils_SQL_Select extends CRM_Utils_SQL_BaseParamQuery {
     return $this->insertInto($table, $fields);
   }
 
-
   /**
    * @param array $fields
    *   The fields to fill in the other table (in order).

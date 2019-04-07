@@ -251,7 +251,8 @@ class CRM_Utils_Cache {
    *   Ex: 'ArrayCache', 'Memcache', 'Redis'.
    */
   public static function getCacheDriver() {
-    $className = 'ArrayCache';   // default to ArrayCache for now
+    // default to ArrayCache for now
+    $className = 'ArrayCache';
 
     // Maintain backward compatibility for now.
     // Setting CIVICRM_USE_MEMCACHE or CIVICRM_USE_ARRAYCACHE will

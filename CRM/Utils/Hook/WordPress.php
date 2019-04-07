@@ -160,7 +160,6 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
 
   }
 
-
   /**
    * Build the list of plugins ("modules" in CiviCRM terminology) to be processed for hooks.
    *

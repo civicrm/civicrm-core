@@ -32,6 +32,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_JS {
+
   /**
    * Parse a javascript file for translatable strings.
    *

@@ -62,7 +62,7 @@ class CRM_Utils_GlobalStack {
    *
    * @return CRM_Utils_GlobalStack
    */
-  static public function singleton() {
+  public static function singleton() {
     if (self::$_singleton === NULL) {
       self::$_singleton = new CRM_Utils_GlobalStack();
     }

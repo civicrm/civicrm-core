@@ -797,7 +797,8 @@ HTACCESS;
       }
     }
     if (empty($childParts)) {
-      return FALSE; // same directory
+      // same directory
+      return FALSE;
     }
     else {
       return TRUE;

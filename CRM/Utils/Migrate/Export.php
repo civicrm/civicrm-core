@@ -475,14 +475,14 @@ class CRM_Utils_Migrate_Export {
         // hack for extends_entity_column_value
         if ($name == 'extends_entity_column_value') {
           if (in_array($object->extends, [
-              'Event',
-              'Activity',
-              'Relationship',
-              'Individual',
-              'Organization',
-              'Household',
-              'Case',
-            ])) {
+            'Event',
+            'Activity',
+            'Relationship',
+            'Individual',
+            'Organization',
+            'Household',
+            'Case',
+          ])) {
             if ($object->extends == 'Event') {
               $key = 'event_type';
             }

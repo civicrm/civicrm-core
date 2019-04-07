@@ -88,6 +88,9 @@ class CRM_Utils_QueryFormatter {
    */
   const MODE_WILDWORDS_SUFFIX = 'wildwords-suffix';
 
+  /**
+   * @var \CRM_Utils_QueryFormatter|NULL
+   */
   static protected $singleton;
 
   /**
@@ -407,8 +410,8 @@ class CRM_Utils_QueryFormatter {
   }
 
   /**
-   * @param $text
-   * @bool $quotes
+   * @param string $text
+   * @param bool $quotes
    * @return array
    */
   protected function parseWords($text, $quotes) {

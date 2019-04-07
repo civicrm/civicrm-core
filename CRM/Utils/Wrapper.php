@@ -41,6 +41,7 @@ class CRM_Utils_Wrapper {
    * Simple Controller.
    *
    * The controller which will handle the display and processing of this page.
+   * @var \CRM_Core_Controller_Simple object
    */
   protected $_controller;
 

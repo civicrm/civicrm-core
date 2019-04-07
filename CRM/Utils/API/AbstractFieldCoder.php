@@ -92,7 +92,7 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
    *
    * @param array|string $values the field value from the API
    */
-  public abstract function encodeInput(&$values);
+  abstract public function encodeInput(&$values);
 
   /**
    * Decode output.
@@ -101,7 +101,7 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
    *
    * @return mixed
    */
-  public abstract function decodeOutput(&$values);
+  abstract public function decodeOutput(&$values);
 
   /**
    * @inheritDoc

@@ -35,7 +35,7 @@
  * Money utilties
  */
 class CRM_Utils_Money {
-  static $_currencySymbols = NULL;
+  public static $_currencySymbols = NULL;
 
   /**
    * Format a monetary string.
@@ -87,9 +87,9 @@ class CRM_Utils_Money {
 
     if (!self::$_currencySymbols) {
       self::$_currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', [
-          'keyColumn' => 'name',
-          'labelColumn' => 'symbol',
-        ]);
+        'keyColumn' => 'name',
+        'labelColumn' => 'symbol',
+      ]);
     }
 
     if (!$currency) {
