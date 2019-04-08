@@ -106,8 +106,6 @@ class CRM_Admin_Form_Preferences_Display extends CRM_Admin_Form_Preferences {
 
     $this->postProcessCommon();
 
-    \Civi::service('asset_builder')->clear();
-
     // If "Configure CKEditor" button was clicked
     if (!empty($this->_params['ckeditor_config'])) {
       // Suppress the "Saved" status message and redirect to the CKEditor Config page
