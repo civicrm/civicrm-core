@@ -66,12 +66,7 @@
       .on('change', function() {
         $('span.permission_operator_wrapper').toggle(CRM._.includes($(this).val(), ','));
       })
-      .change()
-      .crmSelect2({
-        formatResult: CRM.utils.formatSelect2Result,
-        formatSelection: function(row) {return row.label},
-        multiple: true
-      });
+      .change();
   });
 </script>
 {/literal}

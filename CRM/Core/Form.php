@@ -389,7 +389,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($inputType == 'select2') {
       $type = 'text';
       $options = $attributes;
-      $attributes = $attributes = ($extra ? $extra : []) + ['class' => ''];
+      $attributes = ($extra ? $extra : []) + ['class' => ''];
       $attributes['class'] = ltrim($attributes['class'] . " crm-select2 crm-form-select2");
       $attributes['data-select-params'] = json_encode(['data' => $options, 'multiple' => !empty($attributes['multiple'])]);
       unset($attributes['multiple']);

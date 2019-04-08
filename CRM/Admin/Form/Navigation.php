@@ -73,10 +73,10 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
 
     $permissions = [];
     foreach (CRM_Core_Permission::basicPermissions(TRUE, TRUE) as $id => $vals) {
-      $permissions[] = ['id' => $id, 'label' => $vals[0], 'description' => (array) CRM_Utils_Array::value(1, $vals)];
+      $permissions[] = ['id' => $id, 'text' => $vals[0], 'description' => (array) CRM_Utils_Array::value(1, $vals)];
     }
-    $this->add('text', 'permission', ts('Permission'),
-      ['placeholder' => ts('Unrestricted'), 'class' => 'huge', 'data-select-params' => json_encode(['data' => ['results' => $permissions, 'text' => 'label']])]
+    $this->add('select2', 'permission', ts('Permission'), $permissions, FALSE,
+      ['placeholder' => ts('Unrestricted'), 'class' => 'huge', 'multiple' => TRUE]
     );
 
     $operators = ['AND' => ts('AND'), 'OR' => ts('OR')];
@@ -122,6 +122,10 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
 
     // its ok if there is no element called is_active
     $defaults['is_active'] = ($this->_id) ? $this->_defaults['is_active'] : 1;
+
+    if (!empty($defaults['icon'])) {
+      $defaults['icon'] = trim(str_replace('crm-i', '', $defaults['icon']));
+    }
 
     return $defaults;
   }
