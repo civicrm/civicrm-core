@@ -258,14 +258,19 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
   /**
    * Cancel Recurring contribution.
    *
-   * @param int $recurId
-   *   Recur contribution id.
+   * @param array $params
+   *   Recur contribution params
    *
    * @param array $activityParams
    *
    * @return bool
    */
-  public static function cancelRecurContribution($recurId, $activityParams = []) {
+  public static function cancelRecurContribution($params, $activityParams = []) {
+    if (is_int($params)) {
+      CRM_Core_Error::deprecatedFunctionWarning('You are using a BAO function whose signature has changed. Please use the ContributionRecur.cancel api');
+      $params = ['id' => $params];
+    }
+    $recurId = $params['id'];
     if (!$recurId) {
       return FALSE;
     }
@@ -282,6 +287,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       $recur->start_date = CRM_Utils_Date::isoToMysql($recur->start_date);
       $recur->create_date = CRM_Utils_Date::isoToMysql($recur->create_date);
       $recur->modified_date = CRM_Utils_Date::isoToMysql($recur->modified_date);
+      $recur->cancel_reason = CRM_Utils_Array::value('cancel_reason', $params);
       $recur->cancel_date = date('YmdHis');
       $recur->save();
 

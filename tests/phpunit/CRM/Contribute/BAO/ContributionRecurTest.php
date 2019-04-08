@@ -90,7 +90,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    */
   public function testCancelRecur() {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
-    CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution($contributionRecur['id']);
+    CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution(['id' => $contributionRecur['id']]);
   }
 
   /**

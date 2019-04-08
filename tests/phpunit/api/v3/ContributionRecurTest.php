@@ -100,4 +100,16 @@ class api_v3_ContributionRecurTest extends CiviUnitTestCase {
     $this->assertEquals(12, $result['values']['start_date']['type']);
   }
 
+  /**
+   * Test that we can cancel a contribution and add a cancel_reason via the api.
+   */
+  public function testContributionRecurCancel() {
+    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $this->callAPISuccess('ContributionRecur', 'cancel', ['id' => $result['id'], 'cancel_reason' => 'just cos']);
+    $cancelled = $this->callAPISuccess('ContributionRecur', 'getsingle', ['id' => $result['id']]);
+    $this->assertEquals('just cos', $cancelled['cancel_reason']);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Cancelled'), $cancelled['contribution_status_id']);
+    $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($cancelled['cancel_date'])));
+  }
+
 }
