@@ -652,7 +652,7 @@ VALUES $sqlValueString
    */
   public static function createTempTable($sqlColumns) {
     //creating a temporary table for the search result that need be exported
-    $exportTempTable = CRM_Utils_SQL_TempTable::build()->setDurable()->setCategory('export')->setUtf8();
+    $exportTempTable = CRM_Utils_SQL_TempTable::build()->setDurable()->setCategory('export');
 
     // also create the sql table
     $exportTempTable->drop();
