@@ -151,7 +151,7 @@ class CRM_Upgrade_Incremental_Base {
    * @param bool $localizable is this a field that should be localized
    * @return bool
    */
-  public static function addColumn($ctx, $table, $column, $properties, $localizable = FALSE) {
+  public static function addColumn($ctx, $table, $column, $properties, $localizable = FALSE, $version = NULL) {
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
     $queries = [];
@@ -178,7 +178,7 @@ class CRM_Upgrade_Incremental_Base {
     }
     if ($domain->locales) {
       $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
-      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, NULL, TRUE);
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, $version, TRUE);
     }
     return TRUE;
   }
@@ -259,12 +259,12 @@ class CRM_Upgrade_Incremental_Base {
    * @param CRM_Queue_TaskContext $ctx
    * @return bool
    */
-  public static function rebuildMultilingalSchema($ctx) {
+  public static function rebuildMultilingalSchema($ctx, $version = NULL) {
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
     if ($domain->locales) {
       $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
-      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales);
+      CRM_Core_I18n_Schema::rebuildMultilingualSchema($locales, $version);
     }
     return TRUE;
   }

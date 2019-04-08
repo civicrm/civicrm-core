@@ -492,10 +492,10 @@ class CRM_Upgrade_Incremental_php_FourSeven extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_4_7_31($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('CRM-21225: Add display title field to civicrm_uf_group', 'addColumn', 'civicrm_uf_group', 'frontend_title',
-      "VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL COMMENT 'Profile Form Public title'", TRUE);
-    $this->addTask('Rebuild Multilingual Schema', 'rebuildMultilingalSchema');
+      "VARCHAR(64) CHARACTER SET utf8 COLLATE utf8_unicode_ci NULL COMMENT 'Profile Form Public title'", TRUE, '4.7.31');
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Rebuild Multilingual Schema', 'rebuildMultilingalSchema', '4.7.31');
   }
 
   /**
