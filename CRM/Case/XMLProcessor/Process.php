@@ -630,6 +630,31 @@ AND        a.is_deleted = 0
   }
 
   /**
+   * Update role name after relationship is edited.
+   *
+   * @param string $prevName
+   * @param string $updatedName
+   */
+  public function updateCaseRoleNames($prevName, $updatedName) {
+    $repo = new CRM_Case_XMLRepository();
+    foreach ($repo->getAllCaseTypes() as $caseId => $caseTypeName) {
+      $caseTypeXML = $repo->retrieve($caseTypeName);
+      if (in_array($prevName, $this->getDeclaredRelationshipTypes($caseTypeXML))) {
+        foreach ($caseTypeXML->CaseRoles->RelationshipType as $relType) {
+          if ($relType->name == $prevName) {
+            $relType->name = $updatedName;
+          }
+        }
+        $updateParams = [
+          'id' => $caseId,
+          'definition' => CRM_Case_BAO_CaseType::convertXmlToDefinition($caseTypeXML),
+        ];
+        CRM_Case_BAO_CaseType::create($updateParams);
+      }
+    }
+  }
+
+  /**
    * Returns the default assignee for the activity by searching for the target's
    * contact relationship type defined in the activity's details.
    *

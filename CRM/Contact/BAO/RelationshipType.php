@@ -100,6 +100,9 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
         $params['name_b_a'] = $params['label_b_a'];
       }
     }
+    else {
+      $previousLabelBA = CRM_Core_DAO::getFieldValue('CRM_Contact_BAO_RelationshipType', $params['id'], 'label_b_a');
+    }
 
     // action is taken depending upon the mode
     $relationshipType = new CRM_Contact_DAO_RelationshipType();
@@ -109,6 +112,12 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
 
     $relationshipType->copyValues($params);
     $relationshipType->save();
+
+    //Update case roles definition if label is changed.
+    if (!empty($previousLabelBA) && !empty($params['label_b_a']) && $previousLabelBA != $params['label_b_a']) {
+      $xmlProcessor = new CRM_Case_XMLProcessor_Process();
+      $xmlProcessor->updateCaseRoleNames($previousLabelBA, $params['label_b_a']);
+    }
 
     CRM_Utils_Hook::post($hook, 'RelationshipType', $relationshipType->id, $relationshipType);
 

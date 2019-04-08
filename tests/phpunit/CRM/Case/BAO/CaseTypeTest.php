@@ -144,6 +144,41 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
 
   /**
    * @param string $fixtureName
+   * @param string $expectedJson
+   * @param string $inputXml
+   * @dataProvider definitionProvider
+   */
+  public function testUpdateCaseRoleName($fixtureName, $expectedJson, $inputXml) {
+    if ($fixtureName == 'one-item-in-each') {
+      $xml = simplexml_load_string($inputXml);
+      $actualDefinition = CRM_Case_BAO_CaseType::convertXmlToDefinition($xml);
+      $relType = $this->callAPISuccess('RelationshipType', 'create', [
+        'name_a_b' => "First role",
+        'name_b_a' => "First role",
+      ]);
+
+      //Add case type with the definition.
+      $this->callAPISuccess('CaseType', 'create', [
+        'name' => "test_case",
+        'title' => "Test Case",
+        'is_active' => 1,
+        'definition' => $actualDefinition,
+      ]);
+
+      //Update relationship type name.
+      $this->callAPISuccess('RelationshipType', 'create', [
+        'id' => $relType['id'],
+        'label_b_a' => "Edited First role",
+      ]);
+
+      //Check if rel type is correctly updated on case role.
+      $caseTypeDef = CRM_Case_XMLRepository::singleton()->retrieve('test_case');
+      $this->assertEquals("Edited First role", $caseTypeDef->CaseRoles->RelationshipType->name);
+    }
+  }
+
+  /**
+   * @param string $fixtureName
    * @param string $inputJson
    * @param string $expectedXml
    * @dataProvider definitionProvider
