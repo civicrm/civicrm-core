@@ -582,7 +582,6 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addCoreResources($region = 'html-header') {
-    Civi::dispatcher()->addListener('hook_civicrm_buildAsset', [$this, 'renderMenubarStylesheet']);
     if (!isset($this->addedCoreResources[$region]) && !self::isAjaxMode()) {
       $this->addedCoreResources[$region] = TRUE;
       $config = CRM_Core_Config::singleton();
