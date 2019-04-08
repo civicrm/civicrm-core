@@ -3049,7 +3049,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @param int $contributionPageID
    * @param string $module
    */
-  protected function addProfile($name, $contributionPageID, $module = 'CiviContribute') {
+  protected function addProfile($name, $contributionPageID, $module = 'CiviContribute', $moduleData = []) {
     $params = [
       'uf_group_id' => $name,
       'module' => $module,
@@ -3058,7 +3058,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'weight' => 1,
     ];
     if ($module !== 'CiviContribute') {
-      $params['module_data'] = [$module => []];
+      $params['module_data'] = [$module => $moduleData];
     }
     $this->callAPISuccess('UFJoin', 'create', $params);
   }

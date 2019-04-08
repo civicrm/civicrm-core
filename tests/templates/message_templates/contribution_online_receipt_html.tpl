@@ -62,6 +62,7 @@
   customPre_grouptitle:::{$customPre_grouptitle}
   customPost_grouptitle:::{$customPost_grouptitle}
   contributionStatus:::{$contributionStatus}
+  related_contact:::{$related_contact}
  {foreach from=$lineItem item=value key=priceset}
   {foreach from=$value item=line}
      line.html_type:::{$line.html_type}

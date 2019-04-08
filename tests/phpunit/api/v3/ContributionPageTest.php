@@ -1912,6 +1912,86 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($lineItem_TaxAmount, round(180 * 16.95 * 0.10, 2), 'Wrong Sales Tax Amount is calculated and stored.');
   }
 
+  /**
+   * Test submit with a membership block in place.
+   */
+  public function testSubmitContributionPageWithOnBehalfOf() {
+    $mut = new CiviMailUtils($this, TRUE);
+    $this->setUpContributionPage();
+    $this->setupPaymentProcessor();
+    $this->swapMessageTemplateForTestTemplate();
+    $this->createLoggedInUser();
+
+    $this->organizationCreate();
+    $this->addProfile('supporter_profile', $this->_ids['contribution_page']);
+    $this->addProfile('on_behalf_organization', $this->_ids['contribution_page'], 'on_behalf', array(
+      // 1 means giving on behalf of an org is optional. 2 means required.
+      'is_for_organization' => 1,
+      'default' => array(
+        'for_organization' => 'This donation is on behalf of a company.',
+      ),
+    ));
+
+    $result = civicrm_api3('UFJoin', 'get', [
+      'sequential' => 1,
+      'entity_table' => "civicrm_contribution_page",
+    ]);
+    $submitParams = array(
+      'price_' . $this->_ids['price_field'][0] => reset($this->_ids['price_field_value']),
+      'id' => (int) $this->_ids['contribution_page'],
+      'amount' => 10,
+      'billing_first_name' => 'Billy',
+      'billing_middle_name' => 'Goat',
+      'billing_last_name' => 'Gruff',
+      'email-Primary' => 'billy-goat@the-bridge.net',
+      'payment_processor_id' => $this->_paymentProcessor['id'],
+      'credit_card_number' => '4111111111111111',
+      'credit_card_type' => 'Visa',
+      'credit_card_exp_date' => array('M' => 9, 'Y' => 2040),
+      'cvv2' => 123,
+      'is_for_organization' => '1',
+      'onbehalf' => array(
+        'city-3' => 'Washington',
+        'country-3' => '1228',
+        'email-3' => 'president@example.org',
+        'organization_name' => 'United States Govt.',
+        'phone-3-1' => '202-555-5555',
+        'postal_code-3' => '20500',
+        'state_province-3' => '1050',
+        'street_address-3' => '1600 Pennsylvania Avenue NW',
+      ),
+      'onbehalf_location' => array(
+        '' => 'United States Govt.',
+        'address' => array(
+          '3' => array(
+            'city' => 'Washington',
+            'country' => '1228',
+            'is_primary' => 1,
+            'location_type_id' => '3',
+            'postal_code' => '20500',
+            'state_province' => '1050',
+            'street_address' => '1600 Pennsylvania Avenue NW',
+          ),
+          'email' => array(
+            '3' => array(
+              'email' => 'president@example.org',
+            ),
+          ),
+          'phone' => array(
+            '3' => array(
+              'phone' => '202-555-5555',
+            ),
+          ),
+        ),
+      ),
+    );
+
+    $this->callAPISuccess('contribution_page', 'submit', $submitParams);
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('contribution_page_id' => $this->_ids['contribution_page']));
+    $mut->checkMailLog(array('related_contact',));
+    $mut->stop();
+    $mut->clearMessages();
+  }
 
   /**
    * Test validating a contribution page submit.
