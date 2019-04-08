@@ -765,7 +765,9 @@ class CRM_Core_Resources {
       $items[] = 'bower_components/smartmenus/dist/jquery.smartmenus.min.js';
       $items[] = 'bower_components/smartmenus/dist/addons/keyboard/jquery.smartmenus.keyboard.min.js';
       $items[] = 'js/crm.menubar.js';
-      $items[] = Civi::service('asset_builder')->getUrl('crm-menubar.css');
+      $items[] = Civi::service('asset_builder')->getUrl('crm-menubar.css', [
+        'color' => Civi::settings()->get('menubar_color'),
+      ]);
       $items[] = [
         'menubar' => [
           'position' => $position,
@@ -844,7 +846,7 @@ class CRM_Core_Resources {
     foreach ($items as $item) {
       $e->content .= file_get_contents(self::singleton()->getPath('civicrm', $item));
     }
-    $color = Civi::settings()->get('menubar_color');
+    $color = $e->params['color'];
     if (!CRM_Utils_Rule::color($color)) {
       $color = Civi::settings()->getDefault('menubar_color');
     }
