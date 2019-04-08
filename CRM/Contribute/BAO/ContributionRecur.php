@@ -261,11 +261,9 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @param array $params
    *   Recur contribution params
    *
-   * @param array $activityParams
-   *
    * @return bool
    */
-  public static function cancelRecurContribution($params, $activityParams = []) {
+  public static function cancelRecurContribution($params) {
     if (is_int($params)) {
       CRM_Core_Error::deprecatedFunctionWarning('You are using a BAO function whose signature has changed. Please use the ContributionRecur.cancel api');
       $params = ['id' => $params];
@@ -274,6 +272,10 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     if (!$recurId) {
       return FALSE;
     }
+    $activityParams = [
+      'subject' => !empty($params['membership_id']) ? ts('Auto-renewal membership cancelled') : ts('Recurring contribution cancelled'),
+      'details' => CRM_Utils_Array::value('processor_message', $params),
+    ];
 
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $canceledId = array_search('Cancelled', $contributionStatus);
@@ -303,8 +305,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
 <br/>' . ts('Automatic renewal of %1 membership cancelled.', [1 => $membershipType]);
         }
         else {
-          $details .= '
-<br/>' . ts('The recurring contribution of %1, every %2 %3 has been cancelled.', [
+          $details .= '<br/>' . ts('The recurring contribution of %1, every %2 %3 has been cancelled.', [
               1 => $dao->amount,
               2 => $dao->frequency_interval,
               3 => $dao->frequency_unit,
@@ -313,20 +314,18 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
         $activityParams = [
           'source_contact_id' => $dao->contact_id,
           'source_record_id' => $dao->recur_id,
-          'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Cancel Recurring Contribution'),
+          'activity_type_id' => 'Cancel Recurring Contribution',
           'subject' => CRM_Utils_Array::value('subject', $activityParams, ts('Recurring contribution cancelled')),
           'details' => $details,
-          'activity_date_time' => date('YmdHis'),
-          'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
+          'status_id' => 'Completed',
         ];
-        $session = CRM_Core_Session::singleton();
-        $cid = $session->get('userID');
+
+        $cid = CRM_Core_Session::singleton()->get('userID');
         if ($cid) {
           $activityParams['target_contact_id'][] = $activityParams['source_contact_id'];
           $activityParams['source_contact_id'] = $cid;
         }
-        // @todo use the api & do less wrangling above
-        CRM_Activity_BAO_Activity::create($activityParams);
+        civicrm_api3('Activity', 'create', $activityParams);
       }
 
       $transaction->commit();
