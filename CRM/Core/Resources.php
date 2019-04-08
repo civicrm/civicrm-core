@@ -844,9 +844,18 @@ class CRM_Core_Resources {
     foreach ($items as $item) {
       $e->content .= file_get_contents(self::singleton()->getPath('civicrm', $item));
     }
+    $color = Civi::settings()->get('menubar_color');
+    if (!CRM_Utils_Rule::color($color)) {
+      $color = Civi::settings()->getDefault('menubar_color');
+    }
     $vars = [
       'resourceBase' => rtrim($config->resourceBase, '/'),
+      'menubarColor' => $color,
+      'semiTransparentMenuColor' => 'rgba(' . implode(', ', CRM_Utils_Color::getRgb($color)) . ', .85)',
+      'highlightColor' => CRM_Utils_Color::getHighlight($color),
+      'textColor' => CRM_Utils_Color::getContrast($color, '#333', '#ddd'),
     ];
+    $vars['highlightTextColor'] = CRM_Utils_Color::getContrast($vars['highlightColor'], '#333', '#ddd');
     foreach ($vars as $var => $val) {
       $e->content = str_replace('$' . $var, $val, $e->content);
     }
