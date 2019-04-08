@@ -561,8 +561,17 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $preOperationSqls = self::operationSql($mainId, $otherId, $table, $tableOperations);
           $sqls = array_merge($sqls, $preOperationSqls);
 
-          $sqls[] = "DELETE FROM $table WHERE $field = $mainId";
-          $sqls[] = "UPDATE $table SET $field = $mainId WHERE $field = $otherId";
+          if (stripos($table, 'civicrm_value_') === 0) {
+            $sqls[] = "DELETE FROM $table WHERE $field = $mainId";
+            $sqls[] = "UPDATE $table SET $field = $mainId WHERE $field = $otherId";
+          }
+          else {
+            if ($customTableToCopyFrom !== NULL && in_array($table, $customTableToCopyFrom) && !self::customRecordExists($mainId, $table, $field)) {
+              $sqls[] = "INSERT INTO $table ($field) VALUES ($mainId)";
+            }
+            $sqls[] = "UPDATE IGNORE $table SET $field = $mainId WHERE $field = $otherId";
+            $sqls[] = "DELETE FROM $table WHERE $field = $otherId";
+          }
         }
       }
 
