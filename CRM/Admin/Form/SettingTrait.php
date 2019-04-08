@@ -237,6 +237,9 @@ trait CRM_Admin_Form_SettingTrait {
         elseif ($add === 'addYesNo' && ($props['type'] === 'Boolean')) {
           $this->addRadio($setting, ts($props['title']), array(1 => 'Yes', 0 => 'No'), NULL, '&nbsp;&nbsp;');
         }
+        elseif ($add === 'add') {
+          $this->add($props['html_type'], $setting, ts($props['title']), $options);
+        }
         else {
           $this->$add($setting, ts($props['title']), $options);
         }
@@ -292,6 +295,7 @@ trait CRM_Admin_Form_SettingTrait {
       'entity_reference' => 'EntityRef',
       'advmultiselect' => 'Element',
     ];
+    $mapping += array_fill_keys(CRM_Core_Form::$html5Types, '');
     return $mapping[$htmlType];
   }
   /**

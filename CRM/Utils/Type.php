@@ -434,6 +434,7 @@ class CRM_Utils_Type {
       'ExtensionKey',
       'Json',
       'Alphanumeric',
+      'Color',
     );
     if (!in_array($type, $possibleTypes)) {
       if ($isThrowException) {
@@ -551,6 +552,12 @@ class CRM_Utils_Type {
 
       case 'Alphanumeric':
         if (CRM_Utils_Rule::alphanumeric($data)) {
+          return $data;
+        }
+        break;
+
+      case 'Color':
+        if (CRM_Utils_Rule::color($data)) {
           return $data;
         }
         break;

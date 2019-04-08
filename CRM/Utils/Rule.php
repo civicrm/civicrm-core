@@ -541,6 +541,16 @@ class CRM_Utils_Rule {
   }
 
   /**
+   * Strict validation of 6-digit hex color notation per html5 <input type="color">
+   *
+   * @param $value
+   * @return bool
+   */
+  public static function color($value) {
+    return (bool) preg_match('/^#([\da-fA-F]{6})$/', $value);
+  }
+
+  /**
    * Strip thousand separator from a money string.
    *
    * Note that this should be done at the form layer. Once we are processing
