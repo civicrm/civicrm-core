@@ -821,8 +821,8 @@ class CRM_Core_Resources {
     ) {
       return TRUE;
     }
-    $url = CRM_Utils_System::getUrlPath();
-    return (strpos($url, 'civicrm/ajax') === 0) || (strpos($url, 'civicrm/angular') === 0);
+    list($arg0, $arg1) = array_pad(explode('/', CRM_Utils_System::getUrlPath()), 2, '');
+    return ($arg0 === 'civicrm' && in_array($arg1, ['ajax', 'angularprofiles', 'asset']));
   }
 
   /**
