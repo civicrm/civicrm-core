@@ -456,18 +456,6 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'CommaSeparatedIntegers':
-        if (CRM_Utils_Rule::commaSeparatedIntegers($data)) {
-          return $data;
-        }
-        break;
-
-      case 'Boolean':
-        if (CRM_Utils_Rule::boolean($data)) {
-          return $data;
-        }
-        break;
-
       case 'Float':
       case 'Money':
         if (CRM_Utils_Rule::numeric($data)) {
@@ -520,21 +508,9 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'MysqlColumnNameOrAlias':
-        if (CRM_Utils_Rule::mysqlColumnNameOrAlias($data)) {
-          return $data;
-        }
-        break;
-
       case 'MysqlOrderByDirection':
         if (CRM_Utils_Rule::mysqlOrderByDirection($data)) {
           return strtolower($data);
-        }
-        break;
-
-      case 'MysqlOrderBy':
-        if (CRM_Utils_Rule::mysqlOrderBy($data)) {
-          return $data;
         }
         break;
 
@@ -544,23 +520,11 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'Json':
-        if (CRM_Utils_Rule::json($data)) {
+      default:
+        $check = lcfirst($type);
+        if (CRM_Utils_Rule::$check($data)) {
           return $data;
         }
-        break;
-
-      case 'Alphanumeric':
-        if (CRM_Utils_Rule::alphanumeric($data)) {
-          return $data;
-        }
-        break;
-
-      case 'Color':
-        if (CRM_Utils_Rule::color($data)) {
-          return $data;
-        }
-        break;
     }
 
     if ($abort) {
