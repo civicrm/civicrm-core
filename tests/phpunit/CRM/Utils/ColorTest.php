@@ -14,16 +14,32 @@ class CRM_Utils_ColorTest extends CiviUnitTestCase {
   }
 
   public function contrastExamples() {
-    return array(
-      array('ef4444', 'white'),
-      array('FAA31B', 'black'),
-      array('FFF000', 'black'),
-      array(' 82c341', 'black'),
-      array('#009F75', 'white'),
-      array('#88C6eD', 'black'),
-      array('# 394ba0', 'white'),
-      array(' #D54799', 'white'),
-    );
+    return [
+      ['ef4444', 'white'],
+      ['FAA31B', 'black'],
+      ['FFF000', 'black'],
+      [' 82c341', 'black'],
+      ['#009F75', 'white'],
+      ['#88C6eD', 'black'],
+      ['# 394ba0', 'white'],
+      [' #D54799', 'white'],
+    ];
+  }
+
+  /**
+   * @dataProvider rgbExamples
+   */
+  public function testGetRgb($hex, $rgb) {
+    $this->assertEquals($rgb, CRM_Utils_Color::getRgb($hex));
+  }
+
+  public function rgbExamples() {
+    return [
+      ['#fff', [255, 255, 255]],
+      ['#000000', [0, 0, 0]],
+      ['#111', [17, 17, 17]],
+      [' fffc99 ', [255, 252, 153]],
+    ];
   }
 
 }
