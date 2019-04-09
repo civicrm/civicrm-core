@@ -137,6 +137,8 @@ class System {
     if (isset(\Civi::$statics['CRM_Contribute_BAO_ContributionRecur'])) {
       unset(\Civi::$statics['CRM_Contribute_BAO_ContributionRecur']);
     }
+    \CRM_Core_PseudoConstant::flush('paymentProcessor');
+    civicrm_api3('PaymentProcessor', 'getfields', ['cache_clear' => 1]);
     \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('all', TRUE);
     \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('live', TRUE);
     \CRM_Financial_BAO_PaymentProcessor::getAllPaymentProcessors('test', TRUE);
