@@ -92,7 +92,7 @@ WHERE {$key}.id IS NULL";
         if ($value != 'contact_id') {
           $query .= " AND contri_recur.{$value} IS NOT NULL ";
         }
-        $dao = CRM_Core_DAO::executeQuery($query);
+        $dao = CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
         if ($dao->N) {
           $invalidDataMessage = '<strong>Oops, it looks like you have orphaned recurring contribution records in your database. Before this upgrade can complete they will need to be fixed or deleted. <a href="http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Orphaned+Contribution+Recur+Records" target="_blank">You can review steps to correct this situation on the documentation wiki.</a></strong>';
           CRM_Core_Error::fatal($invalidDataMessage);

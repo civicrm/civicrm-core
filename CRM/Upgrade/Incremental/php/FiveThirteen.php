@@ -74,12 +74,13 @@ class CRM_Upgrade_Incremental_php_FiveThirteen extends CRM_Upgrade_Incremental_B
    * @param string $rev
    */
   public function upgrade_5_13_alpha1($rev) {
+    $this->addTask('Add title to civicrm_payment_processor', 'addColumn',
+      'civicrm_payment_processor', 'title', "text COMMENT 'Payment Processor Descriptive Name.'", TRUE, '5.13.alpha1'
+    );
     $this->addTask('Add cancel reason column to civicrm_contribution_recur', 'addColumn',
       'civicrm_contribution_recur', 'cancel_reason', "text COMMENT 'Free text field for a reason for cancelling'", FALSE
     );
-    $this->addTask('Add title to civicrm_payment_processor', 'addColumn',
-      'civicrm_payment_processor', 'title', "text COMMENT 'Payment Processor Descriptive Name.'", FALSE
-    );
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 
 }
