@@ -724,7 +724,7 @@ HERESQL;
     $myGroupByClauseA = $myGroupByClauseB;
     // FIXME: This query could be a lot more efficient if it used COUNT() instead of returning all rows and then counting them with php
     $query = "
-SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS case_type,
+SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_case_type.title AS case_type,
  case_type_id, case_relationship.contact_id_b as case_contact
  FROM civicrm_case
  INNER JOIN civicrm_case_contact cc on cc.case_id = civicrm_case.id
@@ -737,7 +737,7 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
  WHERE is_deleted = 0 AND cc.contact_id IN (SELECT id FROM civicrm_contact WHERE is_deleted <> 1)
 {$myCaseWhereClauseB} {$myGroupByClauseB}
 UNION
-SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS case_type,
+SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_case_type.title AS case_type,
  case_type_id, case_relationship.contact_id_a as case_contact
  FROM civicrm_case
  INNER JOIN civicrm_case_contact cc on cc.case_id = civicrm_case.id
