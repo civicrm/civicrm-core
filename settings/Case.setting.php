@@ -36,71 +36,71 @@
 /**
  * Settings metadata file
  */
-return array(
-  'civicaseRedactActivityEmail' => array(
+return [
+  'civicaseRedactActivityEmail' => [
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'civicaseRedactActivityEmail',
     'type' => 'String',
     'quick_form_type' => 'Select',
     'html_type' => 'Select',
-    'html_attributes' => array(
+    'html_attributes' => [
       //'class' => 'crm-select2',
-    ),
+    ],
     'default' => 'default',
     'add' => '4.7',
     'title' => 'Redact Activity Email',
     'is_domain' => 1,
     'is_contact' => 0,
-    'pseudoconstant' => array(
+    'pseudoconstant' => [
       'callback' => 'CRM_Case_Info::getRedactOptions',
-    ),
+    ],
     'description' => 'Should activity emails be redacted? (Set "Default" to load setting from the legacy "Settings.xml" file.)',
     'help_text' => '',
-  ),
-  'civicaseAllowMultipleClients' => array(
+  ],
+  'civicaseAllowMultipleClients' => [
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'civicaseAllowMultipleClients',
     'type' => 'String',
     'quick_form_type' => 'Select',
     'html_type' => 'Select',
-    'html_attributes' => array(
+    'html_attributes' => [
       //'class' => 'crm-select2',
-    ),
+    ],
     'default' => 'default',
     'add' => '4.7',
     'title' => 'Allow Multiple Case Clients',
     'is_domain' => 1,
     'is_contact' => 0,
-    'pseudoconstant' => array(
+    'pseudoconstant' => [
       'callback' => 'CRM_Case_Info::getMultiClientOptions',
-    ),
+    ],
     'description' => 'How many clients may be associated with a given case? (Set "Default" to load setting from the legacy "Settings.xml" file.)',
     'help_text' => '',
-  ),
-  'civicaseNaturalActivityTypeSort' => array(
+  ],
+  'civicaseNaturalActivityTypeSort' => [
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'civicaseNaturalActivityTypeSort',
     'type' => 'String',
     'quick_form_type' => 'Select',
     'html_type' => 'Select',
-    'html_attributes' => array(
+    'html_attributes' => [
       //'class' => 'crm-select2',
-    ),
+    ],
     'default' => 'default',
     'add' => '4.7',
     'title' => 'Activity Type Sorting',
     'is_domain' => 1,
     'is_contact' => 0,
-    'pseudoconstant' => array(
+    'pseudoconstant' => [
       'callback' => 'CRM_Case_Info::getSortOptions',
-    ),
+    ],
     'description' => 'How to sort activity-types on the "Manage Case" screen? (Set "Default" to load setting from the legacy "Settings.xml" file.)',
     'help_text' => '',
-  ),
-  'civicaseActivityRevisions' => array(
+  ],
+  'civicaseActivityRevisions' => [
     'group_name' => 'CiviCRM Preferences',
     'group' => 'core',
     'name' => 'civicaseActivityRevisions',
@@ -114,5 +114,5 @@ return array(
     'is_contact' => 0,
     'description' => 'Enable tracking of activity revisions embedded within the "civicrm_activity" table. Alternatively, see "Administer => System Settings => Misc => Logging".',
     'help_text' => '',
-  ),
-);
+  ],
+];
