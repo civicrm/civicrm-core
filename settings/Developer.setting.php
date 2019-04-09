@@ -76,7 +76,8 @@ return [
     'group_name' => 'Developer Preferences',
     'group' => 'developer',
     'name' => 'debug_enabled',
-    'config_key' => 'debug', // we can't call the setting debug as that has other meanings in api
+    // we can't call the setting debug as that has other meanings in api
+    'config_key' => 'debug',
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => '0',
