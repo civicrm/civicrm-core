@@ -207,15 +207,8 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
       CRM_Core_Error::displaySessionError($cancelSubscription);
     }
     elseif ($cancelSubscription) {
-      $activityParams
-        = [
-          'subject' => $this->_mid ? ts('Auto-renewal membership cancelled') : ts('Recurring contribution cancelled'),
-          'details' => $message,
-        ];
       $cancelStatus = CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution(
-        ['id' => $this->_subscriptionDetails->recur_id],
-        $activityParams
-      );
+        ['id' => $this->_subscriptionDetails->recur_id, 'membership_id' => $this->_mid, 'processor_message' => $message]);
 
       if ($cancelStatus) {
         $tplParams = [];
