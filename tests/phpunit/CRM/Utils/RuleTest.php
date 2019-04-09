@@ -113,6 +113,36 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   }
 
   /**
+   * @dataProvider colorDataProvider
+   * @param $inputData
+   * @param $expectedResult
+   */
+  public function testColor($inputData, $expectedResult) {
+    $this->assertEquals($expectedResult, CRM_Utils_Rule::color($inputData));
+  }
+
+  /**
+   * @return array
+   */
+  public function colorDataProvider() {
+    return [
+      ['#000000', TRUE],
+      ['#ffffff', TRUE],
+      ['#123456', TRUE],
+      ['#00aaff', TRUE],
+      // Some of these are valid css colors but we reject anything that doesn't conform to the html5 spec for <input type="color">
+      ['#ffffff00', FALSE],
+      ['#fff', FALSE],
+      ['##000000', FALSE],
+      ['ffffff', FALSE],
+      ['red', FALSE],
+      ['#orange', FALSE],
+      ['', FALSE],
+      ['rgb(255, 255, 255)', FALSE],
+    ];
+  }
+
+  /**
    * @return array
    */
   public function extenionKeyTests() {
