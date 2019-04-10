@@ -69,7 +69,11 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
   protected $_limitDetailClause = NULL;
 
   protected $_limitNumber = 10;
-  protected $_limitNumberPlus1 = 11; // this should be one more than self::LIMIT
+  /**
+   * this should be one more than self::LIMIT
+   * @var int
+   */
+  protected $_limitNumberPlus1 = 11;
 
   protected $_foundRows = [];
 
@@ -196,7 +200,8 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
       'membership_status' => 'varchar(255)',
       // We may have multiple files to list on one record.
       // The temporary-table approach can't store full details for all of them
-      'file_ids' => 'varchar(255)', // comma-separate id listing
+      // comma-separate id listing
+      'file_ids' => 'varchar(255)',
     ];
 
     $sql = "

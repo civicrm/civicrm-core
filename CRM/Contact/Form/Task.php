@@ -80,6 +80,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
 
   /**
    * This includes the submitted values of the search form
+   * @var array
    */
   static protected $_searchFormValues;
 
@@ -332,7 +333,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     return $contactIds;
   }
 
-
   /**
    * Set default values for the form. Relationship that in edit/view action.
    *
@@ -378,18 +378,17 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons([
-        [
-          'type' => $nextType,
-          'name' => $title,
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => $backType,
-          'name' => ts('Cancel'),
-          'icon' => 'fa-times',
-        ],
-      ]
-    );
+      [
+        'type' => $nextType,
+        'name' => $title,
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => $backType,
+        'name' => ts('Cancel'),
+        'icon' => 'fa-times',
+      ],
+    ]);
   }
 
   /**
@@ -507,7 +506,8 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     $searchParams = $this->controller->exportValues();
     if ($searchParams['radio_ts'] == 'ts_sel') {
       // Create a static group.
-      $randID = md5(time() . rand(1, 1000)); // groups require a unique name
+      // groups require a unique name
+      $randID = md5(time() . rand(1, 1000));
       $grpTitle = "Hidden Group {$randID}";
       $grpID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $grpTitle, 'id', 'title');
 

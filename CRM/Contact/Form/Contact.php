@@ -110,11 +110,13 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
   /**
    * Do we want to parse street address.
+   * @var bool
    */
   public $_parseStreetAddress;
 
   /**
    * Check contact has a subtype or not.
+   * @var bool
    */
   public $_isContactSubType;
 
@@ -122,6 +124,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    * Lets keep a cache of all the values that we retrieved.
    * THis is an attempt to avoid the number of update statements
    * during the write phase
+   * @var array
    */
   public $_preEditValues;
 
@@ -586,6 +589,7 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
    *   List of errors to be posted back to the form.
    * @param int $contactId
    *   Contact id if doing update.
+   * @param string $contactType
    *
    * @return bool
    *   email/openId
@@ -1161,20 +1165,20 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
         $duplicateContactsLinks = '<div class="matching-contacts-found">';
         $duplicateContactsLinks .= ts('One matching contact was found. ', [
-            'count' => count($contactLinks['rows']),
-            'plural' => '%count matching contacts were found.<br />',
-          ]);
+          'count' => count($contactLinks['rows']),
+          'plural' => '%count matching contacts were found.<br />',
+        ]);
         if ($contactLinks['msg'] == 'view') {
           $duplicateContactsLinks .= ts('You can View the existing contact', [
-              'count' => count($contactLinks['rows']),
-              'plural' => 'You can View the existing contacts',
-            ]);
+            'count' => count($contactLinks['rows']),
+            'plural' => 'You can View the existing contacts',
+          ]);
         }
         else {
           $duplicateContactsLinks .= ts('You can View or Edit the existing contact', [
-              'count' => count($contactLinks['rows']),
-              'plural' => 'You can View or Edit the existing contacts',
-            ]);
+            'count' => count($contactLinks['rows']),
+            'plural' => 'You can View or Edit the existing contacts',
+          ]);
         }
         if ($contactLinks['msg'] == 'merge') {
           // We should also get a merge link if this is for an existing contact
@@ -1256,10 +1260,10 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
       $buildStreetAddress = FALSE;
       $parseFieldName = 'street_address';
       foreach ([
-                 'street_number',
-                 'street_name',
-                 'street_unit',
-               ] as $fld) {
+        'street_number',
+        'street_name',
+        'street_unit',
+      ] as $fld) {
         if (!empty($address[$fld])) {
           $parseFieldName = 'street_number';
           $buildStreetAddress = TRUE;
@@ -1288,11 +1292,11 @@ class CRM_Contact_Form_Contact extends CRM_Core_Form {
 
         $streetAddress = NULL;
         foreach ([
-                   'street_number',
-                   'street_number_suffix',
-                   'street_name',
-                   'street_unit',
-                 ] as $fld) {
+          'street_number',
+          'street_number_suffix',
+          'street_name',
+          'street_unit',
+        ] as $fld) {
           if (in_array($fld, [
             'street_name',
             'street_unit',

@@ -41,7 +41,7 @@ class CRM_Contact_Page_CustomSearch extends CRM_Core_Page {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * @return array

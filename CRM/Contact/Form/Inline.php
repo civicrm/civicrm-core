@@ -38,16 +38,19 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
 
   /**
    * Id of the contact that is being edited
+   * @var int
    */
   public $_contactId;
 
   /**
    * Type of contact being edited
+   * @var string
    */
   public $_contactType;
 
   /**
    * Sub type of contact being edited
+   * @var string
    */
   public $_contactSubType;
 

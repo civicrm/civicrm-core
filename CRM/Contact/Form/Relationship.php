@@ -46,21 +46,25 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
   /**
    * This is a string which is either a_b or  b_a  used to determine the relationship between to contacts
+   * @var string
    */
   public $_rtype;
 
   /**
    * This is a string which is used to determine the relationship between to contacts
+   * @var string
    */
   public $_rtypeId;
 
   /**
    * Display name of contact a
+   * @var string
    */
   public $_display_name_a;
 
   /**
    * Display name of contact b
+   * @var string
    */
   public $_display_name_b;
 
@@ -95,11 +99,13 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
   /**
    * The relationship values if Updating relationship
+   * @var array
    */
   public $_values;
 
   /**
    * Case id if it called from case context
+   * @var int
    */
   public $_caseId;
 
@@ -277,17 +283,16 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons([
-          [
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'isDefault' => TRUE,
-          ],
-          [
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ],
-        ]
-      );
+        [
+          'type' => 'next',
+          'name' => ts('Delete'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
       return;
     }
 
@@ -567,7 +572,6 @@ class CRM_Contact_Form_Relationship extends CRM_Core_Form {
 
     return [$params, $relationshipIds];
   }
-
 
   /**
    * Prepares parameters to be used for create/update actions

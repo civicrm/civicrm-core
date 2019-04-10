@@ -186,6 +186,7 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
    *
    * @return array
    */
+
   /**
    * @return array
    */
@@ -289,14 +290,13 @@ UPDATE civicrm_dedupe_rule_group
         if ($dao->fetch()) {
           // set the length to null for all the fields where prefix length is not supported. eg. int,tinyint,date,enum etc dataTypes.
           if ($dao->COLUMN_NAME == $field && !in_array($dao->DATA_TYPE, [
-                'char',
-                'varchar',
-                'binary',
-                'varbinary',
-                'text',
-                'blob',
-              ])
-          ) {
+            'char',
+            'varchar',
+            'binary',
+            'varbinary',
+            'text',
+            'blob',
+          ])) {
             $length = NULL;
           }
           elseif ($dao->COLUMN_NAME == $field && !empty($dao->CHARACTER_MAXIMUM_LENGTH) && ($length > $dao->CHARACTER_MAXIMUM_LENGTH)) {

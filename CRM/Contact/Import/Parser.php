@@ -43,16 +43,19 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
   /**
    * Running total number of un-matched Contacts.
+   * @var int
    */
   protected $_unMatchCount;
 
   /**
    * Array of unmatched lines
+   * @var array
    */
   protected $_unMatch;
 
   /**
    * Total number of contacts with unparsed addresses
+   * @var int
    */
   protected $_unparsedAddressCount;
 
@@ -294,53 +297,43 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       if ($this->_invalidRowCount) {
         // removed view url for invlaid contacts
         $headers = array_merge([
-            ts('Line Number'),
-            ts('Reason'),
-          ],
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('Reason'),
+        ], $customHeaders);
         $this->_errorFileName = self::errorFileName(self::ERROR);
         self::exportCSV($this->_errorFileName, $headers, $this->_errors);
       }
       if ($this->_conflictCount) {
         $headers = array_merge([
-            ts('Line Number'),
-            ts('Reason'),
-          ],
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('Reason'),
+        ], $customHeaders);
         $this->_conflictFileName = self::errorFileName(self::CONFLICT);
         self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
       }
       if ($this->_duplicateCount) {
         $headers = array_merge([
-            ts('Line Number'),
-            ts('View Contact URL'),
-          ],
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('View Contact URL'),
+        ], $customHeaders);
 
         $this->_duplicateFileName = self::errorFileName(self::DUPLICATE);
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
       }
       if ($this->_unMatchCount) {
         $headers = array_merge([
-            ts('Line Number'),
-            ts('Reason'),
-          ],
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('Reason'),
+        ], $customHeaders);
 
         $this->_misMatchFilemName = self::errorFileName(self::NO_MATCH);
         self::exportCSV($this->_misMatchFilemName, $headers, $this->_unMatch);
       }
       if ($this->_unparsedAddressCount) {
         $headers = array_merge([
-            ts('Line Number'),
-            ts('Contact Edit URL'),
-          ],
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('Contact Edit URL'),
+        ], $customHeaders);
         $this->_errorFileName = self::errorFileName(self::UNPARSED_ADDRESS_WARNING);
         self::exportCSV($this->_errorFileName, $headers, $this->_unparsedAddresses);
       }
@@ -380,6 +373,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   /**
    * @param $elements
    */
+
   /**
    * @param $elements
    */

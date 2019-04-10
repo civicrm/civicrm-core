@@ -113,18 +113,17 @@ class CRM_Contact_Form_Task_Print extends CRM_Contact_Form_Task {
     // just need to add a javacript to popup the window for printing
     //
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Print Contact List'),
-          'js' => ['onclick' => 'window.print()'],
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'back',
-          'name' => ts('Done'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Print Contact List'),
+        'js' => ['onclick' => 'window.print()'],
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'back',
+        'name' => ts('Done'),
+      ],
+    ]);
   }
 
   /**

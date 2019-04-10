@@ -38,11 +38,13 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
 
   /**
    * Websitess of the contact that is been viewed.
+   * @var array
    */
   private $_websites = [];
 
   /**
    * No of website blocks for inline edit.
+   * @var int
    */
   private $_blockCount = 6;
 

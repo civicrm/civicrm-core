@@ -41,14 +41,14 @@ class CRM_Contact_Page_View_Note extends CRM_Core_Page {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * The action links for comments that we need to display for the browse screen
    *
    * @var array
    */
-  static $_commentLinks = NULL;
+  public static $_commentLinks = NULL;
 
   /**
    * View details of a note.

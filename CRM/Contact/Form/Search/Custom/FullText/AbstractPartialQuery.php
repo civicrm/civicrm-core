@@ -93,7 +93,7 @@ abstract class CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
    *   keys: match-descriptor
    *   - count: int
    */
-  public abstract function fillTempTable($queryText, $entityIDTableName, $detailTable, $queryLimit, $detailLimit);
+  abstract public function fillTempTable($queryText, $entityIDTableName, $detailTable, $queryLimit, $detailLimit);
 
   /**
    * @return bool
@@ -177,7 +177,7 @@ $sqlStatement
 
           $query = $tableValues + [
             'text' => CRM_Utils_QueryFormatter::singleton()
-            ->format($queryText, CRM_Utils_QueryFormatter::LANG_SOLR),
+              ->format($queryText, CRM_Utils_QueryFormatter::LANG_SOLR),
           ];
           list($intLimit, $intOffset) = $this->parseLimitOffset($limit);
           $files = $searcher->search($query, $intLimit, $intOffset);
@@ -191,8 +191,10 @@ $sqlStatement
           }
         }
         else {
-          $fullTextFields = []; // array (string $sqlColumnName)
-          $clauses = []; // array (string $sqlExpression)
+          // array (string $sqlColumnName)
+          $fullTextFields = [];
+          // array (string $sqlExpression)
+          $clauses = [];
 
           foreach ($tableValues['fields'] as $fieldName => $fieldType) {
             if ($fieldType == 'Int') {

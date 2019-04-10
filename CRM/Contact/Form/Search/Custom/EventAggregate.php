@@ -93,13 +93,13 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
      * for the search form.
      */
     $form->assign('elements', [
-        'paid_online',
-        'start_date',
-        'end_date',
-        'show_payees',
-        'event_type_id',
-        'event_id',
-      ]);
+      'paid_online',
+      'start_date',
+      'end_date',
+      'show_payees',
+      'event_type_id',
+      'event_id',
+    ]);
   }
 
   /**
@@ -276,8 +276,8 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
     return implode(' AND ', $clauses);
   }
 
-
   /* This function does a query to get totals for some of the search result columns and returns a totals array. */
+
   /**
    * @return array
    */

@@ -485,7 +485,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     );
   }
 
-
   /**
    * Check if there is data to create the object.
    *
@@ -1465,7 +1464,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * @return array
    *   array reference of all relationship types with context to current contact type .
    */
-  static public function getRelationType($targetContactType) {
+  public static function getRelationType($targetContactType) {
     $relationshipType = array();
     $allRelationshipType = CRM_Core_PseudoConstant::relationshipType();
 
@@ -2037,7 +2036,6 @@ AND cc.sort_name LIKE '%$name%'";
       }
     }
   }
-
 
   /**
    * Wrapper for contact relationship selector.

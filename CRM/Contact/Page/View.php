@@ -39,28 +39,28 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
   /**
    * The id of the object being viewed (note/relationship etc)
    *
-   * @int
+   * @var int
    */
   protected $_id;
 
   /**
    * The contact id of the contact being viewed
    *
-   * @int
+   * @var int
    */
   protected $_contactId;
 
   /**
    * The action that we are performing
    *
-   * @string
+   * @var string
    */
   protected $_action;
 
   /**
    * The permission we have on this contact
    *
-   * @string
+   * @var string
    */
   protected $_permission;
 
@@ -332,9 +332,9 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
         $mergedToContactID = $mergedTo['id'];
         $mergedToDisplayName = $mergedTo['values'][$mergedToContactID]['api.Contact.get']['values'][0]['display_name'];
         $title .= ' ' . ts('(This contact has been merged to <a href="%1">%2</a>)', [
-            1 => CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'cid' => $mergedToContactID]),
-            2 => $mergedToDisplayName,
-          ]);
+          1 => CRM_Utils_System::url('civicrm/contact/view', ['reset' => 1, 'cid' => $mergedToContactID]),
+          2 => $mergedToDisplayName,
+        ]);
       }
     }
 

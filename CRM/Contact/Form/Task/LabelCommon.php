@@ -64,7 +64,6 @@ class CRM_Contact_Form_Task_LabelCommon {
     $pdf->Output($fileName, 'D');
   }
 
-
   /**
    * Get the rows for the labels.
    *

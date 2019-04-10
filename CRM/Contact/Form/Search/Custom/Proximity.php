@@ -248,6 +248,7 @@ class CRM_Contact_Form_Search_Custom_Proximity extends CRM_Contact_Form_Search_C
     //unused
     return '';
   }
+
   /**
    * @param bool $includeContactIDs
    *
