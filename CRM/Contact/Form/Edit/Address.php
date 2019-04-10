@@ -73,7 +73,8 @@ class CRM_Contact_Form_Edit_Address {
       "address[$blockId][is_primary]", [
         'entity' => 'address',
         'label' => ts('Primary location for this contact'),
-        'text' => ts('Primary location for this contact')] + $js);
+        'text' => ts('Primary location for this contact'),
+      ] + $js);
 
     if (!$inlineEdit) {
       $js = ['id' => 'Address_' . $blockId . '_IsBilling', 'onClick' => 'singleSelect( this.id );'];
@@ -83,7 +84,8 @@ class CRM_Contact_Form_Edit_Address {
       "address[$blockId][is_billing]", [
         'entity' => 'address',
         'label' => ts('Billing location for this contact'),
-        'text' => ts('Billing location for this contact')] + $js);
+        'text' => ts('Billing location for this contact'),
+      ] + $js);
 
     // hidden element to store master address id
     $form->addField("address[$blockId][master_id]", ['entity' => 'address', 'type' => 'hidden']);
@@ -118,11 +120,10 @@ class CRM_Contact_Form_Edit_Address {
         $continue = TRUE;
         //Don't skip street parsed fields when parsing is enabled.
         if (in_array($nameWithoutID, [
-            'street_number',
-            'street_name',
-            'street_unit',
-          ]) && !empty($addressOptions['street_address_parsing'])
-        ) {
+          'street_number',
+          'street_name',
+          'street_unit',
+        ]) && !empty($addressOptions['street_address_parsing'])) {
           $continue = FALSE;
         }
         if ($continue) {
@@ -259,9 +260,9 @@ class CRM_Contact_Form_Edit_Address {
             'address' => $addressValue['display'],
             'name' => $shareAddressContactNames[$addressValue['master_id']]['name'],
             'options' => CRM_Core_BAO_Address::getValues([
-                'entity_id' => $master_cid,
-                'contact_id' => $master_cid,
-              ]),
+              'entity_id' => $master_cid,
+              'contact_id' => $master_cid,
+            ]),
             'master_id' => $addressValue['master_id'],
           ];
           $defaults['address'][$key]['master_contact_id'] = $master_cid;
@@ -285,11 +286,11 @@ class CRM_Contact_Form_Edit_Address {
         foreach ($defaults['address'] as $cnt => & $address) {
           $streetAddress = NULL;
           foreach ([
-                     'street_number',
-                     'street_number_suffix',
-                     'street_name',
-                     'street_unit',
-                   ] as $fld) {
+            'street_number',
+            'street_number_suffix',
+            'street_name',
+            'street_unit',
+          ] as $fld) {
             if (in_array($fld, [
               'street_name',
               'street_unit',

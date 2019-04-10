@@ -31,6 +31,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_Form_Search_Criteria {
+
   /**
    * @param CRM_Core_Form $form
    */
@@ -283,7 +284,7 @@ class CRM_Contact_Form_Search_Criteria {
       'all_tag_types' => [
         'name' => 'all_tag_types',
         'class' => 'search-field__span-3 search-field__checkbox',
-        'help' => ['id' => 'id-all-tag-types']
+        'help' => ['id' => 'id-all-tag-types'],
       ],
       'phone_numeric' => [
         'name' => 'phone_numeric',
@@ -320,7 +321,6 @@ class CRM_Contact_Form_Search_Criteria {
       ],
     ]);
   }
-
 
   /**
    * @param CRM_Core_Form $form

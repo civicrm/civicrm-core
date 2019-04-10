@@ -82,9 +82,9 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     closedir($handler);
     if (!empty($results)) {
       CRM_Core_Error::fatal(ts('<b>%1</b> file(s) in %2 directory are not writable. Listed file(s) might be used during the import to log the errors occurred during Import process. Contact your site administrator for assistance.', [
-            1 => implode(', ', $results),
-            2 => $config->uploadDir,
-          ]));
+        1 => implode(', ', $results),
+        2 => $config->uploadDir,
+      ]));
     }
 
     $this->_dataSourceIsValid = FALSE;
@@ -216,18 +216,17 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     }
 
     $this->addButtons([
-        [
-          'type' => 'upload',
-          'name' => ts('Continue'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'upload',
+        'name' => ts('Continue'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**

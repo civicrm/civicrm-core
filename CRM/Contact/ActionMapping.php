@@ -25,7 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\ActionSchedule\RecipientBuilder;
 
 /**
  * Class CRM_Contact_ActionMapping
@@ -142,7 +141,8 @@ class CRM_Contact_ActionMapping extends \Civi\ActionSchedule\Mapping {
         'casEntityIdField' => 'e.id',
         'casContactTableAlias' => NULL,
       ]);
-      $query->where('1'); // possible to have no "where" in this case
+      // possible to have no "where" in this case
+      $query->where('1');
     }
 
     $query['casDateField'] = 'e.' . $dateDBField;

@@ -84,15 +84,15 @@ class CRM_Contact_Form_Task_RemoveFromGroup extends CRM_Contact_Form_Task {
     ];
     if ($notRemoved) {
       $status[] = ts('1 contact was already not in this group', [
-          'count' => $notRemoved,
-          'plural' => '%count contacts were already not in this group',
-        ]);
+        'count' => $notRemoved,
+        'plural' => '%count contacts were already not in this group',
+      ]);
     }
     $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
     CRM_Core_Session::setStatus($status, ts("Removed Contact From Group", [
-          'plural' => "Removed Contacts From Group",
-          'count' => $removed,
-        ]), 'success', ['expires' => 0]);
+      'plural' => "Removed Contacts From Group",
+      'count' => $removed,
+    ]), 'success', ['expires' => 0]);
   }
 
 }

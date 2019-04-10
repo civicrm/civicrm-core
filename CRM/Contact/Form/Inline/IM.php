@@ -38,11 +38,13 @@ class CRM_Contact_Form_Inline_IM extends CRM_Contact_Form_Inline {
 
   /**
    * Ims of the contact that is been viewed.
+   * @var array
    */
   private $_ims = [];
 
   /**
    * No of im blocks for inline edit.
+   * @var int
    */
   private $_blockCount = 6;
 

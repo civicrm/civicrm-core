@@ -45,21 +45,25 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
   /**
    * Maximum contacts that should be allowed to update.
+   * @var int
    */
   protected $_maxContacts = 100;
 
   /**
    * Maximum profile fields that will be displayed.
+   * @var int
    */
   protected $_maxFields = 9;
 
   /**
    * Variable to store redirect path.
+   * @var string
    */
   protected $_userContext;
 
   /**
    * When not to reset sort_name.
+   * @var bool
    */
   protected $_preserveDefault = TRUE;
 
@@ -102,17 +106,16 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     //$this->_fields = array_slice($this->_fields, 0, $this->_maxFields);
 
     $this->addButtons([
-        [
-          'type' => 'submit',
-          'name' => ts('Update Contact(s)'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'submit',
+        'name' => ts('Update Contact(s)'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_contactIds);
@@ -249,9 +252,9 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     CRM_Core_Session::setStatus('', ts("Updates Saved"), 'success');
     if ($inValidSubtypeCnt) {
       CRM_Core_Session::setStatus(ts('Contact Subtype field of 1 contact has not been updated.', [
-            'plural' => 'Contact Subtype field of %count contacts has not been updated.',
-            'count' => $inValidSubtypeCnt,
-          ]), ts('Invalid Subtype'));
+        'plural' => 'Contact Subtype field of %count contacts has not been updated.',
+        'count' => $inValidSubtypeCnt,
+      ]), ts('Invalid Subtype'));
     }
   }
 

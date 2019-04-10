@@ -41,7 +41,7 @@ class CRM_Contact_Form_Edit_CommunicationPreferences {
    *
    * @var array
    */
-  static $greetings = [];
+  public static $greetings = [];
 
   /**
    * Build the form object elements for Communication Preferences object.

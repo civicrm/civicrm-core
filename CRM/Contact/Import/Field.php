@@ -30,17 +30,20 @@
  */
 class CRM_Contact_Import_Field {
 
-  /**#@+
+  /**
+   * #@+
    * @var string
    */
 
   /**
    * Name of the field
+   * @var string
    */
   public $_name;
 
   /**
    * Title of the field to be used in display
+   * @var string
    */
   public $_title;
 

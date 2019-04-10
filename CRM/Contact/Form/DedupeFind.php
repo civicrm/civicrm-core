@@ -38,6 +38,7 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
 
   /**
    *  Indicate if this form should warn users of unsaved changes
+   * @var bool
    */
   protected $unsavedChangesWarn = FALSE;
 
@@ -60,20 +61,19 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
       $this->add('text', 'limit', ts('No of contacts to find matches for '));
     }
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Continue'),
-          'isDefault' => TRUE,
-        ],
-        //hack to support cancel button functionality
-        [
-          'type' => 'submit',
-          'class' => 'cancel',
-          'icon' => 'fa-times',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Continue'),
+        'isDefault' => TRUE,
+      ],
+      //hack to support cancel button functionality
+      [
+        'type' => 'submit',
+        'class' => 'cancel',
+        'icon' => 'fa-times',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**

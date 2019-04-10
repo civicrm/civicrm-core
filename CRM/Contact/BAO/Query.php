@@ -80,14 +80,14 @@ class CRM_Contact_BAO_Query {
    *
    * @var array
    */
-  static $_defaultReturnProperties = NULL;
+  public static $_defaultReturnProperties = NULL;
 
   /**
    * The default set of hier return properties.
    *
    * @var array
    */
-  static $_defaultHierReturnProperties;
+  public static $_defaultHierReturnProperties;
 
   /**
    * The set of input params.
@@ -292,6 +292,7 @@ class CRM_Contact_BAO_Query {
 
   /**
    * Should we just display one contact record
+   * @var bool
    */
   public $_useGroupBy = FALSE;
 
@@ -300,14 +301,14 @@ class CRM_Contact_BAO_Query {
    *
    * @var array
    */
-  static $_relType;
+  public static $_relType;
 
   /**
    * The activity role
    *
    * @var array
    */
-  static $_activityRole;
+  public static $_activityRole;
 
   /**
    * Consider the component activity type
@@ -315,7 +316,7 @@ class CRM_Contact_BAO_Query {
    *
    * @var array
    */
-  static $_considerCompActivities;
+  public static $_considerCompActivities;
 
   /**
    * Consider with contact activities only,
@@ -323,7 +324,7 @@ class CRM_Contact_BAO_Query {
    *
    * @var array
    */
-  static $_withContactActivitiesOnly;
+  public static $_withContactActivitiesOnly;
 
   /**
    * Use distinct component clause for component searches
@@ -359,7 +360,7 @@ class CRM_Contact_BAO_Query {
    *
    * @var array
    */
-  static $_dependencies = [
+  public static $_dependencies = [
     'civicrm_state_province' => 1,
     'civicrm_country' => 1,
     'civicrm_county' => 1,
@@ -369,8 +370,9 @@ class CRM_Contact_BAO_Query {
 
   /**
    * List of location specific fields.
+   * @var array
    */
-  static $_locationSpecificFields = [
+  public static $_locationSpecificFields = [
     'street_address',
     'street_number',
     'street_name',
@@ -396,6 +398,7 @@ class CRM_Contact_BAO_Query {
   /**
    * Remember if we handle either end of a number or date range
    * so we can skip the other
+   * @var array
    */
   protected $_rangeCache = [];
   /**
@@ -408,7 +411,7 @@ class CRM_Contact_BAO_Query {
    * Set to the name of the temp table if one has been created
    * @var String
    */
-  static $_relationshipTempTable = NULL;
+  public static $_relationshipTempTable = NULL;
 
   public $_pseudoConstantsSelect = [];
 
@@ -2049,7 +2052,7 @@ class CRM_Contact_BAO_Query {
           $this->_qill[0][] = ts("%1 %2 %3", [
             1 => $field['title'],
             2 => $qillop,
-            3 => $qillVal
+            3 => $qillVal,
           ]);
         }
         else {
@@ -2326,7 +2329,8 @@ class CRM_Contact_BAO_Query {
       $this->_qill[$grouping][] = ts("%1 %2 %3", [
         1 => $field['title'],
         2 => $qillop,
-        3 => (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) ? $qillVal : "'$qillVal'"]);
+        3 => (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) ? $qillVal : "'$qillVal'",
+      ]);
 
       if (is_array($value)) {
         // traditionally an array being passed has been a fatal error. We can take advantage of this to add support
@@ -2573,9 +2577,7 @@ class CRM_Contact_BAO_Query {
     }
 
     if ((!empty($tables['civicrm_state_province']) || !empty($tables['civicrm_country']) ||
-        CRM_Utils_Array::value('civicrm_county', $tables)
-      ) && empty($tables['civicrm_address'])
-    ) {
+        CRM_Utils_Array::value('civicrm_county', $tables)) && empty($tables['civicrm_address'])) {
       $tables = array_merge(['civicrm_address' => 1],
         $tables
       );
@@ -2584,9 +2586,9 @@ class CRM_Contact_BAO_Query {
     // add group_contact and group table is subscription history is present
     if (!empty($tables['civicrm_subscription_history']) && empty($tables['civicrm_group'])) {
       $tables = array_merge([
-          'civicrm_group' => 1,
-          'civicrm_group_contact' => 1,
-        ],
+        'civicrm_group' => 1,
+        'civicrm_group_contact' => 1,
+      ],
         $tables
       );
     }
@@ -4816,7 +4818,8 @@ civicrm_relationship.start_date > {$today}
   public static function getGroupByFromOrderBy(&$groupBy, $orderBys) {
     if (!CRM_Utils_SQL::disableFullGroupByMode()) {
       foreach ($orderBys as $orderBy) {
-        $orderBy = str_ireplace([' DESC', ' ASC', '`'], '', $orderBy); // remove sort syntax from ORDER BY clauses if present
+        // remove sort syntax from ORDER BY clauses if present
+        $orderBy = str_ireplace([' DESC', ' ASC', '`'], '', $orderBy);
         // if ORDER BY column is not present in GROUP BY then append it to end
         if (preg_match('/(MAX|MIN)\(/i', trim($orderBy)) !== 1 && !strstr($groupBy, $orderBy)) {
           $groupBy .= ", {$orderBy}";
@@ -5417,7 +5420,6 @@ civicrm_relationship.start_date > {$today}
     }
   }
 
-
   /**
    * @param $values
    * @param string $tableName
@@ -5435,7 +5437,8 @@ civicrm_relationship.start_date > {$today}
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     $asofDateValues = $this->getWhereValues("{$fieldName}_asof_date", $grouping);
-    $asofDate = NULL;  // will be treated as current day
+    // will be treated as current day
+    $asofDate = NULL;
     if ($asofDateValues) {
       $asofDate = CRM_Utils_Date::processDate($asofDateValues[2]);
       $asofDateFormat = CRM_Utils_Date::customFormat(substr($asofDate, 0, 8));
@@ -5768,8 +5771,7 @@ AND   displayRelType.is_active = 1
    * @return bool
    */
   public static function caseImportant($op) {
-    return
-      in_array($op, ['LIKE', 'IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY']) ? FALSE : TRUE;
+    return in_array($op, ['LIKE', 'IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY']) ? FALSE : TRUE;
   }
 
   /**
@@ -5883,7 +5885,7 @@ AND   displayRelType.is_active = 1
   public static function parseSearchBuilderString($string, $dataType = 'Integer') {
     $string = trim($string);
     if (substr($string, 0, 1) != '(' || substr($string, -1, 1) != ')') {
-      Return FALSE;
+      return FALSE;
     }
 
     $string = substr($string, 1, -1);
@@ -6022,11 +6024,11 @@ AND   displayRelType.is_active = 1
     }
     if (!$usedForAPI) {
       foreach ([
-         'gender_id' => 'gender',
-          'prefix_id' => 'individual_prefix',
-          'suffix_id' => 'individual_suffix',
-          'communication_style_id' => 'communication_style',
-        ] as $realField => $labelField) {
+        'gender_id' => 'gender',
+        'prefix_id' => 'individual_prefix',
+        'suffix_id' => 'individual_suffix',
+        'communication_style_id' => 'communication_style',
+      ] as $realField => $labelField) {
         // This is a temporary routine for handling these fields while
         // we figure out how to handled them based on metadata in
         /// export and search builder. CRM-19815, CRM-19830.
@@ -6703,7 +6705,7 @@ AND   displayRelType.is_active = 1
       '=',
       '1',
       '0',
-      '0'
+      '0',
     ], $this->_params);
 
     // if we’re explicitly looking for a certain contact’s contribs, events, etc.
@@ -6926,25 +6928,25 @@ AND   displayRelType.is_active = 1
       $this->_where[$grouping][] = $fieldSpec['where'] . " <= '{$dates[1]}'";
 
       $this->_qill[$grouping][] = ts('%1 is ', [$fieldSpec['title']]) . $filters[$value] . ' (' . ts("to %1", [
-          CRM_Utils_Date::customFormat($dates[1]),
-        ]) . ')';
+        CRM_Utils_Date::customFormat($dates[1]),
+      ]) . ')';
     }
     elseif (empty($dates[1])) {
       // ie. no end date we only have start date
       $this->_where[$grouping][] = $fieldSpec['where'] . " >= '{$dates[1]}'";
 
       $this->_qill[$grouping][] = ts('%1 is ', [$fieldSpec['title']]) . $filters[$value] . ' (' . ts("from %1", [
-          CRM_Utils_Date::customFormat($dates[0]),
-        ]) . ')';
+        CRM_Utils_Date::customFormat($dates[0]),
+      ]) . ')';
     }
     else {
       // we have start and end dates.
       $this->_where[$grouping][] = $fieldSpec['where'] . " BETWEEN '{$dates[0]}' AND '{$dates[1]}'";
 
       $this->_qill[$grouping][] = ts('%1 is ', [$fieldSpec['title']]) . $filters[$value] . ' (' . ts("between %1 and %2", [
-          CRM_Utils_Date::customFormat($dates[0]),
-          CRM_Utils_Date::customFormat($dates[1]),
-        ]) . ')';
+        CRM_Utils_Date::customFormat($dates[0]),
+        CRM_Utils_Date::customFormat($dates[1]),
+      ]) . ')';
     }
   }
 
@@ -6968,7 +6970,7 @@ AND   displayRelType.is_active = 1
 
     return [
       $aName,
-      $addressJoin
+      $addressJoin,
     ];
   }
 

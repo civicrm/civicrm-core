@@ -36,6 +36,7 @@
  *  via a form post) and asynchronously (i.e. by the workflow system)
  */
 class CRM_Contact_Import_Importer {
+
   /**
    */
   public function __construct() {

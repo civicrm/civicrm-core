@@ -38,11 +38,13 @@ class CRM_Contact_Form_Inline_Phone extends CRM_Contact_Form_Inline {
 
   /**
    * Phones of the contact that is been viewed
+   * @var array
    */
   private $_phones = [];
 
   /**
    * No of phone blocks for inline edit
+   * @var int
    */
   private $_blockCount = 6;
 

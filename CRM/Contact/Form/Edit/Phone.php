@@ -70,10 +70,10 @@ class CRM_Contact_Form_Edit_Phone {
       //Block type select
       $form->addField("phone[$blockId][location_type_id]", [
         'entity' => 'phone',
-          'class' => 'eight',
-          'placeholder' => NULL,
-          'option_url' => NULL,
-        ]);
+        'class' => 'eight',
+        'placeholder' => NULL,
+        'option_url' => NULL,
+      ]);
 
       //is_Primary radio
       $js = ['id' => 'Phone_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );', 'aria-label' => ts('Phone %1 is primary?', [1 => $blockId])];

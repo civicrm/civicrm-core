@@ -39,7 +39,7 @@ class CRM_Contact_Form_Inline_CustomData extends CRM_Contact_Form_Inline {
   /**
    * Custom group id.
    *
-   * @int
+   * @var int
    */
   public $_groupID;
 

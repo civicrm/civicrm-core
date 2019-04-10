@@ -45,16 +45,19 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
 
   /**
    * Maximum contacts that should be allowed to update
+   * @var int
    */
   protected $_maxContacts = 100;
 
   /**
    * Maximum profile fields that will be displayed
+   * @var int
    */
   protected $_maxFields = 9;
 
   /**
    * Variable to store redirect path
+   * @var string
    */
   protected $_userContext;
 
@@ -72,9 +75,9 @@ class CRM_Contact_Form_Task_PickProfile extends CRM_Contact_Form_Task {
     //validations
     if (count($this->_contactIds) > $this->_maxContacts) {
       CRM_Core_Session::setStatus(ts("The maximum number of contacts you can select for Update multiple contacts is %1. You have selected %2. Please select fewer contacts from your search results and try again.", [
-            1 => $this->_maxContacts,
-            2 => count($this->_contactIds),
-          ]), ts('Maximum Exceeded'), 'error');
+        1 => $this->_maxContacts,
+        2 => count($this->_contactIds),
+      ]), ts('Maximum Exceeded'), 'error');
       $validate = TRUE;
     }
 
