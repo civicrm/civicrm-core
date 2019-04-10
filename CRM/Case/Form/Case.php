@@ -45,41 +45,49 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
 
   /**
    * Case Id
+   * @var int
    */
   public $_caseId = NULL;
 
   /**
    * Client Id
+   * @var int
    */
   public $_currentlyViewedContactId = NULL;
 
   /**
    * Activity Type File
+   * @var int
    */
   public $_activityTypeFile = NULL;
 
   /**
    * Logged in contact Id
+   * @var int
    */
   public $_currentUserId = NULL;
 
   /**
    * Activity type Id
+   * @var int
    */
   public $_activityTypeId = NULL;
 
   /**
    * Activity type Id
+   * @var int
    */
   public $_activityId = NULL;
 
   /**
    * Action
+   * @var int
    */
   public $_action;
 
   /**
    * Case type id
+   * @var int
    */
   public $_caseTypeId = NULL;
 

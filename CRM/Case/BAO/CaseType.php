@@ -41,7 +41,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *
    * @var array
    */
-  static $_exportableFields = NULL;
+  public static $_exportableFields = NULL;
 
   /**
    * Takes an associative array and creates a Case Type object.
@@ -101,7 +101,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       parent::assignTestValue($fieldName, $fieldDef, $counter);
     }
   }
-
 
   /**
    * Format / convert submitted array to xml for case type definition

@@ -41,7 +41,7 @@ class CRM_Case_BAO_Case extends CRM_Case_DAO_Case {
    *
    * @var array
    */
-  static $_exportableFields = NULL;
+  public static $_exportableFields = NULL;
 
   /**
    * Class constructor.
@@ -416,6 +416,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
    * @param int $userID
    * @param string $condition
    * @param string $limit
+   * @param string $order
    *
    * @return string
    */

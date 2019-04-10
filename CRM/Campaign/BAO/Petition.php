@@ -31,6 +31,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
+
   /**
    * Class constructor.
    */
@@ -176,7 +177,8 @@ SELECT  petition.id                         as id,
    * @param array $params
    *   (reference ) an assoc array of name/value pairs.
    *
-   * @return CRM_Campaign_BAO_Petition
+   * @return mixed
+   *   CRM_Campaign_BAO_Petition or NULl or void
    */
   public function createSignature(&$params) {
     if (empty($params)) {
@@ -354,7 +356,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
     $statusTotal['count'] = $total;
     return $statusTotal;
   }
-
 
   /**
    * @param int $surveyId

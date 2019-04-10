@@ -59,6 +59,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Prefix for the controller
+   * @var sting
    */
   protected $_prefix = 'case_';
 
@@ -298,6 +299,8 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    *
    * @param array $fields
    *   Posted values of the form.
+   * @param array $files
+   * @param object $form
    *
    * @return array|bool
    */

@@ -36,6 +36,7 @@
 class CRM_Campaign_Info extends CRM_Core_Component_Info {
 
   /**
+   * @var string
    * @inheritDoc
    */
   protected $keyword = 'campaign';
@@ -53,7 +54,6 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
       'showActivitiesInCore' => 1,
     ];
   }
-
 
   /**
    * @inheritDoc
@@ -102,7 +102,6 @@ class CRM_Campaign_Info extends CRM_Core_Component_Info {
 
     return $permissions;
   }
-
 
   /**
    * @inheritDoc

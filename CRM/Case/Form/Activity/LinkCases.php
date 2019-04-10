@@ -35,6 +35,7 @@
  * This class generates form components for LinkCase Activity.
  */
 class CRM_Case_Form_Activity_LinkCases {
+
   /**
    * @param CRM_Core_Form $form
    *

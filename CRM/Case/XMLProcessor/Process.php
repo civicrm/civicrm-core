@@ -619,7 +619,7 @@ AND        a.is_deleted = 0
 
     $defaultAssigneeOptions = civicrm_api3('OptionValue', 'get', [
       'option_group_id' => 'activity_default_assignee',
-      'options' => [ 'limit' => 0 ]
+      'options' => ['limit' => 0],
     ]);
 
     foreach ($defaultAssigneeOptions['values'] as $option) {
@@ -686,7 +686,7 @@ AND        a.is_deleted = 0
   protected function isBidirectionalRelationshipType($relationshipTypeId) {
     $relationshipTypeResult = civicrm_api3('RelationshipType', 'get', [
       'id' => $relationshipTypeId,
-      'options' => ['limit' => 1]
+      'options' => ['limit' => 1],
     ]);
 
     if ($relationshipTypeResult['count'] === 0) {
@@ -712,7 +712,7 @@ AND        a.is_deleted = 0
     }
 
     $contact = civicrm_api3('Contact', 'get', [
-      'id' => $activityTypeXML->default_assignee_contact
+      'id' => $activityTypeXML->default_assignee_contact,
     ]);
 
     if ($contact['count'] == 1) {

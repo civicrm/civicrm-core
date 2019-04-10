@@ -32,6 +32,7 @@
  *
  */
 class CRM_Badge_Page_AJAX {
+
   public static function getImageProp() {
     $img = $_GET['img'];
     list($w, $h) = CRM_Badge_BAO_Badge::getImageProperties($img);

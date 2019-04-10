@@ -73,13 +73,12 @@ WHERE cs.id IN ( {$caseIDs} )";
    */
   public function buildQuickForm() {
     $this->addButtons([
-        [
-          'type' => 'done',
-          'name' => ts('Done'),
-          'isDefault' => TRUE,
-        ],
-      ]
-    );
+      [
+        'type' => 'done',
+        'name' => ts('Done'),
+        'isDefault' => TRUE,
+      ],
+    ]);
   }
 
 }
