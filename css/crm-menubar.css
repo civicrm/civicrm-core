@@ -6,8 +6,8 @@
   font-size: 13px;
 }
 #civicrm-menu {
-  background-color: #f2f2f2;
-	width: 100%;
+  background-color: $menubarColor;
+  width: 100%;
   z-index: 500;
   height: auto;
   margin: 0;
@@ -22,7 +22,6 @@
 #civicrm-menu li a {
   padding: 12px 8px;
   text-decoration: none;
-  color: #333;
   box-shadow: none;
   border: none;
 }
@@ -42,12 +41,12 @@
 #civicrm-menu li a:hover,
 #civicrm-menu li a.highlighted {
   text-decoration: none;
-  background-color: #fff;
+  background-color: $highlightColor;
+  color: $highlightTextColor;
 }
 #civicrm-menu li li .sub-arrow:before {
   content: "\f0da";
 	font-family: 'FontAwesome';
-  color: #666;
 	float: right;
 	margin-right: -25px;
 }
@@ -88,7 +87,7 @@
   cursor: pointer;
   color: transparent;
   -webkit-tap-highlight-color: rgba(0,0,0,0);
-  background-color: #333;
+  background-color: #1b1b1b;
 }
 
 /* responsive icon */
@@ -163,7 +162,7 @@ ul.crm-quickSearch-results.ui-state-disabled {
 }
 
 #civicrm-menu-nav .crm-logo-sm {
-  background: url(../i/logo_sm.png) no-repeat;
+  background: url($resourceBase/i/logo_sm.png) no-repeat;
   display: inline-block;
   width: 16px;
   height: 16px;
@@ -174,10 +173,10 @@ ul.crm-quickSearch-results.ui-state-disabled {
   float: right;
 }
 #civicrm-menu #crm-menubar-toggle-position a i {
-  color: #888;
   margin: 0;
-  border-top: 2px solid #888;
+  border-top: 2px solid $textColor;
   font-size: 11px;
+  opacity: .8;
 }
 body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   transform: rotate(180deg);
@@ -215,8 +214,12 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   }
 
   #civicrm-menu ul {
-    background-color: #fff;
     box-shadow: 0px 0px 2px 0 rgba(0,0,0,0.3);
+  }
+
+  #civicrm-menu li a {
+    background-color: $semiTransparentMenuColor;
+    color: $textColor;
   }
 
   #civicrm-menu > li > a {
@@ -225,13 +228,6 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
 
   #civicrm-menu > li > a.highlighted {
     z-index: 200000;
-  }
-
-  #civicrm-menu ul li a:focus,
-  #civicrm-menu ul li a:hover,
-  #civicrm-menu ul li a.highlighted {
-    background-color: #f2f2f2;
-    color: #222;
   }
 
   body.crm-menubar-over-cms-menu #civicrm-menu,
@@ -256,7 +252,7 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   }
   #civicrm-menu {
     z-index: 100000;
-    background-color: #333;
+    background-color: #1b1b1b;
   }
 	#civicrm-menu ul {
 		background-color: #444;
@@ -316,7 +312,7 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
     left: 5px;
     width: 18px;
     height: 18px;
-    background: url(../i/logo_lg.png) no-repeat;
+    background: url($resourceBase/i/logo_lg.png) no-repeat;
     background-size: 18px;
     top: 6px;
   }
