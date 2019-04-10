@@ -186,22 +186,21 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     );
 
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'next',
-          'name' => ts('Save and New'),
-          'subName' => 'new',
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'next',
+        'name' => ts('Save and New'),
+        'subName' => 'new',
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
     $this->addFormRule(['CRM_Financial_Form_FinancialTypeAccount', 'formRule'], $this);
   }
 

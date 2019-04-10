@@ -93,7 +93,7 @@ class CRM_Export_BAO_ExportProcessor {
    *
    * e.g. ['8_b_a' => 'Household Member Is', '8_a_b = 'Household Member Of'.....]
    *
-   * @var
+   * @var array
    */
   protected $relationshipTypes = [];
 
@@ -168,6 +168,7 @@ class CRM_Export_BAO_ExportProcessor {
   public function setIsPostalableOnly($isPostalableOnly) {
     $this->isPostalableOnly = $isPostalableOnly;
   }
+
   /**
    * @return array|null
    */
@@ -312,7 +313,6 @@ class CRM_Export_BAO_ExportProcessor {
   public function isRelationshipTypeKey($fieldName) {
     return array_key_exists($fieldName, $this->relationshipTypes);
   }
-
 
   /**
    * @param $fieldName
@@ -1002,7 +1002,7 @@ class CRM_Export_BAO_ExportProcessor {
     $skippedFields = ($this->getQueryMode() === CRM_Contact_BAO_Query::MODE_CONTACTS) ? [] : [
       'groups',
       'tags',
-      'notes'
+      'notes',
     ];
 
     foreach ($fields as $key => $var) {

@@ -43,7 +43,6 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
    */
   protected $_isARFlag = FALSE;
 
-
   /**
    * Set variables up before form is built.
    */

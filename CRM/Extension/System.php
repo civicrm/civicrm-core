@@ -109,7 +109,8 @@ class CRM_Extension_System {
     if (!array_key_exists('domain_id', $parameters)) {
       $parameters['domain_id'] = CRM_Core_Config::domainID();
     }
-    ksort($parameters); // guaranteed ordering - useful for md5(serialize($parameters))
+    // guaranteed ordering - useful for md5(serialize($parameters))
+    ksort($parameters);
 
     $this->parameters = $parameters;
   }
@@ -243,7 +244,8 @@ class CRM_Extension_System {
       $this->downloader = new CRM_Extension_Downloader(
         $this->getManager(),
         $basedir,
-        CRM_Utils_File::tempdir() // WAS: $config->extensionsDir . DIRECTORY_SEPARATOR . 'tmp';
+        // WAS: $config->extensionsDir . DIRECTORY_SEPARATOR . 'tmp';
+        CRM_Utils_File::tempdir()
       );
     }
     return $this->downloader;
@@ -323,7 +325,8 @@ class CRM_Extension_System {
 
     switch ($extensionRow['status']) {
       case CRM_Extension_Manager::STATUS_UNINSTALLED:
-        $extensionRow['statusLabel'] = ''; // ts('Uninstalled');
+        // ts('Uninstalled');
+        $extensionRow['statusLabel'] = '';
         break;
 
       case CRM_Extension_Manager::STATUS_DISABLED:
@@ -331,7 +334,8 @@ class CRM_Extension_System {
         break;
 
       case CRM_Extension_Manager::STATUS_INSTALLED:
-        $extensionRow['statusLabel'] = ts('Enabled'); // ts('Installed');
+        // ts('Installed');
+        $extensionRow['statusLabel'] = ts('Enabled');
         break;
 
       case CRM_Extension_Manager::STATUS_DISABLED_MISSING:
@@ -339,7 +343,8 @@ class CRM_Extension_System {
         break;
 
       case CRM_Extension_Manager::STATUS_INSTALLED_MISSING:
-        $extensionRow['statusLabel'] = ts('Enabled (Missing)'); // ts('Installed');
+        // ts('Installed');
+        $extensionRow['statusLabel'] = ts('Enabled (Missing)');
         break;
 
       default:

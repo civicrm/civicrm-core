@@ -41,7 +41,7 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -91,7 +91,6 @@ class CRM_Financial_Page_FinancialBatch extends CRM_Core_Page_Basic {
     // parent run
     return CRM_Core_Page::run();
   }
-
 
   /**
    * Get name of edit form.

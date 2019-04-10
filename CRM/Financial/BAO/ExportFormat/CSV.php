@@ -41,6 +41,7 @@ class CRM_Financial_BAO_ExportFormat_CSV extends CRM_Financial_BAO_ExportFormat 
    * referenced in the journal entries that isn't defined anywhere.
    *
    * Possibly in the future this could be selected by the user.
+   * @var array
    */
   public static $complementaryTables = [
     'ACCNT',

@@ -35,18 +35,18 @@
  * This class generates form components for Financial Type
  */
 class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
-  static $_links = NULL;
-  static $_entityID;
+  public static $_links = NULL;
+  public static $_entityID;
 
   /**
    * Batch status.
-   * @var
+   * @var int
    */
   protected $_batchStatusId;
 
   /**
    * Batch status name.
-   * @string
+   * @var string
    */
   protected $_batchStatus;
 

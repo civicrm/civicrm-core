@@ -47,21 +47,25 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
 
   /**
    * Financial batch ids.
+   * @var array
    */
   protected $_batchIds = [];
 
   /**
    * Export status id.
+   * @var int
    */
   protected $_exportStatusId;
 
   /**
    * Export format.
+   * @var string
    */
   protected $_exportFormat;
 
   /**
    * Download export File.
+   * @var bool
    */
   protected $_downloadFile = TRUE;
 

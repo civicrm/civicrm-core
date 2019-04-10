@@ -142,7 +142,8 @@ class CRM_Export_Form_Select extends CRM_Core_Form_Task {
         if ($formName == 'CRM_Export_StateMachine_Standalone') {
           $componentName = ['CRM', $this->controller->get('entity')];
         }
-        $entityShortname = $componentName[1]; // Contact
+        // Contact
+        $entityShortname = $componentName[1];
         $entityDAOName = $entityShortname;
         break;
     }
@@ -316,18 +317,17 @@ FROM   {$this->_componentTable}
     ]);
 
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Continue'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Continue'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
     $this->addFormRule(['CRM_Export_Form_Select', 'formRule'], $this);
   }

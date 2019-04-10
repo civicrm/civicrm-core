@@ -165,7 +165,7 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
   }
 
   /**
-   * @return DefaultCertificateValidator
+   * @return \Civi\Cxn\Rpc\DefaultCertificateValidator
    * @throws CRM_Core_Exception
    */
   public static function createCertificateValidator() {

@@ -94,22 +94,21 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
     );
 
     $this->addButtons([
-        [
-          'type' => 'back',
-          'name' => ts('Previous'),
-        ],
-        [
-          'type' => 'next',
-          'name' => ts('Export'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-        ],
-        [
-          'type' => 'done',
-          'icon' => 'fa-times',
-          'name' => ts('Done'),
-        ],
-      ]
-    );
+      [
+        'type' => 'back',
+        'name' => ts('Previous'),
+      ],
+      [
+        'type' => 'next',
+        'name' => ts('Export'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+      ],
+      [
+        'type' => 'done',
+        'icon' => 'fa-times',
+        'name' => ts('Done'),
+      ],
+    ]);
   }
 
   /**
