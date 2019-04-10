@@ -91,7 +91,7 @@ abstract class CRM_Financial_BAO_ExportFormat {
    *
    * @param $exportDaos array with DAO's for queries to be exported.
    */
-  public abstract function makeExport($exportDaos);
+  abstract public function makeExport($exportDaos);
 
   /**
    * @return string
@@ -108,7 +108,7 @@ abstract class CRM_Financial_BAO_ExportFormat {
    *
    * @return string
    */
-  public abstract function getFileExtension();
+  abstract public function getFileExtension();
 
   /**
    * @return object
@@ -131,6 +131,7 @@ abstract class CRM_Financial_BAO_ExportFormat {
    * Depending on the output format might want to override this, e.g. for IIF tabs need to be escaped etc,
    * but for CSV it doesn't make sense because php has built in csv output functions.
    */
+
   /**
    * @param $s
    * @param string $type
@@ -162,7 +163,8 @@ abstract class CRM_Financial_BAO_ExportFormat {
         ob_clean();
         flush();
         readfile($config->customFileUploadDir . CRM_Utils_File::cleanFileName(basename($zip)));
-        unlink($zip); //delete the zip to avoid clutter.
+        //delete the zip to avoid clutter.
+        unlink($zip);
         CRM_Utils_System::civiExit();
       }
     }

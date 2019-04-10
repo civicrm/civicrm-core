@@ -47,7 +47,7 @@ class CRM_Export_BAO_Export {
    * @param int $exportMode
    *   Export mode.
    *
-   * @return string $property
+   * @return string
    *   Default Return property
    */
   public static function defaultReturnProperty($exportMode) {
@@ -83,7 +83,7 @@ class CRM_Export_BAO_Export {
    * @param int $exportMode
    *   Export mode.
    *
-   * @return string $component
+   * @return string
    *   CiviCRM Export Component
    */
   public static function exportComponent($exportMode) {
@@ -120,7 +120,7 @@ class CRM_Export_BAO_Export {
    * @param object $query
    *   CRM_Contact_BAO_Query
    *
-   * @return string $groupBy
+   * @return string
    *   Group By Clause
    */
   public static function getGroupBy($processor, $returnProperties, $query) {
@@ -1132,11 +1132,10 @@ LIMIT $offset, $limit
         }
         // CRM-13995
         elseif (is_object($relDAO) && in_array($relationField, [
-            'email_greeting',
-            'postal_greeting',
-            'addressee',
-          ])
-        ) {
+          'email_greeting',
+          'postal_greeting',
+          'addressee',
+        ])) {
           //special case for greeting replacement
           $fldValue = "{$relationField}_display";
           $fieldValue = $relDAO->$fldValue;

@@ -41,11 +41,11 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
-  static $_entityID;
+  public static $_links = NULL;
+  public static $_entityID;
 
-  static $_columnHeader = NULL;
-  static $_returnvalues = NULL;
+  public static $_columnHeader = NULL;
+  public static $_returnvalues = NULL;
 
   /**
    * Get BAO Name.
@@ -91,7 +91,8 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    */
   public function run() {
     // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse'); // default to 'browse'
+    // default to 'browse'
+    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
 
     // assign vars to templates
     $this->assign('action', $action);

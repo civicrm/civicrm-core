@@ -38,6 +38,9 @@ class CRM_Extension_Info {
    */
   const FILENAME = 'info.xml';
 
+  /**
+   * @var string
+   */
   public $key = NULL;
   public $type = NULL;
   public $name = NULL;
