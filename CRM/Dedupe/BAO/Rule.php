@@ -107,8 +107,8 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
       case 'civicrm_address':
         $id = 'contact_id';
         $on[] = 't1.location_type_id = t2.location_type_id';
-        $innerJoinClauses[] = ['t1.location_type_id = t2.location_type_id'];
-        if ($this->params['civicrm_address']['location_type_id']) {
+        $innerJoinClauses[] = 't1.location_type_id = t2.location_type_id';
+        if (!empty($this->params['civicrm_address']['location_type_id'])) {
           $locTypeId = CRM_Utils_Type::escape($this->params['civicrm_address']['location_type_id'], 'Integer', FALSE);
           if ($locTypeId) {
             $where[] = "t1.location_type_id = $locTypeId";
