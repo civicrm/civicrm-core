@@ -36,8 +36,9 @@ class CRM_Core_BAO_Block {
 
   /**
    * Fields that are required for a valid block.
+   * @var array
    */
-  static $requiredBlockFields = [
+  public static $requiredBlockFields = [
     'email' => ['email'],
     'phone' => ['phone'],
     'im' => ['name'],

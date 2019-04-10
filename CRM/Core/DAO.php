@@ -59,14 +59,14 @@ class CRM_Core_DAO extends DB_DataObject {
    * @var null
    * @deprecated
    */
-  static $_nullObject = NULL;
+  public static $_nullObject = NULL;
   /**
    * @var array
    * @deprecated
    */
-  static $_nullArray = [];
+  public static $_nullArray = [];
 
-  static $_dbColumnValueCache = NULL;
+  public static $_dbColumnValueCache = NULL;
   const NOT_NULL = 1, IS_NULL = 2,
     DB_DAO_NOTNULL = 128,
     VALUE_SEPARATOR = "",
@@ -101,18 +101,19 @@ class CRM_Core_DAO extends DB_DataObject {
    * test objects - this prevents world regions, countries etc from being added / deleted
    * @var array
    */
-  static $_testEntitiesToSkip = [];
+  public static $_testEntitiesToSkip = [];
   /**
    * The factory class for this application.
    * @var object
    */
-  static $_factory = NULL;
+  public static $_factory = NULL;
 
-  static $_checkedSqlFunctionsExist = FALSE;
+  public static $_checkedSqlFunctionsExist = FALSE;
 
   /**
    * https://issues.civicrm.org/jira/browse/CRM-17748
    * internal variable for DAO to hold per-query settings
+   * @var array
    */
   protected $_options = [];
 
@@ -1342,7 +1343,7 @@ FROM   civicrm_domain
    * @return CRM_Core_DAO
    *   Object that points to an unbuffered result set
    */
-  static public function executeUnbufferedQuery(
+  public static function executeUnbufferedQuery(
     $query,
     $params = [],
     $abort = TRUE,
@@ -1985,7 +1986,8 @@ SELECT contact_id
     $object = new $daoName();
     $object->id = CRM_Utils_Array::value('id', $params);
 
-    $deletions = []; // array(array(0 => $daoName, 1 => $daoParams))
+    // array(array(0 => $daoName, 1 => $daoParams))
+    $deletions = [];
     if ($object->find(TRUE)) {
 
       $fields = $object->fields();
@@ -2003,7 +2005,8 @@ SELECT contact_id
           // to make this test process pass - line below makes pass for now
           && $dbName != 'member_of_contact_id'
         ) {
-          $deletions[] = [$FKClassName, ['id' => $object->$dbName]]; // x
+          // x
+          $deletions[] = [$FKClassName, ['id' => $object->$dbName]];
         }
       }
     }
@@ -2358,7 +2361,6 @@ SELECT contact_id
     }
   }
 
-
   /**
    * Update the fields array to also hold keys for pseudoconstant fields that relate to contained fields.
    *
@@ -2549,7 +2551,8 @@ SELECT contact_id
               return (sprintf('%s ' . $operator . ' "%s" AND "%s"', $fieldName, CRM_Core_DAO::escapeString($criteria[0]), CRM_Core_DAO::escapeString($criteria[1])));
             }
             else {
-              return NULL;  // not yet implemented (tests required to implement)
+              // not yet implemented (tests required to implement)
+              return NULL;
             }
             break;
 
@@ -2575,7 +2578,8 @@ SELECT contact_id
               return (sprintf('%s %s "%s"', $fieldName, $operator, CRM_Core_DAO::escapeString($criteria)));
             }
             else {
-              return NULL; // not yet implemented (tests required to implement)
+              // not yet implemented (tests required to implement)
+              return NULL;
             }
         }
       }

@@ -39,11 +39,13 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
 
   /**
    * Static holder for the Label Formats Option Group ID.
+   * @var int
    */
   private static $_gid = NULL;
 
   /**
    * Label Format fields stored in the 'value' field of the Option Value table.
+   * @var array
    */
   private static $optionValueFields = [
     'paper-size' => [
@@ -258,7 +260,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Add ordering fields to Label Format list.
    *
-   * @param array (reference) $list List of Label Formats
+   * @param array $list List of Label Formats
    * @param string $returnURL
    *   URL of page calling this function.
    *
@@ -382,7 +384,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @param string $field
    *   Name of a label format field.
-   * @param array (reference) $values associative array of name/value pairs containing
+   * @param array $values associative array of name/value pairs containing
    *                                           label format field selections
    *
    * @param null $default
@@ -458,7 +460,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Save the Label Format in the DB.
    *
-   * @param array (reference) $values associative array of name/value pairs
+   * @param array $values associative array of name/value pairs
    * @param int $id
    *   Id of the database record (null = new record).
    * @param string $groupName

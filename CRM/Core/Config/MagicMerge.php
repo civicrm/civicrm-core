@@ -54,7 +54,8 @@ class CRM_Core_Config_MagicMerge {
    */
   private $map;
 
-  private $locals, $settings;
+  private $locals;
+  private $settings;
 
   private $cache = [];
 
@@ -116,7 +117,8 @@ class CRM_Core_Config_MagicMerge {
 
       'userFrameworkBaseURL' => ['user-system', 'getAbsoluteBaseURL'],
       'userFrameworkVersion' => ['user-system', 'getVersion'],
-      'useFrameworkRelativeBase' => ['user-system', 'getRelativeBaseURL'], // ugh typo.
+    // ugh typo.
+      'useFrameworkRelativeBase' => ['user-system', 'getRelativeBaseURL'],
 
       // "setting" properties are loaded through the setting layer, esp
       // table "civicrm_setting" and global $civicrm_setting.
@@ -133,14 +135,16 @@ class CRM_Core_Config_MagicMerge {
       'dateformatYear' => ['setting'],
       'dateformatFinancialBatch' => ['setting'],
       'dateformatshortdate' => ['setting'],
-      'debug' => ['setting', 'debug_enabled'], // renamed.
+      // renamed.
+      'debug' => ['setting', 'debug_enabled'],
       'defaultContactCountry' => ['setting'],
       'defaultContactStateProvince' => ['setting'],
       'defaultCurrency' => ['setting'],
       'defaultSearchProfileID' => ['setting'],
       'doNotAttachPDFReceipt' => ['setting'],
       'empoweredBy' => ['setting'],
-      'enableComponents' => ['setting', 'enable_components'], // renamed.
+      // renamed.
+      'enableComponents' => ['setting', 'enable_components'],
       'enableSSL' => ['setting'],
       'fatalErrorHandler' => ['setting'],
       'fieldSeparator' => ['setting'],
@@ -164,7 +168,8 @@ class CRM_Core_Config_MagicMerge {
       'mapAPIKey' => ['setting'],
       'mapProvider' => ['setting'],
       'maxFileSize' => ['setting'],
-      'maxAttachments' => ['setting', 'max_attachments'], // renamed.
+      // renamed.
+      'maxAttachments' => ['setting', 'max_attachments'],
       'monetaryDecimalPoint' => ['setting'],
       'monetaryThousandSeparator' => ['setting'],
       'moneyformat' => ['setting'],

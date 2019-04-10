@@ -132,15 +132,15 @@ class CRM_Core_Form_Task_PDFLetterCommon {
 
     $config = CRM_Core_Config::singleton();
     /** CRM-15883 Suppressing Stationery path field until we switch from DOMPDF to a library that supports it.
-    if ($config->wkhtmltopdfPath == FALSE) {
-    $form->add(
-    'text',
-    'stationery',
-    ts('Stationery (relative path to PDF you wish to use as the background)'),
-    array('size' => 25, 'maxlength' => 900, 'onkeyup' => "showUpdateFormatChkBox();"),
-    FALSE
-    );
-    }
+     * if ($config->wkhtmltopdfPath == FALSE) {
+     * $form->add(
+     * 'text',
+     * 'stationery',
+     * ts('Stationery (relative path to PDF you wish to use as the background)'),
+     * array('size' => 25, 'maxlength' => 900, 'onkeyup' => "showUpdateFormatChkBox();"),
+     * FALSE
+     * );
+     * }
      */
     $form->add('checkbox', 'bind_format', ts('Always use this Page Format with the selected Template'));
     $form->add('checkbox', 'update_format', ts('Update Page Format (this will affect all templates that use this format)'));

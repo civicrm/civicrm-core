@@ -259,7 +259,8 @@ class CRM_Core_ManagedEntities {
     if ($doUpdate) {
       $defaults = [
         'id' => $dao->entity_id,
-        'is_active' => 1, // FIXME: test whether is_active is valid
+      // FIXME: test whether is_active is valid
+        'is_active' => 1,
       ];
       $params = array_merge($defaults, $todo['params']);
       $result = civicrm_api($dao->entity_type, 'create', $params);

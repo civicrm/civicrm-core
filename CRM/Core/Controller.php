@@ -276,11 +276,9 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
 
   public function fini() {
     CRM_Core_BAO_Cache::storeSessionToCache([
-        "_{$this->_name}_container",
-        ['CiviCRM', $this->_scope],
-      ],
-      TRUE
-    );
+      "_{$this->_name}_container",
+      ['CiviCRM', $this->_scope],
+    ], TRUE);
   }
 
   /**

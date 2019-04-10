@@ -39,11 +39,13 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
 
   /**
    * Static holder for the PDF Page Formats Option Group ID.
+   * @var int
    */
   private static $_gid = NULL;
 
   /**
    * PDF Page Format fields stored in the 'value' field of the Option Value table.
+   * @var array
    */
   private static $optionValueFields = [
     'paper_size' => [
@@ -139,7 +141,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Add ordering fields to Page Format list.
    *
-   * @param array (reference) $list List of PDF Page Formats
+   * @param array $list List of PDF Page Formats
    * @param string $returnURL
    *   URL of page calling this function.
    */
@@ -253,7 +255,7 @@ class CRM_Core_BAO_PdfFormat extends CRM_Core_DAO_OptionValue {
    *
    * @param string $field
    *   Name of a PDF Page Format field.
-   * @param array (reference) $values associative array of name/value pairs containing
+   * @param array $values associative array of name/value pairs containing
    *                                           PDF Page Format field selections
    *
    * @param null $default

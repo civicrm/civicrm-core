@@ -42,7 +42,10 @@ class CRM_Core_Component {
    */
   const COMPONENT_INFO_CLASS = 'Info';
 
-  static $_contactSubTypes = NULL;
+  /**
+   * @var array
+   */
+  public static $_contactSubTypes = NULL;
 
   /**
    * @param bool $force
@@ -128,17 +131,16 @@ class CRM_Core_Component {
     return $componentIDs;
   }
 
-
   /**
    * @param bool $force
    *
    * @return CRM_Core_Component_Info[]
    */
-  static public function &getEnabledComponents($force = FALSE) {
+  public static function &getEnabledComponents($force = FALSE) {
     return self::_info($force);
   }
 
-  static public function flushEnabledComponents() {
+  public static function flushEnabledComponents() {
     unset(Civi::$statics[__CLASS__]);
   }
 
@@ -387,7 +389,6 @@ class CRM_Core_Component {
     }
     return self::$_contactSubTypes;
   }
-
 
   /**
    * @param $subType

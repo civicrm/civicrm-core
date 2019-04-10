@@ -55,7 +55,6 @@ function smarty_function_crmAPI($params, &$smarty) {
   unset($errorScope);
   if ($result === FALSE) {
     $smarty->trigger_error("Unknown error");
-    return;
   }
 
   if (!empty($result['is_error'])) {

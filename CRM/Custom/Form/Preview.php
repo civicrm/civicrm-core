@@ -118,13 +118,12 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
       $this->assign('groupTree', $this->_groupTree);
     }
     $this->addButtons([
-        [
-          'type' => 'cancel',
-          'name' => ts('Done with Preview'),
-          'isDefault' => TRUE,
-        ],
-      ]
-    );
+      [
+        'type' => 'cancel',
+        'name' => ts('Done with Preview'),
+        'isDefault' => TRUE,
+      ],
+    ]);
   }
 
 }

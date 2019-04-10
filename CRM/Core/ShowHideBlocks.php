@@ -37,7 +37,8 @@ class CRM_Core_ShowHideBlocks {
    *
    * @var string
    */
-  static $_showIcon, $_hideIcon;
+  public static $_showIcon;
+  public static $_hideIcon;
 
   /**
    * The array of ids of blocks that will be shown.

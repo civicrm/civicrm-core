@@ -37,6 +37,7 @@
  *
  */
 class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
+
   /**
    * Given a permission string, check for access requirements
    *

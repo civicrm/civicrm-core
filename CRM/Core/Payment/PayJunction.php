@@ -170,6 +170,7 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
 
     return $params;
   }
+
   // end function doDirectPayment
 
   /**
@@ -189,7 +190,6 @@ class CRM_Core_Payment_PayJunction extends CRM_Core_Payment {
       return TRUE;
     }
   }
-
 
   /**
    * ignore for now, more elaborate error handling later.

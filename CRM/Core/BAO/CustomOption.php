@@ -102,7 +102,7 @@ class CRM_Core_BAO_CustomOption {
    *   -rp = rowcount
    *   -page= offset
    */
-  static public function getOptionListSelector(&$params) {
+  public static function getOptionListSelector(&$params) {
     $options = [];
 
     $field = CRM_Core_BAO_CustomField::getFieldObject($params['fid']);

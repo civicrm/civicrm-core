@@ -70,7 +70,7 @@ abstract class CRM_Core_Task {
    *   This must be defined in each child class.  It is passed to the searchTasks hook.
    *   Example: $objectType = 'event';
    */
-  static $objectType = NULL;
+  public static $objectType = NULL;
 
   /**
    * Generates a list of batch tasks available for the current entities.

@@ -33,6 +33,7 @@
  *
  */
 class CRM_Core_I18n_Form extends CRM_Core_Form {
+
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
     $tsLocale = CRM_Core_I18n::getLocale();

@@ -54,6 +54,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
 
   /**
    * The option group ID
+   * @var int
    */
   protected $_optionGroupID = NULL;
 
@@ -153,17 +154,16 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
       $option = civicrm_api3('option_value', 'getsingle', ['id' => $this->_id]);
       $this->assign('label', $option['label']);
       $this->addButtons([
-          [
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'isDefault' => TRUE,
-          ],
-          [
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ],
-        ]
-      );
+        [
+          'type' => 'next',
+          'name' => ts('Delete'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
     }
     else {
       // lets trim all the whitespace
@@ -196,22 +196,21 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
 
       // add buttons
       $this->addButtons([
-          [
-            'type' => 'next',
-            'name' => ts('Save'),
-            'isDefault' => TRUE,
-          ],
-          [
-            'type' => 'next',
-            'name' => ts('Save and New'),
-            'subName' => 'new',
-          ],
-          [
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ],
-        ]
-      );
+        [
+          'type' => 'next',
+          'name' => ts('Save'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'next',
+          'name' => ts('Save and New'),
+          'subName' => 'new',
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
 
       // if view mode pls freeze it with the done button.
       if ($this->_action & CRM_Core_Action::VIEW) {

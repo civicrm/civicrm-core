@@ -145,7 +145,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     if ($contribution->invoice_id != $input['invoice']) {
       CRM_Core_Error::debug_log_message("Invoice values dont match between database and IPN request");
       echo "Failure: Invoice values dont match between database and IPN request<p>";
-      return;
+      return FALSE;
     }
 
     // lets replace invoice-id with Payment Processor -number because thats what is common and unique
@@ -157,7 +157,7 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
     if ($contribution->total_amount != $input['amount']) {
       CRM_Core_Error::debug_log_message("Amount values dont match between database and IPN request");
       echo "Failure: Amount values dont match between database and IPN request. " . $contribution->total_amount . "/" . $input['amount'] . "<p>";
-      return;
+      return FALSE;
     }
 
     $transaction = new CRM_Core_Transaction();

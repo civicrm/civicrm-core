@@ -60,7 +60,6 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     return $dao;
   }
 
-
   /**
    * Given a UF user object, make sure there is a contact
    * object for this user. If the user has new values, we need

@@ -37,6 +37,7 @@
  *
  */
 class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
+
   /**
    * Given a permission string, check for access requirements
    *
@@ -74,7 +75,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
         // This is a codeblock copied from /Civicrm/Utils/REST
         $uid = NULL;
         if (!$uid) {
-          $store      = NULL;
+          $store = NULL;
 
           $contact_id = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
 
@@ -180,9 +181,9 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     $query = $db->getQuery(TRUE);
 
     $query
-        ->select($db->quoteName('rules'))
-        ->from($db->quoteName('#__assets'))
-        ->where($db->quoteName('name') . ' = ' . $db->quote('com_civicrm'));
+      ->select($db->quoteName('rules'))
+      ->from($db->quoteName('#__assets'))
+      ->where($db->quoteName('name') . ' = ' . $db->quote('com_civicrm'));
 
     $db->setQuery($query);
 
@@ -204,9 +205,9 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     $query = $db->getQuery(TRUE);
 
     $query
-        ->update($db->quoteName('#__assets'))
-        ->set($db->quoteName('rules') . ' = ' . $db->quote(json_encode($associations)))
-        ->where($db->quoteName('name') . ' = ' . $db->quote('com_civicrm'));
+      ->update($db->quoteName('#__assets'))
+      ->set($db->quoteName('rules') . ' = ' . $db->quote(json_encode($associations)))
+      ->where($db->quoteName('name') . ' = ' . $db->quote('com_civicrm'));
 
     $db->setQuery($query)->execute();
   }

@@ -41,7 +41,7 @@
  * used when processing certain API backends.
  */
 class CRM_Core_Permission_Temp {
-  static $id = 0;
+  public static $id = 0;
 
   /**
    * Array(int $grantId => array($perm))

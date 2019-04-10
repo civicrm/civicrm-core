@@ -306,7 +306,7 @@ class CRM_Core_SelectValues {
    *   date format (QF format)
    * @param null $minOffset
    * @param null $maxOffset
-   *
+   * @param string $context
    * @return array
    *   the date array
    */
@@ -932,7 +932,6 @@ class CRM_Core_SelectValues {
 
     return $profileGroupType;
   }
-
 
   /**
    * Word replacement match type.

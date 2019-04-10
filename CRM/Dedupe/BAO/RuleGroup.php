@@ -41,8 +41,9 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
 
   /**
    * Ids of the contacts to limit the SQL queries (whole-database queries otherwise)
+   * @var array
    */
-  var $contactIds = [];
+  public $contactIds = [];
 
   /**
    * Set the contact IDs to restrict the dedupe to.
@@ -55,13 +56,15 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
 
   /**
    * Params to dedupe against (queries against the whole contact set otherwise)
+   * @var array
    */
-  var $params = [];
+  public $params = [];
 
   /**
    * If there are no rules in rule group.
+   * @var bool
    */
-  var $noRules = FALSE;
+  public $noRules = FALSE;
 
   protected $temporaryTables = [];
 
@@ -496,7 +499,6 @@ class CRM_Dedupe_BAO_RuleGroup extends CRM_Dedupe_DAO_RuleGroup {
     }
     return $result;
   }
-
 
   /**
    * Get the cached contact type for a particular rule group.

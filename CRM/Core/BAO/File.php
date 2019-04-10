@@ -38,7 +38,7 @@
  */
 class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
-  static $_signableFields = ['entityTable', 'entityID', 'fileID'];
+  public static $_signableFields = ['entityTable', 'entityID', 'fileID'];
 
   /**
    * Takes an associative array and creates a File object.
@@ -94,7 +94,6 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
 
     return [NULL, NULL];
   }
-
 
   /**
    * @param $data
@@ -695,7 +694,6 @@ AND       CEF.entity_id    = %2";
     self::deleteEntityFile($params['entityTable'], $params['entityID'], NULL, $params['fileID']);
   }
 
-
   /**
    * Display paper icon for a file attachment -- CRM-13624
    *
@@ -772,6 +770,8 @@ AND       CEF.entity_id    = %2";
    *
    * @param int $entityId entity id the file is attached to
    * @param int $fileId file ID
+   * @param int $genTs
+   * @param int $life
    * @return string
    */
   public static function generateFileHash($entityId = NULL, $fileId = NULL, $genTs = NULL, $life = NULL) {

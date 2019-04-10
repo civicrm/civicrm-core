@@ -80,6 +80,9 @@ abstract class CRM_Core_Payment {
     RECURRING_PAYMENT_START = 'START',
     RECURRING_PAYMENT_END = 'END';
 
+  /**
+   * @var object
+   */
   protected $_paymentProcessor;
 
   /**
@@ -108,9 +111,9 @@ abstract class CRM_Core_Payment {
    *
    * (Deprecated parameter but used in some messages).
    *
+   * @var string
    * @deprecated
    *
-   * @var string
    */
   public $_processorName;
 
@@ -520,9 +523,9 @@ abstract class CRM_Core_Payment {
       case 'contributionPageRecurringHelp':
         // require exactly two parameters
         if (array_keys($params) == [
-            'is_recur_installments',
-            'is_email_receipt',
-          ]) {
+          'is_recur_installments',
+          'is_email_receipt',
+        ]) {
           $gotText = ts('Your recurring contribution will be processed automatically.');
           if ($params['is_recur_installments']) {
             $gotText .= ' ' . ts('You can specify the number of installments, or you can leave the number of installments blank if you want to make an open-ended commitment. In either case, you can choose to cancel at any time.');
@@ -910,7 +913,7 @@ abstract class CRM_Core_Payment {
    * @param int $billingLocationID
    *
    * @return array
-   *    Array of metadata for address fields.
+   *   Array of metadata for address fields.
    */
   public function getBillingAddressFieldsMetadata($billingLocationID = NULL) {
     if (!$billingLocationID) {
@@ -1012,8 +1015,8 @@ abstract class CRM_Core_Payment {
       'title' => ts('Country'),
       'cc_field' => TRUE,
       'attributes' => [
-          '' => ts('- select -'),
-        ] + CRM_Core_PseudoConstant::country(),
+        '' => ts('- select -'),
+      ] + CRM_Core_PseudoConstant::country(),
       'is_required' => TRUE,
     ];
     return $metadata;

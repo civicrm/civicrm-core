@@ -4,6 +4,7 @@
  * Class CRM_Core_CodeGen_Util_File
  */
 class CRM_Core_CodeGen_Util_File {
+
   /**
    * @param $dir
    * @param int $perm

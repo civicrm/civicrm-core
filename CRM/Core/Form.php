@@ -162,6 +162,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
   /**
    *  Indicate if this form should warn users of unsaved changes
+   * @var bool
    */
   protected $unsavedChangesWarn;
 
@@ -227,8 +228,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   const CB_PREFIX = 'mark_x_', CB_PREFIY = 'mark_y_', CB_PREFIZ = 'mark_z_', CB_PREFIX_LEN = 7;
 
   /**
-   * @internal to keep track of chain-select fields
    * @var array
+   * @internal to keep track of chain-select fields
    */
   private $_chainSelectFields = [];
 
@@ -491,10 +492,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     // Respond with JSON if in AJAX context (also support legacy value '6')
     if ($allowAjax && !empty($_REQUEST['snippet']) && in_array($_REQUEST['snippet'], [
-          CRM_Core_Smarty::PRINT_JSON,
-          6,
-        ])
-    ) {
+      CRM_Core_Smarty::PRINT_JSON,
+      6,
+    ])) {
       $this->ajaxResponse['buttonName'] = str_replace('_qf_' . $this->getAttribute('id') . '_', '', $this->controller->getButtonName());
       $this->ajaxResponse['action'] = $this->_action;
       if (isset($this->_id) || isset($this->id)) {
@@ -1391,7 +1391,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $props['context'] = $this->getDefaultContext();
       }
       // This is not a required param, so we'll ignore if this doesn't exist.
-      catch (Exception $e) {}
+      catch (Exception $e) {
+      }
     }
     // Fetch options from the api unless passed explicitly
     if (isset($props['options'])) {
@@ -1458,7 +1459,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    *
    * @throws \CiviCRM_API3_Exception
    * @throws \Exception
-   * @return HTML_QuickForm_Element
+   * @return mixed
+   *   HTML_QuickForm_Element
+   *   void
    */
   public function addField($name, $props = [], $required = FALSE, $legacyDate = TRUE) {
     // Resolve context.
@@ -1497,10 +1500,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     }
 
     $isSelect = (in_array($widget, [
-          'Select',
-          'CheckBoxGroup',
-          'RadioGroup',
-          'Radio',
+      'Select',
+      'CheckBoxGroup',
+      'RadioGroup',
+      'Radio',
     ]));
 
     if ($isSelect) {
@@ -2173,9 +2176,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if ($this->canUseAjaxContactLookups()) {
       $this->assign('selectable', $autoCompleteField['id_field']);
       $this->addEntityRef($autoCompleteField['id_field'], NULL, [
-          'placeholder' => $autoCompleteField['placeholder'],
-          'api' => $autoCompleteField['api'],
-        ]);
+        'placeholder' => $autoCompleteField['placeholder'],
+        'api' => $autoCompleteField['api'],
+      ]);
 
       CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/AlternateContactSelector.js', 1, 'html-header')
         ->addSetting([
@@ -2298,11 +2301,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   public function addChainSelect($elementName, $settings = []) {
     $props = $settings += [
       'control_field' => str_replace(['state_province', 'StateProvince', 'county', 'County'], [
-          'country',
-          'Country',
-          'state_province',
-          'StateProvince',
-        ], $elementName),
+        'country',
+        'Country',
+        'state_province',
+        'StateProvince',
+      ], $elementName),
       'data-callback' => strpos($elementName, 'rovince') ? 'civicrm/ajax/jqState' : 'civicrm/ajax/jqCounty',
       'label' => strpos($elementName, 'rovince') ? ts('State/Province') : ts('County'),
       'data-empty-prompt' => strpos($elementName, 'rovince') ? ts('Choose country first') : ts('Choose state first'),
@@ -2337,7 +2340,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->setConstants(['task' => '']);
       $this->assign('taskMetaData', $tasks);
       $select = $this->add('select', 'task', NULL, ['' => ts('Actions')], FALSE, [
-        'class' => 'crm-select2 crm-action-menu fa-check-circle-o huge crm-search-result-actions']
+        'class' => 'crm-select2 crm-action-menu fa-check-circle-o huge crm-search-result-actions',
+      ]
       );
       foreach ($tasks as $key => $task) {
         $attributes = [];
@@ -2428,7 +2432,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
             if (!array_intersect($targetValue, array_keys($options))) {
               $this->setElementError($target, $controlType == 'country' ? ts('State/Province does not match the selected Country') : ts('County does not match the selected State/Province'));
             }
-          } // Suppress "required" error for field if it has no options
+          }
+          // Suppress "required" error for field if it has no options
           elseif (!$options) {
             $this->setElementError($target, NULL);
           }

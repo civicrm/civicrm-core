@@ -80,7 +80,6 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
     return $wordReplacement;
   }
 
-
   /**
    * Save the values of a WordReplacement.
    *

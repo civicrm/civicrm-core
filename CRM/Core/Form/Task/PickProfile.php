@@ -61,14 +61,14 @@ abstract class CRM_Core_Form_Task_PickProfile extends CRM_Core_Form_Task {
    *
    * @var string
    */
-  static $tableName = NULL;
+  public static $tableName = NULL;
 
   /**
    * Must be set to entity shortname (eg. event)
    *
    * @var string
    */
-  static $entityShortname = NULL;
+  public static $entityShortname = NULL;
 
   /**
    * Build all the data structures needed to build the form.

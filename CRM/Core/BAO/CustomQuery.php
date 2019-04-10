@@ -79,10 +79,10 @@ class CRM_Core_BAO_CustomQuery {
   public $_qill;
 
   /**
-   * @deprecated
    * No longer needed due to CRM-17646 refactoring, but still used in some places
    *
    * @var array
+   * @deprecated
    */
   public $_options;
 
@@ -107,7 +107,7 @@ class CRM_Core_BAO_CustomQuery {
    *
    * @var array
    */
-  static $extendsMap = [
+  public static $extendsMap = [
     'Contact' => 'civicrm_contact',
     'Individual' => 'civicrm_contact',
     'Household' => 'civicrm_contact',

@@ -174,11 +174,16 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
   public static function getId() {
     if (!isset(Civi::$statics[__CLASS__]['id'])) {
       Civi::$statics[__CLASS__]['id'] = md5(implode(\CRM_Core_DAO::VALUE_SEPARATOR, [
-        defined('CIVICRM_DOMAIN_ID') ? CIVICRM_DOMAIN_ID : 1, // e.g. one database, multi URL
-        parse_url(CIVICRM_DSN, PHP_URL_PATH), // e.g. one codebase, multi database
-        \CRM_Utils_Array::value('SCRIPT_FILENAME', $_SERVER, ''), // e.g. CMS vs extern vs installer
-        \CRM_Utils_Array::value('HTTP_HOST', $_SERVER, ''), // e.g. name-based vhosts
-        \CRM_Utils_Array::value('SERVER_PORT', $_SERVER, ''), // e.g. port-based vhosts
+        // e.g. one database, multi URL
+        defined('CIVICRM_DOMAIN_ID') ? CIVICRM_DOMAIN_ID : 1,
+        // e.g. one codebase, multi database
+        parse_url(CIVICRM_DSN, PHP_URL_PATH),
+        // e.g. CMS vs extern vs installer
+        \CRM_Utils_Array::value('SCRIPT_FILENAME', $_SERVER, ''),
+        // e.g. name-based vhosts
+        \CRM_Utils_Array::value('HTTP_HOST', $_SERVER, ''),
+        // e.g. port-based vhosts
+        \CRM_Utils_Array::value('SERVER_PORT', $_SERVER, ''),
         // Depending on deployment arch, these signals *could* be redundant, but who cares?
       ]));
     }

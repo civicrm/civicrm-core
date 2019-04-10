@@ -272,9 +272,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
 
       $smarty = CRM_Core_Smarty::singleton();
       foreach ([
-                 'text',
-                 'html',
-               ] as $elem) {
+        'text',
+        'html',
+      ] as $elem) {
         $$elem = $smarty->fetch("string:{$$elem}");
       }
 
@@ -427,9 +427,9 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       }
       else {
         CRM_Core_Error::fatal(ts('No such message template: option group %1, option value %2.', [
-              1 => $params['groupName'],
-              2 => $params['valueName'],
-            ]));
+          1 => $params['groupName'],
+          2 => $params['valueName'],
+        ]));
       }
     }
 

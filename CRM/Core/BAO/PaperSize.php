@@ -39,11 +39,13 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
 
   /**
    * Static holder for the Paper Size Option Group ID.
+   * @var int
    */
   private static $_gid = NULL;
 
   /**
    * Paper Size fields stored in the 'value' field of the Option Value table.
+   * @var array
    */
   private static $optionValueFields = [
     'metric' => [
@@ -84,7 +86,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Add ordering fields to Paper Size list.
    *
-   * @param array (reference) $list List of Paper Sizes
+   * @param array $list List of Paper Sizes
    * @param string $returnURL
    *   URL of page calling this function.
    *
@@ -196,7 +198,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
    *
    * @param string $field
    *   Name of a Paper Size field.
-   * @param array (reference) $values associative array of name/value pairs containing
+   * @param array $values associative array of name/value pairs containing
    *                                           Paper Size field selections
    *
    * @param null $default
@@ -263,7 +265,7 @@ class CRM_Core_BAO_PaperSize extends CRM_Core_DAO_OptionValue {
   /**
    * Save the Paper Size in the DB.
    *
-   * @param array (reference) $values associative array of name/value pairs
+   * @param array $values associative array of name/value pairs
    * @param int $id
    *   Id of the database record (null = new record).
    */

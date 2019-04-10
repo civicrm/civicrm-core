@@ -31,14 +31,15 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_OptionGroup {
-  static $_values = [];
-  static $_cache = [];
+  public static $_values = [];
+  public static $_cache = [];
 
   /**
    * $_domainIDGroups array maintains the list of option groups for whom
    * domainID is to be considered.
+   * @var array
    */
-  static $_domainIDGroups = [
+  public static $_domainIDGroups = [
     'from_email_address',
     'grant_type',
   ];
@@ -615,13 +616,13 @@ WHERE  v.option_group_id = g.id
 
     if ($dao->fetch()) {
       foreach ([
-                 'id',
-                 'name',
-                 'value',
-                 'label',
-                 'weight',
-                 'description',
-               ] as $fld) {
+        'id',
+        'name',
+        'value',
+        'label',
+        'weight',
+        'description',
+      ] as $fld) {
         $row[$fld] = $dao->$fld;
         if ($localize && in_array($fld, ['label', 'description'])) {
           $row[$fld] = ts($row[$fld]);

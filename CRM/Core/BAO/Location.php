@@ -38,8 +38,9 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
 
   /**
    * Location block element array.
+   * @var array
    */
-  static $blocks = ['phone', 'email', 'im', 'openid', 'address'];
+  public static $blocks = ['phone', 'email', 'im', 'openid', 'address'];
 
   /**
    * Create various elements of location block.
@@ -109,11 +110,11 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
     }
 
     foreach ([
-               'phone',
-               'email',
-               'im',
-               'address',
-             ] as $loc) {
+      'phone',
+      'email',
+      'im',
+      'address',
+    ] as $loc) {
       $locBlock["{$loc}_id"] = !empty($location["$loc"][0]) ? $location["$loc"][0]->id : NULL;
       $locBlock["{$loc}_2_id"] = !empty($location["$loc"][1]) ? $location["$loc"][1]->id : NULL;
     }
@@ -367,12 +368,12 @@ WHERE e.id = %1";
     $nonPrimaryBlockIds = CRM_Contact_BAO_Contact::getLocBlockIds($contactId, ['is_primary' => 0]);
 
     foreach ([
-               'Email',
-               'IM',
-               'Phone',
-               'Address',
-               'OpenID',
-             ] as $block) {
+      'Email',
+      'IM',
+      'Phone',
+      'Address',
+      'OpenID',
+    ] as $block) {
       $name = strtolower($block);
       if (array_key_exists($name, $primaryLocBlockIds) &&
         !CRM_Utils_System::isNull($primaryLocBlockIds[$name])

@@ -3,6 +3,7 @@
  * Class CRM_Dedupe_BAO_QueryBuilder
  */
 class CRM_Dedupe_BAO_QueryBuilder {
+
   /**
    * @param $rg
    * @param string $strID1
