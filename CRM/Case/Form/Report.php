@@ -38,16 +38,19 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
 
   /**
    * Case Id
+   * @var int
    */
   public $_caseID = NULL;
 
   /**
    * Client Id
+   * @var int
    */
   public $_clientID = NULL;
 
   /**
    * Activity set name
+   * @var string
    */
   public $_activitySetName = NULL;
 
@@ -98,17 +101,16 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
     );
 
     $this->addButtons([
-        [
-          'type' => 'refresh',
-          'name' => ts('Generate Report'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'refresh',
+        'name' => ts('Generate Report'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
     // We want this form to redirect to a full page
     $this->preventAjaxSubmit();
   }

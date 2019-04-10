@@ -38,13 +38,18 @@
  */
 class CRM_Campaign_Task extends CRM_Core_Task {
 
+  /**
+   * Campaign tasks
+   */
   const
-    // Campaign tasks
     INTERVIEW = 601,
     RESERVE = 602,
     RELEASE = 603;
 
-  static $objectType = 'campaign';
+  /**
+   * @var string
+   */
+  public static $objectType = 'campaign';
 
   /**
    * These tasks are the core set of tasks that the user can perform

@@ -160,7 +160,6 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     return $defaults;
   }
 
-
   public function buildQuickForm() {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -299,7 +298,6 @@ WHERE  $whereClause
     }
     return empty($errors) ? TRUE : $errors;
   }
-
 
   public function postProcess() {
     // store the submitted values in an array

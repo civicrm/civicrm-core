@@ -42,9 +42,9 @@ class CRM_Campaign_BAO_Query {
    *
    * @var array
    */
-  static $_campaignFields = NULL;
+  public static $_campaignFields = NULL;
 
-  static $_applySurveyClause = FALSE;
+  public static $_applySurveyClause = FALSE;
 
   /**
    * Function get the fields for campaign.
@@ -444,12 +444,13 @@ INNER JOIN  civicrm_custom_group grp on fld.custom_group_id = grp.id
    *   An array.
    * @return $voterClause as a string
    */
+
   /**
    * @param array $params
    *
    * @return array
    */
-  static public function voterClause($params) {
+  public static function voterClause($params) {
     $voterClause = [];
     $fromClause = $whereClause = NULL;
     if (!is_array($params) || empty($params)) {

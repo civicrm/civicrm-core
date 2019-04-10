@@ -38,11 +38,15 @@
  */
 class CRM_Case_Task extends CRM_Core_Task {
 
-  const
-    // Case tasks
-    RESTORE_CASES = 501;
+  /**
+   * Case tasks
+   */
+  const RESTORE_CASES = 501;
 
-  static $objectType = 'case';
+  /**
+   * @var string
+   */
+  public static $objectType = 'case';
 
   /**
    * These tasks are the core set of tasks that the user can perform

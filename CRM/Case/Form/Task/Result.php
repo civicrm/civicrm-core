@@ -47,13 +47,12 @@ class CRM_Case_Form_Task_Result extends CRM_Case_Form_Task {
    */
   public function buildQuickForm() {
     $this->addButtons([
-        [
-          'type' => 'done',
-          'name' => ts('Done'),
-          'isDefault' => TRUE,
-        ],
-      ]
-    );
+      [
+        'type' => 'done',
+        'name' => ts('Done'),
+        'isDefault' => TRUE,
+      ],
+    ]);
   }
 
 }

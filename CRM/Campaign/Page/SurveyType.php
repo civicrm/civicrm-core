@@ -43,7 +43,7 @@ class CRM_Campaign_Page_SurveyType extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * The option group name.

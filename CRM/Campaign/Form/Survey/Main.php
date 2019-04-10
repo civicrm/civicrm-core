@@ -36,10 +36,13 @@
  */
 class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
-  /* values
+  /**
+   * values
    *
    * @var array
+   *
    */
+
 
   public $_values;
 

@@ -177,7 +177,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * @return array
    *   associated array of decoded elements
    */
-  static public function getDecodedData($jsonData) {
+  public static function getDecodedData($jsonData) {
     return json_decode($jsonData, TRUE);
   }
 

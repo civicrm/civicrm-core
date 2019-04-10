@@ -65,9 +65,9 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
 
   public function getRedactionRules() {
     foreach (array(
-               'redactionStringRules',
-               'redactionRegexRules',
-             ) as $key => $rule) {
+      'redactionStringRules',
+      'redactionRegexRules',
+    ) as $key => $rule) {
       $$rule = CRM_Case_PseudoConstant::redactionRule($key);
 
       if (!empty($$rule)) {
