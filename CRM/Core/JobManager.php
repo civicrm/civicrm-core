@@ -37,17 +37,16 @@ class CRM_Core_JobManager {
   /**
    * @var array ($id => CRM_Core_ScheduledJob)
    */
-  var $jobs = NULL;
+  public $jobs = NULL;
 
   /**
    * @var CRM_Core_ScheduledJob
    */
-  var $currentJob = NULL;
+  public $currentJob = NULL;
 
-  var $singleRunParams = [];
+  public $singleRunParams = [];
 
-  var $_source = NULL;
-
+  public $_source = NULL;
 
   /**
    * Class constructor.

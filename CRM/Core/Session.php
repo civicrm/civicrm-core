@@ -32,8 +32,9 @@ class CRM_Core_Session {
 
   /**
    * Cache of all the session names that we manage.
+   * @var array
    */
-  static $_managedNames = NULL;
+  public static $_managedNames = NULL;
 
   /**
    * Key is used to allow the application to have multiple top

@@ -41,7 +41,8 @@
  */
 class CRM_Core_Page_AJAX_Attachment {
 
-  const ATTACHMENT_TOKEN_TTL = 10800; // 3hr; 3*60*60
+  // 3hr; 3*60*60
+  const ATTACHMENT_TOKEN_TTL = 10800;
 
   /**
    * (Page Callback)

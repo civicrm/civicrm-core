@@ -33,7 +33,6 @@
  */
 class CRM_Core_Payment_Form {
 
-
   /**
    * Add payment fields depending on payment processor.
    *
@@ -55,7 +54,7 @@ class CRM_Core_Payment_Form {
    * @param int $paymentInstrumentID
    *   ID of the payment processor.
    */
-  static public function setPaymentFieldsByProcessor(&$form, $processor, $billing_profile_id = NULL, $isBackOffice = FALSE, $paymentInstrumentID = NULL) {
+  public static function setPaymentFieldsByProcessor(&$form, $processor, $billing_profile_id = NULL, $isBackOffice = FALSE, $paymentInstrumentID = NULL) {
     $form->billingFieldSets = [];
     // Load the pay-later processor
     // @todo load this right up where the other processors are loaded initially.
@@ -84,7 +83,7 @@ class CRM_Core_Payment_Form {
    * @param CRM_Core_Form $form
    * @param CRM_Core_Payment $processor
    */
-  static protected function setBillingAddressFields(&$form, $processor) {
+  protected static function setBillingAddressFields(&$form, $processor) {
     $billingID = $form->_bltID;
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('billingDetailsFields', self::getBillingAddressFields($processor, $billingID));

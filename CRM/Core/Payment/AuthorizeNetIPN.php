@@ -85,7 +85,7 @@ class CRM_Core_Payment_AuthorizeNetIPN extends CRM_Core_Payment_BaseIPN {
           'is_test' => 0,
           'options' => ['limit' => 1],
           'payment_processor_type_id' => $paymentProcessorTypeID,
-           'return' => 'id',
+          'return' => 'id',
         ]);
       }
 

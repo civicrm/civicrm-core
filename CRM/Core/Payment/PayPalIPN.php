@@ -33,7 +33,7 @@
  */
 class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
-  static $_paymentProcessor = NULL;
+  public static $_paymentProcessor = NULL;
 
   /**
    * Input parameters from payment processor. Store these so that
@@ -404,7 +404,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     }
   }
 
-
   /**
    * Gets PaymentProcessorID for PayPal
    *
@@ -451,7 +450,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     ];
     $paymentProcessorID = civicrm_api3('PaymentProcessor', 'getvalue', $processorParams);
     if (empty($paymentProcessorID)) {
-      Throw new CRM_Core_Exception('PayPalIPN: Could not get Payment Processor ID');
+      throw new CRM_Core_Exception('PayPalIPN: Could not get Payment Processor ID');
     }
     return $paymentProcessorID;
   }

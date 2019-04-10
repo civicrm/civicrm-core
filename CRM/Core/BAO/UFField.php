@@ -38,6 +38,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
 
   /**
    * Batch entry fields.
+   * @var array
    */
   private static $_contriBatchEntryFields = NULL;
   private static $_memberBatchEntryFields = NULL;
@@ -134,7 +135,6 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     civicrm_api3('profile', 'getfields', ['cache_clear' => TRUE]);
     return $ufField;
   }
-
 
   /**
    * Fetch object based on array of properties.

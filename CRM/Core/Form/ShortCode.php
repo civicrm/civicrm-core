@@ -44,13 +44,13 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
    * Values should be an array with label and select.
    * Select can be NULL if there is no entity to select.
    * Otherwise it contains the shortcode key for this entity id (usually 'id') plus an array of params for the EntityRef field
-   * @see CRM_Core_Form::addEntityRef
    *
    * @var array
    *   [component => [
    *     label => Option Label
    *     select => key + EntityRef params
    *   ]]
+   * @see CRM_Core_Form::addEntityRef
    */
   public $components = [];
 
@@ -64,7 +64,6 @@ class CRM_Core_Form_ShortCode extends CRM_Core_Form {
    *   [key, components, options]
    */
   public $options = [];
-
 
   /**
    * Build form data. Can be modified via hook_civicrm_preProcess.

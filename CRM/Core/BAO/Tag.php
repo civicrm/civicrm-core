@@ -506,11 +506,11 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     $query = "SELECT name, id FROM civicrm_tag
               WHERE is_tagset=1 AND parent_id IS NULL and used_for LIKE %1";
     $dao = CRM_Core_DAO::executeQuery($query, [
-        1 => [
-          '%' . $entityTable . '%',
-          'String',
-        ],
-      ], TRUE, NULL, FALSE, FALSE);
+      1 => [
+        '%' . $entityTable . '%',
+        'String',
+      ],
+    ], TRUE, NULL, FALSE, FALSE);
     while ($dao->fetch()) {
       $tagSets[$dao->id] = $dao->name;
     }
@@ -553,7 +553,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
    *
    * @param string $searchString
    *
-   * @return array $childTagIDs
+   * @return array
    *   associated array of child tags in Array('Parent Tag ID' => Array('Child Tag 1', ...)) format
    */
   public static function getChildTags($searchString = NULL) {
@@ -566,11 +566,11 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
 
     // only fetch those tags which has child tags
     $dao = CRM_Utils_SQL_Select::from('civicrm_tag parent')
-              ->join('child', 'INNER JOIN civicrm_tag child ON child.parent_id = parent.id ')
-              ->select('parent.id as parent_id, GROUP_CONCAT(child.id) as child_id')
-              ->where($whereClauses)
-              ->groupBy('parent.id')
-              ->execute();
+      ->join('child', 'INNER JOIN civicrm_tag child ON child.parent_id = parent.id ')
+      ->select('parent.id as parent_id, GROUP_CONCAT(child.id) as child_id')
+      ->where($whereClauses)
+      ->groupBy('parent.id')
+      ->execute();
     while ($dao->fetch()) {
       $childTagIDs[$dao->parent_id] = (array) explode(',', $dao->child_id);
       $parentID = $dao->parent_id;

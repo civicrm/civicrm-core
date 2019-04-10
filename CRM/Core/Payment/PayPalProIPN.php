@@ -32,7 +32,7 @@
  */
 class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
-  static $_paymentProcessor = NULL;
+  public static $_paymentProcessor = NULL;
 
   /**
    * Input parameters from payment processor. Store these so that
@@ -49,6 +49,7 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
    * Is this a payment express transaction.
+   * @var bool
    */
   protected $_isPaymentExpress = FALSE;
 
@@ -215,9 +216,9 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
     switch ($txnType) {
       case 'recurring_payment_profile_created':
         if (in_array($recur->contribution_status_id, [
-              $contributionStatuses['Pending'],
-              $contributionStatuses['In Progress'],
-            ])
+          $contributionStatuses['Pending'],
+          $contributionStatuses['In Progress'],
+        ])
           && !empty($recur->processor_id)
         ) {
           echo "already handled";
@@ -588,11 +589,11 @@ INNER JOIN civicrm_membership_payment mp ON m.id = mp.membership_id AND mp.contr
     }
     // arg api won't get this - fix it
     $ids['contributionPage'] = CRM_Core_DAO::singleValueQuery("SELECT contribution_page_id FROM civicrm_contribution WHERE invoice_id = %1", [
-        1 => [
-          $ids['contribution'],
-          'Integer',
-        ],
-      ]);
+      1 => [
+        $ids['contribution'],
+        'Integer',
+      ],
+    ]);
     // only handle component at this stage - not terribly sure how a recurring event payment would arise
     // & suspec main function may be a victom of copy & paste
     // membership would be an easy add - but not relevant to my customer...

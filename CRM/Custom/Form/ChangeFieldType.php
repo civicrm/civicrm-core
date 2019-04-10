@@ -47,11 +47,13 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
 
   /**
    * Array of custom field values
+   * @var array
    */
   protected $_values;
 
   /**
    * Mapper array of valid field type
+   * @var array
    */
   protected $_htmlTypeTransitions;
 
@@ -118,18 +120,17 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     );
 
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Change Field Type'),
-          'isDefault' => TRUE,
-          'js' => ['onclick' => 'return checkCustomDataField();'],
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Change Field Type'),
+        'isDefault' => TRUE,
+        'js' => ['onclick' => 'return checkCustomDataField();'],
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
@@ -165,23 +166,20 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     $customField->find(TRUE);
 
     if ($dstHtmlType == 'Text' && in_array($srcHtmlType, [
-        'Select',
-        'Radio',
-        'Autocomplete-Select',
-      ])
-    ) {
+      'Select',
+      'Radio',
+      'Autocomplete-Select',
+    ])) {
       $customField->option_group_id = "NULL";
       CRM_Core_BAO_CustomField::checkOptionGroup($this->_values['option_group_id']);
     }
 
     if (in_array($srcHtmlType, $mutliValueOps) &&
-      in_array($dstHtmlType, $singleValueOps)
-    ) {
+      in_array($dstHtmlType, $singleValueOps)) {
       $this->flattenToFirstValue($tableName, $this->_values['column_name']);
     }
     elseif (in_array($srcHtmlType, $singleValueOps) &&
-      in_array($dstHtmlType, $mutliValueOps)
-    ) {
+      in_array($dstHtmlType, $mutliValueOps)) {
       $this->firstValueToFlatten($tableName, $this->_values['column_name']);
     }
 

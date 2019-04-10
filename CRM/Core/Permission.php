@@ -1449,7 +1449,8 @@ class CRM_Core_Permission {
 
     // Profile permissions
     $permissions['profile'] = [
-      'get' => [], // the profile will take care of this
+      // the profile will take care of this
+      'get' => [],
     ];
 
     $permissions['uf_group'] = [

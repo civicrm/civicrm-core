@@ -35,6 +35,7 @@
  * Class contains Contact dashboard related functions.
  */
 class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
+
   /**
    * Add Dashboard.
    *
@@ -175,7 +176,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
    * the default dashlets.
    *
    * @return array
-   *    Array of dashboard_id's
+   *   Array of dashboard_id's
    * @throws \CiviCRM_API3_Exception
    */
   public static function initializeDashlets() {

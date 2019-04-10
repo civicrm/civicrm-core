@@ -71,11 +71,13 @@ class CRM_Core_I18n {
   /**
    * A PHP-gettext instance for string translation;
    * should stay null if the strings are not to be translated (en_US).
+   * @var object
    */
   private $_phpgettext = NULL;
 
   /**
    * Whether we are using native gettext or not.
+   * @var bool
    */
   private $_nativegettext = FALSE;
 
@@ -83,6 +85,7 @@ class CRM_Core_I18n {
    * Gettext cache for extension domains/streamers, depending on if native or phpgettext.
    * - native gettext: we cache the value for textdomain()
    * - phpgettext: we cache the file streamer.
+   * @var array
    */
   private $_extensioncache = [];
 
@@ -243,8 +246,8 @@ class CRM_Core_I18n {
 
   /**
    * Return the available UI languages
-   * @return array(string languageCode) if $justCodes
-   *         array(string languageCode => string languageName) if !$justCodes
+   * @return array|string
+   *   array(string languageCode => string languageName) if !$justCodes
    */
   public static function uiLanguages($justCodes = FALSE) {
     // In multilang we only allow the languages that are configured in db
@@ -616,7 +619,6 @@ class CRM_Core_I18n {
 
     return FALSE;
   }
-
 
   /**
    * Is the CiviCRM in multilingual mode.

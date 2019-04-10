@@ -77,7 +77,8 @@ class CRM_Core_Invoke {
 
     if (!defined('CIVICRM_SYMFONY_PATH')) {
       // Traditional Civi invocation path
-      self::hackMenuRebuild($args); // may exit
+      // may exit
+      self::hackMenuRebuild($args);
       self::init($args);
       self::hackStandalone($args);
       $item = self::getItem($args);
@@ -108,13 +109,14 @@ class CRM_Core_Invoke {
    *   List of path parts.
    * @void
    */
-  static public function hackMenuRebuild($args) {
+  public static function hackMenuRebuild($args) {
     if (['civicrm', 'menu', 'rebuild'] == $args || ['civicrm', 'clearcache'] == $args) {
       // ensure that the user has a good privilege level
       if (CRM_Core_Permission::check('administer CiviCRM')) {
         self::rebuildMenuAndCaches();
         CRM_Core_Session::setStatus(ts('Cleared all CiviCRM caches (database, menu, templates)'), ts('Complete'), 'success');
-        return CRM_Utils_System::redirect(); // exits
+        // exits
+        return CRM_Utils_System::redirect();
       }
       else {
         CRM_Core_Error::fatal('You do not have permission to execute this url');
@@ -129,7 +131,7 @@ class CRM_Core_Invoke {
    *   List of path parts.
    * @void
    */
-  static public function init($args) {
+  public static function init($args) {
     // first fire up IDS and check for bad stuff
     $config = CRM_Core_Config::singleton();
 
@@ -145,7 +147,7 @@ class CRM_Core_Invoke {
    *   List of path parts.
    * @void
    */
-  static public function hackStandalone($args) {
+  public static function hackStandalone($args) {
     $config = CRM_Core_Config::singleton();
     if ($config->userFramework == 'Standalone') {
       $session = CRM_Core_Session::singleton();
@@ -165,7 +167,7 @@ class CRM_Core_Invoke {
    *   List of path parts.
    * @return array; see CRM_Core_Menu
    */
-  static public function getItem($args) {
+  public static function getItem($args) {
     if (is_array($args)) {
       // get the menu items
       $path = implode('/', $args);
@@ -192,7 +194,7 @@ class CRM_Core_Invoke {
    *   See CRM_Core_Menu.
    * @return string, HTML
    */
-  static public function runItem($item) {
+  public static function runItem($item) {
     $ids = new CRM_Core_IDS();
     $ids->check($item);
 

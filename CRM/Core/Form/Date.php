@@ -65,7 +65,6 @@ class CRM_Core_Form_Date {
     $form->setDefaults(['dateFormats' => self::DATE_yyyy_mm_dd]);
   }
 
-
   /**
    * Retrieve the date range - relative or absolute and assign it to the form.
    *

@@ -38,11 +38,13 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
   /**
    * Cache for the current domain object.
+   * @var object
    */
-  static $_domain = NULL;
+  public static $_domain = NULL;
 
   /**
    * Cache for a domain's location array
+   * @var array
    */
   private $_location = NULL;
 
@@ -164,7 +166,7 @@ class CRM_Core_BAO_Domain extends CRM_Core_DAO_Domain {
 
   /**
    * @param bool $skipFatal
-   *
+   * @param bool $returnString
    * @return array
    *   name & email for domain
    * @throws Exception

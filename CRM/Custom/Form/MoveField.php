@@ -126,17 +126,16 @@ class CRM_Custom_Form_MoveField extends CRM_Core_Form {
     );
 
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Move Custom Field'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Move Custom Field'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
     $this->addFormRule(['CRM_Custom_Form_MoveField', 'formRule'], $this);
   }

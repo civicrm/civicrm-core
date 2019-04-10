@@ -36,6 +36,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *
    * @return \CRM_Financial_DAO_FinancialTrxn
    */
+
   /**
    */
   public function __construct() {
@@ -139,6 +140,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    * @param bool $newTrxn
    * @param string $whereClause
    *   Additional where parameters
+   * @param int $fromAccountID
    *
    * @return array
    *   array of category id's the contact belongs to.

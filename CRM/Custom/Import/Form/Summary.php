@@ -4,6 +4,7 @@
  * Class CRM_Custom_Import_Form_Summary
  */
 class CRM_Custom_Import_Form_Summary extends CRM_Contact_Import_Form_Summary {
+
   /**
    * Set variables up before form is built.
    *

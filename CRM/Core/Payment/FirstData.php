@@ -309,6 +309,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
       return $params;
     }
   }
+
   // end function doDirectPayment
 
   /**

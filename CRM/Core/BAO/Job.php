@@ -149,7 +149,7 @@ class CRM_Core_BAO_Job extends CRM_Core_DAO_Job {
    * Make a copy of a Job.
    *
    * @param int $id The job id to copy.
-   *
+   * @param array $params
    * @return CRM_Core_DAO
    */
   public static function copy($id, $params = []) {

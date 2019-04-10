@@ -104,6 +104,7 @@ class CRM_Core_Selector_Controller {
 
   /**
    * The objectAction for the WebObject
+   * @var int
    */
   protected $_action;
 

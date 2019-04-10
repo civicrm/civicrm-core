@@ -33,10 +33,10 @@ class CRM_Custom_Import_Parser_Api extends CRM_Custom_Import_Parser {
     $customGroupID = $this->_multipleCustomData;
     $importableFields = $this->getGroupFieldsForImport($customGroupID, $this);
     $this->_fields = array_merge([
-        'do_not_import' => ['title' => ts('- do not import -')],
-        'contact_id' => ['title' => ts('Contact ID')],
-        'external_identifier' => ['title' => ts('External Identifier')],
-      ], $importableFields);
+      'do_not_import' => ['title' => ts('- do not import -')],
+      'contact_id' => ['title' => ts('Contact ID')],
+      'external_identifier' => ['title' => ts('External Identifier')],
+    ], $importableFields);
   }
 
   /**

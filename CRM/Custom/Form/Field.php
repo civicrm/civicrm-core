@@ -66,6 +66,7 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
   /**
    * Array of custom field values if update mode.
+   * @var array
    */
   protected $_values;
 
@@ -483,7 +484,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     $this->add('number',
       'note_length',
       ts('Maximum length') . ' ',
-      $attributes['text_length'], // note_length is an alias for the text-length field
+      // note_length is an alias for the text-length field
+      $attributes['text_length'],
       FALSE
     );
 
@@ -540,22 +542,21 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
 
     // add buttons
     $this->addButtons([
-        [
-          'type' => 'done',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'next',
-          'name' => ts('Save and New'),
-          'subName' => 'new',
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'done',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'next',
+        'name' => ts('Save and New'),
+        'subName' => 'new',
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
     // add a form rule to check default value
     $this->addFormRule(['CRM_Custom_Form_Field', 'formRule'], $this);
@@ -595,7 +596,8 @@ class CRM_Custom_Form_Field extends CRM_Core_Form {
     //validate field label as well as name.
     $title = $fields['label'];
     $name = CRM_Utils_String::munge($title, '_', 64);
-    $gId = $self->_gid;  // CRM-7564
+    // CRM-7564
+    $gId = $self->_gid;
     $query = 'select count(*) from civicrm_custom_field where ( name like %1 OR label like %2 ) and id != %3 and custom_group_id = %4';
     $fldCnt = CRM_Core_DAO::singleValueQuery($query, [
       1 => [$name, 'String'],

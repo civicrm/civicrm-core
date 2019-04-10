@@ -792,7 +792,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
    *
    * @return bool|\CRM_Core_DAO
    */
-  static public function createOrUpdateTopLevelReportsNavItem($domain_id) {
+  public static function createOrUpdateTopLevelReportsNavItem($domain_id) {
     $id = NULL;
 
     $dao = new CRM_Core_BAO_Navigation();
@@ -892,7 +892,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
    *   If True then do not match with a url that has a different parent
    *   (This is because for top level items there is a risk of 'stealing' rows that normally
    *   live under 'Contact' and intentionally duplicate the report examples.)
-   *
+   * @param bool $useWildcard
    * @return \CRM_Core_DAO_Navigation
    */
   protected static function createOrUpdateReportNavItem($name, $url, $url_params, $parent_id, $permission,
@@ -996,7 +996,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
               'name' => 'CiviCRM Home',
               'url' => 'civicrm/dashboard?reset=1',
               'weight' => 1,
-            ]
+            ],
           ],
           [
             'attributes' => [
@@ -1004,7 +1004,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
               'name' => 'Hide Menu',
               'url' => '#hidemenu',
               'weight' => 2,
-            ]
+            ],
           ],
           [
             'attributes' => [
@@ -1012,7 +1012,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
               'name' => 'Log out',
               'url' => 'civicrm/logout?reset=1',
               'weight' => 3,
-            ]
+            ],
           ],
         ];
         return;

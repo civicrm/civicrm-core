@@ -53,7 +53,7 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
    *
    * @var array
    */
-  static $_sizeMapper = [
+  public static $_sizeMapper = [
     2 => 'two',
     4 => 'four',
     6 => 'six',
@@ -370,9 +370,9 @@ class CRM_Core_Form_Renderer extends HTML_QuickForm_Renderer_ArraySmarty {
           }
         }
         $field->setAttribute('data-entity-value', json_encode([
-              'id' => $contact['id'],
-              'text' => implode(' :: ', $view),
-            ]));
+          'id' => $contact['id'],
+          'text' => implode(' :: ', $view),
+        ]));
       }
     }
   }

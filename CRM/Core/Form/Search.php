@@ -170,6 +170,8 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    *
    * @param array $fields
    *   Posted values of the form.
+   * @param array $files
+   * @param object $form
    *
    * @return array
    *   list of errors to be posted back to the form

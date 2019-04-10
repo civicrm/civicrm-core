@@ -40,6 +40,7 @@ require_once 'HTML/QuickForm/advmultiselect.php';
  * Class CRM_Core_QuickForm_NestedAdvMultiSelect
  */
 class CRM_Core_QuickForm_NestedAdvMultiSelect extends HTML_QuickForm_advmultiselect {
+
   /**
    * Loads options from different types of data sources.
    *

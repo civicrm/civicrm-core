@@ -157,7 +157,8 @@ WHERE  cacheKey     = %3 AND
 
     if (isset($cacheKey)) {
       $sql .= " AND cacheKey LIKE %4";
-      $params[4] = ["{$cacheKey}%", 'String']; // used % to address any row with conflict-cacheKey e.g "merge Individual_8_0_conflicts"
+      // used % to address any row with conflict-cacheKey e.g "merge Individual_8_0_conflicts"
+      $params[4] = ["{$cacheKey}%", 'String'];
     }
 
     CRM_Core_DAO::executeQuery($sql, $params);
@@ -288,7 +289,7 @@ FROM   civicrm_prevnext_cache pn
       if (!empty($select)) {
         $extraData = [];
         foreach ($select as $sfield) {
-          $extraData[$sfield]  = $dao->$sfield;
+          $extraData[$sfield] = $dao->$sfield;
         }
         $main[$count] = [
           'prevnext_id' => $dao->id,
@@ -437,7 +438,6 @@ AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
     ];
     CRM_Core_DAO::executeQuery($sql, $params);
   }
-
 
   /**
    * Get the selections.

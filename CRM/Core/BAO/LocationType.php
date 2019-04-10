@@ -36,9 +36,10 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
 
   /**
    * Static holder for the default LT.
+   * @var int
    */
-  static $_defaultLocationType = NULL;
-  static $_billingLocationType = NULL;
+  public static $_defaultLocationType = NULL;
+  public static $_billingLocationType = NULL;
 
   /**
    * Class constructor.

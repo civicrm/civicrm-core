@@ -44,11 +44,16 @@ class CRM_Core_Lock implements \Civi\Core\Lock\LockInterface {
    *
    * @var bool
    */
-  static $jobLog = FALSE;
+  public static $jobLog = FALSE;
 
-  // lets have a 3 second timeout for now
+  /**
+   * lets have a 3 second timeout for now
+   */
   const TIMEOUT = 3;
 
+  /**
+   * @var bool
+   */
   protected $_hasLock = FALSE;
 
   protected $_name;

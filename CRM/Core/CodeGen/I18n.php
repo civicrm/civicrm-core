@@ -4,6 +4,7 @@
  * Generate language files and classes
  */
 class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
+
   public function run() {
     $this->generateInstallLangs();
     $this->generateSchemaStructure();

@@ -111,7 +111,7 @@ class CRM_Core_Resources {
    *   New copy of the manager.
    * @return CRM_Core_Resources
    */
-  static public function singleton(CRM_Core_Resources $instance = NULL) {
+  public static function singleton(CRM_Core_Resources $instance = NULL) {
     if ($instance !== NULL) {
       self::$_singleton = $instance;
     }
@@ -207,12 +207,12 @@ class CRM_Core_Resources {
    */
   public function addScriptUrl($url, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
     CRM_Core_Region::instance($region)->add([
-        'name' => $url,
-        'type' => 'scriptUrl',
-        'scriptUrl' => $url,
-        'weight' => $weight,
-        'region' => $region,
-      ]);
+      'name' => $url,
+      'type' => 'scriptUrl',
+      'scriptUrl' => $url,
+      'weight' => $weight,
+      'region' => $region,
+    ]);
     return $this;
   }
 
@@ -230,11 +230,11 @@ class CRM_Core_Resources {
   public function addScript($code, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
     CRM_Core_Region::instance($region)->add([
         // 'name' => automatic
-        'type' => 'script',
-        'script' => $code,
-        'weight' => $weight,
-        'region' => $region,
-      ]);
+      'type' => 'script',
+      'script' => $code,
+      'weight' => $weight,
+      'region' => $region,
+    ]);
     return $this;
   }
 
@@ -423,12 +423,12 @@ class CRM_Core_Resources {
    */
   public function addStyleUrl($url, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
     CRM_Core_Region::instance($region)->add([
-        'name' => $url,
-        'type' => 'styleUrl',
-        'styleUrl' => $url,
-        'weight' => $weight,
-        'region' => $region,
-      ]);
+      'name' => $url,
+      'type' => 'styleUrl',
+      'styleUrl' => $url,
+      'weight' => $weight,
+      'region' => $region,
+    ]);
     return $this;
   }
 
@@ -446,11 +446,11 @@ class CRM_Core_Resources {
   public function addStyle($code, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
     CRM_Core_Region::instance($region)->add([
         // 'name' => automatic
-        'type' => 'style',
-        'style' => $code,
-        'weight' => $weight,
-        'region' => $region,
-      ]);
+      'type' => 'style',
+      'style' => $code,
+      'weight' => $weight,
+      'region' => $region,
+    ]);
     return $this;
   }
 
@@ -535,7 +535,8 @@ class CRM_Core_Resources {
         $files = array_merge($files, (array) glob("$path/$pattern", $flags));
       }
     }
-    sort($files); // Deterministic order.
+    // Deterministic order.
+    sort($files);
     $files = array_unique($files);
     return array_map(function ($file) use ($path) {
       return CRM_Utils_File::relativize($file, "$path/");
@@ -813,10 +814,10 @@ class CRM_Core_Resources {
    */
   public static function isAjaxMode() {
     if (in_array(CRM_Utils_Array::value('snippet', $_REQUEST), [
-        CRM_Core_Smarty::PRINT_SNIPPET,
-        CRM_Core_Smarty::PRINT_NOFORM,
-        CRM_Core_Smarty::PRINT_JSON,
-      ])
+      CRM_Core_Smarty::PRINT_SNIPPET,
+      CRM_Core_Smarty::PRINT_NOFORM,
+      CRM_Core_Smarty::PRINT_JSON,
+    ])
     ) {
       return TRUE;
     }
@@ -825,7 +826,7 @@ class CRM_Core_Resources {
   }
 
   /**
-   * @param GenericHookEvent $e
+   * @param \Civi\Core\Event\GenericHookEvent $e
    * @see \CRM_Utils_Hook::buildAsset()
    */
   public static function renderMenubarStylesheet(GenericHookEvent $e) {

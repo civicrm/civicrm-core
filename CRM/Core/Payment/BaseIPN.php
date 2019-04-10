@@ -30,7 +30,7 @@
  */
 class CRM_Core_Payment_BaseIPN {
 
-  static $_now = NULL;
+  public static $_now = NULL;
 
   /**
    * Input parameters from payment processor. Store these so that
@@ -41,19 +41,19 @@ class CRM_Core_Payment_BaseIPN {
 
   /**
    * Only used by AuthorizeNetIPN.
+   * @var bool
    *
    * @deprecated
    *
-   * @var bool
    */
   protected $_isRecurring = FALSE;
 
   /**
    * Only used by AuthorizeNetIPN.
+   * @var bool
    *
    * @deprecated
    *
-   * @var bool
    */
   protected $_isFirstOrLastRecurringPayment = FALSE;
 
@@ -232,9 +232,9 @@ class CRM_Core_Payment_BaseIPN {
 
     // CRM-15546
     $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
-        'labelColumn' => 'name',
-        'flip' => 1,
-      ]);
+      'labelColumn' => 'name',
+      'flip' => 1,
+    ]);
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
     $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
@@ -257,9 +257,9 @@ class CRM_Core_Payment_BaseIPN {
       if (!empty($memberships)) {
         // if transaction is failed then set "Cancelled" as membership status
         $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', [
-            'labelColumn' => 'name',
-            'flip' => 1,
-          ]);
+          'labelColumn' => 'name',
+          'flip' => 1,
+        ]);
         foreach ($memberships as $membership) {
           if ($membership) {
             $membership->status_id = $membershipStatuses['Cancelled'];
@@ -322,9 +322,9 @@ class CRM_Core_Payment_BaseIPN {
       $addLineItems = TRUE;
     }
     $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
-        'labelColumn' => 'name',
-        'flip' => 1,
-      ]);
+      'labelColumn' => 'name',
+      'flip' => 1,
+    ]);
     $contribution->contribution_status_id = $contributionStatuses['Cancelled'];
     $contribution->cancel_date = self::$_now;
     $contribution->cancel_reason = CRM_Utils_Array::value('reasonCode', $input);
@@ -348,9 +348,9 @@ class CRM_Core_Payment_BaseIPN {
     if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
       if (!empty($memberships)) {
         $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', [
-            'labelColumn' => 'name',
-            'flip' => 1,
-          ]);
+          'labelColumn' => 'name',
+          'flip' => 1,
+        ]);
         // Cancel only Pending memberships
         // CRM-18688
         $pendingStatusId = $membershipStatuses['Pending'];

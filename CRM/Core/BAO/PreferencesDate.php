@@ -34,8 +34,9 @@ class CRM_Core_BAO_PreferencesDate extends CRM_Core_DAO_PreferencesDate {
 
   /**
    * Static holder for the default LT.
+   * @var string
    */
-  static $_defaultPreferencesDate = NULL;
+  public static $_defaultPreferencesDate = NULL;
 
   /**
    * Class constructor.

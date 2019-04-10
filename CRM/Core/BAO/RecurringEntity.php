@@ -59,7 +59,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
   public static $status = NULL;
 
-  static $_recurringEntityHelper
+  public static $_recurringEntityHelper
     = [
       'civicrm_event' => [
         'helper_class' => 'CRM_Event_DAO_Event',
@@ -73,7 +73,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       ],
     ];
 
-  static $_dateColumns
+  public static $_dateColumns
     = [
       'civicrm_event' => [
         'dateColumns' => ['start_date'],
@@ -85,7 +85,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       ],
     ];
 
-  static $_tableDAOMapper
+  public static $_tableDAOMapper
     = [
       'civicrm_event' => 'CRM_Event_DAO_Event',
       'civicrm_price_set_entity' => 'CRM_Price_DAO_PriceSetEntity',
@@ -96,7 +96,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       'civicrm_activity_contact' => 'CRM_Activity_DAO_ActivityContact',
     ];
 
-  static $_updateSkipFields
+  public static $_updateSkipFields
     = [
       'civicrm_event' => ['start_date', 'end_date'],
       'civicrm_tell_friend' => ['entity_id'],
@@ -104,7 +104,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       'civicrm_activity' => ['activity_date_time'],
     ];
 
-  static $_linkedEntitiesInfo
+  public static $_linkedEntitiesInfo
     = [
       'civicrm_tell_friend' => [
         'entity_id_col' => 'entity_id',
@@ -418,7 +418,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @return array
    *   an array of child ids
    */
-  static public function getEntitiesForParent($parentId, $entityTable, $includeParent = TRUE, $mode = 3, $initiatorId = NULL) {
+  public static function getEntitiesForParent($parentId, $entityTable, $includeParent = TRUE, $mode = 3, $initiatorId = NULL) {
     $entities = [];
     if (empty($parentId) || empty($entityTable)) {
       return $entities;
@@ -454,7 +454,8 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       $recurringEntityID = CRM_Core_DAO::singleValueQuery("SELECT id FROM civicrm_recurring_entity WHERE entity_id = %3 AND entity_table = %2", $queryParams);
       if ($recurringEntityID) {
         $query .= $includeParent ? " AND id >= %4" : " AND id > %4";
-        $query .= " ORDER BY id ASC"; // FIXME: change to order by dates
+        // FIXME: change to order by dates
+        $query .= " ORDER BY id ASC";
         $queryParams[4] = [$recurringEntityID, 'Integer'];
       }
       else {
@@ -488,7 +489,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @return array
    *   array of connected ids
    */
-  static public function getEntitiesFor($entityId, $entityTable, $includeParent = TRUE, $mode = 3) {
+  public static function getEntitiesFor($entityId, $entityTable, $includeParent = TRUE, $mode = 3) {
     $parentId = self::getParentFor($entityId, $entityTable);
     if ($parentId) {
       return self::getEntitiesForParent($parentId, $entityTable, $includeParent, $mode, $entityId);
@@ -510,7 +511,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @return int
    *   unsigned $parentId Parent ID
    */
-  static public function getParentFor($entityId, $entityTable, $includeParent = TRUE) {
+  public static function getParentFor($entityId, $entityTable, $includeParent = TRUE) {
     if (empty($entityId) || empty($entityTable)) {
       return NULL;
     }
@@ -539,7 +540,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param $entityTable
    * @return array|null
    */
-  static public function getPositionAndCount($entityId, $entityTable) {
+  public static function getPositionAndCount($entityId, $entityTable) {
     $position = $count = 0;
 
     $query = "
@@ -581,7 +582,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @return object
    */
-  static public function copyCreateEntity($entityTable, $fromCriteria, $newParams, $createRecurringEntity = TRUE) {
+  public static function copyCreateEntity($entityTable, $fromCriteria, $newParams, $createRecurringEntity = TRUE) {
     $daoName = self::$_tableDAOMapper[$entityTable];
     if (!$daoName) {
       CRM_Core_Error::fatal("DAO Mapper missing for $entityTable.");
@@ -608,7 +609,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param object $event
    *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just updated.
    */
-  static public function triggerUpdate($event) {
+  public static function triggerUpdate($event) {
     // if DB version is earlier than 4.6 skip any processing
     static $currentVer = NULL;
     if (!$currentVer) {
@@ -676,7 +677,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param object $event
    *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just inserted.
    */
-  static public function triggerInsert($event) {
+  public static function triggerInsert($event) {
     $obj =& $event->object;
     if (!array_key_exists($obj->__table, self::$_linkedEntitiesInfo)) {
       return;
@@ -783,7 +784,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @param object $event
    *   An object of /Civi/Core/DAO/Event/PostUpdate containing dao object that was just deleted.
    */
-  static public function triggerDelete($event) {
+  public static function triggerDelete($event) {
     $obj =& $event->object;
 
     // if DB version is earlier than 4.6 skip any processing
@@ -828,7 +829,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @return bool|\CRM_Core_DAO_RecurringEntity
    * @throws \Exception
    */
-  static public function delEntity($entityId, $entityTable, $isDelLinkedEntities = FALSE) {
+  public static function delEntity($entityId, $entityTable, $isDelLinkedEntities = FALSE) {
     if (empty($entityId) || empty($entityTable)) {
       return FALSE;
     }
@@ -947,7 +948,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    *
    * @return object
    */
-  static public function getScheduleReminderDetailsById($scheduleReminderId) {
+  public static function getScheduleReminderDetailsById($scheduleReminderId) {
     $query = "SELECT *
       FROM civicrm_action_schedule WHERE 1";
     if ($scheduleReminderId) {
@@ -1091,7 +1092,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     return $r;
   }
 
-
   /**
    * This function gets time difference between the two datetime object.
    *
@@ -1104,7 +1104,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    * @return object
    *   DateTime object which contain time difference
    */
-  static public function getInterval($startDate, $endDate) {
+  public static function getInterval($startDate, $endDate) {
     if ($startDate && $endDate) {
       $startDate = new DateTime($startDate);
       $endDate = new DateTime($endDate);
@@ -1222,10 +1222,12 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           $seriesEventRecords = CRM_Core_BAO_RecurringEntity::getEntitiesFor($entityId, $entityTable);
           foreach ($seriesEventRecords as $event) {
             //Step-2: Save price set in other series events
-            if (CRM_Price_BAO_PriceSet::removeFrom($event['table'], $event['id'])) {//Remove existing priceset
+            //Remove existing priceset
+            if (CRM_Price_BAO_PriceSet::removeFrom($event['table'], $event['id'])) {
               CRM_Core_BAO_Discount::del($event['id'], $event['table']);
             }
-            CRM_Price_BAO_PriceSet::addTo($event['table'], $event['id'], $priceSet); //Add new price set
+            //Add new price set
+            CRM_Price_BAO_PriceSet::addTo($event['table'], $event['id'], $priceSet);
           }
         }
 
@@ -1235,10 +1237,12 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           foreach ($seriesEventRecords as $event) {
             //Step-2: Save price set in other series events
             if ($entityId < $event["id"]) {
-              if (CRM_Price_BAO_PriceSet::removeFrom($event['table'], $event['id'])) {//Remove existing priceset
+              //Remove existing priceset
+              if (CRM_Price_BAO_PriceSet::removeFrom($event['table'], $event['id'])) {
                 CRM_Core_BAO_Discount::del($event['id'], $event['table']);
               }
-              CRM_Price_BAO_PriceSet::addTo($event['table'], $event['id'], $priceSet); //Add new price set
+              //Add new price set
+              CRM_Price_BAO_PriceSet::addTo($event['table'], $event['id'], $priceSet);
             }
           }
         }

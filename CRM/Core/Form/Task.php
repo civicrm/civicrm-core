@@ -80,14 +80,14 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    *
    * @var string
    */
-  static $tableName = NULL;
+  public static $tableName = NULL;
 
   /**
    * Must be set to entity shortname (eg. event)
    *
    * @var string
    */
-  static $entityShortname = NULL;
+  public static $entityShortname = NULL;
 
   /**
    * Build all the data structures needed to build the form.
@@ -195,17 +195,16 @@ abstract class CRM_Core_Form_Task extends CRM_Core_Form {
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $this->addButtons([
-        [
-          'type' => $nextType,
-          'name' => $title,
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => $backType,
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => $nextType,
+        'name' => $title,
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => $backType,
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**

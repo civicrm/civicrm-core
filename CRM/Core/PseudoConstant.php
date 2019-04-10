@@ -54,10 +54,9 @@ class CRM_Core_PseudoConstant {
   private static $cache;
 
   /**
-   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
-   *
    * activity type
    * @var array
+   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
    */
   private static $activityType;
 
@@ -92,10 +91,9 @@ class CRM_Core_PseudoConstant {
   private static $countryIsoCode;
 
   /**
-   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
-   *
    * group
    * @var array
+   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
    */
   private static $group;
 
@@ -136,10 +134,9 @@ class CRM_Core_PseudoConstant {
   private static $worldRegions;
 
   /**
-   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
-   *
    * activity status
    * @var array
+   * @deprecated Please use the buildOptions() method in the appropriate BAO object.
    */
   private static $activityStatus;
 
@@ -1524,7 +1521,6 @@ WHERE  id = %1
     return CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles($fresh);
   }
 
-
   /**
    * Get all tax rates.
    *
@@ -1551,7 +1547,7 @@ WHERE  id = %1
         else {
           $value[] = $option['values'][0]['value'];
         }
-        $where = 'AND efa.account_relationship IN (' . implode(', ', $value)  . ' )';
+        $where = 'AND efa.account_relationship IN (' . implode(', ', $value) . ' )';
       }
       else {
         $where = '';
