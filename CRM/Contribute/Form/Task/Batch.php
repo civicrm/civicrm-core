@@ -45,11 +45,13 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
 
   /**
    * Maximum profile fields that will be displayed
+   * @var int
    */
   protected $_maxFields = 9;
 
   /**
    * Variable to store redirect path
+   * @var string
    */
   protected $_userContext;
 
@@ -113,17 +115,16 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
     $this->_fields = array_slice($this->_fields, 0, $this->_maxFields);
 
     $this->addButtons([
-        [
-          'type' => 'submit',
-          'name' => ts('Update Contribution(s)'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'submit',
+        'name' => ts('Update Contribution(s)'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_contributionIds);

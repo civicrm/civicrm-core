@@ -39,6 +39,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
   /**
    * Id of the component entity
+   * @var int
    */
   public $_id = NULL;
 
@@ -49,9 +50,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   protected $_refund = NULL;
 
   /**
-   * @deprecated - use parent $this->contactID
-   *
    * @var int
+   * @deprecated - use parent $this->contactID
    */
   protected $_contactId = NULL;
 
@@ -153,6 +153,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * @return array
    *   reference to the array of default values
    */
+
   /**
    * @return array
    */
@@ -188,14 +189,13 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
   public function buildQuickForm() {
     if ($this->_view == 'transaction' && ($this->_action & CRM_Core_Action::BROWSE)) {
       $this->addButtons([
-          [
-            'type' => 'cancel',
-            'name' => ts('Done'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ],
-        ]
-      );
+        [
+          'type' => 'cancel',
+          'name' => ts('Done'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ],
+      ]);
       return;
     }
 
@@ -262,18 +262,17 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     $buttonName = $this->_refund ? 'Record Refund' : 'Record Payment';
     $this->addButtons([
-        [
-          'type' => 'upload',
-          'name' => ts('%1', [1 => $buttonName]),
-          'js' => $js,
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'upload',
+        'name' => ts('%1', [1 => $buttonName]),
+        'js' => $js,
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
     $mailingInfo = Civi::settings()->get('mailing_backend');
     $this->assign('outBound_option', $mailingInfo['outBound_option']);
 

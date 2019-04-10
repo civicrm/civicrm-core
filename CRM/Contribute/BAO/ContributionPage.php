@@ -974,10 +974,10 @@ LEFT JOIN  civicrm_premiums            ON ( civicrm_premiums.entity_id = civicrm
    */
   public static function getIsMembershipPayment($id) {
     $membershipBlocks = civicrm_api3('membership_block', 'get', [
-        'entity_table' => 'civicrm_contribution_page',
-        'entity_id' => $id,
-        'sequential' => TRUE,
-      ]);
+      'entity_table' => 'civicrm_contribution_page',
+      'entity_id' => $id,
+      'sequential' => TRUE,
+    ]);
     if (!$membershipBlocks['count']) {
       return FALSE;
     }

@@ -38,11 +38,13 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
   /**
    * Membership price set status.
+   * @var bool
    */
   public $_useForMember;
 
   /**
    * Tranxaaction Id of the current contribution
+   * @var string
    */
   public $_trxnId;
 
@@ -158,11 +160,11 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $qParams .= "&amp;pcpId={$this->_pcpId}";
       $this->assign('pcpBlock', TRUE);
       foreach ([
-                 'pcp_display_in_roll',
-                 'pcp_is_anonymous',
-                 'pcp_roll_nickname',
-                 'pcp_personal_note',
-               ] as $val) {
+        'pcp_display_in_roll',
+        'pcp_is_anonymous',
+        'pcp_roll_nickname',
+        'pcp_personal_note',
+      ] as $val) {
         if (!empty($this->_params[$val])) {
           $this->assign($val, $this->_params[$val]);
         }
@@ -246,10 +248,10 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
           }
         }
         elseif (in_array($name, [
-              'addressee',
-              'email_greeting',
-              'postal_greeting',
-            ]) && !empty($contact[$name . '_custom'])
+          'addressee',
+          'email_greeting',
+          'postal_greeting',
+        ]) && !empty($contact[$name . '_custom'])
         ) {
           $defaults[$name . '_custom'] = $contact[$name . '_custom'];
         }

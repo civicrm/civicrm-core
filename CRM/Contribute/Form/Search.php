@@ -59,9 +59,9 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Prefix for the controller.
+   * @var string
    */
   protected $_prefix = "contribute_";
-
 
   /**
    * Explicitly declare the entity api name.
@@ -270,9 +270,9 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     }
 
     foreach ([
-               'contribution_amount_low',
-               'contribution_amount_high',
-             ] as $f) {
+      'contribution_amount_low',
+      'contribution_amount_high',
+    ] as $f) {
       if (isset($this->_formValues[$f])) {
         $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);
       }

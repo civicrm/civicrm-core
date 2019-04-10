@@ -178,11 +178,13 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
   /**
    * The contribution values if an existing contribution
+   * @var array
    */
   public $_values;
 
   /**
    * The pledge values if this contribution is associated with pledge
+   * @var array
    */
   public $_pledgeValues;
 
@@ -194,6 +196,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
 
   /**
    * Store the line items if price set used.
+   * @var array
    */
   public $_lineItems;
 
@@ -237,6 +240,7 @@ class CRM_Contribute_Form_AbstractEditPayment extends CRM_Contact_Form_Task {
    * These should get a standardised format in the beginPostProcess function.
    *
    * These fields are common to many forms. Some may override this.
+   * @var array
    */
   protected $submittableMoneyFields = ['total_amount', 'net_amount', 'non_deductible_amount', 'fee_amount'];
 
@@ -730,11 +734,10 @@ WHERE  contribution_id = {$id}
     }
   }
 
-
   /**
    * Assign the values to build the payment info block.
    *
-   * @return string $title
+   * @return string
    *   Block title.
    */
   protected function assignPaymentInfoBlock() {

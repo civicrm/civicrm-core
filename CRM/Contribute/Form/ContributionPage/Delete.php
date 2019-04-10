@@ -45,6 +45,7 @@ class CRM_Contribute_Form_ContributionPage_Delete extends CRM_Contribute_Form_Co
 
   /**
    * Check if there are any related contributions.
+   * @var bool
    */
   protected $_relatedContributions;
 

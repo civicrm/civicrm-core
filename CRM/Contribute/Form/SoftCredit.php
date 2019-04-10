@@ -101,10 +101,10 @@ class CRM_Contribute_Form_SoftCredit {
       $form->addMoney("soft_credit_amount[{$rowNumber}]", ts('Amount'), FALSE, NULL, FALSE);
 
       $form->addSelect("soft_credit_type[{$rowNumber}]", [
-          'entity' => 'contribution_soft',
-          'field' => 'soft_credit_type_id',
-          'label' => ts('Type'),
-        ]);
+        'entity' => 'contribution_soft',
+        'field' => 'soft_credit_type_id',
+        'label' => ts('Type'),
+      ]);
       if (!empty($form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id'])) {
         $form->add('hidden', "soft_credit_id[{$rowNumber}]",
           $form->_softCreditInfo['soft_credit'][$rowNumber]['soft_credit_id']);

@@ -45,11 +45,13 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
 
   /**
    * Maximum contributions that should be allowed to update
+   * @var int
    */
   protected $_maxContributions = 100;
 
   /**
    * Variable to store redirect path
+   * @var string
    */
   protected $_userContext;
 
@@ -68,9 +70,9 @@ class CRM_Contribute_Form_Task_PickProfile extends CRM_Contribute_Form_Task {
     //validations
     if (count($this->_contributionIds) > $this->_maxContributions) {
       CRM_Core_Session::setStatus(ts("The maximum number of contributions you can select for Update multiple contributions is %1. You have selected %2. Please select fewer contributions from your search results and try again.", [
-            1 => $this->_maxContributions,
-            2 => count($this->_contributionIds),
-          ]), ts('Update multiple records error'), 'error');
+        1 => $this->_maxContributions,
+        2 => count($this->_contributionIds),
+      ]), ts('Update multiple records error'), 'error');
       $validate = TRUE;
     }
 

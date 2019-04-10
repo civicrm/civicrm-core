@@ -36,7 +36,6 @@
  */
 class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
-
   /**
    * Set variables up before form is built.
    */
@@ -79,10 +78,10 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       //modify field title only for update mode. CRM-3245
       foreach ([
-                 'contribution_id',
-                 'invoice_id',
-                 'trxn_id',
-               ] as $key) {
+        'contribution_id',
+        'invoice_id',
+        'trxn_id',
+      ] as $key) {
         $this->_mapperFields[$key] .= ' (match to contribution record)';
         $highlightedFields[] = $key;
       }
@@ -384,8 +383,8 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
               $self->_onDuplicate != CRM_Import_Parser::DUPLICATE_UPDATE
             ) {
               $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', [
-                  1 => $threshold,
-                ]) . '<br />';
+                1 => $threshold,
+              ]) . '<br />';
             }
             elseif ($self->_onDuplicate == CRM_Import_Parser::DUPLICATE_UPDATE &&
               !(in_array('invoice_id', $importKeys) || in_array('trxn_id', $importKeys) ||
@@ -397,8 +396,8 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
           }
           else {
             $errors['_qf_default'] .= ts('Missing required field: %1', [
-                1 => $title,
-              ]) . '<br />';
+              1 => $title,
+            ]) . '<br />';
           }
         }
       }

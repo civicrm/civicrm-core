@@ -66,10 +66,9 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
     //p3 = Three dimensional pie chart.
     //bvg = Vertical bar chart
     $this->addElement('select', 'chart_type', ts('Chart Style'), [
-        'bvg' => ts('Bar'),
-        'p3' => ts('Pie'),
-      ]
-    );
+      'bvg' => ts('Bar'),
+      'p3' => ts('Pie'),
+    ]);
     $defaultValues['chart_type'] = $this->_chartType;
     $this->setDefaults($defaultValues);
 

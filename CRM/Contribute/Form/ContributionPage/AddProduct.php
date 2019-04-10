@@ -100,7 +100,7 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
       $dao->fetch();
       $defaults['weight'] = $dao->max_weight + 1;
     }
-    RETURN $defaults;
+    return $defaults;
   }
 
   /**
@@ -124,31 +124,29 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
       }
 
       $this->addButtons([
-          [
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ],
-          [
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ],
-        ]
-      );
+        [
+          'type' => 'next',
+          'name' => ts('Delete'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
       return;
     }
 
     if ($this->_action & CRM_Core_Action::PREVIEW) {
       CRM_Contribute_BAO_Premium::buildPremiumPreviewBlock($this, NULL, $this->_pid);
       $this->addButtons([
-          [
-            'type' => 'next',
-            'name' => ts('Done with Preview'),
-            'isDefault' => TRUE,
-          ],
-        ]
-      );
+        [
+          'type' => 'next',
+          'name' => ts('Done with Preview'),
+          'isDefault' => TRUE,
+        ],
+      ]);
       return;
     }
 
@@ -202,18 +200,17 @@ class CRM_Contribute_Form_ContributionPage_AddProduct extends CRM_Contribute_For
 
     if ($this->_single) {
       $this->addButtons([
-          [
-            'type' => 'next',
-            'name' => ts('Save'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ],
-          [
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ],
-        ]
-      );
+        [
+          'type' => 'next',
+          'name' => ts('Save'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
     }
     else {
       parent::buildQuickForm();

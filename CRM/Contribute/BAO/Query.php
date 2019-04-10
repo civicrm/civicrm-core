@@ -32,9 +32,9 @@
  */
 class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
-  static $_contribOrSoftCredit = "only_contribs";
+  public static $_contribOrSoftCredit = "only_contribs";
 
-  static $_contribRecurPayment = NULL;
+  public static $_contribRecurPayment = NULL;
 
   /**
    * Function get the searchable fields for contribution.
@@ -1030,7 +1030,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         FALSE, [
           'class' => 'crm-select2',
           'multiple' => 'multiple',
-          'placeholder' => ts('- any -')
+          'placeholder' => ts('- any -'),
         ]
       );
     }

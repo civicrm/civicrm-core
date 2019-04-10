@@ -84,6 +84,7 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
    * @return array
    *   reference to the array of default values
    */
+
   /**
    * @return array
    */
@@ -142,17 +143,16 @@ class CRM_Contribute_Form_Task_PDFLetter extends CRM_Contribute_Form_Task {
     $this->addElement('select', 'email_options', ts('Print and email options'), $emailOptions, [], "<br/>", FALSE);
 
     $this->addButtons([
-        [
-          'type' => 'upload',
-          'name' => ts('Make Thank-you Letters'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Done'),
-        ],
-      ]
-    );
+      [
+        'type' => 'upload',
+        'name' => ts('Make Thank-you Letters'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Done'),
+      ],
+    ]);
 
   }
 

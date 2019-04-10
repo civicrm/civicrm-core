@@ -88,8 +88,7 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
           'type' => 'back',
           'name' => ts('Cancel'),
         ],
-       ]
-      );
+      ]);
     }
     elseif ($count && !empty($this->_contributionIds)) {
       CRM_Core_Session::setStatus(ts('1 contribution will not be deleted.', ['plural' => '%count contributions will not be deleted.', 'count' => $count]), ts('Warning'), 'warning');
