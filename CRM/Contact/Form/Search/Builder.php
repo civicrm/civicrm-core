@@ -161,13 +161,11 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
         $v[2] = self::checkArrayKeyEmpty($v[2]);
 
         if (in_array($v[1], [
-            'IS NULL',
-            'IS NOT NULL',
-            'IS EMPTY',
-            'IS NOT EMPTY',
-          ]) &&
-          !empty($v[2])
-        ) {
+          'IS NULL',
+          'IS NOT NULL',
+          'IS EMPTY',
+          'IS NOT EMPTY',
+        ]) && !empty($v[2])) {
           $errorMsg["value[$v[3]][$v[4]]"] = ts('Please clear your value if you want to use %1 operator.', [1 => $v[1]]);
         }
         elseif (substr($v[0], 0, 7) === 'do_not_' or substr($v[0], 0, 3) === 'is_') {
@@ -479,9 +477,9 @@ class CRM_Contact_Form_Search_Builder extends CRM_Contact_Form_Search {
           }
         }
         elseif (in_array(substr($field, 0, 3), [
-              'is_',
-              'do_',
-            ]) || CRM_Utils_Array::value('data_type', $info) == 'Boolean'
+          'is_',
+          'do_',
+        ]) || CRM_Utils_Array::value('data_type', $info) == 'Boolean'
         ) {
           $options[$field] = 'yesno';
           if ($entity != 'contact') {

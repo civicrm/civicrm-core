@@ -316,7 +316,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'url' => '#contact-summary',
         'title' => ts('Summary'),
         'weight' => 0,
-        'icon' => 'crm-i fa-address-card-o'
+        'icon' => 'crm-i fa-address-card-o',
       ],
       [
         'id' => 'activity',

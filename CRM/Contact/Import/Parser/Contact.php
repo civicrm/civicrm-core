@@ -80,7 +80,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Array of successfully imported contact id's
    *
-   * @array
+   * @var array
    */
   protected $_newContacts;
 
@@ -94,7 +94,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
   /**
    * Array of successfully imported related contact id's
    *
-   * @array
+   * @var array
    */
   protected $_newRelatedContacts;
 
@@ -251,10 +251,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
     $this->_updateWithId = FALSE;
     if (in_array('id', $this->_mapperKeys) || ($this->_externalIdentifierIndex >= 0 && in_array($this->_onDuplicate, [
-          CRM_Import_Parser::DUPLICATE_UPDATE,
-          CRM_Import_Parser::DUPLICATE_FILL,
-        ]))
-    ) {
+      CRM_Import_Parser::DUPLICATE_UPDATE,
+      CRM_Import_Parser::DUPLICATE_FILL,
+    ]))) {
       $this->_updateWithId = TRUE;
     }
 
@@ -513,10 +512,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
     //check if external identifier exists in database
     if (!empty($params['external_identifier']) && (!empty($params['id']) || in_array($onDuplicate, [
-          CRM_Import_Parser::DUPLICATE_SKIP,
-          CRM_Import_Parser::DUPLICATE_NOCHECK,
-        ]))
-    ) {
+      CRM_Import_Parser::DUPLICATE_SKIP,
+      CRM_Import_Parser::DUPLICATE_NOCHECK,
+    ]))) {
 
       $extIDResult = civicrm_api3('Contact', 'get', [
         'external_identifier' => $params['external_identifier'],
@@ -833,10 +831,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
           }
           // check for valid related contact id in update/fill mode, CRM-4424
           if (in_array($onDuplicate, [
-              CRM_Import_Parser::DUPLICATE_UPDATE,
-              CRM_Import_Parser::DUPLICATE_FILL,
-            ]) && !empty($params[$key]['id'])
-          ) {
+            CRM_Import_Parser::DUPLICATE_UPDATE,
+            CRM_Import_Parser::DUPLICATE_FILL,
+          ]) && !empty($params[$key]['id'])) {
             $relatedContactType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $params[$key]['id'], 'contact_type');
             if (!$relatedContactType) {
               $errorMessage = ts("No contact found for this related contact ID: %1", [1 => $params[$key]['id']]);
@@ -1316,10 +1313,10 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
                 $error = TRUE;
                 foreach ([
-                           $countryNames,
-                           $countryIsoCodes,
-                           $limitCodes,
-                         ] as $values) {
+                  $countryNames,
+                  $countryIsoCodes,
+                  $limitCodes,
+                ] as $values) {
                   if (in_array(trim($countryValue), $values)) {
                     $error = FALSE;
                     break;

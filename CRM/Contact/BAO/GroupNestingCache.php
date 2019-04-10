@@ -37,7 +37,7 @@ class CRM_Contact_BAO_GroupNestingCache {
    *
    * @throws \Exception
    */
-  static public function update() {
+  public static function update() {
     // lets build the tree in memory first
 
     $sql = "

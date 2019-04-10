@@ -84,18 +84,18 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
     $this->addElement('submit', $this->getButtonName('refresh'), ts('Search'), ['class' => 'crm-form-submit']);
     $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), ['class' => 'crm-form-submit']);
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Add to %1', [1 => $contactType]),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Add to %1', [1 => $contactType]),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
+
   /**
    * Add relationships from form.
    */

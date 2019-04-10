@@ -41,7 +41,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    *
    * @var array
    */
-  static $csv = ['contact_type', 'group', 'tag'];
+  public static $csv = ['contact_type', 'group', 'tag'];
 
   /**
    * Build the form object.
@@ -68,21 +68,21 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     $groupHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($this->_group, NULL, '&nbsp;&nbsp;', TRUE);
     if (!empty($searchOptions['groups'])) {
       $this->addField('group', [
-          'entity' => 'group_contact',
-          'label' => ts('in'),
-          'placeholder' => ts('- any group -'),
-          'options' => $groupHierarchy,
-        ]);
+        'entity' => 'group_contact',
+        'label' => ts('in'),
+        'placeholder' => ts('- any group -'),
+        'options' => $groupHierarchy,
+      ]);
     }
 
     if (!empty($searchOptions['tags'])) {
       // tag criteria
       if (!empty($this->_tag)) {
         $this->addField('tag', [
-            'entity' => 'entity_tag',
-            'label' => ts('with'),
-            'placeholder' => ts('- any tag -'),
-          ]);
+          'entity' => 'entity_tag',
+          'label' => ts('with'),
+          'placeholder' => ts('- any tag -'),
+        ]);
       }
     }
 
@@ -197,6 +197,8 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    * If Go is pressed then we must select some checkboxes and an action.
    *
    * @param array $fields
+   * @param array $files
+   * @param object $form
    *
    * @return array|bool
    */
@@ -232,6 +234,7 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
    *
    * @return string
    */
+
   /**
    * @return string
    */

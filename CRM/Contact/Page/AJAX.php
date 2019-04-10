@@ -41,9 +41,11 @@ class CRM_Contact_Page_AJAX {
    * is the time window in which they can check usernames
    * (without reloading the overall form).
    */
-  const CHECK_USERNAME_TTL = 10800; // 3hr; 3*60*60
+  // 3hr; 3*60*60
+  const CHECK_USERNAME_TTL = 10800;
 
-  const AUTOCOMPLETE_TTL = 21600; // 6hr; 6*60*60
+  // 6hr; 6*60*60
+  const AUTOCOMPLETE_TTL = 21600;
 
   /**
    * Ajax callback for custom fields of type ContactReference
@@ -320,7 +322,7 @@ class CRM_Contact_Page_AJAX {
   /**
    *  check the CMS username.
    */
-  static public function checkUserName() {
+  public static function checkUserName() {
     $signer = new CRM_Utils_Signer(CRM_Core_Key::privateKey(), ['for', 'ts']);
     $sig = CRM_Utils_Request::retrieve('sig', 'String');
     $for = CRM_Utils_Request::retrieve('for', 'String');
@@ -530,7 +532,6 @@ LIMIT {$offset}, {$rowCount}
     CRM_Utils_System::civiExit();
   }
 
-
   public static function buildSubTypes() {
     $parent = CRM_Utils_Request::retrieve('parentId', 'Positive');
 
@@ -662,7 +663,7 @@ LIMIT {$offset}, {$rowCount}
     $whereClause = $orderByClause = '';
     $cacheKeyString   = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, json_decode($criteria, TRUE));
 
-    $searchRows       = [];
+    $searchRows = [];
 
     $searchParams = self::getSearchOptionsFromRequest();
     $queryParams = [];
@@ -695,11 +696,11 @@ LIMIT {$offset}, {$rowCount}
     }
 
     if ($isOrQuery) {
-      $whereClause   = ' ( ' . implode(' OR ', $where) . ' ) ';
+      $whereClause = ' ( ' . implode(' OR ', $where) . ' ) ';
     }
     else {
       if (!empty($where)) {
-        $whereClause  = implode(' AND ', $where);
+        $whereClause = implode(' AND ', $where);
       }
     }
     $whereClause .= $whereClause ? ' AND de.id IS NULL' : ' de.id IS NULL';
@@ -819,13 +820,13 @@ LIMIT {$offset}, {$rowCount}
       if (!empty($pairInfo['data']['canMerge'])) {
         $mergeParams = [
           'reset' => 1,
-            'cid' => $pairInfo['entity_id1'],
-            'oid' => $pairInfo['entity_id2'],
-            'action' => 'update',
-            'rgid' => $rgid,
-            'criteria' => $criteria,
-            'limit' => CRM_Utils_Request::retrieve('limit', 'Integer'),
-          ];
+          'cid' => $pairInfo['entity_id1'],
+          'oid' => $pairInfo['entity_id2'],
+          'action' => 'update',
+          'rgid' => $rgid,
+          'criteria' => $criteria,
+          'limit' => CRM_Utils_Request::retrieve('limit', 'Integer'),
+        ];
         if ($gid) {
           $mergeParams['gid'] = $gid;
         }
@@ -1026,7 +1027,8 @@ LIMIT {$offset}, {$rowCount}
 
     $params = [
       1 => [$isSelected, 'Boolean'],
-      3 => ["$cacheKeyString%", 'String'], // using % to address rows with conflicts as well
+      // using % to address rows with conflicts as well
+      3 => ["$cacheKeyString%", 'String'],
     ];
 
     //check pnid is_array or integer

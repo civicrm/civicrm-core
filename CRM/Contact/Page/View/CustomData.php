@@ -39,7 +39,7 @@ class CRM_Contact_Page_View_CustomData extends CRM_Core_Page {
   /**
    * The id of the object being viewed (note/relationship etc).
    *
-   * @int
+   * @var int
    */
   public $_groupId;
 

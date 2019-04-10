@@ -89,7 +89,8 @@ WHERE      ({$this->matchText('civicrm_contact c', ['sort_name', 'display_name',
           'amount_level' => NULL,
           'trxn_Id' => NULL,
           'invoice_id' => NULL,
-          'check_number' => 'Int', // Odd: This is really a VARCHAR, so why are we searching like an INT?
+          // Odd: This is really a VARCHAR, so why are we searching like an INT?
+          'check_number' => 'Int',
           'total_amount' => 'Int',
         ],
       ],

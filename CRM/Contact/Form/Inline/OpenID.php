@@ -38,11 +38,13 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
 
   /**
    * Ims of the contact that is been viewed.
+   * @var array
    */
   private $_openids = [];
 
   /**
    * No of openid blocks for inline edit.
+   * @var int
    */
   private $_blockCount = 6;
 

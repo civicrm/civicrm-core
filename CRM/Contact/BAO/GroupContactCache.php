@@ -32,7 +32,7 @@
  */
 class CRM_Contact_BAO_GroupContactCache extends CRM_Contact_DAO_GroupContactCache {
 
-  static $_alreadyLoaded = [];
+  public static $_alreadyLoaded = [];
 
   /**
    * Get a list of caching modes.

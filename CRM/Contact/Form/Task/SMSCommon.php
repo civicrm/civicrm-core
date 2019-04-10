@@ -43,7 +43,6 @@ class CRM_Contact_Form_Task_SMSCommon {
 
   public $_toContactPhone = [];
 
-
   /**
    * Pre process the provider.
    *
@@ -401,9 +400,9 @@ class CRM_Contact_Form_Task_SMSCommon {
 
     if ($countSuccess > 0) {
       CRM_Core_Session::setStatus(ts('One message was sent successfully.', [
-            'plural' => '%count messages were sent successfully.',
-            'count' => $countSuccess,
-          ]), ts('Message Sent', ['plural' => 'Messages Sent', 'count' => $countSuccess]), 'success');
+        'plural' => '%count messages were sent successfully.',
+        'count' => $countSuccess,
+      ]), ts('Message Sent', ['plural' => 'Messages Sent', 'count' => $countSuccess]), 'success');
     }
 
     if (is_array($sent)) {
@@ -415,9 +414,9 @@ class CRM_Contact_Form_Task_SMSCommon {
       }
       $status .= '</ul>';
       CRM_Core_Session::setStatus($status, ts('One Message Not Sent', [
-            'count' => count($sent),
-            'plural' => '%count Messages Not Sent',
-          ]), 'info');
+        'count' => count($sent),
+        'plural' => '%count Messages Not Sent',
+      ]), 'info');
     }
     else {
       //Display the name and number of contacts for those sms is not sent.
@@ -437,9 +436,9 @@ class CRM_Contact_Form_Task_SMSCommon {
         }
         $status .= ')<ul><li>' . implode('</li><li>', $not_sent) . '</li></ul>';
         CRM_Core_Session::setStatus($status, ts('One Message Not Sent', [
-              'count' => count($smsNotSent),
-              'plural' => '%count Messages Not Sent',
-            ]), 'info');
+          'count' => count($smsNotSent),
+          'plural' => '%count Messages Not Sent',
+        ]), 'info');
       }
     }
   }

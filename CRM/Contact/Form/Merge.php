@@ -36,13 +36,19 @@
  */
 class CRM_Contact_Form_Merge extends CRM_Core_Form {
   // The id of the contact that there's a duplicate for; this one will
-  // possibly inherit some of $_oid's properties and remain in the system.
-  var $_cid = NULL;
+  /**
+   * possibly inherit some of $_oid's properties and remain in the system.
+   * @var int
+   */
+  public $_cid = NULL;
 
-  // The id of the other contact - the duplicate one that will get deleted.
-  var $_oid = NULL;
+  /**
+   * The id of the other contact - the duplicate one that will get deleted.
+   * @var int
+   */
+  public $_oid = NULL;
 
-  var $_contactType = NULL;
+  public $_contactType = NULL;
 
   /**
    * @var array
@@ -54,7 +60,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
    *
    * @var int
    */
-  var $limit;
+  public $limit;
 
   /**
    * String for quickform bug handling.
@@ -66,7 +72,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
    *
    * @var string
    */
-  var $_qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
+  public $_qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
 
   public function preProcess() {
     try {
@@ -137,9 +143,9 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
 
       $this->prev = $this->next = NULL;
       foreach ([
-                 'prev',
-                 'next',
-               ] as $position) {
+        'prev',
+        'next',
+      ] as $position) {
         if (!empty($pos[$position])) {
           if ($pos[$position]['id1'] && $pos[$position]['id2']) {
             $rowParams = array_merge($urlParams, [

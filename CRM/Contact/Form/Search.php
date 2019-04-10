@@ -42,14 +42,14 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    *
    * @var array
    */
-  static $_validContext = NULL;
+  public static $_validContext = NULL;
 
   /**
    * List of values used when we want to display other objects.
    *
    * @var array
    */
-  static $_modeValues = NULL;
+  public static $_modeValues = NULL;
 
   /**
    * The contextMenu.
@@ -129,7 +129,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    *
    * @var array
    */
-  static $csv = ['contact_type', 'group', 'tag'];
+  public static $csv = ['contact_type', 'group', 'tag'];
 
   /**
    * @var string how to display the results. Should we display as
@@ -153,8 +153,9 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Name of the selector to use.
+   * @var string
    */
-  static $_selectorName = 'CRM_Contact_Selector';
+  public static $_selectorName = 'CRM_Contact_Selector';
   protected $_customSearchID = NULL;
   protected $_customSearchClass = NULL;
 
@@ -638,17 +639,17 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
         // FIXME: we should generalise in a way that components could inject url-filters
         // just like they build their own form elements
         foreach ([
-                   'mailing_id',
-                   'mailing_delivery_status',
-                   'mailing_open_status',
-                   'mailing_click_status',
-                   'mailing_reply_status',
-                   'mailing_optout',
-                   'mailing_forward',
-                   'mailing_unsubscribe',
-                   'mailing_date_low',
-                   'mailing_date_high',
-                 ] as $mailingFilter) {
+          'mailing_id',
+          'mailing_delivery_status',
+          'mailing_open_status',
+          'mailing_click_status',
+          'mailing_reply_status',
+          'mailing_optout',
+          'mailing_forward',
+          'mailing_unsubscribe',
+          'mailing_date_low',
+          'mailing_date_high',
+        ] as $mailingFilter) {
           $type = 'String';
           if ($mailingFilter == 'mailing_id' &&
             $filterVal = CRM_Utils_Request::retrieve('mailing_id', 'Positive', $this)

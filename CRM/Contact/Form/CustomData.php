@@ -92,7 +92,7 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
   /**
    * Custom group id
    *
-   * @int
+   * @var int
    */
   public $_groupID;
 
@@ -178,22 +178,21 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
           $this->assign('multiRecordDisplay', $this->_multiRecordDisplay);
           $saveButtonName = $this->_copyValueId ? ts('Save a Copy') : ts('Save');
           $this->addButtons([
-              [
-                'type' => 'upload',
-                'name' => $saveButtonName,
-                'isDefault' => TRUE,
-              ],
-              [
-                'type' => 'upload',
-                'name' => ts('Save and New'),
-                'subName' => 'new',
-              ],
-              [
-                'type' => 'cancel',
-                'name' => ts('Cancel'),
-              ],
-            ]
-          );
+            [
+              'type' => 'upload',
+              'name' => $saveButtonName,
+              'isDefault' => TRUE,
+            ],
+            [
+              'type' => 'upload',
+              'name' => ts('Save and New'),
+              'subName' => 'new',
+            ],
+            [
+              'type' => 'cancel',
+              'name' => ts('Cancel'),
+            ],
+          ]);
         }
       }
       return CRM_Custom_Form_CustomData::buildQuickForm($this);
@@ -206,17 +205,16 @@ class CRM_Contact_Form_CustomData extends CRM_Core_Form {
     // make this form an upload since we dont know if the custom data injected dynamically
     // is of type file etc
     $this->addButtons([
-        [
-          'type' => 'upload',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'upload',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
