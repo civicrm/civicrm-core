@@ -36,22 +36,26 @@ abstract class CRM_Event_Import_Parser extends CRM_Import_Parser {
 
   protected $_fileName;
 
-  /**#@+
+  /**
+   * #@+
    * @var integer
    */
 
   /**
    * Imported file size
+   * @var int
    */
   protected $_fileSize;
 
   /**
    * Seperator being used
+   * @var string
    */
   protected $_seperator;
 
   /**
    * Total number of lines in file
+   * @var int
    */
   protected $_lineCount;
 
@@ -254,31 +258,25 @@ abstract class CRM_Event_Import_Parser extends CRM_Import_Parser {
       if ($this->_invalidRowCount) {
         // removed view url for invlaid contacts
         $headers = array_merge([
-            ts('Line Number'),
-            ts('Reason'),
-          ],
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('Reason'),
+        ], $customHeaders);
         $this->_errorFileName = self::errorFileName(self::ERROR);
         self::exportCSV($this->_errorFileName, $headers, $this->_errors);
       }
       if ($this->_conflictCount) {
         $headers = array_merge([
-            ts('Line Number'),
-            ts('Reason'),
-          ],
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('Reason'),
+        ], $customHeaders);
         $this->_conflictFileName = self::errorFileName(self::CONFLICT);
         self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
       }
       if ($this->_duplicateCount) {
         $headers = array_merge([
-            ts('Line Number'),
-            ts('View Participant URL'),
-          ],
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('View Participant URL'),
+        ], $customHeaders);
 
         $this->_duplicateFileName = self::errorFileName(self::DUPLICATE);
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);

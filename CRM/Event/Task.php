@@ -38,22 +38,28 @@
  */
 class CRM_Event_Task extends CRM_Core_Task {
 
+  /**
+   * Event tasks
+   */
   const
-    // Event tasks
     CANCEL_REGISTRATION = 301,
     PARTICIPANT_STATUS = 302;
 
-  static $objectType = 'event';
+  /**
+   * @var string
+   */
+  public static $objectType = 'event';
 
   /**
    * These tasks are the core set of tasks that the user can perform
    * on a contact / group of contacts
    *
-   * @return array The set of tasks for a group of contacts
-   *            [ 'title' => The Task title,
-   *              'class' => The Task Form class name,
-   *              'result => Boolean.  FIXME: Not sure what this is for
-   *            ]
+   * @return array
+   *   The set of tasks for a group of contacts
+   *    [ 'title' => The Task title,
+   *      'class' => The Task Form class name,
+   *      'result => Boolean.  FIXME: Not sure what this is for
+   *    ]
    */
   public static function tasks() {
     if (!self::$_tasks) {

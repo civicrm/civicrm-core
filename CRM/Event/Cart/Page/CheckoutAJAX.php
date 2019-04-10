@@ -4,6 +4,7 @@
  * Class CRM_Event_Cart_Page_CheckoutAJAX
  */
 class CRM_Event_Cart_Page_CheckoutAJAX {
+
   public function add_participant_to_cart() {
     $transaction = new CRM_Core_Transaction();
     $cart_id = CRM_Utils_Request::retrieve('cart_id', 'Integer');

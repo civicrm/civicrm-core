@@ -78,13 +78,12 @@ class CRM_Event_Form_Task_SearchTaskHookSample extends CRM_Event_Form_Task {
    */
   public function buildQuickForm() {
     $this->addButtons([
-        [
-          'type' => 'done',
-          'name' => ts('Done'),
-          'isDefault' => TRUE,
-        ],
-      ]
-    );
+      [
+        'type' => 'done',
+        'name' => ts('Done'),
+        'isDefault' => TRUE,
+      ],
+    ]);
   }
 
 }

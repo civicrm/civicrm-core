@@ -226,7 +226,6 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
     }
   }
 
-
   /**
    * @param $query
    */
@@ -384,8 +383,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
           'participant_is_pay_later',
           'participant_campaign_id',
           'participant_registered_by_id',
-        ])
-        ) {
+        ])) {
           $name = str_replace('participant_', '', $name);
           if ($name == 'is_pay_later') {
             $qillName = $name;
@@ -449,12 +447,10 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
       case 'event_title':
         $qillName = $name;
         if (in_array($name, [
-            'event_id',
-            'event_title',
-            'event_is_public',
-          ]
-        )
-        ) {
+          'event_id',
+          'event_title',
+          'event_is_public',
+        ])) {
           $name = str_replace('event_', '', $name);
         }
         $dataType = !empty($fields[$qillName]['type']) ? CRM_Utils_Type::typeToString($fields[$qillName]['type']) : 'String';
@@ -590,21 +586,19 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
     $form->assign('dataURLEventFee', $dataURLEventFee);
 
     $form->addEntityRef('event_id', ts('Event Name'), [
-        'entity' => 'Event',
-        'placeholder' => ts('- any -'),
-        'multiple' => 1,
-        'select' => ['minimumInputLength' => 0],
-      ]
-    );
+      'entity' => 'Event',
+      'placeholder' => ts('- any -'),
+      'multiple' => 1,
+      'select' => ['minimumInputLength' => 0],
+    ]);
     $form->addEntityRef('event_type_id', ts('Event Type'), [
-        'entity' => 'OptionValue',
-        'placeholder' => ts('- any -'),
-        'select' => ['minimumInputLength' => 0],
-        'api' => [
-          'params' => ['option_group_id' => 'event_type'],
-        ],
-      ]
-    );
+      'entity' => 'OptionValue',
+      'placeholder' => ts('- any -'),
+      'select' => ['minimumInputLength' => 0],
+      'api' => [
+        'params' => ['option_group_id' => 'event_type'],
+      ],
+    ]);
     $obj = new CRM_Report_Form_Event_ParticipantListing();
     $form->add('select', 'participant_fee_id',
        ts('Fee Level'),

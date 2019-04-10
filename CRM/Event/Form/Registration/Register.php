@@ -37,11 +37,13 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
   /**
    * The fields involved in this page.
+   * @var array
    */
   public $_fields;
 
   /**
    * The status message that user view.
+   * @var sting
    */
   protected $_waitlistMsg = NULL;
   protected $_requireApprovalMsg = NULL;
@@ -58,6 +60,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *
    * This can be set using hook_civicrm_buildForm() to override the registration dupe check.
    * CRM-7604
+   * @var bool
    */
   public $_skipDupeRegistrationCheck = FALSE;
 
@@ -478,15 +481,14 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
 
       $this->addButtons([
-          [
-            'type' => 'upload',
-            'name' => $buttonLabel,
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-            'js' => $js,
-          ],
-        ]
-      );
+        [
+          'type' => 'upload',
+          'name' => $buttonLabel,
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+          'js' => $js,
+        ],
+      ]);
     }
 
     $this->addFormRule(['CRM_Event_Form_Registration_Register', 'formRule'], $this);
@@ -508,7 +510,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    * @param int $discountId
    *   Discount id for the event.
    */
-  static public function buildAmount(&$form, $required = TRUE, $discountId = NULL) {
+  public static function buildAmount(&$form, $required = TRUE, $discountId = NULL) {
     // build amount only when needed, skip incase of event full and waitlisting is enabled
     // and few other conditions check preProcess()
     if (property_exists($form, '_noFees') && $form->_noFees) {
@@ -1162,7 +1164,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
       if (
         empty($params['additional_participants'])
-        && !$this->_values['event']['is_confirm_enabled'] // CRM-11182 - Optional confirmation screen
+      // CRM-11182 - Optional confirmation screen
+        && !$this->_values['event']['is_confirm_enabled']
       ) {
         $this->processRegistration($this->_params);
       }

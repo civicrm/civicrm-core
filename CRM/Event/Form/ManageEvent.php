@@ -75,11 +75,13 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   /**
    * The campaign id of the existing event, we use this to know if we need to update
    * the participant records
+   * @var int
    */
   protected $_campaignID = NULL;
 
   /**
    * Check if repeating event.
+   * @var bool
    */
   public $_isRepeatingEvent;
 

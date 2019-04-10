@@ -40,6 +40,7 @@ class CRM_Event_Form_Task_Cancel extends CRM_Event_Form_Task {
 
   /**
    * Variable to store redirect path.
+   * @var string
    */
   protected $_userContext;
 

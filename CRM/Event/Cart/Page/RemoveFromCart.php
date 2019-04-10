@@ -4,6 +4,7 @@
  * Class CRM_Event_Cart_Page_RemoveFromCart
  */
 class CRM_Event_Cart_Page_RemoveFromCart extends CRM_Core_Page {
+
   /**
    * This function takes care of all the things common to all pages.
    *

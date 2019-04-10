@@ -113,7 +113,7 @@ class CRM_Event_Cart_Form_MerParticipant extends CRM_Core_Form {
    *
    * @return CRM_Event_Cart_Form_MerParticipant
    */
-  static public function get_form($participant) {
+  public static function get_form($participant) {
     return new CRM_Event_Cart_Form_MerParticipant($participant);
   }
 
