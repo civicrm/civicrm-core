@@ -36,6 +36,7 @@
  * This class contains all the function that are called using AJAX (jQuery)
  */
 class CRM_Contribute_Page_AJAX {
+
   /**
    * Get Soft credit to list in DT
    */

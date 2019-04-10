@@ -181,9 +181,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   public $_useForMember;
 
   /**
+   * @var bool
    * @deprecated
-   *
-   * @var
    */
   public $_isBillingAddressRequiredForPayLater;
 
@@ -1392,7 +1391,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       }
     }
   }
-
 
   /**
    * Get the payment processor object for the submission, returning the manual one for offline payments.

@@ -52,10 +52,10 @@ class CRM_Contribute_Page_DashBoard extends CRM_Core_Page {
     //get contribution dates.
     $dates = CRM_Contribute_BAO_Contribution::getContributionDates();
     foreach ([
-               'now',
-               'yearDate',
-               'monthDate',
-             ] as $date) {
+      'now',
+      'yearDate',
+      'monthDate',
+    ] as $date) {
       $$date = $dates[$date];
     }
     // fiscal years end date

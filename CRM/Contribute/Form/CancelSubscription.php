@@ -152,18 +152,17 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     }
 
     $this->addButtons([
-        [
-          'type' => $type,
-          'name' => $cancelButton,
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Not Now'),
-        ],
-      ]
-    );
+      [
+        'type' => $type,
+        'name' => $cancelButton,
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Not Now'),
+      ],
+    ]);
   }
 
   /**

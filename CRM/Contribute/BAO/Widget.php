@@ -127,14 +127,11 @@ class CRM_Contribute_BAO_Widget extends CRM_Contribute_DAO_Widget {
         $now = time();
         if ($dao->start_date) {
           $startDate = CRM_Utils_Date::unixTime($dao->start_date);
-          if ($startDate &&
-            $startDate >= $now
-          ) {
+          if ($startDate && $startDate >= $now) {
             $data['is_active'] = FALSE;
             $data['campaign_start'] = ts('Campaign starts on %1', [
-                1 => CRM_Utils_Date::customFormat($dao->start_date, $config->dateformatFull),
-              ]
-            );
+              1 => CRM_Utils_Date::customFormat($dao->start_date, $config->dateformatFull),
+            ]);
           }
         }
 
@@ -180,9 +177,9 @@ class CRM_Contribute_BAO_Widget extends CRM_Contribute_DAO_Widget {
       $data['money_raised_percentage'] = (round($percent, 2)) * 100 . "%";
       $data['money_target_display'] = CRM_Utils_Money::format($data['money_target']);
       $data['money_raised'] = ts('Raised %1 of %2', [
-          1 => CRM_Utils_Money::format($data['money_raised']),
-          2 => $data['money_target_display'],
-        ]);
+        1 => CRM_Utils_Money::format($data['money_raised']),
+        2 => $data['money_target_display'],
+      ]);
     }
     else {
       $data['money_raised'] = ts('Raised %1', [1 => CRM_Utils_Money::format($data['money_raised'])]);

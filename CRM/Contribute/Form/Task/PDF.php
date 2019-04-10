@@ -106,12 +106,14 @@ AND    {$this->_componentClause}";
     $this->addElement('radio', 'output', NULL, ts('Email Receipts'), 'email_receipt',
       [
         'onClick' => "document.getElementById('selectPdfFormat').style.display = 'none';
-        document.getElementById('selectEmailFrom').style.display = 'block';"]
+        document.getElementById('selectEmailFrom').style.display = 'block';",
+      ]
     );
     $this->addElement('radio', 'output', NULL, ts('PDF Receipts'), 'pdf_receipt',
       [
         'onClick' => "document.getElementById('selectPdfFormat').style.display = 'block';
-        document.getElementById('selectEmailFrom').style.display = 'none';"]
+        document.getElementById('selectEmailFrom').style.display = 'none';",
+      ]
     );
     $this->addRule('output', ts('Selection required'), 'required');
 
@@ -124,17 +126,16 @@ AND    {$this->_componentClause}";
     $this->add('select', 'from_email_address', ts('From Email'), $this->_fromEmails, FALSE);
 
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Process Receipt(s)'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'back',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Process Receipt(s)'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'back',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
@@ -193,7 +194,8 @@ AND    {$this->_componentClause}";
           FROM civicrm_financial_trxn
           WHERE trxn_id = %1
           LIMIT 1", [
-            1 => [$contribution->trxn_id, 'String']]);
+            1 => [$contribution->trxn_id, 'String'],
+          ]);
 
       // CRM_Contribute_BAO_Contribution::composeMessageArray expects mysql formatted date
       $objects['contribution']->receive_date = CRM_Utils_Date::isoToMysql($objects['contribution']->receive_date);
@@ -262,7 +264,7 @@ AND    {$this->_componentClause}";
    *   array of common elements
    *
    */
-  static public function getElements($contribIds, $params, $contactIds) {
+  public static function getElements($contribIds, $params, $contactIds) {
     $pdfElements = [];
 
     $pdfElements['contribIDs'] = implode(',', $contribIds);

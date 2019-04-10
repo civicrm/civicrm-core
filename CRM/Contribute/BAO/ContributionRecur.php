@@ -175,7 +175,6 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     return CRM_Financial_BAO_PaymentProcessor::getPayment($paymentProcessorID);
   }
 
-
   /**
    * Get the processor object for the recurring contribution record.
    *
@@ -203,7 +202,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
   public static function getPaymentProcessorID($recurID) {
     $recur = civicrm_api3('ContributionRecur', 'getsingle', [
       'id' => $recurID,
-      'return' => ['payment_processor_id']
+      'return' => ['payment_processor_id'],
     ]);
     return (int) CRM_Utils_Array::value('payment_processor_id', $recur, 0);
   }
@@ -306,10 +305,10 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
         }
         else {
           $details .= '<br/>' . ts('The recurring contribution of %1, every %2 %3 has been cancelled.', [
-              1 => $dao->amount,
-              2 => $dao->frequency_interval,
-              3 => $dao->frequency_unit,
-            ]);
+            1 => $dao->amount,
+            2 => $dao->frequency_interval,
+            3 => $dao->frequency_unit,
+          ]);
         }
         $activityParams = [
           'source_contact_id' => $dao->contact_id,
@@ -586,7 +585,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @param int $recurId
    * @param int $targetContributionId
    */
-  static public function copyCustomValues($recurId, $targetContributionId) {
+  public static function copyCustomValues($recurId, $targetContributionId) {
     if ($recurId && $targetContributionId) {
       // get the initial contribution id of recur id
       $sourceContributionId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $recurId, 'id', 'contribution_recur_id');
@@ -851,6 +850,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    *   Payment status - this correlates to the machine name of the contribution status ID ie
    *   - Completed
    *   - Failed
+   * @param string $effectiveDate
    *
    * @throws \CiviCRM_API3_Exception
    */
@@ -931,10 +931,10 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    */
   public static function calculateRecurLineItems($recurId, $total_amount, $financial_type_id) {
     $originalContribution = civicrm_api3('Contribution', 'getsingle', [
-    'contribution_recur_id' => $recurId,
-    'contribution_test' => '',
-    'options' => ['limit' => 1],
-    'return' => ['id', 'financial_type_id'],
+      'contribution_recur_id' => $recurId,
+      'contribution_test' => '',
+      'options' => ['limit' => 1],
+      'return' => ['id', 'financial_type_id'],
     ]);
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($originalContribution['id']);
     $lineSets = [];

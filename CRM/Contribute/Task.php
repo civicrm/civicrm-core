@@ -38,14 +38,19 @@
  */
 class CRM_Contribute_Task extends CRM_Core_Task {
 
+  /**
+   * Contribution tasks
+   */
   const
-    // Contribution tasks
     UPDATE_STATUS = 401,
     PDF_RECEIPT = 402,
     PDF_THANKYOU = 403,
     PDF_INVOICE = 404;
 
-  static $objectType = 'contribution';
+  /**
+   * @var string
+   */
+  public static $objectType = 'contribution';
 
   /**
    * These tasks are the core set of tasks that the user can perform

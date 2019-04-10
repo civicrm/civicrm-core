@@ -275,7 +275,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
    *
    * @param int $id
    *
-   * @return string $title
+   * @return string
    *   Block title.
    */
   protected function assignPaymentInfoBlock($id) {
