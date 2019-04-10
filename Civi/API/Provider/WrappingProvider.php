@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,47 +25,56 @@
  +--------------------------------------------------------------------+
  */
 
-namespace Civi\API\Event;
-use Civi\API\Provider\WrappingProvider;
+namespace Civi\API\Provider;
+
+use Civi\API\Events;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class PrepareEvent
- * @package Civi\API\Event
+ * A wrapping provider overrides an existing API. It has discretion to pass-through
+ * to the original API (0 or many times) or to substitute with entirely different
+ * behavior.
+ *
+ * The WrappingProvider does yield any metadata of its own. It's primarily
+ * intended for dynamically decorating an existing API.
  */
-class PrepareEvent extends Event {
+class WrappingProvider implements ProviderInterface {
 
   /**
-   * @param array $apiRequest
-   *   The full description of the API request.
-   * @return PrepareEvent
+   * @var callable
+   *   Function($apiRequest, callable $continue)
    */
-  public function setApiRequest($apiRequest) {
-    $this->apiRequest = $apiRequest;
-    return $this;
+  protected $callback;
+
+  /**
+   * @var ProviderInterface
+   */
+  protected $original;
+
+  /**
+   * WrappingProvider constructor.
+   * @param callable $callback
+   * @param \Civi\API\Provider\ProviderInterface $original
+   */
+  public function __construct($callback, \Civi\API\Provider\ProviderInterface $original) {
+    $this->callback = $callback;
+    $this->original = $original;
   }
 
-  /**
-   * Replace the normal implementation of an API call with some wrapper.
-   *
-   * The wrapper has discretion to call -- or not call -- or iterate with --
-   * the original API implementation, with original or substituted arguments.
-   *
-   * Ex:
-   *
-   * $event->wrapApi(function($apiRequest, $continue){
-   *   echo "Hello\n";
-   *   $continue($apiRequest);
-   *   echo "Goodbye\n";
-   * });
-   *
-   * @param callable $callback
-   *   The custom API implementation.
-   *   Function(array $apiRequest, callable $continue).
-   * @return PrepareEvent
-   */
-  public function wrapApi($callback) {
-    $this->apiProvider = new WrappingProvider($callback, $this->apiProvider);
-    return $this;
+  public function invoke($apiRequest) {
+    // $continue = function($a) { return $this->original->invoke($a); };
+    $continue = [$this->original, 'invoke'];
+    return call_user_func($this->callback, $apiRequest, $continue);
+  }
+
+  public function getEntityNames($version) {
+    // return $version == $this->version ? [$this->entity] : [];
+    throw new \API_Exception("Not support: WrappingProvider::getEntityNames()");
+  }
+
+  public function getActionNames($version, $entity) {
+    // return $version == $this->version && $this->entity == $entity ? [$this->action] : [];
+    throw new \API_Exception("Not support: WrappingProvider::getActionNames()");
   }
 
 }
