@@ -32,7 +32,7 @@
  */
 class CRM_Mailing_BAO_Query {
 
-  static $_mailingFields = NULL;
+  public static $_mailingFields = NULL;
 
   /**
    * @return array|null
@@ -313,9 +313,9 @@ class CRM_Mailing_BAO_Query {
           'bounce_type_id',
           ts('Bounce type(s)'),
           CRM_Core_PseudoConstant::get('CRM_Mailing_Event_DAO_Bounce', 'bounce_type_id', [
-              'keyColumn' => 'id',
-              'labelColumn' => 'name',
-            ])
+            'keyColumn' => 'id',
+            'labelColumn' => 'name',
+          ])
         );
         return;
 

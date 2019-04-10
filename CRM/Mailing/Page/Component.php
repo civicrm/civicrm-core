@@ -42,7 +42,7 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.

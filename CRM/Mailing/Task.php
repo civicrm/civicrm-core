@@ -38,7 +38,7 @@
  */
 class CRM_Mailing_Task extends CRM_Core_Task {
 
-  static $objectType = 'mailing';
+  public static $objectType = 'mailing';
 
   /**
    * These tasks are the core set of tasks that the user can perform

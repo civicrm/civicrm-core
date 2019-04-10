@@ -88,14 +88,16 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
       }
 
       $job = new CRM_Mailing_BAO_MailingJob();
-      $job->is_test = 0;  // if set to 1 it doesn't show in the UI
+      // if set to 1 it doesn't show in the UI
+      $job->is_test = 0;
       $job->status = 'Complete';
       $job->scheduled_date = CRM_Utils_Date::processDate(date('Y-m-d'), date('H:i:s'));
       $job->start_date = $job->scheduled_date;
       $job->end_date = $job->scheduled_date;
       $job->mailing_id = $mailing->id;
       $job->save();
-      $job_id = $job->id; // need this for parent_id below
+      // need this for parent_id below
+      $job_id = $job->id;
 
       $job = new CRM_Mailing_BAO_MailingJob();
       $job->is_test = 0;
@@ -107,7 +109,8 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
       $job->parent_id = $job_id;
       $job->job_type = 'child';
       $job->save();
-      $job_id = $job->id; // this is the one we want for the spool
+      // this is the one we want for the spool
+      $job_id = $job->id;
 
       if (is_array($recipient)) {
         $recipient = implode(';', $recipient);

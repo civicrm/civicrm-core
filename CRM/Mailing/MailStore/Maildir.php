@@ -48,17 +48,17 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
     $this->_dir = $dir;
 
     $this->_ignored = $this->maildir(implode(DIRECTORY_SEPARATOR, [
-          'CiviMail.ignored',
-          date('Y'),
-          date('m'),
-          date('d'),
-        ]));
+      'CiviMail.ignored',
+      date('Y'),
+      date('m'),
+      date('d'),
+    ]));
     $this->_processed = $this->maildir(implode(DIRECTORY_SEPARATOR, [
-          'CiviMail.processed',
-          date('Y'),
-          date('m'),
-          date('d'),
-        ]));
+      'CiviMail.processed',
+      date('Y'),
+      date('m'),
+      date('d'),
+    ]));
   }
 
   /**
@@ -78,9 +78,9 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
     $parser->options->parseTextAttachmentsAsFiles = TRUE;
 
     foreach ([
-               'cur',
-               'new',
-             ] as $subdir) {
+      'cur',
+      'new',
+    ] as $subdir) {
       $dir = $this->_dir . DIRECTORY_SEPARATOR . $subdir;
       foreach (scandir($dir) as $file) {
         if ($file == '.' or $file == '..') {

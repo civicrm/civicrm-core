@@ -219,18 +219,17 @@ class CRM_Friend_Form extends CRM_Core_Form {
     }
 
     $this->addButtons([
-        [
-          'type' => 'submit',
-          'name' => ts('Send Your Message'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'submit',
+        'name' => ts('Send Your Message'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
     $this->addFormRule(['CRM_Friend_Form', 'formRule']);
   }

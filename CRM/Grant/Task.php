@@ -40,11 +40,15 @@
  */
 class CRM_Grant_Task extends CRM_Core_Task {
 
-  const
-    // Grant Tasks
-    UPDATE_GRANTS = 701;
+  /**
+   * Grant Tasks
+   */
+  const UPDATE_GRANTS = 701;
 
-  static $objectType = 'grant';
+  /**
+   * @var string
+   */
+  public static $objectType = 'grant';
 
   /**
    * These tasks are the core set of tasks that the user can perform

@@ -33,6 +33,7 @@
  *
  */
 class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
+
   /**
    * @return array
    */

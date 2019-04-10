@@ -63,17 +63,16 @@ class CRM_Mailing_Form_Browse extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Confirm'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Confirm'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   public function postProcess() {
