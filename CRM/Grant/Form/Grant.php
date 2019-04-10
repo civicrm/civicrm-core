@@ -155,18 +155,17 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons([
-          [
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ],
-          [
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ],
-        ]
-      );
+        [
+          'type' => 'next',
+          'name' => ts('Delete'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
       return;
     }
 
@@ -208,23 +207,22 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     // make this form an upload since we dont know if the custom data injected dynamically
     // is of type file etc $uploadNames = $this->get( 'uploadNames' );
     $this->addButtons([
-        [
-          'type' => 'upload',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'upload',
-          'name' => ts('Save and New'),
-          'js' => ['onclick' => "return verify( );"],
-          'subName' => 'new',
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'upload',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'upload',
+        'name' => ts('Save and New'),
+        'js' => ['onclick' => "return verify( );"],
+        'subName' => 'new',
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
     if ($this->_context == 'standalone') {
       $this->addEntityRef('contact_id', ts('Applicant'), ['create' => TRUE], TRUE);

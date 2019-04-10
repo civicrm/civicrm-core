@@ -31,6 +31,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Mailing_Page_Resubscribe extends CRM_Mailing_Page_Common {
+
   /**
    * @return string
    */

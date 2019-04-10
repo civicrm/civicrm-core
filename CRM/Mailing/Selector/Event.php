@@ -43,30 +43,35 @@ class CRM_Mailing_Selector_Event extends CRM_Core_Selector_Base implements CRM_C
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * What event type are we browsing?
+   * @var sting
    */
   private $_event;
 
   /**
    * Should we only count distinct contacts?
+   * @var bool
    */
   private $_is_distinct;
 
   /**
    * Which mailing are we browsing events from?
+   * @var int
    */
   private $_mailing_id;
 
   /**
    * Do we want events tied to a specific job?
+   * @var int
    */
   private $_job_id;
 
   /**
    * For click-through events, do we only want those from a specific url?
+   * @var int
    */
   private $_url_id;
 

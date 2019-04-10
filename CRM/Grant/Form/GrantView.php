@@ -132,14 +132,13 @@ class CRM_Grant_Form_GrantView extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     $this->addButtons([
-        [
-          'type' => 'cancel',
-          'name' => ts('Done'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ],
-      ]
-    );
+      [
+        'type' => 'cancel',
+        'name' => ts('Done'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ],
+    ]);
   }
 
 }

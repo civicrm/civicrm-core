@@ -31,8 +31,11 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Mailing_MailStore {
-  // flag to decide whether to print debug messages
-  var $_debug = FALSE;
+  /**
+   * flag to decide whether to print debug messages
+   * @var bool
+   */
+  public $_debug = FALSE;
 
   /**
    * Return the proper mail store implementation, based on config settings.
@@ -153,10 +156,10 @@ class CRM_Mailing_MailStore {
     $config = CRM_Core_Config::singleton();
     $dir = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $name;
     foreach ([
-               'cur',
-               'new',
-               'tmp',
-             ] as $sub) {
+      'cur',
+      'new',
+      'tmp',
+    ] as $sub) {
       if (!file_exists($dir . DIRECTORY_SEPARATOR . $sub)) {
         if ($this->_debug) {
           print "creating $dir/$sub\n";

@@ -109,7 +109,6 @@ class CRM_Mailing_BAO_MailingAB extends CRM_Mailing_DAO_MailingAB {
     return $result;
   }
 
-
   /**
    * Delete MailingAB and all its associated records.
    *

@@ -36,10 +36,10 @@
 class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
   /**
+   * @var string
    * @inheritDoc
    */
   protected $keyword = 'mailing';
-
 
   /**
    * @inheritDoc
@@ -78,7 +78,8 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
     foreach ($reportTypes as $report) {
       $result = civicrm_api3('ReportInstance', 'get', [
         'sequential' => 1,
-        'report_id' => 'mailing/' . $report]);
+        'report_id' => 'mailing/' . $report,
+      ]);
       if (!empty($result['values'])) {
         $reportIds[$report] = $result['values'][0]['id'];
       }
@@ -150,9 +151,9 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
           'disableMandatoryTokensCheck' => (int) Civi::settings()->get('disable_mandatory_tokens_check'),
           'fromAddress' => $fromAddress['values'],
           'defaultTestEmail' => civicrm_api3('Contact', 'getvalue', [
-              'id' => 'user_contact_id',
-              'return' => 'email',
-            ]),
+            'id' => 'user_contact_id',
+            'return' => 'email',
+          ]),
           'visibility' => CRM_Utils_Array::makeNonAssociative(CRM_Core_SelectValues::groupVisibility()),
           'workflowEnabled' => CRM_Mailing_Info::workflowEnabled(),
           'reportIds' => $reportIds,
@@ -244,7 +245,6 @@ class CRM_Mailing_Info extends CRM_Core_Component_Info {
 
     return $permissions;
   }
-
 
   /**
    * @inheritDoc

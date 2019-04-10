@@ -31,6 +31,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
+
   public function preProcess() {
     $job_id = CRM_Utils_Request::retrieve('jid', 'Positive',
       $this, NULL
@@ -139,14 +140,14 @@ class CRM_Mailing_Form_ForwardMailing extends CRM_Core_Form {
     }
 
     $status = ts('Mailing is not forwarded to the given email address.', [
-        'count' => count($emails),
-        'plural' => 'Mailing is not forwarded to the given email addresses.',
-      ]);
+      'count' => count($emails),
+      'plural' => 'Mailing is not forwarded to the given email addresses.',
+    ]);
     if ($forwarded) {
       $status = ts('Mailing is forwarded successfully to %count email address.', [
-          'count' => $forwarded,
-          'plural' => 'Mailing is forwarded successfully to %count email addresses.',
-        ]);
+        'count' => $forwarded,
+        'plural' => 'Mailing is forwarded successfully to %count email addresses.',
+      ]);
     }
 
     CRM_Utils_System::setUFMessage($status);
