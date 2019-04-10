@@ -1378,6 +1378,59 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     }
   }
 
+  /*
+   * Update $values populated by CRM_Core_BAO_UFGroup::getValues() with latest multi record values.
+   * CRM_Core_BAO_UFGroup::getValues() uses search query with left joins with multi custom set tables,
+   * which won't fetch the latest record for multi custom set fields. And changing core search query 
+   * to use sub queries for multi set records is quite a big change and effort.
+   *
+   * Use Cases: 
+   * 1. Use a profile with multi custom set fields for notification. Notifications would include oldest 
+   *    values.
+   * 2. Use onbehalf of profile with multi custom set fields, for a contribution or membership page.
+   *    The receipt include oldest values than the submitted latest values.
+   *
+   * @param int $gid
+   *   Profile Id.
+   * @param int $cid
+   *   Contact Id.
+   * @param array $fields
+   *   List of profile fields and details.
+   * @param array $values
+   *   Values populated by CRM_Core_BAO_UFGroup::getValues() method, that needs to be updated.
+   *
+   * @return bool
+   *
+   */
+  public static function updateMultiRecordValuesWithLatest($gid, $cid, $fields, &$values) {
+    $updated = FALSE;
+    if (CRM_Core_BAO_UFField::checkMultiRecordFieldExists($gid)) {
+      // to make sure we get the latest record set the limit 1 and order by id desc
+      $DTparams = array(
+        'rowCount' => 1,
+        'offset'   => 0,
+        'sort'     => 'id desc'
+      );
+      $result = CRM_Core_BAO_CustomValueTable::getEntityValues($cid, 'Contact', NULL, TRUE, $DTparams);
+      $ctIds = array_keys($result['sortedResult']);
+      $latestId = max($ctIds);
+      foreach ($fields as $fkey => $fval) {
+        if (CRM_Core_BAO_CustomField::isMultiRecordField($fkey)) {
+          $mcfid = CRM_Core_BAO_CustomField::getKeyID($fkey);
+          if ($mcfid && CRM_Utils_Array::value($mcfid, $result[$latestId])) {
+            $display = CRM_Core_BAO_CustomField::displayValue($result[$latestId][$mcfid], $fkey);
+            $label   = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $mcfid, 'label');
+            if (array_key_exists($label, $values)) {
+              $values[$label] = $display;
+              $updated = TRUE;
+            }
+          }
+        }
+      }
+    }
+    return $updated;
+  }
+
   /**
    * Check if profile Group used by any module.
    *
@@ -2814,6 +2867,8 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $values = array();
         $fields = CRM_Core_BAO_UFGroup::getFields($gid, FALSE, CRM_Core_Action::VIEW);
         CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params, TRUE);
+        // update multirecord fields with latest values
+        CRM_Core_BAO_UFGroup::updateMultiRecordValuesWithLatest($gid, $cid, $fields, $values);
 
         $email = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gid, 'notify');
 

@@ -1315,21 +1315,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
     foreach ($ufGroups as $gId => $val) {
       if ($notify = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gId, 'notify')) {
         $values = CRM_Core_BAO_UFGroup::checkFieldsEmptyValues($gId, $this->_id, NULL);
-        // for multi record fields, replace values with that of latest submitted values
-        if (CRM_Core_BAO_UFField::checkMultiRecordFieldExists($gId)) {
-          foreach ($params as $mkey => $mval) {
-            if (CRM_Core_BAO_CustomField::isMultiRecordField($mkey)) {
-              $mcfid = CRM_Core_BAO_CustomField::getKeyID($mkey);
-              if ($mcfid) {
-                $display = CRM_Core_BAO_CustomField::displayValue($mval, $mkey);
-                $label = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $mcfid, 'label');
-                if (array_key_exists($label, $values['values'])) {
-                  $values['values'][$label] = $display;
-                }
-              }
-            }
-          }
-        }
         CRM_Core_BAO_UFGroup::commonSendMail($this->_id, $values);
       }
     }

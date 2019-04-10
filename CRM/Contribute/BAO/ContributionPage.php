@@ -526,6 +526,8 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         }
 
         CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params);
+        // update multirecord fields with latest values
+        CRM_Core_BAO_UFGroup::updateMultiRecordValuesWithLatest($gid, $cid, $fields, $values);
       }
     }
     return [$groupTitle, $values];
