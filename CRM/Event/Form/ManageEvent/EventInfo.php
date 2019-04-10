@@ -37,6 +37,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
   /**
    * Event type.
+   * @var int
    */
   protected $_eventType = NULL;
 

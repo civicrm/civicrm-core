@@ -50,7 +50,7 @@ class CRM_Event_Import_Parser_Participant extends CRM_Event_Import_Parser {
   /**
    * Array of successfully imported participants id's
    *
-   * @array
+   * @var array
    */
   protected $_newParticipants;
 

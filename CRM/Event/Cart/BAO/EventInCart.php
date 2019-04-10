@@ -224,7 +224,6 @@ class CRM_Event_Cart_BAO_EventInCart extends CRM_Event_Cart_DAO_EventInCart impl
     return count($this->waiting_participants());
   }
 
-
   /**
    * @param mixed $offset
    *

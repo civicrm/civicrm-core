@@ -43,17 +43,17 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    *
    * @var array
    */
-  static $_actionLinks = NULL;
+  public static $_actionLinks = NULL;
 
   /**
    * The event links to display for the browse screen.
    * @var array
    */
-  static $_eventLinks = NULL;
+  public static $_eventLinks = NULL;
 
-  static $_links = NULL;
+  public static $_links = NULL;
 
-  static $_tabLinks = NULL;
+  public static $_tabLinks = NULL;
 
   protected $_pager = NULL;
 

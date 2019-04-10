@@ -78,18 +78,17 @@ class CRM_Event_Form_Task_Print extends CRM_Event_Form_Task {
     // just need to add a javacript to popup the window for printing
     //
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Print Participant List'),
-          'js' => ['onclick' => 'window.print()'],
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'back',
-          'name' => ts('Done'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Print Participant List'),
+        'js' => ['onclick' => 'window.print()'],
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'back',
+        'name' => ts('Done'),
+      ],
+    ]);
   }
 
   /**

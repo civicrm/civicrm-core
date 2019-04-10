@@ -356,9 +356,9 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     ];
 
     $configs['allowCoreTypes'] = array_merge([
-        'Contact',
-        'Individual',
-      ], CRM_Contact_BAO_ContactType::subTypes('Individual'));
+      'Contact',
+      'Individual',
+    ], CRM_Contact_BAO_ContactType::subTypes('Individual'));
     $configs['allowCoreTypes'][] = 'Participant';
     if (CRM_Core_Permission::check('manage event profiles') && !CRM_Core_Permission::check('administer CiviCRM')) {
       $configs['usedFor'][] = 'CiviEvent';
@@ -794,7 +794,8 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
 
     // format params
     $params['is_online_registration'] = CRM_Utils_Array::value('is_online_registration', $params, FALSE);
-    $params['is_confirm_enabled'] = CRM_Utils_Array::value('is_confirm_enabled', $params, FALSE); // CRM-11182
+    // CRM-11182
+    $params['is_confirm_enabled'] = CRM_Utils_Array::value('is_confirm_enabled', $params, FALSE);
     $params['is_multiple_registrations'] = CRM_Utils_Array::value('is_multiple_registrations', $params, FALSE);
     $params['allow_same_participant_emails'] = CRM_Utils_Array::value('allow_same_participant_emails', $params, FALSE);
     $params['requires_approval'] = CRM_Utils_Array::value('requires_approval', $params, FALSE);

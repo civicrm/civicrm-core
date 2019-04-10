@@ -39,6 +39,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
   /**
    * Pre-registered additional participant id.
+   * @var int
    */
   public $additionalParticipantId = NULL;
 
@@ -182,17 +183,17 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     $first_name = $last_name = NULL;
     $pre = $post = [];
     foreach ([
-               'pre',
-               'post',
-             ] as $keys) {
+      'pre',
+      'post',
+    ] as $keys) {
       if (isset($this->_values['additional_custom_' . $keys . '_id'])) {
         $this->buildCustom($this->_values['additional_custom_' . $keys . '_id'], 'additionalCustom' . ucfirst($keys));
         $$keys = CRM_Core_BAO_UFGroup::getFields($this->_values['additional_custom_' . $keys . '_id']);
       }
       foreach ([
-                 'first_name',
-                 'last_name',
-               ] as $name) {
+        'first_name',
+        'last_name',
+      ] as $name) {
         if (array_key_exists($name, $$keys) &&
           CRM_Utils_Array::value('is_required', CRM_Utils_Array::value($name, $$keys))
         ) {
@@ -263,22 +264,22 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
           $this->set('allowWaitlist', $this->_allowWaitlist);
           if ($this->_requireApproval) {
             $statusMessage = ts("It looks like you are now registering a group of %1 participants. The event has %2 available spaces (you will not be wait listed). Registration for this event requires approval. You will receive an email once your registration has been reviewed.", [
-                1 => ++$processedCnt,
-                2 => $spaces,
-              ]);
+              1 => ++$processedCnt,
+              2 => $spaces,
+            ]);
           }
           else {
             $statusMessage = ts("It looks like you are now registering a group of %1 participants. The event has %2 available spaces (you will not be wait listed).", [
-                1 => ++$processedCnt,
-                2 => $spaces,
-              ]);
+              1 => ++$processedCnt,
+              2 => $spaces,
+            ]);
           }
         }
         else {
           $statusMessage = ts("It looks like you are now registering a group of %1 participants. The event has %2 available spaces (you will not be wait listed). Please go back to the main registration page and reduce the number of additional people. You will also need to complete payment information.", [
-              1 => ++$processedCnt,
-              2 => $spaces,
-            ]);
+            1 => ++$processedCnt,
+            2 => $spaces,
+          ]);
           $allowToProceed = FALSE;
         }
         CRM_Core_Session::setStatus($statusMessage, ts('Registration Error'), 'error');
@@ -355,25 +356,23 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     //CRM-4320
     if ($allowToProceed) {
       $buttons = array_merge($buttons, [
-          [
-            'type' => 'upload',
-            'name' => ts('Continue'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-            'js' => $js,
-          ],
-        ]
-      );
+        [
+          'type' => 'upload',
+          'name' => ts('Continue'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+          'js' => $js,
+        ],
+      ]);
       if ($includeSkipButton) {
         $buttons = array_merge($buttons, [
-            [
-              'type' => 'next',
-              'name' => ts('Skip Participant'),
-              'subName' => 'skip',
-              'icon' => 'fa-fast-forward',
-            ],
-          ]
-        );
+          [
+            'type' => 'next',
+            'name' => ts('Skip Participant'),
+            'subName' => 'skip',
+            'icon' => 'fa-fast-forward',
+          ],
+        ]);
       }
     }
     $this->addButtons($buttons);
@@ -493,9 +492,9 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
             $totalParticipants > $self->_availableRegistrations
           ) {
             $errors['_qf_default'] = ts('Sorry, it looks like this event only has %2 spaces available, and you are trying to register %1 participants. Please change your selections accordingly.', [
-                1 => $totalParticipants,
-                2 => $self->_availableRegistrations,
-              ]);
+              1 => $totalParticipants,
+              2 => $self->_availableRegistrations,
+            ]);
           }
         }
       }
@@ -739,7 +738,8 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
     // Check whether to process the registration now, calling processRegistration()
     if (
-      !$this->_values['event']['is_confirm_enabled'] // CRM-11182 - Optional confirmation screen
+    // CRM-11182 - Optional confirmation screen
+      !$this->_values['event']['is_confirm_enabled']
       && !$this->_values['event']['is_monetary']
       && CRM_Utils_Array::value('additional_participants', $this->_params[0])
       && $this->isLastParticipant()

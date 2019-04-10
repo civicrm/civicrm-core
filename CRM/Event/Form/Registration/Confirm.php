@@ -55,6 +55,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * These should get a standardised format in the beginPostProcess function.
    *
    * These fields are common to many forms. Some may override this.
+   * @var array
    */
   protected $submittableMoneyFields = ['total_amount', 'net_amount', 'non_deductible_amount', 'fee_amount', 'tax_amount', 'amount'];
 
@@ -224,9 +225,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         if (is_array($v)) {
           $this->cleanMoneyFields($v);
           foreach ([
-                     'first_name',
-                     'last_name',
-                   ] as $name) {
+            'first_name',
+            'last_name',
+          ] as $name) {
             if (isset($v['billing_' . $name]) &&
               !isset($v[$name])
             ) {
@@ -315,18 +316,17 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     $contribButton = ts('Continue');
     $this->addButtons([
-        [
-          'type' => 'back',
-          'name' => ts('Go Back'),
-        ],
-        [
-          'type' => 'next',
-          'name' => $contribButton,
-          'isDefault' => TRUE,
-          'js' => ['onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"],
-        ],
-      ]
-    );
+      [
+        'type' => 'back',
+        'name' => ts('Go Back'),
+      ],
+      [
+        'type' => 'next',
+        'name' => $contribButton,
+        'isDefault' => TRUE,
+        'js' => ['onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"],
+      ],
+    ]);
 
     $defaults = [];
     $fields = [];

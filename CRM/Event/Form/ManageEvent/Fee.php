@@ -47,11 +47,13 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
 
   /**
    * Page action.
+   * @var int
    */
   public $_action;
 
   /**
    * In Date.
+   * @var string
    */
   private $_inDate;
 

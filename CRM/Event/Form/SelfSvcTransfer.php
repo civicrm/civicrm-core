@@ -113,32 +113,32 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   /**
    * particpant values
    *
-   * @array string
+   * @var string
    */
   protected $_part_values;
   /**
    * details
    *
-   * @array string
+   * @var array
    */
   protected $_details = [];
   /**
    * line items
    *
-   * @array string
+   * @var array
    */
   protected $_line_items = [];
   /**
    * contact_id
    *
-   * @array string
+   * @var int
    */
   protected $contact_id;
 
   /**
    * Is backoffice form?
    *
-   * @array bool
+   * @var bool
    */
   protected $isBackoffice = FALSE;
 
@@ -315,7 +315,7 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $query = "select event_id from civicrm_participant where contact_id = " . $contact_id;
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      $to_event_id[]  = $dao->event_id;
+      $to_event_id[] = $dao->event_id;
     }
     if (!empty($to_event_id)) {
       foreach ($to_event_id as $id) {

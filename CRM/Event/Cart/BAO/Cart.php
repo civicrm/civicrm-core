@@ -5,7 +5,10 @@
  */
 class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
   public $associations_loaded = FALSE;
-  /* event_in_cart_id => $event_in_cart */
+  /**
+   * event_in_cart_id => $event_in_cart
+   * @var array
+   */
   public $events_in_carts = [];
 
   /**
@@ -326,7 +329,6 @@ class CRM_Event_Cart_BAO_Cart extends CRM_Event_Cart_DAO_Cart {
     CRM_Core_DAO::storeValues($cart, $values);
     return $values;
   }
-
 
   /**
    * @param int $from_cart_id

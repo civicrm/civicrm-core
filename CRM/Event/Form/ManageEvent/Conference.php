@@ -38,6 +38,7 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
 
   /**
    * Page action.
+   * @var int
    */
   public $_action;
 
@@ -57,11 +58,10 @@ class CRM_Event_Form_ManageEvent_Conference extends CRM_Event_Form_ManageEvent {
     );
 
     $this->addEntityRef('parent_event_id', ts('Parent Event'), [
-        'entity' => 'Event',
-        'placeholder' => ts('- any -'),
-        'select' => ['minimumInputLength' => 0],
-      ]
-    );
+      'entity' => 'Event',
+      'placeholder' => ts('- any -'),
+      'select' => ['minimumInputLength' => 0],
+    ]);
 
     parent::buildQuickForm();
   }

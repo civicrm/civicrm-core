@@ -45,16 +45,19 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
   /**
    * Maximum profile fields that will be displayed.
+   * @var int
    */
   protected $_maxFields = 9;
 
   /**
    * Variable to store redirect path.
+   * @var string
    */
   protected $_userContext;
 
   /**
    * Variable to store previous status id.
+   * @var array
    */
   protected $_fromStatusIds;
 
@@ -128,17 +131,16 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
     $this->_fields = array_slice($this->_fields, 0, $this->_maxFields);
 
     $this->addButtons([
-        [
-          'type' => 'submit',
-          'name' => ts('Update Participant(s)'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'submit',
+        'name' => ts('Update Participant(s)'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_participantIds);
@@ -278,7 +280,7 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
    * @param int $participantId
    * @param int $statusId
    *
-   * @return Ambigous|void
+   * @return mixed
    */
   public static function updatePendingOnlineContribution($participantId, $statusId) {
     if (!$participantId || !$statusId) {
@@ -417,10 +419,10 @@ class CRM_Event_Form_Task_Batch extends CRM_Event_Form_Task {
 
     //set values for ipn code.
     foreach ([
-               'fee_amount',
-               'check_number',
-               'payment_instrument_id',
-             ] as $field) {
+      'fee_amount',
+      'check_number',
+      'payment_instrument_id',
+    ] as $field) {
       if (!$input[$field] = CRM_Utils_Array::value($field, $params)) {
         $input[$field] = $contribution->$field;
       }

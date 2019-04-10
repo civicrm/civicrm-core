@@ -64,6 +64,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
   /**
    * Get the db values for this form.
+   * @var array
    */
   public $_values = [];
 
@@ -242,10 +243,10 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
 
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
     foreach ([
-               'address',
-               'phone',
-               'email',
-             ] as $block) {
+      'address',
+      'phone',
+      'email',
+    ] as $block) {
       if (empty($params[$block]) || !is_array($params[$block])) {
         continue;
       }

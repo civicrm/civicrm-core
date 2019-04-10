@@ -166,10 +166,10 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
             if (array_key_exists($participant->status_id, $statusTypes)) {
               $form = $mer_participant->get_form();
               $this->_errors[$form->html_field_name('email')] = ts("The participant %1 is already registered for %2 (%3).", [
-                  1 => $participant_fields['email'],
-                  2 => $event_in_cart->event->title,
-                  3 => $event_in_cart->event->start_date,
-                ]);
+                1 => $participant_fields['email'],
+                2 => $event_in_cart->event->title,
+                3 => $event_in_cart->event->start_date,
+              ]);
             }
           }
         }

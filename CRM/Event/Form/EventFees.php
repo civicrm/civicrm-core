@@ -225,12 +225,12 @@ class CRM_Event_Form_EventFees {
       $contribution->id = $contriId;
       $contribution->find(TRUE);
       foreach ([
-                 'financial_type_id',
-                 'payment_instrument_id',
-                 'contribution_status_id',
-                 'receive_date',
-                 'total_amount',
-               ] as $f) {
+        'financial_type_id',
+        'payment_instrument_id',
+        'contribution_status_id',
+        'receive_date',
+        'total_amount',
+      ] as $f) {
         $defaults[$form->_pId][$f] = $contribution->$f;
       }
     }
