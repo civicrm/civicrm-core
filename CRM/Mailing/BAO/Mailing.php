@@ -1346,6 +1346,10 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $numSlices = count($embed_data);
       $url = '';
       for ($i = 0; $i < $numSlices; $i++) {
+        $embed_url_data = parse_url($embed_data[$i]);
+        if (!empty($embed_url_data['scheme'])) {
+          $token_a['embed_parts'][$i] = preg_replace("/href=\"(https*:\/\/)/", "href=\"", $token_a['embed_parts'][$i]);
+        }
         $url .= "{$token_a['embed_parts'][$i]}{$embed_data[$i]}";
       }
       if (isset($token_a['embed_parts'][$numSlices])) {
