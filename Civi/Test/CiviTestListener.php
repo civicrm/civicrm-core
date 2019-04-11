@@ -169,11 +169,15 @@ class CiviTestListener extends \PHPUnit_Framework_BaseTestListener {
     }
     elseif (!empty($byInterface['HeadlessInterface'])) {
       putenv('CIVICRM_UF=UnitTests');
+      // phpcs:disable
       eval($this->cv('php:boot --level=full', 'phpcode'));
+      // phpcs:enable
     }
     elseif (!empty($byInterface['EndToEndInterface'])) {
       putenv('CIVICRM_UF=');
+      // phpcs:disable
       eval($this->cv('php:boot --level=full', 'phpcode'));
+      // phpcs:enable
     }
 
     $blurb = "Tip: Run the headless tests and end-to-end tests separately, e.g.\n"
