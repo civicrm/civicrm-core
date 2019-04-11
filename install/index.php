@@ -163,7 +163,7 @@ elseif ($installType == 'backdrop') {
   $object = new CRM_Utils_System_Backdrop();
   $cmsPath = $object->cmsRootPath();
   $siteDir = getSiteDir($cmsPath, $_SERVER['SCRIPT_FILENAME']);
-  $alreadyInstalled = file_exists($cmsPath . CIVICRM_DIRECTORY_SEPARATOR .     'civicrm.settings.php');
+  $alreadyInstalled = file_exists($cmsPath . CIVICRM_DIRECTORY_SEPARATOR . 'civicrm.settings.php');
 }
 elseif ($installType == 'wordpress') {
   $cmsPath = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm';
@@ -424,7 +424,10 @@ else {
  *  $description[2] - The test error to show, if it goes wrong
  */
 class InstallRequirements {
-  var $errors, $warnings, $tests, $conn;
+  public $errors;
+  public $warnings;
+  public $tests;
+  public $conn;
 
   // @see CRM_Upgrade_Form::MINIMUM_THREAD_STACK
   const MINIMUM_THREAD_STACK = 192;
@@ -1170,7 +1173,6 @@ class InstallRequirements {
     mysqli_query($conn, 'DROP TABLE civicrm_install_temp_table_test');
   }
 
-
   /**
    * @param $server
    * @param string $username
@@ -1274,7 +1276,8 @@ class InstallRequirements {
       return;
     }
 
-    $result = mysqli_query($conn, "SHOW VARIABLES LIKE 'thread_stack'"); // bytes => kb
+    // bytes => kb
+    $result = mysqli_query($conn, "SHOW VARIABLES LIKE 'thread_stack'");
     if (!$result) {
       $testDetails[2] = ts('Could not get information about the thread_stack of the database.');
       $this->error($testDetails);
@@ -1519,6 +1522,7 @@ class InstallRequirements {
  * Class Installer
  */
 class Installer extends InstallRequirements {
+
   /**
    * @param $server
    * @param $username
@@ -1729,10 +1733,9 @@ class Installer extends InstallRequirements {
         //change the default language to one chosen
         if (isset($config['seedLanguage']) && $config['seedLanguage'] != 'en_US') {
           civicrm_api3('Setting', 'create', array(
-              'domain_id' => 'current_domain',
-              'lcMessages' => $config['seedLanguage'],
-            )
-          );
+            'domain_id' => 'current_domain',
+            'lcMessages' => $config['seedLanguage'],
+          ));
         }
 
         $output .= '</ul>';

@@ -64,10 +64,12 @@ namespace _CiviVersion_ {
           'administrator/components/com_civicrm/civicrm/civicrm-version.php',
         ),
         'Drupal' => array(
-          'modules/system/system.module', // D7
+          // D7
+          'modules/system/system.module',
         ),
         'Drupal8' => array(
-          'core/core.services.yml', // D8
+          // D8
+          'core/core.services.yml',
         ),
         'Backdrop' => array(
           'core/modules/layout/layout.module',
@@ -112,6 +114,7 @@ namespace _CiviVersion_ {
 }
 
 namespace {
+
   /**
    * Get the CiviCRM version.
    * TODO : For now this function is not included in \Civi\Version class so not to break any code
@@ -125,4 +128,5 @@ namespace {
       'cms' => \_CiviVersion_\Util::findCMS(),
     ];
   }
+
 }

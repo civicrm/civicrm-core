@@ -11,7 +11,7 @@
  */
 class CRM_Widget_Widget {
 
-  static $_methodTable;
+  public static $_methodTable;
 
   public function initialize() {
     if (!self::$_methodTable) {
