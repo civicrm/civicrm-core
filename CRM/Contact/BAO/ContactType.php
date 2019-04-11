@@ -462,8 +462,9 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
   /**
    * Retrieve the basic contact type associated with given subType.
    *
-   * @param array /string $subType contact subType.
-   * @return array/string of basicTypes.
+   * @param array|string $subType contact subType.
+   * @return array|string
+   *   basicTypes.
    */
   public static function getBasicType($subType) {
     static $_cache = NULL;
@@ -664,7 +665,7 @@ WHERE name = %1";
     else {
       $name = self::getBasicType($contactName);
       if (!$name) {
-        return;
+        return NULL;
       }
       $value = ['name' => "New $name"];
       CRM_Core_BAO_Navigation::retrieve($value, $navinfo);
@@ -891,6 +892,7 @@ WHERE extends = %1 AND " . implode(" OR ", $subTypeClause);
    *   Custom group id.
    * @param array $subtypes
    *   List of subtypes related to which entry is to be removed.
+   * @param array $subtypesToPreserve
    *
    * @return bool
    */

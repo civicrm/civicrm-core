@@ -31,7 +31,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CiviContributeProcessor {
-  static $_paypalParamsMapper = array(
+  public static $_paypalParamsMapper = array(
     //category    => array(paypal_param    => civicrm_field);
     'contact' => array(
       'salutation' => 'prefix_id',
@@ -72,10 +72,13 @@ class CiviContributeProcessor {
     ),
   );
 
-  static $_csvParamsMapper = array(
-    // Note: if csv header is not present in the mapper, header itself
-    // is considered as a civicrm field.
-    //category    => array(csv_header      => civicrm_field);
+  /**
+   * Note: if csv header is not present in the mapper, header itself
+   * is considered as a civicrm field.
+   * category    => array(csv_header      => civicrm_field);
+   * @var array
+   */
+  public static $_csvParamsMapper = array(
     'contact' => array(
       'first_name' => 'first_name',
       'last_name' => 'last_name',

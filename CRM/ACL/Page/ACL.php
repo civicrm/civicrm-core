@@ -39,7 +39,7 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.

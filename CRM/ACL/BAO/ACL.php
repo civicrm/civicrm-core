@@ -38,11 +38,11 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * @var string
    */
-  static $_entityTable = NULL;
-  static $_objectTable = NULL;
-  static $_operation = NULL;
+  public static $_entityTable = NULL;
+  public static $_objectTable = NULL;
+  public static $_operation = NULL;
 
-  static $_fieldKeys = NULL;
+  public static $_fieldKeys = NULL;
 
   /**
    * Get ACL entity table.
