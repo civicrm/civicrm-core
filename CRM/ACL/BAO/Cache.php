@@ -36,7 +36,7 @@
  */
 class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_Cache {
 
-  static $_cache = NULL;
+  public static $_cache = NULL;
 
   /**
    * @param int $id
