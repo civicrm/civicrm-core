@@ -325,7 +325,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           if (!empty($this->_params['group_bys'][$fieldName])) {
             switch (CRM_Utils_Array::value($fieldName, $this->_params['group_bys_freq'])) {
               case 'YEARWEEK':
-                $select[] = "DATE_SUB({$field['dbAlias']}, INTERVAL WEEKDAY({$field['dbAlias']}) DAY) AS {$tableName}_{$fieldName}_start";
+                $select[] = "DATE(DATE_SUB({$field['dbAlias']}, INTERVAL WEEKDAY({$field['dbAlias']}) DAY)) AS {$tableName}_{$fieldName}_start";
                 $select[] = "YEARWEEK({$field['dbAlias']}) AS {$tableName}_{$fieldName}_subtotal";
                 $select[] = "WEEKOFYEAR({$field['dbAlias']}) AS {$tableName}_{$fieldName}_interval";
                 $field['title'] = ts('Week Beginning');
@@ -537,6 +537,11 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
                 }
                 if ($this->_params['group_bys_freq'][$fieldName] == 'FISCALYEAR') {
                   $groupByColumns[] = self::fiscalYearOffset($field['dbAlias']);
+                }
+                // core/858: YEARWEEK is unpredictable, so we group by the first day of the week
+                elseif ($this->_params['group_bys_freq'][$fieldName] == 'YEARWEEK') {
+                  $dateIntervalString = "DATE(DATE_SUB({$field['dbAlias']}, INTERVAL WEEKDAY({$field['dbAlias']}) DAY))";
+                  $groupByColumns[] = "YEAR($dateIntervalString), $dateIntervalString";
                 }
                 else {
                   $groupByColumns[] = "$append {$this->_params['group_bys_freq'][$fieldName]}({$field['dbAlias']})";
@@ -905,8 +910,8 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
       }
 
       // make subtotals look nicer
-      if (array_key_exists('civicrm_contribution_receive_date_subtotal', $row) &&
-        !$row['civicrm_contribution_receive_date_subtotal']
+      if (array_key_exists('civicrm_contribution_receive_date_subtotal', $row)
+        && (!$row['civicrm_contribution_receive_date_subtotal'] || !$row['civicrm_contribution_receive_date_start'])
       ) {
         $this->fixSubTotalDisplay($rows[$rowNum], $this->_statFields);
         $entryFound = TRUE;
