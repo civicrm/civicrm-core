@@ -45,9 +45,14 @@ class CRM_Case_BAO_CaseContact extends CRM_Case_DAO_CaseContact {
    * @return CRM_Case_BAO_CaseContact
    */
   public static function create($params) {
+    $hook = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($hook, 'CaseContact', CRM_Utils_Array::value('id', $params), $params);
+
     $caseContact = new self();
     $caseContact->copyValues($params);
     $caseContact->save();
+
+    CRM_Utils_Hook::post($hook, 'CaseContact', $caseContact->id, $caseContact);
 
     // add to recently viewed
     $caseType = CRM_Case_BAO_Case::getCaseType($caseContact->case_id);
