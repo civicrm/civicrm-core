@@ -86,7 +86,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
     $where = NULL;
     $onlyProcessSelected = ($action == CRM_Core_Action::MAP) ? 1 : 0;
 
-    $total  = CRM_Core_BAO_PrevNextCache::getCount($cacheKeyString, NULL, ($onlyProcessSelected ? "pn.is_selected = 1" : NULL));
+    $total = CRM_Core_BAO_PrevNextCache::getCount($cacheKeyString, NULL, ($onlyProcessSelected ? "pn.is_selected = 1" : NULL));
     if ($total <= 0) {
       // Nothing to do.
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry));
@@ -96,7 +96,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
     CRM_Dedupe_Merger::resetMergeStats($cacheKeyString);
 
     for ($i = 1; $i <= ceil($total / self::BATCHLIMIT); $i++) {
-      $task  = new CRM_Queue_Task(
+      $task = new CRM_Queue_Task(
         ['CRM_Contact_Page_DedupeMerge', 'callBatchMerge'],
         [$rgid, $gid, $mode, self::BATCHLIMIT, $onlyProcessSelected, $criteria],
         "Processed " . $i * self::BATCHLIMIT . " pair of duplicates out of " . $total

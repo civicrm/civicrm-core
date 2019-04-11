@@ -44,20 +44,20 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    */
-  static $_columnHeaders;
+  public static $_columnHeaders;
 
   /**
    * Properties of contact we're interested in displaying
    * @var array
    */
-  static $_properties = ['contact_id', 'contact_type', 'display_name'];
+  public static $_properties = ['contact_id', 'contact_type', 'display_name'];
 
   /**
    * FormValues is the array returned by exportValues called on
@@ -92,6 +92,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
 
   /**
    * The object that implements the search interface
+   * @var object
    */
   protected $_search;
 

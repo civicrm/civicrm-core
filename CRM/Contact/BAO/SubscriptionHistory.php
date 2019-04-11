@@ -35,6 +35,7 @@
  * BAO object for crm_email table.
  */
 class CRM_Contact_BAO_SubscriptionHistory extends CRM_Contact_DAO_SubscriptionHistory {
+
   /**
    * Class constructor.
    */

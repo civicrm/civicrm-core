@@ -318,7 +318,7 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
    * @param bool $includeSmartGroups
    *   Include or Exclude Smart Group(s)
    *
-   * @return array|int $values
+   * @return array|int
    *   the relevant data object values for the contact or the total count when $count is TRUE
    */
   public static function getContactGroup(

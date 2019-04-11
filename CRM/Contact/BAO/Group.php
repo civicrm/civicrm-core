@@ -751,7 +751,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @todo there seems little reason for the small number of functions that call this to pass in
    * params that then need to be translated in this function since they are coding them when calling
    */
-  static public function getGroupListSelector(&$params) {
+  public static function getGroupListSelector(&$params) {
     // format the params
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['rowCount'] = $params['rp'];
@@ -999,11 +999,13 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           $values[$object->id]['org_info'] = "<a href='{$contactUrl}'>{$object->org_name}</a>";
         }
         else {
-          $values[$object->id]['org_info'] = ''; // Empty cell
+          // Empty cell
+          $values[$object->id]['org_info'] = '';
         }
       }
       else {
-        $values[$object->id]['org_info'] = NULL; // Collapsed column if all cells are NULL
+        // Collapsed column if all cells are NULL
+        $values[$object->id]['org_info'] = NULL;
       }
       if ($object->created_id) {
         $contactUrl = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$object->created_id}");

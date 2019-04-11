@@ -38,26 +38,31 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
 
   /**
    * Location block no
+   * @var int
    */
   private $_locBlockNo;
 
   /**
    * Do we want to parse street address.
+   * @var bool
    */
   public $_parseStreetAddress;
 
   /**
    * Store address values
+   * @var array
    */
   public $_values;
 
   /**
    * Form action
+   * @var string
    */
   public $_action;
 
   /**
    * Address id
+   * @var int
    */
   public $_addressId;
 

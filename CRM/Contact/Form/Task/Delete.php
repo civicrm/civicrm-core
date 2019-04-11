@@ -48,6 +48,7 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
 
   /**
    * Cache shared address message so we don't query twice
+   * @var string
    */
   protected $_sharedAddressMessage = NULL;
 
@@ -123,16 +124,16 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
         if (count($this->_contactIds) > 1) {
           // more than one contact deleted
           $message = ts('One of the selected contacts has an address record that is shared with 1 other contact.', [
-              'plural' => 'One or more selected contacts have address records which are shared with %count other contacts.',
-              'count' => $sharedAddressCount,
-            ]);
+            'plural' => 'One or more selected contacts have address records which are shared with %count other contacts.',
+            'count' => $sharedAddressCount,
+          ]);
         }
         else {
           // only one contact deleted
           $message = ts('This contact has an address record which is shared with 1 other contact.', [
-              'plural' => 'This contact has an address record which is shared with %count other contacts.',
-              'count' => $sharedAddressCount,
-            ]);
+            'plural' => 'This contact has an address record which is shared with %count other contacts.',
+            'count' => $sharedAddressCount,
+          ]);
         }
         CRM_Core_Session::setStatus($message . ' ' . ts('Shared addresses will not be removed or altered but will no longer be shared.'), ts('Shared Addesses Owner'));
       }
@@ -246,24 +247,24 @@ class CRM_Contact_Form_Task_Delete extends CRM_Contact_Form_Task {
       if ($this->_restore) {
         $title = ts('Restored');
         $status = ts('%1 has been restored from the trash.', [
-            1 => $name,
-            'plural' => '%count contacts restored from trash.',
-            'count' => $deleted,
-          ]);
+          1 => $name,
+          'plural' => '%count contacts restored from trash.',
+          'count' => $deleted,
+        ]);
       }
       elseif ($this->_skipUndelete) {
         $status = ts('%1 has been permanently deleted.', [
-            1 => $name,
-            'plural' => '%count contacts permanently deleted.',
-            'count' => $deleted,
-          ]);
+          1 => $name,
+          'plural' => '%count contacts permanently deleted.',
+          'count' => $deleted,
+        ]);
       }
       else {
         $status = ts('%1 has been moved to the trash.', [
-            1 => $name,
-            'plural' => '%count contacts moved to trash.',
-            'count' => $deleted,
-          ]);
+          1 => $name,
+          'plural' => '%count contacts moved to trash.',
+          'count' => $deleted,
+        ]);
       }
       $session->setStatus($status, $title, 'success');
     }

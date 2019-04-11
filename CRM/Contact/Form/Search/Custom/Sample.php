@@ -33,6 +33,7 @@
 class CRM_Contact_Form_Search_Custom_Sample extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
   protected $_aclFrom = NULL;
   protected $_aclWhere = NULL;
+
   /**
    * Class constructor.
    *

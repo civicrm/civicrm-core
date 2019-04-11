@@ -35,7 +35,9 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
   protected $_aclFrom = NULL;
   protected $_aclWhere = NULL;
 
-  protected $_datesTable = NULL, $_xgTable = NULL, $_igTable = NULL;
+  protected $_datesTable = NULL;
+  protected $_xgTable = NULL;
+  protected $_igTable = NULL;
 
   /**
    * Class constructor.

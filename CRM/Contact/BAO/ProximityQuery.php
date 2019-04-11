@@ -50,6 +50,9 @@ class CRM_Contact_BAO_ProximityQuery {
    * This version has been taken from Drupal's location module: http://drupal.org/project/location
    */
 
+  /**
+   * @var string
+   */
   static protected $_earthFlattening;
   static protected $_earthRadiusSemiMinor;
   static protected $_earthRadiusSemiMajor;

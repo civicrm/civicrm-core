@@ -38,11 +38,13 @@ class CRM_Contact_Form_Inline_Email extends CRM_Contact_Form_Inline {
 
   /**
    * Email addresses of the contact that is been viewed.
+   * @var array
    */
   private $_emails = [];
 
   /**
    * No of email blocks for inline edit.
+   * @var int
    */
   private $_blockCount = 6;
 

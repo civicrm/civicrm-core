@@ -169,6 +169,7 @@ WHERE  $where
    * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
    *
    */
+
   /**
    * @param bool $includeContactIDs
    *
@@ -217,7 +218,6 @@ WHERE  $where
     }
     return implode(' AND ', $clauses);
   }
-
 
   /*
    * Functions below generally don't need to be modified
