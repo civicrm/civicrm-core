@@ -89,17 +89,16 @@ class CRM_Custom_Form_DeleteGroup extends CRM_Core_Form {
   public function buildQuickForm() {
 
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Delete Custom Group'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Delete Custom Group'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**

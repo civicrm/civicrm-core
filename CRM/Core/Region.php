@@ -26,21 +26,21 @@ class CRM_Core_Region {
    *
    * @var string
    */
-  var $_name;
+  public $_name;
 
   /**
    * List of snippets to inject within region
    *
    * @var array; e.g. $this->_snippets[3]['type'] = 'template';
    */
-  var $_snippets;
+  public $_snippets;
 
   /**
    * Whether the snippets array has been sorted
    *
    * @var boolean
    */
-  var $_isSorted;
+  public $_isSorted;
 
   /**
    * @param string $name

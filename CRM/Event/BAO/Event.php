@@ -920,7 +920,7 @@ WHERE civicrm_event.is_active = 1
    * @param int $id
    *   The event id to copy.
    *        boolean $afterCreate call to copy after the create function
-   *
+   * @param array $params
    * @return CRM_Event_DAO_Event
    * @throws \CRM_Core_Exception
    */
@@ -1183,10 +1183,10 @@ WHERE civicrm_event.is_active = 1
           'participantID' => $participantId,
           'conference_sessions' => $sessions,
           'credit_card_number' =>
-            CRM_Utils_System::mungeCreditCard(
+          CRM_Utils_System::mungeCreditCard(
               CRM_Utils_Array::value('credit_card_number', $participantParams)),
           'credit_card_exp_date' =>
-            CRM_Utils_Date::mysqlToIso(
+          CRM_Utils_Date::mysqlToIso(
               CRM_Utils_Date::format(
                 CRM_Utils_Array::value('credit_card_exp_date', $participantParams))),
         ]);
@@ -1587,13 +1587,13 @@ WHERE civicrm_event.is_active = 1
           }
           $values[$index] = implode(', ', $title);
         }
-        elseif ('participant_role_id' == $name OR
+        elseif ('participant_role_id' == $name or
           'participant_role' == $name
         ) {
           $roles = CRM_Event_PseudoConstant::participantRole();
           $values[$index] = $roles[$params[$name]];
         }
-        elseif ('participant_status_id' == $name OR
+        elseif ('participant_status_id' == $name or
           'participant_status' == $name
         ) {
           $status = CRM_Event_PseudoConstant::participantStatus();
@@ -1976,6 +1976,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    * @return boolean
    *   true if allow registration otherwise false
    */
+
   /**
    * @param $values
    *
@@ -2013,6 +2014,7 @@ WHERE  ce.loc_block_id = $locBlockId";
    *   Key/value participant info.
    * @return boolean
    */
+
   /**
    * @param array $params
    *

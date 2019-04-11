@@ -38,6 +38,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
   /**
    * Define default MembershipType Id.
+   * @var int
    */
   public $_defaultMemTypeId;
 
@@ -238,14 +239,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
               CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
               $memtypeID = $selectedCurrentMemTypes[] = $values['membership_type_id'];
             }
-            elseif (!empty($values['is_default']) &&
-              !$opMemTypeId &&
-              (!isset($this->_defaults[$priceFieldName]) ||
-                ($val['html_type'] == 'CheckBox' &&
-                !isset($this->_defaults[$priceFieldName][$keys]))
-              )) {
-                CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
-                $memtypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $this->_defaults[$priceFieldName], 'membership_type_id');
+            elseif (!empty($values['is_default']) && !$opMemTypeId && (!isset($this->_defaults[$priceFieldName]) ||
+              ($val['html_type'] == 'CheckBox' && !isset($this->_defaults[$priceFieldName][$keys])))) {
+              CRM_Price_BAO_PriceSet::setDefaultPriceSetField($priceFieldName, $keys, $val['html_type'], $this->_defaults);
+              $memtypeID = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $this->_defaults[$priceFieldName], 'membership_type_id');
             }
           }
         }

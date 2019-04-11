@@ -38,50 +38,62 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    */
   const SOFT_CREDIT = 512, SOFT_CREDIT_ERROR = 1024, PLEDGE_PAYMENT = 2048, PLEDGE_PAYMENT_ERROR = 4096;
 
+  /**
+   * @var string
+   */
   protected $_fileName;
 
   /**
    * Imported file size
+   * @var int
    */
   protected $_fileSize;
 
   /**
    * Seperator being used
+   * @var string
    */
   protected $_seperator;
 
   /**
    * Total number of lines in file
+   * @var int
    */
   protected $_lineCount;
 
   /**
    * Running total number of valid soft credit rows
+   * @var int
    */
   protected $_validSoftCreditRowCount;
 
   /**
    * Running total number of invalid soft credit rows
+   * @var int
    */
   protected $_invalidSoftCreditRowCount;
 
   /**
    * Running total number of valid pledge payment rows
+   * @var int
    */
   protected $_validPledgePaymentRowCount;
 
   /**
    * Running total number of invalid pledge payment rows
+   * @var int
    */
   protected $_invalidPledgePaymentRowCount;
 
   /**
    * Array of pledge payment error lines, bounded by MAX_ERROR
+   * @var array
    */
   protected $_pledgePaymentErrors;
 
   /**
    * Array of pledge payment error lines, bounded by MAX_ERROR
+   * @var array
    */
   protected $_softCreditErrors;
 
@@ -114,6 +126,8 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    * @param int $mode
    * @param int $contactType
    * @param int $onDuplicate
+   * @param int $statusID
+   * @param int $totalRowCount
    *
    * @return mixed
    * @throws Exception
@@ -346,11 +360,9 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
       if ($this->_invalidRowCount) {
         // removed view url for invlaid contacts
         $headers = array_merge([
-            ts('Line Number'),
-            ts('Reason'),
-          ],
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('Reason'),
+        ], $customHeaders);
         $this->_errorFileName = self::errorFileName(self::ERROR);
         self::exportCSV($this->_errorFileName, $headers, $this->_errors);
       }
@@ -358,11 +370,9 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
       if ($this->_invalidPledgePaymentRowCount) {
         // removed view url for invlaid contacts
         $headers = array_merge([
-            ts('Line Number'),
-            ts('Reason'),
-          ],
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('Reason'),
+        ], $customHeaders);
         $this->_pledgePaymentErrorsFileName = self::errorFileName(self::PLEDGE_PAYMENT_ERROR);
         self::exportCSV($this->_pledgePaymentErrorsFileName, $headers, $this->_pledgePaymentErrors);
       }
@@ -370,32 +380,26 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
       if ($this->_invalidSoftCreditRowCount) {
         // removed view url for invlaid contacts
         $headers = array_merge([
-            ts('Line Number'),
-            ts('Reason'),
-          ],
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('Reason'),
+        ], $customHeaders);
         $this->_softCreditErrorsFileName = self::errorFileName(self::SOFT_CREDIT_ERROR);
         self::exportCSV($this->_softCreditErrorsFileName, $headers, $this->_softCreditErrors);
       }
 
       if ($this->_conflictCount) {
         $headers = array_merge([
-            ts('Line Number'),
-            ts('Reason'),
-          ],
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('Reason'),
+        ], $customHeaders);
         $this->_conflictFileName = self::errorFileName(self::CONFLICT);
         self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
       }
       if ($this->_duplicateCount) {
         $headers = array_merge([
-            ts('Line Number'),
-            ts('View Contribution URL'),
-          ],
-          $customHeaders
-        );
+          ts('Line Number'),
+          ts('View Contribution URL'),
+        ], $customHeaders);
 
         $this->_duplicateFileName = self::errorFileName(self::DUPLICATE);
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);

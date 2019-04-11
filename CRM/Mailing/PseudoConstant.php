@@ -75,6 +75,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
    * Default component id's, indexed by component type
+   * @var array
    */
   private static $defaultComponent;
 
@@ -117,7 +118,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function abWinnerCriteria() {
     if (!is_array(self::$abWinnerCriteria)) {
-      self::$abWinnerCriteria  = [
+      self::$abWinnerCriteria = [
         'open' => ts('Open'),
         'unique_click' => ts('Total Unique Clicks'),
         'link_click' => ts('Total Clicks on a particular link'),
@@ -131,7 +132,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function mailingTypes() {
     if (!is_array(self::$mailingTypes)) {
-      self::$mailingTypes  = [
+      self::$mailingTypes = [
         'standalone' => ts('Standalone'),
         'experiment' => ts('Experimental'),
         'winner' => ts('Winner'),

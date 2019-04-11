@@ -4,6 +4,7 @@
  * Class CRM_Event_Badge_Logo5395
  */
 class CRM_Event_Badge_Logo5395 extends CRM_Event_Badge {
+
   /**
    */
   public function __construct() {
@@ -40,12 +41,12 @@ class CRM_Event_Badge_Logo5395 extends CRM_Event_Badge {
     $y = $this->pdf->GetY();
     $this->printBackground(TRUE);
     $this->pdf->SetLineStyle([
-        'width' => 0.1,
-        'cap' => 'round',
-        'join' => 'round',
-        'dash' => '2,2',
-        'color' => [0, 0, 200],
-      ]);
+      'width' => 0.1,
+      'cap' => 'round',
+      'join' => 'round',
+      'dash' => '2,2',
+      'color' => [0, 0, 200],
+    ]);
 
     $this->pdf->SetFontSize(9);
     $this->pdf->MultiCell($this->pdf->width - $this->lMarginLogo, 0, $participant['event_title'], $this->border, "L", 0, 1, $x + $this->lMarginLogo, $y);

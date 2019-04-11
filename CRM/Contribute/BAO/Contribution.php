@@ -37,21 +37,21 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *
    * @var array
    */
-  static $_importableFields = NULL;
+  public static $_importableFields = NULL;
 
   /**
    * Static field for all the contribution information that we can potentially export
    *
    * @var array
    */
-  static $_exportableFields = NULL;
+  public static $_exportableFields = NULL;
 
   /**
    * Static field to hold financial trxn id's.
    *
    * @var array
    */
-  static $_trxnIDs = NULL;
+  public static $_trxnIDs = NULL;
 
   /**
    * Field for all the objects related to this contribution
@@ -326,7 +326,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
       return $contribution;
     }
-    $null = NULL; // return by reference
+    // return by reference
+    $null = NULL;
     return $null;
   }
 
@@ -965,7 +966,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     // as they would then me membership.contact_id, membership.is_test etc
     return civicrm_api3('Membership', 'get', [
       'id' => ['IN' => $membershipIDs],
-      'return' => ['id', 'contact_id', 'membership_type_id', 'is_test']
+      'return' => ['id', 'contact_id', 'membership_type_id', 'is_test'],
     ])['values'];
   }
 
@@ -990,7 +991,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     }
     else {
       $whereClauses['financial_type_id'] = [
-        'IN (' . implode(',', array_keys($types)) . ')'
+        'IN (' . implode(',', array_keys($types)) . ')',
       ];
     }
     return $whereClauses;
@@ -1157,7 +1158,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = c.contact_id )
       'subject' => ts('Payment failed at payment processor'),
       'source_record_id' => $contributionID,
       'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ? CRM_Core_Session::getLoggedInContactID() :
-        $contactID,
+      $contactID,
     ));
 
     // CRM-20336 Make sure that the contribution status is Failed, not Pending.
@@ -3869,7 +3870,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     return FALSE;
   }
 
-
   /**
    * Function to record additional payment for partial and refund contributions.
    *
@@ -5139,6 +5139,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    *   Line items.
    * @param bool $isARefund
    *   Is this a refund / negative transaction.
+   * @param int $previousLineItemTotal
    *
    * @return float
    */
@@ -5345,9 +5346,10 @@ LIMIT 1;";
    * @param float $balance
    * @param string $contributionStatus
    *
-   * @return array $actionLinks Links array containing:
-   *   -url
-   *   -title
+   * @return array
+   *   $actionLinks Links array containing:
+   *     -url
+   *     -title
    */
   protected static function getContributionPaymentLinks($id, $balance, $contributionStatus) {
     if ($contributionStatus === 'Failed' || !CRM_Core_Permission::check('edit contributions')) {
@@ -5450,7 +5452,7 @@ LIMIT 1;";
 
     $clauses = [];
     foreach ($whereClauses as $key => $clause) {
-      $clauses[] = 'b.' . $key . " "  . implode(' AND b.' . $key, (array) $clause);
+      $clauses[] = 'b.' . $key . " " . implode(' AND b.' . $key, (array) $clause);
     }
     $whereClauseString = implode(' AND ', $clauses);
 

@@ -70,8 +70,7 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
     // Extracted from scheduled-reminders code. See the class description.
-    return
-      !empty($processor->context['actionMapping'])
+    return !empty($processor->context['actionMapping'])
       && $processor->context['actionMapping']->getEntity() === 'civicrm_participant';
   }
 
@@ -85,7 +84,8 @@ class CRM_Event_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       return;
     }
 
-    $e->query->select('e.*'); // FIXME: seems too broad.
+    // FIXME: seems too broad.
+    $e->query->select('e.*');
     $e->query->select('ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone');
     $e->query->join('participant_stuff', "
 !casMailingJoinType civicrm_event ev ON e.event_id = ev.id

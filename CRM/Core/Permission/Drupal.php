@@ -61,7 +61,6 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
   protected $_viewPermissionedGroups;
   protected $_editPermissionedGroups;
 
-
   /**
    * Given a permission string, check for access requirements
    *

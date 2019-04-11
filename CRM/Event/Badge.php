@@ -43,6 +43,7 @@
  *
  */
 class CRM_Event_Badge {
+
   /**
    */
   public function __construct() {
@@ -148,14 +149,14 @@ class CRM_Event_Badge {
     $y = $this->pdf->GetY();
     if ($this->debug) {
       $this->pdf->Rect($x, $y, $this->pdf->width, $this->pdf->height, 'D', [
-          'all' => [
-            'width' => 1,
-            'cap' => 'round',
-            'join' => 'round',
-            'dash' => '2,10',
-            'color' => [255, 0, 0],
-          ],
-        ]);
+        'all' => [
+          'width' => 1,
+          'cap' => 'round',
+          'join' => 'round',
+          'dash' => '2,10',
+          'color' => [255, 0, 0],
+        ],
+      ]);
     }
     $img = $this->getImageFileName($this->event->id, $img);
     if ($img) {

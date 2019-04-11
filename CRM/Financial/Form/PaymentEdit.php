@@ -59,6 +59,7 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
   public function getDefaultContext() {
     return 'create';
   }
+
   /**
    * Set variables up before form is built.
    */

@@ -120,7 +120,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
             1 => $form->_id,
             2 => $contributionParams['source'],
           ]),
-          220 // eventually activity.description append price information to source text so keep it 220 to ensure string length doesn't exceed 255 characters.
+          // eventually activity.description append price information to source text so keep it 220 to ensure string length doesn't exceed 255 characters.
+          220
         );
       }
 
@@ -251,7 +252,7 @@ class CRM_Contribute_BAO_Contribution_Utils {
    *
    * @return bool
    */
-  static protected function isPaymentTransaction($form) {
+  protected static function isPaymentTransaction($form) {
     return ($form->_amount >= 0.0) ? TRUE : FALSE;
   }
 
@@ -533,7 +534,7 @@ LIMIT 1
    * @param int $id
    *   Contribution ID
    *
-   * @return array $statuses
+   * @return array
    *   Array of contribution statuses in array('status id' => 'label') format
    */
   public static function getContributionStatuses($usedFor = 'contribution', $id = NULL) {

@@ -49,21 +49,25 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
   /**
    * Gives all the statues for conribution.
+   * @var int
    */
   public $_contributionStatusId;
 
   /**
    * Gives the HTML template of PDF Invoice.
+   * @var string
    */
   public $_messageInvoice;
 
   /**
    * This variable is used to assign parameters for HTML template of PDF Invoice.
+   * @var string
    */
   public $_invoiceTemplate;
 
   /**
    * Selected output.
+   * @var string
    */
   public $_selectedOutput;
 
@@ -164,17 +168,16 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     ]);
 
     $this->addButtons([
-        [
-          'type' => 'upload',
-          'name' => $this->_selectedOutput == 'email' ? ts('Send Email') : ts('Process Invoice(s)'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'upload',
+        'name' => $this->_selectedOutput == 'email' ? ts('Send Email') : ts('Process Invoice(s)'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
@@ -307,8 +310,8 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       }
 
       $resultPayments = civicrm_api3('Payment', 'get', [
-            'sequential' => 1,
-            'contribution_id' => $contribID,
+        'sequential' => 1,
+        'contribution_id' => $contribID,
       ]);
       $amountPaid = 0;
       foreach ($resultPayments['values'] as $singlePayment) {
@@ -557,7 +560,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    *   For invoices.
    *
    */
-  static public function addActivities($subject, $contactIds, $fileName, $params) {
+  public static function addActivities($subject, $contactIds, $fileName, $params) {
     $session = CRM_Core_Session::singleton();
     $userID = $session->get('userID');
     $config = CRM_Core_Config::singleton();
@@ -605,7 +608,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * @return string
    *   Name of file which is in pdf format
    */
-  static public function putFile($html, $name = 'Invoice.pdf') {
+  public static function putFile($html, $name = 'Invoice.pdf') {
     $options = new Options();
     $options->set('isRemoteEnabled', TRUE);
 

@@ -205,6 +205,7 @@ class CRM_Financial_BAO_Payment {
     ]);
     return (int) $contribution['contact_id'];
   }
+
   /**
    * @param array $entities
    *   Related entities as an array keyed by the various entities.
@@ -268,7 +269,7 @@ class CRM_Financial_BAO_Payment {
       'refundAmount',
       'totalPaid',
       'paymentsComplete',
-      'emailGreeting'
+      'emailGreeting',
     ];
     // These are assigned by the payment form - they still 'get through' from the
     // form for now without being in here but we should ideally load

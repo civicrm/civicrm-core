@@ -110,9 +110,10 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
   /**
    * Is backoffice form?
    *
-   * @array bool
+   * @var bool
    */
   protected $isBackoffice = FALSE;
+
   /**
    * Set variables up before form is built based on participant ID from URL
    *
@@ -206,6 +207,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
     // for self update (event.start_date > today, event can be 'self_updated'
     // retrieve contact name and email, and let user verify his/her identity
   }
+
   /**
    * buildQuickForm -populate input variables for source Event
    * to cancel or transfer to another person

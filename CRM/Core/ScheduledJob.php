@@ -36,13 +36,13 @@
  */
 class CRM_Core_ScheduledJob {
 
-  var $version = 3;
+  public $version = 3;
 
-  var $name = NULL;
+  public $name = NULL;
 
-  var $apiParams = [];
+  public $apiParams = [];
 
-  var $remarks = [];
+  public $remarks = [];
 
   /**
    * @param array $params

@@ -37,21 +37,21 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    *
    * @var array
    */
-  static $_importableFields = NULL;
+  public static $_importableFields = NULL;
 
   /**
    * Static field for all the participant information that we can potentially export.
    *
    * @var array
    */
-  static $_exportableFields = NULL;
+  public static $_exportableFields = NULL;
 
   /**
    * Static array for valid status transitions rules.
    *
    * @var array
    */
-  static $_statusTransitionsRules = [
+  public static $_statusTransitionsRules = [
     'Pending from pay later' => ['Registered', 'Cancelled'],
     'Pending from incomplete transaction' => ['Registered', 'Cancelled'],
     'On waitlist' => ['Cancelled', 'Pending from waitlist'],
@@ -238,9 +238,9 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
     $noteValue = NULL;
     $hasNoteField = FALSE;
     foreach ([
-               'note',
-               'participant_note',
-             ] as $noteFld) {
+      'note',
+      'participant_note',
+    ] as $noteFld) {
       if (array_key_exists($noteFld, $params)) {
         $noteValue = $params[$noteFld];
         $hasNoteField = TRUE;
@@ -1669,8 +1669,8 @@ UPDATE  civicrm_participant
     if (is_string($emptySeats) && $emptySeats !== NULL) {
       $maxParticipants = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $eventId, 'max_participants');
       $eventfullMsg = ts("This event currently has the maximum number of participants registered (%1). However, you can still override this limit and register additional participants using this form.", [
-          1 => $maxParticipants,
-        ]) . '<br />';
+        1 => $maxParticipants,
+      ]) . '<br />';
     }
 
     $hasWaiting = FALSE;

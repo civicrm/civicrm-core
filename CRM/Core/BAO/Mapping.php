@@ -396,10 +396,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     //we need to unset groups, tags, notes for component export
     if ($exportMode != CRM_Export_Form_Select::CONTACT_EXPORT) {
       foreach ([
-                 'groups',
-                 'tags',
-                 'notes',
-               ] as $value) {
+        'groups',
+        'tags',
+        'notes',
+      ] as $value) {
         unset($fields['Individual'][$value]);
         unset($fields['Household'][$value]);
         unset($fields['Organization'][$value]);
@@ -982,7 +982,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     }
     return $groupTitle;
   }
-
 
   /**
    * Function returns all  Custom group Names.

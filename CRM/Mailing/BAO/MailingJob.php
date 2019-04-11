@@ -45,7 +45,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    *
    * @var int
    */
-  static $mailsProcessed = 0;
+  public static $mailsProcessed = 0;
 
   /**
    * Class constructor.
@@ -62,7 +62,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
    * @return \CRM_Mailing_BAO_MailingJob
    * @throws \CRM_Core_Exception
    */
-  static public function create($params) {
+  public static function create($params) {
     if (empty($params['id']) && empty($params['mailing_id'])) {
       throw new CRM_Core_Exception("Failed to create job: Unknown mailing ID");
     }
@@ -300,7 +300,6 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
       }
     }
   }
-
 
   /**
    * before we run jobs, we need to split the jobs
@@ -602,9 +601,11 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
 
     // CRM-15702: Sending bulk sms to contacts without e-mail address fails.
     // Solution is to skip checking for on hold
-    $skipOnHold = TRUE;    //do include a statement to check wether e-mail address is on hold
+    //do include a statement to check wether e-mail address is on hold
+    $skipOnHold = TRUE;
     if ($mailing->sms_provider_id) {
-      $skipOnHold = FALSE; //do not include a statement to check wether e-mail address is on hold
+      //do not include a statement to check wether e-mail address is on hold
+      $skipOnHold = FALSE;
     }
 
     foreach ($fields as $key => $field) {

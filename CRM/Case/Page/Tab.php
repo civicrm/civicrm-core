@@ -41,7 +41,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
   public $_permission = NULL;
   public $_contactId = NULL;
 
@@ -216,7 +216,7 @@ class CRM_Case_Page_Tab extends CRM_Core_Page {
    * @return array
    *   (reference) of action links
    */
-  static public function &links() {
+  public static function &links() {
     $config = CRM_Core_Config::singleton();
 
     if (!(self::$_links)) {

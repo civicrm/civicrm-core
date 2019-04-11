@@ -206,7 +206,8 @@ class CRM_Core_InnoDBIndexer {
    *   (string $indexName => string $sql)
    */
   public function buildIndexSql($table) {
-    $sqls = []; // array (string $idxName => string $sql)
+    // array (string $idxName => string $sql)
+    $sqls = [];
     if ($this->isActive && isset($this->indices[$table])) {
       foreach ($this->indices[$table] as $fields) {
         $name = self::IDX_PREFIX . md5($table . '::' . implode(',', $fields));

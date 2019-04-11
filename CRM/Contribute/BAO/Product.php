@@ -34,8 +34,9 @@ class CRM_Contribute_BAO_Product extends CRM_Contribute_DAO_Product {
 
   /**
    * Static holder for the default LT.
+   * @var int
    */
-  static $_defaultContributionType = NULL;
+  public static $_defaultContributionType = NULL;
 
   /**
    * Class constructor.

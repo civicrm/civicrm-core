@@ -44,6 +44,7 @@ class CRM_Core_Form_Task_Batch extends CRM_Core_Form_Task {
 
   /**
    * Maximum profile fields that will be displayed.
+   * @var int
    */
   protected $_maxFields = 9;
 
@@ -52,10 +53,16 @@ class CRM_Core_Form_Task_Batch extends CRM_Core_Form_Task {
    */
   protected $_fields;
 
-  // Must be set to entity table name (eg. civicrm_participant) by child class
-  static $tableName = NULL;
-  // Must be set to entity shortname (eg. event)
-  static $entityShortname = NULL;
+  /**
+   * Must be set to entity table name (eg. civicrm_participant) by child class
+   * @var string
+   */
+  public static $tableName = NULL;
+  /**
+   * Must be set to entity shortname (eg. event)
+   * @var string
+   */
+  public static $entityShortname = NULL;
 
   /**
    * Build all the data structures needed to build the form.

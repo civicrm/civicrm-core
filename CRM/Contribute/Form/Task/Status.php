@@ -155,17 +155,16 @@ AND    co.id IN ( $contribIDs )";
     $this->assign_by_ref('rows', $this->_rows);
     $this->setDefaults($defaults);
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Update Pending Status'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'back',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Update Pending Status'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'back',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
     $this->addFormRule(['CRM_Contribute_Form_Task_Status', 'formRule']);
   }
@@ -292,7 +291,7 @@ AND    co.id IN ( $contribIDs )";
       else {
         $input['trxn_id'] = $contribution->invoice_id;
       }
-      $input['trxn_date'] = $params["trxn_date_{$row['contribution_id']}"] . ' ' .  date('H:i:s');
+      $input['trxn_date'] = $params["trxn_date_{$row['contribution_id']}"] . ' ' . date('H:i:s');
 
       // @todo calling baseIPN like this is a pattern in it's last gasps. Call contribute.completetransaction api.
       $baseIPN->completeTransaction($input, $ids, $objects, $transaction, FALSE);

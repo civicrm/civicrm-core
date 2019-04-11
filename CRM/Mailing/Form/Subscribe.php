@@ -154,17 +154,16 @@ ORDER BY title";
     }
 
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Subscribe'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Subscribe'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**

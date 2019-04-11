@@ -314,7 +314,7 @@ SELECT  survey.id    as id,
    * @param string $returnColumn
    * @param bool $includePetitionActivityType
    *
-   * @return string
+   * @return mixed
    */
   public static function getSurveyActivityType($returnColumn = 'label', $includePetitionActivityType = FALSE) {
     static $activityTypes;

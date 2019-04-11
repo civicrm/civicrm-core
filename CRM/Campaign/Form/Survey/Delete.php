@@ -50,7 +50,6 @@ class CRM_Campaign_Form_Survey_Delete extends CRM_Core_Form {
    */
   protected $_surveyTitle;
 
-
   /**
    * Set variables up before form is built.
    */

@@ -85,13 +85,13 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   protected $_noteId = NULL;
 
   /**
-   * @deprecated
    *
    * Use parent $this->contactID
    *
    * The id of the contact associated with this participation.
    *
    * @var int
+   * @deprecated
    */
   public $_contactId;
 
@@ -112,52 +112,61 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
   /**
    * If event is paid or unpaid.
+   * @var bool
    */
   public $_isPaidEvent;
 
   /**
    * Page action.
+   * @var int
    */
   public $_action;
 
   /**
    * Role Id.
+   * @var int
    */
   protected $_roleId = NULL;
 
   /**
    * Event Type Id.
+   * @var int
    */
   protected $_eventTypeId = NULL;
 
   /**
    * Participant status Id.
+   * @var int
    */
   protected $_statusId = NULL;
 
   /**
    * Cache all the participant statuses.
+   * @var array
    */
   protected $_participantStatuses;
 
   /**
    * Participant mode.
+   * @var string
    */
   public $_mode = NULL;
 
   /**
    * Event ID preselect.
+   * @var int
    */
   public $_eID = NULL;
 
   /**
    * Line Item for Price Set.
+   * @var array
    */
   public $_lineItem = NULL;
 
   /**
    * Contribution mode for event registration for offline mode.
-   *
+   * @var string
    * @deprecated
    */
   public $_contributeMode = 'direct';
@@ -166,32 +175,37 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
 
   /**
    * Store id of role custom data type ( option value )
+   * @var int
    */
   protected $_roleCustomDataTypeID;
 
   /**
    * Store id of event Name custom data type ( option value)
+   * @var int
    */
   protected $_eventNameCustomDataTypeID;
 
   /**
    * Selected discount id.
+   * @var int
    */
   public $_originalDiscountId = NULL;
 
   /**
    * Event id.
+   * @var int
    */
   public $_eventId = NULL;
 
   /**
    * Id of payment, if any
+   * @var int
    */
   public $_paymentId = NULL;
 
   /**
-   * @todo add explanatory note about this
    * @var null
+   * @todo add explanatory note about this
    */
   public $_onlinePendingContributionId = NULL;
 
@@ -612,26 +626,25 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
       }
       $this->addButtons([
-          [
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-            'isDefault' => TRUE,
-          ],
-          [
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ],
-        ]
-      );
+        [
+          'type' => 'next',
+          'name' => ts('Delete'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
       return;
     }
 
     if ($this->_single && $this->_context == 'standalone') {
       $this->addEntityRef('contact_id', ts('Contact'), [
-          'create' => TRUE,
-          'api' => ['extra' => ['email']],
-        ], TRUE);
+        'create' => TRUE,
+        'api' => ['extra' => ['email']],
+      ], TRUE);
     }
 
     $eventFieldParams = [
@@ -726,9 +739,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
     }
 
     $this->addSelect('status_id', $checkCancelledJs + [
-        'options' => $statusOptions,
-        'option_url' => 'civicrm/admin/participant_status',
-      ], TRUE);
+      'options' => $statusOptions,
+      'option_url' => 'civicrm/admin/participant_status',
+    ], TRUE);
 
     $this->addElement('checkbox', 'is_notify', ts('Send Notification'), NULL);
 
@@ -1127,9 +1140,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       // set source if not set
       if (empty($params['source'])) {
         $this->_params['participant_source'] = ts('Offline Registration for Event: %2 by: %1', [
-            1 => $userName,
-            2 => $eventTitle,
-          ]);
+          1 => $userName,
+          2 => $eventTitle,
+        ]);
       }
       else {
         $this->_params['participant_source'] = $params['source'];
@@ -1360,9 +1373,9 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         if (!$this->_onlinePendingContributionId) {
           if (empty($params['source'])) {
             $contributionParams['source'] = ts('%1 : Offline registration (by %2)', [
-                1 => $eventTitle,
-                2 => $userName,
-              ]);
+              1 => $eventTitle,
+              2 => $userName,
+            ]);
           }
           else {
             $contributionParams['source'] = $params['source'];

@@ -37,21 +37,21 @@ class CRM_Core_OptionValue {
    *
    * @var array
    */
-  static $_exportableFields = NULL;
+  public static $_exportableFields = NULL;
 
   /**
    * Static field for all the option value information that we can potentially export.
    *
    * @var array
    */
-  static $_importableFields = NULL;
+  public static $_importableFields = NULL;
 
   /**
    * Static field for all the option value information that we can potentially export.
    *
    * @var array
    */
-  static $_fields = NULL;
+  public static $_fields = NULL;
 
   /**
    * Return option-values of a particular group

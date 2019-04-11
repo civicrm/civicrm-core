@@ -31,6 +31,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
+
   /**
    * @return string
    * @throws Exception

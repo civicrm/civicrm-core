@@ -60,17 +60,17 @@ class CRM_Mailing_MailStore_Pop3 extends CRM_Mailing_MailStore {
     $this->_transport->authenticate($username, $password);
 
     $this->_ignored = $this->maildir(implode(DIRECTORY_SEPARATOR, [
-          'CiviMail.ignored',
-          date('Y'),
-          date('m'),
-          date('d'),
-        ]));
+      'CiviMail.ignored',
+      date('Y'),
+      date('m'),
+      date('d'),
+    ]));
     $this->_processed = $this->maildir(implode(DIRECTORY_SEPARATOR, [
-          'CiviMail.processed',
-          date('Y'),
-          date('m'),
-          date('d'),
-        ]));
+      'CiviMail.processed',
+      date('Y'),
+      date('m'),
+      date('d'),
+    ]));
   }
 
   /**

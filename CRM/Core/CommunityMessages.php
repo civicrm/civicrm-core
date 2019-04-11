@@ -36,7 +36,8 @@ class CRM_Core_CommunityMessages {
   /**
    * Default time to wait before retrying.
    */
-  const DEFAULT_RETRY = 7200; // 2 hours
+  // 2 hours
+  const DEFAULT_RETRY = 7200;
 
   /**
    * @var CRM_Utils_HttpClient
@@ -96,7 +97,8 @@ class CRM_Core_CommunityMessages {
     if (empty($document) || !is_array($document)) {
       $document = [
         'messages' => [],
-        'expires' => 0, // ASAP
+        // ASAP
+        'expires' => 0,
         'ttl' => self::DEFAULT_RETRY,
         'retry' => self::DEFAULT_RETRY,
       ];

@@ -40,7 +40,7 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
    * Activity type
    * @var array
    */
-  static $activityTypeList = [];
+  public static $activityTypeList = [];
 
   /**
    * Get all the case statues.

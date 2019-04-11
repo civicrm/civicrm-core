@@ -70,7 +70,8 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
         $realSeparator = "<br />";
       }
     }
-    $separator = '****~~~~';// a placeholder in case the separator is common in the string - e.g ', '
+    // a placeholder in case the separator is common in the string - e.g ', '
+    $separator = '****~~~~';
     $groupBy = $formValues['group_by'];
 
     // skip some contacts ?

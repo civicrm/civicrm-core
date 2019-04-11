@@ -38,7 +38,10 @@
  */
 class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
 
-  // permission mapping to stub check() calls
+  /**
+   * permission mapping to stub check() calls
+   * @var array
+   */
   public $permissions = NULL;
 
   /**

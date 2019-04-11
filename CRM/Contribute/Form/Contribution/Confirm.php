@@ -455,10 +455,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       // no on behalf of an organization, CRM-5519
       // so reset loc blocks from main params.
       foreach ([
-                 'phone',
-                 'email',
-                 'address',
-               ] as $blk) {
+        'phone',
+        'email',
+        'address',
+      ] as $blk) {
         if (isset($this->_params[$blk])) {
           unset($this->_params[$blk]);
         }
@@ -606,24 +606,22 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->getPaymentProcessorObject()->getText('contributionPageContinueText', [
         'is_payment_to_existing' => !empty($this->_ccid),
         'amount' => $this->_amount,
-        ]
-      )
+      ])
     );
 
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => $contribButton,
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-          'js' => ['onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"],
-        ],
-        [
-          'type' => 'back',
-          'name' => ts('Go Back'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => $contribButton,
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+        'js' => ['onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"],
+      ],
+      [
+        'type' => 'back',
+        'name' => ts('Go Back'),
+      ],
+    ]);
 
     $defaults = [];
     $fields = array_fill_keys(array_keys($this->_fields), 1);
@@ -635,9 +633,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       if (isset($contact[$name]) && is_array($contact[$name]) && ($name == 'onbehalf' || $name == 'honor')) {
         foreach ($contact[$name] as $fieldName => $fieldValue) {
           if (is_array($fieldValue) && !in_array($this->_fields[$name][$fieldName]['html_type'], [
-              'Multi-Select',
-              'AdvMulti-Select',
-            ])
+            'Multi-Select',
+            'AdvMulti-Select',
+          ])
           ) {
             foreach ($fieldValue as $key => $value) {
               $defaults["{$name}[{$fieldName}][{$key}]"] = $value;
@@ -660,10 +658,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           }
         }
         elseif (in_array($name, [
-            'addressee',
-            'email_greeting',
-            'postal_greeting',
-          ]) && !empty($contact[$name . '_custom'])
+          'addressee',
+          'email_greeting',
+          'postal_greeting',
+        ]) && !empty($contact[$name . '_custom'])
         ) {
           $defaults[$name . '_custom'] = $contact[$name . '_custom'];
         }
@@ -1333,11 +1331,11 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $params['pcp_is_anonymous'] = 0;
     }
     foreach ([
-               'pcp_display_in_roll',
-               'pcp_is_anonymous',
-               'pcp_roll_nickname',
-               'pcp_personal_note',
-             ] as $val) {
+      'pcp_display_in_roll',
+      'pcp_is_anonymous',
+      'pcp_roll_nickname',
+      'pcp_personal_note',
+    ] as $val) {
       if (!empty($params[$val])) {
         $page->assign($val, $params[$val]);
       }

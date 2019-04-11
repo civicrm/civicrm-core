@@ -46,6 +46,7 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
 
   /**
    * Component clause.
+   * @var string
    */
   public $_componentClause;
 

@@ -33,6 +33,7 @@
  *
  */
 class CRM_Event_Form_Task_ParticipantStatus extends CRM_Event_Form_Task_Batch {
+
   public function buildQuickForm() {
     // CRM_Event_Form_Task_Batch::buildQuickForm() gets ufGroupId
     // from the form, so set it here to the id of the reserved profile

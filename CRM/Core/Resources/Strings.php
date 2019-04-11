@@ -67,7 +67,8 @@ class CRM_Core_Resources_Strings {
    *   List of translatable strings.
    */
   public function get($bucket, $file, $format) {
-    $stringsByFile = $this->cache->get($bucket); // array($file => array(...strings...))
+    // array($file => array(...strings...))
+    $stringsByFile = $this->cache->get($bucket);
     if (!$stringsByFile) {
       $stringsByFile = [];
     }

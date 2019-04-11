@@ -22,7 +22,7 @@
  * safe to temporarily switch to exception
  */
 class CRM_Core_TemporaryErrorScope {
-  static $oldFrames;
+  public static $oldFrames;
 
   /**
    * @return CRM_Core_TemporaryErrorScope

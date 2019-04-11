@@ -51,7 +51,7 @@ class CRM_Core_Page_AJAX_Location {
 
     // Verify user id
     $user = CRM_Utils_Request::retrieve('uid', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, CRM_Core_Session::singleton()
-        ->get('userID'));
+      ->get('userID'));
     if (empty($user) || (CRM_Utils_Request::retrieve('cs', 'String', $form, FALSE) && !CRM_Contact_BAO_Contact_Permission::validateChecksumContact($user, CRM_Core_DAO::$_nullObject, FALSE))
     ) {
       CRM_Utils_System::civiExit();
@@ -227,10 +227,9 @@ class CRM_Core_Page_AJAX_Location {
     // lets output only required fields.
     foreach ($addressOptions as $element => $isSet) {
       if ($isSet && (!in_array($element, [
-          'im',
-          'openid',
-        ]))
-      ) {
+        'im',
+        'openid',
+      ]))) {
         if (in_array($element, [
           'country',
           'state_province',
@@ -253,10 +252,10 @@ class CRM_Core_Page_AJAX_Location {
     }
 
     foreach ([
-               'email',
-               'phone_type_id',
-               'phone',
-             ] as $element) {
+      'email',
+      'phone_type_id',
+      'phone',
+    ] as $element) {
       $block = ($element == 'phone_type_id') ? 'phone' : $element;
       for ($i = 1; $i < 3; $i++) {
         $fld = "{$block}[{$i}][{$element}]";

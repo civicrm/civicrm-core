@@ -716,7 +716,7 @@ ORDER BY civicrm_custom_group.weight,
    * @return string
    *   SQL condition.
    */
-  static private function whereListHas($column, $value, $delimiter = CRM_Core_DAO::VALUE_SEPARATOR) {
+  private static function whereListHas($column, $value, $delimiter = CRM_Core_DAO::VALUE_SEPARATOR) {
     // ?
     $bareValue = trim($value, $delimiter);
     $escapedValue = CRM_Utils_Type::escape("%{$delimiter}{$bareValue}{$delimiter}%", 'String', FALSE);
@@ -736,7 +736,7 @@ ORDER BY civicrm_custom_group.weight,
    * @return bool
    *   does this entity have data in this custom table
    */
-  static public function customGroupDataExistsForEntity($entityID, $table, $getCount = FALSE) {
+  public static function customGroupDataExistsForEntity($entityID, $table, $getCount = FALSE) {
     $query = "
       SELECT count(id)
       FROM   $table
@@ -765,7 +765,7 @@ ORDER BY civicrm_custom_group.weight,
    * @param array $singleFieldTablesWithEntityData
    *   Array of tables in which this entity has data.
    */
-  static public function buildEntityTreeSingleFields(&$groupTree, $entityID, $entitySingleSelectClauses, $singleFieldTablesWithEntityData) {
+  public static function buildEntityTreeSingleFields(&$groupTree, $entityID, $entitySingleSelectClauses, $singleFieldTablesWithEntityData) {
     $select = implode(', ', $entitySingleSelectClauses);
     $fromSQL = " (SELECT $entityID as entity_id ) as first ";
     foreach ($singleFieldTablesWithEntityData as $table) {
@@ -796,7 +796,7 @@ ORDER BY civicrm_custom_group.weight,
    * @param string|int $singleRecord
    *   holds 'new' or id if view/edit/copy form for a single record is being loaded.
    */
-  static public function buildEntityTreeMultipleFields(&$groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData, $singleRecord = NULL) {
+  public static function buildEntityTreeMultipleFields(&$groupTree, $entityID, $entityMultipleSelectClauses, $multipleFieldTablesWithEntityData, $singleRecord = NULL) {
     foreach ($entityMultipleSelectClauses as $table => $selectClauses) {
       $select = implode(',', $selectClauses);
       $query = "
@@ -827,7 +827,7 @@ ORDER BY civicrm_custom_group.weight,
    * @param string|int $singleRecord
    *   holds 'new' OR id if view/edit/copy form for a single record is being loaded.
    */
-  static public function buildTreeEntityDataFromQuery(&$groupTree, $query, $includedTables, $singleRecord = NULL) {
+  public static function buildTreeEntityDataFromQuery(&$groupTree, $query, $includedTables, $singleRecord = NULL) {
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       foreach ($groupTree as $groupID => $group) {
@@ -864,7 +864,7 @@ ORDER BY civicrm_custom_group.weight,
    * @param string|int $singleRecord
    *   holds 'new' or id if loading view/edit/copy for a single record.
    */
-  static public function buildCustomFieldData($dao, &$groupTree, $table, $groupID, $fieldID, $singleRecord = NULL) {
+  public static function buildCustomFieldData($dao, &$groupTree, $table, $groupID, $fieldID, $singleRecord = NULL) {
     $column = $groupTree[$groupID]['fields'][$fieldID]['column_name'];
     $idName = "{$table}_id";
     $fieldName = "{$table}_{$column}";

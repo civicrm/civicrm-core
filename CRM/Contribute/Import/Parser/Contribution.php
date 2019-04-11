@@ -48,7 +48,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
   /**
    * Array of successfully imported contribution id's
    *
-   * @array
+   * @var array
    */
   protected $_newContributions;
 

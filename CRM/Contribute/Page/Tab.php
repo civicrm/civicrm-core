@@ -37,8 +37,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
    *
    * @var array
    */
-  static $_links = NULL;
-  static $_recurLinks = NULL;
+  public static $_links = NULL;
+  public static $_recurLinks = NULL;
   public $_permission = NULL;
   public $_contactId = NULL;
   public $_crid = NULL;
@@ -157,7 +157,8 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
         $softCreditTotals['cancel']['count'],
         $softCreditTotals['amount'],
         $softCreditTotals['avg'],
-        $softCreditTotals['cancel']['amount'] // to get cancel amount
+        // to get cancel amount
+        $softCreditTotals['cancel']['amount']
         ) = CRM_Contribute_BAO_ContributionSoft::getSoftContributionTotals($this->_contactId, $isTest);
 
       $this->assign('softCredit', TRUE);
@@ -338,9 +339,9 @@ class CRM_Contribute_Page_Tab extends CRM_Core_Page {
       $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this, empty($this->_id));
       if (empty($this->_contactId)) {
         $this->_contactId = civicrm_api3('contribution', 'getvalue', [
-            'id' => $this->_id,
-            'return' => 'contact_id',
-          ]);
+          'id' => $this->_id,
+          'return' => 'contact_id',
+        ]);
       }
       $this->assign('contactId', $this->_contactId);
 

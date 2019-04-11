@@ -25,7 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\ActionSchedule\RecipientBuilder;
 
 /**
  * Class CRM_Contribute_ActionMapping_ByType

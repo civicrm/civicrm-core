@@ -35,7 +35,7 @@
  * BAO object for crm_log table
  */
 class CRM_Core_BAO_Log extends CRM_Core_DAO_Log {
-  static $_processed = NULL;
+  public static $_processed = NULL;
 
   /**
    * @param int $id

@@ -35,6 +35,7 @@
  * Helper class to build navigation links.
  */
 class CRM_Contribute_Form_ContributionPage_TabHeader {
+
   /**
    * @param CRM_Core_Form $form
    *

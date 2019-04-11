@@ -106,8 +106,8 @@ class CRM_Case_Page_AJAX {
     $case = civicrm_api3('Case', 'getsingle', [
       'id' => $caseId,
       'check_permissions' => TRUE,
-      'return' => ['subject', 'case_type_id', 'status_id', 'start_date', 'end_date']]
-    );
+      'return' => ['subject', 'case_type_id', 'status_id', 'start_date', 'end_date'],
+    ]);
 
     $caseStatuses = CRM_Case_PseudoConstant::caseStatus();
     $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);

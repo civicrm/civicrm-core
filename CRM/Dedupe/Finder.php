@@ -331,7 +331,7 @@ class CRM_Dedupe_Finder {
    * @param array $foundDupes
    * @param string $cacheKeyString
    *
-   * @return array Dupe pairs with the keys
+   * @return array
    *   Dupe pairs with the keys
    *   -srcID
    *   -srcName

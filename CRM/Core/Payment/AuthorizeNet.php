@@ -355,8 +355,10 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    * @return array
    */
   public function _getAuthorizeNetFields() {
-    $amount = $this->_getParam('total_amount');//Total amount is from the form contribution field
-    if (empty($amount)) {//CRM-9894 would this ever be the case??
+    //Total amount is from the form contribution field
+    $amount = $this->_getParam('total_amount');
+    //CRM-9894 would this ever be the case??
+    if (empty($amount)) {
       $amount = $this->_getParam('amount');
     }
     $fields = [];
@@ -728,7 +730,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
   /**
    * Process incoming notification.
    */
-  static public function handlePaymentNotification() {
+  public static function handlePaymentNotification() {
     $ipnClass = new CRM_Core_Payment_AuthorizeNetIPN(array_merge($_GET, $_REQUEST));
     $ipnClass->main();
   }

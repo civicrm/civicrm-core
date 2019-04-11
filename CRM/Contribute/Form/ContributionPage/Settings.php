@@ -213,11 +213,11 @@ class CRM_Contribute_Form_ContributionPage_Settings extends CRM_Contribute_Form_
     ];
 
     $allowCoreTypes = array_merge([
-        'Contact',
-        'Individual',
-        'Organization',
-        'Household',
-      ], CRM_Contact_BAO_ContactType::subTypes('Individual'));
+      'Contact',
+      'Individual',
+      'Organization',
+      'Household',
+    ], CRM_Contact_BAO_ContactType::subTypes('Individual'));
     $allowSubTypes = [];
 
     $this->addProfileSelector('honoree_profile', ts('Honoree Profile'), $allowCoreTypes, $allowSubTypes, $entities);

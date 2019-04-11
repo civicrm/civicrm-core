@@ -34,7 +34,7 @@ class CRM_Core_PrevNextCache_Sql implements CRM_Core_PrevNextCache_Interface {
 
   /**
    * Store the results of a SQL query in the cache.
-   *
+   * @param string $cacheKey
    * @param string $sql
    *   A SQL query. The query *MUST* be a SELECT statement which yields
    *   the following columns (in order): cacheKey, entity_id1, data
@@ -66,7 +66,7 @@ INSERT INTO civicrm_prevnext_cache (cacheKey, entity_id1, data)
       ->columns([
         'entity_id1',
         'cacheKey',
-        'data'
+        'data',
       ]);
 
     foreach ($rows as &$row) {

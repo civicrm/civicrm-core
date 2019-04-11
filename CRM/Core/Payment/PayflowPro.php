@@ -44,6 +44,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * the processor. It is the main function for processing on-server
    * credit card transactions
    */
+
   /**
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
@@ -362,7 +363,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     }
     return $e;
   }
-
 
   /**
    * NOTE: 'doTransferCheckout' not implemented

@@ -4,6 +4,7 @@
  * Generate configuration files
  */
 class CRM_Core_CodeGen_Config extends CRM_Core_CodeGen_BaseTask {
+
   public function run() {
     $this->setupCms();
   }

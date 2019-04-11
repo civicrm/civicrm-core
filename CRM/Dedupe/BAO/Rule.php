@@ -41,13 +41,15 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
 
   /**
    * Ids of the contacts to limit the SQL queries (whole-database queries otherwise)
+   * @var array
    */
-  var $contactIds = [];
+  public $contactIds = [];
 
   /**
    * Params to dedupe against (queries against the whole contact set otherwise)
+   * @var array
    */
-  var $params = [];
+  public $params = [];
 
   /**
    * Return the SQL query for the given rule - either for finding matching
@@ -78,7 +80,7 @@ class CRM_Dedupe_BAO_Rule extends CRM_Dedupe_DAO_Rule {
     $innerJoinClauses = [
       "t1.{$this->rule_field} IS NOT NULL",
       "t2.{$this->rule_field} IS NOT NULL",
-      "t1.{$this->rule_field} = t2.{$this->rule_field}"
+      "t1.{$this->rule_field} = t2.{$this->rule_field}",
     ];
     if ($fields[$this->rule_field]['type'] === CRM_Utils_Type::T_DATE) {
       $innerJoinClauses[] = "t1.{$this->rule_field} > '1000-01-01'";

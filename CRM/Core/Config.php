@@ -138,7 +138,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @return object
    * @see Civi::log()
    */
-  static public function &getLog() {
+  public static function &getLog() {
     if (!isset(self::$_log)) {
       self::$_log = Log::singleton('display');
     }
@@ -181,11 +181,11 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
     // Whether we delete/create or simply preserve directories, we should
     // certainly make sure the restrictions are enforced.
     foreach ([
-               $this->templateCompileDir,
-               $this->uploadDir,
-               $this->configAndLogDir,
-               $this->customFileUploadDir,
-             ] as $dir) {
+      $this->templateCompileDir,
+      $this->uploadDir,
+      $this->configAndLogDir,
+      $this->customFileUploadDir,
+    ] as $dir) {
       if ($dir && is_dir($dir)) {
         CRM_Utils_File::restrictAccess($dir);
       }
@@ -576,7 +576,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
   /**
    * Is the system permitted to flush caches at the moment.
    */
-  static public function isPermitCacheFlushMode() {
+  public static function isPermitCacheFlushMode() {
     return !CRM_Core_Config::singleton()->doNotResetCache;
   }
 
@@ -589,7 +589,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @param bool $enabled
    *   If true then caches can be cleared at this time.
    */
-  static public function setPermitCacheFlushMode($enabled) {
+  public static function setPermitCacheFlushMode($enabled) {
     CRM_Core_Config::singleton()->doNotResetCache = $enabled ? 0 : 1;
   }
 

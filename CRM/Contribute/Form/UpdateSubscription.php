@@ -215,17 +215,16 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
 
     // define the buttons
     $this->addButtons([
-        [
-          'type' => $type,
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => $type,
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
@@ -290,9 +289,9 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
 
       if ($this->_subscriptionDetails->installments != $params['installments']) {
         $message .= "<br /> " . ts("Recurring contribution installments have been updated from %1 to %2 for this subscription.", [
-              1 => $this->_subscriptionDetails->installments,
-              2 => $params['installments'],
-            ]) . ' ';
+          1 => $this->_subscriptionDetails->installments,
+          2 => $params['installments'],
+        ]) . ' ';
       }
 
       $activityParams = [

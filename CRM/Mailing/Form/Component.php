@@ -65,9 +65,9 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
       CRM_Core_DAO::getAttribute('CRM_Mailing_BAO_MailingComponent', 'name'), TRUE
     );
     $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', [
-        'CRM_Mailing_BAO_MailingComponent',
-        $this->_id,
-      ]);
+      'CRM_Mailing_BAO_MailingComponent',
+      $this->_id,
+    ]);
 
     $this->add('select', 'component_type', ts('Component Type'), CRM_Core_SelectValues::mailingComponents());
 
@@ -89,17 +89,16 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     $this->addFormRule(['CRM_Mailing_Form_Component', 'dataRule']);
 
     $this->addButtons([
-        [
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'next',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
@@ -134,9 +133,8 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
 
     $component = CRM_Mailing_BAO_MailingComponent::add($params);
     CRM_Core_Session::setStatus(ts('The mailing component \'%1\' has been saved.', [
-        1 => $component->name,
-      ]
-    ), ts('Saved'), 'success');
+      1 => $component->name,
+    ]), ts('Saved'), 'success');
 
   }
 
@@ -161,24 +159,24 @@ class CRM_Mailing_Form_Component extends CRM_Core_Form {
     }
     $errors = [];
     foreach ([
-               'text',
-               'html',
-             ] as $type) {
+      'text',
+      'html',
+    ] as $type) {
       $dataErrors = [];
       foreach ($InvalidTokens as $token => $desc) {
         if ($params['body_' . $type]) {
           if (preg_match('/' . preg_quote('{' . $token . '}') . '/', $params['body_' . $type])) {
             $dataErrors[] = '<li>' . ts('This message is having a invalid token - %1: %2', [
-                1 => $token,
-                2 => $desc,
-              ]) . '</li>';
+              1 => $token,
+              2 => $desc,
+            ]) . '</li>';
           }
         }
       }
       if (!empty($dataErrors)) {
         $errors['body_' . $type] = ts('The following errors were detected in %1 message:', [
-            1 => $type,
-          ]) . '<ul>' . implode('', $dataErrors) . '</ul><br /><a href="' . CRM_Utils_System::docURL2('Tokens', TRUE, NULL, NULL, NULL, "wiki") . '">' . ts('More information on tokens...') . '</a>';
+          1 => $type,
+        ]) . '<ul>' . implode('', $dataErrors) . '</ul><br /><a href="' . CRM_Utils_System::docURL2('Tokens', TRUE, NULL, NULL, NULL, "wiki") . '">' . ts('More information on tokens...') . '</a>';
       }
     }
     return empty($errors) ? TRUE : $errors;

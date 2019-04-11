@@ -37,8 +37,9 @@
 class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProcessor {
   /**
    * Static holder for the default payment processor
+   * @var object
    */
-  static $_defaultPaymentProcessor = NULL;
+  public static $_defaultPaymentProcessor = NULL;
 
   /**
    * Create Payment Processor.

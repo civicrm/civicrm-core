@@ -36,7 +36,7 @@
  */
 class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
 
-  static $_links = NULL;
+  public static $_links = NULL;
   public $_permission = NULL;
   public $_contactId = NULL;
   public $_id = NULL;

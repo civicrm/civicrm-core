@@ -40,7 +40,7 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * The account id that we need to display for the browse screen.
@@ -94,7 +94,8 @@ class CRM_Financial_Page_FinancialTypeAccount extends CRM_Core_Page {
    */
   public function run() {
     // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse'); // default to 'browse'
+    // default to 'browse'
+    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
 
     // assign vars to templates
     $this->assign('action', $action);

@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2019
  */
-
 trait CRM_Core_Form_EntityFormTrait {
 
   /**
@@ -134,27 +133,25 @@ trait CRM_Core_Form_EntityFormTrait {
   protected function addFormButtons() {
     if ($this->isViewContext() || $this->_action & CRM_Core_Action::PREVIEW) {
       $this->addButtons([
-          [
-            'type' => 'cancel',
-            'name' => ts('Done'),
-            'isDefault' => TRUE,
-          ],
-        ]
-      );
+        [
+          'type' => 'cancel',
+          'name' => ts('Done'),
+          'isDefault' => TRUE,
+        ],
+      ]);
     }
     else {
       $this->addButtons([
-          [
-            'type' => 'next',
-            'name' => $this->isDeleteContext() ? ts('Delete') : ts('Save'),
-            'isDefault' => TRUE,
-          ],
-          [
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ],
-        ]
-      );
+        [
+          'type' => 'next',
+          'name' => $this->isDeleteContext() ? ts('Delete') : ts('Save'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
     }
   }
 
@@ -165,8 +162,7 @@ trait CRM_Core_Form_EntityFormTrait {
     $defaults = $moneyFields = [];
 
     if (!$this->isDeleteContext() &&
-      $this->getEntityId()
-    ) {
+      $this->getEntityId()) {
       $params = ['id' => $this->getEntityId()];
       $baoName = $this->_BAOName;
       $baoName::retrieve($params, $defaults);

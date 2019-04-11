@@ -41,20 +41,20 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    */
-  static $_columnHeaders;
+  public static $_columnHeaders;
 
   /**
    * Properties of contact we're interested in displaying
    * @var array
    */
-  static $_properties = [
+  public static $_properties = [
     'contact_id',
     'contact_type',
     'sort_name',
@@ -180,7 +180,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @return array
    */
-  static public function &links($isDeleted = FALSE, $key = NULL) {
+  public static function &links($isDeleted = FALSE, $key = NULL) {
     $extraParams = ($key) ? "&key={$key}" : NULL;
 
     if ($isDeleted) {

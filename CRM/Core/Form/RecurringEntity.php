@@ -38,36 +38,43 @@
 class CRM_Core_Form_RecurringEntity {
   /**
    *  Current entity id
+   * @var int
    */
   protected static $_entityId = NULL;
 
   /**
    * Schedule Reminder ID
+   * @var int
    */
   protected static $_scheduleReminderID = NULL;
 
   /**
    * Schedule Reminder data
+   * @var array
    */
   protected static $_scheduleReminderDetails = [];
 
   /**
    *  Parent Entity ID
+   * @var int
    */
   protected static $_parentEntityId = NULL;
 
   /**
    * Exclude date information
+   * @var array
    */
   public static $_excludeDateInfo = [];
 
   /**
    * Entity Table
+   * @var string
    */
   public static $_entityTable;
 
   /**
    * Checks current entityID has parent
+   * @var string
    */
   public static $_hasParent = FALSE;
 
@@ -219,17 +226,16 @@ class CRM_Core_Form_RecurringEntity {
     $form->add('text', 'exclude_date_list', ts('Exclude Dates'), ['class' => 'twenty']);
     $form->addElement('hidden', 'allowRepeatConfigToSubmit', '', ['id' => 'allowRepeatConfigToSubmit']);
     $form->addButtons([
-        [
-          'type' => 'submit',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ],
-        [
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ],
-      ]
-    );
+      [
+        'type' => 'submit',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
     // For client-side pluralization
     $form->assign('recurringFrequencyOptions', [
       'single' => CRM_Utils_Array::makeNonAssociative(CRM_Core_SelectValues::getRecurringFrequencyUnits()),

@@ -51,7 +51,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   /**
    * @var array ($cacheKey => $cacheValue)
    */
-  static $_cache = NULL;
+  public static $_cache = NULL;
 
   /**
    * Retrieve an item from the DB cache.
@@ -359,6 +359,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @param bool $session
    * @param bool $table
    * @param bool $prevNext
+   * @param bool $expired
    */
   public static function cleanup($session = FALSE, $table = FALSE, $prevNext = FALSE, $expired = FALSE) {
     // clean up the session cache every $cacheCleanUpNumber probabilistically

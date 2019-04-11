@@ -44,7 +44,7 @@ class CRM_Grant_Page_Tab extends CRM_Contact_Page_View {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
   public $_permission = NULL;
   public $_contactId = NULL;
 

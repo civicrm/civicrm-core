@@ -43,6 +43,7 @@ require_once 'Log.php';
  * Class CRM_Exception
  */
 class CRM_Exception extends PEAR_Exception {
+
   /**
    * Redefine the exception so message isn't optional.
    *
@@ -94,6 +95,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
   /**
    * If modeException == true, errors are raised as exception instead of returning civicrm_errors
+   * @var bool
    */
   public static $modeException = NULL;
 
@@ -139,7 +141,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *
    * @return array|null|string
    */
-  static public function getMessages(&$error, $separator = '<br />') {
+  public static function getMessages(&$error, $separator = '<br />') {
     if (is_a($error, 'CRM_Core_Error')) {
       $errors = $error->getErrors();
       $message = [];
@@ -208,13 +210,15 @@ class CRM_Core_Error extends PEAR_ErrorStack {
           $link = $conn->connection;
           if (mysqli_error($link)) {
             $mysql_error = mysqli_error($link) . ', ' . mysqli_errno($link);
-            mysqli_query($link, 'select 1'); // execute a dummy query to clear error stack
+            // execute a dummy query to clear error stack
+            mysqli_query($link, 'select 1');
           }
         }
         elseif ($conn instanceof DB_mysql) {
           if (mysql_error()) {
             $mysql_error = mysql_error() . ', ' . mysql_errno();
-            mysql_query('select 1'); // execute a dummy query to clear error stack
+            // execute a dummy query to clear error stack
+            mysql_query('select 1');
           }
         }
         else {

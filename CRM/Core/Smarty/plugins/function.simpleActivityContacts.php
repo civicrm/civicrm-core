@@ -51,15 +51,15 @@ function smarty_function_simpleActivityContacts($params, &$smarty) {
   }
 
   foreach ([
-             'target',
-             'assignee',
-           ] as $role) {
+    'target',
+    'assignee',
+  ] as $role) {
     $contact = [];
     if (!empty($activity[$role . '_contact_id'])) {
       $contact_id = array_shift($activity[$role . '_contact_id']);
       $contact = civicrm_api('contact', 'getsingle', $baseContactParams + [
-          'contact_id' => $contact_id,
-        ]);
+        'contact_id' => $contact_id,
+      ]);
     }
     $smarty->assign($params[$role . '_var'], $contact);
   }

@@ -14,14 +14,15 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
 
   /**
    * Parent Event Start Date.
+   * @var string
    */
   protected $_parentEventStartDate = NULL;
 
   /**
    * Parent Event End Date.
+   * @var string
    */
   protected $_parentEventEndDate = NULL;
-
 
   public function preProcess() {
     parent::preProcess();
@@ -168,7 +169,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
    *
    * @return array
    */
-  static public function getParticipantCountforEvent($listOfRelatedEntities = []) {
+  public static function getParticipantCountforEvent($listOfRelatedEntities = []) {
     $participantDetails = [];
     if (!empty($listOfRelatedEntities)) {
       $implodeRelatedEntities = implode(',', array_map(function ($entity) {
@@ -195,7 +196,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
    * This function checks if there was any registration for related event ids,
    * and returns array of ids with no registrations
    *
-   * @param string or int or object... $eventID
+   * @param mixed $eventID string, int or object
    *
    * @return array
    */

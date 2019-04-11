@@ -468,10 +468,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $membershipIDs = CRM_Utils_Array::collect('id',
         CRM_Utils_Array::value('values',
           civicrm_api3("Membership", "get", [
-              "contact_id" => $otherID,
-              "return" => "id",
-            ]
-          )
+            "contact_id" => $otherID,
+            "return" => "id",
+          ])
         )
       );
 
@@ -817,15 +816,15 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $msg = '';
     if (!empty($stats['merged'])) {
       $msg = '<p>' . ts('One contact merged.', [
-          'count' => $stats['merged'],
-          'plural' => '%count contacts merged.',
-        ]) . '</p>';
+        'count' => $stats['merged'],
+        'plural' => '%count contacts merged.',
+      ]) . '</p>';
     }
     if (!empty($stats['skipped'])) {
       $msg .= '<p>' . ts('One contact was skipped.', [
-          'count' => $stats['skipped'],
-          'plural' => '%count contacts were skipped.',
-        ]) . '</p>';
+        'count' => $stats['skipped'],
+        'plural' => '%count contacts were skipped.',
+      ]) . '</p>';
     }
     return $msg;
   }
@@ -1039,7 +1038,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return bool
    */
-  static public function locationIsSame($mainAddress, $comparisonAddress) {
+  public static function locationIsSame($mainAddress, $comparisonAddress) {
     $keysToIgnore = [
       'id',
       'is_primary',
@@ -2037,7 +2036,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     ];
     $activity = civicrm_api3('activity', 'create', [
       'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ? CRM_Core_Session::getLoggedInContactID() :
-        $mainId,
+      $mainId,
       'subject' => ts('Contact ID %1 has been merged and deleted.', $params),
       'target_contact_id' => $mainId,
       'activity_type_id' => 'Contact Merged',
@@ -2049,7 +2048,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     ])) {
       civicrm_api3('activity', 'create', [
         'source_contact_id' => CRM_Core_Session::getLoggedInContactID() ? CRM_Core_Session::getLoggedInContactID() :
-          $otherId,
+        $otherId,
         'subject' => ts('Contact ID %1 has been merged into Contact ID %2 and deleted.', $params),
         'target_contact_id' => $otherId,
         'activity_type_id' => 'Contact Deleted by Merge',
@@ -2081,7 +2080,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Limit to searching for matches against this many contacts.
    *
    * @return array
-   *    Array of matches meeting the criteria.
+   *   Array of matches meeting the criteria.
    */
   public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $orderByClause = '', $includeConflicts = TRUE, $criteria = [], $checkPermissions = TRUE, $searchLimit = 0) {
     $where = self::getWhereString($isSelected);

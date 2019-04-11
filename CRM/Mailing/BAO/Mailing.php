@@ -41,6 +41,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
    * An array that holds the complete templates
    * including any headers or footers that need to be prepended
    * or appended to the body.
+   * @var array
    */
   private $preparedTemplates = NULL;
 
@@ -48,41 +49,49 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
    * An array that holds the complete templates
    * including any headers or footers that need to be prepended
    * or appended to the body.
+   * @var array
    */
   private $templates = NULL;
 
   /**
    * An array that holds the tokens that are specifically found in our text and html bodies.
+   * @var array
    */
   private $tokens = NULL;
 
   /**
    * An array that holds the tokens that are specifically found in our text and html bodies.
+   * @var array
    */
   private $flattenedTokens = NULL;
 
   /**
    * The header associated with this mailing.
+   * @var string
    */
   private $header = NULL;
 
   /**
    * The footer associated with this mailing.
+   * @var string
    */
   private $footer = NULL;
 
   /**
    * The HTML content of the message.
+   * @var string
    */
   private $html = NULL;
 
   /**
    * The text content of the message.
+   * @var string
    */
   private $text = NULL;
 
   /**
    * Cached BAO for the domain.
+   * @var int
    */
   private $_domain = NULL;
 
@@ -607,10 +616,10 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
       $this->preparedTemplates = [];
 
       foreach ([
-                 'html',
-                 'text',
-                 'subject',
-               ] as $key) {
+        'html',
+        'text',
+        'subject',
+      ] as $key) {
         if (!isset($templates[$key])) {
           continue;
         }
@@ -809,14 +818,13 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
   public function getTestRecipients($testParams) {
     if (!empty($testParams['test_group']) && array_key_exists($testParams['test_group'], CRM_Core_PseudoConstant::group())) {
       $contacts = civicrm_api('contact', 'get', [
-          'version' => 3,
-          'group' => $testParams['test_group'],
-          'return' => 'id',
-          'options' => [
-            'limit' => 100000000000,
-          ],
-        ]
-      );
+        'version' => 3,
+        'group' => $testParams['test_group'],
+        'return' => 'id',
+        'options' => [
+          'limit' => 100000000000,
+        ],
+      ]);
 
       foreach (array_keys($contacts['values']) as $groupContact) {
         $query = "
@@ -1742,7 +1750,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    *   'include' or 'exclude'.
    * @param string $entity
    *   'groups' or 'mailings'.
-   * @param array <int> $entityIds
+   * @param array $entityIds
    * @throws CiviCRM_API3_Exception
    */
   public static function replaceGroups($mailingId, $type, $entity, $entityIds) {
@@ -2176,7 +2184,8 @@ ORDER BY   civicrm_email.is_bulkmail DESC
           break;
 
         case 'opened':
-          $reportFilter .= "&distinct=0"; // do not use group by clause in report, because same report used for total and unique open
+          // do not use group by clause in report, because same report used for total and unique open
+          $reportFilter .= "&distinct=0";
         case 'opened_unique':
           $url = "mailing/opened";
           $searchFilter .= "&mailing_open_status=Y";
@@ -2957,7 +2966,7 @@ ORDER BY civicrm_mailing.name";
    *   Array of mailings for a contact
    *
    */
-  static public function getContactMailings(&$params) {
+  public static function getContactMailings(&$params) {
     $params['version'] = 3;
     $params['offset'] = ($params['page'] - 1) * $params['rp'];
     $params['limit'] = $params['rp'];
@@ -2976,7 +2985,7 @@ ORDER BY civicrm_mailing.name";
    *   count of mailings for a contact
    *
    */
-  static public function getContactMailingsCount(&$params) {
+  public static function getContactMailingsCount(&$params) {
     $params['version'] = 3;
     return civicrm_api('MailingContact', 'getcount', $params);
   }
@@ -2994,17 +3003,18 @@ ORDER BY civicrm_mailing.name";
     foreach ($fieldNames as $fieldName) {
       if ($fieldName == 'id') {
         $fieldPerms[$fieldName] = [
+          // OR
           [
             'access CiviMail',
             'schedule mailings',
             'approve mailings',
-            'create mailings',
-          ], // OR
+          ],
         ];
       }
       elseif (in_array($fieldName, ['scheduled_date', 'scheduled_id'])) {
         $fieldPerms[$fieldName] = [
-          ['access CiviMail', 'schedule mailings'], // OR
+          // OR
+          ['access CiviMail', 'schedule mailings'],
         ];
       }
       elseif (in_array($fieldName, [
@@ -3014,12 +3024,14 @@ ORDER BY civicrm_mailing.name";
         'approval_note',
       ])) {
         $fieldPerms[$fieldName] = [
-          ['access CiviMail', 'approve mailings'], // OR
+          // OR
+          ['access CiviMail', 'approve mailings'],
         ];
       }
       else {
         $fieldPerms[$fieldName] = [
-          ['access CiviMail', 'create mailings'], // OR
+          // OR
+          ['access CiviMail', 'create mailings'],
         ];
       }
     }
@@ -3048,9 +3060,9 @@ ORDER BY civicrm_mailing.name";
    */
   public static function getPublicViewUrl($id, $absolute = TRUE) {
     if ((civicrm_api3('Mailing', 'getvalue', [
-        'id' => $id,
-        'return' => 'visibility',
-      ])) === 'Public Pages') {
+      'id' => $id,
+      'return' => 'visibility',
+    ])) === 'Public Pages') {
       return CRM_Utils_System::url('civicrm/mailing/view', ['id' => $id], $absolute, NULL, TRUE, TRUE);
     }
   }

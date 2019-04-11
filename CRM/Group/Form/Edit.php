@@ -215,17 +215,16 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
   public function buildQuickForm() {
     if ($this->_action == CRM_Core_Action::DELETE) {
       $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete Group'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+        array(
+          'type' => 'next',
+          'name' => ts('Delete Group'),
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      ));
       return;
     }
 
@@ -274,17 +273,16 @@ class CRM_Group_Form_Edit extends CRM_Core_Form {
     CRM_Custom_Form_CustomData::buildQuickForm($this);
 
     $this->addButtons(array(
-        array(
-          'type' => 'upload',
-          'name' => ($this->_action == CRM_Core_Action::ADD) ? ts('Continue') : ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => 'upload',
+        'name' => ($this->_action == CRM_Core_Action::ADD) ? ts('Continue') : ts('Save'),
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
 
     $doParentCheck = FALSE;
     if (CRM_Core_Permission::isMultisiteEnabled()) {

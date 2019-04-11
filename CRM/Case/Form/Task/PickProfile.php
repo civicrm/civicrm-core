@@ -40,13 +40,13 @@ class CRM_Case_Form_Task_PickProfile extends CRM_Core_Form_Task_PickProfile {
    *
    * @var string
    */
-  static $tableName = 'civicrm_case';
+  public static $tableName = 'civicrm_case';
 
   /**
    * Must be set to entity shortname (eg. event)
    *
    * @var string
    */
-  static $entityShortname = 'case';
+  public static $entityShortname = 'case';
 
 }
