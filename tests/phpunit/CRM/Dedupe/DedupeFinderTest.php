@@ -90,6 +90,35 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test a custom rule with a non-default field.
+   */
+  public function testCustomRuleWithAddress() {
+    $this->setupForGroupDedupe();
+
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', array(
+      'contact_type' => 'Individual',
+      'threshold' => 10,
+      'used' => 'General',
+      'name' => 'TestRule',
+      'title' => 'TestRule',
+      'is_reserved' => 0,
+    ));
+    $rules = [];
+    foreach (array('postal_code') as $field) {
+      $rules[$field] = $this->callAPISuccess('Rule', 'create', [
+        'dedupe_rule_group_id' => $ruleGroup['id'],
+        'rule_table' => 'civicrm_address',
+        'rule_weight' => 10,
+        'rule_field' => $field,
+      ]);
+    }
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $this->assertEquals(count($foundDupes), 1);
+    CRM_Dedupe_Finder::dupes($ruleGroup['id']);
+
+  }
+
+  /**
    * Test the supervised dedupe rule against a group.
    *
    * @throws \Exception
@@ -225,6 +254,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'email' => 'robin@example.com',
         'contact_type' => 'Individual',
         'birth_date' => '2016-01-01',
+        'api.Address.create' => ['location_type_id' => 'Billing', 'postal_code' => '99999'],
       ),
       array(
         'first_name' => 'robin',
@@ -232,6 +262,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'email' => 'hood@example.com',
         'contact_type' => 'Individual',
         'birth_date' => '2016-01-01',
+        'api.Address.create' => ['location_type_id' => 'Billing', 'postal_code' => '99999'],
       ),
       array(
         'first_name' => 'robin',
