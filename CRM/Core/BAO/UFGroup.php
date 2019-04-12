@@ -1405,24 +1405,36 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
   public static function updateMultiRecordValuesWithLatest($gid, $cid, $fields, &$values) {
     $updated = FALSE;
     if (CRM_Core_BAO_UFField::checkMultiRecordFieldExists($gid)) {
-      // to make sure we get the latest record set the limit 1 and order by id desc
-      $DTparams = array(
-        'rowCount' => 1,
-        'offset'   => 0,
-        'sort'     => 'id desc'
-      );
-      $result = CRM_Core_BAO_CustomValueTable::getEntityValues($cid, 'Contact', NULL, TRUE, $DTparams);
-      $ctIds = array_keys($result['sortedResult']);
-      $latestId = max($ctIds);
+      $fieldIDs    = array();
+      $fieldLabels = array();
       foreach ($fields as $fkey => $fval) {
-        if (CRM_Core_BAO_CustomField::isMultiRecordField($fkey)) {
-          $mcfid = CRM_Core_BAO_CustomField::getKeyID($fkey);
-          if ($mcfid && CRM_Utils_Array::value($mcfid, $result[$latestId])) {
-            $display = CRM_Core_BAO_CustomField::displayValue($result[$latestId][$mcfid], $fkey);
-            $label   = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $mcfid, 'label');
-            if (array_key_exists($label, $values)) {
-              $values[$label] = $display;
-              $updated = TRUE;
+        $fid = CRM_Core_BAO_CustomField::getKeyID($fkey);
+        if ($fid) {
+          $fieldIDs[] = $fid;
+          $fieldLabels[$fid] = $fval['title'];
+        }
+      }
+      if (!empty($fieldIDs)) {
+        // to make sure we get the latest record set the limit 1 and order by id desc
+        $DTparams = array(
+          'rowCount' => 1,
+          'offset'   => 0,
+          'sort'     => 'id desc'
+        );
+        $result = CRM_Core_BAO_CustomValueTable::getEntityValues($cid, NULL, $fieldIDs, TRUE, $DTparams);
+        $ctIds  = array_keys($result['sortedResult']);
+        $latestId = max($ctIds);
+        if (!empty($result[$latestId])) {
+          foreach ($fieldIDs as $fid) {
+            if (CRM_Core_BAO_CustomField::isMultiRecordField($fid) && 
+              CRM_Utils_Array::value($fid, $result[$latestId])
+            ) {
+              $display = CRM_Core_BAO_CustomField::displayValue($result[$latestId][$fid], $fid);
+              $label   = $fieldLabels[$fid];
+              if (array_key_exists($label, $values)) {
+                $values[$label] = $display;
+                $updated = TRUE;
+              }
             }
           }
         }
