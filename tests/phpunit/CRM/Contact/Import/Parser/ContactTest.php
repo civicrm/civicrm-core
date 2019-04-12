@@ -255,6 +255,21 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that address custom fields can be imported
+   */
+  public function testAddressWithCustomData() {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate('Address', 'AddressTest.php');
+    list($contactValues) = $this->setUpBaseContact();
+    $contactValues['nick_name'] = 'Old Bill';
+    $contactValues['external_identifier'] = 'android';
+    $contactValues['street_address'] = 'Big Mansion';
+    $contactValues['custom_' . $ids['custom_field_id']] = 'Update';
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, array(0 => NULL, 1 => NULL, 2 => NULL, 3 => NULL, 4 => NULL, 5 => 'Primary', 6 => 'Primary'));
+    $address = $this->callAPISuccessGetSingle('Address', ['street_address' => 'Big Mansion', 'return' => 'custom_' . $ids['custom_field_id']]);
+    $this->assertEquals('Update', $address['custom_' . $ids['custom_field_id']]);
+  }
+
+  /**
    * Test that the import parser adds the address to the primary location.
    *
    * @throws \Exception
