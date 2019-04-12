@@ -343,44 +343,6 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
   }
 
   /**
-   * @deprecated Get list of recurring contribution of contact Ids.
-   *
-   * @param int $contactId
-   *   Contact ID.
-   *
-   * @return array
-   *   list of recurring contribution fields
-   *
-   */
-  public static function getRecurContributions($contactId) {
-    CRM_Core_Error::deprecatedFunctionWarning('ContributionRecur.get API instead');
-    $params = [];
-    $recurDAO = new CRM_Contribute_DAO_ContributionRecur();
-    $recurDAO->contact_id = $contactId;
-    $recurDAO->find();
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
-
-    while ($recurDAO->fetch()) {
-      $params[$recurDAO->id]['id'] = $recurDAO->id;
-      $params[$recurDAO->id]['contactId'] = $recurDAO->contact_id;
-      $params[$recurDAO->id]['start_date'] = $recurDAO->start_date;
-      $params[$recurDAO->id]['end_date'] = $recurDAO->end_date;
-      $params[$recurDAO->id]['next_sched_contribution_date'] = $recurDAO->next_sched_contribution_date;
-      $params[$recurDAO->id]['amount'] = $recurDAO->amount;
-      $params[$recurDAO->id]['currency'] = $recurDAO->currency;
-      $params[$recurDAO->id]['frequency_unit'] = $recurDAO->frequency_unit;
-      $params[$recurDAO->id]['frequency_interval'] = $recurDAO->frequency_interval;
-      $params[$recurDAO->id]['installments'] = $recurDAO->installments;
-      $params[$recurDAO->id]['contribution_status_id'] = $recurDAO->contribution_status_id;
-      $params[$recurDAO->id]['contribution_status'] = CRM_Utils_Array::value($recurDAO->contribution_status_id, $contributionStatus);
-      $params[$recurDAO->id]['is_test'] = $recurDAO->is_test;
-      $params[$recurDAO->id]['payment_processor_id'] = $recurDAO->payment_processor_id;
-    }
-
-    return $params;
-  }
-
-  /**
    * @param int $entityID
    * @param string $entity
    *
