@@ -1301,7 +1301,10 @@ class CRM_Report_Form extends CRM_Core_Form {
             if (!empty($field['options']) ||
               $fieldName == 'state_province_id' || $fieldName == 'county_id'
             ) {
-              $element = $this->addElement('select', "{$fieldName}_op", ts('Operator:'), $operations);
+              $element = $this->addElement('select', "{$fieldName}_op", ts('Operator:'), $operations,
+                array('onchange' => "return showHideMaxMinVal( '$fieldName', this.value );")
+              );
+
               if (count($operations) <= 1) {
                 $element->freeze();
               }
@@ -1776,6 +1779,8 @@ class CRM_Report_Form extends CRM_Core_Form {
         $result = [
           'in' => ts('Is one of'),
           'notin' => ts('Is not one of'),
+          'nll' => ts('Is empty (Null)'),
+          'nnll' => ts('Is not empty (Null)'),
         ];
         return $result;
 
