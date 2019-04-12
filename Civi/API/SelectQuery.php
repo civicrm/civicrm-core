@@ -105,7 +105,6 @@ abstract class SelectQuery {
     $this->apiFieldSpec = $this->getFields();
 
     $this->query = \CRM_Utils_SQL_Select::from($bao->tableName() . ' ' . self::MAIN_TABLE_ALIAS);
-    $bao->free();
 
     // Add ACLs first to avoid redundant subclauses
     $this->checkPermissions = $checkPermissions;
@@ -145,7 +144,6 @@ abstract class SelectQuery {
 
     while ($result_dao->fetch()) {
       if (in_array('count_rows', $this->select)) {
-        $result_dao->free();
         return (int) $result_dao->c;
       }
       $result_entities[$result_dao->id] = [];
@@ -166,7 +164,6 @@ abstract class SelectQuery {
         }
       };
     }
-    $result_dao->free();
     return $result_entities;
   }
 
