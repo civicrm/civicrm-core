@@ -1200,9 +1200,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    * @return bool
    */
   protected function formatLocationBlock(&$values, &$params) {
-    if (empty($values['location_type_id'])) {
-      return FALSE;
-    }
     $blockTypes = [
       'phone' => 'Phone',
       'email' => 'Email',
