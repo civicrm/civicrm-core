@@ -50,7 +50,7 @@ class CRM_Core_CodeGen_I18n extends CRM_Core_CodeGen_BaseTask {
       }
     }
 
-    $template = new CRM_Core_CodeGen_Util_Template('php');
+    $template = new CRM_Core_CodeGen_Util_Template('php', FALSE);
 
     $template->assign('columns', $columns);
     $template->assign('indices', $indices);
