@@ -29,6 +29,7 @@ trait ContactTestTrait {
       'first_name' => 'Logged In',
       'last_name' => 'User ' . rand(),
       'contact_type' => 'Individual',
+      'domain_id' => \CRM_Core_Config::domainID(),
     );
     $contactID = $this->individualCreate($params);
     $this->callAPISuccess('UFMatch', 'create', array(
