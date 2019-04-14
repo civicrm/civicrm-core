@@ -635,6 +635,7 @@ abstract class CRM_Core_Payment {
     if ($this->supports('changeSubscriptionAmount')) {
       return ['amount'];
     }
+    return [];
   }
 
   /**

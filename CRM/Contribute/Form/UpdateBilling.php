@@ -44,18 +44,11 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
   public $_bltID = NULL;
 
   /**
-   * @var array current payment processor including a copy of the object in 'object' key
-   */
-  public $_paymentProcessor = array();
-
-  /**
    * Set variables up before form is built.
    */
   public function preProcess() {
     parent::preProcess();
     if ($this->_crid) {
-      $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'info');
-      $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'obj');
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_crid);
 
       // Are we cancelling a recurring contribution that is linked to an auto-renew membership?
