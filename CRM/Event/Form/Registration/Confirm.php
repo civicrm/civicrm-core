@@ -559,7 +559,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $preApprovalParams = $this->_paymentProcessor['object']->getPreApprovalDetails($this->get('pre_approval_parameters'));
           $value = array_merge($value, $preApprovalParams);
         }
-        $result = NULL;
 
         if (!empty($value['is_pay_later']) ||
           $value['amount'] == 0 ||
@@ -581,16 +580,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           // thus provide mapping for it with a different email value
           if (empty($value['email'])) {
             $value['email'] = CRM_Utils_Array::valueByRegexKey('/^email-/', $value);
-          }
-
-          if (is_object($payment)) {
-            // Not quite sure why we don't just user $value since it contains the data
-            // from result
-            // @todo ditch $result & retest.
-            list($result, $value) = $this->processPayment($payment, $value);
-          }
-          else {
-            CRM_Core_Error::fatal($paymentObjError);
           }
         }
 
@@ -618,8 +607,44 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             $isAdditionalAmount = TRUE;
           }
 
+          CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params[0]);
           //passing contribution id is already registered.
-          $contribution = self::processContribution($this, $value, $result, $contactID, $pending, $isAdditionalAmount, $this->_paymentProcessor);
+          $contribution = self::processContribution($this, $value, NULL, $contactID, TRUE, $isAdditionalAmount, $this->_paymentProcessor);
+
+          try {
+            // @todo this should really be if $amount > 0, for pay later we should just load the
+            // manual pseudo processor (0) so there *should* always be a defined processor
+            if (!empty($payment)) {
+              $result = $payment->doPayment($value, 'event');
+              if ($result['payment_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed')) {
+                try {
+                  civicrm_api3('contribution', 'completetransaction', [
+                    'id' => $contribution->id,
+                    'trxn_id' => $result['trxn_id'],
+                    'payment_processor_id' => $this->_paymentProcessor['id'],
+                    'is_transactional' => FALSE,
+                    'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
+                    'is_email_receipt' => FALSE,
+                    'card_type_id' => CRM_Utils_Array::value('card_type_id', $params[0]),
+                    'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $params[0]),
+                  ]);
+                  // This has now been set to 1 in the DB - declare it here also
+                  $contribution->contribution_status_id = 1;
+                }
+                catch (CiviCRM_API3_Exception $e) {
+                  if ($e->getErrorCode() != 'contribution_completed') {
+                    throw new CRM_Core_Exception('Failed to update contribution in database');
+                  }
+                }
+              }
+            }
+          }
+          catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
+            Civi::log()->error('Payment processor exception: ' . $e->getMessage());
+            CRM_Core_Session::singleton()->setStatus($e->getMessage());
+            CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/register', "id={$this->_eventId}"));
+          }
+
           $value['contributionID'] = $contribution->id;
           $value['contributionTypeID'] = $contribution->financial_type_id;
           $value['receive_date'] = $contribution->receive_date;
@@ -973,6 +998,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     // CRM-20264: fetch CC type ID and number (last 4 digit) and assign it back to $params
+    // @todo remove this once backoffice form is doing it - front end is doing it twice.
+    // (in general they are sharing much more code than they should - anything that truly should be shared
+    // should not be on this class).
     CRM_Contribute_Form_AbstractEditPayment::formatCreditCardDetails($params);
 
     $contribParams = [
