@@ -88,4 +88,17 @@ class Event extends \Symfony\Component\EventDispatcher\Event {
     return $this->apiRequest;
   }
 
+  /**
+   * Create a brief string identifying the entity/action. Useful for
+   * pithy matching/switching.
+   *
+   * Ex: if ($e->getApiRequestSig() === '3.contact.get') { ... }
+   *
+   * @return string
+   *   Ex: '3.contact.get'
+   */
+  public function getApiRequestSig() {
+    return mb_strtolower($this->apiRequest['version'] . '.' . $this->apiRequest['entity'] . '.' . $this->apiRequest['action']);
+  }
+
 }
