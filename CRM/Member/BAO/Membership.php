@@ -2272,7 +2272,7 @@ WHERE      civicrm_membership.is_test = 0
       self::processOverriddenUntilDateMembership($dao1);
     }
 
-    $query = $baseQuery . " AND civicrm_membership.is_override != 1 
+    $query = $baseQuery . " AND (civicrm_membership.is_override = 0 OR civicrm_membership.is_override IS NULL) 
      AND civicrm_membership.status_id NOT IN (%1, %2, %3, %4)
      AND civicrm_membership.owner_membership_id IS NULL ";
     $params = array(
