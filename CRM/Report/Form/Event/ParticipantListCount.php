@@ -229,6 +229,13 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form {
           'participant_register_date' => [
             'title' => ts('Registration Date'),
           ],
+          'registered_by_id' => [
+            'title' => ts('Registered by Participant ID'),
+          ],
+          'registered_by_name' => [
+            'title' => ts('Registered by Participant Name'),
+            'name' => 'registered_by_id',
+          ],
         ],
         'grouping' => 'event-fields',
         'filters' => [
@@ -584,6 +591,16 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form {
           $rows[$rowNum]['civicrm_participant_status_id'] = CRM_Event_PseudoConstant::participantStatus($value, FALSE);
         }
         $entryFound = TRUE;
+      }
+
+      if (array_key_exists('civicrm_participant_registered_by_name', $row)) {
+        $registeredById = $row['civicrm_participant_registered_by_name'];
+        if ($registeredById) {
+          $registeredByContactId = CRM_Core_DAO::getFieldValue("CRM_Event_DAO_Participant", $registeredById, 'contact_id', 'id');
+          $rows[$rowNum]['civicrm_participant_registered_by_name'] = CRM_Contact_BAO_Contact::displayName($registeredByContactId);
+          $rows[$rowNum]['civicrm_participant_registered_by_name_link'] = CRM_Utils_System::url('civicrm/contact/view', 'reset=1&cid=' . $registeredByContactId, $this->_absoluteUrl);
+          $rows[$rowNum]['civicrm_participant_registered_by_name_hover'] = ts('View Contact Summary for Contact that registered the participant.');
+        }
       }
 
       // handle participant role id
