@@ -1149,6 +1149,10 @@ class CRM_Export_BAO_ExportProcessor {
           if (isset($queryFields[$columnName]['maxlength'])) {
             return "$fieldName varchar({$queryFields[$columnName]['maxlength']})";
           }
+          elseif (isset($queryFields[$columnName]['text_length'])) {
+            $length = max(512, CRM_Utils_Array::value('text_length', $queryFields[$columnName]));
+            return "$fieldName varchar($length)";
+          }
           else {
             return "$fieldName varchar(255)";
           }
