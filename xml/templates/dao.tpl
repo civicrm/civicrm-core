@@ -116,18 +116,15 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 
 {if $field.import}
                       'import'    => {$field.import|strtoupper},
-                                                                      'where'     => '{$table.name}.{$field.name}',
-                                      'headerPattern' => '{$field.headerPattern}',
-                                      'dataPattern' => '{$field.dataPattern}',
+
 {/if} {* field.import *}
+  'where'     => '{$table.name}.{$field.name}',
+  {if $field.headerPattern}'headerPattern' => '{$field.headerPattern}',{/if}
+  {if $field.dataPattern}'dataPattern' => '{$field.dataPattern}',{/if}
 {if $field.export}
                       'export'    => {$field.export|strtoupper},
-                                      {if ! $field.import}
-                      'where'     => '{$table.name}.{$field.name}',
-                                      'headerPattern' => '{$field.headerPattern}',
-                                      'dataPattern' => '{$field.dataPattern}',
-              {/if}
 {/if} {* field.export *}
+
 {if $field.rule}
                       'rule'      => '{$field.rule}',
 {/if} {* field.rule *}
