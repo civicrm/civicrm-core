@@ -102,7 +102,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
 
         if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
           $fixUrl = CRM_Utils_System::url("civicrm/admin/domain", 'action=update&reset=1');
-          CRM_Core_Error::fatal(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', array(1 => $fixUrl)));
+          CRM_Core_Error::fatal(ts('The site administrator needs to enter a valid email address in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; Organization Address and Contact Info</a>. The email address used may need to be a valid mail account with your email service provider.', array(1 => $fixUrl)));
         }
 
         if (!$toEmail) {
