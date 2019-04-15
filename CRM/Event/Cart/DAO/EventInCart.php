@@ -65,7 +65,7 @@ class CRM_Event_Cart_DAO_EventInCart extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'event_id', 'civicrm_event', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'event_cart_id', 'civicrm_event_carts', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -87,6 +87,7 @@ class CRM_Event_Cart_DAO_EventInCart extends CRM_Core_DAO {
           'title' => ts('Event In Cart'),
           'description' => ts('Event In Cart Id'),
           'required' => TRUE,
+          'where' => 'civicrm_events_in_carts.id',
           'table_name' => 'civicrm_events_in_carts',
           'entity' => 'EventInCart',
           'bao' => 'CRM_Event_Cart_BAO_EventInCart',
@@ -97,6 +98,7 @@ class CRM_Event_Cart_DAO_EventInCart extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Event'),
           'description' => ts('FK to Event ID'),
+          'where' => 'civicrm_events_in_carts.event_id',
           'table_name' => 'civicrm_events_in_carts',
           'entity' => 'EventInCart',
           'bao' => 'CRM_Event_Cart_BAO_EventInCart',
@@ -108,6 +110,7 @@ class CRM_Event_Cart_DAO_EventInCart extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Event In Cart'),
           'description' => ts('FK to Event Cart ID'),
+          'where' => 'civicrm_events_in_carts.event_cart_id',
           'table_name' => 'civicrm_events_in_carts',
           'entity' => 'EventInCart',
           'bao' => 'CRM_Event_Cart_BAO_EventInCart',

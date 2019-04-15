@@ -77,7 +77,7 @@ class CRM_Mailing_Event_DAO_Subscribe extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'group_id', 'civicrm_group', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id', 'civicrm_contact', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -98,6 +98,7 @@ class CRM_Mailing_Event_DAO_Subscribe extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Mailing Subscribe ID'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_subscribe.id',
           'table_name' => 'civicrm_mailing_event_subscribe',
           'entity' => 'Subscribe',
           'bao' => 'CRM_Mailing_Event_BAO_Subscribe',
@@ -109,6 +110,7 @@ class CRM_Mailing_Event_DAO_Subscribe extends CRM_Core_DAO {
           'title' => ts('Mailing Subscribe Group'),
           'description' => ts('FK to Group'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_subscribe.group_id',
           'table_name' => 'civicrm_mailing_event_subscribe',
           'entity' => 'Subscribe',
           'bao' => 'CRM_Mailing_Event_BAO_Subscribe',
@@ -129,6 +131,7 @@ class CRM_Mailing_Event_DAO_Subscribe extends CRM_Core_DAO {
           'title' => ts('Mailing Subscribe Contact'),
           'description' => ts('FK to Contact'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_subscribe.contact_id',
           'table_name' => 'civicrm_mailing_event_subscribe',
           'entity' => 'Subscribe',
           'bao' => 'CRM_Mailing_Event_BAO_Subscribe',
@@ -143,6 +146,7 @@ class CRM_Mailing_Event_DAO_Subscribe extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_mailing_event_subscribe.hash',
           'table_name' => 'civicrm_mailing_event_subscribe',
           'entity' => 'Subscribe',
           'bao' => 'CRM_Mailing_Event_BAO_Subscribe',
@@ -154,6 +158,7 @@ class CRM_Mailing_Event_DAO_Subscribe extends CRM_Core_DAO {
           'title' => ts('Mailing Subscribe Timestamp'),
           'description' => ts('When this subscription event occurred.'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_subscribe.time_stamp',
           'default' => 'CURRENT_TIMESTAMP',
           'table_name' => 'civicrm_mailing_event_subscribe',
           'entity' => 'Subscribe',

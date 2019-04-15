@@ -84,7 +84,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'job_id', 'civicrm_mailing_job', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'email_id', 'civicrm_email', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id', 'civicrm_contact', 'id');
@@ -107,6 +107,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Mailing Event Queue ID'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_queue.id',
           'table_name' => 'civicrm_mailing_event_queue',
           'entity' => 'Queue',
           'bao' => 'CRM_Mailing_Event_BAO_Queue',
@@ -118,6 +119,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO {
           'title' => ts('Job ID'),
           'description' => ts('FK to Job'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_queue.job_id',
           'table_name' => 'civicrm_mailing_event_queue',
           'entity' => 'Queue',
           'bao' => 'CRM_Mailing_Event_BAO_Queue',
@@ -129,6 +131,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Email ID'),
           'description' => ts('FK to Email'),
+          'where' => 'civicrm_mailing_event_queue.email_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_mailing_event_queue',
           'entity' => 'Queue',
@@ -142,6 +145,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO {
           'title' => ts('Contact ID'),
           'description' => ts('FK to Contact'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_queue.contact_id',
           'table_name' => 'civicrm_mailing_event_queue',
           'entity' => 'Queue',
           'bao' => 'CRM_Mailing_Event_BAO_Queue',
@@ -156,6 +160,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_mailing_event_queue.hash',
           'table_name' => 'civicrm_mailing_event_queue',
           'entity' => 'Queue',
           'bao' => 'CRM_Mailing_Event_BAO_Queue',
@@ -166,6 +171,7 @@ class CRM_Mailing_Event_DAO_Queue extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Phone ID'),
           'description' => ts('FK to Phone'),
+          'where' => 'civicrm_mailing_event_queue.phone_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_mailing_event_queue',
           'entity' => 'Queue',
