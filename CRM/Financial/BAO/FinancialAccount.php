@@ -293,6 +293,11 @@ WHERE cft.id = %1
       'Sales Tax Account is' => 'Liability',
       'Deferred Revenue Account is' => 'Liability',
     );
+    foreach ($Links as $defaultAccountRelation => $defaultAccountType) {
+      if (!isset(Civi::$statics[__CLASS__]['account_relationships'][$defaultAccountRelation])) {
+        Civi::$statics[__CLASS__]['account_relationships'][$defaultAccountRelation] = $defaultAccountType;
+      }
+    }
     if (!$flip) {
       foreach ($Links as $accountRelation => $accountType) {
         $financialAccountLinks[array_search($accountRelation, $accountRelationships)] = array_search($accountType, $financialAccountType);
