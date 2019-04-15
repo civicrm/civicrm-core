@@ -42,10 +42,10 @@ class CRM_Contribute_Form extends CRM_Admin_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     if (isset($this->_id)) {
-      $params = array('id' => $this->_id);
+      $params = ['id' => $this->_id];
       if (!empty($this->_BAOName)) {
         $baoName = $this->_BAOName;
         $baoName::retrieve($params, $defaults);

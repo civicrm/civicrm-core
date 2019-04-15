@@ -33,7 +33,10 @@
  * @group headless
  */
 class api_v3_UFFieldTest extends CiviUnitTestCase {
-  // ids from the uf_group_test.xml fixture
+  /**
+   * ids from the uf_group_test.xml fixture
+   * @var int
+   */
   protected $_ufGroupId = 11;
   protected $_ufFieldId;
   protected $_contactId = 69;

@@ -45,11 +45,13 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
 
   /**
    * Maximum Activities that should be allowed to update.
+   * @var int
    */
   protected $_maxActivities = 100;
 
   /**
    * Variable to store redirect path.
+   * @var string
    */
   protected $_userContext;
 
@@ -68,10 +70,10 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
     $validate = FALSE;
     // Validations.
     if (count($this->_activityHolderIds) > $this->_maxActivities) {
-      CRM_Core_Session::setStatus(ts("The maximum number of activities you can select for Update multiple activities is %1. You have selected %2. Please select fewer Activities from your search results and try again.", array(
+      CRM_Core_Session::setStatus(ts("The maximum number of activities you can select for Update multiple activities is %1. You have selected %2. Please select fewer Activities from your search results and try again.", [
         1 => $this->_maxActivities,
         2 => count($this->_activityHolderIds),
-      )), ts('Maximum Exceeded'), 'error');
+      ]), ts('Maximum Exceeded'), 'error');
       $validate = TRUE;
     }
 
@@ -85,11 +87,11 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $types = array('Activity');
+    $types = ['Activity'];
     $profiles = CRM_Core_BAO_UFGroup::getProfiles($types, TRUE);
 
     $activityTypeIds = array_flip(CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name'));
-    $nonEditableActivityTypeIds = array(
+    $nonEditableActivityTypeIds = [
       $activityTypeIds['Email'],
       $activityTypeIds['Bulk Email'],
       $activityTypeIds['Contribution'],
@@ -99,7 +101,7 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
       $activityTypeIds['Membership Renewal'],
       $activityTypeIds['Event Registration'],
       $activityTypeIds['Pledge Acknowledgment'],
-    );
+    ];
     $notEditable = FALSE;
     foreach ($this->_activityHolderIds as $activityId) {
       $typeId = CRM_Core_DAO::getFieldValue("CRM_Activity_DAO_Activity", $activityId, 'activity_type_id');
@@ -110,7 +112,7 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
     }
 
     if (empty($profiles)) {
-      CRM_Core_Session::setStatus(ts("You will need to create a Profile containing the %1 fields you want to edit before you can use Update multiple activities. Navigate to Administer > Customize Data and Screens > Profiles to configure a Profile. Consult the online Administrator documentation for more information.", array(1 => $types[0])), ts("No Profile Configured"), "alert");
+      CRM_Core_Session::setStatus(ts("You will need to create a Profile containing the %1 fields you want to edit before you can use Update multiple activities. Navigate to Administer > Customize Data and Screens > Profiles to configure a Profile. Consult the online Administrator documentation for more information.", [1 => $types[0]]), ts("No Profile Configured"), "alert");
       CRM_Utils_System::redirect($this->_userContext);
     }
     elseif ($notEditable) {
@@ -119,9 +121,9 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
     }
 
     $ufGroupElement = $this->add('select', 'uf_group_id', ts('Select Profile'),
-      array(
+      [
         '' => ts('- select profile -'),
-      ) + $profiles, TRUE
+      ] + $profiles, TRUE
     );
     $this->addDefaultButtons(ts('Continue'));
   }
@@ -130,7 +132,7 @@ class CRM_Activity_Form_Task_PickProfile extends CRM_Activity_Form_Task {
    * Add local and global form rules.
    */
   public function addRules() {
-    $this->addFormRule(array('CRM_Activity_Form_Task_PickProfile', 'formRule'));
+    $this->addFormRule(['CRM_Activity_Form_Task_PickProfile', 'formRule']);
   }
 
   /**

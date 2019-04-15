@@ -37,18 +37,18 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
    */
   protected function setupDefaultAssigneeOptions() {
     $options = [
-      'NONE', 'BY_RELATIONSHIP', 'SPECIFIC_CONTACT', 'USER_CREATING_THE_CASE'
+      'NONE', 'BY_RELATIONSHIP', 'SPECIFIC_CONTACT', 'USER_CREATING_THE_CASE',
     ];
 
     CRM_Core_BAO_OptionGroup::ensureOptionGroupExists([
-      'name' => 'activity_default_assignee'
+      'name' => 'activity_default_assignee',
     ]);
 
     foreach ($options as $option) {
       $optionValue = CRM_Core_BAO_OptionValue::ensureOptionValueExists([
         'option_group_id' => 'activity_default_assignee',
         'name' => $option,
-        'label' => $option
+        'label' => $option,
       ]);
 
       $this->defaultAssigneeOptionsValues[$option] = $optionValue['value'];
@@ -65,19 +65,19 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
         'name_a_b' => 'Pupil of',
         'name_b_a' => 'Instructor',
         'contact_id_a' => $this->contacts['ana'],
-        'contact_id_b' => $this->contacts['beto']
+        'contact_id_b' => $this->contacts['beto'],
       ],
       'ana_is_spouse_of_carlos' => [
         'type_id' => NULL,
         'name_a_b' => 'Spouse of',
         'name_b_a' => 'Spouse of',
         'contact_id_a' => $this->contacts['ana'],
-        'contact_id_b' => $this->contacts['carlos']
+        'contact_id_b' => $this->contacts['carlos'],
       ],
       'unassigned_employee' => [
         'type_id' => NULL,
         'name_a_b' => 'Employee of',
-        'name_b_a' => 'Employer'
+        'name_b_a' => 'Employer',
       ],
     ];
 
@@ -88,7 +88,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
         'name_a_b' => $relationship['name_a_b'],
         'label_a_b' => $relationship['name_a_b'],
         'name_b_a' => $relationship['name_b_a'],
-        'label_b_a' => $relationship['name_b_a']
+        'label_b_a' => $relationship['name_b_a'],
       ]);
 
       if (isset($relationship['contact_id_a'])) {
@@ -231,7 +231,7 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $expectedContact = $assigneeContactId === NULL ? [] : [$assigneeContactId];
     $result = $this->callAPISuccess('Activity', 'get', [
       'target_contact_id' => $this->activityParams['clientID'],
-      'return' => ['assignee_contact_id']
+      'return' => ['assignee_contact_id'],
     ]);
     $activity = CRM_Utils_Array::first($result['values']);
 

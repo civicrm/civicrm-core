@@ -77,7 +77,7 @@ class CRM_Mailing_BAO_MailingComponent extends CRM_Mailing_DAO_MailingComponent 
    *
    * @return CRM_Mailing_BAO_MailingComponent
    */
-  public static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = []) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
     $component = new CRM_Mailing_BAO_MailingComponent();
     if ($id) {
@@ -93,16 +93,16 @@ class CRM_Mailing_BAO_MailingComponent extends CRM_Mailing_DAO_MailingComponent 
     if ($component->is_default) {
       if (!empty($id)) {
         $sql = 'UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type = %1 AND id <> %2';
-        $sqlParams = array(
-          1 => array($component->component_type, 'String'),
-          2 => array($id, 'Positive'),
-        );
+        $sqlParams = [
+          1 => [$component->component_type, 'String'],
+          2 => [$id, 'Positive'],
+        ];
       }
       else {
         $sql = 'UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type = %1';
-        $sqlParams = array(
-          1 => array($component->component_type, 'String'),
-        );
+        $sqlParams = [
+          1 => [$component->component_type, 'String'],
+        ];
       }
       CRM_Core_DAO::executeQuery($sql, $sqlParams);
     }

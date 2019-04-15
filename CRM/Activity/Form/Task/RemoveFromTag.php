@@ -67,7 +67,7 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
   }
 
   public function addRules() {
-    $this->addFormRule(array('CRM_Activity_Form_Task_RemoveFromTag', 'formRule'));
+    $this->addFormRule(['CRM_Activity_Form_Task_RemoveFromTag', 'formRule']);
   }
 
   /**
@@ -77,7 +77,7 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
    * @return array
    */
   public static function formRule($form, $rule) {
-    $errors = array();
+    $errors = [];
     if (empty($form['tag']) && empty($form['activity_taglist'])) {
       $errors['_qf_default'] = "Please select atleast one tag.";
     }
@@ -91,7 +91,7 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
     //get the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
 
-    $activityTags = $tagList = array();
+    $activityTags = $tagList = [];
 
     // check if contact tags exists
     if (!empty($params['tag'])) {
@@ -120,27 +120,27 @@ class CRM_Activity_Form_Task_RemoveFromTag extends CRM_Activity_Form_Task {
     // merge contact and taglist tags
     $allTags = CRM_Utils_Array::crmArrayMerge($activityTags, $tagList);
 
-    $this->_name = array();
+    $this->_name = [];
     foreach ($allTags as $key => $dnc) {
       $this->_name[] = $this->_tags[$key];
 
       list($total, $removed, $notRemoved) = CRM_Core_BAO_EntityTag::removeEntitiesFromTag($this->_activityHolderIds,
         $key, 'civicrm_activity', FALSE);
 
-      $status = array(
-        ts('%count activity un-tagged', array(
+      $status = [
+        ts('%count activity un-tagged', [
           'count' => $removed,
           'plural' => '%count activities un-tagged',
-        )),
-      );
+        ]),
+      ];
       if ($notRemoved) {
-        $status[] = ts('1 activity already did not have this tag', array(
+        $status[] = ts('1 activity already did not have this tag', [
           'count' => $notRemoved,
           'plural' => '%count activities already did not have this tag',
-        ));
+        ]);
       }
       $status = '<ul><li>' . implode('</li><li>', $status) . '</li></ul>';
-      CRM_Core_Session::setStatus($status, ts("Removed Tag <em>%1</em>", array(1 => $this->_tags[$key])), 'success', array('expires' => 0));
+      CRM_Core_Session::setStatus($status, ts("Removed Tag <em>%1</em>", [1 => $this->_tags[$key]]), 'success', ['expires' => 0]);
     }
   }
 

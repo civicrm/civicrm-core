@@ -96,13 +96,13 @@ class Events {
    * @return array<string>
    */
   public static function allEvents() {
-    return array(
+    return [
       self::AUTHORIZE,
       self::EXCEPTION,
       self::PREPARE,
       self::RESOLVE,
       self::RESPOND,
-    );
+    ];
   }
 
   /**

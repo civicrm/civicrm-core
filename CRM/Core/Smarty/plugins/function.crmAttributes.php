@@ -43,6 +43,6 @@
  * @return string
  */
 function smarty_function_crmAttributes($params, &$smarty) {
-  $attributes = isset($params['a']) ? $params['a'] : array();
+  $attributes = isset($params['a']) ? $params['a'] : [];
   return CRM_Utils_String::htmlAttributes($attributes);
 }

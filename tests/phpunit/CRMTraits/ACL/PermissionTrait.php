@@ -32,7 +32,16 @@
  */
 trait CRMTraits_ACL_PermissionTrait {
 
+  /**
+   * ContactID of allowed Contact
+   * @var int
+   */
   protected $allowedContactId = 0;
+
+  /**
+   * Array of allowed contactIds
+   * @var array
+   */
   protected $allowedContacts = [];
 
   /**
@@ -154,6 +163,16 @@ trait CRMTraits_ACL_PermissionTrait {
     $this->scenarioIDs['Contact']['non_permitted_contact'] = $this->individualCreate();
     CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
     $this->setupCoreACLPermittedToGroup([$this->scenarioIDs['Group']['permitted_group']]);
+  }
+
+  /**
+   * Clean up places where permissions get cached.
+   */
+  protected function cleanupCachedPermissions() {
+    if (isset(Civi::$statics['CRM_Contact_BAO_Contact_Permission'])) {
+      unset(Civi::$statics['CRM_Contact_BAO_Contact_Permission']);
+    }
+    CRM_Core_DAO::executeQuery('TRUNCATE civicrm_acl_contact_cache');
   }
 
 }

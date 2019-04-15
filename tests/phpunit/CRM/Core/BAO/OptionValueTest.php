@@ -64,7 +64,6 @@ class CRM_Core_BAO_OptionValueTest extends CiviUnitTestCase {
     $this->fail('Should not have gotten this far');
   }
 
-
   /**
    * Ensure only one option value copes with disabled.
    *

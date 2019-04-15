@@ -38,16 +38,19 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
 
   /**
    * Id of the contact that is being edited
+   * @var int
    */
   public $_contactId;
 
   /**
    * Type of contact being edited
+   * @var string
    */
   public $_contactType;
 
   /**
    * Sub type of contact being edited
+   * @var string
    */
   public $_contactSubType;
 
@@ -96,17 +99,17 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
   public function buildQuickForm() {
     CRM_Contact_Form_Inline_Lock::buildQuickForm($this, $this->_contactId);
 
-    $buttons = array(
-      array(
+    $buttons = [
+      [
         'type' => 'upload',
         'name' => ts('Save'),
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ),
-    );
+      ],
+    ];
     $this->addButtons($buttons);
   }
 
@@ -114,7 +117,7 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * Override default cancel action.
    */
   public function cancelAction() {
-    $response = array('status' => 'cancel');
+    $response = ['status' => 'cancel'];
     CRM_Utils_JSON::output($response);
   }
 
@@ -124,7 +127,7 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = $params = array();
+    $defaults = $params = [];
     $params['id'] = $this->_contactId;
 
     CRM_Contact_BAO_Contact::getValues($params, $defaults);
@@ -175,11 +178,11 @@ abstract class CRM_Contact_Form_Inline extends CRM_Core_Form {
       'contact_view_options', TRUE
     );
     $smarty->assign('changeLog', $viewOptions['log']);
-    $ret = array('markup' => $smarty->fetch('CRM/common/contactFooter.tpl'));
+    $ret = ['markup' => $smarty->fetch('CRM/common/contactFooter.tpl')];
     if ($includeCount) {
       $ret['count'] = CRM_Contact_BAO_Contact::getCountComponent('log', $cid);
     }
-    return array('changeLog' => $ret);
+    return ['changeLog' => $ret];
   }
 
 }

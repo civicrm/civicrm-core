@@ -56,6 +56,9 @@
 - github      : alexmarketaccess
   name        : Alex Block
 
+- github      : alexymik
+  name        : Alexy Mikhailichenko
+
 - github      : alifrumin
   name        : Alice Frumin
   organization: AGH Strategies
@@ -130,6 +133,10 @@
 - github      : autarch
   name        : Dave Rolsky
   jira        : autarch
+
+- github      : awasson
+  name        : Andrew Wasson
+  organization: Luna Design
 
 - github      : awzilkie
   name        : Adam Zilkie
@@ -629,6 +636,10 @@
   name        : Jérôme Lebleu
   jira        : jlebleu
 
+- github      : jgillmanjr
+  name        : Jason Gillman Jr.
+  organization: Liquid Web, Inc.
+
 - github      : jitendrapurohit
   name        : Jitendra Purohit
   organization: Fuzion
@@ -856,6 +867,10 @@
   organization: Circle Interactive
   jira        : marshCircle
 
+- github      : mathavanveda
+  name        : Mathavan Veeramuthu
+  organization: Veda Consulting
+
 - name        : Matt Allard
   organization: City of Winnipeg, Manitoba
   jira        : mattallard
@@ -864,6 +879,10 @@
   name        : Matthew Wire
   organization: MJW Consulting
   jira        : mattwire
+
+- github      : martinh-pw
+  name        : Martin Hansen
+  organization: PeaceWorks Technology Solutions
 
 - github      : mc0e
   name        : Andrew McNaughton
@@ -979,6 +998,9 @@
   organization: CompuCorp
   jira        : mukesh
 
+- github      : mwestergaard
+  name        : Mark Westergaard
+
 - github      : nbrettell
   name        : Nathan Brettell
   jira        : nathan_b
@@ -1020,6 +1042,10 @@
 
 - name        : Peter Bull
   jira        : peter39
+
+- github      : pfigel
+  name        : Patrick Figel
+  organization: GreenPeace Central and Eastern Europe
 
 - github      : philmck
   name        : Phil McKerracher
@@ -1126,6 +1152,10 @@
 - github      : ray-wright
   name        : Ray Wright
 
+- github      : reecebenson
+  name        : Reece Benson
+  organization: Circle Interactive
+
 - name        : Renaee Churches
   organization: Play Australia
   jira        : Renz56c.o
@@ -1230,6 +1260,10 @@
   name        : Sharique Ahmed Farooqui
   jira        : sharique
 
+- github      : shitijg
+  name        : Shitij Gugnani
+  organization: CompuCorp
+
 - name        : James van der Hoven
   jira        : sixfootjames
 
@@ -1282,6 +1316,10 @@
   name        : Sunil Pawar
   organization: CiviDesk
   jira        : sunil
+
+- github      : swastikpareek
+  name        : Swastik Pareek
+  organization: QED42
 
 - github      : systopia
   name        : Björn Endres
@@ -1373,6 +1411,9 @@
   name        : Allen Shaw
   organization: Joinery
   jira        : allenshaw
+
+- github      : universalhandle
+  name        : Frank J. Gómez
 
 - github      : upperholme
   name        : Graham Mitchell

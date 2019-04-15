@@ -6,7 +6,7 @@
  *   API result array
  */
 function address_create_example() {
-  $params = array(
+  $params = [
     'contact_id' => 3,
     'location_type_id' => 6,
     'street_name' => 'Ambachtstraat',
@@ -16,7 +16,7 @@ function address_create_example() {
     'country_id' => '1152',
     'city' => 'Brummen',
     'is_primary' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Address', 'create', $params);
@@ -26,12 +26,12 @@ function address_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -45,13 +45,13 @@ function address_create_example() {
  */
 function address_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 2,
-    'values' => array(
-      '2' => array(
+    'values' => [
+      '2' => [
         'id' => '2',
         'contact_id' => '3',
         'location_type_id' => '6',
@@ -64,9 +64,9 @@ function address_create_expectedresult() {
         'postal_code' => '6971 BN',
         'country_id' => '1152',
         'manual_geo_code' => 0,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

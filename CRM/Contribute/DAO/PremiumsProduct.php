@@ -19,14 +19,14 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_premiums_product';
+  public static $_tableName = 'civicrm_premiums_product';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Contribution ID
@@ -77,7 +77,7 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'premiums_id', 'civicrm_premiums', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'product_id', 'civicrm_product', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'financial_type_id', 'civicrm_financial_type', 'id');

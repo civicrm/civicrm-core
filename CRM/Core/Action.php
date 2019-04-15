@@ -74,10 +74,10 @@ class CRM_Core_Action {
    * bit manipulation operations so we can perform multiple
    * actions on the same object if needed
    *
-   * @var array $_names type of variable name to action constant
+   * @var array
    *
    */
-  static $_names = array(
+  public static $_names = [
     'add' => self::ADD,
     'update' => self::UPDATE,
     'view' => self::VIEW,
@@ -95,14 +95,14 @@ class CRM_Core_Action {
     'revert' => self::REVERT,
     'close' => self::CLOSE,
     'reopen' => self::REOPEN,
-  );
+  ];
 
   /**
    * The flipped version of the names array, initialized when used
    *
    * @var array
    */
-  static $_description;
+  public static $_description;
 
   /**
    * Called by the request object to translate a string into a mask.
@@ -216,7 +216,7 @@ class CRM_Core_Action {
 
     // make links indexed sequentially instead of by bitmask
     // otherwise it's next to impossible to reliably add new ones
-    $seqLinks = array();
+    $seqLinks = [];
     foreach ($links as $bit => $link) {
       $link['bit'] = $bit;
       $seqLinks[] = $link;
@@ -226,7 +226,7 @@ class CRM_Core_Action {
       CRM_Utils_Hook::links($op, $objectName, $objectId, $seqLinks, $mask, $values);
     }
 
-    $url = array();
+    $url = [];
 
     foreach ($seqLinks as $i => $link) {
       if (!$mask || !array_key_exists('bit', $link) || ($mask & $link['bit'])) {

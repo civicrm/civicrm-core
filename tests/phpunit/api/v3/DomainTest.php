@@ -34,9 +34,11 @@
  */
 class api_v3_DomainTest extends CiviUnitTestCase {
 
-  /* This test case doesn't require DB reset - apart from
-  where cleanDB() is called. */
-
+  /**
+   * This test case doesn't require DB reset - apart from
+   * where cleanDB() is called.
+   * @var bool
+   */
   public $DBResetRequired = FALSE;
 
   protected $_apiversion = 3;
@@ -56,29 +58,27 @@ class api_v3_DomainTest extends CiviUnitTestCase {
     $params['entity_table'] = CRM_Core_BAO_Domain::getTableName();
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
     $domContact = $this->callAPISuccess('contact', 'create', array(
-        'contact_type' => 'Organization',
-        'organization_name' => 'new org',
-        'api.phone.create' => array(
-          'location_type_id' => $defaultLocationType->id,
-          'phone_type_id' => 1,
-          'phone' => '456-456',
-        ),
-        'api.address.create' => array(
-          'location_type_id' => $defaultLocationType->id,
-          'street_address' => '45 Penny Lane',
-        ),
-        'api.email.create' => array(
-          'location_type_id' => $defaultLocationType->id,
-          'email' => 'my@email.com',
-        ),
-      )
-    );
+      'contact_type' => 'Organization',
+      'organization_name' => 'new org',
+      'api.phone.create' => array(
+        'location_type_id' => $defaultLocationType->id,
+        'phone_type_id' => 1,
+        'phone' => '456-456',
+      ),
+      'api.address.create' => array(
+        'location_type_id' => $defaultLocationType->id,
+        'street_address' => '45 Penny Lane',
+      ),
+      'api.email.create' => array(
+        'location_type_id' => $defaultLocationType->id,
+        'email' => 'my@email.com',
+      ),
+    ));
 
     $this->callAPISuccess('domain', 'create', array(
-        'id' => 1,
-        'contact_id' => $domContact['id'],
-      )
-    );
+      'id' => 1,
+      'contact_id' => $domContact['id'],
+    ));
     $this->params = array(
       'name' => 'A-team domain',
       'description' => 'domain of chaos',

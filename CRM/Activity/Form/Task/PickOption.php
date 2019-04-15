@@ -45,16 +45,19 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
 
   /**
    * Maximum Activities that should be allowed to update.
+   * @var int
    */
   protected $_maxActivities = 100;
 
   /**
    * Variable to store redirect path.
+   * @var int
    */
   protected $_userContext;
 
   /**
    * Variable to store contact Ids.
+   * @var array
    */
   public $_contacts;
 
@@ -73,10 +76,10 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
     $validate = FALSE;
     //validations
     if (count($this->_activityHolderIds) > $this->_maxActivities) {
-      CRM_Core_Session::setStatus(ts("The maximum number of Activities you can select to send an email is %1. You have selected %2. Please select fewer Activities from your search results and try again.", array(
+      CRM_Core_Session::setStatus(ts("The maximum number of Activities you can select to send an email is %1. You have selected %2. Please select fewer Activities from your search results and try again.", [
         1 => $this->_maxActivities,
         2 => count($this->_activityHolderIds),
-      )), ts("Maximum Exceeded"), "error");
+      ]), ts("Maximum Exceeded"), "error");
       $validate = TRUE;
     }
     // then redirect
@@ -92,7 +95,7 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
     $this->addElement('checkbox', 'with_contact', ts('With Contact'));
     $this->addElement('checkbox', 'assigned_to', ts('Assigned to Contact'));
     $this->addElement('checkbox', 'created_by', ts('Created by'));
-    $this->setDefaults(array('with_contact' => 1));
+    $this->setDefaults(['with_contact' => 1]);
     $this->addDefaultButtons(ts('Continue'));
   }
 
@@ -100,7 +103,7 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
    * Add local and global form rules.
    */
   public function addRules() {
-    $this->addFormRule(array('CRM_Activity_Form_Task_PickOption', 'formRule'));
+    $this->addFormRule(['CRM_Activity_Form_Task_PickOption', 'formRule']);
   }
 
   /**
@@ -117,7 +120,7 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
       !isset($fields['assigned_to']) &&
       !isset($fields['created_by'])
     ) {
-      return array('with_contact' => ts('You must select at least one email recipient type.'));
+      return ['with_contact' => ts('You must select at least one email recipient type.')];
     }
     return TRUE;
   }
@@ -129,7 +132,7 @@ class CRM_Activity_Form_Task_PickOption extends CRM_Activity_Form_Task {
     // Clear any formRule errors from Email form in case they came back here via Cancel button
     $this->controller->resetPage('Email');
     $params = $this->exportValues();
-    $this->_contacts = array();
+    $this->_contacts = [];
 
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);

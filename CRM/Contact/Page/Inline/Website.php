@@ -47,7 +47,7 @@ class CRM_Contact_Page_Inline_Website extends CRM_Core_Page {
 
     $websiteTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
 
-    $params = array('contact_id' => $contactId);
+    $params = ['contact_id' => $contactId];
     $websites = CRM_Core_BAO_Website::getValues($params, CRM_Core_DAO::$_nullArray);
     if (!empty($websites)) {
       foreach ($websites as $key => & $value) {

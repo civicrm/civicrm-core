@@ -52,10 +52,10 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
       $this->assign('displayName', $displayName);
       $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('pledge', $this->_contactId);
       // Refresh other tabs with related data
-      $this->ajaxResponse['updateTabs'] = array(
+      $this->ajaxResponse['updateTabs'] = [
         '#tab_contribute' => CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId),
         '#tab_activity' => CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId),
-      );
+      ];
     }
   }
 

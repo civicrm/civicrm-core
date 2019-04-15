@@ -33,9 +33,6 @@
  */
 class api_v3_PledgeTest extends CiviUnitTestCase {
 
-  /**
-   * Assume empty database with just civicrm_data.
-   */
   protected $_individualId;
   protected $_pledge;
   protected $_apiversion;
@@ -322,7 +319,6 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $apiResult = $this->callAPISuccess('pledge', 'create', $params);
   }
 
-
   /**
    * Test creation of pledge with only one payment.
    *
@@ -504,7 +500,6 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   public function testDeleteEmptyParamsPledge() {
     $this->callAPIFailure('pledge', 'delete', array(), 'Mandatory key(s) missing from params array: id');
   }
-
 
   /**
    * Failure test for invalid pledge id.

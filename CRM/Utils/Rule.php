@@ -138,7 +138,7 @@ class CRM_Utils_Rule {
    * @return bool
    */
   public static function mysqlOrderBy($str) {
-    $matches = array();
+    $matches = [];
     // Using the field function in order by is valid.
     // Look for a string like field(contribution_status_id,3,4,6).
     // or field(civicrm_contribution.contribution_status_id,3,4,6)
@@ -541,6 +541,16 @@ class CRM_Utils_Rule {
   }
 
   /**
+   * Strict validation of 6-digit hex color notation per html5 <input type="color">
+   *
+   * @param $value
+   * @return bool
+   */
+  public static function color($value) {
+    return (bool) preg_match('/^#([\da-fA-F]{6})$/', $value);
+  }
+
+  /**
    * Strip thousand separator from a money string.
    *
    * Note that this should be done at the form layer. Once we are processing
@@ -553,17 +563,17 @@ class CRM_Utils_Rule {
    */
   public static function cleanMoney($value) {
     // first remove all white space
-    $value = str_replace(array(' ', "\t", "\n"), '', $value);
+    $value = str_replace([' ', "\t", "\n"], '', $value);
 
     $config = CRM_Core_Config::singleton();
 
     //CRM-14868
     $currencySymbols = CRM_Core_PseudoConstant::get(
       'CRM_Contribute_DAO_Contribution',
-      'currency', array(
+      'currency', [
         'keyColumn' => 'name',
         'labelColumn' => 'symbol',
-      )
+      ]
     );
     $value = str_replace($currencySymbols, '', $value);
 
@@ -971,7 +981,7 @@ class CRM_Utils_Rule {
     $highDate = strtotime($fields[$fieldName . '_high']);
 
     if ($lowDate > $highDate) {
-      $errors[$fieldName . '_range_error'] = ts('%1: Please check that your date range is in correct chronological order.', array(1 => $title));
+      $errors[$fieldName . '_range_error'] = ts('%1: Please check that your date range is in correct chronological order.', [1 => $title]);
     }
   }
 

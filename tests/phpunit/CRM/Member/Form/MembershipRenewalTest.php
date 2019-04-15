@@ -33,9 +33,6 @@
  */
 class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
-  /**
-   * Assume empty database with just civicrm_data.
-   */
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
@@ -170,7 +167,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'cvv2' => '123',
       'credit_card_exp_date' => array(
         'M' => '9',
-        'Y' => '2024', // TODO: Future proof
+        // TODO: Future proof
+        'Y' => '2024',
       ),
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
@@ -204,7 +202,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
         'id' => $this->_paymentProcessorID,
         'return' => 'payment_instrument_id',
       )),
-      ), 'online');
+    ), 'online');
   }
 
   /**
@@ -247,7 +245,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'cvv2' => '123',
       'credit_card_exp_date' => array(
         'M' => '9',
-        'Y' => '2019', // TODO: Future proof
+        // TODO: Future proof
+        'Y' => '2019',
       ),
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
@@ -296,7 +295,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('address', array(
       'contact_id' => $this->_individualId,
       'street_address' => '10 Test St',
-       'postal_code' => 90210,
+      'postal_code' => 90210,
     ));
   }
 
@@ -400,7 +399,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', array('contact_id' => $this->_individualId));
     $this->assertEquals(1, $contributionRecur['is_email_receipt']);
     $this->mut->checkMailLog([
-      '$ ' . $this->formatMoneyInput(7800.90)
+      '$ ' . $this->formatMoneyInput(7800.90),
     ]);
     $this->mut->stop();
     $this->setCurrencySeparators(',');
@@ -611,7 +610,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'num_terms' => '1',
       'source' => '',
       'total_amount' => $this->formatMoneyInput('7800.90'),
-      'financial_type_id' => '2', //Member dues, see data.xml
+      //Member dues, see data.xml
+      'financial_type_id' => '2',
       'soft_credit_type_id' => 11,
       'soft_credit_contact_id' => '',
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
@@ -621,7 +621,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'cvv2' => '123',
       'credit_card_exp_date' => array(
         'M' => '9',
-        'Y' => '2019', // TODO: Future proof
+        // TODO: Future proof
+        'Y' => '2019',
       ),
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',

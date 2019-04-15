@@ -77,10 +77,10 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       $attributes['name'], TRUE
     );
 
-    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
-        'CRM_Core_DAO_Job',
-        $this->_id,
-      ));
+    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', [
+      'CRM_Core_DAO_Job',
+      $this->_id,
+    ]);
 
     $this->add('text', 'description', ts('Description'),
       $attributes['description']
@@ -97,7 +97,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $this->add('select', 'run_frequency', ts('Run frequency'), CRM_Core_SelectValues::getJobFrequency());
 
     // CRM-17686
-    $this->add('datepicker', 'scheduled_run_date', ts('Scheduled Run Date'), NULL, FALSE, array('minDate' => time()));
+    $this->add('datepicker', 'scheduled_run_date', ts('Scheduled Run Date'), NULL, FALSE, ['minDate' => time()]);
 
     $this->add('textarea', 'parameters', ts('Command parameters'),
       "cols=50 rows=6"
@@ -106,7 +106,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     // is this job active ?
     $this->add('checkbox', 'is_active', ts('Is this Scheduled Job active?'));
 
-    $this->addFormRule(array('CRM_Admin_Form_Job', 'formRule'));
+    $this->addFormRule(['CRM_Admin_Form_Job', 'formRule']);
   }
 
   /**
@@ -117,13 +117,13 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
    */
   public static function formRule($fields) {
 
-    $errors = array();
+    $errors = [];
 
     require_once 'api/api.php';
 
     /** @var \Civi\API\Kernel $apiKernel */
     $apiKernel = \Civi::service('civi_api_kernel');
-    $apiRequest = \Civi\API\Request::create($fields['api_entity'], $fields['api_action'], array('version' => 3), NULL);
+    $apiRequest = \Civi\API\Request::create($fields['api_entity'], $fields['api_action'], ['version' => 3], NULL);
     try {
       $apiKernel->resolve($apiRequest);
     }
@@ -142,7 +142,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     if (!$this->_id) {
       $defaults['is_active'] = $defaults['is_default'] = 1;
@@ -217,13 +217,13 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
               The result will land on the same day of the month except for days 29-31 when the target month contains fewer days than the previous month.
               For example, if a job is scheduled to run on August 31st, the following invocation will occur on October 1st, and then the 1st of every month thereafter.
               To avoid this issue, please schedule Monthly and Quarterly jobs to run within the first 28 days of the month.'),
-            ts('Warning'), 'info', array('expires' => 0));
+            ts('Warning'), 'info', ['expires' => 0]);
         }
       }
     }
     // ...otherwise, if this isn't a new scheduled job, clear the next scheduled run
     elseif ($dao->id) {
-      $job = new CRM_Core_ScheduledJob(array('id' => $dao->id));
+      $job = new CRM_Core_ScheduledJob(['id' => $dao->id]);
       $job->clearScheduledRunDate();
     }
 
@@ -233,7 +233,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     if ($values['api_action'] == 'update_greeting' && CRM_Utils_Array::value('is_active', $values) == 1) {
       // pass "wiki" as 6th param to docURL2 if you are linking to a page in wiki.civicrm.org
       $docLink = CRM_Utils_System::docURL2("Managing Scheduled Jobs", NULL, NULL, NULL, NULL, "wiki");
-      $msg = ts('The update greeting job can be very resource intensive and is typically not necessary to run on a regular basis. If you do choose to enable the job, we recommend you do not run it with the force=1 option, which would rebuild greetings on all records. Leaving that option absent, or setting it to force=0, will only rebuild greetings for contacts that do not currently have a value stored. %1', array(1 => $docLink));
+      $msg = ts('The update greeting job can be very resource intensive and is typically not necessary to run on a regular basis. If you do choose to enable the job, we recommend you do not run it with the force=1 option, which would rebuild greetings on all records. Leaving that option absent, or setting it to force=0, will only rebuild greetings for contacts that do not currently have a value stored. %1', [1 => $docLink]);
       CRM_Core_Session::setStatus($msg, ts('Warning: Update Greeting job enabled'), 'alert');
     }
 

@@ -72,19 +72,18 @@ class CRM_Contribute_Form_Task_Print extends CRM_Contribute_Form_Task {
     //
     // just need to add a javascript to popup the window for printing
     //
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Print Contributions'),
-          'js' => array('onclick' => 'window.print()'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'back',
-          'name' => ts('Done'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'next',
+        'name' => ts('Print Contributions'),
+        'js' => ['onclick' => 'window.print()'],
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'back',
+        'name' => ts('Done'),
+      ],
+    ]);
   }
 
   /**

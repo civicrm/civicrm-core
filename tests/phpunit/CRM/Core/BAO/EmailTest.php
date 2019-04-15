@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
 

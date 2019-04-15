@@ -49,7 +49,7 @@ class CRM_Queue_ErrorPolicy {
    *   PHP error level to capture (e.g. E_PARSE|E_USER_ERROR).
    */
   public function __construct($level = NULL) {
-    register_shutdown_function(array($this, 'onShutdown'));
+    register_shutdown_function([$this, 'onShutdown']);
     if ($level === NULL) {
       $level = E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR;
     }
@@ -61,16 +61,16 @@ class CRM_Queue_ErrorPolicy {
    */
   public function activate() {
     $this->active = TRUE;
-    $this->backup = array();
-    foreach (array(
-               'display_errors',
-               'html_errors',
-               'xmlrpc_errors',
-             ) as $key) {
+    $this->backup = [];
+    foreach ([
+      'display_errors',
+      'html_errors',
+      'xmlrpc_errors',
+    ] as $key) {
       $this->backup[$key] = ini_get($key);
       ini_set($key, 0);
     }
-    set_error_handler(array($this, 'onError'), $this->level);
+    set_error_handler([$this, 'onError'], $this->level);
     // FIXME make this temporary/reversible
     $this->errorScope = CRM_Core_TemporaryErrorScope::useException();
   }
@@ -81,11 +81,11 @@ class CRM_Queue_ErrorPolicy {
   public function deactivate() {
     $this->errorScope = NULL;
     restore_error_handler();
-    foreach (array(
-               'display_errors',
-               'html_errors',
-               'xmlrpc_errors',
-             ) as $key) {
+    foreach ([
+      'display_errors',
+      'html_errors',
+      'xmlrpc_errors',
+    ] as $key) {
       ini_set($key, $this->backup[$key]);
     }
     $this->active = FALSE;
@@ -155,11 +155,11 @@ class CRM_Queue_ErrorPolicy {
    *   The PHP error (with "type", "message", etc).
    */
   public function reportError($error) {
-    $response = array(
+    $response = [
       'is_error' => 1,
       'is_continue' => 0,
       'exception' => htmlentities(sprintf('Error %s: %s in %s, line %s', $error['type'], $error['message'], $error['file'], $error['line'])),
-    );
+    ];
     global $activeQueueRunner;
     if (is_object($activeQueueRunner)) {
       $response['last_task_title'] = $activeQueueRunner->lastTaskTitle;
@@ -178,10 +178,10 @@ class CRM_Queue_ErrorPolicy {
   public function reportException(Exception $e) {
     CRM_Core_Error::debug_var('CRM_Queue_ErrorPolicy_reportException', CRM_Core_Error::formatTextException($e));
 
-    $response = array(
+    $response = [
       'is_error' => 1,
       'is_continue' => 0,
-    );
+    ];
 
     $config = CRM_Core_Config::singleton();
     if ($config->backtrace || CRM_Core_Config::isUpgradeMode()) {

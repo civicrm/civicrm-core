@@ -10,10 +10,5 @@
         // D7 hack, restore toolbar position (CRM-15341)
         $('#toolbar').css('z-index', '');
       }
-    })
-    .on('crmLoad', '#civicrm-menu', function(e) {
-      if ($('#toolbar a.toggle').length) {
-        $('#civicrm-menu').css({width: 'calc(100% - 40px)'});
-      }
     });
 })(CRM.$);

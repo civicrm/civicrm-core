@@ -38,12 +38,13 @@
  * @param array $params
  *   Associative array of property name-value pairs to insert in new saved search.
  * @example SavedSearch/Create.php Std create example.
- * @return array api result array
+ * @return array
+ *   api result array
  *   {@getfields saved_search_create}
  * @access public
  */
 function civicrm_api3_saved_search_create($params) {
-  civicrm_api3_verify_one_mandatory($params, NULL, array('form_values', 'where_clause'));
+  civicrm_api3_verify_one_mandatory($params, NULL, ['form_values', 'where_clause']);
   // The create function of the dao expects a 'formValues' that is
   // not serialized. The get function returns form_values, that is
   // serialized.
@@ -72,7 +73,8 @@ function civicrm_api3_saved_search_create($params) {
  *   Associative array of property name-value pairs. $params['id'] should be
  *   the ID of the saved search to be deleted.
  * @example SavedSearch/Delete.php Std delete example.
- * @return array api result array
+ * @return array
+ *   api result array
  *   {@getfields saved_search_delete}
  * @access public
  */
@@ -86,7 +88,8 @@ function civicrm_api3_saved_search_delete($params) {
  * @param array $params
  *   An associative array of name-value pairs.
  * @example SavedSearch/Get.php Std get example.
- * @return array api result array
+ * @return array
+ *   api result array
  *   {@getfields saved_search_get}
  * @access public
  */

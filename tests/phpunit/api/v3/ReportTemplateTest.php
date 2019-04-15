@@ -473,7 +473,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
     $this->assertEquals(2, $rows['count'], "Report failed - the sql used to generate the results was " . print_r($rows['metadata']['sql'], TRUE));
 
-    $expected = preg_replace('/\s+/', ' ', 'DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
+    $expected = preg_replace('/\s+/', ' ', 'DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AS
       SELECT SQL_CALC_FOUND_ROWS contact_civireport.id as cid  FROM civicrm_contact contact_civireport    INNER JOIN civicrm_contribution contribution_civireport USE index (received_date) ON contribution_civireport.contact_id = contact_civireport.id
          AND contribution_civireport.is_test = 0
          AND contribution_civireport.receive_date BETWEEN \'20140701000000\' AND \'20150630235959\'
@@ -550,6 +550,23 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => array('metadata' => array('sql')),
     ));
     $this->assertEquals(2, $rows['values'][0]['civicrm_contribution_total_amount_count']);
+  }
+
+  /**
+   * Test no fatal on order by per https://lab.civicrm.org/dev/core/issues/739
+   */
+  public function testCaseDetailsCaseTypeHeader() {
+    $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'case/detail',
+      'fields' => ['subject' => 1, 'client_sort_name' => 1],
+      'order_bys' => [
+        1 => [
+          'column' => 'case_type_title',
+          'order' => 'ASC',
+          'section' => '1',
+        ],
+      ],
+    ]);
   }
 
   /**
@@ -827,11 +844,11 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ));
 
     foreach (array(
-               $addedToBothIndividualID,
-               $removedFromBothIndividualID,
-               $addedToSmartGroupRemovedFromOtherIndividualID,
-               $removedFromSmartGroupAddedToOtherIndividualID,
-             ) as $contactID) {
+      $addedToBothIndividualID,
+      $removedFromBothIndividualID,
+      $addedToSmartGroupRemovedFromOtherIndividualID,
+      $removedFromSmartGroupAddedToOtherIndividualID,
+    ) as $contactID) {
       $this->contributionCreate(array(
         'contact_id' => $contactID,
         'invoice_id' => '',
@@ -1066,10 +1083,26 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
         'financial_type_id' => '1',
         'receive_date' => '1',
         'total_amount' => '1',
-       ],
+      ],
       'order_bys' => [['column' => 'sort_name', 'order' => 'ASC', 'section' => '1']],
       'options' => array('metadata' => array('sql')),
     ));
+  }
+
+  /**
+   * Test contact subtype filter on grant report.
+   */
+  public function testGrantReportSeparatedFilter() {
+    $contactID = $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
+    $contactID2 = $this->individualCreate();
+    $this->callAPISuccess('Grant', 'create', ['contact_id' => $contactID, 'status_id' => 1, 'grant_type_id' => 1, 'amount_total' => 1]);
+    $this->callAPISuccess('Grant', 'create', ['contact_id' => $contactID2, 'status_id' => 1, 'grant_type_id' => 1, 'amount_total' => 1]);
+    $rows = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'grant/detail',
+      'contact_sub_type_op' => 'in',
+      'contact_sub_type_value' => ['Student'],
+    ]);
+    $this->assertEquals(1, $rows['count']);
   }
 
   /**
@@ -1186,7 +1219,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'fields' => [
         'amount_1' => '1',
         'soft_id' => '1',
-       ],
+      ],
     ));
     $values = $rows['values'][0];
     $this->assertEquals(100.00, $values['civicrm_contribution_soft_amount_1_sum'], "Total commited should be $100");

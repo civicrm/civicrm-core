@@ -74,36 +74,36 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
    */
   public static function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
-      self::$_actionLinks = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_actionLinks = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit Option'),
           'url' => 'civicrm/admin/custom/group/field/option',
           'qs' => 'reset=1&action=update&id=%%id%%&fid=%%fid%%&gid=%%gid%%',
           'title' => ts('Edit Multiple Choice Option'),
-        ),
-        CRM_Core_Action::VIEW => array(
+        ],
+        CRM_Core_Action::VIEW => [
           'name' => ts('View'),
           'url' => 'civicrm/admin/custom/group/field/option',
           'qs' => 'action=view&id=%%id%%&fid=%%fid%%',
           'title' => ts('View Multiple Choice Option'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Multiple Choice Option'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Multiple Choice Option'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/custom/group/field/option',
           'qs' => 'action=delete&id=%%id%%&fid=%%fid%%',
           'title' => ts('Delete Multiple Choice Option'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_actionLinks;
   }
@@ -122,11 +122,11 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
 SELECT id, label
 FROM   civicrm_option_value
 WHERE  option_group_id = %1";
-    $params = array(
-      1 => array($optionGroupID, 'Integer'),
-    );
+    $params = [
+      1 => [$optionGroupID, 'Integer'],
+    ];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
-    $optionValue = array();
+    $optionValue = [];
     while ($dao->fetch()) {
       $optionValue[$dao->id] = $dao->label;
     }
@@ -166,19 +166,19 @@ WHERE option_group_id = %1";
 SELECT id, label
 FROM   civicrm_custom_field
 WHERE  option_group_id = %1";
-    $params = array(
-      1 => array($optionGroupID, 'Integer'),
-      2 => array($this->_fid, 'Integer'),
-    );
+    $params = [
+      1 => [$optionGroupID, 'Integer'],
+      2 => [$this->_fid, 'Integer'],
+    ];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
-    $reusedNames = array();
+    $reusedNames = [];
     if ($dao->N > 1) {
       while ($dao->fetch()) {
         $reusedNames[] = $dao->label;
       }
       $reusedNames = implode(', ', $reusedNames);
       $newTitle = ts('%1 - Multiple Choice Options',
-        array(1 => $reusedNames)
+        [1 => $reusedNames]
       );
       CRM_Utils_System::setTitle($newTitle);
       $this->assign('reusedNames', $reusedNames);
@@ -238,12 +238,12 @@ WHERE  option_group_id = %1";
     $this->assign('isOptionGroupLocked', $isOptionGroupLocked);
 
     //as url contain $gid so append breadcrumb dynamically.
-    $breadcrumb = array(
-      array(
+    $breadcrumb = [
+      [
         'title' => ts('Custom Data Fields'),
         'url' => CRM_Utils_System::url('civicrm/admin/custom/group/field', 'reset=1&gid=' . $this->_gid),
-      ),
-    );
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadcrumb);
 
     if ($this->_fid) {
@@ -251,7 +251,7 @@ WHERE  option_group_id = %1";
       $this->assign('fid', $this->_fid);
       $this->assign('gid', $this->_gid);
       $this->assign('fieldTitle', $fieldTitle);
-      CRM_Utils_System::setTitle(ts('%1 - Multiple Choice Options', array(1 => $fieldTitle)));
+      CRM_Utils_System::setTitle(ts('%1 - Multiple Choice Options', [1 => $fieldTitle]));
     }
 
     // get the requested action

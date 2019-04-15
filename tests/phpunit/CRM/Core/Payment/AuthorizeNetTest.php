@@ -53,8 +53,8 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    * Test works but not both due to some form of caching going on in the SmartySingleton
    */
   public function testCreateSingleNowDated() {
-    $firstName = 'John_' . substr(sha1(rand()), 0, 7);
-    $lastName = 'Smith_' . substr(sha1(rand()), 0, 7);
+    $firstName = 'John_' . substr(sha1(rand()), 0, 7) . uniqid();
+    $lastName = 'Smith_' . substr(sha1(rand()), 0, 7) . uniqid();
     $nameParams = array('first_name' => $firstName, 'last_name' => $lastName);
     $contactId = $this->individualCreate($nameParams);
 
@@ -145,7 +145,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'first_name' => $firstName,
       'middle_name' => '',
       'last_name' => $lastName,
-      'street_address' => '8 Hobbiton Road',
+      'street_address' => '8 Hobbiton Road' . uniqid(),
       'city' => 'The Shire',
       'state_province' => 'IL',
       'postal_code' => 5010,
@@ -238,7 +238,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'cvv2' => 123,
       'credit_card_exp_date' => array(
         'M' => 11,
-        'Y' => 2019,
+        'Y' => 2022,
       ),
       'credit_card_type' => 'Visa',
       'is_recur' => 1,
@@ -261,7 +261,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'state_province-5' => 'IL',
       'billing_country-5' => 'US',
       'country-5' => 'US',
-      'year' => 2019,
+      'year' => 2022,
       'month' => 10,
       'ip_address' => '127.0.0.1',
       'amount' => 70,
@@ -281,18 +281,15 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
       'first_name' => $firstName,
       'middle_name' => 'bob',
       'last_name' => $lastName,
-      'street_address' => '8 Hobbiton Road',
+      'street_address' => '8 Hobbiton Road' . uniqid(),
       'city' => 'The Shire',
       'state_province' => 'IL',
       'postal_code' => 5010,
       'country' => 'US',
-      'contributionType_name' => 'My precious',
-      'contributionType_accounting_code' => '',
       'contributionPageID' => '',
       'email' => "{$firstName}.{$lastName}@example.com",
       'contactID' => $contactId,
       'contributionID' => $contribution['id'],
-      'contributionTypeID' => $this->_financialTypeId,
       'contributionRecurID' => $recur->id,
     );
 

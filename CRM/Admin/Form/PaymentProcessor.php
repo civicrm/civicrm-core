@@ -44,7 +44,8 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
   protected $_paymentProcessorDAO;
 
   /**
-   * @var int $_paymentProcessorType Payment processor Type ID
+   * @var int
+   * Payment processor Type ID
    */
   protected $_paymentProcessorType;
 
@@ -111,56 +112,56 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
 
     $this->assign('is_recur', $this->_paymentProcessorDAO->is_recur);
 
-    $this->_fields = array(
-      array(
+    $this->_fields = [
+      [
         'name' => 'user_name',
         'label' => $this->_paymentProcessorDAO->user_name_label,
-      ),
-      array(
+      ],
+      [
         'name' => 'password',
         'label' => $this->_paymentProcessorDAO->password_label,
-      ),
-      array(
+      ],
+      [
         'name' => 'signature',
         'label' => $this->_paymentProcessorDAO->signature_label,
-      ),
-      array(
+      ],
+      [
         'name' => 'subject',
         'label' => $this->_paymentProcessorDAO->subject_label,
-      ),
-      array(
+      ],
+      [
         'name' => 'url_site',
         'label' => ts('Site URL'),
         'rule' => 'url',
         'msg' => ts('Enter a valid URL'),
-      ),
-    );
+      ],
+    ];
 
     if ($this->_paymentProcessorDAO->is_recur) {
-      $this->_fields[] = array(
+      $this->_fields[] = [
         'name' => 'url_recur',
         'label' => ts('Recurring Payments URL'),
         'rule' => 'url',
         'msg' => ts('Enter a valid URL'),
-      );
+      ];
     }
 
     if (!empty($this->_paymentProcessorDAO->url_button_default)) {
-      $this->_fields[] = array(
+      $this->_fields[] = [
         'name' => 'url_button',
         'label' => ts('Button URL'),
         'rule' => 'url',
         'msg' => ts('Enter a valid URL'),
-      );
+      ];
     }
 
     if (!empty($this->_paymentProcessorDAO->url_api_default)) {
-      $this->_fields[] = array(
+      $this->_fields[] = [
         'name' => 'url_api',
         'label' => ts('API URL'),
         'rule' => 'url',
         'msg' => ts('Enter a valid URL'),
-      );
+      ];
     }
   }
 
@@ -182,12 +183,12 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $attributes['name'], TRUE
     );
 
-    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
-        'CRM_Financial_DAO_PaymentProcessor',
-        $this->_id,
-        'name',
-        CRM_Core_Config::domainID(),
-      ));
+    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', [
+      'CRM_Financial_DAO_PaymentProcessor',
+      $this->_id,
+      'name',
+      CRM_Core_Config::domainID(),
+    ]);
 
     $this->add('text', 'description', ts('Description'),
       $attributes['description']
@@ -198,7 +199,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       ts('Payment Processor Type'),
       CRM_Financial_BAO_PaymentProcessor::buildOptions('payment_processor_type_id'),
       TRUE,
-      array('onchange' => "reload(true)")
+      ['onchange' => "reload(true)"]
     );
 
     // Financial Account of account type asset CRM-11515
@@ -208,15 +209,15 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       $this->assign('financialAccount', $fcount);
     }
     $this->add('select', 'financial_account_id', ts('Financial Account'),
-      array('' => ts('- select -')) + $financialAccount,
+      ['' => ts('- select -')] + $financialAccount,
       TRUE
     );
     $this->addSelect('payment_instrument_id',
-      array(
+      [
         'entity' => 'contribution',
         'label' => ts('Payment Method'),
         'placeholder'  => NULL,
-      )
+      ]
     );
 
     // is this processor active ?
@@ -230,12 +231,12 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
         continue;
       }
 
-      $this->addField($field['name'], array('label' => $field['label']));
+      $this->addField($field['name'], ['label' => $field['label']]);
 
-      $fieldSpec = civicrm_api3($this->getDefaultEntity(), 'getfield', array(
+      $fieldSpec = civicrm_api3($this->getDefaultEntity(), 'getfield', [
         'name' => $field['name'],
         'action' => 'create',
-      ));
+      ]);
       $this->add($fieldSpec['values']['html']['type'], "test_{$field['name']}",
         $field['label'], $attributes[$field['name']]
       );
@@ -245,7 +246,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       }
     }
 
-    $this->addFormRule(array('CRM_Admin_Form_PaymentProcessor', 'formRule'));
+    $this->addFormRule(['CRM_Admin_Form_PaymentProcessor', 'formRule']);
   }
 
   /**
@@ -258,7 +259,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     // make sure that at least one of live or test is present
     // and we have at least name and url_site
     // would be good to make this processor specific
-    $errors = array();
+    $errors = [];
 
     if (!(self::checkSection($fields, $errors) ||
       self::checkSection($fields, $errors, 'test')
@@ -282,7 +283,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @return bool
    */
   public static function checkSection(&$fields, &$errors, $section = NULL) {
-    $names = array('user_name');
+    $names = ['user_name'];
 
     $present = FALSE;
     $allPresent = TRUE;
@@ -310,7 +311,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     if (!$this->_id) {
       $defaults['is_active'] = $defaults['is_default'] = 1;
@@ -354,7 +355,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
           $this->_id,
           'accepted_credit_cards'
         ), TRUE);
-    $acceptedCards = array();
+    $acceptedCards = [];
     if (!empty($cards)) {
       foreach ($cards as $card => $val) {
         $acceptedCards[$card] = 1;
@@ -409,7 +410,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     $this->updatePaymentProcessor($values, $domainID, FALSE);
     $this->updatePaymentProcessor($values, $domainID, TRUE);
 
-    $processor = civicrm_api3('payment_processor', 'getsingle', array('name' => $values['name'], 'is_test' => 0));
+    $processor = civicrm_api3('payment_processor', 'getsingle', ['name' => $values['name'], 'is_test' => 0]);
     $errors = Civi\Payment\System::singleton()->checkProcessorConfig($processor);
     if ($errors) {
       CRM_Core_Session::setStatus($errors, 'Payment processor configuration invalid', 'error');
@@ -417,7 +418,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       CRM_Core_Session::singleton()->pushUserContext($this->refreshURL);
     }
     else {
-      CRM_Core_Session::setStatus(ts('Payment processor %1 has been saved.', array(1 => "<em>{$values['name']}</em>")), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('Payment processor %1 has been saved.', [1 => "<em>{$values['name']}</em>"]), ts('Saved'), 'success');
     }
   }
 
@@ -430,12 +431,12 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
    */
   public function updatePaymentProcessor(&$values, $domainID, $test) {
     if ($test) {
-      foreach (array('user_name', 'password', 'signature', 'url_site', 'url_recur', 'url_api', 'url_button', 'subject') as $field) {
+      foreach (['user_name', 'password', 'signature', 'url_site', 'url_recur', 'url_api', 'url_button', 'subject'] as $field) {
         $values[$field] = empty($values["test_{$field}"]) ? CRM_Utils_Array::value($field, $values) : $values["test_{$field}"];
       }
     }
     if (!empty($values['accept_credit_cards'])) {
-      $creditCards = array();
+      $creditCards = [];
       $accptedCards = array_keys($values['accept_credit_cards']);
       $creditCardTypes = CRM_Contribute_PseudoConstant::creditCard();
       foreach ($creditCardTypes as $type => $val) {
@@ -448,7 +449,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
     else {
       $creditCards = "NULL";
     }
-    $params  = array_merge(array(
+    $params = array_merge([
       'id' => $test ? $this->_testID : $this->_id,
       'domain_id' => $domainID,
       'is_test' => $test,
@@ -461,7 +462,7 @@ class CRM_Admin_Form_PaymentProcessor extends CRM_Admin_Form {
       'payment_instrument_id' => $this->_paymentProcessorDAO->payment_instrument_id,
       'financial_account_id' => $values['financial_account_id'],
       'accepted_credit_cards' => $creditCards,
-    ), $values);
+    ], $values);
 
     civicrm_api3('PaymentProcessor', 'create', $params);
   }

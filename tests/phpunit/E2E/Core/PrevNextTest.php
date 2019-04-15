@@ -15,7 +15,12 @@ class PrevNextTest extends \CiviEndToEndTestCase {
   /**
    * @var string
    */
-  protected $cacheKey, $cacheKeyB;
+  protected $cacheKey;
+
+  /**
+   * @var string
+   */
+  protected $cacheKeyB;
 
   /**
    * @var \CRM_Core_PrevNextCache_Interface
@@ -45,11 +50,11 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     $query = new \CRM_Contact_BAO_Query(array(), NULL, NULL, FALSE, FALSE, 1, FALSE, TRUE, FALSE, NULL, 'AND');
     $sql = $query->searchQuery($start, $prefillLimit, $sort, FALSE, $query->_includeContactIds,
       FALSE, TRUE, TRUE);
-    $selectSQL = "SELECT DISTINCT '$this->cacheKey', contact_a.id, contact_a.sort_name";
+    $selectSQL = "SELECT DISTINCT %1, contact_a.id, contact_a.sort_name";
     $sql = str_replace(array("SELECT contact_a.id as contact_id", "SELECT contact_a.id as id"), $selectSQL, $sql);
 
     $this->assertTrue(
-      $this->prevNext->fillWithSql($this->cacheKey, $sql),
+      $this->prevNext->fillWithSql($this->cacheKey, $sql, [1 => [$this->cacheKey, 'String']]),
       "fillWithSql should return TRUE on success"
     );
 
@@ -313,12 +318,13 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     $this->assertSelections([], 'getall', $this->cacheKeyB);
   }
 
-
   /**
    * Assert that the current cacheKey has a list of selected contact IDs.
    *
    * @param array $ids
    *   Contact IDs that should be selected.
+   * @param string $action
+   * @param string|NULL $cacheKey
    */
   protected function assertSelections($ids, $action = 'get', $cacheKey = NULL) {
     if ($cacheKey === NULL) {

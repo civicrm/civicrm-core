@@ -39,7 +39,6 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
   protected $_activityID;
   protected $_params;
 
-
   public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();

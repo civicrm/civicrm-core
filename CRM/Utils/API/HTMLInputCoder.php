@@ -63,7 +63,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
    */
   public function getSkipFields() {
     if ($this->skipFields === NULL) {
-      $this->skipFields = array(
+      $this->skipFields = [
         'widget_code',
         'html_message',
         'body_html',
@@ -97,20 +97,29 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'honor_block_text',
         'pay_later_text',
         'pay_later_receipt',
-        'label', // This is needed for FROM Email Address configuration. dgg
-        'url', // This is needed for navigation items urls
+        // This is needed for FROM Email Address configuration. dgg
+        'label',
+        // This is needed for navigation items urls
+        'url',
         'details',
-        'msg_text', // message templates’ text versions
-        'text_message', // (send an) email to contact’s and CiviMail’s text version
-        'data', // data i/p of persistent table
-        'sqlQuery', // CRM-6673
+        // message templates’ text versions
+        'msg_text',
+        // (send an) email to contact’s and CiviMail’s text version
+        'text_message',
+        // data i/p of persistent table
+        'data',
+        // CRM-6673
+        'sqlQuery',
         'pcp_title',
         'pcp_intro_text',
-        'new', // The 'new' text in word replacements
-        'replyto_email', // e.g. '"Full Name" <user@example.org>'
+        // The 'new' text in word replacements
+        'new',
+        // e.g. '"Full Name" <user@example.org>'
+        'replyto_email',
         'operator',
-        'content', // CRM-20468
-      );
+        // CRM-20468
+        'content',
+      ];
       $custom = CRM_Core_DAO::executeQuery('SELECT id FROM civicrm_custom_field WHERE html_type = "RichTextEditor"');
       while ($custom->fetch()) {
         $this->skipFields[] = 'custom_' . $custom->id;
@@ -135,7 +144,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
       }
     }
     elseif ($castToString || is_string($values)) {
-      $values = str_replace(array('<', '>'), array('&lt;', '&gt;'), $values);
+      $values = str_replace(['<', '>'], ['&lt;', '&gt;'], $values);
     }
   }
 
@@ -150,7 +159,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
       }
     }
     elseif ($castToString || is_string($values)) {
-      $values = str_replace(array('&lt;', '&gt;'), array('<', '>'), $values);
+      $values = str_replace(['&lt;', '&gt;'], ['<', '>'], $values);
     }
   }
 

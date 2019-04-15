@@ -109,6 +109,7 @@ trait CRM_Utils_Cache_NaiveMultipleTrait {
   }
 
   /**
+   * @param $func
    * @param $keys
    * @throws \CRM_Utils_Cache_InvalidArgumentException
    */

@@ -19,14 +19,14 @@ class CRM_Price_DAO_PriceField extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_price_field';
+  public static $_tableName = 'civicrm_price_field';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Price Field
@@ -161,7 +161,7 @@ class CRM_Price_DAO_PriceField extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'price_set_id', 'civicrm_price_set', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }

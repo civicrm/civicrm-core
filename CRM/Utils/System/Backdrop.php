@@ -42,15 +42,15 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
   public function createUser(&$params, $mail) {
     $form_state = form_state_defaults();
 
-    $form_state['input'] = array(
+    $form_state['input'] = [
       'name' => $params['cms_name'],
       'mail' => $params[$mail],
       'op' => 'Create new account',
-    );
+    ];
 
     $admin = user_access('administer users');
     if (!config_get('system.core', 'user_email_verification') || $admin) {
-      $form_state['input']['pass'] = array('pass1' => $params['cms_pass'], 'pass2' => $params['cms_pass']);
+      $form_state['input']['pass'] = ['pass1' => $params['cms_pass'], 'pass2' => $params['cms_pass']];
     }
 
     if (!empty($params['notify'])) {
@@ -61,7 +61,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
     $form_state['programmed'] = TRUE;
     $form_state['complete form'] = FALSE;
     $form_state['method'] = 'post';
-    $form_state['build_info']['args'] = array();
+    $form_state['build_info']['args'] = [];
     /*
      * if we want to submit this form more than once in a process (e.g. create more than one user)
      * we must force it to validate each time for this form. Otherwise it will not validate
@@ -76,7 +76,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
     $form = backdrop_retrieve_form('user_register_form', $form_state);
     $form_state['process_input'] = 1;
     $form_state['submitted'] = 1;
-    $form['#array_parents'] = array();
+    $form['#array_parents'] = [];
     $form['#tree'] = FALSE;
     backdrop_process_form('user_register_form', $form, $form_state);
 
@@ -124,23 +124,23 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
         $errors['cms_name'] = $nameError;
       }
       else {
-        $uid = db_query("SELECT uid FROM {users} WHERE name = :name", array(':name' => $params['name']))->fetchField();
+        $uid = db_query("SELECT uid FROM {users} WHERE name = :name", [':name' => $params['name']])->fetchField();
         if ((bool) $uid) {
-          $errors['cms_name'] = ts('The username %1 is already taken. Please select another username.', array(1 => $params['name']));
+          $errors['cms_name'] = ts('The username %1 is already taken. Please select another username.', [1 => $params['name']]);
         }
       }
     }
 
     if (!empty($params['mail'])) {
       if (!valid_email_address($params['mail'])) {
-        $errors[$emailName] = ts('The e-mail address %1 is not valid.', array('%1' => $params['mail']));
+        $errors[$emailName] = ts('The e-mail address %1 is not valid.', ['%1' => $params['mail']]);
       }
       else {
-        $uid = db_query("SELECT uid FROM {users} WHERE mail = :mail", array(':mail' => $params['mail']))->fetchField();
+        $uid = db_query("SELECT uid FROM {users} WHERE mail = :mail", [':mail' => $params['mail']])->fetchField();
         if ((bool) $uid) {
           $resetUrl = url('user/password');
           $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
-            array(1 => $params['mail'], 2 => $resetUrl)
+            [1 => $params['mail'], 2 => $resetUrl]
           );
         }
       }
@@ -151,8 +151,8 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function getLoginURL($destination = '') {
-    $query = $destination ? array('destination' => $destination) : array();
-    return url('user', array('query' => $query, 'absolute' => TRUE));
+    $query = $destination ? ['destination' => $destination] : [];
+    return url('user', ['query' => $query, 'absolute' => TRUE]);
   }
 
   /**
@@ -177,7 +177,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
     if (is_array($breadCrumbs)) {
       foreach ($breadCrumbs as $crumbs) {
         if (stripos($crumbs['url'], 'id%%')) {
-          $args = array('cid', 'mid');
+          $args = ['cid', 'mid'];
           foreach ($args as $a) {
             $val = CRM_Utils_Request::retrieve($a, 'Positive', CRM_Core_DAO::$_nullObject,
               FALSE, NULL, $_GET
@@ -197,7 +197,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function resetBreadCrumb() {
-    $bc = array();
+    $bc = [];
     backdrop_set_breadcrumb($bc);
   }
 
@@ -208,10 +208,10 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
     static $count = 0;
     if (!empty($header)) {
       $key = 'civi_' . ++$count;
-      $data = array(
+      $data = [
         '#type' => 'markup',
         '#markup' => $header,
-      );
+      ];
       backdrop_add_html_head($data, $key);
     }
   }
@@ -220,7 +220,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function addScriptUrl($url, $region) {
-    $params = array('group' => JS_LIBRARY, 'weight' => 10);
+    $params = ['group' => JS_LIBRARY, 'weight' => 10];
     switch ($region) {
       case 'html-header':
       case 'page-footer':
@@ -240,7 +240,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function addScript($code, $region) {
-    $params = array('type' => 'inline', 'group' => JS_LIBRARY, 'weight' => 10);
+    $params = ['type' => 'inline', 'group' => JS_LIBRARY, 'weight' => 10];
     switch ($region) {
       case 'html-header':
       case 'page-footer':
@@ -261,7 +261,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
     if ($region != 'html-header') {
       return FALSE;
     }
-    $params = array();
+    $params = [];
     // If the path is within the Backdrop directory we can use the more efficient 'file' setting
     $params['type'] = $this->formatResourceUrl($url) ? 'file' : 'external';
     backdrop_add_css($url, $params);
@@ -275,7 +275,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
     if ($region != 'html-header') {
       return FALSE;
     }
-    $params = array('type' => 'inline');
+    $params = ['type' => 'inline'];
     backdrop_add_css($code, $params);
     return TRUE;
   }
@@ -314,12 +314,12 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
 
     $account = $userUid = $userMail = NULL;
     if ($loadCMSBootstrap) {
-      $bootStrapParams = array();
+      $bootStrapParams = [];
       if ($name && $password) {
-        $bootStrapParams = array(
+        $bootStrapParams = [
           'name' => $name,
           'pass' => $password,
-        );
+        ];
       }
       CRM_Utils_System::loadBootStrap($bootStrapParams, TRUE, TRUE, $realPath);
 
@@ -373,7 +373,7 @@ AND    u.status = 1
       if (!$contactID) {
         return FALSE;
       }
-      return array($contactID, $userUid, mt_rand());
+      return [$contactID, $userUid, mt_rand()];
     }
     return FALSE;
   }
@@ -408,7 +408,7 @@ AND    u.status = 1
    * @param array $params
    *   The array of form values submitted by the user.
    */
-  public function userLoginFinalize($params = array()) {
+  public function userLoginFinalize($params = []) {
     user_login_finalize($params);
   }
 
@@ -527,7 +527,7 @@ AND    u.status = 1
    *
    * @return bool
    */
-  public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
+  public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     $cmsPath = $this->cmsRootPath($realPath);
 
     if (!file_exists("$cmsPath/core/includes/bootstrap.inc")) {
@@ -694,7 +694,7 @@ AND    u.status = 1
       user_is_logged_in() &&
       function_exists('user_uid_optional_to_arg')
     ) {
-      $ufID = user_uid_optional_to_arg(array());
+      $ufID = user_uid_optional_to_arg([]);
     }
 
     return $ufID;
@@ -775,7 +775,7 @@ AND    u.status = 1
     $roles = user_roles(FALSE, $oldPerm);
     if (!empty($roles)) {
       foreach (array_keys($roles) as $rid) {
-        user_role_revoke_permissions($rid, array($oldPerm));
+        user_role_revoke_permissions($rid, [$oldPerm]);
         user_role_grant_permissions($rid, $newPerms);
       }
     }
@@ -796,11 +796,11 @@ AND    u.status = 1
       // @TODO Find more solid way to check - try system_get_info('module', 'og').
       //
       // Also, since we don't know how to get the entity type of the // group, we'll assume it's 'node'
-      og_group('node', $ogID, array('entity' => user_load($userID)));
+      og_group('node', $ogID, ['entity' => user_load($userID)]);
     }
     else {
       // Works for the OG 7.x-1.x branch
-      og_group($ogID, array('entity' => user_load($userID)));
+      og_group($ogID, ['entity' => user_load($userID)]);
     }
   }
 
@@ -885,11 +885,11 @@ AND    u.status = 1
       }
     }
 
-    return array(
+    return [
       'contactCount' => $contactCount,
       'contactMatching' => $contactMatching,
       'contactCreated' => $contactCreated,
-    );
+    ];
   }
 
   /**
@@ -910,7 +910,7 @@ AND    u.status = 1
    */
   public function permissionEmails($permissionName) {
     // FIXME!!!!
-    return array();
+    return [];
   }
 
   /**
@@ -928,10 +928,10 @@ AND    u.status = 1
       $filesURL = $baseURL . "files/civicrm/";
     }
 
-    return array(
+    return [
       'url' => $filesURL,
       'path' => CRM_Utils_File::baseFilePath(),
-    );
+    ];
   }
 
   /**
@@ -1018,7 +1018,7 @@ AND    u.status = 1
       include $confdir . "/sites.php";
     }
     else {
-      $sites = array();
+      $sites = [];
     }
 
     $uri = explode('/', $phpSelf);

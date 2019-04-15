@@ -81,11 +81,11 @@ CREATE TEMPORARY TABLE {$this->_tableName} (
 ";
 
     foreach ($this->_columns as $dontCare => $fieldName) {
-      if (in_array($fieldName, array(
+      if (in_array($fieldName, [
         'contact_id',
         'participant_id',
         'display_name',
-      ))) {
+      ])) {
         continue;
       }
       $sql .= "{$fieldName} int default 0,\n";
@@ -133,12 +133,12 @@ ORDER BY c.id, l.price_field_value_id;
     $dao = CRM_Core_DAO::executeQuery($sql);
 
     // first store all the information by option value id
-    $rows = array();
+    $rows = [];
     while ($dao->fetch()) {
       $contactID = $dao->contact_id;
       $participantID = $dao->participant_id;
       if (!isset($rows[$participantID])) {
-        $rows[$participantID] = array();
+        $rows[$participantID] = [];
       }
 
       $rows[$participantID][] = "price_field_{$dao->price_field_value_id} = {$dao->qty}";
@@ -176,9 +176,9 @@ WHERE  p.entity_table = 'civicrm_event'
 AND    p.entity_id    = e.id
 ";
 
-    $params = array();
+    $params = [];
     if ($eventID) {
-      $params[1] = array($eventID, 'Integer');
+      $params[1] = [$eventID, 'Integer'];
       $sql .= " AND e.id = $eventID";
     }
 
@@ -196,7 +196,7 @@ AND    p.entity_id    = e.id
   public function buildForm(&$form) {
     $dao = $this->priceSetDAO();
 
-    $event = array();
+    $event = [];
     while ($dao->fetch()) {
       $event[$dao->id] = $dao->title;
     }
@@ -221,15 +221,15 @@ AND    p.entity_id    = e.id
      * if you are using the standard template, this array tells the template what elements
      * are part of the search criteria
      */
-    $form->assign('elements', array('event_id'));
+    $form->assign('elements', ['event_id']);
   }
 
   public function setColumns() {
-    $this->_columns = array(
+    $this->_columns = [
       ts('Contact ID') => 'contact_id',
       ts('Participant ID') => 'participant_id',
       ts('Name') => 'display_name',
-    );
+    ];
 
     if (!$this->_eventID) {
       return;
@@ -292,10 +292,10 @@ contact_a.id             as contact_id  ,
 contact_a.display_name   as display_name";
 
       foreach ($this->_columns as $dontCare => $fieldName) {
-        if (in_array($fieldName, array(
+        if (in_array($fieldName, [
           'contact_id',
           'display_name',
-        ))) {
+        ])) {
           continue;
         }
         $selectClause .= ",\ntempTable.{$fieldName} as {$fieldName}";

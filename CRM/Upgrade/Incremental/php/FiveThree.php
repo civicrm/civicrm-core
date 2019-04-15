@@ -41,11 +41,11 @@ class CRM_Upgrade_Incremental_php_FiveThree extends CRM_Upgrade_Incremental_Base
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '5.3.0') {
-      $params = array(
+      $params = [
         1 => 'edit user-driven message templates',
         2 => 'edit system workflow message templates',
         3 => 'edit message templates',
-      );
+      ];
       $preUpgradeMessage .= '<p>' . ts('New granular permissions called %1 and %2 have been added for %3 permission. These permissions help to limit user access per template', $params) . '</p>';
     }
     // Example: Generate a pre-upgrade message.
@@ -75,7 +75,7 @@ class CRM_Upgrade_Incremental_php_FiveThree extends CRM_Upgrade_Incremental_Base
    * @param string $rev
    */
   public function upgrade_5_3_alpha1($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('CRM-19948 - Add created_id column to civicrm_file', 'addFileCreatedIdColumn');
   }
 

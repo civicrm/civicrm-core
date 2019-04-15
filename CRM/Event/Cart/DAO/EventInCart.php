@@ -19,14 +19,14 @@ class CRM_Event_Cart_DAO_EventInCart extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_events_in_carts';
+  public static $_tableName = 'civicrm_events_in_carts';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Event In Cart Id

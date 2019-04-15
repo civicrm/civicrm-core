@@ -35,6 +35,7 @@
  * Page for displaying Administer CiviCRM Control Panel.
  */
 class CRM_Admin_Page_Admin extends CRM_Core_Page {
+
   /**
    * Run page.
    *
@@ -45,13 +46,13 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
 
     $this->assign('registerSite', htmlspecialchars('https://civicrm.org/register-your-site?src=iam&sid=' . CRM_Utils_System::getSiteID()));
 
-    $groups = array(
+    $groups = [
       'Customize Data and Screens' => ts('Customize Data and Screens'),
       'Communications' => ts('Communications'),
       'Localization' => ts('Localization'),
       'Users and Permissions' => ts('Users and Permissions'),
       'System Settings' => ts('System Settings'),
-    );
+    ];
 
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviContribute', $config->enableComponents)) {
@@ -98,7 +99,7 @@ class CRM_Admin_Page_Admin extends CRM_Core_Page {
         $adminPanel[$groupId]['title'] = $title;
       }
       else {
-        $adminPanel[$groupId] = array();
+        $adminPanel[$groupId] = [];
         $adminPanel[$groupId]['show'] = '';
         $adminPanel[$groupId]['hide'] = '';
         $adminPanel[$groupId]['title'] = $title;

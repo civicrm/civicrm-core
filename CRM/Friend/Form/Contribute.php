@@ -58,7 +58,7 @@ class CRM_Friend_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * @return void
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     if (isset($this->_id)) {
       $defaults['entity_table'] = 'civicrm_contribution_page';

@@ -30,6 +30,7 @@
  * @group headless
  */
 class CRM_Core_BAO_ConfigSettingTest extends CiviUnitTestCase {
+
   public function testToggleComponent() {
     $origNames = array();
     foreach (CRM_Core_Component::getEnabledComponents() as $c) {

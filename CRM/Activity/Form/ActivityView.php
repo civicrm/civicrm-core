@@ -53,11 +53,11 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     }
 
     $session = CRM_Core_Session::singleton();
-    if (!in_array($context, array(
+    if (!in_array($context, [
       'home',
       'dashlet',
       'dashletFullscreen',
-    ))
+    ])
     ) {
       $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$cid}&selectedChild=activity");
     }
@@ -66,8 +66,8 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     }
 
     $session->pushUserContext($url);
-    $defaults = array();
-    $params = array('id' => $activityId);
+    $defaults = [];
+    $params = ['id' => $activityId];
     CRM_Activity_BAO_Activity::retrieve($params, $defaults);
 
     // Set activity type name and description to template.
@@ -123,14 +123,14 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'cancel',
           'name' => ts('Done'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-      )
+        ],
+    ]
     );
   }
 

@@ -46,7 +46,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
       CRM_Core_Error::fatal(ts('Case Id not found.'));
     }
 
-    $form->addElement('checkbox', 'updateLinkedCases', NULL, NULL, array('class' => 'select-row'));
+    $form->addElement('checkbox', 'updateLinkedCases', NULL, NULL, ['class' => 'select-row']);
 
     $caseID = CRM_Utils_Array::first($form->_caseId);
     $cases = CRM_Case_BAO_Case::getRelatedCases($caseID);
@@ -64,7 +64,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    * @return array
    */
   public static function setDefaultValues(&$form) {
-    $defaults = array();
+    $defaults = [];
     // Retrieve current case status
     $defaults['case_status_id'] = $form->_defaultCaseStatus;
 
@@ -78,17 +78,17 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
     $form->removeElement('status_id');
     $form->removeElement('priority_id');
 
-    $caseTypes = array();
+    $caseTypes = [];
 
     $form->_caseStatus = CRM_Case_PseudoConstant::caseStatus();
     $statusNames = CRM_Case_PseudoConstant::caseStatus('name');
 
     // Limit case statuses to allowed types for these case(s)
-    $allCases = civicrm_api3('Case', 'get', array('return' => 'case_type_id', 'id' => array('IN' => (array) $form->_caseId)));
+    $allCases = civicrm_api3('Case', 'get', ['return' => 'case_type_id', 'id' => ['IN' => (array) $form->_caseId]]);
     foreach ($allCases['values'] as $case) {
       $caseTypes[$case['case_type_id']] = $case['case_type_id'];
     }
-    $caseTypes = civicrm_api3('CaseType', 'get', array('id' => array('IN' => $caseTypes)));
+    $caseTypes = civicrm_api3('CaseType', 'get', ['id' => ['IN' => $caseTypes]]);
     foreach ($caseTypes['values'] as $ct) {
       if (!empty($ct['definition']['statuses'])) {
         foreach ($form->_caseStatus as $id => $label) {
@@ -178,10 +178,10 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
         // FIXME: Is there an existing function to close a relationship?
         $query = 'UPDATE civicrm_relationship SET end_date=%2 WHERE id=%1';
         foreach ($rels as $relId => $relData) {
-          $relParams = array(
-            1 => array($relId, 'Integer'),
-            2 => array($params['end_date'], 'Timestamp'),
-          );
+          $relParams = [
+            1 => [$relId, 'Integer'],
+            2 => [$params['end_date'], 'Timestamp'],
+          ];
           CRM_Core_DAO::executeQuery($query, $relParams);
         }
       }
@@ -195,7 +195,7 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
         // FIXME: Is there an existing function?
         $query = 'UPDATE civicrm_relationship SET end_date=NULL WHERE id=%1';
         foreach ($rels as $relId => $relData) {
-          $relParams = array(1 => array($relId, 'Integer'));
+          $relParams = [1 => [$relId, 'Integer']];
           CRM_Core_DAO::executeQuery($query, $relParams);
         }
       }
@@ -207,11 +207,10 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
 
     foreach ($form->_oldCaseStatus as $statuskey => $statusval) {
       if ($activity->subject == 'null') {
-        $activity->subject = ts('Case status changed from %1 to %2', array(
-            1 => CRM_Utils_Array::value($statusval, $form->_caseStatus),
-            2 => CRM_Utils_Array::value($params['case_status_id'], $form->_caseStatus),
-          )
-        );
+        $activity->subject = ts('Case status changed from %1 to %2', [
+          1 => CRM_Utils_Array::value($statusval, $form->_caseStatus),
+          2 => CRM_Utils_Array::value($params['case_status_id'], $form->_caseStatus),
+        ]);
         $activity->save();
       }
     }

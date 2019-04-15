@@ -42,7 +42,7 @@ class CRM_Activity_Form_Task_SearchTaskHookSample extends CRM_Activity_Form_Task
    */
   public function preProcess() {
     parent::preProcess();
-    $rows = array();
+    $rows = [];
     // display name and activity details of all selected contacts
     $activityIDs = implode(',', $this->_activityHolderIds);
 
@@ -63,12 +63,12 @@ INNER JOIN civicrm_contact ct ON ( ac.contact_id = ct.id )
     $dao = CRM_Core_DAO::executeQuery($query);
 
     while ($dao->fetch()) {
-      $rows[] = array(
+      $rows[] = [
         'subject' => $dao->subject,
         'activity_type' => $dao->activity_type,
         'activity_date' => $dao->activity_date,
         'display_name' => $dao->display_name,
-      );
+      ];
     }
     $this->assign('rows', $rows);
   }
@@ -77,13 +77,13 @@ INNER JOIN civicrm_contact ct ON ( ac.contact_id = ct.id )
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'done',
         'name' => ts('Done'),
         'isDefault' => TRUE,
-      ),
-    ));
+      ],
+    ]);
   }
 
 }

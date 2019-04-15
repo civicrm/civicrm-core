@@ -43,7 +43,7 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   public $useLivePageJS = TRUE;
 
@@ -55,30 +55,30 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/member/membershipType/add',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Membership Type'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Membership Type'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Membership Type'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/member/membershipType/add',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Membership Type'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -107,7 +107,7 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
    */
   public function browse() {
     // get all membership types sorted by weight
-    $membershipType = array();
+    $membershipType = [];
     $dao = new CRM_Member_DAO_MembershipType();
 
     $dao->orderBy('weight');
@@ -120,7 +120,7 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
         continue;
       }
       $links = self::links();
-      $membershipType[$dao->id] = array();
+      $membershipType[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $membershipType[$dao->id]);
 
       $membershipType[$dao->id]['period_type'] = CRM_Utils_Array::value($dao->period_type, CRM_Core_SelectValues::periodType(), '');
@@ -162,7 +162,7 @@ class CRM_Member_Page_MembershipType extends CRM_Core_Page {
         }
         $membershipType[$dao->id]['order'] = $membershipType[$dao->id]['weight'];
         $membershipType[$dao->id]['action'] = CRM_Core_Action::formLink($links, $action,
-          array('id' => $dao->id),
+          ['id' => $dao->id],
           ts('more'),
           FALSE,
           'membershipType.manage.action',

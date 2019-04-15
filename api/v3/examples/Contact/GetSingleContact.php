@@ -10,9 +10,9 @@
  *   API result array
  */
 function contact_getsingle_example() {
-  $params = array(
+  $params = [
     'id' => 17,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Contact', 'getsingle', $params);
@@ -22,12 +22,12 @@ function contact_getsingle_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -41,7 +41,7 @@ function contact_getsingle_example() {
  */
 function contact_getsingle_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'contact_id' => '17',
     'contact_type' => 'Individual',
     'contact_sub_type' => '',
@@ -110,7 +110,7 @@ function contact_getsingle_expectedresult() {
     'state_province' => '',
     'country' => '',
     'id' => '17',
-  );
+  ];
 
   return $expectedResult;
 }

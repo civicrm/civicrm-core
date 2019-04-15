@@ -33,9 +33,6 @@
  */
 class api_v3_PledgePaymentTest extends CiviUnitTestCase {
 
-  /**
-   * Assume empty database with just civicrm_data.
-   */
   protected $_individualId;
   protected $_pledgeID;
   protected $_apiversion = 3;
@@ -168,7 +165,6 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(array_search('Completed', $paymentStatusTypes), $checkPaymentStatus['status_id']);
   }
-
 
   /**
    * Test that passing in a single variable works:: status_id

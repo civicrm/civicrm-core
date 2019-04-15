@@ -300,14 +300,16 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $tempName = CRM_Core_DAO::createTempTableName('civicrm', FALSE);
     $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery("CREATE TABLE $tempName (`id` int(10) unsigned NOT NULL) ENGINE = MyISAM");
-    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM()); // Ignore temp tables
+    // Ignore temp tables
+    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery("DROP TABLE $tempName");
 
     // A temp table should not raise flag (randomized naming).
     $tempName = CRM_Core_DAO::createTempTableName('civicrm', TRUE);
     $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery("CREATE TABLE $tempName (`id` int(10) unsigned NOT NULL) ENGINE = MyISAM");
-    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM()); // Ignore temp tables
+    // Ignore temp tables
+    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery("DROP TABLE $tempName");
   }
 

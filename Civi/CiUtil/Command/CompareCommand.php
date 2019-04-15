@@ -7,6 +7,7 @@ namespace Civi\CiUtil\Command;
  * @package Civi\CiUtil\Command
  */
 class CompareCommand {
+
   /**
    * @param $argv
    */
@@ -17,21 +18,22 @@ class CompareCommand {
       exit(1);
     }
 
-    $parser = array('\Civi\CiUtil\PHPUnitParser', 'parseJsonResults');
+    $parser = ['\Civi\CiUtil\PHPUnitParser', 'parseJsonResults'];
     $printerType = 'txt';
-    $suites = array(); // array('file' => string, 'results' => array)
+    // array('file' => string, 'results' => array)
+    $suites = [];
     for ($i = 1; $i < count($argv); $i++) {
       switch ($argv[$i]) {
         case '--phpunit-json':
-          $parser = array('\Civi\CiUtil\PHPUnitParser', 'parseJsonResults');
+          $parser = ['\Civi\CiUtil\PHPUnitParser', 'parseJsonResults'];
           break;
 
         case '--jenkins-xml':
-          $parser = array('\Civi\CiUtil\JenkinsParser', 'parseXmlResults');
+          $parser = ['\Civi\CiUtil\JenkinsParser', 'parseXmlResults'];
           break;
 
         case '--csv':
-          $parser = array('\Civi\CiUtil\CSVParser', 'parseResults');
+          $parser = ['\Civi\CiUtil\CSVParser', 'parseResults'];
           break;
 
         case '--out=txt':
@@ -43,14 +45,15 @@ class CompareCommand {
           break;
 
         default:
-          $suites[] = array(
+          $suites[] = [
             'file' => $argv[$i],
             'results' => call_user_func($parser, file_get_contents($argv[$i])),
-          );
+          ];
       }
     }
 
-    $tests = array(); // array(string $name)
+    // array(string $name)
+    $tests = [];
     foreach ($suites as $suite) {
       $tests = array_unique(array_merge(
         $tests,
@@ -66,7 +69,7 @@ class CompareCommand {
       $printer = new \Civi\CiUtil\ComparisonPrinter(\Civi\CiUtil\Arrays::collect($suites, 'file'));
     }
     foreach ($tests as $test) {
-      $values = array();
+      $values = [];
       foreach ($suites as $suite) {
         $values[] = isset($suite['results'][$test]) ? $suite['results'][$test] : 'MISSING';
       }

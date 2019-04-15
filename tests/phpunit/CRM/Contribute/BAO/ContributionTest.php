@@ -32,6 +32,7 @@
 class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_FinancialACLTrait;
+  use CRMTraits_Financial_PriceSetTrait;
 
   /**
    * Clean up after tests.
@@ -321,6 +322,24 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
     // Run it to make sure it's not bad sql.
     CRM_Core_DAO::executeQuery($sql);
+    $this->disableFinancialACLs();
+  }
+
+  /**
+   * Test the annual query returns a correct result when multiple line items are present.
+   */
+  public function testAnnualWithMultipleLineItems() {
+    $contactID = $this->createLoggedInUserWithFinancialACL();
+    $this->createContributionWithTwoLineItemsAgainstPriceSet([
+      'contact_id' => $contactID,
+    ]
+    );
+    $this->enableFinancialACLs();
+    $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([$contactID]);
+    $result = CRM_Core_DAO::executeQuery($sql);
+    $result->fetch();
+    $this->assertEquals(300, $result->amount);
+    $this->assertEquals(1, $result->count);
     $this->disableFinancialACLs();
   }
 
@@ -1364,14 +1383,12 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit(array(
-       'total_amount' => $params['total_amount'],
-        'financial_type_id' => $financialType['id'],
-        'contact_id' => $contactId,
-        'contribution_status_id' => 1,
-        'price_set_id' => 0,
-      ),
-      CRM_Core_Action::ADD
-    );
+      'total_amount' => $params['total_amount'],
+      'financial_type_id' => $financialType['id'],
+      'contact_id' => $contactId,
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+    ), CRM_Core_Action::ADD);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       array(
         'contact_id' => $contactId,

@@ -8,10 +8,10 @@
  *   API result array
  */
 function activity_get_example() {
-  $params = array(
+  $params = [
     'return.custom_2' => 1,
     'id' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Activity', 'get', $params);
@@ -21,12 +21,12 @@ function activity_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -40,13 +40,13 @@ function activity_get_example() {
  */
 function activity_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'activity_type_id' => '9999',
         'subject' => 'test activity type id',
@@ -68,9 +68,9 @@ function activity_get_expectedresult() {
         'custom_1_1' => 'defaultValue',
         'custom_2_1' => 'Anderson, Anthony',
         'custom_2_1_id' => '1',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

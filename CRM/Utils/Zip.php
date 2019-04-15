@@ -44,7 +44,7 @@ class CRM_Utils_Zip {
    * @return mixed
    *   FALSE if #root level items !=1; otherwise, the name of base dir
    */
-  static public function findBaseDirName(ZipArchive $zip) {
+  public static function findBaseDirName(ZipArchive $zip) {
     $cnt = $zip->numFiles;
 
     $base = FALSE;
@@ -77,9 +77,9 @@ class CRM_Utils_Zip {
    * @return array(string)
    *   no trailing /
    */
-  static public function findBaseDirs(ZipArchive $zip) {
+  public static function findBaseDirs(ZipArchive $zip) {
     $cnt = $zip->numFiles;
-    $basedirs = array();
+    $basedirs = [];
 
     for ($i = 0; $i < $cnt; $i++) {
       $filename = $zip->getNameIndex($i);
@@ -101,7 +101,7 @@ class CRM_Utils_Zip {
    * @return string|bool
    *   Return string or FALSE
    */
-  static public function guessBasedir(ZipArchive $zip, $expected) {
+  public static function guessBasedir(ZipArchive $zip, $expected) {
     $candidate = FALSE;
     $basedirs = CRM_Utils_Zip::findBaseDirs($zip);
     if (in_array($expected, $basedirs)) {
@@ -118,7 +118,6 @@ class CRM_Utils_Zip {
     }
   }
 
-
   /**
    * An inefficient helper for creating a ZIP file from data in memory.
    * This is only intended for building temp files for unit-testing.
@@ -131,7 +130,7 @@ class CRM_Utils_Zip {
    *   Array, keys are file names and values are file contents.
    * @return bool
    */
-  static public function createTestZip($zipName, $dirs, $files) {
+  public static function createTestZip($zipName, $dirs, $files) {
     $zip = new ZipArchive();
     $res = $zip->open($zipName, ZipArchive::CREATE);
     if ($res === TRUE) {

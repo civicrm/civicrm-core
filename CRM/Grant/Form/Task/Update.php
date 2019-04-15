@@ -62,14 +62,14 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
    */
   public function buildQuickForm() {
     $grantStatus = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'status_id');
-    $this->addElement('select', 'status_id', ts('Grant Status'), array('' => '') + $grantStatus);
+    $this->addElement('select', 'status_id', ts('Grant Status'), ['' => ''] + $grantStatus);
 
     $this->addElement('text', 'amount_granted', ts('Amount Granted'));
     $this->addRule('amount_granted', ts('Please enter a valid amount.'), 'money');
 
     $this->add('datepicker', 'decision_date', ts('Grant Decision'), [], FALSE, ['time' => FALSE]);
 
-    $this->assign('elements', array('status_id', 'amount_granted', 'decision_date'));
+    $this->assign('elements', ['status_id', 'amount_granted', 'decision_date']);
     $this->assign('totalSelectedGrants', count($this->_grantIds));
 
     $this->addDefaultButtons(ts('Update Grants'), 'done');
@@ -105,7 +105,7 @@ class CRM_Grant_Form_Task_Update extends CRM_Grant_Form_Task {
       }
     }
 
-    $status = ts('Updated Grant(s): %1 (Total Selected: %2)', array(1 => $updatedGrants, 2 => count($this->_grantIds)));
+    $status = ts('Updated Grant(s): %1 (Total Selected: %2)', [1 => $updatedGrants, 2 => count($this->_grantIds)]);
     CRM_Core_Session::setStatus($status, '', 'info');
     CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/grant/search', 'force=1&qfKey=' . $qfKey));
   }

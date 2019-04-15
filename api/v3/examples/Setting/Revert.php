@@ -8,9 +8,9 @@
  *   API result array
  */
 function setting_revert_example() {
-  $params = array(
+  $params = [
     'name' => 'address_format',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Setting', 'revert', $params);
@@ -20,12 +20,12 @@ function setting_revert_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -39,18 +39,18 @@ function setting_revert_example() {
  */
 function setting_revert_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 5,
     'id' => 1,
-    'values' => array(
+    'values' => [
       'is_error' => 0,
       'version' => 3,
       'count' => 1,
       'id' => 1,
-      'values' => array(
-        '1' => array(
+      'values' => [
+        '1' => [
           'address_format' => '{contact.address_name}
 {contact.street_address}
 {contact.supplemental_address_1}
@@ -58,10 +58,10 @@ function setting_revert_expectedresult() {
 {contact.supplemental_address_3}
 {contact.city}{, }{contact.state_province}{ }{contact.postal_code}
 {contact.country}',
-        ),
-      ),
-    ),
-  );
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

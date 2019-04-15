@@ -95,7 +95,7 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
     $newsFeed = $this->getFeed($this->getNewsUrl());
     // If unable to fetch the feed, return empty results.
     if (!$newsFeed) {
-      return array();
+      return [];
     }
     $feeds = $this->formatItems($newsFeed);
     return $feeds;
@@ -123,15 +123,15 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
    * @return array
    */
   protected function formatItems($feed) {
-    $result = array();
+    $result = [];
     if ($feed && !empty($feed->channel)) {
       foreach ($feed->channel as $channel) {
-        $content = array(
+        $content = [
           'title' => (string) $channel->title,
           'description' => (string) $channel->description,
           'name' => strtolower(CRM_Utils_String::munge($channel->title, '-')),
-          'items' => array(),
-        );
+          'items' => [],
+        ];
         foreach ($channel->item as $item) {
           $item = (array) $item;
           $item['title'] = strip_tags($item['title']);

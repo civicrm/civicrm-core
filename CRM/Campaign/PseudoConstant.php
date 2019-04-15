@@ -47,16 +47,17 @@ class CRM_Campaign_PseudoConstant extends CRM_Core_PseudoConstant {
    * Campaign Type
    * @var array
    */
-  private static $campaignType = array();
+  private static $campaignType = [];
 
   /**
    * Campaign Status
    * @var array
    */
-  private static $campaignStatus = array();
+  private static $campaignStatus = [];
 
   /**
    * Engagement Level
+   * @var int
    */
   private static $engagementLevel;
 

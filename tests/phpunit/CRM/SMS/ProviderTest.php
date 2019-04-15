@@ -96,7 +96,6 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
     $this->assertEquals($contact['id'], $activity['source_contact_id']);
   }
 
-
   public function smsHookTest(&$message) {
     $testSourceContact = $this->individualCreate(array('phone' => array(1 => array('phone' => '+61487654321'))));
     $message->toContactID = $testSourceContact;

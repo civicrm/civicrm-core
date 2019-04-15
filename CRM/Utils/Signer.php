@@ -64,10 +64,12 @@ class CRM_Utils_Signer {
    *   Array, fields which should be part of the signature.
    */
   public function __construct($secret, $paramNames) {
-    sort($paramNames); // ensure consistent serialization of payloads
+    // ensure consistent serialization of payloads
+    sort($paramNames);
     $this->secret = $secret;
     $this->paramNames = $paramNames;
-    $this->signDelim = "_"; // chosen to be valid in URLs but not in salt or md5
+    // chosen to be valid in URLs but not in salt or md5
+    $this->signDelim = "_";
     $this->defaultSalt = CRM_Utils_String::createRandom(self::SALT_LEN, CRM_Utils_String::ALPHANUMERIC);
   }
 
@@ -81,9 +83,9 @@ class CRM_Utils_Signer {
    * @return string, the full public token representing the signature
    */
   public function sign($params, $salt = NULL) {
-    $message = array();
+    $message = [];
     $message['secret'] = $this->secret;
-    $message['payload'] = array();
+    $message['payload'] = [];
     if (empty($salt)) {
       $message['salt'] = $this->createSalt();
     }

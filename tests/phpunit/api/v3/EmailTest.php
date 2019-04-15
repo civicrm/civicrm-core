@@ -87,9 +87,9 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     //now we check & make sure it has been set to primary
     $expected = 1;
     $check = $this->callAPISuccess('email', 'getcount', array(
-        'is_primary' => 1,
-        'id' => $email1['id'],
-      ),
+      'is_primary' => 1,
+      'id' => $email1['id'],
+    ),
       $expected
     );
   }

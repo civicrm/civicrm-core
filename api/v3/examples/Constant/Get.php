@@ -9,9 +9,9 @@
  *   API result array
  */
 function constant_get_example() {
-  $params = array(
+  $params = [
     'name' => 'activityType',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Constant', 'get', $params);
@@ -21,12 +21,12 @@ function constant_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -40,11 +40,11 @@ function constant_get_example() {
  */
 function constant_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 36,
-    'values' => array(
+    'values' => [
       '1' => 'Meeting',
       '2' => 'Phone Call',
       '3' => 'Email',
@@ -81,9 +81,9 @@ function constant_get_expectedresult() {
       '52' => 'Contact Deleted by Merge',
       '53' => 'Failed Payment',
       '54' => 'Close Accounting Period',
-    ),
+    ],
     'deprecated' => 'The Constant api is deprecated as of CiviCRM 4.4. Please use the getoptions api action instead.',
-  );
+  ];
 
   return $expectedResult;
 }

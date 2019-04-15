@@ -70,7 +70,7 @@ function dm_install_core() {
   done
 
   dm_install_files "$repo" "$to" {agpl-3.0,agpl-3.0.exception,gpl,CONTRIBUTORS}.txt
-  dm_install_files "$repo" "$to" composer.json composer.lock bower.json package.json Civi.php README.md release-notes.md
+  dm_install_files "$repo" "$to" composer.json composer.lock bower.json package.json Civi.php README.md release-notes.md extension-compatibility.json
 
   mkdir -p "$to/sql"
   pushd "$repo" >> /dev/null
@@ -96,7 +96,7 @@ function dm_install_packages() {
   local to="$2"
 
   local excludes_rsync=""
-  for exclude in .git .svn _ORIGINAL_ SeleniumRC PHPUnit PhpDocumentor SymfonyComponents amavisd-new git-footnote PHP/CodeCoverage ; do
+  for exclude in .git .svn _ORIGINAL_ SeleniumRC PHPUnit PhpDocumentor SymfonyComponents git-footnote PHP/CodeCoverage ; do
     excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
   done
 

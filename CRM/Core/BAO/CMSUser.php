@@ -113,9 +113,9 @@ class CRM_Core_BAO_CMSUser {
     if ($isCMSUser && $emailPresent) {
       if ($showUserRegistration) {
         if ($isCMSUser != 2) {
-          $extra = array(
+          $extra = [
             'onclick' => "return showHideByValue('cms_create_account','','details','block','radio',false );",
-          );
+          ];
           $form->addElement('checkbox', 'cms_create_account', ts('Create an account?'), NULL, $extra);
           $required = FALSE;
         }
@@ -132,7 +132,7 @@ class CRM_Core_BAO_CMSUser {
             $form->add('password', 'cms_confirm_pass', ts('Confirm Password'));
           }
 
-          $form->addFormRule(array('CRM_Core_BAO_CMSUser', 'formRule'), $form);
+          $form->addFormRule(['CRM_Core_BAO_CMSUser', 'formRule'], $form);
         }
         $showCMS = TRUE;
       }
@@ -167,7 +167,7 @@ class CRM_Core_BAO_CMSUser {
     $isJoomla = ucfirst($config->userFramework) == 'Joomla' ? TRUE : FALSE;
     $isWordPress = $config->userFramework == 'WordPress' ? TRUE : FALSE;
 
-    $errors = array();
+    $errors = [];
     if ($isDrupal || $isJoomla || $isWordPress) {
       $emailName = NULL;
       if (!empty($form->_bltID) && array_key_exists("email-{$form->_bltID}", $fields)) {
@@ -213,11 +213,11 @@ class CRM_Core_BAO_CMSUser {
       }
 
       // now check that the cms db does not have the user name and/or email
-      if ($isDrupal OR $isJoomla OR $isWordPress) {
-        $params = array(
+      if ($isDrupal or $isJoomla or $isWordPress) {
+        $params = [
           'name' => $fields['cms_name'],
           'mail' => $fields[$emailName],
-        );
+        ];
       }
 
       $config->userSystem->checkUserNameEmailExists($params, $errors, $emailName);

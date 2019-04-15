@@ -30,6 +30,7 @@
  * @group headless
  */
 class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
   }
@@ -106,9 +107,9 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getPartialPaymentTrxn function.
+   * Tests the lines of code that used to be in the getPartialPaymentTrxn fn.
    */
-  public function testGetPartialPaymentTrxn() {
+  public function testGetExPartialPaymentTrxn() {
     $contributionTest = new CRM_Contribute_BAO_ContributionTest();
     list($lineItems, $contribution) = $contributionTest->addParticipantWithContribution();
     $contribution = (array) $contribution;
@@ -116,7 +117,14 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
       'total_amount' => 100.00,
     );
-    $trxn = CRM_Core_BAO_FinancialTrxn::getPartialPaymentTrxn($contribution, $params);
+    $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
+    $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
+    $total = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
+    $cmp = bccomp($total, $paid, 5);
+    // If paid amount is greater or equal to total amount
+    if ($cmp == 0 || $cmp == -1) {
+      civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
+    }
 
     $this->assertEquals('100.00', $trxn->total_amount, 'Amount does not match.');
 

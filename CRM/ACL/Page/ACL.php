@@ -39,7 +39,7 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -59,30 +59,30 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/acl',
           'qs' => 'reset=1&action=update&id=%%id%%',
           'title' => ts('Edit ACL'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable ACL'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable ACL'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/acl',
           'qs' => 'reset=1&action=delete&id=%%id%%',
           'title' => ts('Delete ACL'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -94,14 +94,12 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
    */
   public function run() {
     // set breadcrumb to append to admin/access
-    $breadCrumb = array(
-      array(
+    $breadCrumb = [
+      [
         'title' => ts('Access Control'),
-        'url' => CRM_Utils_System::url('civicrm/admin/access',
-          'reset=1'
-        ),
-      ),
-    );
+        'url' => CRM_Utils_System::url('civicrm/admin/access', 'reset=1'),
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
 
     // parent run
@@ -113,7 +111,7 @@ class CRM_ACL_Page_ACL extends CRM_Core_Page_Basic {
    */
   public function browse() {
     // get all acl's sorted by weight
-    $acl = array();
+    $acl = [];
     $query = "
   SELECT *
     FROM civicrm_acl
@@ -124,26 +122,26 @@ ORDER BY entity_id
 
     $roles = CRM_Core_OptionGroup::values('acl_role');
 
-    $group = array(
+    $group = [
       '-1' => ts('- select -'),
       '0' => ts('All Groups'),
-    ) + CRM_Core_PseudoConstant::group();
-    $customGroup = array(
+    ] + CRM_Core_PseudoConstant::group();
+    $customGroup = [
       '-1' => ts('- select -'),
       '0' => ts('All Custom Groups'),
-    ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
-    $ufGroup = array(
+    ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_CustomField', 'custom_group_id');
+    $ufGroup = [
       '-1' => ts('- select -'),
       '0' => ts('All Profiles'),
-    ) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
+    ] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_UFField', 'uf_group_id');
 
-    $event = array(
+    $event = [
       '-1' => ts('- select -'),
       '0' => ts('All Events'),
-    ) + CRM_Event_PseudoConstant::event();
+    ] + CRM_Event_PseudoConstant::event();
 
     while ($dao->fetch()) {
-      $acl[$dao->id] = array();
+      $acl[$dao->id] = [];
       $acl[$dao->id]['name'] = $dao->name;
       $acl[$dao->id]['operation'] = $dao->operation;
       $acl[$dao->id]['entity_id'] = $dao->entity_id;
@@ -194,7 +192,7 @@ ORDER BY entity_id
       $acl[$dao->id]['action'] = CRM_Core_Action::formLink(
         self::links(),
         $action,
-        array('id' => $dao->id),
+        ['id' => $dao->id],
         ts('more'),
         FALSE,
         'ACL.manage.action',
@@ -253,7 +251,7 @@ ORDER BY entity_id
     if ($mode & (CRM_Core_Action::UPDATE)) {
       if (isset($id)) {
         $aclName = CRM_Core_DAO::getFieldValue('CRM_ACL_DAO_ACL', $id);
-        CRM_Utils_System::setTitle(ts('Edit ACL &ndash; %1', array(1 => $aclName)));
+        CRM_Utils_System::setTitle(ts('Edit ACL &ndash; %1', [1 => $aclName]));
       }
     }
     parent::edit($mode, $id, $imageUpload, $pushUserContext);

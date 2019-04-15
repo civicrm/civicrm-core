@@ -85,7 +85,35 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     }
     $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
     $this->assertEquals(count($foundDupes), 4);
-    $this->markTestIncomplete('This currenctly fails - see https://lab.civicrm.org/dev/core/issues/397');
+    CRM_Dedupe_Finder::dupes($ruleGroup['id']);
+
+  }
+
+  /**
+   * Test a custom rule with a non-default field.
+   */
+  public function testCustomRuleWithAddress() {
+    $this->setupForGroupDedupe();
+
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', array(
+      'contact_type' => 'Individual',
+      'threshold' => 10,
+      'used' => 'General',
+      'name' => 'TestRule',
+      'title' => 'TestRule',
+      'is_reserved' => 0,
+    ));
+    $rules = [];
+    foreach (array('postal_code') as $field) {
+      $rules[$field] = $this->callAPISuccess('Rule', 'create', [
+        'dedupe_rule_group_id' => $ruleGroup['id'],
+        'rule_table' => 'civicrm_address',
+        'rule_weight' => 10,
+        'rule_field' => $field,
+      ]);
+    }
+    $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
+    $this->assertEquals(count($foundDupes), 1);
     CRM_Dedupe_Finder::dupes($ruleGroup['id']);
 
   }
@@ -170,6 +198,8 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       ),
     );
 
+    $this->hookClass->setHook('civicrm_findDuplicates', array($this, 'hook_civicrm_findDuplicates'));
+
     $count = 1;
 
     foreach ($params as $param) {
@@ -193,7 +223,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       'street_address' => 'Ambachtstraat 23',
     );
     CRM_Core_TemporaryErrorScope::useException();
-    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($fields, 'Individual', 'General');
+    $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($fields, 'Individual', 'General', [], TRUE, NULL, ['event_id' => 1]);
 
     // Check with default Individual-General rule
     $this->assertEquals(count($ids), 2, 'Check Individual-General rule for dupesByParams().');
@@ -202,6 +232,39 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     foreach ($contactIds as $contactId) {
       $this->contactDelete($contactId);
     }
+  }
+
+  /**
+   * Implements hook_civicrm_findDuplicates().
+   *
+   * Locks in expected params
+   *
+   */
+  public function hook_civicrm_findDuplicates($dedupeParams, &$dedupeResults, $contextParams) {
+    $expectedDedupeParams = [
+      'check_permission' => TRUE,
+      'contact_type' => 'Individual',
+      'rule' => 'General',
+      'rule_group_id' => NULL,
+      'excluded_contact_ids' => [],
+    ];
+    foreach ($expectedDedupeParams as $key => $value) {
+      $this->assertEquals($value, $dedupeParams[$key]);
+    }
+    $expectedDedupeResults = [
+      'ids' => [],
+      'handled' => FALSE,
+    ];
+    foreach ($expectedDedupeResults as $key => $value) {
+      $this->assertEquals($value, $dedupeResults[$key]);
+    }
+
+    $expectedContext = ['event_id' => 1];
+    foreach ($expectedContext as $key => $value) {
+      $this->assertEquals($value, $contextParams[$key]);
+    }
+
+    return $dedupeResults;
   }
 
   /**
@@ -226,6 +289,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'email' => 'robin@example.com',
         'contact_type' => 'Individual',
         'birth_date' => '2016-01-01',
+        'api.Address.create' => ['location_type_id' => 'Billing', 'postal_code' => '99999'],
       ),
       array(
         'first_name' => 'robin',
@@ -233,6 +297,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
         'email' => 'hood@example.com',
         'contact_type' => 'Individual',
         'birth_date' => '2016-01-01',
+        'api.Address.create' => ['location_type_id' => 'Billing', 'postal_code' => '99999'],
       ),
       array(
         'first_name' => 'robin',

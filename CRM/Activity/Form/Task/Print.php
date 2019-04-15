@@ -71,18 +71,18 @@ class CRM_Activity_Form_Task_Print extends CRM_Activity_Form_Task {
   public function buildQuickForm() {
 
     // just need to add a javacript to popup the window for printing
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'next',
         'name' => ts('Print Activities'),
-        'js' => array('onclick' => 'window.print()'),
+        'js' => ['onclick' => 'window.print()'],
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'back',
         'name' => ts('Done'),
-      ),
-    ));
+      ],
+    ]);
   }
 
 }

@@ -65,9 +65,9 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
 
   public function getRedactionRules() {
     foreach (array(
-               'redactionStringRules',
-               'redactionRegexRules',
-             ) as $key => $rule) {
+      'redactionStringRules',
+      'redactionRegexRules',
+    ) as $key => $rule) {
       $$rule = CRM_Case_PseudoConstant::redactionRule($key);
 
       if (!empty($$rule)) {
@@ -581,10 +581,11 @@ WHERE      a.id = %1
   /**
    * @param int $activityTypeID
    * @param null $dateFormat
+   * @param bool $onlyActive
    *
    * @return mixed
    */
-  public function getActivityTypeCustomSQL($activityTypeID, $dateFormat = NULL) {
+  public function getActivityTypeCustomSQL($activityTypeID, $dateFormat = NULL, $onlyActive = TRUE) {
     static $cache = array();
 
     if (is_null($activityTypeID)) {
@@ -608,6 +609,9 @@ WHERE  cf.custom_group_id = cg.id
 AND    cg.extends = 'Activity'
 AND " . CRM_Core_Permission::customGroupClause(CRM_Core_Permission::VIEW, 'cg.');
 
+      if ($onlyActive) {
+        $query .= " AND cf.is_active = 1 ";
+      }
       if ($activityTypeID) {
         $query .= "AND ( cg.extends_entity_column_value IS NULL OR cg.extends_entity_column_value LIKE '%" . CRM_Core_DAO::VALUE_SEPARATOR . "%1" . CRM_Core_DAO::VALUE_SEPARATOR . "%' )";
       }

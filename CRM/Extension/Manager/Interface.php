@@ -33,6 +33,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 interface CRM_Extension_Manager_Interface {
+
   /**
    * Perform type-specific installation logic (before marking the
    * extension as installed or clearing the caches).

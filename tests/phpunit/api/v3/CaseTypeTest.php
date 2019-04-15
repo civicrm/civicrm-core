@@ -127,14 +127,14 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     // Create Case Type
     $params = array(
       'title' => 'Application',
-      'name' => 'Appl ication', // spaces are not allowed
+      // spaces are not allowed
+      'name' => 'Appl ication',
       'is_active' => 1,
       'weight' => 4,
     );
 
     $this->callAPIFailure('CaseType', 'create', $params);
   }
-
 
   /**
    * Test update (create with id) function with valid parameters.

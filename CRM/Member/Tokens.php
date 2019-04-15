@@ -45,7 +45,7 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    */
   public function __construct() {
     parent::__construct('membership', array_merge(
-      array(
+      [
         'fee' => ts('Membership Fee'),
         'id' => ts('Membership ID'),
         'join_date' => ts('Membership Join Date'),
@@ -53,7 +53,7 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
         'end_date' => ts('Membership End Date'),
         'status' => ts('Membership Status'),
         'type' => ts('Membership Type'),
-      ),
+      ],
       CRM_Utils_Token::getCustomFieldTokens('Membership')
     ));
   }
@@ -63,8 +63,7 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
     // Extracted from scheduled-reminders code. See the class description.
-    return
-      !empty($processor->context['actionMapping'])
+    return !empty($processor->context['actionMapping'])
       && $processor->context['actionMapping']->getEntity() === 'civicrm_membership';
   }
 
@@ -92,7 +91,7 @@ class CRM_Member_Tokens extends \Civi\Token\AbstractTokenSubscriber {
   public function evaluateToken(\Civi\Token\TokenRow $row, $entity, $field, $prefetch = NULL) {
     $actionSearchResult = $row->context['actionSearchResult'];
 
-    if (in_array($field, array('start_date', 'end_date', 'join_date'))) {
+    if (in_array($field, ['start_date', 'end_date', 'join_date'])) {
       $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($actionSearchResult->$field));
     }
     elseif (isset($actionSearchResult->$field)) {

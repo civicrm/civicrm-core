@@ -8,7 +8,7 @@
  *   API result array
  */
 function contact_getactions_example() {
-  $params = array();
+  $params = [];
 
   try{
     $result = civicrm_api3('Contact', 'getactions', $params);
@@ -18,12 +18,12 @@ function contact_getactions_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,11 +37,11 @@ function contact_getactions_example() {
  */
 function contact_getactions_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 20,
-    'values' => array(
+    'values' => [
       '0' => 'create',
       '1' => 'delete',
       '2' => 'duplicatecheck',
@@ -62,13 +62,13 @@ function contact_getactions_expectedresult() {
       '17' => 'setvalue',
       '18' => 'update',
       '19' => 'validate',
-    ),
-    'deprecated' => array(
+    ],
+    'deprecated' => [
       'getquick' => 'The "getquick" action is deprecated in favor of "getlist".',
       'setvalue' => 'The "setvalue" action is deprecated. Use "create" with an id instead.',
       'update' => 'The "update" action is deprecated. Use "create" with an id instead.',
-    ),
-  );
+    ],
+  ];
 
   return $expectedResult;
 }

@@ -168,6 +168,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    *
    * @return string
    */
+
   /**
    * @return string
    */
@@ -236,9 +237,9 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       // FIXME: so leaving this as a dependency for now
       if (array_key_exists('contribution_amount_low', $this->_formValues)) {
         foreach (array(
-                   'contribution_amount_low',
-                   'contribution_amount_high',
-                 ) as $f) {
+          'contribution_amount_low',
+          'contribution_amount_high',
+        ) as $f) {
           $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);
         }
       }
@@ -269,11 +270,11 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
         !$this->_force
       ) {
         foreach (array(
-                   'case_type_id',
-                   'case_status_id',
-                   'case_deleted',
-                   'case_tags',
-                 ) as $caseCriteria) {
+          'case_type_id',
+          'case_status_id',
+          'case_deleted',
+          'case_tags',
+        ) as $caseCriteria) {
           if (!empty($this->_formValues[$caseCriteria])) {
             $allCases = TRUE;
             $this->_formValues['case_owner'] = 1;
@@ -314,7 +315,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
 
     CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
-    $this->_formValues = $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
+    $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, $this->entityReferenceFields);
     $this->_returnProperties = &$this->returnProperties();
     parent::postProcess();
   }

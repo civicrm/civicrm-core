@@ -53,7 +53,7 @@ function smarty_block_localize($params, $text, &$smarty) {
     return $text;
   }
 
-  $lines = array();
+  $lines = [];
   foreach ($smarty->_tpl_vars['locales'] as $locale) {
     $line = $text;
     if ($params['field']) {

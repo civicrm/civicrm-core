@@ -526,9 +526,9 @@ class CRM_Contact_Form_Task_EmailCommon {
 
       $count_success = count($form->_toContactDetails);
       CRM_Core_Session::setStatus(ts('One message was sent successfully. ', array(
-            'plural' => '%count messages were sent successfully. ',
-            'count' => $count_success,
-          )) . $followupStatus, ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $count_success)), 'success');
+        'plural' => '%count messages were sent successfully. ',
+        'count' => $count_success,
+      )) . $followupStatus, ts('Message Sent', array('plural' => 'Messages Sent', 'count' => $count_success)), 'success');
     }
 
     // Display the name and number of contacts for those email is not sent.
@@ -547,9 +547,9 @@ class CRM_Contact_Form_Task_EmailCommon {
       }
       $status = '(' . ts('because no email address on file or communication preferences specify DO NOT EMAIL or Contact is deceased or Primary email address is On Hold') . ')<ul><li>' . implode('</li><li>', $not_sent) . '</li></ul>';
       CRM_Core_Session::setStatus($status, ts('One Message Not Sent', array(
-            'count' => count($emailsNotSent),
-            'plural' => '%count Messages Not Sent',
-          )), 'info');
+        'count' => count($emailsNotSent),
+        'plural' => '%count Messages Not Sent',
+      )), 'info');
     }
 
     if (isset($form->_caseId)) {

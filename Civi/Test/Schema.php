@@ -25,7 +25,7 @@ class Schema {
       $pdo->quote($type)
     );
     $tables = $pdo->query($query);
-    $result = array();
+    $result = [];
     foreach ($tables as $table) {
       $result[] = $table['table_name'];
     }
@@ -35,20 +35,20 @@ class Schema {
   public function setStrict($checks) {
     $dbName = \Civi\Test::dsn('database');
     if ($checks) {
-      $queries = array(
+      $queries = [
         "USE {$dbName};",
         "SET global innodb_flush_log_at_trx_commit = 1;",
         "SET SQL_MODE='STRICT_ALL_TABLES';",
         "SET foreign_key_checks = 1;",
-      );
+      ];
     }
     else {
-      $queries = array(
+      $queries = [
         "USE {$dbName};",
         "SET foreign_key_checks = 0",
         "SET SQL_MODE='STRICT_ALL_TABLES';",
         "SET global innodb_flush_log_at_trx_commit = 2;",
-      );
+      ];
     }
     foreach ($queries as $query) {
       if (\Civi\Test::execute($query) === FALSE) {
@@ -59,7 +59,7 @@ class Schema {
   }
 
   public function dropAll() {
-    $queries = array();
+    $queries = [];
     foreach ($this->getTables('VIEW') as $table) {
       if (preg_match('/^(civicrm_|log_)/', $table)) {
         $queries[] = "DROP VIEW $table";
@@ -89,8 +89,8 @@ class Schema {
   public function truncateAll() {
     $tables = \Civi\Test::schema()->getTables('BASE TABLE');
 
-    $truncates = array();
-    $drops = array();
+    $truncates = [];
+    $drops = [];
     foreach ($tables as $table) {
       // skip log tables
       if (substr($table, 0, 4) == 'log_') {

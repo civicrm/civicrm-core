@@ -84,8 +84,9 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   /**
    * Store profile ids if multiple profile ids are passed using comma separated.
    * Currently lets implement this functionality only for dialog mode
+   * @var array
    */
-  protected $_profileIds = array();
+  protected $_profileIds = [];
 
   /**
    * Extracts the parameters from the request and constructs information for
@@ -141,9 +142,9 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     );
 
     $this->_customFields = CRM_Core_BAO_CustomField::getFieldsForImport(NULL, FALSE, FALSE, FALSE, TRUE, TRUE);
-    $this->_params = array();
+    $this->_params = [];
 
-    $resetArray = array(
+    $resetArray = [
       'group',
       'tag',
       'preferred_communication_method',
@@ -153,13 +154,13 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       'do_not_sms',
       'do_not_trade',
       'gender',
-    );
+    ];
 
     foreach ($this->_fields as $name => $field) {
       if ((substr($name, 0, 6) == 'custom') && !empty($field['is_search_range'])) {
         $from = CRM_Utils_Request::retrieve($name . '_from', 'String', $this);
         $to = CRM_Utils_Request::retrieve($name . '_to', 'String', $this);
-        $value = array();
+        $value = [];
         if ($from && $to) {
           $value[$name . '_from'] = $from;
           $value[$name . '_to'] = $to;
@@ -214,7 +215,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
 
       if (($name == 'group' || $name == 'tag') && !empty($value) && !is_array($value)) {
         $v = explode(',', $value);
-        $value = array();
+        $value = [];
         foreach ($v as $item) {
           $value[$item] = 1;
         }
@@ -226,7 +227,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
         if ($customField) {
           // reset checkbox/radio because a form does not send null checkbox values
           if (in_array($customField['html_type'],
-            array('Multi-Select', 'CheckBox', 'Multi-Select State/Province', 'Multi-Select Country', 'Radio', 'Select')
+            ['Multi-Select', 'CheckBox', 'Multi-Select State/Province', 'Multi-Select Country', 'Radio', 'Select']
           )) {
             // only reset on a POST submission if we don't see any value
             $value = NULL;
@@ -258,7 +259,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
 
     // set the prox params
     // need to ensure proximity searching is enabled
-    $proximityVars = array(
+    $proximityVars = [
       'street_address',
       'city',
       'postal_code',
@@ -266,7 +267,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       'country_id',
       'distance',
       'distance_unit',
-    );
+    ];
     foreach ($proximityVars as $var) {
       $value = CRM_Utils_Request::retrieve("prox_{$var}",
         'String',
@@ -416,8 +417,8 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     $session = CRM_Core_Session::singleton();
     $params = $session->get('profileParams');
 
-    $details = array();
-    $ufGroupParam = array('id' => $gid);
+    $details = [];
+    $ufGroupParam = ['id' => $gid];
     CRM_Core_BAO_UFGroup::retrieve($ufGroupParam, $details);
 
     // make sure this group can be mapped
@@ -433,7 +434,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
         $params['group'][$groupId] = 1;
       }
       else {
-        $params['group'] = array($groupId => 1);
+        $params['group'] = [$groupId => 1];
       }
     }
 

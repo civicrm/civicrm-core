@@ -31,8 +31,8 @@
     <dataPattern>/^\d+$/</dataPattern>
     <comment>FK to Contact ID</comment>
     <html>
-       <type>EntityRef</type>
-     </html>
+      <type>EntityRef</type>
+    </html>
     <add>1.3</add>
   </field>
   <foreignKey>

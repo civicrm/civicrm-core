@@ -44,16 +44,16 @@ class CRM_Core_Menu {
    *
    * @var array
    */
-  static $_items = NULL;
+  public static $_items = NULL;
 
   /**
    * The list of permissioned menu items.
    *
    * @var array
    */
-  static $_permissionedItems = NULL;
+  public static $_permissionedItems = NULL;
 
-  static $_serializedElements = array(
+  public static $_serializedElements = array(
     'access_arguments',
     'access_callback',
     'page_arguments',
@@ -61,7 +61,7 @@ class CRM_Core_Menu {
     'breadcrumb',
   );
 
-  static $_menuCache = NULL;
+  public static $_menuCache = NULL;
   const MENU_ITEM = 1;
 
   /**
@@ -367,13 +367,12 @@ class CRM_Core_Menu {
         'title' => $item['title'],
         'desc' => CRM_Utils_Array::value('desc', $item),
         'id' => strtr($item['title'], array(
-            '(' => '_',
-            ')' => '',
-            ' ' => '',
-            ',' => '_',
-            '/' => '_',
-          )
-        ),
+          '(' => '_',
+          ')' => '',
+          ' ' => '',
+          ',' => '_',
+          '/' => '_',
+        )),
         'url' => CRM_Utils_System::url($path, $query,
           FALSE,
           NULL,
@@ -570,11 +569,16 @@ class CRM_Core_Menu {
           'title' => $menu[$currentPath]['title'],
           'url' => CRM_Utils_System::url($currentPath,
             'reset=1' . $urlVar,
-            FALSE, // absolute
-            NULL, // fragment
-            TRUE, // htmlize
-            FALSE, // frontend
-            TRUE // forceBackend; CRM-14439 work-around; acceptable for now because we don't display breadcrumbs on frontend
+            // absolute
+            FALSE,
+            // fragment
+            NULL,
+            // htmlize
+            TRUE,
+            // frontend
+            FALSE,
+            // forceBackend; CRM-14439 work-around; acceptable for now because we don't display breadcrumbs on frontend
+            TRUE
           ),
         );
       }

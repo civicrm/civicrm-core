@@ -6,9 +6,9 @@
  *   API result array
  */
 function uf_field_delete_example() {
-  $params = array(
+  $params = [
     'field_id' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('UFField', 'delete', $params);
@@ -18,12 +18,12 @@ function uf_field_delete_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,12 +37,12 @@ function uf_field_delete_example() {
  */
 function uf_field_delete_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'values' => TRUE,
-  );
+  ];
 
   return $expectedResult;
 }

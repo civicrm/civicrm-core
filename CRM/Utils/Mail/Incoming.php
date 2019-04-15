@@ -254,8 +254,8 @@ class CRM_Utils_Mail_Incoming {
    * @return string
    */
   public function formatUnrecognisedPart($part) {
-    CRM_Core_Error::debug_log_message(ts('CRM_Utils_Mail_Incoming: Unable to handle message part of type "%1".', array('%1' => get_class($part))));
-    return ts('Unrecognised message part of type "%1".', array('%1' => get_class($part)));
+    CRM_Core_Error::debug_log_message(ts('CRM_Utils_Mail_Incoming: Unable to handle message part of type "%1".', ['%1' => get_class($part)]));
+    return ts('Unrecognised message part of type "%1".', ['%1' => get_class($part)]);
   }
 
   /**
@@ -265,13 +265,13 @@ class CRM_Utils_Mail_Incoming {
    * @return null
    */
   public static function formatMailFile($part, &$attachments) {
-    $attachments[] = array(
+    $attachments[] = [
       'dispositionType' => $part->dispositionType,
       'contentType' => $part->contentType,
       'mimeType' => $part->mimeType,
       'contentID' => $part->contentId,
       'fullName' => $part->fileName,
-    );
+    ];
     return NULL;
   }
 
@@ -281,7 +281,7 @@ class CRM_Utils_Mail_Incoming {
    * @return string
    */
   public static function formatAddresses($addresses) {
-    $fa = array();
+    $fa = [];
     foreach ($addresses as $address) {
       $fa[] = self::formatAddress($address);
     }
@@ -314,18 +314,18 @@ class CRM_Utils_Mail_Incoming {
       !trim(file_get_contents($file))
     ) {
       return CRM_Core_Error::createAPIError(ts('%1 does not exists or is empty',
-        array(1 => $file)
+        [1 => $file]
       ));
     }
 
     // explode email to digestable format
-    $set = new ezcMailFileSet(array($file));
+    $set = new ezcMailFileSet([$file]);
     $parser = new ezcMailParser();
     $mail = $parser->parseMail($set);
 
     if (!$mail) {
       return CRM_Core_Error::createAPIError(ts('%1 could not be parsed',
-        array(1 => $file)
+        [1 => $file]
       ));
     }
 
@@ -347,7 +347,7 @@ class CRM_Utils_Mail_Incoming {
 
     // get ready for collecting data about this email
     // and put it in a standardized format
-    $params = array('is_error' => 0);
+    $params = ['is_error' => 0];
 
     // Sometimes $mail->from is unset because ezcMail didn't handle format
     // of From header. CRM-19215.
@@ -357,7 +357,7 @@ class CRM_Utils_Mail_Incoming {
       }
     }
 
-    $params['from'] = array();
+    $params['from'] = [];
     self::parseAddress($mail->from, $field, $params['from'], $mail);
 
     // we definitely need a contact id for the from address
@@ -366,7 +366,7 @@ class CRM_Utils_Mail_Incoming {
       return NULL;
     }
 
-    $emailFields = array('to', 'cc', 'bcc');
+    $emailFields = ['to', 'cc', 'bcc'];
     foreach ($emailFields as $field) {
       $value = $mail->$field;
       self::parseAddresses($value, $field, $params, $mail);
@@ -377,7 +377,7 @@ class CRM_Utils_Mail_Incoming {
     $params['date'] = date("YmdHi00",
       strtotime($mail->getHeader("Date"))
     );
-    $attachments = array();
+    $attachments = [];
     $params['body'] = self::formatMailPart($mail->body, $attachments);
 
     // format and move attachments to the civicrm area
@@ -395,12 +395,12 @@ class CRM_Utils_Mail_Incoming {
 
         $mimeType = "{$attachments[$i]['contentType']}/{$attachments[$i]['mimeType']}";
 
-        $params["attachFile_$attachNum"] = array(
+        $params["attachFile_$attachNum"] = [
           'uri' => $fileName,
           'type' => $mimeType,
           'upload_date' => $date,
           'location' => $location,
-        );
+        ];
       }
     }
 
@@ -437,10 +437,10 @@ class CRM_Utils_Mail_Incoming {
    * @param $mail
    */
   public static function parseAddresses(&$addresses, $token, &$params, &$mail) {
-    $params[$token] = array();
+    $params[$token] = [];
 
     foreach ($addresses as $address) {
-      $subParam = array();
+      $subParam = [];
       self::parseAddress($address, $params, $subParam, $mail);
       $params[$token][] = $subParam;
     }
@@ -490,10 +490,10 @@ class CRM_Utils_Mail_Incoming {
     }
 
     // contact does not exist, lets create it
-    $params = array(
+    $params = [
       'contact_type' => 'Individual',
       'email-Primary' => $email,
-    );
+    ];
 
     CRM_Utils_String::extractName($name, $params);
 

@@ -34,8 +34,9 @@ class CRM_Mailing_BAO_BouncePattern extends CRM_Mailing_DAO_BouncePattern {
 
   /**
    * Pseudo-constant pattern array.
+   * @var array
    */
-  static $_patterns = NULL;
+  public static $_patterns = NULL;
 
   /**
    * Class constructor.
@@ -48,7 +49,7 @@ class CRM_Mailing_BAO_BouncePattern extends CRM_Mailing_DAO_BouncePattern {
    * Build the static pattern array.
    */
   public static function buildPatterns() {
-    self::$_patterns = array();
+    self::$_patterns = [];
     $bp = new CRM_Mailing_BAO_BouncePattern();
     $bp->find();
 
@@ -85,18 +86,18 @@ class CRM_Mailing_BAO_BouncePattern extends CRM_Mailing_DAO_BouncePattern {
 
     foreach (self::$_patterns as $type => $re) {
       if (preg_match($re, $message, $matches)) {
-        $bounce = array(
+        $bounce = [
           'bounce_type_id' => $type,
           'bounce_reason' => $message,
-        );
+        ];
         return $bounce;
       }
     }
 
-    $bounce = array(
+    $bounce = [
       'bounce_type_id' => NULL,
       'bounce_reason' => $message,
-    );
+    ];
 
     return $bounce;
   }

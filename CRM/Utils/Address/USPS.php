@@ -99,7 +99,7 @@ class CRM_Utils_Address_USPS {
     $code = $request->getResponseCode();
     if ($code != 200) {
       $session->setStatus(ts('USPS Address Lookup Failed with HTTP status code: %1',
-        array(1 => $code)
+        [1 => $code]
       ));
       return FALSE;
     }

@@ -25,6 +25,7 @@
  +--------------------------------------------------------------------+
  */
 namespace Civi\API;
+
 use Civi\API\Exception\UnauthorizedException;
 
 /**
@@ -50,15 +51,15 @@ abstract class SelectQuery {
    * @var string
    */
   protected $entity;
-  public $select = array();
-  public $where = array();
-  public $orderBy = array();
+  public $select = [];
+  public $where = [];
+  public $orderBy = [];
   public $limit;
   public $offset;
   /**
    * @var array
    */
-  protected $selectFields = array();
+  protected $selectFields = [];
   /**
    * @var bool
    */
@@ -70,7 +71,7 @@ abstract class SelectQuery {
   /**
    * @var array
    */
-  protected $joins = array();
+  protected $joins = [];
   /**
    * @var array
    */
@@ -82,7 +83,7 @@ abstract class SelectQuery {
   /**
    * @var array
    */
-  protected $aclFields = array();
+  protected $aclFields = [];
   /**
    * @var string|bool
    */
@@ -104,7 +105,6 @@ abstract class SelectQuery {
     $this->apiFieldSpec = $this->getFields();
 
     $this->query = \CRM_Utils_SQL_Select::from($bao->tableName() . ' ' . self::MAIN_TABLE_ALIAS);
-    $bao->free();
 
     // Add ACLs first to avoid redundant subclauses
     $this->checkPermissions = $checkPermissions;
@@ -139,15 +139,14 @@ abstract class SelectQuery {
       $this->query->limit($this->limit, $this->offset);
     }
 
-    $result_entities = array();
+    $result_entities = [];
     $result_dao = \CRM_Core_DAO::executeQuery($this->query->toSQL());
 
     while ($result_dao->fetch()) {
       if (in_array('count_rows', $this->select)) {
-        $result_dao->free();
         return (int) $result_dao->c;
       }
-      $result_entities[$result_dao->id] = array();
+      $result_entities[$result_dao->id] = [];
       foreach ($this->selectFields as $column => $alias) {
         $returnName = $alias;
         $alias = str_replace('.', '_', $alias);
@@ -165,7 +164,6 @@ abstract class SelectQuery {
         }
       };
     }
-    $result_dao->free();
     return $result_entities;
   }
 
@@ -240,7 +238,7 @@ abstract class SelectQuery {
 
       // Add acl condition
       $joinCondition = array_merge(
-        array("$prev.$fk = $tableAlias.$keyColumn"),
+        ["$prev.$fk = $tableAlias.$keyColumn"],
         $this->getAclClause($tableAlias, \_civicrm_api3_get_BAO($fkField['FKApiName']), $subStack)
       );
 
@@ -259,7 +257,7 @@ abstract class SelectQuery {
       $fkField = &$fkField['FKApiSpec'][$fieldName];
       $prev = $tableAlias;
     }
-    return array($tableAlias, $fieldName);
+    return [$tableAlias, $fieldName];
   }
 
   /**
@@ -300,8 +298,8 @@ abstract class SelectQuery {
     $tableName = $customField["table_name"];
     $columnName = $customField["column_name"];
     $tableAlias = "{$baseTable}_to_$tableName";
-    $this->join($side, $tableName, $tableAlias, array("`$tableAlias`.entity_id = `$baseTable`.id"));
-    return array($tableAlias, $columnName);
+    $this->join($side, $tableName, $tableAlias, ["`$tableAlias`.entity_id = `$baseTable`.id"]);
+    return [$tableAlias, $columnName];
   }
 
   /**
@@ -330,7 +328,7 @@ abstract class SelectQuery {
       $entity = $spec[$name]['FKApiName'];
       $spec = $spec[$name]['FKApiSpec'];
     }
-    $params = array($fieldName => $value);
+    $params = [$fieldName => $value];
     \_civicrm_api3_validate_fields($entity, 'get', $params, $spec);
     $value = $params[$fieldName];
   }
@@ -348,11 +346,11 @@ abstract class SelectQuery {
       return TRUE;
     }
     // Build an array of params that relate to the joined entity
-    $params = array(
+    $params = [
       'version' => 3,
-      'return' => array(),
+      'return' => [],
       'check_permissions' => $this->checkPermissions,
-    );
+    ];
     $prefix = implode('.', $fieldStack) . '.';
     $len = strlen($prefix);
     foreach ($this->select as $key => $ret) {
@@ -377,15 +375,15 @@ abstract class SelectQuery {
    * @param array $stack
    * @return array
    */
-  protected function getAclClause($tableAlias, $baoName, $stack = array()) {
+  protected function getAclClause($tableAlias, $baoName, $stack = []) {
     if (!$this->checkPermissions) {
-      return array();
+      return [];
     }
     // Prevent (most) redundant acl sub clauses if they have already been applied to the main entity.
     // FIXME: Currently this only works 1 level deep, but tracking through multiple joins would increase complexity
     // and just doing it for the first join takes care of most acl clause deduping.
     if (count($stack) === 1 && in_array($stack[0], $this->aclFields)) {
-      return array();
+      return [];
     }
     $clauses = $baoName::getSelectWhereClause($tableAlias);
     if (!$stack) {

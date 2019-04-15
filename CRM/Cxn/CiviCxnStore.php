@@ -5,14 +5,14 @@
  */
 class CRM_Cxn_CiviCxnStore implements Civi\Cxn\Rpc\CxnStore\CxnStoreInterface {
 
-  protected $cxns = array();
+  protected $cxns = [];
 
   /**
    * @inheritDoc
    */
   public function getAll() {
     if (!$this->cxns) {
-      $this->cxns = array();
+      $this->cxns = [];
       $dao = new CRM_Cxn_DAO_Cxn();
       $dao->find();
       while ($dao->fetch()) {
@@ -71,9 +71,9 @@ class CRM_Cxn_CiviCxnStore implements Civi\Cxn\Rpc\CxnStore\CxnStoreInterface {
       WHERE created_date IS NULL
       AND cxn_guid = %1
       ';
-    CRM_Core_DAO::executeQuery($sql, array(
-      1 => array($cxn['cxnId'], 'String'),
-    ));
+    CRM_Core_DAO::executeQuery($sql, [
+      1 => [$cxn['cxnId'], 'String'],
+    ]);
 
     $this->cxns[$cxn['cxnId']] = $cxn;
   }
@@ -82,9 +82,9 @@ class CRM_Cxn_CiviCxnStore implements Civi\Cxn\Rpc\CxnStore\CxnStoreInterface {
    * @inheritDoc
    */
   public function remove($cxnId) {
-    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_cxn WHERE cxn_guid = %1', array(
-      1 => array($cxnId, 'String'),
-    ));
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_cxn WHERE cxn_guid = %1', [
+      1 => [$cxnId, 'String'],
+    ]);
     unset($this->cxns[$cxnId]);
   }
 
@@ -95,14 +95,14 @@ class CRM_Cxn_CiviCxnStore implements Civi\Cxn\Rpc\CxnStore\CxnStoreInterface {
    */
   protected function convertDaoToCxn($dao) {
     $appMeta = json_decode($dao->app_meta, TRUE);
-    return array(
+    return [
       'cxnId' => $dao->cxn_guid,
       'secret' => $dao->secret,
       'appId' => $dao->app_guid,
       'appUrl' => $appMeta['appUrl'],
       'siteUrl' => CRM_Cxn_BAO_Cxn::getSiteCallbackUrl(),
       'perm' => json_decode($dao->perm, TRUE),
-    );
+    ];
   }
 
   /**

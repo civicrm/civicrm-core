@@ -49,12 +49,11 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   protected $entity = 'survey';
   public $DBResetRequired = FALSE;
 
-
   public function setUp() {
     $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', array(
-        'label' => 'PhoneBank',
-        'return' => 'value',
-      ), 'integer');
+      'label' => 'PhoneBank',
+      'return' => 'value',
+    ), 'integer');
     $this->useTransaction();
     $this->enableCiviCampaign();
     $this->params = array(

@@ -36,9 +36,9 @@
  */
 class CRM_Report_Page_InstanceList extends CRM_Core_Page {
 
-  static $_links = NULL;
+  public static $_links = NULL;
 
-  static $_exceptions = array('logging/contact/detail');
+  public static $_exceptions = ['logging/contact/detail'];
 
   /**
    * Name of component if report list is filtered.
@@ -85,11 +85,11 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
   public function info() {
 
     $report = '';
-    $queryParams = array();
+    $queryParams = [];
 
     if ($this->ovID) {
       $report .= " AND v.id = %1 ";
-      $queryParams[1] = array($this->ovID, 'Integer');
+      $queryParams[1] = [$this->ovID, 'Integer'];
     }
 
     if ($this->compID) {
@@ -99,7 +99,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
       }
       else {
         $report .= " AND v.component_id = %2 ";
-        $queryParams[2] = array($this->compID, 'Integer');
+        $queryParams[2] = [$this->compID, 'Integer'];
         $cmpName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Component', $this->compID,
           'name', 'id'
         );
@@ -111,11 +111,11 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
     }
     elseif ($this->grouping) {
       $report .= " AND v.grouping = %3 ";
-      $queryParams[3] = array($this->grouping, 'String');
+      $queryParams[3] = [$this->grouping, 'String'];
     }
     elseif ($this->myReports) {
       $report .= " AND inst.owner_id = %4 ";
-      $queryParams[4] = array(CRM_Core_Session::getLoggedInContactID(), 'Integer');
+      $queryParams[4] = [CRM_Core_Session::getLoggedInContactID(), 'Integer'];
     }
 
     $sql = "
@@ -137,12 +137,12 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
           WHERE v.is_active = 1 {$report}
                 AND inst.domain_id = %9
           ORDER BY  v.weight ASC, inst.title ASC";
-    $queryParams[9] = array(CRM_Core_Config::domainID(), 'Integer');
+    $queryParams[9] = [CRM_Core_Config::domainID(), 'Integer'];
 
     $dao = CRM_Core_DAO::executeQuery($sql, $queryParams);
 
     $config = CRM_Core_Config::singleton();
-    $rows = array();
+    $rows = [];
     $url = 'civicrm/report/instance';
     $my_reports_grouping = 'My';
     while ($dao->fetch()) {
@@ -171,7 +171,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
 
       if (trim($dao->title)) {
         if ($this->ovID) {
-          $this->title = ts("Report(s) created from the template: %1", array(1 => $dao->label));
+          $this->title = ts("Report(s) created from the template: %1", [1 => $dao->label]);
         }
 
         $report_grouping = $dao->compName;
@@ -190,7 +190,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
     if (isset($rows[$my_reports_grouping])) {
       $my_reports = $rows[$my_reports_grouping];
       unset($rows[$my_reports_grouping]);
-      $rows = array($my_reports_grouping => $my_reports) + $rows;
+      $rows = [$my_reports_grouping => $my_reports] + $rows;
     }
     return $rows;
   }
@@ -208,7 +208,7 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
     $rows = $this->info();
 
     $this->assign('list', $rows);
-    if ($this->ovID OR $this->compID) {
+    if ($this->ovID or $this->compID) {
       // link to view all reports
       $reportUrl = CRM_Utils_System::url('civicrm/report/list', "reset=1");
       $this->assign('reportUrl', $reportUrl);
@@ -216,13 +216,13 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
         $this->assign('title', $this->title);
       }
       else {
-        CRM_Utils_System::setTitle(ts('%1 Reports', array(1 => $this->_compName)));
+        CRM_Utils_System::setTitle(ts('%1 Reports', [1 => $this->_compName]));
       }
     }
     // assign link to template list for users with appropriate permissions
     if (CRM_Core_Permission::check('administer Reports')) {
       if ($this->compID) {
-        $newButton = ts('New %1 Report', array(1 => $this->_compName));
+        $newButton = ts('New %1 Report', [1 => $this->_compName]);
         $templateUrl = CRM_Utils_System::url('civicrm/report/template/list', "reset=1&compid={$this->compID}");
       }
       else {
@@ -247,40 +247,40 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
    */
   protected function getActionLinks($instanceID, $className) {
     $urlCommon = 'civicrm/report/instance/' . $instanceID;
-    $actions = array(
-      'copy' => array(
+    $actions = [
+      'copy' => [
         'url' => CRM_Utils_System::url($urlCommon, 'reset=1&output=copy'),
         'label' => ts('Save a Copy'),
-      ),
-      'pdf' => array(
+      ],
+      'pdf' => [
         'url' => CRM_Utils_System::url($urlCommon, 'reset=1&force=1&output=pdf'),
         'label' => ts('View as pdf'),
-      ),
-      'print' => array(
+      ],
+      'print' => [
         'url' => CRM_Utils_System::url($urlCommon, 'reset=1&force=1&output=print'),
         'label' => ts('Print report'),
-      ),
-    );
+      ],
+    ];
     // Hackery, Hackera, Hacker ahahahahahaha a super nasty hack.
     // Almost all report classes support csv & loading each class to call the method seems too
     // expensive. We also have on our later list 'do they support charts' which is instance specific
     // e.g use of group by might affect it. So, lets just skip for the few that don't for now.
-    $csvBlackList = array(
+    $csvBlackList = [
       'CRM_Report_Form_Contact_Detail',
       'CRM_Report_Form_Event_Income',
-    );
+    ];
     if (!in_array($className, $csvBlackList)) {
-      $actions['csv'] = array(
+      $actions['csv'] = [
         'url' => CRM_Utils_System::url($urlCommon, 'reset=1&force=1&output=csv'),
         'label' => ts('Export to csv'),
-      );
+      ];
     }
     if (CRM_Core_Permission::check('administer Reports')) {
-      $actions['delete'] = array(
+      $actions['delete'] = [
         'url' => CRM_Utils_System::url($urlCommon, 'reset=1&action=delete'),
         'label' => ts('Delete report'),
         'confirm_message' => ts('Are you sure you want delete this report? This action cannot be undone.'),
-      );
+      ];
     }
 
     return $actions;

@@ -45,7 +45,7 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
 
     // keep track of all 'added' contact groups so we can remove them from the smart group
     // section
-    $staticGroups = array();
+    $staticGroups = [];
     if (!empty($in)) {
       foreach ($in as $group) {
         $staticGroups[$group['group_id']] = 1;
@@ -176,7 +176,7 @@ class CRM_Contact_Page_View_GroupContact extends CRM_Core_Page {
       return FALSE;
     }
 
-    $ids = array($contactID);
+    $ids = [$contactID];
     $method = 'Admin';
 
     $session = CRM_Core_Session::singleton();

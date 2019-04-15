@@ -89,9 +89,9 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
 
     $this->assertEquals(CRM_Import_Parser::VALID, $parser->import(CRM_Import_Parser::DUPLICATE_UPDATE, $values), 'Return code from parser import was not as expected');
     $this->callAPISuccess("Contact", "get", array(
-        "first_name"        => "Alok",
-        "last_name"         => "Patel",
-        "organization_name" => "Agileware",
+      "first_name"        => "Alok",
+      "last_name"         => "Patel",
+      "organization_name" => "Agileware",
     ));
   }
 
@@ -271,7 +271,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(1, $contact['is_deceased']);
     $this->callAPISuccess('Contact', 'delete', array('id' => $contact['id']));
   }
-
 
   /**
    * Test that the import parser adds the address to the primary location.
@@ -509,6 +508,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * CRM-19888 default country should be used if ambigous.
    */
   public function testImportAmbiguousStateCountry() {
+    $this->callAPISuccess('Setting', 'create', ['defaultContactCountry' => 1228]);
     $countries = CRM_Core_PseudoConstant::country(FALSE, FALSE);
     $this->callAPISuccess('Setting', 'create', array('countryLimit' => array(array_search('United States', $countries), array_search('Guyana', $countries), array_search('Netherlands', $countries))));
     $this->callAPISuccess('Setting', 'create', array('provinceLimit' => array(array_search('United States', $countries), array_search('Guyana', $countries), array_search('Netherlands', $countries))));

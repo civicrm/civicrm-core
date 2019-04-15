@@ -45,7 +45,7 @@ class CRM_Tag_Form_Merge extends CRM_Core_Form {
     if (count($this->_id) < 2) {
       CRM_Core_Error::statusBounce(ts("You must select at least 2 tags for merging."), $url);
     }
-    $tags = civicrm_api3('Tag', 'get', array('id' => array('IN' => $this->_id), 'options' => array('limit' => 0)));
+    $tags = civicrm_api3('Tag', 'get', ['id' => ['IN' => $this->_id], 'options' => ['limit' => 0]]);
     $this->_tags = $tags['values'];
     if (count($this->_id) != count($this->_tags)) {
       CRM_Core_Error::statusBounce(ts("Unknown tag."), $url);
@@ -66,19 +66,18 @@ class CRM_Tag_Form_Merge extends CRM_Core_Form {
     $this->add('text', 'name', ts('Name of combined tag'), TRUE);
     $this->assign('tags', CRM_Utils_Array::collect('name', $this->_tags));
 
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'next',
           'name' => ts('Merge'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
-    );
+        ],
+    ]);
   }
 
   /**
@@ -88,9 +87,9 @@ class CRM_Tag_Form_Merge extends CRM_Core_Form {
    */
   public function setDefaultValues() {
     $primary = CRM_Utils_Array::first($this->_tags);
-    return array(
+    return [
       'name' => $primary['name'],
-    );
+    ];
   }
 
   /**
@@ -106,7 +105,7 @@ class CRM_Tag_Form_Merge extends CRM_Core_Form {
     }
 
     if ($params['name'] != $primary['name']) {
-      civicrm_api3('Tag', 'create', array('id' => $primary['id'], 'name' => $params['name']));
+      civicrm_api3('Tag', 'create', ['id' => $primary['id'], 'name' => $params['name']]);
     }
 
     $key = array_search($params['name'], $deleted);
@@ -115,8 +114,8 @@ class CRM_Tag_Form_Merge extends CRM_Core_Form {
     }
 
     CRM_Core_Session::setStatus(
-      ts('All records previously tagged %1 are now tagged %2.', array(1 => implode(' ' . ts('or') . ' ', $deleted), 2 => $params['name'])),
-      ts('%1 Tags Merged', array(1 => count($this->_id))),
+      ts('All records previously tagged %1 are now tagged %2.', [1 => implode(' ' . ts('or') . ' ', $deleted), 2 => $params['name']]),
+      ts('%1 Tags Merged', [1 => count($this->_id)]),
       'success'
     );
 

@@ -53,6 +53,7 @@ class CRM_Utils_Hook_Soap extends CRM_Utils_Hook {
    *
    * @return mixed
    */
+
   /**
    * @param int $numParams
    * @param mixed $arg1

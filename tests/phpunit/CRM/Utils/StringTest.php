@@ -131,7 +131,8 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
    * @return array
    */
   public function booleanDataProvider() {
-    $cases = array(); // array(0 => $input, 1 => $expectedOutput)
+    // array(0 => $input, 1 => $expectedOutput)
+    $cases = array();
     $cases[] = array(TRUE, TRUE);
     $cases[] = array(FALSE, FALSE);
     $cases[] = array(1, TRUE);
@@ -351,6 +352,23 @@ class CRM_Utils_StringTest extends CiviUnitTestCase {
         ),
       ),
     );
+  }
+
+  public function purifyHTMLProvider() {
+    $tests = [];
+    $tests[] = ['<span onmouseover=alert(0)>HOVER</span>', '<span>HOVER</span>'];
+    $tests[] = ['<a href="https://civicrm.org" target="_blank" class="button-purple">hello</a>', '<a href="https://civicrm.org" target="_blank" class="button-purple" rel="noreferrer noopener">hello</a>'];
+    return $tests;
+  }
+
+  /**
+   * Test ouput of purifyHTML
+   * @param string $testString
+   * @param string $expectedString
+   * @dataProvider purifyHTMLProvider
+   */
+  public function testPurifyHTML($testString, $expectedString) {
+    $this->assertEquals($expectedString, CRM_Utils_String::purifyHTML($testString));
   }
 
 }

@@ -63,6 +63,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Prefix for the controller.
+   * @var string
    */
   protected $_prefix = "event_";
 
@@ -88,7 +89,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
-    $this->defaults = array();
 
     $this->loadStandardSearchOptionsFromUrl();
     $this->loadFormValues();
@@ -105,7 +105,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       );
     }
 
-    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, array('event_id'));
+    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, ['event_id']);
     $selector = new CRM_Event_Selector_Search($this->_queryParams,
       $this->_action,
       NULL,
@@ -149,7 +149,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
     $rows = $this->get('rows');
     if (is_array($rows)) {
-      $lineItems = $eventIds = array();
+      $lineItems = $eventIds = [];
       if (!$this->_single) {
         $this->addRowSelectors($rows);
       }
@@ -165,7 +165,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $participantCount = 0;
       if (count($eventIds) == 1) {
         //convert form values to clause.
-        $seatClause = array();
+        $seatClause = [];
         if (CRM_Utils_Array::value('participant_test', $this->_formValues) == '1' || CRM_Utils_Array::value('participant_test', $this->_formValues) == '0') {
           $seatClause[] = "( participant.is_test = {$this->_formValues['participant_test']} )";
         }
@@ -176,7 +176,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
           }
         }
         if (!empty($this->_formValues['participant_role_id'])) {
-          $escapedRoles = array();
+          $escapedRoles = [];
           foreach ((array) $this->_formValues['participant_role_id'] as $participantRole) {
             $escapedRoles[] = CRM_Utils_Type::escape($participantRole, 'String');
           }
@@ -186,11 +186,13 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
         // CRM-15379
         if (!empty($this->_formValues['participant_fee_id'])) {
           $participant_fee_id = $this->_formValues['participant_fee_id'];
+          $val_regexp = [];
           foreach ($participant_fee_id as $k => &$val) {
             $val = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $val, 'label');
+            $val_regexp[$k] = CRM_Core_DAO::escapeString(preg_quote(trim($val)));
             $val = CRM_Core_DAO::escapeString(trim($val));
           }
-          $feeLabel = implode('|', $participant_fee_id);
+          $feeLabel = implode('|', $val_regexp);
           $seatClause[] = "( participant.fee_level REGEXP '{$feeLabel}' )";
         }
 
@@ -204,10 +206,10 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       $tasks = CRM_Event_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission(), $taskParams);
 
       if (isset($this->_ssID)) {
-        $savedSearchValues = array(
+        $savedSearchValues = [
           'id' => $this->_ssID,
           'name' => CRM_Contact_BAO_SavedSearch::getName($this->_ssID, 'title'),
-        );
+        ];
         $this->assign_by_ref('savedSearch', $savedSearchValues);
         $this->assign('ssID', $this->_ssID);
       }
@@ -270,36 +272,19 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * The post processing of the form gets done here.
-   *
-   * Key things done during post processing are
-   *      - check for reset or next request. if present, skip post procesing.
-   *      - now check if user requested running a saved search, if so, then
-   *        the form values associated with the saved search are used for searching.
-   *      - if user has done a submit with new values the regular post submissing is
-   *        done.
-   * The processing consists of using a Selector / Controller framework for getting the
-   * search results.
-   *
-   * @param
-   *
-   * @return void
+   * Test submit the form.
+   * @param $formValues
    */
-  public function postProcess() {
-    if ($this->_done) {
-      return;
-    }
+  public function testSubmit($formValues) {
+    $this->submit($formValues);
+  }
 
-    $this->_done = TRUE;
-
-    if (!empty($_POST)) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-      CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, array('participant_status_id'));
-    }
-
-    if (empty($this->_formValues)) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-    }
+  /**
+   * Submit the search form with given values.
+   * @param $formValues
+   */
+  private function submit($formValues) {
+    $this->_formValues = $formValues;
 
     $this->fixFormValues();
 
@@ -315,7 +300,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
     CRM_Core_BAO_CustomValue::fixCustomFieldValue($this->_formValues);
 
-    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, array('event_id'));
+    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, ['event_id']);
 
     $this->set('formValues', $this->_formValues);
     $this->set('queryParams', $this->_queryParams);
@@ -338,7 +323,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       );
     }
 
-    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, array('event_id'));
+    $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, ['event_id']);
 
     $selector = new CRM_Event_Selector_Search($this->_queryParams,
       $this->_action,
@@ -376,6 +361,42 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
+   * The post processing of the form gets done here.
+   *
+   * Key things done during post processing are
+   *      - check for reset or next request. if present, skip post procesing.
+   *      - now check if user requested running a saved search, if so, then
+   *        the form values associated with the saved search are used for searching.
+   *      - if user has done a submit with new values the regular post submissing is
+   *        done.
+   * The processing consists of using a Selector / Controller framework for getting the
+   * search results.
+   *
+   * @param
+   *
+   * @return void
+   */
+  public function postProcess() {
+    if ($this->_done) {
+      return;
+    }
+
+    $this->_done = TRUE;
+    $formValues = [];
+
+    if (!empty($_POST)) {
+      $formValues = $this->controller->exportValues($this->_name);
+      CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, ['participant_status_id']);
+    }
+
+    if (empty($this->_formValues)) {
+      $formValues = $this->controller->exportValues($this->_name);
+    }
+
+    $this->submit($formValues);
+  }
+
+  /**
    * add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
@@ -393,7 +414,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    *   the default array reference
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     $defaults = $this->_formValues;
     return $defaults;
   }
@@ -423,7 +444,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
       elseif (is_array($status) && !array_key_exists('IN', $status)) {
         $statusTypes = array_keys($status);
       }
-      $this->_formValues['participant_status_id'] = is_array($statusTypes) ? array('IN' => array_keys($statusTypes)) : $statusTypes;
+      $this->_formValues['participant_status_id'] = is_array($statusTypes) ? ['IN' => array_keys($statusTypes)] : $statusTypes;
     }
 
     $role = CRM_Utils_Request::retrieve('role', 'String');

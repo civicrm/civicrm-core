@@ -30,6 +30,7 @@
  * @group headless
  */
 class CRM_Utils_JSTest extends CiviUnitTestCase {
+
   /**
    * @return array
    */
@@ -39,27 +40,33 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
       '',
       array(),
     );
-    $cases[] = array(// missing ts
+    // missing ts
+    $cases[] = array(
       'alert("Hello world")',
       array(),
     );
-    $cases[] = array(// basic function call
+    // basic function call
+    $cases[] = array(
       'alert(ts("Hello world"));',
       array('Hello world'),
     );
-    $cases[] = array(// with arg
+    // with arg
+    $cases[] = array(
       'alert(ts("Hello world", {1: "whiz"}));',
       array('Hello world'),
     );
-    $cases[] = array(// not really ts()
+    // not really ts()
+    $cases[] = array(
       'alert(clients("Hello world"));',
       array(),
     );
-    $cases[] = array(// not really ts()
+    // not really ts()
+    $cases[] = array(
       'alert(clients("Hello world", {1: "whiz"}));',
       array(),
     );
-    $cases[] = array(// with arg
+    // with arg
+    $cases[] = array(
       "\n" .
       "public function whits() {\n" .
       "  for (a in b) {\n" .
@@ -70,15 +77,18 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
       "}\n",
       array('Hello'),
     );
-    $cases[] = array(// duplicate
+    // duplicate
+    $cases[] = array(
       'alert(ts("Hello world") + "-" + ts("Hello world"));',
       array('Hello world'),
     );
-    $cases[] = array(// two strings, addition
+    // two strings, addition
+    $cases[] = array(
       'alert(ts("Hello world") + "-" + ts("How do you do?"));',
       array('Hello world', 'How do you do?'),
     );
-    $cases[] = array(// two strings, separate calls
+    // two strings, separate calls
+    $cases[] = array(
       'alert(ts("Hello world");\nalert(ts("How do you do?"));',
       array('Hello world', 'How do you do?'),
     );
@@ -86,11 +96,13 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
       'alert(ts(\'Single quoted\'));',
       array('Single quoted'),
     );
-    $cases[] = array(// unclear string
+    // unclear string
+    $cases[] = array(
       'alert(ts(message));',
       array(),
     );
-    $cases[] = array(// ts() within a string
+    // ts() within a string
+    $cases[] = array(
       'alert(ts("Does the ts(\'example\') notation work?"));',
       array('Does the ts(\'example\') notation work?'),
     );

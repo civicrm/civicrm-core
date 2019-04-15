@@ -105,7 +105,6 @@ class api_v3_MembershipPaymentTest extends CiviUnitTestCase {
 
   }
 
-
   ///////////////// civicrm_membershipPayment_get methods
 
   /**

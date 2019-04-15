@@ -15,7 +15,7 @@ class ExampleTransactionalTest extends \PHPUnit_Framework_TestCase implements He
    * @var array
    *   Array(int $id).
    */
-  static $contactIds = array();
+  protected static $contactIds = array();
 
   public function setUpHeadless() {
     return \Civi\Test::headless()->apply();

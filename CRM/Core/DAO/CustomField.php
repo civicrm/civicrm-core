@@ -19,14 +19,14 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_custom_field';
+  public static $_tableName = 'civicrm_custom_field';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Unique Custom Field ID
@@ -254,7 +254,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'custom_group_id', 'civicrm_custom_group', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'option_group_id', 'civicrm_option_group', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);

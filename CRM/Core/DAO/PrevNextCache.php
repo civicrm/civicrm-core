@@ -19,14 +19,14 @@ class CRM_Core_DAO_PrevNextCache extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_prevnext_cache';
+  public static $_tableName = 'civicrm_prevnext_cache';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned

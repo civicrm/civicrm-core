@@ -36,236 +36,237 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
 
   /**
    * Holds Deferred Financial Account
+   * @var array
    */
-  protected $_deferredFinancialAccount = array();
+  protected $_deferredFinancialAccount = [];
 
   /**
    */
   public function __construct() {
     $this->_exposeContactID = FALSE;
     $this->_deferredFinancialAccount = CRM_Financial_BAO_FinancialAccount::getAllDeferredFinancialAccount();
-    $this->_columns = array(
-      'civicrm_financial_trxn' => array(
+    $this->_columns = [
+      'civicrm_financial_trxn' => [
         'dao' => 'CRM_Financial_DAO_FinancialTrxn',
-        'fields' => array(
-          'status_id' => array(
+        'fields' => [
+          'status_id' => [
             'title' => ts('Transaction'),
-          ),
-          'trxn_date' => array(
+          ],
+          'trxn_date' => [
             'title' => ts('Transaction Date'),
             'type' => CRM_Utils_Type::T_DATE,
             'required' => TRUE,
-          ),
-          'total_amount' => array(
+          ],
+          'total_amount' => [
             'title' => ts('Transaction Amount'),
             'type' => CRM_Utils_Type::T_MONEY,
             'required' => TRUE,
             'dbAlias' => 'SUM(financial_trxn_1_civireport.total_amount )',
-          ),
-        ),
-        'filters' => array(
-          'trxn_date' => array(
+          ],
+        ],
+        'filters' => [
+          'trxn_date' => [
             'title' => ts('Transaction Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-        ),
-      ),
-      'civicrm_contribution' => array(
+          ],
+        ],
+      ],
+      'civicrm_contribution' => [
         'dao' => 'CRM_Contribute_DAO_Contribution',
-        'fields' => array(
-          'id' => array(
+        'fields' => [
+          'id' => [
             'title' => ts('Contribution ID'),
-          ),
-          'contribution_id' => array(
+          ],
+          'contribution_id' => [
             'title' => ts('Contribution ID'),
             'required' => TRUE,
             'no_display' => TRUE,
             'dbAlias' => 'contribution_civireport.id',
-          ),
-          'contact_id' => array(
+          ],
+          'contact_id' => [
             'title' => ts('Contact ID'),
-          ),
-          'source' => array(
+          ],
+          'source' => [
             'title' => ts('Source'),
-          ),
-          'receive_date' => array(
+          ],
+          'receive_date' => [
             'title' => ts('Receive Date'),
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'cancel_date' => array(
+          ],
+          'cancel_date' => [
             'title' => ts('Cancel Date'),
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'revenue_recognition_date' => array(
+          ],
+          'revenue_recognition_date' => [
             'title' => ts('Revenue Recognition Date'),
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-        ),
-        'filters' => array(
-          'receive_date' => array(
+          ],
+        ],
+        'filters' => [
+          'receive_date' => [
             'title' => ts('Receive Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'cancel_date' => array(
+          ],
+          'cancel_date' => [
             'title' => ts('Cancel Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'revenue_recognition_date' => array(
+          ],
+          'revenue_recognition_date' => [
             'title' => ts('Revenue Recognition Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'revenue_recognition_date_toggle' => array(
+          ],
+          'revenue_recognition_date_toggle' => [
             'title' => ts("Current month's revenue?"),
             'type' => CRM_Utils_Type::T_BOOLEAN,
             'default' => 0,
             'pseudofield' => TRUE,
-          ),
-        ),
-      ),
-      'civicrm_financial_account' => array(
+          ],
+        ],
+      ],
+      'civicrm_financial_account' => [
         'dao' => 'CRM_Financial_DAO_FinancialAccount',
-        'fields' => array(
-          'name' => array(
+        'fields' => [
+          'name' => [
             'title' => ts('Deferred Account'),
             'required' => TRUE,
             'no_display' => TRUE,
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'title' => ts('Deferred Account ID'),
             'required' => TRUE,
             'no_display' => TRUE,
-          ),
-          'accounting_code' => array(
+          ],
+          'accounting_code' => [
             'title' => ts('Deferred Accounting Code'),
             'required' => TRUE,
             'no_display' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'id' => array(
+          ],
+        ],
+        'filters' => [
+          'id' => [
             'title' => ts('Deferred Financial Account'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->_deferredFinancialAccount,
             'type' => CRM_Utils_Type::T_INT,
-          ),
-        ),
-      ),
-      'civicrm_financial_account_1' => array(
+          ],
+        ],
+      ],
+      'civicrm_financial_account_1' => [
         'dao' => 'CRM_Financial_DAO_FinancialAccount',
-        'fields' => array(
-          'name' => array(
+        'fields' => [
+          'name' => [
             'title' => ts('Revenue Account'),
             'required' => TRUE,
             'no_display' => TRUE,
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'title' => ts('Revenue Account ID'),
             'required' => TRUE,
             'no_display' => TRUE,
-          ),
-          'accounting_code' => array(
+          ],
+          'accounting_code' => [
             'title' => ts('Revenue Accounting code'),
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-        ),
-      ),
-      'civicrm_financial_item' => array(
+          ],
+        ],
+      ],
+      'civicrm_financial_item' => [
         'dao' => 'CRM_Financial_DAO_FinancialItem',
-        'fields' => array(
-          'status_id' => array(
+        'fields' => [
+          'status_id' => [
             'title' => ts('Status'),
             'required' => TRUE,
             'no_display' => TRUE,
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'title' => ts('Financial Item ID'),
             'required' => TRUE,
             'no_display' => TRUE,
-          ),
-          'description' => array(
+          ],
+          'description' => [
             'title' => ts('Item'),
-          ),
-        ),
-      ),
-      'civicrm_financial_trxn_1' => array(
+          ],
+        ],
+      ],
+      'civicrm_financial_trxn_1' => [
         'dao' => 'CRM_Financial_DAO_FinancialTrxn',
-        'fields' => array(
-          'total_amount' => array(
+        'fields' => [
+          'total_amount' => [
             'title' => ts('Deferred Transaction Amount'),
             'type' => CRM_Utils_Type::T_MONEY,
             'required' => TRUE,
             'no_display' => TRUE,
             'dbAlias' => 'GROUP_CONCAT(financial_trxn_1_civireport.total_amount)',
-          ),
-          'trxn_date' => array(
+          ],
+          'trxn_date' => [
             'title' => ts('Deferred Transaction Date'),
             'required' => TRUE,
             'no_display' => TRUE,
             'dbAlias' => 'GROUP_CONCAT(financial_trxn_1_civireport.trxn_date)',
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-        ),
-      ),
-      'civicrm_contact' => array(
+          ],
+        ],
+      ],
+      'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'display_name' => array(
+        'fields' => [
+          'display_name' => [
             'title' => ts('Contact Name'),
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'title' => ts('Contact ID'),
             'required' => TRUE,
             'no_display' => TRUE,
-          ),
-        ),
-      ),
-      'civicrm_membership' => array(
+          ],
+        ],
+      ],
+      'civicrm_membership' => [
         'dao' => 'CRM_Member_DAO_Membership',
-        'fields' => array(
-          'start_date' => array(
+        'fields' => [
+          'start_date' => [
             'title' => ts('Start Date'),
             'dbAlias' => 'IFNULL(membership_civireport.start_date, event_civireport.start_date)',
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'end_date' => array(
+          ],
+          'end_date' => [
             'title' => ts('End Date'),
             'dbdbAlias' => 'IFNULL(membership_civireport.end_date, event_civireport.end_date)',
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-        ),
-      ),
-      'civicrm_event' => array(
+          ],
+        ],
+      ],
+      'civicrm_event' => [
         'dao' => 'CRM_Event_DAO_Event',
-      ),
-      'civicrm_participant' => array(
+      ],
+      'civicrm_participant' => [
         'dao' => 'CRM_Event_DAO_Participant',
-      ),
-      'civicrm_batch' => array(
+      ],
+      'civicrm_batch' => [
         'dao' => 'CRM_Batch_DAO_EntityBatch',
         'grouping' => 'contri-fields',
-        'fields' => array(
-          'batch_id' => array(
+        'fields' => [
+          'batch_id' => [
             'title' => ts('Batch Title'),
             'dbAlias' => "GROUP_CONCAT(DISTINCT batch_civireport.batch_id
                                     ORDER BY batch_civireport.batch_id SEPARATOR ',')",
 
-          ),
-        ),
-        'filters' => array(
-          'batch_id' => array(
+          ],
+        ],
+        'filters' => [
+          'batch_id' => [
             'title' => ts('Batch Title'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Batch_BAO_Batch::getBatches(),
             'type' => CRM_Utils_Type::T_INT,
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
     parent::__construct();
   }
 
@@ -386,10 +387,10 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
     $this->_groupBy = "GROUP BY {$this->_aliases['civicrm_financial_account']}.id,  {$this->_aliases['civicrm_financial_account_1']}.id, {$this->_aliases['civicrm_financial_item']}.id";
     $this->_select = CRM_Contact_BAO_Query::appendAnyValueToSelect(
       $this->_selectClauses,
-      array(
+      [
         "{$this->_aliases['civicrm_financial_account_1']}.id",
         "{$this->_aliases['civicrm_financial_item']}.id",
-      )
+      ]
     );
   }
 
@@ -398,7 +399,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
    */
   public function modifyColumnHeaders() {
     // Re-order the columns in a custom order defined below.
-    $sortArray = array(
+    $sortArray = [
       'civicrm_batch_batch_id',
       'civicrm_financial_trxn_status_id',
       'civicrm_financial_trxn_trxn_date',
@@ -410,7 +411,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
       'civicrm_contribution_contact_id',
       'civicrm_contact_display_name',
       'civicrm_contribution_source',
-    );
+    ];
     // Only re-order selected columns.
     $sortArray = array_flip(array_intersect_key(array_flip($sortArray), $this->_columnHeaders));
 
@@ -419,17 +420,17 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
 
     // Add months to the columns.
     if ($this->_params['revenue_recognition_date_toggle_value']) {
-      $this->_columnHeaders[date('M, Y', strtotime(date('Y-m-d')))] = array(
+      $this->_columnHeaders[date('M, Y', strtotime(date('Y-m-d')))] = [
         'title' => date('M, Y', strtotime(date('Y-m-d'))),
         'type' => CRM_Utils_Type::T_DATE,
-      );
+      ];
     }
     else {
       for ($i = 0; $i < 12; $i++) {
-        $this->_columnHeaders[date('M, Y', strtotime(date('Y-m-d') . "+{$i} month"))] = array(
+        $this->_columnHeaders[date('M, Y', strtotime(date('Y-m-d') . "+{$i} month"))] = [
           'title' => date('M, Y', strtotime(date('Y-m-d') . "+{$i} month")),
           'type' => CRM_Utils_Type::T_DATE,
-        );
+        ];
       }
     }
   }
@@ -450,11 +451,11 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
     $dateFormat = Civi::settings()->get('dateformatFinancialBatch');
 
     if (!is_array($rows)) {
-      $rows = array();
+      $rows = [];
     }
 
     while ($dao->fetch()) {
-      $row = array();
+      $row = [];
       foreach ($this->_columnHeaders as $key => $value) {
         $arraykey = $dao->civicrm_financial_account_id . '_' . $dao->civicrm_financial_account_1_id;
 

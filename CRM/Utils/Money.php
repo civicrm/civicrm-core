@@ -35,7 +35,7 @@
  * Money utilties
  */
 class CRM_Utils_Money {
-  static $_currencySymbols = NULL;
+  public static $_currencySymbols = NULL;
 
   /**
    * Format a monetary string.
@@ -86,15 +86,22 @@ class CRM_Utils_Money {
     }
 
     if (!self::$_currencySymbols) {
-      self::$_currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array(
-          'keyColumn' => 'name',
-          'labelColumn' => 'symbol',
-        ));
+      self::$_currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', [
+        'keyColumn' => 'name',
+        'labelColumn' => 'symbol',
+      ]);
     }
 
     if (!$currency) {
       $currency = $config->defaultCurrency;
     }
+
+    // ensure $currency is a valid currency code
+    // for backwards-compatibility, also accept one space instead of a currency
+    if ($currency != ' ' && !array_key_exists($currency, self::$_currencySymbols)) {
+      throw new CRM_Core_Exception("Invalid currency \"{$currency}\"");
+    }
+
     $amount = self::formatNumericByFormat($amount, $valueFormat);
     // If it contains tags, means that HTML was passed and the
     // amount is already converted properly,
@@ -104,11 +111,11 @@ class CRM_Utils_Money {
       $amount = self::replaceCurrencySeparators($amount);
     }
 
-    $replacements = array(
+    $replacements = [
       '%a' => $amount,
       '%C' => $currency,
       '%c' => CRM_Utils_Array::value($currency, self::$_currencySymbols, $currency),
-    );
+    ];
     return strtr($format, $replacements);
   }
 
@@ -243,10 +250,10 @@ class CRM_Utils_Money {
    */
   protected static function replaceCurrencySeparators($amount) {
     $config = CRM_Core_Config::singleton();
-    $rep = array(
+    $rep = [
       ',' => $config->monetaryThousandSeparator,
       '.' => $config->monetaryDecimalPoint,
-    );
+    ];
     return strtr($amount, $rep);
   }
 

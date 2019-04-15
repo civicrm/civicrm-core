@@ -65,19 +65,19 @@ function civicrm_api3_mailing_event_confirm_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_mailing_event_confirm_create_spec(&$params) {
-  $params['contact_id'] = array(
+  $params['contact_id'] = [
     'api.required' => 1,
     'title' => 'Contact ID',
     'type' => CRM_Utils_Type::T_INT,
-  );
-  $params['subscribe_id'] = array(
+  ];
+  $params['subscribe_id'] = [
     'api.required' => 1,
     'title' => 'Subscribe Event ID',
     'type' => CRM_Utils_Type::T_INT,
-  );
-  $params['hash'] = array(
+  ];
+  $params['hash'] = [
     'api.required' => 1,
     'title' => 'Hash',
     'type' => CRM_Utils_Type::T_STRING,
-  );
+  ];
 }

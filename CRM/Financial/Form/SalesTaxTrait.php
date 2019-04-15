@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2019
  */
-
 trait CRM_Financial_Form_SalesTaxTrait {
 
   /**

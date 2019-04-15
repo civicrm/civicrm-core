@@ -65,7 +65,7 @@ class SettingsMetadata {
    *   - description
    *   - help_text
    */
-  public static function getMetadata($filters = array(), $domainID = NULL) {
+  public static function getMetadata($filters = [], $domainID = NULL) {
     if ($domainID === NULL) {
       $domainID = \CRM_Core_Config::domainID();
     }
@@ -81,7 +81,7 @@ class SettingsMetadata {
       $settingsMetadata = $cache->get(self::ALL);
       if (empty($settingsMetadata)) {
         global $civicrm_root;
-        $metaDataFolders = array($civicrm_root . '/settings');
+        $metaDataFolders = [$civicrm_root . '/settings'];
         \CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
         $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
         $cache->set(self::ALL, $settingsMetadata);
@@ -106,8 +106,8 @@ class SettingsMetadata {
    * @return array
    */
   protected static function loadSettingsMetaDataFolders($metaDataFolders) {
-    $settingsMetadata = array();
-    $loadedFolders = array();
+    $settingsMetadata = [];
+    $loadedFolders = [];
     foreach ($metaDataFolders as $metaDataFolder) {
       $realFolder = realpath($metaDataFolder);
       if (is_dir($realFolder) && !isset($loadedFolders[$realFolder])) {
@@ -126,7 +126,7 @@ class SettingsMetadata {
    * @return array
    */
   protected static function loadSettingsMetadata($metaDataFolder) {
-    $settingMetaData = array();
+    $settingMetaData = [];
     $settingsFiles = \CRM_Utils_File::findFiles($metaDataFolder, '*.setting.php');
     foreach ($settingsFiles as $file) {
       $settings = include $file;
@@ -148,8 +148,8 @@ class SettingsMetadata {
     if (empty($filters)) {
       return;
     }
-    elseif (array_keys($filters) == array('name')) {
-      $settingSpec = array($filters['name'] => \CRM_Utils_Array::value($filters['name'], $settingSpec, ''));
+    elseif (array_keys($filters) == ['name']) {
+      $settingSpec = [$filters['name'] => \CRM_Utils_Array::value($filters['name'], $settingSpec, '')];
       return;
     }
     else {

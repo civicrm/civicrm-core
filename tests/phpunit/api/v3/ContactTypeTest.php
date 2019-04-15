@@ -110,7 +110,6 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     $this->callAPISuccess('contact', 'delete', $params);
   }
 
-
   /**
    * Test add with invalid data.
    */
@@ -133,7 +132,6 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     );
     $contact = $this->callAPIFailure('contact', 'create', $contactParams);
   }
-
 
   /**
    * Test update with no subtype to valid subtype.
@@ -199,7 +197,6 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
     $this->assertEquals(end($result['contact_sub_type']), $updateParams['contact_sub_type'], "In line " . __LINE__);
     $this->callAPISuccess('contact', 'delete', $params);
   }
-
 
   /**
    * Test update with no subtype to invalid subtype.

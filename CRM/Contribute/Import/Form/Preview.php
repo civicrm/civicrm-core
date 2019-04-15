@@ -84,7 +84,7 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
       $this->set('downloadMismatchRecordsUrl', CRM_Utils_System::url('civicrm/export', $urlParams));
     }
 
-    $properties = array(
+    $properties = [
       'mapper',
       'softCreditFields',
       'mapperSoftCreditType',
@@ -97,7 +97,7 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
       'downloadErrorRecordsUrl',
       'downloadConflictRecordsUrl',
       'downloadMismatchRecordsUrl',
-    );
+    ];
     $this->setStatusUrl();
 
     foreach ($properties as $property) {
@@ -118,9 +118,9 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
     $mapperSoftCreditType = $this->get('mapperSoftCreditType');
 
     $mapper = $this->controller->exportValue('MapField', 'mapper');
-    $mapperKeys = array();
-    $mapperSoftCredit = array();
-    $mapperPhoneType = array();
+    $mapperKeys = [];
+    $mapperSoftCredit = [];
+    $mapperPhoneType = [];
 
     foreach ($mapper as $key => $value) {
       $mapperKeys[$key] = $mapper[$key][0];
@@ -138,7 +138,7 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
     $mapFields = $this->get('fields');
 
     foreach ($mapper as $key => $value) {
-      $header = array();
+      $header = [];
       if (isset($mapFields[$mapper[$key][0]])) {
         $header[] = $mapFields[$mapper[$key][0]];
       }
@@ -161,7 +161,7 @@ class CRM_Contribute_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     $errorStack = CRM_Core_Error::singleton();
     $errors = $errorStack->getErrors();
-    $errorMessage = array();
+    $errorMessage = [];
 
     if (is_array($errors)) {
       foreach ($errors as $key => $value) {

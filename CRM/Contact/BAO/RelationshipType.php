@@ -142,10 +142,10 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
     $relationship->delete();
 
     // remove this relationship type from membership types
-    $mems = civicrm_api3('MembershipType', 'get', array(
-      'relationship_type_id' => array('LIKE' => "%{$relationshipTypeId}%"),
-      'return' => array('id', 'relationship_type_id', 'relationship_direction'),
-    ));
+    $mems = civicrm_api3('MembershipType', 'get', [
+      'relationship_type_id' => ['LIKE' => "%{$relationshipTypeId}%"],
+      'return' => ['id', 'relationship_type_id', 'relationship_direction'],
+    ]);
     foreach ($mems['values'] as $membershipTypeId => $membershipType) {
       $pos = array_search($relationshipTypeId, $membershipType['relationship_type_id']);
       // Api call may have returned false positives but currently the relationship_type_id uses

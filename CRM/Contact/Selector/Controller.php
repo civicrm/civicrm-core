@@ -31,6 +31,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_Selector_Controller extends CRM_Core_Selector_Controller {
+
   /**
    * Default function for qill.
    *

@@ -70,7 +70,7 @@ class CRM_Contact_Form_Search_Custom_FullText_Contact extends CRM_Contact_Form_S
   public function prepareQueries($queryText, $entityIDTableName) {
     // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
 
-    $contactSQL = array();
+    $contactSQL = [];
     $contactSQL[] = "
 SELECT     et.entity_id
 FROM       civicrm_entity_tag et
@@ -84,48 +84,48 @@ GROUP BY   et.entity_id
     // lets delete all the deceased contacts from the entityID box
     // this allows us to keep numbers in sync
     // when we have acl contacts, the situation gets even more murky
-    $final = array();
+    $final = [];
     $final[] = "DELETE FROM {$entityIDTableName} WHERE entity_id IN (SELECT id FROM civicrm_contact WHERE is_deleted = 1)";
 
-    $tables = array(
-      'civicrm_contact' => array(
+    $tables = [
+      'civicrm_contact' => [
         'id' => 'id',
-        'fields' => array(
+        'fields' => [
           'sort_name' => NULL,
           'nick_name' => NULL,
           'display_name' => NULL,
-        ),
-      ),
-      'civicrm_address' => array(
+        ],
+      ],
+      'civicrm_address' => [
         'id' => 'contact_id',
-        'fields' => array(
+        'fields' => [
           'street_address' => NULL,
           'city' => NULL,
           'postal_code' => NULL,
-        ),
-      ),
-      'civicrm_email' => array(
+        ],
+      ],
+      'civicrm_email' => [
         'id' => 'contact_id',
-        'fields' => array('email' => NULL),
-      ),
-      'civicrm_phone' => array(
+        'fields' => ['email' => NULL],
+      ],
+      'civicrm_phone' => [
         'id' => 'contact_id',
-        'fields' => array('phone' => NULL),
-      ),
-      'civicrm_note' => array(
+        'fields' => ['phone' => NULL],
+      ],
+      'civicrm_note' => [
         'id' => 'entity_id',
         'entity_table' => 'civicrm_contact',
-        'fields' => array(
+        'fields' => [
           'subject' => NULL,
           'note' => NULL,
-        ),
-      ),
-      'file' => array(
+        ],
+      ],
+      'file' => [
         'xparent_table' => 'civicrm_contact',
-      ),
+      ],
       'sql' => $contactSQL,
       'final' => $final,
-    );
+    ];
 
     // get the custom data info
     $this->fillCustomInfo($tables,

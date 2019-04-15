@@ -55,14 +55,14 @@ class CRM_Utils_GlobalStack {
    */
   private static $_singleton = NULL;
 
-  private $backups = array();
+  private $backups = [];
 
   /**
    * Get or set the single instance of CRM_Utils_GlobalStack.
    *
    * @return CRM_Utils_GlobalStack
    */
-  static public function singleton() {
+  public static function singleton() {
     if (self::$_singleton === NULL) {
       self::$_singleton = new CRM_Utils_GlobalStack();
     }
@@ -88,7 +88,7 @@ class CRM_Utils_GlobalStack {
    *   frame
    */
   public function createBackup($new) {
-    $frame = array();
+    $frame = [];
     foreach ($new as $globalKey => $values) {
       if (is_array($values)) {
         foreach ($values as $key => $value) {

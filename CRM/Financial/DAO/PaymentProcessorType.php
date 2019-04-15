@@ -19,14 +19,14 @@ class CRM_Financial_DAO_PaymentProcessorType extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_payment_processor_type';
+  public static $_tableName = 'civicrm_payment_processor_type';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Payment Processor Type ID

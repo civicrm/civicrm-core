@@ -34,9 +34,6 @@
  */
 class api_v3_PaymentTest extends CiviUnitTestCase {
 
-  /**
-   * Assume empty database with just civicrm_data.
-   */
   protected $_individualId;
   protected $_financialTypeId = 1;
   protected $_apiversion;
@@ -102,6 +99,130 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
+  }
+
+  /**
+   * Test email receipt for partial payment.
+   */
+  public function testPaymentEmailReceipt() {
+    $mut = new CiviMailUtils($this);
+    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+    $event = $this->callAPISuccess('Event', 'get', []);
+    $this->addLocationToEvent($event['id']);
+    $params = [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 50,
+      'check_number' => '345',
+      'trxn_date' => '2018-08-13 17:57:56',
+    ];
+    $payment = $this->callAPISuccess('payment', 'create', $params);
+    $this->checkPaymentResult($payment, [
+      $payment['id'] => [
+        'from_financial_account_id' => 7,
+        'to_financial_account_id' => 6,
+        'total_amount' => 50,
+        'status_id' => 1,
+        'is_payment' => 1,
+      ],
+    ]);
+
+    $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
+    $mut->assertSubjects(['Payment Receipt - Annual CiviCRM meet']);
+    $mut->checkMailLog(array(
+      'Dear Anthony,',
+      'Total Fees: $ 300.00',
+      'This Payment Amount: $ 50.00',
+      //150 was paid in the 1st payment.
+      'Balance Owed: $ 100.00',
+      'Event Information and Location',
+      'Paid By: Check',
+      'Check Number: 345',
+      'Transaction Date: August 13th, 2018  5:57 PM',
+      'event place',
+      'streety street',
+    ));
+    $mut->stop();
+    $mut->clearMessages();
+  }
+
+  /**
+   * Test email receipt for partial payment.
+   */
+  public function testPaymentEmailReceiptFullyPaid() {
+    $mut = new CiviMailUtils($this);
+    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+
+    $params = [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 150,
+    ];
+    $payment = $this->callAPISuccess('payment', 'create', $params);
+
+    $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
+    $mut->assertSubjects(['Payment Receipt - Annual CiviCRM meet']);
+    $mut->checkMailLog(array(
+      'Dear Anthony,',
+      'A payment has been received.',
+      'Total Fees: $ 300.00',
+      'This Payment Amount: $ 150.00',
+      'Balance Owed: $ 0.00',
+      'Thank you for completing payment.',
+    ));
+    $mut->stop();
+    $mut->clearMessages();
+  }
+
+  /**
+   * Test email receipt for partial payment.
+   *
+   * @dataProvider getThousandSeparators
+   *
+   * @param string $thousandSeparator
+   */
+  public function testRefundEmailReceipt($thousandSeparator) {
+    $this->setCurrencySeparators($thousandSeparator);
+    $decimalSeparator = ($thousandSeparator === ',' ? '.' : ',');
+    $mut = new CiviMailUtils($this);
+    list($lineItems, $contribution) = $this->createParticipantWithContribution();
+    $this->callAPISuccess('payment', 'create', [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 50,
+      'check_number' => '345',
+      'trxn_date' => '2018-08-13 17:57:56',
+    ]);
+
+    $payment = $this->callAPISuccess('payment', 'create', [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => -30,
+      'trxn_date' => '2018-11-13 12:01:56',
+      'sequential' => TRUE,
+    ])['values'][0];
+
+    $expected = [
+      'from_financial_account_id' => 7,
+      'to_financial_account_id' => 6,
+      'total_amount' => -30,
+      'status_id' => 1,
+      'is_payment' => 1,
+    ];
+    foreach ($expected as $key => $value) {
+      $this->assertEquals($expected[$key], $payment[$key], 'mismatch on key ' . $key);
+    }
+
+    $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
+    $mut->assertSubjects(['Refund Notification - Annual CiviCRM meet']);
+    $mut->checkMailLog(array(
+      'Dear Anthony,',
+      'A refund has been issued based on changes in your registration selections.',
+      'Total Fees: $ 300' . $decimalSeparator . '00',
+      'Refund Amount: $ -30' . $decimalSeparator . '00',
+      'Event Information and Location',
+      'Paid By: Check',
+      'Transaction Date: November 13th, 2018 12:01 PM',
+      'You Paid: $ 170' . $decimalSeparator . '00',
+    ));
+    $mut->stop();
+    $mut->clearMessages();
   }
 
   /**
@@ -590,6 +711,29 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
+  }
+
+  /**
+   * Add a location to our event.
+   *
+   * @param int $eventID
+   */
+  protected function addLocationToEvent($eventID) {
+    $addressParams = [
+      'name' => 'event place',
+      'street_address' => 'streety street',
+      'location_type_id' => 1,
+      'is_primary' => 1,
+    ];
+    // api requires contact_id - perhaps incorrectly but use add to get past that.
+    $address = CRM_Core_BAO_Address::add($addressParams);
+
+    $location = $this->callAPISuccess('LocBlock', 'create', ['address_id' => $address->id]);
+    $this->callAPISuccess('Event', 'create', [
+      'id' => $eventID,
+      'loc_block_id' => $location['id'],
+      'is_show_location' => TRUE,
+    ]);
   }
 
 }

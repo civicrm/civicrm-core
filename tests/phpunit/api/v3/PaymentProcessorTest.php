@@ -74,6 +74,15 @@ class api_v3_PaymentProcessorTest extends CiviUnitTestCase {
     $params = $this->_params;
     $result = $this->callAPIAndDocument('payment_processor', 'create', $params, __FUNCTION__, __FILE__);
     $this->callAPISuccessGetSingle('EntityFinancialAccount', ['entity_table' => 'civicrm_payment_processor', 'entity_id' => $result['id']]);
+
+    // Test that the option values are flushed so ths can be used straight away.
+    $this->callAPISuccess('ContributionRecur', 'create', [
+      'contact_id' => $this->individualCreate(),
+      'amount' => 5,
+      'financial_type_id' => 'Donation',
+      'payment_processor_id' => 'API Test PP',
+      'frequency_interval' => 1,
+    ]);
     $this->getAndCheck($params, $result['id'], 'PaymentProcessor');
   }
 

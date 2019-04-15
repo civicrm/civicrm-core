@@ -47,12 +47,12 @@ class CRM_Mailing_Page_AJAX {
     $messageTemplate->selectAdd();
     $messageTemplate->selectAdd('msg_text, msg_html, msg_subject, pdf_format_id');
     $messageTemplate->find(TRUE);
-    $messages = array(
+    $messages = [
       'subject' => $messageTemplate->msg_subject,
       'msg_text' => $messageTemplate->msg_text,
       'msg_html' => $messageTemplate->msg_html,
       'pdf_format_id' => $messageTemplate->pdf_format_id,
-    );
+    ];
 
     $documentInfo = CRM_Core_BAO_File::getEntityFile('civicrm_msg_template', $templateId);
     foreach ((array) $documentInfo as $info) {
@@ -67,7 +67,7 @@ class CRM_Mailing_Page_AJAX {
    */
   public static function getContactMailings() {
     $params = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
-    $params += CRM_Core_Page_AJAX::validateParams(array('contact_id' => 'Integer'));
+    $params += CRM_Core_Page_AJAX::validateParams(['contact_id' => 'Integer']);
 
     // get the contact mailings
     $mailings = CRM_Mailing_BAO_Mailing::getContactMailingSelector($params);

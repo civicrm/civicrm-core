@@ -6,7 +6,7 @@
  *   API result array
  */
 function price_field_value_create_example() {
-  $params = array(
+  $params = [
     'price_field_id' => 13,
     'membership_type_id' => 5,
     'name' => 'memType1',
@@ -15,7 +15,7 @@ function price_field_value_create_example() {
     'membership_num_terms' => 2,
     'is_active' => 1,
     'financial_type_id' => 2,
-  );
+  ];
 
   try{
     $result = civicrm_api3('PriceFieldValue', 'create', $params);
@@ -25,12 +25,12 @@ function price_field_value_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -44,13 +44,13 @@ function price_field_value_create_example() {
  */
 function price_field_value_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 10,
-    'values' => array(
-      '10' => array(
+    'values' => [
+      '10' => [
         'id' => '10',
         'price_field_id' => '13',
         'name' => 'memType1',
@@ -69,9 +69,9 @@ function price_field_value_create_expectedresult() {
         'financial_type_id' => '2',
         'non_deductible_amount' => '',
         'contribution_type_id' => '2',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

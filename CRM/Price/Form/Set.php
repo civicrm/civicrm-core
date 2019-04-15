@@ -119,20 +119,20 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
       $title = CRM_Price_BAO_PriceSet::getTitle($this->getEntityId());
     }
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $title = ts('Edit %1', array(1 => $title));
+      $title = ts('Edit %1', [1 => $title]);
     }
     elseif ($this->_action & CRM_Core_Action::VIEW) {
-      $title = ts('Preview %1', array(1 => $title));
+      $title = ts('Preview %1', [1 => $title]);
     }
     CRM_Utils_System::setTitle($title);
 
     $url = CRM_Utils_System::url('civicrm/admin/price', 'reset=1');
-    $breadCrumb = array(
-      array(
+    $breadCrumb = [
+      [
         'title' => ts('Price Sets'),
         'url' => $url,
-      ),
-    );
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
   }
 
@@ -150,7 +150,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $options) {
-    $errors = array();
+    $errors = [];
     $count = count(CRM_Utils_Array::value('extends', $fields));
     //price sets configured for membership
     if ($count && array_key_exists(CRM_Core_Component::getComponentID('CiviMember'), $fields['extends'])) {
@@ -173,10 +173,10 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     $this->assign('sid', $this->getEntityId());
 
     $this->addRule('title', ts('Name already exists in Database.'),
-      'objectExists', array('CRM_Price_DAO_PriceSet', $this->getEntityId(), 'title')
+      'objectExists', ['CRM_Price_DAO_PriceSet', $this->getEntityId(), 'title']
     );
 
-    $priceSetUsedTables = $extends = array();
+    $priceSetUsedTables = $extends = [];
     if ($this->_action == CRM_Core_Action::UPDATE && $this->getEntityId()) {
       $priceSetUsedTables = CRM_Price_BAO_PriceSet::getUsedBy($this->getEntityId(), 'table');
     }
@@ -188,7 +188,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
         case 'CiviEvent':
           $option = $this->createElement('checkbox', $compObj->componentID, NULL, ts('Event'));
           if (!empty($priceSetUsedTables)) {
-            foreach (array('civicrm_event', 'civicrm_participant') as $table) {
+            foreach (['civicrm_event', 'civicrm_participant'] as $table) {
               if (in_array($table, $priceSetUsedTables)) {
                 $option->freeze();
                 break;
@@ -201,7 +201,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
         case 'CiviContribute':
           $option = $this->createElement('checkbox', $compObj->componentID, NULL, ts('Contribution'));
           if (!empty($priceSetUsedTables)) {
-            foreach (array('civicrm_contribution', 'civicrm_contribution_page') as $table) {
+            foreach (['civicrm_contribution', 'civicrm_contribution_page'] as $table) {
               if (in_array($table, $priceSetUsedTables)) {
                 $option->freeze();
                 break;
@@ -214,7 +214,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
         case 'CiviMember':
           $option = $this->createElement('checkbox', $compObj->componentID, NULL, ts('Membership'));
           if (!empty($priceSetUsedTables)) {
-            foreach (array('civicrm_membership', 'civicrm_contribution_page') as $table) {
+            foreach (['civicrm_membership', 'civicrm_contribution_page'] as $table) {
               if (in_array($table, $priceSetUsedTables)) {
                 $option->freeze();
                 break;
@@ -235,17 +235,17 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
 
     $this->addGroup($extends, 'extends', ts('Used For'), '&nbsp;', TRUE);
 
-    $this->addRule('extends', ts('%1 is a required field.', array(1 => ts('Used For'))), 'required');
+    $this->addRule('extends', ts('%1 is a required field.', [1 => ts('Used For')]), 'required');
 
     // financial type
     $financialType = CRM_Financial_BAO_FinancialType::getIncomeFinancialType();
 
     $this->add('select', 'financial_type_id',
       ts('Default Financial Type'),
-      array('' => ts('- select -')) + $financialType, 'required'
+      ['' => ts('- select -')] + $financialType, 'required'
     );
 
-    $this->addFormRule(array('CRM_Price_Form_Set', 'formRule'));
+    $this->addFormRule(['CRM_Price_Form_Set', 'formRule']);
 
     // views are implemented as frozen form
     if ($this->_action & CRM_Core_Action::VIEW) {
@@ -262,9 +262,9 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
    *   array of default values
    */
   public function setDefaultValues() {
-    $defaults = array('is_active' => TRUE);
+    $defaults = ['is_active' => TRUE];
     if ($this->getEntityId()) {
-      $params = array('id' => $this->getEntityId());
+      $params = ['id' => $this->getEntityId()];
       CRM_Price_BAO_PriceSet::retrieve($params, $defaults);
       $extends = explode(CRM_Core_DAO::VALUE_SEPARATOR, $defaults['extends']);
       unset($defaults['extends']);
@@ -286,7 +286,7 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
     $params['financial_type_id'] = CRM_Utils_Array::value('financial_type_id', $params, FALSE);
 
-    $compIds = array();
+    $compIds = [];
     $extends = CRM_Utils_Array::value('extends', $params);
     if (is_array($extends)) {
       foreach ($extends as $compId => $selected) {
@@ -307,19 +307,19 @@ class CRM_Price_Form_Set extends CRM_Core_Form {
 
     $set = CRM_Price_BAO_PriceSet::create($params);
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      CRM_Core_Session::setStatus(ts('The Set \'%1\' has been saved.', array(1 => $set->title)), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('The Set \'%1\' has been saved.', [1 => $set->title]), ts('Saved'), 'success');
     }
     else {
       // Jump directly to adding a field if popups are disabled
       $action = CRM_Core_Resources::singleton()->ajaxPopupsEnabled ? 'browse' : 'add';
-      $url = CRM_Utils_System::url('civicrm/admin/price/field', array(
+      $url = CRM_Utils_System::url('civicrm/admin/price/field', [
         'reset' => 1,
         'action' => $action,
         'sid' => $set->id,
         'new' => 1,
-      ));
+      ]);
       CRM_Core_Session::setStatus(ts("Your Set '%1' has been added. You can add fields to this set now.",
-        array(1 => $set->title)
+        [1 => $set->title]
       ), ts('Saved'), 'success');
       $session = CRM_Core_Session::singleton();
       $session->replaceUserContext($url);

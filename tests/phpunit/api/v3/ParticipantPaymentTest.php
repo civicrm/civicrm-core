@@ -56,24 +56,24 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $this->_financialTypeId = 1;
 
     $this->_participantID = $this->participantCreate(array(
-        'contactID' => $this->_contactID,
-        'eventID' => $this->_eventID,
-      ));
+      'contactID' => $this->_contactID,
+      'eventID' => $this->_eventID,
+    ));
     $this->_contactID2 = $this->individualCreate();
     $this->_participantID2 = $this->participantCreate(array(
-        'contactID' => $this->_contactID2,
-        'eventID' => $this->_eventID,
-      ));
+      'contactID' => $this->_contactID2,
+      'eventID' => $this->_eventID,
+    ));
     $this->_participantID3 = $this->participantCreate(array(
-        'contactID' => $this->_contactID2,
-        'eventID' => $this->_eventID,
-      ));
+      'contactID' => $this->_contactID2,
+      'eventID' => $this->_eventID,
+    ));
 
     $this->_contactID3 = $this->individualCreate();
     $this->_participantID4 = $this->participantCreate(array(
-        'contactID' => $this->_contactID3,
-        'eventID' => $this->_eventID,
-      ));
+      'contactID' => $this->_contactID3,
+      'eventID' => $this->_eventID,
+    ));
   }
 
   /**
@@ -143,7 +143,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $this->assertEquals('Completed', $paymentInfo['contribution_status']);
     $this->assertEquals('100.00', $paymentInfo['total']);
   }
-
 
   ///////////////// civicrm_participant_payment_create methods
 
@@ -284,7 +283,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     );
     $this->callAPISuccess('participant_payment', 'delete', $params);
   }
-
 
   /**
    * Test civicrm_participant_payment_delete with wrong params type.

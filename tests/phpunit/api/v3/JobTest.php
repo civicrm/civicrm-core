@@ -49,7 +49,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * Must be created outside the transaction due to it breaking the transaction.
    *
-   * @var
+   * @var int
    */
   public $membershipTypeID;
 
@@ -264,12 +264,11 @@ class api_v3_JobTest extends CiviUnitTestCase {
       }
       if ($i > 1) {
         $this->callAPISuccess('membership', 'create', array(
-            'contact_id' => $contactID,
-            'membership_type_id' => $membershipTypeID,
-            'join_date' => 'now',
-            'start_date' => '+ 1 day',
-          )
-        );
+          'contact_id' => $contactID,
+          'membership_type_id' => $membershipTypeID,
+          'join_date' => 'now',
+          'start_date' => '+ 1 day',
+        ));
       }
     }
     $this->callAPISuccess('action_schedule', 'create', array(
@@ -697,10 +696,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $data = $this->getMergeLocations($address1, $address2, 'Address');
     $data = array_merge($data, $this->getMergeLocations(array('phone' => '12345', 'phone_type_id' => 1), array('phone' => '678910', 'phone_type_id' => 1), 'Phone'));
     $data = array_merge($data, $this->getMergeLocations(array('phone' => '12345'), array('phone' => '678910'), 'Phone'));
-    $data = array_merge($data, $this->getMergeLocations(array('email' => 'mini@me.com'), array('email' => 'mini@me.org'), 'Email', array(array(
-      'email' => 'anthony_anderson@civicrm.org',
-      'location_type_id' => 'Home',
-    ))));
+    $data = array_merge($data, $this->getMergeLocations(array('email' => 'mini@me.com'), array('email' => 'mini@me.org'), 'Email', array(
+      array(
+        'email' => 'anthony_anderson@civicrm.org',
+        'location_type_id' => 'Home',
+      ),
+    )));
     return $data;
 
   }
@@ -780,6 +781,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @param string $contactType
    * @param string $used
+   * @param string $name
    * @param bool $isReserved
    * @param int $threshold
    */
@@ -1381,7 +1383,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param array $locationParams1
    * @param array $locationParams2
    * @param string $entity
-   *
+   * @param array $additionalExpected
    * @return array
    */
   public function getMergeLocations($locationParams1, $locationParams2, $entity, $additionalExpected = array()) {
@@ -1819,7 +1821,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     // Default params, which we'll expand on below.
     $params = [
       'membership_type_id' => $membershipTypeId,
-      'skipStatusCal' => 1, // Don't calculate status.
+      // Don't calculate status.
+      'skipStatusCal' => 1,
       'source' => 'Test',
       'sequential' => 1,
     ];
@@ -1835,7 +1838,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $params['join_date'] = date('Y-m-d');
     $params['start_date'] = date('Y-m-d');
     $params['end_date'] = date('Y-m-d', strtotime('now + 1 year'));
-    $params['status_id'] = 'Current'; // Intentionally incorrect status.
+    // Intentionally incorrect status.
+    $params['status_id'] = 'Current';
     $resultNew = $this->callAPISuccess('Membership', 'create', $params);
     $this->assertEquals(array_search('Current', $memStatus), $resultNew['values'][0]['status_id']);
 
@@ -1844,7 +1848,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $params['join_date'] = date('Y-m-d', strtotime('now - 6 month'));
     $params['start_date'] = date('Y-m-d', strtotime('now - 6 month'));
     $params['end_date'] = date('Y-m-d', strtotime('now + 6 month'));
-    $params['status_id'] = 'New'; // Intentionally incorrect status.
+    // Intentionally incorrect status.
+    $params['status_id'] = 'New';
     $resultCurrent = $this->callAPISuccess('Membership', 'create', $params);
     $this->assertEquals(array_search('New', $memStatus), $resultCurrent['values'][0]['status_id']);
 
@@ -1853,7 +1858,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $params['join_date'] = date('Y-m-d', strtotime('now - 53 week'));
     $params['start_date'] = date('Y-m-d', strtotime('now - 53 week'));
     $params['end_date'] = date('Y-m-d', strtotime('now - 1 week'));
-    $params['status_id'] = 'Current'; // Intentionally incorrect status.
+    // Intentionally incorrect status.
+    $params['status_id'] = 'Current';
     $resultGrace = $this->callAPISuccess('Membership', 'create', $params);
     $this->assertEquals(array_search('Current', $memStatus), $resultGrace['values'][0]['status_id']);
 
@@ -1862,7 +1868,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $params['join_date'] = date('Y-m-d', strtotime('now - 16 month'));
     $params['start_date'] = date('Y-m-d', strtotime('now - 16 month'));
     $params['end_date'] = date('Y-m-d', strtotime('now - 4 month'));
-    $params['status_id'] = 'Grace'; // Intentionally incorrect status.
+    // Intentionally incorrect status.
+    $params['status_id'] = 'Grace';
     $resultExpired = $this->callAPISuccess('Membership', 'create', $params);
     $this->assertEquals(array_search('Grace', $memStatus), $resultExpired['values'][0]['status_id']);
 
@@ -1940,8 +1947,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'join_date' => date('Y-m-d', strtotime('now - 16 month')),
       'start_date' => date('Y-m-d', strtotime('now - 16 month')),
       'end_date' => date('Y-m-d', strtotime('now - 4 month')),
-      'status_id' => 'Grace', // Intentionally incorrect status.
-      'skipStatusCal' => 1, // Don't calculate status.
+      // Intentionally incorrect status.
+      'status_id' => 'Grace',
+      // Don't calculate status.
+      'skipStatusCal' => 1,
     ];
     $organizationMembershipID = $this->contactMembershipCreate($params);
 

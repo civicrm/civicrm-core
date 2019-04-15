@@ -8,9 +8,9 @@
  *   API result array
  */
 function event_get_example() {
-  $params = array(
+  $params = [
     'isCurrent' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Event', 'get', $params);
@@ -20,12 +20,12 @@ function event_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -39,13 +39,13 @@ function event_get_example() {
  */
 function event_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 3,
-    'values' => array(
-      '3' => array(
+    'values' => [
+      '3' => [
         'id' => '3',
         'title' => 'Annual CiviCRM meet 2',
         'event_title' => 'Annual CiviCRM meet 2',
@@ -82,9 +82,9 @@ function event_get_expectedresult() {
         'is_share' => '1',
         'is_confirm_enabled' => '1',
         'is_billing_required' => 0,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

@@ -8,9 +8,9 @@
  *   API result array
  */
 function tag_getfields_example() {
-  $params = array(
+  $params = [
     'action' => 'create',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Tag', 'getfields', $params);
@@ -20,12 +20,12 @@ function tag_getfields_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -39,12 +39,12 @@ function tag_getfields_example() {
  */
 function tag_getfields_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 11,
-    'values' => array(
-      'id' => array(
+    'values' => [
+      'id' => [
         'name' => 'id',
         'type' => 1,
         'title' => 'Tag ID',
@@ -53,11 +53,11 @@ function tag_getfields_expectedresult() {
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
-        'api.aliases' => array(
+        'api.aliases' => [
           '0' => 'tag',
-        ),
-      ),
-      'name' => array(
+        ],
+      ],
+      'name' => [
         'name' => 'name',
         'type' => 2,
         'title' => 'Tag Name',
@@ -69,8 +69,8 @@ function tag_getfields_expectedresult() {
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
         'api.required' => 1,
-      ),
-      'description' => array(
+      ],
+      'description' => [
         'name' => 'description',
         'type' => 2,
         'title' => 'Description',
@@ -80,8 +80,8 @@ function tag_getfields_expectedresult() {
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
-      ),
-      'parent_id' => array(
+      ],
+      'parent_id' => [
         'name' => 'parent_id',
         'type' => 1,
         'title' => 'Parent Tag',
@@ -92,8 +92,8 @@ function tag_getfields_expectedresult() {
         'bao' => 'CRM_Core_BAO_Tag',
         'FKClassName' => 'CRM_Core_DAO_Tag',
         'FKApiName' => 'Tag',
-      ),
-      'is_selectable' => array(
+      ],
+      'is_selectable' => [
         'name' => 'is_selectable',
         'type' => 16,
         'title' => 'Display Tag?',
@@ -102,24 +102,24 @@ function tag_getfields_expectedresult() {
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
-      ),
-      'is_reserved' => array(
+      ],
+      'is_reserved' => [
         'name' => 'is_reserved',
         'type' => 16,
         'title' => 'Reserved',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
-      ),
-      'is_tagset' => array(
+      ],
+      'is_tagset' => [
         'name' => 'is_tagset',
         'type' => 16,
         'title' => 'Tagset',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
-      ),
-      'used_for' => array(
+      ],
+      'used_for' => [
         'name' => 'used_for',
         'type' => 2,
         'title' => 'Used For',
@@ -129,18 +129,18 @@ function tag_getfields_expectedresult() {
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'maxlength' => 64,
           'size' => 30,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'optionGroupName' => 'tag_used_for',
           'optionEditPath' => 'civicrm/admin/options/tag_used_for',
-        ),
+        ],
         'api.default' => 'civicrm_contact',
-      ),
-      'created_id' => array(
+      ],
+      'created_id' => [
         'name' => 'created_id',
         'type' => 1,
         'title' => 'Tag Created By',
@@ -150,8 +150,8 @@ function tag_getfields_expectedresult() {
         'bao' => 'CRM_Core_BAO_Tag',
         'FKClassName' => 'CRM_Contact_DAO_Contact',
         'FKApiName' => 'Contact',
-      ),
-      'color' => array(
+      ],
+      'color' => [
         'name' => 'color',
         'type' => 2,
         'title' => 'Color',
@@ -162,8 +162,8 @@ function tag_getfields_expectedresult() {
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
-      ),
-      'created_date' => array(
+      ],
+      'created_date' => [
         'name' => 'created_date',
         'type' => 12,
         'title' => 'Tag Created Date',
@@ -171,9 +171,9 @@ function tag_getfields_expectedresult() {
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

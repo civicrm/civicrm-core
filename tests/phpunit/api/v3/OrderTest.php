@@ -34,9 +34,6 @@
  */
 class api_v3_OrderTest extends CiviUnitTestCase {
 
-  /**
-   * Assume empty database with just civicrm_data.
-   */
   protected $_individualId;
   protected $_financialTypeId = 1;
   protected $_apiversion;
@@ -557,7 +554,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
               'financial_type_id' => 1,
               'entity_table' => 'civicrm_contribution',
             ],
-          ]
+          ],
         ],
       ],
     ];
@@ -592,7 +589,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
               'entity_table' => 'civicrm_contribution',
               'tax_amount' => 15,
             ],
-          ]
+          ],
         ],
       ],
     ];
@@ -623,7 +620,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
               'entity_table' => 'civicrm_contribution',
               'tax_amount' => 15,
             ],
-          ]
+          ],
         ],
       ],
     ];

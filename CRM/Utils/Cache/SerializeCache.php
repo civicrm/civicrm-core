@@ -37,10 +37,12 @@
 class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
 
   use CRM_Utils_Cache_NaiveMultipleTrait;
-  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
+  // TODO Native implementation
+  use CRM_Utils_Cache_NaiveHasTrait;
 
   /**
    * The cache storage container, an array by default, stored in a file under templates
+   * @var array
    */
   private $_cache;
 
@@ -53,7 +55,7 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
    * @return \CRM_Utils_Cache_SerializeCache
    */
   public function __construct($config) {
-    $this->_cache = array();
+    $this->_cache = [];
   }
 
   /**
@@ -101,7 +103,8 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
       throw new \RuntimeException("FIXME: " . __CLASS__ . "::set() should support non-NULL TTL");
     }
     if (file_exists($this->fileName($key))) {
-      return FALSE; // WTF, write-once cache?!
+      // WTF, write-once cache?!
+      return FALSE;
     }
     $this->_cache[$key] = $value;
     $bytes = file_put_contents($this->fileName($key), "<?php //" . serialize($value));
@@ -127,7 +130,8 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
   public function flush($key = NULL) {
     $prefix = "CRM_";
     if (!$handle = opendir(CIVICRM_TEMPLATE_COMPILEDIR)) {
-      return FALSE; // die? Error?
+      // die? Error?
+      return FALSE;
     }
     while (FALSE !== ($entry = readdir($handle))) {
       if (substr($entry, 0, 4) == $prefix) {
@@ -136,7 +140,7 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
     }
     closedir($handle);
     unset($this->_cache);
-    $this->_cache = array();
+    $this->_cache = [];
     return TRUE;
   }
 

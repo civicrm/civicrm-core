@@ -51,10 +51,9 @@ class CiviCaseTestCase extends CiviUnitTestCase {
     // & was really hard to troubleshoot as involved truncating option_value table to mitigate this & not leaving DB in a
     // state where tests could run afterwards without re-loading.
     $this->caseStatusGroup = $this->callAPISuccess('option_group', 'get', array(
-        'name' => 'case_status',
-        'format.only_id' => 1,
-      )
-    );
+      'name' => 'case_status',
+      'format.only_id' => 1,
+    ));
     $optionValues = array(
       'Medical evaluation' => 'Medical evaluation',
       'Mental health evaluation' => "Mental health evaluation",

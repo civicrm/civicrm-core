@@ -37,11 +37,11 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *
    * @var array
    */
-  static $_importableFields = NULL;
+  public static $_importableFields = NULL;
 
-  static $_renewalActType = NULL;
+  public static $_renewalActType = NULL;
 
-  static $_signupActType = NULL;
+  public static $_signupActType = NULL;
 
   /**
    * Class constructor.
@@ -94,7 +94,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     $membership->id = $id;
 
     $membership->save();
-    $membership->free();
 
     if (empty($membership->contact_id) || empty($membership->status_id)) {
       // this means we are in renewal mode and are just updating the membership
@@ -545,8 +544,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         $defaults['active'] = TRUE;
       }
 
-      $membership->free();
-
       return $membership;
     }
 
@@ -604,6 +601,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *
    * @param int $membershipId
    *   Membership id that needs to be deleted.
+   * @param bool $preserveContrib
    *
    * @return int
    *   Id of deleted Membership on success, false otherwise.
@@ -619,6 +617,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *
    * @param int $membershipId
    *   Membership id that needs to be deleted.
+   * @param bool $preserveContrib
    *
    * @return int
    *   Id of deleted Membership on success, false otherwise.
@@ -702,7 +701,6 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
       self::deleteRelatedMemberships($membership->id);
       self::deleteMembership($membership->id);
     }
-    $membership->free();
   }
 
   /**
@@ -1118,7 +1116,7 @@ AND civicrm_membership.is_test = %2";
    * @param CRM_Member_DAO_Membership $membership
    * @param \CRM_Contribute_BAO_Contribution|\CRM_Contribute_DAO_Contribution $contribution
    */
-  static public function updateRecurMembership(CRM_Member_DAO_Membership $membership, CRM_Contribute_BAO_Contribution $contribution) {
+  public static function updateRecurMembership(CRM_Member_DAO_Membership $membership, CRM_Contribute_BAO_Contribution $contribution) {
 
     if (empty($contribution->contribution_recur_id)) {
       return;
@@ -1164,10 +1162,8 @@ AND civicrm_membership.is_test = %2";
       $currentMembership
     );
 
-    if (empty($status) ||
-      empty($status['id'])
-    ) {
-      CRM_Core_Error::fatal(ts('Oops, it looks like there is no valid membership status corresponding to the membership start and end dates for this membership. Contact the site administrator for assistance.'));
+    if (empty($status) || empty($status['id'])) {
+      throw new CRM_Core_Exception(ts('Oops, it looks like there is no valid membership status corresponding to the membership start and end dates for this membership. Contact the site administrator for assistance.'));
     }
 
     $currentMembership['today_date'] = $today;
@@ -1184,7 +1180,6 @@ AND civicrm_membership.is_test = %2";
       $memberDAO->end_date = CRM_Utils_Date::isoToMysql($memberDAO->end_date);
       $memberDAO->save();
       CRM_Core_DAO::storeValues($memberDAO, $currentMembership);
-      $memberDAO->free();
 
       $currentMembership['is_current_member'] = CRM_Core_DAO::getFieldValue(
         'CRM_Member_DAO_MembershipStatus',
@@ -1277,10 +1272,8 @@ SELECT c.contribution_page_id as pageID
       $relatedMembership->id = $membership->id;
       $relatedMembership->copyValues($params);
       $relatedMembership->save();
-      $relatedMembership->free();
     }
 
-    $membership->free();
   }
 
   /**
@@ -1407,7 +1400,6 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
           $nestedRelMembership->id = $membership->owner_membership_id;
           $nestedRelMembership->contact_id = $cid;
           $nestedRelationship = $nestedRelMembership->find(TRUE);
-          $nestedRelMembership->free();
         }
         if (!$nestedRelationship) {
           $relatedContacts[$cid] = $status;
@@ -1527,6 +1519,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    * Delete the record that are associated with this Membership Payment.
    *
    * @param int $membershipId
+   * @param bool $preserveContrib
    *
    * @return object
    *   $membershipPayment deleted membership payment object
@@ -1610,7 +1603,6 @@ FROM   civicrm_membership_type
         $membershipTypeValues[$dao->id][$mtField] = $dao->$mtField;
       }
     }
-    $dao->free();
 
     CRM_Utils_Hook::membershipTypeValues($form, $membershipTypeValues);
 
@@ -2168,7 +2160,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       ]);
       $count++;
     }
-    $deceasedDAO->free();
     return $count;
   }
 
@@ -2204,7 +2195,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @param int $membershipId
    *   Membership id.
-   * @all bool
+   * @param bool $all
    *   if more than one payment associated with membership id need to be returned.
    *
    * @return int|int[]
@@ -2241,7 +2232,11 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     // Tests for this function are in api_v3_JobTest. Please add tests for all updates.
 
     $updateCount = $processCount = self::updateDeceasedMembersStatuses();
-    $allStatus = CRM_Member_PseudoConstant::membershipStatus();
+
+    // We want all of the statuses as id => name, even the disabled ones (cf.
+    // CRM-15475), to identify which are Pending, Deceased, Cancelled, and
+    // Expired.
+    $allStatus = CRM_Member_BAO_Membership::buildOptions('status_id', 'validate');
     $allTypes = CRM_Member_PseudoConstant::membershipType();
 
     // This query retrieves ALL memberships of active types.
@@ -2262,24 +2257,20 @@ FROM       civicrm_membership
 INNER JOIN civicrm_contact ON ( civicrm_membership.contact_id = civicrm_contact.id )
 INNER JOIN civicrm_membership_type ON
   (civicrm_membership.membership_type_id = civicrm_membership_type.id AND civicrm_membership_type.is_active = 1)
-WHERE      civicrm_membership.is_test = 0 
+WHERE      civicrm_membership.is_test = 0
            AND civicrm_contact.is_deceased = 0 ";
 
     $deceaseStatusId = array_search('Deceased', $allStatus);
     $pendingStatusId = array_search('Pending', $allStatus);
-    // CRM-15475
-    $cancelledStatusId = array_search(
-      'Cancelled',
-      CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)
-    );
-    $expiredStatusId = array_search('Expired', $allStatus);
+    $cancelledStatusId = array_search('Cancelled', $allStatus);
+    // Expired is not reserved so might not exist.  A value of `0` won't break.
+    $expiredStatusId = array_search('Expired', $allStatus) ?: 0;
 
     $query = $baseQuery . " AND civicrm_membership.is_override IS NOT NULL AND civicrm_membership.status_override_end_date IS NOT NULL";
     $dao1 = CRM_Core_DAO::executeQuery($query);
     while ($dao1->fetch()) {
       self::processOverriddenUntilDateMembership($dao1);
     }
-    $dao1->free();
 
     $query = $baseQuery . " AND civicrm_membership.is_override IS NULL
      AND civicrm_membership.status_id NOT IN (%1, %2, %3, %4)
@@ -2351,7 +2342,6 @@ WHERE      civicrm_membership.is_test = 0
         $updateCount++;
       }
     }
-    $dao2->free();
     $result['is_error'] = 0;
     $result['messages'] = ts('Processed %1 membership records. Updated %2 records.', array(
       1 => $processCount,

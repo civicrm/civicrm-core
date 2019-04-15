@@ -44,7 +44,7 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
    */
   public static function activeProviderCount() {
     $activeProviders = CRM_Core_DAO::singleValueQuery('SELECT count(id) FROM civicrm_sms_provider WHERE is_active = 1 AND (domain_id = %1 OR domain_id IS NULL)',
-       array(1 => array(CRM_Core_Config::domainID(), 'Positive')));
+       [1 => [CRM_Core_Config::domainID(), 'Positive']]);
     return $activeProviders;
   }
 
@@ -63,8 +63,8 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
    */
   public static function getProviders($selectArr = NULL, $filter = NULL, $getActive = TRUE, $orderBy = 'id') {
 
-    $providers = array();
-    $temp = array();
+    $providers = [];
+    $temp = [];
     $dao = new CRM_SMS_DAO_Provider();
     if ($filter && !array_key_exists('is_active', $filter) && $getActive) {
       $dao->is_active = 1;
@@ -148,7 +148,7 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
 
     $dao = new CRM_SMS_DAO_Provider();
     $dao->id = $providerID;
-    $dao->whereAdd = "(domain_id = " .  CRM_Core_Config::domainID() . "OR domain_id IS NULL)";
+    $dao->whereAdd = "(domain_id = " . CRM_Core_Config::domainID() . "OR domain_id IS NULL)";
     if (!$dao->find(TRUE)) {
       return NULL;
     }
@@ -163,17 +163,17 @@ class CRM_SMS_BAO_Provider extends CRM_SMS_DAO_Provider {
    * @return mixed
    */
   public static function getProviderInfo($providerID, $returnParam = NULL, $returnDefaultString = NULL) {
-    static $providerInfo = array();
+    static $providerInfo = [];
 
     if (!array_key_exists($providerID, $providerInfo)) {
-      $providerInfo[$providerID] = array();
+      $providerInfo[$providerID] = [];
 
       $dao = new CRM_SMS_DAO_Provider();
       $dao->id = $providerID;
       if ($dao->find(TRUE)) {
         CRM_Core_DAO::storeValues($dao, $providerInfo[$providerID]);
         $inputLines = explode("\n", $providerInfo[$providerID]['api_params']);
-        $inputVals = array();
+        $inputVals = [];
         foreach ($inputLines as $value) {
           if ($value) {
             list($key, $val) = explode("=", $value);

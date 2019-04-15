@@ -68,14 +68,14 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
           CRM_Core_Error::statusBounce(ts("Unknown tag."), $bounceUrl);
         }
         if ($tag = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $id, 'name', 'parent_id')) {
-          CRM_Core_Error::statusBounce(ts("This tag cannot be deleted. You must delete all its child tags ('%1', etc) prior to deleting this tag.", array(1 => $tag)), $bounceUrl);
+          CRM_Core_Error::statusBounce(ts("This tag cannot be deleted. You must delete all its child tags ('%1', etc) prior to deleting this tag.", [1 => $tag]), $bounceUrl);
         }
         if (!CRM_Core_Permission::check('administer reserved tags') && CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $id, 'is_reserved')) {
           CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to delete this reserved tag."), $bounceUrl);
         }
       }
       if (count($this->_id) > 1) {
-        $this->assign('delName', ts('%1 tags', array(1 => count($this->_id))));
+        $this->assign('delName', ts('%1 tags', [1 => count($this->_id)]));
       }
     }
     else {
@@ -107,7 +107,7 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
       if (!$this->_isTagSet) {
         if (!$isTagSetChild) {
           $colorTags = CRM_Core_BAO_Tag::getColorTags(NULL, TRUE, $this->_id);
-          $this->add('select2', 'parent_id', ts('Parent Tag'), $colorTags, FALSE, array('placeholder' => ts('- select -')));
+          $this->add('select2', 'parent_id', ts('Parent Tag'), $colorTags, FALSE, ['placeholder' => ts('- select -')]);
         }
 
         // Tagsets are not selectable by definition so only include the selectable field if NOT a tagset.
@@ -127,10 +127,10 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
       $this->add('text', 'name', ts('Name'),
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'name'), TRUE
       );
-      $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
-          'CRM_Core_DAO_Tag',
-          $this->_id,
-        ));
+      $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', [
+        'CRM_Core_DAO_Tag',
+        $this->_id,
+      ]);
 
       $this->add('text', 'description', ts('Description'),
         CRM_Core_DAO::getAttribute('CRM_Core_DAO_Tag', 'description')
@@ -139,7 +139,7 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
       $isReserved = $this->add('checkbox', 'is_reserved', ts('Reserved?'));
 
       if (!$isTagSetChild) {
-        $this->addSelect('used_for', array('multiple' => TRUE, 'option_url' => NULL));
+        $this->addSelect('used_for', ['multiple' => TRUE, 'option_url' => NULL]);
       }
 
       $this->assign('adminTagset', $adminTagset);
@@ -162,7 +162,7 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
     $defaults = parent::setDefaultValues();
     $cloneFrom = CRM_Utils_Request::retrieve('clone_from', 'Integer');
     if (empty($this->_id) && $cloneFrom) {
-      $params = array('id' => $cloneFrom);
+      $params = ['id' => $cloneFrom];
       CRM_Core_BAO_Tag::retrieve($params, $this->_values);
       $this->_values['name'] .= ' (' . ts('copy') . ')';
       if (!empty($this->_values['is_reserved']) && !CRM_Core_Permission::check('administer reserved tags')) {
@@ -185,7 +185,7 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
   public function postProcess() {
     if ($this->_action == CRM_Core_Action::DELETE) {
       $deleted = 0;
-      $tag = civicrm_api3('tag', 'getsingle', array('id' => $this->_id[0]));
+      $tag = civicrm_api3('tag', 'getsingle', ['id' => $this->_id[0]]);
       foreach ($this->_id as $id) {
         if (CRM_Core_BAO_Tag::del($id)) {
           $deleted++;
@@ -193,14 +193,14 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
       }
       if (count($this->_id) == 1 && $deleted == 1) {
         if ($tag['is_tagset']) {
-          CRM_Core_Session::setStatus(ts("The tag set '%1' has been deleted.", array(1 => $tag['name'])), ts('Deleted'), 'success');
+          CRM_Core_Session::setStatus(ts("The tag set '%1' has been deleted.", [1 => $tag['name']]), ts('Deleted'), 'success');
         }
         else {
-          CRM_Core_Session::setStatus(ts("The tag '%1' has been deleted.", array(1 => $tag['name'])), ts('Deleted'), 'success');
+          CRM_Core_Session::setStatus(ts("The tag '%1' has been deleted.", [1 => $tag['name']]), ts('Deleted'), 'success');
         }
       }
       else {
-        CRM_Core_Session::setStatus(ts("Deleted %1 tags.", array(1 => $deleted)), ts('Deleted'), 'success');
+        CRM_Core_Session::setStatus(ts("Deleted %1 tags.", [1 => $deleted]), ts('Deleted'), 'success');
       }
     }
     else {
@@ -233,7 +233,7 @@ class CRM_Tag_Form_Edit extends CRM_Admin_Form {
         $params['is_selectable'] = 0;
       }
       $tag = CRM_Core_BAO_Tag::add($params);
-      CRM_Core_Session::setStatus(ts("The tag '%1' has been saved.", array(1 => $tag->name)), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts("The tag '%1' has been saved.", [1 => $tag->name]), ts('Saved'), 'success');
       $this->ajaxResponse['tag'] = $tag->toArray();
     }
     CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/tag'));

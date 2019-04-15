@@ -37,6 +37,7 @@
 class CRM_Report_Info extends CRM_Core_Component_Info {
 
   /**
+   * @var string
    * @inheritDoc
    */
   protected $keyword = 'report';
@@ -51,15 +52,14 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    *   collection of required component settings
    */
   public function getInfo() {
-    return array(
+    return [
       'name' => 'CiviReport',
       'translatedName' => ts('CiviReport'),
       'title' => ts('CiviCRM Report Engine'),
       'search' => 0,
       'showActivitiesInCore' => 1,
-    );
+    ];
   }
-
 
   /**
    * @inheritDoc
@@ -78,36 +78,36 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    *   collection of permissions, null if none
    */
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
-    $permissions = array(
-      'access CiviReport' => array(
+    $permissions = [
+      'access CiviReport' => [
         ts('access CiviReport'),
         ts('View reports'),
-      ),
-      'access Report Criteria' => array(
+      ],
+      'access Report Criteria' => [
         ts('access Report Criteria'),
         ts('Change report search criteria'),
-      ),
-      'save Report Criteria' => array(
+      ],
+      'save Report Criteria' => [
         ts('save Report Criteria'),
         ts('Save report search criteria'),
-      ),
-      'administer private reports' => array(
+      ],
+      'administer private reports' => [
         ts('administer private reports'),
         ts('Edit all private reports'),
-      ),
-      'administer reserved reports' => array(
+      ],
+      'administer reserved reports' => [
         ts('administer reserved reports'),
         ts('Edit all reports that have been marked as reserved'),
-      ),
-      'administer Reports' => array(
+      ],
+      'administer Reports' => [
         ts('administer Reports'),
         ts('Manage report templates'),
-      ),
-      'view report sql' => array(
+      ],
+      'view report sql' => [
         ts('view report sql'),
         ts('View sql used in CiviReports'),
-      ),
-    );
+      ],
+    ];
 
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
@@ -117,7 +117,6 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
 
     return $permissions;
   }
-
 
   /**
    * @inheritDoc
@@ -139,6 +138,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    * @return mixed
    *   component's User Dashboard applet object
    */
+
   /**
    * @return mixed
    */
@@ -156,6 +156,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    *   collection of required dashboard settings,
    *                    null if no element offered
    */
+
   /**
    * @return array|null
    */
@@ -181,6 +182,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    *   collection of required pane settings,
    *                    null if no element offered
    */
+
   /**
    * @return array|null
    */
@@ -199,6 +201,7 @@ class CRM_Report_Info extends CRM_Core_Component_Info {
    * @return array|null
    *   collection of activity types
    */
+
   /**
    * @return array|null
    */

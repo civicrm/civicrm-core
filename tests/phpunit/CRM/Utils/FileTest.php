@@ -23,6 +23,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
       ));
     }
   }
+
   public function testStripComment() {
     $strings = array(
       "\nab\n-- cd\nef" => "\nab\nef",
@@ -71,6 +72,27 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
     $this->assertEquals('test file content', $contents);
     unlink("/tmp/$fileName");
     unlink($newFile);
+  }
+
+  public function fileNames() {
+    $cases = [];
+    $cases[] = ['helloworld.txt', TRUE];
+    $cases[] = ['../helloworld.txt', FALSE];
+    // Test case seems to be failing for a strange reason
+    // $cases[] = ['\helloworld.txt', FALSE];
+    $cases[] = ['.helloworld', FALSE];
+    $cases[] = ['smartwatch_1736683_1280_9af3657015e8660cc234eb1601da871.jpg', TRUE];
+    return $cases;
+  }
+
+  /**
+   * Test if the fileName is valid or not
+   * @dataProvider fileNames
+   * @param string $fileName
+   * @param bool $expectedResult
+   */
+  public function testFileNameValid($fileName, $expectedResult) {
+    $this->assertEquals($expectedResult, CRM_Utils_File::isValidFileName($fileName));
   }
 
 }

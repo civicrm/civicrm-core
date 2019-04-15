@@ -19,14 +19,14 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_uf_group';
+  public static $_tableName = 'civicrm_uf_group';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Unique table ID
@@ -231,7 +231,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'limit_listings_group_id', 'civicrm_group', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'add_to_group_id', 'civicrm_group', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'created_id', 'civicrm_contact', 'id');

@@ -40,51 +40,120 @@ class CRM_Utils_PDF_Label extends TCPDF {
 
   // make these properties public due to
   // CRM-5880
-  // Default label format values
+  /**
+   * Default label format values
+   * @var array
+   */
   public $defaults;
-  // Current label format values
+  /**
+   * Current label format values
+   * @var array
+   */
   public $format;
-  // Name of format
+  /**
+   * Name of format
+   * @var string
+   */
   public $formatName;
-  // Left margin of labels
+  /**
+   * Left margin of labels
+   * @var float
+   */
   public $marginLeft;
-  // Top margin of labels
+  /**
+   * Top margin of labels
+   * @var float
+   */
   public $marginTop;
-  // Horizontal space between 2 labels
+  /**
+   * Horizontal space between 2 labels
+   * @var float
+   */
   public $xSpace;
-  // Vertical space between 2 labels
+  /**
+   * Vertical space between 2 labels
+   * @var float
+   */
   public $ySpace;
-  // Number of labels horizontally
+  /**
+   * Number of labels horizontally
+   * @var float
+   */
   public $xNumber;
-  // Number of labels vertically
+  /**
+   * Number of labels vertically
+   * @var float
+   */
   public $yNumber;
-  // Width of label
+  /**
+   * Width of label
+   * @var float
+   */
   public $width;
-  // Height of label
+  /**
+   * Height of label
+   * @var float
+   */
   public $height;
-  // Line Height of label - used in event code
+  /**
+   * Line Height of label - used in event code
+   * @var float
+   */
   public $lineHeight = 0;
-  // Space between text and left edge of label
+  /**
+   * Space between text and left edge of label
+   * @var float
+   */
   public $paddingLeft;
-  // Space between text and top edge of label
+  /**
+   * Space between text and top edge of label
+   * @var float
+   */
   public $paddingTop;
-  // Character size (in points)
+  /**
+   * Character size (in points)
+   * @var float
+   */
   public $charSize;
-  // Metric used for all PDF doc measurements
+  /**
+   * Metric used for all PDF doc measurements
+   * @var string
+   */
   public $metricDoc;
-  // Name of the font
+  /**
+   * Name of the font
+   * @var string
+   */
   public $fontName;
-  // 'B' bold, 'I' italic, 'BI' bold+italic
+  /**
+   * 'B' bold, 'I' italic, 'BI' bold+italic
+   * @var string
+   */
   public $fontStyle;
-  // Paper size name
+  /**
+   * Paper size name
+   * @var string
+   */
   public $paperSize;
-  // Paper orientation
+  /**
+   * Paper orientation
+   * @var string
+   */
   public $orientation;
-  // Paper dimensions array (w, h)
+  /**
+   * Paper dimensions array (w, h)
+   * @var array
+   */
   public $paper_dimensions;
-  // Counter for positioning labels
+  /**
+   * Counter for positioning labels
+   * @var float
+   */
   public $countX = 0;
-  // Counter for positioning labels
+  /**
+   * Counter for positioning labels
+   * @var float
+   */
   public $countY = 0;
 
   /**
@@ -175,7 +244,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
     $paperSize = CRM_Core_BAO_PaperSize::getByName($this->paperSize);
     $w = CRM_Utils_PDF_Utils::convertMetric($paperSize['width'], $paperSize['metric'], $this->metricDoc);
     $h = CRM_Utils_PDF_Utils::convertMetric($paperSize['height'], $paperSize['metric'], $this->metricDoc);
-    $this->paper_dimensions = array($w, $h);
+    $this->paper_dimensions = [$w, $h];
   }
 
   /**
@@ -186,7 +255,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
   public function generateLabel($text) {
     // paddingLeft is used for both left & right padding so needs to be
     // subtracted twice from width to get the width that is available for text
-    $args = array(
+    $args = [
       'w' => $this->width - 2 * $this->paddingLeft,
       'h' => 0,
       'txt' => $text,
@@ -201,7 +270,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
       'ishtml' => FALSE,
       'autopadding' => FALSE,
       'maxh' => $this->height,
-    );
+    ];
 
     CRM_Utils_Hook::alterMailingLabelParams($args);
 
@@ -243,7 +312,7 @@ class CRM_Utils_PDF_Label extends TCPDF {
     $posY = $this->marginTop + ($this->countY * ($this->height + $this->ySpace));
     $this->SetXY($posX + $this->paddingLeft, $posY + $this->paddingTop);
     if ($this->generatorMethod) {
-      call_user_func_array(array($this->generatorObject, $this->generatorMethod), array($texte));
+      call_user_func_array([$this->generatorObject, $this->generatorMethod], [$texte]);
     }
     else {
       $this->generateLabel($texte);
@@ -264,12 +333,12 @@ class CRM_Utils_PDF_Label extends TCPDF {
    */
   public function getFontNames() {
     // Define labels for TCPDF core fonts
-    $fontLabel = array(
+    $fontLabel = [
       'courier' => ts('Courier'),
       'helvetica' => ts('Helvetica'),
       'times' => ts('Times New Roman'),
       'dejavusans' => ts('Deja Vu Sans (UTF-8)'),
-    );
+    ];
 
     // Check to see if we have any additional fonts to add. You can specify more fonts in
     // civicrm.settings.php via: $config['CiviCRM Preferences']['additional_fonts']

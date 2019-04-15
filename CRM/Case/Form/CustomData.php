@@ -76,10 +76,10 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     // Array contains only one item
     foreach ($groupTree as $groupValues) {
       $this->_customTitle = $groupValues['title'];
-      CRM_Utils_System::setTitle(ts('Edit %1', array(1 => $groupValues['title'])));
+      CRM_Utils_System::setTitle(ts('Edit %1', [1 => $groupValues['title']]));
     }
 
-    $this->_defaults = array();
+    $this->_defaults = [];
     CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $this->_defaults);
     $this->setDefaults($this->_defaults);
 
@@ -98,18 +98,17 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
   public function buildQuickForm() {
     // make this form an upload since we dont know if the custom data injected dynamically
     // is of type file etc
-    $this->addButtons(array(
-        array(
-          'type' => 'upload',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'upload',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
@@ -130,7 +129,7 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     $session->pushUserContext(CRM_Utils_System::url('civicrm/contact/view/case', "reset=1&id={$this->_entityID}&cid={$this->_contactID}&action=view"));
 
     $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Custom Data');
-    $activityParams = array(
+    $activityParams = [
       'activity_type_id' => $activityTypeID,
       'source_contact_id' => $session->get('userID'),
       'is_auto' => TRUE,
@@ -139,13 +138,13 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
       'target_contact_id' => $this->_contactID,
       'details' => json_encode($this->_defaults),
       'activity_date_time' => date('YmdHis'),
-    );
+    ];
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
 
-    $caseParams = array(
+    $caseParams = [
       'activity_id' => $activity->id,
       'case_id' => $this->_entityID,
-    );
+    ];
     CRM_Case_BAO_Case::processCaseActivity($caseParams);
 
     $transaction->commit();

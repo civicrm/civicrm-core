@@ -54,15 +54,15 @@ WHERE  e.contact_id = c.id
 AND    e.is_primary = 1
 AND    c.id IN ( $contactIDs )";
 
-    $rows = array();
+    $rows = [];
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      $rows[] = array(
+      $rows[] = [
         'id' => $dao->contact_id,
         'name' => $dao->name,
         'contact_type' => $dao->contact_type,
         'email' => $dao->email,
-      );
+      ];
     }
 
     $this->assign('rows', $rows);

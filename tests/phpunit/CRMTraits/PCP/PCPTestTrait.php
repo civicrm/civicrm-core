@@ -31,6 +31,7 @@
  * Traits for testing PCP pages.
  */
 trait CRMTraits_PCP_PCPTestTrait {
+
   /**
    * Build and return pcpBlock params.
    *

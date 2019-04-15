@@ -34,9 +34,6 @@
  */
 class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
-  /**
-   * Assume empty database with just civicrm_data.
-   */
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
@@ -158,8 +155,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => 1,
-    ),
-      CRM_Core_Action::ADD);
+    ), CRM_Core_Action::ADD);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
     $this->assertEmpty($contribution['amount_level']);
     $this->assertEquals(1234, $contribution['total_amount']);
@@ -181,8 +177,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('Contribution', array(
       'contact_id' => $this->_individualId,
       'contribution_status_id' => 'Completed',
-      ),
-    1);
+    ), 1);
   }
 
   /**
@@ -240,7 +235,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', array(
         'return' => 'payment_instrument_id',
         'id' => $paymentProcessorID,
-       )),
+      )),
     ));
 
     $this->assertEquals(1, $contribution["count"], "Contribution count should be one.");
@@ -314,7 +309,6 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $mut->stop();
   }
 
-
   /**
    * Test the submit function on the contribution page.
    */
@@ -369,7 +363,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'payment_instrument_id' => $this->callAPISuccessGetValue('PaymentProcessor', array(
         'return' => 'payment_instrument_id',
         'id' => $this->paymentProcessorID,
-       )),
+      )),
     ), 1);
     $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $this->_individualId));
     $this->assertTrue(empty($contact['source']));
@@ -501,9 +495,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
         'payment_processor_id' => $this->paymentProcessorID,
         'credit_card_exp_date' => array('M' => 5, 'Y' => 2012),
         'credit_card_number' => '411111111111111',
-      ), CRM_Core_Action::ADD,
-        'live'
-      );
+      ), CRM_Core_Action::ADD, 'live');
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
       $this->callAPISuccessGetCount('Contribution', array(
@@ -540,9 +532,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'credit_card_exp_date' => array('M' => 5, 'Y' => 2025),
       'credit_card_number' => '411111111111111',
       'billing_city-5' => 'Vancouver',
-    ), CRM_Core_Action::ADD,
-      'live'
-    );
+    ), CRM_Core_Action::ADD, 'live');
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('return' => 'address_id'));
     $this->assertNotEmpty($contribution['address_id']);
     // CRM-18490 : There is a unwanted test leakage due to below getsingle Api as it only fails in Jenkin
@@ -573,9 +563,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'credit_card_exp_date' => array('M' => 5, 'Y' => 2025),
       'credit_card_number' => '411111111111111',
       'billing_city-5' => 'Vancouver',
-    ), CRM_Core_Action::ADD,
-      'live'
-    );
+    ), CRM_Core_Action::ADD, 'live');
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('return' => 'receive_date'));
     $this->assertEquals($contribution['receive_date'], $receiveDate);
   }
@@ -593,9 +581,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => array('M' => 5, 'Y' => 2025),
       'credit_card_number' => '411111111111111',
-    ), CRM_Core_Action::ADD,
-      'live'
-    );
+    ), CRM_Core_Action::ADD, 'live');
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('return' => 'address_id'));
     $this->assertEmpty($contribution['address_id']);
     $this->callAPISuccessGetCount('Address', array(
@@ -620,9 +606,8 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ), CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
     $mut->checkMailLog(array(
-        '<p>Please print this receipt for your records.</p>',
-      )
-    );
+      '<p>Please print this receipt for your records.</p>',
+    ));
     $mut->stop();
   }
 
@@ -646,10 +631,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ), CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
     $mut->checkMailLog(array(
-        '<p>Please print this receipt for your records.</p>',
-        '<testloggedin@example.com>',
-      )
-    );
+      '<p>Please print this receipt for your records.</p>',
+      '<testloggedin@example.com>',
+    ));
     $mut->stop();
   }
 
@@ -714,14 +698,13 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     $form->testSubmit($params, CRM_Core_Action::ADD);
 
     $mut->checkMailLog(array(
-        'Financial Type: Donation
+      'Financial Type: Donation
 ---------------------------------------------------------
 Item                             Qty       Each       Total
 ----------------------------------------------------------
 Price Field - Price Field 1        1   $ 100.00      $ 100.00
 ',
-      )
-    );
+    ));
     $mut->stop();
   }
 
@@ -809,8 +792,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'payment_processor_id' => $this->paymentProcessorID,
       'credit_card_exp_date' => array('M' => 5, 'Y' => 2026),
       'credit_card_number' => '411111111111111',
-    ), CRM_Core_Action::ADD,
-    'live');
+    ), CRM_Core_Action::ADD, 'live');
     $contributionProduct = $this->callAPISuccess('contribution_product', 'getsingle', array());
     $this->assertEquals('clumsy smurf', $contributionProduct['product_option']);
     $mut->checkMailLog(array(
@@ -833,8 +815,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => 1,
       'note' => 'Super cool and interesting stuff',
-    ),
-      CRM_Core_Action::ADD);
+    ), CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', array('contact_id' => $this->_individualId), 1);
     $note = $this->callAPISuccessGetSingle('note', array('entity_table' => 'civicrm_contribution'));
     $this->assertEquals($note['note'], 'Super cool and interesting stuff');
@@ -897,14 +878,13 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit(array(
-        'total_amount' => $this->formatMoneyInput(6100.10),
-        'financial_type_id' => 1,
-        'contact_id' => $this->_individualId,
-        'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
-        'contribution_status_id' => 1,
-        'price_set_id' => 0,
-      ),
-      CRM_Core_Action::ADD);
+      'total_amount' => $this->formatMoneyInput(6100.10),
+      'financial_type_id' => 1,
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+    ), CRM_Core_Action::ADD);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
     $form->testSubmit(array(
       'total_amount' => $this->formatMoneyInput(5200.20),
@@ -915,8 +895,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'contribution_status_id' => 1,
       'price_set_id' => 0,
       'id' => $contribution['id'],
-    ),
-      CRM_Core_Action::UPDATE);
+    ), CRM_Core_Action::UPDATE);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
     $this->assertEquals(5200.20, $contribution['total_amount'], 2);
 
@@ -941,15 +920,14 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit(array(
-        'total_amount' => 1200.55,
-        'financial_type_id' => 1,
-        'contact_id' => $this->_individualId,
-        'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
-        'check_number' => '123AX',
-        'contribution_status_id' => 1,
-        'price_set_id' => 0,
-      ),
-      CRM_Core_Action::ADD);
+      'total_amount' => 1200.55,
+      'financial_type_id' => 1,
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'check_number' => '123AX',
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+    ), CRM_Core_Action::ADD);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
     $form->testSubmit(array(
       'total_amount' => 1200.55,
@@ -962,8 +940,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'contribution_status_id' => 1,
       'price_set_id' => 0,
       'id' => $contribution['id'],
-    ),
-      CRM_Core_Action::UPDATE);
+    ), CRM_Core_Action::UPDATE);
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
     $this->assertEquals(1200.55, $contribution['total_amount']);
 
@@ -1061,13 +1038,13 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit(array(
-       'total_amount' => $this->formatMoneyInput(1000.00),
-        'financial_type_id' => $this->_financialTypeId,
-        'contact_id' => $this->_individualId,
-        'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
-        'contribution_status_id' => 1,
-        'price_set_id' => 0,
-      ),
+      'total_amount' => $this->formatMoneyInput(1000.00),
+      'financial_type_id' => $this->_financialTypeId,
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+    ),
       CRM_Core_Action::ADD
     );
     $contribution = $this->callAPISuccessGetSingle('Contribution',
@@ -1086,14 +1063,12 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
 
     // CRM-20423: Upon simple submit of 'Edit Contribution' form ensure that total amount is same
     $form->testSubmit(array(
-        'id' => $contribution['id'],
-        'financial_type_id' => 3,
-        'contact_id' => $this->_individualId,
-        'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
-        'contribution_status_id' => 1,
-      ),
-      CRM_Core_Action::UPDATE
-    );
+      'id' => $contribution['id'],
+      'financial_type_id' => 3,
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+    ), CRM_Core_Action::UPDATE);
 
     $contribution = $this->callAPISuccessGetSingle('Contribution', array('contact_id' => $this->_individualId));
     // Check if total amount is unchanged
@@ -1109,15 +1084,13 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit(array(
-       'total_amount' => 100,
-        'financial_type_id' => 3,
-        'contact_id' => $this->_individualId,
-        'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
-        'contribution_status_id' => 1,
-        'price_set_id' => 0,
-      ),
-      CRM_Core_Action::ADD
-    );
+      'total_amount' => 100,
+      'financial_type_id' => 3,
+      'contact_id' => $this->_individualId,
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+    ), CRM_Core_Action::ADD);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       array(
         'contact_id' => $this->_individualId,
@@ -1170,9 +1143,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'contribution_status_id' => 1,
       'is_email_receipt' => 1,
       'from_email_address' => 'demo@example.com',
-    ),
-      CRM_Core_Action::UPDATE
-    );
+    ), CRM_Core_Action::UPDATE);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       array(
         'contribution_id' => 1,
@@ -1231,9 +1202,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'contribution_status_id' => 1,
       'is_email_receipt' => 1,
       'from_email_address' => 'demo@example.com',
-    ),
-      CRM_Core_Action::UPDATE
-    );
+    ), CRM_Core_Action::UPDATE);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       array(
         'contribution_id' => 1,
@@ -1285,9 +1254,7 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
       'contribution_status_id' => 1,
       'price_set_id' => 0,
-    ),
-      CRM_Core_Action::ADD
-    );
+    ), CRM_Core_Action::ADD);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       array(
         'contribution_id' => 1,

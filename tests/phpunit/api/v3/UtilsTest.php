@@ -324,14 +324,18 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
 
     $cases[] = array(
       $records,
-      array('version' => 3), // params
-      array('a', 'b', 'c', 'd', 'e'), // expected results
+      // params
+      array('version' => 3),
+      // expected results
+      array('a', 'b', 'c', 'd', 'e'),
     );
 
     $cases[] = array(
       $records,
-      array('version' => 3, 'fruit' => 'apple'), // params
-      array('a', 'c', 'd', 'e'), // expected results
+      // params
+      array('version' => 3, 'fruit' => 'apple'),
+      // expected results
+      array('a', 'c', 'd', 'e'),
     );
 
     $cases[] = array(

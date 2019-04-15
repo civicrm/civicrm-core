@@ -61,7 +61,6 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
   public $debug = 0;
   protected $_params;
 
-
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
@@ -148,9 +147,8 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
 
     //test get by contact id works
     $result = $this->callAPISuccess('contribution_soft', 'get', array(
-        'contact_id' => $this->_softIndividual2Id,
-      )
-    );
+      'contact_id' => $this->_softIndividual2Id,
+    ));
     $this->assertEquals(1, $result['count']);
 
     $this->callAPISuccess('contribution_soft', 'Delete', array(
@@ -167,7 +165,6 @@ class api_v3_ContributionSoftTest extends CiviUnitTestCase {
       'id' => $this->_softcontribution2['id'],
     ));
   }
-
 
   /**
    * civicrm_contribution_soft.

@@ -38,7 +38,7 @@
  *   Extra params to return. eg an extra array of ids. It is not mandatory, but can help the computer using the api. Keep in mind the api consumer isn't to be trusted. eg. the database password is NOT a good extra data.
  */
 class CRM_Core_Exception extends PEAR_Exception {
-  private $errorData = array();
+  private $errorData = [];
 
   /**
    * Class constructor.
@@ -48,9 +48,9 @@ class CRM_Core_Exception extends PEAR_Exception {
    * @param array $errorData
    * @param null $previous
    */
-  public function __construct($message, $error_code = 0, $errorData = array(), $previous = NULL) {
+  public function __construct($message, $error_code = 0, $errorData = [], $previous = NULL) {
     parent::__construct(ts($message));
-    $this->errorData = $errorData + array('error_code' => $error_code);
+    $this->errorData = $errorData + ['error_code' => $error_code];
   }
 
   /**

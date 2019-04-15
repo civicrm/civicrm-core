@@ -1,5 +1,6 @@
 <?php
 namespace Civi\Test\CiviEnvBuilder;
+
 class CallbackStep implements StepInterface {
   private $callback;
   private $sig;

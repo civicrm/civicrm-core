@@ -36,7 +36,6 @@ class api_v3_CountryTest extends CiviUnitTestCase {
   protected $_apiversion;
   protected $_params;
 
-
   public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();

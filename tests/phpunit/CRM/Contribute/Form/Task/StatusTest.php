@@ -29,9 +29,7 @@
  * Class CRM_Contribute_Form_Task_StatusTest
  */
 class CRM_Contribute_Form_Task_StatusTest extends CiviUnitTestCase {
-  /**
-   * Assume empty database with just civicrm_data.
-   */
+
   protected $_individualId;
 
   /**

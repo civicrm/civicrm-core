@@ -9,10 +9,10 @@
  *   API result array
  */
 function survey_respondant_get_example() {
-  $params = array(
+  $params = [
     'sequential' => '1',
     'survey_id' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('SurveyRespondant', 'get', $params);
@@ -22,12 +22,12 @@ function survey_respondant_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -41,13 +41,13 @@ function survey_respondant_get_example() {
  */
 function survey_respondant_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 0,
-    'values' => array(),
+    'values' => [],
     'deprecated' => 'The SurveyRespondant api is not currently supported.',
-  );
+  ];
 
   return $expectedResult;
 }

@@ -74,7 +74,6 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $this->callAPIFailure('group', 'create', $params, 'Mandatory key(s) missing from params array: title');
   }
 
-
   public function testGetGroupWithEmptyParams() {
     $group = $this->callAPISuccess('group', 'get', array());
 
@@ -173,11 +172,10 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
     //Pass group_type param in checkbox format.
     $params = array_merge($params, array(
-        'name' => 'Test Checkbox Format',
-        'title' => 'Test Checkbox Format',
-        'group_type' => array(2 => 1),
-      )
-    );
+      'name' => 'Test Checkbox Format',
+      'title' => 'Test Checkbox Format',
+      'group_type' => array(2 => 1),
+    ));
     $result = $this->callAPISuccess('Group', 'create', $params);
     $group = $result['values'][$result['id']];
     $this->assertEquals($group['name'], "Test Checkbox Format");
@@ -185,13 +183,12 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
     //assert single value for group_type and parent
     $params = array_merge($params, array(
-        'name' => 'Test Group 2',
-        'title' => 'Test Group 2',
-        'group_type' => 2,
-        'parents' => $result['id'],
-        'sequential' => 1,
-      )
-    );
+      'name' => 'Test Group 2',
+      'title' => 'Test Group 2',
+      'group_type' => 2,
+      'parents' => $result['id'],
+      'sequential' => 1,
+    ));
     $group2 = $this->callAPISuccess('Group', 'create', $params)['values'][0];
 
     $this->assertEquals($group2['group_type'], array($params['group_type']));
@@ -199,11 +196,10 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
     // Test array format for parents.
     $params = array_merge($params, array(
-        'name' => 'Test Group 3',
-        'title' => 'Test Group 3',
-        'parents' => [$result['id'], $group2['id']],
-      )
-    );
+      'name' => 'Test Group 3',
+      'title' => 'Test Group 3',
+      'parents' => [$result['id'], $group2['id']],
+    ));
     $group3 = $this->callAPISuccess('Group', 'create', $params)['values'][0];
     $parents = $this->callAPISuccess('Group', 'getvalue', ['return' => 'parents', 'id' => $group3['id']]);
 

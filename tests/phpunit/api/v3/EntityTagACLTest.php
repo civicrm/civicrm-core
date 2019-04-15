@@ -81,8 +81,7 @@ class api_v3_EntityTagACLTest extends CiviUnitTestCase {
         'used_for' => $key,
         'name' => $entity,
         'description' => $entity,
-        )
-      );
+      ));
     }
     CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
   }
@@ -108,6 +107,7 @@ class api_v3_EntityTagACLTest extends CiviUnitTestCase {
     $options = $this->getTagOptions();
     return array_search($entity, $options);
   }
+
   /**
    * Get entities which can be tagged in data provider format.
    */

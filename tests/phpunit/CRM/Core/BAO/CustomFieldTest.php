@@ -361,13 +361,29 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
     $fieldID = CRM_Core_BAO_CustomField::getCustomFieldID('testFld', 'new custom group');
     $this->assertEquals($this->customFieldID, $fieldID);
+
+    $fieldID = CRM_Core_BAO_CustomField::getCustomFieldID('testFld', 'new custom group', TRUE);
+    $this->assertEquals('custom_' . $this->customFieldID, $fieldID);
+
+    // create field with same name in a different group
+    $this->createCustomField('other custom group');
+    $otherFieldID = CRM_Core_BAO_CustomField::getCustomFieldID('testFld', 'other custom group');
+    // make sure it does not return the field ID of the first field
+    $this->assertNotEquals($fieldID, $otherFieldID);
   }
 
   /**
+   * Create a custom field
+   *
+   * @param string $groupTitle
+   *
    * @return array
    */
-  protected function createCustomField() {
-    $customGroup = $this->customGroupCreate(array('extends' => 'Individual'));
+  protected function createCustomField($groupTitle = 'new custom group') {
+    $customGroup = $this->customGroupCreate([
+      'extends' => 'Individual',
+      'title'   => $groupTitle,
+    ]);
     $fields = array(
       'label' => 'testFld',
       'data_type' => 'String',

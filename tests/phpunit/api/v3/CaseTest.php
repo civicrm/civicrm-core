@@ -380,9 +380,9 @@ class api_v3_CaseTest extends CiviCaseTestCase {
 
     // Fetch case based on an activity id
     $result = $this->callAPISuccess('case', 'get', array(
-        'activity_id' => $activity,
-        'return' => 'activities',
-      ));
+      'activity_id' => $activity,
+      'return' => 'activities',
+    ));
     $this->assertEquals(FALSE, empty($result['values'][$id]));
     $this->assertEquals($result['values'][$id], $case);
   }
@@ -400,9 +400,9 @@ class api_v3_CaseTest extends CiviCaseTestCase {
 
     // Fetch case based on client contact id
     $result = $this->callAPISuccess('case', 'get', array(
-        'client_id' => $this->_params['contact_id'],
-        'return' => array('activities', 'contacts'),
-      ));
+      'client_id' => $this->_params['contact_id'],
+      'return' => array('activities', 'contacts'),
+    ));
     $this->assertAPIArrayComparison($result['values'][$id], $case);
   }
 
@@ -419,9 +419,9 @@ class api_v3_CaseTest extends CiviCaseTestCase {
 
     // Fetch case based on client contact id
     $result = $this->callAPISuccess('case', 'get', array(
-        'subject' => $this->_params['subject'],
-        'return' => array('subject'),
-      ));
+      'subject' => $this->_params['subject'],
+      'return' => array('subject'),
+    ));
     $this->assertAPIArrayComparison($result['values'][$id], $case);
   }
 
@@ -433,9 +433,9 @@ class api_v3_CaseTest extends CiviCaseTestCase {
 
     // Append 'wrong' to subject so that it is no longer the same.
     $result = $this->callAPISuccess('case', 'get', array(
-        'subject' => $this->_params['subject'] . 'wrong',
-        'return' => array('activities', 'contacts'),
-      ));
+      'subject' => $this->_params['subject'] . 'wrong',
+      'return' => array('activities', 'contacts'),
+    ));
     $this->assertEquals(0, $result['count']);
   }
 

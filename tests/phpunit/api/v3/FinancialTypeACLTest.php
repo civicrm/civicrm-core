@@ -35,9 +35,6 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_FinancialACLTrait;
 
-  /**
-   * Assume empty database with just civicrm_data.
-   */
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
@@ -188,6 +185,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'add contributions of type Donation',
     ]);
     $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
+    $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, ['financial_type_id' => 'Member Dues']));
 
     $params = array(
       'id' => $contribution['id'],
@@ -197,9 +195,10 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['count'], 0);
 
     $this->addFinancialAclPermissions([['view', 'Donation']]);
-    $contribution = $this->callAPISuccess('contribution', 'get', $params);
-
-    $this->assertEquals($contribution['count'], 1);
+    $this->callAPISuccessGetSingle('contribution', $params);
+    $this->callAPISuccessGetCount('contribution', ['financial_type_id' => 'Member Dues', 'check_permissions' => 1], 0);
+    $this->markTestIncomplete('check_permissions = 0 should be respected but is not - I have added a todo at the right place but not changed it as yet');
+    $this->callAPISuccessGetCount('contribution', ['financial_type_id' => 'Member Dues'], 1);
   }
 
   /**

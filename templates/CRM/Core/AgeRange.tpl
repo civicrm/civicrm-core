@@ -37,22 +37,22 @@
       {$form.$maxName.html}
     </span>
   </span>
-</td>
-<td>
   <span class="crm-age-range-asofdate">
-      {assign var=dateName   value=$fieldName|cat:$date}
-      {$form.$dateName.label}
-      {include file="CRM/common/jcalendar.tpl" elementName=$dateName}
+    {assign var=dateName value=$fieldName|cat:$date}
+    {$form.$dateName.label}
+    {$form.$dateName.html}
   </span>
   {literal}
     <script type="text/javascript">
-      cj(".crm-age-range").change(function() {
-        if (cj('.crm-age-range-min :text').val() || cj('.crm-age-range-max :text').val()) {
-          cj(".crm-age-range-asofdate").show();
-        } else {
-          cj(".crm-age-range-asofdate").hide();
+      CRM.$(function($) {
+        var $form = $('form.{/literal}{$form.formClass}{literal}');
+        function toggleDate() {
+          $(".crm-age-range-asofdate").toggle(!!($('.crm-age-range-min input', $form).val() || $('.crm-age-range-max input', $form).val()));
         }
-      }).change();
+        $('.crm-age-range input', $form).on('keyup change', toggleDate);
+        toggleDate();
+      });
+
     </script>
   {/literal}
 </td>

@@ -6,13 +6,13 @@
  *   API result array
  */
 function mailing_event_subscribe_create_example() {
-  $params = array(
+  $params = [
     'email' => 'test@test.test',
     'group_id' => 2,
     'contact_id' => 3,
     'hash' => 'b15de8b64e2cec34',
     'time_stamp' => '20101212121212',
-  );
+  ];
 
   try{
     $result = civicrm_api3('MailingEventSubscribe', 'create', $params);
@@ -22,12 +22,12 @@ function mailing_event_subscribe_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -41,19 +41,19 @@ function mailing_event_subscribe_create_example() {
  */
 function mailing_event_subscribe_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'contact_id' => '3',
         'subscribe_id' => '1',
         'hash' => '67eac7789eaee00',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

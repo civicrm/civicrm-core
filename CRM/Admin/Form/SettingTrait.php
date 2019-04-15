@@ -119,6 +119,7 @@ trait CRM_Admin_Form_SettingTrait {
    * e.g get 'serialize' key, if exists, for a field.
    *
    * @param $setting
+   * @param $item
    * @return mixed
    */
   protected function getSettingMetadataItem($setting, $item) {
@@ -177,6 +178,12 @@ trait CRM_Admin_Form_SettingTrait {
           $options = civicrm_api3('Setting', 'getoptions', [
             'field' => $setting,
           ])['values'];
+          if ($props['html_type'] === 'Select' && isset($props['is_required']) && $props['is_required'] === FALSE && !isset($options[''])) {
+            // If the spec specifies the field is not required add a null option.
+            // Why not if empty($props['is_required']) - basically this has been added to the spec & might not be set to TRUE
+            // when it is true.
+            $options = ['' => ts('None')] + $options;
+          }
         }
         if ($props['type'] === 'Boolean') {
           $options = [$props['title'] => $props['name']];
@@ -229,7 +236,10 @@ trait CRM_Admin_Form_SettingTrait {
           $this->$add($setting, ts($props['title']), $props['entity_reference_options']);
         }
         elseif ($add === 'addYesNo' && ($props['type'] === 'Boolean')) {
-          $this->addRadio($setting, ts($props['title']), array(1 => 'Yes', 0 => 'No'), NULL, '&nbsp;&nbsp;');
+          $this->addRadio($setting, ts($props['title']), [1 => 'Yes', 0 => 'No'], NULL, '&nbsp;&nbsp;');
+        }
+        elseif ($add === 'add') {
+          $this->add($props['html_type'], $setting, ts($props['title']), $options);
         }
         else {
           $this->$add($setting, ts($props['title']), $options);
@@ -286,8 +296,10 @@ trait CRM_Admin_Form_SettingTrait {
       'entity_reference' => 'EntityRef',
       'advmultiselect' => 'Element',
     ];
+    $mapping += array_fill_keys(CRM_Core_Form::$html5Types, '');
     return $mapping[$htmlType];
   }
+
   /**
    * Get the defaults for all fields defined in the metadata.
    *

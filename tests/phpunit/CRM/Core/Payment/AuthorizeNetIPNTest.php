@@ -33,6 +33,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
   }
+
   /**
    * Ensure recurring contributions from Contribution Pages
    * with receipt turned off don't send a receipt.
@@ -131,9 +132,9 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction());
     $IPN->main();
     $contribution = $this->callAPISuccess('contribution', 'get', array(
-        'contribution_recur_id' => $this->_contributionRecurID,
-        'sequential' => 1,
-      ));
+      'contribution_recur_id' => $this->_contributionRecurID,
+      'sequential' => 1,
+    ));
     $this->assertEquals(2, $contribution['count']);
     $this->assertEquals('second_one', $contribution['values'][1]['trxn_id']);
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['values'][1]['receive_date'])));
@@ -184,7 +185,6 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertEquals('2010-07-01', date('Y-m-d', strtotime($contribution['values'][1]['receive_date'])));
   }
 
-
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
    */
@@ -202,9 +202,9 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction());
     $IPN->main();
     $contribution = $this->callAPISuccess('contribution', 'get', array(
-        'contribution_recur_id' => $this->_contributionRecurID,
-        'sequential' => 1,
-      ));
+      'contribution_recur_id' => $this->_contributionRecurID,
+      'sequential' => 1,
+    ));
     $this->assertEquals(2, $contribution['count']);
     // Ensure both contributions are coded as credit card contributions.
     $this->assertEquals(1, $contribution['values'][0]['payment_instrument_id']);
@@ -212,9 +212,9 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertEquals('second_one', $contribution['values'][1]['trxn_id']);
     $this->callAPISuccessGetSingle('membership_payment', array('contribution_id' => $contribution['values'][1]['id']));
     $this->callAPISuccessGetSingle('line_item', array(
-        'contribution_id' => $contribution['values'][1]['id'],
-        'entity_table' => 'civicrm_membership',
-      ));
+      'contribution_id' => $contribution['values'][1]['id'],
+      'entity_table' => 'civicrm_membership',
+    ));
   }
 
   /**

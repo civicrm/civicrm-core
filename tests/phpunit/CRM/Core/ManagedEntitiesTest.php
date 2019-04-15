@@ -16,7 +16,7 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
   protected $adhocProvider;
 
   /**
-   * @var array(string $shortName => CRM_Core_Module $module)
+   * @var array(string
    */
   protected $modules;
 
@@ -173,7 +173,8 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
 
     // create first managed entity ('foo')
     $decls[] = array_merge($this->fixtures['com.example.one-foo'], array(
-      'update' => 'never', // Policy is to never update after initial creation
+      // Policy is to never update after initial creation
+      'update' => 'never',
     ));
     $me = new CRM_Core_ManagedEntities($this->modules, $decls);
     $me->reconcile();
@@ -281,7 +282,8 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     // create first managed entity ('foo')
     $decls = array();
     $decls[] = array(
-      'module' => 'com.example.unknown', // erroneous
+      // erroneous
+      'module' => 'com.example.unknown',
       'name' => 'foo',
       'entity' => 'CustomSearch',
       'params' => array(
@@ -308,7 +310,8 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $decls = array();
     $decls[] = array(
       'module' => 'com.example.unknown',
-      'name' => NULL, // erroneous
+      // erroneous
+      'name' => NULL,
       'entity' => 'CustomSearch',
       'params' => array(
         'version' => 3,
@@ -335,7 +338,8 @@ class CRM_Core_ManagedEntitiesTest extends CiviUnitTestCase {
     $decls[] = array(
       'module' => 'com.example.unknown',
       'name' => 'foo',
-      'entity' => NULL, // erroneous
+      // erroneous
+      'entity' => NULL,
       'params' => array(
         'version' => 3,
         'class_name' => 'CRM_Example_One_Foo',

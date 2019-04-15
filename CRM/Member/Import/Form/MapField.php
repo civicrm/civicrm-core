@@ -44,8 +44,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @var int
    */
-  static $_contactType = NULL;
-
+  public static $_contactType = NULL;
 
   /**
    * Set variables up before form is built.

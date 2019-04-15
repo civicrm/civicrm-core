@@ -8,14 +8,14 @@
  *   API result array
  */
 function activity_get_example() {
-  $params = array(
+  $params = [
     'activity_id' => 1,
     'sequential' => 1,
     'return.assignee_contact_id' => 1,
-    'api.contact.get' => array(
+    'api.contact.get' => [
       'id' => '$value.source_contact_id',
-    ),
-  );
+    ],
+  ];
 
   try{
     $result = civicrm_api3('Activity', 'get', $params);
@@ -25,12 +25,12 @@ function activity_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -44,13 +44,13 @@ function activity_get_example() {
  */
 function activity_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '0' => array(
+    'values' => [
+      '0' => [
         'id' => '1',
         'activity_type_id' => '9999',
         'subject' => 'test activity type id',
@@ -65,17 +65,17 @@ function activity_get_expectedresult() {
         'is_current_revision' => '1',
         'is_deleted' => 0,
         'is_star' => 0,
-        'assignee_contact_id' => array(
+        'assignee_contact_id' => [
           '0' => '3',
-        ),
+        ],
         'source_contact_id' => '1',
-        'api.contact.get' => array(
+        'api.contact.get' => [
           'is_error' => 0,
           'version' => 3,
           'count' => 1,
           'id' => 1,
-          'values' => array(
-            '0' => array(
+          'values' => [
+            '0' => [
               'contact_id' => '1',
               'contact_type' => 'Individual',
               'contact_sub_type' => '',
@@ -144,12 +144,12 @@ function activity_get_expectedresult() {
               'state_province' => '',
               'country' => '',
               'id' => '1',
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
+            ],
+          ],
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

@@ -49,8 +49,7 @@ abstract class CRM_Import_Form_Summary extends CRM_Core_Form {
           'name' => ts('Done'),
           'isDefault' => TRUE,
         ),
-      )
-    );
+    ));
   }
 
   /**

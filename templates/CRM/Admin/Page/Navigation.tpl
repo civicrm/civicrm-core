@@ -27,19 +27,19 @@
   {include file="CRM/Admin/Form/Navigation.tpl"}
 {else}
   <div class="help">
-    {ts}Customize the CiviCRM navigation menu bar for your users here.{/ts} {help id="id-navigation"}
+    {capture assign="displayPrefUrl"}href="{crmURL p='civicrm/admin/setting/preferences/display' q='reset=1'}"{/capture}
+    {capture assign="searchPrefUrl"}href="{crmURL p='civicrm/admin/setting/search' q='reset=1'}"{/capture}
+    <p>{ts}Customize the CiviCRM navigation menu bar for your users here.{/ts} {help id="id-navigation"}</p>
+    <p>{ts 1=$displayPrefUrl}The menu color and position can be adjusted on the <a %1>Display Preferences</a> screen.{/ts}</p>
+    <p>{ts 1=$searchPrefUrl}Quicksearch options can be edited on the <a %1>Search Preferences</a> screen.{/ts}</p>
   </div>
 
   <div class="crm-block crm-content-block">
     <div id="new-menu-item">
-      {crmButton p="civicrm/admin/menu" q="action=add&reset=1" id="newMenuItem" icon="crm-i fa-plus-circle" style="margin-left: 6px;"}{ts}Add Menu Item{/ts}{/crmButton}&nbsp;&nbsp;&nbsp;&nbsp;
-        <span id="reset-menu" class="status" style="display:none">
-        {capture assign=rebuildURL}{crmURL p='civicrm/admin/menu' q="reset=1"}{/capture}
-          {ts 1=$rebuildURL}<a href='%1' title="Reload page"><strong>Click here</strong></a> to reload the page and see your changes in the menu bar above.{/ts}
-        </span><br/><br/>
+      {crmButton p="civicrm/admin/menu" q="action=add&reset=1" id="newMenuItem" icon="crm-i fa-plus-circle" style="margin-left: 6px;"}{ts}Add Menu Item{/ts}{/crmButton}
     </div>
     <div class="spacer"></div>
-    <div style="padding-left: 25px;"><div class="crm-logo-sm"></div></div>
+    <div style="padding-left: 48px;"><img src="{$config->resourceBase}i/logo_sm.png" /></div>
     <div id="navigation-tree" class="navigation-tree" style="height:auto; border-collapse:separate; background-color:#FFFFFF;"></div>
     <div class="spacer"></div>
     <div>
@@ -63,7 +63,7 @@
               return: ['label', 'parent_id', 'icon'],
               name: {'!=': 'Home'},
               sequential: 1
-            }).done(function(data) {
+            }).then(function(data) {
               var items = [];
               $.each(data.values, function(key, value) {
                 items.push({
@@ -108,9 +108,8 @@
                   }
                   CRM.confirm({message: deleteMsg})
                     .on('crmConfirm:yes', function() {
-                      CRM.api3('Navigation', 'delete', {id: nodeID}, true);
+                      CRM.api3('Navigation', 'delete', {id: nodeID}, true).then(refreshMenubar);
                       $("#navigation-tree").jstree(true).delete_node(menu.reference.closest('li'));
-                      $("#reset-menu").show();
                     });
                 }
               }
@@ -123,8 +122,7 @@
         var refID = data.parent === '#' ? '' : data.parent;
         var ps = data.position;
         var postURL = {/literal}"{crmURL p='civicrm/ajax/menutree' h=0 q='key='}{crmKey name='civicrm/ajax/menutree'}"{literal};
-        CRM.status({}, $.get( postURL + '&type=move&id=' +  nodeID + '&ref_id=' + refID + '&ps='+ps));
-        $("#reset-menu").show();
+        CRM.status({}, $.get( postURL + '&type=move&id=' +  nodeID + '&ref_id=' + refID + '&ps='+ps).then(refreshMenubar));
       });
 
       function editForm(menu) {
@@ -138,7 +136,7 @@
         }
         CRM.loadForm(CRM.url('civicrm/admin/menu', args)).on('crmFormSuccess', function() {
           $("#navigation-tree").jstree(true).refresh();
-          $("#reset-menu").show();
+          refreshMenubar();
         });
       }
 
@@ -146,7 +144,7 @@
         .on('click', CRM.popup)
         .on('crmPopupFormSuccess', function() {
           $("#navigation-tree").jstree(true).refresh();
-          $("#reset-menu").show();
+          refreshMenubar();
         });
 
       $('a.nav-reset').on('click', function(e) {
@@ -158,13 +156,20 @@
           .on('crmConfirm:yes', function() {
             $('#crm-container').block();
             CRM.api3('Navigation', 'reset', {'for': 'report'}, true)
-              .done(function() {
+              .then(function() {
                 $('#crm-container').unblock();
                 $("#navigation-tree").jstree(true).refresh();
-                $("#reset-menu").show();
-              })
+                refreshMenubar();
+              });
           });
       });
+
+      // Force-refresh the menubar by resetting the cache code
+      function refreshMenubar() {
+        CRM.menubar.destroy();
+        CRM.menubar.cacheCode = Math.random();
+        CRM.menubar.initialize();
+      }
     });
 </script>
 {/literal}

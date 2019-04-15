@@ -6,14 +6,14 @@
  *   API result array
  */
 function profile_get_example() {
-  $params = array(
-    'profile_id' => array(
+  $params = [
+    'profile_id' => [
       '0' => 15,
       '1' => 1,
       '2' => 'Billing',
-    ),
+    ],
     'contact_id' => 3,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Profile', 'get', $params);
@@ -23,12 +23,12 @@ function profile_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -42,12 +42,12 @@ function profile_get_example() {
  */
 function profile_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 3,
-    'values' => array(
-      '15' => array(
+    'values' => [
+      '15' => [
         'postal_code-1' => '90210',
         'state_province-1' => '1021',
         'country-1' => '1228',
@@ -56,8 +56,8 @@ function profile_get_expectedresult() {
         'last_name' => 'xyz1',
         'first_name' => 'abc1',
         'email-primary' => 'abc1.xyz1@yahoo.com',
-      ),
-      '1' => array(
+      ],
+      '1' => [
         'first_name' => 'abc1',
         'last_name' => 'xyz1',
         'street_address-1' => '5 Saint Helier St',
@@ -65,8 +65,8 @@ function profile_get_expectedresult() {
         'postal_code-1' => '90210',
         'country-1' => '1228',
         'state_province-1' => '1021',
-      ),
-      'Billing' => array(
+      ],
+      'Billing' => [
         'billing_first_name' => 'abc1',
         'billing_middle_name' => 'J.',
         'billing_last_name' => 'xyz1',
@@ -77,9 +77,9 @@ function profile_get_expectedresult() {
         'billing_postal_code-5' => '90210',
         'billing-email-5' => 'abc1.xyz1@yahoo.com',
         'email-5' => 'abc1.xyz1@yahoo.com',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

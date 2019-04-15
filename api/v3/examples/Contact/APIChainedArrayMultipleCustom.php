@@ -8,14 +8,14 @@
  *   API result array
  */
 function contact_get_example() {
-  $params = array(
+  $params = [
     'id' => 3,
-    'api.website.getValue' => array(
+    'api.website.getValue' => [
       'return' => 'url',
-    ),
-    'api.Contribution.getCount' => array(),
+    ],
+    'api.Contribution.getCount' => [],
     'api.CustomValue.get' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Contact', 'get', $params);
@@ -25,12 +25,12 @@ function contact_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -44,13 +44,13 @@ function contact_get_example() {
  */
 function contact_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 3,
-    'values' => array(
-      '3' => array(
+    'values' => [
+      '3' => [
         'contact_id' => '3',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
@@ -121,67 +121,67 @@ function contact_get_expectedresult() {
         'id' => '3',
         'api.website.getValue' => 'http://civicrm.org',
         'api.Contribution.getCount' => 2,
-        'api.CustomValue.get' => array(
+        'api.CustomValue.get' => [
           'is_error' => 0,
           'version' => 3,
           'count' => 7,
-          'values' => array(
-            '0' => array(
+          'values' => [
+            '0' => [
               'entity_id' => '3',
               'entity_table' => 'Contact',
               'latest' => 'value 4',
               'id' => '1',
-            ),
-            '1' => array(
+            ],
+            '1' => [
               'entity_id' => '3',
               'entity_table' => 'Contact',
               'latest' => 'value 3',
               'id' => '2',
               '1' => 'value 2',
               '2' => 'value 3',
-            ),
-            '2' => array(
+            ],
+            '2' => [
               'entity_id' => '3',
               'entity_table' => 'Contact',
               'latest' => '',
               'id' => '3',
               '1' => 'warm beer',
               '2' => '',
-            ),
-            '3' => array(
+            ],
+            '3' => [
               'entity_id' => '3',
               'entity_table' => 'Contact',
               'latest' => '',
               'id' => '4',
               '1' => '',
               '2' => '',
-            ),
-            '4' => array(
+            ],
+            '4' => [
               'entity_id' => '3',
               'entity_table' => 'Contact',
               'latest' => 'defaultValue',
               'id' => '5',
               '1' => 'defaultValue',
-            ),
-            '5' => array(
+            ],
+            '5' => [
               'entity_id' => '3',
               'entity_table' => 'Contact',
               'latest' => 'vegemite',
               'id' => '6',
               '1' => 'vegemite',
-            ),
-            '6' => array(
+            ],
+            '6' => [
               'entity_id' => '3',
               'entity_table' => 'Contact',
               'latest' => '',
               'id' => '7',
               '1' => '',
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
+            ],
+          ],
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

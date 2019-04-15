@@ -6,11 +6,11 @@
  *   API result array
  */
 function uf_join_get_example() {
-  $params = array(
+  $params = [
     'entity_table' => 'civicrm_contribution_page',
     'entity_id' => 1,
     'sequential' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('UFJoin', 'get', $params);
@@ -20,12 +20,12 @@ function uf_join_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -39,13 +39,13 @@ function uf_join_get_example() {
  */
 function uf_join_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '0' => array(
+    'values' => [
+      '0' => [
         'id' => '1',
         'is_active' => '1',
         'module' => 'CiviContribute',
@@ -53,9 +53,9 @@ function uf_join_get_expectedresult() {
         'entity_id' => '1',
         'weight' => '1',
         'uf_group_id' => '11',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

@@ -71,7 +71,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     );
 
     //retrieve event information
-    $params = array('id' => $this->_id);
+    $params = ['id' => $this->_id];
     CRM_Event_BAO_Event::retrieve($params, $values['event']);
 
     if (!$values['event']['is_active']) {
@@ -178,7 +178,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
       }
     }
 
-    $params = array('entity_id' => $this->_id, 'entity_table' => 'civicrm_event');
+    $params = ['entity_id' => $this->_id, 'entity_table' => 'civicrm_event'];
     $values['location'] = CRM_Core_BAO_Location::getValues($params, TRUE);
 
     // fix phone type labels
@@ -223,14 +223,14 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
         }
       }
 
-      $center = array(
+      $center = [
         'lat' => (float ) $sumLat / count($locations),
         'lng' => (float ) $sumLng / count($locations),
-      );
-      $span = array(
+      ];
+      $span = [
         'lat' => (float ) ($maxLat - $minLat),
         'lng' => (float ) ($maxLng - $minLng),
-      );
+      ];
       $this->assign_by_ref('center', $center);
       $this->assign_by_ref('span', $span);
       if ($action == CRM_Core_Action::PREVIEW) {
@@ -317,11 +317,11 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
     $this->assign('allowRegistration', $allowRegistration);
 
     $session = CRM_Core_Session::singleton();
-    $params = array(
+    $params = [
       'contact_id' => $session->get('userID'),
       'event_id' => CRM_Utils_Array::value('id', $values['event']),
       'role_id' => CRM_Utils_Array::value('default_role_id', $values['event']),
-    );
+    ];
 
     if ($eventFullMessage && ($noFullMsg == 'false') || CRM_Event_BAO_Event::checkRegistration($params)) {
       $statusMessage = $eventFullMessage;
@@ -334,7 +334,7 @@ class CRM_Event_Page_EventInfo extends CRM_Core_Page {
             $registerUrl = CRM_Utils_System::url('civicrm/event/register',
               "reset=1&id={$values['event']['id']}&cid=0"
             );
-            $statusMessage = ts("It looks like you are already registered for this event. If you want to change your registration, or you feel that you've gotten this message in error, please contact the site administrator.") . ' ' . ts('You can also <a href="%1">register another participant</a>.', array(1 => $registerUrl));
+            $statusMessage = ts("It looks like you are already registered for this event. If you want to change your registration, or you feel that you've gotten this message in error, please contact the site administrator.") . ' ' . ts('You can also <a href="%1">register another participant</a>.', [1 => $registerUrl]);
           }
         }
       }

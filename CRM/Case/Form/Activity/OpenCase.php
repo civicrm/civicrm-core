@@ -93,7 +93,7 @@ class CRM_Case_Form_Activity_OpenCase {
    * @return array $defaults
    */
   public static function setDefaultValues(&$form) {
-    $defaults = array();
+    $defaults = [];
     if ($form->_context == 'caseActivity') {
       return $defaults;
     }
@@ -107,7 +107,8 @@ class CRM_Case_Form_Activity_OpenCase {
     else {
       $caseStatus = CRM_Core_OptionGroup::values('case_status', FALSE, FALSE, FALSE, 'AND is_default = 1');
       if (count($caseStatus) == 1) {
-        $caseStatus = key($caseStatus); //$defaults['status_id'] = key($caseStatus);
+        //$defaults['status_id'] = key($caseStatus);
+        $caseStatus = key($caseStatus);
       }
     }
     $defaults['status_id'] = $caseStatus;
@@ -152,25 +153,25 @@ class CRM_Case_Form_Activity_OpenCase {
       return;
     }
     if ($form->_context == 'standalone') {
-      $form->addEntityRef('client_id', ts('Client'), array(
-          'create' => TRUE,
-          'multiple' => $form->_allowMultiClient,
-        ), TRUE);
+      $form->addEntityRef('client_id', ts('Client'), [
+        'create' => TRUE,
+        'multiple' => $form->_allowMultiClient,
+      ], TRUE);
     }
 
-    $element = $form->addField('case_type_id', array(
+    $element = $form->addField('case_type_id', [
       'context' => 'create',
       'entity' => 'Case',
       'onchange' => "CRM.buildCustomData('Case', this.value);",
-    ), TRUE);
+    ], TRUE);
     if ($form->_caseTypeId) {
       $element->freeze();
     }
 
-    $csElement = $form->addField('status_id', array(
+    $csElement = $form->addField('status_id', [
       'context' => 'create',
       'entity' => 'Case',
-    ), TRUE);
+    ], TRUE);
     if ($form->_caseStatusId) {
       $csElement->freeze();
     }
@@ -185,30 +186,31 @@ class CRM_Case_Form_Activity_OpenCase {
 
     $form->add('datepicker', 'start_date', ts('Case Start Date'), [], TRUE);
 
-    $form->addField('medium_id', array('entity' => 'activity', 'context' => 'create'), TRUE);
+    $form->addField('medium_id', ['entity' => 'activity', 'context' => 'create'], TRUE);
 
     // calling this field activity_location to prevent conflict with contact location fields
     $form->add('text', 'activity_location', ts('Location'), CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity', 'location'));
 
-    $form->add('wysiwyg', 'activity_details', ts('Details'), array('rows' => 4, 'cols' => 60), FALSE);
+    $form->add('wysiwyg', 'activity_details', ts('Details'), ['rows' => 4, 'cols' => 60], FALSE);
 
-    $form->addButtons(array(
-        array(
-          'type' => 'upload',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'upload',
-          'name' => ts('Save and New'),
-          'subName' => 'new',
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $form->addButtons([
+      [
+        'type' => 'upload',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+        'submitOnce' => TRUE,
+      ],
+      [
+        'type' => 'upload',
+        'name' => ts('Save and New'),
+        'subName' => 'new',
+        'submitOnce' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
@@ -255,7 +257,7 @@ class CRM_Case_Form_Activity_OpenCase {
       return TRUE;
     }
 
-    $errors = array();
+    $errors = [];
     return $errors;
   }
 
@@ -292,25 +294,25 @@ class CRM_Case_Form_Activity_OpenCase {
         if (empty($cliId)) {
           CRM_Core_Error::fatal('client_id cannot be empty');
         }
-        $contactParams = array(
+        $contactParams = [
           'case_id' => $params['case_id'],
           'contact_id' => $cliId,
-        );
+        ];
         CRM_Case_BAO_CaseContact::create($contactParams);
       }
     }
     else {
-      $contactParams = array(
+      $contactParams = [
         'case_id' => $params['case_id'],
         'contact_id' => $form->_currentlyViewedContactId,
-      );
+      ];
       CRM_Case_BAO_CaseContact::create($contactParams);
     }
 
     // 2. initiate xml processor
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
 
-    $xmlProcessorParams = array(
+    $xmlProcessorParams = [
       'clientID' => $form->_currentlyViewedContactId,
       'creatorID' => $form->_currentUserId,
       'standardTimeline' => 1,
@@ -323,7 +325,7 @@ class CRM_Case_Form_Activity_OpenCase {
       'medium_id' => $params['medium_id'],
       'details' => $params['activity_details'],
       'relationship_end_date' => CRM_Utils_Array::value('end_date', $params),
-    );
+    ];
 
     if (array_key_exists('custom', $params) && is_array($params['custom'])) {
       $xmlProcessorParams['custom'] = $params['custom'];
