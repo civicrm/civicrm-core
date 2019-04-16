@@ -1830,7 +1830,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           CRM_Core_BAO_File::deleteFileReferences($fileIds[$mainId], $mainId, $customId);
         }
       }
-      $dao->free();
 
       // move the other contact's file to main contact
       //NYSS need to INSERT or UPDATE depending on whether main contact has an existing record

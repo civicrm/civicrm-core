@@ -245,8 +245,6 @@ UPDATE civicrm_dedupe_rule_group
     $ruleDao = new CRM_Dedupe_DAO_Rule();
     $ruleDao->dedupe_rule_group_id = $rgDao->id;
     $ruleDao->delete();
-    $ruleDao->free();
-
     $substrLenghts = [];
 
     $tables = [];
@@ -267,7 +265,6 @@ UPDATE civicrm_dedupe_rule_group
         $ruleDao->rule_length = $length;
         $ruleDao->rule_weight = $weight;
         $ruleDao->save();
-        $ruleDao->free();
 
         if (!array_key_exists($table, $tables)) {
           $tables[$table] = [];

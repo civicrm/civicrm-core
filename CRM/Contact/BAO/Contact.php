@@ -2945,7 +2945,6 @@ AND       civicrm_openid.is_primary = 1";
       while ($blockDAO->fetch()) {
         $locBlockIds[$name][] = $blockDAO->id;
       }
-      $blockDAO->free();
     }
 
     return $locBlockIds;
@@ -3556,7 +3555,6 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
       }
     }
     CRM_Utils_Hook::post('delete', $type, $id, $obj);
-    $obj->free();
     return TRUE;
   }
 

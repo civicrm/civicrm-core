@@ -97,7 +97,6 @@ LEFT JOIN civicrm_email      ON contact_a.id = civicrm_email.contact_id
       if ($dao->fetch()) {
         $contact_id = $dao->contact_id;
       }
-      $dao->free();
     }
 
     $transaction = new CRM_Core_Transaction();
@@ -343,7 +342,6 @@ SELECT     civicrm_email.id as email_id
       ];
     }
 
-    $dao->free();
     return $groups;
   }
 

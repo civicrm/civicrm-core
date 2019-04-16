@@ -453,7 +453,6 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
           $this->_contactIds[] = $householdsDAO->household_id;
         }
       }
-      $householdsDAO->free();
     }
 
     // If contact list has changed, households will probably be at the end of
