@@ -373,11 +373,9 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     $contactsFetchedFromBufferedQuery = $dao->fetchAll();
-    $dao->free();
 
     $dao = CRM_Core_DAO::executeUnbufferedQuery($sql);
     $contactsFetchedFromUnbufferedQuery = $dao->fetchAll();
-    $dao->free();
 
     $this->checkArrayEquals($contactsFetchedFromBufferedQuery, $contactsFetchedFromUnbufferedQuery);
   }

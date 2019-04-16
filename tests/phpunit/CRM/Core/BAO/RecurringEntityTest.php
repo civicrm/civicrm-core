@@ -298,7 +298,6 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $daoRecurEvent->id = $generatedEntities['civicrm_event'][$key];
     if ($daoRecurEvent->find(TRUE)) {
       $daoRecurEvent->delete();
-      $daoRecurEvent->free();
     }
 
     //Check if this event_id was deleted
