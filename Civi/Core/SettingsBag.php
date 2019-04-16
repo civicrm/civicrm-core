@@ -392,7 +392,6 @@ class SettingsBag {
       // to save the field `group_name`, which is required in older schema.
       \CRM_Core_DAO::executeQuery(\CRM_Utils_SQL_Insert::dao($dao)->toSQL());
     }
-    $dao->free();
   }
 
 }

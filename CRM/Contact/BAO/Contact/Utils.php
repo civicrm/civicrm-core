@@ -374,7 +374,6 @@ UNION
         $ids['relationship'] = $relationship->id;
         CRM_Contact_BAO_Relationship::setIsActive($relationship->id, TRUE);
       }
-      $relationship->free();
     }
 
     //need to handle related meberships. CRM-3792
@@ -457,7 +456,6 @@ WHERE id={$contactId}; ";
             CRM_Core_Action::DELETE
           );
         }
-        $relationship->free();
       }
     }
   }
@@ -799,7 +797,6 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
           $contactDetails[$contact->componentId][$property] = $contact->$property;
         }
       }
-      $contact->free();
     }
 
     return $contactDetails;

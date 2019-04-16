@@ -617,7 +617,6 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
     while ($dao->fetch()) {
       $contactIds[] = $dao->cid;
     }
-    $dao->free();
     $this->setPager();
 
     $relationshipRows = [];
@@ -732,7 +731,6 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
       }
       $rows[$dao->civicrm_contact_id]['aggregate_amount'] += $dao->civicrm_contribution_total_amount;
     }
-    $dao->free();
     return $rows;
   }
 
@@ -776,7 +774,6 @@ class CRM_Report_Form_Contribute_History extends CRM_Report_Form {
         $relatedContactIds[$dao->contact_id_a] = $dao->contact_id_a;
       }
     }
-    $dao->free();
     return [$relationshipRows, $relatedContactIds];
   }
 

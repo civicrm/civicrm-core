@@ -2237,7 +2237,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     while ($dao->fetch()) {
       $customFields[$dao->table_name . '_custom_' . $dao->id] = $dao->id;
     }
-    $dao->free();
 
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {

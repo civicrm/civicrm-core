@@ -1112,7 +1112,6 @@ WHERE  id IN $groupIdString
         ];
       }
     }
-    $dao->free();
 
     $hierarchy = [];
     for ($i = 0; $i < count($roots); $i++) {

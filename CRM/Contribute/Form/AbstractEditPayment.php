@@ -343,7 +343,6 @@ WHERE  contribution_id = {$id}
       $this->_premiumID = $dao->id;
       $this->_productDAO = $dao;
     }
-    $dao->free();
   }
 
   /**

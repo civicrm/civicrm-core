@@ -56,7 +56,6 @@ class CRM_Mailing_Event_BAO_Delivered extends CRM_Mailing_Event_DAO_Delivered {
     if (!$q) {
       return NULL;
     }
-    $q->free();
 
     $delivered = new CRM_Mailing_Event_BAO_Delivered();
     $delivered->time_stamp = date('YmdHis');
