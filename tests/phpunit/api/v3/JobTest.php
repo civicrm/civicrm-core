@@ -2010,4 +2010,40 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertEquals(array_search('Expired', $memStatus), $membership['status_id']);
   }
 
+  /**
+   * Test procesing membership where is_override is set to 0 rather than NULL
+   */
+  public function testProcessMembershipIsOverrideNotNullNot1either() {
+    $membershipTypeId = $this->membershipTypeCreate();
+
+    // Create admin-only membership status and get all statuses.
+    $result = $this->callAPISuccess('membership_status', 'create', ['name' => 'Admin', 'is_admin' => 1, 'sequential' => 1]);
+    $membershipStatusIdAdmin = $result['values'][0]['id'];
+    $memStatus = CRM_Member_PseudoConstant::membershipStatus();
+
+    // Default params, which we'll expand on below.
+    $params = [
+      'membership_type_id' => $membershipTypeId,
+      // Don't calculate status.
+      'skipStatusCal' => 1,
+      'source' => 'Test',
+      'sequential' => 1,
+    ];
+
+    // Create membership with incorrect status but dates implying status Current.
+    $params['contact_id'] = $this->individualCreate();
+    $params['join_date'] = date('Y-m-d', strtotime('now - 6 month'));
+    $params['start_date'] = date('Y-m-d', strtotime('now - 6 month'));
+    $params['end_date'] = date('Y-m-d', strtotime('now + 6 month'));
+    // Intentionally incorrect status.
+    $params['status_id'] = 'New';
+    $resultCurrent = $this->callAPISuccess('Membership', 'create', $params);
+    // Ensure that is_override is set to 0 by doing through DB given API not seem to accept id
+    CRM_Core_DAO::executeQuery("Update civicrm_membership SET is_override = 0 WHERE id = %1", [1 => [$resultCurrent['id'], 'Positive']]);
+    $this->assertEquals(array_search('New', $memStatus), $resultCurrent['values'][0]['status_id']);
+    $jobResult = $this->callAPISuccess('Job', 'process_membership', []);
+    $this->assertEquals('Processed 1 membership records. Updated 1 records.', $jobResult['values']);
+    $this->assertEquals(array_search('Current', $memStatus), $this->callAPISuccess('Membership', 'get', ['id' => $resultCurrent['id']])['values'][$resultCurrent['id']]['status_id']);
+  }
+
 }
