@@ -940,6 +940,9 @@ if (!CRM.vars) CRM.vars = {};
             $(this).button('option', 'icons', {primary: 'fa-expand'});
           } else {
             var menuHeight = $('#civicrm-menu').outerHeight();
+            if ($('body').hasClass('crm-menubar-below-cms-menu')) {
+              menuHeight += $('#civicrm-menu').offset().top;
+            }
             $el.data('origSize', {
               position: {my: 'center', at: 'center center+' + (menuHeight / 2), of: window},
               width: $el.dialog('option', 'width'),
