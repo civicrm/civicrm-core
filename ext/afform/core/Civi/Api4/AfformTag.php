@@ -3,6 +3,7 @@ namespace Civi\Api4;
 
 use Civi\Api4\Generic\AbstractEntity;
 use Civi\Api4\Generic\BasicGetAction;
+use Civi\Api4\Generic\BasicGetFieldsAction;
 
 /**
  * Class AfformTag
@@ -27,6 +28,19 @@ class AfformTag extends AbstractEntity {
         [
           'name' => 'afl-contact-email',
           'attrs' => ['contact-id', 'afl-label'],
+        ],
+      ];
+    });
+  }
+
+  public static function getFields() {
+    return new BasicGetFieldsAction('Afform', __FUNCTION__, function() {
+      return [
+        [
+          'name' => 'name',
+        ],
+        [
+          'name' => 'attrs',
         ],
       ];
     });

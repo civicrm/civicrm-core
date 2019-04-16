@@ -5,6 +5,7 @@ namespace Civi\Api4;
 use Civi\Api4\Generic\AbstractEntity;
 use Civi\Api4\Generic\BasicBatchAction;
 use Civi\Api4\Generic\BasicGetAction;
+use Civi\Api4\Generic\BasicGetFieldsAction;
 use Civi\Api4\Generic\BasicUpdateAction;
 
 /**
@@ -131,6 +132,35 @@ class Afform extends AbstractEntity {
       return $updates;
     };
     return new BasicUpdateAction('Afform', __FUNCTION__, $save, 'name');
+  }
+
+  public static function getFields() {
+    return new BasicGetFieldsAction('Afform', __FUNCTION__, function() {
+      return [
+        [
+          'name' => 'name',
+        ],
+        [
+          'name' => 'requires',
+        ],
+        [
+          'name' => 'title',
+        ],
+        [
+          'name' => 'description',
+        ],
+        [
+          'name' => 'is_public',
+          'data_type' => 'Boolean',
+        ],
+        [
+          'name' => 'server_route',
+        ],
+        [
+          'name' => 'layout',
+        ],
+      ];
+    });
   }
 
   /**

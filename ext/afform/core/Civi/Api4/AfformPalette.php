@@ -4,6 +4,7 @@ namespace Civi\Api4;
 
 use Civi\Api4\Generic\AbstractEntity;
 use Civi\Api4\Generic\BasicGetAction;
+use Civi\Api4\Generic\BasicGetFieldsAction;
 
 /**
  * Class AfformPalette
@@ -28,6 +29,25 @@ class AfformPalette extends AbstractEntity {
           'entity' => 'Parent',
           'title' => 'Address',
           'template' => '<afl-address contact-id="entities.parent.id" afl-label="Address"/>',
+        ],
+      ];
+    });
+  }
+
+  public static function getFields() {
+    return new BasicGetFieldsAction('Afform', __FUNCTION__, function() {
+      return [
+        [
+          'name' => 'id',
+        ],
+        [
+          'name' => 'entity',
+        ],
+        [
+          'name' => 'title',
+        ],
+        [
+          'name' => 'template',
         ],
       ];
     });
