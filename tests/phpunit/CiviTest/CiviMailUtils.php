@@ -165,7 +165,6 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       if ($dao->fetch()) {
         $msg = $dao->headers . "\n\n" . $dao->body;
       }
-      $dao->free();
     }
 
     switch ($type) {
@@ -198,7 +197,6 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       while ($dao->fetch()) {
         $msgs[] = $dao->headers . "\n\n" . $dao->body;
       }
-      $dao->free();
     }
 
     switch ($type) {
