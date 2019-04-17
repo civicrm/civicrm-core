@@ -542,7 +542,7 @@ AND    $cond
     }
 
     if (!isset($params['entityID']) || !CRM_Utils_Type::validate($params['entityID'], 'Integer', FALSE)) {
-      return CRM_Core_Error::createAPIError(ts('entityID needs to be set and of type Integer'));
+      return CRM_Core_Error::createAPIError(ts('entity_id needs to be set and of type Integer'));
     }
 
     // first collect all the id/value pairs. The format is:
