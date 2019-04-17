@@ -77,7 +77,7 @@ class CRM_Mailing_Event_DAO_Bounce extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'event_queue_id', 'civicrm_mailing_event_queue', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -97,6 +97,7 @@ class CRM_Mailing_Event_DAO_Bounce extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Bounce ID'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_bounce.id',
           'table_name' => 'civicrm_mailing_event_bounce',
           'entity' => 'Bounce',
           'bao' => 'CRM_Mailing_Event_BAO_Bounce',
@@ -108,6 +109,7 @@ class CRM_Mailing_Event_DAO_Bounce extends CRM_Core_DAO {
           'title' => ts('Event Queue'),
           'description' => ts('FK to EventQueue'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_bounce.event_queue_id',
           'table_name' => 'civicrm_mailing_event_bounce',
           'entity' => 'Bounce',
           'bao' => 'CRM_Mailing_Event_BAO_Bounce',
@@ -119,6 +121,7 @@ class CRM_Mailing_Event_DAO_Bounce extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Bounce Type'),
           'description' => ts('What type of bounce was it?'),
+          'where' => 'civicrm_mailing_event_bounce.bounce_type_id',
           'table_name' => 'civicrm_mailing_event_bounce',
           'entity' => 'Bounce',
           'bao' => 'CRM_Mailing_Event_BAO_Bounce',
@@ -139,6 +142,7 @@ class CRM_Mailing_Event_DAO_Bounce extends CRM_Core_DAO {
           'description' => ts('The reason the email bounced.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_mailing_event_bounce.bounce_reason',
           'table_name' => 'civicrm_mailing_event_bounce',
           'entity' => 'Bounce',
           'bao' => 'CRM_Mailing_Event_BAO_Bounce',
@@ -150,6 +154,7 @@ class CRM_Mailing_Event_DAO_Bounce extends CRM_Core_DAO {
           'title' => ts('Timestamp'),
           'description' => ts('When this bounce event occurred.'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_bounce.time_stamp',
           'default' => 'CURRENT_TIMESTAMP',
           'table_name' => 'civicrm_mailing_event_bounce',
           'entity' => 'Bounce',

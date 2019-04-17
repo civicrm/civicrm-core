@@ -63,7 +63,7 @@ class CRM_Mailing_Event_DAO_Confirm extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'event_subscribe_id', 'civicrm_mailing_event_subscribe', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -83,6 +83,7 @@ class CRM_Mailing_Event_DAO_Confirm extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Mailing Confirmation ID'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_confirm.id',
           'table_name' => 'civicrm_mailing_event_confirm',
           'entity' => 'Confirm',
           'bao' => 'CRM_Mailing_Event_BAO_Confirm',
@@ -94,6 +95,7 @@ class CRM_Mailing_Event_DAO_Confirm extends CRM_Core_DAO {
           'title' => ts('Mailing Subscribe ID'),
           'description' => ts('FK to civicrm_mailing_event_subscribe'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_confirm.event_subscribe_id',
           'table_name' => 'civicrm_mailing_event_confirm',
           'entity' => 'Confirm',
           'bao' => 'CRM_Mailing_Event_BAO_Confirm',
@@ -106,6 +108,7 @@ class CRM_Mailing_Event_DAO_Confirm extends CRM_Core_DAO {
           'title' => ts('Confirm Timestamp'),
           'description' => ts('When this confirmation event occurred.'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_confirm.time_stamp',
           'default' => 'CURRENT_TIMESTAMP',
           'table_name' => 'civicrm_mailing_event_confirm',
           'entity' => 'Confirm',
