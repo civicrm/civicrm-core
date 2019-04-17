@@ -1421,18 +1421,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         }
         break;
 
-      case 'Autocomplete-Select':
-        if ($customField->data_type == 'ContactReference') {
-          if (is_numeric($value)) {
-            $defaults[$elementName . '_id'] = $value;
-            $defaults[$elementName] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $value, 'sort_name');
-          }
-        }
-        else {
-          $defaults[$elementName] = $value;
-        }
-        break;
-
       default:
         $defaults[$elementName] = $value;
     }
