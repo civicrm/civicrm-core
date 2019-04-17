@@ -536,16 +536,17 @@ AND    $cond
    * @return array
    */
   public static function setValues(&$params) {
+    // For legacy reasons, accept this param in either format
+    if (empty($params['entityID']) && !empty($params['entity_id'])) {
+      $params['entityID'] = $params['entity_id'];
+    }
 
-    if (!isset($params['entityID']) ||
-      CRM_Utils_Type::escape($params['entityID'], 'Integer', FALSE) === NULL
-    ) {
+    if (!isset($params['entityID']) || !CRM_Utils_Type::validate($params['entityID'], 'Integer', FALSE)) {
       return CRM_Core_Error::createAPIError(ts('entityID needs to be set and of type Integer'));
     }
 
     // first collect all the id/value pairs. The format is:
     // custom_X => value or custom_X_VALUEID => value (for multiple values), VALUEID == -1, -2 etc for new insertions
-    $values = [];
     $fieldValues = [];
     foreach ($params as $n => $v) {
       if ($customFieldInfo = CRM_Core_BAO_CustomField::getKeyID($n, TRUE)) {
