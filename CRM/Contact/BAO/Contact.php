@@ -272,6 +272,10 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       return $contact;
     }
 
+    if (!empty($params['contact_id']) && empty($params['contact_type'])) {
+      $params['contact_type'] = self::getContactType($params['contact_id']);
+    }
+
     $isEdit = TRUE;
     if ($invokeHooks) {
       if (!empty($params['contact_id'])) {
