@@ -134,6 +134,7 @@ input#crm-qsearch-input {
   height: 30px;
   width: 30px;
   transition: width .5s .05s, background-color .3s .05s;
+  color: black;
 }
 a.highlighted #crm-qsearch-input,
 #crm-qsearch-input:focus,
