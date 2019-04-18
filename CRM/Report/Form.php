@@ -5631,7 +5631,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'type' => CRM_Utils_Type::T_INT,
         'no_display' => TRUE,
         'required' => TRUE,
-        'dbAlias' => '(address_civireport.street_number % 2)',
+        'dbAlias' => "({$tableAlias}_civireport.street_number % 2)",
         'is_fields' => TRUE,
         'is_order_bys' => TRUE,
       ],
