@@ -1086,6 +1086,7 @@ SELECT  id
    */
   public static function getAvailableFieldTitles() {
     $fields = self::getAvailableFieldsFlat();
+    $fields['formatting'] = ['title' => ts('Formatting')];
     return CRM_Utils_Array::collect('title', $fields);
   }
 
