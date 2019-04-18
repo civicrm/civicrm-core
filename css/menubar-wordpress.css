@@ -57,3 +57,8 @@
   }
 
 }
+
+/* Make admin bar hide behind popup windows */
+body.ui-dialog-open #adminmenuwrap {
+  z-index: 100 !important;
+}
