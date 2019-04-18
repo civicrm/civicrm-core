@@ -927,6 +927,7 @@ if (!CRM.vars) CRM.vars = {};
     })
     .on('dialogopen', function(e) {
       var $el = $(e.target);
+      $('body').addClass('ui-dialog-open');
       // Modal dialogs should disable scrollbars
       if ($el.dialog('option', 'modal')) {
         $el.addClass('modal-dialog');
@@ -943,6 +944,9 @@ if (!CRM.vars) CRM.vars = {};
             $(this).button('option', 'icons', {primary: 'fa-expand'});
           } else {
             var menuHeight = $('#civicrm-menu').outerHeight();
+            if ($('body').hasClass('crm-menubar-below-cms-menu')) {
+              menuHeight += $('#civicrm-menu').offset().top;
+            }
             $el.data('origSize', {
               position: {my: 'center', at: 'center center+' + (menuHeight / 2), of: window},
               width: $el.dialog('option', 'width'),
@@ -960,6 +964,9 @@ if (!CRM.vars) CRM.vars = {};
       // Restore scrollbars when closing modal
       if ($('.ui-dialog .modal-dialog:visible').not(e.target).length < 1) {
         $('body').css({overflow: ''});
+      }
+      if ($('.ui-dialog-content:visible').not(e.target).length < 1) {
+        $('body').removeClass('ui-dialog-open');
       }
     })
     .on('submit', function(e) {
