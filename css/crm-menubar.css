@@ -241,6 +241,10 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
     z-index: 99999;
   }
 
+  body.crm-menubar-above-crm-container #civicrm-menu {
+    z-index: 100;
+  }
+
   body.crm-menubar-hidden #civicrm-menu {
     display: none;
   }
