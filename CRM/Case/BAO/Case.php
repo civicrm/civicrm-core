@@ -479,6 +479,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       ) AS upcomingOrdered
     ) AS act
 ) AS t_act
+    ON t_act.case_id = civicrm_case.id
 ";
     }
     elseif ($type == 'recent') {
@@ -495,21 +496,18 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       ORDER BY activity_date_time DESC, id ASC
       ) AS recentOrdered
     ) AS act
-) AS t_act ";
+) AS t_act
+    ON t_act.case_id = civicrm_case.id ";
     }
     elseif ($type == 'any') {
-      $query .= " LEFT JOIN
-(
-  SELECT ca4.case_id, act4.id AS id, act4.activity_date_time AS desired_date, act4.activity_type_id, act4.status_id
-  FROM civicrm_activity act4
-  LEFT JOIN civicrm_case_activity ca4
-    ON ca4.activity_id = act4.id
-    AND act4.is_current_revision = 1
-) AS t_act";
+      $query .= " LEFT JOIN civicrm_case_activity ca4
+    ON civicrm_case.id = ca4.case_id
+  LEFT JOIN civicrm_activity t_act
+    ON t_act.id = ca4.activity_id
+      AND t_act.is_current_revision = 1";
     }
 
     $query .= "
-        ON t_act.case_id = civicrm_case.id
  LEFT JOIN civicrm_phone ON (civicrm_phone.contact_id = civicrm_contact.id AND civicrm_phone.is_primary=1)
  LEFT JOIN civicrm_relationship case_relationship
  ON ( case_relationship.contact_id_a = civicrm_case_contact.contact_id AND case_relationship.contact_id_b = {$userID} AND case_relationship.is_active AND case_relationship.case_id = civicrm_case.id )
