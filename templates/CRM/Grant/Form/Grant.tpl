@@ -97,27 +97,11 @@
       </tr>
   </table>
 
-        <div id="customData" class="crm-grant-form-block-custom_data"></div>
-        {*include custom data js file*}
-        {include file="CRM/common/customData.tpl"}
+  {include file="CRM/common/customDataBlock.tpl"}
 
-{literal}
-<script type="text/javascript">
-    CRM.$(function($) {
-        {/literal}
-        CRM.buildCustomData( '{$customDataType}' );
-        {if $customDataSubType}
-        CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-        {/if}
-        {literal}
-    });
-
-</script>
-{/literal}
-
- <div class="crm-grant-form-block-attachment">
-     {include file="CRM/Form/attachment.tpl"}
- </div>
+  <div class="crm-grant-form-block-attachment">
+    {include file="CRM/Form/attachment.tpl"}
+  </div>
 
    {/if}
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

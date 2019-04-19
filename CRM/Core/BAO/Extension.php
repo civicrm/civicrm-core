@@ -82,10 +82,10 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    */
   public static function setSchemaVersion($fullName, $schemaVersion) {
     $sql = 'UPDATE civicrm_extension SET schema_version = %1 WHERE full_name = %2';
-    $params = array(
-      1 => array($schemaVersion, 'String'),
-      2 => array($fullName, 'String'),
-    );
+    $params = [
+      1 => [$schemaVersion, 'String'],
+      2 => [$fullName, 'String'],
+    ];
     return CRM_Core_DAO::executeQuery($sql, $params);
   }
 
@@ -98,9 +98,9 @@ class CRM_Core_BAO_Extension extends CRM_Core_DAO_Extension {
    */
   public static function getSchemaVersion($fullName) {
     $sql = 'SELECT schema_version FROM civicrm_extension WHERE full_name = %1';
-    $params = array(
-      1 => array($fullName, 'String'),
-    );
+    $params = [
+      1 => [$fullName, 'String'],
+    ];
     return CRM_Core_DAO::singleValueQuery($sql, $params);
   }
 

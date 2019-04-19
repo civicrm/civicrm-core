@@ -12,6 +12,7 @@ return array(
     'decc78cc4436b1292c6c0d151b19445c' => $vendorDir . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
     '3919eeb97e98d4648304477f8ef734ba' => $vendorDir . '/phpseclib/phpseclib/phpseclib/Crypt/Random.php',
     '5636a0a89fc28f9cfa8624493b142015' => $vendorDir . '/civicrm/civicrm-setup/civicrm-setup-autoload.php',
+    '2cffec82183ee1cea088009cef9a6fc3' => $vendorDir . '/ezyang/htmlpurifier/library/HTMLPurifier.composer.php',
     '37a3dc5111fe8f707ab4c132ef1dbc62' => $vendorDir . '/guzzlehttp/guzzle/src/functions_include.php',
     'def43f6c87e4f8dfd0c9e1b1bab14fe8' => $vendorDir . '/symfony/polyfill-iconv/bootstrap.php',
 );

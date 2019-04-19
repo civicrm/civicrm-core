@@ -1,6 +1,7 @@
 <?php
 
 require_once 'api4.civix.php';
+require_once 'api/Exception.php';
 
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -10,21 +11,39 @@ use Symfony\Component\Config\FileLocator;
 /**
  * Procedural wrapper for the OO api version 4.
  *
- * @param $entity
- * @param $action
+ * @param string $entity
+ * @param string $action
  * @param array $params
+ * @param string|int $index
+ *   If $index is a string, the results array will be indexed by that key.
+ *   If $index is an integer, only the result at that index will be returned.
  *
  * @return \Civi\Api4\Generic\Result
+ * @throws \API_Exception
+ * @throws \Civi\API\Exception\NotImplementedException
  */
-function civicrm_api4($entity, $action, $params = []) {
-  $params['version'] = 4;
-  // For custom pseudo-entities
-  if (strpos($entity, 'Custom_') === 0) {
-    $params['customGroup'] = substr($entity, 7);
-    $entity = 'CustomValue';
+function civicrm_api4($entity, $action, $params = [], $index = NULL) {
+  $apiCall = \Civi\Api4\Utils\ActionUtil::getAction($entity, $action);
+  foreach ($params as $name => $param) {
+    $setter = 'set' . ucfirst($name);
+    $apiCall->$setter($param);
   }
-  $request = \Civi\API\Request::create($entity, $action, $params);
-  return \Civi::service('civi_api_kernel')->runRequest($request);
+  $result = $apiCall->execute();
+
+  // Index results by key
+  if ($index && is_string($index) && !CRM_Utils_Rule::integer($index)) {
+    $result->indexBy($index);
+  }
+  // Return result at index
+  if (CRM_Utils_Rule::integer($index)) {
+    $item = $result->itemAt($index);
+    if (is_null($item)) {
+      throw new \API_Exception("Index $index not found in api results");
+    }
+    $result->exchangeArray($item);
+
+  }
+  return $result;
 }
 
 /**

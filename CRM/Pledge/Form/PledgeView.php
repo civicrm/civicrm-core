@@ -41,14 +41,14 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
    */
   public function preProcess() {
 
-    $values = $ids = array();
-    $params = array('id' => $this->get('id'));
+    $values = $ids = [];
+    $params = ['id' => $this->get('id')];
     CRM_Pledge_BAO_Pledge::getValues($params,
       $values,
       $ids
     );
 
-    $values['frequencyUnit'] = ts('%1(s)', array(1 => $values['frequency_unit']));
+    $values['frequencyUnit'] = ts('%1(s)', [1 => $values['frequency_unit']]);
 
     if (isset($values["honor_contact_id"]) && $values["honor_contact_id"]) {
       $sql = "SELECT display_name FROM civicrm_contact WHERE id = " . $values["honor_contact_id"];
@@ -80,7 +80,7 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
       "action=view&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
     );
 
-    $recentOther = array();
+    $recentOther = [];
     if (CRM_Core_Permission::checkActionPermission('CiviPledge', CRM_Core_Action::UPDATE)) {
       $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/pledge',
         "action=update&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
@@ -129,15 +129,14 @@ class CRM_Pledge_Form_PledgeView extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'next',
           'name' => ts('Done'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-      )
-    );
+        ],
+    ]);
   }
 
 }

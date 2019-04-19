@@ -957,6 +957,27 @@ function _civicrm_core_data(&$data, $enabled) {
     ),
   );
 
+  //FULL STREET ADDRESS SUPPLEMENTAL 3
+  $data['civicrm_address']['supplemental_address_3'] = array(
+    'title' => t('3rd Supplemental Street Address'),
+    'help' => t('3rd Supplemental Street Address such as Apartment or Suite Number or Department'),
+    'field' => array(
+      'handler' => 'civicrm_handler_field_address',
+      'click sortable' => TRUE,
+      'dao class' => 'CRM_Core_DAO_Address',
+    ),
+    'argument' => array(
+      'handler' => 'views_handler_argument_string',
+    ),
+    'filter' => array(
+      'handler' => 'views_handler_filter_string',
+      'allow empty' => TRUE,
+    ),
+    'sort' => array(
+      'handler' => 'views_handler_sort',
+    ),
+  );
+
   //CITY OR SUBURB THE ADDRESS IS AT
   $data['civicrm_address']['city'] = array(
     'title' => t('City / Suburb'),
@@ -1968,7 +1989,8 @@ function _civicrm_core_data(&$data, $enabled) {
       'click sortable' => TRUE,
       'pseudo class' => 'CRM_Core_PseudoConstant',
       'pseudo method' => 'activityType',
-      'pseudo args' => array(TRUE, TRUE), // Include cases (if CiviCase is enabled)
+      // Include cases (if CiviCase is enabled)
+      'pseudo args' => array(TRUE, TRUE),
     ),
     'argument' => array(
       'handler' => 'views_handler_argument',

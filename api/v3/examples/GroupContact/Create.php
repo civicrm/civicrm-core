@@ -6,11 +6,11 @@
  *   API result array
  */
 function group_contact_create_example() {
-  $params = array(
+  $params = [
     'contact_id' => 8,
     'contact_id.2' => 9,
     'group_id' => 11,
-  );
+  ];
 
   try{
     $result = civicrm_api3('GroupContact', 'create', $params);
@@ -20,12 +20,12 @@ function group_contact_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -39,7 +39,7 @@ function group_contact_create_example() {
  */
 function group_contact_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
@@ -47,7 +47,7 @@ function group_contact_create_expectedresult() {
     'total_count' => 2,
     'added' => 1,
     'not_added' => 1,
-  );
+  ];
 
   return $expectedResult;
 }

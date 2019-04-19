@@ -342,10 +342,8 @@
     <!-- end of PCP -->
 
   {if !$payNow}
-    <div id="customData" class="crm-contribution-form-block-customData"></div>
+    {include file="CRM/common/customDataBlock.tpl"}
   {/if}
-
-  {include file="CRM/Custom/Form/Edit.tpl"}
 
   {literal}
   <script type="text/javascript">

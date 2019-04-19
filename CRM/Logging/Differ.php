@@ -59,7 +59,7 @@ class CRM_Logging_Differ {
    * @return array
    */
   public function diffsInTables($tables) {
-    $diffs = array();
+    $diffs = [];
     foreach ($tables as $table) {
       $diff = $this->diffsInTable($table);
       if (!empty($diff)) {
@@ -76,18 +76,18 @@ class CRM_Logging_Differ {
    * @return array
    */
   public function diffsInTable($table, $contactID = NULL) {
-    $diffs = array();
+    $diffs = [];
 
-    $params = array(
-      1 => array($this->log_conn_id, 'String'),
-    );
+    $params = [
+      1 => [$this->log_conn_id, 'String'],
+    ];
 
     $logging = new CRM_Logging_Schema();
     $addressCustomTables = $logging->entityCustomDataLogTables('Address');
 
     $contactIdClause = $join = '';
     if ($contactID) {
-      $params[3] = array($contactID, 'Integer');
+      $params[3] = [$contactID, 'Integer'];
       switch ($table) {
         case 'civicrm_contact':
           $contactIdClause = "AND id = %3";
@@ -143,7 +143,7 @@ LEFT JOIN civicrm_activity_contact source ON source.activity_id = lt.id AND sour
 
     $logDateClause = '';
     if ($this->log_date) {
-      $params[2] = array($this->log_date, 'String');
+      $params[2] = [$this->log_date, 'String'];
       $logDateClause = "
         AND lt.log_date BETWEEN DATE_SUB(%2, INTERVAL {$this->interval}) AND DATE_ADD(%2, INTERVAL {$this->interval})
       ";
@@ -172,18 +172,18 @@ WHERE lt.log_conn_id = %1
    * @throws \CRM_Core_Exception
    */
   private function diffsInTableForId($table, $id) {
-    $diffs = array();
+    $diffs = [];
 
-    $params = array(
-      1 => array($this->log_conn_id, 'String'),
-      3 => array($id, 'Integer'),
-    );
+    $params = [
+      1 => [$this->log_conn_id, 'String'],
+      3 => [$id, 'Integer'],
+    ];
 
     // look for all the changes in the given connection that happened less than {$this->interval} s later than log_date to the given id to catch multi-query changes
     $logDateClause = "";
     if ($this->log_date && $this->interval) {
       $logDateClause = " AND log_date >= %2 AND log_date < DATE_ADD(%2, INTERVAL {$this->interval})";
-      $params[2] = array($this->log_date, 'String');
+      $params[2] = [$this->log_date, 'String'];
     }
 
     $changedSQL = "SELECT * FROM `{$this->db}`.`log_$table` WHERE log_conn_id = %1 $logDateClause AND id = %3 ORDER BY log_date DESC LIMIT 1";
@@ -212,11 +212,11 @@ WHERE lt.log_conn_id = %1
 
         case 'Insert':
           // the previous state does not exist
-          $original = array();
+          $original = [];
           break;
 
         case 'Update':
-          $params[2] = array($changedDAO->log_date, 'String');
+          $params[2] = [$changedDAO->log_date, 'String'];
           // look for the previous state (different log_conn_id) of the given id
           $originalSQL = "SELECT * FROM `{$this->db}`.`log_$table` WHERE log_conn_id != %1 AND log_date < %2 AND id = %3 ORDER BY log_date DESC LIMIT 1";
           $original = $this->sqlToArray($originalSQL, $params);
@@ -230,7 +230,7 @@ WHERE lt.log_conn_id = %1
       }
 
       // populate $diffs with only the differences between $changed and $original
-      $skipped = array('log_action', 'log_conn_id', 'log_date', 'log_user_id');
+      $skipped = ['log_action', 'log_conn_id', 'log_date', 'log_user_id'];
       foreach (array_keys(array_diff_assoc($changed, $original)) as $diff) {
         if (in_array($diff, $skipped)) {
           continue;
@@ -243,7 +243,7 @@ WHERE lt.log_conn_id = %1
         // hack: case_type_id column is a varchar with separator. For proper mapping to type labels,
         // we need to make sure separators are trimmed
         if ($diff == 'case_type_id') {
-          foreach (array('original', 'changed') as $var) {
+          foreach (['original', 'changed'] as $var) {
             if (!empty(${$var[$diff]})) {
               $holder =& $$var;
               $val = explode(CRM_Case_BAO_Case::VALUE_SEPARATOR, $holder[$diff]);
@@ -252,7 +252,7 @@ WHERE lt.log_conn_id = %1
           }
         }
 
-        $diffs[] = array(
+        $diffs[] = [
           'action' => $changed['log_action'],
           'id' => $id,
           'field' => $diff,
@@ -261,7 +261,7 @@ WHERE lt.log_conn_id = %1
           'table' => $table,
           'log_date' => $changed['log_date'],
           'log_conn_id' => $changed['log_conn_id'],
-        );
+        ];
       }
     }
 
@@ -280,15 +280,15 @@ WHERE lt.log_conn_id = %1
    */
   public function titlesAndValuesForTable($table, $referenceDate) {
     // static caches for subsequent calls with the same $table
-    static $titles = array();
-    static $values = array();
+    static $titles = [];
+    static $values = [];
 
     if (!isset($titles[$table]) or !isset($values[$table])) {
       if (($tableDAO = CRM_Core_DAO_AllCoreTables::getClassForTable($table)) != FALSE) {
         // FIXME: these should be populated with pseudo constants as they
         // were at the time of logging rather than their current values
         // FIXME: Use *_BAO:buildOptions() method rather than pseudoconstants & fetch programmatically
-        $values[$table] = array(
+        $values[$table] = [
           'contribution_page_id' => CRM_Contribute_PseudoConstant::contributionPage(),
           'contribution_status_id' => CRM_Contribute_PseudoConstant::contributionStatus(),
           'financial_type_id' => CRM_Contribute_PseudoConstant::financialType(),
@@ -307,7 +307,7 @@ WHERE lt.log_conn_id = %1
           'activity_type_id' => CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'label', TRUE),
           'case_type_id' => CRM_Case_PseudoConstant::caseType('title', FALSE),
           'priority_id' => CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id'),
-        );
+        ];
 
         // for columns that appear in more than 1 table
         switch ($table) {
@@ -325,7 +325,7 @@ WHERE lt.log_conn_id = %1
           $titles[$table][$field['name']] = CRM_Utils_Array::value('title', $field);
 
           if ($field['type'] == CRM_Utils_Type::T_BOOLEAN) {
-            $values[$table][$field['name']] = array('0' => ts('false'), '1' => ts('true'));
+            $values[$table][$field['name']] = ['0' => ts('false'), '1' => ts('true')];
           }
         }
       }
@@ -333,11 +333,11 @@ WHERE lt.log_conn_id = %1
         list($titles[$table], $values[$table]) = $this->titlesAndValuesForCustomDataTable($table, $referenceDate);
       }
       else {
-        $titles[$table] = $values[$table] = array();
+        $titles[$table] = $values[$table] = [];
       }
     }
 
-    return array($titles[$table], $values[$table]);
+    return [$titles[$table], $values[$table]];
   }
 
   /**
@@ -361,20 +361,20 @@ WHERE lt.log_conn_id = %1
    * @return array
    */
   private function titlesAndValuesForCustomDataTable($table, $referenceDate) {
-    $titles = array();
-    $values = array();
+    $titles = [];
+    $values = [];
 
-    $params = array(
-      1 => array($this->log_conn_id, 'String'),
-      2 => array($referenceDate, 'String'),
-      3 => array($table, 'String'),
-    );
+    $params = [
+      1 => [$this->log_conn_id, 'String'],
+      2 => [$referenceDate, 'String'],
+      3 => [$table, 'String'],
+    ];
 
     $sql = "SELECT id, title FROM `{$this->db}`.log_civicrm_custom_group WHERE log_date <= %2 AND table_name = %3 ORDER BY log_date DESC LIMIT 1";
     $cgDao = CRM_Core_DAO::executeQuery($sql, $params);
     $cgDao->fetch();
 
-    $params[3] = array($cgDao->id, 'Integer');
+    $params[3] = [$cgDao->id, 'Integer'];
     $sql = "
 SELECT column_name, data_type, label, name, option_group_id
 FROM   `{$this->db}`.log_civicrm_custom_field
@@ -389,13 +389,13 @@ ORDER BY log_date
 
       switch ($cfDao->data_type) {
         case 'Boolean':
-          $values[$cfDao->column_name] = array('0' => ts('false'), '1' => ts('true'));
+          $values[$cfDao->column_name] = ['0' => ts('false'), '1' => ts('true')];
           break;
 
         case 'String':
-          $values[$cfDao->column_name] = array();
+          $values[$cfDao->column_name] = [];
           if (!empty($cfDao->option_group_id)) {
-            $params[3] = array($cfDao->option_group_id, 'Integer');
+            $params[3] = [$cfDao->option_group_id, 'Integer'];
             $sql = "
 SELECT   label, value
 FROM     `{$this->db}`.log_civicrm_option_value
@@ -412,7 +412,7 @@ ORDER BY log_date
       }
     }
 
-    return array($titles, $values);
+    return [$titles, $values];
   }
 
   /**
@@ -424,7 +424,7 @@ ORDER BY log_date
    * @return array
    */
   public function getAllChangesForConnection($tables) {
-    $params = array(1 => array($this->log_conn_id, 'String'));
+    $params = [1 => [$this->log_conn_id, 'String']];
     foreach ($tables as $table) {
       if (empty($sql)) {
         $sql = " SELECT '{$table}' as table_name, id FROM {$this->db}.log_{$table} WHERE log_conn_id = %1";
@@ -433,7 +433,7 @@ ORDER BY log_date
         $sql .= " UNION SELECT '{$table}' as table_name, id FROM {$this->db}.log_{$table} WHERE log_conn_id = %1";
       }
     }
-    $diffs = array();
+    $diffs = [];
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     while ($dao->fetch()) {
       if (empty($this->log_date)) {
@@ -461,13 +461,13 @@ ORDER BY log_date
    */
   public static function checkLogCanBeUsedWithNoLogDate($change_date) {
 
-    if (civicrm_api3('Setting', 'getvalue', array('name' => 'logging_all_tables_uniquid', 'group' => 'CiviCRM Preferences'))) {
+    if (civicrm_api3('Setting', 'getvalue', ['name' => 'logging_all_tables_uniquid', 'group' => 'CiviCRM Preferences'])) {
       return TRUE;
     };
-    $uniqueDate = civicrm_api3('Setting', 'getvalue', array(
+    $uniqueDate = civicrm_api3('Setting', 'getvalue', [
       'name' => 'logging_uniqueid_date',
       'group' => 'CiviCRM Preferences',
-    ));
+    ]);
     if (strtotime($uniqueDate) <= strtotime($change_date)) {
       return TRUE;
     }
@@ -492,7 +492,7 @@ ORDER BY log_date
       return $interval;
     }
 
-    $units = array('MICROSECOND', 'SECOND', 'MINUTE', 'HOUR', 'DAY', 'WEEK', 'MONTH', 'QUARTER', 'YEAR');
+    $units = ['MICROSECOND', 'SECOND', 'MINUTE', 'HOUR', 'DAY', 'WEEK', 'MONTH', 'QUARTER', 'YEAR'];
     $interval = strtoupper($interval);
     if (preg_match('/^([0-9]+) ([A-Z]+)$/', $interval, $matches)) {
       if (in_array($matches[2], $units)) {

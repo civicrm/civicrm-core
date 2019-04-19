@@ -32,7 +32,8 @@
  *
  */
 class civicrm_handler_filter_relationship_type extends views_handler_filter_in_operator {
-  static $_relationshipType;
+  public static $_relationshipType;
+
   public function construct() {
     parent::construct();
     if (!self::$_relationshipType) {

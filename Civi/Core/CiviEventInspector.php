@@ -33,7 +33,7 @@ class CiviEventInspector {
    * @see \CRM_Utils_Hook::eventDefs()
    */
   public static function findBuiltInEvents(\Civi\Core\Event\GenericHookEvent $e) {
-    $skipList = array('singleton');
+    $skipList = ['singleton'];
     $e->inspector->addStaticStubs('CRM_Utils_Hook', 'hook_civicrm_',
       function ($eventDef, $method) use ($skipList) {
         return in_array($method->name, $skipList) ? NULL : $eventDef;
@@ -56,7 +56,7 @@ class CiviEventInspector {
    */
   public function build($force = FALSE) {
     if ($force || $this->eventDefs === NULL) {
-      $this->eventDefs = array();
+      $this->eventDefs = [];
       \CRM_Utils_Hook::eventDefs($this);
       ksort($this->eventDefs);
     }
@@ -113,7 +113,7 @@ class CiviEventInspector {
       return FALSE;
     }
 
-    if (!in_array($eventDef['type'], array('hook', 'object'))) {
+    if (!in_array($eventDef['type'], ['hook', 'object'])) {
       return FALSE;
     }
 
@@ -167,10 +167,10 @@ class CiviEventInspector {
    * @return CiviEventInspector
    */
   public function addEventClass($event, $className) {
-    $this->add(array(
+    $this->add([
       'name' => $event,
       'class' => $className,
-    ));
+    ]);
     return $this;
   }
 
@@ -195,20 +195,20 @@ class CiviEventInspector {
         continue;
       }
 
-      $eventDef = array(
+      $eventDef = [
         'name' => $prefix . $method->name,
         'description_html' => $method->getDocComment() ? \CRM_Admin_Page_APIExplorer::formatDocBlock($method->getDocComment()) : '',
-        'fields' => array(),
+        'fields' => [],
         'class' => 'Civi\Core\Event\GenericHookEvent',
         'stub' => $method,
-      );
+      ];
 
       foreach ($method->getParameters() as $parameter) {
-        $eventDef['fields'][$parameter->getName()] = array(
+        $eventDef['fields'][$parameter->getName()] = [
           'name' => $parameter->getName(),
           'ref' => (bool) $parameter->isPassedByReference(),
           // WISHLIST: 'type' => 'mixed',
-        );
+        ];
       }
 
       if ($filter !== NULL) {

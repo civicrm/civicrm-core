@@ -56,7 +56,6 @@ class StaticTriggers {
     $this->triggers = $triggers;
   }
 
-
   /**
    * Add our list of triggers to the global list.
    *

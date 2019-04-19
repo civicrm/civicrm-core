@@ -61,7 +61,8 @@ class civicrm_handler_field_pseudo_constant extends views_handler_field {
   public function render($values) {
     if (!empty($values->{$this->field_alias})) {
       $val = $values->{$this->field_alias};
-      $val = str_replace("\x01", '', $val); // TODO This fix should be replaced as described in  CRM-12853
+      // TODO This fix should be replaced as described in  CRM-12853
+      $val = str_replace("\x01", '', $val);
       return $this->_pseudo_constant[$val];
     }
   }

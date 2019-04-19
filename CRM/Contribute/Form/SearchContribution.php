@@ -48,13 +48,13 @@ class CRM_Contribute_Form_SearchContribution extends CRM_Core_Form {
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($this);
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'refresh',
         'name' => ts('Search'),
         'isDefault' => TRUE,
-      ),
-    ));
+      ],
+    ]);
   }
 
   public function postProcess() {
@@ -62,7 +62,7 @@ class CRM_Contribute_Form_SearchContribution extends CRM_Core_Form {
     $parent = $this->controller->getParent();
     $parent->set('searchResult', 1);
     if (!empty($params)) {
-      $fields = array('title', 'financial_type_id', 'campaign_id');
+      $fields = ['title', 'financial_type_id', 'campaign_id'];
       foreach ($fields as $field) {
         if (isset($params[$field]) &&
           !CRM_Utils_System::isNull($params[$field])

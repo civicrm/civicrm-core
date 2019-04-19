@@ -47,7 +47,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
   /**
    * Array of successfully imported activity id's
    *
-   * @array
+   * @var array
    */
   protected $_newActivity;
 
@@ -78,16 +78,16 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       $activityTarget
     );
 
-    $fields = array_merge($fields, array(
-      'source_contact_id' => array(
+    $fields = array_merge($fields, [
+      'source_contact_id' => [
         'title' => ts('Source Contact'),
         'headerPattern' => '/Source.Contact?/i',
-      ),
-      'activity_label' => array(
+      ],
+      'activity_label' => [
         'title' => ts('Activity Type Label'),
         'headerPattern' => '/(activity.)?type label?/i',
-      ),
-    ));
+      ],
+    ]);
 
     foreach ($fields as $name => $field) {
       $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
@@ -96,7 +96,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
     }
 
-    $this->_newActivity = array();
+    $this->_newActivity = [];
 
     $this->setActiveFields($this->_mapperKeys);
 
@@ -258,7 +258,7 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
     $params = &$this->getActiveFieldParams();
     $activityLabel = array_search('activity_label', $this->_mapperKeys);
     if ($activityLabel) {
-      $params = array_merge($params, array('activity_label' => $values[$activityLabel]));
+      $params = array_merge($params, ['activity_label' => $values[$activityLabel]]);
     }
     // For date-Formats.
     $session = CRM_Core_Session::singleton();
@@ -332,10 +332,10 @@ class CRM_Activity_Import_Parser_Activity extends CRM_Activity_Import_Parser {
       }
       else {
         // Using new Dedupe rule.
-        $ruleParams = array(
+        $ruleParams = [
           'contact_type' => 'Individual',
           'used' => 'Unsupervised',
-        );
+        ];
         $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
 
         $disp = NULL;

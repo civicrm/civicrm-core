@@ -44,7 +44,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @var string
    */
-  static $_matchFields = NULL;
+  public static $_matchFields = NULL;
 
   /**
    * Fetch object based on array of properties.
@@ -336,7 +336,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       $query .= " AND $permissionClause ";
     }
 
-    if ($orderProfiles AND count($profileIds) > 1) {
+    if ($orderProfiles and count($profileIds) > 1) {
       $query .= " ORDER BY FIELD(  g.id, {$gids} )";
     }
     $group = CRM_Core_DAO::executeQuery($query, $params);
@@ -452,9 +452,9 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
     $addressCustom = FALSE;
     if (in_array($permissionType, array(
-        CRM_Core_Permission::CREATE,
-        CRM_Core_Permission::EDIT,
-      )) &&
+      CRM_Core_Permission::CREATE,
+      CRM_Core_Permission::EDIT,
+    )) &&
       in_array($field->field_name, array_keys($addressCustomFields))
     ) {
       $addressCustom = TRUE;
@@ -993,8 +993,10 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
 
     $details = $query->searchQuery(0, 0, NULL, FALSE, FALSE,
       FALSE, FALSE, FALSE, $additionalWhereClause);
-    if (!$details->fetch()) {
-      return;
+    while ($details->fetch()) {
+      if (!$details) {
+        return;
+      }
     }
     $query->convertToPseudoNames($details);
     $config = CRM_Core_Config::singleton();
@@ -1875,9 +1877,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->addChainSelect($name, array('label' => $title, 'required' => $required));
       $config = CRM_Core_Config::singleton();
       if (!in_array($mode, array(
-          CRM_Profile_Form::MODE_EDIT,
-          CRM_Profile_Form::MODE_SEARCH,
-        )) &&
+        CRM_Profile_Form::MODE_EDIT,
+        CRM_Profile_Form::MODE_SEARCH,
+      )) &&
         $config->defaultContactStateProvince
       ) {
         $defaultValues[$name] = $config->defaultContactStateProvince;
@@ -1888,9 +1890,9 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->add('select', $name, $title, array('' => ts('- select -')) + CRM_Core_PseudoConstant::country(), $required, $selectAttributes);
       $config = CRM_Core_Config::singleton();
       if (!in_array($mode, array(
-          CRM_Profile_Form::MODE_EDIT,
-          CRM_Profile_Form::MODE_SEARCH,
-        )) &&
+        CRM_Profile_Form::MODE_EDIT,
+        CRM_Profile_Form::MODE_SEARCH,
+      )) &&
         $config->defaultContactCountry
       ) {
         $defaultValues[$name] = $config->defaultContactCountry;
@@ -2018,11 +2020,11 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $profileType = CRM_Core_BAO_UFField::getProfileType($gId, TRUE, FALSE, TRUE);
 
       if (empty($profileType) || in_array($profileType, array(
-          'Contact',
-          'Contribution',
-          'Participant',
-          'Membership',
-        ))
+        'Contact',
+        'Contribution',
+        'Participant',
+        'Membership',
+      ))
       ) {
         $profileType = 'Individual';
       }
@@ -2136,10 +2138,10 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus();
       $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       foreach (array(
-                 'In Progress',
-                 'Overdue',
-                 'Refunded',
-               ) as $suppress) {
+        'In Progress',
+        'Overdue',
+        'Refunded',
+      ) as $suppress) {
         unset($contributionStatuses[CRM_Utils_Array::key($suppress, $statusName)]);
       }
 
@@ -2839,7 +2841,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
    * @param array $values
    * @param CRM_Core_Smarty $template
    */
-  static public function profileDisplay($gid, $values, $template) {
+  public static function profileDisplay($gid, $values, $template) {
     $groupTitle = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $gid, 'title');
     $template->assign('grouptitle', $groupTitle);
     if (count($values)) {
@@ -3318,48 +3320,6 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
         $defaults[$fldName] = $values[$fldName];
       }
     }
-  }
-
-  /**
-   * @param array|string $profiles - name of profile(s) to create links for
-   * @param array $appendProfiles
-   *   Name of profile(s) to append to each link.
-   *
-   * @return array
-   */
-  public static function getCreateLinks($profiles = '', $appendProfiles = array()) {
-    // Default to contact profiles
-    if (!$profiles) {
-      $profiles = array('new_individual', 'new_organization', 'new_household');
-    }
-    $profiles = (array) $profiles;
-    $toGet = array_merge($profiles, (array) $appendProfiles);
-    $retrieved = civicrm_api3('uf_group', 'get', array(
-      'name' => array('IN' => $toGet),
-      'is_active' => 1,
-    ));
-    $links = $append = array();
-    if (!empty($retrieved['values'])) {
-      foreach ($retrieved['values'] as $id => $profile) {
-        if (in_array($profile['name'], $profiles)) {
-          $links[] = array(
-            'label' => $profile['title'],
-            'url' => CRM_Utils_System::url('civicrm/profile/create', "reset=1&context=dialog&gid=$id",
-              NULL, NULL, FALSE, FALSE, TRUE),
-            'type' => ucfirst(str_replace('new_', '', $profile['name'])),
-          );
-        }
-        else {
-          $append[] = $id;
-        }
-      }
-      foreach ($append as $id) {
-        foreach ($links as &$link) {
-          $link['url'] .= ",$id";
-        }
-      }
-    }
-    return $links;
   }
 
   /**

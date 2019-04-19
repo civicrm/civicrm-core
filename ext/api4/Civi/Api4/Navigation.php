@@ -1,13 +1,19 @@
 <?php
 
 namespace Civi\Api4;
-use Civi\Api4\Generic\AbstractEntity;
 
 /**
  * Navigation entity.
  *
  * @package Civi\Api4
  */
-class Navigation extends AbstractEntity {
+class Navigation extends Generic\DAOEntity {
+
+  /**
+   * @return Action\Navigation\Get
+   */
+  public static function get() {
+    return new Action\Navigation\Get(__CLASS__, __FUNCTION__);
+  }
 
 }

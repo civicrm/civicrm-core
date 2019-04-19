@@ -73,6 +73,12 @@ class SpecGatherer {
       if ($DAOField['name'] == 'id' && $action == 'create') {
         continue;
       }
+      if ($action !== 'create' || isset($DAOField['default'])) {
+        $DAOField['required'] = FALSE;
+      }
+      if ($DAOField['name'] == 'is_active' && empty($DAOField['default'])) {
+        $DAOField['default'] = '1';
+      }
       $field = SpecFormatter::arrayToField($DAOField, $entity);
       $specification->addFieldSpec($field);
     }
@@ -86,7 +92,7 @@ class SpecGatherer {
     $extends = ($entity == 'Contact') ? ['Contact', 'Individual', 'Organization', 'Household'] : [$entity];
     $customFields = CustomField::get()
       ->addWhere('custom_group.extends', 'IN', $extends)
-      ->setSelect(['custom_group.name', 'custom_group_id', 'name', 'label', 'data_type', 'html_type', 'is_required', 'is_searchable', 'is_search_range', 'weight', 'is_active', 'is_view', 'option_group_id', 'default_value'])
+      ->setSelect(['custom_group.name', 'custom_group_id', 'name', 'label', 'data_type', 'html_type', 'is_searchable', 'is_search_range', 'weight', 'is_active', 'is_view', 'option_group_id', 'default_value'])
       ->execute();
 
     foreach ($customFields as $fieldArray) {
@@ -102,7 +108,7 @@ class SpecGatherer {
   private function getCustomGroupFields($customGroup, RequestSpec $specification) {
     $customFields = CustomField::get()
       ->addWhere('custom_group.name', '=', $customGroup)
-      ->setSelect(['custom_group.name', 'custom_group_id', 'name', 'label', 'data_type', 'html_type', 'is_required', 'is_searchable', 'is_search_range', 'weight', 'is_active', 'is_view', 'option_group_id', 'default_value', 'custom_group.table_name', 'column_name'])
+      ->setSelect(['custom_group.name', 'custom_group_id', 'name', 'label', 'data_type', 'html_type', 'is_searchable', 'is_search_range', 'weight', 'is_active', 'is_view', 'option_group_id', 'default_value', 'custom_group.table_name', 'column_name'])
       ->execute();
 
     foreach ($customFields as $fieldArray) {

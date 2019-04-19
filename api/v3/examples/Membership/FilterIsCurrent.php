@@ -8,12 +8,12 @@
  *   API result array
  */
 function membership_get_example() {
-  $params = array(
+  $params = [
     'contact_id' => 47,
-    'filters' => array(
+    'filters' => [
       'is_current' => 1,
-    ),
-  );
+    ],
+  ];
 
   try{
     $result = civicrm_api3('Membership', 'get', $params);
@@ -23,12 +23,12 @@ function membership_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -42,13 +42,13 @@ function membership_get_example() {
  */
 function membership_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'contact_id' => '47',
         'membership_type_id' => '29',
@@ -62,9 +62,9 @@ function membership_get_expectedresult() {
         'is_pay_later' => 0,
         'membership_name' => 'General',
         'relationship_name' => 'Child of',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

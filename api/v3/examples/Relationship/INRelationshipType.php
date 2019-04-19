@@ -8,14 +8,14 @@
  *   API result array
  */
 function relationship_get_example() {
-  $params = array(
-    'relationship_type_id' => array(
-      'IN' => array(
+  $params = [
+    'relationship_type_id' => [
+      'IN' => [
         '0' => 36,
         '1' => 37,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   try{
     $result = civicrm_api3('Relationship', 'get', $params);
@@ -25,12 +25,12 @@ function relationship_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -44,12 +44,12 @@ function relationship_get_example() {
  */
 function relationship_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 2,
-    'values' => array(
-      '2' => array(
+    'values' => [
+      '2' => [
         'id' => '2',
         'contact_id_a' => '99',
         'contact_id_b' => '101',
@@ -58,8 +58,8 @@ function relationship_get_expectedresult() {
         'is_active' => '1',
         'is_permission_a_b' => 0,
         'is_permission_b_a' => 0,
-      ),
-      '3' => array(
+      ],
+      '3' => [
         'id' => '3',
         'contact_id_a' => '99',
         'contact_id_b' => '101',
@@ -68,9 +68,9 @@ function relationship_get_expectedresult() {
         'is_active' => '1',
         'is_permission_a_b' => 0,
         'is_permission_b_a' => 0,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

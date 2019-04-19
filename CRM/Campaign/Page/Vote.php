@@ -70,10 +70,10 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
   }
 
   public function browse() {
-    $this->_tabs = array(
+    $this->_tabs = [
       'reserve' => ts('Reserve Respondents'),
       'interview' => ts('Interview Respondents'),
-    );
+    ];
 
     $this->_surveyId = CRM_Utils_Request::retrieve('sid', 'Positive', $this);
     $this->_interviewerId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
@@ -93,11 +93,11 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
 
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
-      ->addSetting(array(
-        'tabSettings' => array(
+      ->addSetting([
+        'tabSettings' => [
           'active' => strtolower(CRM_Utils_Array::value('subPage', $_GET, 'reserve')),
-        ),
-      ));
+        ],
+      ]);
   }
 
   /**
@@ -110,17 +110,16 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
   }
 
   public function buildTabs() {
-    $allTabs = array();
+    $allTabs = [];
     foreach ($this->_tabs as $name => $title) {
       // check for required permissions.
-      if (!CRM_Core_Permission::check(array(
-          array(
+      if (!CRM_Core_Permission::check([
+          [
             'manage campaign',
             'administer CiviCampaign',
             "{$name} campaign contacts",
-          ),
-        ))
-      ) {
+          ],
+      ])) {
         continue;
       }
 
@@ -131,12 +130,12 @@ class CRM_Campaign_Page_Vote extends CRM_Core_Page {
       if ($this->_interviewerId) {
         $urlParams .= "&cid={$this->_interviewerId}";
       }
-      $allTabs[$name] = array(
+      $allTabs[$name] = [
         'title' => $title,
         'valid' => TRUE,
         'active' => TRUE,
         'link' => CRM_Utils_System::url('civicrm/campaign/vote', $urlParams),
-      );
+      ];
     }
 
     $this->assign('tabHeader', empty($allTabs) ? FALSE : $allTabs);

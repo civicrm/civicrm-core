@@ -243,7 +243,7 @@ INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated
 INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1200", "Sudan", "SD", "3", "0");
 INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1201", "Suriname", "SR", "2", "0");
 INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1202", "Svalbard and Jan Mayen", "SJ", "1", "0");
-INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1203", "Swaziland", "SZ", "5", "0");
+INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1203", "Eswatini", "SZ", "5", "0");
 INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1204", "Sweden", "SE", "1", "0");
 INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1205", "Switzerland", "CH", "1", "0");
 INSERT INTO civicrm_country (id, name,iso_code,region_id,is_province_abbreviated) VALUES("1206", "Syrian Arab Republic", "SY", "3", "0");
@@ -4595,7 +4595,7 @@ INSERT INTO civicrm_currency (id, name, symbol, numeric_code, full_name) VALUES
 (145, "STD", NULL, "678", "São Tome and Principe Dobra"),
 (146, "SVC",  "$", "222", "El Salvador Colon"),
 (147, "SYP",  "£", "760", "Syrian Pound"),
-(148, "SZL", NULL, "748", "Swaziland Lilangeni"),
+(148, "SZL", NULL, "748", "Eswatini Lilangeni"),
 (149, "TJS", NULL, "972", "Tajik Somoni"),
 (150, "TMM", NULL, "795", "Turkmenistan Manat"),
 (151, "TND", NULL, "788", "Tunisian Dinar"),
@@ -11897,14 +11897,12 @@ INSERT INTO civicrm_msg_template
 ', @tpl_ovid_pcp_owner_notify, 0,          1) ,      
       
       
-      ('Additional Payment Receipt or Refund Notification', '{if $isRefund}{ts}Refund Notification{/ts}{else}{ts}Payment Receipt{/ts}{/if} - {if $component eq \'event\'}{$event.title}{/if}', 'Dear {$contactDisplayName}
-{if $isRefund}
+      ('Additional Payment Receipt or Refund Notification', '{if $isRefund}{ts}Refund Notification{/ts}{else}{ts}Payment Receipt{/ts}{/if} - {if $component eq \'event\'}{$event.title}{/if}', '{if $emailGreeting}{$emailGreeting},
+{/if}{if $isRefund}
 {ts}A refund has been issued based on changes in your registration selections.{/ts}
 {else}
 {ts}A payment has been received.{/ts}
 {/if}
-
-{ts}Please print this confirmation for your records.{/ts}
 
 {if $isRefund}
 ===============================================================================
@@ -11945,7 +11943,7 @@ INSERT INTO civicrm_msg_template
 {if $checkNumber}
 {ts}Check Number{/ts}: {$checkNumber}
 {/if}
-{if $contributeMode eq \'direct\' and !$isAmountzero}
+{if $billingName || $address}
 
 ===============================================================================
 
@@ -11957,7 +11955,7 @@ INSERT INTO civicrm_msg_template
 {$address}
 {/if}
 
-{if $contributeMode eq \'direct\' and !$isAmountzero}
+{if $credit_card_number}
 ===========================================================
 {ts}Credit Card Information{/ts}
 
@@ -12013,7 +12011,6 @@ INSERT INTO civicrm_msg_template
 {capture assign=emptyBlockStyle }style="padding: 10px; border-bottom: 1px solid #999;background-color: #f7f7f7;"{/capture}
 {capture assign=emptyBlockValueStyle }style="padding: 10px; border-bottom: 1px solid #999;"{/capture}
 
-<p>Dear {$contactDisplayName}</p>
 <center>
  <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
 
@@ -12022,7 +12019,7 @@ INSERT INTO civicrm_msg_template
   <!-- END HEADER -->
 
   <!-- BEGIN CONTENT -->
-
+   {if $emailGreeting}<tr><td>{$emailGreeting},</td></tr>{/if}
   <tr>
     <td>
       {if $isRefund}
@@ -12030,7 +12027,6 @@ INSERT INTO civicrm_msg_template
       {else}
       <p>{ts}A payment has been received.{/ts}</p>
       {/if}
-      <p>{ts}Please print this confirmation for your records.{/ts}</p>
     </td>
   </tr>
   <tr>
@@ -12148,7 +12144,7 @@ INSERT INTO civicrm_msg_template
     <tr>
       <td>
   <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
-    {if $contributeMode eq \'direct\' and !$isAmountzero}
+    {if $billingName || $address}
           <tr>
             <th {$headerStyle}>
         {ts}Billing Name and Address{/ts}
@@ -12161,7 +12157,7 @@ INSERT INTO civicrm_msg_template
             </td>
           </tr>
     {/if}
-    {if $contributeMode eq\'direct\' and !$isAmountzero}
+    {if $credit_card_number}
           <tr>
             <th {$headerStyle}>
         {ts}Credit Card Information{/ts}
@@ -12253,14 +12249,12 @@ INSERT INTO civicrm_msg_template
  </body>
 </html>
 ', @tpl_ovid_payment_or_refund_notification, 1,          0),
-      ('Additional Payment Receipt or Refund Notification', '{if $isRefund}{ts}Refund Notification{/ts}{else}{ts}Payment Receipt{/ts}{/if} - {if $component eq \'event\'}{$event.title}{/if}', 'Dear {$contactDisplayName}
-{if $isRefund}
+      ('Additional Payment Receipt or Refund Notification', '{if $isRefund}{ts}Refund Notification{/ts}{else}{ts}Payment Receipt{/ts}{/if} - {if $component eq \'event\'}{$event.title}{/if}', '{if $emailGreeting}{$emailGreeting},
+{/if}{if $isRefund}
 {ts}A refund has been issued based on changes in your registration selections.{/ts}
 {else}
 {ts}A payment has been received.{/ts}
 {/if}
-
-{ts}Please print this confirmation for your records.{/ts}
 
 {if $isRefund}
 ===============================================================================
@@ -12301,7 +12295,7 @@ INSERT INTO civicrm_msg_template
 {if $checkNumber}
 {ts}Check Number{/ts}: {$checkNumber}
 {/if}
-{if $contributeMode eq \'direct\' and !$isAmountzero}
+{if $billingName || $address}
 
 ===============================================================================
 
@@ -12313,7 +12307,7 @@ INSERT INTO civicrm_msg_template
 {$address}
 {/if}
 
-{if $contributeMode eq \'direct\' and !$isAmountzero}
+{if $credit_card_number}
 ===========================================================
 {ts}Credit Card Information{/ts}
 
@@ -12369,7 +12363,6 @@ INSERT INTO civicrm_msg_template
 {capture assign=emptyBlockStyle }style="padding: 10px; border-bottom: 1px solid #999;background-color: #f7f7f7;"{/capture}
 {capture assign=emptyBlockValueStyle }style="padding: 10px; border-bottom: 1px solid #999;"{/capture}
 
-<p>Dear {$contactDisplayName}</p>
 <center>
  <table width="620" border="0" cellpadding="0" cellspacing="0" id="crm-event_receipt" style="font-family: Arial, Verdana, sans-serif; text-align: left;">
 
@@ -12378,7 +12371,7 @@ INSERT INTO civicrm_msg_template
   <!-- END HEADER -->
 
   <!-- BEGIN CONTENT -->
-
+   {if $emailGreeting}<tr><td>{$emailGreeting},</td></tr>{/if}
   <tr>
     <td>
       {if $isRefund}
@@ -12386,7 +12379,6 @@ INSERT INTO civicrm_msg_template
       {else}
       <p>{ts}A payment has been received.{/ts}</p>
       {/if}
-      <p>{ts}Please print this confirmation for your records.{/ts}</p>
     </td>
   </tr>
   <tr>
@@ -12504,7 +12496,7 @@ INSERT INTO civicrm_msg_template
     <tr>
       <td>
   <table style="border: 1px solid #999; margin: 1em 0em 1em; border-collapse: collapse; width:100%;">
-    {if $contributeMode eq \'direct\' and !$isAmountzero}
+    {if $billingName || $address}
           <tr>
             <th {$headerStyle}>
         {ts}Billing Name and Address{/ts}
@@ -12517,7 +12509,7 @@ INSERT INTO civicrm_msg_template
             </td>
           </tr>
     {/if}
-    {if $contributeMode eq\'direct\' and !$isAmountzero}
+    {if $credit_card_number}
           <tr>
             <th {$headerStyle}>
         {ts}Credit Card Information{/ts}
@@ -24043,4 +24035,4 @@ INSERT INTO `civicrm_report_instance`
     ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
 VALUES
     (  @domainID, 'Survey Details', 'survey/detail', 'Detailed report for canvassing, phone-banking, walk lists or other surveys.', 'access CiviReport', 'a:39:{s:6:"fields";a:2:{s:9:"sort_name";s:1:"1";s:6:"result";s:1:"1";}s:22:"assignee_contact_id_op";s:2:"eq";s:25:"assignee_contact_id_value";s:0:"";s:12:"sort_name_op";s:3:"has";s:15:"sort_name_value";s:0:"";s:17:"street_number_min";s:0:"";s:17:"street_number_max";s:0:"";s:16:"street_number_op";s:3:"lte";s:19:"street_number_value";s:0:"";s:14:"street_name_op";s:3:"has";s:17:"street_name_value";s:0:"";s:15:"postal_code_min";s:0:"";s:15:"postal_code_max";s:0:"";s:14:"postal_code_op";s:3:"lte";s:17:"postal_code_value";s:0:"";s:7:"city_op";s:3:"has";s:10:"city_value";s:0:"";s:20:"state_province_id_op";s:2:"in";s:23:"state_province_id_value";a:0:{}s:13:"country_id_op";s:2:"in";s:16:"country_id_value";a:0:{}s:12:"survey_id_op";s:2:"in";s:15:"survey_id_value";a:0:{}s:12:"status_id_op";s:2:"eq";s:15:"status_id_value";s:1:"1";s:11:"custom_1_op";s:2:"in";s:14:"custom_1_value";a:0:{}s:11:"custom_2_op";s:2:"in";s:14:"custom_2_value";a:0:{}s:17:"custom_3_relative";s:1:"0";s:13:"custom_3_from";s:0:"";s:11:"custom_3_to";s:0:"";s:11:"description";s:75:"Detailed report for canvassing, phone-banking, walk lists or other surveys.";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:17:"access CiviReport";s:6:"groups";s:0:"";s:9:"domain_id";i:1;}');
-UPDATE civicrm_domain SET version = '5.10.4';
+UPDATE civicrm_domain SET version = '5.13.4';

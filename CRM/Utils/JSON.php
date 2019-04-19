@@ -78,7 +78,7 @@ class CRM_Utils_JSON {
         // CRM-7130 --lets addslashes to only double quotes,
         // since we are using it to quote the field value.
         // str_replace helps to provide a break for new-line
-        $sOutput .= '"' . addcslashes(str_replace(array("\r\n", "\n", "\r"), '<br />', $value[$element]), '"\\') . '"';
+        $sOutput .= '"' . addcslashes(str_replace(["\r\n", "\n", "\r"], '<br />', $value[$element]), '"\\') . '"';
 
         // remove extra spaces and tab character that breaks dataTable CRM-12551
         $sOutput = preg_replace("/\s+/", " ", $sOutput);

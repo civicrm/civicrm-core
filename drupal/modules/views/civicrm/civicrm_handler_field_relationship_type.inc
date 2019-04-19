@@ -31,7 +31,8 @@
  *
  */
 class civicrm_handler_field_relationship_type extends views_handler_field {
-  static $_relationshipType;
+  public static $_relationshipType;
+
   public function construct() {
     parent::construct();
     if (!self::$_relationshipType) {

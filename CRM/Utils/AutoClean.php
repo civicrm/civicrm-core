@@ -87,19 +87,39 @@ class CRM_Utils_AutoClean {
   public static function swap($getter, $setter, $tmpValue) {
     $resolver = \Civi\Core\Resolver::singleton();
 
-    $origValue = $resolver->call($getter, array());
+    $origValue = $resolver->call($getter, []);
 
     $ac = new CRM_Utils_AutoClean();
     $ac->callback = $setter;
-    $ac->args = array($origValue);
+    $ac->args = [$origValue];
 
-    $resolver->call($setter, array($tmpValue));
+    $resolver->call($setter, [$tmpValue]);
 
     return $ac;
   }
 
   public function __destruct() {
     \Civi\Core\Resolver::singleton()->call($this->callback, $this->args);
+  }
+
+  /**
+   * Prohibit (de)serialization of CRM_Utils_AutoClean.
+   *
+   * The generic nature of AutoClean makes it a potential target for escalating
+   * serialization vulnerabilities, and there's no good reason for serializing it.
+   */
+  public function __sleep() {
+    throw new \RuntimeException("CRM_Utils_AutoClean is a runtime helper. It is not intended for serialization.");
+  }
+
+  /**
+   * Prohibit (de)serialization of CRM_Utils_AutoClean.
+   *
+   * The generic nature of AutoClean makes it a potential target for escalating
+   * serialization vulnerabilities, and there's no good reason for deserializing it.
+   */
+  public function __wakeup() {
+    throw new \RuntimeException("CRM_Utils_AutoClean is a runtime helper. It is not intended for deserialization.");
   }
 
 }

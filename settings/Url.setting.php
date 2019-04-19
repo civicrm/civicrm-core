@@ -35,8 +35,8 @@
 /*
  * Settings metadata file
  */
-return array(
-  'userFrameworkResourceURL' => array(
+return [
+  'userFrameworkResourceURL' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group' => 'url',
     'group_name' => 'URL Preferences',
@@ -52,8 +52,8 @@ return array(
     'description' => 'Absolute URL of the location where the civicrm module or component has been installed.',
     'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::urlish',
-  ),
-  'imageUploadURL' => array(
+  ],
+  'imageUploadURL' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group' => 'url',
     'group_name' => 'URL Preferences',
@@ -69,8 +69,8 @@ return array(
     'description' => 'URL of the location for uploaded image files.',
     'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::urlish',
-  ),
-  'customCSSURL' => array(
+  ],
+  'customCSSURL' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group' => 'url',
     'group_name' => 'URL Preferences',
@@ -86,8 +86,8 @@ return array(
     'description' => 'You can modify the look and feel of CiviCRM by adding your own stylesheet. For small to medium sized modifications, use your css file to override some of the styles in civicrm.css. Or if you need to make drastic changes, you can choose to disable civicrm.css completely.',
     'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::urlish',
-  ),
-  'extensionsURL' => array(
+  ],
+  'extensionsURL' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group' => 'url',
     'group_name' => 'URL Preferences',
@@ -103,5 +103,5 @@ return array(
     'description' => 'Base URL for extension resources (images, stylesheets, etc). This should match extensionsDir.',
     'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::urlish',
-  ),
-);
+  ],
+];

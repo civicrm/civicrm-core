@@ -22,9 +22,9 @@ class Paths {
    * @var array
    *   Array(string $name => array(url => $, path => $)).
    */
-  private $variables = array();
+  private $variables = [];
 
-  private $variableFactory = array();
+  private $variableFactory = [];
 
   /**
    * Class constructor.
@@ -36,56 +36,56 @@ class Paths {
         return \CRM_Core_Config::singleton()->userSystem->getCiviSourceStorage();
       })
       ->register('civicrm.packages', function () {
-        return array(
+        return [
           'path' => \Civi::paths()->getPath('[civicrm.root]/packages/'),
           'url' => \Civi::paths()->getUrl('[civicrm.root]/packages/'),
-        );
+        ];
       })
       ->register('civicrm.vendor', function () {
-        return array(
+        return [
           'path' => \Civi::paths()->getPath('[civicrm.root]/vendor/'),
           'url' => \Civi::paths()->getUrl('[civicrm.root]/vendor/'),
-        );
+        ];
       })
       ->register('civicrm.bower', function () {
-        return array(
+        return [
           'path' => \Civi::paths()->getPath('[civicrm.root]/bower_components/'),
           'url' => \Civi::paths()->getUrl('[civicrm.root]/bower_components/'),
-        );
+        ];
       })
       ->register('civicrm.files', function () {
         return \CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
       })
       ->register('wp.frontend.base', function () {
-        return array('url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/');
+        return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/'];
       })
       ->register('wp.frontend', function () use ($paths) {
         $config = \CRM_Core_Config::singleton();
         $suffix = defined('CIVICRM_UF_WP_BASEPAGE') ? CIVICRM_UF_WP_BASEPAGE : $config->wpBasePage;
-        return array(
+        return [
           'url' => $paths->getVariable('wp.frontend.base', 'url') . $suffix,
-        );
+        ];
       })
       ->register('wp.backend.base', function () {
-        return array('url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/wp-admin/');
+        return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/wp-admin/'];
       })
       ->register('wp.backend', function () use ($paths) {
-        return array(
+        return [
           'url' => $paths->getVariable('wp.backend.base', 'url') . 'admin.php',
-        );
+        ];
       })
       ->register('cms', function () {
-        return array(
+        return [
           'path' => \CRM_Core_Config::singleton()->userSystem->cmsRootPath(),
           'url' => \CRM_Utils_System::baseCMSURL(),
-        );
+        ];
       })
       ->register('cms.root', function () {
-        return array(
+        return [
           'path' => \CRM_Core_Config::singleton()->userSystem->cmsRootPath(),
           // Misleading: this *removes* the language part of the URL, producing a pristine base URL.
           'url' => \CRM_Utils_System::languageNegotiationURL(\CRM_Utils_System::baseCMSURL(), FALSE, TRUE),
-        );
+        ];
       });
   }
 

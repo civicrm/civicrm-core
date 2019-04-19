@@ -2,10 +2,26 @@
 /**
  * File containing the ezcMail class
  *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
  * @package Mail
  * @version //autogen//
- * @copyright Copyright (C) 2005-2009 eZ Systems AS. All rights reserved.
- * @license http://ez.no/licenses/new_bsd New BSD License
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
  */
 
 /**
@@ -25,6 +41,20 @@
  * $transport = new ezcMailMtaTransport();
  * $transport->send( $mail );
  * </code>
+ *
+ * By default, the ezcMail class will generate a mail with the Bcc header inside,
+ * and leave it to the SMTP server to strip the Bcc header. This can pose a
+ * problem with some SMTP servers which do not strip the Bcc header
+ * (issue #16154: Bcc headers are not stripped when using SMTP). Use the option
+ * stripBccHeader from {@link ezcMailOptions} to delete the Bcc header from
+ * the mail before it is sent.
+ *
+ * Example:
+ * <code>
+ * $options = new ezcMailOptions();
+ * $options->stripBccHeader = true; // default value is false
+ *
+ * $mail = new ezcMail( $options );
  *
  * You can also derive your own mail classes from this class if you have
  * special requirements. An example of this is the ezcMailComposer class which
@@ -59,7 +89,13 @@
  *                                       The date/time of when the message was
  *                                       sent as Unix Timestamp.
  * @property ezcMailAddress        $returnPath Contains the Return-Path address as an
- *                                             ezcMailAddress object.
+ *                                             ezcMailAddress object. The email
+ *                                             address embedded in the
+ *                                             ezcMailAddress object may only
+ *                                             contain letters from the
+ *                                             RETURN_PATH_CHARS set.
+ * @property ezcMailOptions $options
+ *           Options for generating mail. See {@link ezcMailOptions}.
  *
  * @apichange Remove the support for the deprecated property messageID.
  *
@@ -95,9 +131,21 @@ class ezcMail extends ezcMailPart
     const BASE64 = "base64";
 
     /**
+     * Characters allowed in the returnPath address
+     */
+    const RETURN_PATH_CHARS = 'A-Za-z0-9_.@=/+{}#~-';
+
+    /**
+     * Holds the options for this class.
+     *
+     * @var ezcMailOptions
+     */
+    protected $options;
+
+    /**
      * Constructs an empty ezcMail object.
      */
-    public function __construct()
+    public function __construct( ezcMailOptions $options = null )
     {
         parent::__construct();
 
@@ -110,6 +158,13 @@ class ezcMail extends ezcMailPart
         $this->properties['body'] = null;
         $this->properties['messageId'] = null;
         $this->properties['returnPath'] = null;
+
+        if ( $options === null )
+        {
+            $options = new ezcMailOptions();
+        }
+
+        $this->options = $options;
     }
 
     /**
@@ -127,8 +182,19 @@ class ezcMail extends ezcMailPart
     {
         switch ( $name )
         {
-            case 'from':
             case 'returnPath':
+                if ( $value !== null && !$value instanceof ezcMailAddress )
+                {
+                    throw new ezcBaseValueException( $name, $value, 'ezcMailAddress or null' );
+                }
+                if ( $value !== null && preg_replace( '([' . self::RETURN_PATH_CHARS . '])', '', $value->email ) != '' )
+                {
+                    throw new ezcBaseValueException( $name, $value->email, 'the characters \'' . self::RETURN_PATH_CHARS . '\'' );
+                }
+                $this->properties[$name] = $value;
+                break;
+
+            case 'from':
                 if ( $value !== null && !$value instanceof ezcMailAddress )
                 {
                     throw new ezcBaseValueException( $name, $value, 'ezcMailAddress or null' );
@@ -325,7 +391,7 @@ class ezcMail extends ezcMailPart
         {
             $this->setHeader( "Cc", ezcMailTools::composeEmailAddresses( $this->cc ) );
         }
-        if ( count( $this->bcc ) )
+        if ( count( $this->bcc ) && $this->options->stripBccHeader === false )
         {
             $this->setHeader( "Bcc", ezcMailTools::composeEmailAddresses( $this->bcc ) );
         }
@@ -333,7 +399,7 @@ class ezcMail extends ezcMailPart
         $this->setHeader( 'Subject', $this->subject, $this->subjectCharset );
 
         $this->setHeader( 'MIME-Version', '1.0' );
-        $this->setHeader( 'User-Agent', 'eZ Components' );
+        $this->setHeader( 'User-Agent', 'Apache Zeta Components' );
         $this->setHeader( 'Date', date( 'r' ) );
         $idhost = $this->from != null && $this->from->email != '' ? $this->from->email : 'localhost';
         if ( is_null( $this->messageId ) )
@@ -472,6 +538,8 @@ class ezcMail extends ezcMailPart
 
             case 'ezcMailText':
             case 'ezcMailFile':
+            case 'ezcMailVirtualFile':
+            case 'ezcMailStreamFile':
             case 'ezcMailDeliveryStatus':
                 if ( empty( $context->filter ) || in_array( $className, $context->filter ) )
                 {

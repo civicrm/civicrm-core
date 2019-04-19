@@ -58,8 +58,8 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
-    $params = array('id' => $this->_activityId);
+    $defaults = [];
+    $params = ['id' => $this->_activityId];
 
     CRM_Activity_BAO_Activity::retrieve($params, $defaults);
     $defaults['file_on_case_activity_subject'] = $defaults['subject'];
@@ -68,21 +68,21 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
     // If this contact has an open case, supply it as a default
     $cid = CRM_Utils_Request::retrieve('cid', 'Integer');
     if (!$cid) {
-      $act = civicrm_api3('Activity', 'getsingle', array('id' => $this->_activityId, 'return' => 'target_contact_id'));
+      $act = civicrm_api3('Activity', 'getsingle', ['id' => $this->_activityId, 'return' => 'target_contact_id']);
       if (!empty($act['target_contact_id'])) {
         $cid = $act['target_contact_id'][0];
       }
     }
     if ($cid) {
-      $cases = civicrm_api3('CaseContact', 'get', array(
+      $cases = civicrm_api3('CaseContact', 'get', [
         'contact_id' => $cid,
-        'case_id' => array('!=' => $this->_currentCaseId),
-        'case_id.status_id' => array('!=' => "Closed"),
+        'case_id' => ['!=' => $this->_currentCaseId],
+        'case_id.status_id' => ['!=' => "Closed"],
         'case_id.is_deleted' => 0,
-        'case_id.end_date' => array('IS NULL' => 1),
-        'options' => array('limit' => 1),
+        'case_id.end_date' => ['IS NULL' => 1],
+        'options' => ['limit' => 1],
         'return' => 'case_id',
-      ));
+      ]);
       foreach ($cases['values'] as $record) {
         $defaults['file_on_case_unclosed_case_id'] = $record['case_id'];
         break;
@@ -95,20 +95,20 @@ class CRM_Case_Form_ActivityToCase extends CRM_Core_Form {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->addEntityRef('file_on_case_unclosed_case_id', ts('Select Case'), array(
+    $this->addEntityRef('file_on_case_unclosed_case_id', ts('Select Case'), [
       'entity' => 'Case',
-      'api' => array(
-        'extra' => array('contact_id'),
-        'params' => array(
-          'case_id' => array('!=' => $this->_currentCaseId),
+      'api' => [
+        'extra' => ['contact_id'],
+        'params' => [
+          'case_id' => ['!=' => $this->_currentCaseId],
           'case_id.is_deleted' => 0,
-          'case_id.status_id' => array('!=' => "Closed"),
-          'case_id.end_date' => array('IS NULL' => 1),
-        ),
-      ),
-    ), TRUE);
-    $this->addEntityRef('file_on_case_target_contact_id', ts('With Contact(s)'), array('multiple' => TRUE));
-    $this->add('text', 'file_on_case_activity_subject', ts('Subject'), array('size' => 50));
+          'case_id.status_id' => ['!=' => "Closed"],
+          'case_id.end_date' => ['IS NULL' => 1],
+        ],
+      ],
+    ], TRUE);
+    $this->addEntityRef('file_on_case_target_contact_id', ts('With Contact(s)'), ['multiple' => TRUE]);
+    $this->add('text', 'file_on_case_activity_subject', ts('Subject'), ['size' => 50]);
   }
 
 }

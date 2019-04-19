@@ -46,12 +46,12 @@ class CRM_Import_StateMachine extends CRM_Core_StateMachine {
     parent::__construct($controller, $action);
 
     $classType = str_replace('_Controller', '', get_class($controller));
-    $this->_pages = array(
+    $this->_pages = [
       $classType . '_Form_DataSource' => NULL,
       $classType . '_Form_MapField' => NULL,
       $classType . '_Form_Preview' => NULL,
       $classType . '_Form_Summary' => NULL,
-    );
+    ];
 
     $this->addSequentialPages($this->_pages, $action);
   }

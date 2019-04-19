@@ -10,8 +10,9 @@
             <argument type="service" id="dispatcher" />
         </service>
 
-        <!-- factory service is deprecated but for now we're stuck with v2.5 -->
-        <service id="schema_map" class="Civi\Api4\Service\Schema\SchemaMap" factory-service="schema_map_builder" factory-method="build"/>
+        <service id="schema_map" class="Civi\Api4\Service\Schema\SchemaMap">
+          <factory service="schema_map_builder" method="build"/>
+        </service>
 
         <service id="joiner" class="Civi\Api4\Service\Schema\Joiner">
             <argument type="service" id="schema_map"/>
@@ -38,6 +39,10 @@
         </service>
 
         <service class="Civi\Api4\Service\Spec\Provider\ActivityCreationSpecProvider">
+            <tag name="spec_provider"/>
+        </service>
+
+        <service class="Civi\Api4\Service\Spec\Provider\ActionScheduleCreationSpecProvider">
             <tag name="spec_provider"/>
         </service>
 

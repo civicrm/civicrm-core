@@ -69,7 +69,8 @@ function civicrmtheme_form_system_themes_admin_form_alter(&$form, $form_state) {
   $form['admin_theme']['civicrm']['civicrm_admin'] = array(
     '#type' => 'select',
     '#options' => array(
-      0 => t('Default theme')) + $theme_list,
+      0 => t('Default theme'),
+    ) + $theme_list,
     '#title' => t('CiviCRM Administration theme'),
     '#description' => t('Choose theme for CiviCRM administration/backend pages.'),
     '#default_value' => variable_get('civicrmtheme_theme_admin', 0),
@@ -78,7 +79,8 @@ function civicrmtheme_form_system_themes_admin_form_alter(&$form, $form_state) {
   $form['admin_theme']['civicrm']['civicrm_public'] = array(
     '#type' => 'select',
     '#options' => array(
-      0 => t('Default theme')) + $theme_list,
+      0 => t('Default theme'),
+    ) + $theme_list,
     '#title' => t('CiviCRM Public theme'),
     '#description' => t('Choose theme for CiviCRM frontend pages.'),
     '#default_value' => variable_get('civicrmtheme_theme_public', 0),

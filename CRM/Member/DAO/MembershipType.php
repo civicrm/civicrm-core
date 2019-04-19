@@ -19,14 +19,14 @@ class CRM_Member_DAO_MembershipType extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_membership_type';
+  public static $_tableName = 'civicrm_membership_type';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Membership Id
@@ -185,7 +185,7 @@ class CRM_Member_DAO_MembershipType extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'domain_id', 'civicrm_domain', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'member_of_contact_id', 'civicrm_contact', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'financial_type_id', 'civicrm_financial_type', 'id');

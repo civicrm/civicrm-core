@@ -6,12 +6,12 @@
  *   API result array
  */
 function pcp_create_example() {
-  $params = array(
+  $params = [
     'title' => 'Pcp title',
     'contact_id' => 1,
     'page_id' => 1,
     'pcp_block_id' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Pcp', 'create', $params);
@@ -21,12 +21,12 @@ function pcp_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -40,13 +40,13 @@ function pcp_create_example() {
  */
 function pcp_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'contact_id' => '1',
         'status_id' => 0,
@@ -63,9 +63,9 @@ function pcp_create_expectedresult() {
         'currency' => 'USD',
         'is_active' => '',
         'is_notify' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

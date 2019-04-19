@@ -23,7 +23,7 @@
 | GNU Affero General Public License or the licensing of CiviCRM,     |
 | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
 +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
@@ -42,7 +42,7 @@ class CRM_Core_I18n_SchemaStructure {
    *   A table-indexed array of translatable columns.
    */
   public static function &columns() {
-    static $result = null;
+    static $result = NULL;
     if (!$result) {
       $result = [
         'civicrm_location_type' => [
@@ -129,6 +129,9 @@ class CRM_Core_I18n_SchemaStructure {
           'description' => "text",
           'options' => "text",
         ],
+        'civicrm_payment_processor' => [
+          'title' => "varchar(127)",
+        ],
         'civicrm_membership_type' => [
           'name' => "varchar(128)",
           'description' => "varchar(255)",
@@ -211,7 +214,7 @@ class CRM_Core_I18n_SchemaStructure {
    *   Indices for translatable fields.
    */
   public static function &indices() {
-    static $result = null;
+    static $result = NULL;
     if (!$result) {
       $result = [
         'civicrm_custom_group' => [
@@ -254,8 +257,8 @@ class CRM_Core_I18n_SchemaStructure {
    * @return array
    *   Array of names of tables with fields that can be translated.
    */
-  static function &tables() {
-    static $result = null;
+  public static function &tables() {
+    static $result = NULL;
     if (!$result) {
       $result = array_keys(self::columns());
     }
@@ -268,8 +271,8 @@ class CRM_Core_I18n_SchemaStructure {
    * @return array
    *   Array of the widgets for editing translatable fields.
    */
-  static function &widgets() {
-    static $result = null;
+  public static function &widgets() {
+    static $result = NULL;
     if (!$result) {
       $result = [
         'civicrm_location_type' => [
@@ -483,6 +486,11 @@ class CRM_Core_I18n_SchemaStructure {
             'type' => "Text",
           ],
           'options' => [
+            'type' => "Text",
+          ],
+        ],
+        'civicrm_payment_processor' => [
+          'title' => [
             'type' => "Text",
           ],
         ],

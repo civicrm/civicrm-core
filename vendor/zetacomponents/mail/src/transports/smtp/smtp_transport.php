@@ -2,10 +2,26 @@
 /**
  * File containing the ezcMailSmtpTransport class.
  *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
  * @package Mail
  * @version //autogen//
- * @copyright Copyright (C) 2005-2009 eZ Systems AS. All rights reserved.
- * @license http://ez.no/licenses/new_bsd New BSD License
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
  */
 
 /**
@@ -33,6 +49,7 @@
  *  - DIGEST-MD5
  *  - CRAM-MD5
  *  - NTLM (requires the PHP mcrypt extension)
+ *  - XOAUTH2
  *  - LOGIN
  *  - PLAIN
  *
@@ -154,6 +171,11 @@ class ezcMailSmtpTransport implements ezcMailTransport
      * Authenticate with 'AUTH NTLM'.
      */
     const AUTH_NTLM = 'NTLM';
+
+    /**
+     * Authenticate with 'AUTH XOAUTH2'.
+     */
+    const AUTH_XOAUTH2 = 'XOAUTH2';
 
     /**
      * No authentication method. Specifies that the transport should try to
@@ -543,15 +565,19 @@ class ezcMailSmtpTransport implements ezcMailTransport
         {
             throw new ezcBaseExtensionNotFoundException( 'openssl', null, "PHP not configured --with-openssl." );
         }
+
+        // start TLS connections unencrypted
+        $connectionType = $this->options->connectionType == 'tls' ? 'tcp' : $this->options->connectionType;
+
         if ( count( $this->options->connectionOptions ) > 0 )
         {
             $context = stream_context_create( $this->options->connectionOptions );
-            $this->connection = @stream_socket_client( "{$this->options->connectionType}://{$this->serverHost}:{$this->serverPort}",
+            $this->connection = @stream_socket_client( "{$connectionType}://{$this->serverHost}:{$this->serverPort}",
                                                        $errno, $errstr, $this->options->timeout, STREAM_CLIENT_CONNECT, $context );
         }
         else
         {
-            $this->connection = @stream_socket_client( "{$this->options->connectionType}://{$this->serverHost}:{$this->serverPort}",
+            $this->connection = @stream_socket_client( "{$connectionType}://{$this->serverHost}:{$this->serverPort}",
                                                        $errno, $errstr, $this->options->timeout );
         }
 
@@ -592,6 +618,24 @@ class ezcMailSmtpTransport implements ezcMailTransport
             throw new ezcMailTransportSmtpException( "HELO/EHLO failed with error: {$response}." );
         }
 
+        // setup TLS connection before continuing with AUTH
+        if ( $this->options->connectionType == 'tls' )
+        {
+            if ( !preg_match( "/250[- ]STARTTLS/", $response) )
+            {
+                throw new ezcMailTransportSmtpException( 'SMTP server does not accept the STARTTLS command.' );
+            }
+
+            $this->startTls();
+
+            // need to redo HELO after TLS negotiation
+            $this->sendData( 'EHLO ' . $this->senderHost );
+            if ( $this->getReplyCode( $response ) !== '250' )
+            {
+                throw new ezcMailTransportSmtpException( "HELO/EHLO failed with error: {$response}." );
+            }
+        }
+
         // do authentication
         if ( $this->doAuthenticate )
         {
@@ -601,7 +645,7 @@ class ezcMailSmtpTransport implements ezcMailTransport
             }
             else
             {
-                preg_match( "/250-AUTH[= ](.*)/", $response, $matches );
+                preg_match( "/250[- ]AUTH[= ](.*)/", $response, $matches );
                 if ( count( $matches ) > 0 )
                 {
                     $methods = explode( ' ', trim( $matches[1] ) );
@@ -648,7 +692,31 @@ class ezcMailSmtpTransport implements ezcMailTransport
             ezcMailSmtpTransport::AUTH_NTLM,
             ezcMailSmtpTransport::AUTH_LOGIN,
             ezcMailSmtpTransport::AUTH_PLAIN,
+            ezcMailSmtpTransport::AUTH_XOAUTH2,
             );
+    }
+
+     /**
+      * Enables TLS on an unencrypted SMTP connection
+      *
+      * @throws ezcMailTransportSmtpException
+      *         if the STARTTLS command or crypto exchange fails
+      * @return void
+      */
+    protected function startTls()
+    {
+        // start TLS authentication process
+        $this->sendData('STARTTLS');
+        if ( $this->getReplyCode( $response ) !== '220' )
+        {
+            throw new ezcMailTransportSmtpException( "STARTTLS failed with error: {$response}." );
+        }
+
+        // setup the current connection for TLS
+        if ( !stream_socket_enable_crypto($this->connection, true, STREAM_CRYPTO_METHOD_TLS_CLIENT) )
+        {
+            throw new ezcMailTransportSmtpException( "Error enabling TLS on existing SMTP connection." );
+        }
     }
 
     /**
@@ -712,6 +780,10 @@ class ezcMailSmtpTransport implements ezcMailTransport
 
             case self::AUTH_PLAIN:
                 $authenticated = $this->authPlain();
+                break;
+
+            case self::AUTH_XOAUTH2:
+                $authenticated = $this->authXOAuth2();
                 break;
 
             default:
@@ -891,6 +963,8 @@ class ezcMailSmtpTransport implements ezcMailTransport
         {
             throw new ezcMailTransportSmtpException( 'SMTP server did not allow NTLM authentication.' );
         }
+        
+        return true;
     }
 
     /**
@@ -939,6 +1013,26 @@ class ezcMailSmtpTransport implements ezcMailTransport
         if ( $this->getReplyCode( $error ) !== '235' )
         {
             throw new ezcMailTransportSmtpException( 'SMTP server did not accept the provided username and password.' );
+        }
+
+        return true;
+    }
+
+    /**
+     * Tries to login to the SMTP server with 'AUTH XOAUTH2' and returns true if
+     * successful.
+     *
+     * @throws ezcMailTransportSmtpException
+     *         if the SMTP server returned an error
+     * @return bool
+     */
+    protected function authXOAuth2()
+    {
+        $digest = base64_encode("user={$this->user}\1auth=Bearer {$this->password}\1\1");
+        $this->sendData( "AUTH XOAUTH2 {$digest}" );
+        if ( $this->getReplyCode( $error ) !== '235' )
+        {
+            throw new ezcMailTransportSmtpException( 'SMTP server did not accept the provided OAuth token.' );
         }
 
         return true;
@@ -1090,7 +1184,7 @@ class ezcMailSmtpTransport implements ezcMailTransport
         {
             while ( ( strpos( $data, self::CRLF ) === false || (string) substr( $line, 3, 1 ) !== ' ' ) && $loops < 100 )
             {
-                $line = fgets( $this->connection, 512 );
+                $line = @fgets( $this->connection, 512 );
                 $data .= $line;
                 $loops++;
             }

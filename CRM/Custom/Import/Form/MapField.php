@@ -23,7 +23,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
     $this->_columnCount = $this->get('columnCount');
     $this->assign('columnCount', $this->_columnCount);
     $this->_dataValues = $this->get('dataValues');
-    $highlightedFields = array('contact_id', 'external_identifier');
+    $highlightedFields = ['contact_id', 'external_identifier'];
 
     //Separate column names from actual values.
     $columnNames = $this->_dataValues[0];
@@ -52,7 +52,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->addFormRule(array('CRM_Custom_Import_Form_MapField', 'formRule'));
+    $this->addFormRule(['CRM_Custom_Import_Form_MapField', 'formRule']);
   }
 
   /**
@@ -65,10 +65,10 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields) {
-    $errors = array();
+    $errors = [];
     $fieldMessage = NULL;
     if (!array_key_exists('savedMapping', $fields)) {
-      $importKeys = array();
+      $importKeys = [];
       foreach ($fields['mapper'] as $mapperPart) {
         $importKeys[] = $mapperPart[0];
       }
@@ -78,7 +78,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
         if (!isset($errors['_qf_default'])) {
           $errors['_qf_default'] = '';
         }
-        $errors['_qf_default'] .= ts('Missing required field: %1', array(1 => ts('Contact ID or External Identifier')));
+        $errors['_qf_default'] .= ts('Missing required field: %1', [1 => ts('Contact ID or External Identifier')]);
       }
     }
 
@@ -136,10 +136,10 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
     $this->_entity = $this->controller->exportValue('DataSource', 'entity');
 
-    $mapperKeys = array();
-    $mapper = array();
+    $mapperKeys = [];
+    $mapper = [];
     $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
-    $mapperKeysMain = array();
+    $mapperKeysMain = [];
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $mapper[$i] = $this->_mapperFields[$mapperKeys[$i][0]];
@@ -158,7 +158,7 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
       $mappingFields->mapping_id = $params['mappingId'];
       $mappingFields->find();
 
-      $mappingFieldsId = array();
+      $mappingFieldsId = [];
       while ($mappingFields->fetch()) {
         if ($mappingFields->id) {
           $mappingFieldsId[$mappingFields->column_number] = $mappingFields->id;
@@ -183,11 +183,11 @@ class CRM_Custom_Import_Form_MapField extends CRM_Contact_Import_Form_MapField {
 
     //Saving Mapping Details and Records
     if (!empty($params['saveMapping'])) {
-      $mappingParams = array(
+      $mappingParams = [
         'name' => $params['saveMappingName'],
         'description' => $params['saveMappingDesc'],
         'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', $this->_mappingType),
-      );
+      ];
       $saveMapping = CRM_Core_BAO_Mapping::add($mappingParams);
 
       for ($i = 0; $i < $this->_columnCount; $i++) {

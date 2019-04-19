@@ -35,6 +35,7 @@
  * This class generates form components for Activity Links.
  */
 class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
+
   public function buildQuickForm() {
     self::commonBuildQuickForm($this);
   }
@@ -49,13 +50,13 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
     }
     $urlParams = "action=add&reset=1&cid={$contactId}&selectedChild=activity&atype=";
 
-    $allTypes = CRM_Utils_Array::value('values', civicrm_api3('OptionValue', 'get', array(
+    $allTypes = CRM_Utils_Array::value('values', civicrm_api3('OptionValue', 'get', [
       'option_group_id' => 'activity_type',
       'is_active' => 1,
-      'options' => array('limit' => 0, 'sort' => 'weight'),
-    )));
+      'options' => ['limit' => 0, 'sort' => 'weight'],
+    ]));
 
-    $activityTypes = array();
+    $activityTypes = [];
 
     foreach ($allTypes as $act) {
       $url = 'civicrm/activity/add';
@@ -78,16 +79,16 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
         }
         // Check for existence of a mobile phone and ! do not SMS privacy setting
         try {
-          $phone = civicrm_api3('Phone', 'getsingle', array(
+          $phone = civicrm_api3('Phone', 'getsingle', [
             'contact_id' => $contactId,
             'phone_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Phone', 'phone_type_id', 'Mobile'),
-            'return' => array('phone', 'contact_id'),
-            'options' => array('limit' => 1, 'sort' => "is_primary DESC"),
-            'api.Contact.getsingle' => array(
+            'return' => ['phone', 'contact_id'],
+            'options' => ['limit' => 1, 'sort' => "is_primary DESC"],
+            'api.Contact.getsingle' => [
               'id' => '$value.contact_id',
               'return' => 'do_not_sms',
-            ),
-          ));
+            ],
+          ]);
         }
         catch (CiviCRM_API3_Exception $e) {
           continue;
@@ -108,7 +109,7 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
       $act['url'] = CRM_Utils_System::url($url,
         "{$urlParams}{$act['value']}", FALSE, NULL, FALSE
       );
-      $act += array('icon' => 'fa-plus-square-o');
+      $act += ['icon' => 'fa-plus-square-o'];
       $activityTypes[$act['value']] = $act;
     }
 

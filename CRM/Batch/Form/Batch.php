@@ -71,7 +71,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     if ($this->_action & CRM_Core_Action::ADD) {
       // Set batch name default.

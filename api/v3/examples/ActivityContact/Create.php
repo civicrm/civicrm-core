@@ -6,11 +6,11 @@
  *   API result array
  */
 function activity_contact_create_example() {
-  $params = array(
+  $params = [
     'contact_id' => 3,
     'activity_id' => 1,
     'record_type_id' => 2,
-  );
+  ];
 
   try{
     $result = civicrm_api3('ActivityContact', 'create', $params);
@@ -20,12 +20,12 @@ function activity_contact_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -39,20 +39,20 @@ function activity_contact_create_example() {
  */
 function activity_contact_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 4,
-    'values' => array(
-      '4' => array(
+    'values' => [
+      '4' => [
         'id' => '4',
         'activity_id' => '1',
         'contact_id' => '3',
         'record_type_id' => '2',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

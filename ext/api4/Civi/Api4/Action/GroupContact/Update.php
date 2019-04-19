@@ -3,7 +3,6 @@
 namespace Civi\Api4\Action\GroupContact;
 
 use Civi\Api4\Generic\Result;
-use Civi\Api4\Action\Update as DefaultUpdate;
 
 /**
  * @inheritDoc
@@ -11,7 +10,7 @@ use Civi\Api4\Action\Update as DefaultUpdate;
  * @method $this setMethod(string $method) Indicate who added/removed the group.
  * @method $this setTracking(string $tracking) Specify ip address or other tracking info.
  */
-class Update extends DefaultUpdate {
+class Update extends \Civi\Api4\Generic\DAOUpdateAction {
 
   /**
    * String to indicate who added/removed the group.

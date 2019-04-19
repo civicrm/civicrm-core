@@ -30,7 +30,8 @@
  */
 class civicrm_handler_relationship_im extends civicrm_handler_relationship_location {
 
-  static $_provider;
+  public static $_provider;
+
   public function construct() {
     parent::construct();
     if (!self::$_provider) {

@@ -69,19 +69,18 @@ class CRM_Pledge_Form_Task_Print extends CRM_Pledge_Form_Task {
    */
   public function buildQuickForm() {
     // just need to add a javacript to popup the window for printing
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'next',
           'name' => ts('Print Pledge List'),
-          'js' => array('onclick' => 'window.print()'),
+          'js' => ['onclick' => 'window.print()'],
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'back',
           'name' => ts('Done'),
-        ),
-      )
-    );
+        ],
+    ]);
   }
 
   /**

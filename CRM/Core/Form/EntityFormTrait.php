@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2019
  */
-
 trait CRM_Core_Form_EntityFormTrait {
 
   /**
@@ -114,6 +113,10 @@ trait CRM_Core_Form_EntityFormTrait {
     $this->assign('entityTable', CRM_Core_DAO_AllCoreTables::getTableForClass(CRM_Core_DAO_AllCoreTables::getFullName($this->getDefaultEntity())));
     $this->addCustomDataToForm();
     $this->addFormButtons();
+
+    if ($this->isViewContext()) {
+      $this->freeze();
+    }
   }
 
   /**
@@ -128,29 +131,27 @@ trait CRM_Core_Form_EntityFormTrait {
    * Add relevant buttons to the form.
    */
   protected function addFormButtons() {
-    if ($this->_action & CRM_Core_Action::VIEW || $this->_action & CRM_Core_Action::PREVIEW) {
-      $this->addButtons(array(
-          array(
-            'type' => 'cancel',
-            'name' => ts('Done'),
-            'isDefault' => TRUE,
-          ),
-        )
-      );
+    if ($this->isViewContext() || $this->_action & CRM_Core_Action::PREVIEW) {
+      $this->addButtons([
+        [
+          'type' => 'cancel',
+          'name' => ts('Done'),
+          'isDefault' => TRUE,
+        ],
+      ]);
     }
     else {
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+      $this->addButtons([
+        [
+          'type' => 'next',
+          'name' => $this->isDeleteContext() ? ts('Delete') : ts('Save'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
     }
   }
 
@@ -158,20 +159,33 @@ trait CRM_Core_Form_EntityFormTrait {
    * Get the defaults for the entity.
    */
   protected function getEntityDefaults() {
-    $defaults = [];
-    if ($this->_action != CRM_Core_Action::DELETE &&
-      $this->getEntityId()
-    ) {
+    $defaults = $moneyFields = [];
+
+    if (!$this->isDeleteContext() &&
+      $this->getEntityId()) {
       $params = ['id' => $this->getEntityId()];
       $baoName = $this->_BAOName;
       $baoName::retrieve($params, $defaults);
     }
-    foreach ($this->entityFields as $fieldSpec) {
+    foreach ($this->entityFields as $entityFieldName => $fieldSpec) {
       $value = CRM_Utils_Request::retrieveValue($fieldSpec['name'], $this->getValidationTypeForField($fieldSpec['name']));
       if ($value !== FALSE && $value !== NULL) {
         $defaults[$fieldSpec['name']] = $value;
       }
+      // Store a list of fields with money formatters
+      if (CRM_Utils_Array::value('formatter', $fieldSpec) == 'crmMoney') {
+        $moneyFields[] = $entityFieldName;
+      }
     }
+    if (!empty($defaults['currency'])) {
+      // If we have a money formatter we need to pass the specified currency or it will render as the default
+      foreach ($moneyFields as $entityFieldName) {
+        $this->entityFields[$entityFieldName]['formatterParam'] = $defaults['currency'];
+      }
+    }
+
+    // Assign again as we may have modified above
+    $this->assign('entityFields', $this->entityFields);
     return $defaults;
   }
 
@@ -242,6 +256,15 @@ trait CRM_Core_Form_EntityFormTrait {
    */
   protected function isDeleteContext() {
     return ($this->_action & CRM_Core_Action::DELETE);
+  }
+
+  /**
+   * Is the form being used in the context of a view.
+   *
+   * @return bool
+   */
+  protected function isViewContext() {
+    return ($this->_action & CRM_Core_Action::VIEW);
   }
 
   protected function setEntityFieldsMetadata() {

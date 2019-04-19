@@ -73,7 +73,6 @@ class civicrm_handler_relationship_address extends civicrm_handler_relationship_
     return $join;
   }
 
-
   /**
    * Called to implement a relationship in a query.
    */

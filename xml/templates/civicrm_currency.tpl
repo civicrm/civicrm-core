@@ -173,7 +173,7 @@ INSERT INTO civicrm_currency (id, name, symbol, numeric_code, full_name) VALUES
 (145, "STD", NULL, "678", "São Tome and Principe Dobra"),
 (146, "SVC",  "$", "222", "El Salvador Colon"),
 (147, "SYP",  "£", "760", "Syrian Pound"),
-(148, "SZL", NULL, "748", "Swaziland Lilangeni"),
+(148, "SZL", NULL, "748", "Eswatini Lilangeni"),
 (149, "TJS", NULL, "972", "Tajik Somoni"),
 (150, "TMM", NULL, "795", "Turkmenistan Manat"),
 (151, "TND", NULL, "788", "Tunisian Dinar"),

@@ -13,11 +13,11 @@
     <url desc="Documentation">https://wiki.civicrm.org/confluence/display/CRM/API+v4+Spec</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2018-10-03</releaseDate>
-  <version>4.1.0</version>
+  <releaseDate>2019-04-21</releaseDate>
+  <version>4.4.0</version>
   <develStage>stable</develStage>
   <compatibility>
-    <ver>5.0</ver>
+    <ver>5.13</ver>
   </compatibility>
   <comments>This extension does nothing on its own. Install it if other extensions require you to do so.</comments>
   <classloader>

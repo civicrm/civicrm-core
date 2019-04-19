@@ -45,14 +45,17 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   protected $log_conn_id;
   protected $log_date;
   protected $raw;
-  protected $tables = array();
+  protected $tables = [];
   protected $interval = '10 SECOND';
 
   protected $altered_name;
   protected $altered_by;
   protected $altered_by_id;
 
-  // detail/summary report ids
+  /**
+   * detail/summary report ids
+   * @var int
+   */
   protected $detail;
   protected $summary;
 
@@ -68,7 +71,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
    *
    * @var array
    */
-  protected $diffs = array();
+  protected $diffs = [];
 
   /**
    * Don't display the Add these contacts to Group button.
@@ -89,35 +92,35 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     parent::__construct();
 
     CRM_Utils_System::resetBreadCrumb();
-    $breadcrumb = array(
-      array(
+    $breadcrumb = [
+      [
         'title' => ts('Home'),
         'url' => CRM_Utils_System::url(),
-      ),
-      array(
+      ],
+      [
         'title' => ts('CiviCRM'),
         'url' => CRM_Utils_System::url('civicrm', 'reset=1'),
-      ),
-      array(
+      ],
+      [
         'title' => ts('View Contact'),
         'url' => CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$this->cid}"),
-      ),
-      array(
+      ],
+      [
         'title' => ts('Search Results'),
         'url' => CRM_Utils_System::url('civicrm/contact/search', "force=1"),
-      ),
-    );
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadcrumb);
 
     if (CRM_Utils_Request::retrieve('revert', 'Boolean')) {
       $this->revert();
     }
 
-    $this->_columnHeaders = array(
-      'field' => array('title' => ts('Field')),
-      'from' => array('title' => ts('Changed From')),
-      'to' => array('title' => ts('Changed To')),
-    );
+    $this->_columnHeaders = [
+      'field' => ['title' => ts('Field')],
+      'from' => ['title' => ts('Changed From')],
+      'to' => ['title' => ts('Changed To')],
+    ];
   }
 
   /**
@@ -180,17 +183,17 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
   protected function convertDiffsToRows() {
     // return early if nothing found
     if (empty($this->diffs)) {
-      return array();
+      return [];
     }
 
     // populate $rows with only the differences between $changed and $original (skipping certain columns and NULL ↔ empty changes unless raw requested)
-    $skipped = array('id');
+    $skipped = ['id'];
     foreach ($this->diffs as $diff) {
       $table = $diff['table'];
       if (empty($metadata[$table])) {
         list($metadata[$table]['titles'], $metadata[$table]['values']) = $this->differ->titlesAndValuesForTable($table, $diff['log_date']);
       }
-      $values = CRM_Utils_Array::value('values', $metadata[$diff['table']], array());
+      $values = CRM_Utils_Array::value('values', $metadata[$diff['table']], []);
       $titles = $metadata[$diff['table']]['titles'];
       $field = $diff['field'];
       $from = $diff['from'];
@@ -214,7 +217,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
           (substr($to, 0, 1) == CRM_Core_DAO::VALUE_SEPARATOR &&
             substr($to, -1, 1) == CRM_Core_DAO::VALUE_SEPARATOR)
         ) {
-          $froms = $tos = array();
+          $froms = $tos = [];
           foreach (explode(CRM_Core_DAO::VALUE_SEPARATOR, trim($from, CRM_Core_DAO::VALUE_SEPARATOR)) as $val) {
             $froms[] = CRM_Utils_Array::value($val, $values[$field]);
           }
@@ -242,7 +245,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
         }
       }
 
-      $rows[] = array('field' => $field . " (id: {$diff['id']})", 'from' => $from, 'to' => $to);
+      $rows[] = ['field' => $field . " (id: {$diff['id']})", 'from' => $from, 'to' => $to];
     }
 
     return $rows;
@@ -281,7 +284,6 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
     $this->diffs = $this->getAllContactChangesForConnection();
   }
 
-
   /**
    * Get an array of changes made in the mysql connection.
    *
@@ -289,7 +291,7 @@ class CRM_Logging_ReportDetail extends CRM_Report_Form {
    */
   public function getAllContactChangesForConnection() {
     if (empty($this->log_conn_id)) {
-      return array();
+      return [];
     }
     $this->setDiffer();
     try {

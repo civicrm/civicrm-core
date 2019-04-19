@@ -57,10 +57,10 @@ class CRM_Contact_Form_Task_SaveSearch_Update extends CRM_Contact_Form_Task_Save
    */
   public function setDefaultValues() {
 
-    $defaults = array();
-    $params = array();
+    $defaults = [];
+    $params = [];
 
-    $params = array('saved_search_id' => $this->_id);
+    $params = ['saved_search_id' => $this->_id];
     CRM_Contact_BAO_Group::retrieve($params, $defaults);
 
     return $defaults;

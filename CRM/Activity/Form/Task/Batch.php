@@ -45,11 +45,13 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
 
   /**
    * Maximum profile fields that will be displayed.
+   * @var int
    */
   protected $_maxFields = 9;
 
   /**
    * Variable to store redirect path.
+   * @var string
    */
   protected $_userContext;
 
@@ -62,7 +64,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     parent::preProcess();
 
     // Get the contact read only fields to display.
-    $readOnlyFields = array_merge(array('sort_name' => ts('Added By'), 'target_sort_name' => ts('With Contact')),
+    $readOnlyFields = array_merge(['sort_name' => ts('Added By'), 'target_sort_name' => ts('With Contact')],
       CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
         'contact_autocomplete_options',
         TRUE, NULL, FALSE, 'name', TRUE
@@ -101,12 +103,12 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     CRM_Utils_System::setTitle($this->_title);
 
     $this->addDefaultButtons(ts('Save'));
-    $this->_fields = array();
+    $this->_fields = [];
     $this->_fields = CRM_Core_BAO_UFGroup::getFields($ufGroupId, FALSE, CRM_Core_Action::VIEW);
 
     // remove file type field and then limit fields
     $suppressFields = FALSE;
-    $removehtmlTypes = array('File');
+    $removehtmlTypes = ['File'];
     foreach ($this->_fields as $name => $field) {
       if (CRM_Core_BAO_CustomField::getKeyID($name) &&
         in_array($this->_fields[$name]['html_type'], $removehtmlTypes)
@@ -124,24 +126,24 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
 
     $this->_fields = array_slice($this->_fields, 0, $this->_maxFields);
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'submit',
         'name' => ts('Update Activities'),
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ),
-    ));
+      ],
+    ]);
 
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_activityHolderIds);
 
     // Load all campaigns.
     if (array_key_exists('activity_campaign_id', $this->_fields)) {
-      $this->_componentCampaigns = array();
+      $this->_componentCampaigns = [];
       CRM_Core_PseudoConstant::populate($this->_componentCampaigns,
         'CRM_Activity_DAO_Activity',
         TRUE, 'campaign_id', 'id',
@@ -153,7 +155,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
     // It is possible to have fields that are required in CiviCRM not be required in the
     // profile. Overriding that here. Perhaps a better approach would be to
     // make them required in the schema & read that up through getFields functionality.
-    $requiredFields = array('activity_date_time');
+    $requiredFields = ['activity_date_time'];
 
     foreach ($this->_activityHolderIds as $activityId) {
       $typeId = CRM_Core_DAO::getFieldValue("CRM_Activity_DAO_Activity", $activityId, 'activity_type_id');
@@ -201,7 +203,7 @@ class CRM_Activity_Form_Task_Batch extends CRM_Activity_Form_Task {
       return;
     }
 
-    $defaults = array();
+    $defaults = [];
     foreach ($this->_activityHolderIds as $activityId) {
       CRM_Core_BAO_UFGroup::setProfileDefaults(NULL, $this->_fields, $defaults, FALSE, $activityId, 'Activity');
     }

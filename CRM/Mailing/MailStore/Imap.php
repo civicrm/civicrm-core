@@ -64,13 +64,13 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
 
     }
 
-    $options = array('ssl' => $ssl, 'uidReferencing' => TRUE);
+    $options = ['ssl' => $ssl, 'uidReferencing' => TRUE];
     $this->_transport = new ezcMailImapTransport($host, NULL, $options);
     $this->_transport->authenticate($username, $password);
     $this->_transport->selectMailbox($folder);
 
-    $this->_ignored = implode($this->_transport->getHierarchyDelimiter(), array($folder, 'CiviMail', 'ignored'));
-    $this->_processed = implode($this->_transport->getHierarchyDelimiter(), array($folder, 'CiviMail', 'processed'));
+    $this->_ignored = implode($this->_transport->getHierarchyDelimiter(), [$folder, 'CiviMail', 'ignored']);
+    $this->_processed = implode($this->_transport->getHierarchyDelimiter(), [$folder, 'CiviMail', 'processed']);
     $boxes = $this->_transport->listMailboxes();
 
     if ($this->_debug) {

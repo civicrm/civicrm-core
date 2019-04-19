@@ -84,7 +84,7 @@
       </tr>
       <tr class="crm-member-membershiprenew-form-block-renewal_date">
         <td class="label">{$form.renewal_date.label}</td>
-        <td>{include file="CRM/common/jcalendar.tpl" elementName=renewal_date}</td>
+        <td>{$form.renewal_date.html}</td>
       </tr>
       <tr id="defaultNumTerms" class="crm-member-membershiprenew-form-block-default-num_terms">
         <td colspan="2" class="description">
@@ -136,9 +136,7 @@
       </table>
     {/if}
 
-    <div id="customData"></div>
-    {*include custom data js file*}
-    {include file="CRM/common/customData.tpl"}
+    {include file="CRM/common/customDataBlock.tpl"}
 
     <div>{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 
@@ -189,12 +187,6 @@
     CRM.$(function($) {
       $('#membershipOrgType').hide();
       $('#changeNumTerms').hide();
-      {/literal}
-      CRM.buildCustomData('{$customDataType}');
-      {if $customDataSubType}
-      CRM.buildCustomData('{$customDataType}', {$customDataSubType});
-      {/if}
-      {literal}
     });
 
     function checkPayment() {

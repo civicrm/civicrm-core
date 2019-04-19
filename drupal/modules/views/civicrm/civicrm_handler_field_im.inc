@@ -29,7 +29,7 @@
  * @ingroup civicrm_field_handlers
  */
 class civicrm_handler_field_im extends civicrm_handler_field_location {
-  static $_provider;
+  public static $_provider;
 
   public function construct() {
     parent::construct();

@@ -47,13 +47,14 @@ class CRM_Utils_Check_Component_PriceFields extends CRM_Utils_Check_Component {
     $dao = CRM_Core_DAO::executeQuery($sql);
     $count = 0;
     $html = '';
-    $messages = array();
+    $messages = [];
     while ($dao->fetch()) {
       $count++;
-      $url = CRM_Utils_System::url('civicrm/admin/price/field', array(
+      $url = CRM_Utils_System::url('civicrm/admin/price/field', [
         'reset' => 1,
         'action' => 'browse',
-        'sid' => $dao->ps_id));
+        'sid' => $dao->ps_id,
+      ]);
       $html .= "<tr><td>$dao->ps_title</td><td>$dao->psf_label</td><td><a href='$url'>View Price Set Fields</a></td></tr>";
     }
     if ($count > 0) {

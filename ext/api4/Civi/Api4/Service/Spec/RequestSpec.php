@@ -67,6 +67,15 @@ class RequestSpec {
   }
 
   /**
+   * @return array|FieldSpec[]
+   */
+  public function getConditionalRequiredFields() {
+    return array_filter($this->fields, function (FieldSpec $field) {
+      return $field->getRequiredIf();
+    });
+  }
+
+  /**
    * @param array $fieldNames
    *   Optional array of fields to return
    * @return FieldSpec[]

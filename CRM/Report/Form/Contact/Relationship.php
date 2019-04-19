@@ -39,10 +39,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   protected $_emailField_b = FALSE;
   protected $_phoneField_a = FALSE;
   protected $_phoneField_b = FALSE;
-  protected $_customGroupExtends = array(
+  protected $_customGroupExtends = [
     'Relationship',
-  );
-  public $_drilldownReport = array('contact/detail' => 'Link to Detail Report');
+  ];
+  public $_drilldownReport = ['contact/detail' => 'Link to Detail Report'];
 
   /**
    * This report has not been optimised for group filtering.
@@ -71,284 +71,284 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
 
     $contact_type = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, '_');
 
-    $this->_columns = array(
-      'civicrm_contact' => array(
+    $this->_columns = [
+      'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name_a' => array(
+        'fields' => [
+          'sort_name_a' => [
             'title' => ts('Contact A'),
             'name' => 'sort_name',
             'required' => TRUE,
-          ),
-          'display_name_a' => array(
+          ],
+          'display_name_a' => [
             'title' => ts('Contact A Full Name'),
             'name' => 'display_name',
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'contact_type_a' => array(
+          ],
+          'contact_type_a' => [
             'title' => ts('Contact Type (Contact A)'),
             'name' => 'contact_type',
-          ),
-          'contact_sub_type_a' => array(
+          ],
+          'contact_sub_type_a' => [
             'title' => ts('Contact Subtype (Contact A)'),
             'name' => 'contact_sub_type',
-          ),
-        ),
-        'filters' => array(
-          'sort_name_a' => array(
+          ],
+        ],
+        'filters' => [
+          'sort_name_a' => [
             'title' => ts('Contact A'),
             'name' => 'sort_name',
             'operator' => 'like',
             'type' => CRM_Report_Form::OP_STRING,
-          ),
-          'contact_type_a' => array(
+          ],
+          'contact_type_a' => [
             'title' => ts('Contact Type A'),
             'name' => 'contact_type',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $contact_type,
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
-        'order_bys' => array(
-          'sort_name_a' => array(
+          ],
+        ],
+        'order_bys' => [
+          'sort_name_a' => [
             'title' => ts('Contact A'),
             'name' => 'sort_name',
             'default_weight' => '1',
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact_a_fields',
-      ),
-      'civicrm_contact_b' => array(
+      ],
+      'civicrm_contact_b' => [
         'dao' => 'CRM_Contact_DAO_Contact',
         'alias' => 'contact_b',
-        'fields' => array(
-          'sort_name_b' => array(
+        'fields' => [
+          'sort_name_b' => [
             'title' => ts('Contact B'),
             'name' => 'sort_name',
             'required' => TRUE,
-          ),
-          'display_name_b' => array(
+          ],
+          'display_name_b' => [
             'title' => ts('Contact B Full Name'),
             'name' => 'display_name',
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'contact_type_b' => array(
+          ],
+          'contact_type_b' => [
             'title' => ts('Contact Type (Contact B)'),
             'name' => 'contact_type',
-          ),
-          'contact_sub_type_b' => array(
+          ],
+          'contact_sub_type_b' => [
             'title' => ts('Contact Subtype (Contact B)'),
             'name' => 'contact_sub_type',
-          ),
-        ),
-        'filters' => array(
-          'sort_name_b' => array(
+          ],
+        ],
+        'filters' => [
+          'sort_name_b' => [
             'title' => ts('Contact B'),
             'name' => 'sort_name',
             'operator' => 'like',
             'type' => CRM_Report_Form::OP_STRING,
-          ),
-          'contact_type_b' => array(
+          ],
+          'contact_type_b' => [
             'title' => ts('Contact Type B'),
             'name' => 'contact_type',
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $contact_type,
             'type' => CRM_Utils_Type::T_STRING,
-          ),
-        ),
-        'order_bys' => array(
-          'sort_name_b' => array(
+          ],
+        ],
+        'order_bys' => [
+          'sort_name_b' => [
             'title' => ts('Contact B'),
             'name' => 'sort_name',
             'default_weight' => '2',
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact_b_fields',
-      ),
-      'civicrm_email' => array(
+      ],
+      'civicrm_email' => [
         'dao' => 'CRM_Core_DAO_Email',
-        'fields' => array(
-          'email_a' => array(
+        'fields' => [
+          'email_a' => [
             'title' => ts('Email (Contact A)'),
             'name' => 'email',
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact_a_fields',
-      ),
-      'civicrm_email_b' => array(
+      ],
+      'civicrm_email_b' => [
         'dao' => 'CRM_Core_DAO_Email',
         'alias' => 'email_b',
-        'fields' => array(
-          'email_b' => array(
+        'fields' => [
+          'email_b' => [
             'title' => ts('Email (Contact B)'),
             'name' => 'email',
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact_b_fields',
-      ),
-      'civicrm_phone' => array(
+      ],
+      'civicrm_phone' => [
         'dao' => 'CRM_Core_DAO_Phone',
         'alias' => 'phone_a',
-        'fields' => array(
-          'phone_a' => array(
+        'fields' => [
+          'phone_a' => [
             'title' => ts('Phone (Contact A)'),
             'name' => 'phone',
-          ),
-          'phone_ext_a' => array(
+          ],
+          'phone_ext_a' => [
             'title' => ts('Phone Ext (Contact A)'),
             'name' => 'phone_ext',
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact_a_fields',
-      ),
-      'civicrm_phone_b' => array(
+      ],
+      'civicrm_phone_b' => [
         'dao' => 'CRM_Core_DAO_Phone',
         'alias' => 'phone_b',
-        'fields' => array(
-          'phone_b' => array(
+        'fields' => [
+          'phone_b' => [
             'title' => ts('Phone (Contact B)'),
             'name' => 'phone',
-          ),
-          'phone_ext_b' => array(
+          ],
+          'phone_ext_b' => [
             'title' => ts('Phone Ext (Contact B)'),
             'name' => 'phone_ext',
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact_b_fields',
-      ),
-      'civicrm_relationship_type' => array(
+      ],
+      'civicrm_relationship_type' => [
         'dao' => 'CRM_Contact_DAO_RelationshipType',
-        'fields' => array(
-          'label_a_b' => array(
+        'fields' => [
+          'label_a_b' => [
             'title' => ts('Relationship A-B '),
             'default' => TRUE,
-          ),
-          'label_b_a' => array(
+          ],
+          'label_b_a' => [
             'title' => ts('Relationship B-A '),
             'default' => TRUE,
-          ),
-        ),
-        'order_bys' => array(
-          'label_a_b' => array(
+          ],
+        ],
+        'order_bys' => [
+          'label_a_b' => [
             'title' => ts('Relationship A-B'),
             'name' => 'label_a_b',
-          ),
-          'label_b_A' => array(
+          ],
+          'label_b_A' => [
             'title' => ts('Relationship B-A'),
             'name' => 'label_b_a',
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'relation-fields',
-      ),
-      'civicrm_relationship' => array(
+      ],
+      'civicrm_relationship' => [
         'dao' => 'CRM_Contact_DAO_Relationship',
-        'fields' => array(
-          'start_date' => array(
+        'fields' => [
+          'start_date' => [
             'title' => ts('Relationship Start Date'),
-          ),
-          'end_date' => array(
+          ],
+          'end_date' => [
             'title' => ts('Relationship End Date'),
-          ),
-          'is_permission_a_b' => array(
+          ],
+          'is_permission_a_b' => [
             'title' => ts('Permission A has to access B'),
-          ),
-          'is_permission_b_a' => array(
+          ],
+          'is_permission_b_a' => [
             'title' => ts('Permission B has to access A'),
-          ),
-          'description' => array(
+          ],
+          'description' => [
             'title' => ts('Description'),
-          ),
-          'relationship_id' => array(
+          ],
+          'relationship_id' => [
             'title' => ts('Rel ID'),
             'name' => 'id',
-          ),
-        ),
-        'filters' => array(
-          'is_active' => array(
+          ],
+        ],
+        'filters' => [
+          'is_active' => [
             'title' => ts('Relationship Status'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
-            'options' => array(
+            'options' => [
               '' => ts('- Any -'),
               1 => ts('Active'),
               0 => ts('Inactive'),
-            ),
+            ],
             'type' => CRM_Utils_Type::T_INT,
-          ),
-          'is_valid' => array(
+          ],
+          'is_valid' => [
             'title' => ts('Relationship Dates Validity'),
             'operatorType' => CRM_Report_Form::OP_SELECT,
-            'options' => array(
+            'options' => [
               NULL => ts('- Any -'),
               1 => ts('Not expired'),
               0 => ts('Expired'),
-            ),
+            ],
             'type' => CRM_Utils_Type::T_INT,
-          ),
-          'relationship_type_id' => array(
+          ],
+          'relationship_type_id' => [
             'title' => ts('Relationship'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, NULL, TRUE),
             'type' => CRM_Utils_Type::T_INT,
-          ),
-          'start_date' => array(
+          ],
+          'start_date' => [
             'title' => ts('Start Date'),
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'end_date' => array(
+          ],
+          'end_date' => [
             'title' => ts('End Date'),
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'active_period_date' => array(
+          ],
+          'active_period_date' => [
             'title' => ts('Active Period'),
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'is_permission_a_b' => array(
+          ],
+          'is_permission_a_b' => [
             'title' => ts('Does contact A have permission over contact B?'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contact_BAO_Relationship::buildOptions('is_permission_a_b'),
             'type' => CRM_Utils_Type::T_INT,
-          ),
-          'is_permission_b_a' => array(
+          ],
+          'is_permission_b_a' => [
             'title' => ts('Does contact B have permission over contact A?'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contact_BAO_Relationship::buildOptions('is_permission_b_a'),
             'type' => CRM_Utils_Type::T_INT,
-          ),
-        ),
+          ],
+        ],
 
-        'order_bys' => array(
-          'start_date' => array(
+        'order_bys' => [
+          'start_date' => [
             'title' => ts('Start Date'),
             'name' => 'start_date',
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'relation-fields',
-      ),
-      'civicrm_address' => array(
+      ],
+      'civicrm_address' => [
         'dao' => 'CRM_Core_DAO_Address',
-        'filters' => array(
-          'country_id' => array(
+        'filters' => [
+          'country_id' => [
             'title' => ts('Country'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::country(),
-          ),
-          'state_province_id' => array(
+          ],
+          'state_province_id' => [
             'title' => ts('State/Province'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_PseudoConstant::stateProvince(),
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-      ),
-    );
+      ],
+    ];
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
@@ -360,7 +360,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   }
 
   public function select() {
-    $select = $this->_columnHeaders = array();
+    $select = $this->_columnHeaders = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
@@ -456,7 +456,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   }
 
   public function where() {
-    $whereClauses = $havingClauses = array();
+    $whereClauses = $havingClauses = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
         foreach ($table['filters'] as $fieldName => $field) {
@@ -483,7 +483,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
                   $fieldName == 'contact_type_b')
               ) {
                 $cTypes = CRM_Utils_Array::value("{$fieldName}_value", $this->_params);
-                $contactTypes = $contactSubTypes = array();
+                $contactTypes = $contactSubTypes = [];
                 if (!empty($cTypes)) {
                   foreach ($cTypes as $ctype) {
                     $getTypes = CRM_Utils_System::explode('_', $ctype, 2);
@@ -593,7 +593,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
         if ($value['title'] == 'Relationship') {
           $relTypes = CRM_Core_PseudoConstant::relationshipType();
           $op = CRM_Utils_Array::value('relationship_type_id_op', $this->_params) == 'in' ? ts('Is one of') . ' ' : ts('Is not one of') . ' ';
-          $relationshipTypes = array();
+          $relationshipTypes = [];
           foreach ($this->_params['relationship_type_id_value'] as $relationship) {
             $relationshipTypes[] = $relTypes[$relationship]['label_' . $this->relationType];
           }
@@ -610,17 +610,17 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     }
     // For displaying relationship status.
     if (!$isStatusFilter && $relStatus) {
-      $statistics['filters'][] = array(
+      $statistics['filters'][] = [
         'title' => ts('Relationship Status'),
         'value' => $relStatus,
-      );
+      ];
     }
     return $statistics;
   }
 
   public function groupBy() {
     $this->_groupBy = " ";
-    $groupBy = array();
+    $groupBy = [];
     if ($this->relationType == 'a_b') {
       $groupBy[] = " {$this->_aliases['civicrm_contact']}.id";
     }
@@ -632,7 +632,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       $groupBy[] = "{$this->_aliases['civicrm_relationship']}.id";
     }
     else {
-      $groupBy = array("{$this->_aliases['civicrm_relationship']}.id");
+      $groupBy = ["{$this->_aliases['civicrm_relationship']}.id"];
     }
 
     $this->_groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($this->_selectClauses, $groupBy);
@@ -641,8 +641,8 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   public function beginPostProcessCommon() {
     $originalRelationshipTypeIdValue = CRM_Utils_Array::value('relationship_type_id_value', $this->_params);
     if ($originalRelationshipTypeIdValue) {
-      $relationshipTypes = array();
-      $direction = array();
+      $relationshipTypes = [];
+      $direction = [];
       foreach ((array) $originalRelationshipTypeIdValue as $relationship_type) {
         $relType = explode('_', $relationship_type);
         $direction[] = $relType[1] . '_' . $relType[2];
@@ -658,10 +658,10 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
   public function postProcess() {
     $this->beginPostProcess();
 
-    $this->buildACLClause(array(
+    $this->buildACLClause([
       $this->_aliases['civicrm_contact'],
       $this->_aliases['civicrm_contact_b'],
-    ));
+    ]);
 
     $sql = $this->buildQuery();
     $this->buildRows($sql, $rows);
@@ -693,7 +693,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       if (array_key_exists('civicrm_contact_contact_sub_type_a', $row)) {
         if ($value = $row['civicrm_contact_contact_sub_type_a']) {
           $rowValues = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-          $rowLabels = array();
+          $rowLabels = [];
           foreach ($rowValues as $rowValue) {
             if ($rowValue) {
               $rowLabels[] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', 'contact_sub_type', $rowValue);
@@ -709,7 +709,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
       if (array_key_exists('civicrm_contact_b_contact_sub_type_b', $row)) {
         if ($value = $row['civicrm_contact_b_contact_sub_type_b']) {
           $rowValues = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-          $rowLabels = array();
+          $rowLabels = [];
           foreach ($rowValues as $rowValue) {
             if ($rowValue) {
               $rowLabels[] = CRM_Core_Pseudoconstant::getLabel('CRM_Contact_BAO_Contact', 'contact_sub_type', $rowValue);
@@ -837,7 +837,7 @@ class CRM_Report_Form_Contact_Relationship extends CRM_Report_Form {
     $fieldName,
     $relative, $from, $to, $type = NULL, $fromTime = NULL, $toTime = NULL
     ) {
-    $clauses = array();
+    $clauses = [];
     if (in_array($relative, array_keys($this->getOperationPair(CRM_Report_Form::OP_DATE)))) {
       return NULL;
     }

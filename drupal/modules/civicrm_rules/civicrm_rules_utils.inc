@@ -136,7 +136,6 @@ function _civicrm_rules_load_mailing($mailingID) {
   return $mailing;
 }
 
-
 /**
  * function to return labels for checkboxes & stuff
  */

@@ -19,14 +19,21 @@ class CRM_Contact_DAO_ACLContactCache extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_acl_contact_cache';
+  public static $_tableName = 'civicrm_acl_contact_cache';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
+
+  /**
+   * primary key
+   *
+   * @var int unsigned
+   */
+  public $id;
 
   /**
    * FK to civicrm_contact (could be null for anon user)
@@ -65,7 +72,7 @@ class CRM_Contact_DAO_ACLContactCache extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id', 'civicrm_contact', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -80,6 +87,17 @@ class CRM_Contact_DAO_ACLContactCache extends CRM_Core_DAO {
   public static function &fields() {
     if (!isset(Civi::$statics[__CLASS__]['fields'])) {
       Civi::$statics[__CLASS__]['fields'] = [
+        'id' => [
+          'name' => 'id',
+          'type' => CRM_Utils_Type::T_INT,
+          'title' => ts('ACL Contact Cache ID'),
+          'description' => ts('primary key'),
+          'required' => TRUE,
+          'table_name' => 'civicrm_acl_contact_cache',
+          'entity' => 'ACLContactCache',
+          'bao' => 'CRM_Contact_DAO_ACLContactCache',
+          'localizable' => 0,
+        ],
         'user_id' => [
           'name' => 'user_id',
           'type' => CRM_Utils_Type::T_INT,

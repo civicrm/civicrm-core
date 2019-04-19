@@ -37,7 +37,7 @@ class CRM_Core_Page_RecurringEntityPreview extends CRM_Core_Page {
    */
   public function run() {
     $parentEntityId = $startDate = $endDate = NULL;
-    $dates = $original = array();
+    $dates = $original = [];
     $formValues = $_REQUEST;
     if (!empty($formValues['entity_table'])) {
       $startDateColumnName = CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']]['dateColumns'][0];
@@ -71,11 +71,11 @@ class CRM_Core_Page_RecurringEntityPreview extends CRM_Core_Page {
       if (CRM_Utils_Array::value('intervalDateColumns', CRM_Core_BAO_RecurringEntity::$_dateColumns[$formValues['entity_table']])) {
         if ($endDate) {
           $interval = $recursion->getInterval($startDate, $endDate);
-          $recursion->intervalDateColumns = array($endDateColumnName => $interval);
+          $recursion->intervalDateColumns = [$endDateColumnName => $interval];
         }
       }
 
-      $dates = array_merge(array($original), $recursion->generateRecursiveDates());
+      $dates = array_merge([$original], $recursion->generateRecursiveDates());
 
       foreach ($dates as $key => &$value) {
         if ($startDateColumnName) {

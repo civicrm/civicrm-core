@@ -1,0 +1,55 @@
+#toolbar-tray-civicrm {
+  display: none;
+}
+
+body.crm-menubar-visible.crm-menubar-over-cms-menu,
+body.crm-menubar-visible.crm-menubar-below-cms-menu {
+  margin-left: 0 !important;
+}
+
+nav#civicrm-menu-nav .crm-menubar-toggle-btn {
+  margin: 0;
+  position: absolute;
+  top: 0;
+  height: 38px;
+}
+#crm-menubar-state:checked ~ .crm-menubar-toggle-btn {
+  left: 0!important;
+}
+nav#civicrm-menu-nav .crm-menubar-toggle-btn span.crm-menu-logo {
+  top: 10px;
+  left: 20px;
+}
+nav#civicrm-menu-nav .crm-menubar-toggle-btn-icon {
+  left: 44px;
+}
+
+@media (min-width: 768px) {
+
+  body.crm-menubar-visible.crm-menubar-over-cms-menu #toolbar-administration  {
+    display: none;
+  }
+
+  body.crm-menubar-visible.crm-menubar-over-cms-menu {
+    padding-top: 40px !important;
+  }
+  body.crm-menubar-visible.crm-menubar-over-cms-menu.crm-menubar-wrapped,
+  body.crm-menubar-visible.crm-menubar-below-cms-menu {
+    padding-top: 80px !important;
+  }
+  body.crm-menubar-visible.crm-menubar-below-cms-menu.crm-menubar-wrapped {
+    padding-top: 120px !important;
+  }
+
+  body.crm-menubar-below-cms-menu > #civicrm-menu-nav ul#civicrm-menu {
+    z-index: 1000;
+    top: 40px;
+  }
+
+}
+
+@media (max-width: 609px) {
+  nav#civicrm-menu-nav {
+    position: absolute;
+  }
+}

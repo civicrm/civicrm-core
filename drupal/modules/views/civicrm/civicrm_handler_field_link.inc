@@ -29,6 +29,7 @@
  * @ingroup civicrm_field_handlers
  */
 class civicrm_handler_field_link extends civicrm_handler_field {
+
   public function construct() {
     parent::construct();
     $this->additional_fields['id'] = 'id';

@@ -42,8 +42,8 @@ class ReflectionUtils {
     $docs = self::parseDocBlock($reflection->getDocComment());
 
     // Recurse into parent functions
-    if (isset($docs['inheritDoc'])) {
-      unset($docs['inheritDoc']);
+    if (isset($docs['inheritDoc']) || isset($docs['inheritdoc'])) {
+      unset($docs['inheritDoc'], $docs['inheritdoc']);
       $newReflection = NULL;
       try {
         if ($type) {

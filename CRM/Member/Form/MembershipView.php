@@ -43,7 +43,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * The id of the membership being viewed.
@@ -67,7 +67,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    */
   public function addContext() {
     $extra = '';
-    foreach (array('context', 'selectedChild') as $arg) {
+    foreach (['context', 'selectedChild'] as $arg) {
       if ($value = CRM_Utils_Request::retrieve($arg, 'String', $this)) {
         $extra .= "&{$arg}={$value}";
       }
@@ -83,20 +83,20 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::DELETE => array(
+      self::$_links = [
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=view&id=%%id%%&cid=%%cid%%&relAction=delete&mid=%%mid%%&reset=1' . $this->addContext(),
           'title' => ts('Cancel Related Membership'),
-        ),
-        CRM_Core_Action::ADD => array(
+        ],
+        CRM_Core_Action::ADD => [
           'name' => ts('Create'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=view&id=%%id%%&cid=%%cid%%&relAction=create&rid=%%rid%%&reset=1' . $this->addContext(),
           'title' => ts('Create Related Membership'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -116,13 +116,13 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
         $relatedContactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
         $relatedDisplayName = CRM_Contact_BAO_Contact::displayName($relatedContactId);
         CRM_Member_BAO_Membership::del($id);
-        CRM_Core_Session::setStatus(ts('Related membership for %1 has been deleted.', array(1 => $relatedDisplayName)),
+        CRM_Core_Session::setStatus(ts('Related membership for %1 has been deleted.', [1 => $relatedDisplayName]),
           ts('Membership Deleted'), 'success');
         break;
 
       case 'create':
-        $ids = array();
-        $params = array(
+        $ids = [];
+        $params = [
           'contact_id' => CRM_Utils_Request::retrieve('rid', 'Positive', $this),
           'membership_type_id' => $owner['membership_type_id'],
           'owner_membership_id' => $owner['id'],
@@ -135,10 +135,10 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
           'status_id' => $owner['status_id'],
           'skipStatusCal' => TRUE,
           'createActivity' => TRUE,
-        );
+        ];
         CRM_Member_BAO_Membership::create($params, $ids);
         $relatedDisplayName = CRM_Contact_BAO_Contact::displayName($params['contact_id']);
-        CRM_Core_Session::setStatus(ts('Related membership for %1 has been created.', array(1 => $relatedDisplayName)),
+        CRM_Core_Session::setStatus(ts('Related membership for %1 has been created.', [1 => $relatedDisplayName]),
           ts('Membership Added'), 'success');
         break;
 
@@ -161,7 +161,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
    * @return void
    */
   public function preProcess() {
-    $values = array();
+    $values = [];
     $this->membershipID = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
@@ -170,7 +170,7 @@ class CRM_Member_Form_MembershipView extends CRM_Core_Form {
     $this->assign('context', $context);
 
     if ($this->membershipID) {
-      $params = array('id' => $this->membershipID);
+      $params = ['id' => $this->membershipID];
       CRM_Member_BAO_Membership::retrieve($params, $values);
       if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
         $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $values['membership_type_id'], 'financial_type_id');
@@ -272,7 +272,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
   LEFT JOIN civicrm_membership_status ms ON ms.id = m.status_id
  WHERE r.contact_id_y = {$values['contact_id']} AND r.is_active = 1  AND c.is_deleted = 0";
         $query = '';
-        foreach (array('a', 'b') as $dir) {
+        foreach (['a', 'b'] as $dir) {
           if (isset($relTypeDir[$dir])) {
             $query .= ($query ? ' UNION ' : '')
               . str_replace('_y', '_' . $dir, str_replace('_x', '_' . ($dir == 'a' ? 'b' : 'a'), $select))
@@ -281,9 +281,9 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
         }
         $query .= " ORDER BY is_current_member DESC";
         $dao = CRM_Core_DAO::executeQuery($query);
-        $related = array();
+        $related = [];
         $relatedRemaining = CRM_Utils_Array::value('max_related', $values, PHP_INT_MAX);
-        $rowElememts = array(
+        $rowElememts = [
           'id',
           'cid',
           'name',
@@ -294,21 +294,21 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
           'end_date',
           'is_current_member',
           'status',
-        );
+        ];
 
         while ($dao->fetch()) {
-          $row = array();
+          $row = [];
           foreach ($rowElememts as $field) {
             $row[$field] = $dao->$field;
           }
           if ($row['mid'] && ($row['is_current_member'] == 1)) {
             $relatedRemaining--;
             $row['action'] = CRM_Core_Action::formLink(self::links(), CRM_Core_Action::DELETE,
-              array(
+              [
                 'id' => CRM_Utils_Request::retrieve('id', 'Positive', $this),
                 'cid' => $row['cid'],
                 'mid' => $row['mid'],
-              ),
+              ],
               ts('more'),
               FALSE,
               'membership.relationship.action',
@@ -319,11 +319,11 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
           else {
             if ($relatedRemaining > 0) {
               $row['action'] = CRM_Core_Action::formLink(self::links(), CRM_Core_Action::ADD,
-                array(
+                [
                   'id' => CRM_Utils_Request::retrieve('id', 'Positive', $this),
                   'cid' => $row['cid'],
                   'rid' => $row['cid'],
-                ),
+                ],
                 ts('more'),
                 FALSE,
                 'membership.relationship.action',
@@ -340,10 +340,10 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
         }
         else {
           if ($relatedRemaining < 100000) {
-            $this->assign('related_text', ts('%1 available', array(1 => $relatedRemaining)));
+            $this->assign('related_text', ts('%1 available', [1 => $relatedRemaining]));
           }
           else {
-            $this->assign('related_text', ts('Unlimited', array(1 => $relatedRemaining)));
+            $this->assign('related_text', ts('Unlimited', [1 => $relatedRemaining]));
           }
         }
       }
@@ -365,7 +365,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
         "action=view&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
       );
 
-      $recentOther = array();
+      $recentOther = [];
       if (CRM_Core_Permission::checkActionPermission('CiviMember', CRM_Core_Action::UPDATE)) {
         $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/membership',
           "action=update&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
@@ -398,7 +398,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
     }
 
     if (!empty($values['is_test'])) {
-      $values['membership_type'] .= ' (test) ';
+      $values['membership_type'] = CRM_Core_TestEntity::appendTestText($values['membership_type']);
     }
 
     $subscriptionCancelled = CRM_Member_BAO_Membership::isSubscriptionCancelled($this->membershipID);
@@ -419,14 +419,14 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
    * @return void
    */
   public function buildQuickForm() {
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'cancel',
         'name' => ts('Done'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
-      ),
-    ));
+      ],
+    ]);
   }
 
 }

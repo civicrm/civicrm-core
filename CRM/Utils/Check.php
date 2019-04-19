@@ -38,7 +38,7 @@ class CRM_Utils_Check {
    * @var array
    * @link https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-3-logger-interface.md
    */
-  protected static $severityList = array(
+  protected static $severityList = [
     \Psr\Log\LogLevel::DEBUG,
     \Psr\Log\LogLevel::INFO,
     \Psr\Log\LogLevel::NOTICE,
@@ -47,7 +47,7 @@ class CRM_Utils_Check {
     \Psr\Log\LogLevel::CRITICAL,
     \Psr\Log\LogLevel::ALERT,
     \Psr\Log\LogLevel::EMERGENCY,
-  );
+  ];
 
   /**
    * We only need one instance of this object, so we use the
@@ -88,7 +88,7 @@ class CRM_Utils_Check {
         $config = CRM_Core_Config::singleton();
         $config->cleanup(0, FALSE);
 
-        $statusMessages = array();
+        $statusMessages = [];
         $maxSeverity = 0;
         foreach ($this->checkAll() as $message) {
           if (!$message->isVisible()) {
@@ -174,7 +174,7 @@ class CRM_Utils_Check {
       $messages = $this->checkAll();
     }
     $minLevel = self::severityMap($threshold);
-    $errors = array();
+    $errors = [];
     foreach ($messages as $message) {
       if ($message->getLevel() >= $minLevel) {
         $errors[] = $message->toArray();
@@ -200,7 +200,7 @@ class CRM_Utils_Check {
    *   Array of CRM_Utils_Check_Message objects
    */
   public static function checkAll($max = FALSE) {
-    $messages = array();
+    $messages = [];
     foreach (glob(__DIR__ . '/Check/Component/*.php') as $filePath) {
       $className = 'CRM_Utils_Check_Component_' . basename($filePath, '.php');
       /* @var CRM_Utils_Check_Component $check */
@@ -212,7 +212,7 @@ class CRM_Utils_Check {
 
     CRM_Utils_Hook::check($messages);
 
-    uasort($messages, array(__CLASS__, 'severitySort'));
+    uasort($messages, [__CLASS__, 'severitySort']);
 
     $maxSeverity = 1;
     foreach ($messages as $message) {

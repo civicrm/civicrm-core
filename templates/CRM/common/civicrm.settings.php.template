@@ -448,6 +448,20 @@ if (!defined('CIVICRM_PSR16_STRICT')) {
 define('CIVICRM_DEADLOCK_RETRIES', 3);
 
 /**
+ * Enable support for multiple locks.
+ *
+ * This is a transitional setting. When enabled sites with mysql 5.7.5+ or equivalent
+ * MariaDB can improve their DB conflict management.
+ *
+ * There is no known or expected downside or enabling this (and definite upside).
+ * The setting only exists to allow sites to manage change in their environment
+ * conservatively for the first 3 months.
+ *
+ * See https://github.com/civicrm/civicrm-core/pull/13854
+ */
+ // define('CIVICRM_SUPPORT_MULTIPLE_LOCKS', TRUE);
+
+/**
  * Configure MySQL to throw more errors when encountering unusual SQL expressions.
  *
  * If undefined, the value is determined automatically. For CiviCRM tarballs, it defaults
@@ -456,6 +470,12 @@ define('CIVICRM_DEADLOCK_RETRIES', 3);
 // if (!defined('CIVICRM_MYSQL_STRICT')) {
 // define('CIVICRM_MYSQL_STRICT', TRUE );
 // }
+
+/**
+ * Specify whether the CRM_Core_BAO_Cache should use the legacy
+ * direct-to-SQL-mode or the interim PSR-16 adapter.
+ */
+// define('CIVICRM_BAO_CACHE_ADAPTER', 'CRM_Core_BAO_Cache_Psr16');
 
 if (CIVICRM_UF === 'UnitTests') {
   if (!defined('CIVICRM_CONTAINER_CACHE')) define('CIVICRM_CONTAINER_CACHE', 'auto');

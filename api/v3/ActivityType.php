@@ -78,7 +78,7 @@ function civicrm_api3_activity_type_create($params) {
   }
 
   $activityObject = CRM_Core_OptionValue::addOptionValue($params, 'activity_type', $action, $optionValueID);
-  $activityType = array();
+  $activityType = [];
   _civicrm_api3_object_to_array($activityObject, $activityType[$activityObject->id]);
   return civicrm_api3_create_success($activityType, $params, 'activity_type', 'create');
 }
@@ -92,16 +92,16 @@ function civicrm_api3_activity_type_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_activity_type_create_spec(&$params) {
-  $params['label'] = array(
+  $params['label'] = [
     'api.required' => 1,
     'title' => 'Label',
     'type' => CRM_Utils_Type::T_STRING,
-  );
-  $params['weight'] = array(
+  ];
+  $params['weight'] = [
     'api.required' => 1,
     'title' => 'Weight',
     'type' => CRM_Utils_Type::T_STRING,
-  );
+  ];
 }
 
 /**

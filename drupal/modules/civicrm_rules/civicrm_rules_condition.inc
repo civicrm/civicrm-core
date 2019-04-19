@@ -85,7 +85,8 @@ function civicrm_rules_condition_parameter($label, $type = 'contact') {
         'type' => 'list<integer>',
         'label' => t('Participant role'),
         'options list' => 'civicrm_rules_get_participant_role_options',
-      ));
+      ),
+    );
   }
 
   if ($type == 'event') {
@@ -94,7 +95,8 @@ function civicrm_rules_condition_parameter($label, $type = 'contact') {
         'type' => 'list<integer>',
         'label' => t('CiviCRM event type'),
         'options list' => 'civicrm_rules_get_event_type_options',
-      ));
+      ),
+    );
   }
 
   return $default;

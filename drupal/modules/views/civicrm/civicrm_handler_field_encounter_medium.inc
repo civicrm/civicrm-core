@@ -31,7 +31,8 @@
  *
  */
 class civicrm_handler_field_encounter_medium extends views_handler_field {
-  static $_encounter_medium;
+  public static $_encounter_medium;
+
   public function construct() {
     parent::construct();
     if (!self::$_encounter_medium) {

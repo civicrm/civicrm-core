@@ -41,7 +41,8 @@
  * @{
  */
 require_once 'civicrm_rules_utils.inc';
-function civicrm_rules_rules_action_contact_send_email($to, $subject, $message, $from = NULL, $settings, RulesState$state, RulesPlugin$element) {
+
+function civicrm_rules_rules_action_contact_send_email($to, $subject, $message, $from = NULL, $settings, RulesState $state, RulesPlugin $element) {
 
   $to = str_replace(array("\r", "\n"), ',', $to);
   $toEmails = explode(',', $to);
@@ -51,7 +52,8 @@ function civicrm_rules_rules_action_contact_send_email($to, $subject, $message, 
   foreach ($toEmails as $toEmail) {
     $params            = array();
     $params['from']    = !empty($from) ? str_replace(array(
-      "\r", "\n"), '', $from) : 'Admin';
+      "\r", "\n",
+    ), '', $from) : 'Admin';
     $params['toEmail'] = $toEmail;
     $params['subject'] = $subject;
     $params['text']    = is_array($message) ? implode("\n", $message) : $message;

@@ -38,7 +38,6 @@
  */
 class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
 
-
   /**
    * Set variables up before form is built.
    *
@@ -263,22 +262,21 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->setDefaults($defaults);
 
     $this->addButtons(array(
-        array(
-          'type' => 'back',
-          'name' => ts('Previous'),
-        ),
-        array(
-          'type' => 'next',
-          'name' => ts('Continue'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+      array(
+        'type' => 'back',
+        'name' => ts('Previous'),
+      ),
+      array(
+        'type' => 'next',
+        'name' => ts('Continue'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ),
+      array(
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ),
+    ));
   }
 
   /**
@@ -343,8 +341,8 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
             }
             else {
               $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(
-                  1 => $threshold,
-                )) . ' ' . ts('Or Provide Contact ID or External ID.') . '<br />';
+                1 => $threshold,
+              )) . ' ' . ts('Or Provide Contact ID or External ID.') . '<br />';
             }
           }
           elseif (!in_array('event_title', $importKeys)) {

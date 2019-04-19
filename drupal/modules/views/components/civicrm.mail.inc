@@ -540,8 +540,8 @@ function _civicrm_mail_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_mailing'], array(
     'title' => 'Created Date',
-      'name' => 'created_date',
-    ));
+    'name' => 'created_date',
+  ));
 
   //scheduled_id
 
@@ -591,8 +591,8 @@ function _civicrm_mail_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_mailing'], array(
     'title' => 'Approval Date',
-      'name' => 'approval_date',
-    ));
+    'name' => 'approval_date',
+  ));
 
   //approval_status_id
   //Based on an option value. This value is an integer
@@ -782,8 +782,8 @@ function _civicrm_mail_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_mailing_job'], array(
     'title' => 'Scheduled Date',
-      'name' => 'scheduled_date',
-    ));
+    'name' => 'scheduled_date',
+  ));
   //When did the mailing start to send
   $data['civicrm_mailing_job']['start_date'] = array(
     'title' => t('Start Date'),
@@ -803,8 +803,8 @@ function _civicrm_mail_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_mailing_job'], array(
     'title' => 'Start Date',
-      'name' => 'start_date',
-    ));
+    'name' => 'start_date',
+  ));
   //Mailing finish date
   $data['civicrm_mailing_job']['end_date'] = array(
     'title' => t('End Date'),
@@ -824,8 +824,8 @@ function _civicrm_mail_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_mailing_job'], array(
     'title' => 'End Date',
-      'name' => 'end_date',
-    ));
+    'name' => 'end_date',
+  ));
 
   //Is this a test mailing
   $data['civicrm_mailing_job']['is_test'] = array(

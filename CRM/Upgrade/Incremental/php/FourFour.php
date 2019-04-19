@@ -52,9 +52,9 @@ class CRM_Upgrade_Incremental_php_FourFour extends CRM_Upgrade_Incremental_Base 
         }
       }
       if ($oversizedEntries > 0) {
-        $preUpgradeMessage .= '<br/>' . ts("WARNING: There are %1 word-replacement entries which will not be valid in v4.4+ (eg with over 255 characters). They will be dropped during upgrade. For details, consult the CiviCRM log.", array(
-            1 => $oversizedEntries,
-          ));
+        $preUpgradeMessage .= '<br/>' . ts("WARNING: There are %1 word-replacement entries which will not be valid in v4.4+ (eg with over 255 characters). They will be dropped during upgrade. For details, consult the CiviCRM log.", [
+          1 => $oversizedEntries,
+        ]);
       }
     }
   }
@@ -85,10 +85,10 @@ LEFT JOIN civicrm_contribution cc ON ceft.entity_id = cc.id
 WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id IS NULL;";
       $dao = CRM_Core_DAO::executeQuery($query);
       if ($dao->N) {
-        $postUpgradeMessage .= '<br /><br /><strong>' . ts('Your database contains %1 financial transaction records with no payment instrument (Paid By is empty). If you use the Accounting Batches feature this may result in unbalanced transactions. If you do not use this feature, you can ignore the condition (although you will be required to select a Paid By value for new transactions). <a href="%2" target="_blank">You can review steps to correct transactions with missing payment instruments on the wiki.</a>', array(
-              1 => $dao->N,
-              2 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Transactions+Missing+a+Payment+Instrument+-+4.4.3+Upgrades',
-            )) . '</strong>';
+        $postUpgradeMessage .= '<br /><br /><strong>' . ts('Your database contains %1 financial transaction records with no payment instrument (Paid By is empty). If you use the Accounting Batches feature this may result in unbalanced transactions. If you do not use this feature, you can ignore the condition (although you will be required to select a Paid By value for new transactions). <a href="%2" target="_blank">You can review steps to correct transactions with missing payment instruments on the wiki.</a>', [
+          1 => $dao->N,
+          2 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Fixing+Transactions+Missing+a+Payment+Instrument+-+4.4.3+Upgrades',
+        ]) . '</strong>';
       }
     }
     if ($rev == '4.4.6') {
@@ -105,7 +105,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
    */
   public function upgrade_4_4_alpha1($rev) {
     // task to process sql
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.alpha1')), 'runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => '4.4.alpha1']), 'runSql', $rev);
 
     // Consolidate activity contacts CRM-12274.
     $this->addTask('Consolidate activity contacts', 'activityContacts');
@@ -117,11 +117,11 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
    * @param $rev
    */
   public function upgrade_4_4_beta1($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.beta1')), 'runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => '4.4.beta1']), 'runSql', $rev);
 
     // add new 'data' column in civicrm_batch
     $query = 'ALTER TABLE civicrm_batch ADD data LONGTEXT NULL COMMENT "cache entered data"';
-    CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
+    CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
 
     // check if batch entry data exists in civicrm_cache table
     $query = 'SELECT path, data FROM civicrm_cache WHERE group_name = "batch entry"';
@@ -132,7 +132,7 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
       $data = unserialize($dao->data);
 
       // move the data to civicrm_batch table
-      CRM_Core_DAO::setFieldValue('CRM_Batch_DAO_Batch', $batchId[2], 'data', json_encode(array('values' => $data)));
+      CRM_Core_DAO::setFieldValue('CRM_Batch_DAO_Batch', $batchId[2], 'data', json_encode(['values' => $data]));
     }
 
     // delete entries from civicrm_cache table
@@ -157,25 +157,25 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
         SET value = '{$dimension}'
         WHERE option_group_id = %1 AND name = 'Fattorini Name Badge 100x65'";
 
-      CRM_Core_DAO::executeQuery($query, array(1 => array($ogID, 'Integer')));
+      CRM_Core_DAO::executeQuery($query, [1 => [$ogID, 'Integer']]);
     }
     else {
-      $dimensions = array(
+      $dimensions = [
         1 => '{"paper-size":"a4","orientation":"landscape","font-name":"times","font-size":6,"font-style":"","NX":2,"NY":1,"metric":"mm","lMargin":25,"tMargin":27,"SpaceX":0,"SpaceY":35,"width":106,"height":150,"lPadding":5,"tPadding":5}',
         2 => '{"paper-size":"a4","orientation":"portrait","font-name":"times","font-size":6,"font-style":"","NX":2,"NY":4,"metric":"mm","lMargin":6,"tMargin":19,"SpaceX":0,"SpaceY":0,"width":100,"height":65,"lPadding":0,"tPadding":0}',
         3 => '{"paper-size":"a4","orientation":"portrait","font-name":"times","font-size":6,"font-style":"","NX":2,"NY":2,"metric":"mm","lMargin":10,"tMargin":28,"SpaceX":0,"SpaceY":0,"width":96,"height":121,"lPadding":5,"tPadding":5}',
-      );
-      $insertStatements = array(
+      ];
+      $insertStatements = [
         1 => "($ogID, %1, '{$dimensions[1]}', %1, NULL, 0, NULL, 2, NULL, 0, 0, 1, NULL, NULL)",
         2 => "($ogID, %2, '{$dimensions[2]}', %2, NULL, 0, NULL, 3, NULL, 0, 0, 1, NULL, NULL)",
         3 => "($ogID, %3, '{$dimensions[3]}', %3, NULL, 0, NULL, 4, NULL, 0, 0, 1, NULL, NULL)",
-      );
+      ];
 
-      $queryParams = array(
-        1 => array('A6 Badge Portrait 150x106', 'String'),
-        2 => array('Fattorini Name Badge 100x65', 'String'),
-        3 => array('Hanging Badge 3-3/4" x 4-3"/4', 'String'),
-      );
+      $queryParams = [
+        1 => ['A6 Badge Portrait 150x106', 'String'],
+        2 => ['Fattorini Name Badge 100x65', 'String'],
+        3 => ['Hanging Badge 3-3/4" x 4-3"/4', 'String'],
+      ];
 
       foreach ($insertStatements as $values) {
         $query = 'INSERT INTO civicrm_option_value (`option_group_id`, `label`, `value`, `name`, `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`) VALUES' . $values;
@@ -189,13 +189,13 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
       $sql = '
         INSERT INTO civicrm_setting (group_name, name , value , domain_id , is_domain , created_date)
         VALUES (%1, %2, %3, %4, %5, now())';
-      CRM_Core_DAO::executeQuery($sql, array(
-        1 => array(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'String'),
-        2 => array('disable_core_css', 'String'),
-        3 => array(serialize(1), 'String'),
-        4 => array(CRM_Core_Config::domainID(), 'Positive'),
-        5 => array(1, 'Int'),
-      ));
+      CRM_Core_DAO::executeQuery($sql, [
+        1 => [CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME, 'String'],
+        2 => ['disable_core_css', 'String'],
+        3 => [serialize(1), 'String'],
+        4 => [CRM_Core_Config::domainID(), 'Positive'],
+        5 => [1, 'Int'],
+      ]);
       Civi::service('settings_manager')->flush();
     }
 
@@ -209,12 +209,12 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
     ";
     $timeInputFormat = CRM_Core_DAO::singleValueQuery($sql);
     if ($timeInputFormat && $timeInputFormat != $config->timeInputFormat) {
-      $params = array('timeInputFormat' => $timeInputFormat);
+      $params = ['timeInputFormat' => $timeInputFormat];
       CRM_Core_BAO_ConfigSetting::add($params);
     }
 
     // CRM-13698 - add 'Available' and 'No-show' activity statuses
-    $insertStatus = array();
+    $insertStatus = [];
     $nsinc = $avinc = $inc = 0;
     if (!CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Available')) {
       $insertStatus[] = "(%1, 'Available', %2, 'Available',  NULL, 0, NULL, %3, 0, 0, 1, NULL, NULL)";
@@ -229,14 +229,14 @@ WHERE ceft.entity_table = 'civicrm_contribution' AND cft.payment_instrument_id I
       $maxVal = CRM_Core_DAO::singleValueQuery("SELECT MAX(ROUND(op.value)) FROM civicrm_option_value op WHERE op.option_group_id  = $acOptionGroupID");
       $maxWeight = CRM_Core_DAO::singleValueQuery("SELECT MAX(weight) FROM civicrm_option_value WHERE option_group_id = $acOptionGroupID");
 
-      $p[1] = array($acOptionGroupID, 'Integer');
+      $p[1] = [$acOptionGroupID, 'Integer'];
       if ($avinc) {
-        $p[2] = array($avinc + $maxVal, 'Integer');
-        $p[3] = array($avinc + $maxWeight, 'Integer');
+        $p[2] = [$avinc + $maxVal, 'Integer'];
+        $p[3] = [$avinc + $maxWeight, 'Integer'];
       }
       if ($nsinc) {
-        $p[4] = array($nsinc + $maxVal, 'Integer');
-        $p[5] = array($nsinc + $maxWeight, 'Integer');
+        $p[4] = [$nsinc + $maxVal, 'Integer'];
+        $p[5] = [$nsinc + $maxWeight, 'Integer'];
       }
       $insertStatus = implode(',', $insertStatus);
 
@@ -247,7 +247,7 @@ VALUES {$insertStatus}";
       CRM_Core_DAO::executeQuery($sql, $p);
     }
 
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.1')), 'runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => '4.4.1']), 'runSql', $rev);
     $this->addTask('Patch word-replacement schema', 'wordReplacements_patch', $rev);
   }
 
@@ -257,7 +257,7 @@ VALUES {$insertStatus}";
    * @return bool
    */
   public function upgrade_4_4_4($rev) {
-    $fkConstraint = array();
+    $fkConstraint = [];
     if (!CRM_Core_DAO::checkFKConstraintInFormat('civicrm_activity_contact', 'activity_id')) {
       $fkConstraint[] = "ADD CONSTRAINT `FK_civicrm_activity_contact_activity_id` FOREIGN KEY (`activity_id`) REFERENCES `civicrm_activity` (`id`) ON DELETE CASCADE";
     }
@@ -290,13 +290,13 @@ WHERE a.id IS NULL;
     }
 
     // task to process sql
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.4.4')), 'runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => '4.4.4']), 'runSql', $rev);
 
     // CRM-13892 : add `name` column to dashboard schema
     $query = "
 ALTER TABLE civicrm_dashboard
     ADD name varchar(64) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT 'Internal name of dashlet.' AFTER domain_id ";
-    CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
+    CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
 
     $dashboard = new CRM_Core_DAO_Dashboard();
     $dashboard->find();
@@ -321,7 +321,7 @@ ALTER TABLE civicrm_dashboard
   {$values}
   END;
     ";
-    CRM_Core_DAO::executeQuery($query, array(), TRUE, NULL, FALSE, FALSE);
+    CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
 
     // CRM-13998 : missing alter statements for civicrm_report_instance
     $this->addTask(ts('Confirm civicrm_report_instance sql table for upgrades'), 'updateReportInstanceTable');
@@ -359,7 +359,8 @@ ALTER TABLE civicrm_dashboard
    */
   public function upgrade_4_4_7($rev, $originalVer, $latestVer) {
     // For WordPress/Joomla(?), cleanup broken image_URL from 4.4.6 upgrades - https://issues.civicrm.org/jira/browse/CRM-14971
-    $exBackendUrl = CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=XXX', TRUE); // URL formula from 4.4.6 upgrade
+    // URL formula from 4.4.6 upgrade
+    $exBackendUrl = CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=XXX', TRUE);
     $exFrontendUrl = CRM_Utils_System::url('civicrm/contact/imagefile', 'photo=XXX', TRUE, NULL, TRUE, TRUE);
     if ($originalVer == '4.4.6' && $exBackendUrl != $exFrontendUrl) {
       $minId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(min(id),0) FROM civicrm_contact WHERE image_URL IS NOT NULL');
@@ -384,7 +385,7 @@ ALTER TABLE civicrm_dashboard
    */
   public static function upgradeImageUrls(CRM_Queue_TaskContext $ctx, $startId, $endId) {
     $dao = self::findContactImageUrls($startId, $endId);
-    $failures = array();
+    $failures = [];
     $config = CRM_Core_Config::singleton();
     while ($dao->fetch()) {
       $imageURL = $dao->image_url;
@@ -435,7 +436,7 @@ ALTER TABLE civicrm_dashboard
       if (!empty($formValues['mapper'])) {
         foreach ($formValues['mapper'] as $key => $value) {
           foreach ($value as $k => $v) {
-            if ($v[0] == 'Membership' && in_array($v[1], array('membership_status', 'membership_status_id'))) {
+            if ($v[0] == 'Membership' && in_array($v[1], ['membership_status', 'membership_status_id'])) {
               $value = $formValues['value'][$key][$k];
               $op = $formValues['operator'][$key][$k];
               if ($op == 'IN') {
@@ -444,7 +445,7 @@ ALTER TABLE civicrm_dashboard
                 $value = str_replace(')', '', $value);
 
                 $v = explode(',', $value);
-                $value = array();
+                $value = [];
                 foreach ($v as $k1 => $v2) {
                   if (is_numeric($v2)) {
                     break 2;
@@ -453,7 +454,7 @@ ALTER TABLE civicrm_dashboard
                 }
                 $formValues['value'][$key][$k] = "(" . implode(',', $value) . ")";
               }
-              elseif (in_array($op, array('=', '!='))) {
+              elseif (in_array($op, ['=', '!='])) {
                 if (is_numeric($value)) {
                   break;
                 }
@@ -511,10 +512,10 @@ AND id BETWEEN %1 AND %2
 AND image_URL IS NOT NULL
 ";
 
-    $params = array(
-      1 => array($startId, 'Integer'),
-      2 => array($endId, 'Integer'),
-    );
+    $params = [
+      1 => [$startId, 'Integer'],
+      2 => [$endId, 'Integer'],
+    ];
     $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, NULL, FALSE, FALSE);
     return $dao;
   }
@@ -525,10 +526,10 @@ AND image_URL IS NOT NULL
    */
   public static function setContactImageUrl($cid, $newImageUrl) {
     $sql = 'UPDATE civicrm_contact SET image_url=%1 WHERE id=%2';
-    $params = array(
-      1 => array($newImageUrl, 'String'),
-      2 => array($cid, 'Integer'),
-    );
+    $params = [
+      1 => [$newImageUrl, 'String'],
+      2 => [$cid, 'Integer'],
+    ];
     $updatedao = CRM_Core_DAO::executeQuery($sql, $params);
   }
 
@@ -713,23 +714,23 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
    * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
    */
   public static function getConfigArraysAsAPIParams($rebuildEach) {
-    $wordReplacementCreateParams = array();
+    $wordReplacementCreateParams = [];
     // get all domains
-    $result = civicrm_api3('domain', 'get', array(
-      'return' => array('locale_custom_strings'),
-    ));
+    $result = civicrm_api3('domain', 'get', [
+      'return' => ['locale_custom_strings'],
+    ]);
     if (!empty($result["values"])) {
       foreach ($result["values"] as $value) {
-        $params = array();
+        $params = [];
         $params["domain_id"] = $value["id"];
-        $params["options"] = array('wp-rebuild' => $rebuildEach);
+        $params["options"] = ['wp-rebuild' => $rebuildEach];
         // unserialize word match string
-        $localeCustomArray = array();
+        $localeCustomArray = [];
         if (!empty($value["locale_custom_strings"])) {
           $localeCustomArray = unserialize($value["locale_custom_strings"]);
         }
         if (!empty($localeCustomArray)) {
-          $wordMatchArray = array();
+          $wordMatchArray = [];
           // Traverse Language array
           foreach ($localeCustomArray as $localCustomData) {
             // Traverse status array "enabled" "disabled"
@@ -763,13 +764,12 @@ CREATE TABLE IF NOT EXISTS `civicrm_word_replacement` (
    * bugfix in both places.
    */
   public static function rebuildWordReplacementTable() {
-    civicrm_api3('word_replacement', 'replace', array(
-      'options' => array('match' => array('domain_id', 'find_word')),
-      'values' => array_filter(self::getConfigArraysAsAPIParams(FALSE), array(__CLASS__, 'isValidWordReplacement')),
-    ));
+    civicrm_api3('word_replacement', 'replace', [
+      'options' => ['match' => ['domain_id', 'find_word']],
+      'values' => array_filter(self::getConfigArraysAsAPIParams(FALSE), [__CLASS__, 'isValidWordReplacement']),
+    ]);
     CRM_Core_BAO_WordReplacement::rebuild();
   }
-
 
   /**
    * CRM-13998 missing alter statements for civicrm_report_instance

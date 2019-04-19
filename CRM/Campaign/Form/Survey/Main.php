@@ -36,10 +36,13 @@
  */
 class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
-  /* values
+  /**
+   * values
    *
    * @var array
+   *
    */
+
 
   public $_values;
 
@@ -49,13 +52,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
    * @var string
    */
   protected $_context;
-
-  /**
-   * Explicitly declare the entity api name.
-   */
-  public function getDefaultEntity() {
-    return 'Survey';
-  }
 
   public function preProcess() {
     parent::preProcess();
@@ -70,22 +66,19 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
       CRM_Utils_System::setTitle(ts('Configure Survey') . ' - ' . $this->_surveyTitle);
     }
 
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      CRM_Custom_Form_CustomData::preProcess($this);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-    }
+    // Add custom data to form
+    CRM_Custom_Form_CustomData::addToForm($this);
 
     if ($this->_name != 'Petition') {
       $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
-      CRM_Utils_System::appendBreadCrumb(array(array('title' => ts('Survey Dashboard'), 'url' => $url)));
+      CRM_Utils_System::appendBreadCrumb([['title' => ts('Survey Dashboard'), 'url' => $url]]);
     }
 
     $this->_values = $this->get('values');
     if (!is_array($this->_values)) {
-      $this->_values = array();
+      $this->_values = [];
       if ($this->_surveyId) {
-        $params = array('id' => $this->_surveyId);
+        $params = ['id' => $this->_surveyId];
         CRM_Campaign_BAO_Survey::retrieve($params, $this->_values);
       }
       $this->set('values', $this->_values);
@@ -93,8 +86,6 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
 
     $this->assign('action', $this->_action);
     $this->assign('surveyId', $this->_surveyId);
-    // for custom data
-    $this->assign('entityID', $this->_surveyId);
   }
 
   /**
@@ -136,31 +127,31 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
    * Build the form object.
    */
   public function buildQuickForm() {
-
     $this->add('text', 'title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'title'), TRUE);
 
-    $surveyActivityTypes = CRM_Campaign_BAO_Survey::getSurveyActivityType();
     // Activity Type id
-    $this->addSelect('activity_type_id', array('option_url' => 'civicrm/admin/campaign/surveyType'), TRUE);
+    $this->addSelect('activity_type_id', ['option_url' => 'civicrm/admin/campaign/surveyType'], TRUE);
 
-    // Campaign id
-    $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value('campaign_id', $this->_values));
-    $this->add('select', 'campaign_id', ts('Campaign'), array('' => ts('- select -')) + $campaigns);
+    $this->addEntityRef('campaign_id', ts('Campaign'), [
+      'entity' => 'Campaign',
+      'create' => TRUE,
+      'select' => ['minimumInputLength' => 0],
+    ]);
 
     // script / instructions
-    $this->add('wysiwyg', 'instructions', ts('Instructions for interviewers'), array('rows' => 5, 'cols' => 40));
+    $this->add('wysiwyg', 'instructions', ts('Instructions for interviewers'), ['rows' => 5, 'cols' => 40]);
 
     // release frequency
-    $this->add('text', 'release_frequency', ts('Release Frequency'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'release_frequency'));
+    $this->add('number', 'release_frequency', ts('Release Frequency'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'release_frequency'));
 
     $this->addRule('release_frequency', ts('Release Frequency interval should be a positive number.'), 'positiveInteger');
 
     // max reserved contacts at a time
-    $this->add('text', 'default_number_of_contacts', ts('Maximum reserved at one time'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'default_number_of_contacts'));
+    $this->add('number', 'default_number_of_contacts', ts('Maximum reserved at one time'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'default_number_of_contacts'));
     $this->addRule('default_number_of_contacts', ts('Maximum reserved at one time should be a positive number'), 'positiveInteger');
 
     // total reserved per interviewer
-    $this->add('text', 'max_number_of_contacts', ts('Total reserved per interviewer'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'max_number_of_contacts'));
+    $this->add('number', 'max_number_of_contacts', ts('Total reserved per interviewer'), CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Survey', 'max_number_of_contacts'));
     $this->addRule('max_number_of_contacts', ts('Total reserved contacts should be a positive number'), 'positiveInteger');
 
     // is active ?
@@ -195,22 +186,20 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, 0);
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, 0);
 
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $this->_surveyId,
-      'Survey'
-    );
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->getEntityId(), $this->getDefaultEntity());
+
     $survey = CRM_Campaign_BAO_Survey::create($params);
     $this->_surveyId = $survey->id;
 
     if (!empty($this->_values['result_id'])) {
       $query = "SELECT COUNT(*) FROM civicrm_survey WHERE result_id = %1";
       $countSurvey = (int) CRM_Core_DAO::singleValueQuery($query,
-        array(
-          1 => array(
+        [
+          1 => [
             $this->_values['result_id'],
             'Positive',
-          ),
-        )
+          ],
+        ]
       );
       // delete option group if no any survey is using it.
       if (!$countSurvey) {

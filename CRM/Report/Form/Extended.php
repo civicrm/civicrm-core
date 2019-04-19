@@ -39,7 +39,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
 
   protected $_summary = NULL;
 
-  protected $_customGroupExtends = array();
+  protected $_customGroupExtends = [];
   protected $_baseTable = 'civicrm_contact';
 
   /**
@@ -62,7 +62,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   public function select() {
     parent::select();
   }
-
 
   /**
    * From clause build where baseTable & fromClauses are defined
@@ -88,7 +87,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    * @return array
    */
   public function fromClauses() {
-    return array();
+    return [];
   }
 
   public function groupBy() {
@@ -149,7 +148,7 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     }
     $selectedFields = array_keys($firstRow);
 
-    $alterfunctions = $altermap = array();
+    $alterfunctions = $altermap = [];
     foreach ($this->_columns as $tablename => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $field => $specs) {
@@ -181,526 +180,527 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    * @return array
    */
   public function getLineItemColumns() {
-    return array(
-      'civicrm_line_item' => array(
+    return [
+      'civicrm_line_item' => [
         'dao' => 'CRM_Price_BAO_LineItem',
-        'fields' => array(
-          'qty' => array(
+        'fields' => [
+          'qty' => [
             'title' => ts('Quantity'),
             'type' => CRM_Utils_Type::T_INT,
-            'statistics' => array('sum' => ts('Total Quantity Selected')),
-          ),
-          'unit_price' => array(
+            'statistics' => ['sum' => ts('Total Quantity Selected')],
+          ],
+          'unit_price' => [
             'title' => ts('Unit Price'),
-          ),
-          'line_total' => array(
+          ],
+          'line_total' => [
             'title' => ts('Line Total'),
             'type' => CRM_Utils_Type::T_MONEY,
-            'statistics' => array('sum' => ts('Total of Line Items')),
-          ),
-        ),
-        'participant_count' => array(
+            'statistics' => ['sum' => ts('Total of Line Items')],
+          ],
+        ],
+        'participant_count' => [
           'title' => ts('Participant Count'),
-          'statistics' => array('sum' => ts('Total Participants')),
-        ),
-        'filters' => array(
-          'qty' => array(
+          'statistics' => ['sum' => ts('Total Participants')],
+        ],
+        'filters' => [
+          'qty' => [
             'title' => ts('Quantity'),
             'type' => CRM_Utils_Type::T_INT,
             'operator' => CRM_Report_Form::OP_INT,
-          ),
-        ),
-        'group_bys' => array(
-          'price_field_id' => array(
+          ],
+        ],
+        'group_bys' => [
+          'price_field_id' => [
             'title' => ts('Price Field'),
-          ),
-          'price_field_value_id' => array(
+          ],
+          'price_field_value_id' => [
             'title' => ts('Price Field Option'),
-          ),
-          'line_item_id' => array(
+          ],
+          'line_item_id' => [
             'title' => ts('Individual Line Item'),
             'name' => 'id',
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
   }
 
   /**
    * @return array
    */
   public function getPriceFieldValueColumns() {
-    return array(
-      'civicrm_price_field_value' => array(
+    return [
+      'civicrm_price_field_value' => [
         'dao' => 'CRM_Price_BAO_PriceFieldValue',
-        'fields' => array(
-          'price_field_value_label' => array(
+        'fields' => [
+          'price_field_value_label' => [
             'title' => ts('Price Field Value Label'),
             'name' => 'label',
-          ),
-        ),
-        'filters' => array(
-          'price_field_value_label' => array(
+          ],
+        ],
+        'filters' => [
+          'price_field_value_label' => [
             'title' => ts('Price Fields Value Label'),
             'type' => CRM_Utils_Type::T_STRING,
             'operator' => 'like',
             'name' => 'label',
-          ),
-        ),
-        'order_bys' => array(
-          'label' => array(
+          ],
+        ],
+        'order_bys' => [
+          'label' => [
             'title' => ts('Price Field Value Label'),
-          ),
-        ),
-        'group_bys' => //note that we have a requirement to group by label such that all 'Promo book' lines
+          ],
+        ],
+        //note that we have a requirement to group by label such that all 'Promo book' lines
+        'group_bys' =>
         // are grouped together across price sets but there may be a separate need to group
         // by id so that entries in one price set are distinct from others. Not quite sure what
         // to call the distinction for end users benefit
-        array(
-          'price_field_value_label' => array(
+        [
+          'price_field_value_label' => [
             'title' => ts('Price Field Value Label'),
             'name' => 'label',
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
   }
 
   /**
    * @return array
    */
   public function getPriceFieldColumns() {
-    return array(
-      'civicrm_price_field' => array(
+    return [
+      'civicrm_price_field' => [
         'dao' => 'CRM_Price_BAO_PriceField',
-        'fields' => array(
-          'price_field_label' => array(
+        'fields' => [
+          'price_field_label' => [
             'title' => ts('Price Field Label'),
             'name' => 'label',
-          ),
-        ),
-        'filters' => array(
-          'price_field_label' => array(
+          ],
+        ],
+        'filters' => [
+          'price_field_label' => [
             'title' => ts('Price Field Label'),
             'type' => CRM_Utils_Type::T_STRING,
             'operator' => 'like',
             'name' => 'label',
-          ),
-        ),
-        'order_bys' => array(
-          'price_field_label' => array(
+          ],
+        ],
+        'order_bys' => [
+          'price_field_label' => [
             'title' => ts('Price Field Label'),
             'name' => 'label',
-          ),
-        ),
-        'group_bys' => array(
-          'price_field_label' => array(
+          ],
+        ],
+        'group_bys' => [
+          'price_field_label' => [
             'title' => ts('Price Field Label'),
             'name' => 'label',
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
   }
 
   /**
    * @return array
    */
   public function getParticipantColumns() {
-    static $_events = array();
+    static $_events = [];
     if (!isset($_events['all'])) {
       CRM_Core_PseudoConstant::populate($_events['all'], 'CRM_Event_DAO_Event', FALSE, 'title', 'is_active', "is_template IS NULL OR is_template = 0", 'end_date DESC');
     }
-    return array(
-      'civicrm_participant' => array(
+    return [
+      'civicrm_participant' => [
         'dao' => 'CRM_Event_DAO_Participant',
-        'fields' => array(
-          'participant_id' => array('title' => ts('Participant ID')),
-          'participant_record' => array(
+        'fields' => [
+          'participant_id' => ['title' => ts('Participant ID')],
+          'participant_record' => [
             'name' => 'id',
             'title' => ts('Participant ID'),
-          ),
-          'event_id' => array(
+          ],
+          'event_id' => [
             'title' => ts('Event ID'),
             'type' => CRM_Utils_Type::T_STRING,
             'alter_display' => 'alterEventID',
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => ts('Status'),
             'alter_display' => 'alterParticipantStatus',
-          ),
-          'role_id' => array(
+          ],
+          'role_id' => [
             'title' => ts('Role'),
             'alter_display' => 'alterParticipantRole',
-          ),
+          ],
           'participant_fee_level' => NULL,
           'participant_fee_amount' => NULL,
-          'participant_register_date' => array('title' => ts('Registration Date')),
-        ),
+          'participant_register_date' => ['title' => ts('Registration Date')],
+        ],
         'grouping' => 'event-fields',
-        'filters' => array(
-          'event_id' => array(
+        'filters' => [
+          'event_id' => [
             'name' => 'event_id',
             'title' => ts('Event'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $_events['all'],
-          ),
-          'sid' => array(
+          ],
+          'sid' => [
             'name' => 'status_id',
             'title' => ts('Participant Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label'),
-          ),
-          'rid' => array(
+          ],
+          'rid' => [
             'name' => 'role_id',
             'title' => ts('Participant Role'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Event_PseudoConstant::participantRole(),
-          ),
-          'participant_register_date' => array(
+          ],
+          'participant_register_date' => [
             'title' => ts('Registration Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-        ),
-        'order_bys' => array(
-          'event_id' => array(
+          ],
+        ],
+        'order_bys' => [
+          'event_id' => [
             'title' => ts('Event'),
             'default_weight' => '1',
             'default_order' => 'ASC',
-          ),
-        ),
-        'group_bys' => array(
-          'event_id' => array('title' => ts('Event')),
-        ),
-      ),
-    );
+          ],
+        ],
+        'group_bys' => [
+          'event_id' => ['title' => ts('Event')],
+        ],
+      ],
+    ];
   }
 
   /**
    * @return array
    */
   public function getMembershipColumns() {
-    return array(
-      'civicrm_membership' => array(
+    return [
+      'civicrm_membership' => [
         'dao' => 'CRM_Member_DAO_Membership',
         'grouping' => 'member-fields',
-        'fields' => array(
-          'membership_type_id' => array(
+        'fields' => [
+          'membership_type_id' => [
             'title' => ts('Membership Type'),
             'required' => TRUE,
             'alter_display' => 'alterMembershipTypeID',
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => ts('Membership Status'),
             'required' => TRUE,
             'alter_display' => 'alterMembershipStatusID',
-          ),
+          ],
           'join_date' => NULL,
-          'start_date' => array(
+          'start_date' => [
             'title' => ts('Current Cycle Start Date'),
-          ),
-          'end_date' => array(
+          ],
+          'end_date' => [
             'title' => ts('Current Membership Cycle End Date'),
-          ),
-        ),
-        'group_bys' => array(
-          'membership_type_id' => array(
+          ],
+        ],
+        'group_bys' => [
+          'membership_type_id' => [
             'title' => ts('Membership Type'),
-          ),
-        ),
-        'filters' => array(
-          'join_date' => array(
+          ],
+        ],
+        'filters' => [
+          'join_date' => [
             'type' => CRM_Utils_Type::T_DATE,
             'operatorType' => CRM_Report_Form::OP_DATE,
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
   }
 
   /**
    * @return array
    */
   public function getMembershipTypeColumns() {
-    return array(
-      'civicrm_membership_type' => array(
+    return [
+      'civicrm_membership_type' => [
         'dao' => 'CRM_Member_DAO_MembershipType',
         'grouping' => 'member-fields',
-        'filters' => array(
-          'gid' => array(
+        'filters' => [
+          'gid' => [
             'name' => 'id',
             'title' => ts('Membership Types'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'type' => CRM_Utils_Type::T_INT + CRM_Utils_Type::T_ENUM,
             'options' => CRM_Member_PseudoConstant::membershipType(),
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
   }
 
   /**
    * @return array
    */
   public function getEventColumns() {
-    return array(
-      'civicrm_event' => array(
+    return [
+      'civicrm_event' => [
         'dao' => 'CRM_Event_DAO_Event',
-        'fields' => array(
-          'id' => array(
+        'fields' => [
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'title' => array(
+          ],
+          'title' => [
             'title' => ts('Event Title'),
             'required' => TRUE,
-          ),
-          'event_type_id' => array(
+          ],
+          'event_type_id' => [
             'title' => ts('Event Type'),
             'required' => TRUE,
             'alter_display' => 'alterEventType',
-          ),
-          'fee_label' => array('title' => ts('Fee Label')),
-          'event_start_date' => array(
+          ],
+          'fee_label' => ['title' => ts('Fee Label')],
+          'event_start_date' => [
             'title' => ts('Event Start Date'),
-          ),
-          'event_end_date' => array('title' => ts('Event End Date')),
-          'max_participants' => array(
+          ],
+          'event_end_date' => ['title' => ts('Event End Date')],
+          'max_participants' => [
             'title' => ts('Capacity'),
             'type' => CRM_Utils_Type::T_INT,
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'event-fields',
-        'filters' => array(
-          'event_type_id' => array(
+        'filters' => [
+          'event_type_id' => [
             'name' => 'event_type_id',
             'title' => ts('Event Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Core_OptionGroup::values('event_type'),
-          ),
-          'event_title' => array(
+          ],
+          'event_title' => [
             'name' => 'title',
             'title' => ts('Event Title'),
             'operatorType' => CRM_Report_Form::OP_STRING,
-          ),
-        ),
-        'order_bys' => array(
-          'event_type_id' => array(
+          ],
+        ],
+        'order_bys' => [
+          'event_type_id' => [
             'title' => ts('Event Type'),
             'default_weight' => '2',
             'default_order' => 'ASC',
-          ),
-        ),
-        'group_bys' => array(
-          'event_type_id' => array(
+          ],
+        ],
+        'group_bys' => [
+          'event_type_id' => [
             'title' => ts('Event Type'),
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
   }
 
   /**
    * @return array
    */
   public function getContributionColumns() {
-    return array(
-      'civicrm_contribution' => array(
+    return [
+      'civicrm_contribution' => [
         'dao' => 'CRM_Contribute_DAO_Contribution',
-        'fields' => array(
-          'contribution_id' => array(
+        'fields' => [
+          'contribution_id' => [
             'name' => 'id',
-          ),
-          'financial_type_id' => array(
+          ],
+          'financial_type_id' => [
             'title' => ts('Financial Type'),
             'default' => TRUE,
             'alter_display' => 'alterContributionType',
-          ),
-          'payment_instrument_id' => array(
+          ],
+          'payment_instrument_id' => [
             'title' => ts('Payment Method'),
             'alter_display' => 'alterPaymentType',
-          ),
-          'source' => array('title' => ts('Contribution Source')),
+          ],
+          'source' => ['title' => ts('Contribution Source')],
           'trxn_id' => NULL,
-          'receive_date' => array('default' => TRUE),
+          'receive_date' => ['default' => TRUE],
           'receipt_date' => NULL,
           'fee_amount' => NULL,
           'net_amount' => NULL,
-          'total_amount' => array(
+          'total_amount' => [
             'title' => ts('Amount'),
-            'statistics' => array('sum' => ts('Total Amount')),
+            'statistics' => ['sum' => ts('Total Amount')],
             'type' => CRM_Utils_Type::T_MONEY,
-          ),
-        ),
-        'filters' => array(
-          'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
-          'financial_type_id' => array(
+          ],
+        ],
+        'filters' => [
+          'receive_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
+          'financial_type_id' => [
             'title' => ts('Financial Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::financialType(),
-          ),
-          'payment_instrument_id' => array(
+          ],
+          'payment_instrument_id' => [
             'title' => ts('Payment Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::paymentInstrument(),
-          ),
-          'contribution_status_id' => array(
+          ],
+          'contribution_status_id' => [
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
-          ),
-          'total_amount' => array('title' => ts('Contribution Amount')),
-        ),
-        'order_bys' => array(
-          'payment_instrument_id' => array(
+          ],
+          'total_amount' => ['title' => ts('Contribution Amount')],
+        ],
+        'order_bys' => [
+          'payment_instrument_id' => [
             'title' => ts('Payment Method'),
-          ),
-          'financial_type_id' => array(
+          ],
+          'financial_type_id' => [
             'title' => ts('Financial Type'),
-          ),
-        ),
-        'group_bys' => array(
-          'financial_type_id' => array('title' => ts('Financial Type')),
-          'payment_instrument_id' => array('title' => ts('Payment Method')),
-          'contribution_id' => array(
+          ],
+        ],
+        'group_bys' => [
+          'financial_type_id' => ['title' => ts('Financial Type')],
+          'payment_instrument_id' => ['title' => ts('Payment Method')],
+          'contribution_id' => [
             'title' => ts('Individual Contribution'),
             'name' => 'id',
-          ),
-          'source' => array('title' => ts('Contribution Source')),
-        ),
+          ],
+          'source' => ['title' => ts('Contribution Source')],
+        ],
         'grouping' => 'contribution-fields',
-      ),
-    );
+      ],
+    ];
   }
 
   /**
    * @return array
    */
   public function getContactColumns() {
-    return array(
-      'civicrm_contact' => array(
+    return [
+      'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'display_name' => array(
+        'fields' => [
+          'display_name' => [
             'title' => ts('Contact Name'),
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'title' => ts('Contact ID'),
             'alter_display' => 'alterContactID',
-          ),
-          'first_name' => array(
+          ],
+          'first_name' => [
             'title' => ts('First Name'),
-          ),
-          'last_name' => array(
+          ],
+          'last_name' => [
             'title' => ts('Last Name'),
-          ),
-          'nick_name' => array(
+          ],
+          'nick_name' => [
             'title' => ts('Nickname'),
             'alter_display' => 'alterNickname',
-          ),
-        ),
-        'filters' => array(
-          'id' => array(
+          ],
+        ],
+        'filters' => [
+          'id' => [
             'title' => ts('Contact ID'),
-          ),
-          'sort_name' => array(
+          ],
+          'sort_name' => [
             'title' => ts('Contact Name'),
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'contact-fields',
-        'order_bys' => array(
-          'sort_name' => array(
+        'order_bys' => [
+          'sort_name' => [
             'title' => ts('Last Name, First Name'),
             'default' => '1',
             'default_weight' => '0',
             'default_order' => 'ASC',
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
   }
 
   /**
    * @return array
    */
   public function getCaseColumns() {
-    return array(
-      'civicrm_case' => array(
+    return [
+      'civicrm_case' => [
         'dao' => 'CRM_Case_DAO_Case',
-        'fields' => array(
-          'id' => array(
+        'fields' => [
+          'id' => [
             'title' => ts('Case ID'),
             'required' => FALSE,
-          ),
-          'subject' => array(
+          ],
+          'subject' => [
             'title' => ts('Case Subject'),
             'default' => TRUE,
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => ts('Status'),
             'default' => TRUE,
-          ),
-          'case_type_id' => array(
+          ],
+          'case_type_id' => [
             'title' => ts('Case Type'),
             'default' => TRUE,
-          ),
-          'case_start_date' => array(
+          ],
+          'case_start_date' => [
             'title' => ts('Case Start Date'),
             'name' => 'start_date',
             'default' => TRUE,
-          ),
-          'case_end_date' => array(
+          ],
+          'case_end_date' => [
             'title' => ts('Case End Date'),
             'name' => 'end_date',
             'default' => TRUE,
-          ),
-          'case_duration' => array(
+          ],
+          'case_duration' => [
             'name' => 'duration',
             'title' => ts('Duration (Days)'),
             'default' => FALSE,
-          ),
-          'case_is_deleted' => array(
+          ],
+          'case_is_deleted' => [
             'name' => 'is_deleted',
             'title' => ts('Case Deleted?'),
             'default' => FALSE,
             'type' => CRM_Utils_Type::T_INT,
-          ),
-        ),
-        'filters' => array(
-          'case_start_date' => array(
+          ],
+        ],
+        'filters' => [
+          'case_start_date' => [
             'title' => ts('Case Start Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
             'name' => 'start_date',
-          ),
-          'case_end_date' => array(
+          ],
+          'case_end_date' => [
             'title' => ts('Case End Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
             'name' => 'end_date',
-          ),
-          'case_type_id' => array(
+          ],
+          'case_type_id' => [
             'title' => ts('Case Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->case_types,
-          ),
-          'case_status_id' => array(
+          ],
+          'case_status_id' => [
             'title' => ts('Case Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->case_statuses,
             'name' => 'status_id',
-          ),
-          'case_is_deleted' => array(
+          ],
+          'case_is_deleted' => [
             'title' => ts('Case Deleted?'),
             'type' => CRM_Report_Form::OP_INT,
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => $this->deleted_labels,
             'default' => 0,
             'name' => 'is_deleted',
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
   }
 
   /**
@@ -718,204 +718,204 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    * @return array
    *   address columns definition
    */
-  public function getAddressColumns($options = array()) {
-    $defaultOptions = array(
+  public function getAddressColumns($options = []) {
+    $defaultOptions = [
       'prefix' => '',
       'prefix_label' => '',
       'group_by' => FALSE,
       'order_by' => TRUE,
       'filters' => TRUE,
-      'defaults' => array(
+      'defaults' => [
         'country_id' => TRUE,
-      ),
-    );
+      ],
+    ];
 
     $options = array_merge($defaultOptions, $options);
 
-    $addressFields = array(
-      $options['prefix'] . 'civicrm_address' => array(
+    $addressFields = [
+      $options['prefix'] . 'civicrm_address' => [
         'dao' => 'CRM_Core_DAO_Address',
         'name' => 'civicrm_address',
         'alias' => $options['prefix'] . 'civicrm_address',
-        'fields' => array(
-          $options['prefix'] . 'name' => array(
+        'fields' => [
+          $options['prefix'] . 'name' => [
             'title' => ts($options['prefix_label'] . 'Address Name'),
             'default' => CRM_Utils_Array::value('name', $options['defaults'], FALSE),
             'name' => 'name',
-          ),
-          $options['prefix'] . 'street_address' => array(
+          ],
+          $options['prefix'] . 'street_address' => [
             'title' => ts($options['prefix_label'] . 'Street Address'),
             'default' => CRM_Utils_Array::value('street_address', $options['defaults'], FALSE),
             'name' => 'street_address',
-          ),
-          $options['prefix'] . 'supplemental_address_1' => array(
+          ],
+          $options['prefix'] . 'supplemental_address_1' => [
             'title' => ts($options['prefix_label'] .
               'Supplementary Address Field 1'),
             'default' => CRM_Utils_Array::value('supplemental_address_1', $options['defaults'], FALSE),
             'name' => 'supplemental_address_1',
-          ),
-          $options['prefix'] . 'supplemental_address_2' => array(
+          ],
+          $options['prefix'] . 'supplemental_address_2' => [
             'title' => ts($options['prefix_label'] .
               'Supplementary Address Field 2'),
             'default' => CRM_Utils_Array::value('supplemental_address_2', $options['defaults'], FALSE),
             'name' => 'supplemental_address_2',
-          ),
-          $options['prefix'] . 'supplemental_address_3' => array(
+          ],
+          $options['prefix'] . 'supplemental_address_3' => [
             'title' => ts($options['prefix_label'] .
               'Supplementary Address Field 3'),
             'default' => CRM_Utils_Array::value('supplemental_address_3', $options['defaults'], FALSE),
             'name' => 'supplemental_address_3',
-          ),
-          $options['prefix'] . 'street_number' => array(
+          ],
+          $options['prefix'] . 'street_number' => [
             'name' => 'street_number',
             'title' => ts($options['prefix_label'] . 'Street Number'),
             'type' => 1,
             'default' => CRM_Utils_Array::value('street_number', $options['defaults'], FALSE),
-          ),
-          $options['prefix'] . 'street_name' => array(
+          ],
+          $options['prefix'] . 'street_name' => [
             'name' => 'street_name',
             'title' => ts($options['prefix_label'] . 'Street Name'),
             'type' => 1,
             'default' => CRM_Utils_Array::value('street_name', $options['defaults'], FALSE),
-          ),
-          $options['prefix'] . 'street_unit' => array(
+          ],
+          $options['prefix'] . 'street_unit' => [
             'name' => 'street_unit',
             'title' => ts($options['prefix_label'] . 'Street Unit'),
             'type' => 1,
             'default' => CRM_Utils_Array::value('street_unit', $options['defaults'], FALSE),
-          ),
-          $options['prefix'] . 'city' => array(
+          ],
+          $options['prefix'] . 'city' => [
             'title' => ts($options['prefix_label'] . 'City'),
             'default' => CRM_Utils_Array::value('city', $options['defaults'], FALSE),
             'name' => 'city',
-          ),
-          $options['prefix'] . 'postal_code' => array(
+          ],
+          $options['prefix'] . 'postal_code' => [
             'title' => ts($options['prefix_label'] . 'Postal Code'),
             'default' => CRM_Utils_Array::value('postal_code', $options['defaults'], FALSE),
             'name' => 'postal_code',
-          ),
-          $options['prefix'] . 'county_id' => array(
+          ],
+          $options['prefix'] . 'county_id' => [
             'title' => ts($options['prefix_label'] . 'County'),
             'default' => CRM_Utils_Array::value('county_id', $options['defaults'], FALSE),
             'alter_display' => 'alterCountyID',
             'name' => 'county_id',
-          ),
-          $options['prefix'] . 'state_province_id' => array(
+          ],
+          $options['prefix'] . 'state_province_id' => [
             'title' => ts($options['prefix_label'] . 'State/Province'),
             'default' => CRM_Utils_Array::value('state_province_id', $options['defaults'], FALSE),
             'alter_display' => 'alterStateProvinceID',
             'name' => 'state_province_id',
-          ),
-          $options['prefix'] . 'country_id' => array(
+          ],
+          $options['prefix'] . 'country_id' => [
             'title' => ts($options['prefix_label'] . 'Country'),
             'default' => CRM_Utils_Array::value('country_id', $options['defaults'], FALSE),
             'alter_display' => 'alterCountryID',
             'name' => 'country_id',
-          ),
-        ),
+          ],
+        ],
         'grouping' => 'location-fields',
-      ),
-    );
+      ],
+    ];
 
     if ($options['filters']) {
-      $addressFields[$options['prefix'] . 'civicrm_address']['filters'] = array(
-        $options['prefix'] . 'street_number' => array(
+      $addressFields[$options['prefix'] . 'civicrm_address']['filters'] = [
+        $options['prefix'] . 'street_number' => [
           'title' => ts($options['prefix_label'] . 'Street Number'),
           'type' => 1,
           'name' => 'street_number',
-        ),
-        $options['prefix'] . 'street_name' => array(
+        ],
+        $options['prefix'] . 'street_name' => [
           'title' => ts($options['prefix_label'] . 'Street Name'),
           'name' => $options['prefix'] . 'street_name',
           'operator' => 'like',
-        ),
-        $options['prefix'] . 'postal_code' => array(
+        ],
+        $options['prefix'] . 'postal_code' => [
           'title' => ts($options['prefix_label'] . 'Postal Code'),
           'type' => 1,
           'name' => 'postal_code',
-        ),
-        $options['prefix'] . 'city' => array(
+        ],
+        $options['prefix'] . 'city' => [
           'title' => ts($options['prefix_label'] . 'City'),
           'operator' => 'like',
           'name' => 'city',
-        ),
-        $options['prefix'] . 'county_id' => array(
+        ],
+        $options['prefix'] . 'county_id' => [
           'name' => 'county_id',
           'title' => ts($options['prefix_label'] . 'County'),
           'type' => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Core_PseudoConstant::county(),
-        ),
-        $options['prefix'] . 'state_province_id' => array(
+        ],
+        $options['prefix'] . 'state_province_id' => [
           'name' => 'state_province_id',
           'title' => ts($options['prefix_label'] . 'State/Province'),
           'type' => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Core_PseudoConstant::stateProvince(),
-        ),
-        $options['prefix'] . 'country_id' => array(
+        ],
+        $options['prefix'] . 'country_id' => [
           'name' => 'country_id',
           'title' => ts($options['prefix_label'] . 'Country'),
           'type' => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'options' => CRM_Core_PseudoConstant::country(),
-        ),
-      );
+        ],
+      ];
     }
 
     if ($options['order_by']) {
       $addressFields[$options['prefix'] .
-      'civicrm_address']['order_bys'] = array(
-        $options['prefix'] . 'street_name' => array(
+      'civicrm_address']['order_bys'] = [
+        $options['prefix'] . 'street_name' => [
           'title' => ts($options['prefix_label'] . 'Street Name'),
           'name' => 'street_name',
-        ),
-        $options['prefix'] . 'street_number' => array(
+        ],
+        $options['prefix'] . 'street_number' => [
           'title' => ts($options['prefix_label'] . 'Odd / Even Street Number'),
           'name' => 'street_number',
-        ),
-        $options['prefix'] . 'street_address' => array(
+        ],
+        $options['prefix'] . 'street_address' => [
           'title' => ts($options['prefix_label'] . 'Street Address'),
           'name' => 'street_address',
-        ),
-        $options['prefix'] . 'city' => array(
+        ],
+        $options['prefix'] . 'city' => [
           'title' => ts($options['prefix_label'] . 'City'),
           'name' => 'city',
-        ),
-        $options['prefix'] . 'postal_code' => array(
+        ],
+        $options['prefix'] . 'postal_code' => [
           'title' => ts($options['prefix_label'] . 'Post Code'),
           'name' => 'postal_code',
-        ),
-      );
+        ],
+      ];
     }
 
     if ($options['group_by']) {
-      $addressFields['civicrm_address']['group_bys'] = array(
-        $options['prefix'] . 'street_address' => array(
+      $addressFields['civicrm_address']['group_bys'] = [
+        $options['prefix'] . 'street_address' => [
           'title' => ts($options['prefix_label'] . 'Street Address'),
           'name' => 'street_address',
-        ),
-        $options['prefix'] . 'city' => array(
+        ],
+        $options['prefix'] . 'city' => [
           'title' => ts($options['prefix_label'] . 'City'),
           'name' => 'city',
-        ),
-        $options['prefix'] . 'postal_code' => array(
+        ],
+        $options['prefix'] . 'postal_code' => [
           'title' => ts($options['prefix_label'] . 'Post Code'),
           'name' => 'postal_code',
-        ),
-        $options['prefix'] . 'state_province_id' => array(
+        ],
+        $options['prefix'] . 'state_province_id' => [
           'title' => ts($options['prefix_label'] . 'State/Province'),
           'name' => 'state_province_id',
-        ),
-        $options['prefix'] . 'country_id' => array(
+        ],
+        $options['prefix'] . 'country_id' => [
           'title' => ts($options['prefix_label'] . 'Country'),
           'name' => 'country_id',
-        ),
-        $options['prefix'] . 'county_id' => array(
+        ],
+        $options['prefix'] . 'county_id' => [
           'title' => ts($options['prefix_label'] . 'County'),
           'name' => 'county_id',
-        ),
-      );
+        ],
+      ];
     }
     return $addressFields;
   }
@@ -926,88 +926,88 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    * @return array
    */
   public function getAvailableJoins() {
-    return array(
-      'priceFieldValue_from_lineItem' => array(
+    return [
+      'priceFieldValue_from_lineItem' => [
         'leftTable' => 'civicrm_line_item',
         'rightTable' => 'civicrm_price_field_value',
         'callback' => 'joinPriceFieldValueFromLineItem',
-      ),
-      'priceField_from_lineItem' => array(
+      ],
+      'priceField_from_lineItem' => [
         'leftTable' => 'civicrm_line_item',
         'rightTable' => 'civicrm_price_field',
         'callback' => 'joinPriceFieldFromLineItem',
-      ),
-      'participant_from_lineItem' => array(
+      ],
+      'participant_from_lineItem' => [
         'leftTable' => 'civicrm_line_item',
         'rightTable' => 'civicrm_participant',
         'callback' => 'joinParticipantFromLineItem',
-      ),
-      'contribution_from_lineItem' => array(
+      ],
+      'contribution_from_lineItem' => [
         'leftTable' => 'civicrm_line_item',
         'rightTable' => 'civicrm_contribution',
         'callback' => 'joinContributionFromLineItem',
-      ),
-      'membership_from_lineItem' => array(
+      ],
+      'membership_from_lineItem' => [
         'leftTable' => 'civicrm_line_item',
         'rightTable' => 'civicrm_membership',
         'callback' => 'joinMembershipFromLineItem',
-      ),
-      'contribution_from_participant' => array(
+      ],
+      'contribution_from_participant' => [
         'leftTable' => 'civicrm_participant',
         'rightTable' => 'civicrm_contribution',
         'callback' => 'joinContributionFromParticipant',
-      ),
-      'contribution_from_membership' => array(
+      ],
+      'contribution_from_membership' => [
         'leftTable' => 'civicrm_membership',
         'rightTable' => 'civicrm_contribution',
         'callback' => 'joinContributionFromMembership',
-      ),
-      'membership_from_contribution' => array(
+      ],
+      'membership_from_contribution' => [
         'leftTable' => 'civicrm_contribution',
         'rightTable' => 'civicrm_membership',
         'callback' => 'joinMembershipFromContribution',
-      ),
-      'membershipType_from_membership' => array(
+      ],
+      'membershipType_from_membership' => [
         'leftTable' => 'civicrm_membership',
         'rightTable' => 'civicrm_membership_type',
         'callback' => 'joinMembershipTypeFromMembership',
-      ),
-      'lineItem_from_contribution' => array(
+      ],
+      'lineItem_from_contribution' => [
         'leftTable' => 'civicrm_contribution',
         'rightTable' => 'civicrm_line_item',
         'callback' => 'joinLineItemFromContribution',
-      ),
-      'lineItem_from_membership' => array(
+      ],
+      'lineItem_from_membership' => [
         'leftTable' => 'civicrm_membership',
         'rightTable' => 'civicrm_line_item',
         'callback' => 'joinLineItemFromMembership',
-      ),
-      'contact_from_participant' => array(
+      ],
+      'contact_from_participant' => [
         'leftTable' => 'civicrm_participant',
         'rightTable' => 'civicrm_contact',
         'callback' => 'joinContactFromParticipant',
-      ),
-      'contact_from_membership' => array(
+      ],
+      'contact_from_membership' => [
         'leftTable' => 'civicrm_membership',
         'rightTable' => 'civicrm_contact',
         'callback' => 'joinContactFromMembership',
-      ),
-      'contact_from_contribution' => array(
+      ],
+      'contact_from_contribution' => [
         'leftTable' => 'civicrm_contribution',
         'rightTable' => 'civicrm_contact',
         'callback' => 'joinContactFromContribution',
-      ),
-      'event_from_participant' => array(
+      ],
+      'event_from_participant' => [
         'leftTable' => 'civicrm_participant',
         'rightTable' => 'civicrm_event',
         'callback' => 'joinEventFromParticipant',
-      ),
-      'address_from_contact' => array(
+      ],
+      'address_from_contact' => [
         'leftTable' => 'civicrm_contact',
         'rightTable' => 'civicrm_address',
         'callback' => 'joinAddressFromContact',
-      ),
-    );
+      ],
+    ];
   }
 
   /**
@@ -1319,7 +1319,7 @@ WHERE   line_item_civireport.id IS NOT NULL
     $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), "reset=1&force=1&{$criteriaFieldName}_op=in&{$criteriaFieldName}_value={$value}", $this->_absoluteUrl);
     $row[$selectedfield . '_link'] = $url;
     $row[$selectedfield .
-    '_hover'] = ts("%1 for this country.", array(1 => $value));
+    '_hover'] = ts("%1 for this country.", [1 => $value]);
     $countries = CRM_Core_PseudoConstant::country($value, FALSE);
     if (!is_array($countries)) {
       return $countries;
@@ -1338,7 +1338,7 @@ WHERE   line_item_civireport.id IS NOT NULL
     $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), "reset=1&force=1&{$criteriaFieldName}_op=in&{$criteriaFieldName}_value={$value}", $this->_absoluteUrl);
     $row[$selectedfield . '_link'] = $url;
     $row[$selectedfield .
-    '_hover'] = ts("%1 for this county.", array(1 => $value));
+    '_hover'] = ts("%1 for this county.", [1 => $value]);
     $counties = CRM_Core_PseudoConstant::county($value, FALSE);
     if (!is_array($counties)) {
       return $counties;
@@ -1357,7 +1357,7 @@ WHERE   line_item_civireport.id IS NOT NULL
     $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), "reset=1&force=1&{$criteriaFieldName}_op=in&{$criteriaFieldName}_value={$value}", $this->_absoluteUrl);
     $row[$selectedfield . '_link'] = $url;
     $row[$selectedfield .
-    '_hover'] = ts("%1 for this state.", array(1 => $value));
+    '_hover'] = ts("%1 for this state.", [1 => $value]);
 
     $states = CRM_Core_PseudoConstant::stateProvince($value, FALSE);
     if (!is_array($states)) {
@@ -1400,7 +1400,7 @@ WHERE   line_item_civireport.id IS NOT NULL
       return NULL;
     }
     $roles = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-    $value = array();
+    $value = [];
     foreach ($roles as $role) {
       $value[$role] = CRM_Event_PseudoConstant::participantRole($role, FALSE);
     }

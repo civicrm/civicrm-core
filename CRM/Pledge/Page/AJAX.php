@@ -41,7 +41,7 @@ class CRM_Pledge_Page_AJAX {
    * for batch entry pledges
    */
   public function getPledgeDefaults() {
-    $details = array();
+    $details = [];
     if (!empty($_POST['pid'])) {
       $pledgeID = CRM_Utils_Type::escape($_POST['pid'], 'Integer');
       $details = CRM_Pledge_BAO_PledgePayment::getOldestPledgePayment($pledgeID);

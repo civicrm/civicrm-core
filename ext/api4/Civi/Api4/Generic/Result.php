@@ -57,6 +57,27 @@ class Result extends \ArrayObject {
   }
 
   /**
+   * Return last result.
+   * @return array|null
+   */
+  public function last() {
+    $items = $this->getArrayCopy();
+    return array_pop($items);
+  }
+
+  /**
+   * @param int $index
+   * @return array|null
+   */
+  public function itemAt($index) {
+    $length = $index < 0 ? 0 - $index : $index + 1;
+    if ($length > count($this)) {
+      return NULL;
+    }
+    return array_slice(array_values($this->getArrayCopy()), $index, 1)[0];
+  }
+
+  /**
    * Re-index the results array (which by default is non-associative)
    *
    * Drops any item from the results that does not contain the specified key

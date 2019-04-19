@@ -38,26 +38,31 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
 
   /**
    * Location block no
+   * @var int
    */
   private $_locBlockNo;
 
   /**
    * Do we want to parse street address.
+   * @var bool
    */
   public $_parseStreetAddress;
 
   /**
    * Store address values
+   * @var array
    */
   public $_values;
 
   /**
    * Form action
+   * @var string
    */
   public $_action;
 
   /**
    * Address id
+   * @var int
    */
   public $_addressId;
 
@@ -87,12 +92,12 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
     $addressSequence = CRM_Core_BAO_Address::addressSequence();
     $this->assign('addressSequence', $addressSequence);
 
-    $this->_values = array();
+    $this->_values = [];
     $this->_addressId = CRM_Utils_Request::retrieve('aid', 'Positive', $this, FALSE, NULL, $_REQUEST);
 
     $this->_action = CRM_Core_Action::ADD;
     if ($this->_addressId) {
-      $params = array('id' => $this->_addressId);
+      $params = ['id' => $this->_addressId];
       $address = CRM_Core_BAO_Address::getValues($params, FALSE, 'id');
       $this->_values['address'][$this->_locBlockNo] = array_pop($address);
       $this->_action = CRM_Core_Action::UPDATE;
@@ -125,7 +130,7 @@ class CRM_Contact_Form_Inline_Address extends CRM_Contact_Form_Inline {
   public function buildQuickForm() {
     parent::buildQuickForm();
     CRM_Contact_Form_Edit_Address::buildQuickForm($this, $this->_locBlockNo, TRUE, TRUE);
-    $this->addFormRule(array('CRM_Contact_Form_Edit_Address', 'formRule'), $this);
+    $this->addFormRule(['CRM_Contact_Form_Edit_Address', 'formRule'], $this);
   }
 
   /**

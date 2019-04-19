@@ -36,16 +36,19 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
 
   /**
    * Imported file size.
+   * @var int
    */
   protected $_fileSize;
 
   /**
    * Separator being used.
+   * @var string
    */
   protected $_seperator;
 
   /**
    * Total number of lines in file.
+   * @var int
    */
   protected $_lineCount;
 
@@ -63,6 +66,8 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
    * @param bool $skipColumnHeader
    * @param int $mode
    * @param int $onDuplicate
+   * @param int $statusID
+   * @param int $totalRowCount
    *
    * @return mixed
    * @throws Exception
@@ -97,14 +102,14 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
     $this->_invalidRowCount = $this->_validCount = 0;
     $this->_totalCount = $this->_conflictCount = 0;
 
-    $this->_errors = array();
-    $this->_warnings = array();
-    $this->_conflicts = array();
+    $this->_errors = [];
+    $this->_warnings = [];
+    $this->_conflicts = [];
 
     $this->_fileSize = number_format(filesize($fileName) / 1024.0, 2);
 
     if ($mode == self::MODE_MAPFIELD) {
-      $this->_rows = array();
+      $this->_rows = [];
     }
     else {
       $this->_activeFieldCount = count($this->_activeFields);
@@ -240,30 +245,24 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
       }
       if ($this->_invalidRowCount) {
         // removed view url for invlaid contacts
-        $headers = array_merge(array(
-            ts('Line Number'),
-            ts('Reason'),
-          ),
+        $headers = array_merge(
+          [ts('Line Number'), ts('Reason')],
           $customHeaders
         );
         $this->_errorFileName = self::errorFileName(self::ERROR);
         self::exportCSV($this->_errorFileName, $headers, $this->_errors);
       }
       if ($this->_conflictCount) {
-        $headers = array_merge(array(
-            ts('Line Number'),
-            ts('Reason'),
-          ),
+        $headers = array_merge(
+          [ts('Line Number'), ts('Reason')],
           $customHeaders
         );
         $this->_conflictFileName = self::errorFileName(self::CONFLICT);
         self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
       }
       if ($this->_duplicateCount) {
-        $headers = array_merge(array(
-            ts('Line Number'),
-            ts('View Activity History URL'),
-          ),
+        $headers = array_merge(
+          [ts('Line Number'), ts('View Activity History URL')],
           $customHeaders
         );
 
@@ -298,7 +297,7 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
    *   (reference ) associative array of name/value pairs
    */
   public function &getActiveFieldParams() {
-    $params = array();
+    $params = [];
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
       if (isset($this->_activeFields[$i]->_value)
         && !isset($params[$this->_activeFields[$i]->_name])
@@ -383,7 +382,7 @@ abstract class CRM_Activity_Import_Parser extends CRM_Import_Parser {
    * @param array $data
    */
   public static function exportCSV($fileName, $header, $data) {
-    $output = array();
+    $output = [];
     $fd = fopen($fileName, 'w');
 
     foreach ($header as $key => $value) {

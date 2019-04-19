@@ -101,7 +101,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
     $key = "{$id}_{$all}_{$condition}";
 
     if (!isset(self::$event[$key])) {
-      self::$event[$key] = array();
+      self::$event[$key] = [];
     }
 
     if (!self::$event[$key]) {
@@ -136,13 +136,13 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function &participantStatus($id = NULL, $cond = NULL, $retColumn = 'name') {
     if (self::$participantStatus === NULL) {
-      self::$participantStatus = array();
+      self::$participantStatus = [];
     }
 
     $index = $cond ? $cond : 'No Condition';
     $index = "{$index}_{$retColumn}";
     if (!CRM_Utils_Array::value($index, self::$participantStatus)) {
-      self::$participantStatus[$index] = array();
+      self::$participantStatus[$index] = [];
       CRM_Core_PseudoConstant::populate(self::$participantStatus[$index],
         'CRM_Event_DAO_ParticipantStatusType',
         FALSE, $retColumn, 'is_active', $cond, 'weight'
@@ -162,12 +162,12 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * @return array
    */
   public static function participantStatusClassOptions() {
-    return array(
+    return [
       'Positive' => ts('Positive'),
       'Pending' => ts('Pending'),
       'Waiting' => ts('Waiting'),
       'Negative' => ts('Negative'),
-    );
+    ];
   }
 
   /**
@@ -199,7 +199,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
   public static function &participantRole($id = NULL, $cond = NULL) {
     $index = $cond ? $cond : 'No Condition';
     if (!CRM_Utils_Array::value($index, self::$participantRole)) {
-      self::$participantRole[$index] = array();
+      self::$participantRole[$index] = [];
 
       $condition = NULL;
 
@@ -229,7 +229,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function &participantListing($id = NULL) {
     if (!self::$participantListing) {
-      self::$participantListing = array();
+      self::$participantListing = [];
       self::$participantListing = CRM_Core_OptionGroup::values('participant_listing');
     }
 
@@ -250,7 +250,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function &eventType($id = NULL) {
     if (!self::$eventType) {
-      self::$eventType = array();
+      self::$eventType = [];
       self::$eventType = CRM_Core_OptionGroup::values('event_type');
     }
 

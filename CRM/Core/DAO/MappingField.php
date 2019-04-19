@@ -19,14 +19,14 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_mapping_field';
+  public static $_tableName = 'civicrm_mapping_field';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Mapping Field ID
@@ -141,7 +141,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'mapping_id', 'civicrm_mapping', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'location_type_id', 'civicrm_location_type', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'relationship_type_id', 'civicrm_relationship_type', 'id');

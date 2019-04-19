@@ -56,7 +56,7 @@ function _civicrm_api3_survey_respondant_deprecation() {
  */
 function civicrm_api3_survey_respondant_get(&$params) {
 
-  civicrm_api3_verify_one_mandatory($params, NULL, array('survey_id', 'id'));
+  civicrm_api3_verify_one_mandatory($params, NULL, ['survey_id', 'id']);
 
   if (array_key_exists('survey_id', $params)) {
     $surveyID = $params['survey_id'];
@@ -70,7 +70,7 @@ function civicrm_api3_survey_respondant_get(&$params) {
     $interviewerID = $params['interviewer_id'];
   }
 
-  $statusIds = array();
+  $statusIds = [];
   if (array_key_exists('status_id', $params)) {
     $statusIds = explode(',', $params['status_id']);
   }

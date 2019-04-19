@@ -242,8 +242,8 @@ function _civicrm_event_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_event'], array(
     'title' => 'Start Date',
-      'name' => 'start_date',
-    ));
+    'name' => 'start_date',
+  ));
   //EVENT END DATE
   $data['civicrm_event']['end_date'] = array(
     'title' => t('End Date'),
@@ -263,8 +263,8 @@ function _civicrm_event_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_event'], array(
     'title' => 'End Date',
-      'name' => 'end_date',
-    ));
+    'name' => 'end_date',
+  ));
   //BOOLEAN : IS ONLINE REGISTRATION ENABLED
   $data['civicrm_event']['is_online_registration'] = array(
     'title' => t('Is Online Registration On'),
@@ -300,8 +300,8 @@ function _civicrm_event_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_event'], array(
     'title' => 'Registration Start Date',
-      'name' => 'registration_start_date',
-    ));
+    'name' => 'registration_start_date',
+  ));
   //EVENT ONLINE REGISTRATION END DATE
   $data['civicrm_event']['registration_end_date'] = array(
     'title' => t('Registration End Date'),
@@ -321,8 +321,8 @@ function _civicrm_event_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_event'], array(
     'title' => 'Registration End Date',
-      'name' => 'registration_end_date',
-    ));
+    'name' => 'registration_end_date',
+  ));
 
   //EVENT LINK TEXT
   $data['civicrm_event']['registration_link_text'] = array(
@@ -368,25 +368,6 @@ function _civicrm_event_data(&$data, $enabled) {
       'label' => t('CiviCRM Contact of the event creator'),
     ),
   );
-
-  // Domain information
-  $data['civicrm_event']['domain_id'] = array(
-    'title' => t('Domain Id'),
-    'help' => t('The Numeric ID of the domain this event was created in'),
-    'field' => array(
-      'handler' => 'views_handler_field_numeric',
-    ),
-  );
-
-  $data['civicrm_event']['domain_url'] = array(
-    'title' => t('Domain URL'),
-    'help' => t('Domain URL for registration'),
-    'field' => array(
-      'handler' => 'views_handler_field',
-      'click sortable' => TRUE,
-    ),
-  );
-
   // Link to Campaign Table
   if (isset($enabled['CiviCampaign'])) {
     $data['civicrm_event']['campaign_id'] = array(
@@ -595,8 +576,8 @@ function _civicrm_event_data(&$data, $enabled) {
   );
   civicrm_views_add_date_arguments($data['civicrm_participant'], array(
     'title' => 'Register Date',
-      'name' => 'register_date',
-    ));
+    'name' => 'register_date',
+  ));
 
   //BOOLEAN : IS SET TO PAY LATER
   $data['civicrm_participant']['is_pay_later'] = array(

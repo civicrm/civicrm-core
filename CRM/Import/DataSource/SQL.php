@@ -41,10 +41,10 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
    *   collection of info about this data source
    */
   public function getInfo() {
-    return array(
+    return [
       'title' => ts('SQL Query'),
-      'permissions' => array('import SQL datasource'),
-    );
+      'permissions' => ['import SQL datasource'],
+    ];
   }
 
   /**
@@ -68,7 +68,7 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
   public function buildQuickForm(&$form) {
     $form->add('hidden', 'hidden_dataSource', 'CRM_Import_DataSource_SQL');
     $form->add('textarea', 'sqlQuery', ts('Specify SQL Query'), 'rows=10 cols=45', TRUE);
-    $form->addFormRule(array('CRM_Import_DataSource_SQL', 'formRule'), $form);
+    $form->addFormRule(['CRM_Import_DataSource_SQL', 'formRule'], $form);
   }
 
   /**
@@ -79,13 +79,13 @@ class CRM_Import_DataSource_SQL extends CRM_Import_DataSource {
    * @return array|bool
    */
   public static function formRule($fields, $files, $form) {
-    $errors = array();
+    $errors = [];
 
     // Makeshift query validation (case-insensitive regex matching on word boundaries)
-    $forbidden = array('ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'SHOW', 'UPDATE', 'information_schema');
+    $forbidden = ['ALTER', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'SHOW', 'UPDATE', 'information_schema'];
     foreach ($forbidden as $pattern) {
       if (preg_match("/\\b$pattern\\b/i", $fields['sqlQuery'])) {
-        $errors['sqlQuery'] = ts('The query contains the forbidden %1 command.', array(1 => $pattern));
+        $errors['sqlQuery'] = ts('The query contains the forbidden %1 command.', [1 => $pattern]);
       }
     }
 

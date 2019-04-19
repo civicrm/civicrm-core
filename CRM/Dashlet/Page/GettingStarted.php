@@ -44,12 +44,13 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
 
   /**
    * Define tokens available for getting started
+   * @var array
    */
-  static $_tokens = array(
-    'crmurl' => array(
+  public static $_tokens = [
+    'crmurl' => [
       'configbackend' => 'civicrm/admin/configtask',
-    ),
-  );
+    ],
+  ];
 
   /**
    * Get the final, usable URL string (after interpolating any variables)
@@ -120,7 +121,6 @@ class CRM_Dashlet_Page_GettingStarted extends CRM_Core_Page {
     $this->replaceLinkToken($tokensList, $html);
     return $html;
   }
-
 
   /**
    * @param array $tokensList

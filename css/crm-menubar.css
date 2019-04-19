@@ -1,0 +1,348 @@
+/* CiviCRM navigation menu stylesheet */
+
+#civicrm-menu-nav {
+  line-height: 0;
+  text-align: left;
+  font-size: 13px;
+}
+#civicrm-menu {
+  background-color: $menubarColor;
+  width: 100%;
+  z-index: 500;
+  height: auto;
+  margin: 0;
+}
+#civicrm-menu i {
+  margin-right: 3px;
+}
+#civicrm-menu li {
+  border: none;
+  padding: 0;
+}
+#civicrm-menu li a {
+  padding: 12px 8px;
+  text-decoration: none;
+  box-shadow: none;
+  border: none;
+}
+#civicrm-menu li a[href="#"] {
+  cursor: default;
+}
+#civicrm-menu li li a {
+  padding: 6px 36px 6px 10px;
+}
+#civicrm-menu li.crm-menu-border-bottom:not(:last-child) {
+  border-bottom: 1px solid #bbb;
+}
+#civicrm-menu li:not(.crm-menu-border-bottom) + li.crm-menu-border-top {
+  border-top: 1px solid #bbb;
+}
+#civicrm-menu li a:focus,
+#civicrm-menu li a:hover,
+#civicrm-menu li a.highlighted {
+  text-decoration: none;
+  background-color: $highlightColor;
+  color: $highlightTextColor;
+}
+#civicrm-menu li li .sub-arrow:before {
+  content: "\f0da";
+	font-family: 'FontAwesome';
+	float: right;
+	margin-right: -25px;
+}
+/* x icon */
+#crm-menubar-state:checked ~ .crm-menubar-toggle-btn .crm-menubar-toggle-btn-icon {
+  height: 0;
+  background: transparent;
+}
+#crm-menubar-state:checked ~ .crm-menubar-toggle-btn .crm-menubar-toggle-btn-icon:before {
+  top: 0;
+  -webkit-transform: rotate(-45deg);
+  transform: rotate(-45deg);
+}
+#crm-menubar-state:checked ~ .crm-menubar-toggle-btn .crm-menubar-toggle-btn-icon:after {
+  top: 0;
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+/* hide menu state checkbox (keep it visible to screen readers) */
+#civicrm-menu-nav #crm-menubar-state {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(1px,1px,1px,1px);
+}
+#civicrm-menu-nav .crm-menubar-toggle-btn {
+  position: relative;
+  display: inline-block;
+  width: 57px;
+  height: 28px;
+  text-indent: 28px;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  color: transparent;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  background-color: #1b1b1b;
+}
+
+/* responsive icon */
+
+#civicrm-menu-nav .crm-menubar-toggle-btn-icon,
+#civicrm-menu-nav .crm-menubar-toggle-btn-icon:before,
+#civicrm-menu-nav .crm-menubar-toggle-btn-icon:after {
+  position: absolute;
+  top: 50%;
+  left: 27px;
+  height: 2px;
+  width: 24px;
+  background: #bbb;
+  -webkit-transition: all 0.25s;
+  transition: all 0.25s;
+}
+#civicrm-menu-nav .crm-menubar-toggle-btn-icon:before {
+  content: '';
+  top: -7px;
+  left: 0;
+}
+#civicrm-menu-nav .crm-menubar-toggle-btn-icon:after {
+  content: '';
+  top: 7px;
+  left: 0;
+}
+
+/* Quicksearch */
+#crm-qsearch {
+  padding: 1px 0 1px 2px;
+  background-color: transparent !important;
+}
+#civicrm-menu #crm-qsearch > a {
+  padding: 2px 0 0 2px;
+}
+
+input#crm-qsearch-input {
+  box-sizing: border-box;
+  background-color: #eaeaea;
+  font-size: 13px;
+  border: 1px solid #ccc;
+  margin: 4px 4px 0;
+  padding: 2px 8px;
+  height: 30px;
+  width: 30px;
+  transition: width .5s .05s, background-color .3s .05s;
+  color: black;
+}
+a.highlighted #crm-qsearch-input,
+#crm-qsearch-input:focus,
+#crm-qsearch-input.has-user-input {
+  background-color: white;
+  width: 130px;
+}
+input#crm-qsearch-input:-ms-input-placeholder {
+  font-family: 'FontAwesome';
+}
+input#crm-qsearch-input::-webkit-input-placeholder {
+  font-family: 'FontAwesome';
+}
+input#crm-qsearch-input::-moz-placeholder {
+  font-family: 'FontAwesome';
+}
+input#crm-qsearch-input::placeholder {
+  font-family: 'FontAwesome';
+}
+
+ul.crm-quickSearch-results {
+  z-index: 100001;
+}
+ul.crm-quickSearch-results.ui-state-disabled {
+  opacity: .8;
+}
+
+#civicrm-menu-nav .crm-logo-sm {
+  background: url($resourceBase/i/logo_sm.png) no-repeat;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin: 0 2px;
+}
+
+#civicrm-menu #crm-menubar-toggle-position {
+  float: right;
+}
+#civicrm-menu #crm-menubar-toggle-position a i {
+  margin: 0;
+  border-top: 2px solid $textColor;
+  font-size: 11px;
+  opacity: .8;
+}
+body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
+  transform: rotate(180deg);
+}
+
+@media (min-width: 768px) {
+
+  /* Switch to desktop layout
+  -----------------------------------------------
+     These transform the menu tree from
+     collapsible to desktop (navbar + dropdowns)
+  -----------------------------------------------*/
+  /* start... (it's not recommended editing these rules) */
+  #civicrm-menu ul{position:absolute;width:12em;}
+  #civicrm-menu li{float:left;}
+  #civicrm-menu.sm-rtl li{float:right;}
+  #civicrm-menu ul li,#civicrm-menu.sm-rtl ul li,#civicrm-menu.sm-vertical li{float:none;}
+  #civicrm-menu a{white-space:nowrap;}
+  #civicrm-menu ul a,#civicrm-menu.sm-vertical a{white-space:normal;}
+  #civicrm-menu .sm-nowrap > li > a,#civicrm-menu .sm-nowrap > li > :not(ul) a{white-space:nowrap;}
+  /* ...end */
+
+  /* hide the button in desktop view */
+  #civicrm-menu-nav .crm-menubar-toggle-btn {
+    position: absolute;
+    top: -99999px;
+  }
+
+  #civicrm-menu {
+    border-bottom: 1px solid #ccc;
+  }
+
+  body.crm-menubar-below-cms-menu > #civicrm-menu-nav #civicrm-menu {
+    top: 30px;
+  }
+
+  #civicrm-menu ul {
+    box-shadow: 0px 0px 2px 0 rgba(0,0,0,0.3);
+  }
+
+  #civicrm-menu li a {
+    background-color: $semiTransparentMenuColor;
+    color: $textColor;
+  }
+
+  #civicrm-menu > li > a {
+    height: 40px;
+  }
+
+  #civicrm-menu > li > a.highlighted {
+    z-index: 200000;
+  }
+
+  body.crm-menubar-over-cms-menu #civicrm-menu,
+  body.crm-menubar-below-cms-menu #civicrm-menu {
+    position: fixed;
+    top: 0;
+  }
+
+  body.crm-menubar-over-cms-menu #civicrm-menu {
+    z-index: 99999;
+  }
+
+  body.crm-menubar-above-crm-container #civicrm-menu {
+    z-index: 100;
+  }
+
+  body.crm-menubar-hidden #civicrm-menu {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  /* hide the menu in mobile view */
+  #crm-menubar-state:not(:checked) ~ #civicrm-menu {
+    display: none;
+  }
+  #civicrm-menu {
+    z-index: 100000;
+    background-color: #1b1b1b;
+  }
+	#civicrm-menu ul {
+		background-color: #444;
+	}
+	#civicrm-menu ul ul {
+		background-color: #555;
+	}
+	#civicrm-menu ul ul ul {
+		background-color: #666;
+	}
+  #civicrm-menu li {
+    padding: 5px;
+  }
+	#civicrm-menu li a {
+		text-align: center;
+		font-size: 14px;
+    color: #ddd;
+	}
+  #civicrm-menu li a:focus,
+  #civicrm-menu li a:hover,
+  #civicrm-menu li a.highlighted {
+    background-color: #676767;
+    color: #fff;
+  }
+  #civicrm-menu li .sub-arrow:before,
+  #civicrm-menu li li .sub-arrow:before {
+    content: "\f0da";
+    font-family: 'FontAwesome';
+    color: #bbb;
+    float: none;
+    margin-left: 10px;
+  }
+  #civicrm-menu li a.highlighted .sub-arrow:before {
+    content: "\f0d7";
+  }
+  #civicrm-menu-nav {
+    position: fixed;
+    background: transparent;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    height: 50px;
+    width: 100%;
+    z-index: 100000;
+  }
+  #civicrm-menu-nav > * {
+    pointer-events: auto;
+  }
+  #civicrm-menu-nav .crm-menubar-toggle-btn {
+    margin-left: 20px;
+    z-index: 110000;
+    margin-top: 10px;
+  }
+  #civicrm-menu-nav .crm-menubar-toggle-btn span.crm-menu-logo {
+    display: block;
+    position: absolute;
+    left: 5px;
+    width: 18px;
+    height: 18px;
+    background: url($resourceBase/i/logo_lg.png) no-repeat;
+    background-size: 18px;
+    top: 6px;
+  }
+  #crm-qsearch {
+    text-align: center;
+  }
+  #crm-qsearch .sub-arrow {
+    display: none;
+  }
+
+  #civicrm-menu li[data-name="Hide Menu"] {
+    display: none;
+  }
+
+  #crm-qsearch-input {
+    width: 14em !important;
+  }
+
+  #crm-menubar-toggle-position {
+    display: none;
+  }
+
+  /* Make sure we can click overlapped submenus in responsive mode */
+  #civicrm-menu li ul li {
+    z-index: 110000;
+    background-color: inherit;
+  }
+}

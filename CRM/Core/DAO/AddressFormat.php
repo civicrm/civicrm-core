@@ -19,14 +19,14 @@ class CRM_Core_DAO_AddressFormat extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_address_format';
+  public static $_tableName = 'civicrm_address_format';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Address Format Id

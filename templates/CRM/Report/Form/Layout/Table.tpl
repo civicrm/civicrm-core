@@ -40,12 +40,12 @@
                 {/if}
                 {if !$skip}
                    {if $header.colspan}
-                       <th colspan={$header.colspan}>{$header.title}</th>
+                       <th colspan={$header.colspan}>{$header.title|escape}</th>
                       {assign var=skip value=true}
                       {assign var=skipCount value=`$header.colspan`}
                       {assign var=skipMade  value=1}
                    {else}
-                       <th {$class}>{$header.title}</th>
+                       <th {$class}>{$header.title|escape}</th>
                    {assign var=skip value=false}
                    {/if}
                 {else} {* for skip case *}
@@ -93,7 +93,7 @@
                     {$l}/if{$r}
                     <tr class="crm-report-sectionHeader crm-report-sectionHeader-{$h}"><th colspan="{$columnCount}">
 
-                        <h{$h}>{$section.title}: {$l}$printValue|default:"<em>none</em>"{$r}
+                        <h{$h}>{$section.title|escape}: {$l}$printValue|default:"<em>none</em>"{$r}
                             ({$l}sectionTotal key=$row.{$column} depth={$smarty.foreach.sections.index}{$r})
                         </h{$h}>
                     </th></tr>

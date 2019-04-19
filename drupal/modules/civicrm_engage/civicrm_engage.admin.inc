@@ -1,4 +1,5 @@
 <?php
+
 /**
  * http://pastebin.com/U32jjBVu - D7 has renamed admin settings
  */
@@ -128,7 +129,6 @@ function civicrm_engage_admin_load_data($form_state = NULL) {
   );
   return $form;
 }
-
 
 function civicrm_engage_admin_load_data_submit($form, &$form_state) {
   if ($form_state['values']['contact_subtypes'] == 1) {

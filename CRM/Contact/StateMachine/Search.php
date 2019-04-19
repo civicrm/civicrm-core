@@ -48,7 +48,7 @@ class CRM_Contact_StateMachine_Search extends CRM_Core_StateMachine {
   public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
-    $this->_pages = array();
+    $this->_pages = [];
     if ($action == CRM_Core_Action::ADVANCED) {
       $this->_pages['CRM_Contact_Form_Search_Advanced'] = NULL;
       list($task, $result) = $this->taskName($controller, 'Advanced');

@@ -60,9 +60,9 @@ LEFT JOIN civicrm_price_set_entity ce ON ce.price_set_id = cf.price_set_id
 WHERE ce.entity_table = 'civicrm_event' AND {$whereClause}";
 
     $dao = CRM_Core_DAO::executeQuery($query);
-    $results = array();
+    $results = [];
     while ($dao->fetch()) {
-      $results[] = array('id' => $dao->id, 'text' => $dao->label);
+      $results[] = ['id' => $dao->id, 'text' => $dao->label];
     }
     CRM_Utils_JSON::output($results);
   }

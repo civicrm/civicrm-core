@@ -50,7 +50,7 @@ class CRM_Event_Page_ParticipantListing_Simple extends CRM_Core_Page {
       $this->_id,
       'title'
     );
-    CRM_Utils_System::setTitle(ts('%1 - Participants', array(1 => $this->_eventTitle)));
+    CRM_Utils_System::setTitle(ts('%1 - Participants', [1 => $this->_eventTitle]));
 
     // we do not want to display recently viewed contacts since this is potentially a public page
     $this->assign('displayRecent', FALSE);
@@ -74,7 +74,7 @@ LEFT JOIN  civicrm_email       ON ( civicrm_contact.id = civicrm_email.contact_i
 WHERE    civicrm_event.id = %1
 AND      civicrm_participant.is_test = 0
 AND      civicrm_participant.status_id IN ( 1, 2 )";
-    $params = array(1 => array($this->_id, 'Integer'));
+    $params = [1 => [$this->_id, 'Integer']];
     $this->pager($fromClause, $whereClause, $params);
     $orderBy = $this->orderBy();
 
@@ -91,15 +91,15 @@ SELECT   civicrm_contact.id           as contact_id    ,
 ORDER BY $orderBy
 LIMIT    $offset, $rowCount";
 
-    $rows = array();
+    $rows = [];
     $object = CRM_Core_DAO::executeQuery($query, $params);
     while ($object->fetch()) {
-      $row = array(
+      $row = [
         'id' => $object->contact_id,
         'participantID' => $object->participant_id,
         'name' => $object->name,
         'email' => $object->email,
-      );
+      ];
       $rows[] = $row;
     }
     $this->assign_by_ref('rows', $rows);
@@ -114,7 +114,7 @@ LIMIT    $offset, $rowCount";
    */
   public function pager($fromClause, $whereClause, $whereParams) {
 
-    $params = array();
+    $params = [];
 
     $params['status'] = ts('Group') . ' %%StatusMessage%%';
     $params['csvString'] = NULL;
@@ -142,18 +142,18 @@ SELECT count( civicrm_contact.id )
   public function orderBy() {
     static $headers = NULL;
     if (!$headers) {
-      $headers = array();
-      $headers[1] = array(
+      $headers = [];
+      $headers[1] = [
         'name' => ts('Name'),
         'sort' => 'civicrm_contact.sort_name',
         'direction' => CRM_Utils_Sort::ASCENDING,
-      );
+      ];
       if ($this->_participantListingType == 'Name and Email') {
-        $headers[2] = array(
+        $headers[2] = [
           'name' => ts('Email'),
           'sort' => 'civicrm_email.email',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        );
+        ];
       }
     }
     $sortID = NULL;

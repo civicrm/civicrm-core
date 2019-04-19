@@ -316,7 +316,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
         'url' => '#contact-summary',
         'title' => ts('Summary'),
         'weight' => 0,
-        'icon' => 'crm-i fa-address-card-o'
+        'icon' => 'crm-i fa-address-card-o',
       ],
       [
         'id' => 'activity',
@@ -411,10 +411,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       }
       elseif ($accessCiviCRM && !empty($this->_viewOptions[$tab['id']])) {
         $allTabs[] = $tab + [
-          'url' => CRM_Utils_System::url(
-            "civicrm/contact/view/{$tab['id']}",
-            "reset=1&cid={$this->_contactId}"
-          ),
+          'url' => CRM_Utils_System::url("civicrm/contact/view/{$tab['id']}", "reset=1&cid={$this->_contactId}"),
           'count' => CRM_Contact_BAO_Contact::getCountComponent($tab['id'], $this->_contactId),
         ];
         $weight = $tab['weight'] + 10;

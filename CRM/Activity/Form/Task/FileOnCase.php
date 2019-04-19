@@ -45,11 +45,13 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
 
   /**
    * Variable to store redirect path.
+   * @var string
    */
   protected $_userContext;
 
   /**
    * Variable to store contact Ids.
+   * @var array
    */
   public $_contacts;
 
@@ -68,7 +70,7 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->addEntityRef('unclosed_case_id', ts('Select Case'), array('entity' => 'Case'), TRUE);
+    $this->addEntityRef('unclosed_case_id', ts('Select Case'), ['entity' => 'Case'], TRUE);
     $this->addDefaultButtons(ts('Save'));
   }
 
@@ -80,8 +82,8 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
     $caseId = $formparams['unclosed_case_id'];
     $filedActivities = 0;
     foreach ($this->_activityHolderIds as $key => $id) {
-      $targetContactValues = $defaults = array();
-      $params = array('id' => $id);
+      $targetContactValues = $defaults = [];
+      $params = ['id' => $id];
       CRM_Activity_BAO_Activity::retrieve($params, $defaults);
       if (CRM_Case_BAO_Case::checkPermission($id, 'File On Case', $defaults['activity_type_id'])) {
 
@@ -92,13 +94,13 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
           $targetContactValues = implode(',', array_keys($targetContactValues));
         }
 
-        $params = array(
+        $params = [
           'caseID' => $caseId,
           'activityID' => $id,
           'newSubject' => empty($defaults['subject']) ? '' : $defaults['subject'],
           'targetContactIds' => $targetContactValues,
           'mode' => 'file',
-        );
+        ];
 
         $error_msg = CRM_Activity_Page_AJAX::_convertToCaseActivity($params);
         if (empty($error_msg['error_msg'])) {
@@ -109,16 +111,17 @@ class CRM_Activity_Form_Task_FileOnCase extends CRM_Activity_Form_Task {
         }
       }
       else {
-        CRM_Core_Session::setStatus(ts('Not permitted to file activity %1 %2.', array(
+        CRM_Core_Session::setStatus(
+          ts('Not permitted to file activity %1 %2.', [
             1 => empty($defaults['subject']) ? '' : $defaults['subject'],
             2 => $defaults['activity_date_time'],
-          )),
+          ]),
           ts("Error"), "error");
       }
     }
 
     CRM_Core_Session::setStatus($filedActivities, ts("Filed Activities"), "success");
-    CRM_Core_Session::setStatus("", ts('Total Selected Activities: %1', array(1 => count($this->_activityHolderIds))), "info");
+    CRM_Core_Session::setStatus("", ts('Total Selected Activities: %1', [1 => count($this->_activityHolderIds)]), "info");
   }
 
 }

@@ -61,7 +61,7 @@ class CRM_Utils_Http {
    *   Ex: Array("max-age"=>86400, "public"=>1).
    */
   public static function parseCacheControl($value) {
-    $result = array();
+    $result = [];
 
     $parts = preg_split('/, */', $value);
     foreach ($parts as $part) {

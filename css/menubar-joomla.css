@@ -1,0 +1,29 @@
+@media (min-width: 768px) {
+
+  body.crm-menubar-over-cms-menu.crm-menubar-visible {
+    padding-top: 40px;
+  }
+  body.crm-menubar-over-cms-menu.crm-menubar-visible.crm-menubar-wrapped {
+    padding-top: 80px;
+  }
+
+  body.crm-menubar-below-cms-menu.crm-menubar-visible {
+    margin-top: 40px;
+  }
+  body.crm-menubar-below-cms-menu.crm-menubar-visible.crm-menubar-wrapped {
+    margin-top: 80px;
+  }
+
+}
+@media (max-width: 768px) {
+
+  body #civicrm-menu-nav {
+    position: absolute;
+  }
+
+  body #civicrm-menu-nav .crm-menubar-toggle-btn {
+    margin-top: 3px;
+    margin-left: 6px;
+  }
+
+}

@@ -8,24 +8,24 @@
  *   API result array
  */
 function loc_block_create_example() {
-  $params = array(
-    'email' => array(
+  $params = [
+    'email' => [
       'location_type_id' => 1,
       'email' => 'test2@loc.block',
-    ),
-    'phone' => array(
+    ],
+    'phone' => [
       'location_type_id' => 1,
       'phone' => '987654321',
-    ),
-    'phone_2' => array(
+    ],
+    'phone_2' => [
       'location_type_id' => 1,
       'phone' => '456-7890',
-    ),
-    'address' => array(
+    ],
+    'address' => [
       'location_type_id' => 1,
       'street_address' => '987654321',
-    ),
-  );
+    ],
+  ];
 
   try{
     $result = civicrm_api3('LocBlock', 'create', $params);
@@ -35,12 +35,12 @@ function loc_block_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -54,22 +54,22 @@ function loc_block_create_example() {
  */
 function loc_block_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 3,
-    'values' => array(
-      '3' => array(
-        'address' => array(
+    'values' => [
+      '3' => [
+        'address' => [
           'id' => '3',
           'location_type_id' => '1',
           'is_primary' => 0,
           'is_billing' => 0,
           'street_address' => '987654321',
           'manual_geo_code' => 0,
-        ),
-        'email' => array(
+        ],
+        'email' => [
           'id' => '4',
           'contact_id' => '',
           'location_type_id' => '1',
@@ -82,8 +82,8 @@ function loc_block_create_expectedresult() {
           'reset_date' => '',
           'signature_text' => '',
           'signature_html' => '',
-        ),
-        'phone' => array(
+        ],
+        'phone' => [
           'id' => '3',
           'contact_id' => '',
           'location_type_id' => '1',
@@ -94,8 +94,8 @@ function loc_block_create_expectedresult() {
           'phone_ext' => '',
           'phone_numeric' => '',
           'phone_type_id' => '',
-        ),
-        'phone_2' => array(
+        ],
+        'phone_2' => [
           'id' => '4',
           'contact_id' => '',
           'location_type_id' => '1',
@@ -106,7 +106,7 @@ function loc_block_create_expectedresult() {
           'phone_ext' => '',
           'phone_numeric' => '',
           'phone_type_id' => '',
-        ),
+        ],
         'id' => '3',
         'address_id' => '3',
         'email_id' => '4',
@@ -116,9 +116,9 @@ function loc_block_create_expectedresult() {
         'email_2_id' => '',
         'phone_2_id' => '4',
         'im_2_id' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

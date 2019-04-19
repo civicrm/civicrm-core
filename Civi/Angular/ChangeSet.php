@@ -82,7 +82,7 @@ class ChangeSet implements ChangeSetInterface {
    *     - resourceType: string
    *     - callback: function
    */
-  protected $resFilters = array();
+  protected $resFilters = [];
 
   /**
    * @var array
@@ -90,7 +90,7 @@ class ChangeSet implements ChangeSetInterface {
    *     - regex: string
    *     - callback: function
    */
-  protected $htmlFilters = array();
+  protected $htmlFilters = [];
 
   /**
    * @param string $name
@@ -115,7 +115,7 @@ class ChangeSet implements ChangeSetInterface {
     return $this->alterResource('requires',
       function ($values) use ($module, $dependencies) {
         if (!isset($values[$module])) {
-          $values[$module] = array();
+          $values[$module] = [];
         }
         $values[$module] = array_unique(array_merge($values[$module], $dependencies));
         return $values;
@@ -130,10 +130,10 @@ class ChangeSet implements ChangeSetInterface {
    * @return ChangeSet
    */
   public function alterResource($resourceType, $callback) {
-    $this->resFilters[] = array(
+    $this->resFilters[] = [
       'resourceType' => $resourceType,
       'callback' => $callback,
-    );
+    ];
     return $this;
   }
 
@@ -152,10 +152,10 @@ class ChangeSet implements ChangeSetInterface {
    * @return ChangeSet
    */
   public function alterHtml($file, $callback) {
-    $this->htmlFilters[] = array(
+    $this->htmlFilters[] = [
       'regex' => ($file{0} === ';') ? $file : $this->createRegex($file),
       'callback' => $callback,
-    );
+    ];
     return $this;
   }
 

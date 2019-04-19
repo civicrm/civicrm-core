@@ -1,0 +1,64 @@
+@media (min-width: 768px) {
+
+  body.crm-menubar-over-cms-menu.crm-menubar-visible #wpbody {
+    padding-top: 8px;
+  }
+  body.crm-menubar-over-cms-menu.crm-menubar-visible.crm-menubar-wrapped #wpbody {
+    padding-top: 48px;
+  }
+
+  body.crm-menubar-over-cms-menu.crm-menubar-visible #wpadminbar {
+    visibility: hidden;
+  }
+
+  .wp-toolbar body.crm-menubar-below-cms-menu > #civicrm-menu-nav #civicrm-menu {
+    top: 32px;
+    left: 160px;
+    width: calc(100% - 160px);
+  }
+
+  .wp-toolbar body.crm-menubar-below-cms-menu.folded > #civicrm-menu-nav #civicrm-menu {
+    left: 36px;
+    width: calc(100% - 36px);
+  }
+
+  body.crm-menubar-below-cms-menu.crm-menubar-visible #wpbody {
+    padding-top: 40px;
+  }
+  body.crm-menubar-below-cms-menu.crm-menubar-visible.crm-menubar-wrapped #wpbody {
+    padding-top: 80px;
+  }
+  body.crm-menubar-over-cms-menu.crm-menubar-visible.crm-menubar-wrapped #adminmenuwrap {
+    margin-top: 40px;
+  }
+
+}
+@media (min-width: 768px) and (max-width: 960px) {
+
+  /* For the auto-fold toolbar */
+  .wp-toolbar body.crm-menubar-below-cms-menu.auto-fold > #civicrm-menu-nav #civicrm-menu {
+    left: 36px;
+    width: calc(100% - 36px);
+  }
+
+}
+@media (max-width: 768px) {
+
+  body #civicrm-menu-nav .crm-menubar-toggle-btn {
+    position: absolute;
+    right: 50px;
+  }
+
+}
+@media (max-width: 600px) {
+
+  body #civicrm-menu-nav {
+    position: absolute;
+  }
+
+}
+
+/* Make admin bar hide behind popup windows */
+body.ui-dialog-open #adminmenuwrap {
+  z-index: 100 !important;
+}

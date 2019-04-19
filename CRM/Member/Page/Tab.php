@@ -39,8 +39,8 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    *
    * @var array
    */
-  static $_links = NULL;
-  static $_membershipTypesLinks = NULL;
+  public static $_links = NULL;
+  public static $_membershipTypesLinks = NULL;
 
   public $_permission = NULL;
   public $_contactId = NULL;
@@ -56,14 +56,14 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       $addWhere = "membership_type_id IN (" . implode(',', array_keys($membershipTypes)) . ")";
     }
 
-    $membership = array();
+    $membership = [];
     $dao = new CRM_Member_DAO_Membership();
     $dao->contact_id = $this->_contactId;
     $dao->whereAdd($addWhere);
     $dao->find();
 
     //CRM--4418, check for view, edit, delete
-    $permissions = array(CRM_Core_Permission::VIEW);
+    $permissions = [CRM_Core_Permission::VIEW];
     if (CRM_Core_Permission::check('edit memberships')) {
       $permissions[] = CRM_Core_Permission::EDIT;
     }
@@ -81,7 +81,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
     //checks membership of contact itself
     while ($dao->fetch()) {
-      $membership[$dao->id] = array();
+      $membership[$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $membership[$dao->id]);
 
       //carry campaign.
@@ -89,7 +89,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
       //get the membership status and type values.
       $statusANDType = CRM_Member_BAO_Membership::getStatusANDTypeValues($dao->id);
-      foreach (array('status', 'membership_type') as $fld) {
+      foreach (['status', 'membership_type'] as $fld) {
         $membership[$dao->id][$fld] = CRM_Utils_Array::value($fld, $statusANDType[$dao->id]);
       }
       if (!empty($statusANDType[$dao->id]['is_current_member'])) {
@@ -124,10 +124,10 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         self::getPermissionedLinks($dao->membership_type_id, $links);
         $membership[$dao->id]['action'] = CRM_Core_Action::formLink($links,
           $currentMask,
-          array(
+          [
             'id' => $dao->id,
             'cid' => $this->_contactId,
-          ),
+          ],
           ts('Renew') . '...',
           FALSE,
           'membership.tab.row',
@@ -140,10 +140,10 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         self::getPermissionedLinks($dao->membership_type_id, $links);
         $membership[$dao->id]['action'] = CRM_Core_Action::formLink($links,
           $mask,
-          array(
+          [
             'id' => $dao->id,
             'cid' => $this->_contactId,
-          ),
+          ],
           ts('more'),
           FALSE,
           'membership.tab.row',
@@ -179,10 +179,10 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
   WHERE m.owner_membership_id = {$dao->id} AND m.is_test = 0 AND ms.is_current_member = 1 AND ct.is_deleted = 0";
         $num_related = CRM_Core_DAO::singleValueQuery($query);
         $max_related = CRM_Utils_Array::value('max_related', $membership[$dao->id]);
-        $membership[$dao->id]['related_count'] = ($max_related == '' ? ts('%1 created', array(1 => $num_related)) : ts('%1 out of %2', array(
+        $membership[$dao->id]['related_count'] = ($max_related == '' ? ts('%1 created', [1 => $num_related]) : ts('%1 out of %2', [
           1 => $num_related,
           2 => $max_related,
-        )));
+        ]));
       }
       else {
         $membership[$dao->id]['related_count'] = ts('N/A');
@@ -191,21 +191,21 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
     //Below code gives list of all Membership Types associated
     //with an Organization(CRM-2016)
-    $membershipTypesResult = civicrm_api3('MembershipType', 'get', array(
+    $membershipTypesResult = civicrm_api3('MembershipType', 'get', [
       'member_of_contact_id' => $this->_contactId,
-      'options' => array(
+      'options' => [
         'limit' => 0,
-      ),
-    ));
+      ],
+    ]);
     $membershipTypes = CRM_Utils_Array::value('values', $membershipTypesResult, NULL);
 
     foreach ($membershipTypes as $key => $value) {
       $membershipTypes[$key]['action'] = CRM_Core_Action::formLink(self::membershipTypeslinks(),
         $mask,
-        array(
+        [
           'id' => $value['id'],
           'cid' => $this->_contactId,
-        ),
+        ],
         ts('more'),
         FALSE,
         'membershipType.organization.action',
@@ -225,10 +225,10 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
       $this->assign('displayName', $displayName);
       $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('membership', $this->_contactId);
       // Refresh other tabs with related data
-      $this->ajaxResponse['updateTabs'] = array(
+      $this->ajaxResponse['updateTabs'] = [
         '#tab_activity' => CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId),
         '#tab_rel' => CRM_Contact_BAO_Contact::getCountComponent('rel', $this->_contactId),
-      );
+      ];
       if (CRM_Core_Permission::access('CiviContribute')) {
         $this->ajaxResponse['updateTabs']['#tab_contribute'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId);
       }
@@ -492,43 +492,43 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
     $isUpdateBilling = FALSE
   ) {
     if (!CRM_Utils_Array::value('view', self::$_links)) {
-      self::$_links['view'] = array(
-        CRM_Core_Action::VIEW => array(
+      self::$_links['view'] = [
+        CRM_Core_Action::VIEW => [
           'name' => ts('View'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=view&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member',
           'title' => ts('View Membership'),
-        ),
-      );
+        ],
+      ];
     }
 
     if (!CRM_Utils_Array::value('all', self::$_links)) {
-      $extraLinks = array(
-        CRM_Core_Action::UPDATE => array(
+      $extraLinks = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=update&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member',
           'title' => ts('Edit Membership'),
-        ),
-        CRM_Core_Action::RENEW => array(
+        ],
+        CRM_Core_Action::RENEW => [
           'name' => ts('Renew'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=renew&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member',
           'title' => ts('Renew Membership'),
-        ),
-        CRM_Core_Action::FOLLOWUP => array(
+        ],
+        CRM_Core_Action::FOLLOWUP => [
           'name' => ts('Renew-Credit Card'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=renew&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member&mode=live',
           'title' => ts('Renew Membership Using Credit Card'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&context=membership&selectedChild=member',
           'title' => ts('Delete Membership'),
-        ),
-      );
+        ],
+      ];
       if (!$isPaymentProcessor || !$accessContribution) {
         //unset the renew with credit card when payment
         //processor is not available or user is not permitted to create contributions
@@ -539,25 +539,25 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
 
     if ($isCancelSupported) {
       $cancelMessage = ts('WARNING: If you cancel the recurring contribution associated with this membership, the membership will no longer be renewed automatically. However, the current membership status will not be affected.');
-      self::$_links['all'][CRM_Core_Action::DISABLE] = array(
+      self::$_links['all'][CRM_Core_Action::DISABLE] = [
         'name' => ts('Cancel Auto-renewal'),
         'url' => 'civicrm/contribute/unsubscribe',
         'qs' => 'reset=1&cid=%%cid%%&mid=%%id%%&context=membership&selectedChild=member',
         'title' => ts('Cancel Auto Renew Subscription'),
         'extra' => 'onclick = "if (confirm(\'' . $cancelMessage . '\') ) {  return true; else return false;}"',
-      );
+      ];
     }
     elseif (isset(self::$_links['all'][CRM_Core_Action::DISABLE])) {
       unset(self::$_links['all'][CRM_Core_Action::DISABLE]);
     }
 
     if ($isUpdateBilling) {
-      self::$_links['all'][CRM_Core_Action::MAP] = array(
+      self::$_links['all'][CRM_Core_Action::MAP] = [
         'name' => ts('Change Billing Details'),
         'url' => 'civicrm/contribute/updatebilling',
         'qs' => 'reset=1&cid=%%cid%%&mid=%%id%%&context=membership&selectedChild=member',
         'title' => ts('Change Billing Details'),
-      );
+      ];
     }
     elseif (isset(self::$_links['all'][CRM_Core_Action::MAP])) {
       unset(self::$_links['all'][CRM_Core_Action::MAP]);
@@ -573,20 +573,20 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
    */
   public static function &membershipTypesLinks() {
     if (!self::$_membershipTypesLinks) {
-      self::$_membershipTypesLinks = array(
-        CRM_Core_Action::VIEW => array(
+      self::$_membershipTypesLinks = [
+        CRM_Core_Action::VIEW => [
           'name' => ts('Members'),
           'url' => 'civicrm/member/search/',
           'qs' => 'reset=1&force=1&type=%%id%%',
           'title' => ts('Search'),
-        ),
-        CRM_Core_Action::UPDATE => array(
+        ],
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/member/membershipType',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Membership Type'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_membershipTypesLinks;
   }

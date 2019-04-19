@@ -62,7 +62,7 @@ function smarty_function_sectionTotal($params, &$smarty) {
    * Note: This array is created and assigned to the template in CRM_Report_Form::sectionTotals()
    */
 
-  static $sectionValues = array();
+  static $sectionValues = [];
 
   // move back in the stack, if necessary
   if (count($sectionValues) > $params['depth']) {

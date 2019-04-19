@@ -34,6 +34,7 @@
  * Class CRM_Utils_Number
  */
 class CRM_Utils_Number {
+
   /**
    * Create a random number with a given precision.
    *
@@ -64,13 +65,16 @@ class CRM_Utils_Number {
   public static function createTruncatedDecimal($keyValue, $precision) {
     list ($sigFigs, $decFigs) = $precision;
     $sign = ($keyValue < 0) ? '-1' : 1;
-    $val = str_replace('.', '', abs($keyValue)); // ex: -123.456 ==> 123456
-    $val = substr($val, 0, $sigFigs);            // ex: 123456 => 1234
+    // ex: -123.456 ==> 123456
+    $val = str_replace('.', '', abs($keyValue));
+    // ex: 123456 => 1234
+    $val = substr($val, 0, $sigFigs);
 
     // Move any extra digits after decimal
     $extraFigs = strlen($val) - ($sigFigs - $decFigs);
     if ($extraFigs > 0) {
-      return $sign * $val / pow(10, $extraFigs); // ex: 1234 => 1.234
+      // ex: 1234 => 1.234
+      return $sign * $val / pow(10, $extraFigs);
     }
     else {
       return $sign * $val;
@@ -109,7 +113,7 @@ class CRM_Utils_Number {
         // respect php.ini upload_max_filesize
         if ($size > $maxImportFileSize && $size !== $postMaxSize) {
           $size = $maxImportFileSize;
-          CRM_Core_Session::setStatus(ts("Note: Please verify your configuration for Maximum File Size (in MB) <a href='%1'>Administrator >> System Settings >> Misc</a>. It should support 'upload_max_size' as defined in PHP.ini.Please check with your system administrator.", array(1 => CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1'))), ts("Warning"), "alert");
+          CRM_Core_Session::setStatus(ts("Note: Please verify your configuration for Maximum File Size (in MB) <a href='%1'>Administrator >> System Settings >> Misc</a>. It should support 'upload_max_size' as defined in PHP.ini.Please check with your system administrator.", [1 => CRM_Utils_System::url('civicrm/admin/setting/misc', 'reset=1')]), ts("Warning"), "alert");
         }
       }
       return $size;

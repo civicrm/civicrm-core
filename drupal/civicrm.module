@@ -201,11 +201,10 @@ function civicrm_initialize() {
     if (!include_once 'CRM/Core/Config.php') {
       $failure = TRUE;
       drupal_set_message(t("<strong><p class='error'>Oops! - The path for including CiviCRM code files is not set properly. Most likely there is an error in the <em>civicrm_root</em> setting in your CiviCRM settings file (!1). </p><p class='error'> &raquo; civicrm_root is currently set to: <em>!2</em></p><p class='error'>!3</p></strong>", array(
-          '!1' => $settingsFile,
-          '!2' => $civicrm_root,
-          '!3' => $errorMsgAdd,
-        ))
-      );
+        '!1' => $settingsFile,
+        '!2' => $civicrm_root,
+        '!3' => $errorMsgAdd,
+      )));
       return FALSE;
     }
 
@@ -330,7 +329,7 @@ function _civicrm_registerClassLoader() {
  *
  * @param string $default contact type
  *
- * @return string $ctype
+ * @return string
  *   Contact type
  */
 function civicrm_get_ctype($default = NULL) {
@@ -445,7 +444,7 @@ function civicrm_invoke() {
   $pageContent = CRM_Core_Invoke::invoke($args);
 
   $printedContent = ob_get_clean();
-  if (empty($pageContent) AND
+  if (empty($pageContent) and
     !empty($printedContent)
   ) {
     $pageContent = $printedContent;
@@ -664,7 +663,7 @@ function _civicrm_get_user_profile_id($name) {
         ));
         continue;
       }
-      catch (Exception $e){
+      catch (Exception $e) {
       }
     }
   }
@@ -945,8 +944,7 @@ function civicrm_theme_registry_alter(&$theme_registry) {
  */
 function civicrm_preprocess_page(&$variables) {
   // to increase it's flexibility.
-  if (module_exists('date_popup') && (in_array(arg(0), array(
-    'civicrm', 'user')))) {
+  if (module_exists('date_popup') && (in_array(arg(0), array('civicrm', 'user')))) {
 
     /**
      * Have hidden this function as it is not needed,

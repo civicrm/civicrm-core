@@ -31,7 +31,6 @@
  * @package CiviCRM_APIv3
  */
 
-
 /**
  * Get group organization record/s.
  *

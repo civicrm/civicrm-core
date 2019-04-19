@@ -44,7 +44,6 @@ function civicrm_api3_mailing_component_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'MailingComponent');
 }
 
-
 /**
  * Adjust Metadata for Create action.
  *

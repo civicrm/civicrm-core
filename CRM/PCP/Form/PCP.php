@@ -92,19 +92,19 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
         case CRM_Core_Action::DELETE:
         case 'delete':
           CRM_PCP_BAO_PCP::deleteById($this->_id);
-          CRM_Core_Session::setStatus(ts("The Campaign Page '%1' has been deleted.", array(1 => $this->_title)), ts('Page Deleted'), 'success');
+          CRM_Core_Session::setStatus(ts("The Campaign Page '%1' has been deleted.", [1 => $this->_title]), ts('Page Deleted'), 'success');
           break;
 
         case CRM_Core_Action::DISABLE:
         case 'disable':
           CRM_PCP_BAO_PCP::setDisable($this->_id, '0');
-          CRM_Core_Session::setStatus(ts("The Campaign Page '%1' has been disabled.", array(1 => $this->_title)), ts('Page Disabled'), 'success');
+          CRM_Core_Session::setStatus(ts("The Campaign Page '%1' has been disabled.", [1 => $this->_title]), ts('Page Disabled'), 'success');
           break;
 
         case CRM_Core_Action::ENABLE:
         case 'enable':
           CRM_PCP_BAO_PCP::setDisable($this->_id, '1');
-          CRM_Core_Session::setStatus(ts("The Campaign Page '%1' has been enabled.", array(1 => $this->_title)), ts('Page Enabled'), 'success');
+          CRM_Core_Session::setStatus(ts("The Campaign Page '%1' has been enabled.", [1 => $this->_title]), ts('Page Enabled'), 'success');
           break;
       }
 
@@ -122,7 +122,7 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    *   array of default values
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     $pageType = CRM_Utils_Request::retrieve('page_type', 'String', $this);
     $defaults['page_type'] = !empty($pageType) ? $pageType : '';
@@ -135,43 +135,41 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $this->addButtons(array(
-          array(
+      $this->addButtons([
+          [
             'type' => 'next',
             'name' => ts('Delete Campaign'),
             'isDefault' => TRUE,
-          ),
-          array(
+          ],
+          [
             'type' => 'cancel',
             'name' => ts('Cancel'),
-          ),
-        )
-      );
+          ],
+      ]);
     }
     else {
 
-      $status = array('' => ts('- select -')) + CRM_Core_OptionGroup::values("pcp_status");
-      $types = array(
+      $status = ['' => ts('- select -')] + CRM_Core_OptionGroup::values("pcp_status");
+      $types = [
         '' => ts('- select -'),
         'contribute' => ts('Contribution'),
         'event' => ts('Event'),
-      );
-      $contribPages = array('' => ts('- select -')) + CRM_Contribute_PseudoConstant::contributionPage();
-      $eventPages = array('' => ts('- select -')) + CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
+      ];
+      $contribPages = ['' => ts('- select -')] + CRM_Contribute_PseudoConstant::contributionPage();
+      $eventPages = ['' => ts('- select -')] + CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
 
       $this->addElement('select', 'status_id', ts('Status'), $status);
       $this->addElement('select', 'page_type', ts('Source Type'), $types);
       $this->addElement('select', 'page_id', ts('Contribution Page'), $contribPages);
       $this->addElement('select', 'event_id', ts('Event Page'), $eventPages);
-      $this->addButtons(array(
-          array(
+      $this->addButtons([
+          [
             'type' => 'refresh',
             'name' => ts('Search'),
             'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
             'isDefault' => TRUE,
-          ),
-        )
-      );
+          ],
+      ]);
       parent::buildQuickForm();
     }
   }
@@ -197,14 +195,14 @@ class CRM_PCP_Form_PCP extends CRM_Core_Form {
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_PCP_BAO_PCP::deleteById($this->_id);
-      CRM_Core_Session::setStatus(ts("The Campaign Page '%1' has been deleted.", array(1 => $this->_title)), ts('Page Deleted'), 'success');
+      CRM_Core_Session::setStatus(ts("The Campaign Page '%1' has been deleted.", [1 => $this->_title]), ts('Page Deleted'), 'success');
     }
     else {
       $params = $this->controller->exportValues($this->_name);
       $parent = $this->controller->getParent();
 
       if (!empty($params)) {
-        $fields = array('status_id', 'page_id');
+        $fields = ['status_id', 'page_id'];
         foreach ($fields as $field) {
           if (isset($params[$field]) &&
             !CRM_Utils_System::isNull($params[$field])

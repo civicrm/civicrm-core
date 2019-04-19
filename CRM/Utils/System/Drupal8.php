@@ -184,8 +184,8 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function getLoginURL($destination = '') {
-    $query = $destination ? array('destination' => $destination) : array();
-    return \Drupal::url('user.page', array(), array('query' => $query));
+    $query = $destination ? ['destination' => $destination] : [];
+    return \Drupal::url('user.page', [], ['query' => $query]);
   }
 
   /**
@@ -229,13 +229,13 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if ($region != 'html-header') {
       return FALSE;
     }
-    $css = array(
+    $css = [
       '#tag' => 'link',
-      '#attributes' => array(
+      '#attributes' => [
         'href' => $url,
         'rel' => 'stylesheet',
-      ),
-    );
+      ],
+    ];
     \Drupal::service('civicrm.page_state')->addCSS($css);
     return TRUE;
   }
@@ -247,10 +247,10 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     if ($region != 'html-header') {
       return FALSE;
     }
-    $css = array(
+    $css = [
       '#tag' => 'style',
       '#value' => $code,
-    );
+    ];
     \Drupal::service('civicrm.page_state')->addCSS($css);
     return TRUE;
   }
@@ -304,11 +304,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
     // Not all links that CiviCRM generates are Drupal routes, so we use the weaker ::fromUri method.
     try {
-      $url = \Drupal\Core\Url::fromUri("base:{$url['path']}", array(
+      $url = \Drupal\Core\Url::fromUri("base:{$url['path']}", [
         'query' => $url['query'],
         'fragment' => $fragment,
         'absolute' => $absolute,
-      ))->toString();
+      ])->toString();
     }
     catch (Exception $e) {
       // @Todo: log to watchdog
@@ -331,13 +331,13 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
     $system = new CRM_Utils_System_Drupal8();
-    $system->loadBootStrap(array(), FALSE);
+    $system->loadBootStrap([], FALSE);
 
     $uid = \Drupal::service('user.auth')->authenticate($name, $password);
     if ($uid) {
       if ($this->loadUser($name)) {
         $contact_id = CRM_Core_BAO_UFMatch::getContactId($uid);
-        return array($contact_id, $uid, mt_rand());
+        return [$contact_id, $uid, mt_rand()];
       }
     }
 
@@ -407,7 +407,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @return bool
    * @Todo Handle setting cleanurls configuration for CiviCRM?
    */
-  public function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
+  public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     static $run_once = FALSE;
     if ($run_once) {
       return TRUE;
@@ -427,7 +427,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       $autoloader = ComposerAutoloaderInitDrupal8::getLoader();
     }
     // @Todo: do we need to handle case where $_SERVER has no HTTP_HOST key, ie. when run via cli?
-    $request = new \Symfony\Component\HttpFoundation\Request(array(), array(), array(), array(), array(), $_SERVER);
+    $request = new \Symfony\Component\HttpFoundation\Request([], [], [], [], [], $_SERVER);
 
     // Create a kernel and boot it.
     \Drupal\Core\DrupalKernel::createFromRequest($request, $autoloader, 'prod')->prepareLegacyRequest($request);
@@ -557,7 +557,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * @inheritDoc
    */
   public function getModules() {
-    $modules = array();
+    $modules = [];
 
     $module_data = system_rebuild_module_data();
     foreach ($module_data as $module_name => $extension) {
@@ -602,7 +602,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       set_time_limit(300);
     }
 
-    $users = array();
+    $users = [];
     $users = \Drupal::entityTypeManager()->getStorage('user')->loadByProperties();
 
     $uf = $config->userFramework;
@@ -627,11 +627,11 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       }
     }
 
-    return array(
+    return [
       'contactCount' => $contactCount,
       'contactMatching' => $contactMatching,
       'contactCreated' => $contactCreated,
-    );
+    ];
   }
 
   /**

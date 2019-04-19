@@ -6,13 +6,13 @@
  *   API result array
  */
 function mapping_field_get_example() {
-  $params = array(
+  $params = [
     'mapping_id' => 2,
     'name' => 'last_name',
     'contact_type' => 'Individual',
     'column_number' => 2,
     'grouping' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('MappingField', 'get', $params);
@@ -22,12 +22,12 @@ function mapping_field_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -41,22 +41,22 @@ function mapping_field_get_example() {
  */
 function mapping_field_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 2,
-    'values' => array(
-      '2' => array(
+    'values' => [
+      '2' => [
         'id' => '2',
         'mapping_id' => '2',
         'name' => 'last_name',
         'contact_type' => 'Individual',
         'column_number' => '2',
         'grouping' => '1',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

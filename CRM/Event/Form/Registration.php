@@ -154,10 +154,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   public $_pcpId;
 
-  /* Is event already full.
+  /**
+   * Is event already full.
    *
    * @var boolean
+   *
    */
+
 
   public $_isEventFull;
 
@@ -168,9 +171,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_forcePayement;
 
   /**
+   * @var bool
    * @deprecated
-   *
-   * @var
    */
   public $_isBillingAddressRequiredForPayLater;
 
@@ -391,9 +393,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->_contributeMode = $this->get('contributeMode');
     $this->assign('contributeMode', $this->_contributeMode);
 
-    // setting CMS page title
-    CRM_Utils_System::setTitle($this->_values['event']['title']);
-    $this->assign('title', $this->_values['event']['title']);
+    $this->setTitle($this->_values['event']['title']);
 
     $this->assign('paidEvent', $this->_values['event']['is_monetary']);
 
@@ -1257,10 +1257,10 @@ WHERE  v.option_group_id = g.id
       return;
     }
     foreach (array(
-               'constantValues',
-               'submitValues',
-               'defaultValues',
-             ) as $val) {
+      'constantValues',
+      'submitValues',
+      'defaultValues',
+    ) as $val) {
       $values = $form->{"_$val"};
       if (!is_array($values) || empty($values)) {
         continue;

@@ -61,7 +61,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
     $this->set('skipTextFile', FALSE);
 
-    $defaults = array();
+    $defaults = [];
 
     if ($mailingID) {
       $dao = new CRM_Mailing_DAO_Mailing();
@@ -115,7 +115,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
     $config = CRM_Core_Config::singleton();
-    $options = array();
+    $options = [];
     $tempVar = FALSE;
 
     $this->assign('max_sms_length', CRM_SMS_Provider::MAX_SMS_CHAR);
@@ -125,8 +125,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       "CRM_SMS_Controller_Send_{$this->controller->_key}"
     );
 
-    $attributes = array('onclick' => "showHideUpload();");
-    $options = array(ts('Upload Content'), ts('Compose On-screen'));
+    $attributes = ['onclick' => "showHideUpload();"];
+    $options = [ts('Upload Content'), ts('Compose On-screen')];
 
     $this->addRadio('upload_type', ts('I want to'), $options, $attributes, "&nbsp;&nbsp;");
 
@@ -137,31 +137,31 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $this->addRule('textFile', ts('File size should be less than 1 MByte'), 'maxfilesize', 1024 * 1024);
     $this->addRule('textFile', ts('File must be in UTF-8 encoding'), 'utf8File');
 
-    $this->addFormRule(array('CRM_SMS_Form_Upload', 'formRule'), $this);
+    $this->addFormRule(['CRM_SMS_Form_Upload', 'formRule'], $this);
 
-    $buttons = array(
-      array(
+    $buttons = [
+      [
         'type' => 'back',
         'name' => ts('Previous'),
-      ),
-      array(
+      ],
+      [
         'type' => 'upload',
         'name' => ts('Next'),
         'spacing' => '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;',
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => 'cancel',
         'name' => ts('Cancel'),
-      ),
-    );
+      ],
+    ];
 
     $this->addButtons($buttons);
   }
 
   public function postProcess() {
-    $params = $ids = array();
-    $uploadParams = array('from_name');
+    $params = $ids = [];
+    $uploadParams = ['from_name'];
 
     $formValues = $this->controller->exportValues($this->_name);
 
@@ -198,16 +198,16 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
     $params['contact_id'] = $session->get('userID');
-    $composeFields = array(
+    $composeFields = [
       'SMStemplate',
       'SMSsaveTemplate',
       'SMSupdateTemplate',
       'SMSsaveTemplateName',
-    );
+    ];
     $msgTemplate = NULL;
     // Mail template is composed.
     if ($formValues['upload_type']) {
-      $composeParams = array();
+      $composeParams = [];
       foreach ($composeFields as $key) {
         if (!empty($formValues[$key])) {
           $composeParams[$key] = $formValues[$key];
@@ -216,11 +216,11 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       }
 
       if (!empty($composeParams['SMSupdateTemplate'])) {
-        $templateParams = array(
+        $templateParams = [
           'msg_text' => $text_message,
           'is_active' => TRUE,
           'is_sms' => TRUE,
-        );
+        ];
 
         $templateParams['id'] = $formValues['SMStemplate'];
 
@@ -228,11 +228,11 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       }
 
       if (!empty($composeParams['SMSsaveTemplate'])) {
-        $templateParams = array(
+        $templateParams = [
           'msg_text' => $text_message,
           'is_active' => TRUE,
           'is_sms' => TRUE,
-        );
+        ];
 
         $templateParams['msg_title'] = $composeParams['SMSsaveTemplateName'];
 
@@ -270,7 +270,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     if (!empty($_POST['_qf_Import_refresh'])) {
       return TRUE;
     }
-    $errors = array();
+    $errors = [];
     $template = CRM_Core_Smarty::singleton();
 
     $domain = CRM_Core_BAO_Domain::getDomain();
@@ -280,22 +280,22 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $mailing->find(TRUE);
 
     $session = CRM_Core_Session::singleton();
-    $values = array(
+    $values = [
       'contact_id' => $session->get('userID'),
       'version' => 3,
-    );
+    ];
     require_once 'api/api.php';
     $contact = civicrm_api('contact', 'get', $values);
 
     // CRM-4524.
     $contact = reset($contact['values']);
 
-    $verp = array_flip(array('optOut', 'reply', 'unsubscribe', 'resubscribe', 'owner'));
+    $verp = array_flip(['optOut', 'reply', 'unsubscribe', 'resubscribe', 'owner']);
     foreach ($verp as $key => $value) {
       $verp[$key]++;
     }
 
-    $urls = array_flip(array('forward', 'optOutUrl', 'unsubscribeUrl', 'resubscribeUrl'));
+    $urls = array_flip(['forward', 'optOutUrl', 'unsubscribeUrl', 'resubscribeUrl']);
     foreach ($urls as $key => $value) {
       $urls[$key]++;
     }
@@ -317,7 +317,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
         if (!empty($params['text_message'])) {
           $messageCheck = CRM_Utils_Array::value('text_message', $params);
           if ($messageCheck && (strlen($messageCheck) > CRM_SMS_Provider::MAX_SMS_CHAR)) {
-            $errors['text_message'] = ts("You can configure the SMS message body up to %1 characters", array(1 => CRM_SMS_Provider::MAX_SMS_CHAR));
+            $errors['text_message'] = ts("You can configure the SMS message body up to %1 characters", [1 => CRM_SMS_Provider::MAX_SMS_CHAR]);
           }
         }
       }
@@ -339,7 +339,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
         $name = 'text message';
       }
 
-      $dataErrors = array();
+      $dataErrors = [];
 
       // Do a full token replacement on a dummy verp, the current
       // contact and domain, and the first organization.
@@ -372,12 +372,12 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
         }
       }
       if (strlen($contentCheck) > CRM_SMS_Provider::MAX_SMS_CHAR) {
-        $dataErrors[] = '<li>' . ts('The body of the SMS cannot exceed %1 characters.', array(1 => CRM_SMS_Provider::MAX_SMS_CHAR)) . '</li>';
+        $dataErrors[] = '<li>' . ts('The body of the SMS cannot exceed %1 characters.', [1 => CRM_SMS_Provider::MAX_SMS_CHAR]) . '</li>';
       }
       if (!empty($dataErrors)) {
-        $errors['textFile'] = ts('The following errors were detected in %1:', array(
+        $errors['textFile'] = ts('The following errors were detected in %1:', [
           1 => $name,
-        )) . ' <ul>' . implode('', $dataErrors) . '</ul>';
+        ]) . ' <ul>' . implode('', $dataErrors) . '</ul>';
       }
     }
 

@@ -5,8 +5,9 @@ define('CIVICRM_CONTAINER_CACHE', 'never');
 
 ini_set('memory_limit', '2G');
 ini_set('safe_mode', 0);
+// phpcs:disable
 eval(cv('php:boot', 'phpcode'));
-
+// phpcs:enable
 assert("CIVICRM_UF === 'Drupal'");
 
 /**

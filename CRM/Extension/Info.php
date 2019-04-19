@@ -38,6 +38,9 @@ class CRM_Extension_Info {
    */
   const FILENAME = 'info.xml';
 
+  /**
+   * @var string
+   */
   public $key = NULL;
   public $type = NULL;
   public $name = NULL;
@@ -49,13 +52,13 @@ class CRM_Extension_Info {
    *   Each item is a specification like:
    *   array('type'=>'psr4', 'namespace'=>'Foo\Bar', 'path'=>'/foo/bar').
    */
-  public $classloader = array();
+  public $classloader = [];
 
   /**
    * @var array
    *   Each item is they key-name of an extension required by this extension.
    */
-  public $requires = array();
+  public $requires = [];
 
   /**
    * Load extension info an XML file.
@@ -108,7 +111,7 @@ class CRM_Extension_Info {
    *   Array(string $key => array $requiredBys).
    */
   public static function buildReverseMap($infos) {
-    $revMap = array();
+    $revMap = [];
     foreach ($infos as $info) {
       foreach ($info->requires as $key) {
         $revMap[$key][] = $info;
@@ -151,7 +154,7 @@ class CRM_Extension_Info {
         $this->$attr = (string) $val;
       }
       elseif ($attr === 'urls') {
-        $this->urls = array();
+        $this->urls = [];
         foreach ($val->url as $url) {
           $urlAttr = (string) $url->attributes()->desc;
           $this->urls[$urlAttr] = (string) $url;
@@ -159,25 +162,40 @@ class CRM_Extension_Info {
         ksort($this->urls);
       }
       elseif ($attr === 'classloader') {
-        $this->classloader = array();
+        $this->classloader = [];
         foreach ($val->psr4 as $psr4) {
-          $this->classloader[] = array(
+          $this->classloader[] = [
             'type' => 'psr4',
             'prefix' => (string) $psr4->attributes()->prefix,
             'path' => (string) $psr4->attributes()->path,
-          );
+          ];
         }
       }
       elseif ($attr === 'requires') {
-        $this->requires = array();
-        foreach ($val->ext as $ext) {
-          $this->requires[] = (string) $ext;
-        }
+        $this->requires = $this->filterRequirements($val);
       }
       else {
         $this->$attr = CRM_Utils_XML::xmlObjToArray($val);
       }
     }
+  }
+
+  /**
+   * Filter out invalid requirements, e.g. extensions that have been moved to core.
+   *
+   * @param SimpleXMLElement $requirements
+   * @return array
+   */
+  public function filterRequirements($requirements) {
+    $filtered = [];
+    $compatInfo = CRM_Extension_System::getCompatibilityInfo();
+    foreach ($requirements->ext as $ext) {
+      $ext = (string) $ext;
+      if (empty($compatInfo[$ext]['obsolete'])) {
+        $filtered[] = $ext;
+      }
+    }
+    return $filtered;
   }
 
 }

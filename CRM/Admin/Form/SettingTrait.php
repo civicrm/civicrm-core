@@ -39,6 +39,13 @@
 trait CRM_Admin_Form_SettingTrait {
 
   /**
+   * The setting page filter.
+   *
+   * @var string
+   */
+  private $_filter;
+
+  /**
    * @var array
    */
   protected $settingsMetadata;
@@ -112,10 +119,49 @@ trait CRM_Admin_Form_SettingTrait {
    * e.g get 'serialize' key, if exists, for a field.
    *
    * @param $setting
+   * @param $item
    * @return mixed
    */
   protected function getSettingMetadataItem($setting, $item) {
     return CRM_Utils_Array::value($item, $this->getSettingsMetaData()[$setting]);
+  }
+
+  /**
+   * @return string
+   */
+  protected function getSettingPageFilter() {
+    if (!isset($this->_filter)) {
+      // Get the last URL component without modifying the urlPath property.
+      $urlPath = array_values($this->urlPath);
+      $this->_filter = end($urlPath);
+    }
+    return $this->_filter;
+  }
+
+  /**
+   * Returns a re-keyed copy of the settings, ordered by weight.
+   *
+   * @return array
+   */
+  protected function getSettingsOrderedByWeight() {
+    $settingMetaData = $this->getSettingsMetaData();
+    $filter = $this->getSettingPageFilter();
+
+    usort($settingMetaData, function ($a, $b) use ($filter) {
+      // Handle cases in which a comparison is impossible. Such will be considered ties.
+      if (
+        // A comparison can't be made unless both setting weights are declared.
+        !isset($a['settings_pages'][$filter]['weight'], $b['settings_pages'][$filter]['weight'])
+        // A pair of settings might actually have the same weight.
+        || $a['settings_pages'][$filter]['weight'] === $b['settings_pages'][$filter]['weight']
+      ) {
+        return 0;
+      }
+
+      return $a['settings_pages'][$filter]['weight'] > $b['settings_pages'][$filter]['weight'] ? 1 : -1;
+    });
+
+    return $settingMetaData;
   }
 
   /**
@@ -132,6 +178,12 @@ trait CRM_Admin_Form_SettingTrait {
           $options = civicrm_api3('Setting', 'getoptions', [
             'field' => $setting,
           ])['values'];
+          if ($props['html_type'] === 'Select' && isset($props['is_required']) && $props['is_required'] === FALSE && !isset($options[''])) {
+            // If the spec specifies the field is not required add a null option.
+            // Why not if empty($props['is_required']) - basically this has been added to the spec & might not be set to TRUE
+            // when it is true.
+            $options = ['' => ts('None')] + $options;
+          }
         }
         if ($props['type'] === 'Boolean') {
           $options = [$props['title'] => $props['name']];
@@ -184,7 +236,10 @@ trait CRM_Admin_Form_SettingTrait {
           $this->$add($setting, ts($props['title']), $props['entity_reference_options']);
         }
         elseif ($add === 'addYesNo' && ($props['type'] === 'Boolean')) {
-          $this->addRadio($setting, ts($props['title']), array(1 => 'Yes', 0 => 'No'), NULL, '&nbsp;&nbsp;');
+          $this->addRadio($setting, ts($props['title']), [1 => 'Yes', 0 => 'No'], NULL, '&nbsp;&nbsp;');
+        }
+        elseif ($add === 'add') {
+          $this->add($props['html_type'], $setting, ts($props['title']), $options);
         }
         else {
           $this->$add($setting, ts($props['title']), $options);
@@ -207,7 +262,7 @@ trait CRM_Admin_Form_SettingTrait {
     // setting_description should be deprecated - see Mail.tpl for metadata based tpl.
     $this->assign('setting_descriptions', $descriptions);
     $this->assign('settings_fields', $settingMetaData);
-    $this->assign('fields', $settingMetaData);
+    $this->assign('fields', $this->getSettingsOrderedByWeight());
   }
 
   /**
@@ -241,8 +296,10 @@ trait CRM_Admin_Form_SettingTrait {
       'entity_reference' => 'EntityRef',
       'advmultiselect' => 'Element',
     ];
+    $mapping += array_fill_keys(CRM_Core_Form::$html5Types, '');
     return $mapping[$htmlType];
   }
+
   /**
    * Get the defaults for all fields defined in the metadata.
    *

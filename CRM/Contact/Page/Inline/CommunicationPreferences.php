@@ -45,9 +45,9 @@ class CRM_Contact_Page_Inline_CommunicationPreferences extends CRM_Core_Page {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
 
-    $params = array('id' => $contactId);
+    $params = ['id' => $contactId];
 
-    $defaults = array();
+    $defaults = [];
     CRM_Contact_BAO_Contact::getValues($params, $defaults);
     $defaults['privacy_values'] = CRM_Core_SelectValues::privacy();
 

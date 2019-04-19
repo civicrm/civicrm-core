@@ -52,7 +52,7 @@ class CRM_Core_Joomla {
       return;
     }
 
-    $blockIds = array(
+    $blockIds = [
       CRM_Core_Block::CREATE_NEW,
       CRM_Core_Block::RECENTLY_VIEWED,
       CRM_Core_Block::DASHBOARD,
@@ -60,9 +60,9 @@ class CRM_Core_Joomla {
       CRM_Core_Block::LANGSWITCH,
       //CRM_Core_Block::EVENT,
       //CRM_Core_Block::FULLTEXT_SEARCH
-    );
+    ];
 
-    $blocks = array();
+    $blocks = [];
     foreach ($blockIds as $id) {
       $blocks[] = CRM_Core_Block::getContent($id);
     }

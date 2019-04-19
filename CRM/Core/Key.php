@@ -33,9 +33,9 @@
  *
  */
 class CRM_Core_Key {
-  static $_key = NULL;
+  public static $_key = NULL;
 
-  static $_sessionID = NULL;
+  public static $_sessionID = NULL;
 
   /**
    * Generate a private key per session and store in session.

@@ -30,7 +30,8 @@
  */
 class civicrm_handler_relationship_website extends civicrm_handler_relationship_location {
 
-  static $_websiteType;
+  public static $_websiteType;
+
   public function construct() {
     parent::construct();
     if (!self::$_websiteType) {

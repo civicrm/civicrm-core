@@ -9,25 +9,25 @@
  *   API result array
  */
 function contact_create_example() {
-  $params = array(
+  $params = [
     'contact_type' => 'Individual',
     'display_name' => 'dlobo',
-    'api.participant' => array(
+    'api.participant' => [
       'event_id' => 42,
       'status_id' => 1,
       'role_id' => 1,
       'format.only_id' => 1,
-    ),
-    'api.contribution.create' => array(
+    ],
+    'api.contribution.create' => [
       'financial_type_id' => 1,
       'total_amount' => 100,
       'format.only_id' => 1,
-    ),
-    'api.participant_payment.create' => array(
+    ],
+    'api.participant_payment.create' => [
       'contribution_id' => '$value.api.contribution.create',
       'participant_id' => '$value.api.participant',
-    ),
-  );
+    ],
+  ];
 
   try{
     $result = civicrm_api3('Contact', 'create', $params);
@@ -37,12 +37,12 @@ function contact_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -56,13 +56,13 @@ function contact_create_example() {
  */
 function contact_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 5,
-    'values' => array(
-      '5' => array(
+    'values' => [
+      '5' => [
         'id' => '5',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
@@ -114,22 +114,22 @@ function contact_create_expectedresult() {
         'modified_date' => '2012-11-14 16:02:35',
         'api.participant' => 4,
         'api.contribution.create' => 1,
-        'api.participant_payment.create' => array(
+        'api.participant_payment.create' => [
           'is_error' => 0,
           'version' => 3,
           'count' => 1,
           'id' => 1,
-          'values' => array(
-            '0' => array(
+          'values' => [
+            '0' => [
               'id' => '1',
               'participant_id' => '4',
               'contribution_id' => '1',
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
+            ],
+          ],
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

@@ -8,8 +8,12 @@ $baseDir = dirname($vendorDir);
 return array(
     $vendorDir . '/tecnickcom',
     $vendorDir . '/pear/auth_sasl',
+    $vendorDir . '/pear/console_getopt',
+    $vendorDir . '/pear/log',
+    $vendorDir . '/pear/mail',
     $vendorDir . '/pear/net_smtp',
     $vendorDir . '/pear/net_socket',
+    $vendorDir . '/pear/pear-core-minimal/src',
     $vendorDir . '/pear/pear_exception',
     $vendorDir . '/pear/validate_finance_creditcard',
     $vendorDir . '/phpseclib/phpseclib/phpseclib',

@@ -88,7 +88,7 @@ class ValidateFieldsSubscriber extends AbstractPrepareSubscriber {
           break;
 
         default:
-          throw new \API_Exception('Unknown paramater type: ' . $type);
+          throw new \API_Exception('Unknown parameter type: ' . $type);
       }
     }
     return FALSE;

@@ -35,10 +35,16 @@
  */
 class CRM_Case_Form_Task_Batch extends CRM_Core_Form_Task_Batch {
 
-  // Must be set to entity table name (eg. civicrm_participant) by child class
-  static $tableName = 'civicrm_case';
-  // Must be set to entity shortname (eg. event)
-  static $entityShortname = 'case';
+  /**
+   * Must be set to entity table name (eg. civicrm_participant) by child class
+   * @var string
+   */
+  public static $tableName = 'civicrm_case';
+  /**
+   * Must be set to entity shortname (eg. event)
+   * @var string
+   */
+  public static $entityShortname = 'case';
 
   /**
    * Process the form after the input has been submitted and validated.
@@ -53,13 +59,13 @@ class CRM_Case_Form_Task_Batch extends CRM_Core_Form_Task_Batch {
       return;
     }
 
-    $customFields = array();
-    $dateFields = array(
+    $customFields = [];
+    $dateFields = [
       'case_created_date',
       'case_start_date',
       'case_end_date',
       'case_modified_date',
-    );
+    ];
     foreach ($params['field'] as $key => $value) {
       $value['id'] = $key;
 

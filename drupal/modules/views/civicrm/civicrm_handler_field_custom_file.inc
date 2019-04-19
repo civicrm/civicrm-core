@@ -37,6 +37,7 @@
  * @ingroup civicrm_field_handlers
  */
 class civicrm_handler_field_custom_file extends views_handler_field {
+
   public function construct() {
     parent::construct();
     civicrm_initialize();
@@ -53,7 +54,8 @@ class civicrm_handler_field_custom_file extends views_handler_field {
       );
 
       if ($fileType && in_array($fileType, array(
-        "image/jpeg", "image/pjpeg", "image/gif", "image/x-png", "image/png"))) {
+        "image/jpeg", "image/pjpeg", "image/gif", "image/x-png", "image/png",
+      ))) {
         $uri = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File',
           $value,
           'uri'

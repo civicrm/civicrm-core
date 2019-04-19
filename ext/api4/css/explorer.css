@@ -3,6 +3,9 @@
 #bootstrap-theme.api4-explorer-page .panel-heading {
   height: 50px;
 }
+#bootstrap-theme.api4-explorer-page .panel-body {
+  min-height: calc( 100% - 50px);
+}
 #bootstrap-theme.api4-explorer-page .explorer-params-panel .panel-heading {
   padding-top: 12px;
 }
@@ -10,16 +13,22 @@
   position: relative;
   top: -5px;
 }
-#bootstrap-theme.api4-explorer-page .row .panel-body {
-  min-height: 400px;
-  overflow-x: auto;
+#bootstrap-theme .explorer-params-panel .panel-heading .form-inline > .select2-container {
+  max-width: 25% !important;
 }
-#bootstrap-theme.api4-explorer-page .row .explorer-help-panel .panel-body {
-  max-height: 400px;
-  overflow: auto;
+#bootstrap-theme.api4-explorer-page .api4-explorer-row {
+  display: flex;
+}
+#bootstrap-theme.api4-explorer-page > div > .panel {
+  flex: 1;
+  margin: 10px;
+  min-height: 400px;
+}
+#bootstrap-theme.api4-explorer-page > div > form.panel {
+  flex: 2;
 }
 /* Fix weird shorditch style */
-#bootstrap-theme.api4-explorer-page .row .panel-heading {
+#bootstrap-theme.api4-explorer-page .api4-explorer-row .panel .panel-heading {
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
   margin-bottom: 0;
@@ -30,6 +39,10 @@
 
 #bootstrap-theme.api4-explorer-page .explorer-params-panel > .panel-body > div.api4-input {
   margin-bottom: 10px;
+}
+
+#bootstrap-theme.api4-explorer-page .explorer-help-panel .panel-body {
+  word-break: break-word;
 }
 
 #bootstrap-theme.api4-explorer-page form label {
@@ -127,8 +140,14 @@
   display: inline-block;
 }
 
-#bootstrap-theme.api4-explorer-page .api4-operator {
+#bootstrap-theme.api4-explorer-page .api4-operator,
+#bootstrap-theme.api4-explorer-page .api4-chain-index,
+#bootstrap-theme.api4-explorer-page .api4-index,
+#bootstrap-theme.api4-explorer-page .api4-chain-action {
   width: 70px;
+}
+#bootstrap-theme.api4-explorer-page .api4-chain-params {
+  width: calc( 100% - 346px);
 }
 
 #bootstrap-theme.api4-explorer-page .api4-add-where-group-menu {
@@ -153,4 +172,20 @@ div.select2-drop.collapsible-optgroups-enabled .select2-result-with-children > .
 }
 div.select2-drop.collapsible-optgroups-enabled .select2-result-with-children.optgroup-expanded > .select2-result-label:before {
   content: "\f0d7";
+}
+
+/**
+ * Shims so the UI isn't completely broken when a Bootstrap theme is not installed
+ */
+#bootstrap-theme.api4-explorer-page * {
+  box-sizing: border-box;
+}
+.api4-explorer-page.panel {
+  border: 1px solid grey;
+  background-color: white;
+}
+.api4-explorer-page.panel-heading {
+  padding: 10px 20px;
+  color: #464354;
+  background-color: #f3f6f7;
 }

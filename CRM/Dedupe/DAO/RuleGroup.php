@@ -19,14 +19,14 @@ class CRM_Dedupe_DAO_RuleGroup extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_dedupe_rule_group';
+  public static $_tableName = 'civicrm_dedupe_rule_group';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Unique dedupe rule group id

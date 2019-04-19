@@ -6,11 +6,11 @@
  *   API result array
  */
 function entity_batch_get_example() {
-  $params = array(
+  $params = [
     'entity_id' => 2,
     'batch_id' => 2,
     'entity_table' => 'civicrm_financial_trxn',
-  );
+  ];
 
   try{
     $result = civicrm_api3('EntityBatch', 'get', $params);
@@ -20,12 +20,12 @@ function entity_batch_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -39,20 +39,20 @@ function entity_batch_get_example() {
  */
 function entity_batch_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 2,
-    'values' => array(
-      '2' => array(
+    'values' => [
+      '2' => [
         'id' => '2',
         'entity_table' => 'civicrm_financial_trxn',
         'entity_id' => '2',
         'batch_id' => '2',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

@@ -84,8 +84,23 @@ function civicrm_api3_contribution_recur_get($params) {
  *   returns true is successfully cancelled
  */
 function civicrm_api3_contribution_recur_cancel($params) {
-  civicrm_api3_verify_one_mandatory($params, NULL, array('id'));
-  return CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution($params['id']) ? civicrm_api3_create_success() : civicrm_api3_create_error(ts('Error while cancelling recurring contribution'));
+  return CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution($params) ? civicrm_api3_create_success() : civicrm_api3_create_error(ts('Error while cancelling recurring contribution'));
+}
+
+/**
+ * Adjust Metadata for Cancel action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_contribution_recur_cancel_spec(&$params) {
+  $params['id'] = [
+    'title' => ts('Contribution Recur ID'),
+    'api.required' => TRUE,
+    'type' => CRM_Utils_Type::T_INT,
+  ];
 }
 
 /**

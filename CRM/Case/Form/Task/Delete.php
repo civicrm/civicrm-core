@@ -84,16 +84,16 @@ class CRM_Case_Form_Task_Delete extends CRM_Case_Form_Task {
 
     if ($deleted) {
       if ($this->_moveToTrash) {
-        $msg = ts('%count case moved to trash.', array('plural' => '%count cases moved to trash.', 'count' => $deleted));
+        $msg = ts('%count case moved to trash.', ['plural' => '%count cases moved to trash.', 'count' => $deleted]);
       }
       else {
-        $msg = ts('%count case permanently deleted.', array('plural' => '%count cases permanently deleted.', 'count' => $deleted));
+        $msg = ts('%count case permanently deleted.', ['plural' => '%count cases permanently deleted.', 'count' => $deleted]);
       }
       CRM_Core_Session::setStatus($msg, ts('Removed'), 'success');
     }
 
     if ($failed) {
-      CRM_Core_Session::setStatus(ts('1 could not be deleted.', array('plural' => '%count could not be deleted.', 'count' => $failed)), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(ts('1 could not be deleted.', ['plural' => '%count could not be deleted.', 'count' => $failed]), ts('Error'), 'error');
     }
   }
 

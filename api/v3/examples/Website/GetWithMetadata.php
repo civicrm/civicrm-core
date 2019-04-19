@@ -8,13 +8,13 @@
  *   API result array
  */
 function website_get_example() {
-  $params = array(
-    'options' => array(
-      'metadata' => array(
+  $params = [
+    'options' => [
+      'metadata' => [
         '0' => 'fields',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   try{
     $result = civicrm_api3('Website', 'get', $params);
@@ -24,12 +24,12 @@ function website_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -43,14 +43,14 @@ function website_get_example() {
  */
 function website_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 0,
-    'values' => array(),
-    'metadata' => array(
-      'fields' => array(
-        'id' => array(
+    'values' => [],
+    'metadata' => [
+      'fields' => [
+        'id' => [
           'name' => 'id',
           'type' => '1',
           'title' => 'Website ID',
@@ -59,11 +59,11 @@ function website_get_expectedresult() {
           'table_name' => 'civicrm_website',
           'entity' => 'Website',
           'bao' => 'CRM_Core_BAO_Website',
-          'api.aliases' => array(
+          'api.aliases' => [
             '0' => 'website_id',
-          ),
-        ),
-        'contact_id' => array(
+          ],
+        ],
+        'contact_id' => [
           'name' => 'contact_id',
           'type' => '1',
           'title' => 'Contact',
@@ -73,8 +73,8 @@ function website_get_expectedresult() {
           'bao' => 'CRM_Core_BAO_Website',
           'FKClassName' => 'CRM_Contact_DAO_Contact',
           'FKApiName' => 'Contact',
-        ),
-        'url' => array(
+        ],
+        'url' => [
           'name' => 'url',
           'type' => '2',
           'title' => 'Website',
@@ -89,13 +89,13 @@ function website_get_expectedresult() {
           'table_name' => 'civicrm_website',
           'entity' => 'Website',
           'bao' => 'CRM_Core_BAO_Website',
-          'html' => array(
+          'html' => [
             'type' => 'Text',
             'maxlength' => '128',
             'size' => '30',
-          ),
-        ),
-        'website_type_id' => array(
+          ],
+        ],
+        'website_type_id' => [
           'name' => 'website_type_id',
           'type' => '1',
           'title' => 'Website Type',
@@ -103,19 +103,19 @@ function website_get_expectedresult() {
           'table_name' => 'civicrm_website',
           'entity' => 'Website',
           'bao' => 'CRM_Core_BAO_Website',
-          'html' => array(
+          'html' => [
             'type' => 'Select',
             'size' => '6',
             'maxlength' => '14',
-          ),
-          'pseudoconstant' => array(
+          ],
+          'pseudoconstant' => [
             'optionGroupName' => 'website_type',
             'optionEditPath' => 'civicrm/admin/options/website_type',
-          ),
-        ),
-      ),
-    ),
-  );
+          ],
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

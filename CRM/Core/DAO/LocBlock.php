@@ -19,14 +19,14 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_loc_block';
+  public static $_tableName = 'civicrm_loc_block';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Unique ID
@@ -91,7 +91,7 @@ class CRM_Core_DAO_LocBlock extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'address_id', 'civicrm_address', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'email_id', 'civicrm_email', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'phone_id', 'civicrm_phone', 'id');

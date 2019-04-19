@@ -73,9 +73,9 @@ class CRM_Admin_Form extends CRM_Core_Form {
 
     $this->_id = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
-    $this->_values = array();
+    $this->_values = [];
     if (isset($this->_id)) {
-      $params = array('id' => $this->_id);
+      $params = ['id' => $this->_id];
       // this is needed if the form is outside the CRM name space
       $baoName = $this->_BAOName;
       $baoName::retrieve($params, $this->_values);
@@ -92,8 +92,8 @@ class CRM_Admin_Form extends CRM_Core_Form {
   public function setDefaultValues() {
     // Fetch defaults from the db
     if (!empty($this->_id) && empty($this->_values) && CRM_Utils_Rule::positiveInteger($this->_id)) {
-      $this->_values = array();
-      $params = array('id' => $this->_id);
+      $this->_values = [];
+      $params = ['id' => $this->_id];
       $baoName = $this->_BAOName;
       $baoName::retrieve($params, $this->_values);
     }
@@ -127,28 +127,26 @@ class CRM_Admin_Form extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::VIEW || $this->_action & CRM_Core_Action::PREVIEW) {
-      $this->addButtons(array(
-          array(
-            'type' => 'cancel',
-            'name' => ts('Done'),
-            'isDefault' => TRUE,
-          ),
-        )
-      );
+      $this->addButtons([
+        [
+          'type' => 'cancel',
+          'name' => ts('Done'),
+          'isDefault' => TRUE,
+        ],
+      ]);
     }
     else {
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+      $this->addButtons([
+        [
+          'type' => 'next',
+          'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
     }
   }
 

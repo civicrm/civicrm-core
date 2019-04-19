@@ -44,6 +44,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    * the processor. It is the main function for processing on-server
    * credit card transactions
    */
+
   /**
    * This function collects all the information from a web/api form and invokes
    * the relevant payment processor specific functions to perform the transaction
@@ -89,7 +90,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
      *
      */
 
-    $payflow_query_array = array(
+    $payflow_query_array = [
       'USER' => $user,
       'VENDOR' => $this->_paymentProcessor['user_name'],
       'PARTNER' => $this->_paymentProcessor['signature'],
@@ -121,7 +122,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       'ORDERDESC' => urlencode($params['description']),
       'VERBOSITY' => 'MEDIUM',
       'BILLTOCOUNTRY' => urlencode($params['country']),
-    );
+    ];
 
     if ($params['installments'] == 1) {
       $params['is_recur'] = FALSE;
@@ -272,7 +273,7 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
       return self::errorExit(9016, "No RESULT code from PayPal.");
     }
 
-    $nvpArray = array();
+    $nvpArray = [];
     while (strlen($result)) {
       // name
       $keypos = strpos($result, '=');
@@ -363,7 +364,6 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
     return $e;
   }
 
-
   /**
    * NOTE: 'doTransferCheckout' not implemented
    *
@@ -386,13 +386,13 @@ class CRM_Core_Payment_PayflowPro extends CRM_Core_Payment {
    *   the error message if any, null if OK
    */
   public function checkConfig() {
-    $errorMsg = array();
+    $errorMsg = [];
     if (empty($this->_paymentProcessor['user_name'])) {
       $errorMsg[] = ' ' . ts('ssl_merchant_id is not set for this payment processor');
     }
 
     if (empty($this->_paymentProcessor['url_site'])) {
-      $errorMsg[] = ' ' . ts('URL is not set for %1', array(1 => $this->_paymentProcessor['name']));
+      $errorMsg[] = ' ' . ts('URL is not set for %1', [1 => $this->_paymentProcessor['name']]);
     }
 
     if (!empty($errorMsg)) {

@@ -37,6 +37,7 @@
  * Helper authentication class for unit tests
  */
 class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
+
   /**
    */
   public function __construct() {
@@ -48,21 +49,14 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function authenticate($name, $password, $loadCMSBootstrap = FALSE, $realPath = NULL) {
-    $retVal = array(1, 1, 12345);
+    $retVal = [1, 1, 12345];
     return $retVal;
   }
 
   /**
    * Bootstrap the phony CMS.
-   *
-   * @param string $name
-   *   Optional username for login.
-   * @param string $pass
-   *   Optional password for login.
-   *
-   * @return bool
    */
-  public function loadBootStrap($name = NULL, $pass = NULL) {
+  public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     return TRUE;
   }
 

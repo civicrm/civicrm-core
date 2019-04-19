@@ -84,8 +84,8 @@ class CRM_Case_Page_DashBoard extends CRM_Core_Page {
       $this->assign('newClient', TRUE);
     }
     $summary = CRM_Case_BAO_Case::getCasesSummary($allCases);
-    $upcoming = CRM_Case_BAO_Case::getCases($allCases, array(), 'dashboard', TRUE);
-    $recent = CRM_Case_BAO_Case::getCases($allCases, array('type' => 'recent'), 'dashboard', TRUE);
+    $upcoming = CRM_Case_BAO_Case::getCases($allCases, [], 'dashboard', TRUE);
+    $recent = CRM_Case_BAO_Case::getCases($allCases, ['type' => 'recent'], 'dashboard', TRUE);
 
     $this->assign('casesSummary', $summary);
     if (!empty($upcoming)) {

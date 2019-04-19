@@ -27,7 +27,8 @@ function civicrm_contact_ref_field_info() {
       'description' => t('Reference a CiviCRM contact.'),
       'default_widget' => 'options_select',
       'default_formatter' => 'civicrm_contact_ref_link',
-      'property_type' => 'integer', // note that this property is used by entity.module
+      // note that this property is used by entity.module
+      'property_type' => 'integer',
     ),
   );
 }

@@ -13,7 +13,7 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
         $calls = json_decode($calls, TRUE);
         $response = [];
         foreach ($calls as $index => $call) {
-          $response[$index] = $this->execute($call[0], $call[1], CRM_Utils_Array::value(2, $call, []));
+          $response[$index] = call_user_func_array([$this, 'execute'], $call);
         }
       }
       // Call single
@@ -22,7 +22,8 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
         $action = $this->urlPath[4];
         $params = CRM_Utils_Request::retrieve('params', 'String');
         $params = $params ? json_decode($params, TRUE) : [];
-        $response = $this->execute($entity, $action, $params);
+        $index = CRM_Utils_Request::retrieve('index', 'String');
+        $response = $this->execute($entity, $action, $params, $index);
       }
     }
     catch (Exception $e) {
@@ -45,14 +46,15 @@ class CRM_Api4_Page_AJAX extends CRM_Core_Page {
   /**
    * Run api call & prepare result for json encoding
    *
-   * @param $entity
-   * @param $action
-   * @param $params
+   * @param string $entity
+   * @param string $action
+   * @param array $params
+   * @param string $index
    * @return array
    */
-  protected function execute($entity, $action, $params) {
+  protected function execute($entity, $action, $params = [], $index = NULL) {
     $params['checkPermissions'] = TRUE;
-    $result = civicrm_api4($entity, $action, $params);
+    $result = civicrm_api4($entity, $action, $params, $index);
     // Convert arrayObject into something more suitable for json
     $vals = ['values' => (array) $result];
     foreach (get_class_vars(get_class($result)) as $key => $val) {

@@ -91,9 +91,9 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
 
       case '1':
       case 'default':
-        $params = array(
+        $params = [
           'id' => $result['id'],
-        );
+        ];
         $reloadResult = civicrm_api3($apiRequest['entity'], 'get', $params);
         if ($reloadResult['is_error']) {
           throw new API_Exception($reloadResult['error_message']);
@@ -102,10 +102,10 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
         return $result;
 
       case 'selected':
-        $params = array(
+        $params = [
           'id' => $id,
           'return' => $this->pickReturnFields($apiRequest),
-        );
+        ];
         $reloadResult = civicrm_api3($apiRequest['entity'], 'get', $params);
         $result['values'][$id] = array_merge($result['values'][$id], $reloadResult['values'][$id]);
         return $result;
@@ -122,7 +122,7 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
    * @return array
    */
   public function pickReturnFields($apiRequest) {
-    $fields = civicrm_api3($apiRequest['entity'], 'getfields', array());
+    $fields = civicrm_api3($apiRequest['entity'], 'getfields', []);
     $returnKeys = array_intersect(
       array_keys($apiRequest['params']),
       array_keys($fields['values'])

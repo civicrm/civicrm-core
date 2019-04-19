@@ -5,6 +5,7 @@
  *
  */
 class civicrm_handler_field_markup extends views_handler_field {
+
   public function option_definition() {
     $options = parent::option_definition();
 

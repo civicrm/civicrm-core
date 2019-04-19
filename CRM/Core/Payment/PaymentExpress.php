@@ -77,7 +77,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
   public function checkConfig() {
     $config = CRM_Core_Config::singleton();
 
-    $error = array();
+    $error = [];
 
     if (empty($this->_paymentProcessor['user_name'])) {
       $error[] = ts('UserID is not set in the Administer &raquo; System Settings &raquo; Payment Processors');
@@ -159,7 +159,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
 
     }
 
-    $dpsParams = array(
+    $dpsParams = [
       'AmountInput' => str_replace(",", "", number_format($params['amount'], 2)),
       'CurrencyInput' => $params['currencyID'],
       'MerchantReference' => $merchantRef,
@@ -171,7 +171,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       'TxnId' => '',
       'UrlFail' => $url,
       'UrlSuccess' => $url,
-    );
+    ];
     // Allow further manipulation of params via custom hooks
     CRM_Utils_Hook::alterPaymentProcessorParams($this, $params, $dpsParams);
 

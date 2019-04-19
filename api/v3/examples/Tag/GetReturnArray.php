@@ -8,13 +8,13 @@
  *   API result array
  */
 function tag_get_example() {
-  $params = array(
+  $params = [
     'id' => '8',
     'name' => 'New Tag3',
-    'return' => array(
+    'return' => [
       '0' => 'name',
-    ),
-  );
+    ],
+  ];
 
   try{
     $result = civicrm_api3('Tag', 'get', $params);
@@ -24,12 +24,12 @@ function tag_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -43,18 +43,18 @@ function tag_get_example() {
  */
 function tag_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 8,
-    'values' => array(
-      '8' => array(
+    'values' => [
+      '8' => [
         'id' => '8',
         'name' => 'New Tag3',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

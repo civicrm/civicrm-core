@@ -31,6 +31,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_SystemLogger extends Psr\Log\AbstractLogger implements \Psr\Log\LoggerInterface {
+
   /**
    * Logs with an arbitrary level.
    *
@@ -38,12 +39,12 @@ class CRM_Utils_SystemLogger extends Psr\Log\AbstractLogger implements \Psr\Log\
    * @param string $message
    * @param array $context
    */
-  public function log($level, $message, array $context = array()) {
+  public function log($level, $message, array $context = []) {
     if (!isset($context['hostname'])) {
       $context['hostname'] = CRM_Utils_System::ipAddress();
     }
     $rec = new CRM_Core_DAO_SystemLog();
-    $separateFields = array('contact_id', 'hostname');
+    $separateFields = ['contact_id', 'hostname'];
     foreach ($separateFields as $separateField) {
       if (isset($context[$separateField])) {
         $rec->{$separateField} = $context[$separateField];

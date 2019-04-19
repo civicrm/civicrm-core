@@ -40,6 +40,7 @@ require_once 'Engage/Report/Form/List.php';
  *  Generate a walk list
  */
 class Engage_Report_Form_WalkList extends Engage_Report_Form_List {
+
   public function __construct() {
 
     parent::__construct();
@@ -435,7 +436,7 @@ class Engage_Report_Form_WalkList extends Engage_Report_Form_List {
       $dob  = $value['civicrm_contact_birth_date'];
       $age  = empty($dob) ? 0 : $this->dob2age($dob);
       if (!empty($value['civicrm_contact_gender_id'])) {
-        $sex  = $gender[CRM_Utils_Array::value('civicrm_contact_gender_id', $value)];
+        $sex = $gender[CRM_Utils_Array::value('civicrm_contact_gender_id', $value)];
       }
       $sex  = empty($sex) ? '' : $sex;
       $lang = strtoupper(substr($value[$this->_demoTable . '_' . $this->_demoLangCol], 0, 2));

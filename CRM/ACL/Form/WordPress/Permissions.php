@@ -77,7 +77,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
     $this->setDefaults($defaults);
 
-    $descArray = array();
+    $descArray = [];
     foreach ($permissionsDesc as $perm => $attr) {
       if (count($attr) > 1) {
         $descArray[$perm] = $attr[1];
@@ -85,7 +85,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
     }
 
     // build table rows by merging role perms
-    $rows = array();
+    $rows = [];
     foreach ($rolePerms as $role => $perms) {
       foreach ($perms as $name => $title) {
         $rows[$name] = $title;
@@ -93,14 +93,14 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
     }
 
     // Build array keyed by permission
-    $table = array();
+    $table = [];
     foreach ($rows as $perm => $label) {
 
       // Init row with permission label
-      $table[$perm] = array(
+      $table[$perm] = [
         'label' => $label,
-        'roles' => array(),
-      );
+        'roles' => [],
+      ];
 
       // Add permission description and role names
       foreach ($roles as $key => $label) {
@@ -117,14 +117,14 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
     $this->assign('roles', $roles);
 
     $this->addButtons(
-      array(
-        array(
+      [
+        [
           'type' => 'next',
           'name' => ts('Save'),
           'spacing' => '',
           'isDefault' => FALSE,
-        ),
-      )
+        ],
+      ]
     );
 
   }
@@ -165,16 +165,16 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
           $allWarningPermissions[$key] = CRM_Utils_String::munge(strtolower($permission));
         }
         $warningPermissions = array_intersect($allWarningPermissions, array_keys($rolePermissions));
-        $warningPermissionNames = array();
+        $warningPermissionNames = [];
         foreach ($warningPermissions as $permission) {
           $warningPermissionNames[$permission] = $permissionsArray[$permission];
         }
         if (!empty($warningPermissionNames)) {
           CRM_Core_Session::setStatus(
-            ts('The %1 role was assigned one or more permissions that may prove dangerous for users of that role to have. Please reconsider assigning %2 to them.', array(
-                1 => $wp_roles->role_names[$role],
-                2 => implode(', ', $warningPermissionNames),
-              )),
+            ts('The %1 role was assigned one or more permissions that may prove dangerous for users of that role to have. Please reconsider assigning %2 to them.', [
+              1 => $wp_roles->role_names[$role],
+              2 => implode(', ', $warningPermissionNames),
+            ]),
             ts('Unsafe Permission Settings')
           );
         }
@@ -214,7 +214,7 @@ class CRM_ACL_Form_WordPress_Permissions extends CRM_Core_Form {
 
     $permissions = CRM_Core_Permission::basicPermissions(FALSE, $descriptions);
 
-    $perms_array = array();
+    $perms_array = [];
     foreach ($permissions as $perm => $title) {
       //order matters here, but we deal with that later
       $perms_array[CRM_Utils_String::munge(strtolower($perm))] = $title;

@@ -42,6 +42,22 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
    */
   public $_surveyId;
 
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Survey';
+  }
+
+  /**
+   * Get the entity id being edited.
+   *
+   * @return int|null
+   */
+  public function getEntityId() {
+    return $this->_surveyId;
+  }
+
   public function preProcess() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();
@@ -64,14 +80,8 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
       }
     }
 
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      $this->set('type', 'Event');
-      $this->set('entityId', $this->_surveyId);
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Survey', $this->_surveyId);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
+    // Add custom data to form
+    CRM_Custom_Form_CustomData::addToForm($this);
 
     $session = CRM_Core_Session::singleton();
     $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
@@ -80,9 +90,9 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     $this->_values = $this->get('values');
 
     if (!is_array($this->_values)) {
-      $this->_values = array();
+      $this->_values = [];
       if ($this->_surveyId) {
-        $params = array('id' => $this->_surveyId);
+        $params = ['id' => $this->_surveyId];
         CRM_Campaign_BAO_Survey::retrieve($params, $this->_values);
       }
       $this->set('values', $this->_values);
@@ -90,8 +100,6 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
 
     $this->assign('action', $this->_action);
     $this->assign('surveyId', $this->_surveyId);
-    // for custom data
-    $this->assign('entityID', $this->_surveyId);
 
     if ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::DELETE)) {
       $this->_surveyId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
@@ -108,7 +116,7 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=petition');
     $session->pushUserContext($url);
 
-    CRM_Utils_System::appendBreadCrumb(array(array('title' => ts('Petition Dashboard'), 'url' => $url)));
+    CRM_Utils_System::appendBreadCrumb([['title' => ts('Petition Dashboard'), 'url' => $url]]);
   }
 
   /**
@@ -121,20 +129,20 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
   public function setDefaultValues() {
     $defaults = $this->_values;
 
-    $ufContactJoinParams = array(
+    $ufContactJoinParams = [
       'entity_table' => 'civicrm_survey',
       'entity_id' => $this->_surveyId,
       'weight' => 2,
-    );
+    ];
 
     if ($ufContactGroupId = CRM_Core_BAO_UFJoin::findUFGroupId($ufContactJoinParams)) {
       $defaults['contact_profile_id'] = $ufContactGroupId;
     }
-    $ufActivityJoinParams = array(
+    $ufActivityJoinParams = [
       'entity_table' => 'civicrm_survey',
       'entity_id' => $this->_surveyId,
       'weight' => 1,
-    );
+    ];
 
     if ($ufActivityGroupId = CRM_Core_BAO_UFJoin::findUFGroupId($ufActivityJoinParams)) {
       $defaults['profile_id'] = $ufActivityGroupId;
@@ -152,22 +160,21 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     return $defaults;
   }
 
-
   public function buildQuickForm() {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(
-        array(
-          array(
+        [
+          [
             'type' => 'next',
             'name' => ts('Delete'),
             'isDefault' => TRUE,
-          ),
-          array(
+          ],
+          [
             'type' => 'cancel',
             'name' => ts('Cancel'),
-          ),
-        )
+          ],
+        ]
       );
       return;
     }
@@ -182,24 +189,26 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     // script / instructions / description of petition purpose
     $this->add('wysiwyg', 'instructions', ts('Introduction'), $attributes['instructions']);
 
-    // Campaign id
-    $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value('campaign_id', $this->_values));
-    $this->add('select', 'campaign_id', ts('Campaign'), array('' => ts('- select -')) + $campaigns);
+    $this->addEntityRef('campaign_id', ts('Campaign'), [
+      'entity' => 'Campaign',
+      'create' => TRUE,
+      'select' => ['minimumInputLength' => 0],
+    ]);
 
-    $customContactProfiles = CRM_Core_BAO_UFGroup::getProfiles(array('Individual'));
+    $customContactProfiles = CRM_Core_BAO_UFGroup::getProfiles(['Individual']);
     // custom group id
     $this->add('select', 'contact_profile_id', ts('Contact Profile'),
-      array(
+      [
         '' => ts('- select -'),
-      ) + $customContactProfiles, TRUE
+      ] + $customContactProfiles, TRUE
     );
 
-    $customProfiles = CRM_Core_BAO_UFGroup::getProfiles(array('Activity'));
+    $customProfiles = CRM_Core_BAO_UFGroup::getProfiles(['Activity']);
     // custom group id
     $this->add('select', 'profile_id', ts('Activity Profile'),
-      array(
+      [
         '' => ts('- select -'),
-      ) + $customProfiles
+      ] + $customProfiles
     );
 
     // thank you title and text (html allowed in text)
@@ -220,26 +229,26 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
 
     // add buttons
     $this->addButtons(
-      array(
-        array(
+      [
+        [
           'type' => 'next',
           'name' => ts('Save'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'next',
           'name' => ts('Save and New'),
           'subName' => 'new',
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
 
     // add a form rule to check default value
-    $this->addFormRule(array('CRM_Campaign_Form_Petition', 'formRule'), $this);
+    $this->addFormRule(['CRM_Campaign_Form_Petition', 'formRule'], $this);
   }
 
   /**
@@ -250,14 +259,14 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
    * @return array|bool
    */
   public static function formRule($fields, $files, $form) {
-    $errors = array();
+    $errors = [];
     // Petitions should be unique by: title, campaign ID (if assigned) and activity type ID
     // NOTE: This class is called for both Petition create / update AND for Survey Results tab, but this rule is only for Petition.
-    $where = array('activity_type_id = %1', 'title = %2');
-    $params = array(
-      1 => array($fields['activity_type_id'], 'Integer'),
-      2 => array($fields['title'], 'String'),
-    );
+    $where = ['activity_type_id = %1', 'title = %2'];
+    $params = [
+      1 => [$fields['activity_type_id'], 'Integer'],
+      2 => [$fields['title'], 'String'],
+    ];
     $uniqueRuleErrorMessage = ts('This title is already associated with the selected activity type. Please specify a unique title.');
 
     if (empty($fields['campaign_id'])) {
@@ -265,14 +274,14 @@ class CRM_Campaign_Form_Petition extends CRM_Core_Form {
     }
     else {
       $where[] = 'campaign_id = %3';
-      $params[3] = array($fields['campaign_id'], 'Integer');
+      $params[3] = [$fields['campaign_id'], 'Integer'];
       $uniqueRuleErrorMessage = ts('This title is already associated with the selected campaign and activity type. Please specify a unique title.');
     }
 
     // Exclude current Petition row if UPDATE.
     if ($form->_surveyId) {
       $where[] = 'id != %4';
-      $params[4] = array($form->_surveyId, 'Integer');
+      $params[4] = [$form->_surveyId, 'Integer'];
     }
 
     $whereClause = implode(' AND ', $where);
@@ -289,7 +298,6 @@ WHERE  $whereClause
     }
     return empty($errors) ? TRUE : $errors;
   }
-
 
   public function postProcess() {
     // store the submitted values in an array
@@ -321,21 +329,17 @@ WHERE  $whereClause
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, 0);
     $params['is_default'] = CRM_Utils_Array::value('is_default', $params, 0);
 
-    $customFields = CRM_Core_BAO_CustomField::getFields('Survey');
-    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      $this->_surveyId,
-      'Survey'
-    );
+    $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->getEntityId(), $this->getDefaultEntity());
 
     $surveyId = CRM_Campaign_BAO_Survey::create($params);
 
     // also update the ProfileModule tables
-    $ufJoinParams = array(
+    $ufJoinParams = [
       'is_active' => 1,
       'module' => 'CiviCampaign',
       'entity_table' => 'civicrm_survey',
       'entity_id' => $surveyId->id,
-    );
+    ];
 
     // first delete all past entries
     if ($this->_surveyId) {

@@ -61,90 +61,90 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
       'title'
     );
 
-    $this->_fields = array(
-      'title' => array(
+    $this->_fields = [
+      'title' => [
         ts('Title'),
         'text',
         FALSE,
         $title,
-      ),
-      'url_logo' => array(
+      ],
+      'url_logo' => [
         ts('URL to Logo Image'),
         'text',
         FALSE,
         NULL,
-      ),
-      'button_title' => array(
+      ],
+      'button_title' => [
         ts('Button Title'),
         'text',
         FALSE,
         ts('Contribute!'),
-      ),
-    );
+      ],
+    ];
 
-    $this->_colorFields = array(
-      'color_title' => array(
+    $this->_colorFields = [
+      'color_title' => [
         ts('Title Text Color'),
         'color',
         FALSE,
         '#2786C2',
-      ),
-      'color_bar' => array(
+      ],
+      'color_bar' => [
         ts('Progress Bar Color'),
         'color',
         FALSE,
         '#2786C2',
-      ),
-      'color_main_text' => array(
+      ],
+      'color_main_text' => [
         ts('Additional Text Color'),
         'color',
         FALSE,
         '#FFFFFF',
-      ),
-      'color_main' => array(
+      ],
+      'color_main' => [
         ts('Background Color'),
         'color',
         FALSE,
         '#96C0E7',
-      ),
-      'color_main_bg' => array(
+      ],
+      'color_main_bg' => [
         ts('Background Color Top Area'),
         'color',
         FALSE,
         '#B7E2FF',
-      ),
-      'color_bg' => array(
+      ],
+      'color_bg' => [
         ts('Border Color'),
         'color',
         FALSE,
         '#96C0E7',
-      ),
-      'color_about_link' => array(
+      ],
+      'color_about_link' => [
         ts('Button Text Color'),
         'color',
         FALSE,
         '#556C82',
-      ),
-      'color_button' => array(
+      ],
+      'color_button' => [
         ts('Button Background Color'),
         'color',
         FALSE,
         '#FFFFFF',
-      ),
-      'color_homepage_link' => array(
+      ],
+      'color_homepage_link' => [
         ts('Homepage Link Color'),
         'color',
         FALSE,
         '#FFFFFF',
-      ),
-    );
+      ],
+    ];
   }
 
   /**
    * Set default values for the form.
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     // check if there is a widget already created
     if ($this->_widget) {
       CRM_Core_DAO::storeValues($this->_widget, $defaults);
@@ -175,7 +175,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
       'is_active',
       ts('Enable Widget?'),
       NULL,
-      array('onclick' => "widgetBlock(this)")
+      ['onclick' => "widgetBlock(this)"]
     );
 
     $this->add('wysiwyg', 'about', ts('About'), $attributes['about']);
@@ -206,7 +206,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
       ts('Save and Preview')
     );
     parent::buildQuickForm();
-    $this->addFormRule(array('CRM_Contribute_Form_ContributionPage_Widget', 'formRule'), $this);
+    $this->addFormRule(['CRM_Contribute_Form_ContributionPage_Widget', 'formRule'], $this);
   }
 
   /**
@@ -222,7 +222,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
    *   mixed true or array of errors
    */
   public static function formRule($params, $files, $self) {
-    $errors = array();
+    $errors = [];
     if (!empty($params['is_active'])) {
       if (empty($params['title'])) {
         $errors['title'] = ts('Title is a required field.');
@@ -233,7 +233,7 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
 
       foreach ($params as $key => $val) {
         if (substr($key, 0, 6) == 'color_' && empty($params[$key])) {
-          $errors[$key] = ts('%1 is a required field.', array(1 => $self->_colorFields[$key][0]));
+          $errors[$key] = ts('%1 is a required field.', [1 => $self->_colorFields[$key][0]]);
         }
       }
     }

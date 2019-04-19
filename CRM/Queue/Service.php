@@ -77,7 +77,7 @@ class CRM_Queue_Service {
   /**
    */
   public function __construct() {
-    $this->queues = array();
+    $this->queues = [];
   }
 
   /**

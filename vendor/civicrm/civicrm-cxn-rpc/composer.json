@@ -2,7 +2,7 @@
     "name": "civicrm/civicrm-cxn-rpc",
     "description": "RPC library for CiviConnect",
     "require": {
-        "psr/log": "~1.0.0",
+        "psr/log": "~1.1",
         "phpseclib/phpseclib": "1.0.*"
     },
     "autoload": {

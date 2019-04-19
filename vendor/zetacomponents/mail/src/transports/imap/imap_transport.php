@@ -2,10 +2,26 @@
 /**
  * File containing the ezcMailImapTransport class.
  *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
  * @package Mail
  * @version //autogen//
- * @copyright Copyright (C) 2005-2009 eZ Systems AS. All rights reserved.
- * @license http://ez.no/licenses/new_bsd New BSD License
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
  */
 
 /**
@@ -395,7 +411,14 @@ class ezcMailImapTransport
      */
     public function __destruct()
     {
-        $this->disconnect();
+        try 
+        {
+            $this->disconnect();
+        }
+        catch ( ezcMailTransportException $e )
+        {
+            // Ignore occuring transport exceptions.
+        }
     }
 
     /**
@@ -520,7 +543,9 @@ class ezcMailImapTransport
         }
 
         $tag = $this->getNextTag();
-        $this->connection->sendData( "{$tag} LOGIN {$user} \"{$password}\"" );
+        $user = addcslashes($user, '\"');
+        $password = addcslashes($password, '\"');
+        $this->connection->sendData( "{$tag} LOGIN \"{$user}\" \"{$password}\"" );
         $response = trim( $this->connection->getLine() );
         // hack for gmail, to fix issue #15837: imap.google.com (google gmail) changed IMAP response
         if ( $this->serverType === self::SERVER_GIMAP && strpos( $response, "* CAPABILITY" ) === 0 )
@@ -1068,7 +1093,7 @@ class ezcMailImapTransport
         }
 
         $sizes = array();
-        $ids = implode( $messages, ',' );
+        $ids = implode( ',', $messages );
 
         $tag = $this->getNextTag();
         $this->connection->sendData( "{$tag} {$uid}FETCH {$ids} (RFC822.SIZE)" );
@@ -2014,7 +2039,7 @@ class ezcMailImapTransport
         }
 
         $flags = array();
-        $ids = implode( $messages, ',' );
+        $ids = implode( ',', $messages );
 
         $tag = $this->getNextTag();
         $this->connection->sendData( "{$tag} {$uid}FETCH {$ids} (FLAGS)" );
@@ -2026,9 +2051,19 @@ class ezcMailImapTransport
             {
                 if ( $this->options->uidReferencing )
                 {
-                    preg_match( '/\*\s.*\sFETCH\s\(FLAGS \((.*)\)\sUID\s(.*)\)/U', $response, $matches );
-                    $parts = explode( ' ', $matches[1] );
-                    $flags[intval( $matches[2] )] = $parts;
+                    if ( preg_match( '/\*\s.*\sFETCH\s\(FLAGS \((.*)\)\sUID\s(.*)\)/U', $response, $matches ) )
+                    {
+                        $parts = explode( ' ', $matches[1] );
+                        $flags[intval( $matches[2] )] = $parts;
+                    }
+
+                    // The second regex here is to handle edge cases where a mail server like gmail returns the FETCH response in a different order than normal
+                    else
+                    {
+                        preg_match( '/\*\s.*\sFETCH\s\(UID\s(.*)\sFLAGS \((.*)\)\)/U', $response, $matches );
+                        $parts = explode( ' ', $matches[2] );
+                        $flags[intval( $matches[1] )] = $parts;
+                    }
                 }
                 else
                 {
@@ -2427,11 +2462,11 @@ class ezcMailImapTransport
                 $flags[$i] = '\\' . $this->normalizeFlag( $flags[$i] );
             }
             $flagList = implode( ' ', $flags );
-            $command = "{$tag} APPEND {$mailbox} ({$flagList}) {{$mailSize}}";
+            $command = "{$tag} APPEND \"{$mailbox}\" ({$flagList}) {{$mailSize}}";
         }
         else
         {
-            $command = "{$tag} APPEND {$mailbox} {{$mailSize}}";
+            $command = "{$tag} APPEND \"{$mailbox}\" {{$mailSize}}";
         }
 
         $this->connection->sendData( $command );

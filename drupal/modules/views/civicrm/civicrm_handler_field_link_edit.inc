@@ -29,6 +29,7 @@
  * @ingroup civicrm_field_handlers
  */
 class civicrm_handler_field_link_edit extends civicrm_handler_field_link {
+
   /**
    * An example of field level access control.
    */

@@ -69,9 +69,9 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     return CRM_Core_DAO::singleValueQuery("
       DELETE FROM civicrm_queue_item
       WHERE queue_name = %1
-    ", array(
-      1 => array($this->getName(), 'String'),
-    ));
+    ", [
+      1 => [$this->getName(), 'String'],
+    ]);
   }
 
   /**
@@ -92,7 +92,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
    *   Queue-dependent options; for example, if this is a
    *   priority-queue, then $options might specify the item's priority.
    */
-  public function createItem($data, $options = array()) {
+  public function createItem($data, $options = []) {
     $dao = new CRM_Queue_DAO_QueueItem();
     $dao->queue_name = $this->getName();
     $dao->submit_time = CRM_Utils_Time::getTime('YmdHis');
@@ -111,9 +111,9 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
       SELECT count(*)
       FROM civicrm_queue_item
       WHERE queue_name = %1
-    ", array(
-      1 => array($this->getName(), 'String'),
-    ));
+    ", [
+      1 => [$this->getName(), 'String'],
+    ]);
   }
 
   /**
@@ -133,9 +133,9 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
       ORDER BY weight ASC, id ASC
       LIMIT 1
     ";
-    $params = array(
-      1 => array($this->getName(), 'String'),
-    );
+    $params = [
+      1 => [$this->getName(), 'String'],
+    ];
     $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
     if (is_a($dao, 'DB_Error')) {
       // FIXME - Adding code to allow tests to pass
@@ -145,10 +145,10 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     if ($dao->fetch()) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
       if ($dao->release_time === NULL || strtotime($dao->release_time) < $nowEpoch) {
-        CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", array(
-          '1' => array(date('YmdHis', $nowEpoch + $lease_time), 'String'),
-          '2' => array($dao->id, 'Integer'),
-        ));
+        CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", [
+          '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
+          '2' => [$dao->id, 'Integer'],
+        ]);
         // work-around: inconsistent date-formatting causes unintentional breakage
         #        $dao->submit_time = date('YmdHis', strtotime($dao->submit_time));
         #        $dao->release_time = date('YmdHis', $nowEpoch + $lease_time);
@@ -176,16 +176,16 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
       ORDER BY weight ASC, id ASC
       LIMIT 1
     ";
-    $params = array(
-      1 => array($this->getName(), 'String'),
-    );
+    $params = [
+      1 => [$this->getName(), 'String'],
+    ];
     $dao = CRM_Core_DAO::executeQuery($sql, $params, TRUE, 'CRM_Queue_DAO_QueueItem');
     if ($dao->fetch()) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", array(
-        '1' => array(date('YmdHis', $nowEpoch + $lease_time), 'String'),
-        '2' => array($dao->id, 'Integer'),
-      ));
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", [
+        '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
+        '2' => [$dao->id, 'Integer'],
+      ]);
       $dao->data = unserialize($dao->data);
       return $dao;
     }
@@ -210,9 +210,9 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
    */
   public function releaseItem($dao) {
     $sql = "UPDATE civicrm_queue_item SET release_time = NULL WHERE id = %1";
-    $params = array(
-      1 => array($dao->id, 'Integer'),
-    );
+    $params = [
+      1 => [$dao->id, 'Integer'],
+    ];
     CRM_Core_DAO::executeQuery($sql, $params);
     $dao->free();
   }

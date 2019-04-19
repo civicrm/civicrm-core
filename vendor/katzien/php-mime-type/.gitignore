@@ -1,0 +1,4 @@
+.idea
+vendor
+test/coverage
+composer.lock

@@ -125,26 +125,26 @@ class CRM_Utils_HttpClient {
         ts('As a result, actions like retrieving the CiviCRM news feed will fail. Talk to your server administrator or hosting company to rectify this.'),
         ts('Curl is not installed')
       );
-      return array(self::STATUS_DL_ERROR, NULL);
+      return [self::STATUS_DL_ERROR, NULL];
     }
 
     list($ch, $caConfig) = $this->createCurl($remoteFile);
 
     if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
       // CRM_Core_Error::fatal('Cannot install this extension - does not support SSL');
-      return array(self::STATUS_DL_ERROR, NULL);
+      return [self::STATUS_DL_ERROR, NULL];
     }
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     $data = curl_exec($ch);
     if (curl_errno($ch)) {
-      return array(self::STATUS_DL_ERROR, $data);
+      return [self::STATUS_DL_ERROR, $data];
     }
     else {
       curl_close($ch);
     }
 
-    return array(self::STATUS_OK, $data);
+    return [self::STATUS_OK, $data];
   }
 
   /**
@@ -161,14 +161,14 @@ class CRM_Utils_HttpClient {
     // Download extension zip file ...
     if (!function_exists('curl_init')) {
       //CRM_Core_Error::fatal('Cannot install this extension - curl is not installed!');
-      return array(self::STATUS_DL_ERROR, NULL);
+      return [self::STATUS_DL_ERROR, NULL];
     }
 
     list($ch, $caConfig) = $this->createCurl($remoteFile);
 
     if (preg_match('/^https:/', $remoteFile) && !$caConfig->isEnableSSL()) {
       // CRM_Core_Error::fatal('Cannot install this extension - does not support SSL');
-      return array(self::STATUS_DL_ERROR, NULL);
+      return [self::STATUS_DL_ERROR, NULL];
     }
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -177,13 +177,13 @@ class CRM_Utils_HttpClient {
     curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
     $data = curl_exec($ch);
     if (curl_errno($ch)) {
-      return array(self::STATUS_DL_ERROR, $data);
+      return [self::STATUS_DL_ERROR, $data];
     }
     else {
       curl_close($ch);
     }
 
-    return array(self::STATUS_OK, $data);
+    return [self::STATUS_OK, $data];
   }
 
   /**
@@ -192,9 +192,9 @@ class CRM_Utils_HttpClient {
    *   (0 => resource, 1 => CA_Config_Curl)
    */
   protected function createCurl($remoteFile) {
-    $caConfig = CA_Config_Curl::probe(array(
+    $caConfig = CA_Config_Curl::probe([
       'verify_peer' => (bool) Civi::settings()->get('verifySSL'),
-    ));
+    ]);
 
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $remoteFile);
@@ -211,7 +211,7 @@ class CRM_Utils_HttpClient {
       curl_setopt_array($ch, $caConfig->toCurlOptions());
     }
 
-    return array($ch, $caConfig);
+    return [$ch, $caConfig];
   }
 
   /**

@@ -6,7 +6,7 @@
  *   API result array
  */
 function message_template_get_example() {
-  $params = array(
+  $params = [
     'msg_title' => 'msg_title_285',
     'msg_subject' => 'msg_subject_285',
     'msg_text' => 'msg_text_285',
@@ -14,7 +14,7 @@ function message_template_get_example() {
     'workflow_id' => 285,
     'is_default' => '1',
     'is_reserved' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('MessageTemplate', 'get', $params);
@@ -24,12 +24,12 @@ function message_template_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -43,13 +43,13 @@ function message_template_get_example() {
  */
 function message_template_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 70,
-    'values' => array(
-      '70' => array(
+    'values' => [
+      '70' => [
         'id' => '70',
         'msg_title' => 'msg_title_285',
         'msg_subject' => 'msg_subject_285',
@@ -61,9 +61,9 @@ function message_template_get_expectedresult() {
         'is_reserved' => '1',
         'is_sms' => '1',
         'pdf_format_id' => '285',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }
