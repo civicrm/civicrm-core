@@ -182,6 +182,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $form->_contactID = $this->_individualId;
 
     $form->testSubmit($params);
+    $form->setRenewalMessage();
     $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
     $this->callAPISuccessGetCount('ContributionRecur', array('contact_id' => $this->_individualId), 0);
     $contribution = $this->callAPISuccess('Contribution', 'get', array(
@@ -203,6 +204,14 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
         'return' => 'payment_instrument_id',
       )),
     ), 'online');
+    $this->assertEquals([
+      [
+        'text' => 'AnnualFixed membership for Mr. Anthony Anderson II has been renewed.',
+        'title' => 'Complete',
+        'type' => 'success',
+        'options' => NULL,
+      ],
+    ], CRM_Core_Session::singleton()->getStatus());
   }
 
   /**
