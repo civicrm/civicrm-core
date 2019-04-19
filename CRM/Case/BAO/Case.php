@@ -2983,8 +2983,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
  AS SELECT ca.case_id, a.id, a.activity_date_time, a.status_id, a.activity_type_id
  FROM civicrm_case_activity ca
  INNER JOIN civicrm_activity a ON ca.activity_id=a.id
- WHERE a.activity_date_time =
-(SELECT b.activity_date_time FROM civicrm_case_activity bca
+ WHERE a.id =
+(SELECT b.id FROM civicrm_case_activity bca
  INNER JOIN civicrm_activity b ON bca.activity_id=b.id
  WHERE b.activity_date_time <= DATE_ADD( NOW(), INTERVAL 14 DAY )
  AND b.is_current_revision = 1 AND b.is_deleted=0 AND b.status_id = $scheduled_id
@@ -2996,8 +2996,8 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
  AS SELECT ca.case_id, a.id, a.activity_date_time, a.status_id, a.activity_type_id
  FROM civicrm_case_activity ca
  INNER JOIN civicrm_activity a ON ca.activity_id=a.id
- WHERE a.activity_date_time =
-(SELECT b.activity_date_time FROM civicrm_case_activity bca
+ WHERE a.id =
+(SELECT b.id FROM civicrm_case_activity bca
  INNER JOIN civicrm_activity b ON bca.activity_id=b.id
  WHERE b.activity_date_time >= DATE_SUB( NOW(), INTERVAL 14 DAY )
  AND b.is_current_revision = 1 AND b.is_deleted=0 AND b.status_id <> $scheduled_id
