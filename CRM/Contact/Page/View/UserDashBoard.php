@@ -180,9 +180,6 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
     usort($dashboardElements, array('CRM_Utils_Sort', 'cmpFunc'));
     $this->assign('dashboardElements', $dashboardElements);
 
-    // return true when 'Invoices / Credit Notes' checkbox is checked
-    $this->assign('invoices', $dashboardOptions['Invoices / Credit Notes']);
-
     if (!empty($dashboardOptions['Groups'])) {
       $this->assign('showGroup', TRUE);
       //build group selector

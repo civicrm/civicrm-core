@@ -102,6 +102,14 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
       'trxn_id' => '',
       'invoice_id' => '',
     ]);
+    $this->contributions[] = $this->contributionCreate([
+      'contact_id' => $this->contactID,
+      'receive_date' => '2018-11-24',
+      'receipt_date' => '2018-11-24',
+      'trxn_id' => '',
+      'invoice_id' => '',
+      'contribution_status_id' => 'Pending',
+    ]);
     $recur = $this->callAPISuccess('ContributionRecur', 'create', [
       'contact_id' => $this->contactID,
       'frequency_interval' => 1,
@@ -117,11 +125,13 @@ class CRM_Contact_Page_View_UserDashBoardTest extends CiviUnitTestCase {
       'contribution_recur_id' => $recur['id'],
     ]);
     $this->callAPISuccess('Setting', 'create', ['invoicing' => 1]);
+    $this->callAPISuccess('Setting', 'create', ['default_invoice_page' => $this->contributionPageCreate()['id']]);
     $this->runUserDashboard();
     $expectedStrings = [
       'Your Contribution(s)',
       '<table class="selector"><tr class="columnheader"><th>Total Amount</th><th>Financial Type</th><th>Received date</th><th>Receipt Sent</th><th>Status</th><th></th>',
       '<td>Completed</td><td><a class="button no-popup nowrap"href="/index.php?q=civicrm/contribute/invoice&amp;reset=1&amp;id=1&amp;cid=' . $this->contactID . '"><i class="crm-i fa-print"></i><span>Print Invoice</span></a></td></tr><tr id=\'rowid2\'',
+      'Pay Now',
     ];
 
     $this->assertPageContains($expectedStrings);
