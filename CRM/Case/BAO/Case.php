@@ -435,26 +435,9 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       't_act.status_id',
       'civicrm_case.start_date as case_start_date',
       'case_relation_type.label_b_a as case_role',
+      't_act.activity_date_time as activity_date_time',
+      't_act.id as activity_id',
     );
-
-    if ($type == 'upcoming') {
-      $selectClauses = array_merge($selectClauses, array(
-        't_act.activity_date_time as case_scheduled_activity_date',
-        't_act.id as case_scheduled_activity_id',
-      ));
-    }
-    elseif ($type == 'recent') {
-      $selectClauses = array_merge($selectClauses, array(
-        't_act.activity_date_time as case_recent_activity_date',
-        't_act.id as case_recent_activity_id',
-      ));
-    }
-    elseif ($type == 'any') {
-      $selectClauses = array_merge($selectClauses, array(
-        't_act.activity_date_time as case_activity_date',
-        't_act.id as case_activity_id',
-      ));
-    }
 
     $query = CRM_Contact_BAO_Query::appendAnyValueToSelect($selectClauses, 'case_id');
 
@@ -522,20 +505,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
     }
     $query .= " GROUP BY case_id ";
 
-    if ($order) {
-      $query .= $order;
-    }
-    else {
-      if ($type == 'upcoming') {
-        $query .= " ORDER BY case_scheduled_activity_date ASC ";
-      }
-      elseif ($type == 'recent') {
-        $query .= " ORDER BY case_recent_activity_date ASC ";
-      }
-      elseif ($type == 'any') {
-        $query .= " ORDER BY case_activity_date ASC ";
-      }
-    }
+    $query .= ($order) ?: ' ORDER BY activity_date_time ASC';
 
     if ($limit) {
       $query .= $limit;
@@ -571,20 +541,6 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
 
     $type = CRM_Utils_Array::value('type', $params, 'upcoming');
     $userID = CRM_Core_Session::singleton()->get('userID');
-
-    $caseActivityTypeColumn = 'case_activity_type_name';
-    $caseActivityDateColumn = 'case_activity_date';
-    $caseActivityIDColumn = 'case_activity_id';
-    if ($type == 'upcoming') {
-      $caseActivityDateColumn = 'case_scheduled_activity_date';
-      $caseActivityTypeColumn = 'case_scheduled_activity_type';
-      $caseActivityIDColumn = 'case_scheduled_activity_id';
-    }
-    elseif ($type == 'recent') {
-      $caseActivityDateColumn = 'case_recent_activity_date';
-      $caseActivityTypeColumn = 'case_recent_activity_type';
-      $caseActivityIDColumn = 'case_recent_activity_id';
-    }
 
     // validate access for all cases.
     if ($allCases && !CRM_Core_Permission::check('access all cases and activities')) {
@@ -625,17 +581,13 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
     $order = NULL;
     if (!empty($params['sortBy'])) {
       if (strstr($params['sortBy'], 'date ')) {
-        $params['sortBy'] = str_replace('date', $caseActivityDateColumn, $params['sortBy']);
+        $params['sortBy'] = str_replace('date', 'activity_date_time', $params['sortBy']);
       }
       $order = "ORDER BY " . $params['sortBy'];
     }
 
     $query = self::getCaseActivityQuery($type, $userID, $condition, $limit, $order);
     $result = CRM_Core_DAO::executeQuery($query);
-
-    $caseStatus = CRM_Core_OptionGroup::values('case_status', FALSE, FALSE, FALSE, " AND v.name = 'Urgent' ");
-    $urgentId = key((array) $caseStatus);
-    $caseStatuses = CRM_Case_PseudoConstant::caseStatus('label', FALSE);
 
     // we're going to use the usual actions, so doesn't make sense to duplicate definitions
     $actions = CRM_Case_Selector_Search::links();
@@ -652,8 +604,12 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
     }
     $mask = CRM_Core_Action::mask($permissions);
 
+    // Pseudoconstants to populate labels
+    $caseStatuses = CRM_Case_PseudoConstant::caseStatus('label', FALSE);
     $caseTypes = CRM_Case_PseudoConstant::caseType('name');
     $caseTypeTitles = CRM_Case_PseudoConstant::caseType('title', FALSE);
+    $activityTypeLabels = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
+
     foreach ($result->fetchAll() as $case) {
       $key = $case['case_id'];
       $casesList[$key] = array();
@@ -676,32 +632,30 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
       );
       $casesList[$key]['subject'] = $case['case_subject'];
       $casesList[$key]['case_status'] = CRM_Utils_Array::value($case['case_status_id'], $caseStatuses);
-      if ($case['case_status_id'] == $urgentId) {
+      if ($case['case_status_id'] == CRM_Case_PseudoConstant::getKey('CRM_Case_BAO_Case', 'case_status_id', 'Urgent')) {
         $casesList[$key]['case_status'] = sprintf('<strong>%s</strong>', strtoupper($casesList[$key]['case_status']));
       }
       $casesList[$key]['case_type'] = CRM_Utils_Array::value($case['case_type_id'], $caseTypeTitles);
       $casesList[$key]['case_role'] = CRM_Utils_Array::value('case_role', $case, '---');
       $casesList[$key]['manager'] = self::getCaseManagerContact($caseTypes[$case['case_type_id']], $case['case_id']);
 
-      $casesList[$key]['date'] = $case[$caseActivityTypeColumn];
-      if (($actId = CRM_Utils_Array::value('case_scheduled_activity_id', $case)) ||
-        ($actId = CRM_Utils_Array::value('case_recent_activity_id', $case))
-      ) {
+      $casesList[$key]['date'] = CRM_Utils_Array::value($case['activity_type_id'], $activityTypeLabels);
+      if ($actId = CRM_Utils_Array::value('activity_id', $case)) {
         if (self::checkPermission($actId, 'view', $case['activity_type_id'], $userID)) {
           if ($type == 'recent') {
             $casesList[$key]['date'] = sprintf('<a class="action-item crm-hover-button" href="%s" title="%s">%s</a>',
-              CRM_Utils_System::url('civicrm/case/activity/view', array('reset' => 1, 'cid' => $case['contact_id'], 'aid' => $case[$caseActivityIDColumn])),
+              CRM_Utils_System::url('civicrm/case/activity/view', array('reset' => 1, 'cid' => $case['contact_id'], 'aid' => $case['activity_id'])),
               ts('View activity'),
-              $case[$caseActivityTypeColumn]
+              CRM_Utils_Array::value($case['activity_type_id'], $activityTypeLabels)
             );
           }
           else {
-            $status = CRM_Utils_Date::overdue($case[$caseActivityDateColumn]) ? 'status-overdue' : 'status-scheduled';
+            $status = CRM_Utils_Date::overdue($case['activity_date_time']) ? 'status-overdue' : 'status-scheduled';
             $casesList[$key]['date'] = sprintf('<a class="crm-popup %s" href="%s" title="%s">%s</a> &nbsp;&nbsp;',
              $status,
-              CRM_Utils_System::url('civicrm/case/activity/view', array('reset' => 1, 'cid' => $case['contact_id'], 'aid' => $case[$caseActivityIDColumn])),
+              CRM_Utils_System::url('civicrm/case/activity/view', array('reset' => 1, 'cid' => $case['contact_id'], 'aid' => $case['activity_id'])),
               ts('View activity'),
-              $case[$caseActivityTypeColumn]
+              CRM_Utils_Array::value($case['activity_type_id'], $activityTypeLabels)
             );
           }
         }
@@ -712,7 +666,7 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
           );
         }
       }
-      $casesList[$key]['date'] .= "<br/>" . CRM_Utils_Date::customFormat($case[$caseActivityDateColumn]);
+      $casesList[$key]['date'] .= "<br/>" . CRM_Utils_Date::customFormat($case['activity_date_time']);
       $casesList[$key]['links'] = CRM_Core_Action::formLink($actions['primaryActions'], $mask,
         array(
           'id' => $case['case_id'],
@@ -1605,11 +1559,11 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     $activityInfo = array();
     while ($res->fetch()) {
       if ($type == 'upcoming') {
-        $activityInfo[$res->case_id]['date'] = $res->case_scheduled_activity_date;
+        $activityInfo[$res->case_id]['date'] = $res->activity_date_time;
         $activityInfo[$res->case_id]['type'] = CRM_Utils_Array::value($res->activity_type_id, $activityTypes);
       }
       else {
-        $activityInfo[$res->case_id]['date'] = $res->case_recent_activity_date;
+        $activityInfo[$res->case_id]['date'] = $res->activity_date_time;
         $activityInfo[$res->case_id]['type'] = CRM_Utils_Array::value($res->activity_type_id, $activityTypes);
       }
     }
