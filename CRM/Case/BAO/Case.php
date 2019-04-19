@@ -441,63 +441,48 @@ WHERE cc.contact_id = %1 AND civicrm_case_type.name = '{$caseType}'";
 
     $query = CRM_Contact_BAO_Query::appendAnyValueToSelect($selectClauses, 'case_id');
 
-    $query .= " FROM civicrm_case
-                  INNER JOIN civicrm_case_contact ON civicrm_case.id = civicrm_case_contact.case_id
-                  INNER JOIN civicrm_contact ON civicrm_case_contact.contact_id = civicrm_contact.id ";
+    $query .= <<<HERESQL
+      FROM civicrm_case
+        INNER JOIN civicrm_case_contact ON civicrm_case.id = civicrm_case_contact.case_id
+        INNER JOIN civicrm_contact ON civicrm_case_contact.contact_id = civicrm_contact.id
+HERESQL;
 
-    if ($type == 'upcoming') {
-      // This gets the earliest activity per case that's scheduled within 14 days from now.
-      // Note we have an inner select to get the min activity id in order to remove duplicates in case there are two with the same datetime.
-      // In this case we don't really care which one, so min(id) works.
-      // optimized in CRM-11837
-      $query .= " INNER JOIN
-(
-  SELECT case_id, act.id, activity_date_time, activity_type_id, status_id
-  FROM (
-    SELECT *
-    FROM (
-      SELECT *
-      FROM civicrm_view_case_activity_upcoming
-      ORDER BY activity_date_time ASC, id ASC
-      ) AS upcomingOrdered
-    ) AS act
-) AS t_act
-    ON t_act.case_id = civicrm_case.id
-";
-    }
-    elseif ($type == 'recent') {
-      // Similarly, the most recent activity in the past 14 days, and exclude scheduled.
-      //improve query performance - CRM-10598
-      $query .= " INNER JOIN
-(
-  SELECT case_id, act.id, activity_date_time, activity_type_id, status_id
-  FROM (
-    SELECT *
-    FROM (
-      SELECT *
-      FROM civicrm_view_case_activity_recent
-      ORDER BY activity_date_time DESC, id ASC
-      ) AS recentOrdered
-    ) AS act
-) AS t_act
-    ON t_act.case_id = civicrm_case.id ";
-    }
-    elseif ($type == 'any') {
-      $query .= " LEFT JOIN civicrm_case_activity ca4
-    ON civicrm_case.id = ca4.case_id
-  LEFT JOIN civicrm_activity t_act
-    ON t_act.id = ca4.activity_id
-      AND t_act.is_current_revision = 1";
+    switch ($type) {
+      case 'upcoming':
+      case 'recent':
+        // civicrm_view_case_activity_upcoming and
+        // civicrm_view_case_activity_recent are views that show the next
+        // scheduled and most recent not-scheduled activity on each case,
+        // respectively.
+        $query .= <<<HERESQL
+        INNER JOIN civicrm_view_case_activity_$type t_act
+          ON t_act.case_id = civicrm_case.id
+HERESQL;
+        break;
+
+      case 'any':
+        $query .= <<<HERESQL
+        LEFT JOIN civicrm_case_activity ca4
+          ON civicrm_case.id = ca4.case_id
+        LEFT JOIN civicrm_activity t_act
+          ON t_act.id = ca4.activity_id
+          AND t_act.is_current_revision = 1
+HERESQL;
     }
 
-    $query .= "
- LEFT JOIN civicrm_phone ON (civicrm_phone.contact_id = civicrm_contact.id AND civicrm_phone.is_primary=1)
- LEFT JOIN civicrm_relationship case_relationship
- ON ( case_relationship.contact_id_a = civicrm_case_contact.contact_id AND case_relationship.contact_id_b = {$userID} AND case_relationship.is_active AND case_relationship.case_id = civicrm_case.id )
- LEFT JOIN civicrm_relationship_type case_relation_type
- ON ( case_relation_type.id = case_relationship.relationship_type_id
-      AND case_relation_type.id = case_relationship.relationship_type_id )
-";
+    $query .= <<<HERESQL
+        LEFT JOIN civicrm_phone
+          ON civicrm_phone.contact_id = civicrm_contact.id
+            AND civicrm_phone.is_primary = 1
+        LEFT JOIN civicrm_relationship case_relationship
+          ON case_relationship.contact_id_a = civicrm_case_contact.contact_id
+            AND case_relationship.contact_id_b = {$userID}
+            AND case_relationship.is_active
+            AND case_relationship.case_id = civicrm_case.id
+        LEFT JOIN civicrm_relationship_type case_relation_type
+          ON case_relation_type.id = case_relationship.relationship_type_id
+            AND case_relation_type.id = case_relationship.relationship_type_id
+HERESQL;
 
     if ($condition) {
       // CRM-8749 backwards compatibility - callers of this function expect to start $condition with "AND"
