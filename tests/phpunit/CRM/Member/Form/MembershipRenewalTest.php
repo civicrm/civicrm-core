@@ -208,7 +208,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       ), 'online');
     $this->assertEquals([
       [
-        'text' => 'AnnualFixed membership for Mr. Anthony Anderson II has been renewed. The new membership End Date is December 31st, ' . (date('Y') + 1) . '.',
+        'text' => 'AnnualFixed membership for Mr. Anthony Anderson II has been renewed.',
         'title' => 'Complete',
         'type' => 'success',
         'options' => NULL,
