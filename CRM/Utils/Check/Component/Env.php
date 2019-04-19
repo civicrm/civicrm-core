@@ -303,17 +303,16 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       );
     }
     else {
+      $cronLink = 'target="_blank" href="' . htmlentities(CRM_Utils_System::docURL2('sysadmin/setup/jobs/', TRUE)) . '""';
+      $msg .= '<p>' . ts('To enable scheduling support, please <a %1>set up the cron job</a>.', [
+        1 => $cronLink,
+      ]) . '</p>';
       $message = new CRM_Utils_Check_Message(
         __FUNCTION__,
         $msg,
         ts('Cron Not Running'),
         ($lastCron > gmdate('U') - 86400) ? \Psr\Log\LogLevel::WARNING : \Psr\Log\LogLevel::ERROR,
         'fa-clock-o'
-      );
-      $docUrl = 'target="_blank" href="' . CRM_Utils_System::docURL(['resource' => 'wiki', 'page' => 'Managing Scheduled Jobs', 'URLonly' => TRUE]) . '""';
-      $message->addHelp(
-        ts('Configuring cron on your server is necessary for running scheduled jobs such as sending mail and scheduled reminders.') . '<br />' .
-        ts("Learn more in the <a %1>online documentation</a>.", [1 => $docUrl])
       );
       $messages[] = $message;
     }
