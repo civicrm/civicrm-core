@@ -104,7 +104,7 @@ class CRM_Upgrade_Incremental_General {
       // ignore the matter and simply run CRM_Core_InnoDBIndexer::fixSchemaDifferences
       // after the upgrade.  But that's speculative.  For now, we'll leave this
       // advanced feature in the hands of the sysadmin.
-      $preUpgradeMessage .= '<br />' . ts('This database uses InnoDB Full Text Search for optimized searching. The upgrade procedure has not been tested with this feature. You should disable (and later re-enable) the feature by navigating to "Administer => System Settings => Miscellaneous".');
+      $preUpgradeMessage .= '<br />' . ts('This database uses InnoDB Full Text Search for optimized searching. The upgrade procedure has not been tested with this feature. You should disable (and later re-enable) the feature by navigating to "Administer => Customize Data and Screens => Search Preferences".');
     }
 
     $ftAclSetting = Civi::settings()->get('acl_financial_type');
