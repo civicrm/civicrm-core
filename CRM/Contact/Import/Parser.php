@@ -69,6 +69,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
   protected $_primaryKeyName;
   protected $_statusFieldName;
 
+  protected $fieldMetadata = [];
   /**
    * On duplicate
    *
@@ -1129,7 +1130,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
     // get the formatted location blocks into params - w/ 3.0 format, CRM-4605
     if (!empty($values['location_type_id'])) {
-      return $this->formatLocationBlock($values, $params, $fields);
+      return $this->formatLocationBlock($values, $params);
     }
 
     if (isset($values['note'])) {
@@ -1188,11 +1189,10 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    *
    * @param array $values
    * @param array $params
-   * @param array $fields
    *
    * @return bool
    */
-  protected function formatLocationBlock(&$values, &$params, $fields) {
+  protected function formatLocationBlock(&$values, &$params) {
     if (empty($values['location_type_id'])) {
       return FALSE;
     }
@@ -1213,10 +1213,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
         $params[$blockFieldName] = [];
       }
 
-      if (!array_key_exists($block, $fields)) {
-        $className = "CRM_Core_DAO_$block";
-        $fields[$block] = $className::fields();
-      }
+      $fields[$block] = $this->getMetadataForEntity($block);
 
       $blockCnt = count($params[$blockFieldName]);
 
@@ -1256,10 +1253,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       $params['address'] = [];
     }
 
-    if (!array_key_exists('Address', $fields)) {
-      $fields['Address'] = CRM_Core_DAO_Address::fields();
-    }
-
     // Note: we doing multiple value formatting here for address custom fields, plus putting into right format.
     // The actual formatting (like date, country ..etc) for address custom fields is taken care of while saving
     // the address in CRM_Core_BAO_Address::create method
@@ -1273,8 +1266,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       foreach ($values as $key => $val) {
         $customFieldID = CRM_Core_BAO_CustomField::getKeyID($key);
         if ($customFieldID && array_key_exists($customFieldID, $customFields)) {
-          // mark an entry in fields array since we want the value of custom field to be copied
-          $fields['Address'][$key] = NULL;
 
           $htmlType = CRM_Utils_Array::value('html_type', $customFields[$customFieldID]);
           switch ($htmlType) {
@@ -1307,6 +1298,8 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       $values = $newValues;
     }
 
+    $fields['Address'] = $this->getMetadataForEntity('Address');
+    // @todo this is kinda replicated below....
     _civicrm_api3_store_values($fields['Address'], $values, $params['address'][$values['location_type_id']]);
 
     $addressFields = [
@@ -1318,6 +1311,9 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       'supplemental_address_3',
       'StateProvince.name',
     ];
+    foreach (array_keys($customFields) as $customFieldID) {
+      $addressFields[] = 'custom_' . $customFieldID;
+    }
 
     foreach ($addressFields as $field) {
       if (array_key_exists($field, $values)) {
@@ -1343,6 +1339,21 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
     }
     return TRUE;
+  }
+
+  /**
+   * Get the field metadata for the relevant entity.
+   *
+   * @param string $entity
+   *
+   * @return array
+   */
+  protected function getMetadataForEntity($entity) {
+    if (!isset($this->fieldMetadata[$entity])) {
+      $className = "CRM_Core_DAO_$entity";
+      $this->fieldMetadata[$entity] = $className::fields();
+    }
+    return $this->fieldMetadata[$entity];
   }
 
 }
