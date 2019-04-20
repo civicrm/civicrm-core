@@ -67,8 +67,8 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
   public function run() {
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/Admin/Page/APIExplorer.js')
-      ->addScriptFile('civicrm', 'bower_components/google-code-prettify/bin/prettify.min.js', 99)
-      ->addStyleFile('civicrm', 'bower_components/google-code-prettify/bin/prettify.min.css', 99)
+      ->addScriptFile('civicrm', 'node_modules/@bower_components/google-code-prettify/bin/prettify.min.js', 99)
+      ->addStyleFile('civicrm', 'node_modules/@bower_components/google-code-prettify/bin/prettify.min.css', 99)
       ->addVars('explorer', ['max_joins' => \Civi\API\Api3SelectQuery::MAX_JOINS]);
 
     $this->assign('operators', CRM_Core_DAO::acceptedSQLOperators());

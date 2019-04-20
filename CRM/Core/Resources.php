@@ -704,20 +704,20 @@ class CRM_Core_Resources {
     // Scripts needed by everyone, everywhere
     // FIXME: This is too long; list needs finer-grained segmentation
     $items = [
-      "bower_components/jquery/dist/jquery.min.js",
-      "bower_components/jquery-ui/jquery-ui.min.js",
-      "bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css",
-      "bower_components/lodash-compat/lodash.min.js",
+      "node_modules/@bower_components/jquery/dist/jquery.min.js",
+      "node_modules/@bower_components/jquery-ui/jquery-ui.min.js",
+      "node_modules/@bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css",
+      "node_modules/@bower_components/lodash-compat/lodash.min.js",
       "packages/jquery/plugins/jquery.mousewheel.min.js",
-      "bower_components/select2/select2.min.js",
-      "bower_components/select2/select2.min.css",
-      "bower_components/font-awesome/css/font-awesome.min.css",
+      "node_modules/@bower_components/select2/select2.min.js",
+      "node_modules/@bower_components/select2/select2.min.css",
+      "node_modules/@bower_components/font-awesome/css/font-awesome.min.css",
       "packages/jquery/plugins/jquery.form.min.js",
       "packages/jquery/plugins/jquery.timeentry.min.js",
       "packages/jquery/plugins/jquery.blockUI.min.js",
-      "bower_components/datatables/media/js/jquery.dataTables.min.js",
-      "bower_components/datatables/media/css/jquery.dataTables.min.css",
-      "bower_components/jquery-validation/dist/jquery.validate.min.js",
+      "node_modules/@bower_components/datatables/media/js/jquery.dataTables.min.js",
+      "node_modules/@bower_components/datatables/media/css/jquery.dataTables.min.css",
+      "node_modules/@bower_components/jquery-validation/dist/jquery.validate.min.js",
       "packages/jquery/plugins/jquery.ui.datepicker.validation.min.js",
       "js/Common.js",
       "js/crm.datepicker.js",
@@ -762,8 +762,8 @@ class CRM_Core_Resources {
       $position = Civi::settings()->get('menubar_position') ?: 'over-cms-menu';
     }
     if ($position !== 'none') {
-      $items[] = 'bower_components/smartmenus/dist/jquery.smartmenus.min.js';
-      $items[] = 'bower_components/smartmenus/dist/addons/keyboard/jquery.smartmenus.keyboard.min.js';
+      $items[] = 'node_modules/@bower_components/smartmenus/dist/jquery.smartmenus.min.js';
+      $items[] = 'node_modules/@bower_components/smartmenus/dist/addons/keyboard/jquery.smartmenus.keyboard.min.js';
       $items[] = 'js/crm.menubar.js';
       $items[] = Civi::service('asset_builder')->getUrl('crm-menubar.css', [
         'color' => Civi::settings()->get('menubar_color'),
@@ -792,7 +792,7 @@ class CRM_Core_Resources {
     if ($tsLocale && $tsLocale != 'en_US') {
       // Search for i18n file in order of specificity (try fr-CA, then fr)
       list($lang) = explode('_', $tsLocale);
-      $path = "bower_components/jquery-ui/ui/i18n";
+      $path = "node_modules/@bower_components/jquery-ui/ui/i18n";
       foreach ([str_replace('_', '-', $tsLocale), $lang] as $language) {
         $localizationFile = "$path/datepicker-{$language}.js";
         if ($this->getPath('civicrm', $localizationFile)) {
@@ -839,7 +839,7 @@ class CRM_Core_Resources {
     $cms = strtolower($config->userFramework);
     $cms = $cms === 'drupal' ? 'drupal7' : $cms;
     $items = [
-      'bower_components/smartmenus/dist/css/sm-core-css.css',
+      'node_modules/@bower_components/smartmenus/dist/css/sm-core-css.css',
       'css/crm-menubar.css',
       "css/menubar-$cms.css",
     ];

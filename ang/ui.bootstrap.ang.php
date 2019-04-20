@@ -6,6 +6,6 @@
 return [
   'ext' => 'civicrm',
   'basePages' => [],
-  'js' => ['bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js'],
-  'css' => ['bower_components/angular-bootstrap/ui-bootstrap-csp.css', 'ang/ui.bootstrap.css'],
+  'js' => ['node_modules/@bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js'],
+  'css' => ['node_modules/@bower_components/angular-bootstrap/ui-bootstrap-csp.css', 'ang/ui.bootstrap.css'],
 ];

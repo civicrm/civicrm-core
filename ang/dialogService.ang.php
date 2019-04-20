@@ -7,5 +7,5 @@
 
 return [
   'ext' => 'civicrm',
-  'js' => ['bower_components/angular-jquery-dialog-service/dialog-service.js'],
+  'js' => ['node_modules/@bower_components/angular-jquery-dialog-service/dialog-service.js'],
 ];

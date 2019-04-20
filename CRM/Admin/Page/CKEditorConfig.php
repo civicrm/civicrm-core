@@ -83,13 +83,13 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
     $settings = $this->getConfigSettings();
 
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'bower_components/ckeditor/ckeditor.js', 0, 'page-header')
-      ->addScriptFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/js/fulltoolbareditor.js', 1)
-      ->addScriptFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/js/abstracttoolbarmodifier.js', 2)
-      ->addScriptFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/js/toolbarmodifier.js', 3)
+      ->addScriptFile('civicrm', 'node_modules/@bower_components/ckeditor/ckeditor.js', 0, 'page-header')
+      ->addScriptFile('civicrm', 'node_modules/@bower_components/ckeditor/samples/toolbarconfigurator/js/fulltoolbareditor.js', 1)
+      ->addScriptFile('civicrm', 'node_modules/@bower_components/ckeditor/samples/toolbarconfigurator/js/abstracttoolbarmodifier.js', 2)
+      ->addScriptFile('civicrm', 'node_modules/@bower_components/ckeditor/samples/toolbarconfigurator/js/toolbarmodifier.js', 3)
       ->addScriptFile('civicrm', 'js/wysiwyg/admin.ckeditor-configurator.js', 10)
-      ->addStyleFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/css/fontello.css')
-      ->addStyleFile('civicrm', 'bower_components/ckeditor/samples/css/samples.css')
+      ->addStyleFile('civicrm', 'node_modules/@bower_components/ckeditor/samples/toolbarconfigurator/css/fontello.css')
+      ->addStyleFile('civicrm', 'node_modules/@bower_components/ckeditor/samples/css/samples.css')
       ->addVars('ckConfig', [
         'plugins' => array_values($this->getCKPlugins()),
         'blacklist' => $this->blackList,
@@ -158,7 +158,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    */
   private function getCKPlugins() {
     $plugins = [];
-    $pluginDir = Civi::paths()->getPath('[civicrm.root]/bower_components/ckeditor/plugins');
+    $pluginDir = Civi::paths()->getPath('[civicrm.root]/node_modules/@bower_components/ckeditor/plugins');
 
     foreach (glob($pluginDir . '/*', GLOB_ONLYDIR) as $dir) {
       $dir = rtrim(str_replace('\\', '/', $dir), '/');
@@ -172,12 +172,12 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
         ];
         if (is_dir($dir . "icons")) {
           if (is_file($dir . "icons/$name.png")) {
-            $plugins[$name]['icon'] = "bower_components/ckeditor/plugins/$name/icons/$name.png";
+            $plugins[$name]['icon'] = "node_modules/@bower_components/ckeditor/plugins/$name/icons/$name.png";
           }
           elseif (glob($dir . "icons/*.png")) {
             $icon = CRM_Utils_Array::first(glob($dir . "icons/*.png"));
             $icon = rtrim(str_replace('\\', '/', $icon), '/');
-            $plugins[$name]['icon'] = "bower_components/ckeditor/plugins/$name/icons/" . substr($icon, strrpos($icon, '/') + 1);
+            $plugins[$name]['icon'] = "node_modules/@bower_components/ckeditor/plugins/$name/icons/" . substr($icon, strrpos($icon, '/') + 1);
           }
         }
       }
@@ -193,7 +193,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    */
   private function getCKSkins() {
     $skins = [];
-    $skinDir = Civi::paths()->getPath('[civicrm.root]/bower_components/ckeditor/skins');
+    $skinDir = Civi::paths()->getPath('[civicrm.root]/node_modules/@bower_components/ckeditor/skins');
     foreach (glob($skinDir . '/*', GLOB_ONLYDIR) as $dir) {
       $dir = rtrim(str_replace('\\', '/', $dir), '/');
       $skins[] = substr($dir, strrpos($dir, '/') + 1);

@@ -105,8 +105,8 @@ class CRM_Admin_Page_Navigation extends CRM_Core_Page_Basic {
 
     // Add jstree support
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'bower_components/jstree/dist/jstree.min.js', 0, 'html-header')
-      ->addStyleFile('civicrm', 'bower_components/jstree/dist/themes/default/style.min.css');
+      ->addScriptFile('civicrm', 'node_modules/@bower_components/jstree/dist/jstree.min.js', 0, 'html-header')
+      ->addStyleFile('civicrm', 'node_modules/@bower_components/jstree/dist/themes/default/style.min.css');
   }
 
 }

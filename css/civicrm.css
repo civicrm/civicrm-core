@@ -2770,7 +2770,7 @@ tbody.scrollContent tr.alternateRow {
 .crm-container a.sorting_desc,
 .crm-container a.sorting_asc {
   color: #A7A7A7;
-  background: url("../bower_components/datatables/media/images/sort_both.png") no-repeat left center;
+  background: url("../node_modules/@bower_components/datatables/media/images/sort_both.png") no-repeat left center;
   padding-left: 20px;
 }
 .crm-container a.sorting_desc,
@@ -2785,16 +2785,16 @@ tbody.scrollContent tr.alternateRow {
 }
 
 .crm-container table thead a.sorting_asc {
-  background: url("../bower_components/datatables/media/images/sort_asc.png") no-repeat left center;
+  background: url("../node_modules/@bower_components/datatables/media/images/sort_asc.png") no-repeat left center;
 }
 .crm-container table thead a.sorting_desc {
-  background: url("../bower_components/datatables/media/images/sort_desc.png") no-repeat left center;
+  background: url("../node_modules/@bower_components/datatables/media/images/sort_desc.png") no-repeat left center;
 }
 .crm-container table thead a.sorting_asc_disabled {
-  background: url("../bower_components/datatables/media/images/sort_asc_disabled.png") no-repeat left center;
+  background: url("../node_modules/@bower_components/datatables/media/images/sort_asc_disabled.png") no-repeat left center;
 }
 .crm-container table thead a.sorting_desc_disabled {
-  background: url("../bower_components/datatables/media/images/sort_desc_disabled.png") no-repeat left center;
+  background: url("../node_modules/@bower_components/datatables/media/images/sort_desc_disabled.png") no-repeat left center;
 }
 
 /* Otherwise for some reason we have 2 sort icons */
@@ -3008,7 +3008,7 @@ tbody.scrollContent tr.alternateRow {
 }
 /* Add arrow icon to multi-selects */
 .crm-container .select2-container-multi .select2-choices:before {
-  background: url("../bower_components/select2/select2.png") no-repeat scroll 0 -4px;
+  background: url("../node_modules/@bower_components/select2/select2.png") no-repeat scroll 0 -4px;
   content: "";
   display: block;
   height: 15px;

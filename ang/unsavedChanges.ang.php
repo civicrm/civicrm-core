@@ -5,5 +5,5 @@
 
 return [
   'ext' => 'civicrm',
-  'js' => ['bower_components/angular-unsavedChanges/dist/unsavedChanges.min.js'],
+  'js' => ['node_modules/@bower_components/angular-unsavedChanges/dist/unsavedChanges.min.js'],
 ];

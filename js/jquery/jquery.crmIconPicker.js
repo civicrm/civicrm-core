@@ -9,7 +9,7 @@
     function loadIcons() {
       if (!loaded) {
         loaded = $.Deferred();
-        CRM.$.get(CRM.config.resourceBase + 'bower_components/font-awesome/css/font-awesome.css').done(function(data) {
+        CRM.$.get(CRM.config.resourceBase + 'node_modules/@bower_components/font-awesome/css/font-awesome.css').done(function(data) {
           var match,
             regex = /\.(fa-[-a-zA-Z0-9]+):before {/g;
           while((match = regex.exec(data)) !== null) {

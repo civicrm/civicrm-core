@@ -18,7 +18,42 @@
     "karma-jasmine": "~2.0.1"
   },
   "scripts": {
-    "postinstall": "bash tools/scripts/npm/postinstall.sh",
+    "postinstall": "bash tools/scripts/npm/postinstall.sh && node -e \"try { require('fs').symlinkSync(require('path').resolve('node_modules/@bower_components'), 'bower_components', 'junction') } catch (e) { }\"",
     "test": "bash tools/scripts/npm/test.sh"
+  },
+  "dependencies": {
+    "@bower_components/angular": "angular/bower-angular#1.5.11",
+    "@bower_components/angular-bootstrap": "angular-ui/bootstrap-bower#^2.5.0",
+    "@bower_components/angular-file-upload": "nervgh/angular-file-upload#>=1.1.5 <=1.1.6",
+    "@bower_components/angular-jquery-dialog-service": "totten/angular-jquery-dialog-service#civicrm",
+    "@bower_components/angular-mocks": "angular/bower-angular-mocks#~1.5.0",
+    "@bower_components/angular-route": "angular/bower-angular-route#~1.5.0",
+    "@bower_components/angular-sanitize": "angular/bower-angular-sanitize#~1.5.0",
+    "@bower_components/angular-ui-sortable": "angular-ui/ui-sortable#0.12.x",
+    "@bower_components/angular-ui-utils": "angular-ui/ui-utils#0.1.x",
+    "@bower_components/angular-unsavedChanges": "facultymatt/angular-unsavedChanges#~0.1.1",
+    "@bower_components/ckeditor": "ckeditor/ckeditor-releases#~4.9",
+    "@bower_components/crossfilter-1.3.x": "crossfilter/crossfilter#~1.3.11",
+    "@bower_components/crossfilter2": "crossfilter/crossfilter#~1.4",
+    "@bower_components/d3": "mbostock-bower/d3-bower#3.4.11",
+    "@bower_components/d3-3.5.x": "mbostock-bower/d3-bower#~3.5.17",
+    "@bower_components/datatables": "DataTables/DataTables#~1.10",
+    "@bower_components/dc-2.1.x": "NickQiZhu/dc.js#~2.1.8",
+    "@bower_components/es6-promise": "components/es6-promise#^4.2.4",
+    "@bower_components/font-awesome": "FortAwesome/Font-Awesome#~4",
+    "@bower_components/google-code-prettify": "tcollard/google-code-prettify#~1.0",
+    "@bower_components/jquery": "jquery/jquery-dist#~1.12",
+    "@bower_components/jquery-ui": "components/jqueryui#>=1.9",
+    "@bower_components/jquery-validation": "jzaefferer/jquery-validation#~1.13",
+    "@bower_components/jstree": "vakata/jstree#~3",
+    "@bower_components/lodash-compat": "lodash/lodash-compat#~3.0",
+    "@bower_components/phantomjs-polyfill": "conversocial/phantomjs-polyfill#^0.0.2",
+    "@bower_components/qunit": "jquery/qunit#~1.10",
+    "@bower_components/select2": "colemanw/select2#stable/3.5",
+    "@bower_components/smartmenus": "vadikom/smartmenus#~1.1",
+    "yarn": "^1.15.2"
+  },
+  "engines": {
+    "yarn": ">= 1.0.0"
   }
 }

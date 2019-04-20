@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for adding/editing tags  *}
-{crmStyle file='bower_components/jstree/dist/themes/default/style.min.css'}
+{crmStyle file='node_modules/@bower_components/jstree/dist/themes/default/style.min.css'}
 {literal}
 <script type="text/javascript">
   (function($, _){{/literal}
@@ -55,7 +55,7 @@
       }
 
       // Load js tree.
-      CRM.loadScript(CRM.config.resourceBase + 'bower_components/jstree/dist/jstree.min.js').done(function() {
+      CRM.loadScript(CRM.config.resourceBase + 'node_modules/@bower_components/jstree/dist/jstree.min.js').done(function() {
         $("#tagtree").jstree({
           plugins : ['search', 'wholerow', 'checkbox'],
           core: {

@@ -5,5 +5,5 @@
 
 return [
   'ext' => 'civicrm',
-  'js' => ['bower_components/angular-route/angular-route.min.js'],
+  'js' => ['node_modules/@bower_components/angular-route/angular-route.min.js'],
 ];

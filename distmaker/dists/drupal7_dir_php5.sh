@@ -28,7 +28,7 @@ dm_generate_version "$TRG/civicrm-version.php" Drupal
 dm_install_core "$SRC" "$TRG"
 dm_install_packages $DM_PACKAGESDIR "$TRG/packages"
 dm_install_vendor "$SRC/vendor" "$TRG/vendor"
-dm_install_bower "$SRC/bower_components" "$TRG/bower_components"
+dm_install_bower "$SRC/node_modules" "$TRG/node_modules"
 dm_install_drupal "$DM_DRUPALDIR" "$TRG/drupal"
 dm_install_cvext org.civicrm.api4 "$TRG/ext/api4"
 dm_install_cvext com.iatspayments.civicrm "$TRG/ext/iatspayments"

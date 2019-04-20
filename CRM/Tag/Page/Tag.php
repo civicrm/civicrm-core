@@ -41,8 +41,8 @@ class CRM_Tag_Page_Tag extends CRM_Core_Page {
    */
   public function run() {
     CRM_Core_Resources::singleton()
-      ->addScriptFile('civicrm', 'bower_components/jstree/dist/jstree.min.js', 0, 'html-header')
-      ->addStyleFile('civicrm', 'bower_components/jstree/dist/themes/default/style.min.css')
+      ->addScriptFile('civicrm', 'node_modules/@bower_components/jstree/dist/jstree.min.js', 0, 'html-header')
+      ->addStyleFile('civicrm', 'node_modules/@bower_components/jstree/dist/themes/default/style.min.css')
       ->addPermissions(['administer reserved tags', 'administer Tagsets']);
 
     $usedFor = $tagsets = [];

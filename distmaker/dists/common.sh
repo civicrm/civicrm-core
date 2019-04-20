@@ -47,9 +47,9 @@ function dm_remove_files() {
 
 ## Copy all bower dependencies
 function dm_install_bower() {
-  local repo="$1"
-  local to="$2"
-
+  local repo="$1/@bower_components"
+  local to="$2/@bower_components"
+  mkdir $2
   local excludes_rsync=""
   for exclude in .git .svn {T,t}est{,s} {D,d}oc{,s} {E,e}xample{,s} ; do
     excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
@@ -198,8 +198,9 @@ function dm_install_wordpress() {
 function dm_generate_bower() {
   local repo="$1"
   pushd "$repo"
-    ${DM_NPM:-npm} install
-    ${DM_NODE:-node} node_modules/bower/bin/bower install
+    rm -rf node_modules
+    ${DM_NPM:-npm} install yarn
+    node_modules/yarn/bin/yarn install
   popd
 }
 
@@ -221,7 +222,7 @@ function dm_generate_version() {
   # final touch
   echo "<?php
 /** @deprecated */
-function civicrmVersion( ) {
+function civicrmVersion() {
   return array( 'version'  => '$DM_VERSION',
                 'cms'      => '$ufname',
                 'revision' => '$DM_REVISION' );

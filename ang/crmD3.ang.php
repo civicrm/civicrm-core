@@ -10,7 +10,7 @@ return [
   'ext' => 'civicrm',
   'js' => [
     'ang/crmD3.js',
-    'bower_components/d3/d3.min.js',
+    'node_modules/@bower_components/d3/d3.min.js',
   ],
   'requires' => [],
 ];

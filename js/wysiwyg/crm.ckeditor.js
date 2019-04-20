@@ -85,7 +85,7 @@
       if (window.CKEDITOR) {
         initialize();
       } else {
-        CRM.loadScript(CRM.config.resourceBase + 'bower_components/ckeditor/ckeditor.js').done(initialize);
+        CRM.loadScript(CRM.config.resourceBase + 'node_modules/@bower_components/ckeditor/ckeditor.js').done(initialize);
       }
     } else {
       deferred.reject();

@@ -50,7 +50,7 @@
 {/htxt}
 {htxt id='standalone'}
     <p>{ts}The HTML Form Snippet code will display a form consisting of the active fields in this Profile. You can copy this HTML code and paste it into any block or page on your website where you want to collect contact information.{/ts}</p>
-    <p>{ts}By changing the relative URLs included in the snippet to absolute URLs (e.g. change "/sites/all/modules/civicrm/bower_components/jquery/dist/jquery.min.js?r=dXCgD" to "https://yourdomain.com/sites/all/modules/civicrm/bower_components/jquery/dist/jquery.min.js?r=dXCgD") you will be able to use the snippet on any website.{/ts}</p>
+    <p>{ts}By changing the relative URLs included in the snippet to absolute URLs (e.g. change "/sites/all/modules/civicrm/node_modules/@bower_components/jquery/dist/jquery.min.js?r=dXCgD" to "https://yourdomain.com/sites/all/modules/civicrm/bower_components/jquery/dist/jquery.min.js?r=dXCgD") you will be able to use the snippet on any website.{/ts}</p>
     <p><strong>{ts}If the web page you are pasting the snippet code to is hosted in a different domain from your CiviCRM site, you may NOT be able to include Country and State fields in the form (the script which dynamically loads the states based on selected country may not be able to execute across domains).{/ts}</strong></p>
     <p>{ts}You can control the web page that someone is directed to AFTER completing the form by modifying the contents of the hidden <strong>postURL</strong> input field. Replace the default value with any valid complete URL prior to saving the form code to the desired page(s).{/ts}</p>
     <p>{ts}EXAMPLE:{/ts} <strong>&lt;input type="hidden" name="postURL" value="{ts}http://www.example.com/thank_you.html{/ts}"&gt;</strong></p>

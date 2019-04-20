@@ -5,5 +5,5 @@
 
 return [
   'ext' => 'civicrm',
-  'js' => ['bower_components/angular-ui-sortable/sortable.min.js'],
+  'js' => ['node_modules/@bower_components/angular-ui-sortable/sortable.min.js'],
 ];
