@@ -297,7 +297,7 @@ class CRM_Grant_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
-   * Get the metadata for fields to be included on the activity search form.
+   * Get the metadata for fields to be included on the grant search form.
    */
   public static function getSearchFieldMetadata() {
     $fields = [

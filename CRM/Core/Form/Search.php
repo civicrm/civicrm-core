@@ -178,6 +178,11 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    */
   public static function formRule($fields, $files, $form) {
     $errors = [];
+    if (!is_a($form, 'CRM_Core_Form_Search')) {
+      // So this gets hit with a form object when doing an activity date search from
+      // advanced search, but a NULL object when doing a pledge search.
+      return $errors;
+    }
     foreach ($form->getSearchFieldMetadata() as $entity => $spec) {
       foreach ($spec as $fieldName => $fieldSpec) {
         if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || $fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
