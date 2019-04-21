@@ -147,6 +147,14 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   }
 
   /**
+   * Supports altering future start dates
+   * @return bool
+   */
+  public function supportsFutureRecurStartDate() {
+    return TRUE;
+  }
+
+  /**
    * Submit a refund payment
    *
    * @throws \Civi\Payment\Exception\PaymentProcessorException

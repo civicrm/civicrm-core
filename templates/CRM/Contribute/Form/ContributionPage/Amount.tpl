@@ -121,7 +121,7 @@
         </table>
     </div>
 {if $futurePaymentProcessor}
-    <span id="pledge_calendar_date_field">&nbsp;&nbsp;{include file="CRM/common/jcalendar.tpl" elementName=pledge_calendar_date}</span>
+    <span id="pledge_calendar_date_field">&nbsp;&nbsp;{$form.pledge_calendar_date.html}</span>
     <span id="pledge_calendar_month_field">&nbsp;&nbsp;{$form.pledge_calendar_month.html}<br/><span class="description">{ts}Recurring payment will be processed this day of the month following submission of this contribution page.{/ts}</span></span>
 {/if}
 

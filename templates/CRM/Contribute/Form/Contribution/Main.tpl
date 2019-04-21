@@ -135,7 +135,7 @@
           <div class="clear"></div>
           {if $start_date_editable}
             {if $is_date}
-              <div class="label">{$form.start_date.label}</div><div class="content">{include file="CRM/common/jcalendar.tpl" elementName=start_date}</div>
+              <div class="label">{$form.start_date.label}</div><div class="content">{$form.start_date.html}</div>
             {else}
               <div class="label">{$form.start_date.label}</div><div class="content">{$form.start_date.html}</div>
             {/if}
