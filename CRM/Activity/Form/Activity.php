@@ -602,7 +602,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     // CRM-15472 - 50 is around the practical limit of how many items a select2 entityRef can handle
-    if ($this->_action == 2 && !empty($defaults['target_contact_id'])) {
+    if ($this->_action == CRM_Core_Action::UPDATE && !empty($defaults['target_contact_id'])) {
       $count = count(is_array($defaults['target_contact_id']) ? $defaults['target_contact_id'] : explode(',', $defaults['target_contact_id']));
       if ($count > 50) {
         $this->freeze(['target_contact_id']);
@@ -860,14 +860,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $errors['activity_type_id'] = ts('Activity Type is a required field');
     }
 
-    if (CRM_Utils_Array::value('activity_type_id', $fields) == 3 &&
-      CRM_Utils_Array::value('status_id', $fields) == 1
-    ) {
+    if (CRM_Utils_Array::value('activity_type_id', $fields) == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email')
+      && CRM_Utils_Array::value('status_id', $fields) == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled')) {
       $errors['status_id'] = ts('You cannot record scheduled email activity.');
     }
-    elseif (CRM_Utils_Array::value('activity_type_id', $fields) == 4 &&
-      CRM_Utils_Array::value('status_id', $fields) == 1
-    ) {
+    elseif (CRM_Utils_Array::value('activity_type_id', $fields) == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'SMS')
+      && CRM_Utils_Array::value('status_id', $fields) == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled')) {
       $errors['status_id'] = ts('You cannot record scheduled SMS activity.');
     }
 
@@ -896,7 +894,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    *
    *
    * @param array $params
+
    * @return array|null
+   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess($params = NULL) {
     if ($this->_action & CRM_Core_Action::DELETE) {
