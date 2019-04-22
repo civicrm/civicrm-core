@@ -351,50 +351,11 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
         CRM_Core_Error::statusBounce(ts('Contact does not exist.'));
       }
     }
-    $from_participant = $params = [];
-    $query = "select role_id, source, fee_level, is_test, is_pay_later, fee_amount, discount_id, fee_currency,campaign_id, discount_amount from civicrm_participant where id = " . $this->_from_participant_id;
-    $dao = CRM_Core_DAO::executeQuery($query);
-    $value_to = [];
-    while ($dao->fetch()) {
-      $value_to['role_id'] = $dao->role_id;
-      $value_to['source'] = $dao->source;
-      $value_to['fee_level'] = $dao->fee_level;
-      $value_to['is_test'] = $dao->is_test;
-      $value_to['is_pay_later'] = $dao->is_pay_later;
-      $value_to['fee_amount'] = $dao->fee_amount;
-    }
-    $value_to['contact_id'] = $contact_id;
-    $value_to['event_id'] = $this->_event_id;
-    $value_to['status_id'] = 1;
-    $value_to['register_date'] = date("Y-m-d");
-    //first create the new participant row -don't set registered_by yet or email won't be sent
-    $participant = CRM_Event_BAO_Participant::create($value_to);
-    //send a confirmation email to the new participant
-    $this->participantTransfer($participant);
-    //now update registered_by_id
-    $query = "UPDATE civicrm_participant cp SET cp.registered_by_id = %1 WHERE  cp.id = ({$participant->id})";
-    $params = [1 => [$this->_from_participant_id, 'Integer']];
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
-    //copy line items to new participant
-    $line_items = CRM_Price_BAO_LineItem::getLineItems($this->_from_participant_id);
-    foreach ($line_items as $id => $item) {
-      //Remove contribution id from older participant line item.
-      CRM_Core_DAO::singleValueQuery("UPDATE civicrm_line_item SET contribution_id = NULL WHERE id = %1", [1 => [$id, 'Integer']]);
-      $item['entity_id'] = $participant->id;
-      $item['id'] = NULL;
-      $item['entity_table'] = "civicrm_participant";
-      CRM_Price_BAO_LineItem::create($item);
-    }
-    //now cancel the from participant record, leaving the original line-item(s)
-    $value_from = [];
-    $value_from['id'] = $this->_from_participant_id;
-    $tansferId = array_search('Transferred', CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'"));
-    $value_from['status_id'] = $tansferId;
-    $value_from['transferred_to_contact_id'] = $contact_id;
+    self::transferParticipantRegistration($this->_from_participant_id, $contact_id);
+
     $contact_details = CRM_Contact_BAO_Contact::getContactDetails($contact_id);
     $display_name = current($contact_details);
     $this->assign('to_participant', $display_name);
-    CRM_Event_BAO_Participant::create($value_from);
     $this->sendCancellation();
     list($displayName, $email) = CRM_Contact_BAO_Contact_Location::getEmailDetails($contact_id);
     $statusMsg = ts('Event registration information for %1 has been updated.', [1 => $displayName]);
@@ -408,11 +369,61 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
   }
 
   /**
+   * Move Participant registration to new contact.
+   *
+   * @param int $fromParticipantID
+   * @param int $toContactID
+   */
+  public static function transferParticipantRegistration($fromParticipantID, $toContactID) {
+    $query = "select role_id, source, fee_level, is_test, is_pay_later, fee_amount, discount_id, fee_currency,campaign_id, discount_amount from civicrm_participant where id = " . $fromParticipantID;
+    $dao = CRM_Core_DAO::executeQuery($query);
+    $value_to = [];
+    while ($dao->fetch()) {
+      $value_to['role_id'] = $dao->role_id;
+      $value_to['source'] = $dao->source;
+      $value_to['fee_level'] = $dao->fee_level;
+      $value_to['is_test'] = $dao->is_test;
+      $value_to['is_pay_later'] = $dao->is_pay_later;
+      $value_to['fee_amount'] = $dao->fee_amount;
+    }
+    $value_to['contact_id'] = $toContactID;
+    $value_to['event_id'] = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Participant', $fromParticipantID, 'event_id');
+    $value_to['status_id'] = 1;
+    $value_to['register_date'] = date("Y-m-d");
+    //first create the new participant row -don't set registered_by yet or email won't be sent
+    $participant = CRM_Event_BAO_Participant::create($value_to);
+    //send a confirmation email to the new participant
+    self::sendConfirmationEmail($participant);
+    //now update registered_by_id
+    $query = "UPDATE civicrm_participant cp SET cp.registered_by_id = %1 WHERE  cp.id = ({$participant->id})";
+    $params = [1 => [$fromParticipantID, 'Integer']];
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    //copy line items to new participant
+    $line_items = CRM_Price_BAO_LineItem::getLineItems($fromParticipantID);
+    foreach ($line_items as $id => $item) {
+      //Remove contribution id from older participant line item.
+      CRM_Core_DAO::singleValueQuery("UPDATE civicrm_line_item SET contribution_id = NULL WHERE id = %1", [1 => [$id, 'Integer']]);
+      $item['entity_id'] = $participant->id;
+      $item['id'] = NULL;
+      $item['entity_table'] = "civicrm_participant";
+      CRM_Price_BAO_LineItem::create($item);
+    }
+
+    //now cancel the from participant record, leaving the original line-item(s)
+    $value_from = [];
+    $value_from['id'] = $fromParticipantID;
+    $tansferId = array_search('Transferred', CRM_Event_PseudoConstant::participantStatus(NULL, "class = 'Negative'"));
+    $value_from['status_id'] = $tansferId;
+    $value_from['transferred_to_contact_id'] = $toContactID;
+    CRM_Event_BAO_Participant::create($value_from);
+  }
+
+  /**
    * Based on input, create participant row for transferee and send email
    *
    * return @ void
    */
-  public function participantTransfer($participant) {
+  public static function sendConfirmationEmail($participant) {
     $contactDetails = [];
     $contactIds[] = $participant->contact_id;
     list($currentContactDetails) = CRM_Utils_Token::getTokenDetails($contactIds, NULL,
