@@ -377,11 +377,13 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     //copy line items to new participant
     $line_items = CRM_Price_BAO_LineItem::getLineItems($this->_from_participant_id);
-    foreach ($line_items as $item) {
+    foreach ($line_items as $id => $item) {
+      //Remove contribution id from older participant line item.
+      CRM_Core_DAO::singleValueQuery("UPDATE civicrm_line_item SET contribution_id = NULL WHERE id = %1", [1 => [$id, 'Integer']]);
       $item['entity_id'] = $participant->id;
       $item['id'] = NULL;
       $item['entity_table'] = "civicrm_participant";
-      $new_item = CRM_Price_BAO_LineItem::create($item);
+      CRM_Price_BAO_LineItem::create($item);
     }
     //now cancel the from participant record, leaving the original line-item(s)
     $value_from = [];
