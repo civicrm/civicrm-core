@@ -332,7 +332,10 @@ class CRM_Financial_BAO_Payment {
         if ($lineItemValue['qty'] == 0) {
           continue;
         }
-        $paid = $lineItemValue['line_total'] * ($financialTrxn->total_amount / $contributionDAO->total_amount);
+        $paid = $financialTrxn->total_amount;
+        if (!empty(floatval($contributionDAO->total_amount))) {
+          $paid = $lineItemValue['line_total'] * ($financialTrxn->total_amount / $contributionDAO->total_amount);
+        }
         $addFinancialEntry = [
           'transaction_date' => $financialTrxn->trxn_date,
           'contact_id' => $contributionDAO->contact_id,
