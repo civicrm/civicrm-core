@@ -2414,7 +2414,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
   }
 
   /**
-   * Checks if user has permissions to edit inbound e-mails, either bsic info
+   * Checks if user has permissions to edit inbound e-mails, either basic info
    * or both basic information and content.
    *
    * @return bool
