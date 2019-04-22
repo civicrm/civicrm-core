@@ -67,8 +67,8 @@ class CRM_SMS_Form_Schedule extends CRM_Core_Form {
     $this->setAttribute('autocomplete', 'off');
 
     $sendOptions = [
-      $this->createElement('radio', NULL, NULL, 'Send immediately', 'send_immediate', ['id' => 'send_immediate', 'style' => 'margin-bottom: 10px;']),
-      $this->createElement('radio', NULL, NULL, 'Send at:', 'send_later', ['id' => 'send_later']),
+      $this->createElement('radio', NULL, NULL, ts('Send immediately'), 'send_immediate', ['id' => 'send_immediate', 'style' => 'margin-bottom: 10px;']),
+      $this->createElement('radio', NULL, NULL, ts('Send at:'), 'send_later', ['id' => 'send_later']),
     ];
     $this->addGroup($sendOptions, 'send_option', '', '<br>');
 
