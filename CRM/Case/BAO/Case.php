@@ -1151,9 +1151,18 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
 
       // Activity Status Label for Case activities list
       $caseActivities[$caseActivityId]['status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_status_id', $dao->status);
+      $deleted = '';
+      if ($dao->deleted) {
+        $deleted = '<br /> ' . ts('(deleted)');
+      }
+      $caseActivities[$caseActivityId]['status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_status_id', $dao->status) . $deleted;
+      // if there are file attachments we will return how many
+      if (!empty($dao->attachment_ids)) {
+        $attachmentIDs = array_unique(explode(',', $dao->attachment_ids));
+        $caseActivity['no_attachments'] = count($attachmentIDs);
+      }
 
-      $caseActivities[$caseActivityId]
-        = self::addCaseActivityLinks($caseID, $contactID, $userID, $context, $dao, $caseActivities[$caseActivityId]);
+      $caseActivities[$caseActivityId]['links'] = self::addCaseActivityLinks($caseID, $contactID, $userID, $context, $dao);
     }
 
     $caseActivitiesDT = array();
@@ -1173,11 +1182,11 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
    * @param int $userID
    * @param string $context
    * @param \CRM_Core_DAO $dao
-   * @param array $caseActivity
    *
-   * @return array caseActivity
+   * @return string
+   *   HTML formatted Link
    */
-  public static function addCaseActivityLinks($caseID, $contactID, $userID, $context, $dao, $caseActivity) {
+  private static function addCaseActivityLinks($caseID, $contactID, $userID, $context, $dao) {
     // FIXME: Why are we not using CRM_Core_Action for these links? This is too much manual work and likely to get out-of-sync with core markup.
     $caseActivityId = $dao->id;
     $allowView = self::checkPermission($caseActivityId, 'view', $dao->activity_type_id, $userID);
@@ -1221,7 +1230,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     }
     elseif (!$caseDeleted) {
       $url = ' <a ' . $css . ' href="' . $restoreUrl . $additionalUrl . '">' . ts('Restore') . '</a>';
-      $caseActivity['status_id'] = $caseActivity['status_id'] . '<br /> (deleted)';
     }
 
     //check for operations.
@@ -1233,12 +1241,10 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
     }
     // if there are file attachments we will return how many and, if only one, add a link to it
     if (!empty($dao->attachment_ids)) {
-      $attachmentIDs = array_unique(explode(',', $dao->attachment_ids));
-      $caseActivity['no_attachments'] = count($attachmentIDs);
       $url .= implode(' ', CRM_Core_BAO_File::paperIconAttachment('civicrm_activity', $caseActivityId));
     }
-    $caseActivity['links'] = $url;
-    return $caseActivity;
+
+    return $url;
   }
 
   /**
