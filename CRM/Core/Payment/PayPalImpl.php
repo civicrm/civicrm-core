@@ -463,6 +463,15 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
   }
 
   /**
+   * Does this payment processor support refund?
+   *
+   * @return bool
+   */
+  public function supportsRefund() {
+    return TRUE;
+  }
+
+  /**
    * Initialise.
    *
    * @param $args
@@ -475,6 +484,41 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $args['signature'] = $this->_paymentProcessor['signature'];
     $args['subject'] = CRM_Utils_Array::value('subject', $this->_paymentProcessor);
     $args['method'] = $method;
+  }
+
+  /**
+   * Submit a refund payment
+   *
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
+   *
+   * @param array $params
+   *   Assoc array of input parameters for this transaction.
+   */
+  public function doRefund(&$params) {
+    if (empty($params['trxn_id'])) {
+      throw new \Civi\Payment\Exception\PaymentProcessorException('transaction id not set');
+    }
+    $trxnDetails = $this->doQuery($params);
+
+    $args = [];
+    $this->initialize($args, 'RefundTransaction');
+    $args['amt'] = $params['total_amount'];
+    $args['REFUNDTYPE'] = ($params['total_amount'] == $trxnDetails['net_amount']) ? 'full' : 'partial';
+    $args['CURRENCYCODE'] = $params['currency'];
+    $args['TRANSACTIONID'] = $params['trxn_id'];
+
+    $result = $this->invokeAPI($args);
+    if (is_a($result, 'CRM_Core_Error')) {
+      return FALSE;
+    }
+    $params['trxn_id'] = CRM_Utils_Array::value('refundtransactionid', $result);
+    $params['fee_amount'] = CRM_Utils_Array::value('feerefundamt', $result);
+    $params['net_amount'] = CRM_Utils_Array::value('netrefundamt', $result);
+    /* Success */
+    if ($result['ack'] == 'Success') {
+      return TRUE;
+    }
+    return FALSE;
   }
 
   /**

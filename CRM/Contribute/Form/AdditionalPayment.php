@@ -259,6 +259,19 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       );
       $this->addRule('net_amount', ts('Please enter a valid monetary value for Net Amount.'), 'money');
     }
+    $ft = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($this->_contributionId);
+    if (!empty($ft['financialTrxnId'])) {
+      $defaults = [];
+      $ftParams = ['id' => $ft['financialTrxnId']];
+      $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($ftParams, $defaults);
+      if (!empty($financialTrxn->payment_processor_id)) {
+        $processor = Civi\Payment\System::singleton()->getById($financialTrxn->payment_processor_id);
+        if ($processor->supports('Refund')) {
+          $this->addElement('checkbox', 'processor_refund', ts('Record refund from the payment processor?'));
+          $this->assign('processorRefund', TRUE);
+        }
+      }
+    }
 
     $buttonName = $this->_refund ? 'Record Refund' : 'Record Payment';
     $this->addButtons([

@@ -304,7 +304,26 @@ class CRM_Financial_BAO_Payment {
    */
   public static function recordRefundPayment($contributionId, $trxnData, $updateStatus) {
     list($contributionDAO, $params) = self::getContributionAndParamsInFormatForRecordFinancialTransaction($contributionId);
-
+    $ft = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId);
+    if (!empty($ft['financialTrxnId'])) {
+      $defaults = [];
+      $ftParams = ['id' => $ft['financialTrxnId']];
+      $financialTrxn = CRM_Core_BAO_FinancialTrxn::retrieve($ftParams, $defaults);
+      //Refund the payment from the payment processor side.
+      if (!empty($financialTrxn->payment_processor_id) && !empty($trxnData['processor_refund'])) {
+        $processor = Civi\Payment\System::singleton()->getById($financialTrxn->payment_processor_id);
+        if (!empty($params['trxn_id']) && $processor->supports('Refund')) {
+          $trxnData['trxn_id'] = $params['trxn_id'];
+          $refundResult = $processor->doRefund($trxnData);
+          if (!$refundResult) {
+            return FALSE;
+          }
+          $trxnData['payment_processor_id'] = $financialTrxn->payment_processor_id;
+          $params['card_type_id'] = $trxnData['card_type_id'] = $financialTrxn->card_type_id;
+          $params['pan_truncation'] = $trxnData['pan_truncation'] = $financialTrxn->pan_truncation;
+        }
+      }
+    }
     $params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $trxnData, CRM_Utils_Array::value('payment_instrument_id', $params));
 
     $paidStatus = CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialItem', 'status_id', 'Paid');
