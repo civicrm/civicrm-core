@@ -847,7 +847,13 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
           }
 
           if (!$break) {
-            $this->formatContactParameters($value, $formatted);
+            if (!empty($value['location_type_id'])) {
+              $this->formatLocationBlock($value, $formatted);
+            }
+            else {
+              CRM_Core_Error::deprecatedFunctionWarning('this is not expected to be reachable now');
+              $this->formatContactParameters($value, $formatted);
+            }
           }
         }
         if (!$isAddressCustomField) {
@@ -1130,6 +1136,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
     // get the formatted location blocks into params - w/ 3.0 format, CRM-4605
     if (!empty($values['location_type_id'])) {
+      CRM_Core_Error::deprecatedFunctionWarning('this is not expected to be reachable now');
       return $this->formatLocationBlock($values, $params);
     }
 
@@ -1193,9 +1200,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    * @return bool
    */
   protected function formatLocationBlock(&$values, &$params) {
-    if (empty($values['location_type_id'])) {
-      return FALSE;
-    }
     $blockTypes = [
       'phone' => 'Phone',
       'email' => 'Email',
