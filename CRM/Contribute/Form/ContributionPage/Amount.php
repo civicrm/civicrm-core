@@ -179,7 +179,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
         $this->addElement('checkbox', 'adjust_recur_start_date', ts('Adjust Recurring Start Date'), NULL,
           ['onclick' => "showHideByValue('adjust_recur_start_date',true,'recurDefaults','table-row','radio',false);"]
         );
-        $this->addDate('pledge_calendar_date', ts('Specific Calendar Date'));
+        $this->add('datepicker', 'pledge_calendar_date', ts('Specific Calendar Date'), [], FALSE, ['time' => FALSE]);
         $month = CRM_Utils_Date::getCalendarDayOfMonth();
         $this->add('select', 'pledge_calendar_month', ts('Specific day of Month'), $month);
         $pledgeDefaults = [
@@ -512,7 +512,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
         'calendar_month' => 'pledge_calendar_month',
       ];
       if ($params['pledge_default_toggle'] == 'contribution_date') {
-        $fieldValue = json_encode(['contribution_date' => date('m/d/Y')]);
+        $fieldValue = json_encode(['contribution_date' => date('Y-m-d')]);
       }
       else {
         foreach ($pledgeDateFields as $key => $pledgeDateField) {
