@@ -254,6 +254,29 @@ class CRM_Export_BAO_ExportProcessor {
   }
 
   /**
+   * Store the household Id if it has relationships.
+   * This is used by the merge same households to prevent duplicate households on export
+   * If a household has no relationships (it is not in this list) we export explicitly,
+   *   otherwise we rely on implicit export via "merge same household".
+   *
+   * @param int $householdId
+   */
+  public function setHouseholdHasRelationships($householdId) {
+    $this->relatedContactValues['householdRelationships'][$householdId] = TRUE;
+  }
+
+  /**
+   * If a household has relationships return TRUE, else return FALSE.
+   *
+   * @param $householdId
+   *
+   * @return bool
+   */
+  public function getHouseholdHasRelationships($householdId) {
+    return isset($this->relatedContactValues['householdRelationships'][$householdId]);
+  }
+
+  /**
    * Get the id of the related household.
    *
    * @param int $contactID
@@ -643,9 +666,18 @@ class CRM_Export_BAO_ExportProcessor {
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
 
+    // If the household has relationships (to individuals) then we skip as it is added by the individual records.
+    // If a household has no relationships we add it below
+    if ($this->isMergeSameHousehold()
+      && (isset($iterationDAO->contact_type) && ($iterationDAO->contact_type === 'Household'))
+      && ($this->getHouseholdHasRelationships($iterationDAO->contact_id))) {
+      return FALSE;
+    }
+
     $row = [];
     $householdMergeRelationshipType = $this->getHouseholdMergeTypeForRow($iterationDAO->contact_id);
     if ($householdMergeRelationshipType) {
+      // This is an (individual) contact linked to a household
       $householdID = $this->getRelatedHouseholdID($iterationDAO->contact_id, $householdMergeRelationshipType);
       if ($this->isHouseholdExported($householdID)) {
         return FALSE;

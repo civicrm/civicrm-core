@@ -330,8 +330,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       if (empty($returnProperties['id'])) {
         $returnProperties['id'] = 1;
       }
-
-      $processor->setHouseholdMergeReturnProperties(array_diff_key($returnProperties, array_fill_keys(['location_type', 'im_provider'], 1)));
+      $processor->setHouseholdMergeReturnProperties($returnProperties);
     }
 
     self::buildRelatedContactArray($selectAll, $ids, $processor, $componentTable);
@@ -464,7 +463,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $componentDetails[] = $row;
 
         // output every $tempRowCount rows
-        if ($count % $tempRowCount == 0) {
+        if (($count > 0) && ($count % $tempRowCount == 0)) {
           self::writeDetailsToTable($exportTempTable, $componentDetails, $sqlColumns);
           $componentDetails = [];
         }
@@ -1334,6 +1333,7 @@ LIMIT $offset, $limit
             $processor->setRelationshipValue($relationshipKey, $allRelContactDAO->refContact, $property, $row[$relationshipKey . '_' . $property]);
           }
         }
+        $processor->setHouseholdHasRelationships($allRelContactDAO->contact_id);
       }
     }
   }
