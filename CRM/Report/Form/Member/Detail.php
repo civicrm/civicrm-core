@@ -122,6 +122,11 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
             'title' => ts('Membership Owner ID'),
             'operatorType' => CRM_Report_Form::OP_INT,
           ],
+          'primary_member' => array(
+            'title' => ts('Primary Member?'),
+            'type' => CRM_Utils_Type::T_BOOLEAN,
+            'pseudofield' => TRUE,
+          ),
           'tid' => [
             'name' => 'membership_type_id',
             'title' => ts('Membership Types'),
@@ -252,6 +257,17 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
 
     $this->_currencyColumn = 'civicrm_contribution_currency';
     parent::__construct();
+  }
+
+  public function where() {
+    parent::where();
+    $dbAlias = $this->_columns['civicrm_membership']['alias'];
+    if ($this->_params['primary_member_value'] == 1) {
+      $this->_where .= ' AND ( ' . $dbAlias . '.owner_membership_id IS NULL )';
+    }
+    if ($this->_params['primary_member_value'] != '' && $this->_params['primary_member_value'] == 0) {
+      $this->_where .= ' AND ( ' . $dbAlias . '.owner_membership_id IS NOT NULL )';
+    }
   }
 
   public function preProcess() {
