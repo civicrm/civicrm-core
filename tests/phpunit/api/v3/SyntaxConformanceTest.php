@@ -498,7 +498,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'Profile',
       'CustomValue',
       'UFJoin',
-      'UFField',
       'Relationship',
       'RelationshipType',
       'Note',
@@ -734,6 +733,27 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'StatusPreference' => array(
         'break_return' => array(
           'ignore_severity',
+        ),
+      ),
+      'UFField' => array(
+        'cant_update' => array(
+          // These fields get auto-adjusted by the BAO prior to saving
+          'weight',
+          'location_type_id',
+          'phone_type_id',
+          'website_type_id',
+          // Not a real field
+          'option.autoweight',
+        ),
+        'break_return' => array(
+          // These fields get auto-adjusted by the BAO prior to saving
+          'weight',
+          'field_type',
+          'location_type_id',
+          'phone_type_id',
+          'website_type_id',
+          // Not a real field
+          'option.autoweight',
         ),
       ),
       'JobLog' => array(

@@ -52,85 +52,74 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
    * @return \CRM_Core_BAO_UFField
    * @throws \API_Exception
    */
-  public static function create(&$params) {
-    // CRM-14756: kind of a hack-ish fix. If the user gives the id, uf_group_id is retrieved and then set.
-    if (isset($params['id'])) {
-      $groupId = civicrm_api3('UFField', 'getvalue', [
-        'return' => 'uf_group_id',
-        'id' => $params['id'],
-      ]);
-    }
-    else {
-      $groupId = CRM_Utils_Array::value('uf_group_id', $params);
+  public static function create($params) {
+    $id = CRM_Utils_Array::value('id', $params);
+
+    // Merge in data from existing field
+    if (!empty($id)) {
+      $UFField = new CRM_Core_BAO_UFField();
+      $UFField->id = $params['id'];
+      if ($UFField->find(TRUE)) {
+        $defaults = $UFField->toArray();
+        // This will be calculated based on field name
+        unset($defaults['field_type']);
+        $params += $defaults;
+      }
+      else {
+        throw new API_Exception("UFFIeld id {$params['id']} not found.");
+      }
     }
 
-    $field_name = CRM_Utils_Array::value('field_name', $params);
-
-    if (strpos($field_name, 'formatting') !== 0 && !CRM_Core_BAO_UFField::isValidFieldName($field_name)) {
+    // Validate field_name
+    if (strpos($params['field_name'], 'formatting') !== 0 && !CRM_Core_BAO_UFField::isValidFieldName($params['field_name'])) {
       throw new API_Exception('The field_name is not valid');
     }
 
-    if (!(CRM_Utils_Array::value('group_id', $params))) {
-      $params['group_id'] = $groupId;
+    // Supply default label if not set
+    if (empty($id) && !isset($params['label'])) {
+      $params['label'] = self::getAvailableFieldTitles()[$params['field_name']];
     }
 
-    $fieldId = CRM_Utils_Array::value('id', $params);
-    if (!empty($fieldId)) {
-      $UFField = new CRM_Core_BAO_UFField();
-      $UFField->id = $fieldId;
-      if ($UFField->find(TRUE)) {
-        if (!(CRM_Utils_Array::value('group_id', $params))) {
-          // this copied here from previous api function - not sure if required
-          $params['group_id'] = $UFField->uf_group_id;
-        }
-      }
-      else {
-        throw new API_Exception("there is no field for this fieldId");
-      }
+    // Supply field_type if not set
+    if (empty($params['field_type']) && strpos($params['field_name'], 'formatting') !== 0) {
+      $params['field_type'] = CRM_Utils_Array::pathGet(self::getAvailableFieldsFlat(), [$params['field_name'], 'field_type']);
     }
-    $params['uf_group_id'] = $params['group_id'];
+    elseif (empty($params['field_type'])) {
+      $params['field_type'] = 'Formatting';
+    }
 
-    if (CRM_Core_BAO_UFField::duplicateField($params)) {
+    // Generate unique name for formatting fields
+    if ($params['field_name'] === 'formatting') {
+      $params['field_name'] = 'formatting_' . substr(uniqid(), -4);
+    }
+
+    if (self::duplicateField($params)) {
       throw new API_Exception("The field was not added. It already exists in this profile.");
     }
 
-    // @todo fix BAO to be less weird.
-    $field_type       = CRM_Utils_Array::value('field_type', $params);
-    $location_type_id = CRM_Utils_Array::value('location_type_id', $params, CRM_Utils_Array::value('website_type_id', $params));
-    $phone_type       = CRM_Utils_Array::value('phone_type_id', $params, CRM_Utils_Array::value('phone_type', $params));
-    $params['field_name'] = [$field_type, $field_name, $location_type_id, $phone_type];
     //@todo why is this even optional? Surely weight should just be 'managed' ??
     if (CRM_Utils_Array::value('option.autoweight', $params, TRUE)) {
       $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
     }
-    // set values for uf field properties and save
+
+    // Set values for uf field properties and save
     $ufField = new CRM_Core_DAO_UFField();
     $ufField->copyValues($params);
-    $ufField->field_type = $params['field_name'][0];
-    $ufField->field_name = $params['field_name'][1];
 
-    //should not set location type id for Primary
-    $locationTypeId = NULL;
-    if ($params['field_name'][1] == 'url') {
-      $ufField->website_type_id = CRM_Utils_Array::value(2, $params['field_name']);
-    }
-    else {
-      $locationTypeId = CRM_Utils_Array::value(2, $params['field_name']);
-      $ufField->website_type_id = NULL;
-    }
-    if ($locationTypeId) {
-      $ufField->location_type_id = $locationTypeId;
-    }
-    else {
+    if ($params['field_name'] == 'url') {
       $ufField->location_type_id = 'null';
     }
-
-    $ufField->phone_type_id = CRM_Utils_Array::value(3, $params['field_name'], 'NULL');
+    else {
+      $ufField->website_type_id = 'null';
+    }
+    if (!strstr($params['field_name'], 'phone')) {
+      $ufField->phone_type_id = 'null';
+    }
 
     $ufField->save();
 
-    $fieldsType = CRM_Core_BAO_UFGroup::calculateGroupType($groupId, TRUE);
-    CRM_Core_BAO_UFGroup::updateGroupTypes($groupId, $fieldsType);
+    $fieldsType = CRM_Core_BAO_UFGroup::calculateGroupType($ufField->uf_group_id, TRUE);
+    CRM_Core_BAO_UFGroup::updateGroupTypes($ufField->uf_group_id, $fieldsType);
 
     civicrm_api3('profile', 'getfields', ['cache_clear' => TRUE]);
     return $ufField;
@@ -204,8 +193,8 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
   public static function duplicateField($params) {
     $ufField = new CRM_Core_DAO_UFField();
     $ufField->uf_group_id = CRM_Utils_Array::value('uf_group_id', $params);
-    $ufField->field_type = $params['field_type'];
-    $ufField->field_name = $params['field_name'];
+    $ufField->field_type = CRM_Utils_Array::value('field_type', $params);
+    $ufField->field_name = CRM_Utils_Array::value('field_name', $params);
     $ufField->website_type_id = CRM_Utils_Array::value('website_type_id', $params);
     if (is_null(CRM_Utils_Array::value('location_type_id', $params, ''))) {
       // primary location type have NULL value in DB
@@ -220,7 +209,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
       $ufField->whereAdd("id <> " . $params['id']);
     }
 
-    return ($ufField->find(TRUE) ? 1 : 0);
+    return (bool) $ufField->find(TRUE);
   }
 
   /**
@@ -280,10 +269,10 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
     // fix for CRM-316
     $oldWeight = NULL;
 
-    if (!empty($params['field_id'])) {
-      $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', $params['field_id'], 'weight', 'id');
+    if (!empty($params['field_id']) || !empty($params['id'])) {
+      $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', !empty($params['id']) ? $params['id'] : $params['field_id'], 'weight', 'id');
     }
-    $fieldValues = ['uf_group_id' => $params['group_id']];
+    $fieldValues = ['uf_group_id' => !empty($params['uf_group_id']) ? $params['uf_group_id'] : $params['group_id']];
     return CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_UFField', $oldWeight, CRM_Utils_Array::value('weight', $params, 0), $fieldValues);
   }
 
@@ -1086,6 +1075,7 @@ SELECT  id
    */
   public static function getAvailableFieldTitles() {
     $fields = self::getAvailableFieldsFlat();
+    $fields['formatting'] = ['title' => ts('Formatting')];
     return CRM_Utils_Array::collect('title', $fields);
   }
 
