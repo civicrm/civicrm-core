@@ -86,8 +86,8 @@ WHERE  mailing_id = %1
     }
 
     $sql = "
-SELECT contact_id, email_id, phone_id
-FROM   civicrm_mailing_recipients
+SELECT r.contact_id, r.email_id, r.phone_id
+FROM   civicrm_mailing_recipients r
 {$additionalJoin}
 WHERE  mailing_id = %1
        $limitString
