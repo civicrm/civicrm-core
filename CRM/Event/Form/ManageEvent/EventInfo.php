@@ -48,11 +48,10 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     parent::preProcess();
     $this->assign('selectedChild', 'settings');
 
-    $entityID = $this->_id ?: $this->_templateId;
-    if ($entityID) {
-      $this->assign('entityID', $entityID);
+    if ($this->_id) {
+      $this->assign('entityID', $this->_id);
       $eventType = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event',
-        $entityID,
+        $this->_id,
         'event_type_id'
       );
     }
@@ -128,6 +127,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     if ($this->_eventType) {
       $this->assign('customDataSubType', $this->_eventType);
     }
+    $this->assign('entityId', $this->_id);
 
     $this->_first = TRUE;
     $this->applyFilter('__ALL__', 'trim');
