@@ -65,6 +65,20 @@ trait CRM_Core_Form_EntityFormTrait {
   }
 
   /**
+   * Set the delete message.
+   *
+   * We do this from the constructor in order to do a translation.
+   */
+  public function setDeleteMessage() {
+  }
+
+  /**
+   * Set entity fields to be assigned to the form.
+   */
+  protected function setEntityFields() {
+  }
+
+  /**
    * Get the entity id being edited.
    *
    * @return int|null
