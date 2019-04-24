@@ -609,6 +609,7 @@ class Requirements {
       return $results;
     }
 
+    mysqli_query($conn, 'DROP TABLE IF EXISTS civicrm_utf8mb4_test');
     $r = mysqli_query($conn, 'CREATE TABLE civicrm_utf8mb4_test (id VARCHAR(255), PRIMARY KEY(id(255))) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC ENGINE=INNODB');
     if (!$r) {
       $results['severity'] = $this::REQUIREMENT_WARNING;
@@ -616,7 +617,7 @@ class Requirements {
       mysqli_close($conn);
       return $results;
     }
-    mysqli_query('DROP TABLE civicrm_utf8mb4_test');
+    mysqli_query($conn, 'DROP TABLE civicrm_utf8mb4_test');
 
     // Ensure that the MySQL driver supports utf8mb4 encoding.
     $version = mysqli_get_client_info($conn);
