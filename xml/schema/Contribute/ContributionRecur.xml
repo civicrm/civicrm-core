@@ -7,6 +7,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <uniqueName>contribution_recur_id</uniqueName>
     <title>Recurring Contribution ID</title>
     <type>int unsigned</type>
     <required>true</required>
@@ -172,6 +173,7 @@
   </field>
   <field>
     <name>processor_id</name>
+    <uniqueName>contribution_recur_processor_id</uniqueName>
     <title>Processor ID</title>
     <type>varchar</type>
     <length>255</length>
@@ -197,6 +199,7 @@
   </foreignKey>
   <field>
     <name>trxn_id</name>
+    <uniqueName>contribution_recur_trxn_id</uniqueName>
     <title>Transaction ID</title>
     <type>varchar</type>
     <length>255</length>
@@ -231,6 +234,7 @@
   </index>
   <field>
     <name>contribution_status_id</name>
+    <uniqueName>contribution_recur_contribution_status_id</uniqueName>
     <title>Status</title>
     <type>int unsigned</type>
     <default>1</default>
@@ -325,6 +329,7 @@
   <field>
     <name>payment_processor_id</name>
     <title>Payment Processor</title>
+    <uniqueName>contribution_recur_payment_processor_id</uniqueName>
     <type>int unsigned</type>
     <comment>Foreign key to civicrm_payment_processor.id</comment>
     <add>3.3</add>
