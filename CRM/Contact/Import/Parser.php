@@ -1219,33 +1219,19 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
 
       $fields[$block] = $this->getMetadataForEntity($block);
 
-      $blockCnt = count($params[$blockFieldName]);
-
       // copy value to dao field name.
       if ($blockFieldName == 'im') {
         $values['name'] = $values[$blockFieldName];
       }
 
       _civicrm_api3_store_values($fields[$block], $values,
-        $params[$blockFieldName][++$blockCnt]
+        $params[$blockFieldName][$values['location_type_id']]
       );
 
-      if ($values['location_type_id'] === 'Primary') {
-        if (!empty($params['id'])) {
-          $primary = civicrm_api3($block, 'get', [
-            'return' => 'location_type_id',
-            'contact_id' => $params['id'],
-            'is_primary' => 1,
-            'sequential' => 1
-          ]);
-        }
-        $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
-        $values['location_type_id'] = (isset($primary) && $primary['count']) ? $primary['values'][0]['location_type_id'] : $defaultLocationType->id;
-        $values['is_primary'] = 1;
-      }
+      $this->fillPrimary($params[$blockFieldName][$values['location_type_id']], $values, $block, CRM_Utils_Array::value('id', $params));
 
-      if (empty($params['id']) && ($blockCnt == 1)) {
-        $params[$blockFieldName][$blockCnt]['is_primary'] = TRUE;
+      if (empty($params['id']) && (count($params[$blockFieldName]) == 1)) {
+        $params[$blockFieldName][$values['location_type_id']]['is_primary'] = TRUE;
       }
 
       // we only process single block at a time.
@@ -1358,6 +1344,36 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       $this->fieldMetadata[$entity] = $className::fields();
     }
     return $this->fieldMetadata[$entity];
+  }
+
+  /**
+   * Fill in the primary location.
+   *
+   * If the contact has a primary address we update it. Otherwise
+   * we add an address of the default location type.
+   *
+   * @param array $params
+   *   Address block parameters
+   * @param array $values
+   *   Input values
+   * @param string $entity
+   *  - address, email, phone
+   * @param int|NULL $contactID
+   */
+  protected function fillPrimary(&$params, $values, $entity, $contactID) {
+    if ($values['location_type_id'] === 'Primary') {
+      if ($contactID) {
+        $primary = civicrm_api3($entity, 'get', [
+          'return' => 'location_type_id',
+          'contact_id' => $contactID,
+          'is_primary' => 1,
+          'sequential' => 1
+        ]);
+      }
+      $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
+      $params['location_type_id'] = (int) (isset($primary) && $primary['count']) ? $primary['values'][0]['location_type_id'] : $defaultLocationType->id;
+      $params['is_primary'] = 1;
+    }
   }
 
 }
