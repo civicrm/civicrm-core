@@ -486,8 +486,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       default:
         //all other elements are handle in this case
         $fldName = substr($name, 13);
-        CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.financial_type_id", 'IN', array_keys($financialTypes), 'String');
         if (!isset($fields[$fldName])) {
           // CRM-12597
           CRM_Core_Session::setStatus(ts(
