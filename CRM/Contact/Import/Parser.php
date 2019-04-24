@@ -1314,20 +1314,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       }
     }
 
-    if ($values['location_type_id'] === 'Primary') {
-      if (!empty($params['id'])) {
-        $primary = civicrm_api3('Address', 'get', [
-          'return' => 'location_type_id',
-          'contact_id' => $params['id'],
-          'is_primary' => 1,
-          'sequential' => 1
-        ]);
-      }
-      $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
-      $params['address'][$values['location_type_id']]['location_type_id'] = (isset($primary) && $primary['count']) ? $primary['values'][0]['location_type_id'] : $defaultLocationType->id;
-      $params['address'][$values['location_type_id']]['is_primary'] = 1;
-
-    }
+    $this->fillPrimary($params['address'][$values['location_type_id']], $values, 'address', CRM_Utils_Array::value('id', $params));
     return TRUE;
   }
 
