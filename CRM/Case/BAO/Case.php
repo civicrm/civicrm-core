@@ -2750,9 +2750,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
       //allow edit operation.
       $allowEditNames = array('Open Case');
 
-      if (CRM_Core_Permission::check('edit inbound email basic information') ||
-        CRM_Core_Permission::check('edit inbound email basic information and content')
-      ) {
+      if (CRM_Activity_BAO_Activity::checkEditInboundEmailsPermissions()) {
         $allowEditNames[] = 'Inbound Email';
       }
 
