@@ -1750,7 +1750,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
    */
   public static function getMailingHash($id) {
     $hash = NULL;
-    if (Civi::settings()->get('hash_mailing_url')) {
+    if (Civi::settings()->get('hash_mailing_url') && !empty($id)) {
       $hash = CRM_Core_DAO::getFieldValue('CRM_Mailing_BAO_Mailing', $id, 'hash', 'id');
     }
     return $hash;
