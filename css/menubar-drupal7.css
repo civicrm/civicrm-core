@@ -5,10 +5,10 @@
   }
 
   body.crm-menubar-visible.crm-menubar-over-cms-menu {
-    padding-top: 40px !important;
+    padding-top: $menubarHeight !important;
   }
   body.crm-menubar-visible.crm-menubar-over-cms-menu.crm-menubar-wrapped {
-    padding-top: 80px !important;
+    padding-top: calc($menubarHeight * 2) !important;
   }
 
   body.crm-menubar-visible.crm-menubar-over-cms-menu #toolbar .toolbar-drawer {
@@ -47,10 +47,10 @@
     min-height: 30px;
   }
   body.crm-menubar-visible.crm-menubar-below-cms-menu.admin-menu {
-    padding-top: 40px !important;
+    padding-top: $menubarHeight !important;
   }
   body.crm-menubar-visible.crm-menubar-below-cms-menu.crm-menubar-wrapped.admin-menu {
-    padding-top: 80px !important;
+    padding-top: calc($menubarHeight * 2) !important;
   }
   body.crm-menubar-visible.crm-menubar-over-cms-menu #admin-menu {
     display: none;

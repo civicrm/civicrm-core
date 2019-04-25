@@ -2,10 +2,10 @@
 
   body.crm-menubar-visible.crm-menubar-over-cms-menu {
     border-top: 0 none !important;
-    margin-top: 40px;
+    margin-top: $menubarHeight;
   }
   body.crm-menubar-visible.crm-menubar-over-cms-menu.crm-menubar-wrapped {
-    margin-top: 80px;
+    margin-top: calc($menubarHeight * 2);
   }
   body.crm-menubar-visible.crm-menubar-over-cms-menu #admin-bar {
     visibility: hidden;
