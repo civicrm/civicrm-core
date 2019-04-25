@@ -667,10 +667,10 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   /**
    * Append Drupal8 js to coreResourcesList.
    *
-   * @param array $list
+   * @param \Civi\Core\Event\GenericHookEvent $e
    */
-  public function appendCoreResources(&$list) {
-    $list[] = 'js/crm.drupal8.js';
+  public function appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) {
+    $e->list[] = 'js/crm.drupal8.js';
   }
 
 }

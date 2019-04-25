@@ -2386,9 +2386,6 @@ abstract class CRM_Utils_Hook {
    * @param string $region
    */
   public static function coreResourceList(&$list, $region) {
-    // First allow the cms integration to add to the list
-    CRM_Core_Config::singleton()->userSystem->appendCoreResources($list);
-
     self::singleton()->invoke(['list', 'region'], $list, $region,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_coreResourceList'
