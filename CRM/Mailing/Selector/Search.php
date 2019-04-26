@@ -343,9 +343,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
   public function &getColumnHeaders($action = NULL, $output = NULL) {
 
     if (!isset(self::$_columnHeaders)) {
-      $enabledLanguages = CRM_Core_I18n::languages(TRUE);
-      $isMultiLingual = (count($enabledLanguages) > 1);
-
+      $isMultiLingual = CRM_Core_I18n::isMultiLingual();
       $headers = [
         ['desc' => ts('Contact Type')],
         [
