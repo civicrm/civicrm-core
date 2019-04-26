@@ -315,8 +315,7 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
 
     $whereClause = $this->whereClause($params, FALSE, $this->_force);
 
-    $config = CRM_Core_Config::singleton();
-    if ($config->includeAlphabeticalPager) {
+    if (CRM_Core_Config::singleton()->includeAlphabeticalPager) {
       $this->pagerAToZ($whereClause, $params);
     }
 
