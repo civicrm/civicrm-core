@@ -367,7 +367,7 @@ class CRM_Mailing_Selector_Search extends CRM_Core_Selector_Base implements CRM_
 
       // Check to see if languages column should be displayed.
       if ($isMultiLingual) {
-        $headers[] =  [
+        $headers[] = [
           'name' => ts('Language'),
           'sort' => 'language',
           'direction' => CRM_Utils_Sort::DONTCARE,
