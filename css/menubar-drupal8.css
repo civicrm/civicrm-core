@@ -24,7 +24,7 @@ nav#civicrm-menu-nav .crm-menubar-toggle-btn-icon {
   left: 44px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: $breakMin) {
 
   body.crm-menubar-visible.crm-menubar-over-cms-menu #toolbar-administration {
     display: none;

@@ -853,6 +853,8 @@ class CRM_Core_Resources {
     $vars = [
       'resourceBase' => rtrim($config->resourceBase, '/'),
       'menubarHeight' => '40px',
+      'breakMin' => '768px',
+      'breakMax' => '767px',
       'menubarColor' => $color,
       'semiTransparentMenuColor' => 'rgba(' . implode(', ', CRM_Utils_Color::getRgb($color)) . ', .85)',
       'highlightColor' => CRM_Utils_Color::getHighlight($color),
