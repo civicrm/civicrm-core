@@ -859,7 +859,7 @@ class CRM_Core_Resources {
       'breakMin' => $e->params['breakpoint'] . 'px',
       'breakMax' => ($e->params['breakpoint'] - 1) . 'px',
       'menubarColor' => $color,
-      'semiTransparentMenuColor' => 'rgba(' . implode(', ', CRM_Utils_Color::getRgb($color)) . ", {$e->params['opacity']})",
+      'menuItemColor' => 'rgba(' . implode(', ', CRM_Utils_Color::getRgb($color)) . ", {$e->params['opacity']})",
       'highlightColor' => CRM_Utils_Color::getHighlight($color),
       'textColor' => CRM_Utils_Color::getContrast($color, '#333', '#ddd'),
     ];
