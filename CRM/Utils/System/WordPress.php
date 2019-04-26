@@ -801,10 +801,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Append WP js to coreResourcesList.
    *
-   * @param array $list
+   * @param \Civi\Core\Event\GenericHookEvent $e
    */
-  public function appendCoreResources(&$list) {
-    $list[] = 'js/crm.wordpress.js';
+  public function appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) {
+    $e->list[] = 'js/crm.wordpress.js';
   }
 
   /**
