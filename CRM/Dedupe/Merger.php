@@ -1609,14 +1609,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       return FALSE;
     }
 
-    $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
     $relTables = CRM_Dedupe_Merger::relTables();
     $submittedCustomFields = $moveTables = $locationMigrationInfo = $tableOperations = $removeTables = [];
 
+    self::swapOutFieldsAffectedByQFZeroBug($migrationInfo);
     foreach ($migrationInfo as $key => $value) {
-      if ($value == $qfZeroBug) {
-        $value = '0';
-      }
 
       if (substr($key, 0, 12) == 'move_custom_' && $value != NULL) {
         $submitted[substr($key, 5)] = $value;
@@ -2405,6 +2402,25 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       // delete entry from PrevNextCache table so we don't consider the pair next time
       // pair may have been flipped, so make sure we delete using both orders
       CRM_Core_BAO_PrevNextCache::deletePair($mainId, $otherId, $cacheKeyString, TRUE);
+    }
+  }
+
+  /**
+   * Replace the pseudo QFKey with zero if it is present.
+   *
+   * @todo - on the slim chance this is still relevant it should be moved to the form layer.
+   *
+   * Details about this bug are somewhat obscured by the move from svn but perhaps JIRA
+   * can still help.
+   *
+   * @param array $migrationInfo
+   */
+  protected static function swapOutFieldsAffectedByQFZeroBug(&$migrationInfo) {
+    $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
+    foreach ($migrationInfo as $key => &$value) {
+      if ($value == $qfZeroBug) {
+        $value = '0';
+      }
     }
   }
 
