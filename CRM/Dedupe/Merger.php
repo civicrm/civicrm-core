@@ -1678,33 +1678,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'groupName' => 'postal_greeting',
     ];
     CRM_Core_OptionGroup::lookupValues($submitted, $names, TRUE);
-
     // fix custom fields so they're edible by createProfileContact()
-    $treeCache = [];
-    if (!array_key_exists($contactType, $treeCache)) {
-      $treeCache[$contactType] = CRM_Core_BAO_CustomGroup::getTree(
-        $contactType,
-        NULL,
-        NULL,
-        -1,
-        [],
-        NULL,
-        TRUE,
-        NULL,
-        FALSE,
-        FALSE
-      );
-    }
-
-    $cFields = [];
-    foreach ($treeCache[$contactType] as $key => $group) {
-      if (!isset($group['fields'])) {
-        continue;
-      }
-      foreach ($group['fields'] as $fid => $field) {
-        $cFields[$fid]['attributes'] = $field;
-      }
-    }
+    $cFields = self::getCustomFieldMetadata($contactType);
 
     if (!isset($submitted)) {
       $submitted = [];
@@ -2421,6 +2396,42 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $value = '0';
       }
     }
+  }
+
+  /**
+   * Get metadata for the custom fields for the merge.
+   *
+   * @param string $contactType
+   *
+   * @return array
+   */
+  protected static function getCustomFieldMetadata($contactType) {
+    $treeCache = [];
+    if (!array_key_exists($contactType, $treeCache)) {
+      $treeCache[$contactType] = CRM_Core_BAO_CustomGroup::getTree(
+        $contactType,
+        NULL,
+        NULL,
+        -1,
+        [],
+        NULL,
+        TRUE,
+        NULL,
+        FALSE,
+        FALSE
+      );
+    }
+
+    $cFields = [];
+    foreach ($treeCache[$contactType] as $key => $group) {
+      if (!isset($group['fields'])) {
+        continue;
+      }
+      foreach ($group['fields'] as $fid => $field) {
+        $cFields[$fid]['attributes'] = $field;
+      }
+    }
+    return $cFields;
   }
 
 }
