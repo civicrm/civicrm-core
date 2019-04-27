@@ -3459,6 +3459,42 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test merging 2 contacts with custom fields.
+   */
+  public function testMergeCustomFields() {
+    $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __File__);
+    $fileField = $this->customFieldCreate([
+     'custom_group_id' => $ids['custom_group_id'],
+     'data_type' => 'File',
+     'html_type' => 'File',
+     'default_value' => '',
+   ]);
+    $contact1 = $this->individualCreate();
+
+     // Not sure this is quite right but it does get it into the file table
+    $file = $this->callAPISuccess('Attachment', 'create', [
+      'name' => 'header.txt',
+      'mime_type' => 'text/plain',
+      'description' => 'My test description',
+      'content' => 'My test content',
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $contact1,
+    ]);
+    $this->callAPISuccess('Contact', 'create', ['id' => $contact1, 'custom_' . $fileField['id'] => $file['id']]);
+
+    $contact2 = $this->individualCreate();
+
+    $this->callAPISuccess('contact', 'merge', [
+      'to_keep_id' => $contact2,
+      'to_remove_id' => $contact1,
+      'auto_flip' => FALSE,
+    ]);
+
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact2, 'return' => ['custom_' . $fileField['id'], 'custom_' . $ids['custom_field_id']]]);
+    $this->assertEquals($file['id'], $contact['custom_' . $fileField['id']]);
+  }
+
+  /**
    * Test retrieving merged contacts.
    *
    * The goal here is to start with a contact deleted by merged and find out the contact that is the current version of them.
