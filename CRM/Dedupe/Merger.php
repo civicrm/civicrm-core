@@ -1611,7 +1611,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     $qfZeroBug = 'e8cddb72-a257-11dc-b9cc-0016d3330ee9';
     $relTables = CRM_Dedupe_Merger::relTables();
-    $submittedCustomFields = $moveTables = $locationMigrationInfo = $tableOperations = $removeTables = [];
+    $submittedCustomFields = $moveTables = $tableOperations = $removeTables = [];
 
     foreach ($migrationInfo as $key => $value) {
       if ($value == $qfZeroBug) {
@@ -1624,10 +1624,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
       elseif (in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) && $value != NULL) {
         $submitted[substr($key, 5)] = $value;
-      }
-      // Set up initial information for handling migration of location blocks
-      elseif (substr($key, 0, 14) == 'move_location_' and $value != NULL) {
-        $locationMigrationInfo[$key] = $value;
       }
       elseif (substr($key, 0, 15) == 'move_rel_table_' and $value == '1') {
         $moveTables = array_merge($moveTables, $relTables[substr($key, 5)]['tables']);
@@ -1643,7 +1639,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         $removeTables = array_merge($moveTables, $relTables[substr($key, 5)]['tables']);
       }
     }
-    self::mergeLocations($mainId, $otherId, $locationMigrationInfo, $migrationInfo);
+    self::mergeLocations($mainId, $otherId, $migrationInfo);
 
     // **** Do contact related migrations
     $customTablesToCopyValues = self::getAffectedCustomTables($submittedCustomFields);
@@ -2234,14 +2230,16 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @param int $mainId
    * @param int $otherId
-   * @param array $locationMigrationInfo
-   *   Portion of the migration_info that holds location migration information.
    *
    * @param array $migrationInfo
    *   Migration info for the merge. This is passed to the hook as informational only.
    */
-  public static function mergeLocations($mainId, $otherId, $locationMigrationInfo, $migrationInfo) {
-    foreach ($locationMigrationInfo as $key => $value) {
+  public static function mergeLocations($mainId, $otherId, $migrationInfo) {
+    foreach ($migrationInfo as $key => $value) {
+      $isLocationField = (substr($key, 0, 14) == 'move_location_' and $value != NULL);
+      if (!$isLocationField) {
+        continue;
+      }
       $locField = explode('_', $key);
       $fieldName = $locField[2];
       $fieldCount = $locField[3];
