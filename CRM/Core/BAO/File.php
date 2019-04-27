@@ -210,7 +210,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     $fileDAO = new CRM_Core_DAO_File();
     $fileDAO->id = $fileID;
     if (!$fileDAO->find(TRUE)) {
-      CRM_Core_Error::fatal();
+      throw new CRM_Core_Exception(ts('File not found'));
     }
 
     // lets call a pre hook before the delete, so attachments hooks can get the info before things
@@ -226,7 +226,7 @@ class CRM_Core_BAO_File extends CRM_Core_DAO_File {
     $entityFileDAO->entity_table = $tableName;
 
     if (!$entityFileDAO->find(TRUE)) {
-      CRM_Core_Error::fatal(sprintf('No record found for given file ID - %d and entity ID - %d', $fileID, $entityID));
+      throw new CRM_Core_Exception(sprintf('No record found for given file ID - %d and entity ID - %d', $fileID, $entityID));
     }
 
     $entityFileDAO->delete();
