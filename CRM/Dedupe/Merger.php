@@ -1609,6 +1609,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       return FALSE;
     }
 
+    $contactType = $migrationInfo['main_details']['contact_type'];
     $relTables = CRM_Dedupe_Merger::relTables();
     $submittedCustomFields = $moveTables = $tableOperations = $removeTables = [];
 
@@ -1680,9 +1681,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // fix custom fields so they're edible by createProfileContact()
     $treeCache = [];
-    if (!array_key_exists($migrationInfo['main_details']['contact_type'], $treeCache)) {
-      $treeCache[$migrationInfo['main_details']['contact_type']] = CRM_Core_BAO_CustomGroup::getTree(
-        $migrationInfo['main_details']['contact_type'],
+    if (!array_key_exists($contactType, $treeCache)) {
+      $treeCache[$contactType] = CRM_Core_BAO_CustomGroup::getTree(
+        $contactType,
         NULL,
         NULL,
         -1,
@@ -1696,7 +1697,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     $cFields = [];
-    foreach ($treeCache[$migrationInfo['main_details']['contact_type']] as $key => $group) {
+    foreach ($treeCache[$contactType] as $key => $group) {
       if (!isset($group['fields'])) {
         continue;
       }
