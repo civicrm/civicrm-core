@@ -924,92 +924,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   -  Does a force merge otherwise (aggressive mode).
    *
    * @param array $conflicts
+   *  An empty array to be filed with conflict information.
    *
    * @return bool
    */
   public static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe', &$conflicts = []) {
 
-    $originalMigrationInfo = $migrationInfo;
-    foreach ($migrationInfo as $key => $val) {
-      if ($val === "null") {
-        // Rule: Never overwrite with an empty value (in any mode)
-        unset($migrationInfo[$key]);
-        continue;
-      }
-      elseif ((in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) or
-          substr($key, 0, 12) == 'move_custom_'
-        ) and $val != NULL
-      ) {
-        // Rule: If both main-contact, and other-contact have a field with a
-        // different value, then let $mode decide if to merge it or not
-        if (
-          (!empty($migrationInfo['rows'][$key]['main'])
-            // For custom fields a 0 (e.g in an int field) could be a true conflict. This
-            // is probably true for other fields too - e.g. 'do_not_email' but
-            // leaving that investigation as a @todo - until tests can be written.
-            // Note the handling of this has test coverage - although the data-typing
-            // of '0' feels flakey we have insurance.
-            || ($migrationInfo['rows'][$key]['main'] === '0' && substr($key, 0, 12) == 'move_custom_')
-          )
-          && $migrationInfo['rows'][$key]['main'] != $migrationInfo['rows'][$key]['other']
-        ) {
-
-          // note it down & lets wait for response from the hook.
-          // For no response $mode will decide if to skip this merge
-          $conflicts[$key] = NULL;
-        }
-      }
-      elseif (substr($key, 0, 14) == 'move_location_' and $val != NULL) {
-        $locField = explode('_', $key);
-        $fieldName = $locField[2];
-        $fieldCount = $locField[3];
-
-        // Rule: Catch address conflicts (same address type on both contacts)
-        if (
-          isset($migrationInfo['main_details']['location_blocks'][$fieldName]) &&
-          !empty($migrationInfo['main_details']['location_blocks'][$fieldName])
-        ) {
-
-          // Load the address we're inspecting from the 'other' contact
-          $addressRecord = $migrationInfo['other_details']['location_blocks'][$fieldName][$fieldCount];
-          $addressRecordLocTypeId = CRM_Utils_Array::value('location_type_id', $addressRecord);
-
-          // If it exists on the 'main' contact already, skip it. Otherwise
-          // if the location type exists already, log a conflict.
-          foreach ($migrationInfo['main_details']['location_blocks'][$fieldName] as $mainAddressKey => $mainAddressRecord) {
-            if (self::locationIsSame($addressRecord, $mainAddressRecord)) {
-              unset($migrationInfo[$key]);
-              break;
-            }
-            elseif ($addressRecordLocTypeId == $mainAddressRecord['location_type_id']) {
-              $conflicts[$key] = NULL;
-              break;
-            }
-          }
-        }
-
-        // For other locations, don't merge/add if the values are the same
-        elseif (CRM_Utils_Array::value('main', $migrationInfo['rows'][$key]) == $migrationInfo['rows'][$key]['other']) {
-          unset($migrationInfo[$key]);
-        }
-      }
-    }
-
-    // A hook to implement other algorithms for choosing which contact to bias to when
-    // there's a conflict (to handle "gotchas"). fields_in_conflict could be modified here
-    // merge happens with new values filled in here. For a particular field / row not to be merged
-    // field should be unset from fields_in_conflict.
-    $migrationData = [
-      'old_migration_info' => $originalMigrationInfo,
-      'mode' => $mode,
-      'fields_in_conflict' => $conflicts,
-      'merge_mode' => $mode,
-      'migration_info' => $migrationInfo,
-    ];
-    CRM_Utils_Hook::merge('batch', $migrationData, $mainId, $otherId);
-    $conflicts = $migrationData['fields_in_conflict'];
-    // allow hook to override / manipulate migrationInfo as well
-    $migrationInfo = $migrationData['migration_info'];
+    $conflicts = self::getConflicts($migrationInfo, $mainId, $otherId, $mode);
 
     if (!empty($conflicts)) {
       foreach ($conflicts as $key => $val) {
@@ -1023,9 +944,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         }
       }
       // if there are conflicts and mode is aggressive, allow hooks to decide if to skip merges
-      if (array_key_exists('skip_merge', $migrationData)) {
-        return (bool) $migrationData['skip_merge'];
-      }
+      return (bool) $migrationInfo['skip_merge'];
     }
     return FALSE;
   }
@@ -2432,6 +2351,110 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
     }
     return $cFields;
+  }
+
+  /**
+   * Get conflicts for proposed merge pair.
+   *
+   * @param array $migrationInfo
+   *   This is primarily to inform hooks. The can also modify it which feels
+   *   pretty fragile to do it here - but it is historical.
+   * @param int $mainId
+   *   Main contact with whom merge has to happen.
+   * @param int $otherId
+   *   Duplicate contact which would be deleted after merge operation.
+   * @param string $mode
+   *   Helps decide how to behave when there are conflicts.
+   *   -  A 'safe' value skips the merge if there are any un-resolved conflicts.
+   *   -  Does a force merge otherwise (aggressive mode).
+   *
+   * @return array
+   */
+  public static function getConflicts(&$migrationInfo, $mainId, $otherId, $mode) {
+    $conflicts = [];
+    $originalMigrationInfo = $migrationInfo;
+    foreach ($migrationInfo as $key => $val) {
+      if ($val === "null") {
+        // Rule: Never overwrite with an empty value (in any mode)
+        unset($migrationInfo[$key]);
+        continue;
+      }
+      elseif ((in_array(substr($key, 5), CRM_Dedupe_Merger::getContactFields()) or
+          substr($key, 0, 12) == 'move_custom_'
+        ) and $val != NULL
+      ) {
+        // Rule: If both main-contact, and other-contact have a field with a
+        // different value, then let $mode decide if to merge it or not
+        if (
+          (!empty($migrationInfo['rows'][$key]['main'])
+            // For custom fields a 0 (e.g in an int field) could be a true conflict. This
+            // is probably true for other fields too - e.g. 'do_not_email' but
+            // leaving that investigation as a @todo - until tests can be written.
+            // Note the handling of this has test coverage - although the data-typing
+            // of '0' feels flakey we have insurance.
+            || ($migrationInfo['rows'][$key]['main'] === '0' && substr($key, 0, 12) == 'move_custom_')
+          )
+          && $migrationInfo['rows'][$key]['main'] != $migrationInfo['rows'][$key]['other']
+        ) {
+
+          // note it down & lets wait for response from the hook.
+          // For no response $mode will decide if to skip this merge
+          $conflicts[$key] = NULL;
+        }
+      }
+      elseif (substr($key, 0, 14) == 'move_location_' and $val != NULL) {
+        $locField = explode('_', $key);
+        $fieldName = $locField[2];
+        $fieldCount = $locField[3];
+
+        // Rule: Catch address conflicts (same address type on both contacts)
+        if (
+          isset($migrationInfo['main_details']['location_blocks'][$fieldName]) &&
+          !empty($migrationInfo['main_details']['location_blocks'][$fieldName])
+        ) {
+
+          // Load the address we're inspecting from the 'other' contact
+          $addressRecord = $migrationInfo['other_details']['location_blocks'][$fieldName][$fieldCount];
+          $addressRecordLocTypeId = CRM_Utils_Array::value('location_type_id', $addressRecord);
+
+          // If it exists on the 'main' contact already, skip it. Otherwise
+          // if the location type exists already, log a conflict.
+          foreach ($migrationInfo['main_details']['location_blocks'][$fieldName] as $mainAddressKey => $mainAddressRecord) {
+            if (self::locationIsSame($addressRecord, $mainAddressRecord)) {
+              unset($migrationInfo[$key]);
+              break;
+            }
+            elseif ($addressRecordLocTypeId == $mainAddressRecord['location_type_id']) {
+              $conflicts[$key] = NULL;
+              break;
+            }
+          }
+        }
+
+        // For other locations, don't merge/add if the values are the same
+        elseif (CRM_Utils_Array::value('main', $migrationInfo['rows'][$key]) == $migrationInfo['rows'][$key]['other']) {
+          unset($migrationInfo[$key]);
+        }
+      }
+    }
+
+    // A hook to implement other algorithms for choosing which contact to bias to when
+    // there's a conflict (to handle "gotchas"). fields_in_conflict could be modified here
+    // merge happens with new values filled in here. For a particular field / row not to be merged
+    // field should be unset from fields_in_conflict.
+    $migrationData = [
+      'old_migration_info' => $originalMigrationInfo,
+      'mode' => $mode,
+      'fields_in_conflict' => $conflicts,
+      'merge_mode' => $mode,
+      'migration_info' => $migrationInfo,
+    ];
+    CRM_Utils_Hook::merge('batch', $migrationData, $mainId, $otherId);
+    $conflicts = $migrationData['fields_in_conflict'];
+    // allow hook to override / manipulate migrationInfo as well
+    $migrationInfo = $migrationData['migration_info'];
+    $migrationInfo['skip_merge'] = CRM_Utils_Array::value('skip_merge', $migrationData);
+    return $conflicts;
   }
 
 }
