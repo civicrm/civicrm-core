@@ -599,7 +599,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if (!empty($customDataSubType)) {
           $subtypeClause = array();
           foreach ($customDataSubType as $subtype) {
-            $subtype = CRM_Core_DAO::VALUE_SEPARATOR . $subtype . CRM_Core_DAO::VALUE_SEPARATOR;
+            $subtype = CRM_Core_DAO::VALUE_SEPARATOR . CRM_Utils_Type::escape($subtype, 'String') . CRM_Core_DAO::VALUE_SEPARATOR;
             $subtypeClause[] = "$cgTable.extends_entity_column_value LIKE '%{$subtype}%'";
           }
           if (!$onlySubType) {
