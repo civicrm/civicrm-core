@@ -1190,7 +1190,7 @@ abstract class CRM_Core_Payment {
 
   /**
    * Calling this from outside the payment subsystem is deprecated - use doPayment.
-   *
+   * @deprecated
    * Does a server to server payment transaction.
    *
    * @param array $params
@@ -1205,33 +1205,25 @@ abstract class CRM_Core_Payment {
 
   /**
    * Process payment - this function wraps around both doTransferCheckout and doDirectPayment.
+   * Any processor that still implements the deprecated doTransferCheckout() or doDirectPayment() should be updated to use doPayment().
    *
-   * The function ensures an exception is thrown & moves some of this logic out of the form layer and makes the forms
-   * more agnostic.
+   * This function adds some historical defaults ie. the assumption that if a 'doDirectPayment' processors comes back it completed
+   *   the transaction & in fact doTransferCheckout would not traditionally come back.
+   * Payment processors should throw exceptions and not return Error objects as they may have done with the old functions.
    *
-   * Payment processors should set payment_status_id. This function adds some historical defaults ie. the
-   * assumption that if a 'doDirectPayment' processors comes back it completed the transaction & in fact
-   * doTransferCheckout would not traditionally come back.
+   * Payment processors should set payment_status_id (which is really contribution_status_id) in the returned array. The default is assumed to be Pending.
+   *   In some cases the IPN will set the payment to "Completed" some time later.
    *
-   * doDirectPayment does not do an immediate payment for Authorize.net or Paypal so the default is assumed
-   * to be Pending.
-   *
-   * Once this function is fully rolled out then it will be preferred for processors to throw exceptions than to
-   * return Error objects
-   *
-   * Usage:
-   * Payment processors should override this function directly instead of using doDirectPayment/doTransferCheckout which are deprecated.
-   * Payment processors should set and return payment_status_id (Pending if the IPN will complete it, Completed if successful).
-   * @fixme For the contribution workflow we have a contributionID, but for the event and membership workflow the contribution has not yet been created
-   *  so we can't update params directly on the contribution.  However if you return trxn_id, fee_amount, net_amount they will be set on the contribution
-   *  by those workflows.  Ideally all workflows would create a pending contribution BEFORE calling doPayment (eg. https://github.com/civicrm/civicrm-core/pull/13763 for events)
+   * @fixme Creating a contribution record is inconsistent! We should always create a contribution BEFORE calling doPayment...
+   *  For the current status see: https://lab.civicrm.org/dev/financial/issues/53
+   * If we DO have a contribution ID, then the payment processor can (and should) update parameters on the contribution record as necessary.
    *
    * @param array $params
    *
    * @param string $component
    *
    * @return array
-   *   Result array
+   *   Result array (containing at least the key payment_status_id)
    *
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
