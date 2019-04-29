@@ -97,6 +97,7 @@ class CRM_Utils_API_HTMLInputCoder extends CRM_Utils_API_AbstractFieldCoder {
         'honor_block_text',
         'pay_later_text',
         'pay_later_receipt',
+        'receipt_text',
         // This is needed for FROM Email Address configuration. dgg
         'label',
         // This is needed for navigation items urls
