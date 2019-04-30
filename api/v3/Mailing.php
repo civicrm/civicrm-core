@@ -573,13 +573,20 @@ function civicrm_api3_mailing_preview($params) {
   $returnProperties = $mailing->getReturnProperties();
   $contactID = CRM_Utils_Array::value('contact_id', $params);
   if (!$contactID) {
-    $contactID = $session->get('userID');
+    // If we still don't have a userID in a session because we are annon then set contactID to be 0
+    $contactID = empty($session->get('userID')) ? 0 : $session->get('userID');
   }
   $mailingParams = ['contact_id' => $contactID];
 
-  $details = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
+  // if $contactID is zero we are dealing with annon user so call separate function for annon users
+  if (!$contactID) {
+    $details = CRM_Utils_Token::getAnonymousTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
+  }
+  else {
+    $details = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
+  }
 
-  $mime = $mailing->compose(NULL, NULL, NULL, $session->get('userID'), $fromEmail, $fromEmail,
+  $mime = $mailing->compose(NULL, NULL, NULL, $contactID, $fromEmail, $fromEmail,
     TRUE, $details[0][$contactID], $attachments
   );
 
