@@ -263,7 +263,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
    * @return bool
    */
   public static function cancelRecurContribution($params) {
-    if (is_int($params)) {
+    if (is_numeric($params)) {
       CRM_Core_Error::deprecatedFunctionWarning('You are using a BAO function whose signature has changed. Please use the ContributionRecur.cancel api');
       $params = ['id' => $params];
     }
