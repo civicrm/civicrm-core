@@ -1608,55 +1608,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       list($cFields, $customFiles, $submitted) = self::processCustomFields($mainId, $key, $cFields, $customFiles, $submitted, $value);
     }
 
-    // **** Do file custom fields related migrations
-    // FIXME: move this someplace else (one of the BAOs) after discussing
-    // where to, and whether CRM_Core_BAO_File::deleteFileReferences() shouldn't actually,
-    // like, delete a file...
-
-    if (!isset($customFiles)) {
-      $customFiles = [];
-    }
-    foreach ($customFiles as $customId) {
-      list($tableName, $columnName, $groupID) = CRM_Core_BAO_CustomField::getTableColumnGroup($customId);
-
-      // get the contact_id -> file_id mapping
-      $fileIds = [];
-      $sql = "SELECT entity_id, {$columnName} AS file_id FROM {$tableName} WHERE entity_id IN ({$mainId}, {$otherId})";
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      while ($dao->fetch()) {
-        $fileIds[$dao->entity_id] = $dao->file_id;
-        if ($dao->entity_id == $mainId) {
-          CRM_Core_BAO_File::deleteFileReferences($fileIds[$mainId], $mainId, $customId);
-        }
-      }
-
-      // move the other contact's file to main contact
-      //NYSS need to INSERT or UPDATE depending on whether main contact has an existing record
-      if (CRM_Core_DAO::singleValueQuery("SELECT id FROM {$tableName} WHERE entity_id = {$mainId}")) {
-        $sql = "UPDATE {$tableName} SET {$columnName} = {$fileIds[$otherId]} WHERE entity_id = {$mainId}";
-      }
-      else {
-        $sql = "INSERT INTO {$tableName} ( entity_id, {$columnName} ) VALUES ( {$mainId}, {$fileIds[$otherId]} )";
-      }
-      CRM_Core_DAO::executeQuery($sql);
-
-      if (CRM_Core_DAO::singleValueQuery("
-        SELECT id
-        FROM civicrm_entity_file
-        WHERE entity_table = '{$tableName}' AND file_id = {$fileIds[$otherId]}")
-      ) {
-        $sql = "
-          UPDATE civicrm_entity_file
-          SET entity_id = {$mainId}
-          WHERE entity_table = '{$tableName}' AND file_id = {$fileIds[$otherId]}";
-      }
-      else {
-        $sql = "
-          INSERT INTO civicrm_entity_file ( entity_table, entity_id, file_id )
-          VALUES ( '{$tableName}', {$mainId}, {$fileIds[$otherId]} )";
-      }
-      CRM_Core_DAO::executeQuery($sql);
-    }
+    self::processCustomFieldFiles($mainId, $otherId, $customFiles);
 
     // move view only custom fields CRM-5362
     $viewOnlyCustomFields = [];
@@ -2473,6 +2425,63 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $migrationInfo = $migrationData['migration_info'];
     $migrationInfo['skip_merge'] = CRM_Utils_Array::value('skip_merge', $migrationData);
     return $conflicts;
+  }
+
+  /**
+   * Do file custom fields related migrations.
+   * FIXME: move this someplace else (one of the BAOs) after discussing
+   * where to, and whether CRM_Core_BAO_File::deleteFileReferences() shouldn't actually,
+   * like, delete a file...
+   *
+   * Note outstanding bug https://lab.civicrm.org/dev/core/issues/723
+   * relates to this code....
+   *
+   * @param $mainId
+   * @param $otherId
+   * @param $customFiles
+   */
+  protected static function processCustomFieldFiles($mainId, $otherId, $customFiles) {
+    foreach ($customFiles as $customId) {
+      list($tableName, $columnName, $groupID) = CRM_Core_BAO_CustomField::getTableColumnGroup($customId);
+
+      // get the contact_id -> file_id mapping
+      $fileIds = [];
+      $sql = "SELECT entity_id, {$columnName} AS file_id FROM {$tableName} WHERE entity_id IN ({$mainId}, {$otherId})";
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      while ($dao->fetch()) {
+        $fileIds[$dao->entity_id] = $dao->file_id;
+        if ($dao->entity_id == $mainId) {
+          CRM_Core_BAO_File::deleteFileReferences($fileIds[$mainId], $mainId, $customId);
+        }
+      }
+
+      // move the other contact's file to main contact
+      //NYSS need to INSERT or UPDATE depending on whether main contact has an existing record
+      if (CRM_Core_DAO::singleValueQuery("SELECT id FROM {$tableName} WHERE entity_id = {$mainId}")) {
+        $sql = "UPDATE {$tableName} SET {$columnName} = {$fileIds[$otherId]} WHERE entity_id = {$mainId}";
+      }
+      else {
+        $sql = "INSERT INTO {$tableName} ( entity_id, {$columnName} ) VALUES ( {$mainId}, {$fileIds[$otherId]} )";
+      }
+      CRM_Core_DAO::executeQuery($sql);
+
+      if (CRM_Core_DAO::singleValueQuery("
+        SELECT id
+        FROM civicrm_entity_file
+        WHERE entity_table = '{$tableName}' AND file_id = {$fileIds[$otherId]}")
+      ) {
+        $sql = "
+          UPDATE civicrm_entity_file
+          SET entity_id = {$mainId}
+          WHERE entity_table = '{$tableName}' AND file_id = {$fileIds[$otherId]}";
+      }
+      else {
+        $sql = "
+          INSERT INTO civicrm_entity_file ( entity_table, entity_id, file_id )
+          VALUES ( '{$tableName}', {$mainId}, {$fileIds[$otherId]} )";
+      }
+      CRM_Core_DAO::executeQuery($sql);
+    }
   }
 
 }
