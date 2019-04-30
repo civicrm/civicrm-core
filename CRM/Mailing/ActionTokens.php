@@ -65,7 +65,8 @@ class CRM_Mailing_ActionTokens extends \Civi\Token\AbstractTokenSubscriber {
    * @inheritDoc
    */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
-    return !empty($processor->context['mailingId']) || !empty($processor->context['mailing']);
+    return !empty($processor->context['mailingId']) || !empty($processor->context['mailing'])
+      || in_array('mailingId', $processor->context['schema']) || in_array('mailing', $processor->context['schema']);
   }
 
   /**
@@ -85,7 +86,9 @@ class CRM_Mailing_ActionTokens extends \Civi\Token\AbstractTokenSubscriber {
     // replaceSubscribeInviteTokens().
 
     if (empty($row->context['mailingJobId']) || empty($row->context['mailingActionTarget']['hash'])) {
-      throw new \CRM_Core_Exception("Error: Cannot use action tokens unless context defines mailingJobId and mailingActionTarget.");
+      // Strictly speaking, it doesn't make much sense to generate action-tokens when there's no job ID, but traditional CiviMail
+      // does this in v5.6+ for "Preview" functionality. Relaxing this strictness check ensures parity between newer+older styles.
+      // throw new \CRM_Core_Exception("Error: Cannot use action tokens unless context defines mailingJobId and mailingActionTarget.");
     }
 
     if ($field === 'eventQueueId') {
