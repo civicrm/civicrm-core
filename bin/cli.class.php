@@ -146,7 +146,7 @@ class civicrm_cli {
     // of this script
     array_shift($args);
 
-    while (list($k, $arg) = each($args)) {
+    foreach ($args as $k => $arg) {
       // sanitize all user input
       $arg = $this->_sanitize($arg);
 
