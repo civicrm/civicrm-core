@@ -53,6 +53,20 @@
     <add>4.5</add>
   </field>
   <field>
+    <name>category</name>
+    <title>Category</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <add>5.14</add>
+    <comment>FK to a civicrm_option_value (case_type_category)</comment>
+    <pseudoconstant>
+      <optionGroupName>case_type_category</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+  <field>
     <name>is_active</name>
     <title>Case Type Is Active</title>
     <type>boolean</type>
