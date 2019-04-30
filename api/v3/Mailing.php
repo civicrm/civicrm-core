@@ -578,16 +578,17 @@ function civicrm_api3_mailing_preview($params) {
   }
   $mailingParams = ['contact_id' => $contactID];
 
-  // if $contactID is zero we are dealing with annon user so call separate function for annon users
   if (!$contactID) {
     $details = CRM_Utils_Token::getAnonymousTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
+    $details = CRM_Utils_Array::value(0, $details[0]);
   }
   else {
     $details = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
+    $details = $details[0][$contactID];
   }
 
   $mime = $mailing->compose(NULL, NULL, NULL, $contactID, $fromEmail, $fromEmail,
-    TRUE, $details[0][$contactID], $attachments
+    TRUE, $details, $attachments
   );
 
   return civicrm_api3_create_success([
