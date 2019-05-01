@@ -3295,7 +3295,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
           }
           if (!empty($relType['id'])) {
             $roleDetails['id'] = $relType['id'];
-            $roleDetails['direction'] = 'a_b';
+            $roleDetails['direction'] = 'b_a';
           }
           // Check if its a b_a label
           try {
@@ -3309,7 +3309,7 @@ WHERE id IN (' . implode(',', $copiedActivityIds) . ')';
             }
             else {
               $roleDetails['id'] = $relTypeBa['id'];
-              $roleDetails['direction'] = 'b_a';
+              $roleDetails['direction'] = 'a_b';
             }
           }
           $caseRoles[$roleDetails['id']] = $roleDetails;

@@ -144,8 +144,14 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
     }
     elseif ($dao instanceof CRM_Contact_DAO_RelationshipType) {
       /** @var $dao CRM_Contact_DAO_RelationshipType */
-      $count = CRM_Case_XMLRepository::singleton()
-        ->getRelationshipReferenceCount($dao->label_a_b);
+
+      // Need to look both directions, but no need to translate case role
+      // direction from XML perspective to client-based perspective
+      $xmlRepo = CRM_Case_XMLRepository::singleton();
+      $count = $xmlRepo->getRelationshipReferenceCount($dao->label_a_b);
+      if ($dao->label_a_b != $dao->label_b_a) {
+        $count += $xmlRepo->getRelationshipReferenceCount($dao->label_b_a);
+      }
       if ($count > 0) {
         $result[] = [
           'name' => 'casetypexml:relationships',

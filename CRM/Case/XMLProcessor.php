@@ -43,16 +43,6 @@ class CRM_Case_XMLProcessor {
   public static $activityTypes = NULL;
 
   /**
-   * FIXME: This does *NOT* belong in a static property, but we're too late in
-   * the 4.5-cycle to do the necessary cleanup.
-   *
-   * Format is array(int $id => string $relTypeCname).
-   *
-   * @var array|null
-   */
-  public static $relationshipTypes = NULL;
-
-  /**
    * @param $caseType
    *
    * @return FALSE|SimpleXMLElement
@@ -101,22 +91,33 @@ class CRM_Case_XMLProcessor {
   }
 
   /**
+   * Get all relationship type labels
+   *
+   * TODO: These should probably be names, but under legacy behavior this has
+   * been labels.
+   *
+   * @param bool $fromXML
+   *   Is this to be used for lookup of values from XML?
+   *   Relationships are recorded in XML from the perspective of the non-client
+   *   while relationships in the UI and everywhere else are from the
+   *   perspective of the client.  Since the XML can't be expected to be
+   *   switched, the direction needs to be translated.
    * @return array
    */
-  public function &allRelationshipTypes() {
-    if (self::$relationshipTypes === NULL) {
+  public function &allRelationshipTypes($fromXML = FALSE) {
+    if (!isset(Civi::$statics[__CLASS__]['reltypes'][$fromXML])) {
       $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE);
 
-      self::$relationshipTypes = [];
+      Civi::$statics[__CLASS__]['reltypes'][$fromXML] = [];
       foreach ($relationshipInfo as $id => $info) {
-        self::$relationshipTypes[$id . '_b_a'] = $info['label_b_a'];
+        Civi::$statics[__CLASS__]['reltypes'][$fromXML][$id . '_b_a'] = ($fromXML) ? $info['label_a_b'] : $info['label_b_a'];
         if ($info['label_b_a'] !== $info['label_a_b']) {
-          self::$relationshipTypes[$id . '_a_b'] = $info['label_a_b'];
+          Civi::$statics[__CLASS__]['reltypes'][$fromXML][$id . '_a_b'] = ($fromXML) ? $info['label_b_a'] : $info['label_a_b'];
         }
       }
     }
 
-    return self::$relationshipTypes;
+    return Civi::$statics[__CLASS__]['reltypes'][$fromXML];
   }
 
   /**
@@ -124,7 +125,7 @@ class CRM_Case_XMLProcessor {
    */
   public static function flushStaticCaches() {
     self::$activityTypes = NULL;
-    self::$relationshipTypes = NULL;
+    unset(Civi::$statics[__CLASS__]['reltypes']);
   }
 
 }
