@@ -502,6 +502,8 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
         $ctype,
         TRUE
       );
+
+      $params['contact_id'] = $this->payer_contact_id;
     }
 
     $params['now'] = date('YmdHis');
