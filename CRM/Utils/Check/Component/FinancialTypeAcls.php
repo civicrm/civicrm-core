@@ -35,7 +35,7 @@ class CRM_Utils_Check_Component_FinancialTypeAcls extends CRM_Utils_Check_Compon
   public static function checkFinancialAclReport() {
     $messages = [];
     $ftAclSetting = Civi::settings()->get('acl_financial_type');
-    $financialAclExtension = civicrm_api3('extension', 'get', ['key' => 'biz.jmaconsulting.financialaclreport']);
+    $financialAclExtension = civicrm_api3('extension', 'get', ['key' => 'biz.jmaconsulting.financialaclreport', 'sequential' => 1]);
     if ($ftAclSetting && (($financialAclExtension['count'] == 1 && $financialAclExtension['values'][0]['status'] != 'Installed') || $financialAclExtension['count'] !== 1)) {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
