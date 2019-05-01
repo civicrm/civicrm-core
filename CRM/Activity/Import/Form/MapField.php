@@ -36,7 +36,6 @@
  */
 class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
-
   /**
    * Set variables up before form is built.
    */
@@ -62,14 +61,14 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     else {
       $this->assign('rowDisplayCount', 2);
     }
-    $highlightedFields = array();
-    $requiredFields = array(
+    $highlightedFields = [];
+    $requiredFields = [
       'activity_date_time',
       'activity_type_id',
       'activity_label',
       'target_contact_id',
       'activity_subject',
-    );
+    ];
     foreach ($requiredFields as $val) {
       $highlightedFields[] = $val;
     }
@@ -103,8 +102,8 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->assign('loadedMapping', $savedMapping);
       $this->set('loadedMapping', $savedMapping);
 
-      $params = array('id' => $savedMapping);
-      $temp = array();
+      $params = ['id' => $savedMapping];
+      $temp = [];
       $mappingDetails = CRM_Core_BAO_Mapping::retrieve($params, $temp);
 
       $this->assign('savedName', $mappingDetails->name);
@@ -117,13 +116,13 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       $this->add('text', 'saveMappingDesc', ts('Description'));
     }
 
-    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL, array('onclick' => "showSaveDetails(this)"));
+    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL, ['onclick' => "showSaveDetails(this)"]);
 
-    $this->addFormRule(array('CRM_Activity_Import_Form_MapField', 'formRule'));
+    $this->addFormRule(['CRM_Activity_Import_Form_MapField', 'formRule']);
 
     //-------- end of saved mapping stuff ---------
 
-    $defaults = array();
+    $defaults = [];
     $mapperKeys = array_keys($this->_mapperFields);
 
     $hasHeaders = !empty($this->_columnHeaders);
@@ -148,7 +147,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     $warning = 0;
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
-      $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', array(1 => $i)), NULL);
+      $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
       $jsSet = FALSE;
       if ($this->get('savedMapping')) {
         if (isset($mappingName[$i])) {
@@ -165,15 +164,15 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
             }
 
             $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
-            $defaults["mapper[$i]"] = array(
+            $defaults["mapper[$i]"] = [
               $mappingHeader[0],
               (isset($locationId)) ? $locationId : "",
               (isset($phoneType)) ? $phoneType : "",
-            );
+            ];
             $jsSet = TRUE;
           }
           else {
-            $defaults["mapper[$i]"] = array();
+            $defaults["mapper[$i]"] = [];
           }
           if (!$jsSet) {
             for ($k = 1; $k < 4; $k++) {
@@ -186,14 +185,10 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
           $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_" . $i . "_');\n";
 
           if ($hasHeaders) {
-            $defaults["mapper[$i]"] = array(
-              $this->defaultFromHeader($this->_columnHeaders[$i],
-                $headerPatterns
-              ),
-            );
+            $defaults["mapper[$i]"] = [$this->defaultFromHeader($this->_columnHeaders[$i], $headerPatterns)];
           }
           else {
-            $defaults["mapper[$i]"] = array($this->defaultFromData($dataPatterns, $i));
+            $defaults["mapper[$i]"] = [$this->defaultFromData($dataPatterns, $i)];
           }
         }
         // End of load mapping.
@@ -202,23 +197,23 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_" . $i . "_');\n";
         if ($hasHeaders) {
           // Infer the default from the skipped headers if we have them
-          $defaults["mapper[$i]"] = array(
-            $this->defaultFromHeader($this->_columnHeaders[$i],
-              $headerPatterns
-            ),
+          $defaults["mapper[$i]"] = [
+            $this->defaultFromHeader($this->_columnHeaders[$i], $headerPatterns),
             0,
-          );
+          ];
         }
         else {
           // Otherwise guess the default from the form of the data
-          $defaults["mapper[$i]"] = array(
-            $this->defaultFromData($dataPatterns, $i),
-            0,
-          );
+          $defaults["mapper[$i]"] = [$this->defaultFromData($dataPatterns, $i), 0];
         }
       }
 
-      $sel->setOptions(array($sel1, $sel2, (isset($sel3)) ? $sel3 : "", (isset($sel4)) ? $sel4 : ""));
+      $sel->setOptions([
+        $sel1,
+        $sel2,
+        (isset($sel3)) ? $sel3 : "",
+        (isset($sel4)) ? $sel4 : "",
+      ]);
     }
     $js .= "</script>\n";
     $this->assign('initHideBoxes', $js);
@@ -240,22 +235,22 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $this->setDefaults($defaults);
 
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'back',
           'name' => ts('Previous'),
-        ),
-        array(
+        ],
+        [
           'type' => 'next',
           'name' => ts('Continue'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+    ]
     );
   }
 
@@ -269,28 +264,28 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields) {
-    $errors = array();
+    $errors = [];
     // define so we avoid notices below
     $errors['_qf_default'] = '';
 
     $fieldMessage = NULL;
     if (!array_key_exists('savedMapping', $fields)) {
-      $importKeys = array();
+      $importKeys = [];
       foreach ($fields['mapper'] as $mapperPart) {
         $importKeys[] = $mapperPart[0];
       }
       // FIXME: should use the schema titles, not redeclare them
-      $requiredFields = array(
+      $requiredFields = [
         'target_contact_id' => ts('Contact ID'),
         'activity_date_time' => ts('Activity Date'),
         'activity_subject' => ts('Activity Subject'),
         'activity_type_id' => ts('Activity Type ID'),
-      );
+      ];
 
-      $params = array(
+      $params = [
         'used' => 'Unsupervised',
         'contact_type' => 'Individual',
-      );
+      ];
       list($ruleFields, $threshold) = CRM_Dedupe_BAO_RuleGroup::dedupeRuleFieldsWeight($params);
       $weightSum = 0;
       foreach ($importKeys as $key => $val) {
@@ -310,7 +305,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
             else {
               $errors['_qf_default'] .= ts('Missing required contact matching fields.')
                 . $fieldMessage . ' '
-                . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(1 => $threshold))
+                . ts('(Sum of all weights should be greater than or equal to threshold: %1).', [1 => $threshold])
                 . '<br />';
             }
           }
@@ -320,14 +315,14 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
             }
             else {
               $errors['_qf_default'] .= ts('Missing required field: Provide %1 or %2',
-                  array(
+                  [
                     1 => $title,
                     2 => 'Activity Type Label',
-                  )) . '<br />';
+                  ]) . '<br />';
             }
           }
           else {
-            $errors['_qf_default'] .= ts('Missing required field: %1', array(1 => $title)) . '<br />';
+            $errors['_qf_default'] .= ts('Missing required field: %1', [1 => $title]) . '<br />';
           }
         }
       }
@@ -378,12 +373,12 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     $seperator = $this->controller->exportValue('DataSource', 'fieldSeparator');
     $skipColumnHeader = $this->controller->exportValue('DataSource', 'skipColumnHeader');
 
-    $mapperKeys = array();
-    $mapper = array();
+    $mapperKeys = [];
+    $mapper = [];
     $mapperKeys = $this->controller->exportValue($this->_name, 'mapper');
-    $mapperKeysMain = array();
-    $mapperLocType = array();
-    $mapperPhoneType = array();
+    $mapperKeysMain = [];
+    $mapperLocType = [];
+    $mapperPhoneType = [];
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $mapper[$i] = $this->_mapperFields[$mapperKeys[$i][0]];
@@ -417,7 +412,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       $mappingFields->mapping_id = $params['mappingId'];
       $mappingFields->find();
 
-      $mappingFieldsId = array();
+      $mappingFieldsId = [];
       while ($mappingFields->fetch()) {
         if ($mappingFields->id) {
           $mappingFieldsId[$mappingFields->column_number] = $mappingFields->id;
@@ -437,11 +432,11 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     // Saving Mapping Details and Records.
     if (!empty($params['saveMapping'])) {
-      $mappingParams = array(
+      $mappingParams = [
         'name' => $params['saveMappingName'],
         'description' => $params['saveMappingDesc'],
         'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Activity'),
-      );
+      ];
       $saveMapping = CRM_Core_BAO_Mapping::add($mappingParams);
 
       for ($i = 0; $i < $this->_columnCount; $i++) {

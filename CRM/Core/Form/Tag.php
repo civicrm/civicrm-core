@@ -58,7 +58,7 @@ class CRM_Core_Form_Tag {
   public static function buildQuickForm(
     &$form, $parentNames, $entityTable, $entityId = NULL, $skipTagCreate = FALSE,
     $skipEntityAction = FALSE, $tagsetElementName = NULL) {
-    $tagset = $form->_entityTagValues = array();
+    $tagset = $form->_entityTagValues = [];
     $form->assign("isTagset", FALSE);
     $mode = NULL;
 
@@ -77,22 +77,22 @@ class CRM_Core_Form_Tag {
         }
         $tagset[$tagsetItem]['tagsetElementName'] = $tagsetElementName;
 
-        $form->addEntityRef("{$tagsetElementName}[{$parentId}]", $parentNameItem, array(
+        $form->addEntityRef("{$tagsetElementName}[{$parentId}]", $parentNameItem, [
           'entity' => 'Tag',
           'multiple' => TRUE,
           'create' => !$skipTagCreate,
-          'api' => array('params' => array('parent_id' => $parentId)),
+          'api' => ['params' => ['parent_id' => $parentId]],
           'data-entity_table' => $entityTable,
           'data-entity_id' => $entityId,
           'class' => "crm-$mode-tagset",
-          'select' => array('minimumInputLength' => 0),
-        ));
+          'select' => ['minimumInputLength' => 0],
+        ]);
 
         if ($entityId) {
           $tagset[$tagsetItem]['entityId'] = $entityId;
           $entityTags = CRM_Core_BAO_EntityTag::getChildEntityTags($parentId, $entityId, $entityTable);
           if ($entityTags) {
-            $form->setDefaults(array("{$tagsetElementName}[{$parentId}]" => implode(',', array_keys($entityTags))));
+            $form->setDefaults(["{$tagsetElementName}[{$parentId}]" => implode(',', array_keys($entityTags))]);
           }
         }
         else {
@@ -109,7 +109,7 @@ class CRM_Core_Form_Tag {
       // Merge this tagset info with possibly existing info in the template
       $tagsetInfo = (array) $form->get_template_vars("tagsetInfo");
       if (empty($tagsetInfo[$mode])) {
-        $tagsetInfo[$mode] = array();
+        $tagsetInfo[$mode] = [];
       }
       $tagsetInfo[$mode] = array_merge($tagsetInfo[$mode], $tagset);
       $form->assign("tagsetInfo", $tagsetInfo);
@@ -152,8 +152,8 @@ class CRM_Core_Form_Tag {
     // when form is submitted with tagset values below logic will work and in the case when all tags in a tagset
     // are deleted we will have to set $params[tagset id] = '' which is done by above logic
     foreach ($params as $parentId => $value) {
-      $newTagIds = array();
-      $tagIds = array();
+      $newTagIds = [];
+      $tagIds = [];
 
       if ($value) {
         $tagIds = explode(',', $value);
@@ -178,7 +178,7 @@ class CRM_Core_Form_Tag {
 
       if (!empty($newTagIds)) {
         // New tag ids can be inserted directly into the db table.
-        $insertValues = array();
+        $insertValues = [];
         foreach ($newTagIds as $tagId) {
           $insertValues[] = "( {$tagId}, {$entityId}, '{$entityTable}' ) ";
         }

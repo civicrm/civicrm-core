@@ -33,7 +33,17 @@ class E2E_Extern_SoapTest extends CiviEndToEndTestCase {
   /**
    * @var string
    */
-  var $url, $adminUser, $adminPass;
+  public $url;
+
+  /**
+   * @var string
+   */
+  public $adminUser;
+
+  /**
+   * @var string
+   */
+  public $adminPass;
 
   public function setUp() {
     CRM_Core_Config::singleton(1, 1);
@@ -91,11 +101,10 @@ class E2E_Extern_SoapTest extends CiviEndToEndTestCase {
    */
   protected function createClient() {
     return new SoapClient(NULL, array(
-        'location' => $this->url,
-        'uri' => 'urn:civicrm',
-        'trace' => 1,
-      )
-    );
+      'location' => $this->url,
+      'uri' => 'urn:civicrm',
+      'trace' => 1,
+    ));
   }
 
 }

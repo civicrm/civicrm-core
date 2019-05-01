@@ -35,6 +35,7 @@
  * scanned for extensions.
  */
 class CRM_Extension_Container_Static implements CRM_Extension_Container_Interface {
+
   /**
    * @param array $exts
    *   Array(string $key => array $spec) List of extensions.
@@ -47,7 +48,7 @@ class CRM_Extension_Container_Static implements CRM_Extension_Container_Interfac
    * @inheritDoc
    */
   public function checkRequirements() {
-    return array();
+    return [];
   }
 
   /**

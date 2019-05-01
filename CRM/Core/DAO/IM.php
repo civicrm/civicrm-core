@@ -19,14 +19,14 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_im';
+  public static $_tableName = 'civicrm_im';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Unique IM ID
@@ -93,7 +93,7 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id', 'civicrm_contact', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -114,6 +114,7 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO {
           'title' => ts('Instant Messenger ID'),
           'description' => ts('Unique IM ID'),
           'required' => TRUE,
+          'where' => 'civicrm_im.id',
           'table_name' => 'civicrm_im',
           'entity' => 'IM',
           'bao' => 'CRM_Core_BAO_IM',
@@ -124,6 +125,7 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('IM Contact'),
           'description' => ts('FK to Contact ID'),
+          'where' => 'civicrm_im.contact_id',
           'table_name' => 'civicrm_im',
           'entity' => 'IM',
           'bao' => 'CRM_Core_BAO_IM',
@@ -135,6 +137,7 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('IM Location Type'),
           'description' => ts('Which Location does this email belong to.'),
+          'where' => 'civicrm_im.location_type_id',
           'table_name' => 'civicrm_im',
           'entity' => 'IM',
           'bao' => 'CRM_Core_BAO_IM',
@@ -173,6 +176,7 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('IM Provider'),
           'description' => ts('Which IM Provider does this screen name belong to.'),
+          'where' => 'civicrm_im.provider_id',
           'table_name' => 'civicrm_im',
           'entity' => 'IM',
           'bao' => 'CRM_Core_BAO_IM',
@@ -190,6 +194,7 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is IM Primary?'),
           'description' => ts('Is this the primary IM for this contact and location.'),
+          'where' => 'civicrm_im.is_primary',
           'default' => '0',
           'table_name' => 'civicrm_im',
           'entity' => 'IM',
@@ -201,6 +206,7 @@ class CRM_Core_DAO_IM extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is IM Billing?'),
           'description' => ts('Is this the billing?'),
+          'where' => 'civicrm_im.is_billing',
           'default' => '0',
           'table_name' => 'civicrm_im',
           'entity' => 'IM',

@@ -35,7 +35,7 @@
  * This class generates form components for the display preferences.
  */
 class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
-  protected $_settings = array(
+  protected $_settings = [
     'cvv_backoffice_required' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'update_contribution_on_membership_type_change' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'acl_financial_type' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
@@ -43,7 +43,7 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
     'deferred_revenue_enabled' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'default_invoice_page' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
     'invoicing' => CRM_Core_BAO_Setting::CONTRIBUTE_PREFERENCES_NAME,
-  );
+  ];
 
   /**
    * Our standards for settings are to have a setting per value with defined metadata.

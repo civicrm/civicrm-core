@@ -81,7 +81,7 @@ class CRM_Utils_ConsoleTee {
    */
   public function start($mode = 'w') {
     $this->fh = fopen($this->fileName, $mode);
-    ob_start(array($this, 'onOutput'));
+    ob_start([$this, 'onOutput']);
     return $this;
   }
 

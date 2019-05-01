@@ -19,14 +19,14 @@ class CRM_Case_DAO_CaseActivity extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_case_activity';
+  public static $_tableName = 'civicrm_case_activity';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Unique case-activity association id
@@ -65,7 +65,7 @@ class CRM_Case_DAO_CaseActivity extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'case_id', 'civicrm_case', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'activity_id', 'civicrm_activity', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -87,6 +87,7 @@ class CRM_Case_DAO_CaseActivity extends CRM_Core_DAO {
           'title' => ts('Case Activity ID'),
           'description' => ts('Unique case-activity association id'),
           'required' => TRUE,
+          'where' => 'civicrm_case_activity.id',
           'table_name' => 'civicrm_case_activity',
           'entity' => 'CaseActivity',
           'bao' => 'CRM_Case_DAO_CaseActivity',
@@ -98,6 +99,7 @@ class CRM_Case_DAO_CaseActivity extends CRM_Core_DAO {
           'title' => ts('Case'),
           'description' => ts('Case ID of case-activity association.'),
           'required' => TRUE,
+          'where' => 'civicrm_case_activity.case_id',
           'table_name' => 'civicrm_case_activity',
           'entity' => 'CaseActivity',
           'bao' => 'CRM_Case_DAO_CaseActivity',
@@ -110,6 +112,7 @@ class CRM_Case_DAO_CaseActivity extends CRM_Core_DAO {
           'title' => ts('Activity ID'),
           'description' => ts('Activity ID of case-activity association.'),
           'required' => TRUE,
+          'where' => 'civicrm_case_activity.activity_id',
           'table_name' => 'civicrm_case_activity',
           'entity' => 'CaseActivity',
           'bao' => 'CRM_Case_DAO_CaseActivity',

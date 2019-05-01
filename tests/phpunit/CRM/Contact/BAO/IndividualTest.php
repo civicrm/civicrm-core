@@ -58,8 +58,10 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
       'first_name' => 'Ben',
       'last_name' => 'Lee',
-      'prefix_id' => 4, // this is the doctor
-      'suffix_id' => 2, // and the doctor is a senior
+      // this is the doctor
+      'prefix_id' => 4,
+      // and the doctor is a senior
+      'suffix_id' => 2,
     );
 
     $contact = new CRM_Contact_DAO_Contact();

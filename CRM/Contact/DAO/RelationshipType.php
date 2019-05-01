@@ -19,14 +19,14 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_relationship_type';
+  public static $_tableName = 'civicrm_relationship_type';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Primary key
@@ -134,6 +134,7 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
           'title' => ts('Relationship Type ID'),
           'description' => ts('Primary key'),
           'required' => TRUE,
+          'where' => 'civicrm_relationship_type.id',
           'table_name' => 'civicrm_relationship_type',
           'entity' => 'RelationshipType',
           'bao' => 'CRM_Contact_BAO_RelationshipType',
@@ -146,6 +147,7 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
           'description' => ts('name for relationship of contact_a to contact_b.'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_relationship_type.name_a_b',
           'table_name' => 'civicrm_relationship_type',
           'entity' => 'RelationshipType',
           'bao' => 'CRM_Contact_BAO_RelationshipType',
@@ -158,6 +160,7 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
           'description' => ts('label for relationship of contact_a to contact_b.'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_relationship_type.label_a_b',
           'table_name' => 'civicrm_relationship_type',
           'entity' => 'RelationshipType',
           'bao' => 'CRM_Contact_BAO_RelationshipType',
@@ -173,6 +176,7 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
           'description' => ts('Optional name for relationship of contact_b to contact_a.'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_relationship_type.name_b_a',
           'table_name' => 'civicrm_relationship_type',
           'entity' => 'RelationshipType',
           'bao' => 'CRM_Contact_BAO_RelationshipType',
@@ -185,6 +189,7 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
           'description' => ts('Optional label for relationship of contact_b to contact_a.'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_relationship_type.label_b_a',
           'table_name' => 'civicrm_relationship_type',
           'entity' => 'RelationshipType',
           'bao' => 'CRM_Contact_BAO_RelationshipType',
@@ -200,6 +205,7 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
           'description' => ts('Optional verbose description of the relationship type.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_relationship_type.description',
           'table_name' => 'civicrm_relationship_type',
           'entity' => 'RelationshipType',
           'bao' => 'CRM_Contact_BAO_RelationshipType',
@@ -215,6 +221,7 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
           'description' => ts('If defined, contact_a in a relationship of this type must be a specific contact_type.'),
           'maxlength' => 12,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_relationship_type.contact_type_a',
           'table_name' => 'civicrm_relationship_type',
           'entity' => 'RelationshipType',
           'bao' => 'CRM_Contact_BAO_RelationshipType',
@@ -236,6 +243,7 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
           'description' => ts('If defined, contact_b in a relationship of this type must be a specific contact_type.'),
           'maxlength' => 12,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_relationship_type.contact_type_b',
           'table_name' => 'civicrm_relationship_type',
           'entity' => 'RelationshipType',
           'bao' => 'CRM_Contact_BAO_RelationshipType',
@@ -258,6 +266,7 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
     '),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_relationship_type.contact_sub_type_a',
           'table_name' => 'civicrm_relationship_type',
           'entity' => 'RelationshipType',
           'bao' => 'CRM_Contact_BAO_RelationshipType',
@@ -280,6 +289,7 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
     '),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_relationship_type.contact_sub_type_b',
           'table_name' => 'civicrm_relationship_type',
           'entity' => 'RelationshipType',
           'bao' => 'CRM_Contact_BAO_RelationshipType',
@@ -299,6 +309,7 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Relationship Type is Reserved'),
           'description' => ts('Is this relationship type a predefined system type (can not be changed or de-activated)?'),
+          'where' => 'civicrm_relationship_type.is_reserved',
           'table_name' => 'civicrm_relationship_type',
           'entity' => 'RelationshipType',
           'bao' => 'CRM_Contact_BAO_RelationshipType',
@@ -313,6 +324,7 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
           'title' => ts('Relationship Type is Active'),
           'description' => ts('Is this relationship type currently active (i.e. can be used when creating or editing relationships)?
     '),
+          'where' => 'civicrm_relationship_type.is_active',
           'default' => '1',
           'table_name' => 'civicrm_relationship_type',
           'entity' => 'RelationshipType',

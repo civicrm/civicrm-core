@@ -54,12 +54,11 @@ class api_v3_DashboardContactTest extends CiviUnitTestCase {
     );
     $dashresult = $this->callAPISuccess('dashboard', 'create', $dashParams);
     $contact = $this->callAPISuccess('contact', 'create', array(
-        'first_name' => 'abc1',
-        'contact_type' => 'Individual',
-        'last_name' => 'xyz1',
-        'email' => 'abc@abc.com',
-      )
-    );
+      'first_name' => 'abc1',
+      'contact_type' => 'Individual',
+      'last_name' => 'xyz1',
+      'email' => 'abc@abc.com',
+    ));
     $oldCount = CRM_Core_DAO::singleValueQuery("select count(*) from civicrm_dashboard_contact where contact_id = {$contact['id']} AND is_active = 1 AND dashboard_id = {$dashresult['id']}");
     $params = array(
       'version' => 3,

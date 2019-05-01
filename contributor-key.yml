@@ -56,6 +56,9 @@
 - github      : alexmarketaccess
   name        : Alex Block
 
+- github      : alexymik
+  name        : Alexy Mikhailichenko
+
 - github      : alifrumin
   name        : Alice Frumin
   organization: AGH Strategies
@@ -130,6 +133,10 @@
 - github      : autarch
   name        : Dave Rolsky
   jira        : autarch
+
+- github      : awasson
+  name        : Andrew Wasson
+  organization: Luna Design
 
 - github      : awzilkie
   name        : Adam Zilkie
@@ -991,6 +998,9 @@
   organization: CompuCorp
   jira        : mukesh
 
+- github      : mwestergaard
+  name        : Mark Westergaard
+
 - github      : nbrettell
   name        : Nathan Brettell
   jira        : nathan_b
@@ -1141,6 +1151,10 @@
 
 - github      : ray-wright
   name        : Ray Wright
+
+- github      : reecebenson
+  name        : Reece Benson
+  organization: Circle Interactive
 
 - name        : Renaee Churches
   organization: Play Australia

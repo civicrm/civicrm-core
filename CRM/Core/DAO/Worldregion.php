@@ -19,14 +19,14 @@ class CRM_Core_DAO_Worldregion extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_worldregion';
+  public static $_tableName = 'civicrm_worldregion';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Country Id
@@ -64,6 +64,7 @@ class CRM_Core_DAO_Worldregion extends CRM_Core_DAO {
           'title' => ts('World Region ID'),
           'description' => ts('Country Id'),
           'required' => TRUE,
+          'where' => 'civicrm_worldregion.id',
           'table_name' => 'civicrm_worldregion',
           'entity' => 'Worldregion',
           'bao' => 'CRM_Core_DAO_Worldregion',
@@ -76,10 +77,8 @@ class CRM_Core_DAO_Worldregion extends CRM_Core_DAO {
           'description' => ts('Region name to be associated with countries'),
           'maxlength' => 128,
           'size' => CRM_Utils_Type::HUGE,
-          'export' => TRUE,
           'where' => 'civicrm_worldregion.name',
-          'headerPattern' => '',
-          'dataPattern' => '',
+          'export' => TRUE,
           'table_name' => 'civicrm_worldregion',
           'entity' => 'Worldregion',
           'bao' => 'CRM_Core_DAO_Worldregion',

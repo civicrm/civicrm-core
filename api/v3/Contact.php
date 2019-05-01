@@ -524,7 +524,6 @@ function civicrm_api3_contact_delete($params) {
   }
 }
 
-
 /**
  * Check parameters passed in.
  *
@@ -549,12 +548,11 @@ function _civicrm_api3_contact_check_params(&$params) {
 
     case 'individual':
       civicrm_api3_verify_one_mandatory($params, NULL, [
-          'first_name',
-          'last_name',
-          'email',
-          'display_name',
-        ]
-      );
+        'first_name',
+        'last_name',
+        'email',
+        'display_name',
+      ]);
       break;
   }
 
@@ -1195,12 +1193,14 @@ function _civicrm_api3_contact_deprecation() {
  * @throws API_Exception
  */
 function civicrm_api3_contact_merge($params) {
-  if (($result = CRM_Dedupe_Merger::merge([
-      [
-        'srcID' => $params['to_remove_id'],
-        'dstID' => $params['to_keep_id'],
-      ],
-    ], [], $params['mode'])) != FALSE) {
+  if (($result = CRM_Dedupe_Merger::merge(
+    [['srcID' => $params['to_remove_id'], 'dstID' => $params['to_keep_id']]],
+    [],
+    $params['mode'],
+    FALSE,
+    CRM_Utils_Array::value('check_permissions', $params)
+    )) != FALSE) {
+
     return civicrm_api3_create_success($result, $params);
   }
   throw new API_Exception('Merge failed');
@@ -1451,7 +1451,6 @@ WHERE     $whereClause
 
   return civicrm_api3_create_success($contacts, $params, 'Contact', 'get_by_location', $dao);
 }
-
 
 /**
  * Get parameters for getlist function.

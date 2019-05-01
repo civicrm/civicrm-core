@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Core_Smarty_plugins_CrmMoneyTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
     require_once 'CRM/Core/Smarty.php';
@@ -23,7 +24,7 @@ class CRM_Core_Smarty_plugins_CrmMoneyTest extends CiviUnitTestCase {
     $cases[] = ['€ 1,234.00', '{assign var="amount" value="1234.00"}{$amount|crmMoney:EUR}'];
     $cases[] = [
       '$ <input size="10" style="background-color:#EBECE4" readonly="readonly" name="eachPaymentAmount" type="text" id="eachPaymentAmount" class="crm-form-text">',
-      '{assign var="amount" value=\'<input size="10" style="background-color:#EBECE4" readonly="readonly" name="eachPaymentAmount" type="text" id="eachPaymentAmount" class="crm-form-text">\'}{$amount|crmMoney:USD}'
+      '{assign var="amount" value=\'<input size="10" style="background-color:#EBECE4" readonly="readonly" name="eachPaymentAmount" type="text" id="eachPaymentAmount" class="crm-form-text">\'}{$amount|crmMoney:USD}',
     ];
     return $cases;
   }

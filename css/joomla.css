@@ -392,3 +392,8 @@ body.admin.com_civicrm #crm-nav-menu-container {
 body.admin.com_civicrm #content-right {
 	padding: 12px;
 }
+
+/* Make footer admin bar hide behind popup windows (CRM-15723) */
+body.ui-dialog-open #status {
+  z-index: 100 !important;
+}

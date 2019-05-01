@@ -19,14 +19,14 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_mailing_job';
+  public static $_tableName = 'civicrm_mailing_job';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned
@@ -119,7 +119,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'mailing_id', 'civicrm_mailing', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'parent_id', 'civicrm_mailing_job', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -140,6 +140,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Mailing Job ID'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_job.id',
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
           'bao' => 'CRM_Mailing_BAO_MailingJob',
@@ -151,6 +152,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'title' => ts('Mailing'),
           'description' => ts('The ID of the mailing this Job will send.'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_job.mailing_id',
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
           'bao' => 'CRM_Mailing_BAO_MailingJob',
@@ -163,6 +165,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'title' => ts('Mailing Scheduled Date'),
           'description' => ts('date on which this job was scheduled.'),
           'required' => FALSE,
+          'where' => 'civicrm_mailing_job.scheduled_date',
           'default' => 'NULL',
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
@@ -175,6 +178,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'title' => ts('Mailing Job Start Date'),
           'description' => ts('date on which this job was started.'),
           'required' => FALSE,
+          'where' => 'civicrm_mailing_job.start_date',
           'default' => 'NULL',
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
@@ -187,6 +191,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'title' => ts('Mailing Job End Date'),
           'description' => ts('date on which this job ended.'),
           'required' => FALSE,
+          'where' => 'civicrm_mailing_job.end_date',
           'default' => 'NULL',
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
@@ -200,6 +205,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'description' => ts('The state of this job'),
           'maxlength' => 12,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_mailing_job.status',
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
           'bao' => 'CRM_Mailing_BAO_MailingJob',
@@ -216,6 +222,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Mailing Job Is Test?'),
           'description' => ts('Is this job for a test mail?'),
+          'where' => 'civicrm_mailing_job.is_test',
           'default' => '0',
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
@@ -229,6 +236,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'description' => ts('Type of mailling job: null | child '),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_mailing_job.job_type',
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
           'bao' => 'CRM_Mailing_BAO_MailingJob',
@@ -239,6 +247,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Mailing Job Parent'),
           'description' => ts('Parent job id'),
+          'where' => 'civicrm_mailing_job.parent_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
@@ -251,6 +260,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Mailing Job Offset'),
           'description' => ts('Offset of the child job'),
+          'where' => 'civicrm_mailing_job.job_offset',
           'default' => '0',
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',
@@ -262,6 +272,7 @@ class CRM_Mailing_DAO_MailingJob extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Mailing Job Limit'),
           'description' => ts('Queue size limit for each child job'),
+          'where' => 'civicrm_mailing_job.job_limit',
           'default' => '0',
           'table_name' => 'civicrm_mailing_job',
           'entity' => 'MailingJob',

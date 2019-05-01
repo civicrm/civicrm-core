@@ -35,6 +35,7 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
   protected $session_id;
   protected $nocms_contact_id;
   protected $old_api_keys;
+  protected $adminContactId;
 
   /**
    * @param $apiResult
@@ -96,104 +97,122 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
 
     // entity,action: omit apiKey, valid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "entity" => "Contact",
         "action" => "get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
       ),
-      1, // is_error
+      // is_error
+      1,
     );
 
     // entity,action: valid apiKey, valid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "entity" => "Contact",
         "action" => "get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
         "api_key" => self::getApiKey(),
       ),
-      0, // is_error
+      // is_error
+      0,
     );
 
     // entity,action: bad apiKey, valid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "entity" => "Contact",
         "action" => "get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
         "api_key" => 'garbage_' . self::getApiKey(),
       ),
-      1, // is_error
+      // is_error
+      1,
     );
 
     // entity,action: valid apiKey, invalid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "entity" => "Contactses",
         "action" => "get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
         "api_key" => self::getApiKey(),
       ),
-      1, // is_error
+      // is_error
+      1,
     );
 
     // q=civicrm/entity/action: omit apiKey, valid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "q" => "civicrm/contact/get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
       ),
-      1, // is_error
+      // is_error
+      1,
     );
 
     // q=civicrm/entity/action: valid apiKey, valid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "q" => "civicrm/contact/get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
         "api_key" => self::getApiKey(),
       ),
-      0, // is_error
+      // is_error
+      0,
     );
 
     // q=civicrm/entity/action: invalid apiKey, valid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "q" => "civicrm/contact/get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
         "api_key" => 'garbage_' . self::getApiKey(),
       ),
-      1, // is_error
+      // is_error
+      1,
     );
 
     // q=civicrm/entity/action: valid apiKey, invalid entity+action
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "q" => "civicrm/contactses/get",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
         "api_key" => self::getApiKey(),
       ),
-      1, // is_error
+      // is_error
+      1,
     );
 
     // q=civicrm/entity/action: valid apiKey, invalid entity+action
     // XXX Actually Ping is valid, no?
     $cases[] = array(
-      array(// query
+      // query
+      array(
         "q" => "civicrm/ping",
         "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
         "json" => "1",
         "api_key" => self::getApiKey(),
       ),
-      0, // is_error
+      // is_error
+      0,
     );
 
     return $cases;
@@ -255,6 +274,31 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
   }
 
   /**
+   * Submit a request with an API key that exists but does not correspond to.
+   * a real user. Submit in "?entity=X&action=X" notation
+   */
+  public function testGetCorrectUserBack() {
+    $this->updateAdminApiKey();
+    $client = CRM_Utils_HttpClient::singleton();
+
+    //Create contact with api_key
+    // The key associates with a real contact but not a real user
+    $params = array(
+      "entity" => "Contact",
+      "action" => "get",
+      "key" => $GLOBALS['_CV']['CIVI_SITE_KEY'],
+      "json" => "1",
+      "api_key" => self::getApiKey(),
+      "id" => "user_contact_id",
+    );
+    list($status, $data) = $client->post($this->getRestUrl(), $params);
+    $this->assertEquals(CRM_Utils_HttpClient::STATUS_OK, $status);
+    $result = json_decode($data, TRUE);
+    $this->assertNotNull($result);
+    $this->assertEquals($result['id'], $this->adminContactId);
+  }
+
+  /**
    * Submit a request with an API key that exists but does not correspond to
    * a real user. Submit in "?q=civicrm/$entity/$action" notation
    */
@@ -287,15 +331,14 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
 
   protected function updateAdminApiKey() {
     /** @var int $adminContactId */
-    $adminContactId = civicrm_api3('contact', 'getvalue', array(
+    $this->adminContactId = civicrm_api3('contact', 'getvalue', array(
       'id' => '@user:' . $GLOBALS['_CV']['ADMIN_USER'],
       'return' => 'id',
     ));
 
-    $this->old_api_keys[$adminContactId] = CRM_Core_DAO::singleValueQuery('SELECT api_key FROM civicrm_contact WHERE id = %1',
-      array(
-        1 => array($adminContactId, 'Positive'),
-      ));
+    $this->old_api_keys[$this->adminContactId] = CRM_Core_DAO::singleValueQuery('SELECT api_key FROM civicrm_contact WHERE id = %1', [
+      1 => [$this->adminContactId, 'Positive'],
+    ]);
 
     //$this->old_admin_api_key = civicrm_api3('Contact', 'get', array(
     //  'id' => $adminContactId,
@@ -303,7 +346,7 @@ class E2E_Extern_RestTest extends CiviEndToEndTestCase {
     //));
 
     civicrm_api3('Contact', 'create', array(
-      'id' => $adminContactId,
+      'id' => $this->adminContactId,
       'api_key' => self::getApiKey(),
     ));
   }

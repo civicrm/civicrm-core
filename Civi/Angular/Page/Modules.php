@@ -102,14 +102,14 @@ class Modules extends \CRM_Core_Page {
    * @return string
    */
   public function digestJs($files) {
-    $scripts = array();
+    $scripts = [];
     foreach ($files as $file) {
       $scripts[] = file_get_contents($file);
     }
     $scripts = \CRM_Utils_JS::dedupeClosures(
       $scripts,
-      array('angular', '$', '_'),
-      array('angular', 'CRM.$', 'CRM._')
+      ['angular', '$', '_'],
+      ['angular', 'CRM.$', 'CRM._']
     );
     // This impl of stripComments currently adds 10-20ms and cuts ~7%
     return \CRM_Utils_JS::stripComments(implode("\n", $scripts));
@@ -144,10 +144,10 @@ class Modules extends \CRM_Core_Page {
    */
   public function getMetadata($moduleNames, $angular) {
     $modules = $angular->getModules();
-    $result = array();
+    $result = [];
     foreach ($moduleNames as $moduleName) {
       if (isset($modules[$moduleName])) {
-        $result[$moduleName] = array();
+        $result[$moduleName] = [];
         $result[$moduleName]['domain'] = $modules[$moduleName]['ext'];
         $result[$moduleName]['js'] = $angular->getResources($moduleName, 'js', 'rawUrl');
         $result[$moduleName]['css'] = $angular->getResources($moduleName, 'css', 'rawUrl');

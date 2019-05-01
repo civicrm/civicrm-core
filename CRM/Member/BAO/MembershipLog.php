@@ -74,7 +74,7 @@ UPDATE civicrm_membership_log
    SET modified_id = null
  WHERE modified_id = %1";
 
-    $params = array(1 => array($contactID, 'Integer'));
+    $params = [1 => [$contactID, 'Integer']];
     CRM_Core_DAO::executeQuery($query, $params);
   }
 

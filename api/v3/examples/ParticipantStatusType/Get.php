@@ -6,7 +6,7 @@
  *   API result array
  */
 function participant_status_type_get_example() {
-  $params = array(
+  $params = [
     'name' => 'test status',
     'label' => 'I am a test',
     'class' => 'Positive',
@@ -15,7 +15,7 @@ function participant_status_type_get_example() {
     'is_counted' => 1,
     'visibility_id' => 1,
     'weight' => 10,
-  );
+  ];
 
   try{
     $result = civicrm_api3('ParticipantStatusType', 'get', $params);
@@ -25,12 +25,12 @@ function participant_status_type_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -44,13 +44,13 @@ function participant_status_type_get_example() {
  */
 function participant_status_type_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 18,
-    'values' => array(
-      '18' => array(
+    'values' => [
+      '18' => [
         'id' => '18',
         'name' => 'test status',
         'label' => 'I am a test',
@@ -60,9 +60,9 @@ function participant_status_type_get_expectedresult() {
         'is_counted' => '1',
         'weight' => '10',
         'visibility_id' => '1',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

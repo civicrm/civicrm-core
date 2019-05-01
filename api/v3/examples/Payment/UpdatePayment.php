@@ -8,12 +8,12 @@
  *   API result array
  */
 function payment_create_example() {
-  $params = array(
+  $params = [
     'contribution_id' => 1,
     'total_amount' => 100,
     'id' => 3,
     'check_permissions' => TRUE,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Payment', 'create', $params);
@@ -23,12 +23,12 @@ function payment_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -42,13 +42,13 @@ function payment_create_example() {
  */
 function payment_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 5,
-    'values' => array(
-      '5' => array(
+    'values' => [
+      '5' => [
         'id' => '5',
         'from_financial_account_id' => '7',
         'to_financial_account_id' => '6',
@@ -62,9 +62,9 @@ function payment_create_expectedresult() {
         'trxn_result_code' => '',
         'status_id' => '1',
         'payment_processor_id' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

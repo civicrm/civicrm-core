@@ -59,6 +59,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Prefix for the controller.
+   * @var string
    */
   protected $_prefix = "activity_";
 
@@ -198,16 +199,16 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
     if (!empty($_POST)) {
       $this->_formValues = $this->controller->exportValues($this->_name);
-      $specialParams = array(
+      $specialParams = [
         'activity_type_id',
         'status_id',
         'priority_id',
         'activity_text',
-      );
-      $changeNames = array(
+      ];
+      $changeNames = [
         'status_id' => 'activity_status_id',
         'priority_id' => 'activity_priority_id',
-      );
+      ];
 
       CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams, $changeNames);
     }

@@ -19,14 +19,14 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_relationship';
+  public static $_tableName = 'civicrm_relationship';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Relationship ID
@@ -121,7 +121,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id_a', 'civicrm_contact', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id_b', 'civicrm_contact', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'relationship_type_id', 'civicrm_relationship_type', 'id');
@@ -145,6 +145,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'title' => ts('Relationship ID'),
           'description' => ts('Relationship ID'),
           'required' => TRUE,
+          'where' => 'civicrm_relationship.id',
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
@@ -156,6 +157,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'title' => ts('Contact A'),
           'description' => ts('id of the first contact'),
           'required' => TRUE,
+          'where' => 'civicrm_relationship.contact_id_a',
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
@@ -168,6 +170,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'title' => ts('Contact B'),
           'description' => ts('id of the second contact'),
           'required' => TRUE,
+          'where' => 'civicrm_relationship.contact_id_b',
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
@@ -183,6 +186,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'title' => ts('Relationship Type'),
           'description' => ts('id of the relationship'),
           'required' => TRUE,
+          'where' => 'civicrm_relationship.relationship_type_id',
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
@@ -197,6 +201,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_DATE,
           'title' => ts('Relationship Start Date'),
           'description' => ts('date when the relationship started'),
+          'where' => 'civicrm_relationship.start_date',
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
@@ -211,6 +216,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_DATE,
           'title' => ts('Relationship End Date'),
           'description' => ts('date when the relationship ended'),
+          'where' => 'civicrm_relationship.end_date',
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
@@ -225,6 +231,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Relationship Is Active'),
           'description' => ts('is the relationship active ?'),
+          'where' => 'civicrm_relationship.is_active',
           'default' => '1',
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
@@ -241,6 +248,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'description' => ts('Optional verbose description for the relationship.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_relationship.description',
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
           'bao' => 'CRM_Contact_BAO_Relationship',
@@ -255,6 +263,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'title' => ts('Contact A has Permission Over Contact B'),
           'description' => ts('Permission that Contact A has to view/update Contact B'),
           'required' => TRUE,
+          'where' => 'civicrm_relationship.is_permission_a_b',
           'default' => '0',
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
@@ -273,6 +282,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'title' => ts('Contact B has Permission Over Contact A'),
           'description' => ts('Permission that Contact B has to view/update Contact A'),
           'required' => TRUE,
+          'where' => 'civicrm_relationship.is_permission_b_a',
           'default' => '0',
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',
@@ -290,6 +300,7 @@ class CRM_Contact_DAO_Relationship extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Relationship Case'),
           'description' => ts('FK to civicrm_case'),
+          'where' => 'civicrm_relationship.case_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_relationship',
           'entity' => 'Relationship',

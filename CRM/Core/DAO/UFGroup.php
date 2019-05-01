@@ -19,14 +19,14 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_uf_group';
+  public static $_tableName = 'civicrm_uf_group';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Unique table ID
@@ -231,7 +231,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'limit_listings_group_id', 'civicrm_group', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'add_to_group_id', 'civicrm_group', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'created_id', 'civicrm_contact', 'id');
@@ -254,6 +254,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'title' => ts('Profile ID'),
           'description' => ts('Unique table ID'),
           'required' => TRUE,
+          'where' => 'civicrm_uf_group.id',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
@@ -264,6 +265,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Profile Is Active'),
           'description' => ts('Is this form currently active? If false, hide all related fields for all sharing contexts.'),
+          'where' => 'civicrm_uf_group.is_active',
           'default' => '1',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
@@ -279,8 +281,6 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'size' => CRM_Utils_Type::HUGE,
           'import' => TRUE,
           'where' => 'civicrm_uf_group.group_type',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
@@ -296,6 +296,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_uf_group.title',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
@@ -311,6 +312,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'description' => ts('Profile Form Public title'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_uf_group.frontend_title',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
@@ -326,6 +328,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'description' => ts('Optional verbose description of the profile.'),
           'rows' => 2,
           'cols' => 60,
+          'where' => 'civicrm_uf_group.description',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
@@ -341,6 +344,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'description' => ts('Description and/or help text to display before fields in form.'),
           'rows' => 4,
           'cols' => 80,
+          'where' => 'civicrm_uf_group.help_pre',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
@@ -356,6 +360,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'description' => ts('Description and/or help text to display after fields in form.'),
           'rows' => 4,
           'cols' => 80,
+          'where' => 'civicrm_uf_group.help_post',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
@@ -369,6 +374,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Profile Search Limit Group'),
           'description' => ts('Group id, foreign key from civicrm_group'),
+          'where' => 'civicrm_uf_group.limit_listings_group_id',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
@@ -382,6 +388,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'description' => ts('Redirect to URL.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_uf_group.post_URL',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
@@ -392,6 +399,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Add Contact To Group'),
           'description' => ts('foreign key to civicrm_group_id'),
+          'where' => 'civicrm_uf_group.add_to_group_id',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
@@ -403,6 +411,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Show Captcha On Profile'),
           'description' => ts('Should a CAPTCHA widget be included this Profile form.'),
+          'where' => 'civicrm_uf_group.add_captcha',
           'default' => '0',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
@@ -414,6 +423,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Map Profile'),
           'description' => ts('Do we want to map results from this profile.'),
+          'where' => 'civicrm_uf_group.is_map',
           'default' => '0',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
@@ -425,6 +435,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Show Edit Link?'),
           'description' => ts('Should edit link display in profile selector'),
+          'where' => 'civicrm_uf_group.is_edit_link',
           'default' => '0',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
@@ -436,6 +447,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Show Link to CMS User'),
           'description' => ts('Should we display a link to the website profile in profile selector'),
+          'where' => 'civicrm_uf_group.is_uf_link',
           'default' => '0',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
@@ -447,6 +459,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Update on Duplicate'),
           'description' => ts('Should we update the contact record if we find a duplicate'),
+          'where' => 'civicrm_uf_group.is_update_dupe',
           'default' => '0',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
@@ -460,6 +473,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'description' => ts('Redirect to URL when Cancle button clik .'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_uf_group.cancel_URL',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
@@ -470,6 +484,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Create CMS User?'),
           'description' => ts('Should we create a cms user for this profile '),
+          'where' => 'civicrm_uf_group.is_cms_user',
           'default' => '0',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
@@ -480,6 +495,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'name' => 'notify',
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Notify on Profile Submit'),
+          'where' => 'civicrm_uf_group.notify',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
@@ -490,6 +506,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Profile Is Reserved'),
           'description' => ts('Is this group reserved for use by some other CiviCRM functionality?'),
+          'where' => 'civicrm_uf_group.is_reserved',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
@@ -502,6 +519,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'description' => ts('Name of the UF group for directly addressing it in the codebase'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_uf_group.name',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
@@ -512,6 +530,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Profile Created By'),
           'description' => ts('FK to civicrm_contact, who created this UF group'),
+          'where' => 'civicrm_uf_group.created_id',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
@@ -523,6 +542,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           'title' => ts('UF Group Created Date'),
           'description' => ts('Date and time this UF group was created.'),
+          'where' => 'civicrm_uf_group.created_date',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
           'bao' => 'CRM_Core_BAO_UFGroup',
@@ -533,6 +553,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Include Proximity Search?'),
           'description' => ts('Should we include proximity search feature in this profile search form?'),
+          'where' => 'civicrm_uf_group.is_proximity_search',
           'default' => '0',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
@@ -546,6 +567,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'description' => ts('Custom Text to display on the Cancel button when used in create or edit mode'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_uf_group.cancel_button_text',
           'default' => 'NULL',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
@@ -562,6 +584,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'description' => ts('Custom Text to display on the submit button on profile edit/create screens'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_uf_group.submit_button_text',
           'default' => 'NULL',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',
@@ -576,6 +599,7 @@ class CRM_Core_DAO_UFGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Include Cancel Button'),
           'description' => ts('Should a Cancel button be included in this Profile form.'),
+          'where' => 'civicrm_uf_group.add_cancel_button',
           'default' => '1',
           'table_name' => 'civicrm_uf_group',
           'entity' => 'UFGroup',

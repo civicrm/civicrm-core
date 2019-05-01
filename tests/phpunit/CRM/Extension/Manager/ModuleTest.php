@@ -140,7 +140,8 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     $this->assertHookCounts('test_extension_manager_module_auto1', array(
       'install' => 1,
       'enable' => 1,
-      'disable' => 0, // normally called -- but not for missing modules!
+      // normally called -- but not for missing modules!
+      'disable' => 0,
       'uninstall' => 0,
     ));
     $this->assertModuleActiveByName(FALSE, 'test_extension_manager_module_auto1');
@@ -150,8 +151,10 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     $this->assertHookCounts('test_extension_manager_module_auto1', array(
       'install' => 1,
       'enable' => 1,
-      'disable' => 0, // normally called -- but not for missing modules!
-      'uninstall' => 0, // normally called -- but not for missing modules!
+      // normally called -- but not for missing modules!
+      'disable' => 0,
+      // normally called -- but not for missing modules!
+      'uninstall' => 0,
     ));
     $this->assertEquals('unknown', $manager->getStatus('test.extension.manager.module.auto1'));
     $this->assertModuleActiveByName(FALSE, 'test_extension_manager_module_auto1');
@@ -193,7 +196,8 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
     $this->assertHookCounts('test_extension_manager_module_auto2', array(
       'install' => 1,
       'enable' => 1,
-      'disable' => 0, // normally called -- but not for missing modules!
+      // normally called -- but not for missing modules!
+      'disable' => 0,
       'uninstall' => 0,
     ));
     $this->assertModuleActiveByName(FALSE, 'test_extension_manager_module_auto2');
@@ -233,7 +237,8 @@ class CRM_Extension_Manager_ModuleTest extends CiviUnitTestCase {
    * @param $prefix
    */
   public function assertModuleActiveByName($expectedIsActive, $prefix) {
-    $activeModules = CRM_Core_PseudoConstant::getModuleExtensions(TRUE); // FIXME
+    // FIXME
+    $activeModules = CRM_Core_PseudoConstant::getModuleExtensions(TRUE);
     foreach ($activeModules as $activeModule) {
       if ($activeModule['prefix'] == $prefix) {
         $this->assertEquals($expectedIsActive, TRUE);

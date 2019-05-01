@@ -66,7 +66,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
    *   An empty array, or a list of warnings
    */
   public function checkCaseTypeNameConsistency() {
-    $messages = array();
+    $messages = [];
 
     foreach ($this->caseTypeNames as $caseTypeName) {
       $normalFile = $this->xmlRepo->findXmlFile($caseTypeName);
@@ -78,11 +78,11 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       elseif ($normalFile && $mungedFile) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__ . $caseTypeName,
-          ts('Case type "%1" has duplicate XML files ("%2" and "%3")', array(
+          ts('Case type "%1" has duplicate XML files ("%2" and "%3")', [
             1 => $caseTypeName,
             2 => $normalFile,
             3 => $mungedFile,
-          )) .
+          ]) .
           '<br /><a href="' . CRM_Utils_System::getWikiBaseURL() . __FUNCTION__ . '">' .
           ts('Read more about this warning') .
           '</a>',
@@ -97,11 +97,11 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       elseif (!$normalFile && $mungedFile) {
         $messages[] = new CRM_Utils_Check_Message(
           __FUNCTION__ . $caseTypeName,
-          ts('Case type "%1" corresponds to XML file ("%2") The XML file should be named "%3".', array(
+          ts('Case type "%1" corresponds to XML file ("%2") The XML file should be named "%3".', [
             1 => $caseTypeName,
             2 => $mungedFile,
             3 => "{$caseTypeName}.xml",
-          )) .
+          ]) .
           '<br /><a href="' . CRM_Utils_System::getWikiBaseURL() . __FUNCTION__ . '">' .
           ts('Read more about this warning') .
           '</a>',
@@ -125,7 +125,7 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
    *   An empty array, or a list of warnings
    */
   public function checkNullTimestamps() {
-    $messages = array();
+    $messages = [];
 
     $nullCount = 0;
     $nullCount += CRM_Utils_SQL_Select::from('civicrm_activity')
@@ -143,15 +143,15 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
       $messages[] = new CRM_Utils_Check_Message(
         __FUNCTION__,
         '<p>' .
-        ts('The tables "<em>civicrm_activity</em>" and "<em>civicrm_case</em>" were updated to support two new fields, "<em>created_date</em>" and "<em>modified_date</em>". For historical data, these fields may appear blank. (%1 records have NULL timestamps.)', array(
+        ts('The tables "<em>civicrm_activity</em>" and "<em>civicrm_case</em>" were updated to support two new fields, "<em>created_date</em>" and "<em>modified_date</em>". For historical data, these fields may appear blank. (%1 records have NULL timestamps.)', [
           1 => $nullCount,
-        )) .
+        ]) .
         '</p><p>' .
         ts('At time of writing, this is not a problem. However, future extensions and improvements could rely on these fields, so it may be useful to back-fill them.') .
         '</p><p>' .
-        ts('For further discussion, please visit %1', array(
+        ts('For further discussion, please visit %1', [
           1 => sprintf('<a href="%s" target="_blank">%s</a>', self::DOCTOR_WHEN, self::DOCTOR_WHEN),
-        )) .
+        ]) .
         '</p>',
         ts('Timestamps for Activities and Cases'),
         \Psr\Log\LogLevel::NOTICE,

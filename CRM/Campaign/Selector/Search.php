@@ -41,20 +41,20 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    */
-  static $_columnHeaders;
+  public static $_columnHeaders;
 
   /**
    * Properties of contact we're interested in displaying
    * @var array
    */
-  static $_properties = array(
+  public static $_properties = [
     'contact_id',
     'sort_name',
     'street_unit',
@@ -71,7 +71,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
     'survey_activity_id',
     'survey_activity_target_id',
     'survey_activity_target_contact_id',
-  );
+  ];
 
   /**
    * Are we restricting ourselves to a single contact
@@ -178,8 +178,8 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
    *
    * @return array
    */
-  static public function &links() {
-    return self::$_links = array();
+  public static function &links() {
+    return self::$_links = [];
   }
 
   /**
@@ -241,11 +241,11 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
     );
 
     // process the result of the query
-    $rows = array();
+    $rows = [];
 
     while ($result->fetch()) {
       $this->_query->convertToPseudoNames($result);
-      $row = array();
+      $row = [];
       // the columns we are interested in
       foreach (self::$_properties as $property) {
         if (property_exists($result, $property)) {
@@ -322,40 +322,40 @@ FROM {$sql['from']}
    *   the column headers that need to be displayed
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
-    self::$_columnHeaders = array();
+    self::$_columnHeaders = [];
 
     if (!$this->_single) {
-      $contactDetails = array(
-        array(
+      $contactDetails = [
+        [
           'name' => ts('Contact Name'),
           'sort' => 'sort_name',
           'direction' => CRM_Utils_Sort::ASCENDING,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Street Number'),
           'sort' => 'street_number',
-        ),
-        array(
+        ],
+        [
           'name' => ts('Street Name'),
           'sort' => 'street_name',
-        ),
-        array('name' => ts('Street Address')),
-        array(
+        ],
+        ['name' => ts('Street Address')],
+        [
           'name' => ts('City'),
           'sort' => 'city',
-        ),
-        array(
+        ],
+        [
           'name' => ts('Postal Code'),
           'sort' => 'postal_code',
-        ),
-        array(
+        ],
+        [
           'name' => ts('State'),
           'sort' => 'state_province_name',
-        ),
-        array('name' => ts('Country')),
-        array('name' => ts('Email')),
-        array('name' => ts('Phone')),
-      );
+        ],
+        ['name' => ts('Country')],
+        ['name' => ts('Email')],
+        ['name' => ts('Phone')],
+      ];
       self::$_columnHeaders = array_merge($contactDetails, self::$_columnHeaders);
     }
 

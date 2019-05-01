@@ -19,14 +19,14 @@ class CRM_Event_Cart_DAO_Cart extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_event_carts';
+  public static $_tableName = 'civicrm_event_carts';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Cart Id
@@ -63,7 +63,7 @@ class CRM_Event_Cart_DAO_Cart extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'user_id', 'civicrm_contact', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -84,6 +84,7 @@ class CRM_Event_Cart_DAO_Cart extends CRM_Core_DAO {
           'title' => ts('Cart ID'),
           'description' => ts('Cart Id'),
           'required' => TRUE,
+          'where' => 'civicrm_event_carts.id',
           'table_name' => 'civicrm_event_carts',
           'entity' => 'Cart',
           'bao' => 'CRM_Event_Cart_BAO_Cart',
@@ -94,6 +95,7 @@ class CRM_Event_Cart_DAO_Cart extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Created By'),
           'description' => ts('FK to civicrm_contact who created this cart'),
+          'where' => 'civicrm_event_carts.user_id',
           'table_name' => 'civicrm_event_carts',
           'entity' => 'Cart',
           'bao' => 'CRM_Event_Cart_BAO_Cart',
@@ -104,6 +106,7 @@ class CRM_Event_Cart_DAO_Cart extends CRM_Core_DAO {
           'name' => 'completed',
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Complete?'),
+          'where' => 'civicrm_event_carts.completed',
           'default' => '0',
           'table_name' => 'civicrm_event_carts',
           'entity' => 'Cart',

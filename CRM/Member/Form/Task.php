@@ -61,7 +61,7 @@ class CRM_Member_Form_Task extends CRM_Core_Form_Task {
    * @param CRM_Core_Form $form
    */
   public static function preProcessCommon(&$form) {
-    $form->_memberIds = array();
+    $form->_memberIds = [];
 
     $values = $form->controller->exportValues($form->get('searchFormName'));
 
@@ -72,7 +72,7 @@ class CRM_Member_Form_Task extends CRM_Core_Form_Task {
     }
     $form->assign('taskName', $tasks[$form->_task]);
 
-    $ids = array();
+    $ids = [];
     if ($values['radio_ts'] == 'ts_sel') {
       foreach ($values as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
@@ -148,17 +148,17 @@ class CRM_Member_Form_Task extends CRM_Core_Form_Task {
    * @return void
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => $nextType,
         'name' => $title,
         'isDefault' => TRUE,
-      ),
-      array(
+      ],
+      [
         'type' => $backType,
         'name' => ts('Cancel'),
-      ),
-    ));
+      ],
+    ]);
   }
 
 }

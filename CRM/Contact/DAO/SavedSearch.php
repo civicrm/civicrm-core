@@ -19,14 +19,14 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_saved_search';
+  public static $_tableName = 'civicrm_saved_search';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Saved Search ID
@@ -93,7 +93,7 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'mapping_id', 'civicrm_mapping', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -114,6 +114,7 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
           'title' => ts('Saved Search ID'),
           'description' => ts('Saved Search ID'),
           'required' => TRUE,
+          'where' => 'civicrm_saved_search.id',
           'table_name' => 'civicrm_saved_search',
           'entity' => 'SavedSearch',
           'bao' => 'CRM_Contact_BAO_SavedSearch',
@@ -126,8 +127,6 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
           'description' => ts('Submitted form values for this search'),
           'import' => TRUE,
           'where' => 'civicrm_saved_search.form_values',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_saved_search',
           'entity' => 'SavedSearch',
@@ -140,6 +139,7 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Mapping ID'),
           'description' => ts('Foreign key to civicrm_mapping used for saved search-builder searches.'),
+          'where' => 'civicrm_saved_search.mapping_id',
           'table_name' => 'civicrm_saved_search',
           'entity' => 'SavedSearch',
           'bao' => 'CRM_Contact_BAO_SavedSearch',
@@ -151,6 +151,7 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Option Value ID'),
           'description' => ts('Foreign key to civicrm_option value table used for saved custom searches.'),
+          'where' => 'civicrm_saved_search.search_custom_id',
           'table_name' => 'civicrm_saved_search',
           'entity' => 'SavedSearch',
           'bao' => 'CRM_Contact_BAO_SavedSearch',
@@ -161,6 +162,7 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Where Clause'),
           'description' => ts('the sql where clause if a saved search acl'),
+          'where' => 'civicrm_saved_search.where_clause',
           'table_name' => 'civicrm_saved_search',
           'entity' => 'SavedSearch',
           'bao' => 'CRM_Contact_BAO_SavedSearch',
@@ -171,6 +173,7 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Select Tables'),
           'description' => ts('the tables to be included in a select data'),
+          'where' => 'civicrm_saved_search.select_tables',
           'table_name' => 'civicrm_saved_search',
           'entity' => 'SavedSearch',
           'bao' => 'CRM_Contact_BAO_SavedSearch',
@@ -182,6 +185,7 @@ class CRM_Contact_DAO_SavedSearch extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Where Tables'),
           'description' => ts('the tables to be included in the count statement'),
+          'where' => 'civicrm_saved_search.where_tables',
           'table_name' => 'civicrm_saved_search',
           'entity' => 'SavedSearch',
           'bao' => 'CRM_Contact_BAO_SavedSearch',

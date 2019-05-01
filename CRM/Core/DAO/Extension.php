@@ -19,14 +19,14 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_extension';
+  public static $_tableName = 'civicrm_extension';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Local Extension ID
@@ -104,6 +104,7 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'title' => ts('Extension ID'),
           'description' => ts('Local Extension ID'),
           'required' => TRUE,
+          'where' => 'civicrm_extension.id',
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',
           'bao' => 'CRM_Core_BAO_Extension',
@@ -116,6 +117,7 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 8,
           'size' => CRM_Utils_Type::EIGHT,
+          'where' => 'civicrm_extension.type',
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',
           'bao' => 'CRM_Core_BAO_Extension',
@@ -135,6 +137,7 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_extension.full_name',
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',
           'bao' => 'CRM_Core_BAO_Extension',
@@ -149,8 +152,6 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'size' => CRM_Utils_Type::HUGE,
           'import' => TRUE,
           'where' => 'civicrm_extension.name',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',
@@ -166,8 +167,6 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'size' => CRM_Utils_Type::HUGE,
           'import' => TRUE,
           'where' => 'civicrm_extension.label',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',
@@ -183,8 +182,6 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'size' => CRM_Utils_Type::HUGE,
           'import' => TRUE,
           'where' => 'civicrm_extension.file',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',
@@ -200,8 +197,6 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'size' => CRM_Utils_Type::BIG,
           'import' => TRUE,
           'where' => 'civicrm_extension.schema_version',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',
@@ -213,6 +208,7 @@ class CRM_Core_DAO_Extension extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Extension is Active?'),
           'description' => ts('Is this extension active?'),
+          'where' => 'civicrm_extension.is_active',
           'default' => '1',
           'table_name' => 'civicrm_extension',
           'entity' => 'Extension',

@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Core_BAO_OpenIDTest extends CiviUnitTestCase {
+
   public function tearDown() {
     // If we truncate only contact, then stale domain and openid records will be left.
     // If we truncate none of these tables, then contactDelete() will incrementally

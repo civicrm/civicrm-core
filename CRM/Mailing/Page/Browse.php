@@ -94,7 +94,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
       // If this is not an SMS page, check that the user has an appropriate
       // permission (specific permissions have been copied from
       // CRM/Mailing/xml/Menu/Mailing.xml)
-      if (!CRM_Core_Permission::check(array(array('access CiviMail', 'approve mailings', 'create mailings', 'schedule mailings')))) {
+      if (!CRM_Core_Permission::check([['access CiviMail', 'approve mailings', 'create mailings', 'schedule mailings']])) {
         CRM_Core_Error::fatal(ts('You do not have permission to view this page.'));
       }
     }
@@ -337,18 +337,18 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
    * @return string
    */
   public function whereClause(&$params, $sortBy = TRUE) {
-    $values = array();
+    $values = [];
 
-    $clauses = array();
+    $clauses = [];
     $title = $this->get('mailing_name');
     // echo " name=$title  ";
     if ($title) {
       $clauses[] = 'name LIKE %1';
       if (strpos($title, '%') !== FALSE) {
-        $params[1] = array($title, 'String', FALSE);
+        $params[1] = [$title, 'String', FALSE];
       }
       else {
-        $params[1] = array($title, 'String', TRUE);
+        $params[1] = [$title, 'String', TRUE];
       }
     }
 
@@ -361,7 +361,7 @@ class CRM_Mailing_Page_Browse extends CRM_Core_Page {
     $campainIds = $this->get('campaign_id');
     if (!CRM_Utils_System::isNull($campainIds)) {
       if (!is_array($campainIds)) {
-        $campaignIds = array($campaignIds);
+        $campaignIds = [$campaignIds];
       }
       $clauses[] = '( campaign_id IN ( ' . implode(' , ', array_values($campainIds)) . ' ) )';
     }

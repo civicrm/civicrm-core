@@ -19,14 +19,14 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_activity';
+  public static $_tableName = 'civicrm_activity';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Unique  Other Activity ID
@@ -223,7 +223,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'phone_id', 'civicrm_phone', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'parent_id', 'civicrm_activity', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'relationship_id', 'civicrm_relationship', 'id');
@@ -250,8 +250,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'required' => TRUE,
           'import' => TRUE,
           'where' => 'civicrm_activity.id',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
@@ -263,6 +261,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Source Record'),
           'description' => ts('Artificial FK to original transaction (e.g. contribution) IF it is not an Activity. Table can be figured out through activity_type_id, and further through component registry.'),
+          'where' => 'civicrm_activity.source_record_id',
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
@@ -277,7 +276,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_activity.activity_type_id',
           'headerPattern' => '/(activity.)?type(.id$)/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'default' => '1',
           'table_name' => 'civicrm_activity',
@@ -302,7 +300,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_activity.subject',
           'headerPattern' => '/(activity.)?subject/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
@@ -320,7 +317,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_activity.activity_date_time',
           'headerPattern' => '/(activity.)?date(.time$)?/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
@@ -339,7 +335,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_activity.duration',
           'headerPattern' => '/(activity.)?duration(s)?$/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
@@ -359,7 +354,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_activity.location',
           'headerPattern' => '/(activity.)?location$/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
@@ -374,6 +368,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Phone (called) ID'),
           'description' => ts('Phone ID of the number called (optional - used if an existing phone number is selected).'),
+          'where' => 'civicrm_activity.phone_id',
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
@@ -390,6 +385,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'description' => ts('Phone number in case the number does not exist in the civicrm_phone table.'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_activity.phone_number',
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
@@ -406,7 +402,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_activity.details',
           'headerPattern' => '/(activity.)?detail(s)?$/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
@@ -424,7 +419,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_activity.status_id',
           'headerPattern' => '/(activity.)?status(.label$)?/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
@@ -443,6 +437,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Priority'),
           'description' => ts('ID of the priority given to this activity. Foreign key to civicrm_option_value.'),
+          'where' => 'civicrm_activity.priority_id',
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
@@ -460,6 +455,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Parent Activity Id'),
           'description' => ts('Parent meeting ID (if this is a follow-up item). This is not currently implemented'),
+          'where' => 'civicrm_activity.parent_id',
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
@@ -473,7 +469,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_activity.is_test',
           'headerPattern' => '/(is.)?test(.activity)?/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'default' => '0',
           'table_name' => 'civicrm_activity',
@@ -489,6 +484,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Activity Medium'),
           'description' => ts('Activity Medium, Implicit FK to civicrm_option_value where option_group = encounter_medium.'),
+          'where' => 'civicrm_activity.medium_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
@@ -506,6 +502,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'name' => 'is_auto',
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Auto'),
+          'where' => 'civicrm_activity.is_auto',
           'default' => '0',
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
@@ -517,6 +514,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Relationship Id'),
           'description' => ts('FK to Relationship ID'),
+          'where' => 'civicrm_activity.relationship_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
@@ -531,7 +529,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_activity.is_current_revision',
           'headerPattern' => '/(is.)?(current.)?(revision|version(ing)?)/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'default' => '1',
           'table_name' => 'civicrm_activity',
@@ -547,6 +544,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Original Activity ID '),
           'description' => ts('Activity ID of the first activity record in versioning chain.'),
+          'where' => 'civicrm_activity.original_id',
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
@@ -560,6 +558,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'description' => ts('Currently being used to store result id for survey activity, FK to option value.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_activity.result',
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
@@ -575,7 +574,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_activity.is_deleted',
           'headerPattern' => '/(activity.)?(trash|deleted)/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'default' => '0',
           'table_name' => 'civicrm_activity',
@@ -593,8 +591,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'description' => ts('The campaign for which this activity has been triggered.'),
           'import' => TRUE,
           'where' => 'civicrm_activity.campaign_id',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
@@ -617,8 +613,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'description' => ts('Assign a specific level of engagement to this activity. Used for tracking constituents in ladder of engagement.'),
           'import' => TRUE,
           'where' => 'civicrm_activity.engagement_level',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
@@ -636,6 +630,7 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'name' => 'weight',
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Order'),
+          'where' => 'civicrm_activity.weight',
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
           'bao' => 'CRM_Activity_BAO_Activity',
@@ -652,7 +647,6 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_activity.is_star',
           'headerPattern' => '/(activity.)?(star|favorite)/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'default' => '0',
           'table_name' => 'civicrm_activity',
@@ -666,10 +660,8 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'title' => ts('Created Date'),
           'description' => ts('When was the activity was created.'),
           'required' => FALSE,
-          'export' => TRUE,
           'where' => 'civicrm_activity.created_date',
-          'headerPattern' => '',
-          'dataPattern' => '',
+          'export' => TRUE,
           'default' => 'NULL',
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',
@@ -682,10 +674,8 @@ class CRM_Activity_DAO_Activity extends CRM_Core_DAO {
           'title' => ts('Modified Date'),
           'description' => ts('When was the activity (or closely related entity) was created or modified or deleted.'),
           'required' => FALSE,
-          'export' => TRUE,
           'where' => 'civicrm_activity.modified_date',
-          'headerPattern' => '',
-          'dataPattern' => '',
+          'export' => TRUE,
           'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
           'table_name' => 'civicrm_activity',
           'entity' => 'Activity',

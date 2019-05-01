@@ -30,6 +30,7 @@
  * @group headless
  */
 class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
   }

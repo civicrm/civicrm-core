@@ -19,14 +19,14 @@ class CRM_Mailing_DAO_Recipients extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_mailing_recipients';
+  public static $_tableName = 'civicrm_mailing_recipients';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned
@@ -77,7 +77,7 @@ class CRM_Mailing_DAO_Recipients extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'mailing_id', 'civicrm_mailing', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id', 'civicrm_contact', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'email_id', 'civicrm_email', 'id');
@@ -100,6 +100,7 @@ class CRM_Mailing_DAO_Recipients extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Mailing Recipients ID'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_recipients.id',
           'table_name' => 'civicrm_mailing_recipients',
           'entity' => 'Recipients',
           'bao' => 'CRM_Mailing_BAO_Recipients',
@@ -111,6 +112,7 @@ class CRM_Mailing_DAO_Recipients extends CRM_Core_DAO {
           'title' => ts('Mailing'),
           'description' => ts('The ID of the mailing this Job will send.'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_recipients.mailing_id',
           'table_name' => 'civicrm_mailing_recipients',
           'entity' => 'Recipients',
           'bao' => 'CRM_Mailing_BAO_Recipients',
@@ -123,6 +125,7 @@ class CRM_Mailing_DAO_Recipients extends CRM_Core_DAO {
           'title' => ts('Mailing Recipient'),
           'description' => ts('FK to Contact'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_recipients.contact_id',
           'table_name' => 'civicrm_mailing_recipients',
           'entity' => 'Recipients',
           'bao' => 'CRM_Mailing_BAO_Recipients',
@@ -134,6 +137,7 @@ class CRM_Mailing_DAO_Recipients extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Recipient Email'),
           'description' => ts('FK to Email'),
+          'where' => 'civicrm_mailing_recipients.email_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_mailing_recipients',
           'entity' => 'Recipients',
@@ -146,6 +150,7 @@ class CRM_Mailing_DAO_Recipients extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Recipient Phone'),
           'description' => ts('FK to Phone'),
+          'where' => 'civicrm_mailing_recipients.phone_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_mailing_recipients',
           'entity' => 'Recipients',

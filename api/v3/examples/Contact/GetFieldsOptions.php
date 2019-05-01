@@ -8,12 +8,12 @@
  *   API result array
  */
 function contact_getfields_example() {
-  $params = array(
-    'options' => array(
+  $params = [
+    'options' => [
       'get_options' => 'custom_1',
-    ),
+    ],
     'action' => 'create',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Contact', 'getfields', $params);
@@ -23,12 +23,12 @@ function contact_getfields_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -42,12 +42,12 @@ function contact_getfields_example() {
  */
 function contact_getfields_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 55,
-    'values' => array(
-      'id' => array(
+    'values' => [
+      'id' => [
         'name' => 'id',
         'type' => 1,
         'title' => 'Contact ID',
@@ -60,11 +60,11 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'api.aliases' => array(
+        'api.aliases' => [
           '0' => 'contact_id',
-        ),
-      ),
-      'contact_type' => array(
+        ],
+      ],
+      'contact_type' => [
         'name' => 'contact_type',
         'type' => 2,
         'title' => 'Contact Type',
@@ -76,20 +76,20 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'maxlength' => 64,
           'size' => 30,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'table' => 'civicrm_contact_type',
           'keyColumn' => 'name',
           'labelColumn' => 'label',
           'condition' => 'parent_id IS NULL',
-        ),
+        ],
         'api.required' => 1,
-      ),
-      'contact_sub_type' => array(
+      ],
+      'contact_sub_type' => [
         'name' => 'contact_sub_type',
         'type' => 2,
         'title' => 'Contact Subtype',
@@ -103,19 +103,19 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'maxlength' => 255,
           'size' => 45,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'table' => 'civicrm_contact_type',
           'keyColumn' => 'name',
           'labelColumn' => 'label',
           'condition' => 'parent_id IS NOT NULL',
-        ),
-      ),
-      'do_not_email' => array(
+        ],
+      ],
+      'do_not_email' => [
         'name' => 'do_not_email',
         'type' => 16,
         'title' => 'Do Not Email',
@@ -127,11 +127,11 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'CheckBox',
-        ),
-      ),
-      'do_not_phone' => array(
+        ],
+      ],
+      'do_not_phone' => [
         'name' => 'do_not_phone',
         'type' => 16,
         'title' => 'Do Not Phone',
@@ -143,11 +143,11 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'CheckBox',
-        ),
-      ),
-      'do_not_mail' => array(
+        ],
+      ],
+      'do_not_mail' => [
         'name' => 'do_not_mail',
         'type' => 16,
         'title' => 'Do Not Mail',
@@ -159,11 +159,11 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'CheckBox',
-        ),
-      ),
-      'do_not_sms' => array(
+        ],
+      ],
+      'do_not_sms' => [
         'name' => 'do_not_sms',
         'type' => 16,
         'title' => 'Do Not Sms',
@@ -175,11 +175,11 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'CheckBox',
-        ),
-      ),
-      'do_not_trade' => array(
+        ],
+      ],
+      'do_not_trade' => [
         'name' => 'do_not_trade',
         'type' => 16,
         'title' => 'Do Not Trade',
@@ -191,11 +191,11 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'CheckBox',
-        ),
-      ),
-      'is_opt_out' => array(
+        ],
+      ],
+      'is_opt_out' => [
         'name' => 'is_opt_out',
         'type' => 16,
         'title' => 'No Bulk Emails (User Opt Out)',
@@ -207,11 +207,11 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'CheckBox',
-        ),
-      ),
-      'legal_identifier' => array(
+        ],
+      ],
+      'legal_identifier' => [
         'name' => 'legal_identifier',
         'type' => 2,
         'title' => 'Legal Identifier',
@@ -227,13 +227,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 32,
           'size' => 20,
-        ),
-      ),
-      'external_identifier' => array(
+        ],
+      ],
+      'external_identifier' => [
         'name' => 'external_identifier',
         'type' => 2,
         'title' => 'External Identifier',
@@ -248,13 +248,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 64,
           'size' => 8,
-        ),
-      ),
-      'sort_name' => array(
+        ],
+      ],
+      'sort_name' => [
         'name' => 'sort_name',
         'type' => 2,
         'title' => 'Sort Name',
@@ -266,13 +266,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 128,
           'size' => 30,
-        ),
-      ),
-      'display_name' => array(
+        ],
+      ],
+      'display_name' => [
         'name' => 'display_name',
         'type' => 2,
         'title' => 'Display Name',
@@ -284,13 +284,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 128,
           'size' => 30,
-        ),
-      ),
-      'nick_name' => array(
+        ],
+      ],
+      'nick_name' => [
         'name' => 'nick_name',
         'type' => 2,
         'title' => 'Nickname',
@@ -305,13 +305,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 128,
           'size' => 30,
-        ),
-      ),
-      'legal_name' => array(
+        ],
+      ],
+      'legal_name' => [
         'name' => 'legal_name',
         'type' => 2,
         'title' => 'Legal Name',
@@ -325,13 +325,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 128,
           'size' => 30,
-        ),
-      ),
-      'image_URL' => array(
+        ],
+      ],
+      'image_URL' => [
         'name' => 'image_URL',
         'type' => 32,
         'title' => 'Image Url',
@@ -342,13 +342,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'File',
           'rows' => 2,
           'cols' => 80,
-        ),
-      ),
-      'preferred_communication_method' => array(
+        ],
+      ],
+      'preferred_communication_method' => [
         'name' => 'preferred_communication_method',
         'type' => 2,
         'title' => 'Preferred Communication Method',
@@ -363,17 +363,17 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'maxlength' => 255,
           'size' => 45,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'optionGroupName' => 'preferred_communication_method',
           'optionEditPath' => 'civicrm/admin/options/preferred_communication_method',
-        ),
-      ),
-      'preferred_language' => array(
+        ],
+      ],
+      'preferred_language' => [
         'name' => 'preferred_language',
         'type' => 2,
         'title' => 'Preferred Language',
@@ -387,18 +387,18 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'maxlength' => 5,
           'size' => 6,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'optionGroupName' => 'languages',
           'keyColumn' => 'name',
           'optionEditPath' => 'civicrm/admin/options/languages',
-        ),
-      ),
-      'preferred_mail_format' => array(
+        ],
+      ],
+      'preferred_mail_format' => [
         'name' => 'preferred_mail_format',
         'type' => 2,
         'title' => 'Preferred Mail Format',
@@ -413,16 +413,16 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'maxlength' => 8,
           'size' => 8,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'callback' => 'CRM_Core_SelectValues::pmf',
-        ),
-      ),
-      'hash' => array(
+        ],
+      ],
+      'hash' => [
         'name' => 'hash',
         'type' => 2,
         'title' => 'Contact Hash',
@@ -434,8 +434,8 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-      ),
-      'api_key' => array(
+      ],
+      'api_key' => [
         'name' => 'api_key',
         'type' => 2,
         'title' => 'Api Key',
@@ -445,8 +445,8 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-      ),
-      'first_name' => array(
+      ],
+      'first_name' => [
         'name' => 'first_name',
         'type' => 2,
         'title' => 'First Name',
@@ -461,13 +461,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 64,
           'size' => 30,
-        ),
-      ),
-      'middle_name' => array(
+        ],
+      ],
+      'middle_name' => [
         'name' => 'middle_name',
         'type' => 2,
         'title' => 'Middle Name',
@@ -482,13 +482,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 64,
           'size' => 30,
-        ),
-      ),
-      'last_name' => array(
+        ],
+      ],
+      'last_name' => [
         'name' => 'last_name',
         'type' => 2,
         'title' => 'Last Name',
@@ -503,13 +503,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 64,
           'size' => 30,
-        ),
-      ),
-      'prefix_id' => array(
+        ],
+      ],
+      'prefix_id' => [
         'name' => 'prefix_id',
         'type' => 1,
         'title' => 'Individual Prefix',
@@ -522,21 +522,21 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'size' => 6,
           'maxlength' => 14,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'optionGroupName' => 'individual_prefix',
           'optionEditPath' => 'civicrm/admin/options/individual_prefix',
-        ),
-        'api.aliases' => array(
+        ],
+        'api.aliases' => [
           '0' => 'individual_prefix',
           '1' => 'individual_prefix_id',
-        ),
-      ),
-      'suffix_id' => array(
+        ],
+      ],
+      'suffix_id' => [
         'name' => 'suffix_id',
         'type' => 1,
         'title' => 'Individual Suffix',
@@ -549,21 +549,21 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'size' => 6,
           'maxlength' => 14,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'optionGroupName' => 'individual_suffix',
           'optionEditPath' => 'civicrm/admin/options/individual_suffix',
-        ),
-        'api.aliases' => array(
+        ],
+        'api.aliases' => [
           '0' => 'individual_suffix',
           '1' => 'individual_suffix_id',
-        ),
-      ),
-      'formal_title' => array(
+        ],
+      ],
+      'formal_title' => [
         'name' => 'formal_title',
         'type' => 2,
         'title' => 'Formal Title',
@@ -577,13 +577,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 64,
           'size' => 30,
-        ),
-      ),
-      'communication_style_id' => array(
+        ],
+      ],
+      'communication_style_id' => [
         'name' => 'communication_style_id',
         'type' => 1,
         'title' => 'Communication Style',
@@ -593,17 +593,17 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'size' => 6,
           'maxlength' => 14,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'optionGroupName' => 'communication_style',
           'optionEditPath' => 'civicrm/admin/options/communication_style',
-        ),
-      ),
-      'email_greeting_id' => array(
+        ],
+      ],
+      'email_greeting_id' => [
         'name' => 'email_greeting_id',
         'type' => 1,
         'title' => 'Email Greeting ID',
@@ -611,8 +611,8 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-      ),
-      'email_greeting_custom' => array(
+      ],
+      'email_greeting_custom' => [
         'name' => 'email_greeting_custom',
         'type' => 2,
         'title' => 'Email Greeting Custom',
@@ -624,13 +624,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 128,
           'size' => 45,
-        ),
-      ),
-      'email_greeting_display' => array(
+        ],
+      ],
+      'email_greeting_display' => [
         'name' => 'email_greeting_display',
         'type' => 2,
         'title' => 'Email Greeting',
@@ -640,13 +640,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 255,
           'size' => 45,
-        ),
-      ),
-      'postal_greeting_id' => array(
+        ],
+      ],
+      'postal_greeting_id' => [
         'name' => 'postal_greeting_id',
         'type' => 1,
         'title' => 'Postal Greeting ID',
@@ -654,13 +654,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'size' => 6,
           'maxlength' => 14,
-        ),
-      ),
-      'postal_greeting_custom' => array(
+        ],
+      ],
+      'postal_greeting_custom' => [
         'name' => 'postal_greeting_custom',
         'type' => 2,
         'title' => 'Postal Greeting Custom',
@@ -672,13 +672,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 128,
           'size' => 45,
-        ),
-      ),
-      'postal_greeting_display' => array(
+        ],
+      ],
+      'postal_greeting_display' => [
         'name' => 'postal_greeting_display',
         'type' => 2,
         'title' => 'Postal Greeting',
@@ -688,13 +688,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 255,
           'size' => 45,
-        ),
-      ),
-      'addressee_id' => array(
+        ],
+      ],
+      'addressee_id' => [
         'name' => 'addressee_id',
         'type' => 1,
         'title' => 'Addressee ID',
@@ -702,8 +702,8 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-      ),
-      'addressee_custom' => array(
+      ],
+      'addressee_custom' => [
         'name' => 'addressee_custom',
         'type' => 2,
         'title' => 'Addressee Custom',
@@ -715,13 +715,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 128,
           'size' => 45,
-        ),
-      ),
-      'addressee_display' => array(
+        ],
+      ],
+      'addressee_display' => [
         'name' => 'addressee_display',
         'type' => 2,
         'title' => 'Addressee',
@@ -731,13 +731,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 255,
           'size' => 45,
-        ),
-      ),
-      'job_title' => array(
+        ],
+      ],
+      'job_title' => [
         'name' => 'job_title',
         'type' => 2,
         'title' => 'Job Title',
@@ -752,13 +752,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 255,
           'size' => 30,
-        ),
-      ),
-      'gender_id' => array(
+        ],
+      ],
+      'gender_id' => [
         'name' => 'gender_id',
         'type' => 1,
         'title' => 'Gender',
@@ -770,20 +770,20 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'size' => 6,
           'maxlength' => 14,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'optionGroupName' => 'gender',
           'optionEditPath' => 'civicrm/admin/options/gender',
-        ),
-        'api.aliases' => array(
+        ],
+        'api.aliases' => [
           '0' => 'gender',
-        ),
-      ),
-      'birth_date' => array(
+        ],
+      ],
+      'birth_date' => [
         'name' => 'birth_date',
         'type' => 4,
         'title' => 'Birth Date',
@@ -796,12 +796,12 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Select Date',
           'format' => 'birth',
-        ),
-      ),
-      'is_deceased' => array(
+        ],
+      ],
+      'is_deceased' => [
         'name' => 'is_deceased',
         'type' => 16,
         'title' => 'Deceased',
@@ -812,11 +812,11 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'CheckBox',
-        ),
-      ),
-      'deceased_date' => array(
+        ],
+      ],
+      'deceased_date' => [
         'name' => 'deceased_date',
         'type' => 4,
         'title' => 'Deceased Date',
@@ -828,12 +828,12 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Select Date',
           'format' => 'birth',
-        ),
-      ),
-      'household_name' => array(
+        ],
+      ],
+      'household_name' => [
         'name' => 'household_name',
         'type' => 2,
         'title' => 'Household Name',
@@ -848,13 +848,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 128,
           'size' => 30,
-        ),
-      ),
-      'primary_contact_id' => array(
+        ],
+      ],
+      'primary_contact_id' => [
         'name' => 'primary_contact_id',
         'type' => 1,
         'title' => 'Household Primary Contact ID',
@@ -863,14 +863,14 @@ function contact_getfields_expectedresult() {
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
         'FKClassName' => 'CRM_Contact_DAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'size' => 6,
           'maxlength' => 14,
-        ),
+        ],
         'FKApiName' => 'Contact',
-      ),
-      'organization_name' => array(
+      ],
+      'organization_name' => [
         'name' => 'organization_name',
         'type' => 2,
         'title' => 'Organization Name',
@@ -885,13 +885,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 128,
           'size' => 30,
-        ),
-      ),
-      'sic_code' => array(
+        ],
+      ],
+      'sic_code' => [
         'name' => 'sic_code',
         'type' => 2,
         'title' => 'Sic Code',
@@ -905,13 +905,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 8,
           'size' => 8,
-        ),
-      ),
-      'user_unique_id' => array(
+        ],
+      ],
+      'user_unique_id' => [
         'name' => 'user_unique_id',
         'type' => 2,
         'title' => 'Unique ID (OpenID)',
@@ -927,13 +927,13 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 255,
           'size' => 45,
-        ),
-      ),
-      'created_date' => array(
+        ],
+      ],
+      'created_date' => [
         'name' => 'created_date',
         'type' => 256,
         'title' => 'Created Date',
@@ -945,8 +945,8 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-      ),
-      'modified_date' => array(
+      ],
+      'modified_date' => [
         'name' => 'modified_date',
         'type' => 256,
         'title' => 'Modified Date',
@@ -958,8 +958,8 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-      ),
-      'source' => array(
+      ],
+      'source' => [
         'name' => 'source',
         'type' => 2,
         'title' => 'Contact Source',
@@ -973,14 +973,14 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'Text',
           'maxlength' => 255,
           'size' => 30,
-        ),
+        ],
         'uniqueName' => 'contact_source',
-      ),
-      'employer_id' => array(
+      ],
+      'employer_id' => [
         'name' => 'employer_id',
         'type' => 1,
         'title' => 'Current Employer',
@@ -991,15 +991,15 @@ function contact_getfields_expectedresult() {
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
         'FKClassName' => 'CRM_Contact_DAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'EntityRef',
           'size' => 6,
           'maxlength' => 14,
-        ),
+        ],
         'uniqueName' => 'current_employer_id',
         'FKApiName' => 'Contact',
-      ),
-      'is_deleted' => array(
+      ],
+      'is_deleted' => [
         'name' => 'is_deleted',
         'type' => 16,
         'title' => 'Contact is in Trash',
@@ -1009,12 +1009,12 @@ function contact_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'Contact',
         'bao' => 'CRM_Contact_BAO_Contact',
-        'html' => array(
+        'html' => [
           'type' => 'CheckBox',
-        ),
+        ],
         'uniqueName' => 'contact_is_deleted',
-      ),
-      'custom_1' => array(
+      ],
+      'custom_1' => [
         'label' => 'Our special field',
         'groupTitle' => 'select_test_g',
         'data_type' => 'String',
@@ -1035,32 +1035,32 @@ function contact_getfields_expectedresult() {
         'is_required' => '1',
         'table_name' => 'civicrm_value_select_test_g_1',
         'column_name' => 'our_special_field_1',
-        'pseudoconstant' => array(
+        'pseudoconstant' => [
           'optionGroupName' => 'our_special_field_20170207021937',
           'optionEditPath' => 'civicrm/admin/options/our_special_field_20170207021937',
-        ),
+        ],
         'name' => 'custom_1',
         'title' => 'Our special field',
         'type' => 2,
-        'options' => array(
+        'options' => [
           '1' => 'Label1',
           '2' => 'Label2',
-        ),
-      ),
-      'current_employer' => array(
+        ],
+      ],
+      'current_employer' => [
         'title' => 'Current Employer',
         'description' => 'Name of Current Employer',
         'type' => 2,
         'name' => 'current_employer',
-      ),
-      'dupe_check' => array(
+      ],
+      'dupe_check' => [
         'title' => 'Check for Duplicates',
         'description' => 'Throw error if contact create matches dedupe rule',
         'type' => 16,
         'name' => 'dupe_check',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

@@ -19,14 +19,14 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_membership';
+  public static $_tableName = 'civicrm_membership';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Membership Id
@@ -150,7 +150,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id', 'civicrm_contact', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'membership_type_id', 'civicrm_membership_type', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'status_id', 'civicrm_membership_status', 'id');
@@ -179,7 +179,6 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_membership.id',
           'headerPattern' => '/^(m(embership\s)?id)$/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
@@ -215,7 +214,6 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_membership.membership_type_id',
           'headerPattern' => '/^(m(embership\s)?type)$/i',
-          'dataPattern' => '',
           'export' => FALSE,
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
@@ -297,7 +295,6 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_membership.source',
           'headerPattern' => '/^(member(ship?))?source$/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
@@ -316,7 +313,6 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_membership.status_id',
           'headerPattern' => '/(member(ship|).)?(status)$/i',
-          'dataPattern' => '',
           'export' => FALSE,
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
@@ -340,7 +336,6 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_membership.is_override',
           'headerPattern' => '/override$/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
@@ -357,8 +352,6 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'description' => ts('Then end date of membership status override if \'Override until selected date\' override type is selected.'),
           'import' => TRUE,
           'where' => 'civicrm_membership.status_override_end_date',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'default' => 'NULL',
           'table_name' => 'civicrm_membership',
@@ -374,10 +367,8 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Primary Member ID'),
           'description' => ts('Optional FK to Parent Membership.'),
-          'export' => TRUE,
           'where' => 'civicrm_membership.owner_membership_id',
-          'headerPattern' => '',
-          'dataPattern' => '',
+          'export' => TRUE,
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
@@ -389,6 +380,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Max Related'),
           'description' => ts('Maximum number of related memberships (membership_type override).'),
+          'where' => 'civicrm_membership.max_related',
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
@@ -404,7 +396,6 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_membership.is_test',
           'headerPattern' => '/(is.)?test(.member(ship)?)?/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'default' => '0',
           'table_name' => 'civicrm_membership',
@@ -422,7 +413,6 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_membership.is_pay_later',
           'headerPattern' => '/(is.)?(pay(.)?later)$/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'default' => '0',
           'table_name' => 'civicrm_membership',
@@ -438,6 +428,7 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Membership Recurring Contribution'),
           'description' => ts('Conditional foreign key to civicrm_contribution_recur id. Each membership in connection with a recurring contribution carries a foreign key to the recurring contribution record. This assumes we can track these processor initiated events.'),
+          'where' => 'civicrm_membership.contribution_recur_id',
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',
           'bao' => 'CRM_Member_BAO_Membership',
@@ -451,8 +442,6 @@ class CRM_Member_DAO_Membership extends CRM_Core_DAO {
           'description' => ts('The campaign for which this membership is attached.'),
           'import' => TRUE,
           'where' => 'civicrm_membership.campaign_id',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_membership',
           'entity' => 'Membership',

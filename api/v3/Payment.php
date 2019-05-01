@@ -41,7 +41,7 @@
  *   Array of financial transactions which are payments, if error an array with an error id and error message
  */
 function civicrm_api3_payment_get($params) {
-  $financialTrxn = array();
+  $financialTrxn = [];
   $limit = '';
   if (isset($params['options']) && CRM_Utils_Array::value('limit', $params['options'])) {
     $limit = CRM_Utils_Array::value('limit', $params['options']);
@@ -49,7 +49,7 @@ function civicrm_api3_payment_get($params) {
   $params['options']['limit'] = 0;
   $eft = civicrm_api3('EntityFinancialTrxn', 'get', $params);
   if (!empty($eft['values'])) {
-    $eftIds = array();
+    $eftIds = [];
     foreach ($eft['values'] as $efts) {
       if (empty($efts['financial_trxn_id'])) {
         continue;
@@ -58,10 +58,10 @@ function civicrm_api3_payment_get($params) {
       $map[$efts['financial_trxn_id']] = $efts['entity_id'];
     }
     if (!empty($eftIds)) {
-      $ftParams = array(
-        'id' => array('IN' => $eftIds),
+      $ftParams = [
+        'id' => ['IN' => $eftIds],
         'is_payment' => 1,
-      );
+      ];
       if ($limit) {
         $ftParams['options']['limit'] = $limit;
       }
@@ -71,7 +71,7 @@ function civicrm_api3_payment_get($params) {
       }
     }
   }
-  return civicrm_api3_create_success(CRM_Utils_Array::value('values', $financialTrxn, array()), $params, 'Payment', 'get');
+  return civicrm_api3_create_success(CRM_Utils_Array::value('values', $financialTrxn, []), $params, 'Payment', 'get');
 }
 
 /**
@@ -99,20 +99,25 @@ function civicrm_api3_payment_delete(&$params) {
  *   Api result array
  */
 function civicrm_api3_payment_cancel(&$params) {
-  $eftParams = array(
+  $eftParams = [
     'entity_table' => 'civicrm_contribution',
     'financial_trxn_id' => $params['id'],
-  );
+  ];
   $entity = civicrm_api3('EntityFinancialTrxn', 'getsingle', $eftParams);
-  $contributionId = $entity['entity_id'];
-  $params['total_amount'] = $entity['amount'];
-  unset($params['id']);
 
-  $trxn = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionId, $params, 'refund', NULL, FALSE);
+  $paymentParams = [
+    'total_amount' => -$entity['amount'],
+    'contribution_id' => $entity['entity_id'],
+    'trxn_date' => CRM_Utils_Array::value('trxn_date', $params, 'now'),
+  ];
 
-  $values = array();
-  _civicrm_api3_object_to_array_unique_fields($trxn, $values[$trxn->id]);
-  return civicrm_api3_create_success($values, $params, 'Payment', 'cancel', $trxn);
+  foreach (['trxn_id', 'payment_instrument_id'] as $permittedParam) {
+    if (isset($params[$permittedParam])) {
+      $paymentParams[$permittedParam] = $params[$permittedParam];
+    }
+  }
+  $result = civicrm_api3('Payment', 'create', $paymentParams);
+  return civicrm_api3_create_success($result['values'], $params, 'Payment', 'cancel');
 }
 
 /**
@@ -134,7 +139,7 @@ function civicrm_api3_payment_create(&$params) {
   }
   $trxn = CRM_Financial_BAO_Payment::create($params);
 
-  $values = array();
+  $values = [];
   _civicrm_api3_object_to_array_unique_fields($trxn, $values[$trxn->id]);
   return civicrm_api3_create_success($values, $params, 'Payment', 'create', $trxn);
 }
@@ -148,28 +153,32 @@ function civicrm_api3_payment_create(&$params) {
  *   Array of parameters.
  */
 function _civicrm_api3_payment_create_spec(&$params) {
-  $params = array(
-    'contribution_id' => array(
-      'api.required' => 1 ,
+  $params = [
+    'contribution_id' => [
+      'api.required' => 1,
       'title' => 'Contribution ID',
       'type' => CRM_Utils_Type::T_INT,
-    ),
-    'total_amount' => array(
-      'api.required' => 1 ,
+    ],
+    'total_amount' => [
+      'api.required' => 1,
       'title' => 'Total Payment Amount',
       'type' => CRM_Utils_Type::T_FLOAT,
-    ),
-    'payment_processor_id' => array(
+    ],
+    'payment_processor_id' => [
       'title' => 'Payment Processor ID',
       'type' => CRM_Utils_Type::T_INT,
       'description' => ts('Payment processor ID - required for payment processor payments'),
-    ),
-    'id' => array(
+    ],
+    'id' => [
       'title' => 'Payment ID',
       'type' => CRM_Utils_Type::T_INT,
-      'api.aliases' => array('payment_id'),
-    ),
-  );
+      'api.aliases' => ['payment_id'],
+    ],
+    'trxn_date' => [
+      'title' => 'Cancel Date',
+      'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+    ],
+  ];
 }
 
 /**
@@ -181,21 +190,21 @@ function _civicrm_api3_payment_create_spec(&$params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_payment_get_spec(&$params) {
-  $params = array(
-    'contribution_id' => array(
+  $params = [
+    'contribution_id' => [
       'title' => 'Contribution ID',
       'type' => CRM_Utils_Type::T_INT,
-    ),
-    'entity_table' => array(
+    ],
+    'entity_table' => [
       'title' => 'Entity Table',
       'api.default' => 'civicrm_contribution',
-    ),
-    'entity_id' => array(
+    ],
+    'entity_id' => [
       'title' => 'Entity ID',
       'type' => CRM_Utils_Type::T_INT,
-      'api.aliases' => array('contribution_id'),
-    ),
-  );
+      'api.aliases' => ['contribution_id'],
+    ],
+  ];
 }
 
 /**
@@ -207,14 +216,14 @@ function _civicrm_api3_payment_get_spec(&$params) {
  *   Array of parameters.
  */
 function _civicrm_api3_payment_delete_spec(&$params) {
-  $params = array(
-    'id' => array(
-      'api.required' => 1 ,
+  $params = [
+    'id' => [
+      'api.required' => 1,
       'title' => 'Payment ID',
       'type' => CRM_Utils_Type::T_INT,
-      'api.aliases' => array('payment_id'),
-    ),
-  );
+      'api.aliases' => ['payment_id'],
+    ],
+  ];
 }
 
 /**
@@ -226,14 +235,18 @@ function _civicrm_api3_payment_delete_spec(&$params) {
  *   Array of parameters.
  */
 function _civicrm_api3_payment_cancel_spec(&$params) {
-  $params = array(
-    'id' => array(
-      'api.required' => 1 ,
+  $params = [
+    'id' => [
+      'api.required' => 1,
       'title' => 'Payment ID',
       'type' => CRM_Utils_Type::T_INT,
-      'api.aliases' => array('payment_id'),
-    ),
-  );
+      'api.aliases' => ['payment_id'],
+    ],
+    'trxn_date' => [
+      'title' => 'Cancel Date',
+      'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
+    ],
+  ];
 }
 
 /**
@@ -263,7 +276,8 @@ function civicrm_api3_payment_sendconfirmation($params) {
       'subject' => $result[1],
       'message_txt' => $result[2],
       'message_html' => $result[3],
-  ]]);
+    ],
+  ]);
 }
 
 /**
@@ -275,9 +289,9 @@ function civicrm_api3_payment_sendconfirmation($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_payment_sendconfirmation_spec(&$params) {
-  $params['id'] = array(
+  $params['id'] = [
     'api.required' => 1,
     'title' => ts('Payment ID'),
     'type' => CRM_Utils_Type::T_INT,
-  );
+  ];
 }

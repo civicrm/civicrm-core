@@ -19,14 +19,14 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_setting';
+  public static $_tableName = 'civicrm_setting';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned
@@ -105,7 +105,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'domain_id', 'civicrm_domain', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id', 'civicrm_contact', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'component_id', 'civicrm_component', 'id');
@@ -128,6 +128,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Setting ID'),
           'required' => TRUE,
+          'where' => 'civicrm_setting.id',
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
@@ -140,6 +141,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'description' => ts('Unique name for setting'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_setting.name',
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
@@ -150,6 +152,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Value'),
           'description' => ts('data associated with this group / name combo'),
+          'where' => 'civicrm_setting.value',
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
@@ -162,6 +165,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'title' => ts('Setting Domain'),
           'description' => ts('Which Domain is this menu item for'),
           'required' => TRUE,
+          'where' => 'civicrm_setting.domain_id',
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
@@ -178,6 +182,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Setting Contact'),
           'description' => ts('FK to Contact ID if the setting is localized to a contact'),
+          'where' => 'civicrm_setting.contact_id',
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
@@ -189,6 +194,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is Domain Setting?'),
           'description' => ts('Is this setting a contact specific or site wide setting?'),
+          'where' => 'civicrm_setting.is_domain',
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
@@ -199,6 +205,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Setting Component'),
           'description' => ts('Component that this menu item belongs to'),
+          'where' => 'civicrm_setting.component_id',
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
@@ -218,6 +225,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           'title' => ts('Setting Created Date'),
           'description' => ts('When was the setting created'),
+          'where' => 'civicrm_setting.created_date',
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',
@@ -228,6 +236,7 @@ class CRM_Core_DAO_Setting extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Setting Created By'),
           'description' => ts('FK to civicrm_contact, who created this setting'),
+          'where' => 'civicrm_setting.created_id',
           'table_name' => 'civicrm_setting',
           'entity' => 'Setting',
           'bao' => 'CRM_Core_BAO_Setting',

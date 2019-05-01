@@ -78,21 +78,21 @@ class CRM_Campaign_Form_Search_Survey extends CRM_Core_Form {
     //activity Type id
     $surveyTypes = CRM_Campaign_BAO_Survey::getSurveyActivityType();
     $this->add('select', 'activity_type_id',
-      ts('Activity Type'), array(
+      ts('Activity Type'), [
         '' => ts('- select -'),
-      ) + $surveyTypes
+      ] + $surveyTypes
     );
     $this->set('surveyTypes', $surveyTypes);
     $this->assign('surveyTypes', json_encode($surveyTypes));
 
     //campaigns
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
-    $this->add('select', 'survey_campaign_id', ts('Campaign'), array('' => ts('- select -')) + $campaigns);
+    $this->add('select', 'survey_campaign_id', ts('Campaign'), ['' => ts('- select -')] + $campaigns);
     $this->set('surveyCampaigns', $campaigns);
     $this->assign('surveyCampaigns', json_encode($campaigns));
 
     //build the array of all search params.
-    $this->_searchParams = array();
+    $this->_searchParams = [];
     foreach ($this->_elements as $element) {
       $name = $element->_attributes['name'];
       $label = $element->_label;

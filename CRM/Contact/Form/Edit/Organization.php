@@ -68,11 +68,11 @@ class CRM_Contact_Form_Edit_Organization {
     }
 
     if (!$inlineEditMode) {
-      $form->addField('external_identifier', array('label' => ts('External ID')));
+      $form->addField('external_identifier', ['label' => ts('External ID')]);
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),
         'objectExists',
-        array('CRM_Contact_DAO_Contact', $form->_contactId, 'external_identifier')
+        ['CRM_Contact_DAO_Contact', $form->_contactId, 'external_identifier']
       );
     }
   }
@@ -85,7 +85,7 @@ class CRM_Contact_Form_Edit_Organization {
    * @return array|bool
    */
   public static function formRule($fields, $files, $contactID = NULL) {
-    $errors = array();
+    $errors = [];
     $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID, 'Organization');
 
     // make sure that organization name is set

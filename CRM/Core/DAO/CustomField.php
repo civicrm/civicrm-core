@@ -19,14 +19,14 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_custom_field';
+  public static $_tableName = 'civicrm_custom_field';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Unique Custom Field ID
@@ -254,7 +254,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'custom_group_id', 'civicrm_custom_group', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'option_group_id', 'civicrm_option_group', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -276,6 +276,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'title' => ts('Custom Field ID'),
           'description' => ts('Unique Custom Field ID'),
           'required' => TRUE,
+          'where' => 'civicrm_custom_field.id',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -287,6 +288,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'title' => ts('Custom Group'),
           'description' => ts('FK to civicrm_custom_group.'),
           'required' => TRUE,
+          'where' => 'civicrm_custom_field.custom_group_id',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -308,6 +310,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'description' => ts('Variable name/programmatic handle for this group.'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_custom_field.name',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -321,6 +324,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_custom_field.label',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -334,6 +338,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 16,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_custom_field.data_type',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -353,6 +358,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 32,
           'size' => CRM_Utils_Type::MEDIUM,
+          'where' => 'civicrm_custom_field.html_type',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -368,6 +374,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'description' => ts('Use form_options.is_default for field_types which use options.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_custom_field.default_value',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -378,6 +385,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Custom Field Is Required?'),
           'description' => ts('Is a value required for this property.'),
+          'where' => 'civicrm_custom_field.is_required',
           'default' => '0',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
@@ -389,6 +397,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Allow Searching on Field?'),
           'description' => ts('Is this property searchable.'),
+          'where' => 'civicrm_custom_field.is_searchable',
           'default' => '0',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
@@ -400,6 +409,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Search as a Range'),
           'description' => ts('Is this property range searchable.'),
+          'where' => 'civicrm_custom_field.is_search_range',
           'default' => '0',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
@@ -412,6 +422,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'title' => ts('Order'),
           'description' => ts('Controls field display order within an extended property group.'),
           'required' => TRUE,
+          'where' => 'civicrm_custom_field.weight',
           'default' => '1',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
@@ -423,6 +434,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Custom Field Pre Text'),
           'description' => ts('Description and/or help text to display before this field.'),
+          'where' => 'civicrm_custom_field.help_pre',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -433,6 +445,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Custom Field Post Text'),
           'description' => ts('Description and/or help text to display after this field.'),
+          'where' => 'civicrm_custom_field.help_post',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -445,6 +458,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'description' => ts('Optional format instructions for specific field types, like date types.'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_custom_field.mask',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -457,6 +471,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'description' => ts('Store collection of type-appropriate attributes, e.g. textarea  needs rows/cols attributes'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_custom_field.attributes',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -469,6 +484,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'description' => ts('Optional scripting attributes for field.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_custom_field.javascript',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -479,6 +495,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Custom Field Is Active?'),
           'description' => ts('Is this property active?'),
+          'where' => 'civicrm_custom_field.is_active',
           'default' => '1',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
@@ -490,6 +507,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Field is Viewable'),
           'description' => ts('Is this property set by PHP Code? A code field is viewable but not editable'),
+          'where' => 'civicrm_custom_field.is_view',
           'default' => '0',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
@@ -501,6 +519,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Field Options Per Line'),
           'description' => ts('number of options per line for checkbox and radio'),
+          'where' => 'civicrm_custom_field.options_per_line',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -511,6 +530,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Field Length'),
           'description' => ts('field length if alphanumeric'),
+          'where' => 'civicrm_custom_field.text_length',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -521,6 +541,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Field Start Date'),
           'description' => ts('Date may be up to start_date_years years prior to the current date.'),
+          'where' => 'civicrm_custom_field.start_date_years',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -531,6 +552,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Field End Date'),
           'description' => ts('Date may be up to end_date_years years after the current date.'),
+          'where' => 'civicrm_custom_field.end_date_years',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -543,6 +565,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'description' => ts('date format for custom date'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_custom_field.date_format',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -553,6 +576,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Field Time Format'),
           'description' => ts('time format for custom date'),
+          'where' => 'civicrm_custom_field.time_format',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -563,6 +587,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Field Note Columns'),
           'description' => ts(' Number of columns in Note Field '),
+          'where' => 'civicrm_custom_field.note_columns',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -573,6 +598,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Field Note Rows'),
           'description' => ts(' Number of rows in Note Field '),
+          'where' => 'civicrm_custom_field.note_rows',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -585,6 +611,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'description' => ts('Name of the column that holds the values for this field.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_custom_field.column_name',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -595,6 +622,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Field Option Group'),
           'description' => ts('For elements with options, the option group id that is used'),
+          'where' => 'civicrm_custom_field.option_group_id',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -613,6 +641,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'description' => ts('Stores Contact Get API params contact reference custom fields. May be used for other filters in the future.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_custom_field.filter',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',
           'bao' => 'CRM_Core_BAO_CustomField',
@@ -623,6 +652,7 @@ class CRM_Core_DAO_CustomField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Field Display'),
           'description' => ts('Should the multi-record custom field values be displayed in tab table listing'),
+          'where' => 'civicrm_custom_field.in_selector',
           'default' => '0',
           'table_name' => 'civicrm_custom_field',
           'entity' => 'CustomField',

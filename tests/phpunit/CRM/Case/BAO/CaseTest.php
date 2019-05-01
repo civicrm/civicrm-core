@@ -31,6 +31,28 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
   }
 
+  /**
+   * Make sure that the latest case activity works accurately.
+   */
+  public function testCaseActivity() {
+    $userID = $this->createLoggedInUser();
+
+    $addTimeline = civicrm_api3('Case', 'addtimeline', [
+      'case_id' => 1,
+      'timeline' => "standard_timeline",
+    ]);
+
+    $query = CRM_Case_BAO_Case::getCaseActivityQuery('recent', $userID, ' civicrm_case.id IN( 1 )');
+    $res = CRM_Core_DAO::executeQuery($query);
+    $openCaseType = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
+    while ($res->fetch()) {
+      $message = 'Failed asserting that the case activity query has a activity_type_id property:';
+      $this->assertObjectHasAttribute('activity_type_id', $res, $message . PHP_EOL . print_r($res, TRUE));
+      $message = 'Failed asserting that the latest activity from Case ID 1 was "Open Case":';
+      $this->assertEquals($openCaseType, $res->activity_type_id, $message . PHP_EOL . print_r($res, TRUE));
+    }
+  }
+
   protected function tearDown() {
     parent::tearDown();
     $this->quickCleanup($this->tablesToTruncate, TRUE);

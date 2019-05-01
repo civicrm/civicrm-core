@@ -6,7 +6,7 @@
  *   API result array
  */
 function mail_settings_create_example() {
-  $params = array(
+  $params = [
     'domain_id' => 1,
     'name' => 'my mail setting',
     'domain' => 'setting.com',
@@ -15,7 +15,7 @@ function mail_settings_create_example() {
     'username' => 'sue',
     'password' => 'pass',
     'is_default' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('MailSettings', 'create', $params);
@@ -25,12 +25,12 @@ function mail_settings_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -44,13 +44,13 @@ function mail_settings_create_example() {
  */
 function mail_settings_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 5,
-    'values' => array(
-      '5' => array(
+    'values' => [
+      '5' => [
         'id' => '5',
         'domain_id' => '1',
         'name' => 'my mail setting',
@@ -65,9 +65,9 @@ function mail_settings_create_expectedresult() {
         'password' => 'pass',
         'is_ssl' => '',
         'source' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

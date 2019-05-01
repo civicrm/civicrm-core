@@ -4,7 +4,6 @@
  * Class CRM_Utils_Mail_EmailProcessorTest
  * @group headless
  */
-
 class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
 
   /**
@@ -61,7 +60,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $this->setUpMailing();
     $mail = 'test_invalid_character.eml';
 
-    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' .   $mail);
+    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
     $this->callAPISuccess('job', 'fetch_bounces', array());
     $this->assertFalse(file_exists(__DIR__ . '/data/mail/' . $mail));
     $this->checkMailingBounces(1);
@@ -74,7 +73,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $this->setUpMailing();
     $mail = 'test_utf8mb4_character.txt';
 
-    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' .   $mail);
+    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
     $this->callAPISuccess('job', 'fetch_bounces', array());
     $this->assertFalse(file_exists(__DIR__ . '/data/mail/' . $mail));
     $this->checkMailingBounces(1);
@@ -89,7 +88,7 @@ class CRM_Utils_Mail_EmailProcessorTest extends CiviUnitTestCase {
     $this->setUpMailing();
     $mail = 'test_sample_message.eml';
 
-    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' .   $mail);
+    copy(__DIR__ . '/data/bounces/' . $mail, __DIR__ . '/data/mail/' . $mail);
     $this->callAPISuccess('job', 'fetch_bounces', array());
     $this->assertFalse(file_exists(__DIR__ . '/data/mail/' . $mail));
     $this->checkMailingBounces(1);

@@ -43,6 +43,7 @@
  * @endcode
  */
 class CRM_Utils_FakeObject {
+
   /**
    * @param $array
    */

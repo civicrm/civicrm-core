@@ -19,14 +19,14 @@ class CRM_Mailing_DAO_MailingGroup extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_mailing_group';
+  public static $_tableName = 'civicrm_mailing_group';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned
@@ -91,7 +91,7 @@ class CRM_Mailing_DAO_MailingGroup extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'mailing_id', 'civicrm_mailing', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), 'entity_id', NULL, 'id', 'entity_table');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -112,6 +112,7 @@ class CRM_Mailing_DAO_MailingGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Mailing Group ID'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_group.id',
           'table_name' => 'civicrm_mailing_group',
           'entity' => 'MailingGroup',
           'bao' => 'CRM_Mailing_DAO_MailingGroup',
@@ -123,6 +124,7 @@ class CRM_Mailing_DAO_MailingGroup extends CRM_Core_DAO {
           'title' => ts('Mailing'),
           'description' => ts('The ID of a previous mailing to include/exclude recipients.'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_group.mailing_id',
           'table_name' => 'civicrm_mailing_group',
           'entity' => 'MailingGroup',
           'bao' => 'CRM_Mailing_DAO_MailingGroup',
@@ -136,6 +138,7 @@ class CRM_Mailing_DAO_MailingGroup extends CRM_Core_DAO {
           'description' => ts('Are the members of the group included or excluded?.'),
           'maxlength' => 8,
           'size' => CRM_Utils_Type::EIGHT,
+          'where' => 'civicrm_mailing_group.group_type',
           'table_name' => 'civicrm_mailing_group',
           'entity' => 'MailingGroup',
           'bao' => 'CRM_Mailing_DAO_MailingGroup',
@@ -155,6 +158,7 @@ class CRM_Mailing_DAO_MailingGroup extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_mailing_group.entity_table',
           'table_name' => 'civicrm_mailing_group',
           'entity' => 'MailingGroup',
           'bao' => 'CRM_Mailing_DAO_MailingGroup',
@@ -169,6 +173,7 @@ class CRM_Mailing_DAO_MailingGroup extends CRM_Core_DAO {
           'title' => ts('Mailing Group Entity'),
           'description' => ts('Foreign key to the referenced item.'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_group.entity_id',
           'table_name' => 'civicrm_mailing_group',
           'entity' => 'MailingGroup',
           'bao' => 'CRM_Mailing_DAO_MailingGroup',
@@ -179,6 +184,7 @@ class CRM_Mailing_DAO_MailingGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Mailing Group Search'),
           'description' => ts('The filtering search. custom search id or -1 for civicrm api search'),
+          'where' => 'civicrm_mailing_group.search_id',
           'table_name' => 'civicrm_mailing_group',
           'entity' => 'MailingGroup',
           'bao' => 'CRM_Mailing_DAO_MailingGroup',
@@ -189,6 +195,7 @@ class CRM_Mailing_DAO_MailingGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Mailing Group Search Arguments'),
           'description' => ts('The arguments to be sent to the search function'),
+          'where' => 'civicrm_mailing_group.search_args',
           'table_name' => 'civicrm_mailing_group',
           'entity' => 'MailingGroup',
           'bao' => 'CRM_Mailing_DAO_MailingGroup',

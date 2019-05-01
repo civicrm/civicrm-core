@@ -63,7 +63,7 @@ class CRM_Financial_BAO_Payment {
     // should be handled through Payment.create.
     $isSkipRecordingPaymentHereForLegacyHandlingReasons = ($contributionStatus == 'Pending' && $isPaymentCompletesContribution);
 
-    if (!$isSkipRecordingPaymentHereForLegacyHandlingReasons) {
+    if (!$isSkipRecordingPaymentHereForLegacyHandlingReasons && $params['total_amount'] > 0) {
       $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
 
       if (CRM_Utils_Array::value('line_item', $params) && !empty($trxn)) {
@@ -99,9 +99,12 @@ class CRM_Financial_BAO_Payment {
         CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn->id, $contribution['total_amount']);
       }
     }
+    elseif ($params['total_amount'] < 0) {
+      $trxn = self::recordRefundPayment($params['contribution_id'], $params, FALSE);
+    }
 
     if ($isPaymentCompletesContribution) {
-      civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
+      civicrm_api3('Contribution', 'completetransaction', ['id' => $contribution['id']]);
       // Get the trxn
       $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
       $ftParams = ['id' => $trxnId['financialTrxnId']];
@@ -129,7 +132,7 @@ class CRM_Financial_BAO_Payment {
   public static function sendConfirmation($params) {
 
     $entities = self::loadRelatedEntities($params['id']);
-    $sendTemplateParams = array(
+    $sendTemplateParams = [
       'groupName' => 'msg_tpl_workflow_contribution',
       'valueName' => 'payment_or_refund_notification',
       'PDFFilename' => ts('notification') . '.pdf',
@@ -137,7 +140,7 @@ class CRM_Financial_BAO_Payment {
       'toName' => $entities['contact']['display_name'],
       'toEmail' => $entities['contact']['email'],
       'tplParams' => self::getConfirmationTemplateParameters($entities),
-    );
+    ];
     return CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
   }
 
@@ -205,6 +208,7 @@ class CRM_Financial_BAO_Payment {
     ]);
     return (int) $contribution['contact_id'];
   }
+
   /**
    * @param array $entities
    *   Related entities as an array keyed by the various entities.
@@ -268,7 +272,7 @@ class CRM_Financial_BAO_Payment {
       'refundAmount',
       'totalPaid',
       'paymentsComplete',
-      'emailGreeting'
+      'emailGreeting',
     ];
     // These are assigned by the payment form - they still 'get through' from the
     // form for now without being in here but we should ideally load
@@ -310,7 +314,7 @@ class CRM_Financial_BAO_Payment {
     $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionDAO->financial_type_id, 'Accounts Receivable Account is');
     $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
 
-    $trxnData['total_amount'] = $trxnData['net_amount'] = -$trxnData['total_amount'];
+    $trxnData['total_amount'] = $trxnData['net_amount'] = $trxnData['total_amount'];
     $trxnData['from_financial_account_id'] = $arAccountId;
     $trxnData['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
     // record the entry
@@ -357,10 +361,6 @@ class CRM_Financial_BAO_Payment {
    */
   public static function recordPayment($contributionId, $trxnData, $participantId) {
     list($contributionDAO, $params) = self::getContributionAndParamsInFormatForRecordFinancialTransaction($contributionId);
-
-    if (!$participantId) {
-      $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $contributionId, 'participant_id', 'contribution_id');
-    }
 
     $trxnData['trxn_date'] = !empty($trxnData['trxn_date']) ? $trxnData['trxn_date'] : date('YmdHis');
     $params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $trxnData, CRM_Utils_Array::value('payment_instrument_id', $params));
@@ -428,6 +428,9 @@ WHERE eft.entity_table = 'civicrm_contribution'
       // which in 'Partial Paid' => 'Completed' is not useful, instead specific financial record updates
       // are coded below i.e. just updating financial_item status to 'Paid'
 
+      if (!$participantId) {
+        $participantId = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_ParticipantPayment', $contributionId, 'participant_id', 'contribution_id');
+      }
       if ($participantId) {
         // update participant status
         $participantStatuses = CRM_Event_PseudoConstant::participantStatus();

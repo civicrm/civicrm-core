@@ -6,12 +6,12 @@
  *   API result array
  */
 function im_create_example() {
-  $params = array(
+  $params = [
     'contact_id' => 3,
     'name' => 'My Yahoo IM Handle',
     'location_type_id' => 1,
     'provider_id' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Im', 'create', $params);
@@ -21,12 +21,12 @@ function im_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -40,13 +40,13 @@ function im_create_example() {
  */
 function im_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'contact_id' => '3',
         'location_type_id' => '1',
@@ -54,9 +54,9 @@ function im_create_expectedresult() {
         'provider_id' => '1',
         'is_primary' => '',
         'is_billing' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

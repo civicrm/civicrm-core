@@ -89,9 +89,10 @@ class CRM_Upgrade_Incremental_php_FourSix extends CRM_Upgrade_Incremental_Base {
    schedule.start_action_date IS NOT NULL";
 
     // construct basic where clauses
-    $where = array(
+    $where = [
+      //choose reminder older then 9 months
       'reminder.action_date_time >= DATE_SUB(reminder.action_date_time, INTERVAL 9 MONTH)',
-    ); //choose reminder older then 9 months
+    ];
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
 
@@ -145,7 +146,7 @@ class CRM_Upgrade_Incremental_php_FourSix extends CRM_Upgrade_Incremental_Base {
     // CRM-16846 - This sql file may have been previously skipped. No harm in running it again because it's just UPDATE statements.
     $this->addTask('State-province update from 4.4.7', 'task_4_6_x_runOnlySql', '4.4.7');
 
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 
   /**

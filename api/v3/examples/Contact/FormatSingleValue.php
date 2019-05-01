@@ -10,10 +10,10 @@
  *   API result array
  */
 function contact_getvalue_example() {
-  $params = array(
+  $params = [
     'id' => 17,
     'return' => 'display_name',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Contact', 'getvalue', $params);
@@ -23,12 +23,12 @@ function contact_getvalue_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;

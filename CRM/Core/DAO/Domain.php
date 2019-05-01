@@ -19,14 +19,14 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_domain';
+  public static $_tableName = 'civicrm_domain';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Domain ID
@@ -100,7 +100,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id', 'civicrm_contact', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -121,6 +121,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'title' => ts('Domain ID'),
           'description' => ts('Domain ID'),
           'required' => TRUE,
+          'where' => 'civicrm_domain.id',
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',
@@ -133,6 +134,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'description' => ts('Name of Domain / Organization'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_domain.name',
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',
@@ -148,6 +150,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'description' => ts('Description of Domain.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_domain.description',
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',
@@ -161,6 +164,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Domain Configuration'),
           'description' => ts('Backend configuration.'),
+          'where' => 'civicrm_domain.config_backend',
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',
@@ -174,6 +178,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'description' => ts('The civicrm version this instance is running'),
           'maxlength' => 32,
           'size' => CRM_Utils_Type::MEDIUM,
+          'where' => 'civicrm_domain.version',
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',
@@ -184,6 +189,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Domain Contact'),
           'description' => ts('FK to Contact ID. This is specifically not an FK to avoid circular constraints'),
+          'where' => 'civicrm_domain.contact_id',
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',
@@ -195,6 +201,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Supported Languages'),
           'description' => ts('list of locales supported by the current db state (NULL for single-lang install)'),
+          'where' => 'civicrm_domain.locales',
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',
@@ -205,6 +212,7 @@ class CRM_Core_DAO_Domain extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Language Customizations'),
           'description' => ts('Locale specific string overrides'),
+          'where' => 'civicrm_domain.locale_custom_strings',
           'table_name' => 'civicrm_domain',
           'entity' => 'Domain',
           'bao' => 'CRM_Core_BAO_Domain',

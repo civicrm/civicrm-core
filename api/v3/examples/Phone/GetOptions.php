@@ -6,9 +6,9 @@
  *   API result array
  */
 function phone_getoptions_example() {
-  $params = array(
+  $params = [
     'field' => 'phone_type_id',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Phone', 'getoptions', $params);
@@ -18,12 +18,12 @@ function phone_getoptions_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,18 +37,18 @@ function phone_getoptions_example() {
  */
 function phone_getoptions_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 5,
-    'values' => array(
+    'values' => [
       '1' => 'Phone',
       '2' => 'Mobile',
       '3' => 'Fax',
       '4' => 'Pager',
       '5' => 'Voicemail',
-    ),
-  );
+    ],
+  ];
 
   return $expectedResult;
 }

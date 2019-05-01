@@ -23,13 +23,13 @@
   }
 
   body.crm-menubar-below-cms-menu.crm-menubar-visible #wpbody {
-    padding-top: 40px;
+    padding-top: $menubarHeight;
   }
   body.crm-menubar-below-cms-menu.crm-menubar-visible.crm-menubar-wrapped #wpbody {
-    padding-top: 80px;
+    padding-top: calc($menubarHeight * 2);
   }
   body.crm-menubar-over-cms-menu.crm-menubar-visible.crm-menubar-wrapped #adminmenuwrap {
-    margin-top: 40px;
+    margin-top: $menubarHeight;
   }
 
 }
@@ -56,4 +56,9 @@
     position: absolute;
   }
 
+}
+
+/* Make admin bar hide behind popup windows */
+body.ui-dialog-open #adminmenuwrap {
+  z-index: 100 !important;
 }

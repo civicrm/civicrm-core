@@ -45,10 +45,10 @@ class CRM_Contact_Page_Inline_IM extends CRM_Core_Page {
     // get the emails for this contact
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', CRM_Core_DAO::$_nullObject, TRUE, NULL, $_REQUEST);
 
-    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array('labelColumn' => 'display_name'));
+    $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', ['labelColumn' => 'display_name']);
     $IMProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
 
-    $entityBlock = array('contact_id' => $contactId);
+    $entityBlock = ['contact_id' => $contactId];
     $ims = CRM_Core_BAO_IM::getValues($entityBlock);
     if (!empty($ims)) {
       foreach ($ims as $key => & $value) {

@@ -30,6 +30,7 @@
  * @group headless
  */
 class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
     global $civicrm_setting;
@@ -143,7 +144,8 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
         'is_contact' => 0,
         'description' => NULL,
         'help_text' => NULL,
-        'on_change' => array(// list of callbacks
+        // list of callbacks
+        'on_change' => array(
           array(__CLASS__, '_testOnChange_onChangeExample'),
         ),
       ),

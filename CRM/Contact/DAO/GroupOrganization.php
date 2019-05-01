@@ -19,14 +19,14 @@ class CRM_Contact_DAO_GroupOrganization extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_group_organization';
+  public static $_tableName = 'civicrm_group_organization';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Relationship ID
@@ -65,7 +65,7 @@ class CRM_Contact_DAO_GroupOrganization extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'group_id', 'civicrm_group', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'organization_id', 'civicrm_contact', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -87,6 +87,7 @@ class CRM_Contact_DAO_GroupOrganization extends CRM_Core_DAO {
           'title' => ts('Group Organization ID'),
           'description' => ts('Relationship ID'),
           'required' => TRUE,
+          'where' => 'civicrm_group_organization.id',
           'table_name' => 'civicrm_group_organization',
           'entity' => 'GroupOrganization',
           'bao' => 'CRM_Contact_BAO_GroupOrganization',
@@ -98,6 +99,7 @@ class CRM_Contact_DAO_GroupOrganization extends CRM_Core_DAO {
           'title' => ts('Group'),
           'description' => ts('ID of the group'),
           'required' => TRUE,
+          'where' => 'civicrm_group_organization.group_id',
           'table_name' => 'civicrm_group_organization',
           'entity' => 'GroupOrganization',
           'bao' => 'CRM_Contact_BAO_GroupOrganization',
@@ -118,6 +120,7 @@ class CRM_Contact_DAO_GroupOrganization extends CRM_Core_DAO {
           'title' => ts('Organization'),
           'description' => ts('ID of the Organization Contact'),
           'required' => TRUE,
+          'where' => 'civicrm_group_organization.organization_id',
           'table_name' => 'civicrm_group_organization',
           'entity' => 'GroupOrganization',
           'bao' => 'CRM_Contact_BAO_GroupOrganization',

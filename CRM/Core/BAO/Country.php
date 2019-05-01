@@ -47,7 +47,7 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
     if (!isset(Civi::$statics[__CLASS__]['provinceLimit'])) {
       $countryIsoCodes = CRM_Core_PseudoConstant::countryIsoCode();
       $provinceLimit = Civi::settings()->get('provinceLimit');
-      $country = array();
+      $country = [];
       if (is_array($provinceLimit)) {
         foreach ($provinceLimit as $val) {
           // CRM-12007
@@ -74,7 +74,7 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
   public static function countryLimit() {
     if (!isset(Civi::$statics[__CLASS__]['countryLimit'])) {
       $countryIsoCodes = CRM_Core_PseudoConstant::countryIsoCode();
-      $country = array();
+      $country = [];
       $countryLimit = Civi::settings()->get('countryLimit');
       if (is_array($countryLimit)) {
         foreach ($countryLimit as $val) {
@@ -139,10 +139,10 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
     if (!$cachedSymbol || $defaultCurrency) {
       $currency = $defaultCurrency ? $defaultCurrency : Civi::settings()->get('defaultCurrency');
       if ($currency) {
-        $currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', array(
+        $currencySymbols = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'currency', [
           'labelColumn' => 'symbol',
           'orderColumn' => TRUE,
-        ));
+        ]);
         $cachedSymbol = CRM_Utils_Array::value($currency, $currencySymbols, '');
       }
       else {

@@ -55,7 +55,8 @@ class api_v3_PcpTest extends CiviUnitTestCase {
       'title' => "Pcp title",
       'contact_id' => 1,
       'page_id' => 1,
-      'pcp_block_id' => 1);
+      'pcp_block_id' => 1,
+    );
     parent::setUp();
   }
 

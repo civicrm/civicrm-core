@@ -34,8 +34,10 @@
  */
 class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
 
-  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
-  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
+  // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveMultipleTrait;
+  // TODO Native implementation
+  use CRM_Utils_Cache_NaiveHasTrait;
 
   const DEFAULT_HOST    = 'localhost';
   const DEFAULT_PORT    = 6379;
@@ -76,7 +78,8 @@ class CRM_Utils_Cache_Redis implements CRM_Utils_Cache_Interface {
   public static function connect($config) {
     $host = isset($config['host']) ? $config['host'] : self::DEFAULT_HOST;
     $port = isset($config['port']) ? $config['port'] : self::DEFAULT_PORT;
-    $pass = CRM_Utils_Constant::value('CIVICRM_DB_CACHE_PASSWORD'); // Ugh.
+    // Ugh.
+    $pass = CRM_Utils_Constant::value('CIVICRM_DB_CACHE_PASSWORD');
     $id = implode(':', ['connect', $host, $port /* $pass is constant */]);
     if (!isset(Civi::$statics[__CLASS__][$id])) {
       // Ideally, we'd track the connection in the service-container, but the

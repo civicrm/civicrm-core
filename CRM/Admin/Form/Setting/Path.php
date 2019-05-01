@@ -36,14 +36,14 @@
  */
 class CRM_Admin_Form_Setting_Path extends CRM_Admin_Form_Setting {
 
-  protected $_settings = array(
+  protected $_settings = [
     'uploadDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
     'imageUploadDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
     'customFileUploadDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
     'customTemplateDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
     'customPHPPathDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
     'extensionsDir' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
-  );
+  ];
 
   /**
    * Build the form object.
@@ -52,19 +52,19 @@ class CRM_Admin_Form_Setting_Path extends CRM_Admin_Form_Setting {
     CRM_Utils_System::setTitle(ts('Settings - Upload Directories'));
     parent::buildQuickForm();
 
-    $directories = array(
+    $directories = [
       'uploadDir' => ts('Temporary Files'),
       'imageUploadDir' => ts('Images'),
       'customFileUploadDir' => ts('Custom Files'),
       'customTemplateDir' => ts('Custom Templates'),
       'customPHPPathDir' => ts('Custom PHP Path Directory'),
       'extensionsDir' => ts('CiviCRM Extensions Directory'),
-    );
+    ];
     foreach ($directories as $name => $title) {
       //$this->add('text', $name, $title);
       $this->addRule($name,
         ts("'%1' directory does not exist",
-          array(1 => $title)
+          [1 => $title]
         ),
         'settingPath'
       );

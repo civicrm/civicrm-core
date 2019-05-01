@@ -62,7 +62,7 @@ class CRM_Core_BAO_Cache_Psr16 {
 
       $cache = CRM_Utils_Cache::create([
         'name' => "bao_$group",
-        'type' => array('*memory*', 'SqlGroup', 'ArrayCache'),
+        'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
         // We're replacing CRM_Core_BAO_Cache, which traditionally used a front-cache
         // that was not aware of TTLs. So it seems more consistent/performant to
         // use 'fast' here.
@@ -189,11 +189,21 @@ class CRM_Core_BAO_Cache_Psr16 {
       'custom data',
 
       // Universe
-      'dashboard', // be.chiro.civi.atomfeeds
-      'lineitem-editor', // biz.jmaconsulting.lineitemedit
-      'HRCore_Info', // civihr/uk.co.compucorp.civicrm.hrcore
-      'CiviCRM setting Spec', // nz.co.fuzion.entitysetting
-      'descendant groups for an org', // org.civicrm.multisite
+
+      // be.chiro.civi.atomfeeds
+      'dashboard',
+
+      // biz.jmaconsulting.lineitemedit
+      'lineitem-editor',
+
+      // civihr/uk.co.compucorp.civicrm.hrcore
+      'HRCore_Info',
+
+      // nz.co.fuzion.entitysetting
+      'CiviCRM setting Spec',
+
+      // org.civicrm.multisite
+      'descendant groups for an org',
     ];
   }
 

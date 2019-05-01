@@ -19,14 +19,14 @@ class CRM_Core_DAO_Website extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_website';
+  public static $_tableName = 'civicrm_website';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Unique Website ID
@@ -72,7 +72,7 @@ class CRM_Core_DAO_Website extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id', 'civicrm_contact', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -93,6 +93,7 @@ class CRM_Core_DAO_Website extends CRM_Core_DAO {
           'title' => ts('Website ID'),
           'description' => ts('Unique Website ID'),
           'required' => TRUE,
+          'where' => 'civicrm_website.id',
           'table_name' => 'civicrm_website',
           'entity' => 'Website',
           'bao' => 'CRM_Core_BAO_Website',
@@ -103,6 +104,7 @@ class CRM_Core_DAO_Website extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Contact'),
           'description' => ts('FK to Contact ID'),
+          'where' => 'civicrm_website.contact_id',
           'table_name' => 'civicrm_website',
           'entity' => 'Website',
           'bao' => 'CRM_Core_BAO_Website',
@@ -134,6 +136,7 @@ class CRM_Core_DAO_Website extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Website Type'),
           'description' => ts('Which Website type does this website belong to.'),
+          'where' => 'civicrm_website.website_type_id',
           'table_name' => 'civicrm_website',
           'entity' => 'Website',
           'bao' => 'CRM_Core_BAO_Website',

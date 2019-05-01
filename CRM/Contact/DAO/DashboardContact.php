@@ -19,14 +19,14 @@ class CRM_Contact_DAO_DashboardContact extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_dashboard_contact';
+  public static $_tableName = 'civicrm_dashboard_contact';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned
@@ -84,7 +84,7 @@ class CRM_Contact_DAO_DashboardContact extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'dashboard_id', 'civicrm_dashboard', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id', 'civicrm_contact', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -105,6 +105,7 @@ class CRM_Contact_DAO_DashboardContact extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Dashboard Contact ID'),
           'required' => TRUE,
+          'where' => 'civicrm_dashboard_contact.id',
           'table_name' => 'civicrm_dashboard_contact',
           'entity' => 'DashboardContact',
           'bao' => 'CRM_Contact_BAO_DashboardContact',
@@ -116,6 +117,7 @@ class CRM_Contact_DAO_DashboardContact extends CRM_Core_DAO {
           'title' => ts('Dashboard'),
           'description' => ts('Dashboard ID'),
           'required' => TRUE,
+          'where' => 'civicrm_dashboard_contact.dashboard_id',
           'table_name' => 'civicrm_dashboard_contact',
           'entity' => 'DashboardContact',
           'bao' => 'CRM_Contact_BAO_DashboardContact',
@@ -128,6 +130,7 @@ class CRM_Contact_DAO_DashboardContact extends CRM_Core_DAO {
           'title' => ts('Dashboard Contact'),
           'description' => ts('Contact ID'),
           'required' => TRUE,
+          'where' => 'civicrm_dashboard_contact.contact_id',
           'table_name' => 'civicrm_dashboard_contact',
           'entity' => 'DashboardContact',
           'bao' => 'CRM_Contact_BAO_DashboardContact',
@@ -139,6 +142,7 @@ class CRM_Contact_DAO_DashboardContact extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Column No'),
           'description' => ts('column no for this widget'),
+          'where' => 'civicrm_dashboard_contact.column_no',
           'default' => '0',
           'table_name' => 'civicrm_dashboard_contact',
           'entity' => 'DashboardContact',
@@ -150,6 +154,7 @@ class CRM_Contact_DAO_DashboardContact extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Dashlet is Active?'),
           'description' => ts('Is this widget active?'),
+          'where' => 'civicrm_dashboard_contact.is_active',
           'default' => '0',
           'table_name' => 'civicrm_dashboard_contact',
           'entity' => 'DashboardContact',
@@ -161,6 +166,7 @@ class CRM_Contact_DAO_DashboardContact extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Order'),
           'description' => ts('Ordering of the widgets.'),
+          'where' => 'civicrm_dashboard_contact.weight',
           'default' => '0',
           'table_name' => 'civicrm_dashboard_contact',
           'entity' => 'DashboardContact',

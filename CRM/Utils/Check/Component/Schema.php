@@ -36,7 +36,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
    * @return array
    */
   public function checkIndices() {
-    $messages = array();
+    $messages = [];
 
     // CRM-21298: The "Update Indices" tool that this check suggests is
     // unreliable. Bypass this check until CRM-20817 and CRM-20533 are resolved.
@@ -67,7 +67,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         ts('Update Indices'),
         ts('Update all database indices now? This may take a few minutes and cause a noticeable performance lag for all users while running.'),
         'api3',
-        array('System', 'updateindexes')
+        ['System', 'updateindexes']
       );
       $messages[] = $msg;
     }
@@ -78,7 +78,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
    * @return array
    */
   public function checkMissingLogTables() {
-    $messages = array();
+    $messages = [];
     $logging = new CRM_Logging_Schema();
     $missingLogTables = $logging->getMissingLogTables();
 
@@ -94,7 +94,7 @@ class CRM_Utils_Check_Component_Schema extends CRM_Utils_Check_Component {
         ts('Create Missing Log Tables'),
         ts('Create missing log tables now? This may take few minutes.'),
         'api3',
-        array('System', 'createmissinglogtables')
+        ['System', 'createmissinglogtables']
       );
       $messages[] = $msg;
     }

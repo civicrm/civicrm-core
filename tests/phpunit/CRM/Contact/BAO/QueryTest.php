@@ -78,10 +78,10 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     CRM_Core_Config::singleton()->defaultSearchProfileID = 1;
     $this->callAPISuccess('address', 'create', array(
-        'contact_id' => $contactID,
-        'city' => 'Cool City',
-        'location_type_id' => 1,
-      ));
+      'contact_id' => $contactID,
+      'city' => 'Cool City',
+      'location_type_id' => 1,
+    ));
     $params = array(
       0 => array(
         0 => 'city-1',
@@ -117,10 +117,10 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     CRM_Core_Config::singleton()->defaultSearchProfileID = 1;
     $this->callAPISuccess('address', 'create', array(
-        'contact_id' => $contactID,
-        'city' => 'Cool City',
-        'location_type_id' => 1,
-      ));
+      'contact_id' => $contactID,
+      'city' => 'Cool City',
+      'location_type_id' => 1,
+    ));
     $params = array(
       0 => array(
         0 => 'city-1',
@@ -242,7 +242,6 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $resultDAO->fetch();
   }
 
-
   /**
    * CRM-14263 search builder failure with search profile & address in criteria.
    *
@@ -252,16 +251,18 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    * @dataProvider getSearchProfileData
    *
    * @param array $params
+   * @param string $selectClause
+   * @param string $whereClause
    */
   public function testSearchProfilePrimaryCityCRM14263($params, $selectClause, $whereClause) {
     $contactID = $this->individualCreate();
     CRM_Core_Config::singleton()->defaultSearchProfileID = 1;
     $this->callAPISuccess('address', 'create', array(
-        'contact_id' => $contactID,
-        'city' => 'Cool CITY',
-        'street_address' => 'Long STREET',
-        'location_type_id' => 1,
-      ));
+      'contact_id' => $contactID,
+      'city' => 'Cool CITY',
+      'street_address' => 'Long STREET',
+      'location_type_id' => 1,
+    ));
     $returnProperties = array(
       'contact_type' => 1,
       'contact_sub_type' => 1,
@@ -696,6 +697,57 @@ civicrm_relationship.is_active = 1 AND
     $this->fail('Test failed for some reason which is not good');
   }
 
+  /**
+   * Test the sorting on the contact ID query works.
+   *
+   * Checking for lack of fatal.
+   *
+   * @param string $sortOrder
+   *   Param reflecting how sort is passed in.
+   *   - 1_d is column 1 descending.
+   *
+   * @dataProvider getSortOptions
+   */
+  public function testContactIDQuery($sortOrder) {
+    $selector = new CRM_Contact_Selector(NULL, ['radio_ts' => 'ts_all'], NULL, ['sort_name' => 1]);
+    $selector->contactIDQuery([], $sortOrder);
+  }
+
+  /**
+   * Test the sorting on the contact ID query works with a profile search.
+   *
+   * Checking for lack of fatal.
+   */
+  public function testContactIDQueryProfileSearchResults() {
+    $profile = $this->callAPISuccess('UFGroup', 'create', ['group_type' => 'Contact', 'name' => 'search', 'title' => 'search']);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $profile['id'],
+      'field_name' => 'postal_code',
+      'field_type' => 'Contact',
+      'in_selector' => TRUE,
+      'is_searchable' => TRUE,
+      'label' => 'postal code',
+      'visibility' => 'Public Pages and Listings',
+    ]);
+    $selector = new CRM_Contact_Selector(NULL, ['radio_ts' => 'ts_all', 'uf_group_id' => $profile['id']], NULL, ['sort_name' => 1]);
+    $selector->contactIDQuery([], '2_d');
+  }
+
+  /**
+   * Get search options to reflect how a UI search would look.
+   *
+   * @return array
+   */
+  public function getSortOptions() {
+    return [
+      ['1_d'],
+      ['2_d'],
+      ['3_d'],
+      ['4_d'],
+      ['5_d'],
+      ['6_d'],
+    ];
+  }
 
   /**
    * Test the summary query does not add an acl clause when acls not enabled..
@@ -719,7 +771,7 @@ civicrm_relationship.is_active = 1 AND
         'avg' => '$ 233.33',
         'amount' => '$ 1,400.00',
         'count' => 6,
-        ],
+      ],
       'cancel' => [
         'count' => 2,
         'amount' => '$ 100.00',
@@ -771,13 +823,15 @@ civicrm_relationship.is_active = 1 AND
    */
   public function testConvertFormValuesCRM21816() {
     $fv = array(
-      "member_end_date_relative" => "starting_2.month", // next 60 days
+    // next 60 days
+      "member_end_date_relative" => "starting_2.month",
       "member_end_date_low" => "20180101000000",
       "member_end_date_high" => "20180331235959",
       "membership_is_current_member" => "1",
       "member_is_primary" => "1",
     );
-    $fv_orig = $fv;  // $fv is modified by convertFormValues()
+    // $fv is modified by convertFormValues()
+    $fv_orig = $fv;
     $params = CRM_Contact_BAO_Query::convertFormValues($fv);
 
     // restructure for easier testing

@@ -43,7 +43,7 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -64,30 +64,30 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
   public function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/scheduleReminders',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Schedule Reminders'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Label Format'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Label Format'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/scheduleReminders',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Schedule Reminders'),
-        ),
-      );
+        ],
+      ];
     }
 
     return self::$_links;
@@ -153,7 +153,7 @@ class CRM_Admin_Page_ScheduleReminders extends CRM_Core_Page_Basic {
         $format['action'] = CRM_Core_Action::formLink(
           self::links(),
           $action,
-          array('id' => $format['id']),
+          ['id' => $format['id']],
           ts('more'),
           FALSE,
           'actionSchedule.manage.action',

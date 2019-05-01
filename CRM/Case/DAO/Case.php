@@ -19,14 +19,14 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_case';
+  public static $_tableName = 'civicrm_case';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Unique Case ID
@@ -112,7 +112,7 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'case_type_id', 'civicrm_case_type', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -135,8 +135,6 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'required' => TRUE,
           'import' => TRUE,
           'where' => 'civicrm_case.id',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
@@ -151,8 +149,6 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'required' => TRUE,
           'import' => TRUE,
           'where' => 'civicrm_case.case_type_id',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => FALSE,
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
@@ -177,8 +173,6 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'size' => CRM_Utils_Type::HUGE,
           'import' => TRUE,
           'where' => 'civicrm_case.subject',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
@@ -195,8 +189,6 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'description' => ts('Date on which given case starts.'),
           'import' => TRUE,
           'where' => 'civicrm_case.start_date',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
@@ -214,8 +206,6 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'description' => ts('Date on which given case ends.'),
           'import' => TRUE,
           'where' => 'civicrm_case.end_date',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
@@ -233,6 +223,7 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'description' => ts('Details about the meeting (agenda, notes, etc).'),
           'rows' => 8,
           'cols' => 60,
+          'where' => 'civicrm_case.details',
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
           'bao' => 'CRM_Case_BAO_Case',
@@ -249,8 +240,6 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'required' => TRUE,
           'import' => TRUE,
           'where' => 'civicrm_case.status_id',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => FALSE,
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
@@ -270,8 +259,6 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'title' => ts('Case is in the Trash'),
           'import' => TRUE,
           'where' => 'civicrm_case.is_deleted',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'default' => '0',
           'table_name' => 'civicrm_case',
@@ -285,10 +272,8 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'title' => ts('Created Date'),
           'description' => ts('When was the case was created.'),
           'required' => FALSE,
-          'export' => TRUE,
           'where' => 'civicrm_case.created_date',
-          'headerPattern' => '',
-          'dataPattern' => '',
+          'export' => TRUE,
           'default' => 'NULL',
           'table_name' => 'civicrm_case',
           'entity' => 'Case',
@@ -301,10 +286,8 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'title' => ts('Modified Date'),
           'description' => ts('When was the case (or closely related entity) was created or modified or deleted.'),
           'required' => FALSE,
-          'export' => TRUE,
           'where' => 'civicrm_case.modified_date',
-          'headerPattern' => '',
-          'dataPattern' => '',
+          'export' => TRUE,
           'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
           'table_name' => 'civicrm_case',
           'entity' => 'Case',

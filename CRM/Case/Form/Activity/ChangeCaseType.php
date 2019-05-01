@@ -57,7 +57,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
    * @return array
    */
   public static function setDefaultValues(&$form) {
-    $defaults = array();
+    $defaults = [];
 
     $defaults['is_reset_timeline'] = 1;
 
@@ -84,7 +84,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
       $form->_caseType[$form->_caseTypeId] = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $form->_caseTypeId, 'title');
     }
 
-    $form->addField('case_type_id', array('context' => 'create', 'entity' => 'Case'));
+    $form->addField('case_type_id', ['context' => 'create', 'entity' => 'Case']);
 
     // timeline
     $form->addYesNo('is_reset_timeline', ts('Reset Case Timeline?'), NULL, TRUE);
@@ -160,10 +160,10 @@ class CRM_Case_Form_Activity_ChangeCaseType {
 
     if ($activity->subject == 'null') {
       $activity->subject = ts('Case type changed from %1 to %2',
-        array(
+        [
           1 => CRM_Utils_Array::value($form->_defaults['case_type_id'], $allCaseTypes),
           2 => CRM_Utils_Array::value($params['case_type_id'], $allCaseTypes),
-        )
+        ]
       );
       $activity->save();
     }
@@ -171,7 +171,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
     // 1. initiate xml processor
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
     $caseId = CRM_Utils_Array::first($form->_caseId);
-    $xmlProcessorParams = array(
+    $xmlProcessorParams = [
       'clientID' => $form->_currentlyViewedContactId,
       'creatorID' => $form->_currentUserId,
       'standardTimeline' => 1,
@@ -179,7 +179,7 @@ class CRM_Case_Form_Activity_ChangeCaseType {
       'activity_date_time' => CRM_Utils_Array::value('reset_date_time', $params),
       'caseID' => $caseId,
       'resetTimeline' => CRM_Utils_Array::value('is_reset_timeline', $params),
-    );
+    ];
 
     $xmlProcessor->run($caseType, $xmlProcessorParams);
     // status msg

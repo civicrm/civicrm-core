@@ -67,10 +67,10 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
       CRM_Core_Error::fatal("Component for which you're trying to install the extension (" . $info->typeInfo['component'] . ") is currently disabled.");
     }
     $weight = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
-      array('option_group_id' => $this->groupId)
+      ['option_group_id' => $this->groupId]
     );
-    $ids = array();
-    $params = array(
+    $ids = [];
+    $params = [
       'label' => $info->label . ' (' . $info->key . ')',
       'value' => $info->typeInfo['reportUrl'],
       'name' => $info->key,
@@ -79,7 +79,7 @@ class CRM_Extension_Manager_Report extends CRM_Extension_Manager_Base {
       'component_id' => $compId,
       'option_group_id' => $this->groupId,
       'is_active' => 1,
-    );
+    ];
 
     $optionValue = CRM_Core_BAO_OptionValue::add($params, $ids);
   }

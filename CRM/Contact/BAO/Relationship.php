@@ -344,8 +344,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_relationship', $relationship->id);
     }
 
-    $relationship->free();
-
     CRM_Utils_Hook::post($hook, 'Relationship', $relationship->id, $relationship);
 
     return $relationship;
@@ -484,7 +482,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       'end_date' => 'NULL',
     );
   }
-
 
   /**
    * Check if there is data to create the object.
@@ -960,11 +957,9 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
       // Check whether the custom field values are identical.
       $result = self::checkDuplicateCustomFields($params, $relationship->id);
       if ($result) {
-        $relationship->free();
         return TRUE;
       }
     }
-    $relationship->free();
     return FALSE;
   }
 
@@ -1451,7 +1446,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         }
       }
 
-      $relationship->free();
       return $values;
     }
   }
@@ -1465,7 +1459,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * @return array
    *   array reference of all relationship types with context to current contact type .
    */
-  static public function getRelationType($targetContactType) {
+  public static function getRelationType($targetContactType) {
     $relationshipType = array();
     $allRelationshipType = CRM_Core_PseudoConstant::relationshipType();
 
@@ -2037,7 +2031,6 @@ AND cc.sort_name LIKE '%$name%'";
       }
     }
   }
-
 
   /**
    * Wrapper for contact relationship selector.

@@ -19,14 +19,14 @@ class CRM_Mailing_DAO_TrackableURL extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_mailing_trackable_url';
+  public static $_tableName = 'civicrm_mailing_trackable_url';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned
@@ -63,7 +63,7 @@ class CRM_Mailing_DAO_TrackableURL extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'mailing_id', 'civicrm_mailing', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -83,6 +83,7 @@ class CRM_Mailing_DAO_TrackableURL extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Trackable URL ID'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_trackable_url.id',
           'table_name' => 'civicrm_mailing_trackable_url',
           'entity' => 'TrackableURL',
           'bao' => 'CRM_Mailing_BAO_TrackableURL',
@@ -94,6 +95,7 @@ class CRM_Mailing_DAO_TrackableURL extends CRM_Core_DAO {
           'title' => ts('Url'),
           'description' => ts('The URL to be tracked.'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_trackable_url.url',
           'table_name' => 'civicrm_mailing_trackable_url',
           'entity' => 'TrackableURL',
           'bao' => 'CRM_Mailing_BAO_TrackableURL',
@@ -105,6 +107,7 @@ class CRM_Mailing_DAO_TrackableURL extends CRM_Core_DAO {
           'title' => ts('Mailing'),
           'description' => ts('FK to the mailing'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_trackable_url.mailing_id',
           'table_name' => 'civicrm_mailing_trackable_url',
           'entity' => 'TrackableURL',
           'bao' => 'CRM_Mailing_BAO_TrackableURL',

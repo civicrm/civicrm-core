@@ -90,7 +90,7 @@
 
 <tr>
   <td>
-    {include file="CRM/Core/DatePickerRange.tpl" fieldName="activity_date_time" from='_low' to='_high'}
+    {include file="CRM/Core/DatePickerRange.tpl" fieldName="activity_date_time"}
   </td>
 </tr>
 <tr>

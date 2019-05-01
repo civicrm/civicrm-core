@@ -74,9 +74,8 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
 
   public function testMailingContactGetFields() {
     $result = $this->callAPISuccess('MailingContact', 'getfields', array(
-        'action' => 'get',
-      )
-    );
+      'action' => 'get',
+    ));
     $this->assertEquals('Delivered', $result['values']['type']['api.default']);
   }
 
@@ -164,7 +163,6 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][1]['creator_id'], 3);
     $this->assertEquals($result['values'][1]['creator_name'], "xyz1, abc1");
   }
-
 
   /**
    * Test that the API returns only the "Bounced" mailings when instructed to do so.

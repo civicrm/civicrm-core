@@ -19,14 +19,14 @@ class CRM_Core_DAO_Timezone extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_timezone';
+  public static $_tableName = 'civicrm_timezone';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Timezone Id
@@ -84,7 +84,7 @@ class CRM_Core_DAO_Timezone extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'country_id', 'civicrm_country', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -105,6 +105,7 @@ class CRM_Core_DAO_Timezone extends CRM_Core_DAO {
           'title' => ts('Timezone ID'),
           'description' => ts('Timezone Id'),
           'required' => TRUE,
+          'where' => 'civicrm_timezone.id',
           'table_name' => 'civicrm_timezone',
           'entity' => 'Timezone',
           'bao' => 'CRM_Core_DAO_Timezone',
@@ -117,6 +118,7 @@ class CRM_Core_DAO_Timezone extends CRM_Core_DAO {
           'description' => ts('Timezone full name'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_timezone.name',
           'table_name' => 'civicrm_timezone',
           'entity' => 'Timezone',
           'bao' => 'CRM_Core_DAO_Timezone',
@@ -129,6 +131,7 @@ class CRM_Core_DAO_Timezone extends CRM_Core_DAO {
           'description' => ts('ISO Code for timezone abbreviation'),
           'maxlength' => 3,
           'size' => CRM_Utils_Type::FOUR,
+          'where' => 'civicrm_timezone.abbreviation',
           'table_name' => 'civicrm_timezone',
           'entity' => 'Timezone',
           'bao' => 'CRM_Core_DAO_Timezone',
@@ -141,6 +144,7 @@ class CRM_Core_DAO_Timezone extends CRM_Core_DAO {
           'description' => ts('GMT name of the timezone'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_timezone.gmt',
           'table_name' => 'civicrm_timezone',
           'entity' => 'Timezone',
           'bao' => 'CRM_Core_DAO_Timezone',
@@ -150,6 +154,7 @@ class CRM_Core_DAO_Timezone extends CRM_Core_DAO {
           'name' => 'offset',
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('GMT Offset'),
+          'where' => 'civicrm_timezone.offset',
           'table_name' => 'civicrm_timezone',
           'entity' => 'Timezone',
           'bao' => 'CRM_Core_DAO_Timezone',
@@ -161,6 +166,7 @@ class CRM_Core_DAO_Timezone extends CRM_Core_DAO {
           'title' => ts('Country'),
           'description' => ts('Country Id'),
           'required' => TRUE,
+          'where' => 'civicrm_timezone.country_id',
           'table_name' => 'civicrm_timezone',
           'entity' => 'Timezone',
           'bao' => 'CRM_Core_DAO_Timezone',

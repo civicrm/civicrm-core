@@ -19,14 +19,14 @@ class CRM_Core_DAO_Cache extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_cache';
+  public static $_tableName = 'civicrm_cache';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned
@@ -91,7 +91,7 @@ class CRM_Core_DAO_Cache extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'component_id', 'civicrm_component', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -110,6 +110,7 @@ class CRM_Core_DAO_Cache extends CRM_Core_DAO {
           'name' => 'id',
           'type' => CRM_Utils_Type::T_INT,
           'required' => TRUE,
+          'where' => 'civicrm_cache.id',
           'table_name' => 'civicrm_cache',
           'entity' => 'Cache',
           'bao' => 'CRM_Core_BAO_Cache',
@@ -123,6 +124,7 @@ class CRM_Core_DAO_Cache extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 32,
           'size' => CRM_Utils_Type::MEDIUM,
+          'where' => 'civicrm_cache.group_name',
           'table_name' => 'civicrm_cache',
           'entity' => 'Cache',
           'bao' => 'CRM_Core_BAO_Cache',
@@ -135,6 +137,7 @@ class CRM_Core_DAO_Cache extends CRM_Core_DAO {
           'description' => ts('Unique path name for cache element'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_cache.path',
           'table_name' => 'civicrm_cache',
           'entity' => 'Cache',
           'bao' => 'CRM_Core_BAO_Cache',
@@ -145,6 +148,7 @@ class CRM_Core_DAO_Cache extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_LONGTEXT,
           'title' => ts('Data'),
           'description' => ts('data associated with this path'),
+          'where' => 'civicrm_cache.data',
           'table_name' => 'civicrm_cache',
           'entity' => 'Cache',
           'bao' => 'CRM_Core_BAO_Cache',
@@ -154,6 +158,7 @@ class CRM_Core_DAO_Cache extends CRM_Core_DAO {
           'name' => 'component_id',
           'type' => CRM_Utils_Type::T_INT,
           'description' => ts('Component that this menu item belongs to'),
+          'where' => 'civicrm_cache.component_id',
           'table_name' => 'civicrm_cache',
           'entity' => 'Cache',
           'bao' => 'CRM_Core_BAO_Cache',
@@ -173,6 +178,7 @@ class CRM_Core_DAO_Cache extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TIMESTAMP,
           'title' => ts('Created Date'),
           'description' => ts('When was the cache item created'),
+          'where' => 'civicrm_cache.created_date',
           'default' => 'CURRENT_TIMESTAMP',
           'table_name' => 'civicrm_cache',
           'entity' => 'Cache',
@@ -185,6 +191,7 @@ class CRM_Core_DAO_Cache extends CRM_Core_DAO {
           'title' => ts('Expired Date'),
           'description' => ts('When should the cache item expire'),
           'required' => FALSE,
+          'where' => 'civicrm_cache.expired_date',
           'default' => 'NULL',
           'table_name' => 'civicrm_cache',
           'entity' => 'Cache',

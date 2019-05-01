@@ -19,14 +19,14 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_batch';
+  public static $_tableName = 'civicrm_batch';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Unique Address ID
@@ -161,7 +161,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'created_id', 'civicrm_contact', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'modified_id', 'civicrm_contact', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'saved_search_id', 'civicrm_saved_search', 'id');
@@ -184,6 +184,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'title' => ts('Batch ID'),
           'description' => ts('Unique Address ID'),
           'required' => TRUE,
+          'where' => 'civicrm_batch.id',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -196,6 +197,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'description' => ts('Variable name/programmatic handle for this batch.'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_batch.name',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -211,6 +213,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'description' => ts('Friendly Name.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_batch.title',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -226,6 +229,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'description' => ts('Description of this batch set.'),
           'rows' => 4,
           'cols' => 80,
+          'where' => 'civicrm_batch.description',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -239,6 +243,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Batch Created By'),
           'description' => ts('FK to Contact ID'),
+          'where' => 'civicrm_batch.created_id',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -250,6 +255,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           'title' => ts('Batch Created Date'),
           'description' => ts('When was this item created'),
+          'where' => 'civicrm_batch.created_date',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -263,6 +269,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Batch Modified By'),
           'description' => ts('FK to Contact ID'),
+          'where' => 'civicrm_batch.modified_id',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -274,6 +281,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           'title' => ts('Batch Modified Date'),
           'description' => ts('When was this item created'),
+          'where' => 'civicrm_batch.modified_date',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -284,6 +292,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Batch Smart Group'),
           'description' => ts('FK to Saved Search ID'),
+          'where' => 'civicrm_batch.saved_search_id',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -299,6 +308,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'title' => ts('Batch Status'),
           'description' => ts('fk to Batch Status options in civicrm_option_values'),
           'required' => TRUE,
+          'where' => 'civicrm_batch.status_id',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -316,6 +326,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Batch Type'),
           'description' => ts('fk to Batch Type options in civicrm_option_values'),
+          'where' => 'civicrm_batch.type_id',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -333,6 +344,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Batch Mode'),
           'description' => ts('fk to Batch mode options in civicrm_option_values'),
+          'where' => 'civicrm_batch.mode_id',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -354,6 +366,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
             20,
             2
           ],
+          'where' => 'civicrm_batch.total',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -367,6 +380,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Batch Number of Items'),
           'description' => ts('Number of items in a batch.'),
+          'where' => 'civicrm_batch.item_count',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -380,6 +394,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Batch Payment Method'),
           'description' => ts('fk to Payment Instrument options in civicrm_option_values'),
+          'where' => 'civicrm_batch.payment_instrument_id',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -396,6 +411,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'name' => 'exported_date',
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           'title' => ts('Batch Exported Date'),
+          'where' => 'civicrm_batch.exported_date',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',
@@ -406,6 +422,7 @@ class CRM_Batch_DAO_Batch extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_LONGTEXT,
           'title' => ts('Batch Data'),
           'description' => ts('cache entered data'),
+          'where' => 'civicrm_batch.data',
           'table_name' => 'civicrm_batch',
           'entity' => 'Batch',
           'bao' => 'CRM_Batch_BAO_Batch',

@@ -45,25 +45,31 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $fields = CRM_Core_BAO_UFField::getAvailableFields($ufGroupId);
 
     // Make sure that each entity has 1+ present field and 1+ missing (already-used) field
-    $this->assertFalse(isset($fields['Contact']['do_not_sms'])); // already used
+    // already used
+    $this->assertFalse(isset($fields['Contact']['do_not_sms']));
     $this->assertEquals('city', $fields['Contact']['city']['name']);
 
-    $this->assertFalse(isset($fields['Individual']['first_name'])); // already used
+    // already used
+    $this->assertFalse(isset($fields['Individual']['first_name']));
     $this->assertEquals('birth_date', $fields['Individual']['birth_date']['name']);
 
     $this->assertEquals('organization_name', $fields['Organization']['organization_name']['name']);
     $this->assertEquals('legal_name', $fields['Organization']['legal_name']['name']);
 
-    $this->assertFalse(isset($fields['Contribution']['amount_level'])); // already used
+    // already used
+    $this->assertFalse(isset($fields['Contribution']['amount_level']));
     $this->assertEquals('cancel_reason', $fields['Contribution']['cancel_reason']['name']);
 
-    $this->assertFalse(isset($fields['Participant']['participant_note'])); // already used
+    // already used
+    $this->assertFalse(isset($fields['Participant']['participant_note']));
     $this->assertEquals('participant_role', $fields['Participant']['participant_role']['name']);
 
-    $this->assertFalse(isset($fields['Membership']['join_date'])); // already used
+    // already used
+    $this->assertFalse(isset($fields['Membership']['join_date']));
     $this->assertEquals('end_date', $fields['Membership']['membership_end_date']['name']);
 
-    $this->assertFalse(isset($fields['Activity']['activity_date_time'])); // already used
+    // already used
+    $this->assertFalse(isset($fields['Activity']['activity_date_time']));
     $this->assertEquals('subject', $fields['Activity']['activity_subject']['name']);
 
     // Make sure that some of the blacklisted fields don't appear
@@ -93,10 +99,12 @@ class CRM_Core_BAO_UFFieldTest extends CiviUnitTestCase {
     $defaults = array('field_name' => array('Individual', 'first_name'));
     $fields = CRM_Core_BAO_UFField::getAvailableFields($ufGroupId, $defaults);
 
-    $this->assertFalse(isset($fields['Contact']['do_not_sms'])); // already used
+    // already used
+    $this->assertFalse(isset($fields['Contact']['do_not_sms']));
     $this->assertEquals('city', $fields['Contact']['city']['name']);
 
-    $this->assertEquals('first_name', $fields['Individual']['first_name']['name']); // used by me
+    // used by me
+    $this->assertEquals('first_name', $fields['Individual']['first_name']['name']);
     $this->assertEquals('birth_date', $fields['Individual']['birth_date']['name']);
   }
 

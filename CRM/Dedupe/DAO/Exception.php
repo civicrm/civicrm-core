@@ -19,14 +19,14 @@ class CRM_Dedupe_DAO_Exception extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_dedupe_exception';
+  public static $_tableName = 'civicrm_dedupe_exception';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Unique dedupe exception id
@@ -65,7 +65,7 @@ class CRM_Dedupe_DAO_Exception extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id1', 'civicrm_contact', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id2', 'civicrm_contact', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -87,6 +87,7 @@ class CRM_Dedupe_DAO_Exception extends CRM_Core_DAO {
           'title' => ts('Dedupe Exception ID'),
           'description' => ts('Unique dedupe exception id'),
           'required' => TRUE,
+          'where' => 'civicrm_dedupe_exception.id',
           'table_name' => 'civicrm_dedupe_exception',
           'entity' => 'Exception',
           'bao' => 'CRM_Dedupe_DAO_Exception',
@@ -98,6 +99,7 @@ class CRM_Dedupe_DAO_Exception extends CRM_Core_DAO {
           'title' => ts('First Dupe Contact ID'),
           'description' => ts('FK to Contact ID'),
           'required' => TRUE,
+          'where' => 'civicrm_dedupe_exception.contact_id1',
           'table_name' => 'civicrm_dedupe_exception',
           'entity' => 'Exception',
           'bao' => 'CRM_Dedupe_DAO_Exception',
@@ -110,6 +112,7 @@ class CRM_Dedupe_DAO_Exception extends CRM_Core_DAO {
           'title' => ts('Second Dupe Contact ID'),
           'description' => ts('FK to Contact ID'),
           'required' => TRUE,
+          'where' => 'civicrm_dedupe_exception.contact_id2',
           'table_name' => 'civicrm_dedupe_exception',
           'entity' => 'Exception',
           'bao' => 'CRM_Dedupe_DAO_Exception',

@@ -46,7 +46,7 @@ class CRM_UF_Page_AJAX {
     $customId = $_GET['customId'];
 
     $isMultiple = CRM_Core_BAO_CustomField::isMultiRecordField($customId);
-    $isMultiple = array('is_multi' => $isMultiple);
+    $isMultiple = ['is_multi' => $isMultiple];
     CRM_Utils_JSON::output($isMultiple);
   }
 

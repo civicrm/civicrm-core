@@ -153,7 +153,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @param $formValues
    */
   public static function includeContactIDs(&$sql, &$formValues) {
-    $contactIDs = array();
+    $contactIDs = [];
     foreach ($formValues as $id => $value) {
       if ($value &&
         substr($id, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX
@@ -200,17 +200,17 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @throws Exception
    */
   public function validateUserSQL(&$sql, $onlyWhere = FALSE) {
-    $includeStrings = array('contact_a');
-    $excludeStrings = array('insert', 'delete', 'update');
+    $includeStrings = ['contact_a'];
+    $excludeStrings = ['insert', 'delete', 'update'];
 
     if (!$onlyWhere) {
-      $includeStrings += array('select', 'from', 'where', 'civicrm_contact');
+      $includeStrings += ['select', 'from', 'where', 'civicrm_contact'];
     }
 
     foreach ($includeStrings as $string) {
       if (stripos($sql, $string) === FALSE) {
         CRM_Core_Error::fatal(ts('Could not find \'%1\' string in SQL clause.',
-          array(1 => $string)
+          [1 => $string]
         ));
       }
     }
@@ -218,7 +218,7 @@ class CRM_Contact_Form_Search_Custom_Base {
     foreach ($excludeStrings as $string) {
       if (preg_match('/(\s' . $string . ')|(' . $string . '\s)/i', $sql)) {
         CRM_Core_Error::fatal(ts('Found illegal \'%1\' string in SQL clause.',
-          array(1 => $string)
+          [1 => $string]
         ));
       }
     }

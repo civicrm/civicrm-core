@@ -47,21 +47,25 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
 
   /**
    * Financial batch ids.
+   * @var array
    */
-  protected $_batchIds = array();
+  protected $_batchIds = [];
 
   /**
    * Export status id.
+   * @var int
    */
   protected $_exportStatusId;
 
   /**
    * Export format.
+   * @var string
    */
   protected $_exportFormat;
 
   /**
    * Download export File.
+   * @var bool
    */
   protected $_downloadFile = TRUE;
 
@@ -86,7 +90,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
       else {
         $this->_batchIds = $this->get('batchIds');
       }
-      if (!empty($_GET['export_format']) && in_array($_GET['export_format'], array('IIF', 'CSV'))) {
+      if (!empty($_GET['export_format']) && in_array($_GET['export_format'], ['IIF', 'CSV'])) {
         $this->_exportFormat = $_GET['export_format'];
       }
     }
@@ -125,26 +129,26 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
       }
     }
 
-    $optionTypes = array(
+    $optionTypes = [
       'IIF' => ts('Export to IIF'),
       'CSV' => ts('Export to CSV'),
-    );
+    ];
 
     $this->addRadio('export_format', NULL, $optionTypes, NULL, '<br/>', TRUE);
 
     $this->addButtons(
-      array(
-        array(
+      [
+        [
           'type' => 'next',
           'name' => ts('Export Batch'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
   }
 
@@ -158,7 +162,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
     }
 
     if ($this->_id) {
-      $batchIds = array($this->_id);
+      $batchIds = [$this->_id];
     }
     elseif (!empty($this->_batchIds)) {
       $batchIds = explode(',', $this->_batchIds);

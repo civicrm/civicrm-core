@@ -116,15 +116,15 @@ class CRM_Utils_Sort {
    * @return \CRM_Utils_Sort
    */
   public function __construct(&$vars, $defaultSortOrder = NULL) {
-    $this->_vars = array();
-    $this->_response = array();
+    $this->_vars = [];
+    $this->_response = [];
 
     foreach ($vars as $weight => $value) {
-      $this->_vars[$weight] = array(
+      $this->_vars[$weight] = [
         'name' => CRM_Utils_Type::validate($value['sort'], 'MysqlColumnNameOrAlias'),
         'direction' => CRM_Utils_Array::value('direction', $value),
         'title' => $value['name'],
-      );
+      ];
     }
 
     $this->_currentSortID = 1;
@@ -219,12 +219,12 @@ class CRM_Utils_Sort {
   public function initialize($defaultSortOrder) {
     $this->initSortID($defaultSortOrder);
 
-    $this->_response = array();
+    $this->_response = [];
 
     $current = $this->_currentSortID;
     foreach ($this->_vars as $index => $item) {
       $name = $item['name'];
-      $this->_response[$name] = array();
+      $this->_response[$name] = [];
 
       $newDirection = ($item['direction'] == self::ASCENDING) ? self::DESCENDING : self::ASCENDING;
 
@@ -274,7 +274,7 @@ class CRM_Utils_Sort {
    *   (-1 or 1)
    */
   public static function cmpFunc($a, $b) {
-    $cmp_order = array('weight', 'id', 'title', 'name');
+    $cmp_order = ['weight', 'id', 'title', 'name'];
     foreach ($cmp_order as $attribute) {
       if (isset($a[$attribute]) && isset($b[$attribute])) {
         if ($a[$attribute] < $b[$attribute]) {

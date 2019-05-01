@@ -30,6 +30,7 @@
  * @group headless
  */
 class CRM_Member_StatusOverrideTypesTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
   }
@@ -45,7 +46,6 @@ class CRM_Member_StatusOverrideTypesTest extends CiviUnitTestCase {
     $isOverridden = $statusOverrideTypes::isOverridden(CRM_Member_StatusOverrideTypes::PERMANENT);
     $this->assertTrue($isOverridden);
   }
-
 
   public function testIsOverriddenReturnTrueForUntilDateStatusOverrideType() {
     $statusOverrideTypes = new CRM_Member_StatusOverrideTypes();

@@ -72,23 +72,22 @@
   <table class="row-highlight">
     <tr class="columnheader">
       <th>&nbsp;</th>
-      <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$other_cid"}">{$other_name|escape}</a> ({ts}duplicate{/ts})</th>
+      <th>{$otherContactTypeIcon} <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$other_cid"}">{$other_name|escape}</a> ({ts}duplicate{/ts})</th>
       <th>{ts}Mark All{/ts}<br />=={$form.toggleSelect.html} ==&gt;</th>
-      <th><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$main_cid"}">{$main_name|escape}</a></th>
+      <th>{$mainContactTypeIcon}<a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$main_cid"}">{$main_name|escape}</a></th>
       <th width="300">Add/overwrite?</th>
     </tr>
 
-    {crmAPI var='other_result' entity='Contact' action='get' return="modified_date" id=$other_cid}
 
-    {crmAPI var='main_result' entity='Contact' action='get' return="modified_date" id=$main_cid}
-
-    <tr>
-      <td>Last modified</td>
-      <td>{$other_result.values.0.modified_date|crmDate} {if $other_result.values.0.modified_date gt $main_result.values.0.modified_date} (Most recent) {/if}</td>
-      <td></td>
-      <td>{$main_result.values.0.modified_date|crmDate} {if $main_result.values.0.modified_date gt $other_result.values.0.modified_date} (Most recent) {/if}</td>
-      <td></td>
-    </tr>
+    {foreach from=$summary_rows item=summaryRow}
+      <tr>
+        <td>{$summaryRow.label}</td>
+        <td>{$summaryRow.other_contact_value}</td>
+        <td></td>
+        <td>{$summaryRow.main_contact_value}</td>
+        <td></td>
+      </tr>
+    {/foreach}
 
     {foreach from=$rows item=row key=field}
 
@@ -114,8 +113,8 @@
 
           <td>
             {* @TODO check if this is ever an array or a fileName? *}
-            {if $row.title|substr:0:5 == "Email"   OR
-                $row.title|substr:0:7 == "Address"}
+            {if $row.location_entity == "email"   OR
+                $row.location_entity == "address"}
               <span style="white-space: pre">
             {else}
               <span>
@@ -135,16 +134,12 @@
           </td>
 
           {* For location blocks *}
-          {if $row.title|substr:0:5 == "Email"   OR
-              $row.title|substr:0:7 == "Address" OR
-              $row.title|substr:0:2 == "IM"      OR
-              $row.title|substr:0:7 == "Website" OR
-              $row.title|substr:0:5 == "Phone"}
+          {if $row.location_entity}
 
             <td>
               {strip}
-                {if $row.title|substr:0:5 == "Email"   OR
-                    $row.title|substr:0:7 == "Address"}
+                {if $row.location_entity == "email"   OR
+                    $row.location_entity == "address"}
                   <span style="white-space: pre" id="main_{$blockName|escape}_{$blockId|escape}">
                 {else}
                   <span id="main_{$blockName|escape}_{$blockId|escape}">

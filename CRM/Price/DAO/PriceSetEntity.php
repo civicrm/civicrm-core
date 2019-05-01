@@ -19,14 +19,14 @@ class CRM_Price_DAO_PriceSetEntity extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_price_set_entity';
+  public static $_tableName = 'civicrm_price_set_entity';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Price Set Entity
@@ -72,7 +72,7 @@ class CRM_Price_DAO_PriceSetEntity extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'price_set_id', 'civicrm_price_set', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), 'entity_id', NULL, 'id', 'entity_table');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -94,6 +94,7 @@ class CRM_Price_DAO_PriceSetEntity extends CRM_Core_DAO {
           'title' => ts('Price Set Entity ID'),
           'description' => ts('Price Set Entity'),
           'required' => TRUE,
+          'where' => 'civicrm_price_set_entity.id',
           'table_name' => 'civicrm_price_set_entity',
           'entity' => 'PriceSetEntity',
           'bao' => 'CRM_Price_DAO_PriceSetEntity',
@@ -107,6 +108,7 @@ class CRM_Price_DAO_PriceSetEntity extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_price_set_entity.entity_table',
           'table_name' => 'civicrm_price_set_entity',
           'entity' => 'PriceSetEntity',
           'bao' => 'CRM_Price_DAO_PriceSetEntity',
@@ -118,6 +120,7 @@ class CRM_Price_DAO_PriceSetEntity extends CRM_Core_DAO {
           'title' => ts('Entity IF'),
           'description' => ts('Item in table'),
           'required' => TRUE,
+          'where' => 'civicrm_price_set_entity.entity_id',
           'table_name' => 'civicrm_price_set_entity',
           'entity' => 'PriceSetEntity',
           'bao' => 'CRM_Price_DAO_PriceSetEntity',
@@ -129,6 +132,7 @@ class CRM_Price_DAO_PriceSetEntity extends CRM_Core_DAO {
           'title' => ts('Price Set'),
           'description' => ts('price set being used'),
           'required' => TRUE,
+          'where' => 'civicrm_price_set_entity.price_set_id',
           'table_name' => 'civicrm_price_set_entity',
           'entity' => 'PriceSetEntity',
           'bao' => 'CRM_Price_DAO_PriceSetEntity',

@@ -143,6 +143,37 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
     $this->assertEquals('01/01/2009', $result['participant_register_date_low']);
     $this->assertEquals('01/01/2018', $result['participant_register_date_high']);
   }
+
+  /**
+   * Test if skipped elements are correctly
+   * stored and retrieved as formvalues.
+   */
+  public function testSkippedElements() {
+    $relTypeID = $this->relationshipTypeCreate();
+    $savedSearch = new CRM_Contact_BAO_SavedSearch();
+    $formValues = array(
+      'operator' => 'AND',
+      'title' => 'testsmart',
+      'radio_ts' => 'ts_all',
+      'component_mode' => CRM_Contact_BAO_Query::MODE_CONTACTS,
+      'display_relationship_type' => "{$relTypeID}_a_b",
+      'uf_group_id' => 1,
+    );
+    $queryParams = array();
+    CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
+    $savedSearch->form_values = serialize($queryParams);
+    $savedSearch->save();
+
+    $result = CRM_Contact_BAO_SavedSearch::getFormValues(CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()'));
+    $expectedResult = array(
+      'operator' => 'AND',
+      'component_mode' => CRM_Contact_BAO_Query::MODE_CONTACTS,
+      'display_relationship_type' => "{$relTypeID}_a_b",
+      'uf_group_id' => 1,
+    );
+    $this->checkArrayEquals($result, $expectedResult);
+  }
+
   /**
    * Test if relative dates are stored correctly
    * in civicrm_saved_search table.

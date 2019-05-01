@@ -19,14 +19,14 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_file';
+  public static $_tableName = 'civicrm_file';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Unique ID
@@ -100,7 +100,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'created_id', 'civicrm_contact', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -121,6 +121,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
           'title' => ts('File ID'),
           'description' => ts('Unique ID'),
           'required' => TRUE,
+          'where' => 'civicrm_file.id',
           'table_name' => 'civicrm_file',
           'entity' => 'File',
           'bao' => 'CRM_Core_BAO_File',
@@ -131,6 +132,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('File Type'),
           'description' => ts('Type of file (e.g. Transcript, Income Tax Return, etc). FK to civicrm_option_value.'),
+          'where' => 'civicrm_file.file_type_id',
           'table_name' => 'civicrm_file',
           'entity' => 'File',
           'bao' => 'CRM_Core_BAO_File',
@@ -143,6 +145,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
           'description' => ts('mime type of the document'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_file.mime_type',
           'table_name' => 'civicrm_file',
           'entity' => 'File',
           'bao' => 'CRM_Core_BAO_File',
@@ -155,6 +158,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
           'description' => ts('uri of the file on disk'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_file.uri',
           'table_name' => 'civicrm_file',
           'entity' => 'File',
           'bao' => 'CRM_Core_BAO_File',
@@ -165,6 +169,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_MEDIUMBLOB,
           'title' => ts('File Contents'),
           'description' => ts('contents of the document'),
+          'where' => 'civicrm_file.document',
           'table_name' => 'civicrm_file',
           'entity' => 'File',
           'bao' => 'CRM_Core_BAO_File',
@@ -177,6 +182,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
           'description' => ts('Additional descriptive text regarding this attachment (optional).'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_file.description',
           'table_name' => 'civicrm_file',
           'entity' => 'File',
           'bao' => 'CRM_Core_BAO_File',
@@ -187,6 +193,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           'title' => ts('File Upload Date'),
           'description' => ts('Date and time that this attachment was uploaded or written to server.'),
+          'where' => 'civicrm_file.upload_date',
           'table_name' => 'civicrm_file',
           'entity' => 'File',
           'bao' => 'CRM_Core_BAO_File',
@@ -197,6 +204,7 @@ class CRM_Core_DAO_File extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Created By Contact ID'),
           'description' => ts('FK to civicrm_contact, who uploaded this file'),
+          'where' => 'civicrm_file.created_id',
           'table_name' => 'civicrm_file',
           'entity' => 'File',
           'bao' => 'CRM_Core_BAO_File',

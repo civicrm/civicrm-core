@@ -19,14 +19,14 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_cxn';
+  public static $_tableName = 'civicrm_cxn';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Connection ID
@@ -127,6 +127,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'title' => ts('Connection ID'),
           'description' => ts('Connection ID'),
           'required' => TRUE,
+          'where' => 'civicrm_cxn.id',
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
@@ -139,6 +140,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'description' => ts('Application GUID'),
           'maxlength' => 128,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_cxn.app_guid',
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
@@ -149,6 +151,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Application Metadata (JSON)'),
           'description' => ts('Application Metadata (JSON)'),
+          'where' => 'civicrm_cxn.app_meta',
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
@@ -161,6 +164,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'description' => ts('Connection GUID'),
           'maxlength' => 128,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_cxn.cxn_guid',
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
@@ -171,6 +175,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Secret'),
           'description' => ts('Shared secret'),
+          'where' => 'civicrm_cxn.secret',
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
@@ -181,6 +186,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Perm'),
           'description' => ts('Permissions approved for the service (JSON)'),
+          'where' => 'civicrm_cxn.perm',
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
@@ -191,6 +197,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Options'),
           'description' => ts('Options for the service (JSON)'),
+          'where' => 'civicrm_cxn.options',
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
           'bao' => 'CRM_Cxn_BAO_Cxn',
@@ -202,6 +209,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is Active'),
           'description' => ts('Is connection currently enabled?'),
+          'where' => 'civicrm_cxn.is_active',
           'default' => '1',
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
@@ -214,6 +222,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'title' => ts('Created Date'),
           'description' => ts('When was the connection was created.'),
           'required' => FALSE,
+          'where' => 'civicrm_cxn.created_date',
           'default' => 'NULL',
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
@@ -226,6 +235,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'title' => ts('Modified Date'),
           'description' => ts('When the connection was created or modified.'),
           'required' => FALSE,
+          'where' => 'civicrm_cxn.modified_date',
           'default' => 'CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',
@@ -238,6 +248,7 @@ class CRM_Cxn_DAO_Cxn extends CRM_Core_DAO {
           'title' => ts('Fetched Date'),
           'description' => ts('The last time the application metadata was fetched.'),
           'required' => FALSE,
+          'where' => 'civicrm_cxn.fetched_date',
           'default' => 'NULL',
           'table_name' => 'civicrm_cxn',
           'entity' => 'Cxn',

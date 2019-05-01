@@ -70,7 +70,7 @@ abstract class CRM_Core_Task {
    *   This must be defined in each child class.  It is passed to the searchTasks hook.
    *   Example: $objectType = 'event';
    */
-  static $objectType = NULL;
+  public static $objectType = NULL;
 
   /**
    * Generates a list of batch tasks available for the current entities.
@@ -98,7 +98,7 @@ abstract class CRM_Core_Task {
   public static function taskTitles() {
     static::tasks();
 
-    $titles = array();
+    $titles = [];
     foreach (self::$_tasks as $id => $value) {
       $titles[$id] = $value['title'];
     }
@@ -175,10 +175,10 @@ abstract class CRM_Core_Task {
       // Children can specify a default task (eg. print), pick another if it is not valid.
       $value = key(self::$_tasks);
     }
-    return array(
+    return [
       CRM_Utils_Array::value('class', self::$_tasks[$value]),
       CRM_Utils_Array::value('result', self::$_tasks[$value]),
-    );
+    ];
   }
 
   /**
@@ -195,10 +195,10 @@ abstract class CRM_Core_Task {
       if ((!empty($value['url']) || $task == self::TASK_EXPORT)
           && ((is_array($value['class']) && in_array($className, $value['class']))
           || ($value['class'] == $className))) {
-        return array($task, CRM_Utils_Array::value('title', $value));
+        return [$task, CRM_Utils_Array::value('title', $value)];
       }
     }
-    return array();
+    return [];
   }
 
 }

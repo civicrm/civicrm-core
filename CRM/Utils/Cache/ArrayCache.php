@@ -37,12 +37,14 @@
 class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
 
   use CRM_Utils_Cache_NaiveMultipleTrait;
-  use CRM_Utils_Cache_NaiveHasTrait; // TODO Native implementation
+  // TODO Native implementation
+  use CRM_Utils_Cache_NaiveHasTrait;
 
   const DEFAULT_TIMEOUT = 3600;
 
   /**
    * The cache storage container, an in memory array by default
+   * @var array
    */
   protected $_cache;
 
@@ -57,8 +59,8 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
    * @return \CRM_Utils_Cache_Arraycache
    */
   public function __construct($config) {
-    $this->_cache = array();
-    $this->_expires = array();
+    $this->_cache = [];
+    $this->_expires = [];
   }
 
   /**
@@ -109,7 +111,7 @@ class CRM_Utils_Cache_Arraycache implements CRM_Utils_Cache_Interface {
   public function flush() {
     unset($this->_cache);
     unset($this->_expires);
-    $this->_cache = array();
+    $this->_cache = [];
     return TRUE;
   }
 

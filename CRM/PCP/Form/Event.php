@@ -46,7 +46,6 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
    */
   public $_component = 'event';
 
-
   public function preProcess() {
     parent::preProcess();
     $this->assign('selectedChild', 'pcp');
@@ -58,12 +57,12 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (isset($this->_id)) {
       $title = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_id, 'title');
-      CRM_Utils_System::setTitle(ts('Personal Campaign Page Settings (%1)', array(1 => $title)));
+      CRM_Utils_System::setTitle(ts('Personal Campaign Page Settings (%1)', [1 => $title]));
 
-      $params = array('entity_id' => $this->_id, 'entity_table' => 'civicrm_event');
+      $params = ['entity_id' => $this->_id, 'entity_table' => 'civicrm_event'];
       CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $params, $defaults);
       $defaults['pcp_active'] = CRM_Utils_Array::value('is_active', $defaults);
       // Assign contribution page ID to pageId for referencing in PCP.hlp - since $id is overwritten there. dgg
@@ -95,18 +94,18 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
   public function buildQuickForm() {
     CRM_PCP_BAO_PCP::buildPCPForm($this);
 
-    $this->addElement('checkbox', 'pcp_active', ts('Enable Personal Campaign Pages? (for this event)'), NULL, array('onclick' => "return showHideByValue('pcp_active',true,'pcpFields','table-row','radio',false);"));
+    $this->addElement('checkbox', 'pcp_active', ts('Enable Personal Campaign Pages? (for this event)'), NULL, ['onclick' => "return showHideByValue('pcp_active',true,'pcpFields','table-row','radio',false);"]);
 
     $this->add('select', 'target_entity_type', ts('Campaign Type'),
-      array('' => ts('- select -'), 'event' => ts('Event'), 'contribute' => ts('Contribution')),
-      NULL, array('onchange' => "return showHideByValue('target_entity_type','contribute','pcpDetailFields','block','select',false);")
+      ['' => ts('- select -'), 'event' => ts('Event'), 'contribute' => ts('Contribution')],
+      NULL, ['onchange' => "return showHideByValue('target_entity_type','contribute','pcpDetailFields','block','select',false);"]
     );
 
     $this->add('select', 'target_entity_id',
       ts('Online Contribution Page'),
-      array(
+      [
         '' => ts('- select -'),
-      ) +
+      ] +
       CRM_Contribute_PseudoConstant::contributionPage()
     );
 
@@ -119,15 +118,15 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
     $pcpBlock->find(TRUE);
 
     if (!empty($pcpBlock->id) && CRM_PCP_BAO_PCP::getPcpBlockInUse($pcpBlock->id)) {
-      foreach (array(
-                 'target_entity_type',
-                 'target_entity_id',
-               ) as $element_name) {
+      foreach ([
+        'target_entity_type',
+        'target_entity_id',
+      ] as $element_name) {
         $element = $this->getElement($element_name);
         $element->freeze();
       }
     }
-    $this->addFormRule(array('CRM_PCP_Form_Event', 'formRule'), $this);
+    $this->addFormRule(['CRM_PCP_Form_Event', 'formRule'], $this);
   }
 
   /**
@@ -143,7 +142,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
    *   mixed true or array of errors
    */
   public static function formRule($params, $files, $self) {
-    $errors = array();
+    $errors = [];
     if (!empty($params['is_active'])) {
 
       if (!empty($params['is_tellfriend_enabled']) &&

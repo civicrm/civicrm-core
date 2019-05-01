@@ -118,7 +118,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
     $contacts = CRM_Contact_BAO_Contact::getTableName();
     $domain_id = CRM_Core_Config::domainID();
-    $domainValues = civicrm_api3('Domain', 'get', array('sequential' => 1, 'id' => $domain_id));
+    $domainValues = civicrm_api3('Domain', 'get', ['sequential' => 1, 'id' => $domain_id]);
     $fromEmail = CRM_Core_BAO_Domain::getNoReplyEmailAddress();
 
     $eq = new CRM_Core_DAO();
@@ -140,7 +140,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
       $parser = new ezcMailParser();
       $set = new ezcMailVariableSet($fullEmail);
       $parsed = array_shift($parser->parseMail($set));
-      $parsed->to = array(new ezcMailAddress($mailing->replyto_email));
+      $parsed->to = [new ezcMailAddress($mailing->replyto_email)];
 
       // CRM-5567: we need to set Reply-To: so that any response
       // to the forward goes to the sender of the reply
@@ -167,7 +167,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
       // the body and make the boundary in the header match it
       $ct = $h['Content-Type'];
       if (substr_count($ct, 'boundary=')) {
-        $matches = array();
+        $matches = [];
         preg_match('/^--(.*)$/m', $b, $matches);
         $boundary = rtrim($matches[1]);
         $parts = explode('boundary=', $ct);
@@ -179,7 +179,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
 
       $message = new Mail_mime("\n");
 
-      $headers = array(
+      $headers = [
         'Subject' => "Re: {$mailing->subject}",
         'To' => $mailing->replyto_email,
         'From' => "\"$fromName\" <$fromEmail>",
@@ -188,7 +188,7 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
         // CRM-17754 Include re-sent headers to indicate that we have forwarded on the email
         'Resent-From' => $domainValues['values'][0]['from_email'],
         'Resent-Date' => date('r'),
-      );
+      ];
 
       $message->setTxtBody($bodyTxt);
       $message->setHTMLBody($bodyHTML);
@@ -248,13 +248,13 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
     $domain = CRM_Core_BAO_Domain::getDomain();
     list($domainEmailName, $_) = CRM_Core_BAO_Domain::getNameAndEmail();
 
-    $headers = array(
+    $headers = [
       'Subject' => $component->subject,
       'To' => $to,
       'From' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
       'Reply-To' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'Return-Path' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
-    );
+    ];
 
     // TODO: do we need reply tokens?
     $html = $component->body_html;
@@ -427,17 +427,17 @@ class CRM_Mailing_Event_BAO_Reply extends CRM_Mailing_Event_DAO_Reply {
 
     $dao->query($query);
 
-    $results = array();
+    $results = [];
 
     while ($dao->fetch()) {
       $url = CRM_Utils_System::url('civicrm/contact/view',
         "reset=1&cid={$dao->contact_id}"
       );
-      $results[] = array(
+      $results[] = [
         'name' => "<a href=\"$url\">{$dao->display_name}</a>",
         'email' => $dao->email,
         'date' => CRM_Utils_Date::customFormat($dao->date),
-      );
+      ];
     }
     return $results;
   }

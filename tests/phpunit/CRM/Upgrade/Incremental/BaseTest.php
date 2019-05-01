@@ -89,10 +89,10 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
    */
   public function testSmartGroupDatePickerConversion() {
     $this->callAPISuccess('SavedSearch', 'create', [
-       'form_values' => [
+      'form_values' => [
          ['grant_application_received_date_high', '=', '01/20/2019'],
          ['grant_due_date_low', '=', '01/22/2019'],
-       ]
+      ],
     ]);
     $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups();
     $smartGroupConversionObject->updateGroups([
@@ -100,8 +100,8 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
         'grant_application_received_date',
         'grant_decision_date',
         'grant_money_transfer_date',
-        'grant_due_date'
-      ]
+        'grant_due_date',
+      ],
     ]);
     $savedSearch = $this->callAPISuccessGetSingle('SavedSearch', []);
     $this->assertEquals('grant_application_received_date_high', $savedSearch['form_values'][0][0]);
@@ -124,7 +124,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     $this->callAPISuccess('SavedSearch', 'create', [
       'form_values' => [
         ['on_hold', '=', '1'],
-      ]
+      ],
     ]);
     $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups('5.11.alpha1');
     $smartGroupConversionObject->convertEqualsStringToInArray('on_hold');
@@ -141,7 +141,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     $this->callAPISuccess('SavedSearch', 'create', [
       'form_values' => [
         ['activity_date_low', '=', '01/22/2019'],
-      ]
+      ],
     ]);
     $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups();
     $smartGroupConversionObject->renameField('activity_date_low', 'activity_date_time_low');
@@ -157,7 +157,7 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
       'form_values' => [
         ['activity_date_low', '=', '01/22/2019'],
         ['activity_date_relative', '=', 0],
-      ]
+      ],
     ]);
     $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups();
     $smartGroupConversionObject->renameFields([

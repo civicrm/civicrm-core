@@ -19,14 +19,14 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_contribution_widget';
+  public static $_tableName = 'civicrm_contribution_widget';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Contribution Id
@@ -145,7 +145,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contribution_page_id', 'civicrm_contribution_page', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -166,6 +166,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'title' => ts('Widget ID'),
           'description' => ts('Contribution Id'),
           'required' => TRUE,
+          'where' => 'civicrm_contribution_widget.id',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -176,6 +177,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Contribution Page'),
           'description' => ts('The Contribution Page which triggered this contribution'),
+          'where' => 'civicrm_contribution_widget.contribution_page_id',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -187,6 +189,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Enabled?'),
           'description' => ts('Is this property active?'),
+          'where' => 'civicrm_contribution_widget.is_active',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -199,6 +202,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'description' => ts('Widget title.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_contribution_widget.title',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -211,6 +215,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'description' => ts('URL to Widget logo'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_contribution_widget.url_logo',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -223,6 +228,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'description' => ts('Button title.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_contribution_widget.button_title',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -233,6 +239,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Description'),
           'description' => ts('About description.'),
+          'where' => 'civicrm_contribution_widget.about',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -245,6 +252,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'description' => ts('URL to Homepage.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_contribution_widget.url_homepage',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -256,6 +264,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'title' => ts('Title Color'),
           'maxlength' => 10,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_contribution_widget.color_title',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -267,6 +276,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'title' => ts('Button Colour'),
           'maxlength' => 10,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_contribution_widget.color_button',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -278,6 +288,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'title' => ts('Bar Color'),
           'maxlength' => 10,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_contribution_widget.color_bar',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -289,6 +300,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'title' => ts('Main Text Color'),
           'maxlength' => 10,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_contribution_widget.color_main_text',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -300,6 +312,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'title' => ts('Main Colour'),
           'maxlength' => 10,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_contribution_widget.color_main',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -311,6 +324,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'title' => ts('Backgroup Color'),
           'maxlength' => 10,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_contribution_widget.color_main_bg',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -322,6 +336,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'title' => ts('Other Backgroun Colour'),
           'maxlength' => 10,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_contribution_widget.color_bg',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -333,6 +348,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'title' => ts('About Link Colour'),
           'maxlength' => 10,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_contribution_widget.color_about_link',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',
@@ -344,6 +360,7 @@ class CRM_Contribute_DAO_Widget extends CRM_Core_DAO {
           'title' => ts('Homepage Link Colour'),
           'maxlength' => 10,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_contribution_widget.color_homepage_link',
           'table_name' => 'civicrm_contribution_widget',
           'entity' => 'Widget',
           'bao' => 'CRM_Contribute_BAO_Widget',

@@ -37,10 +37,12 @@ class CRM_Utils_ICalendarTest extends CiviUnitTestCase {
   public function escapeExamples() {
     $cases = array();
     $cases[] = array("Hello
-    this is, a test!");
+    this is, a test!",
+    );
     $cases[] = array("Hello!!
 
-    this is, a \"test\"!");
+    this is, a \"test\"!",
+    );
     return $cases;
   }
 

@@ -39,14 +39,14 @@
  */
 class CRM_Utils_Address_BatchUpdate {
 
-  var $start = NULL;
-  var $end = NULL;
-  var $geocoding = 1;
-  var $parse = 1;
-  var $throttle = 0;
+  public $start = NULL;
+  public $end = NULL;
+  public $geocoding = 1;
+  public $parse = 1;
+  public $throttle = 0;
 
-  var $returnMessages = array();
-  var $returnError = 0;
+  public $returnMessages = [];
+  public $returnError = 0;
 
   /**
    * Class constructor.
@@ -132,16 +132,16 @@ class CRM_Utils_Address_BatchUpdate {
    */
   public function processContacts($processGeocode, $parseStreetAddress) {
     // build where clause.
-    $clause = array('( c.id = a.contact_id )');
-    $params = array();
+    $clause = ['( c.id = a.contact_id )'];
+    $params = [];
     if ($this->start) {
       $clause[] = "( c.id >= %1 )";
-      $params[1] = array($this->start, 'Integer');
+      $params[1] = [$this->start, 'Integer'];
     }
 
     if ($this->end) {
       $clause[] = "( c.id <= %2 )";
-      $params[2] = array($this->end, 'Integer');
+      $params[2] = [$this->end, 'Integer'];
     }
 
     if ($processGeocode) {
@@ -173,19 +173,19 @@ class CRM_Utils_Address_BatchUpdate {
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
-    $unparseableContactAddress = array();
+    $unparseableContactAddress = [];
     while ($dao->fetch()) {
       $totalAddresses++;
-      $params = array(
+      $params = [
         'street_address' => $dao->street_address,
         'postal_code' => $dao->postal_code,
         'city' => $dao->city,
         'state_province' => $dao->state,
         'country' => $dao->country,
         'country_id' => $dao->country_id,
-      );
+      ];
 
-      $addressParams = array();
+      $addressParams = [];
 
       // process geocode.
       if ($processGeocode) {
@@ -258,18 +258,18 @@ class CRM_Utils_Address_BatchUpdate {
       }
     }
 
-    $this->returnMessages[] = ts("Addresses Evaluated: %1", array(
+    $this->returnMessages[] = ts("Addresses Evaluated: %1", [
       1 => $totalAddresses,
-      )) . "\n";
+    ]) . "\n";
     if ($processGeocode) {
-      $this->returnMessages[] = ts("Addresses Geocoded: %1", array(
-          1 => $totalGeocoded,
-        )) . "\n";
+      $this->returnMessages[] = ts("Addresses Geocoded: %1", [
+        1 => $totalGeocoded,
+      ]) . "\n";
     }
     if ($parseStreetAddress) {
-      $this->returnMessages[] = ts("Street Addresses Parsed: %1", array(
-          1 => $totalAddressParsed,
-        )) . "\n";
+      $this->returnMessages[] = ts("Street Addresses Parsed: %1", [
+        1 => $totalAddressParsed,
+      ]) . "\n";
       if ($unparseableContactAddress) {
         $this->returnMessages[] = "<br />\n" . ts("Following is the list of contacts whose address is not parsed:") . "<br />\n";
         foreach ($unparseableContactAddress as $contactLink) {
@@ -287,7 +287,7 @@ class CRM_Utils_Address_BatchUpdate {
    * @return array
    */
   public function returnResult() {
-    $result = array();
+    $result = [];
     $result['is_error'] = $this->returnError;
     $result['messages'] = '';
     // Pad message size to allow for prefix added by CRM_Core_JobManager.

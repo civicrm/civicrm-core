@@ -91,7 +91,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
    * We do this from the constructor in order to do a translation.
    */
   public function setDeleteMessage() {
-    $this->deleteMessage = ts('You will not be able to delete this membership status if there are existing memberships with this status. You will need to check all your membership status rules afterwards to ensure that a valid status will always be available.') . " "  . ts('Do you want to continue?');
+    $this->deleteMessage = ts('You will not be able to delete this membership status if there are existing memberships with this status. You will need to check all your membership status rules afterwards to ensure that a valid status will always be available.') . " " . ts('Do you want to continue?');
   }
 
   public function preProcess() {
@@ -138,16 +138,16 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
       $this->assign('id', $this->_id);
     }
     $this->addRule('label', ts('A membership status with this label already exists. Please select another label.'),
-      'objectExists', array('CRM_Member_DAO_MembershipStatus', $this->_id, 'name')
+      'objectExists', ['CRM_Member_DAO_MembershipStatus', $this->_id, 'name']
     );
 
     $this->add('select', 'start_event', ts('Start Event'), CRM_Core_SelectValues::eventDate(), TRUE);
-    $this->add('select', 'start_event_adjust_unit', ts('Start Event Adjustment'), array('' => ts('- select -')) + CRM_Core_SelectValues::unitList());
+    $this->add('select', 'start_event_adjust_unit', ts('Start Event Adjustment'), ['' => ts('- select -')] + CRM_Core_SelectValues::unitList());
     $this->add('text', 'start_event_adjust_interval', ts('Start Event Adjust Interval'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipStatus', 'start_event_adjust_interval')
     );
-    $this->add('select', 'end_event', ts('End Event'), array('' => ts('- select -')) + CRM_Core_SelectValues::eventDate());
-    $this->add('select', 'end_event_adjust_unit', ts('End Event Adjustment'), array('' => ts('- select -')) + CRM_Core_SelectValues::unitList());
+    $this->add('select', 'end_event', ts('End Event'), ['' => ts('- select -')] + CRM_Core_SelectValues::eventDate());
+    $this->add('select', 'end_event_adjust_unit', ts('End Event Adjustment'), ['' => ts('- select -')] + CRM_Core_SelectValues::unitList());
     $this->add('text', 'end_event_adjust_interval', ts('End Event Adjust Interval'),
       CRM_Core_DAO::getAttribute('CRM_Member_DAO_MembershipStatus', 'end_event_adjust_interval')
     );
@@ -197,7 +197,7 @@ class CRM_Member_Form_MembershipStatus extends CRM_Core_Form {
 
       $membershipStatus = CRM_Member_BAO_MembershipStatus::add($params);
       CRM_Core_Session::setStatus(ts('The membership status \'%1\' has been saved.',
-        array(1 => $membershipStatus->label)
+        [1 => $membershipStatus->label]
       ), ts('Saved'), 'success');
     }
   }

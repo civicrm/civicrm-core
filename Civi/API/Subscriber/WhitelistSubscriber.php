@@ -29,7 +29,6 @@ namespace Civi\API\Subscriber;
 use Civi\API\Events;
 use Civi\API\Event\AuthorizeEvent;
 use Civi\API\Event\RespondEvent;
-use Civi\API\WhitelistRule;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -46,10 +45,10 @@ class WhitelistSubscriber implements EventSubscriberInterface {
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::AUTHORIZE => array('onApiAuthorize', Events::W_EARLY),
-      Events::RESPOND => array('onApiRespond', Events::W_MIDDLE),
-    );
+    return [
+      Events::AUTHORIZE => ['onApiAuthorize', Events::W_EARLY],
+      Events::RESPOND => ['onApiRespond', Events::W_MIDDLE],
+    ];
   }
 
   /**
@@ -73,9 +72,9 @@ class WhitelistSubscriber implements EventSubscriberInterface {
    * @throws \CRM_Core_Exception
    */
   public function __construct($rules) {
-    $this->rules = array();
+    $this->rules = [];
     foreach ($rules as $rule) {
-      /** @var WhitelistRule $rule */
+      /** @var \Civi\API\WhitelistRule $rule */
       if ($rule->isValid()) {
         $this->rules[] = $rule;
       }
@@ -89,7 +88,7 @@ class WhitelistSubscriber implements EventSubscriberInterface {
    * Determine which, if any, whitelist rules apply this request.
    * Reject unauthorized requests.
    *
-   * @param AuthorizeEvent $event
+   * @param \Civi\API\Event\AuthorizeEvent $event
    * @throws \CRM_Core_Exception
    */
   public function onApiAuthorize(AuthorizeEvent $event) {
@@ -108,7 +107,7 @@ class WhitelistSubscriber implements EventSubscriberInterface {
 
   /**
    * Apply any filtering rules based on the chosen whitelist rule.
-   * @param RespondEvent $event
+   * @param \Civi\API\Event\RespondEvent $event
    */
   public function onApiRespond(RespondEvent $event) {
     $apiRequest = $event->getApiRequest();

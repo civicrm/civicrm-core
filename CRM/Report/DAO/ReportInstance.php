@@ -19,14 +19,14 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_report_instance';
+  public static $_tableName = 'civicrm_report_instance';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Report Instance ID
@@ -189,7 +189,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'domain_id', 'civicrm_domain', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'created_id', 'civicrm_contact', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'owner_id', 'civicrm_contact', 'id');
@@ -214,6 +214,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'title' => ts('Report Instance ID'),
           'description' => ts('Report Instance ID'),
           'required' => TRUE,
+          'where' => 'civicrm_report_instance.id',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -225,6 +226,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'title' => ts('Report Instance Domain ID'),
           'description' => ts('Which Domain is this instance for'),
           'required' => TRUE,
+          'where' => 'civicrm_report_instance.domain_id',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -243,6 +245,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'description' => ts('Report Instance Title.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_report_instance.title',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -259,6 +262,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 512,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_report_instance.report_id',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -274,6 +278,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'description' => ts('when combined with report_id/template uniquely identifies the instance'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_report_instance.name',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -289,6 +294,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'description' => ts('arguments that are passed in the url when invoking the instance'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_report_instance.args',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -304,6 +310,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'description' => ts('Report Instance description.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_report_instance.description',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -319,6 +326,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'description' => ts('permission required to be able to run this instance'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_report_instance.permission',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -334,6 +342,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'description' => ts('role required to be able to run this instance'),
           'maxlength' => 1024,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_report_instance.grouprole',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -349,8 +358,6 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'description' => ts('Submitted form values for this report'),
           'import' => TRUE,
           'where' => 'civicrm_report_instance.form_values',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
@@ -363,6 +370,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Report Instance is Active'),
           'description' => ts('Is this entry active?'),
+          'where' => 'civicrm_report_instance.is_active',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -376,6 +384,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Report Instance Created By'),
           'description' => ts('FK to contact table.'),
+          'where' => 'civicrm_report_instance.created_id',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -387,6 +396,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Report Instance Owned By'),
           'description' => ts('FK to contact table.'),
+          'where' => 'civicrm_report_instance.owner_id',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -400,6 +410,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'description' => ts('Subject of email'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_report_instance.email_subject',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -413,6 +424,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Email Report Instance To'),
           'description' => ts('comma-separated list of email addresses to send the report to'),
+          'where' => 'civicrm_report_instance.email_to',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -426,6 +438,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('cc Email Report Instance To'),
           'description' => ts('comma-separated list of email addresses to send the report to'),
+          'where' => 'civicrm_report_instance.email_cc',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -441,6 +454,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'description' => ts('comma-separated list of email addresses to send the report to'),
           'rows' => 4,
           'cols' => 60,
+          'where' => 'civicrm_report_instance.header',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -456,6 +470,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'description' => ts('comma-separated list of email addresses to send the report to'),
           'rows' => 4,
           'cols' => 60,
+          'where' => 'civicrm_report_instance.footer',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
           'bao' => 'CRM_Report_BAO_ReportInstance',
@@ -471,8 +486,6 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'description' => ts('FK to navigation ID'),
           'import' => TRUE,
           'where' => 'civicrm_report_instance.navigation_id',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
@@ -487,8 +500,6 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'description' => ts('FK to instance ID drilldown to'),
           'import' => TRUE,
           'where' => 'civicrm_report_instance.drilldown_id',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',
@@ -500,6 +511,7 @@ class CRM_Report_DAO_ReportInstance extends CRM_Core_DAO {
           'name' => 'is_reserved',
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Instance is Reserved'),
+          'where' => 'civicrm_report_instance.is_reserved',
           'default' => '0',
           'table_name' => 'civicrm_report_instance',
           'entity' => 'ReportInstance',

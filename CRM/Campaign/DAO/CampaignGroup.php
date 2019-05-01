@@ -19,14 +19,14 @@ class CRM_Campaign_DAO_CampaignGroup extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_campaign_group';
+  public static $_tableName = 'civicrm_campaign_group';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Campaign Group id.
@@ -79,7 +79,7 @@ class CRM_Campaign_DAO_CampaignGroup extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'campaign_id', 'civicrm_campaign', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), 'entity_id', NULL, 'id', 'entity_table');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -101,6 +101,7 @@ class CRM_Campaign_DAO_CampaignGroup extends CRM_Core_DAO {
           'title' => ts('Campaign Group ID'),
           'description' => ts('Campaign Group id.'),
           'required' => TRUE,
+          'where' => 'civicrm_campaign_group.id',
           'table_name' => 'civicrm_campaign_group',
           'entity' => 'CampaignGroup',
           'bao' => 'CRM_Campaign_DAO_CampaignGroup',
@@ -112,6 +113,7 @@ class CRM_Campaign_DAO_CampaignGroup extends CRM_Core_DAO {
           'title' => ts('Campaign'),
           'description' => ts('Foreign key to the activity Campaign.'),
           'required' => TRUE,
+          'where' => 'civicrm_campaign_group.campaign_id',
           'table_name' => 'civicrm_campaign_group',
           'entity' => 'CampaignGroup',
           'bao' => 'CRM_Campaign_DAO_CampaignGroup',
@@ -130,6 +132,7 @@ class CRM_Campaign_DAO_CampaignGroup extends CRM_Core_DAO {
           'description' => ts('Type of Group.'),
           'maxlength' => 8,
           'size' => CRM_Utils_Type::EIGHT,
+          'where' => 'civicrm_campaign_group.group_type',
           'default' => 'NULL',
           'table_name' => 'civicrm_campaign_group',
           'entity' => 'CampaignGroup',
@@ -149,6 +152,7 @@ class CRM_Campaign_DAO_CampaignGroup extends CRM_Core_DAO {
           'description' => ts('Name of table where item being referenced is stored.'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_campaign_group.entity_table',
           'default' => 'NULL',
           'table_name' => 'civicrm_campaign_group',
           'entity' => 'CampaignGroup',
@@ -160,6 +164,7 @@ class CRM_Campaign_DAO_CampaignGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Entity ID'),
           'description' => ts('Entity id of referenced table.'),
+          'where' => 'civicrm_campaign_group.entity_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_campaign_group',
           'entity' => 'CampaignGroup',

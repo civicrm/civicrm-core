@@ -19,14 +19,14 @@ class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_queue_item';
+  public static $_tableName = 'civicrm_queue_item';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned
@@ -87,6 +87,7 @@ class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Queue ID'),
           'required' => TRUE,
+          'where' => 'civicrm_queue_item.id',
           'table_name' => 'civicrm_queue_item',
           'entity' => 'QueueItem',
           'bao' => 'CRM_Queue_BAO_QueueItem',
@@ -100,6 +101,7 @@ class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_queue_item.queue_name',
           'table_name' => 'civicrm_queue_item',
           'entity' => 'QueueItem',
           'bao' => 'CRM_Queue_BAO_QueueItem',
@@ -113,6 +115,7 @@ class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Order'),
           'required' => TRUE,
+          'where' => 'civicrm_queue_item.weight',
           'table_name' => 'civicrm_queue_item',
           'entity' => 'QueueItem',
           'bao' => 'CRM_Queue_BAO_QueueItem',
@@ -127,6 +130,7 @@ class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
           'title' => ts('Submit Time'),
           'description' => ts('date on which this item was submitted to the queue'),
           'required' => TRUE,
+          'where' => 'civicrm_queue_item.submit_time',
           'table_name' => 'civicrm_queue_item',
           'entity' => 'QueueItem',
           'bao' => 'CRM_Queue_BAO_QueueItem',
@@ -140,6 +144,7 @@ class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           'title' => ts('Release Time'),
           'description' => ts('date on which this job becomes available; null if ASAP'),
+          'where' => 'civicrm_queue_item.release_time',
           'table_name' => 'civicrm_queue_item',
           'entity' => 'QueueItem',
           'bao' => 'CRM_Queue_BAO_QueueItem',
@@ -153,6 +158,7 @@ class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Queue item data'),
           'description' => ts('Serialized queue data'),
+          'where' => 'civicrm_queue_item.data',
           'table_name' => 'civicrm_queue_item',
           'entity' => 'QueueItem',
           'bao' => 'CRM_Queue_BAO_QueueItem',

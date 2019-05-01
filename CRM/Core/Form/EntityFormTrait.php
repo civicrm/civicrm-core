@@ -30,7 +30,6 @@
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2019
  */
-
 trait CRM_Core_Form_EntityFormTrait {
 
   /**
@@ -63,6 +62,20 @@ trait CRM_Core_Form_EntityFormTrait {
    */
   public function getDeleteMessage() {
     return $this->deleteMessage;
+  }
+
+  /**
+   * Set the delete message.
+   *
+   * We do this from the constructor in order to do a translation.
+   */
+  public function setDeleteMessage() {
+  }
+
+  /**
+   * Set entity fields to be assigned to the form.
+   */
+  protected function setEntityFields() {
   }
 
   /**
@@ -133,28 +146,26 @@ trait CRM_Core_Form_EntityFormTrait {
    */
   protected function addFormButtons() {
     if ($this->isViewContext() || $this->_action & CRM_Core_Action::PREVIEW) {
-      $this->addButtons(array(
-          array(
-            'type' => 'cancel',
-            'name' => ts('Done'),
-            'isDefault' => TRUE,
-          ),
-        )
-      );
+      $this->addButtons([
+        [
+          'type' => 'cancel',
+          'name' => ts('Done'),
+          'isDefault' => TRUE,
+        ],
+      ]);
     }
     else {
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => $this->isDeleteContext() ? ts('Delete') : ts('Save'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+      $this->addButtons([
+        [
+          'type' => 'next',
+          'name' => $this->isDeleteContext() ? ts('Delete') : ts('Save'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
     }
   }
 
@@ -165,8 +176,7 @@ trait CRM_Core_Form_EntityFormTrait {
     $defaults = $moneyFields = [];
 
     if (!$this->isDeleteContext() &&
-      $this->getEntityId()
-    ) {
+      $this->getEntityId()) {
       $params = ['id' => $this->getEntityId()];
       $baoName = $this->_BAOName;
       $baoName::retrieve($params, $defaults);

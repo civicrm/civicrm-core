@@ -34,18 +34,11 @@
 /**
  * This class provides support for canceling recurring subscriptions.
  */
-class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
-  protected $_paymentProcessorObj = NULL;
+class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_ContributionRecur {
 
   protected $_userContext = NULL;
 
   protected $_mode = NULL;
-
-  protected $_mid = NULL;
-
-  protected $_coid = NULL;
-
-  protected $_crid = NULL;
 
   protected $_selfService = FALSE;
 
@@ -53,11 +46,8 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
    * Set variables up before form is built.
    */
   public function preProcess() {
-    $this->_mid = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE);
-
-    $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
+    parent::preProcess();
     if ($this->_crid) {
-      $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_crid, 'recur', 'obj');
       $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_crid);
       $this->assign('frequency_unit', $this->_subscriptionDetails->frequency_unit);
       $this->assign('frequency_interval', $this->_subscriptionDetails->frequency_interval);
@@ -84,7 +74,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
       $this->assign('membershipType', CRM_Utils_Array::value($membershipTypeId, $membershipTypes));
     }
 
-    $this->_coid = CRM_Utils_Request::retrieve('coid', 'Integer', $this, FALSE);
     if ($this->_coid) {
       if (CRM_Contribute_BAO_Contribution::isSubscriptionCancelled($this->_coid)) {
         CRM_Core_Error::fatal(ts('The recurring contribution looks to have been cancelled already.'));
@@ -106,9 +95,8 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
     }
 
     if (!CRM_Core_Permission::check('edit contributions')) {
-      $userChecksum = CRM_Utils_Request::retrieve('cs', 'String', $this, FALSE);
-      if (!CRM_Contact_BAO_Contact_Utils::validChecksum($this->_subscriptionDetails->contact_id, $userChecksum)) {
-        CRM_Core_Error::fatal(ts('You do not have permission to cancel this recurring contribution.'));
+      if ($this->_subscriptionDetails->contact_id != $this->getContactID()) {
+        CRM_Core_Error::statusBounce(ts('You do not have permission to cancel this recurring contribution.'));
       }
       $this->_selfService = TRUE;
     }
@@ -133,7 +121,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
     // Determine if we can cancel recurring contribution via API with this processor
     $cancelSupported = $this->_paymentProcessorObj->supports('CancelRecurring');
     if ($cancelSupported) {
-      $searchRange = array();
+      $searchRange = [];
       $searchRange[] = $this->createElement('radio', NULL, NULL, ts('Yes'), '1');
       $searchRange[] = $this->createElement('radio', NULL, NULL, ts('No'), '0');
 
@@ -141,7 +129,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
         $searchRange,
         'send_cancel_request',
         ts('Send cancellation request to %1 ?',
-          array(1 => $this->_paymentProcessorObj->_processorName))
+          [1 => $this->_paymentProcessorObj->_processorName])
       );
     }
     $this->assign('cancelSupported', $cancelSupported);
@@ -161,19 +149,18 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
       $type = 'submit';
     }
 
-    $this->addButtons(array(
-        array(
-          'type' => $type,
-          'name' => $cancelButton,
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Not Now'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => $type,
+        'name' => $cancelButton,
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Not Now'),
+      ],
+    ]);
   }
 
   /**
@@ -183,10 +170,10 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
    *   array of default values
    */
   public function setDefaultValues() {
-    return array(
+    return [
       'is_notify' => 1,
       'send_cancel_request' => 1,
-    );
+    ];
   }
 
   /**
@@ -209,7 +196,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
     }
 
     if (CRM_Utils_Array::value('send_cancel_request', $params) == 1) {
-      $cancelParams = array('subscriptionId' => $this->_subscriptionDetails->subscription_id);
+      $cancelParams = ['subscriptionId' => $this->_subscriptionDetails->subscription_id];
       $cancelSubscription = $this->_paymentProcessorObj->cancelSubscription($message, $cancelParams);
     }
 
@@ -217,27 +204,23 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
       CRM_Core_Error::displaySessionError($cancelSubscription);
     }
     elseif ($cancelSubscription) {
-      $activityParams
-        = array(
-          'subject' => $this->_mid ? ts('Auto-renewal membership cancelled') : ts('Recurring contribution cancelled'),
-          'details' => $message,
-        );
-      $cancelStatus = CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution(
-        $this->_subscriptionDetails->recur_id,
-        $activityParams
-      );
+      try {
+        civicrm_api3('ContributionRecur', 'cancel', [
+          'id' => $this->_subscriptionDetails->recur_id,
+          'membership_id' => $this->_mid,
+          'processor_message' => $message,
+        ]);
 
-      if ($cancelStatus) {
-        $tplParams = array();
+        $tplParams = [];
         if ($this->_mid) {
-          $inputParams = array('id' => $this->_mid);
+          $inputParams = ['id' => $this->_mid];
           CRM_Member_BAO_Membership::getValues($inputParams, $tplParams);
           $tplParams = $tplParams[$this->_mid];
           $tplParams['membership_status']
             = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', $tplParams['status_id']);
           $tplParams['membershipType']
             = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $tplParams['membership_type_id']);
-          $status = ts('The automatic renewal of your %1 membership has been cancelled as requested. This does not affect the status of your membership - you will receive a separate notification when your membership is up for renewal.', array(1 => $tplParams['membershipType']));
+          $status = ts('The automatic renewal of your %1 membership has been cancelled as requested. This does not affect the status of your membership - you will receive a separate notification when your membership is up for renewal.', [1 => $tplParams['membershipType']]);
           $msgTitle = 'Membership Renewal Cancelled';
           $msgType = 'info';
         }
@@ -245,13 +228,13 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
           $tplParams['recur_frequency_interval'] = $this->_subscriptionDetails->frequency_interval;
           $tplParams['recur_frequency_unit'] = $this->_subscriptionDetails->frequency_unit;
           $tplParams['amount'] = $this->_subscriptionDetails->amount;
-          $tplParams['contact'] = array('display_name' => $this->_donorDisplayName);
+          $tplParams['contact'] = ['display_name' => $this->_donorDisplayName];
           $status = ts('The recurring contribution of %1, every %2 %3 has been cancelled.',
-            array(
+            [
               1 => $this->_subscriptionDetails->amount,
               2 => $this->_subscriptionDetails->frequency_interval,
               3 => $this->_subscriptionDetails->frequency_unit,
-            )
+            ]
           );
           $msgTitle = 'Contribution Cancelled';
           $msgType = 'success';
@@ -264,7 +247,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
               'id',
               $this->_subscriptionDetails->contribution_page_id,
               $value,
-              array('title', 'receipt_from_name', 'receipt_from_email')
+              ['title', 'receipt_from_name', 'receipt_from_email']
             );
             $receiptFrom
               = '"' . CRM_Utils_Array::value('receipt_from_name', $value[$this->_subscriptionDetails->contribution_page_id]) .
@@ -279,7 +262,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
 
           // send notification
           $sendTemplateParams
-            = array(
+            = [
               'groupName' => $this->_mode == 'auto_renew' ? 'msg_tpl_workflow_membership' : 'msg_tpl_workflow_contribution',
               'valueName' => $this->_mode == 'auto_renew' ? 'membership_autorenew_cancelled' : 'contribution_recurring_cancelled',
               'contactId' => $this->_subscriptionDetails->contact_id,
@@ -289,11 +272,11 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Core_Form {
               'from' => $receiptFrom,
               'toName' => $this->_donorDisplayName,
               'toEmail' => $this->_donorEmail,
-            );
+            ];
           list($sent) = CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
         }
       }
-      else {
+      catch (CiviCRM_API3_Exception $e) {
         $msgType = 'error';
         $msgTitle = ts('Error');
         if ($params['send_cancel_request'] == 1) {

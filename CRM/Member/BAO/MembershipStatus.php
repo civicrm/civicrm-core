@@ -36,8 +36,9 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
 
   /**
    * Static holder for the default LT.
+   * @var int
    */
-  static $_defaultMembershipStatus = NULL;
+  public static $_defaultMembershipStatus = NULL;
 
   /**
    * Class constructor.
@@ -92,7 +93,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @return CRM_Member_BAO_MembershipStatus
    */
   public static function create($params) {
-    $ids = array();
+    $ids = [];
     if (!empty($params['id'])) {
       $ids['membershipStatus'] = $params['id'];
     }
@@ -119,7 +120,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    *
    * @return object
    */
-  public static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = []) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('membershipStatus', $ids));
     if (!$id) {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
@@ -157,12 +158,12 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @return array
    */
   public static function getDefaults() {
-    return array(
+    return [
       'is_active' => FALSE,
       'is_current_member' => FALSE,
       'is_admin' => FALSE,
       'is_default' => FALSE,
-    );
+    ];
   }
 
   /**
@@ -173,7 +174,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @return array
    */
   public static function getMembershipStatus($membershipStatusId) {
-    $statusDetails = array();
+    $statusDetails = [];
     $membershipStatus = new CRM_Member_DAO_MembershipStatus();
     $membershipStatus->id = $membershipStatusId;
     if ($membershipStatus->find(TRUE)) {
@@ -194,7 +195,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
     //checking if membership status is present in some other table
     $check = FALSE;
 
-    $dependency = array('Membership', 'MembershipLog');
+    $dependency = ['Membership', 'MembershipLog'];
     foreach ($dependency as $name) {
       $baoString = 'CRM_Member_BAO_' . $name;
       $dao = new $baoString();
@@ -234,9 +235,9 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    */
   public static function getMembershipStatusByDate(
     $startDate, $endDate, $joinDate,
-    $statusDate = 'today', $excludeIsAdmin = FALSE, $membershipTypeID, $membership = array()
+    $statusDate = 'today', $excludeIsAdmin = FALSE, $membershipTypeID, $membership = []
   ) {
-    $membershipDetails = array();
+    $membershipDetails = [];
 
     if (!$statusDate || $statusDate == 'today') {
       $statusDate = getdate();
@@ -254,8 +255,8 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
       $statusDate = CRM_Utils_Date::customFormat($statusDate, '%Y%m%d');
     }
 
-    $dates = array('start', 'end', 'join');
-    $events = array('start', 'end');
+    $dates = ['start', 'end', 'join'];
+    $events = ['start', 'end'];
 
     foreach ($dates as $dat) {
       if (${$dat . 'Date'} && ${$dat . 'Date'} != "null") {
@@ -362,7 +363,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
 
     //we bundle the arguments into an array as we can't pass 8 variables to the hook otherwise
     // the membership array might contain the pre-altered settings so we don't want to merge this
-    $arguments = array(
+    $arguments = [
       'start_date' => $startDate,
       'end_date' => $endDate,
       'join_date' => $joinDate,
@@ -371,7 +372,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
       'membership_type_id' => $membershipTypeID,
       'start_event' => $startEvent,
       'end_event' => $endEvent,
-    );
+    ];
     CRM_Utils_Hook::alterCalculatedMembershipStatus($membershipDetails, $arguments, $membership);
     return $membershipDetails;
   }
@@ -382,7 +383,7 @@ class CRM_Member_BAO_MembershipStatus extends CRM_Member_DAO_MembershipStatus {
    * @return array
    */
   public static function getMembershipStatusCurrent() {
-    $statusIds = array();
+    $statusIds = [];
     $membershipStatus = new CRM_Member_DAO_MembershipStatus();
     $membershipStatus->is_current_member = 1;
     $membershipStatus->find();

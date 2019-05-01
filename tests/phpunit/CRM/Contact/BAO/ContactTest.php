@@ -1550,7 +1550,8 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
 
     $prevTimestamps = $origTimestamps;
     foreach ($callbacks as $callbackName => $callback) {
-      sleep(1); // advance clock by 1 second to ensure timestamps change
+      // advance clock by 1 second to ensure timestamps change
+      sleep(1);
 
       $callback($contactId);
       $newTimestamps = CRM_Contact_BAO_Contact::getTimestamps($contactId);

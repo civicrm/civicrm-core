@@ -19,14 +19,14 @@ class CRM_Activity_DAO_ActivityContact extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_activity_contact';
+  public static $_tableName = 'civicrm_activity_contact';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Activity contact id
@@ -72,7 +72,7 @@ class CRM_Activity_DAO_ActivityContact extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'activity_id', 'civicrm_activity', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id', 'civicrm_contact', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -94,6 +94,7 @@ class CRM_Activity_DAO_ActivityContact extends CRM_Core_DAO {
           'title' => ts('Activity Contact ID'),
           'description' => ts('Activity contact id'),
           'required' => TRUE,
+          'where' => 'civicrm_activity_contact.id',
           'table_name' => 'civicrm_activity_contact',
           'entity' => 'ActivityContact',
           'bao' => 'CRM_Activity_BAO_ActivityContact',
@@ -105,6 +106,7 @@ class CRM_Activity_DAO_ActivityContact extends CRM_Core_DAO {
           'title' => ts('Activity ID'),
           'description' => ts('Foreign key to the activity for this record.'),
           'required' => TRUE,
+          'where' => 'civicrm_activity_contact.activity_id',
           'table_name' => 'civicrm_activity_contact',
           'entity' => 'ActivityContact',
           'bao' => 'CRM_Activity_BAO_ActivityContact',
@@ -119,8 +121,6 @@ class CRM_Activity_DAO_ActivityContact extends CRM_Core_DAO {
           'required' => TRUE,
           'import' => TRUE,
           'where' => 'civicrm_activity_contact.contact_id',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_activity_contact',
           'entity' => 'ActivityContact',
@@ -133,6 +133,7 @@ class CRM_Activity_DAO_ActivityContact extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Record Type ID'),
           'description' => ts('Nature of this contact\'s role in the activity: 1 assignee, 2 creator, 3 focus or target.'),
+          'where' => 'civicrm_activity_contact.record_type_id',
           'table_name' => 'civicrm_activity_contact',
           'entity' => 'ActivityContact',
           'bao' => 'CRM_Activity_BAO_ActivityContact',

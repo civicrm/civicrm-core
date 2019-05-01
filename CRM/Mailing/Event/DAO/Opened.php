@@ -19,14 +19,14 @@ class CRM_Mailing_Event_DAO_Opened extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_mailing_event_opened';
+  public static $_tableName = 'civicrm_mailing_event_opened';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned
@@ -63,7 +63,7 @@ class CRM_Mailing_Event_DAO_Opened extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'event_queue_id', 'civicrm_mailing_event_queue', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -83,6 +83,7 @@ class CRM_Mailing_Event_DAO_Opened extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Mailing Opened ID'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_opened.id',
           'table_name' => 'civicrm_mailing_event_opened',
           'entity' => 'Opened',
           'bao' => 'CRM_Mailing_Event_BAO_Opened',
@@ -94,6 +95,7 @@ class CRM_Mailing_Event_DAO_Opened extends CRM_Core_DAO {
           'title' => ts('Event Queue'),
           'description' => ts('FK to EventQueue'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_opened.event_queue_id',
           'table_name' => 'civicrm_mailing_event_opened',
           'entity' => 'Opened',
           'bao' => 'CRM_Mailing_Event_BAO_Opened',
@@ -106,6 +108,7 @@ class CRM_Mailing_Event_DAO_Opened extends CRM_Core_DAO {
           'title' => ts('Timestamp'),
           'description' => ts('When this open event occurred.'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_opened.time_stamp',
           'default' => 'CURRENT_TIMESTAMP',
           'table_name' => 'civicrm_mailing_event_opened',
           'entity' => 'Opened',

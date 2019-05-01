@@ -101,11 +101,11 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     //load the values;
     $this->_values = $this->get('values');
     if (!is_array($this->_values)) {
-      $this->_values = array();
+      $this->_values = [];
 
       // if we are editing
       if (isset($this->_campaignId) && $this->_campaignId) {
-        $params = array('id' => $this->_campaignId);
+        $params = ['id' => $this->_campaignId];
         CRM_Campaign_BAO_Campaign::retrieve($params, $this->_values);
       }
 
@@ -150,7 +150,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
 
     $dao = new CRM_Campaign_DAO_CampaignGroup();
 
-    $campaignGroups = array();
+    $campaignGroups = [];
     $dao->campaign_id = $this->_campaignId;
     $dao->find();
 
@@ -167,18 +167,17 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   public function buildQuickForm() {
     if ($this->_action & CRM_Core_Action::DELETE) {
 
-      $this->addButtons(array(
-          array(
-            'type' => 'next',
-            'name' => ts('Delete'),
-            'isDefault' => TRUE,
-          ),
-          array(
-            'type' => 'cancel',
-            'name' => ts('Cancel'),
-          ),
-        )
-      );
+      $this->addButtons([
+        [
+          'type' => 'next',
+          'name' => ts('Delete'),
+          'isDefault' => TRUE,
+        ],
+        [
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ],
+      ]);
       return;
     }
 
@@ -204,7 +203,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $this->add('datepicker', 'end_date', ts('End Date'));
 
     // add campaign type
-    $this->addSelect('campaign_type_id', array('onChange' => "CRM.buildCustomData( 'Campaign', this.value );"), TRUE);
+    $this->addSelect('campaign_type_id', ['onChange' => "CRM.buildCustomData( 'Campaign', this.value );"], TRUE);
 
     // add campaign status
     $this->addSelect('status_id');
@@ -218,8 +217,8 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value('parent_id', $this->_values), $this->_campaignId);
     if (!empty($campaigns)) {
       $this->addElement('select', 'parent_id', ts('Parent ID'),
-        array('' => ts('- select Parent -')) + $campaigns,
-        array('class' => 'crm-select2')
+        ['' => ts('- select Parent -')] + $campaigns,
+        ['class' => 'crm-select2']
       );
     }
     $groups = CRM_Core_PseudoConstant::nestedGroup();
@@ -228,17 +227,17 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       ts('Include Group(s)'),
       $groups,
       FALSE,
-      array(
+      [
         'multiple' => TRUE,
         'class' => 'crm-select2 huge',
         'placeholder' => ts('- none -'),
-      )
+      ]
     );
 
-    $this->add('wysiwyg', 'goal_general', ts('Campaign Goals'), array('rows' => 2, 'cols' => 40));
-    $this->add('text', 'goal_revenue', ts('Revenue Goal'), array('size' => 8, 'maxlength' => 12));
+    $this->add('wysiwyg', 'goal_general', ts('Campaign Goals'), ['rows' => 2, 'cols' => 40]);
+    $this->add('text', 'goal_revenue', ts('Revenue Goal'), ['size' => 8, 'maxlength' => 12]);
     $this->addRule('goal_revenue', ts('Please enter a valid money value (e.g. %1).',
-      array(1 => CRM_Utils_Money::format('99.99', ' '))
+      [1 => CRM_Utils_Money::format('99.99', ' ')]
     ), 'money');
 
     // is this Campaign active
@@ -279,7 +278,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    * @see valid_date
    */
   public static function formRule($fields, $files, $errors) {
-    $errors = array();
+    $errors = [];
 
     return empty($errors) ? TRUE : $errors;
   }
@@ -292,7 +291,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
     $session = CRM_Core_Session::singleton();
 
-    $groups = array();
+    $groups = [];
     if (isset($this->_campaignId)) {
       if ($this->_action & CRM_Core_Action::DELETE) {
         CRM_Campaign_BAO_Campaign::del($this->_campaignId);
@@ -342,7 +341,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $result = CRM_Campaign_BAO_Campaign::create($params);
 
     if ($result) {
-      CRM_Core_Session::setStatus(ts('Campaign %1 has been saved.', array(1 => $result->title)), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts('Campaign %1 has been saved.', [1 => $result->title]), ts('Saved'), 'success');
       $session->pushUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
       $this->ajaxResponse['id'] = $result->id;
       $this->ajaxResponse['label'] = $result->title;

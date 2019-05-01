@@ -69,7 +69,7 @@ class CRM_Activity_BAO_ActivityTarget extends CRM_Activity_DAO_ActivityContact {
    * @return mixed
    */
   public static function retrieveTargetIdsByActivityId($activity_id) {
-    $targetArray = array();
+    $targetArray = [];
     if (!CRM_Utils_Rule::positiveInteger($activity_id)) {
       return $targetArray;
     }
@@ -85,7 +85,12 @@ WHERE      activity_id = %1
 AND        record_type_id = $targetID
 AND        civicrm_contact.is_deleted = 0
 ";
-    $target = CRM_Core_DAO::executeQuery($sql, array(1 => array($activity_id, 'Integer')));
+    $target = CRM_Core_DAO::executeQuery($sql, [
+      1 => [
+        $activity_id,
+        'Integer',
+      ],
+    ]);
     while ($target->fetch()) {
       $targetArray[] = $target->contact_id;
     }
@@ -100,7 +105,7 @@ AND        civicrm_contact.is_deleted = 0
    * @return array
    */
   public static function getTargetNames($activityID) {
-    $targetNames = array();
+    $targetNames = [];
 
     if (empty($activityID)) {
       return $targetNames;
@@ -116,7 +121,7 @@ WHERE      civicrm_activity_contact.activity_id = %1
 AND        civicrm_activity_contact.record_type_id = $targetID
 AND        contact_a.is_deleted = 0
 ";
-    $queryParam = array(1 => array($activityID, 'Integer'));
+    $queryParam = [1 => [$activityID, 'Integer']];
 
     $dao = CRM_Core_DAO::executeQuery($query, $queryParam);
     while ($dao->fetch()) {

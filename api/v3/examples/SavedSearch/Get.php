@@ -6,9 +6,9 @@
  *   API result array
  */
 function saved_search_get_example() {
-  $params = array(
+  $params = [
     'id' => 2,
-  );
+  ];
 
   try{
     $result = civicrm_api3('SavedSearch', 'get', $params);
@@ -18,12 +18,12 @@ function saved_search_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,21 +37,21 @@ function saved_search_get_example() {
  */
 function saved_search_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 2,
-    'values' => array(
-      '2' => array(
+    'values' => [
+      '2' => [
         'id' => '2',
-        'form_values' => array(
+        'form_values' => [
           'relation_type_id' => '6_a_b',
           'relation_target_name' => 'Default Organization',
-        ),
-      ),
-    ),
-  );
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

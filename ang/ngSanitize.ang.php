@@ -3,7 +3,7 @@
 // in CiviCRM. See also:
 // http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_angularModules
 
-return array(
+return [
   'ext' => 'civicrm',
-  'js' => array('bower_components/angular-sanitize/angular-sanitize.min.js'),
-);
+  'js' => ['bower_components/angular-sanitize/angular-sanitize.min.js'],
+];

@@ -70,7 +70,8 @@ class CRM_Utils_SQL_TempTable {
   const UTF8 = 'DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci';
   const CATEGORY_LENGTH = 12;
   const CATEGORY_REGEXP = ';^[a-zA-Z0-9]+$;';
-  const ID_LENGTH = 37; // MAX{64} - CATEGORY_LENGTH{12} - CONST_LENGHTH{15} = 37
+  // MAX{64} - CATEGORY_LENGTH{12} - CONST_LENGHTH{15} = 37
+  const ID_LENGTH = 37;
   const ID_REGEXP = ';^[a-zA-Z0-9_]+$;';
   const INNODB = 'ENGINE=InnoDB';
   const MEMORY = 'ENGINE=MEMORY';
@@ -78,7 +79,12 @@ class CRM_Utils_SQL_TempTable {
   /**
    * @var bool
    */
-  protected $durable, $utf8;
+  protected $durable;
+
+  /**
+   * @var bool
+   */
+  protected $utf8;
 
   protected $category;
 
@@ -87,6 +93,8 @@ class CRM_Utils_SQL_TempTable {
   protected $autodrop;
 
   protected $memory;
+
+  protected $createSql;
 
   /**
    * @return CRM_Utils_SQL_TempTable
@@ -137,7 +145,8 @@ class CRM_Utils_SQL_TempTable {
       $this->utf8 ? self::UTF8 : '',
       ($selectQuery instanceof CRM_Utils_SQL_Select ? $selectQuery->toSQL() : $selectQuery)
     );
-    CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, TRUE, FALSE);
+    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
+    $this->createSql = $sql;
     return $this;
   }
 
@@ -156,7 +165,8 @@ class CRM_Utils_SQL_TempTable {
       $this->memory ? self::MEMORY : self::INNODB,
       $this->utf8 ? self::UTF8 : ''
     );
-    CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, TRUE, FALSE);
+    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
+    $this->createSql = $sql;
     return $this;
   }
 
@@ -167,7 +177,7 @@ class CRM_Utils_SQL_TempTable {
    */
   public function drop() {
     $sql = $this->toSQL('DROP', 'IF EXISTS');
-    CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, TRUE, FALSE);
+    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
     return $this;
   }
 
@@ -206,6 +216,13 @@ class CRM_Utils_SQL_TempTable {
    */
   public function getId() {
     return $this->id;
+  }
+
+  /**
+   * @return string|NULL
+   */
+  public function getCreateSql() {
+    return $this->createSql;
   }
 
   /**

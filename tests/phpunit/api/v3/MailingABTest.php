@@ -42,9 +42,18 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction(TRUE);
     $this->createLoggedInUser();
-    $this->_mailingID_A = $this->createMailing();
-    $this->_mailingID_B = $this->createMailing();
-    $this->_mailingID_C = $this->createMailing();
+    $this->_mailingID_A = $this->createMailing([
+      'subject' => 'subject a ' . time(),
+      'body_text' => 'body_text a ' . time(),
+    ]);
+    $this->_mailingID_B = $this->createMailing([
+      'subject' => 'subject b ' . time(),
+      'body_text' => 'body_text b ' . time(),
+    ]);
+    $this->_mailingID_C = $this->createMailing([
+      'subject' => 'not yet ' . time(),
+      'body_text' => 'not yet ' . time(),
+    ]);
     $this->_groupID = $this->groupCreate();
 
     $this->_params = array(
@@ -98,7 +107,8 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
    * @return array
    */
   public function groupPctProvider() {
-    $cases = array(); // array(int $totalSize, int $groupPct, int $expectedCountA, $expectedCountB, $expectedCountC)
+    // array(int $totalSize, int $groupPct, int $expectedCountA, $expectedCountB, $expectedCountC)
+    $cases = array();
     $cases[] = array(400, 7, 28, 28, 344);
     $cases[] = array(100, 10, 10, 10, 80);
     $cases[] = array(50, 20, 10, 10, 30);
@@ -151,6 +161,65 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     ));
     $this->assertRecipientCounts($expectedCountA, $expectedCountB, $expectedCountC);
     $this->assertJobCounts(1, 1, 1);
+  }
+
+  /**
+   * Create a test. Declare the second mailing a winner. Ensure that key
+   * fields propagate to the final mailing.
+   */
+  public function testSubmitWinnderId() {
+    $checkSyncFields = ['subject', 'body_text'];
+
+    $result = $this->groupContactCreate($this->_groupID, 20, TRUE);
+    $this->assertEquals(20, $result['added'], "in line " . __LINE__);
+
+    $params = $this->_params;
+    $params['group_percentage'] = 10;
+    $result = $this->callAPISuccess($this->_entity, 'create', $params);
+
+    $this->callAPISuccess('Mailing', 'create', [
+      'id' => $this->_mailingID_A,
+      'groups' => ['include' => [$this->_groupID]],
+    ]);
+    $this->assertJobCounts(0, 0, 0);
+
+    $this->callAPISuccess('MailingAB', 'submit', [
+      'id' => $result['id'],
+      'status' => 'Testing',
+      'scheduled_date' => 'now',
+      'approval_date' => 'now',
+    ]);
+    $this->assertJobCounts(1, 1, 0);
+
+    $b = $this->getApiValues('Mailing', ['id' => $this->_mailingID_B], $checkSyncFields);
+    $c = $this->getApiValues('Mailing', ['id' => $this->_mailingID_C], $checkSyncFields);
+    $this->assertNotEquals($b, $c);
+
+    $this->callAPISuccess('MailingAB', 'submit', [
+      'id' => $result['id'],
+      'status' => 'Final',
+      'winner_id' => $this->_mailingID_B,
+      'scheduled_date' => 'now',
+      'approval_date' => 'now',
+    ]);
+    $this->assertJobCounts(1, 1, 1);
+
+    $b = $this->getApiValues('Mailing', ['id' => $this->_mailingID_B], $checkSyncFields);
+    $c = $this->getApiValues('Mailing', ['id' => $this->_mailingID_C], $checkSyncFields);
+    $this->assertEquals($b, $c);
+  }
+
+  /**
+   * Lookup a record via API. Return *only* the expected values.
+   *
+   * @param $entity
+   * @param $filter
+   * @param $return
+   * @return array
+   */
+  protected function getApiValues($entity, $filter, $return) {
+    $rec = $this->callAPISuccess($entity, 'getsingle', $filter + ['return' => $return]);
+    return CRM_Utils_Array::subset($rec, $return);
   }
 
   /**

@@ -19,14 +19,14 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_tell_friend';
+  public static $_tableName = 'civicrm_tell_friend';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Friend ID
@@ -110,7 +110,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), 'entity_id', NULL, 'id', 'entity_table');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -131,6 +131,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'title' => ts('Friend ID'),
           'description' => ts('Friend ID'),
           'required' => TRUE,
+          'where' => 'civicrm_tell_friend.id',
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
@@ -144,6 +145,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_tell_friend.entity_table',
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
@@ -155,6 +157,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'title' => ts('Entity ID'),
           'description' => ts('Foreign key to the referenced item.'),
           'required' => TRUE,
+          'where' => 'civicrm_tell_friend.entity_id',
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
@@ -166,6 +169,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'title' => ts('Title'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_tell_friend.title',
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
@@ -179,6 +183,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Intro'),
           'description' => ts('Introductory message to contributor or participant displayed on the Tell a Friend form.'),
+          'where' => 'civicrm_tell_friend.intro',
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
@@ -192,6 +197,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Suggested Message'),
           'description' => ts('Suggested message to friends, provided as default on the Tell A Friend form.'),
+          'where' => 'civicrm_tell_friend.suggested_message',
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
@@ -209,8 +215,6 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'size' => CRM_Utils_Type::HUGE,
           'import' => TRUE,
           'where' => 'civicrm_tell_friend.general_link',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
@@ -227,6 +231,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'description' => ts('Text for Tell a Friend thank you page header and HTML title.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_tell_friend.thankyou_title',
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
@@ -240,6 +245,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Thank You Text'),
           'description' => ts('Thank you message displayed on success page.'),
+          'where' => 'civicrm_tell_friend.thankyou_text',
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',
@@ -252,6 +258,7 @@ class CRM_Friend_DAO_Friend extends CRM_Core_DAO {
           'name' => 'is_active',
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Enabled?'),
+          'where' => 'civicrm_tell_friend.is_active',
           'table_name' => 'civicrm_tell_friend',
           'entity' => 'Friend',
           'bao' => 'CRM_Friend_BAO_Friend',

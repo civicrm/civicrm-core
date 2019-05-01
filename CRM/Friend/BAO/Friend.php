@@ -98,18 +98,18 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   public static function create(&$params) {
     $transaction = new CRM_Core_Transaction();
 
-    $mailParams = array();
-    $contactParams = array();
+    $mailParams = [];
+    $contactParams = [];
 
     // create contact corresponding to each friend
     foreach ($params['friend'] as $key => $details) {
       if ($details["first_name"]) {
-        $contactParams[$key] = array(
+        $contactParams[$key] = [
           'first_name' => $details["first_name"],
           'last_name' => $details["last_name"],
           'contact_source' => ts('Tell a Friend') . ": {$params['title']}",
           'email-Primary' => $details["email"],
-        );
+        ];
 
         $displayName = $details["first_name"] . " " . $details["last_name"];
         $mailParams['email'][$displayName] = $details["email"];
@@ -125,7 +125,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
     $activityTypeId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', 'Tell a Friend', 'value', 'name');
 
     // create activity
-    $activityParams = array(
+    $activityParams = [
       'source_contact_id' => $params['source_contact_id'],
       'source_record_id' => NULL,
       'activity_type_id' => $activityTypeId,
@@ -136,7 +136,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
       'is_test' => $params['is_test'],
       'campaign_id' => CRM_Utils_Array::value('campaign_id', $params),
-    );
+    ];
 
     // activity creation
     $activity = CRM_Activity_BAO_Activity::create($activityParams);
@@ -147,18 +147,18 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
     foreach ($contactParams as $key => $value) {
       // create contact only if it does not exits in db
       $value['email'] = $value['email-Primary'];
-      $contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($value, 'Individual', 'Supervised', array(), FALSE);
+      $contactID = CRM_Contact_BAO_Contact::getFirstDuplicateContact($value, 'Individual', 'Supervised', [], FALSE);
 
       if (!$contactID) {
         $contactID = self::add($value);
       }
 
       // attempt to save activity targets
-      $targetParams = array(
+      $targetParams = [
         'activity_id' => $activity->id,
         'contact_id' => $contactID,
         'record_type_id' => $targetID,
-      );
+      ];
 
       // See if it already exists
       $activityContact = new CRM_Activity_DAO_ActivityContact();
@@ -181,11 +181,11 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
     list($_, $mailParams['email_from']) = CRM_Core_BAO_Domain::getNameAndEmail();
     list($username, $mailParams['domain']) = explode('@', $mailParams['email_from']);
 
-    $default = array();
-    $findProperties = array('id' => $params['entity_id']);
+    $default = [];
+    $findProperties = ['id' => $params['entity_id']];
 
     if ($params['entity_table'] == 'civicrm_contribution_page') {
-      $returnProperties = array('receipt_from_email', 'is_email_receipt');
+      $returnProperties = ['receipt_from_email', 'is_email_receipt'];
       CRM_Core_DAO::commonRetrieve('CRM_Contribute_DAO_ContributionPage',
         $findProperties,
         $default,
@@ -201,7 +201,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
       $mailParams['module'] = 'contribute';
     }
     elseif ($params['entity_table'] == 'civicrm_event') {
-      $returnProperties = array('confirm_from_email', 'is_email_confirm');
+      $returnProperties = ['confirm_from_email', 'is_email_confirm'];
       CRM_Core_DAO::commonRetrieve('CRM_Event_DAO_Event',
         $findProperties,
         $default,
@@ -241,12 +241,12 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
    * @return void
    */
   public static function buildFriendForm($form) {
-    $form->addElement('checkbox', 'tf_is_active', ts('Tell a Friend enabled?'), NULL, array('onclick' => "friendBlock(this)"));
+    $form->addElement('checkbox', 'tf_is_active', ts('Tell a Friend enabled?'), NULL, ['onclick' => "friendBlock(this)"]);
     // name
     $form->add('text', 'tf_title', ts('Title'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'title'), TRUE);
 
     // intro-text and thank-you text
-    $form->add('wysiwyg', 'intro', ts('Introduction'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'intro') + array('class' => 'collapsed'));
+    $form->add('wysiwyg', 'intro', ts('Introduction'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'intro') + ['class' => 'collapsed']);
 
     $form->add('textarea', 'suggested_message', ts('Suggested Message'),
       CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'suggested_message'), FALSE
@@ -256,7 +256,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
 
     $form->add('text', 'tf_thankyou_title', ts('Thank-you Title'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'thankyou_title'), TRUE);
 
-    $form->add('wysiwyg', 'tf_thankyou_text', ts('Thank-you Message'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'thankyou_text') + array('class' => 'collapsed'));
+    $form->add('wysiwyg', 'tf_thankyou_text', ts('Thank-you Message'), CRM_Core_DAO::getAttribute('CRM_Friend_DAO_Friend', 'thankyou_text') + ['class' => 'collapsed']);
 
     if ($form->_friendId) {
       // CRM-14200 the i18n dialogs need this for translation
@@ -313,21 +313,21 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
       $values['domain'] = $domainFromName;
     }
 
-    $templateParams = array(
+    $templateParams = [
       'groupName' => 'msg_tpl_workflow_friend',
       'valueName' => 'friend',
       'contactId' => $contactID,
-      'tplParams' => array(
+      'tplParams' => [
         $values['module'] => $values['module'],
         'senderContactName' => $fromName,
         'title' => $values['title'],
         'generalLink' => $values['general_link'],
         'pageURL' => $values['page_url'],
         'senderMessage' => $values['message'],
-      ),
+      ],
       'from' => "$fromName (via {$values['domain']}) <{$values['email_from']}>",
       'replyTo' => $email,
-    );
+    ];
 
     foreach ($values['email'] as $displayName => $emailTo) {
       if ($emailTo) {

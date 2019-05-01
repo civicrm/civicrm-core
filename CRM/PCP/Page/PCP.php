@@ -43,7 +43,7 @@ class CRM_PCP_Page_PCP extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.

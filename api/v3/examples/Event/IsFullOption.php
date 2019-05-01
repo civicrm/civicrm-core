@@ -8,10 +8,10 @@
  *   API result array
  */
 function event_getsingle_example() {
-  $params = array(
+  $params = [
     'id' => 1,
     'return.is_full' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Event', 'getsingle', $params);
@@ -21,12 +21,12 @@ function event_getsingle_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -40,7 +40,7 @@ function event_getsingle_example() {
  */
 function event_getsingle_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'id' => '1',
     'title' => 'Annual CiviCRM meet',
     'event_title' => 'Annual CiviCRM meet',
@@ -73,7 +73,7 @@ function event_getsingle_expectedresult() {
     'is_billing_required' => 0,
     'available_places' => 0,
     'is_full' => '1',
-  );
+  ];
 
   return $expectedResult;
 }

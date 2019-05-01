@@ -19,14 +19,14 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_premiums_product';
+  public static $_tableName = 'civicrm_premiums_product';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Contribution ID
@@ -77,7 +77,7 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'premiums_id', 'civicrm_premiums', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'product_id', 'civicrm_product', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'financial_type_id', 'civicrm_financial_type', 'id');
@@ -100,6 +100,7 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
           'title' => ts('Premium Product ID'),
           'description' => ts('Contribution ID'),
           'required' => TRUE,
+          'where' => 'civicrm_premiums_product.id',
           'table_name' => 'civicrm_premiums_product',
           'entity' => 'PremiumsProduct',
           'bao' => 'CRM_Contribute_DAO_PremiumsProduct',
@@ -111,6 +112,7 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
           'title' => ts('Premium'),
           'description' => ts('Foreign key to premiums settings record.'),
           'required' => TRUE,
+          'where' => 'civicrm_premiums_product.premiums_id',
           'table_name' => 'civicrm_premiums_product',
           'entity' => 'PremiumsProduct',
           'bao' => 'CRM_Contribute_DAO_PremiumsProduct',
@@ -123,6 +125,7 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
           'title' => ts('Product'),
           'description' => ts('Foreign key to each product object.'),
           'required' => TRUE,
+          'where' => 'civicrm_premiums_product.product_id',
           'table_name' => 'civicrm_premiums_product',
           'entity' => 'PremiumsProduct',
           'bao' => 'CRM_Contribute_DAO_PremiumsProduct',
@@ -134,6 +137,7 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Order'),
           'required' => TRUE,
+          'where' => 'civicrm_premiums_product.weight',
           'table_name' => 'civicrm_premiums_product',
           'entity' => 'PremiumsProduct',
           'bao' => 'CRM_Contribute_DAO_PremiumsProduct',
@@ -144,6 +148,7 @@ class CRM_Contribute_DAO_PremiumsProduct extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Financial Type'),
           'description' => ts('FK to Financial Type.'),
+          'where' => 'civicrm_premiums_product.financial_type_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_premiums_product',
           'entity' => 'PremiumsProduct',

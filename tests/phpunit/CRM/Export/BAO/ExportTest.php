@@ -654,7 +654,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $relationships = [
       $this->contactIDs[1] => ['label' => 'Spouse of'],
       $this->contactIDs[2] => ['label' => 'Household Member of'],
-      $this->contactIDs[3] => ['label' => 'Employee of']
+      $this->contactIDs[3] => ['label' => 'Employee of'],
     ];
 
     foreach ($relationships as $contactID => $relationshipType) {
@@ -662,7 +662,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $result = $this->callAPISuccess('Relationship', 'create', [
         'contact_id_a' => $this->contactIDs[0],
         'relationship_type_id' => $relationshipTypeID,
-        'contact_id_b' => $contactID
+        'contact_id_b' => $contactID,
       ]);
       $relationships[$contactID]['id'] = $result['id'];
       $relationships[$contactID]['relationship_type_id'] = $relationshipTypeID;
@@ -817,7 +817,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   }
 
-
   /**
    * Test phone data export.
    *
@@ -845,7 +844,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     }
 
     $relationships = [
-      $this->contactIDs[1] => ['label' => 'Spouse of']
+      $this->contactIDs[1] => ['label' => 'Spouse of'],
     ];
 
     foreach ($relationships as $contactID => $relationshipType) {
@@ -853,7 +852,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $result = $this->callAPISuccess('Relationship', 'create', [
         'contact_id_a' => $this->contactIDs[0],
         'relationship_type_id' => $relationshipTypeID,
-        'contact_id_b' => $contactID
+        'contact_id_b' => $contactID,
       ]);
       $relationships[$contactID]['id'] = $result['id'];
       $relationships[$contactID]['relationship_type_id'] = $relationshipTypeID;
@@ -943,7 +942,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $relationships = [
       $this->contactIDs[1] => ['label' => 'Spouse of'],
       $this->contactIDs[2] => ['label' => 'Household Member of'],
-      $this->contactIDs[3] => ['label' => 'Employee of']
+      $this->contactIDs[3] => ['label' => 'Employee of'],
     ];
 
     foreach ($relationships as $contactID => $relationshipType) {
@@ -951,7 +950,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $result = $this->callAPISuccess('Relationship', 'create', [
         'contact_id_a' => $this->contactIDs[0],
         'relationship_type_id' => $relationshipTypeID,
-        'contact_id_b' => $contactID
+        'contact_id_b' => $contactID,
       ]);
       $relationships[$contactID]['id'] = $result['id'];
       $relationships[$contactID]['relationship_type_id'] = $relationshipTypeID;
@@ -1148,6 +1147,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       [[], ['street_address' => '']],
     ];
   }
+
   /**
    * @return array
    */
@@ -1158,8 +1158,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'api.Address.create' => [
         'city' => 'Portland',
         'state_province_id' => 'Maine',
-        'location_type_id' => 'Home'
-      ]
+        'location_type_id' => 'Home',
+      ],
     ]);
 
     $relationshipTypes = $this->callAPISuccess('RelationshipType', 'get', [])['values'];
@@ -1690,6 +1690,18 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test exported with data entry mis-fire.
+   *
+   * Not fatal error if data incomplete.
+   *
+   * https://lab.civicrm.org/dev/core/issues/819
+   */
+  public function testExportIncompleteSubmission() {
+    $this->setUpContactExportData();
+    $this->doExport([['Individual', '']], $this->contactIDs[1]);
+  }
+
+  /**
    * Test exported with fields to output specified.
    *
    * @dataProvider getAllSpecifiableReturnFields
@@ -1712,20 +1724,21 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $selectedFields = $this->getAllSpecifiableParticipantReturnFields();
     foreach ($selectedFields as $index => $field) {
       if (substr($field[1], 0, 22) === 'componentPaymentField_') {
-        unset ($selectedFields[$index]);
+        unset($selectedFields[$index]);
       }
     }
 
     $expected = $this->getAllSpecifiableParticipantReturnFields();
     foreach ($expected as $index => $field) {
       if (substr($index, 0, 22) === 'componentPaymentField_') {
-        unset ($expected[$index]);
+        unset($expected[$index]);
       }
     }
 
     list($tableName, $sqlColumns) = $this->doExport($selectedFields, $this->contactIDs[1], CRM_Export_Form_Select::EVENT_EXPORT);
     $this->assertEquals($expected, $sqlColumns);
   }
+
   /**
    * Get all return fields (@todo - still being built up.
    *
@@ -2023,90 +2036,90 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function getBasicHeaderDefinition($isContactExport) {
     $headers = [
-        0 => 'Contact ID',
-        1 => 'Contact Type',
-        2 => 'Contact Subtype',
-        3 => 'Do Not Email',
-        4 => 'Do Not Phone',
-        5 => 'Do Not Mail',
-        6 => 'Do Not Sms',
-        7 => 'Do Not Trade',
-        8 => 'No Bulk Emails (User Opt Out)',
-        9 => 'Legal Identifier',
-        10 => 'External Identifier',
-        11 => 'Sort Name',
-        12 => 'Display Name',
-        13 => 'Nickname',
-        14 => 'Legal Name',
-        15 => 'Image Url',
-        16 => 'Preferred Communication Method',
-        17 => 'Preferred Language',
-        18 => 'Preferred Mail Format',
-        19 => 'Contact Hash',
-        20 => 'Contact Source',
-        21 => 'First Name',
-        22 => 'Middle Name',
-        23 => 'Last Name',
-        24 => 'Individual Prefix',
-        25 => 'Individual Suffix',
-        26 => 'Formal Title',
-        27 => 'Communication Style',
-        28 => 'Email Greeting ID',
-        29 => 'Postal Greeting ID',
-        30 => 'Addressee ID',
-        31 => 'Job Title',
-        32 => 'Gender',
-        33 => 'Birth Date',
-        34 => 'Deceased',
-        35 => 'Deceased Date',
-        36 => 'Household Name',
-        37 => 'Organization Name',
-        38 => 'Sic Code',
-        39 => 'Unique ID (OpenID)',
-        40 => 'Current Employer ID',
-        41 => 'Contact is in Trash',
-        42 => 'Created Date',
-        43 => 'Modified Date',
-        44 => 'Addressee',
-        45 => 'Email Greeting',
-        46 => 'Postal Greeting',
-        47 => 'Current Employer',
-        48 => 'Location Type',
-        49 => 'Street Address',
-        50 => 'Street Number',
-        51 => 'Street Number Suffix',
-        52 => 'Street Name',
-        53 => 'Street Unit',
-        54 => 'Supplemental Address 1',
-        55 => 'Supplemental Address 2',
-        56 => 'Supplemental Address 3',
-        57 => 'City',
-        58 => 'Postal Code Suffix',
-        59 => 'Postal Code',
-        60 => 'Latitude',
-        61 => 'Longitude',
-        62 => 'Address Name',
-        63 => 'Master Address Belongs To',
-        64 => 'County',
-        65 => 'State',
-        66 => 'Country',
-        67 => 'Phone',
-        68 => 'Phone Extension',
-        69 => 'Phone Type',
-        70 => 'Email',
-        71 => 'On Hold',
-        72 => 'Use for Bulk Mail',
-        73 => 'Signature Text',
-        74 => 'Signature Html',
-        75 => 'IM Provider',
-        76 => 'IM Screen Name',
-        77 => 'OpenID',
-        78 => 'World Region',
-        79 => 'Website',
-        80 => 'Group(s)',
-        81 => 'Tag(s)',
-        82 => 'Note(s)',
-      ];
+      0 => 'Contact ID',
+      1 => 'Contact Type',
+      2 => 'Contact Subtype',
+      3 => 'Do Not Email',
+      4 => 'Do Not Phone',
+      5 => 'Do Not Mail',
+      6 => 'Do Not Sms',
+      7 => 'Do Not Trade',
+      8 => 'No Bulk Emails (User Opt Out)',
+      9 => 'Legal Identifier',
+      10 => 'External Identifier',
+      11 => 'Sort Name',
+      12 => 'Display Name',
+      13 => 'Nickname',
+      14 => 'Legal Name',
+      15 => 'Image Url',
+      16 => 'Preferred Communication Method',
+      17 => 'Preferred Language',
+      18 => 'Preferred Mail Format',
+      19 => 'Contact Hash',
+      20 => 'Contact Source',
+      21 => 'First Name',
+      22 => 'Middle Name',
+      23 => 'Last Name',
+      24 => 'Individual Prefix',
+      25 => 'Individual Suffix',
+      26 => 'Formal Title',
+      27 => 'Communication Style',
+      28 => 'Email Greeting ID',
+      29 => 'Postal Greeting ID',
+      30 => 'Addressee ID',
+      31 => 'Job Title',
+      32 => 'Gender',
+      33 => 'Birth Date',
+      34 => 'Deceased',
+      35 => 'Deceased Date',
+      36 => 'Household Name',
+      37 => 'Organization Name',
+      38 => 'Sic Code',
+      39 => 'Unique ID (OpenID)',
+      40 => 'Current Employer ID',
+      41 => 'Contact is in Trash',
+      42 => 'Created Date',
+      43 => 'Modified Date',
+      44 => 'Addressee',
+      45 => 'Email Greeting',
+      46 => 'Postal Greeting',
+      47 => 'Current Employer',
+      48 => 'Location Type',
+      49 => 'Street Address',
+      50 => 'Street Number',
+      51 => 'Street Number Suffix',
+      52 => 'Street Name',
+      53 => 'Street Unit',
+      54 => 'Supplemental Address 1',
+      55 => 'Supplemental Address 2',
+      56 => 'Supplemental Address 3',
+      57 => 'City',
+      58 => 'Postal Code Suffix',
+      59 => 'Postal Code',
+      60 => 'Latitude',
+      61 => 'Longitude',
+      62 => 'Address Name',
+      63 => 'Master Address Belongs To',
+      64 => 'County',
+      65 => 'State',
+      66 => 'Country',
+      67 => 'Phone',
+      68 => 'Phone Extension',
+      69 => 'Phone Type',
+      70 => 'Email',
+      71 => 'On Hold',
+      72 => 'Use for Bulk Mail',
+      73 => 'Signature Text',
+      74 => 'Signature Html',
+      75 => 'IM Provider',
+      76 => 'IM Screen Name',
+      77 => 'OpenID',
+      78 => 'World Region',
+      79 => 'Website',
+      80 => 'Group(s)',
+      81 => 'Tag(s)',
+      82 => 'Note(s)',
+    ];
     if (!$isContactExport) {
       unset($headers[80]);
       unset($headers[81]);

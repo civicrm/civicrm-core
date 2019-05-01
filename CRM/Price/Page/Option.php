@@ -81,36 +81,36 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    */
   public static function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
-      self::$_actionLinks = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_actionLinks = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit Option'),
           'url' => 'civicrm/admin/price/field/option',
           'qs' => 'reset=1&action=update&oid=%%oid%%&fid=%%fid%%&sid=%%sid%%',
           'title' => ts('Edit Price Option'),
-        ),
-        CRM_Core_Action::VIEW => array(
+        ],
+        CRM_Core_Action::VIEW => [
           'name' => ts('View'),
           'url' => 'civicrm/admin/price/field/option',
           'qs' => 'action=view&oid=%%oid%%',
           'title' => ts('View Price Option'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Price Option'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Price Option'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/price/field/option',
           'qs' => 'action=delete&oid=%%oid%%',
           'title' => ts('Disable Price Option'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_actionLinks;
   }
@@ -121,16 +121,16 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
    * @return void
    */
   public function browse() {
-    $priceOptions = civicrm_api3('PriceFieldValue', 'get', array(
-        'price_field_id' => $this->_fid,
+    $priceOptions = civicrm_api3('PriceFieldValue', 'get', [
+      'price_field_id' => $this->_fid,
          // Explicitly do not check permissions so we are not
          // restricted by financial type, so we can change them.
-        'check_permissions' => FALSE,
-        'options' => array(
-          'limit' => 0,
-          'sort' => array('weight', 'label'),
-        ),
-    ));
+      'check_permissions' => FALSE,
+      'options' => [
+        'limit' => 0,
+        'sort' => ['weight', 'label'],
+      ],
+    ]);
     $customOption = $priceOptions['values'];
 
     // CRM-15378 - check if these price options are in an Event price set
@@ -184,11 +184,11 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       }
       $customOption[$id]['order'] = $customOption[$id]['weight'];
       $customOption[$id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
-        array(
+        [
           'oid' => $id,
           'fid' => $this->_fid,
           'sid' => $this->_sid,
-        ),
+        ],
         ts('more'),
         FALSE,
         'priceFieldValue.row.actions',
@@ -224,7 +224,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
     $oid = CRM_Utils_Request::retrieve('oid', 'Positive',
       $this, FALSE, 0
     );
-    $params = array();
+    $params = [];
     if ($oid) {
       $params['oid'] = $oid;
       $sid = CRM_Price_BAO_PriceSet::getSetId($params);
@@ -251,11 +251,11 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       );
       $this->assign('usedPriceSetTitle', CRM_Price_BAO_PriceFieldValue::getOptionLabel($oid));
       $this->assign('usedBy', $usedBy);
-      $comps = array(
+      $comps = [
         "Event" => "civicrm_event",
         "Contribution" => "civicrm_contribution_page",
-      );
-      $priceSetContexts = array();
+      ];
+      $priceSetContexts = [];
       foreach ($comps as $name => $table) {
         if (array_key_exists($table, $usedBy)) {
           $priceSetContexts[] = $name;
@@ -289,19 +289,19 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
       $this->assign('isReserved', $this->_isSetReserved);
     }
     //as url contain $sid so append breadcrumb dynamically.
-    $breadcrumb = array(
-      array(
+    $breadcrumb = [
+      [
         'title' => ts('Price Fields'),
         'url' => CRM_Utils_System::url('civicrm/admin/price/field', 'reset=1&sid=' . $this->_sid),
-      ),
-    );
+      ],
+    ];
     CRM_Utils_System::appendBreadCrumb($breadcrumb);
 
     if ($this->_fid) {
       $fieldTitle = CRM_Price_BAO_PriceField::getTitle($this->_fid);
       $this->assign('fid', $this->_fid);
       $this->assign('fieldTitle', $fieldTitle);
-      CRM_Utils_System::setTitle(ts('%1 - Price Options', array(1 => $fieldTitle)));
+      CRM_Utils_System::setTitle(ts('%1 - Price Options', [1 => $fieldTitle]));
 
       $htmlType = CRM_Core_DAO::getFieldValue('CRM_Price_BAO_PriceField', $this->_fid, 'html_type');
       $this->assign('addMoreFields', TRUE);

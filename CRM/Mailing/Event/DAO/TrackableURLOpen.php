@@ -19,14 +19,14 @@ class CRM_Mailing_Event_DAO_TrackableURLOpen extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_mailing_event_trackable_url_open';
+  public static $_tableName = 'civicrm_mailing_event_trackable_url_open';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned
@@ -70,7 +70,7 @@ class CRM_Mailing_Event_DAO_TrackableURLOpen extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'event_queue_id', 'civicrm_mailing_event_queue', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'trackable_url_id', 'civicrm_mailing_trackable_url', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -91,6 +91,7 @@ class CRM_Mailing_Event_DAO_TrackableURLOpen extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Trackable URL Open ID'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_trackable_url_open.id',
           'table_name' => 'civicrm_mailing_event_trackable_url_open',
           'entity' => 'TrackableURLOpen',
           'bao' => 'CRM_Mailing_Event_BAO_TrackableURLOpen',
@@ -102,6 +103,7 @@ class CRM_Mailing_Event_DAO_TrackableURLOpen extends CRM_Core_DAO {
           'title' => ts('Event Queue'),
           'description' => ts('FK to EventQueue'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_trackable_url_open.event_queue_id',
           'table_name' => 'civicrm_mailing_event_trackable_url_open',
           'entity' => 'TrackableURLOpen',
           'bao' => 'CRM_Mailing_Event_BAO_TrackableURLOpen',
@@ -114,6 +116,7 @@ class CRM_Mailing_Event_DAO_TrackableURLOpen extends CRM_Core_DAO {
           'title' => ts('Trackable Url'),
           'description' => ts('FK to TrackableURL'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_trackable_url_open.trackable_url_id',
           'table_name' => 'civicrm_mailing_event_trackable_url_open',
           'entity' => 'TrackableURLOpen',
           'bao' => 'CRM_Mailing_Event_BAO_TrackableURLOpen',
@@ -126,6 +129,7 @@ class CRM_Mailing_Event_DAO_TrackableURLOpen extends CRM_Core_DAO {
           'title' => ts('Timestamp'),
           'description' => ts('When this trackable URL open occurred.'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_event_trackable_url_open.time_stamp',
           'default' => 'CURRENT_TIMESTAMP',
           'table_name' => 'civicrm_mailing_event_trackable_url_open',
           'entity' => 'TrackableURLOpen',

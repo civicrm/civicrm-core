@@ -44,7 +44,7 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -65,26 +65,26 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
   public function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/labelFormats',
           'qs' => 'action=update&id=%%id%%&group=%%group%%&reset=1',
           'title' => ts('Edit Label Format'),
-        ),
-        CRM_Core_Action::COPY => array(
+        ],
+        CRM_Core_Action::COPY => [
           'name' => ts('Copy'),
           'url' => 'civicrm/admin/labelFormats',
           'qs' => 'action=copy&id=%%id%%&group=%%group%%&reset=1',
           'title' => ts('Copy Label Format'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/labelFormats',
           'qs' => 'action=delete&id=%%id%%&group=%%group%%&reset=1',
           'title' => ts('Delete Label Format'),
-        ),
-      );
+        ],
+      ];
     }
 
     return self::$_links;
@@ -141,7 +141,7 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
 
       $format['groupName'] = ts('Mailing Label');
       $format['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $format['id'], 'group' => 'label_format'),
+        ['id' => $format['id'], 'group' => 'label_format'],
         ts('more'),
         FALSE,
         'labelFormat.manage.action',

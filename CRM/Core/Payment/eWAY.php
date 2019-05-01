@@ -410,6 +410,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
 
     return $params;
   }
+
   // end function doDirectPayment
 
   /**
@@ -465,7 +466,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    * *****************************************************************************************
    */
   public function checkConfig() {
-    $errorMsg = array();
+    $errorMsg = [];
 
     if (empty($this->_paymentProcessor['user_name'])) {
       $errorMsg[] = ts('eWAY CustomerID is not set for this payment processor');

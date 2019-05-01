@@ -48,7 +48,7 @@ class CRM_Contribute_StateMachine_Search extends CRM_Core_StateMachine {
   public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
-    $this->_pages = array();
+    $this->_pages = [];
 
     $this->_pages['CRM_Contribute_Form_Search'] = NULL;
     list($task, $result) = $this->taskName($controller, 'Search');
@@ -78,7 +78,8 @@ class CRM_Contribute_StateMachine_Search extends CRM_Core_StateMachine {
    *
    * @param string $formName
    *
-   * @return array [ 'class' => task classname, 'result' => TRUE ]
+   * @return array
+   *   [ 'class' => task classname, 'result' => TRUE ]
    *   the name of the form that will handle the task
    */
   public function taskName($controller, $formName = 'Search') {

@@ -19,14 +19,14 @@ class CRM_Contact_DAO_SubscriptionHistory extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_subscription_history';
+  public static $_tableName = 'civicrm_subscription_history';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Internal Id
@@ -93,7 +93,7 @@ class CRM_Contact_DAO_SubscriptionHistory extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id', 'civicrm_contact', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'group_id', 'civicrm_group', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -115,6 +115,7 @@ class CRM_Contact_DAO_SubscriptionHistory extends CRM_Core_DAO {
           'title' => ts('Group Membership History ID'),
           'description' => ts('Internal Id'),
           'required' => TRUE,
+          'where' => 'civicrm_subscription_history.id',
           'table_name' => 'civicrm_subscription_history',
           'entity' => 'SubscriptionHistory',
           'bao' => 'CRM_Contact_BAO_SubscriptionHistory',
@@ -126,6 +127,7 @@ class CRM_Contact_DAO_SubscriptionHistory extends CRM_Core_DAO {
           'title' => ts('Contact ID'),
           'description' => ts('Contact Id'),
           'required' => TRUE,
+          'where' => 'civicrm_subscription_history.contact_id',
           'table_name' => 'civicrm_subscription_history',
           'entity' => 'SubscriptionHistory',
           'bao' => 'CRM_Contact_BAO_SubscriptionHistory',
@@ -137,6 +139,7 @@ class CRM_Contact_DAO_SubscriptionHistory extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Group'),
           'description' => ts('Group Id'),
+          'where' => 'civicrm_subscription_history.group_id',
           'table_name' => 'civicrm_subscription_history',
           'entity' => 'SubscriptionHistory',
           'bao' => 'CRM_Contact_BAO_SubscriptionHistory',
@@ -157,6 +160,7 @@ class CRM_Contact_DAO_SubscriptionHistory extends CRM_Core_DAO {
           'title' => ts('Group Membership Action Date'),
           'description' => ts('Date of the (un)subscription'),
           'required' => TRUE,
+          'where' => 'civicrm_subscription_history.date',
           'default' => 'CURRENT_TIMESTAMP',
           'table_name' => 'civicrm_subscription_history',
           'entity' => 'SubscriptionHistory',
@@ -170,6 +174,7 @@ class CRM_Contact_DAO_SubscriptionHistory extends CRM_Core_DAO {
           'description' => ts('How the (un)subscription was triggered'),
           'maxlength' => 8,
           'size' => CRM_Utils_Type::EIGHT,
+          'where' => 'civicrm_subscription_history.method',
           'table_name' => 'civicrm_subscription_history',
           'entity' => 'SubscriptionHistory',
           'bao' => 'CRM_Contact_BAO_SubscriptionHistory',
@@ -188,6 +193,7 @@ class CRM_Contact_DAO_SubscriptionHistory extends CRM_Core_DAO {
           'description' => ts('The state of the contact within the group'),
           'maxlength' => 8,
           'size' => CRM_Utils_Type::EIGHT,
+          'where' => 'civicrm_subscription_history.status',
           'table_name' => 'civicrm_subscription_history',
           'entity' => 'SubscriptionHistory',
           'bao' => 'CRM_Contact_BAO_SubscriptionHistory',
@@ -203,6 +209,7 @@ class CRM_Contact_DAO_SubscriptionHistory extends CRM_Core_DAO {
           'description' => ts('IP address or other tracking info'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_subscription_history.tracking',
           'table_name' => 'civicrm_subscription_history',
           'entity' => 'SubscriptionHistory',
           'bao' => 'CRM_Contact_BAO_SubscriptionHistory',

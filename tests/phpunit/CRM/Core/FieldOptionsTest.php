@@ -204,8 +204,6 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
     $this->appendOptions = array(2 => 'Maybe');
     $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', $this->targetField);
     $this->assertEquals(array(1 => 'Yes', 0 => 'No', 2 => 'Maybe'), $options);
-
-    $field->free();
   }
 
   /**

@@ -44,7 +44,7 @@ class CRM_Batch_Page_AJAX {
     $batchId = CRM_Utils_Type::escape($_POST['batch_id'], 'Positive');
 
     unset($_POST['qfKey']);
-    CRM_Core_DAO::setFieldValue('CRM_Batch_DAO_Batch', $batchId, 'data', json_encode(array('values' => $_POST)));
+    CRM_Core_DAO::setFieldValue('CRM_Batch_DAO_Batch', $batchId, 'data', json_encode(['values' => $_POST]));
 
     CRM_Utils_System::civiExit();
   }
@@ -56,24 +56,24 @@ class CRM_Batch_Page_AJAX {
   public static function getBatchList() {
     $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric');
     if ($context != 'financialBatch') {
-      $sortMapper = array(
+      $sortMapper = [
         0 => 'title',
         1 => 'type_id.label',
         2 => 'item_count',
         3 => 'total',
         4 => 'status_id.label',
         5 => 'created_id.sort_name',
-      );
+      ];
     }
     else {
-      $sortMapper = array(
+      $sortMapper = [
         1 => 'title',
         2 => 'payment_instrument_id.label',
         3 => 'item_count',
         4 => 'total',
         5 => 'status_id.label',
         6 => 'created_id.sort_name',
-      );
+      ];
     }
     $sEcho = CRM_Utils_Type::escape($_REQUEST['sEcho'], 'Integer');
     $offset = isset($_REQUEST['iDisplayStart']) ? CRM_Utils_Type::escape($_REQUEST['iDisplayStart'], 'Integer') : 0;
@@ -102,7 +102,7 @@ class CRM_Batch_Page_AJAX {
     $iFilteredTotal = $iTotal = $params['total'];
 
     if ($context == 'financialBatch') {
-      $selectorElements = array(
+      $selectorElements = [
         'check',
         'batch_name',
         'payment_instrument',
@@ -111,10 +111,10 @@ class CRM_Batch_Page_AJAX {
         'status',
         'created_by',
         'links',
-      );
+      ];
     }
     else {
-      $selectorElements = array(
+      $selectorElements = [
         'batch_name',
         'type',
         'item_count',
@@ -122,7 +122,7 @@ class CRM_Batch_Page_AJAX {
         'status',
         'created_by',
         'links',
-      );
+      ];
     }
     CRM_Utils_System::setHttpHeader('Content-Type', 'application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($batches, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);

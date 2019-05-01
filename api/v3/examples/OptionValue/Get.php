@@ -6,9 +6,9 @@
  *   API result array
  */
 function option_value_get_example() {
-  $params = array(
+  $params = [
     'option_group_id' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('OptionValue', 'get', $params);
@@ -18,12 +18,12 @@ function option_value_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,12 +37,12 @@ function option_value_get_example() {
  */
 function option_value_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 5,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'option_group_id' => '1',
         'label' => 'Phone',
@@ -53,8 +53,8 @@ function option_value_get_expectedresult() {
         'is_optgroup' => 0,
         'is_reserved' => 0,
         'is_active' => '1',
-      ),
-      '2' => array(
+      ],
+      '2' => [
         'id' => '2',
         'option_group_id' => '1',
         'label' => 'Email',
@@ -65,8 +65,8 @@ function option_value_get_expectedresult() {
         'is_optgroup' => 0,
         'is_reserved' => 0,
         'is_active' => '1',
-      ),
-      '3' => array(
+      ],
+      '3' => [
         'id' => '3',
         'option_group_id' => '1',
         'label' => 'Postal Mail',
@@ -77,8 +77,8 @@ function option_value_get_expectedresult() {
         'is_optgroup' => 0,
         'is_reserved' => 0,
         'is_active' => '1',
-      ),
-      '4' => array(
+      ],
+      '4' => [
         'id' => '4',
         'option_group_id' => '1',
         'label' => 'SMS',
@@ -89,8 +89,8 @@ function option_value_get_expectedresult() {
         'is_optgroup' => 0,
         'is_reserved' => 0,
         'is_active' => '1',
-      ),
-      '5' => array(
+      ],
+      '5' => [
         'id' => '5',
         'option_group_id' => '1',
         'label' => 'Fax',
@@ -101,9 +101,9 @@ function option_value_get_expectedresult() {
         'is_optgroup' => 0,
         'is_reserved' => 0,
         'is_active' => '1',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

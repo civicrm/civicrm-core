@@ -31,16 +31,8 @@
 
 <div class="crm-contribution-page-id-{$contributionPageID} crm-block crm-contribution-confirm-form-block">
   <div class="help">
-    <p>{ts}Please verify the information below carefully. Click<strong>Go Back</strong>if you need to make changes.{/ts}
-      {if $contributeMode EQ 'notify' and ! $is_pay_later}
-        {ts 1=$paymentProcessor.name 2=$button}Click the
-          <strong>%2</strong>
-          button to go to %1, where you will select your payment method and complete the contribution.{/ts}
-      {elseif ! $is_monetary or $amount LE 0.0 or $is_pay_later}
-        {ts 1=$button}To complete this transaction, click the<strong>%1</strong>button below.{/ts}
-      {else}
-        {ts 1=$button}To complete your contribution, click the<strong>%1</strong>button below.{/ts}
-      {/if}
+    <p>{ts}Please verify the information below carefully. Click <strong>Go Back</strong> if you need to make changes.{/ts}
+      {$continueText}
     </p>
   </div>
   <div id="crm-submit-buttons" class="crm-submit-buttons">
@@ -52,16 +44,16 @@
 
   {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl" context="confirmContribution"}
 
-  {if $amount GTE 0 OR $minimum_fee GTE 0 OR ( $priceSetID and $lineItem ) }
+  {if $amount GTE 0 OR $minimum_fee GTE 0 OR ( $isDisplayLineItems and $lineItem ) }
     <div class="crm-group amount_display-group">
       {if !$useForMember}
         <div class="header-dark">
-          {if !$membershipBlock AND $amount OR ( $priceSetID and $lineItem ) }{ts}Contribution Amount{/ts}{else}{ts}Membership Fee{/ts} {/if}
+          {if !$membershipBlock AND $amount OR ( $isDisplayLineItems and $lineItem ) }{ts}Contribution Amount{/ts}{else}{ts}Membership Fee{/ts} {/if}
         </div>
       {/if}
       <div class="display-block">
         {if !$useForMember}
-          {if $lineItem and $priceSetID}
+          {if $lineItem and $isDisplayLineItems}
             {if !$amount}{assign var="amount" value=0}{/if}
             {assign var="totalAmount" value=$amount}
             {include file="CRM/Price/Page/LineItem.tpl" context="Contribution"}
@@ -281,10 +273,9 @@
           {/if}
         {else}
           <div class="crm-section no-label credit_card_details-section">
-            <div class="content">{$credit_card_type|escape}</div>
-            <div class="content">{$credit_card_number|escape}</div>
-            <div
-              class="content">{if $credit_card_exp_date}{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}{/if}</div>
+            <div class="content">{$credit_card_type}</div>
+            <div class="content">{$credit_card_number}</div>
+            <div class="content">{if $credit_card_exp_date}{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}{/if}</div>
             <div class="clear"></div>
           </div>
         {/if}

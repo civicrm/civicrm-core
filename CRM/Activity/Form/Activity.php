@@ -48,7 +48,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    *
    * @var int
    */
-  public $_activityIds = array();
+  public $_activityIds = [];
 
   /**
    * The id of activity type.
@@ -115,11 +115,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    */
   protected $_isSurveyActivity;
 
-  protected $_values = array();
+  protected $_values = [];
 
   protected $unsavedWarn = TRUE;
 
-  /*
+  /**
+   *
    * Is it possible to create separate activities with this form?
    *
    * When TRUE, the form will ask whether the user wants to create separate
@@ -133,7 +134,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * behavior (e.g. in CRM_Case_Form_Activity)
    *
    * @var boolean
+   *
    */
+
   protected $supportsActivitySeparation = TRUE;
 
   /**
@@ -154,88 +157,84 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $unwanted = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, "AND v.name = 'Print PDF Letter'");
     $activityTypes = array_diff_key(CRM_Core_PseudoConstant::ActivityType(FALSE), $unwanted);
 
-    $this->_fields = array(
-      'subject' => array(
+    $this->_fields = [
+      'subject' => [
         'type' => 'text',
         'label' => ts('Subject'),
-        'attributes' => CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity',
-          'activity_subject'
-        ),
-      ),
-      'duration' => array(
+        'attributes' => CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity', 'activity_subject'),
+      ],
+      'duration' => [
         'type' => 'number',
         'label' => ts('Duration'),
-        'attributes' => array('class' => 'four', 'min' => 1),
+        'attributes' => ['class' => 'four', 'min' => 1],
         'required' => FALSE,
-      ),
-      'location' => array(
+      ],
+      'location' => [
         'type' => 'text',
         'label' => ts('Location'),
         'attributes' => CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity', 'location'),
         'required' => FALSE,
-      ),
-      'details' => array(
+      ],
+      'details' => [
         'type' => 'wysiwyg',
         'label' => ts('Details'),
-        'attributes' => array('class' => 'huge'),
+        'attributes' => ['class' => 'huge'],
         'required' => FALSE,
-      ),
-      'status_id' => array(
+      ],
+      'status_id' => [
         'type' => 'select',
         'required' => TRUE,
-      ),
-      'priority_id' => array(
+      ],
+      'priority_id' => [
         'type' => 'select',
         'required' => TRUE,
-      ),
-      'source_contact_id' => array(
+      ],
+      'source_contact_id' => [
         'type' => 'entityRef',
         'label' => ts('Added By'),
         'required' => FALSE,
-      ),
-      'target_contact_id' => array(
+      ],
+      'target_contact_id' => [
         'type' => 'entityRef',
         'label' => ts('With Contact'),
-        'attributes' => array('multiple' => TRUE, 'create' => TRUE),
-      ),
-      'assignee_contact_id' => array(
+        'attributes' => ['multiple' => TRUE, 'create' => TRUE],
+      ],
+      'assignee_contact_id' => [
         'type' => 'entityRef',
         'label' => ts('Assigned to'),
-        'attributes' => array(
+        'attributes' => [
           'multiple' => TRUE,
           'create' => TRUE,
-          'api' => array('params' => array('is_deceased' => 0)),
-        ),
-      ),
-      'activity_date_time' => array(
+          'api' => ['params' => ['is_deceased' => 0]],
+        ],
+      ],
+      'activity_date_time' => [
         'type' => 'datepicker',
         'label' => ts('Date'),
         'required' => TRUE,
-      ),
-      'followup_assignee_contact_id' => array(
+      ],
+      'followup_assignee_contact_id' => [
         'type' => 'entityRef',
         'label' => ts('Assigned to'),
-        'attributes' => array(
+        'attributes' => [
           'multiple' => TRUE,
           'create' => TRUE,
-          'api' => array('params' => array('is_deceased' => 0)),
-        ),
-      ),
-      'followup_activity_type_id' => array(
+          'api' => ['params' => ['is_deceased' => 0]],
+        ],
+      ],
+      'followup_activity_type_id' => [
         'type' => 'select',
         'label' => ts('Followup Activity'),
-        'attributes' => array('' => '- ' . ts('select activity') . ' -') + $activityTypes,
-        'extra' => array('class' => 'crm-select2'),
-      ),
+        'attributes' => ['' => '- ' . ts('select activity') . ' -'] + $activityTypes,
+        'extra' => ['class' => 'crm-select2'],
+      ],
       // Add optional 'Subject' field for the Follow-up Activiity, CRM-4491
-      'followup_activity_subject' => array(
+      'followup_activity_subject' => [
         'type' => 'text',
         'label' => ts('Subject'),
-        'attributes' => CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity',
-          'subject'
-        ),
-      ),
-    );
+        'attributes' => CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity', 'subject'),
+      ],
+    ];
   }
 
   /**
@@ -264,7 +263,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       if (CRM_Contact_Form_Search::isSearchContext($this->_context)) {
         $this->_context = 'search';
       }
-      elseif (!in_array($this->_context, array('dashlet', 'case', 'dashletFullscreen'))
+      elseif (!in_array($this->_context, ['dashlet', 'case', 'dashletFullscreen'])
         && $this->_currentlyViewedContactId
       ) {
         $this->_context = 'activity';
@@ -301,10 +300,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // Check for required permissions, CRM-6264.
     if ($this->_activityId &&
-      in_array($this->_action, array(
+      in_array($this->_action, [
         CRM_Core_Action::UPDATE,
         CRM_Core_Action::VIEW,
-      )) &&
+      ]) &&
       !CRM_Activity_BAO_Activity::checkPermission($this->_activityId, $this->_action)
     ) {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
@@ -345,7 +344,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         CRM_Utils_System::setTitle($displayName . ' - ' . $activityName);
       }
       else {
-        CRM_Utils_System::setTitle(ts('%1 Activity', array(1 => $activityName)));
+        CRM_Utils_System::setTitle(ts('%1 Activity', [1 => $activityName]));
       }
     }
 
@@ -437,12 +436,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       }
       $this->assign('searchKey', $qfKey);
     }
-    elseif (in_array($this->_context, array(
+    elseif (in_array($this->_context, [
       'standalone',
       'home',
       'dashlet',
       'dashletFullscreen',
-    ))
+    ])
     ) {
       $urlParams = 'reset=1';
       $urlString = 'civicrm/dashboard';
@@ -516,9 +515,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     $this->_values = $this->get('values');
     if (!is_array($this->_values)) {
-      $this->_values = array();
+      $this->_values = [];
       if (isset($this->_activityId) && $this->_activityId) {
-        $params = array('id' => $this->_activityId);
+        $params = ['id' => $this->_activityId];
         CRM_Activity_BAO_Activity::retrieve($params, $this->_values);
       }
 
@@ -603,10 +602,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     // CRM-15472 - 50 is around the practical limit of how many items a select2 entityRef can handle
-    if ($this->_action == 2 && !empty($defaults['target_contact_id'])) {
+    if ($this->_action == CRM_Core_Action::UPDATE && !empty($defaults['target_contact_id'])) {
       $count = count(is_array($defaults['target_contact_id']) ? $defaults['target_contact_id'] : explode(',', $defaults['target_contact_id']));
       if ($count > 50) {
-        $this->freeze(array('target_contact_id'));
+        $this->freeze(['target_contact_id']);
       }
     }
 
@@ -637,18 +636,18 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       if ($this->_action & CRM_Core_Action::RENEW) {
         $button = ts('Restore');
       }
-      $this->addButtons(array(
-        array(
+      $this->addButtons([
+        [
           'type' => 'next',
           'name' => $button,
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      ));
+        ],
+      ]);
       return;
     }
 
@@ -659,11 +658,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->assign('suppressForm', FALSE);
 
     $element = &$this->add('select', 'activity_type_id', ts('Activity Type'),
-      array('' => '- ' . ts('select') . ' -') + $this->_fields['followup_activity_type_id']['attributes'],
-      FALSE, array(
+      ['' => '- ' . ts('select') . ' -'] + $this->_fields['followup_activity_type_id']['attributes'],
+      FALSE, [
         'onchange' => "CRM.buildCustomData( 'Activity', this.value );",
         'class' => 'crm-select2 required',
-      )
+      ]
     );
 
     // Freeze for update mode.
@@ -682,7 +681,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $required = !empty($values['required']);
 
         if ($values['type'] == 'select' && empty($attribute)) {
-          $this->addSelect($field, array('entity' => 'activity'), $required);
+          $this->addSelect($field, ['entity' => 'activity'], $required);
         }
         elseif ($values['type'] == 'entityRef') {
           $this->addEntityRef($field, $values['label'], $attribute, $required);
@@ -702,7 +701,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       CRM_Campaign_BAO_Campaign::accessCampaign()
     ) {
       $buildEngagementLevel = TRUE;
-      $this->addSelect('engagement_level', array('entity' => 'activity'));
+      $this->addSelect('engagement_level', ['entity' => 'activity']);
       $this->addRule('engagement_level',
         ts('Please enter the engagement index as a number (integers only).'),
         'positiveInteger'
@@ -726,7 +725,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $responseOptions = CRM_Campaign_BAO_Survey::getResponsesOptions($surveyId);
         if ($responseOptions) {
           $this->add('select', 'result', ts('Result'),
-            array('' => ts('- select -')) + array_combine($responseOptions, $responseOptions)
+            ['' => ts('- select -')] + array_combine($responseOptions, $responseOptions)
           );
         }
         $surveyTitle = NULL;
@@ -745,10 +744,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $this->addRadio(
         'separation',
         ts('Activity Separation'),
-        array(
+        [
           'separate' => ts('Create separate activities for each contact'),
           'combined' => ts('Create one activity with all contacts together'),
-        )
+        ]
       );
     }
 
@@ -772,11 +771,15 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $tags = CRM_Core_BAO_Tag::getColorTags('civicrm_activity');
 
     if (!empty($tags)) {
-      $this->add('select2', 'tag', ts('Tags'), $tags, FALSE, array('class' => 'huge', 'placeholder' => ts('- select -'), 'multiple' => TRUE));
+      $this->add('select2', 'tag', ts('Tags'), $tags, FALSE, [
+        'class' => 'huge',
+        'placeholder' => ts('- select -'),
+        'multiple' => TRUE,
+      ]);
     }
 
     // we need to hide activity tagset for special activities
-    $specialActivities = array('Open Case');
+    $specialActivities = ['Open Case'];
 
     if (!in_array($this->_activityTypeName, $specialActivities)) {
       // build tag widget
@@ -818,13 +821,15 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
 
       $className::buildQuickForm($this);
-      $this->addFormRule(array($className, 'formRule'), $this);
+      $this->addFormRule([$className, 'formRule'], $this);
     }
 
-    $this->addFormRule(array('CRM_Activity_Form_Activity', 'formRule'), $this);
+    $this->addFormRule(['CRM_Activity_Form_Activity', 'formRule'], $this);
 
-    $doNotNotifyAssigneeFor = (array) Civi::settings()->get('do_not_notify_assignees_for');
-    if (($this->_activityTypeId && in_array($this->_activityTypeId, $doNotNotifyAssigneeFor)) || !Civi::settings()->get('activity_assignee_notification')) {
+    $doNotNotifyAssigneeFor = (array) Civi::settings()
+      ->get('do_not_notify_assignees_for');
+    if (($this->_activityTypeId && in_array($this->_activityTypeId, $doNotNotifyAssigneeFor)) || !Civi::settings()
+      ->get('activity_assignee_notification')) {
       $this->assign('activityAssigneeNotification', FALSE);
     }
     else {
@@ -850,19 +855,17 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     if (CRM_Utils_Array::value('_qf_Activity_next_', $fields) == 'Delete') {
       return TRUE;
     }
-    $errors = array();
+    $errors = [];
     if ((array_key_exists('activity_type_id', $fields) || !$self->_single) && empty($fields['activity_type_id'])) {
       $errors['activity_type_id'] = ts('Activity Type is a required field');
     }
 
-    if (CRM_Utils_Array::value('activity_type_id', $fields) == 3 &&
-      CRM_Utils_Array::value('status_id', $fields) == 1
-    ) {
+    if (CRM_Utils_Array::value('activity_type_id', $fields) == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email')
+      && CRM_Utils_Array::value('status_id', $fields) == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled')) {
       $errors['status_id'] = ts('You cannot record scheduled email activity.');
     }
-    elseif (CRM_Utils_Array::value('activity_type_id', $fields) == 4 &&
-      CRM_Utils_Array::value('status_id', $fields) == 1
-    ) {
+    elseif (CRM_Utils_Array::value('activity_type_id', $fields) == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'SMS')
+      && CRM_Utils_Array::value('status_id', $fields) == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled')) {
       $errors['status_id'] = ts('You cannot record scheduled SMS activity.');
     }
 
@@ -891,19 +894,21 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    *
    *
    * @param array $params
+
    * @return array|null
+   * @throws \CiviCRM_API3_Exception
    */
   public function postProcess($params = NULL) {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $deleteParams = array('id' => $this->_activityId);
+      $deleteParams = ['id' => $this->_activityId];
       $moveToTrash = CRM_Case_BAO_Case::isCaseActivity($this->_activityId);
       CRM_Activity_BAO_Activity::deleteActivity($deleteParams, $moveToTrash);
 
       // delete tags for the entity
-      $tagParams = array(
+      $tagParams = [
         'entity_table' => 'civicrm_activity',
         'entity_id' => $this->_activityId,
-      );
+      ];
 
       CRM_Core_BAO_EntityTag::del($tagParams);
 
@@ -939,12 +944,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     // format params as arrays
-    foreach (array('target', 'assignee', 'followup_assignee') as $name) {
+    foreach (['target', 'assignee', 'followup_assignee'] as $name) {
       if (!empty($params["{$name}_contact_id"])) {
         $params["{$name}_contact_id"] = explode(',', $params["{$name}_contact_id"]);
       }
       else {
-        $params["{$name}_contact_id"] = array();
+        $params["{$name}_contact_id"] = [];
       }
     }
 
@@ -966,13 +971,13 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     $params['is_multi_activity'] = CRM_Utils_Array::value('separation', $params) == 'separate';
 
-    $activity = array();
+    $activity = [];
     if (!empty($params['is_multi_activity']) &&
       !CRM_Utils_Array::crmIsEmptyArray($params['target_contact_id'])
     ) {
       $targetContacts = $params['target_contact_id'];
       foreach ($targetContacts as $targetContactId) {
-        $params['target_contact_id'] = array($targetContactId);
+        $params['target_contact_id'] = [$targetContactId];
         // save activity
         $activity[] = $this->processActivity($params);
       }
@@ -982,7 +987,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $activity = $this->processActivity($params);
     }
 
-    $activityIds = empty($this->_activityIds) ? array($this->_activityId) : $this->_activityIds;
+    $activityIds = empty($this->_activityIds) ? [$this->_activityId] : $this->_activityIds;
     foreach ($activityIds as $activityId) {
       // set params for repeat configuration in create mode
       $params['entity_id'] = $activityId;
@@ -1001,7 +1006,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           $params['schedule_reminder_id'] = $scheduleReminderDetails->id;
         }
       }
-      $params['dateColumns'] = array('activity_date_time');
+      $params['dateColumns'] = ['activity_date_time'];
 
       // Set default repetition start if it was not provided.
       if (empty($params['repetition_start_date'])) {
@@ -1010,20 +1015,20 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
       // unset activity id
       unset($params['id']);
-      $linkedEntities = array(
-        array(
+      $linkedEntities = [
+        [
           'table' => 'civicrm_activity_contact',
-          'findCriteria' => array(
+          'findCriteria' => [
             'activity_id' => $activityId,
-          ),
-          'linkedColumns' => array('activity_id'),
+          ],
+          'linkedColumns' => ['activity_id'],
           'isRecurringEntityRecord' => FALSE,
-        ),
-      );
+        ],
+      ];
       CRM_Core_Form_RecurringEntity::postProcess($params, 'civicrm_activity', $linkedEntities);
     }
 
-    return array('activity' => $activity);
+    return ['activity' => $activity];
   }
 
   /**
@@ -1035,7 +1040,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * @return self|null|object
    */
   protected function processActivity(&$params) {
-    $activityAssigned = array();
+    $activityAssigned = [];
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     // format assignee params
@@ -1056,7 +1061,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $activity = CRM_Activity_BAO_Activity::create($params);
 
     // add tags if exists
-    $tagParams = array();
+    $tagParams = [];
     if (!empty($params['tag'])) {
       if (!is_array($params['tag'])) {
         $params['tag'] = explode(',', $params['tag']);
@@ -1097,15 +1102,16 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $mailStatus = '';
 
     if (Civi::settings()->get('activity_assignee_notification')
-      && !in_array($activity->activity_type_id, Civi::settings()->get('do_not_notify_assignees_for'))) {
-      $activityIDs = array($activity->id);
+      && !in_array($activity->activity_type_id, Civi::settings()
+        ->get('do_not_notify_assignees_for'))) {
+      $activityIDs = [$activity->id];
       if ($followupActivity) {
-        $activityIDs = array_merge($activityIDs, array($followupActivity->id));
+        $activityIDs = array_merge($activityIDs, [$followupActivity->id]);
       }
       $assigneeContacts = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames($activityIDs, TRUE, FALSE);
 
       if (!CRM_Utils_Array::crmIsEmptyArray($params['assignee_contact_id'])) {
-        $mailToContacts = array();
+        $mailToContacts = [];
 
         // Build an associative array with unique email addresses.
         foreach ($activityAssigned as $id => $dnc) {
@@ -1122,7 +1128,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
       // Also send email to follow-up activity assignees if set
       if ($followupActivity) {
-        $mailToFollowupContacts = array();
+        $mailToFollowupContacts = [];
         foreach ($assigneeContacts as $values) {
           if ($values['activity_id'] == $followupActivity->id) {
             $mailToFollowupContacts[$values['email']] = $values;
@@ -1143,11 +1149,11 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     CRM_Core_Session::setStatus(ts('Activity %1 has been saved. %2 %3',
-      array(
+      [
         1 => $subject,
         2 => $followupStatus,
         3 => $mailStatus,
-      )
+      ]
     ), ts('Saved'), 'success');
 
     return $activity;

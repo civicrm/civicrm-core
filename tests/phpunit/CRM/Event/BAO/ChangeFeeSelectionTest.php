@@ -79,8 +79,8 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
   protected function priceSetCreate($type = 'Radio') {
     $feeTotal = 55;
     $minAmt = 0;
-    $paramsSet['title'] = 'Two Options'  . substr(sha1(rand()), 0, 4);
-    $paramsSet['name'] = CRM_Utils_String::titleToVar('Two Options')  . substr(sha1(rand()), 0, 4);
+    $paramsSet['title'] = 'Two Options' . substr(sha1(rand()), 0, 4);
+    $paramsSet['name'] = CRM_Utils_String::titleToVar('Two Options') . substr(sha1(rand()), 0, 4);
     $paramsSet['is_active'] = FALSE;
     $paramsSet['extends'] = 1;
 
@@ -129,7 +129,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $field = CRM_Price_BAO_PriceField::create($paramsField);
     $values = $this->callAPISuccess('PriceFieldValue', 'get', [
       'price_field_id' => $field->id,
-      'return' => ['id', 'label']
+      'return' => ['id', 'label'],
     ]);
     foreach ($values['values'] as $value) {
       switch ($value['label']) {
@@ -410,19 +410,22 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $unpaidStatus = CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialItem', 'status_id', 'Unpaid');
     $expectedResults = array(
       array(
-        'amount' => 10.00, // when qty 1 is used
+        // when qty 1 is used
+        'amount' => 10.00,
         'status_id' => $unpaidStatus,
         'entity_table' => 'civicrm_line_item',
         'entity_id' => 1,
       ),
       array(
-        'amount' => 20.00, // when qty 3 is used, add the surplus amount i.e. $30 - $10 = $20
+        // when qty 3 is used, add the surplus amount i.e. $30 - $10 = $20
+        'amount' => 20.00,
         'status_id' => $unpaidStatus,
         'entity_table' => 'civicrm_line_item',
         'entity_id' => 1,
       ),
       array(
-        'amount' => -10.00, // when qty 2 is used, add the surplus amount i.e. $20 - $30 = -$10
+        // when qty 2 is used, add the surplus amount i.e. $20 - $30 = -$10
+        'amount' => -10.00,
         'status_id' => $unpaidStatus,
         'entity_table' => 'civicrm_line_item',
         'entity_id' => 1,

@@ -55,6 +55,7 @@ class CRM_Utils_Crypt {
     if (function_exists('mcrypt_module_open') &&
       defined('CIVICRM_SITE_KEY')
     ) {
+      // phpcs:disable
       $td = mcrypt_module_open(MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_ECB, '');
       // ECB mode - iv not needed - CRM-8198
       $iv = '00000000000000000000000000000000';
@@ -66,6 +67,7 @@ class CRM_Utils_Crypt {
       mcrypt_generic_deinit($td);
       mcrypt_module_close($td);
     }
+    // phpcs:enable
     return base64_encode($string);
   }
 
@@ -94,6 +96,7 @@ class CRM_Utils_Crypt {
     if (function_exists('mcrypt_module_open') &&
       defined('CIVICRM_SITE_KEY')
     ) {
+      // phpcs:disable
       $td = mcrypt_module_open(MCRYPT_RIJNDAEL_256, '', MCRYPT_MODE_ECB, '');
       // ECB mode - iv not needed - CRM-8198
       $iv = '00000000000000000000000000000000';
@@ -104,6 +107,7 @@ class CRM_Utils_Crypt {
       $string = rtrim(mdecrypt_generic($td, $string));
       mcrypt_generic_deinit($td);
       mcrypt_module_close($td);
+      // phpcs:enable
     }
 
     return $string;

@@ -93,7 +93,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->method('onPostDisable');
     $manager->disable(array('test.foo.bar'));
     $this->assertEquals('disabled', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang')); // no side-effect
+    // no side-effect
+    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
 
     $testingTypeManager
       ->expects($this->once())
@@ -103,7 +104,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->method('onPostUninstall');
     $manager->uninstall(array('test.foo.bar'));
     $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang')); // no side-effect
+    // no side-effect
+    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
   }
 
   /**
@@ -221,7 +223,6 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
     $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
   }
-
 
   /**
    * Install an extension and then harshly remove the underlying source.
@@ -341,7 +342,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $testingTypeManager
       ->expects($this->once())
       ->method('onPostEnable');
-    $manager->install(array('test.foo.bar')); // install() instead of enable()
+    // install() instead of enable()
+    $manager->install(array('test.foo.bar'));
     $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
   }
 
@@ -368,7 +370,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $testingTypeManager
       ->expects($this->never())
       ->method('onPostEnable');
-    $manager->enable(array('test.foo.bar')); // enable not install
+    // enable not install
+    $manager->enable(array('test.foo.bar'));
     $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
   }
 
@@ -400,10 +403,12 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->download = $this->_createDownload('test.newextension', 'newextension');
 
     $testingTypeManager
-      ->expects($this->never())// no data to replace
+    // no data to replace
+      ->expects($this->never())
       ->method('onPreReplace');
     $testingTypeManager
-      ->expects($this->never())// no data to replace
+    // no data to replace
+      ->expects($this->never())
       ->method('onPostReplace');
     $manager->replace($this->download);
     $this->assertEquals('uninstalled', $manager->getStatus('test.newextension'));
@@ -428,10 +433,12 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->download = $this->_createDownload('test.whiz.bang', 'newextension');
 
     $testingTypeManager
-      ->expects($this->never())// no data to replace
+    // no data to replace
+      ->expects($this->never())
       ->method('onPreReplace');
     $testingTypeManager
-      ->expects($this->never())// no data to replace
+    // no data to replace
+      ->expects($this->never())
       ->method('onPostReplace');
     $manager->replace($this->download);
     $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));

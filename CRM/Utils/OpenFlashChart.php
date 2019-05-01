@@ -42,7 +42,7 @@ class CRM_Utils_OpenFlashChart {
    * Colours.
    * @var array
    */
-  private static $_colours = array(
+  private static $_colours = [
     "#C3CC38",
     "#C8B935",
     "#CEA632",
@@ -55,7 +55,7 @@ class CRM_Utils_OpenFlashChart {
     "#6F8069",
     "#C92200",
     "#EB6C5C",
-  );
+  ];
 
   /**
    * Build The Bar Gharph.
@@ -72,7 +72,7 @@ class CRM_Utils_OpenFlashChart {
       return $chart;
     }
     if (empty($params['multiValues'])) {
-      $params['multiValues'] = array($params['values']);
+      $params['multiValues'] = [$params['values']];
     }
 
     $values = CRM_Utils_Array::value('multiValues', $params);
@@ -83,7 +83,7 @@ class CRM_Utils_OpenFlashChart {
     // get the required data.
     $chartTitle = !empty($params['legend']) ? $params['legend'] : ts('Bar Chart');
 
-    $xValues = $yValues = array();
+    $xValues = $yValues = [];
     $xValues = array_keys($values[0]);
     $yValues = array_values($values[0]);
 
@@ -97,7 +97,7 @@ class CRM_Utils_OpenFlashChart {
     }
     $ySteps = $yMax / 5;
 
-    $bars = array();
+    $bars = [];
     $config = CRM_Core_Config::singleton();
     $symbol = $config->defaultCurrencySymbol;
     foreach ($values as $barCount => $barVal) {
@@ -207,7 +207,7 @@ class CRM_Utils_OpenFlashChart {
     }
 
     // get the required data.
-    $values = array();
+    $values = [];
     foreach ($allValues as $label => $value) {
       $values[] = new pie_value((double) $value, $label);
     }
@@ -275,7 +275,7 @@ class CRM_Utils_OpenFlashChart {
     }
 
     // get the required data.
-    $xReferences = $xValueLabels = $xValues = $yValues = array();
+    $xReferences = $xValueLabels = $xValues = $yValues = [];
 
     foreach ($values as $xVal => $yVal) {
       if (!is_array($yVal) || empty($yVal)) {
@@ -408,15 +408,15 @@ class CRM_Utils_OpenFlashChart {
   public static function chart($rows, $chart, $interval) {
     $lcInterval = strtolower($interval);
     $label = ucfirst($lcInterval);
-    $chartData = $dateKeys = array();
-    $intervalLabels = array(
+    $chartData = $dateKeys = [];
+    $intervalLabels = [
       'year' => ts('Yearly'),
       'fiscalyear' => ts('Yearly (Fiscal)'),
       'month' => ts('Monthly'),
       'quarter' => ts('Quarterly'),
       'week' => ts('Weekly'),
       'yearweek' => ts('Weekly'),
-    );
+    ];
 
     switch ($lcInterval) {
       case 'month':
@@ -435,7 +435,7 @@ class CRM_Utils_OpenFlashChart {
           list($year, $month) = explode('-', $val);
           $dateKeys[] = $year;
         }
-        $legend = ts("%1", array(1 => $label));
+        $legend = ts("%1", [1 => $label]);
         if (!empty($intervalLabels[$lcInterval])) {
           $legend = $intervalLabels[$lcInterval];
         }
@@ -443,19 +443,19 @@ class CRM_Utils_OpenFlashChart {
     }
 
     if (!empty($dateKeys)) {
-      $graph = array();
+      $graph = [];
       if (!array_key_exists('multiValue', $rows)) {
-        $rows['multiValue'] = array($rows['value']);
+        $rows['multiValue'] = [$rows['value']];
       }
       foreach ($rows['multiValue'] as $key => $val) {
         $graph[$key] = array_combine($dateKeys, $rows['multiValue'][$key]);
       }
-      $chartData = array(
+      $chartData = [
         'legend' => "$legend " . CRM_Utils_Array::value('legend', $rows, ts('Contribution')) . ' ' . ts('Summary'),
         'values' => $graph[0],
         'multiValues' => $graph,
-        'barKeys' => CRM_Utils_Array::value('barKeys', $rows, array()),
-      );
+        'barKeys' => CRM_Utils_Array::value('barKeys', $rows, []),
+      ];
     }
 
     // rotate the x labels.
@@ -469,11 +469,11 @@ class CRM_Utils_OpenFlashChart {
     $chartData['yname'] = CRM_Utils_Array::value('yname', $rows);
 
     // carry some chart params if pass.
-    foreach (array(
-               'xSize',
-               'ySize',
-               'divName',
-             ) as $f) {
+    foreach ([
+      'xSize',
+      'ySize',
+      'divName',
+    ] as $f) {
       if (!empty($rows[$f])) {
         $chartData[$f] = $rows[$f];
       }
@@ -495,12 +495,12 @@ class CRM_Utils_OpenFlashChart {
       $graph[$val] = $rows['value'][$key];
     }
 
-    $chartData = array(
+    $chartData = [
       'values' => $graph,
       'legend' => $chartInfo['legend'],
       'xname' => $chartInfo['xname'],
       'yname' => $chartInfo['yname'],
-    );
+    ];
 
     // rotate the x labels.
     $chartData['xLabelAngle'] = CRM_Utils_Array::value('xLabelAngle', $chartInfo, 20);
@@ -509,11 +509,11 @@ class CRM_Utils_OpenFlashChart {
     }
 
     // carry some chart params if pass.
-    foreach (array(
-               'xSize',
-               'ySize',
-               'divName',
-             ) as $f) {
+    foreach ([
+      'xSize',
+      'ySize',
+      'divName',
+    ] as $f) {
       if (!empty($rows[$f])) {
         $chartData[$f] = $rows[$f];
       }
@@ -529,12 +529,12 @@ class CRM_Utils_OpenFlashChart {
    * @return array
    */
   public static function buildChart(&$params, $chart) {
-    $openFlashChart = array();
+    $openFlashChart = [];
     if ($chart && is_array($params) && !empty($params)) {
       // build the chart objects.
       $chartObj = CRM_Utils_OpenFlashChart::$chart($params);
 
-      $openFlashChart = array();
+      $openFlashChart = [];
       if ($chartObj) {
         // calculate chart size.
         $xSize = CRM_Utils_Array::value('xSize', $params, 400);
@@ -554,7 +554,7 @@ class CRM_Utils_OpenFlashChart {
         // generate unique id for this chart instance
         $uniqueId = md5(uniqid(rand(), TRUE));
 
-        $openFlashChart["chart_{$uniqueId}"]['size'] = array('xSize' => $xSize, 'ySize' => $ySize);
+        $openFlashChart["chart_{$uniqueId}"]['size'] = ['xSize' => $xSize, 'ySize' => $ySize];
         $openFlashChart["chart_{$uniqueId}"]['object'] = $chartObj;
 
         // assign chart data to template

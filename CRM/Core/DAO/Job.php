@@ -19,14 +19,14 @@ class CRM_Core_DAO_Job extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_job';
+  public static $_tableName = 'civicrm_job';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Job Id
@@ -121,7 +121,7 @@ class CRM_Core_DAO_Job extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'domain_id', 'civicrm_domain', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -142,6 +142,7 @@ class CRM_Core_DAO_Job extends CRM_Core_DAO {
           'title' => ts('Job ID'),
           'description' => ts('Job Id'),
           'required' => TRUE,
+          'where' => 'civicrm_job.id',
           'table_name' => 'civicrm_job',
           'entity' => 'Job',
           'bao' => 'CRM_Core_BAO_Job',
@@ -153,6 +154,7 @@ class CRM_Core_DAO_Job extends CRM_Core_DAO {
           'title' => ts('Job Domain'),
           'description' => ts('Which Domain is this scheduled job for'),
           'required' => TRUE,
+          'where' => 'civicrm_job.domain_id',
           'table_name' => 'civicrm_job',
           'entity' => 'Job',
           'bao' => 'CRM_Core_BAO_Job',
@@ -171,6 +173,7 @@ class CRM_Core_DAO_Job extends CRM_Core_DAO {
           'description' => ts('Scheduled job run frequency.'),
           'maxlength' => 8,
           'size' => CRM_Utils_Type::EIGHT,
+          'where' => 'civicrm_job.run_frequency',
           'default' => 'Daily',
           'table_name' => 'civicrm_job',
           'entity' => 'Job',
@@ -189,6 +192,7 @@ class CRM_Core_DAO_Job extends CRM_Core_DAO {
           'title' => ts('Last Run'),
           'description' => ts('When was this cron entry last run'),
           'required' => FALSE,
+          'where' => 'civicrm_job.last_run',
           'default' => 'NULL',
           'table_name' => 'civicrm_job',
           'entity' => 'Job',
@@ -201,6 +205,7 @@ class CRM_Core_DAO_Job extends CRM_Core_DAO {
           'title' => ts('Scheduled Run Date'),
           'description' => ts('When is this cron entry scheduled to run'),
           'required' => FALSE,
+          'where' => 'civicrm_job.scheduled_run_date',
           'default' => 'NULL',
           'table_name' => 'civicrm_job',
           'entity' => 'Job',
@@ -214,6 +219,7 @@ class CRM_Core_DAO_Job extends CRM_Core_DAO {
           'description' => ts('Title of the job'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_job.name',
           'table_name' => 'civicrm_job',
           'entity' => 'Job',
           'bao' => 'CRM_Core_BAO_Job',
@@ -226,6 +232,7 @@ class CRM_Core_DAO_Job extends CRM_Core_DAO {
           'description' => ts('Description of the job'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_job.description',
           'table_name' => 'civicrm_job',
           'entity' => 'Job',
           'bao' => 'CRM_Core_BAO_Job',
@@ -238,6 +245,7 @@ class CRM_Core_DAO_Job extends CRM_Core_DAO {
           'description' => ts('Entity of the job api call'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_job.api_entity',
           'table_name' => 'civicrm_job',
           'entity' => 'Job',
           'bao' => 'CRM_Core_BAO_Job',
@@ -250,6 +258,7 @@ class CRM_Core_DAO_Job extends CRM_Core_DAO {
           'description' => ts('Action of the job api call'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_job.api_action',
           'table_name' => 'civicrm_job',
           'entity' => 'Job',
           'bao' => 'CRM_Core_BAO_Job',
@@ -262,6 +271,7 @@ class CRM_Core_DAO_Job extends CRM_Core_DAO {
           'description' => ts('List of parameters to the command.'),
           'rows' => 4,
           'cols' => 60,
+          'where' => 'civicrm_job.parameters',
           'table_name' => 'civicrm_job',
           'entity' => 'Job',
           'bao' => 'CRM_Core_BAO_Job',
@@ -275,6 +285,7 @@ class CRM_Core_DAO_Job extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Job Is Active?'),
           'description' => ts('Is this job active?'),
+          'where' => 'civicrm_job.is_active',
           'table_name' => 'civicrm_job',
           'entity' => 'Job',
           'bao' => 'CRM_Core_BAO_Job',

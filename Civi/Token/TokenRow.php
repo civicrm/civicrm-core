@@ -65,7 +65,8 @@ class TokenRow {
   public function __construct(TokenProcessor $tokenProcessor, $key) {
     $this->tokenProcessor = $tokenProcessor;
     $this->tokenRow = $key;
-    $this->format('text/plain'); // Set a default.
+    // Set a default.
+    $this->format('text/plain');
     $this->context = new TokenRowContext($tokenProcessor, $key);
   }
 
@@ -138,7 +139,7 @@ class TokenRow {
     $customFieldName = "custom_" . $customFieldID;
     $record = civicrm_api3($entity, "getSingle", [
       'return' => $customFieldName,
-       'id' => $entityID,
+      'id' => $entityID,
     ]);
     $fieldValue = \CRM_Utils_Array::value($customFieldName, $record, '');
 
@@ -205,10 +206,10 @@ class TokenRow {
     }
 
     if (!isset($this->tokenProcessor->rowValues[$this->tokenRow]['text/html'])) {
-      $this->tokenProcessor->rowValues[$this->tokenRow]['text/html'] = array();
+      $this->tokenProcessor->rowValues[$this->tokenRow]['text/html'] = [];
     }
     if (!isset($this->tokenProcessor->rowValues[$this->tokenRow]['text/plain'])) {
-      $this->tokenProcessor->rowValues[$this->tokenRow]['text/plain'] = array();
+      $this->tokenProcessor->rowValues[$this->tokenRow]['text/plain'] = [];
     }
 
     $htmlTokens = &$this->tokenProcessor->rowValues[$this->tokenRow]['text/html'];
@@ -218,7 +219,7 @@ class TokenRow {
       case 'text/html':
         // Plain => HTML.
         foreach ($textTokens as $entity => $values) {
-          $entityFields = civicrm_api3($entity, "getFields", array('api_action' => 'get'));
+          $entityFields = civicrm_api3($entity, "getFields", ['api_action' => 'get']);
           foreach ($values as $field => $value) {
             if (!isset($htmlTokens[$entity][$field])) {
               // CRM-18420 - Activity Details Field are enclosed within <p>,
@@ -305,8 +306,7 @@ class TokenRowContext implements \ArrayAccess, \IteratorAggregate, \Countable {
    * @return bool
    */
   public function offsetExists($offset) {
-    return
-      isset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset])
+    return isset($this->tokenProcessor->rowContexts[$this->tokenRow][$offset])
       || isset($this->tokenProcessor->context[$offset]);
   }
 

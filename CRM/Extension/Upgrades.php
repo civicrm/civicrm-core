@@ -59,11 +59,11 @@ class CRM_Extension_Upgrades {
    * @return CRM_Queue_Queue
    */
   public static function createQueue() {
-    $queue = CRM_Queue_Service::singleton()->create(array(
+    $queue = CRM_Queue_Service::singleton()->create([
       'type' => 'Sql',
       'name' => self::QUEUE_NAME,
       'reset' => TRUE,
-    ));
+    ]);
 
     CRM_Utils_Hook::upgrade('enqueue', $queue);
 

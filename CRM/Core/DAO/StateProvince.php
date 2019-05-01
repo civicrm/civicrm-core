@@ -19,14 +19,14 @@ class CRM_Core_DAO_StateProvince extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_state_province';
+  public static $_tableName = 'civicrm_state_province';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * State/Province ID
@@ -72,7 +72,7 @@ class CRM_Core_DAO_StateProvince extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'country_id', 'civicrm_country', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -93,6 +93,7 @@ class CRM_Core_DAO_StateProvince extends CRM_Core_DAO {
           'title' => ts('State ID'),
           'description' => ts('State/Province ID'),
           'required' => TRUE,
+          'where' => 'civicrm_state_province.id',
           'table_name' => 'civicrm_state_province',
           'entity' => 'StateProvince',
           'bao' => 'CRM_Core_DAO_StateProvince',
@@ -122,6 +123,7 @@ class CRM_Core_DAO_StateProvince extends CRM_Core_DAO {
           'description' => ts('2-4 Character Abbreviation of State/Province'),
           'maxlength' => 4,
           'size' => CRM_Utils_Type::FOUR,
+          'where' => 'civicrm_state_province.abbreviation',
           'table_name' => 'civicrm_state_province',
           'entity' => 'StateProvince',
           'bao' => 'CRM_Core_DAO_StateProvince',
@@ -133,6 +135,7 @@ class CRM_Core_DAO_StateProvince extends CRM_Core_DAO {
           'title' => ts('Country'),
           'description' => ts('ID of Country that State/Province belong'),
           'required' => TRUE,
+          'where' => 'civicrm_state_province.country_id',
           'table_name' => 'civicrm_state_province',
           'entity' => 'StateProvince',
           'bao' => 'CRM_Core_DAO_StateProvince',

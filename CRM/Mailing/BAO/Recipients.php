@@ -50,7 +50,7 @@ SELECT count(*) as count
 FROM   civicrm_mailing_recipients
 WHERE  mailing_id = %1
 ";
-    $params = array(1 => array($mailingID, 'Integer'));
+    $params = [1 => [$mailingID, 'Integer']];
     return CRM_Core_DAO::singleValueQuery($sql, $params);
   }
 
@@ -79,7 +79,7 @@ FROM   civicrm_mailing_recipients
 WHERE  mailing_id = %1
        $limitString
 ";
-    $params = array(1 => array($mailingID, 'Integer'));
+    $params = [1 => [$mailingID, 'Integer']];
 
     return CRM_Core_DAO::executeQuery($sql, $params);
   }

@@ -19,14 +19,14 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_sms_provider';
+  public static $_tableName = 'civicrm_sms_provider';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * SMS Provider ID
@@ -111,7 +111,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'domain_id', 'civicrm_domain', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -132,6 +132,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'title' => ts('SMS Provider ID'),
           'description' => ts('SMS Provider ID'),
           'required' => TRUE,
+          'where' => 'civicrm_sms_provider.id',
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
@@ -144,6 +145,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'description' => ts('Provider internal name points to option_value of option_group sms_provider_name'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_sms_provider.name',
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
@@ -156,6 +158,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'description' => ts('Provider name visible to user'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_sms_provider.title',
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
@@ -170,6 +173,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'title' => ts('SMS Provider Username'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_sms_provider.username',
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
@@ -184,6 +188,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'title' => ts('SMS Provider Password'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_sms_provider.password',
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
@@ -198,6 +203,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'title' => ts('SMS Provider API'),
           'description' => ts('points to value in civicrm_option_value for group sms_api_type'),
           'required' => TRUE,
+          'where' => 'civicrm_sms_provider.api_type',
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
@@ -212,6 +218,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'title' => ts('SMS Provider API URL'),
           'maxlength' => 128,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_sms_provider.api_url',
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
@@ -225,6 +232,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('SMS Provider API Params'),
           'description' => ts('the api params in xml, http or smtp format'),
+          'where' => 'civicrm_sms_provider.api_params',
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',
@@ -237,6 +245,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'name' => 'is_default',
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('SMS Provider is Default?'),
+          'where' => 'civicrm_sms_provider.is_default',
           'default' => '0',
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
@@ -250,6 +259,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'name' => 'is_active',
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('SMS Provider is Active?'),
+          'where' => 'civicrm_sms_provider.is_active',
           'default' => '0',
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
@@ -264,6 +274,7 @@ class CRM_SMS_DAO_Provider extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('SMS Domain'),
           'description' => ts('Which Domain is this sms provider for'),
+          'where' => 'civicrm_sms_provider.domain_id',
           'table_name' => 'civicrm_sms_provider',
           'entity' => 'Provider',
           'bao' => 'CRM_SMS_BAO_Provider',

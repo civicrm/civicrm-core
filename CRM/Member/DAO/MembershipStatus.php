@@ -19,14 +19,14 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_membership_status';
+  public static $_tableName = 'civicrm_membership_status';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Membership Id
@@ -153,6 +153,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'title' => ts('Membership Status ID'),
           'description' => ts('Membership Id'),
           'required' => TRUE,
+          'where' => 'civicrm_membership_status.id',
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
@@ -167,8 +168,6 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'size' => CRM_Utils_Type::HUGE,
           'import' => TRUE,
           'where' => 'civicrm_membership_status.name',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
@@ -182,6 +181,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'description' => ts('Label for Membership Status'),
           'maxlength' => 128,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_membership_status.label',
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
@@ -197,6 +197,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'description' => ts('Event when this status starts.'),
           'maxlength' => 12,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_membership_status.start_event',
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
@@ -215,6 +216,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'description' => ts('Unit used for adjusting from start_event.'),
           'maxlength' => 8,
           'size' => CRM_Utils_Type::EIGHT,
+          'where' => 'civicrm_membership_status.start_event_adjust_unit',
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
@@ -231,6 +233,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Start Event Adjust Interval'),
           'description' => ts('Status range begins this many units from start_event.'),
+          'where' => 'civicrm_membership_status.start_event_adjust_interval',
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
@@ -243,6 +246,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'description' => ts('Event after which this status ends.'),
           'maxlength' => 12,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_membership_status.end_event',
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
@@ -261,6 +265,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'description' => ts('Unit used for adjusting from the ending event.'),
           'maxlength' => 8,
           'size' => CRM_Utils_Type::EIGHT,
+          'where' => 'civicrm_membership_status.end_event_adjust_unit',
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
@@ -277,6 +282,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('End Event Adjust Interval'),
           'description' => ts('Status range ends this many units from end_event.'),
+          'where' => 'civicrm_membership_status.end_event_adjust_interval',
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
@@ -287,6 +293,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Current Membership?'),
           'description' => ts('Does this status aggregate to current members (e.g. New, Renewed, Grace might all be TRUE... while Unrenewed, Lapsed, Inactive would be FALSE).'),
+          'where' => 'civicrm_membership_status.is_current_member',
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
@@ -297,6 +304,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Administrator Only?'),
           'description' => ts('Is this status for admin/manual assignment only.'),
+          'where' => 'civicrm_membership_status.is_admin',
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
@@ -309,6 +317,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'name' => 'weight',
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Order'),
+          'where' => 'civicrm_membership_status.weight',
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
@@ -319,6 +328,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Default Status?'),
           'description' => ts('Assign this status to a membership record if no other status match is found.'),
+          'where' => 'civicrm_membership_status.is_default',
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
           'bao' => 'CRM_Member_BAO_MembershipStatus',
@@ -332,6 +342,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is Active'),
           'description' => ts('Is this membership_status enabled.'),
+          'where' => 'civicrm_membership_status.is_active',
           'default' => '1',
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',
@@ -346,6 +357,7 @@ class CRM_Member_DAO_MembershipStatus extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is Reserved'),
           'description' => ts('Is this membership_status reserved.'),
+          'where' => 'civicrm_membership_status.is_reserved',
           'default' => '0',
           'table_name' => 'civicrm_membership_status',
           'entity' => 'MembershipStatus',

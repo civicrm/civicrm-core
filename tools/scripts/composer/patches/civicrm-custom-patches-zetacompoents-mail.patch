@@ -1,0 +1,25 @@
+diff --git a/src/transports/imap/imap_transport.php b/src/transports/imap/imap_transport.php
+index 94837cd..1542673 100644
+--- a/src/transports/imap/imap_transport.php
++++ b/src/transports/imap/imap_transport.php
+@@ -1012,7 +1012,9 @@ class ezcMailImapTransport
+         {
+             // get the sizes of the messages
+             $tag = $this->getNextTag();
+-            $query = trim( implode( ',', $messageList ) );
++            $mailBatchSize = defined('MAIL_BATCH_SIZE') ? MAIL_BATCH_SIZE : 1000;
++            $truncatedMessageList = array_slice($messageList, 0, $mailBatchSize);
++            $query = trim( implode( ',', $truncatedMessageList ) );
+             $this->connection->sendData( "{$tag} FETCH {$query} RFC822.SIZE" );
+             $response = $this->getResponse( 'FETCH (' );
+             $currentMessage = trim( reset( $messageList ) );
+diff --git a/tests/tutorial_examples.php b/tests/tutorial_examples.php
+index 3acadc3..06f1e71 100644
+--- a/tests/tutorial_examples.php
++++ b/tests/tutorial_examples.php
+@@ -1,5 +1,4 @@
+ <?php
+-declare(encoding="latin1");
+ /**
+  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
+  * @version //autogentag//

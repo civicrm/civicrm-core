@@ -19,14 +19,14 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_pcp_block';
+  public static $_tableName = 'civicrm_pcp_block';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * PCP block Id
@@ -133,7 +133,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'supporter_profile_id', 'civicrm_uf_group', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), 'entity_id', NULL, 'id', 'entity_table');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), 'target_entity_id', NULL, 'id', 'target_entity_type');
@@ -156,6 +156,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'title' => ts('PCP Block ID'),
           'description' => ts('PCP block Id'),
           'required' => TRUE,
+          'where' => 'civicrm_pcp_block.id',
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
@@ -167,6 +168,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'title' => ts('Entity Table'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_pcp_block.entity_table',
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
@@ -178,6 +180,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'title' => ts('Entity'),
           'description' => ts('FK to civicrm_contribution_page.id OR civicrm_event.id'),
           'required' => TRUE,
+          'where' => 'civicrm_pcp_block.entity_id',
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
@@ -191,6 +194,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_pcp_block.target_entity_type',
           'default' => 'contribute',
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
@@ -203,6 +207,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'title' => ts('Target Entity ID'),
           'description' => ts('The entity that this pcp targets'),
           'required' => TRUE,
+          'where' => 'civicrm_pcp_block.target_entity_id',
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
           'bao' => 'CRM_PCP_BAO_PCPBlock',
@@ -213,6 +218,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Supporter Profile'),
           'description' => ts('FK to civicrm_uf_group.id. Does Personal Campaign Page require manual activation by administrator? (is inactive by default after setup)?'),
+          'where' => 'civicrm_pcp_block.supporter_profile_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
@@ -225,6 +231,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Owner Notification'),
           'description' => ts('FK to civicrm_option_group with name = PCP owner notifications'),
+          'where' => 'civicrm_pcp_block.owner_notify_id',
           'default' => '0',
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
@@ -243,6 +250,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Approval Required?'),
           'description' => ts('Does Personal Campaign Page require manual activation by administrator? (is inactive by default after setup)?'),
+          'where' => 'civicrm_pcp_block.is_approval_needed',
           'default' => 'NULL',
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
@@ -254,6 +262,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Tell a Friend Enabled?'),
           'description' => ts('Does Personal Campaign Page allow using tell a friend?'),
+          'where' => 'civicrm_pcp_block.is_tellfriend_enabled',
           'default' => 'NULL',
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
@@ -265,6 +274,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Tell A Friend Limit'),
           'description' => ts('Maximum recipient fields allowed in tell a friend'),
+          'where' => 'civicrm_pcp_block.tellfriend_limit',
           'default' => 'NULL',
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
@@ -278,6 +288,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'description' => ts('Link text for PCP.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_pcp_block.link_text',
           'default' => 'NULL',
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
@@ -289,6 +300,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Enabled?'),
           'description' => ts('Is Personal Campaign Page Block enabled/active?'),
+          'where' => 'civicrm_pcp_block.is_active',
           'default' => '1',
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',
@@ -302,6 +314,7 @@ class CRM_PCP_DAO_PCPBlock extends CRM_Core_DAO {
           'description' => ts('If set, notification is automatically emailed to this email-address on create/update Personal Campaign Page'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_pcp_block.notify_email',
           'default' => 'NULL',
           'table_name' => 'civicrm_pcp_block',
           'entity' => 'PCPBlock',

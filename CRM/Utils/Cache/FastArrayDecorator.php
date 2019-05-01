@@ -54,7 +54,8 @@
  */
 class CRM_Utils_Cache_FastArrayDecorator implements CRM_Utils_Cache_Interface {
 
-  use CRM_Utils_Cache_NaiveMultipleTrait; // TODO Consider native implementation.
+  // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveMultipleTrait;
 
   /**
    * @var int
@@ -99,6 +100,7 @@ class CRM_Utils_Cache_FastArrayDecorator implements CRM_Utils_Cache_Interface {
   }
 
   public function get($key, $default = NULL) {
+    CRM_Utils_Cache::assertValidKey($key);
     if (array_key_exists($key, $this->values)) {
       return $this->values[$key];
     }
@@ -114,6 +116,7 @@ class CRM_Utils_Cache_FastArrayDecorator implements CRM_Utils_Cache_Interface {
   }
 
   public function delete($key) {
+    CRM_Utils_Cache::assertValidKey($key);
     unset($this->values[$key]);
     return $this->delegate->delete($key);
   }

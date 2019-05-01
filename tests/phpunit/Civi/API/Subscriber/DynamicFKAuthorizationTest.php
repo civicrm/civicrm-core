@@ -1,8 +1,8 @@
 <?php
 namespace Civi\API\Subscriber;
 
-use \Civi\API\Kernel;
-use \Symfony\Component\EventDispatcher\EventDispatcher;
+use Civi\API\Kernel;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  */
@@ -18,14 +18,14 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
   const FORBIDDEN_ID = 30;
 
   /**
-   * @var EventDispatcher
+   * @var \Symfony\Component\EventDispatcher\EventDispatcher
    */
-  var $dispatcher;
+  public $dispatcher;
 
   /**
-   * @var Kernel
+   * @var \Civi\API\Kernel
    */
-  var $kernel;
+  public $kernel;
 
   protected function setUp() {
     parent::setUp();

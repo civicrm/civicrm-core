@@ -37,7 +37,10 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
    */
   public function listContribution() {
     $rows = civicrm_api3('Contribution', 'get', [
-      'options' => ['limit' => 12],
+      'options' => [
+        'limit' => 12,
+        'sort' => 'receive_date DESC',
+      ],
       'sequential' => 1,
       'contact_id' => $this->_contactId,
       'return' => [
@@ -54,11 +57,26 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       ],
     ])['values'];
 
-    foreach ($rows as $index => $row) {
+    // We want oldest first, just among the most recent contributions
+    $rows = array_reverse($rows);
+
+    foreach ($rows as $index => &$row) {
       // This is required for tpl logic. We should move away from hard-code this to adding an array of actions to the row
       // which the tpl can iterate through - this should allow us to cope with competing attempts to add new buttons
       // and allow extensions to assign new ones through the pageRun hook
-      $row[0]['contribution_status_name'] = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $row['contribution_status_id']);;
+      if ('Pending' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $row['contribution_status_id'])) {
+        $row['buttons']['pay'] = [
+          'class' => 'button',
+          'label' => ts('Pay Now'),
+          'url' => CRM_Utils_System::url('civicrm/contribute/transact', [
+            'reset' => 1,
+            'id' => CRM_Invoicing_Utils::getDefaultPaymentPage(),
+            'ccid' => $row['contribution_id'],
+            'cs' => $this->getUserChecksum(),
+            'cid' => $row['contact_id'],
+          ])
+        ];
+      }
     }
 
     $this->assign('contribute_rows', $rows);
@@ -80,8 +98,8 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
 
     $recurStatus = CRM_Contribute_PseudoConstant::contributionStatus();
 
-    $recurRow = array();
-    $recurIDs = array();
+    $recurRow = [];
+    $recurIDs = [];
     while ($recur->fetch()) {
       if (empty($recur->payment_processor_id)) {
         // it's not clear why we continue here as any without a processor id would likely
@@ -106,11 +124,11 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       }
 
       $recurRow[$values['id']]['action'] = CRM_Core_Action::formLink(CRM_Contribute_Page_Tab::recurLinks($recur->id, 'dashboard'),
-        $action, array(
+        $action, [
           'cid' => $this->_contactId,
           'crid' => $values['id'],
           'cxt' => 'contribution',
-        ),
+        ],
         ts('more'),
         FALSE,
         'contribution.dashboard.recurring',
@@ -140,12 +158,27 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
   }
 
   /**
+   * Should invoice links be displayed on the template.
+   *
+   * @todo This should be moved to a hook-like structure on the invoicing class
+   * (currently CRM_Utils_Invoicing) with a view to possible removal from core.
+   */
+  public function isIncludeInvoiceLinks() {
+    if (!CRM_Invoicing_Utils::isInvoicingEnabled()) {
+      return FALSE;
+    }
+    $dashboardOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+      'user_dashboard_options'
+    );
+    return $dashboardOptions['Invoices / Credit Notes'];
+  }
+
+  /**
    * the main function that is called when the page
    * loads, it decides the which action has to be taken for the page.
    */
   public function run() {
-    $this->assign('invoicing', CRM_Invoicing_Utils::isInvoicingEnabled());
-    $this->assign('defaultInvoicePage', CRM_Invoicing_Utils::getDefaultPaymentPage());
+    $this->assign('isIncludeInvoiceLinks', $this->isIncludeInvoiceLinks());
     parent::preProcess();
     $this->listContribution();
   }

@@ -19,14 +19,14 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_survey';
+  public static $_tableName = 'civicrm_survey';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Survey id.
@@ -184,7 +184,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'campaign_id', 'civicrm_campaign', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'created_id', 'civicrm_contact', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'last_modified_id', 'civicrm_contact', 'id');
@@ -207,6 +207,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'title' => ts('Survey ID'),
           'description' => ts('Survey id.'),
           'required' => TRUE,
+          'where' => 'civicrm_survey.id',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
           'bao' => 'CRM_Campaign_BAO_Survey',
@@ -222,8 +223,6 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'size' => CRM_Utils_Type::HUGE,
           'import' => TRUE,
           'where' => 'civicrm_survey.title',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
@@ -235,6 +234,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Survey Campaign ID'),
           'description' => ts('Foreign key to the Campaign.'),
+          'where' => 'civicrm_survey.campaign_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
@@ -254,8 +254,6 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'description' => ts('Implicit FK to civicrm_option_value where option_group = activity_type'),
           'import' => TRUE,
           'where' => 'civicrm_survey.activity_type_id',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'default' => 'NULL',
           'table_name' => 'civicrm_survey',
@@ -277,6 +275,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'description' => ts('Recontact intervals for each status.'),
           'rows' => 20,
           'cols' => 80,
+          'where' => 'civicrm_survey.recontact_interval',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
           'bao' => 'CRM_Campaign_BAO_Survey',
@@ -292,6 +291,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'description' => ts('Script instructions for volunteers to use for the survey.'),
           'rows' => 20,
           'cols' => 80,
+          'where' => 'civicrm_survey.instructions',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
           'bao' => 'CRM_Campaign_BAO_Survey',
@@ -305,6 +305,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Survey Hold Duration'),
           'description' => ts('Number of days for recurrence of release.'),
+          'where' => 'civicrm_survey.release_frequency',
           'default' => 'NULL',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
@@ -316,6 +317,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Maximum number of contacts'),
           'description' => ts('Maximum number of contacts to allow for survey.'),
+          'where' => 'civicrm_survey.max_number_of_contacts',
           'default' => 'NULL',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
@@ -327,6 +329,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Default number of contacts'),
           'description' => ts('Default number of contacts to allow for survey.'),
+          'where' => 'civicrm_survey.default_number_of_contacts',
           'default' => 'NULL',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
@@ -338,6 +341,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Survey Is Active'),
           'description' => ts('Is this survey enabled or disabled/cancelled?'),
+          'where' => 'civicrm_survey.is_active',
           'default' => '1',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
@@ -349,6 +353,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is Default Survey'),
           'description' => ts('Is this default survey?'),
+          'where' => 'civicrm_survey.is_default',
           'default' => '0',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
@@ -360,6 +365,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Survey Created By'),
           'description' => ts('FK to civicrm_contact, who created this Survey.'),
+          'where' => 'civicrm_survey.created_id',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
           'bao' => 'CRM_Campaign_BAO_Survey',
@@ -371,6 +377,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           'title' => ts('Campaign Created Date'),
           'description' => ts('Date and time that Survey was created.'),
+          'where' => 'civicrm_survey.created_date',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
           'bao' => 'CRM_Campaign_BAO_Survey',
@@ -381,6 +388,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Survey Modified'),
           'description' => ts('FK to civicrm_contact, who recently edited this Survey.'),
+          'where' => 'civicrm_survey.last_modified_id',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
           'bao' => 'CRM_Campaign_BAO_Survey',
@@ -392,6 +400,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           'title' => ts('Survey Modified On'),
           'description' => ts('Date and time that Survey was edited last time.'),
+          'where' => 'civicrm_survey.last_modified_date',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
           'bao' => 'CRM_Campaign_BAO_Survey',
@@ -402,6 +411,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Survey Result'),
           'description' => ts('Used to store option group id.'),
+          'where' => 'civicrm_survey.result_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
@@ -413,6 +423,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('No Email Verification'),
           'description' => ts('Bypass the email verification.'),
+          'where' => 'civicrm_survey.bypass_confirm',
           'default' => '0',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
@@ -426,6 +437,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'description' => ts('Title for Thank-you page (header title tag, and display at the top of the page).'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_survey.thankyou_title',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
           'bao' => 'CRM_Campaign_BAO_Survey',
@@ -438,6 +450,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'description' => ts('text and html allowed. displayed above result on success page'),
           'rows' => 8,
           'cols' => 60,
+          'where' => 'civicrm_survey.thankyou_text',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',
           'bao' => 'CRM_Campaign_BAO_Survey',
@@ -451,6 +464,7 @@ class CRM_Campaign_DAO_Survey extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is shared through social media'),
           'description' => ts('Can people share the petition through social media?'),
+          'where' => 'civicrm_survey.is_share',
           'default' => '1',
           'table_name' => 'civicrm_survey',
           'entity' => 'Survey',

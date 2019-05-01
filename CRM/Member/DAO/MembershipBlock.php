@@ -19,14 +19,14 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_membership_block';
+  public static $_tableName = 'civicrm_membership_block';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Membership Id
@@ -135,7 +135,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'entity_id', 'civicrm_contribution_page', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'membership_type_default', 'civicrm_membership_type', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -157,6 +157,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'title' => ts('Membership Block ID'),
           'description' => ts('Membership Id'),
           'required' => TRUE,
+          'where' => 'civicrm_membership_block.id',
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
@@ -169,6 +170,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'description' => ts('Name for Membership Status'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_membership_block.entity_table',
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
@@ -180,6 +182,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'title' => ts('Membership Block Entity ID'),
           'description' => ts('FK to civicrm_contribution_page.id'),
           'required' => TRUE,
+          'where' => 'civicrm_membership_block.entity_id',
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
@@ -193,6 +196,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'description' => ts('Membership types to be exposed by this block'),
           'maxlength' => 1024,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_membership_block.membership_types',
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
@@ -204,6 +208,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Membership Block Default Type'),
           'description' => ts('Optional foreign key to membership_type'),
+          'where' => 'civicrm_membership_block.membership_type_default',
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
@@ -215,6 +220,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Membership Block Display Minimum Fee'),
           'description' => ts('Display minimum membership fee'),
+          'where' => 'civicrm_membership_block.display_min_fee',
           'default' => '1',
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
@@ -226,6 +232,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Membership Block Is Separate Payment'),
           'description' => ts('Should membership transactions be processed separately'),
+          'where' => 'civicrm_membership_block.is_separate_payment',
           'default' => '1',
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
@@ -239,6 +246,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'description' => ts('Title to display at top of block'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_membership_block.new_title',
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
@@ -249,6 +257,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Membership Block New Text'),
           'description' => ts('Text to display below title'),
+          'where' => 'civicrm_membership_block.new_text',
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
@@ -261,6 +270,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'description' => ts('Title for renewal'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_membership_block.renewal_title',
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
@@ -271,6 +281,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Membership Block Renewal Text'),
           'description' => ts('Text to display for member renewal'),
+          'where' => 'civicrm_membership_block.renewal_text',
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
           'bao' => 'CRM_Member_BAO_MembershipBlock',
@@ -281,6 +292,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is Required'),
           'description' => ts('Is membership sign up optional'),
+          'where' => 'civicrm_membership_block.is_required',
           'default' => '0',
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',
@@ -292,6 +304,7 @@ class CRM_Member_DAO_MembershipBlock extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is Active'),
           'description' => ts('Is this membership_block enabled'),
+          'where' => 'civicrm_membership_block.is_active',
           'default' => '1',
           'table_name' => 'civicrm_membership_block',
           'entity' => 'MembershipBlock',

@@ -395,11 +395,14 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       CRM_Core_Action::ADD,
       $pledgePayments['values'][0]['id'],
       $contributionID,
-      NULL, // adjustTotalAmount
+      // adjustTotalAmount
+      NULL,
       404.70,
       134.90,
-      1, // contribution_status_id
-      NULL // original_contribution_status_id
+      // contribution_status_id
+      1,
+      // original_contribution_status_id
+      NULL
     );
 
     // Fetch the pledge payments again to see if the amounts and statuses
@@ -450,7 +453,8 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       'amount' => 100.00,
       'pledge_status_id' => 2,
       'pledge_financial_type_id' => 1,
-      'original_installment_amount' => (100 / 12), // the API does not allow this
+      // the API does not allow this
+      'original_installment_amount' => (100 / 12),
       'frequency_interval' => 1,
       'frequency_unit' => 'month',
       'frequency_day' => 1,
@@ -491,11 +495,14 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       CRM_Core_Action::ADD,
       $pledgePayments['values'][0]['id'],
       $contributionID,
-      NULL, // adjustTotalAmount
+    // adjustTotalAmount
+      NULL,
       100.00,
       100.00,
-      1, // contribution_status_id
-      NULL // original_contribution_status_id
+    // contribution_status_id
+      1,
+    // original_contribution_status_id
+      NULL
     );
 
     // Fetch the pledge payments again to see if the amounts and statuses

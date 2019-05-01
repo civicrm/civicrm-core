@@ -19,14 +19,14 @@ class CRM_Core_DAO_Discount extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_discount';
+  public static $_tableName = 'civicrm_discount';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * primary key
@@ -86,7 +86,7 @@ class CRM_Core_DAO_Discount extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'price_set_id', 'civicrm_price_set', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), 'entity_id', NULL, 'id', 'entity_table');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -108,6 +108,7 @@ class CRM_Core_DAO_Discount extends CRM_Core_DAO {
           'title' => ts('Discount ID'),
           'description' => ts('primary key'),
           'required' => TRUE,
+          'where' => 'civicrm_discount.id',
           'table_name' => 'civicrm_discount',
           'entity' => 'Discount',
           'bao' => 'CRM_Core_BAO_Discount',
@@ -120,6 +121,7 @@ class CRM_Core_DAO_Discount extends CRM_Core_DAO {
           'description' => ts('physical tablename for entity being joined to discount, e.g. civicrm_event'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_discount.entity_table',
           'table_name' => 'civicrm_discount',
           'entity' => 'Discount',
           'bao' => 'CRM_Core_BAO_Discount',
@@ -131,6 +133,7 @@ class CRM_Core_DAO_Discount extends CRM_Core_DAO {
           'title' => ts('Entity ID'),
           'description' => ts('FK to entity table specified in entity_table column.'),
           'required' => TRUE,
+          'where' => 'civicrm_discount.entity_id',
           'table_name' => 'civicrm_discount',
           'entity' => 'Discount',
           'bao' => 'CRM_Core_BAO_Discount',
@@ -142,10 +145,8 @@ class CRM_Core_DAO_Discount extends CRM_Core_DAO {
           'title' => ts('Discount Name'),
           'description' => ts('FK to civicrm_price_set'),
           'required' => TRUE,
-          'export' => TRUE,
           'where' => 'civicrm_discount.price_set_id',
-          'headerPattern' => '',
-          'dataPattern' => '',
+          'export' => TRUE,
           'table_name' => 'civicrm_discount',
           'entity' => 'Discount',
           'bao' => 'CRM_Core_BAO_Discount',
@@ -157,6 +158,7 @@ class CRM_Core_DAO_Discount extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_DATE,
           'title' => ts('Discount Start Date'),
           'description' => ts('Date when discount starts.'),
+          'where' => 'civicrm_discount.start_date',
           'table_name' => 'civicrm_discount',
           'entity' => 'Discount',
           'bao' => 'CRM_Core_BAO_Discount',
@@ -167,6 +169,7 @@ class CRM_Core_DAO_Discount extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_DATE,
           'title' => ts('Discount End Date'),
           'description' => ts('Date when discount ends.'),
+          'where' => 'civicrm_discount.end_date',
           'table_name' => 'civicrm_discount',
           'entity' => 'Discount',
           'bao' => 'CRM_Core_BAO_Discount',

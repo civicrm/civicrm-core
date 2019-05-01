@@ -19,14 +19,14 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_campaign';
+  public static $_tableName = 'civicrm_campaign';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Unique Campaign ID.
@@ -163,7 +163,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'parent_id', 'civicrm_campaign', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'created_id', 'civicrm_contact', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'last_modified_id', 'civicrm_contact', 'id');
@@ -188,8 +188,6 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'required' => TRUE,
           'import' => TRUE,
           'where' => 'civicrm_campaign.id',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
@@ -206,8 +204,6 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'size' => CRM_Utils_Type::HUGE,
           'import' => TRUE,
           'where' => 'civicrm_campaign.name',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
@@ -226,8 +222,6 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'size' => CRM_Utils_Type::HUGE,
           'import' => TRUE,
           'where' => 'civicrm_campaign.title',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
@@ -244,6 +238,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'description' => ts('Full description of Campaign.'),
           'rows' => 8,
           'cols' => 60,
+          'where' => 'civicrm_campaign.description',
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
@@ -260,7 +255,6 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_campaign.start_date',
           'headerPattern' => '/^start|(s(tart\s)?date)$/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
@@ -278,7 +272,6 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'import' => TRUE,
           'where' => 'civicrm_campaign.end_date',
           'headerPattern' => '/^end|(e(nd\s)?date)$/i',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
@@ -295,8 +288,6 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'description' => ts('Campaign Type ID.Implicit FK to civicrm_option_value where option_group = campaign_type'),
           'import' => TRUE,
           'where' => 'civicrm_campaign.campaign_type_id',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'default' => 'NULL',
           'table_name' => 'civicrm_campaign',
@@ -318,8 +309,6 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'description' => ts('Campaign status ID.Implicit FK to civicrm_option_value where option_group = campaign_status'),
           'import' => TRUE,
           'where' => 'civicrm_campaign.status_id',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'default' => 'NULL',
           'table_name' => 'civicrm_campaign',
@@ -361,8 +350,6 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'description' => ts('Optional parent id for this Campaign.'),
           'import' => TRUE,
           'where' => 'civicrm_campaign.parent_id',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'default' => 'NULL',
           'table_name' => 'civicrm_campaign',
@@ -379,6 +366,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is Campaign Active?'),
           'description' => ts('Is this Campaign enabled or disabled/cancelled?'),
+          'where' => 'civicrm_campaign.is_active',
           'default' => '1',
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
@@ -393,6 +381,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Campaign Created By'),
           'description' => ts('FK to civicrm_contact, who created this Campaign.'),
+          'where' => 'civicrm_campaign.created_id',
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
@@ -404,6 +393,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           'title' => ts('Campaign Created Date'),
           'description' => ts('Date and time that Campaign was created.'),
+          'where' => 'civicrm_campaign.created_date',
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
@@ -417,6 +407,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Campaign Modified By'),
           'description' => ts('FK to civicrm_contact, who recently edited this Campaign.'),
+          'where' => 'civicrm_campaign.last_modified_id',
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
@@ -428,6 +419,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           'title' => ts('Campaign Modified Date'),
           'description' => ts('Date and time that Campaign was edited last time.'),
+          'where' => 'civicrm_campaign.last_modified_date',
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
@@ -438,6 +430,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Campaign Goals'),
           'description' => ts('General goals for Campaign.'),
+          'where' => 'civicrm_campaign.goal_general',
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',
@@ -455,6 +448,7 @@ class CRM_Campaign_DAO_Campaign extends CRM_Core_DAO {
             20,
             2
           ],
+          'where' => 'civicrm_campaign.goal_revenue',
           'table_name' => 'civicrm_campaign',
           'entity' => 'Campaign',
           'bao' => 'CRM_Campaign_BAO_Campaign',

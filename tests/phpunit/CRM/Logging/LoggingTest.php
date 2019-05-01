@@ -30,7 +30,6 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
     $logging->disableLogging();
   }
 
-
   /**
    * Test creating logging schema when database is in multilingual mode.
    * Also test altering a multilingual table.
@@ -47,7 +46,6 @@ class CRM_Logging_LoggingTest extends CiviUnitTestCase {
     $logging->fixSchemaDifferencesFor('civicrm_option_value', array(), TRUE);
     $query = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE `log_civicrm_option_value`", array(), TRUE, NULL, FALSE, FALSE);
     $query->fetch();
-    $query->free();
     $create = explode("\n", $query->Create_Table);
     $this->assertTrue(in_array("  `logging_test` int(11) DEFAULT '0'", $create));
     $create = explode("\n", $query->Create_Table);

@@ -19,14 +19,14 @@ class CRM_ACL_DAO_EntityRole extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_acl_entity_role';
+  public static $_tableName = 'civicrm_acl_entity_role';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Unique table ID
@@ -79,7 +79,7 @@ class CRM_ACL_DAO_EntityRole extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), 'entity_id', NULL, 'id', 'entity_table');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -100,6 +100,7 @@ class CRM_ACL_DAO_EntityRole extends CRM_Core_DAO {
           'title' => ts('Entity Role'),
           'description' => ts('Unique table ID'),
           'required' => TRUE,
+          'where' => 'civicrm_acl_entity_role.id',
           'table_name' => 'civicrm_acl_entity_role',
           'entity' => 'EntityRole',
           'bao' => 'CRM_ACL_BAO_EntityRole',
@@ -111,6 +112,7 @@ class CRM_ACL_DAO_EntityRole extends CRM_Core_DAO {
           'title' => ts('ACL Role ID'),
           'description' => ts('Foreign Key to ACL Role (which is an option value pair and hence an implicit FK)'),
           'required' => TRUE,
+          'where' => 'civicrm_acl_entity_role.acl_role_id',
           'table_name' => 'civicrm_acl_entity_role',
           'entity' => 'EntityRole',
           'bao' => 'CRM_ACL_BAO_EntityRole',
@@ -124,6 +126,7 @@ class CRM_ACL_DAO_EntityRole extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_acl_entity_role.entity_table',
           'table_name' => 'civicrm_acl_entity_role',
           'entity' => 'EntityRole',
           'bao' => 'CRM_ACL_BAO_EntityRole',
@@ -135,6 +138,7 @@ class CRM_ACL_DAO_EntityRole extends CRM_Core_DAO {
           'title' => ts('ACL Entity ID'),
           'description' => ts('ID of the group/contact object being joined'),
           'required' => TRUE,
+          'where' => 'civicrm_acl_entity_role.entity_id',
           'table_name' => 'civicrm_acl_entity_role',
           'entity' => 'EntityRole',
           'bao' => 'CRM_ACL_BAO_EntityRole',
@@ -145,6 +149,7 @@ class CRM_ACL_DAO_EntityRole extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('ACL Entity Role is Active'),
           'description' => ts('Is this property active?'),
+          'where' => 'civicrm_acl_entity_role.is_active',
           'table_name' => 'civicrm_acl_entity_role',
           'entity' => 'EntityRole',
           'bao' => 'CRM_ACL_BAO_EntityRole',

@@ -19,14 +19,14 @@ class CRM_Core_DAO_AddressFormat extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_address_format';
+  public static $_tableName = 'civicrm_address_format';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Address Format Id
@@ -64,6 +64,7 @@ class CRM_Core_DAO_AddressFormat extends CRM_Core_DAO {
           'title' => ts('Address Format ID'),
           'description' => ts('Address Format Id'),
           'required' => TRUE,
+          'where' => 'civicrm_address_format.id',
           'table_name' => 'civicrm_address_format',
           'entity' => 'AddressFormat',
           'bao' => 'CRM_Core_DAO_AddressFormat',
@@ -74,6 +75,7 @@ class CRM_Core_DAO_AddressFormat extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Address Format'),
           'description' => ts('The format of an address'),
+          'where' => 'civicrm_address_format.format',
           'table_name' => 'civicrm_address_format',
           'entity' => 'AddressFormat',
           'bao' => 'CRM_Core_DAO_AddressFormat',

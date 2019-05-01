@@ -214,7 +214,7 @@ class ManagerTest extends \CiviUnitTestCase {
   public function hook_civicrm_alterAngular($angular) {
     $angular->add(ChangeSet::create('cat-stevens')
       ->requires('crmMailing', 'crmCatStevens')
-      ->alterHtml('~/crmMailing/EditMailingCtrl/2step.html', function(\phpQueryObject $doc){
+      ->alterHtml('~/crmMailing/EditMailingCtrl/2step.html', function(\phpQueryObject $doc) {
         $doc->find('[ng-form="crmMailingSubform"]')->attr('cat-stevens', 'ts(\'wild world\')');
       })
     );

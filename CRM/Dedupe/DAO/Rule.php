@@ -19,14 +19,14 @@ class CRM_Dedupe_DAO_Rule extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_dedupe_rule';
+  public static $_tableName = 'civicrm_dedupe_rule';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Unique dedupe rule id
@@ -86,7 +86,7 @@ class CRM_Dedupe_DAO_Rule extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'dedupe_rule_group_id', 'civicrm_dedupe_rule_group', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -107,6 +107,7 @@ class CRM_Dedupe_DAO_Rule extends CRM_Core_DAO {
           'title' => ts('Dedupe Rule ID'),
           'description' => ts('Unique dedupe rule id'),
           'required' => TRUE,
+          'where' => 'civicrm_dedupe_rule.id',
           'table_name' => 'civicrm_dedupe_rule',
           'entity' => 'Rule',
           'bao' => 'CRM_Dedupe_BAO_Rule',
@@ -118,6 +119,7 @@ class CRM_Dedupe_DAO_Rule extends CRM_Core_DAO {
           'title' => ts('Dedupe Rule Group'),
           'description' => ts('The id of the rule group this rule belongs to'),
           'required' => TRUE,
+          'where' => 'civicrm_dedupe_rule.dedupe_rule_group_id',
           'table_name' => 'civicrm_dedupe_rule',
           'entity' => 'Rule',
           'bao' => 'CRM_Dedupe_BAO_Rule',
@@ -132,6 +134,7 @@ class CRM_Dedupe_DAO_Rule extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_dedupe_rule.rule_table',
           'table_name' => 'civicrm_dedupe_rule',
           'entity' => 'Rule',
           'bao' => 'CRM_Dedupe_BAO_Rule',
@@ -145,6 +148,7 @@ class CRM_Dedupe_DAO_Rule extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_dedupe_rule.rule_field',
           'table_name' => 'civicrm_dedupe_rule',
           'entity' => 'Rule',
           'bao' => 'CRM_Dedupe_BAO_Rule',
@@ -155,6 +159,7 @@ class CRM_Dedupe_DAO_Rule extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Rule Length'),
           'description' => ts('The length of the matching substring'),
+          'where' => 'civicrm_dedupe_rule.rule_length',
           'table_name' => 'civicrm_dedupe_rule',
           'entity' => 'Rule',
           'bao' => 'CRM_Dedupe_BAO_Rule',
@@ -169,6 +174,7 @@ class CRM_Dedupe_DAO_Rule extends CRM_Core_DAO {
           'title' => ts('Order'),
           'description' => ts('The weight of the rule'),
           'required' => TRUE,
+          'where' => 'civicrm_dedupe_rule.rule_weight',
           'table_name' => 'civicrm_dedupe_rule',
           'entity' => 'Rule',
           'bao' => 'CRM_Dedupe_BAO_Rule',

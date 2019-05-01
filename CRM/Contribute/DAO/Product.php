@@ -19,14 +19,14 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_product';
+  public static $_tableName = 'civicrm_product';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * @var int unsigned
@@ -174,7 +174,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'financial_type_id', 'civicrm_financial_type', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -194,6 +194,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Product ID'),
           'required' => TRUE,
+          'where' => 'civicrm_product.id',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
           'bao' => 'CRM_Contribute_BAO_Product',
@@ -207,10 +208,8 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
-          'export' => TRUE,
           'where' => 'civicrm_product.name',
-          'headerPattern' => '',
-          'dataPattern' => '',
+          'export' => TRUE,
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
           'bao' => 'CRM_Contribute_BAO_Product',
@@ -221,6 +220,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Description'),
           'description' => ts('Optional description of the product/premium.'),
+          'where' => 'civicrm_product.description',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
           'bao' => 'CRM_Contribute_BAO_Product',
@@ -233,10 +233,8 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
           'description' => ts('Optional product sku or code.'),
           'maxlength' => 50,
           'size' => CRM_Utils_Type::BIG,
-          'export' => TRUE,
           'where' => 'civicrm_product.sku',
-          'headerPattern' => '',
-          'dataPattern' => '',
+          'export' => TRUE,
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
           'bao' => 'CRM_Contribute_BAO_Product',
@@ -247,6 +245,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Options'),
           'description' => ts('Store comma-delimited list of color, size, etc. options for the product.'),
+          'where' => 'civicrm_product.options',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
           'bao' => 'CRM_Contribute_BAO_Product',
@@ -259,6 +258,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
           'description' => ts('Full or relative URL to uploaded image - fullsize.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_product.image',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
           'bao' => 'CRM_Contribute_BAO_Product',
@@ -271,6 +271,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
           'description' => ts('Full or relative URL to image thumbnail.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_product.thumbnail',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
           'bao' => 'CRM_Contribute_BAO_Product',
@@ -285,6 +286,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
             20,
             2
           ],
+          'where' => 'civicrm_product.price',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
           'bao' => 'CRM_Contribute_BAO_Product',
@@ -297,6 +299,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
           'description' => ts('3 character string, value from config setting or input via user.'),
           'maxlength' => 3,
           'size' => CRM_Utils_Type::FOUR,
+          'where' => 'civicrm_product.currency',
           'default' => 'NULL',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
@@ -317,6 +320,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Financial Type'),
           'description' => ts('FK to Financial Type.'),
+          'where' => 'civicrm_product.financial_type_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
@@ -338,6 +342,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
             20,
             2
           ],
+          'where' => 'civicrm_product.min_contribution',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
           'bao' => 'CRM_Contribute_BAO_Product',
@@ -352,6 +357,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
             20,
             2
           ],
+          'where' => 'civicrm_product.cost',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
           'bao' => 'CRM_Contribute_BAO_Product',
@@ -363,6 +369,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
           'title' => ts('Is Active'),
           'description' => ts('Disabling premium removes it from the premiums_premium join table below.'),
           'required' => TRUE,
+          'where' => 'civicrm_product.is_active',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
           'bao' => 'CRM_Contribute_BAO_Product',
@@ -376,6 +383,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
       (e.g. 1 year + fixed -> we would set start/end for 1/1/06 thru 12/31/06 for any premium chosen in 2006) '),
           'maxlength' => 8,
           'size' => CRM_Utils_Type::EIGHT,
+          'where' => 'civicrm_product.period_type',
           'default' => 'rolling',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
@@ -393,6 +401,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Fixed Period Start Day'),
           'description' => ts('Month and day (MMDD) that fixed period type subscription or membership starts.'),
+          'where' => 'civicrm_product.fixed_period_start_day',
           'default' => '0101',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
@@ -405,6 +414,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
           'title' => ts('Duration Unit'),
           'maxlength' => 8,
           'size' => CRM_Utils_Type::EIGHT,
+          'where' => 'civicrm_product.duration_unit',
           'default' => 'year',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
@@ -422,6 +432,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Duration Interval'),
           'description' => ts('Number of units for total duration of subscription, service, membership (e.g. 12 Months).'),
+          'where' => 'civicrm_product.duration_interval',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
           'bao' => 'CRM_Contribute_BAO_Product',
@@ -434,6 +445,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
           'description' => ts('Frequency unit and interval allow option to store actual delivery frequency for a subscription or service.'),
           'maxlength' => 8,
           'size' => CRM_Utils_Type::EIGHT,
+          'where' => 'civicrm_product.frequency_unit',
           'default' => 'month',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
@@ -451,6 +463,7 @@ class CRM_Contribute_DAO_Product extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Frequency Interval'),
           'description' => ts('Number of units for delivery frequency of subscription, service, membership (e.g. every 3 Months).'),
+          'where' => 'civicrm_product.frequency_interval',
           'table_name' => 'civicrm_product',
           'entity' => 'Product',
           'bao' => 'CRM_Contribute_BAO_Product',

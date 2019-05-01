@@ -318,14 +318,12 @@ class CRM_Financial_BAO_FinancialItemTest extends CiviUnitTestCase {
     $this->relationForFinancialTypeWithFinancialAccount(1);
     $form = new CRM_Contribute_Form_Contribution();
     $form->testSubmit(array(
-       'total_amount' => 100,
-        'financial_type_id' => 1,
-        'contact_id' => $contactId,
-        'contribution_status_id' => 1,
-        'price_set_id' => 0,
-      ),
-      CRM_Core_Action::ADD
-    );
+      'total_amount' => 100,
+      'financial_type_id' => 1,
+      'contact_id' => $contactId,
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+    ), CRM_Core_Action::ADD);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       array(
         'contact_id' => $contactId,

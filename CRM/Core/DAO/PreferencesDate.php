@@ -19,14 +19,14 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_preferences_date';
+  public static $_tableName = 'civicrm_preferences_date';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * @var int unsigned
@@ -96,6 +96,7 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Date Preference ID'),
           'required' => TRUE,
+          'where' => 'civicrm_preferences_date.id',
           'table_name' => 'civicrm_preferences_date',
           'entity' => 'PreferencesDate',
           'bao' => 'CRM_Core_BAO_PreferencesDate',
@@ -109,6 +110,7 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_preferences_date.name',
           'table_name' => 'civicrm_preferences_date',
           'entity' => 'PreferencesDate',
           'bao' => 'CRM_Core_BAO_PreferencesDate',
@@ -121,6 +123,7 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO {
           'description' => ts('Description of this date type.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_preferences_date.description',
           'table_name' => 'civicrm_preferences_date',
           'entity' => 'PreferencesDate',
           'bao' => 'CRM_Core_BAO_PreferencesDate',
@@ -132,6 +135,7 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO {
           'title' => ts('Start'),
           'description' => ts('The start offset relative to current year'),
           'required' => TRUE,
+          'where' => 'civicrm_preferences_date.start',
           'table_name' => 'civicrm_preferences_date',
           'entity' => 'PreferencesDate',
           'bao' => 'CRM_Core_BAO_PreferencesDate',
@@ -143,6 +147,7 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO {
           'title' => ts('End Offset'),
           'description' => ts('The end offset relative to current year, can be negative'),
           'required' => TRUE,
+          'where' => 'civicrm_preferences_date.end',
           'table_name' => 'civicrm_preferences_date',
           'entity' => 'PreferencesDate',
           'bao' => 'CRM_Core_BAO_PreferencesDate',
@@ -155,6 +160,7 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO {
           'description' => ts('The date type'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_preferences_date.date_format',
           'table_name' => 'civicrm_preferences_date',
           'entity' => 'PreferencesDate',
           'bao' => 'CRM_Core_BAO_PreferencesDate',
@@ -167,6 +173,7 @@ class CRM_Core_DAO_PreferencesDate extends CRM_Core_DAO {
           'description' => ts('time format'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_preferences_date.time_format',
           'table_name' => 'civicrm_preferences_date',
           'entity' => 'PreferencesDate',
           'bao' => 'CRM_Core_BAO_PreferencesDate',

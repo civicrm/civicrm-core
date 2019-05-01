@@ -131,11 +131,13 @@ class CRM_Utils_SignerTest extends CiviUnitTestCase {
     );
     $cases[] = array(
       'signParams' => array(
-        'a' => 1, // int
+        // int
+        'a' => 1,
         'b' => 'bee',
       ),
       'validateParams' => array(
-        'a' => '1', // string
+        // string
+        'a' => '1',
         'b' => 'bee',
       ),
       'isValid' => TRUE,
@@ -144,9 +146,11 @@ class CRM_Utils_SignerTest extends CiviUnitTestCase {
     foreach ($cases as $caseId => $case) {
       $signer = new CRM_Utils_Signer('secret', array('a', 'b', 'c'));
       $signature = $signer->sign($case['signParams']);
-      $this->assertTrue(!empty($signature) && is_string($signature)); // arbitrary
+      // arbitrary
+      $this->assertTrue(!empty($signature) && is_string($signature));
 
-      $validator = new CRM_Utils_Signer('secret', array('a', 'b', 'c')); // same as $signer but physically separate
+      // same as $signer but physically separate
+      $validator = new CRM_Utils_Signer('secret', array('a', 'b', 'c'));
       $isValid = $validator->validate($signature, $case['validateParams']);
 
       if ($isValid !== $case['isValid']) {

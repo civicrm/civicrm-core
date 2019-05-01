@@ -215,7 +215,8 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
           'title' => ts('Test-drive'),
           'url' => $urlString,
           'qs' => $urlParams . '&action=preview',
-          'fe' => TRUE, // Addresses https://lab.civicrm.org/dev/core/issues/658
+          // Addresses https://lab.civicrm.org/dev/core/issues/658
+          'fe' => TRUE,
           'uniqueName' => 'test_drive',
         ),
       );

@@ -19,14 +19,14 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_recurring_entity';
+  public static $_tableName = 'civicrm_recurring_entity';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * @var int unsigned
@@ -82,6 +82,7 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('ID'),
           'required' => TRUE,
+          'where' => 'civicrm_recurring_entity.id',
           'table_name' => 'civicrm_recurring_entity',
           'entity' => 'RecurringEntity',
           'bao' => 'CRM_Core_BAO_RecurringEntity',
@@ -93,6 +94,7 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO {
           'title' => ts('Parent ID'),
           'description' => ts('Recurring Entity Parent ID'),
           'required' => TRUE,
+          'where' => 'civicrm_recurring_entity.parent_id',
           'table_name' => 'civicrm_recurring_entity',
           'entity' => 'RecurringEntity',
           'bao' => 'CRM_Core_BAO_RecurringEntity',
@@ -103,6 +105,7 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Entity ID'),
           'description' => ts('Recurring Entity Child ID'),
+          'where' => 'civicrm_recurring_entity.entity_id',
           'table_name' => 'civicrm_recurring_entity',
           'entity' => 'RecurringEntity',
           'bao' => 'CRM_Core_BAO_RecurringEntity',
@@ -116,6 +119,7 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_recurring_entity.entity_table',
           'table_name' => 'civicrm_recurring_entity',
           'entity' => 'RecurringEntity',
           'bao' => 'CRM_Core_BAO_RecurringEntity',
@@ -127,6 +131,7 @@ class CRM_Core_DAO_RecurringEntity extends CRM_Core_DAO {
           'title' => ts('Cascade Type'),
           'description' => ts('1-this entity, 2-this and the following entities, 3-all the entities'),
           'required' => TRUE,
+          'where' => 'civicrm_recurring_entity.mode',
           'default' => '1',
           'table_name' => 'civicrm_recurring_entity',
           'entity' => 'RecurringEntity',

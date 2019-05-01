@@ -42,9 +42,13 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->_individual = $this->individualCreate();
+    $this->ids['Contact']['contactID1'] = $this->individualCreate([], 1);
+    $this->ids['Contact']['contactID2'] = $this->individualCreate([], 2);
   }
 
   public function tearDown() {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   /**
@@ -373,117 +377,54 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
   }
 
   /**
-   *  Test CRM_Contribute_Form_Search Recurring Contribution Status Id filters
+   *  Test contact contributions.
    */
-  public function testContributionRecurStatusFilter() {
-    $this->quickCleanup($this->_tablesToTruncate);
-    $contactID1 = $this->individualCreate([], 1);
-    $contactID2 = $this->individualCreate([], 2);
-    // "In Progress" recurring contribution for contactID1
-    $ContributionRecur1 = $this->callAPISuccess('ContributionRecur', 'create', [
-      'sequential' => 1,
-      'contact_id' => $contactID1,
-      'frequency_interval' => 1,
-      'frequency_unit' => "month",
-      'amount' => 11,
-      'currency' => "CAD",
-      'payment_instrument_id' => 1,
-      'contribution_status_id' => 5,
+  public function testContributionSearchWithContactID() {
+    $contactID = $this->individualCreate([], 1);
+    $fv = ['contact_id' => $contactID];
+    $queryParams = CRM_Contact_BAO_Query::convertFormValues($fv);
+    $selector = new CRM_Contribute_Selector_Search($queryParams, CRM_Core_Action::ADD);
+    list($select, $from, $where) = $selector->getQuery()->query();
+
+    // get and assert contribution count
+    $contributions = CRM_Core_DAO::executeQuery("{$select} {$from} {$where}")->fetchAll();
+    $this->assertEquals(count($contributions), 0);
+
+    $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => "Donation",
+      'receive_date' => date('Y-m-d'),
+      'total_amount' => 10,
+      'contact_id' => $contactID,
     ]);
-    $Contribution1 = $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => 'Donation',
-      'total_amount' => 11,
-      'receive_date' => date('Ymd'),
-      'receive_date_time' => NULL,
-      'payment_instrument_id' => 1,
-      'contribution_status_id' => 1,
-      'contact_id' => $contactID1,
-      'contribution_recur_id' => $ContributionRecur1['id'],
-    ]);
-    $params = [
-      'to_financial_account_id' => 1,
-      'status_id' => 1,
-      'contribution_id' => $Contribution1['id'],
-      'payment_instrument_id' => 1,
-      'card_type_id' => 1,
-      'total_amount' => 11,
-    ];
-    CRM_Core_BAO_FinancialTrxn::create($params);
-    // "Completed" recurring contribution for contactID2
-    $ContributionRecur2 = $this->callAPISuccess('ContributionRecur', 'create', [
-      'sequential' => 1,
-      'contact_id' => $contactID2,
-      'frequency_interval' => 1,
-      'frequency_unit' => "month",
-      'amount' => 22,
-      'currency' => "CAD",
-      'payment_instrument_id' => 1,
-      'contribution_status_id' => 1,
-      'financial_type_id' => "Donation",
-    ]);
-    $Contribution2 = $this->callAPISuccess('Contribution', 'create', [
-      'financial_type_id' => 'Donation',
-      'total_amount' => 22,
-      'receive_date' => date('Ymd'),
-      'receive_date_time' => NULL,
-      'payment_instrument' => 1,
-      'contribution_status_id' => 1,
-      'contact_id' => $contactID2,
-      'contribution_recur_id' => $ContributionRecur2['id'],
-    ]);
-    $params = [
-      'to_financial_account_id' => 1,
-      'status_id' => 1,
-      'contribution_id' => $Contribution2['id'],
-      'payment_instrument_id' => 1,
-      'card_type_id' => 1,
-      'total_amount' => 22,
-    ];
-    CRM_Core_BAO_FinancialTrxn::create($params);
+    $selector = new CRM_Contribute_Selector_Search($queryParams, CRM_Core_Action::ADD);
+    list($select, $from, $where) = $selector->getQuery()->query();
 
-    $useCases = [
-      // Case 1: Search for ONLY those recurring contributions with status "In Progress"
-      [
-        'form_value' => ['contribution_recur_contribution_status_id' => 5],
-        'expected_count' => 1,
-        'expected_contact' => [$contactID1],
-        'expected_qill' => "Recurring Contribution Status = 'In Progress'",
-      ],
-      // Case 2: Search for ONLY those recurring contributions with status "Completed"
-      [
-        'form_value' => ['contribution_recur_contribution_status_id' => 1],
-        'expected_count' => 1,
-        'expected_contact' => [$contactID2],
-        'expected_qill' => "Recurring Contribution Status = 'Completed'",
-      ],
-      // Case 3: Search for ONLY those recurring contributions with status "Cancelled"
-      [
-        'form_value' => ['contribution_recur_contribution_status_id' => 3],
-        'expected_count' => 0,
-        'expected_contact' => [],
-        'expected_qill' => "Recurring Contribution Status = 'Cancelled'",
-      ],
-    ];
+    // get and assert contribution count
+    $contributions = CRM_Core_DAO::executeQuery("{$select} {$from} {$where}")->fetchAll();
+    $this->assertEquals(count($contributions), 1);
+  }
 
-    foreach ($useCases as $case) {
-      $fv = $case['form_value'];
-      $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
-      list($select, $from, $where, $having) = $query->query();
+  /**
+   *  Test CRM_Contribute_Form_Search Recurring Contribution Status Id filters
+   *
+   * @dataProvider getSearchData
+   */
+  public function testContributionRecurSearchFilters($formValues, $expectedCount, $expectedContact, $expectedQill) {
+    $this->setUpRecurringContributions();
 
-      // get and assert contribution count
-      $contacts = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT contact_a.id %s %s AND contact_a.id IS NOT NULL', $from, $where))->fetchAll();
-      foreach ($contacts as $key => $value) {
-        $contacts[$key] = $value['id'];
-      }
-      // assert the contribution count
-      $this->assertEquals($case['expected_count'], count($contacts));
-      // assert the contribution IDs
-      $this->checkArrayEquals($case['expected_contact'], $contacts);
-      // get and assert qill string
-      $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
-      $this->assertEquals($case['expected_qill'], $qill);
+    $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($formValues));
+    list($select, $from, $where, $having) = $query->query();
+
+    // get and assert contribution count
+    $contacts = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT contact_a.id, contact_a.display_name %s %s AND contact_a.id IS NOT NULL', $from, $where))->fetchAll();
+    foreach ($contacts as $key => $value) {
+      $this->assertEquals($expectedContact[$key], $value['display_name']);
     }
+    // assert the contribution count
+    $this->assertEquals($expectedCount, count($contacts));
+    // get and assert qill string
+    $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
+    $this->assertEquals($expectedQill, $qill);
   }
 
   /**
@@ -570,6 +511,118 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
       $this->assertEquals($case['expected_qill'], $qill);
     }
+  }
+
+  /**
+   * Set up recurring contributions for the test.
+   */
+  protected function setUpRecurringContributions() {
+    // "In Progress" recurring contribution for contactID1
+    $ContributionRecur1 = $this->callAPISuccess('ContributionRecur', 'create', [
+      'sequential' => 1,
+      'contact_id' => $this->ids['Contact']['contactID1'],
+      'frequency_interval' => 1,
+      'frequency_unit' => "month",
+      'amount' => 11,
+      'currency' => "CAD",
+      'payment_instrument_id' => 1,
+      'contribution_status_id' => 5,
+      'financial_type_id' => "Donation",
+    ]);
+    $Contribution1 = $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => 'Donation',
+      'total_amount' => 11,
+      'receive_date' => date('Ymd'),
+      'receive_date_time' => NULL,
+      'payment_instrument_id' => 1,
+      'contribution_status_id' => 1,
+      'contact_id' => $this->ids['Contact']['contactID1'],
+      'contribution_recur_id' => $ContributionRecur1['id'],
+    ]);
+    $params = [
+      'to_financial_account_id' => 1,
+      'status_id' => 1,
+      'contribution_id' => $Contribution1['id'],
+      'payment_instrument_id' => 1,
+      'card_type_id' => 1,
+      'total_amount' => 11,
+    ];
+    CRM_Core_BAO_FinancialTrxn::create($params);
+    // "Completed" recurring contribution for contactID2
+    $ContributionRecur2 = $this->callAPISuccess('ContributionRecur', 'create', [
+      'sequential' => 1,
+      'contact_id' => $this->ids['Contact']['contactID2'],
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+      'amount' => 22,
+      'currency' => "CAD",
+      'payment_instrument_id' => 1,
+      'contribution_status_id' => 1,
+      'financial_type_id' => 'Donation',
+      'trxn_id' => 'a transaction',
+      'processor_id' => 'a processor',
+    ]);
+    $Contribution2 = $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => 'Donation',
+      'total_amount' => 22,
+      'receive_date' => date('Ymd'),
+      'receive_date_time' => NULL,
+      'payment_instrument' => 1,
+      'contribution_status_id' => 1,
+      'contact_id' => $this->ids['Contact']['contactID2'],
+      'contribution_recur_id' => $ContributionRecur2['id'],
+    ]);
+    $params = [
+      'to_financial_account_id' => 1,
+      'status_id' => 1,
+      'contribution_id' => $Contribution2['id'],
+      'payment_instrument_id' => 1,
+      'card_type_id' => 1,
+      'total_amount' => 22,
+    ];
+    CRM_Core_BAO_FinancialTrxn::create($params);
+  }
+
+  /**
+   * @return array
+   */
+  public function getSearchData() {
+    $useCases = [
+      // Case 1: Search for ONLY those recurring contributions with status "In Progress"
+      'in_progress_search' => [
+        'form_value' => ['contribution_recur_contribution_status_id' => 5],
+        'expected_count' => 1,
+        'expected_contact' => ['Mr. Joe Miller II'],
+        'expected_qill' => "Recurring Contribution Status = 'In Progress'",
+      ],
+      // Case 2: Search for ONLY those recurring contributions with status "Completed"
+      [
+        'form_value' => ['contribution_recur_contribution_status_id' => 1],
+        'expected_count' => 1,
+        'expected_contact' => ['Mr. Terrence Smith II'],
+        'expected_qill' => "Recurring Contribution Status = 'Completed'",
+      ],
+      // Case 3: Search for ONLY those recurring contributions with status "Cancelled"
+      [
+        'form_value' => ['contribution_recur_contribution_status_id' => 3],
+        'expected_count' => 0,
+        'expected_contact' => [],
+        'expected_qill' => "Recurring Contribution Status = 'Cancelled'",
+      ],
+      'trxn_id_search' => [
+        'form_value' => ['contribution_recur_trxn_id' => 'a transaction'],
+        'expected_count' => 1,
+        'expected_contact' => ['Mr. Terrence Smith II'],
+        'expected_qill' => "Recurring Contribution Transaction ID = 'a transaction'",
+      ],
+      'processor_id_search' => [
+        'form_value' => ['contribution_recur_processor_id' => 'a processor'],
+        'expected_count' => 1,
+        'expected_contact' => ['Mr. Terrence Smith II'],
+        'expected_qill' => "Recurring Contribution Processor ID = 'a processor'",
+      ],
+    ];
+    return $useCases;
   }
 
 }

@@ -5,13 +5,15 @@
  * @group headless
  */
 class CRM_Utils_TimeTest extends CiviUnitTestCase {
+
   /**
    * Equal cases.
    *
    * @return array
    */
   public function equalCases() {
-    $cases = array(); // array(0 => $timeA, 1 => $timeB, 2 => $threshold, 3 => $expectedResult)
+    // array(0 => $timeA, 1 => $timeB, 2 => $threshold, 3 => $expectedResult)
+    $cases = array();
     $cases[] = array('2012-04-01 12:00:00', '2012-04-01 12:00:00', 0, 1);
     $cases[] = array('2012-04-01 12:00:00', '2012-04-01 12:00:01', 0, 0);
     $cases[] = array('2012-04-01 12:00:00', '2012-04-01 12:00:50', 60, 1);

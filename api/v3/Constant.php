@@ -104,12 +104,12 @@ function civicrm_api3_constant_get($params) {
   // once tests are 100% can try removing the first block & a similar block from Generic:getoptions
 
   // Whitelist approach is safer
-  $allowedClasses = array(
+  $allowedClasses = [
     'CRM_Core_PseudoConstant',
     'CRM_Event_PseudoConstant',
     'CRM_Contribute_PseudoConstant',
     'CRM_Member_PseudoConstant',
-  );
+  ];
   $className = $allowedClasses[0];
   if (!empty($params['class']) && in_array($params['class'], $allowedClasses)) {
     $className = $params['class'];
@@ -117,17 +117,17 @@ function civicrm_api3_constant_get($params) {
   $callable = "$className::$name";
   if (is_callable($callable)) {
     if (empty($params)) {
-      $values = call_user_func(array($className, $name));
+      $values = call_user_func([$className, $name]);
     }
     else {
-      $values = call_user_func(array($className, $name));
+      $values = call_user_func([$className, $name]);
       //@TODO XAV take out the param the COOKIE, Entity, Action and so there are only the "real param" in it
       //$values = call_user_func_array( array( $className, $name ), $params );
     }
     return civicrm_api3_create_success($values, $params, 'Constant');
   }
   else {
-    $values = call_user_func(array('CRM_Utils_PseudoConstant', 'getConstant'), $name);
+    $values = call_user_func(['CRM_Utils_PseudoConstant', 'getConstant'], $name);
     if (!empty($values)) {
       return civicrm_api3_create_success($values, $params, 'Constant');
     }
@@ -141,7 +141,7 @@ function civicrm_api3_constant_get($params) {
  * @param array $params
  */
 function _civicrm_api3_constant_get_spec(&$params) {
-  $options = array(
+  $options = [
     'activityStatus',
     'activityType',
     'addressee',
@@ -182,14 +182,14 @@ function _civicrm_api3_constant_get_spec(&$params) {
     'visibility',
     'worldRegion',
     'wysiwygEditor',
-  );
-  $params = array(
-    'name' => array(
+  ];
+  $params = [
+    'name' => [
       'title' => 'Constant Name',
       'name' => 'name',
       'api.required' => 1,
       'options' => array_combine($options, $options),
       'type' => CRM_Utils_Type::T_STRING,
-    ),
-  );
+    ],
+  ];
 }

@@ -19,14 +19,14 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_line_item';
+  public static $_tableName = 'civicrm_line_item';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Line Item
@@ -142,7 +142,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contribution_id', 'civicrm_contribution', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'price_field_id', 'civicrm_price_field', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'price_field_value_id', 'civicrm_price_field_value', 'id');
@@ -167,6 +167,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'title' => ts('Line Item ID'),
           'description' => ts('Line Item'),
           'required' => TRUE,
+          'where' => 'civicrm_line_item.id',
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
@@ -180,6 +181,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_line_item.entity_table',
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
@@ -191,6 +193,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'title' => ts('Line Item Entity'),
           'description' => ts('entry in table'),
           'required' => TRUE,
+          'where' => 'civicrm_line_item.entity_id',
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
@@ -201,6 +204,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Line Item Contribution'),
           'description' => ts('FK to civicrm_contribution'),
+          'where' => 'civicrm_line_item.contribution_id',
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
@@ -212,6 +216,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Line Item Price Field'),
           'description' => ts('FK to civicrm_price_field'),
+          'where' => 'civicrm_line_item.price_field_id',
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
@@ -225,6 +230,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'description' => ts('descriptive label for item - from price_field_value.label'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_line_item.label',
           'default' => 'NULL',
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
@@ -244,6 +250,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
             20,
             2
           ],
+          'where' => 'civicrm_line_item.qty',
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
@@ -262,6 +269,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
             20,
             2
           ],
+          'where' => 'civicrm_line_item.unit_price',
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
@@ -280,6 +288,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
             20,
             2
           ],
+          'where' => 'civicrm_line_item.line_total',
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
           'bao' => 'CRM_Price_BAO_LineItem',
@@ -290,6 +299,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Line Item Participant Count'),
           'description' => ts('Participant count for field'),
+          'where' => 'civicrm_line_item.participant_count',
           'default' => 'NULL',
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
@@ -304,6 +314,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Line Item Option'),
           'description' => ts('FK to civicrm_price_field_value'),
+          'where' => 'civicrm_line_item.price_field_value_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
@@ -316,6 +327,7 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Financial Type'),
           'description' => ts('FK to Financial Type.'),
+          'where' => 'civicrm_line_item.financial_type_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',
@@ -341,6 +353,9 @@ class CRM_Price_DAO_LineItem extends CRM_Core_DAO {
             20,
             2
           ],
+          'where' => 'civicrm_line_item.non_deductible_amount',
+          'headerPattern' => '/non?.?deduct/i',
+          'dataPattern' => '/^\d+(\.\d{2})?$/',
           'default' => '0.0',
           'table_name' => 'civicrm_line_item',
           'entity' => 'LineItem',

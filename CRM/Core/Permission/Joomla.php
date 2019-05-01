@@ -37,6 +37,7 @@
  *
  */
 class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
+
   /**
    * Given a permission string, check for access requirements
    *
@@ -74,7 +75,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
         // This is a codeblock copied from /Civicrm/Utils/REST
         $uid = NULL;
         if (!$uid) {
-          $store      = NULL;
+          $store = NULL;
 
           $contact_id = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $api_key, 'id', 'api_key');
 
@@ -120,7 +121,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
         return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
 
       case NULL:
-        return array('civicrm.' . CRM_Utils_String::munge(strtolower($name)), 'com_civicrm');
+        return ['civicrm.' . CRM_Utils_String::munge(strtolower($name)), 'com_civicrm'];
 
       default:
         return CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
@@ -144,7 +145,7 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    * @inheritDoc
    */
   public function upgradePermissions($permissions) {
-    $translatedPerms = array();
+    $translatedPerms = [];
 
     // Flipping the $permissions array gives us just the raw names of the
     // permissions. The descriptions, etc., are irrelevant for the purposes of
@@ -180,15 +181,15 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     $query = $db->getQuery(TRUE);
 
     $query
-        ->select($db->quoteName('rules'))
-        ->from($db->quoteName('#__assets'))
-        ->where($db->quoteName('name') . ' = ' . $db->quote('com_civicrm'));
+      ->select($db->quoteName('rules'))
+      ->from($db->quoteName('#__assets'))
+      ->where($db->quoteName('name') . ' = ' . $db->quote('com_civicrm'));
 
     $db->setQuery($query);
 
     // Joomla gotcha: loadObject returns NULL in the case of no matches.
     $result = $db->loadObject();
-    return $result ? json_decode($result->rules) : (object) array();
+    return $result ? json_decode($result->rules) : (object) [];
   }
 
   /**
@@ -204,9 +205,9 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
     $query = $db->getQuery(TRUE);
 
     $query
-        ->update($db->quoteName('#__assets'))
-        ->set($db->quoteName('rules') . ' = ' . $db->quote(json_encode($associations)))
-        ->where($db->quoteName('name') . ' = ' . $db->quote('com_civicrm'));
+      ->update($db->quoteName('#__assets'))
+      ->set($db->quoteName('rules') . ' = ' . $db->quote(json_encode($associations)))
+      ->where($db->quoteName('name') . ' = ' . $db->quote('com_civicrm'));
 
     $db->setQuery($query)->execute();
   }

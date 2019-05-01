@@ -58,7 +58,7 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
    * @return void
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     if (isset($this->_id)) {
       $defaults['entity_table'] = 'civicrm_event';

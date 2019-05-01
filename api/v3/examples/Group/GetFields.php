@@ -8,9 +8,9 @@
  *   API result array
  */
 function group_getfields_example() {
-  $params = array(
+  $params = [
     'action' => 'create',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Group', 'getfields', $params);
@@ -20,12 +20,12 @@ function group_getfields_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -39,12 +39,12 @@ function group_getfields_example() {
  */
 function group_getfields_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 20,
-    'values' => array(
-      'id' => array(
+    'values' => [
+      'id' => [
         'name' => 'id',
         'type' => 1,
         'title' => 'Group ID',
@@ -53,11 +53,11 @@ function group_getfields_expectedresult() {
         'table_name' => 'civicrm_group',
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
-        'api.aliases' => array(
+        'api.aliases' => [
           '0' => 'group_id',
-        ),
-      ),
-      'name' => array(
+        ],
+      ],
+      'name' => [
         'name' => 'name',
         'type' => 2,
         'title' => 'Group Name',
@@ -67,8 +67,8 @@ function group_getfields_expectedresult() {
         'table_name' => 'civicrm_group',
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
-      ),
-      'title' => array(
+      ],
+      'title' => [
         'name' => 'title',
         'type' => 2,
         'title' => 'Group Title',
@@ -79,8 +79,8 @@ function group_getfields_expectedresult() {
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
         'api.required' => 1,
-      ),
-      'description' => array(
+      ],
+      'description' => [
         'name' => 'description',
         'type' => 32,
         'title' => 'Group Description',
@@ -90,13 +90,13 @@ function group_getfields_expectedresult() {
         'table_name' => 'civicrm_group',
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
-        'html' => array(
+        'html' => [
           'type' => 'TextArea',
           'rows' => 2,
           'cols' => 60,
-        ),
-      ),
-      'source' => array(
+        ],
+      ],
+      'source' => [
         'name' => 'source',
         'type' => 2,
         'title' => 'Group Source',
@@ -106,8 +106,8 @@ function group_getfields_expectedresult() {
         'table_name' => 'civicrm_group',
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
-      ),
-      'saved_search_id' => array(
+      ],
+      'saved_search_id' => [
         'name' => 'saved_search_id',
         'type' => 1,
         'title' => 'Saved Search ID',
@@ -117,8 +117,8 @@ function group_getfields_expectedresult() {
         'bao' => 'CRM_Contact_BAO_Group',
         'FKClassName' => 'CRM_Contact_DAO_SavedSearch',
         'FKApiName' => 'SavedSearch',
-      ),
-      'is_active' => array(
+      ],
+      'is_active' => [
         'name' => 'is_active',
         'type' => 16,
         'title' => 'Group Enabled',
@@ -127,8 +127,8 @@ function group_getfields_expectedresult() {
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
         'api.default' => 1,
-      ),
-      'visibility' => array(
+      ],
+      'visibility' => [
         'name' => 'visibility',
         'type' => 2,
         'title' => 'Group Visibility Setting',
@@ -139,16 +139,16 @@ function group_getfields_expectedresult() {
         'table_name' => 'civicrm_group',
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
-        'html' => array(
+        'html' => [
           'type' => 'Select',
           'maxlength' => 24,
           'size' => 20,
-        ),
-        'pseudoconstant' => array(
+        ],
+        'pseudoconstant' => [
           'callback' => 'CRM_Core_SelectValues::groupVisibility',
-        ),
-      ),
-      'where_clause' => array(
+        ],
+      ],
+      'where_clause' => [
         'name' => 'where_clause',
         'type' => 32,
         'title' => 'Group Where Clause',
@@ -156,8 +156,8 @@ function group_getfields_expectedresult() {
         'table_name' => 'civicrm_group',
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
-      ),
-      'select_tables' => array(
+      ],
+      'select_tables' => [
         'name' => 'select_tables',
         'type' => 32,
         'title' => 'Tables For Select Clause',
@@ -165,8 +165,8 @@ function group_getfields_expectedresult() {
         'table_name' => 'civicrm_group',
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
-      ),
-      'where_tables' => array(
+      ],
+      'where_tables' => [
         'name' => 'where_tables',
         'type' => 32,
         'title' => 'Tables For Where Clause',
@@ -174,8 +174,8 @@ function group_getfields_expectedresult() {
         'table_name' => 'civicrm_group',
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
-      ),
-      'group_type' => array(
+      ],
+      'group_type' => [
         'name' => 'group_type',
         'type' => 2,
         'title' => 'Group Type',
@@ -185,12 +185,12 @@ function group_getfields_expectedresult() {
         'table_name' => 'civicrm_group',
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
-        'pseudoconstant' => array(
+        'pseudoconstant' => [
           'optionGroupName' => 'group_type',
           'optionEditPath' => 'civicrm/admin/options/group_type',
-        ),
-      ),
-      'cache_date' => array(
+        ],
+      ],
+      'cache_date' => [
         'name' => 'cache_date',
         'type' => 256,
         'title' => 'Group Cache Date',
@@ -199,8 +199,8 @@ function group_getfields_expectedresult() {
         'table_name' => 'civicrm_group',
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
-      ),
-      'refresh_date' => array(
+      ],
+      'refresh_date' => [
         'name' => 'refresh_date',
         'type' => 256,
         'title' => 'Next Group Refresh Time',
@@ -209,8 +209,8 @@ function group_getfields_expectedresult() {
         'table_name' => 'civicrm_group',
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
-      ),
-      'parents' => array(
+      ],
+      'parents' => [
         'name' => 'parents',
         'type' => 32,
         'title' => 'Group Parents',
@@ -218,8 +218,8 @@ function group_getfields_expectedresult() {
         'table_name' => 'civicrm_group',
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
-      ),
-      'children' => array(
+      ],
+      'children' => [
         'name' => 'children',
         'type' => 32,
         'title' => 'Group Children',
@@ -227,8 +227,8 @@ function group_getfields_expectedresult() {
         'table_name' => 'civicrm_group',
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
-      ),
-      'is_hidden' => array(
+      ],
+      'is_hidden' => [
         'name' => 'is_hidden',
         'type' => 16,
         'title' => 'Group is Hidden',
@@ -236,16 +236,16 @@ function group_getfields_expectedresult() {
         'table_name' => 'civicrm_group',
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
-      ),
-      'is_reserved' => array(
+      ],
+      'is_reserved' => [
         'name' => 'is_reserved',
         'type' => 16,
         'title' => 'Group is Reserved',
         'table_name' => 'civicrm_group',
         'entity' => 'Group',
         'bao' => 'CRM_Contact_BAO_Group',
-      ),
-      'created_id' => array(
+      ],
+      'created_id' => [
         'name' => 'created_id',
         'type' => 1,
         'title' => 'Group Created By',
@@ -255,8 +255,8 @@ function group_getfields_expectedresult() {
         'bao' => 'CRM_Contact_BAO_Group',
         'FKClassName' => 'CRM_Contact_DAO_Contact',
         'FKApiName' => 'Contact',
-      ),
-      'modified_id' => array(
+      ],
+      'modified_id' => [
         'name' => 'modified_id',
         'type' => 1,
         'title' => 'Group Modified By',
@@ -266,9 +266,9 @@ function group_getfields_expectedresult() {
         'bao' => 'CRM_Contact_BAO_Group',
         'FKClassName' => 'CRM_Contact_DAO_Contact',
         'FKApiName' => 'Contact',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

@@ -19,14 +19,14 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_pcp';
+  public static $_tableName = 'civicrm_pcp';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Personal Campaign Page ID
@@ -142,7 +142,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contact_id', 'civicrm_contact', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -163,6 +163,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'title' => ts('Personal Campaign Page ID'),
           'description' => ts('Personal Campaign Page ID'),
           'required' => TRUE,
+          'where' => 'civicrm_pcp.id',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
@@ -174,6 +175,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'title' => ts('Contact ID'),
           'description' => ts('FK to Contact ID'),
           'required' => TRUE,
+          'where' => 'civicrm_pcp.contact_id',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
@@ -188,6 +190,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Personal Campaign Page Status'),
           'required' => TRUE,
+          'where' => 'civicrm_pcp.status_id',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
@@ -206,6 +209,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'title' => ts('Personal Campaign Page Title'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_pcp.title',
           'default' => 'NULL',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
@@ -219,6 +223,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'name' => 'intro_text',
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Intro Text'),
+          'where' => 'civicrm_pcp.intro_text',
           'default' => 'NULL',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
@@ -232,6 +237,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'name' => 'page_text',
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Page Text'),
+          'where' => 'civicrm_pcp.page_text',
           'default' => 'NULL',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
@@ -247,6 +253,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'title' => ts('Donate Link Text'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_pcp.donate_link_text',
           'default' => 'NULL',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
@@ -262,6 +269,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'title' => ts('Contribution Page'),
           'description' => ts('The Contribution or Event Page which triggered this pcp'),
           'required' => TRUE,
+          'where' => 'civicrm_pcp.page_id',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
@@ -274,6 +282,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'description' => ts('The type of PCP this is: contribute or event'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_pcp.page_type',
           'default' => 'contribute',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
@@ -289,6 +298,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'title' => ts('PCP Block'),
           'description' => ts('The pcp block that this pcp page was created from'),
           'required' => TRUE,
+          'where' => 'civicrm_pcp.pcp_block_id',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
@@ -298,6 +308,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'name' => 'is_thermometer',
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Use Thermometer?'),
+          'where' => 'civicrm_pcp.is_thermometer',
           'default' => '0',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
@@ -311,6 +322,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'name' => 'is_honor_roll',
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Show Honor Roll?'),
+          'where' => 'civicrm_pcp.is_honor_roll',
           'default' => '0',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
@@ -329,6 +341,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
             20,
             2
           ],
+          'where' => 'civicrm_pcp.goal_amount',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
           'bao' => 'CRM_PCP_BAO_PCP',
@@ -344,6 +357,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'description' => ts('3 character string, value from config setting or input via user.'),
           'maxlength' => 3,
           'size' => CRM_Utils_Type::FOUR,
+          'where' => 'civicrm_pcp.currency',
           'default' => 'NULL',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
@@ -364,6 +378,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Enabled?'),
           'description' => ts('Is Personal Campaign Page enabled/active?'),
+          'where' => 'civicrm_pcp.is_active',
           'default' => '0',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',
@@ -378,6 +393,7 @@ class CRM_PCP_DAO_PCP extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Notify Owner?'),
           'description' => ts('Notify owner via email when someone donates to page?'),
+          'where' => 'civicrm_pcp.is_notify',
           'default' => '0',
           'table_name' => 'civicrm_pcp',
           'entity' => 'PCP',

@@ -123,16 +123,16 @@ class CRM_Admin_Page_AJAX {
     require_once 'api/v3/utils.php';
     $recordID = CRM_Utils_Type::escape($_GET['id'], 'Integer');
     $entity = CRM_Utils_Type::escape($_GET['entity'], 'String');
-    $ret = array();
+    $ret = [];
 
     if ($recordID && $entity && $recordBAO = _civicrm_api3_get_BAO($entity)) {
       switch ($recordBAO) {
         case 'CRM_Core_BAO_UFGroup':
           $method = 'getUFJoinRecord';
-          $result = array($recordBAO, $method);
-          $ufJoin = call_user_func_array(($result), array($recordID, TRUE));
+          $result = [$recordBAO, $method];
+          $ufJoin = call_user_func_array(($result), [$recordID, TRUE]);
           if (!empty($ufJoin)) {
-            $ret['content'] = ts('This profile is currently used for %1.', array(1 => implode(', ', $ufJoin))) . ' <br/><br/>' . ts('If you disable the profile - it will be removed from these forms and/or modules. Do you want to continue?');
+            $ret['content'] = ts('This profile is currently used for %1.', [1 => implode(', ', $ufJoin)]) . ' <br/><br/>' . ts('If you disable the profile - it will be removed from these forms and/or modules. Do you want to continue?');
           }
           else {
             $ret['content'] = ts('Are you sure you want to disable this profile?');
@@ -146,12 +146,12 @@ class CRM_Admin_Page_AJAX {
           if (!CRM_Utils_System::isNull($usedBy)) {
             $template = CRM_Core_Smarty::singleton();
             $template->assign('usedBy', $usedBy);
-            $comps = array(
+            $comps = [
               'Event' => 'civicrm_event',
               'Contribution' => 'civicrm_contribution_page',
               'EventTemplate' => 'civicrm_event_template',
-            );
-            $contexts = array();
+            ];
+            $contexts = [];
             foreach ($comps as $name => $table) {
               if (array_key_exists($table, $usedBy)) {
                 $contexts[] = $name;
@@ -161,12 +161,12 @@ class CRM_Admin_Page_AJAX {
 
             $ret['illegal'] = TRUE;
             $table = $template->fetch('CRM/Price/Page/table.tpl');
-            $ret['content'] = ts('Unable to disable the \'%1\' price set - it is currently in use by one or more active events, contribution pages or contributions.', array(
-                1 => $priceSet,
-              )) . "<br/> $table";
+            $ret['content'] = ts('Unable to disable the \'%1\' price set - it is currently in use by one or more active events, contribution pages or contributions.', [
+              1 => $priceSet,
+            ]) . "<br/> $table";
           }
           else {
-            $ret['content'] = ts('Are you sure you want to disable \'%1\' Price Set?', array(1 => $priceSet));
+            $ret['content'] = ts('Are you sure you want to disable \'%1\' Price Set?', [1 => $priceSet]);
           }
           break;
 
@@ -271,7 +271,7 @@ class CRM_Admin_Page_AJAX {
 
         case 'CRM_Core_BAO_OptionValue':
           $label = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionValue', $recordID, 'label');
-          $ret['content'] = ts('Are you sure you want to disable the \'%1\' option ?', array(1 => $label));
+          $ret['content'] = ts('Are you sure you want to disable the \'%1\' option ?', [1 => $label]);
           $ret['content'] .= '<br /><br />' . ts('WARNING - Disabling an option which has been assigned to existing records will result in that option being cleared when the record is edited.');
           break;
 
@@ -290,7 +290,7 @@ class CRM_Admin_Page_AJAX {
       }
     }
     else {
-      $ret = array('status' => 'error', 'content' => 'Error: Unknown entity type.', 'illegal' => TRUE);
+      $ret = ['status' => 'error', 'content' => 'Error: Unknown entity type.', 'illegal' => TRUE];
     }
     CRM_Core_Page_AJAX::returnJsonResponse($ret);
   }
@@ -300,31 +300,31 @@ class CRM_Admin_Page_AJAX {
    *
    * This appears to be only used by scheduled reminders.
    */
-  static public function mappingList() {
+  public static function mappingList() {
     if (empty($_GET['mappingID'])) {
-      CRM_Utils_JSON::output(array('status' => 'error', 'error_msg' => 'required params missing.'));
+      CRM_Utils_JSON::output(['status' => 'error', 'error_msg' => 'required params missing.']);
     }
 
     $mapping = CRM_Core_BAO_ActionSchedule::getMapping($_GET['mappingID']);
-    $dateFieldLabels = $mapping ? $mapping->getDateFields() : array();
+    $dateFieldLabels = $mapping ? $mapping->getDateFields() : [];
 
     // The UX here is quirky -- for "Activity" types, there's a simple drop "Recipients"
     // dropdown which is always displayed. For other types, the "Recipients" drop down is
     // conditional upon the weird isLimit ('Limit To / Also Include / Neither') dropdown.
     $noThanksJustKidding = !$_GET['isLimit'];
     if ($mapping instanceof CRM_Activity_ActionMapping || !$noThanksJustKidding) {
-      $entityRecipientLabels = $mapping ? ($mapping->getRecipientTypes() + CRM_Core_BAO_ActionSchedule::getAdditionalRecipients()) : array();
+      $entityRecipientLabels = $mapping ? ($mapping->getRecipientTypes() + CRM_Core_BAO_ActionSchedule::getAdditionalRecipients()) : [];
     }
     else {
       $entityRecipientLabels = CRM_Core_BAO_ActionSchedule::getAdditionalRecipients();
     }
     $recipientMapping = array_combine(array_keys($entityRecipientLabels), array_keys($entityRecipientLabels));
 
-    $output = array(
+    $output = [
       'sel4' => CRM_Utils_Array::makeNonAssociative($dateFieldLabels),
       'sel5' => CRM_Utils_Array::makeNonAssociative($entityRecipientLabels),
       'recipientMapping' => $recipientMapping,
-    );
+    ];
 
     CRM_Utils_JSON::output($output);
   }
@@ -335,20 +335,20 @@ class CRM_Admin_Page_AJAX {
    * Ex: GET /civicrm/ajax/recipientListing?mappingID=contribpage&recipientType=
    */
   public static function recipientListing() {
-    $mappingID = filter_input(INPUT_GET, 'mappingID', FILTER_VALIDATE_REGEXP, array(
-      'options' => array(
+    $mappingID = filter_input(INPUT_GET, 'mappingID', FILTER_VALIDATE_REGEXP, [
+      'options' => [
         'regexp' => '/^[a-zA-Z0-9_\-]+$/',
-      ),
-    ));
-    $recipientType = filter_input(INPUT_GET, 'recipientType', FILTER_VALIDATE_REGEXP, array(
-      'options' => array(
+      ],
+    ]);
+    $recipientType = filter_input(INPUT_GET, 'recipientType', FILTER_VALIDATE_REGEXP, [
+      'options' => [
         'regexp' => '/^[a-zA-Z0-9_\-]+$/',
-      ),
-    ));
+      ],
+    ]);
 
-    CRM_Utils_JSON::output(array(
+    CRM_Utils_JSON::output([
       'recipients' => CRM_Utils_Array::makeNonAssociative(CRM_Core_BAO_ActionSchedule::getRecipientListing($mappingID, $recipientType)),
-    ));
+    ]);
   }
 
   /**
@@ -359,9 +359,9 @@ class CRM_Admin_Page_AJAX {
   public static function getTagTree() {
     $parent = CRM_Utils_Type::escape(CRM_Utils_Array::value('parent_id', $_GET, 0), 'Integer');
     $substring = CRM_Utils_Type::escape(CRM_Utils_Array::value('str', $_GET), 'String');
-    $result = array();
+    $result = [];
 
-    $whereClauses = array('is_tagset <> 1');
+    $whereClauses = ['is_tagset <> 1'];
     $orderColumn = 'name';
 
     // fetch all child tags in Array('parent_tag' => array('child_tag_1', 'child_tag_2', ...)) format
@@ -383,10 +383,10 @@ class CRM_Admin_Page_AJAX {
     }
 
     $dao = CRM_Utils_SQL_Select::from('civicrm_tag')
-            ->where($whereClauses)
-            ->groupBy('id')
-            ->orderBy($orderColumn)
-            ->execute();
+      ->where($whereClauses)
+      ->groupBy('id')
+      ->orderBy($orderColumn)
+      ->execute();
 
     while ($dao->fetch()) {
       if (!empty($substring)) {

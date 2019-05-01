@@ -62,7 +62,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *
    * @var array
    */
-  static $_commPrefs = array(
+  public static $_commPrefs = array(
     'do_not_phone',
     'do_not_email',
     'do_not_mail',
@@ -75,7 +75,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *
    * @var array
    */
-  static $_greetingTypes = array(
+  public static $_greetingTypes = array(
     'addressee',
     'email_greeting',
     'postal_greeting',
@@ -86,14 +86,14 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
    *
    * @var array
    */
-  static $_importableFields = array();
+  public static $_importableFields = array();
 
   /**
    * Static field for all the contact information that we can potentially export.
    *
    * @var array
    */
-  static $_exportableFields = NULL;
+  public static $_exportableFields = NULL;
 
   /**
    * Class constructor.
@@ -146,16 +146,22 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       $params['contact_sub_type'] = 'null';
     }
 
-    // Fixed contact source.
-    if (isset($params['contact_source'])) {
-      $params['source'] = $params['contact_source'];
-    }
-
     if (isset($params['preferred_communication_method']) && is_array($params['preferred_communication_method'])) {
       CRM_Utils_Array::formatArrayKeys($params['preferred_communication_method']);
       $contact->preferred_communication_method = CRM_Utils_Array::implodePadded($params['preferred_communication_method']);
       unset($params['preferred_communication_method']);
     }
+
+    $defaults = ['source' => CRM_Utils_Array::value('contact_source', $params)];
+    if ($params['contact_type'] === 'Organization' && isset($params['organization_name'])) {
+      $defaults['display_name'] = $params['organization_name'];
+      $defaults['sort_name'] = $params['organization_name'];
+    }
+    if ($params['contact_type'] === 'Household' && isset($params['household_name'])) {
+      $defaults['display_name'] = $params['household_name'];
+      $defaults['sort_name'] = $params['household_name'];
+    }
+    $params = array_merge($defaults, $params);
 
     $allNull = $contact->copyValues($params);
 
@@ -163,22 +169,12 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
 
     if ($contact->contact_type == 'Individual') {
       $allNull = FALSE;
-
+      // @todo allow the lines below to be overridden by input or hooks & add tests,
+      // as has been done for households and organizations.
       // Format individual fields.
       CRM_Contact_BAO_Individual::format($params, $contact);
     }
-    elseif ($contact->contact_type == 'Household') {
-      if (isset($params['household_name'])) {
-        $allNull = FALSE;
-        $contact->display_name = $contact->sort_name = CRM_Utils_Array::value('household_name', $params, '');
-      }
-    }
-    elseif ($contact->contact_type == 'Organization') {
-      if (isset($params['organization_name'])) {
-        $allNull = FALSE;
-        $contact->display_name = $contact->sort_name = CRM_Utils_Array::value('organization_name', $params, '');
-      }
-    }
+
     if (strlen($contact->display_name) > 128) {
       $contact->display_name = substr($contact->display_name, 0, 128);
     }
@@ -274,6 +270,10 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     $contact = NULL;
     if (empty($params['contact_type']) && empty($params['contact_id'])) {
       return $contact;
+    }
+
+    if (!empty($params['contact_id']) && empty($params['contact_type'])) {
+      $params['contact_type'] = self::getContactType($params['contact_id']);
     }
 
     $isEdit = TRUE;
@@ -466,7 +466,8 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     if (!empty($params['contact_id']) && !empty($missingGreetingParams)) {
       $savedGreetings = civicrm_api3('Contact', 'getsingle', array(
         'id' => $params['contact_id'],
-        'return' => array_keys($missingGreetingParams))
+        'return' => array_keys($missingGreetingParams),
+      )
       );
 
       foreach (array_keys($missingGreetingParams) as $missingGreetingParam) {
@@ -1493,7 +1494,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    *   True when used during search, might conflict with export param?.
    *
    * @param bool $withMultiRecord
-   *
+   * @param bool $checkPermissions
    * @return array
    *   array of exportable Fields
    */
@@ -1528,8 +1529,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
           'Household',
           'Organization',
           'All',
-          )
-        )) {
+        ))) {
           $fields = array_merge($fields, CRM_Core_OptionValue::getFields('', $contactType));
         }
         // add current employer for individuals
@@ -1595,10 +1595,10 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
         }
         else {
           foreach (array(
-                     'Individual',
-                     'Household',
-                     'Organization',
-                   ) as $type) {
+            'Individual',
+            'Household',
+            'Organization',
+          ) as $type) {
             $fields = array_merge($fields,
               CRM_Core_BAO_CustomField::getFieldsForImport($type, FALSE, FALSE, $search, $checkPermissions, $withMultiRecord)
             );
@@ -2391,20 +2391,18 @@ ORDER BY civicrm_email.is_primary DESC";
               }
             }
           }
-          elseif (in_array($key,
-              array(
-                'nick_name',
-                'job_title',
-                'middle_name',
-                'birth_date',
-                'gender_id',
-                'current_employer',
-                'prefix_id',
-                'suffix_id',
-              )) &&
-            ($value == '' || !isset($value)) &&
-            ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
-            ($key == 'current_employer' && empty($params['current_employer']))) {
+          elseif (in_array($key, array(
+            'nick_name',
+            'job_title',
+            'middle_name',
+            'birth_date',
+            'gender_id',
+            'current_employer',
+            'prefix_id',
+            'suffix_id',
+          )) && ($value == '' || !isset($value)) &&
+          ($session->get('authSrc') & (CRM_Core_Permission::AUTH_SRC_CHECKSUM + CRM_Core_Permission::AUTH_SRC_LOGIN)) == 0 ||
+          ($key == 'current_employer' && empty($params['current_employer']))) {
             // CRM-10128: if auth source is not checksum / login && $value is blank, do not fill $data with empty value
             // to avoid update with empty values
             continue;
@@ -2734,7 +2732,7 @@ AND       civicrm_openid.is_primary = 1";
           'caseId' => NULL,
           'context' => 'activity',
         );
-        return CRM_Activity_BAO_Activity::deprecatedGetActivitiesCount($input);
+        return CRM_Activity_BAO_Activity::getActivitiesCount($input);
 
       case 'mailing':
         $params = array('contact_id' => $contactId);
@@ -2951,7 +2949,6 @@ AND       civicrm_openid.is_primary = 1";
       while ($blockDAO->fetch()) {
         $locBlockIds[$name][] = $blockDAO->id;
       }
-      $blockDAO->free();
     }
 
     return $locBlockIds;
@@ -3420,8 +3417,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
           array('table' => 'civicrm_im', 'column' => 'contact_id'),
           array('table' => 'civicrm_phone', 'column' => 'contact_id'),
           array('table' => 'civicrm_website', 'column' => 'contact_id'),
-        )
-      )
+      ))
       ->alterTriggerInfo($info, $tableName);
 
     // Update phone table to populate phone_numeric field
@@ -3563,7 +3559,6 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
       }
     }
     CRM_Utils_Hook::post('delete', $type, $id, $obj);
-    $obj->free();
     return TRUE;
   }
 
@@ -3595,14 +3590,25 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    * @param bool $checkPermissions
    * @param int $ruleGroupID
    *   ID of the rule group to be used if an override is desirable.
+   * @param array $contextParams
+   *   The context if relevant, eg. ['event_id' => X]
    *
    * @return array
    */
-  public static function getDuplicateContacts($input, $contactType, $rule = 'Unsupervised', $excludedContactIDs = array(), $checkPermissions = TRUE, $ruleGroupID = NULL) {
+  public static function getDuplicateContacts($input, $contactType, $rule = 'Unsupervised', $excludedContactIDs = [], $checkPermissions = TRUE, $ruleGroupID = NULL, $contextParams = []) {
     $dedupeParams = CRM_Dedupe_Finder::formatParams($input, $contactType);
     $dedupeParams['check_permission'] = $checkPermissions;
-    $ids = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $contactType, $rule, $excludedContactIDs, $ruleGroupID);
-    return $ids;
+    $dedupeParams['contact_type'] = $contactType;
+    $dedupeParams['rule'] = $rule;
+    $dedupeParams['rule_group_id'] = $ruleGroupID;
+    $dedupeParams['excluded_contact_ids'] = $excludedContactIDs;
+    $dedupeResults['ids'] = [];
+    $dedupeResults['handled'] = FALSE;
+    CRM_Utils_Hook::findDuplicates($dedupeParams, $dedupeResults, $contextParams);
+    if (!$dedupeResults['handled']) {
+      $dedupeResults['ids'] = CRM_Dedupe_Finder::dupesByParams($dedupeParams, $contactType, $rule, $excludedContactIDs, $ruleGroupID);
+    }
+    return $dedupeResults['ids'];
   }
 
   /**
@@ -3619,11 +3625,13 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    * @param bool $checkPermissions
    * @param int $ruleGroupID
    *   ID of the rule group to be used if an override is desirable.
+   * @param array $contextParams
+   *   The context if relevant, eg. ['event_id' => X]
    *
    * @return int|NULL
    */
-  public static function getFirstDuplicateContact($input, $contactType, $rule = 'Unsupervised', $excludedContactIDs = array(), $checkPermissions = TRUE, $ruleGroupID = NULL) {
-    $ids = self::getDuplicateContacts($input, $contactType, $rule, $excludedContactIDs, $checkPermissions, $ruleGroupID);
+  public static function getFirstDuplicateContact($input, $contactType, $rule = 'Unsupervised', $excludedContactIDs = [], $checkPermissions = TRUE, $ruleGroupID = NULL, $contextParams = []) {
+    $ids = self::getDuplicateContacts($input, $contactType, $rule, $excludedContactIDs, $checkPermissions, $ruleGroupID, $contextParams);
     if (empty($ids)) {
       return NULL;
     }

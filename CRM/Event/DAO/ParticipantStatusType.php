@@ -19,14 +19,14 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_participant_status_type';
+  public static $_tableName = 'civicrm_participant_status_type';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * unique participant status type id
@@ -113,6 +113,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'title' => ts('Participant Status Type ID'),
           'description' => ts('unique participant status type id'),
           'required' => TRUE,
+          'where' => 'civicrm_participant_status_type.id',
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',
@@ -127,8 +128,6 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'size' => CRM_Utils_Type::BIG,
           'import' => TRUE,
           'where' => 'civicrm_participant_status_type.name',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
@@ -142,6 +141,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'description' => ts('localized label for display of this status type'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_participant_status_type.label',
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',
@@ -154,6 +154,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'description' => ts('the general group of status type this one belongs to'),
           'maxlength' => 8,
           'size' => CRM_Utils_Type::EIGHT,
+          'where' => 'civicrm_participant_status_type.class',
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',
@@ -170,6 +171,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Participant Status Is Reserved?>'),
           'description' => ts('whether this is a status type required by the system'),
+          'where' => 'civicrm_participant_status_type.is_reserved',
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',
@@ -180,6 +182,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Participant Status is Active'),
           'description' => ts('whether this status type is active'),
+          'where' => 'civicrm_participant_status_type.is_active',
           'default' => '1',
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
@@ -191,6 +194,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Participant Status Counts?'),
           'description' => ts('whether this status type is counted against event size limit'),
+          'where' => 'civicrm_participant_status_type.is_counted',
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',
@@ -202,6 +206,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'title' => ts('Order'),
           'description' => ts('controls sort order'),
           'required' => TRUE,
+          'where' => 'civicrm_participant_status_type.weight',
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',
@@ -212,6 +217,7 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Participant Status Visibility'),
           'description' => ts('whether the status type is visible to the public, an implicit foreign key to option_value.value related to the `visibility` option_group'),
+          'where' => 'civicrm_participant_status_type.visibility_id',
           'table_name' => 'civicrm_participant_status_type',
           'entity' => 'ParticipantStatusType',
           'bao' => 'CRM_Event_BAO_ParticipantStatusType',

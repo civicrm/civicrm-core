@@ -442,10 +442,10 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
 
     if (empty($fields['fields']['total_amount'])) {
       foreach (array(
-                 'total_count_value',
-                 'total_sum_value',
-                 'total_avg_value',
-               ) as $val) {
+        'total_count_value',
+        'total_sum_value',
+        'total_avg_value',
+      ) as $val) {
         if (!empty($fields[$val])) {
           $errors[$val] = ts("Please select the Amount Statistics");
         }
@@ -745,7 +745,8 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
       $contriFields = array(
         'civicrm_contribution_total_amount_sum',
         'civicrm_contribution_total_amount_avg',
-        'civicrm_contribution_total_amount_count');
+        'civicrm_contribution_total_amount_count',
+      );
       $contriRows = array();
       while ($contriDAO->fetch()) {
         $contriRow = array();

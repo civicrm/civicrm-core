@@ -19,14 +19,14 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_action_mapping';
+  public static $_tableName = 'civicrm_action_mapping';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned
@@ -110,6 +110,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Action Mapping ID'),
           'required' => TRUE,
+          'where' => 'civicrm_action_mapping.id',
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
@@ -122,6 +123,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'description' => ts('Entity for which the reminder is created'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_action_mapping.entity',
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
@@ -134,6 +136,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'description' => ts('Entity value'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_action_mapping.entity_value',
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
@@ -146,6 +149,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'description' => ts('Entity value label'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_action_mapping.entity_value_label',
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
@@ -158,6 +162,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'description' => ts('Entity status'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_action_mapping.entity_status',
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
@@ -170,6 +175,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'description' => ts('Entity status label'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_action_mapping.entity_status_label',
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
@@ -182,6 +188,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'description' => ts('Entity date'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_action_mapping.entity_date_start',
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
@@ -194,6 +201,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'description' => ts('Entity date'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_action_mapping.entity_date_end',
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',
@@ -206,6 +214,7 @@ class CRM_Core_DAO_ActionMapping extends CRM_Core_DAO {
           'description' => ts('Entity recipient'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_action_mapping.entity_recipient',
           'table_name' => 'civicrm_action_mapping',
           'entity' => 'ActionMapping',
           'bao' => 'CRM_Core_DAO_ActionMapping',

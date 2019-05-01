@@ -34,9 +34,6 @@
  */
 class api_v3_PaymentTest extends CiviUnitTestCase {
 
-  /**
-   * Assume empty database with just civicrm_data.
-   */
   protected $_individualId;
   protected $_financialTypeId = 1;
   protected $_apiversion;
@@ -135,7 +132,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'Dear Anthony,',
       'Total Fees: $ 300.00',
       'This Payment Amount: $ 50.00',
-      'Balance Owed: $ 100.00', //150 was paid in the 1st payment.
+      //150 was paid in the 1st payment.
+      'Balance Owed: $ 100.00',
       'Event Information and Location',
       'Paid By: Check',
       'Check Number: 345',
@@ -197,17 +195,19 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
       'total_amount' => -30,
       'trxn_date' => '2018-11-13 12:01:56',
-    ]);
+      'sequential' => TRUE,
+    ])['values'][0];
 
-    $this->checkPaymentResult($payment, [
-      $payment['id'] => [
-        'from_financial_account_id' => 7,
-        'to_financial_account_id' => 6,
-        'total_amount' => -30,
-        'status_id' => 1,
-        'is_payment' => 1,
-      ],
-    ]);
+    $expected = [
+      'from_financial_account_id' => 7,
+      'to_financial_account_id' => 6,
+      'total_amount' => -30,
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'status_id', 'Refunded'),
+      'is_payment' => 1,
+    ];
+    foreach ($expected as $key => $value) {
+      $this->assertEquals($expected[$key], $payment[$key], 'mismatch on key ' . $key);
+    }
 
     $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
     $mut->assertSubjects(['Refund Notification - Annual CiviCRM meet']);
@@ -315,7 +315,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function checkPaymentResult($payment, $expectedResult) {
     foreach ($expectedResult[$payment['id']] as $key => $value) {
-      $this->assertEquals($payment['values'][$payment['id']][$key], $value);
+      $this->assertEquals($payment['values'][$payment['id']][$key], $value, 'mismatch on ' . $key);
     }
   }
 

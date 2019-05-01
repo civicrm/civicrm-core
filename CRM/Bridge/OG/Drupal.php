@@ -47,7 +47,7 @@ class CRM_Bridge_OG_Drupal {
     // first create or update the CiviCRM group
     $groupParams = $params;
     $groupParams['source'] = CRM_Bridge_OG_Utils::ogSyncName($params['og_id']);
-    $groupParams['group_type'] = array('2' => 1);
+    $groupParams['group_type'] = ['2' => 1];
     self::updateCiviGroup($groupParams, $op);
 
     if (CRM_Bridge_OG_Utils::aclEnabled()) {
@@ -55,7 +55,7 @@ class CRM_Bridge_OG_Drupal {
       $aclParams = $params;
       $aclParams['name'] = $aclParams['title'] = "{$aclParams['name']}: Administrator";
       $aclParams['source'] = CRM_Bridge_OG_Utils::ogSyncACLName($params['og_id']);
-      $aclParams['group_type'] = array('1');
+      $aclParams['group_type'] = ['1'];
       self::updateCiviGroup($aclParams, $op);
 
       $aclParams['acl_group_id'] = $aclParams['group_id'];
@@ -138,7 +138,7 @@ class CRM_Bridge_OG_Drupal {
     $dao->label = $params['title'];
     $dao->is_active = 1;
 
-    $weightParams = array('option_group_id' => $optionGroupID);
+    $weightParams = ['option_group_id' => $optionGroupID];
     $dao->weight = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue',
       $weightParams
     );
@@ -153,10 +153,10 @@ SELECT v.id
  WHERE v.option_group_id = %1
    AND v.description     = %2
 ";
-    $queryParams = array(
-      1 => array($optionGroupID, 'Integer'),
-      2 => array($params['source'], 'String'),
-    );
+    $queryParams = [
+      1 => [$optionGroupID, 'Integer'],
+      2 => [$params['source'], 'String'],
+    ];
     $dao->id = CRM_Core_DAO::singleValueQuery($query, $queryParams);
     $dao->save();
     $params['acl_role_id'] = $dao->value;
@@ -228,11 +228,11 @@ SELECT v.id
       NULL, TRUE
     );
 
-    $groupParams = array(
+    $groupParams = [
       'contact_id' => $contactID,
       'group_id' => $groupID,
       'version' => 3,
-    );
+    ];
 
     if ($op == 'add') {
       $groupParams['status'] = $params['is_active'] ? 'Added' : 'Pending';
@@ -251,12 +251,12 @@ SELECT v.id
         NULL, TRUE
       );
 
-      $groupParams = array(
+      $groupParams = [
         'contact_id' => $contactID,
         'group_id' => $groupID,
         'status' => $params['is_admin'] ? 'Added' : 'Removed',
         'version' => 3,
-      );
+      ];
 
       if ($params['is_admin']) {
         civicrm_api('GroupContact', 'Create', $groupParams);

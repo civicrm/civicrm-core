@@ -52,10 +52,10 @@ function civicrm_api3_recurring_entity_get($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_recurring_entity_get_spec(&$params) {
-  $params['entity_table']['options'] = array(
+  $params['entity_table']['options'] = [
     'civicrm_event' => 'civicrm_event',
     'civicrm_activity' => 'civicrm_activity',
-  );
+  ];
 }
 
 /**
@@ -78,10 +78,10 @@ function civicrm_api3_recurring_entity_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_recurring_entity_create_spec(&$params) {
-  $params['entity_table']['options'] = array(
+  $params['entity_table']['options'] = [
     'civicrm_event' => 'civicrm_event',
     'civicrm_activity' => 'civicrm_activity',
-  );
+  ];
   $params['entity_table']['api.required'] = 1;
 }
 

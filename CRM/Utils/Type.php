@@ -158,7 +158,7 @@ class CRM_Utils_Type {
    *   An array of type in the form 'type name' => 'int representing type'
    */
   public static function getValidTypes() {
-    return array(
+    return [
       'Int' => self::T_INT,
       'String' => self::T_STRING,
       'Enum' => self::T_ENUM,
@@ -172,7 +172,7 @@ class CRM_Utils_Type {
       'Money' => self::T_MONEY,
       'Email' => self::T_EMAIL,
       'Mediumblob' => self::T_MEDIUMBLOB,
-    );
+    ];
   }
 
   /**
@@ -371,7 +371,7 @@ class CRM_Utils_Type {
 
             }
             // Normal clause.
-            $part = preg_replace_callback('/^(?:(?:((?:`[\w-]{1,64}`|[\w-]{1,64}))(?:\.))?(`[\w-]{1,64}`|[\w-]{1,64})(?: (asc|desc))?)$/i', array('CRM_Utils_Type', 'mysqlOrderByCallback'), trim($part));
+            $part = preg_replace_callback('/^(?:(?:((?:`[\w-]{1,64}`|[\w-]{1,64}))(?:\.))?(`[\w-]{1,64}`|[\w-]{1,64})(?: (asc|desc))?)$/i', ['CRM_Utils_Type', 'mysqlOrderByCallback'], trim($part));
           }
           return implode(', ', $parts);
         }
@@ -413,7 +413,7 @@ class CRM_Utils_Type {
    */
   public static function validate($data, $type, $abort = TRUE, $name = 'One of parameters ', $isThrowException = FALSE) {
 
-    $possibleTypes = array(
+    $possibleTypes = [
       'Integer',
       'Int',
       'Positive',
@@ -434,7 +434,8 @@ class CRM_Utils_Type {
       'ExtensionKey',
       'Json',
       'Alphanumeric',
-    );
+      'Color',
+    ];
     if (!in_array($type, $possibleTypes)) {
       if ($isThrowException) {
         throw new CRM_Core_Exception(ts('Invalid type, must be one of : ' . implode($possibleTypes)));
@@ -452,18 +453,6 @@ class CRM_Utils_Type {
       case 'Positive':
         if (CRM_Utils_Rule::positiveInteger($data)) {
           return (int) $data;
-        }
-        break;
-
-      case 'CommaSeparatedIntegers':
-        if (CRM_Utils_Rule::commaSeparatedIntegers($data)) {
-          return $data;
-        }
-        break;
-
-      case 'Boolean':
-        if (CRM_Utils_Rule::boolean($data)) {
-          return $data;
         }
         break;
 
@@ -519,21 +508,9 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'MysqlColumnNameOrAlias':
-        if (CRM_Utils_Rule::mysqlColumnNameOrAlias($data)) {
-          return $data;
-        }
-        break;
-
       case 'MysqlOrderByDirection':
         if (CRM_Utils_Rule::mysqlOrderByDirection($data)) {
           return strtolower($data);
-        }
-        break;
-
-      case 'MysqlOrderBy':
-        if (CRM_Utils_Rule::mysqlOrderBy($data)) {
-          return $data;
         }
         break;
 
@@ -543,17 +520,11 @@ class CRM_Utils_Type {
         }
         break;
 
-      case 'Json':
-        if (CRM_Utils_Rule::json($data)) {
+      default:
+        $check = lcfirst($type);
+        if (CRM_Utils_Rule::$check($data)) {
           return $data;
         }
-        break;
-
-      case 'Alphanumeric':
-        if (CRM_Utils_Rule::alphanumeric($data)) {
-          return $data;
-        }
-        break;
     }
 
     if ($abort) {
@@ -611,7 +582,7 @@ class CRM_Utils_Type {
    * @return array
    */
   public static function dataTypes() {
-    $types = array(
+    $types = [
       'Integer',
       'String',
       'Date',
@@ -619,7 +590,7 @@ class CRM_Utils_Type {
       'Timestamp',
       'Money',
       'Email',
-    );
+    ];
     return array_combine($types, $types);
   }
 

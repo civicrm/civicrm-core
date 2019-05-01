@@ -42,7 +42,7 @@ class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
   /**
    * @var array (string=>int) Keep count of the #times different functions are called
    */
-  var $calls;
+  public $calls;
 
   public function setUp() {
     $this->calls = array(
@@ -55,11 +55,11 @@ class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
   public function testHookAlterMailer() {
     $test = $this;
     $mockMailer = new CRM_Utils_FakeObject(array(
-    'send' => function ($recipients, $headers, $body) use ($test) {
-      $test->calls['send']++;
-      $test->assertEquals(array('to@example.org'), $recipients);
-      $test->assertEquals('Subject Example', $headers['Subject']);
-    },
+      'send' => function ($recipients, $headers, $body) use ($test) {
+        $test->calls['send']++;
+        $test->assertEquals(array('to@example.org'), $recipients);
+        $test->assertEquals('Subject Example', $headers['Subject']);
+      },
     ));
 
     CRM_Utils_Hook::singleton()->setHook('civicrm_alterMailer',

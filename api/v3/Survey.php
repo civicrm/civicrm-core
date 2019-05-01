@@ -35,7 +35,6 @@
  * @package CiviCRM_APIv3
  */
 
-
 /**
  * Create or update a survey.
  *
@@ -99,12 +98,12 @@ function civicrm_api3_survey_delete($params) {
  * @return array
  */
 function _civicrm_api3_survey_getlist_defaults(&$request) {
-  return array(
-    'description_field' => array(
+  return [
+    'description_field' => [
       'campaign_id',
-    ),
-    'params' => array(
+    ],
+    'params' => [
       'is_active' => 1,
-    ),
-  );
+    ],
+  ];
 }

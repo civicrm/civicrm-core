@@ -19,14 +19,14 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_msg_template';
+  public static $_tableName = 'civicrm_msg_template';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Message Template ID
@@ -125,6 +125,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'title' => ts('Message Template ID'),
           'description' => ts('Message Template ID'),
           'required' => TRUE,
+          'where' => 'civicrm_msg_template.id',
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
@@ -137,6 +138,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'description' => ts('Descriptive title of message'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_msg_template.msg_title',
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
@@ -147,6 +149,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Message Template Subject'),
           'description' => ts('Subject for email message.'),
+          'where' => 'civicrm_msg_template.msg_subject',
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
@@ -157,6 +160,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_LONGTEXT,
           'title' => ts('Message Template Text'),
           'description' => ts('Text formatted message'),
+          'where' => 'civicrm_msg_template.msg_text',
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
@@ -170,6 +174,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_LONGTEXT,
           'title' => ts('Message Template HTML'),
           'description' => ts('HTML formatted message'),
+          'where' => 'civicrm_msg_template.msg_html',
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
@@ -182,6 +187,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'name' => 'is_active',
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Is Active'),
+          'where' => 'civicrm_msg_template.is_active',
           'default' => '1',
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
@@ -193,6 +199,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Message Template Workflow'),
           'description' => ts('a pseudo-FK to civicrm_option_value'),
+          'where' => 'civicrm_msg_template.workflow_id',
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
@@ -203,6 +210,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Message Template Is Default?'),
           'description' => ts('is this the default message template for the workflow referenced by workflow_id?'),
+          'where' => 'civicrm_msg_template.is_default',
           'default' => '1',
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
@@ -214,6 +222,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Message Template Is Reserved?'),
           'description' => ts('is this the reserved message template which we ship for the workflow referenced by workflow_id?'),
+          'where' => 'civicrm_msg_template.is_reserved',
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',
@@ -224,6 +233,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Message Template is used for SMS?'),
           'description' => ts('Is this message template used for sms?'),
+          'where' => 'civicrm_msg_template.is_sms',
           'default' => '0',
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
@@ -235,6 +245,7 @@ class CRM_Core_DAO_MessageTemplate extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Message Template Format'),
           'description' => ts('a pseudo-FK to civicrm_option_value containing PDF Page Format.'),
+          'where' => 'civicrm_msg_template.pdf_format_id',
           'table_name' => 'civicrm_msg_template',
           'entity' => 'MessageTemplate',
           'bao' => 'CRM_Core_BAO_MessageTemplate',

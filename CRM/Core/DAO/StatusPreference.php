@@ -19,14 +19,14 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_status_pref';
+  public static $_tableName = 'civicrm_status_pref';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Unique Status Preference ID
@@ -93,7 +93,7 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'domain_id', 'civicrm_domain', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -114,6 +114,7 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
           'title' => ts('Status Preference ID'),
           'description' => ts('Unique Status Preference ID'),
           'required' => TRUE,
+          'where' => 'civicrm_status_pref.id',
           'table_name' => 'civicrm_status_pref',
           'entity' => 'StatusPreference',
           'bao' => 'CRM_Core_BAO_StatusPreference',
@@ -125,6 +126,7 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
           'title' => ts('Setting Domain'),
           'description' => ts('Which Domain is this Status Preference for'),
           'required' => TRUE,
+          'where' => 'civicrm_status_pref.domain_id',
           'table_name' => 'civicrm_status_pref',
           'entity' => 'StatusPreference',
           'bao' => 'CRM_Core_BAO_StatusPreference',
@@ -146,8 +148,6 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
           'size' => CRM_Utils_Type::HUGE,
           'import' => TRUE,
           'where' => 'civicrm_status_pref.name',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_status_pref',
           'entity' => 'StatusPreference',
@@ -161,8 +161,6 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
           'description' => ts('expires ignore_severity.  NULL never hushes.'),
           'import' => TRUE,
           'where' => 'civicrm_status_pref.hush_until',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'default' => 'NULL',
           'table_name' => 'civicrm_status_pref',
@@ -177,8 +175,6 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
           'description' => ts('Hush messages up to and including this severity.'),
           'import' => TRUE,
           'where' => 'civicrm_status_pref.ignore_severity',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'default' => '1',
           'table_name' => 'civicrm_status_pref',
@@ -196,6 +192,7 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
           'description' => ts('These settings are per-check, and can\'t be compared across checks.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_status_pref.prefs',
           'table_name' => 'civicrm_status_pref',
           'entity' => 'StatusPreference',
           'bao' => 'CRM_Core_BAO_StatusPreference',
@@ -208,6 +205,7 @@ class CRM_Core_DAO_StatusPreference extends CRM_Core_DAO {
           'description' => ts('These values are per-check, and can\'t be compared across checks.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_status_pref.check_info',
           'table_name' => 'civicrm_status_pref',
           'entity' => 'StatusPreference',
           'bao' => 'CRM_Core_BAO_StatusPreference',

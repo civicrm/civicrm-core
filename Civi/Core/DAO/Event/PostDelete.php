@@ -51,4 +51,5 @@ class PostDelete extends \Symfony\Component\EventDispatcher\Event {
     $this->object = $object;
     $this->result = $result;
   }
+
 }

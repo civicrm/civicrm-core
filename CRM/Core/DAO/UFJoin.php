@@ -19,14 +19,14 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_uf_join';
+  public static $_tableName = 'civicrm_uf_join';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Unique table ID
@@ -100,7 +100,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'uf_group_id', 'civicrm_uf_group', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), 'entity_id', NULL, 'id', 'entity_table');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -122,6 +122,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'title' => ts('UF Join ID'),
           'description' => ts('Unique table ID'),
           'required' => TRUE,
+          'where' => 'civicrm_uf_join.id',
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
           'bao' => 'CRM_Core_BAO_UFJoin',
@@ -132,6 +133,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Profile Use is active'),
           'description' => ts('Is this join currently active?'),
+          'where' => 'civicrm_uf_join.is_active',
           'default' => '1',
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
@@ -146,6 +148,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_uf_join.module',
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
           'bao' => 'CRM_Core_BAO_UFJoin',
@@ -158,6 +161,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'description' => ts('Name of table where item being referenced is stored. Modules which only need a single collection of uf_join instances may choose not to populate entity_table and entity_id.'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_uf_join.entity_table',
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
           'bao' => 'CRM_Core_BAO_UFJoin',
@@ -171,6 +175,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Profile Entity ID'),
           'description' => ts('Foreign key to the referenced item.'),
+          'where' => 'civicrm_uf_join.entity_id',
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
           'bao' => 'CRM_Core_BAO_UFJoin',
@@ -182,6 +187,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'title' => ts('Order'),
           'description' => ts('Controls display order when multiple user framework groups are setup for concurrent display.'),
           'required' => TRUE,
+          'where' => 'civicrm_uf_join.weight',
           'default' => '1',
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
@@ -194,6 +200,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'title' => ts('Profile ID'),
           'description' => ts('Which form does this field belong to.'),
           'required' => TRUE,
+          'where' => 'civicrm_uf_join.uf_group_id',
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
           'bao' => 'CRM_Core_BAO_UFJoin',
@@ -213,6 +220,7 @@ class CRM_Core_DAO_UFJoin extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_LONGTEXT,
           'title' => ts('Profile Use Data'),
           'description' => ts('Json serialized array of data used by the ufjoin.module'),
+          'where' => 'civicrm_uf_join.module_data',
           'table_name' => 'civicrm_uf_join',
           'entity' => 'UFJoin',
           'bao' => 'CRM_Core_BAO_UFJoin',

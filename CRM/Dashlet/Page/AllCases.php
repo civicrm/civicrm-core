@@ -62,7 +62,7 @@ class CRM_Dashlet_Page_AllCases extends CRM_Core_Page {
     $controller->process();
     $controller->run();
 
-    if (CRM_Case_BAO_Case::getCases(TRUE, array('type' => 'any'), 'dashboard', TRUE)) {
+    if (CRM_Case_BAO_Case::getCases(TRUE, ['type' => 'any'], 'dashboard', TRUE)) {
       $this->assign('casePresent', TRUE);
     }
     return parent::run();

@@ -47,7 +47,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
   /**
    * Membership Type ID
-   * @var
+   * @var int
    */
   protected $_memType;
 
@@ -55,21 +55,21 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * Array of from email ids
    * @var array
    */
-  protected $_fromEmails = array();
+  protected $_fromEmails = [];
 
   /**
    * Details of all enabled membership types.
    *
    * @var array
    */
-  protected $allMembershipTypeDetails = array();
+  protected $allMembershipTypeDetails = [];
 
   /**
    * Array of membership type IDs and whether they permit autorenewal.
    *
    * @var array
    */
-  protected $membershipTypeRenewalStatus = array();
+  protected $membershipTypeRenewalStatus = [];
 
   /**
    * Price set ID configured for the form.
@@ -120,7 +120,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *
    * @var array
    */
-  protected $_params = array();
+  protected $_params = [];
 
   /**
    * Fields for the entity to be assigned to the template.
@@ -151,7 +151,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     }
 
     parent::preProcess();
-    $params = array();
+    $params = [];
     $params['context'] = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'membership');
     $params['id'] = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $params['mode'] = CRM_Utils_Request::retrieve('mode', 'Alphanumeric', $this);
@@ -160,7 +160,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
     $this->assign('context', $this->_context);
     $this->assign('membershipMode', $this->_mode);
-    $this->allMembershipTypeDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, array(), TRUE);
+    $this->allMembershipTypeDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, [], TRUE);
     foreach ($this->allMembershipTypeDetails as $index => $membershipType) {
       if ($membershipType['auto_renew']) {
         $this->_recurMembershipTypes[$index] = $membershipType;
@@ -178,9 +178,9 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    *   defaults
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (isset($this->_id)) {
-      $params = array('id' => $this->_id);
+      $params = ['id' => $this->_id];
       CRM_Member_BAO_Membership::retrieve($params, $defaults);
       if (isset($defaults['minimum_fee'])) {
         $defaults['minimum_fee'] = CRM_Utils_Money::format($defaults['minimum_fee'], NULL, '%a');
@@ -213,7 +213,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       $this->_memType = $defaults['membership_type_id'];
     }
     if (is_numeric($this->_memType)) {
-      $defaults['membership_type_id'] = array();
+      $defaults['membership_type_id'] = [];
       $defaults['membership_type_id'][0] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType',
         $this->_memType,
         'member_of_contact_id',
@@ -243,7 +243,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       }
 
       $autoRenewElement = $this->addElement('checkbox', 'auto_renew', ts('Membership renewed automatically'),
-        NULL, array('onclick' => "showHideByValue('auto_renew','','send-receipt','table-row','radio',true); showHideNotice( );")
+        NULL, ['onclick' => "showHideByValue('auto_renew','','send-receipt','table-row','radio',true); showHideNotice( );"]
       );
       if ($this->_action & CRM_Core_Action::UPDATE) {
         $autoRenewElement->freeze();
@@ -259,48 +259,48 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
     $this->assign('autoRenewOptions', json_encode($this->membershipTypeRenewalStatus));
 
     if ($this->_action & CRM_Core_Action::RENEW) {
-      $this->addButtons(array(
-        array(
+      $this->addButtons([
+        [
           'type' => 'upload',
           'name' => ts('Renew'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      ));
+        ],
+      ]);
     }
     elseif ($this->_action & CRM_Core_Action::DELETE) {
-      $this->addButtons(array(
-        array(
+      $this->addButtons([
+        [
           'type' => 'next',
           'name' => ts('Delete'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      ));
+        ],
+      ]);
     }
     else {
-      $this->addButtons(array(
-        array(
+      $this->addButtons([
+        [
           'type' => 'upload',
           'name' => ts('Save'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'upload',
           'name' => ts('Save and New'),
           'subName' => 'new',
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      ));
+        ],
+      ]);
     }
   }
 
@@ -355,13 +355,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * @param array $params
    */
   protected function setContextVariables($params) {
-    $variables = array(
+    $variables = [
       'action' => '_action',
       'context' => '_context',
       'id' => '_id',
       'cid' => '_contactID',
       'mode' => '_mode',
-    );
+    ];
     foreach ($variables as $paramKey => $classVar) {
       if (isset($params[$paramKey]) && !isset($this->$classVar)) {
         $this->$classVar = $params[$paramKey];
@@ -388,7 +388,7 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    */
   protected function processRecurringContribution($paymentParams) {
     $membershipID = $paymentParams['membership_type_id'][1];
-    $contributionRecurParams = array(
+    $contributionRecurParams = [
       'contact_id' => $paymentParams['contactID'],
       'amount' => $paymentParams['total_amount'],
       'contribution_status_id' => 'Pending',
@@ -398,18 +398,18 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
       'is_email_receipt' => $paymentParams['is_email_receipt'],
       'payment_instrument_id' => $paymentParams['payment_instrument_id'],
       'invoice_id' => $paymentParams['invoice_id'],
-    );
+    ];
 
-    $mapping = array(
+    $mapping = [
       'frequency_interval' => 'duration_interval',
       'frequency_unit' => 'duration_unit',
-    );
-    $membershipType = civicrm_api3('MembershipType', 'getsingle', array(
+    ];
+    $membershipType = civicrm_api3('MembershipType', 'getsingle', [
       'id' => $membershipID,
       'return' => $mapping,
-    ));
+    ]);
 
-    $returnParams = array('is_recur' => TRUE);
+    $returnParams = ['is_recur' => TRUE];
     foreach ($mapping as $recurringFieldName => $membershipTypeFieldName) {
       $contributionRecurParams[$recurringFieldName] = $membershipType[$membershipTypeFieldName];
       $returnParams[$recurringFieldName] = $membershipType[$membershipTypeFieldName];

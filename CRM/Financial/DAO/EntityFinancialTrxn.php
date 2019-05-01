@@ -19,14 +19,14 @@ class CRM_Financial_DAO_EntityFinancialTrxn extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_entity_financial_trxn';
+  public static $_tableName = 'civicrm_entity_financial_trxn';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * ID
@@ -75,7 +75,7 @@ class CRM_Financial_DAO_EntityFinancialTrxn extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'financial_trxn_id', 'civicrm_financial_trxn', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), 'entity_id', NULL, 'id', 'entity_table');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -97,6 +97,7 @@ class CRM_Financial_DAO_EntityFinancialTrxn extends CRM_Core_DAO {
           'title' => ts('Entity Financial Transaction ID'),
           'description' => ts('ID'),
           'required' => TRUE,
+          'where' => 'civicrm_entity_financial_trxn.id',
           'table_name' => 'civicrm_entity_financial_trxn',
           'entity' => 'EntityFinancialTrxn',
           'bao' => 'CRM_Financial_DAO_EntityFinancialTrxn',
@@ -112,8 +113,6 @@ class CRM_Financial_DAO_EntityFinancialTrxn extends CRM_Core_DAO {
           'size' => CRM_Utils_Type::BIG,
           'import' => TRUE,
           'where' => 'civicrm_entity_financial_trxn.entity_table',
-          'headerPattern' => '',
-          'dataPattern' => '',
           'export' => TRUE,
           'table_name' => 'civicrm_entity_financial_trxn',
           'entity' => 'EntityFinancialTrxn',
@@ -125,6 +124,7 @@ class CRM_Financial_DAO_EntityFinancialTrxn extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Entity ID'),
           'required' => TRUE,
+          'where' => 'civicrm_entity_financial_trxn.entity_id',
           'table_name' => 'civicrm_entity_financial_trxn',
           'entity' => 'EntityFinancialTrxn',
           'bao' => 'CRM_Financial_DAO_EntityFinancialTrxn',
@@ -134,6 +134,7 @@ class CRM_Financial_DAO_EntityFinancialTrxn extends CRM_Core_DAO {
           'name' => 'financial_trxn_id',
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Financial Transaction Id'),
+          'where' => 'civicrm_entity_financial_trxn.financial_trxn_id',
           'table_name' => 'civicrm_entity_financial_trxn',
           'entity' => 'EntityFinancialTrxn',
           'bao' => 'CRM_Financial_DAO_EntityFinancialTrxn',

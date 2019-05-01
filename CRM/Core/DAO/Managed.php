@@ -19,14 +19,14 @@ class CRM_Core_DAO_Managed extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_managed';
+  public static $_tableName = 'civicrm_managed';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Surrogate Key
@@ -92,6 +92,7 @@ class CRM_Core_DAO_Managed extends CRM_Core_DAO {
           'title' => ts('Managed ID'),
           'description' => ts('Surrogate Key'),
           'required' => TRUE,
+          'where' => 'civicrm_managed.id',
           'table_name' => 'civicrm_managed',
           'entity' => 'Managed',
           'bao' => 'CRM_Core_DAO_Managed',
@@ -105,6 +106,7 @@ class CRM_Core_DAO_Managed extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 127,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_managed.module',
           'table_name' => 'civicrm_managed',
           'entity' => 'Managed',
           'bao' => 'CRM_Core_DAO_Managed',
@@ -117,6 +119,7 @@ class CRM_Core_DAO_Managed extends CRM_Core_DAO {
           'description' => ts('Symbolic name used by the module to identify the object'),
           'maxlength' => 127,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_managed.name',
           'table_name' => 'civicrm_managed',
           'entity' => 'Managed',
           'bao' => 'CRM_Core_DAO_Managed',
@@ -130,6 +133,7 @@ class CRM_Core_DAO_Managed extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_managed.entity_type',
           'table_name' => 'civicrm_managed',
           'entity' => 'Managed',
           'bao' => 'CRM_Core_DAO_Managed',
@@ -141,6 +145,7 @@ class CRM_Core_DAO_Managed extends CRM_Core_DAO {
           'title' => ts('Entity ID'),
           'description' => ts('Foreign key to the referenced item.'),
           'required' => TRUE,
+          'where' => 'civicrm_managed.entity_id',
           'table_name' => 'civicrm_managed',
           'entity' => 'Managed',
           'bao' => 'CRM_Core_DAO_Managed',
@@ -153,6 +158,7 @@ class CRM_Core_DAO_Managed extends CRM_Core_DAO {
           'description' => ts('Policy on when to cleanup entity (always, never, unused)'),
           'maxlength' => 32,
           'size' => CRM_Utils_Type::MEDIUM,
+          'where' => 'civicrm_managed.cleanup',
           'table_name' => 'civicrm_managed',
           'entity' => 'Managed',
           'bao' => 'CRM_Core_DAO_Managed',

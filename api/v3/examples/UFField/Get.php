@@ -6,7 +6,7 @@
  *   API result array
  */
 function uf_field_get_example() {
-  $params = array();
+  $params = [];
 
   try{
     $result = civicrm_api3('UFField', 'get', $params);
@@ -16,12 +16,12 @@ function uf_field_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -35,13 +35,13 @@ function uf_field_get_example() {
  */
 function uf_field_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'uf_group_id' => '11',
         'field_name' => 'phone',
@@ -57,9 +57,9 @@ function uf_field_get_expectedresult() {
         'label' => 'Test Phone',
         'field_type' => 'Contact',
         'is_multi_summary' => 0,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

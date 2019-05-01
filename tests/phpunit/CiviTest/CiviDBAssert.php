@@ -86,7 +86,6 @@ class CiviDBAssert {
     else {
       $testCase->fail("Could not retrieve object: $daoName, $id");
     }
-    $object->free();
     $matchSize = count($match);
     if ($verifiedCount != $matchSize) {
       $testCase->fail("Did not verify all fields in match array: $daoName, $id. Verified count = $verifiedCount. Match array size = $matchSize");

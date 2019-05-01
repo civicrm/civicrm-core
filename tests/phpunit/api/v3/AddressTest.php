@@ -408,4 +408,75 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->assertEquals('Individual', $result['contact_id.contact_type']);
   }
 
+  /**
+   * Test Address create with a state name that at least two countries have, e.g. Maryland, United States vs. Maryland, Liberia
+   *
+   * @see https://lab.civicrm.org/dev/core/issues/725
+   */
+  public function testCreateAddressStateProvinceIDCorrectForCountry() {
+    $params = $this->_params;
+    $params['sequential'] = 1;
+    // United States country id
+    $params['country_id'] = '1228';
+    $params['state_province_id'] = 'Maryland';
+    $params['city'] = 'Baltimore';
+    $params['street_address'] = '600 N Charles St.';
+    $params['postal_code'] = '21201';
+    unset($params['street_name']);
+    unset($params['street_number']);
+    $address1 = $this->callAPISuccess('address', 'create', $params);
+    // should find state_province_id of 1019, Maryland, United States ... NOT 3497, Maryland, Liberia
+    $this->assertEquals('1019', $address1['values'][0]['state_province_id']);
+
+    // Now try it in Liberia
+    $params = $this->_params;
+    $params['sequential'] = 1;
+    // Liberia country id
+    $params['country_id'] = '1122';
+    $params['state_province_id'] = 'Maryland';
+    $address2 = $this->callAPISuccess('address', 'create', $params);
+    $this->assertEquals('3497', $address2['values'][0]['state_province_id']);
+  }
+
+  public function getSymbolicCountryStateExamples() {
+    return [
+      // [mixed $inputCountry, mixed $inputState, int $expectCountry, int $expectState]
+      [1228, 1004, 1228, 1004],
+      //['US', 'CA', 1228, 1004],
+      //['US', 'TX', 1228, 1042],
+      ['US', 'California', 1228, 1004],
+      [1228, 'Texas', 1228, 1042],
+      // Don't think these have been supported?
+      // ['United States', 1004, 1228, 1004] ,
+      // ['United States', 'TX', 1228, 1042],
+    ];
+  }
+
+  /**
+   * @param mixed $inputCountry
+   *   Ex: 1228 or 'US'
+   * @param mixed $inputState
+   *   Ex: 1004 or 'CA'
+   * @param int $expectCountry
+   * @param int $expectState
+   * @dataProvider getSymbolicCountryStateExamples
+   */
+  public function testCreateAddressSymbolicCountryAndState($inputCountry, $inputState, $expectCountry, $expectState) {
+    $cid = $this->individualCreate();
+    $r = $this->callAPISuccess('Address', 'create', [
+      'contact_id' => $cid,
+      'location_type_id' => 1,
+      'street_address' => '123 Some St',
+      'city' => 'Hereville',
+      //'US',
+      'country_id' => $inputCountry,
+      // 'California',
+      'state_province_id' => $inputState,
+      'postal_code' => '94100',
+    ]);
+    $created = CRM_Utils_Array::first($r['values']);
+    $this->assertEquals($expectCountry, $created['country_id']);
+    $this->assertEquals($expectState, $created['state_province_id']);
+  }
+
 }

@@ -61,6 +61,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Prefix for the controller.
+   * @var string
    */
   protected $_prefix = "member_";
 
@@ -69,7 +70,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
    *
    * @var array
    */
-  protected $entityReferenceFields = array('membership_type_id');
+  protected $entityReferenceFields = ['membership_type_id'];
 
   /**
    * Processing needed for buildForm and later.
@@ -321,8 +322,8 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     $membershipType = CRM_Utils_Request::retrieve('type', 'String');
 
     if ($membershipType) {
-      $this->_formValues['membership_type_id'] = array($membershipType);
-      $this->_defaults['membership_type_id'] = array($membershipType);
+      $this->_formValues['membership_type_id'] = [$membershipType];
+      $this->_defaults['membership_type_id'] = [$membershipType];
     }
 
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive');
@@ -369,7 +370,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
     //LCD also allow restrictions to membership owner via GET
     $owner = CRM_Utils_Request::retrieve('owner', 'String');
-    if (in_array($owner, array('0', '1'))) {
+    if (in_array($owner, ['0', '1'])) {
       $this->_formValues['member_is_primary'] = $this->_defaults['member_is_primary'] = $owner;
     }
   }

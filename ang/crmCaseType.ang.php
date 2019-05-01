@@ -5,16 +5,16 @@
 
 // ODDITY: This only loads if CiviCase is active.
 
-CRM_Core_Resources::singleton()->addSetting(array(
-  'crmCaseType' => array(
+CRM_Core_Resources::singleton()->addSetting([
+  'crmCaseType' => [
     'REL_TYPE_CNAME' => CRM_Case_XMLProcessor::REL_TYPE_CNAME,
-  ),
-));
+  ],
+]);
 
-return array(
+return [
   'ext' => 'civicrm',
-  'js' => array('ang/crmCaseType.js'),
-  'css' => array('ang/crmCaseType.css'),
-  'partials' => array('ang/crmCaseType'),
-  'requires' => array('ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges', 'crmUtil', 'crmResource'),
-);
+  'js' => ['ang/crmCaseType.js'],
+  'css' => ['ang/crmCaseType.css'],
+  'partials' => ['ang/crmCaseType'],
+  'requires' => ['ngRoute', 'ui.utils', 'crmUi', 'unsavedChanges', 'crmUtil', 'crmResource'],
+];

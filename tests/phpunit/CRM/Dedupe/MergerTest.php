@@ -153,7 +153,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->assertEquals(count($foundDupes), 3, 'Check Individual-Supervised dupe rule for dupesInGroup().');
 
     // Run dedupe finder as the browser would
-    $_SERVER['REQUEST_METHOD'] = 'GET'; //avoid invalid key error
+    //avoid invalid key error
+    $_SERVER['REQUEST_METHOD'] = 'GET';
     $object = new CRM_Contact_Page_DedupeFind();
     $object->set('gid', $this->_groupId);
     $object->set('rgid', $dao->id);
@@ -216,7 +217,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->assertEquals(count($foundDupes), 3, 'Check Individual-Supervised dupe rule for dupesInGroup().');
 
     // Run dedupe finder as the browser would
-    $_SERVER['REQUEST_METHOD'] = 'GET'; //avoid invalid key error
+    //avoid invalid key error
+    $_SERVER['REQUEST_METHOD'] = 'GET';
     $object = new CRM_Contact_Page_DedupeFind();
     $object->set('gid', $this->_groupId);
     $object->set('rgid', $dao->id);
@@ -510,7 +512,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     //Merge and move the mem to the main contact.
     $this->mergeContacts($originalContactID, $duplicateContactID, [
       'move_rel_table_memberships' => 1,
-      'operation' => ['move_rel_table_memberships' => ['add' => 1]]
+      'operation' => ['move_rel_table_memberships' => ['add' => 1]],
     ]);
 
     //Check if membership is correctly transferred to original contact.
@@ -535,8 +537,10 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $this->setupMatchData();
 
     $originalContactID = $this->contacts[0]['id'];
-    $duplicateContactID1 = $this->contacts[1]['id']; // used as duplicate contact in 1st use-case
-    $duplicateContactID2 = $this->contacts[2]['id']; // used as duplicate contact in 2nd use-case
+    // used as duplicate contact in 1st use-case
+    $duplicateContactID1 = $this->contacts[1]['id'];
+    // used as duplicate contact in 2nd use-case
+    $duplicateContactID2 = $this->contacts[2]['id'];
 
     // update the text custom field for original contact with value 'abc'
     $this->callAPISuccess('Contact', 'create', array(
@@ -561,7 +565,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     /*** USE-CASE 1: DO NOT OVERWRITE CUSTOM FIELD VALUE **/
     $this->mergeContacts($originalContactID, $duplicateContactID1, array(
-        "move_{$customFieldName}" => NULL,
+      "move_{$customFieldName}" => NULL,
     ));
     $this->assertCustomFieldValue($originalContactID, 'abc', $customFieldName);
 
@@ -818,7 +822,6 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     }
   }
 
-
   /**
    * Get the list of tables that refer to the CID.
    *
@@ -958,7 +961,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       ),
       'civicrm_participant' => array(
         0 => 'contact_id',
-        1 => 'transferred_to_contact_id', //CRM-16761
+        //CRM-16761
+        1 => 'transferred_to_contact_id',
       ),
       'civicrm_payment_token' => array(
         0 => 'contact_id',

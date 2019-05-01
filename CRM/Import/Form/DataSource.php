@@ -68,43 +68,42 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
 
     $this->add('File', 'uploadFile', ts('Import Data File'), 'size=30 maxlength=255', TRUE);
     $this->setMaxFileSize($uploadFileSize);
-    $this->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', array(
+    $this->addRule('uploadFile', ts('File size should be less than %1 MBytes (%2 bytes)', [
       1 => $uploadSize,
       2 => $uploadFileSize,
-    )), 'maxfilesize', $uploadFileSize);
+    ]), 'maxfilesize', $uploadFileSize);
     $this->addRule('uploadFile', ts('A valid file must be uploaded.'), 'uploadedfile');
     $this->addRule('uploadFile', ts('Input file must be in CSV format'), 'utf8File');
 
     $this->addElement('checkbox', 'skipColumnHeader', ts('First row contains column headers'));
 
-    $this->add('text', 'fieldSeparator', ts('Import Field Separator'), array('size' => 2), TRUE);
-    $this->setDefaults(array('fieldSeparator' => $config->fieldSeparator));
+    $this->add('text', 'fieldSeparator', ts('Import Field Separator'), ['size' => 2], TRUE);
+    $this->setDefaults(['fieldSeparator' => $config->fieldSeparator]);
     $mappingArray = CRM_Core_BAO_Mapping::getCreateMappingValues('Import ' . static::IMPORT_ENTITY);
 
     $this->assign('savedMapping', $mappingArray);
-    $this->add('select', 'savedMapping', ts('Mapping Option'), array('' => ts('- select -')) + $mappingArray);
+    $this->add('select', 'savedMapping', ts('Mapping Option'), ['' => ts('- select -')] + $mappingArray);
 
     if ($loadedMapping = $this->get('loadedMapping')) {
       $this->assign('loadedMapping', $loadedMapping);
-      $this->setDefaults(array('savedMapping' => $loadedMapping));
+      $this->setDefaults(['savedMapping' => $loadedMapping]);
     }
 
     //build date formats
     CRM_Core_Form_Date::buildAllowedDateFormats($this);
 
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'upload',
           'name' => ts('Continue'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
-    );
+        ],
+    ]);
   }
 
   /**
@@ -112,7 +111,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
    */
   protected function addContactTypeSelector() {
     //contact types option
-    $contactOptions = array();
+    $contactOptions = [];
     if (CRM_Contact_BAO_ContactType::isActive('Individual')) {
       $contactOptions[] = $this->createElement('radio',
         NULL, NULL, ts('Individual'), CRM_Import_Parser::CONTACT_INDIVIDUAL
@@ -133,9 +132,9 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
       ts('Contact Type')
     );
 
-    $this->setDefaults(array(
+    $this->setDefaults([
       'contactType' => CRM_Import_Parser::CONTACT_INDIVIDUAL,
-    ));
+    ]);
   }
 
   /**
@@ -168,7 +167,7 @@ abstract class CRM_Import_Form_DataSource extends CRM_Core_Form {
 
     $separator = $this->controller->exportValue($this->_name, 'fieldSeparator');
 
-    $mapper = array();
+    $mapper = [];
 
     $parser = new $parserClassName($mapper);
     if ($entity) {

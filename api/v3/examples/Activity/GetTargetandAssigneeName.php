@@ -8,15 +8,15 @@
  *   API result array
  */
 function activity_getsingle_example() {
-  $params = array(
+  $params = [
     'id' => 1,
-    'return' => array(
+    'return' => [
       '0' => 'source_contact_name',
       '1' => 'target_contact_name',
       '2' => 'assignee_contact_name',
       '3' => 'subject',
-    ),
-  );
+    ],
+  ];
 
   try{
     $result = civicrm_api3('Activity', 'getsingle', $params);
@@ -26,12 +26,12 @@ function activity_getsingle_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -45,23 +45,23 @@ function activity_getsingle_example() {
  */
 function activity_getsingle_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'id' => '1',
     'subject' => 'Make-it-Happen Meeting',
     'source_contact_id' => '6',
     'source_contact_name' => 'D Bug',
-    'target_contact_id' => array(
+    'target_contact_id' => [
       '1' => '4',
-    ),
-    'target_contact_name' => array(
+    ],
+    'target_contact_name' => [
       '3' => 'A Cat',
       '4' => 'B Good',
-    ),
-    'assignee_contact_id' => array(),
-    'assignee_contact_name' => array(
+    ],
+    'assignee_contact_id' => [],
+    'assignee_contact_name' => [
       '5' => 'C Shore',
-    ),
-  );
+    ],
+  ];
 
   return $expectedResult;
 }

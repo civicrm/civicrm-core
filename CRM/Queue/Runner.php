@@ -59,7 +59,10 @@ class CRM_Queue_Runner {
   public $onEnd;
   public $onEndUrl;
   public $pathPrefix;
-  // queue-runner id; used for persistence
+  /**
+   * queue-runner id; used for persistence
+   * @var int
+   */
   public $qrid;
 
   /**
@@ -112,7 +115,7 @@ class CRM_Queue_Runner {
     $this->onEnd = CRM_Utils_Array::value('onEnd', $runnerSpec, NULL);
     $this->onEndUrl = CRM_Utils_Array::value('onEndUrl', $runnerSpec, NULL);
     $this->pathPrefix = CRM_Utils_Array::value('pathPrefix', $runnerSpec, 'civicrm/queue');
-    $this->buttons = CRM_Utils_Array::value('buttons', $runnerSpec, array('retry' => TRUE, 'skip' => TRUE));
+    $this->buttons = CRM_Utils_Array::value('buttons', $runnerSpec, ['retry' => TRUE, 'skip' => TRUE]);
     // perhaps this value should be randomized?
     $this->qrid = $this->queue->getName();
   }
@@ -122,7 +125,7 @@ class CRM_Queue_Runner {
    */
   public function __sleep() {
     // exclude taskCtx
-    return array(
+    return [
       'title',
       'queue',
       'errorMode',
@@ -132,7 +135,7 @@ class CRM_Queue_Runner {
       'pathPrefix',
       'qrid',
       'buttons',
-    );
+    ];
   }
 
   /**
@@ -300,7 +303,7 @@ class CRM_Queue_Runner {
     }
 
     // Fallback; web UI does redirect in Javascript
-    $result = array();
+    $result = [];
     $result['is_error'] = 0;
     $result['numberOfItems'] = 0;
     $result['is_continue'] = 0;
@@ -324,7 +327,7 @@ class CRM_Queue_Runner {
   public function formatTaskResult($isOK, $exception = NULL) {
     $numberOfItems = $this->queue->numberOfItems();
 
-    $result = array();
+    $result = [];
     $result['is_error'] = $isOK ? 0 : 1;
     $result['exception'] = $exception;
     $result['last_task_title'] = isset($this->lastTaskTitle) ? $this->lastTaskTitle : '';

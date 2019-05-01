@@ -19,14 +19,14 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_menu';
+  public static $_tableName = 'civicrm_menu';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned
@@ -194,7 +194,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'domain_id', 'civicrm_domain', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'component_id', 'civicrm_component', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -215,6 +215,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Menu ID'),
           'required' => TRUE,
+          'where' => 'civicrm_menu.id',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -226,6 +227,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'title' => ts('Domain'),
           'description' => ts('Which Domain is this menu item for'),
           'required' => TRUE,
+          'where' => 'civicrm_menu.domain_id',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -244,6 +246,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'description' => ts('Path Name'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_menu.path',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -254,6 +257,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Arguments'),
           'description' => ts('Arguments to pass to the url'),
+          'where' => 'civicrm_menu.path_arguments',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -265,6 +269,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'title' => ts('Menu Title'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_menu.title',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -277,6 +282,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'description' => ts('Function to call to check access permissions'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_menu.access_callback',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -287,6 +293,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Access Arguments'),
           'description' => ts('Arguments to pass to access callback'),
+          'where' => 'civicrm_menu.access_arguments',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -299,6 +306,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'description' => ts('function to call for this url'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_menu.page_callback',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -309,6 +317,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Page Arguments'),
           'description' => ts('Arguments to pass to page callback'),
+          'where' => 'civicrm_menu.page_arguments',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -319,6 +328,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Breadcrumb'),
           'description' => ts('Breadcrumb for the path.'),
+          'where' => 'civicrm_menu.breadcrumb',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -331,6 +341,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'description' => ts('Url where a page should redirected to, if next url not known.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_menu.return_url',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -343,6 +354,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'description' => ts('Arguments to pass to return_url'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_menu.return_url_args',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -353,6 +365,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Component'),
           'description' => ts('Component that this menu item belongs to'),
+          'where' => 'civicrm_menu.component_id',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -372,6 +385,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Enabled?'),
           'description' => ts('Is this menu item active?'),
+          'where' => 'civicrm_menu.is_active',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -382,6 +396,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Public?'),
           'description' => ts('Is this menu accessible to the public?'),
+          'where' => 'civicrm_menu.is_public',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -392,6 +407,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Exposed?'),
           'description' => ts('Is this menu exposed to the navigation system?'),
+          'where' => 'civicrm_menu.is_exposed',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -402,6 +418,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Use SSL?'),
           'description' => ts('Should this menu be exposed via SSL if enabled?'),
+          'where' => 'civicrm_menu.is_ssl',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -413,6 +430,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'title' => ts('Order'),
           'description' => ts('Ordering of the menu items in various blocks.'),
           'required' => TRUE,
+          'where' => 'civicrm_menu.weight',
           'default' => '1',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
@@ -425,6 +443,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'title' => ts('Type'),
           'description' => ts('Drupal menu type.'),
           'required' => TRUE,
+          'where' => 'civicrm_menu.type',
           'default' => '1',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
@@ -437,6 +456,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'title' => ts('Page Type'),
           'description' => ts('CiviCRM menu type.'),
           'required' => TRUE,
+          'where' => 'civicrm_menu.page_type',
           'default' => '1',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
@@ -448,6 +468,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Hide Breadcrumb?'),
           'description' => ts('skip this url being exposed to breadcrumb'),
+          'where' => 'civicrm_menu.skipBreadcrumb',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',
@@ -458,6 +479,7 @@ class CRM_Core_DAO_Menu extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_TEXT,
           'title' => ts('Other menu data'),
           'description' => ts('All other menu metadata not stored in other fields'),
+          'where' => 'civicrm_menu.module_data',
           'table_name' => 'civicrm_menu',
           'entity' => 'Menu',
           'bao' => 'CRM_Core_DAO_Menu',

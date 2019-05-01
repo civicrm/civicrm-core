@@ -38,6 +38,7 @@
 class CRM_Member_Info extends CRM_Core_Component_Info {
 
   /**
+   * @var string
    * @inheritDoc
    */
   protected $keyword = 'member';
@@ -51,19 +52,19 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    * @return array
    *   collection of required component settings
    */
+
   /**
    * @return array
    */
   public function getInfo() {
-    return array(
+    return [
       'name' => 'CiviMember',
       'translatedName' => ts('CiviMember'),
       'title' => ts('CiviCRM Membership Engine'),
       'search' => 1,
       'showActivitiesInCore' => 1,
-    );
+    ];
   }
-
 
   /**
    * @inheritDoc
@@ -82,20 +83,20 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    *   collection of permissions, null if none
    */
   public function getPermissions($getAllUnconditionally = FALSE, $descriptions = FALSE) {
-    $permissions = array(
-      'access CiviMember' => array(
+    $permissions = [
+      'access CiviMember' => [
         ts('access CiviMember'),
         ts('View memberships'),
-      ),
-      'edit memberships' => array(
+      ],
+      'edit memberships' => [
         ts('edit memberships'),
         ts('Create and update memberships'),
-      ),
-      'delete in CiviMember' => array(
+      ],
+      'delete in CiviMember' => [
         ts('delete in CiviMember'),
         ts('Delete memberships'),
-      ),
-    );
+      ],
+    ];
 
     if (!$descriptions) {
       foreach ($permissions as $name => $attr) {
@@ -115,19 +116,20 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    *   collection of required dashboard settings,
    *                    null if no element offered
    */
+
   /**
    * @return array|null
    */
   public function getUserDashboardElement() {
-    return array(
+    return [
       'name' => ts('Memberships'),
       'title' => ts('Your Membership(s)'),
       // this is CiviContribute specific permission, since
       // there is no permission that could be checked for
       // CiviMember
-      'perm' => array('make online contributions'),
+      'perm' => ['make online contributions'],
       'weight' => 30,
-    );
+    ];
   }
 
   /**
@@ -139,15 +141,16 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    *   collection of required dashboard settings,
    *                    null if no element offered
    */
+
   /**
    * @return array|null
    */
   public function registerTab() {
-    return array(
+    return [
       'title' => ts('Memberships'),
       'url' => 'membership',
       'weight' => 30,
-    );
+    ];
   }
 
   /**
@@ -167,14 +170,15 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    *   collection of required pane settings,
    *                    null if no element offered
    */
+
   /**
    * @return array|null
    */
   public function registerAdvancedSearchPane() {
-    return array(
+    return [
       'title' => ts('Memberships'),
       'weight' => 30,
-    );
+    ];
   }
 
   /**
@@ -187,6 +191,7 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
    * @return array|null
    *   collection of activity types
    */
+
   /**
    * @return array|null
    */
@@ -203,20 +208,20 @@ class CRM_Member_Info extends CRM_Core_Component_Info {
     if (CRM_Core_Permission::check('access CiviMember') &&
       CRM_Core_Permission::check('edit memberships')
     ) {
-      $shortCut[] = array(
+      $shortCut[] = [
         'path' => 'civicrm/member/add',
         'query' => "reset=1&action=add&context=standalone",
         'ref' => 'new-membership',
         'title' => ts('Membership'),
-      );
+      ];
       if ($newCredit) {
         $title = ts('Membership') . '<br />&nbsp;&nbsp;(' . ts('credit card') . ')';
-        $shortCut[0]['shortCuts'][] = array(
+        $shortCut[0]['shortCuts'][] = [
           'path' => 'civicrm/member/add',
           'query' => "reset=1&action=add&context=standalone&mode=live",
           'ref' => 'new-membership-cc',
           'title' => $title,
-        );
+        ];
       }
       $shortCuts = array_merge($shortCuts, $shortCut);
     }

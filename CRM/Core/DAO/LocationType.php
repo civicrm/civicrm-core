@@ -19,14 +19,14 @@ class CRM_Core_DAO_LocationType extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_location_type';
+  public static $_tableName = 'civicrm_location_type';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Location Type ID
@@ -106,6 +106,7 @@ class CRM_Core_DAO_LocationType extends CRM_Core_DAO {
           'title' => ts('Location Type ID'),
           'description' => ts('Location Type ID'),
           'required' => TRUE,
+          'where' => 'civicrm_location_type.id',
           'table_name' => 'civicrm_location_type',
           'entity' => 'LocationType',
           'bao' => 'CRM_Core_BAO_LocationType',
@@ -118,6 +119,7 @@ class CRM_Core_DAO_LocationType extends CRM_Core_DAO {
           'description' => ts('Location Type Name.'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_location_type.name',
           'table_name' => 'civicrm_location_type',
           'entity' => 'LocationType',
           'bao' => 'CRM_Core_BAO_LocationType',
@@ -130,6 +132,7 @@ class CRM_Core_DAO_LocationType extends CRM_Core_DAO {
           'description' => ts('Location Type Display Name.'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_location_type.display_name',
           'table_name' => 'civicrm_location_type',
           'entity' => 'LocationType',
           'bao' => 'CRM_Core_BAO_LocationType',
@@ -142,6 +145,7 @@ class CRM_Core_DAO_LocationType extends CRM_Core_DAO {
           'description' => ts('vCard Location Type Name.'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_location_type.vcard_name',
           'table_name' => 'civicrm_location_type',
           'entity' => 'LocationType',
           'bao' => 'CRM_Core_BAO_LocationType',
@@ -154,6 +158,7 @@ class CRM_Core_DAO_LocationType extends CRM_Core_DAO {
           'description' => ts('Location Type Description.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_location_type.description',
           'table_name' => 'civicrm_location_type',
           'entity' => 'LocationType',
           'bao' => 'CRM_Core_BAO_LocationType',
@@ -164,6 +169,7 @@ class CRM_Core_DAO_LocationType extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Location Type is Reserved?'),
           'description' => ts('Is this location type a predefined system location?'),
+          'where' => 'civicrm_location_type.is_reserved',
           'table_name' => 'civicrm_location_type',
           'entity' => 'LocationType',
           'bao' => 'CRM_Core_BAO_LocationType',
@@ -174,6 +180,7 @@ class CRM_Core_DAO_LocationType extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Location Type is Active?'),
           'description' => ts('Is this property active?'),
+          'where' => 'civicrm_location_type.is_active',
           'table_name' => 'civicrm_location_type',
           'entity' => 'LocationType',
           'bao' => 'CRM_Core_BAO_LocationType',
@@ -184,6 +191,7 @@ class CRM_Core_DAO_LocationType extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Default Location Type?'),
           'description' => ts('Is this location type the default?'),
+          'where' => 'civicrm_location_type.is_default',
           'table_name' => 'civicrm_location_type',
           'entity' => 'LocationType',
           'bao' => 'CRM_Core_BAO_LocationType',

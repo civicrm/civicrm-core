@@ -36,21 +36,21 @@
  */
 class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
 
-  protected $_settings = array(
+  protected $_settings = [
     'mailerBatchLimit' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'mailThrottleTime' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'mailerJobSize' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'mailerJobsMax' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'verpSeparator' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
     'replyTo' => CRM_Core_BAO_Setting::MAILING_PREFERENCES_NAME,
-  );
+  ];
 
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Settings - CiviMail'));
-    $this->addFormRule(array('CRM_Admin_Form_Setting_Mail', 'formRule'));
+    $this->addFormRule(['CRM_Admin_Form_Setting_Mail', 'formRule']);
 
     parent::buildQuickForm();
   }
@@ -61,7 +61,7 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
    * @return array|bool
    */
   public static function formRule($fields) {
-    $errors = array();
+    $errors = [];
 
     if (CRM_Utils_Array::value('mailerJobSize', $fields) > 0) {
       if (CRM_Utils_Array::value('mailerJobSize', $fields) < 1000) {

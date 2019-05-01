@@ -41,7 +41,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    *
    * @var array
    */
-  static $_exportableFields = NULL;
+  public static $_exportableFields = NULL;
 
   /**
    * Takes an associative array and creates a Case Type object.
@@ -102,7 +102,6 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     }
   }
 
-
   /**
    * Format / convert submitted array to xml for case type definition
    *
@@ -160,7 +159,8 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
               }
               break;
 
-            case 'sequence': // passthrough
+            // passthrough
+            case 'sequence':
             case 'timeline':
               if ($setVal) {
                 $xmlFile .= "<{$index}>true</{$index}>\n";
@@ -190,7 +190,20 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
       $xmlFile .= "</CaseRoles>\n";
     }
 
+    if (array_key_exists('restrictActivityAsgmtToCmsUser', $definition)) {
+      $xmlFile .= "<RestrictActivityAsgmtToCmsUser>" . $definition['restrictActivityAsgmtToCmsUser'] . "</RestrictActivityAsgmtToCmsUser>\n";
+    }
+
+    if (!empty($definition['activityAsgmtGrps'])) {
+      $xmlFile .= "<ActivityAsgmtGrps>\n";
+      foreach ($definition['activityAsgmtGrps'] as $value) {
+        $xmlFile .= "<Group>$value</Group>\n";
+      }
+      $xmlFile .= "</ActivityAsgmtGrps>\n";
+    }
+
     $xmlFile .= '</CaseType>';
+
     return $xmlFile;
   }
 
@@ -220,15 +233,23 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    */
   public static function convertXmlToDefinition($xml) {
     // build PHP array based on definition
-    $definition = array();
+    $definition = [];
 
     if (isset($xml->forkable)) {
       $definition['forkable'] = (int) $xml->forkable;
     }
 
+    if (isset($xml->RestrictActivityAsgmtToCmsUser)) {
+      $definition['restrictActivityAsgmtToCmsUser'] = (int) $xml->RestrictActivityAsgmtToCmsUser;
+    }
+
+    if (isset($xml->ActivityAsgmtGrps)) {
+      $definition['activityAsgmtGrps'] = (array) $xml->ActivityAsgmtGrps->Group;
+    }
+
     // set activity types
     if (isset($xml->ActivityTypes)) {
-      $definition['activityTypes'] = array();
+      $definition['activityTypes'] = [];
       foreach ($xml->ActivityTypes->ActivityType as $activityTypeXML) {
         $definition['activityTypes'][] = json_decode(json_encode($activityTypeXML), TRUE);
       }
@@ -241,12 +262,12 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
     // set activity sets
     if (isset($xml->ActivitySets)) {
-      $definition['activitySets'] = array();
-      $definition['timelineActivityTypes'] = array();
+      $definition['activitySets'] = [];
+      $definition['timelineActivityTypes'] = [];
 
       foreach ($xml->ActivitySets->ActivitySet as $activitySetXML) {
         // parse basic properties
-        $activitySet = array();
+        $activitySet = [];
         $activitySet['name'] = (string) $activitySetXML->name;
         $activitySet['label'] = (string) $activitySetXML->label;
         if ('true' == (string) $activitySetXML->timeline) {
@@ -257,7 +278,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
         }
 
         if (isset($activitySetXML->ActivityTypes)) {
-          $activitySet['activityTypes'] = array();
+          $activitySet['activityTypes'] = [];
           foreach ($activitySetXML->ActivityTypes->ActivityType as $activityTypeXML) {
             $activityType = json_decode(json_encode($activityTypeXML), TRUE);
             $activitySet['activityTypes'][] = $activityType;
@@ -272,7 +293,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
     // set case roles
     if (isset($xml->CaseRoles)) {
-      $definition['caseRoles'] = array();
+      $definition['caseRoles'] = [];
       foreach ($xml->CaseRoles->RelationshipType as $caseRoleXml) {
         $definition['caseRoles'][] = json_decode(json_encode($caseRoleXml), TRUE);
       }
@@ -372,7 +393,7 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
     $refCounts = $caseType->getReferenceCounts();
     $total = array_sum(CRM_Utils_Array::collect('count', $refCounts));
     if ($total) {
-      throw new CRM_Core_Exception(ts("You can not delete this case type -- it is assigned to %1 existing case record(s). If you do not want this case type to be used going forward, consider disabling it instead.", array(1 => $total)));
+      throw new CRM_Core_Exception(ts("You can not delete this case type -- it is assigned to %1 existing case record(s). If you do not want this case type to be used going forward, consider disabling it instead.", [1 => $total]));
     }
     $result = $caseType->delete();
     CRM_Case_XMLRepository::singleton(TRUE);

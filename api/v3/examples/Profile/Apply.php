@@ -6,7 +6,7 @@
  *   API result array
  */
 function profile_apply_example() {
-  $params = array(
+  $params = [
     'profile_id' => 31,
     'contact_id' => 3,
     'first_name' => 'abc2',
@@ -15,7 +15,7 @@ function profile_apply_example() {
     'phone-1-1' => '022 321 826',
     'country-1' => '1013',
     'state_province-1' => '1000',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Profile', 'apply', $params);
@@ -25,12 +25,12 @@ function profile_apply_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -44,11 +44,11 @@ function profile_apply_example() {
  */
 function profile_apply_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 11,
-    'values' => array(
+    'values' => [
       'contact_type' => 'Individual',
       'contact_sub_type' => '',
       'contact_id' => 3,
@@ -57,31 +57,31 @@ function profile_apply_expectedresult() {
       'profile_id' => 31,
       'first_name' => 'abc2',
       'last_name' => 'xyz2',
-      'email' => array(
-        '1' => array(
+      'email' => [
+        '1' => [
           'location_type_id' => '1',
           'is_primary' => 1,
           'email' => 'abc2.xyz2@gmail.com',
-        ),
-      ),
-      'phone' => array(
-        '2' => array(
+        ],
+      ],
+      'phone' => [
+        '2' => [
           'location_type_id' => '1',
           'is_primary' => 1,
           'phone_type_id' => '1',
           'phone' => '022 321 826',
-        ),
-      ),
-      'address' => array(
-        '1' => array(
+        ],
+      ],
+      'address' => [
+        '1' => [
           'location_type_id' => '1',
           'is_primary' => 1,
           'country_id' => '1013',
           'state_province_id' => '1000',
-        ),
-      ),
-    ),
-  );
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

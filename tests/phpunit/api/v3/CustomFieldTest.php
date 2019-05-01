@@ -144,9 +144,11 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       $n++;
     }
   }
+
   /*
    * Can't figure out the point of this?
    */
+
   /**
    * @param array $params
    */
@@ -466,16 +468,16 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     // Add some fields
     $contactGroup = $this->customGroupCreate(array('extends' => 'Contact', 'title' => 'test_group_c'));
     $contactField = $this->customFieldCreate(array(
-        'custom_group_id' => $contactGroup['id'],
-        'label' => 'For Contacts',
-      ));
+      'custom_group_id' => $contactGroup['id'],
+      'label' => 'For Contacts',
+    ));
     $indivGroup = $this->customGroupCreate(array('extends' => 'Individual', 'title' => 'test_group_i'));
     $indivField = $this->customFieldCreate(array('custom_group_id' => $indivGroup['id'], 'label' => 'For Individuals'));
     $activityGroup = $this->customGroupCreate(array('extends' => 'Activity', 'title' => 'test_group_a'));
     $activityField = $this->customFieldCreate(array(
-        'custom_group_id' => $activityGroup['id'],
-        'label' => 'For Activities',
-      ));
+      'custom_group_id' => $activityGroup['id'],
+      'label' => 'For Activities',
+    ));
 
     // Check getfields
     $this->assertEquals(
@@ -567,7 +569,6 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     );
     $result = $this->callAPISuccess('CustomField', 'create', $params);
   }
-
 
   /**
    * @param $getFieldsResult

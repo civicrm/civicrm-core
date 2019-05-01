@@ -128,7 +128,7 @@ SELECT module,is_reserved
   WHERE civicrm_uf_group.id = %1
 ";
 
-    $params = array(1 => array($this->_gid, 'Integer'));
+    $params = [1 => [$this->_gid, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
     $isProfile = FALSE;
@@ -142,7 +142,7 @@ SELECT module,is_reserved
     //Remove need for Profile module type when using reserved profiles [CRM-14488]
     if (!$dao->N || (!$isProfile && !($dao->is_reserved && $canAdd))) {
       CRM_Core_Error::fatal(ts('The requested Profile (gid=%1) is not configured to be used for \'Profile\' edit and view forms in its Settings. Contact the site administrator if you need assistance.',
-        array(1 => $this->_gid)
+        [1 => $this->_gid]
       ));
     }
   }
@@ -242,15 +242,15 @@ SELECT module,is_reserved
       $buttonName = 'next';
     }
 
-    $buttons[] = array(
+    $buttons[] = [
       'type' => $buttonName,
       'name' => !empty($this->_ufGroup['submit_button_text']) ? $this->_ufGroup['submit_button_text'] : ts('Save'),
       'isDefault' => TRUE,
-    );
+    ];
 
     $this->addButtons($buttons);
 
-    $this->addFormRule(array('CRM_Profile_Form', 'formRule'), $this);
+    $this->addFormRule(['CRM_Profile_Form', 'formRule'], $this);
   }
 
   /**
@@ -262,10 +262,10 @@ SELECT module,is_reserved
 
     // Send back data for the EntityRef widget
     if ($this->returnExtra) {
-      $contact = civicrm_api3('Contact', 'getsingle', array(
+      $contact = civicrm_api3('Contact', 'getsingle', [
         'id' => $this->_id,
         'return' => $this->returnExtra,
-      ));
+      ]);
       foreach (explode(',', $this->returnExtra) as $field) {
         $field = trim($field);
         $this->ajaxResponse['extra'][$field] = CRM_Utils_Array::value($field, $contact);
@@ -301,10 +301,10 @@ SELECT module,is_reserved
     }
     else {
       // Replace tokens from post URL
-      $contactParams = array(
+      $contactParams = [
         'contact_id' => $this->_id,
         'version' => 3,
-      );
+      ];
 
       $contact = civicrm_api('contact', 'get', $contactParams);
       $contact = reset($contact['values']);

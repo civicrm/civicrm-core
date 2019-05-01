@@ -29,6 +29,7 @@
  * Class CiviReportTestCase
  */
 class CiviReportTestCase extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
     $this->_sethtmlGlobals();

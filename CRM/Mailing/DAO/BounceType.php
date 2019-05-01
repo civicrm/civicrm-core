@@ -19,14 +19,14 @@ class CRM_Mailing_DAO_BounceType extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_mailing_bounce_type';
+  public static $_tableName = 'civicrm_mailing_bounce_type';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned
@@ -75,6 +75,7 @@ class CRM_Mailing_DAO_BounceType extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Bounce Type ID'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_bounce_type.id',
           'table_name' => 'civicrm_mailing_bounce_type',
           'entity' => 'BounceType',
           'bao' => 'CRM_Mailing_DAO_BounceType',
@@ -88,6 +89,7 @@ class CRM_Mailing_DAO_BounceType extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 24,
           'size' => CRM_Utils_Type::MEDIUM,
+          'where' => 'civicrm_mailing_bounce_type.name',
           'table_name' => 'civicrm_mailing_bounce_type',
           'entity' => 'BounceType',
           'bao' => 'CRM_Mailing_DAO_BounceType',
@@ -100,6 +102,7 @@ class CRM_Mailing_DAO_BounceType extends CRM_Core_DAO {
           'description' => ts('A description of this bounce type'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_mailing_bounce_type.description',
           'table_name' => 'civicrm_mailing_bounce_type',
           'entity' => 'BounceType',
           'bao' => 'CRM_Mailing_DAO_BounceType',
@@ -111,6 +114,7 @@ class CRM_Mailing_DAO_BounceType extends CRM_Core_DAO {
           'title' => ts('Hold Threshold'),
           'description' => ts('Number of bounces of this type required before the email address is put on bounce hold'),
           'required' => TRUE,
+          'where' => 'civicrm_mailing_bounce_type.hold_threshold',
           'table_name' => 'civicrm_mailing_bounce_type',
           'entity' => 'BounceType',
           'bao' => 'CRM_Mailing_DAO_BounceType',

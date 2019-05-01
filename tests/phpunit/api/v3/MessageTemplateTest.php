@@ -32,12 +32,9 @@
  * @group headless
  */
 class api_v3_MessageTemplateTest extends CiviUnitTestCase {
-  /**
-   * Assume empty database with just civicrm_data.
-   */
+
   protected $entity = 'MessageTemplate';
   protected $params;
-
 
   public function setUp() {
     $this->_apiversion = 3;

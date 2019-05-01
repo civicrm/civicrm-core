@@ -19,14 +19,14 @@ class CRM_Core_DAO_OptionGroup extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_option_group';
+  public static $_tableName = 'civicrm_option_group';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Option Group ID
@@ -106,6 +106,7 @@ class CRM_Core_DAO_OptionGroup extends CRM_Core_DAO {
           'title' => ts('Option Group ID'),
           'description' => ts('Option Group ID'),
           'required' => TRUE,
+          'where' => 'civicrm_option_group.id',
           'table_name' => 'civicrm_option_group',
           'entity' => 'OptionGroup',
           'bao' => 'CRM_Core_BAO_OptionGroup',
@@ -119,6 +120,7 @@ class CRM_Core_DAO_OptionGroup extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_option_group.name',
           'table_name' => 'civicrm_option_group',
           'entity' => 'OptionGroup',
           'bao' => 'CRM_Core_BAO_OptionGroup',
@@ -131,6 +133,7 @@ class CRM_Core_DAO_OptionGroup extends CRM_Core_DAO {
           'description' => ts('Option Group title.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_option_group.title',
           'table_name' => 'civicrm_option_group',
           'entity' => 'OptionGroup',
           'bao' => 'CRM_Core_BAO_OptionGroup',
@@ -143,6 +146,7 @@ class CRM_Core_DAO_OptionGroup extends CRM_Core_DAO {
           'description' => ts('Option group description.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_option_group.description',
           'table_name' => 'civicrm_option_group',
           'entity' => 'OptionGroup',
           'bao' => 'CRM_Core_BAO_OptionGroup',
@@ -155,6 +159,7 @@ class CRM_Core_DAO_OptionGroup extends CRM_Core_DAO {
           'description' => ts('Option group description.'),
           'maxlength' => 128,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_option_group.data_type',
           'table_name' => 'civicrm_option_group',
           'entity' => 'OptionGroup',
           'bao' => 'CRM_Core_BAO_OptionGroup',
@@ -169,6 +174,7 @@ class CRM_Core_DAO_OptionGroup extends CRM_Core_DAO {
           'title' => ts('Option Group Is Reserved?'),
           'description' => ts('Is this a predefined system option group (i.e. it can not be deleted)?'),
           'required' => TRUE,
+          'where' => 'civicrm_option_group.is_reserved',
           'default' => '1',
           'table_name' => 'civicrm_option_group',
           'entity' => 'OptionGroup',
@@ -181,6 +187,7 @@ class CRM_Core_DAO_OptionGroup extends CRM_Core_DAO {
           'title' => ts('Option Group Is Active?'),
           'description' => ts('Is this option group active?'),
           'required' => TRUE,
+          'where' => 'civicrm_option_group.is_active',
           'default' => '1',
           'table_name' => 'civicrm_option_group',
           'entity' => 'OptionGroup',
@@ -193,6 +200,7 @@ class CRM_Core_DAO_OptionGroup extends CRM_Core_DAO {
           'title' => ts('Option Group Is Locked'),
           'description' => ts('A lock to remove the ability to add new options via the UI.'),
           'required' => TRUE,
+          'where' => 'civicrm_option_group.is_locked',
           'default' => '0',
           'table_name' => 'civicrm_option_group',
           'entity' => 'OptionGroup',

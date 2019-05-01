@@ -19,14 +19,14 @@ class CRM_Core_DAO_County extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_county';
+  public static $_tableName = 'civicrm_county';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * County ID
@@ -72,7 +72,7 @@ class CRM_Core_DAO_County extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'state_province_id', 'civicrm_state_province', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -93,6 +93,7 @@ class CRM_Core_DAO_County extends CRM_Core_DAO {
           'title' => ts('County ID'),
           'description' => ts('County ID'),
           'required' => TRUE,
+          'where' => 'civicrm_county.id',
           'table_name' => 'civicrm_county',
           'entity' => 'County',
           'bao' => 'CRM_Core_DAO_County',
@@ -122,6 +123,7 @@ class CRM_Core_DAO_County extends CRM_Core_DAO {
           'description' => ts('2-4 Character Abbreviation of County'),
           'maxlength' => 4,
           'size' => CRM_Utils_Type::FOUR,
+          'where' => 'civicrm_county.abbreviation',
           'table_name' => 'civicrm_county',
           'entity' => 'County',
           'bao' => 'CRM_Core_DAO_County',
@@ -133,6 +135,7 @@ class CRM_Core_DAO_County extends CRM_Core_DAO {
           'title' => ts('State'),
           'description' => ts('ID of State/Province that County belongs'),
           'required' => TRUE,
+          'where' => 'civicrm_county.state_province_id',
           'table_name' => 'civicrm_county',
           'entity' => 'County',
           'bao' => 'CRM_Core_DAO_County',

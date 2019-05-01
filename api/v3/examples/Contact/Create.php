@@ -8,12 +8,12 @@
  *   API result array
  */
 function contact_create_example() {
-  $params = array(
+  $params = [
     'first_name' => 'abc1',
     'contact_type' => 'Individual',
     'last_name' => 'xyz1',
     'custom_1' => 'custom string',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Contact', 'create', $params);
@@ -23,12 +23,12 @@ function contact_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -42,13 +42,13 @@ function contact_create_example() {
  */
 function contact_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 3,
-    'values' => array(
-      '3' => array(
+    'values' => [
+      '3' => [
         'id' => '3',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
@@ -98,9 +98,9 @@ function contact_create_expectedresult() {
         'user_unique_id' => '',
         'created_date' => '2013-07-28 08:49:19',
         'modified_date' => '2012-11-14 16:02:35',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

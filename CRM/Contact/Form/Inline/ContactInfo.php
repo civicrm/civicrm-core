@@ -73,9 +73,9 @@ class CRM_Contact_Form_Inline_ContactInfo extends CRM_Contact_Form_Inline {
     CRM_Contact_BAO_Contact::create($params);
 
     // Saving current employer affects relationship tab, and possibly related memberships and contributions
-    $this->ajaxResponse['updateTabs'] = array(
+    $this->ajaxResponse['updateTabs'] = [
       '#tab_rel' => CRM_Contact_BAO_Contact::getCountComponent('rel', $this->_contactId),
-    );
+    ];
     if (CRM_Core_Permission::access('CiviContribute')) {
       $this->ajaxResponse['updateTabs']['#tab_contribute'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId);
     }

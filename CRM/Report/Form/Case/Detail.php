@@ -150,7 +150,8 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           'case_type_title' => [
             'title' => 'Case Type',
             'name' => 'title',
-        ]]
+          ],
+        ],
       ],
       'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',

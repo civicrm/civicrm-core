@@ -30,6 +30,7 @@
  * @group headless
  */
 class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
   }
@@ -120,7 +121,8 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
     $total = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
     $cmp = bccomp($total, $paid, 5);
-    if ($cmp == 0 || $cmp == -1) {// If paid amount is greater or equal to total amount
+    // If paid amount is greater or equal to total amount
+    if ($cmp == 0 || $cmp == -1) {
       civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
     }
 

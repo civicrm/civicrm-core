@@ -268,7 +268,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals('priority_id', $result['error_field']);
   }
 
-
   /**
    * Test create succeeds with valid string for priority.
    */
@@ -560,7 +559,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       "'Invalid' is not a valid option for field status_id");
   }
 
-
   /**
    * Test civicrm_activity_create() with using a text status_id.
    */
@@ -654,7 +652,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals('Make-it-Happen Meeting', $result['values'][$result['id']]['subject']);
     $this->callAPISuccess('Activity', 'Delete', array('id' => $result['id']));
   }
-
 
   /**
    * Test civicrm_activity_get() with filter target_contact_id
@@ -767,7 +764,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals($tagColor, $activityget['tag_id'][$tag['id']]['tag_id.color']);
     $this->assertEquals($tagDescription, $activityget['tag_id'][$tag['id']]['tag_id.description']);
   }
-
 
   /**
    * Test that activity.get api works to filter on and return files.
@@ -1391,15 +1387,13 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    */
   public function testGetOverdue() {
     $overdueAct = $this->callAPISuccess('Activity', 'create', array(
-        'activity_date_time' => 'now - 1 week',
-        'status_id' => 'Scheduled',
-      ) + $this->_params
-    );
+      'activity_date_time' => 'now - 1 week',
+      'status_id' => 'Scheduled',
+    ) + $this->_params);
     $completedAct = $this->callAPISuccess('Activity', 'create', array(
-        'activity_date_time' => 'now - 1 week',
-        'status_id' => 'Completed',
-      ) + $this->_params
-    );
+      'activity_date_time' => 'now - 1 week',
+      'status_id' => 'Completed',
+    ) + $this->_params);
     $ids = array($overdueAct['id'], $completedAct['id']);
 
     // Test sorting

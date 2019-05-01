@@ -76,12 +76,12 @@ class CRM_Activity_Form_Task_Delete extends CRM_Activity_Form_Task {
     }
 
     if ($deleted) {
-      $msg = ts('%count activity deleted.', array('plural' => '%count activities deleted.', 'count' => $deleted));
+      $msg = ts('%count activity deleted.', ['plural' => '%count activities deleted.', 'count' => $deleted]);
       CRM_Core_Session::setStatus($msg, ts('Removed'), 'success');
     }
 
     if ($failed) {
-      CRM_Core_Session::setStatus(ts('1 could not be deleted.', array('plural' => '%count could not be deleted.', 'count' => $failed)), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(ts('1 could not be deleted.', ['plural' => '%count could not be deleted.', 'count' => $failed]), ts('Error'), 'error');
     }
   }
 

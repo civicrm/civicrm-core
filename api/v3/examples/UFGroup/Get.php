@@ -6,9 +6,9 @@
  *   API result array
  */
 function uf_group_get_example() {
-  $params = array(
+  $params = [
     'id' => 2,
-  );
+  ];
 
   try{
     $result = civicrm_api3('UFGroup', 'get', $params);
@@ -18,12 +18,12 @@ function uf_group_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,13 +37,13 @@ function uf_group_get_example() {
  */
 function uf_group_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 2,
-    'values' => array(
-      '2' => array(
+    'values' => [
+      '2' => [
         'id' => '2',
         'is_active' => 0,
         'group_type' => 'Individual,Contact',
@@ -66,9 +66,9 @@ function uf_group_get_expectedresult() {
         'created_id' => '1',
         'created_date' => '2013-07-28 08:49:19',
         'is_proximity_search' => 0,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

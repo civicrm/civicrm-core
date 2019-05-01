@@ -19,14 +19,14 @@ class CRM_Core_DAO_EntityTag extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_entity_tag';
+  public static $_tableName = 'civicrm_entity_tag';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * primary key
@@ -72,7 +72,7 @@ class CRM_Core_DAO_EntityTag extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'tag_id', 'civicrm_tag', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Dynamic(self::getTableName(), 'entity_id', NULL, 'id', 'entity_table');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -94,6 +94,7 @@ class CRM_Core_DAO_EntityTag extends CRM_Core_DAO {
           'title' => ts('Entity Tag ID'),
           'description' => ts('primary key'),
           'required' => TRUE,
+          'where' => 'civicrm_entity_tag.id',
           'table_name' => 'civicrm_entity_tag',
           'entity' => 'EntityTag',
           'bao' => 'CRM_Core_BAO_EntityTag',
@@ -106,6 +107,7 @@ class CRM_Core_DAO_EntityTag extends CRM_Core_DAO {
           'description' => ts('physical tablename for entity being joined to file, e.g. civicrm_contact'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_entity_tag.entity_table',
           'table_name' => 'civicrm_entity_tag',
           'entity' => 'EntityTag',
           'bao' => 'CRM_Core_BAO_EntityTag',
@@ -121,6 +123,7 @@ class CRM_Core_DAO_EntityTag extends CRM_Core_DAO {
           'title' => ts('Entity ID'),
           'description' => ts('FK to entity table specified in entity_table column.'),
           'required' => TRUE,
+          'where' => 'civicrm_entity_tag.entity_id',
           'table_name' => 'civicrm_entity_tag',
           'entity' => 'EntityTag',
           'bao' => 'CRM_Core_BAO_EntityTag',
@@ -132,6 +135,7 @@ class CRM_Core_DAO_EntityTag extends CRM_Core_DAO {
           'title' => ts('Tag'),
           'description' => ts('FK to civicrm_tag'),
           'required' => TRUE,
+          'where' => 'civicrm_entity_tag.tag_id',
           'table_name' => 'civicrm_entity_tag',
           'entity' => 'EntityTag',
           'bao' => 'CRM_Core_BAO_EntityTag',

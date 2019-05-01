@@ -31,6 +31,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Mailing_Page_Optout extends CRM_Mailing_Page_Common {
+
   /**
    * Run page.
    *

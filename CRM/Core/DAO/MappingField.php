@@ -19,14 +19,14 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_mapping_field';
+  public static $_tableName = 'civicrm_mapping_field';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Mapping Field ID
@@ -141,7 +141,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'mapping_id', 'civicrm_mapping', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'location_type_id', 'civicrm_location_type', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'relationship_type_id', 'civicrm_relationship_type', 'id');
@@ -164,6 +164,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'title' => ts('Mapping Field ID'),
           'description' => ts('Mapping Field ID'),
           'required' => TRUE,
+          'where' => 'civicrm_mapping_field.id',
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
@@ -175,6 +176,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'title' => ts('Mapping ID'),
           'description' => ts('Mapping to which this field belongs'),
           'required' => TRUE,
+          'where' => 'civicrm_mapping_field.mapping_id',
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
@@ -188,6 +190,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'description' => ts('Mapping field key'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_mapping_field.name',
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
@@ -200,6 +203,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'description' => ts('Contact Type in mapping'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_mapping_field.contact_type',
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
@@ -214,6 +218,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'title' => ts('Column Number'),
           'description' => ts('Column number for mapping set'),
           'required' => TRUE,
+          'where' => 'civicrm_mapping_field.column_number',
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
@@ -224,6 +229,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Location type ID'),
           'description' => ts('Location type of this mapping, if required'),
+          'where' => 'civicrm_mapping_field.location_type_id',
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
@@ -235,6 +241,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Phone type ID'),
           'description' => ts('Which type of phone does this number belongs.'),
+          'where' => 'civicrm_mapping_field.phone_type_id',
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
@@ -245,6 +252,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('IM provider ID'),
           'description' => ts('Which type of IM Provider does this name belong.'),
+          'where' => 'civicrm_mapping_field.im_provider_id',
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
@@ -262,6 +270,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Website type ID'),
           'description' => ts('Which type of website does this site belong'),
+          'where' => 'civicrm_mapping_field.website_type_id',
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
@@ -279,6 +288,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Relationship type ID'),
           'description' => ts('Relationship type, if required'),
+          'where' => 'civicrm_mapping_field.relationship_type_id',
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
@@ -291,6 +301,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'title' => ts('Relationship Direction'),
           'maxlength' => 6,
           'size' => CRM_Utils_Type::SIX,
+          'where' => 'civicrm_mapping_field.relationship_direction',
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
@@ -303,6 +314,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'description' => ts('Used to group mapping_field records into related sets (e.g. for criteria sets in search builder
       mappings).
     '),
+          'where' => 'civicrm_mapping_field.grouping',
           'default' => '1',
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
@@ -316,6 +328,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'description' => ts('SQL WHERE operator for search-builder mapping fields (search criteria).'),
           'maxlength' => 16,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_mapping_field.operator',
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',
@@ -334,6 +347,7 @@ class CRM_Core_DAO_MappingField extends CRM_Core_DAO {
           'description' => ts('SQL WHERE value for search-builder mapping fields.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_mapping_field.value',
           'table_name' => 'civicrm_mapping_field',
           'entity' => 'MappingField',
           'bao' => 'CRM_Core_DAO_MappingField',

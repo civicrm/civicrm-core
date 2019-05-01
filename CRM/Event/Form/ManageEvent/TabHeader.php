@@ -55,11 +55,11 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $form->assign_by_ref('tabHeader', $tabs);
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
-      ->addSetting(array(
-        'tabSettings' => array(
+      ->addSetting([
+        'tabSettings' => [
           'active' => self::getCurrentTab($tabs),
-        ),
-      ));
+        ],
+      ]);
     CRM_Event_Form_ManageEvent::addProfileEditScripts();
     return $tabs;
   }
@@ -75,26 +75,26 @@ class CRM_Event_Form_ManageEvent_TabHeader {
       return NULL;
     }
 
-    $default = array(
+    $default = [
       'link' => NULL,
       'valid' => TRUE,
       'active' => TRUE,
       'current' => FALSE,
       'class' => 'ajaxForm',
-    );
+    ];
 
-    $tabs = array();
-    $tabs['settings'] = array('title' => ts('Info and Settings'), 'class' => 'ajaxForm livePage') + $default;
-    $tabs['location'] = array('title' => ts('Event Location')) + $default;
-    $tabs['fee'] = array('title' => ts('Fees')) + $default;
-    $tabs['registration'] = array('title' => ts('Online Registration')) + $default;
+    $tabs = [];
+    $tabs['settings'] = ['title' => ts('Info and Settings'), 'class' => 'ajaxForm livePage'] + $default;
+    $tabs['location'] = ['title' => ts('Event Location')] + $default;
+    $tabs['fee'] = ['title' => ts('Fees')] + $default;
+    $tabs['registration'] = ['title' => ts('Online Registration')] + $default;
     if (CRM_Core_Permission::check('administer CiviCRM') || CRM_Event_BAO_Event::checkPermission(NULL, CRM_Core_Permission::EDIT)) {
-      $tabs['reminder'] = array('title' => ts('Schedule Reminders'), 'class' => 'livePage') + $default;
+      $tabs['reminder'] = ['title' => ts('Schedule Reminders'), 'class' => 'livePage'] + $default;
     }
-    $tabs['conference'] = array('title' => ts('Conference Slots')) + $default;
-    $tabs['friend'] = array('title' => ts('Tell a Friend')) + $default;
-    $tabs['pcp'] = array('title' => ts('Personal Campaigns')) + $default;
-    $tabs['repeat'] = array('title' => ts('Repeat')) + $default;
+    $tabs['conference'] = ['title' => ts('Conference Slots')] + $default;
+    $tabs['friend'] = ['title' => ts('Tell a Friend')] + $default;
+    $tabs['pcp'] = ['title' => ts('Personal Campaigns')] + $default;
+    $tabs['repeat'] = ['title' => ts('Repeat')] + $default;
 
     // Repeat tab must refresh page when switching repeat mode so js & vars will get set-up
     if (!$form->_isRepeatingEvent) {
@@ -110,9 +110,9 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $eventID = $form->getVar('_id');
     if ($eventID) {
       // disable tabs based on their configuration status
-      $eventNameMapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings(array(
+      $eventNameMapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings([
         'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
-      )));
+      ]));
       $sql = "
 SELECT     e.loc_block_id as is_location, e.is_online_registration, e.is_monetary, taf.is_active, pcp.is_active as is_pcp, sch.id as is_reminder, re.id as is_repeating_event
 FROM       civicrm_event e
@@ -124,10 +124,10 @@ WHERE      e.id = %1
 ";
       //Check if repeat is configured
       $eventHasParent = CRM_Core_BAO_RecurringEntity::getParentFor($eventID, 'civicrm_event');
-      $params = array(
-        1 => array($eventID, 'Integer'),
-        2 => array($eventNameMapping->getId(), 'Integer'),
-      );
+      $params = [
+        1 => [$eventID, 'Integer'],
+        2 => [$eventNameMapping->getId(), 'Integer'],
+      ];
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
       if (!$dao->fetch()) {
         CRM_Core_Error::fatal();
@@ -158,7 +158,7 @@ WHERE      e.id = %1
     // see if any other modules want to add any tabs
     // note: status of 'valid' flag of any injected tab, needs to be taken care in the hook implementation.
     CRM_Utils_Hook::tabset('civicrm/event/manage', $tabs,
-      array('event_id' => $eventID));
+      ['event_id' => $eventID]);
 
     $fullName = $form->getVar('_name');
     $className = CRM_Utils_String::getClassName($fullName);

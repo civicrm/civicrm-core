@@ -300,7 +300,6 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   }
 
-
   /**
    * Check relationship creation.
    */
@@ -1123,9 +1122,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->_ids['relationship'] = $this->callAPISuccess($this->_entity, 'create', array('format.only_id' => TRUE) +
       $this->_params);
     $this->callAPISuccess($this->_entity, 'getcount', array(
-        'contact_id_a' => $this->_cId_a,
-      ),
-      1);
+      'contact_id_a' => $this->_cId_a,
+    ), 1);
     $result = $this->callAPISuccess($this->_entity, 'get', array(
       'contact_id_a' => $this->_cId_a,
       'relationship_type_id' => $this->_relTypeID,
@@ -1148,8 +1146,10 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   public function testGetRelationshipByTypeArrayDAO() {
     $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $org3 = $this->organizationCreate();
-    $relType2 = 5; // lets just assume built in ones aren't being messed with!
-    $relType3 = 6; // lets just assume built in ones aren't being messed with!
+    // lets just assume built in ones aren't being messed with!
+    $relType2 = 5;
+    // lets just assume built in ones aren't being messed with!
+    $relType3 = 6;
 
     // Relationship 2.
     $this->callAPISuccess($this->_entity, 'create',
@@ -1232,8 +1232,10 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $org3 = $this->organizationCreate();
 
-    $relType2 = 5; // lets just assume built in ones aren't being messed with!
-    $relType3 = 6; // lets just assume built in ones aren't being messed with!
+    // lets just assume built in ones aren't being messed with!
+    $relType2 = 5;
+    // lets just assume built in ones aren't being messed with!
+    $relType3 = 6;
     $relType1 = 1;
     $memberType = $this->membershipTypeCreate(array(
       'relationship_type_id' => CRM_Core_DAO::VALUE_SEPARATOR . $relType1 . CRM_Core_DAO::VALUE_SEPARATOR . $relType3 . CRM_Core_DAO::VALUE_SEPARATOR,

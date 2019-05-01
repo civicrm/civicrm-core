@@ -19,14 +19,14 @@ class CRM_Member_DAO_MembershipPayment extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_membership_payment';
+  public static $_tableName = 'civicrm_membership_payment';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * @var int unsigned
@@ -63,7 +63,7 @@ class CRM_Member_DAO_MembershipPayment extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'membership_id', 'civicrm_membership', 'id');
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'contribution_id', 'civicrm_contribution', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
@@ -84,6 +84,7 @@ class CRM_Member_DAO_MembershipPayment extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Membership Payment ID'),
           'required' => TRUE,
+          'where' => 'civicrm_membership_payment.id',
           'table_name' => 'civicrm_membership_payment',
           'entity' => 'MembershipPayment',
           'bao' => 'CRM_Member_BAO_MembershipPayment',
@@ -95,6 +96,7 @@ class CRM_Member_DAO_MembershipPayment extends CRM_Core_DAO {
           'title' => ts('Membership'),
           'description' => ts('FK to Membership table'),
           'required' => TRUE,
+          'where' => 'civicrm_membership_payment.membership_id',
           'table_name' => 'civicrm_membership_payment',
           'entity' => 'MembershipPayment',
           'bao' => 'CRM_Member_BAO_MembershipPayment',
@@ -106,6 +108,7 @@ class CRM_Member_DAO_MembershipPayment extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Contribution'),
           'description' => ts('FK to contribution table.'),
+          'where' => 'civicrm_membership_payment.contribution_id',
           'table_name' => 'civicrm_membership_payment',
           'entity' => 'MembershipPayment',
           'bao' => 'CRM_Member_BAO_MembershipPayment',

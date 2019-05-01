@@ -39,6 +39,7 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
 
   /**
    * PDF Page Format ID.
+   * @var int
    */
   protected $_id = NULL;
 
@@ -56,33 +57,33 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Core_BAO_PdfFormat');
     $this->add('text', 'name', ts('Name'), $attributes['name'], TRUE);
-    $this->add('text', 'description', ts('Description'), array('size' => CRM_Utils_Type::HUGE));
+    $this->add('text', 'description', ts('Description'), ['size' => CRM_Utils_Type::HUGE]);
     $this->add('checkbox', 'is_default', ts('Is this PDF Page Format the default?'));
 
     $this->add('select', 'paper_size', ts('Paper Size'),
-      array(
+      [
         0 => ts('- default -'),
-      ) + CRM_Core_BAO_PaperSize::getList(TRUE), FALSE,
-      array('onChange' => "selectPaper( this.value );")
+      ] + CRM_Core_BAO_PaperSize::getList(TRUE), FALSE,
+      ['onChange' => "selectPaper( this.value );"]
     );
 
     $this->add('static', 'paper_dimensions', NULL, ts('Width x Height'));
     $this->add('select', 'orientation', ts('Orientation'), CRM_Core_BAO_PdfFormat::getPageOrientations(), FALSE,
-      array('onChange' => "updatePaperDimensions();")
+      ['onChange' => "updatePaperDimensions();"]
     );
     $this->add('select', 'metric', ts('Unit of Measure'), CRM_Core_BAO_PdfFormat::getUnits(), FALSE,
-      array('onChange' => "selectMetric( this.value );")
+      ['onChange' => "selectMetric( this.value );"]
     );
-    $this->add('text', 'margin_left', ts('Left Margin'), array('size' => 8, 'maxlength' => 8), TRUE);
-    $this->add('text', 'margin_right', ts('Right Margin'), array('size' => 8, 'maxlength' => 8), TRUE);
-    $this->add('text', 'margin_top', ts('Top Margin'), array('size' => 8, 'maxlength' => 8), TRUE);
-    $this->add('text', 'margin_bottom', ts('Bottom Margin'), array('size' => 8, 'maxlength' => 8), TRUE);
+    $this->add('text', 'margin_left', ts('Left Margin'), ['size' => 8, 'maxlength' => 8], TRUE);
+    $this->add('text', 'margin_right', ts('Right Margin'), ['size' => 8, 'maxlength' => 8], TRUE);
+    $this->add('text', 'margin_top', ts('Top Margin'), ['size' => 8, 'maxlength' => 8], TRUE);
+    $this->add('text', 'margin_bottom', ts('Bottom Margin'), ['size' => 8, 'maxlength' => 8], TRUE);
     $this->add('number', 'weight', ts('Order'), CRM_Core_DAO::getAttribute('CRM_Core_BAO_PdfFormat', 'weight'), TRUE);
 
-    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', array(
-        'CRM_Core_BAO_PdfFormat',
-        $this->_id,
-      ));
+    $this->addRule('name', ts('Name already exists in Database.'), 'objectExists', [
+      'CRM_Core_BAO_PdfFormat',
+      $this->_id,
+    ]);
     $this->addRule('margin_left', ts('Margin must be numeric'), 'numeric');
     $this->addRule('margin_right', ts('Margin must be numeric'), 'numeric');
     $this->addRule('margin_top', ts('Margin must be numeric'), 'numeric');
@@ -119,9 +120,9 @@ class CRM_Admin_Form_PdfFormats extends CRM_Admin_Form {
     $bao = new CRM_Core_BAO_PdfFormat();
     $bao->savePdfFormat($values, $this->_id);
 
-    $status = ts('Your new PDF Page Format titled <strong>%1</strong> has been saved.', array(1 => $values['name']), ts('Saved'), 'success');
+    $status = ts('Your new PDF Page Format titled <strong>%1</strong> has been saved.', [1 => $values['name']], ts('Saved'), 'success');
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $status = ts('Your PDF Page Format titled <strong>%1</strong> has been updated.', array(1 => $values['name']), ts('Saved'), 'success');
+      $status = ts('Your PDF Page Format titled <strong>%1</strong> has been updated.', [1 => $values['name']], ts('Saved'), 'success');
     }
     CRM_Core_Session::setStatus($status);
   }

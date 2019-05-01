@@ -19,14 +19,14 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_custom_group';
+  public static $_tableName = 'civicrm_custom_group';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Unique Custom Group ID
@@ -191,7 +191,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
    */
   public static function getReferenceColumns() {
     if (!isset(Civi::$statics[__CLASS__]['links'])) {
-      Civi::$statics[__CLASS__]['links'] = static ::createReferenceColumns(__CLASS__);
+      Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
       Civi::$statics[__CLASS__]['links'][] = new CRM_Core_Reference_Basic(self::getTableName(), 'created_id', 'civicrm_contact', 'id');
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'links_callback', Civi::$statics[__CLASS__]['links']);
     }
@@ -212,6 +212,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'title' => ts('Custom Group ID'),
           'description' => ts('Unique Custom Group ID'),
           'required' => TRUE,
+          'where' => 'civicrm_custom_group.id',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
           'bao' => 'CRM_Core_BAO_CustomGroup',
@@ -224,6 +225,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'description' => ts('Variable name/programmatic handle for this group.'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_custom_group.name',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
           'bao' => 'CRM_Core_BAO_CustomGroup',
@@ -237,6 +239,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_custom_group.title',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
           'bao' => 'CRM_Core_BAO_CustomGroup',
@@ -249,6 +252,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'description' => ts('Type of object this group extends (can add other options later e.g. contact_address, etc.).'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_custom_group.extends',
           'default' => 'Contact',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
@@ -260,6 +264,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Custom Group Subtype List'),
           'description' => ts('FK to civicrm_option_value.id (for option group custom_data_type.)'),
+          'where' => 'civicrm_custom_group.extends_entity_column_id',
           'default' => 'NULL',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
@@ -280,6 +285,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'description' => ts('linking custom group for dynamic object'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_custom_group.extends_entity_column_value',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
           'bao' => 'CRM_Core_BAO_CustomGroup',
@@ -293,6 +299,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'description' => ts('Visual relationship between this form and its parent.'),
           'maxlength' => 15,
           'size' => CRM_Utils_Type::TWELVE,
+          'where' => 'civicrm_custom_group.style',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
           'bao' => 'CRM_Core_BAO_CustomGroup',
@@ -309,6 +316,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Collapse Custom Group?'),
           'description' => ts('Will this group be in collapsed or expanded mode on initial display ?'),
+          'where' => 'civicrm_custom_group.collapse_display',
           'default' => '0',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
@@ -322,6 +330,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'description' => ts('Description and/or help text to display before fields in form.'),
           'rows' => 4,
           'cols' => 80,
+          'where' => 'civicrm_custom_group.help_pre',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
           'bao' => 'CRM_Core_BAO_CustomGroup',
@@ -337,6 +346,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'description' => ts('Description and/or help text to display after fields in form.'),
           'rows' => 4,
           'cols' => 80,
+          'where' => 'civicrm_custom_group.help_post',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
           'bao' => 'CRM_Core_BAO_CustomGroup',
@@ -351,6 +361,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'title' => ts('Order'),
           'description' => ts('Controls display order when multiple extended property groups are setup for the same class.'),
           'required' => TRUE,
+          'where' => 'civicrm_custom_group.weight',
           'default' => '1',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
@@ -362,6 +373,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Custom Group Is Active?'),
           'description' => ts('Is this property active?'),
+          'where' => 'civicrm_custom_group.is_active',
           'default' => '1',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
@@ -375,6 +387,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'description' => ts('Name of the table that holds the values for this group.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_custom_group.table_name',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
           'bao' => 'CRM_Core_BAO_CustomGroup',
@@ -385,6 +398,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Supports Multiple Records'),
           'description' => ts('Does this group hold multiple values?'),
+          'where' => 'civicrm_custom_group.is_multiple',
           'default' => '0',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
@@ -396,6 +410,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Minimum Multiple Records'),
           'description' => ts('minimum number of multiple records (typically 0?)'),
+          'where' => 'civicrm_custom_group.min_multiple',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
           'bao' => 'CRM_Core_BAO_CustomGroup',
@@ -406,6 +421,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Maximum Multiple Records'),
           'description' => ts('maximum number of multiple records, if 0 - no max'),
+          'where' => 'civicrm_custom_group.max_multiple',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
           'bao' => 'CRM_Core_BAO_CustomGroup',
@@ -416,6 +432,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Collapse Group Display'),
           'description' => ts('Will this group be in collapsed or expanded mode on advanced search display ?'),
+          'where' => 'civicrm_custom_group.collapse_adv_display',
           'default' => '0',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
@@ -427,6 +444,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Custom Group Created By'),
           'description' => ts('FK to civicrm_contact, who created this custom group'),
+          'where' => 'civicrm_custom_group.created_id',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
           'bao' => 'CRM_Core_BAO_CustomGroup',
@@ -438,6 +456,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
           'title' => ts('Custom Group Created Date'),
           'description' => ts('Date and time this custom group was created.'),
+          'where' => 'civicrm_custom_group.created_date',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
           'bao' => 'CRM_Core_BAO_CustomGroup',
@@ -448,6 +467,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Reserved Group?'),
           'description' => ts('Is this a reserved Custom Group?'),
+          'where' => 'civicrm_custom_group.is_reserved',
           'default' => '0',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',
@@ -459,6 +479,7 @@ class CRM_Core_DAO_CustomGroup extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'title' => ts('Custom Group Is Public?'),
           'description' => ts('Is this property public?'),
+          'where' => 'civicrm_custom_group.is_public',
           'default' => '1',
           'table_name' => 'civicrm_custom_group',
           'entity' => 'CustomGroup',

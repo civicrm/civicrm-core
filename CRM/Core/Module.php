@@ -68,7 +68,8 @@ class CRM_Core_Module {
     static $result;
     if ($fresh || !is_array($result)) {
       $result = CRM_Extension_System::singleton()->getMapper()->getModules();
-      $result[] = new CRM_Core_Module('civicrm', TRUE); // pseudo-module for core
+      // pseudo-module for core
+      $result[] = new CRM_Core_Module('civicrm', TRUE);
 
       $config = CRM_Core_Config::singleton();
       $result = array_merge($result, $config->userSystem->getModules());
@@ -87,7 +88,7 @@ class CRM_Core_Module {
    * @see CRM_Extension_Manager::STATUS_DISABLED
    */
   public static function collectStatuses($modules) {
-    $statuses = array();
+    $statuses = [];
     foreach ($modules as $module) {
       $statuses[$module->name] = $module->is_active ? CRM_Extension_Manager::STATUS_INSTALLED : CRM_Extension_Manager::STATUS_DISABLED;
 

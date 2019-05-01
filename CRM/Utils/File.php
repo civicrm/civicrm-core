@@ -139,7 +139,7 @@ class CRM_Utils_File {
    * @throws Exception
    */
   public static function cleanDir($target, $rmdir = TRUE, $verbose = TRUE) {
-    static $exceptions = array('.', '..');
+    static $exceptions = ['.', '..'];
     if ($target == '' || $target == '/' || !$target) {
       throw new Exception("Overly broad deletion");
     }
@@ -154,7 +154,7 @@ class CRM_Utils_File {
           }
           elseif (is_file($object)) {
             if (!unlink($object)) {
-              CRM_Core_Session::setStatus(ts('Unable to remove file %1', array(1 => $object)), ts('Warning'), 'error');
+              CRM_Core_Session::setStatus(ts('Unable to remove file %1', [1 => $object]), ts('Warning'), 'error');
             }
           }
         }
@@ -164,12 +164,12 @@ class CRM_Utils_File {
       if ($rmdir) {
         if (rmdir($target)) {
           if ($verbose) {
-            CRM_Core_Session::setStatus(ts('Removed directory %1', array(1 => $target)), '', 'success');
+            CRM_Core_Session::setStatus(ts('Removed directory %1', [1 => $target]), '', 'success');
           }
           return TRUE;
         }
         else {
-          CRM_Core_Session::setStatus(ts('Unable to remove directory %1', array(1 => $target)), ts('Warning'), 'error');
+          CRM_Core_Session::setStatus(ts('Unable to remove directory %1', [1 => $target]), ts('Warning'), 'error');
         }
       }
     }
@@ -280,7 +280,7 @@ class CRM_Utils_File {
       // I think this fn should default to forward-slash instead.
       $slash = DIRECTORY_SEPARATOR;
     }
-    if (!in_array(substr($path, -1, 1), array('/', '\\'))) {
+    if (!in_array(substr($path, -1, 1), ['/', '\\'])) {
       $path .= $slash;
     }
     return $path;
@@ -500,7 +500,7 @@ class CRM_Utils_File {
    */
   public static function getFilesByExtension($path, $ext) {
     $path = self::addTrailingSlash($path);
-    $files = array();
+    $files = [];
     if ($dh = opendir($path)) {
       while (FALSE !== ($elem = readdir($dh))) {
         if (substr($elem, -(strlen($ext) + 1)) == '.' . $ext) {
@@ -743,11 +743,11 @@ HTACCESS;
    */
   public static function findFiles($dir, $pattern, $relative = FALSE) {
     if (!is_dir($dir)) {
-      return array();
+      return [];
     }
     $dir = rtrim($dir, '/');
-    $todos = array($dir);
-    $result = array();
+    $todos = [$dir];
+    $result = [];
     while (!empty($todos)) {
       $subdir = array_shift($todos);
       $matches = glob("$subdir/$pattern");
@@ -797,7 +797,8 @@ HTACCESS;
       }
     }
     if (empty($childParts)) {
-      return FALSE; // same directory
+      // same directory
+      return FALSE;
     }
     else {
       return TRUE;
@@ -828,7 +829,7 @@ HTACCESS;
 
     CRM_Utils_File::copyDir($fromDir, $toDir);
     if (!CRM_Utils_File::cleanDir($fromDir, TRUE, FALSE)) {
-      CRM_Core_Session::setStatus(ts('Failed to clean temp dir: %1', array(1 => $fromDir)), '', 'alert');
+      CRM_Core_Session::setStatus(ts('Failed to clean temp dir: %1', [1 => $fromDir]), '', 'alert');
       return FALSE;
     }
     return TRUE;
@@ -841,17 +842,17 @@ HTACCESS;
    * @param string $fileName
    * @param array $extraParams
    */
-  public static function formatFile(&$param, $fileName, $extraParams = array()) {
+  public static function formatFile(&$param, $fileName, $extraParams = []) {
     if (empty($param[$fileName])) {
       return;
     }
 
-    $fileParams = array(
+    $fileParams = [
       'uri' => $param[$fileName]['name'],
       'type' => $param[$fileName]['type'],
       'location' => $param[$fileName]['name'],
       'upload_date' => date('YmdHis'),
-    ) + $extraParams;
+    ] + $extraParams;
 
     $param[$fileName] = $fileParams;
   }

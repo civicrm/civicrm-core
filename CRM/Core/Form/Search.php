@@ -77,7 +77,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    *
    * @var array
    */
-  protected $_taskList = array();
+  protected $_taskList = [];
 
   /**
    * Declare entity reference fields as they will need to be converted.
@@ -87,7 +87,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    *
    * @var array
    */
-  protected $entityReferenceFields = array();
+  protected $entityReferenceFields = [];
 
   /**
    * Builds the list of tasks or actions that a searcher can perform on a result set.
@@ -130,13 +130,13 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       ->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header')
       ->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'refresh',
         'name' => ts('Search'),
         'isDefault' => TRUE,
-      ),
-    ));
+      ],
+    ]);
 
     $this->addClass('crm-search-form');
 
@@ -170,12 +170,19 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    *
    * @param array $fields
    *   Posted values of the form.
+   * @param array $files
+   * @param object $form
    *
    * @return array
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $form) {
     $errors = [];
+    if (!is_a($form, 'CRM_Core_Form_Search')) {
+      // So this gets hit with a form object when doing an activity date search from
+      // advanced search, but a NULL object when doing a pledge search.
+      return $errors;
+    }
     foreach ($form->getSearchFieldMetadata() as $entity => $spec) {
       foreach ($spec as $fieldName => $fieldSpec) {
         if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || $fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
@@ -253,11 +260,11 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * @param array $rows
    */
   public function addRowSelectors($rows) {
-    $this->addElement('checkbox', 'toggleSelect', NULL, NULL, array('class' => 'select-rows'));
+    $this->addElement('checkbox', 'toggleSelect', NULL, NULL, ['class' => 'select-rows']);
     if (!empty($rows)) {
       foreach ($rows as $row) {
         if (CRM_Utils_Array::value('checkbox', $row)) {
-          $this->addElement('checkbox', $row['checkbox'], NULL, NULL, array('class' => 'select-row'));
+          $this->addElement('checkbox', $row['checkbox'], NULL, NULL, ['class' => 'select-row']);
         }
       }
     }
@@ -269,9 +276,9 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * @param array $tasks
    */
   public function addTaskMenu($tasks) {
-    $taskMetaData = array();
+    $taskMetaData = [];
     foreach ($tasks as $key => $task) {
-      $taskMetaData[$key] = array('title' => $task);
+      $taskMetaData[$key] = ['title' => $task];
     }
     parent::addTaskMenu($taskMetaData);
   }
@@ -289,7 +296,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     $this->addElement(
       'text',
       'sort_name',
-      civicrm_api3('setting', 'getvalue', array('name' => 'includeEmailInName', 'group' => 'Search Preferences')) ? $this->getSortNameLabelWithEmail() : $this->getSortNameLabelWithOutEmail(),
+      civicrm_api3('setting', 'getvalue', ['name' => 'includeEmailInName', 'group' => 'Search Preferences']) ? $this->getSortNameLabelWithEmail() : $this->getSortNameLabelWithOutEmail(),
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name')
     );
   }
@@ -335,25 +342,25 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     $this->_group = CRM_Core_PseudoConstant::nestedGroup();
     if ($this->_group) {
       $this->add('select', 'group', $this->getGroupLabel(), $this->_group, FALSE,
-        array(
+        [
           'id' => 'group',
           'multiple' => 'multiple',
           'class' => 'crm-select2',
-        )
+        ]
       );
     }
 
     $contactTags = CRM_Core_BAO_Tag::getTags();
     if ($contactTags) {
       $this->add('select', 'contact_tags', $this->getTagLabel(), $contactTags, FALSE,
-        array(
+        [
           'id' => 'contact_tags',
           'multiple' => 'multiple',
           'class' => 'crm-select2',
-        )
+        ]
       );
     }
-    $this->addField('contact_type', array('entity' => 'Contact'));
+    $this->addField('contact_type', ['entity' => 'Contact']);
 
     if (CRM_Core_Permission::check('access deleted contacts') && Civi::settings()->get('contact_undelete')) {
       $this->addElement('checkbox', 'deleted_contacts', ts('Search in Trash') . '<br />' . ts('(deleted contacts)'));

@@ -90,7 +90,7 @@ class CRM_Core_I18n_SchemaTest extends CiviUnitTestCase {
     // Test Currently skipped for civicrm_option_group and civicrm_event due to issues with the regex.
     // Agreed as not a blocker for CRM-20427 as an issue previously.
     if (!$skip_tests) {
-      $query6 = "SELECT " . '"'  . "Fixed the the {$table} ticket" . '"';
+      $query6 = "SELECT " . '"' . "Fixed the the {$table} ticket" . '"';
       $new_query6 = CRM_Core_I18n_Schema::rewriteQuery($query6);
       $this->assertEquals($query6, $new_query6);
     }

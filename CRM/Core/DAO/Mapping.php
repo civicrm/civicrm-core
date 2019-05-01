@@ -19,14 +19,14 @@ class CRM_Core_DAO_Mapping extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_mapping';
+  public static $_tableName = 'civicrm_mapping';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Mapping ID
@@ -78,6 +78,7 @@ class CRM_Core_DAO_Mapping extends CRM_Core_DAO {
           'title' => ts('Mapping ID'),
           'description' => ts('Mapping ID'),
           'required' => TRUE,
+          'where' => 'civicrm_mapping.id',
           'table_name' => 'civicrm_mapping',
           'entity' => 'Mapping',
           'bao' => 'CRM_Core_BAO_Mapping',
@@ -90,6 +91,7 @@ class CRM_Core_DAO_Mapping extends CRM_Core_DAO {
           'description' => ts('Name of Mapping'),
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_mapping.name',
           'table_name' => 'civicrm_mapping',
           'entity' => 'Mapping',
           'bao' => 'CRM_Core_BAO_Mapping',
@@ -102,6 +104,7 @@ class CRM_Core_DAO_Mapping extends CRM_Core_DAO {
           'description' => ts('Description of Mapping.'),
           'maxlength' => 255,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_mapping.description',
           'table_name' => 'civicrm_mapping',
           'entity' => 'Mapping',
           'bao' => 'CRM_Core_BAO_Mapping',
@@ -112,6 +115,7 @@ class CRM_Core_DAO_Mapping extends CRM_Core_DAO {
           'type' => CRM_Utils_Type::T_INT,
           'title' => ts('Mapping Type'),
           'description' => ts('Mapping Type'),
+          'where' => 'civicrm_mapping.mapping_type_id',
           'table_name' => 'civicrm_mapping',
           'entity' => 'Mapping',
           'bao' => 'CRM_Core_BAO_Mapping',

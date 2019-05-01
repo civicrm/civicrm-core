@@ -19,14 +19,14 @@ class CRM_Core_DAO_Component extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_component';
+  public static $_tableName = 'civicrm_component';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * Component ID
@@ -72,6 +72,7 @@ class CRM_Core_DAO_Component extends CRM_Core_DAO {
           'title' => ts('Component ID'),
           'description' => ts('Component ID'),
           'required' => TRUE,
+          'where' => 'civicrm_component.id',
           'table_name' => 'civicrm_component',
           'entity' => 'Component',
           'bao' => 'CRM_Core_DAO_Component',
@@ -85,6 +86,7 @@ class CRM_Core_DAO_Component extends CRM_Core_DAO {
           'required' => TRUE,
           'maxlength' => 64,
           'size' => CRM_Utils_Type::BIG,
+          'where' => 'civicrm_component.name',
           'table_name' => 'civicrm_component',
           'entity' => 'Component',
           'bao' => 'CRM_Core_DAO_Component',
@@ -99,6 +101,7 @@ class CRM_Core_DAO_Component extends CRM_Core_DAO {
     '),
           'maxlength' => 128,
           'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_component.namespace',
           'table_name' => 'civicrm_component',
           'entity' => 'Component',
           'bao' => 'CRM_Core_DAO_Component',

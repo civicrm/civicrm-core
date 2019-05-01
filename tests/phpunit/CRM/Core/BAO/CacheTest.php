@@ -84,14 +84,22 @@ class CRM_Core_BAO_CacheTest extends CiviUnitTestCase {
 
   public function getCleanKeyExamples() {
     $es = [];
-    $es[] = ['hello_world and/other.planets', 'hello_world-20and-2fother.planets']; // allowed chars
-    $es[] = ['hello/world+-#@{}', 'hello-2fworld-2b-2d-23-40-7b-7d']; // escaped chars
-    $es[] = ["LF-\nTAB-\tCR-\remojiskull💀", 'LF-2d-aTAB-2d-9CR-2d-demojiskull-f0-9f-92-80']; // short with emoji
-    $es[] = ["LF-\nTAB-\tCR-\remojibomb💣emojiskull💀", '-5d9324e052f6e10240dce5029c5e8525']; // long with emoji
-    $es[] = ['123456789 123456789 123456789 123456789 123456789 123', '123456789-20123456789-20123456789-20123456789-20123456789-20123']; // spaces are escaped
-    $es[] = ['123456789_123456789_123456789_123456789_123456789_123456789_123', '123456789_123456789_123456789_123456789_123456789_123456789_123']; // long but allowed
-    $es[] = ['123456789_123456789_123456789_123456789_123456789_123456789_1234', '-e02b981aff954fdcc9a81c25f5ec9681']; // too long, md5 fallback
-    $es[] = ['123456789-/23456789-+23456789--23456789_123456789_123456789', '-43b6dec1026187ae6f6a8fe4d56ab22e']; // too long, md5 fallback
+    // allowed chars
+    $es[] = ['hello_world and/other.planets', 'hello_world-20and-2fother.planets'];
+    // escaped chars
+    $es[] = ['hello/world+-#@{}', 'hello-2fworld-2b-2d-23-40-7b-7d'];
+    // short with emoji
+    $es[] = ["LF-\nTAB-\tCR-\remojiskull💀", 'LF-2d-aTAB-2d-9CR-2d-demojiskull-f0-9f-92-80'];
+    // long with emoji
+    $es[] = ["LF-\nTAB-\tCR-\remojibomb💣emojiskull💀", '-5d9324e052f6e10240dce5029c5e8525'];
+    // spaces are escaped
+    $es[] = ['123456789 123456789 123456789 123456789 123456789 123', '123456789-20123456789-20123456789-20123456789-20123456789-20123'];
+    // long but allowed
+    $es[] = ['123456789_123456789_123456789_123456789_123456789_123456789_123', '123456789_123456789_123456789_123456789_123456789_123456789_123'];
+    // too long, md5 fallback
+    $es[] = ['123456789_123456789_123456789_123456789_123456789_123456789_1234', '-e02b981aff954fdcc9a81c25f5ec9681'];
+    // too long, md5 fallback
+    $es[] = ['123456789-/23456789-+23456789--23456789_123456789_123456789', '-43b6dec1026187ae6f6a8fe4d56ab22e'];
     return $es;
   }
 
