@@ -151,6 +151,11 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
         }
       }
 
+      // Validate if participant is already registered
+      if ($event_in_cart->event->allow_same_participant_emails) {
+        continue;
+      }
+
       foreach ($event_in_cart->participants as $mer_participant) {
         $participant_fields = $fields['event'][$event_in_cart->event_id]['participant'][$mer_participant->id];
         //TODO what to do when profile responses differ for the same contact?
