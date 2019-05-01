@@ -175,6 +175,10 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       );
       $this->assign('pay_later_instructions', $this->pay_later_receipt);
     }
+
+    // Event Cart does not support multiple payment processors
+    // so we cannot call $this->preProcessPaymentOptions();
+    CRM_Financial_Form_Payment::addCreditCardJs($this->_paymentProcessor['id']);
   }
 
   /**
