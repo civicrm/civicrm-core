@@ -278,6 +278,23 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertNotContains("http://http://", $previewResult['values']['body_html']);
   }
 
+  public function testMailerPreviewUnknownContact() {
+    $params = $this->_params;
+    $params['api.Mailing.preview'] = array(
+      'id' => '$value.id',
+    );
+
+    $result = $this->callAPISuccess('mailing', 'create', $params);
+
+    // NOTE: It's highly debatable what's best to do with contact-tokens for an
+    // unknown-contact. However, changes should be purposeful, so we'll test
+    // for the current behavior (i.e. returning blanks).
+    $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
+    $this->assertEquals("Hello ", $previewResult['values']['subject']);
+    $this->assertContains("This is .", $previewResult['values']['body_text']);
+    $this->assertContains("<p>This is .</p>", $previewResult['values']['body_html']);
+  }
+
   public function testMailerPreviewRecipients() {
     // BEGIN SAMPLE DATA
     $groupIDs['inc'] = $this->groupCreate(array('name' => 'Example include group', 'title' => 'Example include group'));

@@ -573,18 +573,26 @@ function civicrm_api3_mailing_preview($params) {
   $returnProperties = $mailing->getReturnProperties();
   $contactID = CRM_Utils_Array::value('contact_id', $params);
   if (!$contactID) {
-    $contactID = $session->get('userID');
+    // If we still don't have a userID in a session because we are annon then set contactID to be 0
+    $contactID = empty($session->get('userID')) ? 0 : $session->get('userID');
   }
   $mailingParams = ['contact_id' => $contactID];
 
-  $details = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
+  if (!$contactID) {
+    $details = CRM_Utils_Token::getAnonymousTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
+    $details = CRM_Utils_Array::value(0, $details[0]);
+  }
+  else {
+    $details = CRM_Utils_Token::getTokenDetails($mailingParams, $returnProperties, TRUE, TRUE, NULL, $mailing->getFlattenedTokens());
+    $details = $details[0][$contactID];
+  }
 
-  $mime = $mailing->compose(NULL, NULL, NULL, $session->get('userID'), $fromEmail, $fromEmail,
-    TRUE, $details[0][$contactID], $attachments
+  $mime = $mailing->compose(NULL, NULL, NULL, $contactID, $fromEmail, $fromEmail,
+    TRUE, $details, $attachments
   );
 
   return civicrm_api3_create_success([
-    'id' => $params['id'],
+    'id' => $mailingID,
     'contact_id' => $contactID,
     'subject' => $mime->headers()['Subject'],
     'body_html' => $mime->getHTMLBody(),
