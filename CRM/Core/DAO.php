@@ -1680,21 +1680,24 @@ FROM   civicrm_domain
   }
 
   /**
-   * Method that copies custom fields values from an old event to a new one. Fixes bug CRM-19302,
+   * Method that copies custom fields values from an old entity to a new one.
+   *
+   * Fixes bug CRM-19302,
    * where if a custom field of File type was present, left both events using the same file,
    * breaking download URL's for the old event.
    *
    * @todo the goal here is to clean this up so that it works for any entity. Copy Generic already DOES some custom field stuff
-   * so it's not clear why this is needed - best guess is the custom fields are not handled - this is ALSO the
-   * situation with the dedupe.
+   * but it seems to be bypassed & perhaps less good than this (or this just duplicates it...)
    *
-   * @param int $oldEventID
-   * @param int $newCopyID
+   * @param int $entityID
+   * @param int $newEntityID
    */
-  public function copyCustomFields($oldEventID, $newCopyID) {
+  public function copyCustomFields($entityID, $newEntityID) {
+    $entity = CRM_Core_DAO_AllCoreTables::getBriefName(get_class($this));
+    $tableName = CRM_Core_DAO_AllCoreTables::getTableForClass(get_class($this));
     // Obtain custom values for old event
     $customParams = $htmlType = [];
-    $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($oldEventID, 'Event');
+    $customValues = CRM_Core_BAO_CustomValueTable::getEntityValues($entityID, $entity);
 
     // If custom values present, we copy them
     if (!empty($customValues)) {
@@ -1713,7 +1716,7 @@ FROM   civicrm_domain
         if ($value !== NULL) {
           // Handle File type attributes
           if (in_array($field, $htmlType)) {
-            $fileValues = CRM_Core_BAO_File::path($value, $oldEventID);
+            $fileValues = CRM_Core_BAO_File::path($value, $entityID);
             $customParams["custom_{$field}_-1"] = [
               'name' => CRM_Utils_File::duplicate($fileValues[0]),
               'type' => $fileValues[1],
@@ -1727,11 +1730,11 @@ FROM   civicrm_domain
       }
 
       // Save Custom Fields for new Event
-      CRM_Core_BAO_CustomValueTable::postProcess($customParams, 'civicrm_event', $newCopyID, 'Event');
+      CRM_Core_BAO_CustomValueTable::postProcess($customParams, $tableName, $newEntityID, $entity);
     }
 
     // copy activity attachments ( if any )
-    CRM_Core_BAO_File::copyEntityFile('civicrm_event', $oldEventID, 'civicrm_event', $newCopyID);
+    CRM_Core_BAO_File::copyEntityFile($tableName, $entityID, $tableName, $newEntityID);
   }
 
   /**
