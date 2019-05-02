@@ -472,9 +472,6 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     $name = CRM_Utils_Array::value('name', $params);
     $pass = CRM_Utils_Array::value('pass', $params);
-    if (isset($params['uid'])) {
-      throw new \RuntimeException("Not implemented WordPress::loadBootStrap([uid=>\$num]))");
-    }
 
     if (!defined('WP_USE_THEMES')) {
       define('WP_USE_THEMES', FALSE);
@@ -500,7 +497,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
     }
     require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-includes/pluggable.php';
-    $uid = CRM_Utils_Array::value('uid', $name);
+    $uid = CRM_Utils_Array::value('uid', $params);
     if (!$uid) {
       $name = $name ? $name : trim(CRM_Utils_Array::value('name', $_REQUEST));
       $pass = $pass ? $pass : trim(CRM_Utils_Array::value('pass', $_REQUEST));
