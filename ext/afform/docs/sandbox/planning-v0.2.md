@@ -18,14 +18,14 @@ The data is saved to 4 entities:
 ## General Metadata
 
 ```php
-// The "library" is a definition of available tags/directives. It can be
+// The tag library is a definition of available tags/directives. It can be
 // used to validate form definitions; to advise sysadmins; and (probably)
 // to generate the $palette.
 //
 // Must NOT be required at runtime. Only required for administration.
 //
 // CONSIDER: Specifying non-conventional names for design/props variants
-$afformLibrary = [
+$afformTags = [
   'afl-entity' =>[
     'attrs' => ['entity-name', 'matching-rule', 'assigned-values'],
   ],
