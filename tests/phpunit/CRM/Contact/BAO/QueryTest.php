@@ -625,6 +625,27 @@ civicrm_relationship.is_active = 1 AND
   }
 
   /**
+   * Test we can narrow a group get by status.
+   */
+  public function testGetByGroupWithStatus() {
+    $groupID = $this->groupCreate();
+    $this->groupContactCreate($groupID , 3);
+    $groupContactID = $this->callAPISuccessGetSingle('GroupContact', ['group_id' => $groupID, 'options' => ['limit' => 1]])['id'];
+    $this->callAPISuccess('GroupContact', 'create', ['id' => $groupContactID, 'status' => 'Removed']);
+    $queryObj = new CRM_Contact_BAO_Query([['group', '=', $groupID, 0, 0], ['group_contact_status', 'IN', ['Removed' => 1], 0, 0]]);
+    $resultDAO = $queryObj->searchQuery();
+    $this->assertEquals(1, $resultDAO->N);
+
+    $queryObj = new CRM_Contact_BAO_Query([['group', '=', $groupID, 0, 0], ['group_contact_status', 'IN', ['Added' => 1], 0, 0]]);
+    $resultDAO = $queryObj->searchQuery();
+    $this->assertEquals(2, $resultDAO->N);
+
+    $queryObj = new CRM_Contact_BAO_Query([['group', '=', $groupID, 0, 0]]);
+    $resultDAO = $queryObj->searchQuery();
+    $this->assertEquals(2, $resultDAO->N);
+  }
+
+  /**
    * Test the group contact clause does not contain an OR.
    *
    * The search should return 3 contacts - 2 households in the smart group of
