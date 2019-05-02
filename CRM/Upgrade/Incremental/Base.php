@@ -156,12 +156,12 @@ class CRM_Upgrade_Incremental_Base {
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
     $queries = [];
-    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column)) {
+    if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, $column, FALSE)) {
       if ($domain->locales) {
         if ($localizable) {
           $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
           foreach ($locales as $locale) {
-            if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, "{$column}_{$locale}")) {
+            if (!CRM_Core_BAO_SchemaHandler::checkIfFieldExists($table, "{$column}_{$locale}", FALSE)) {
               $queries[] = "ALTER TABLE `$table` ADD COLUMN `{$column}_{$locale}` $properties";
             }
           }
