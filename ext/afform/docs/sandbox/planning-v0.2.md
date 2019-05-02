@@ -44,20 +44,24 @@ $afformTags = [
 // format (e.g. `entity,id`).
 //
 // Must NOT be required at runtime. Only required for administration.
-$afformPalette = [
-  [
-    'id' => 'Parent:afl-name', /* string; should be stable but otherwise opaque to consumer */
-    'entity' => 'Parent',
-    'title' => 'Name',
-    'template' => '<afl-name contact-id="entities.parent.id" afl-label="Name"/>',
-  ],
-  [
-    'id' => 'Parent:afl-name',
-    'entity' => 'Parent',
-    'title' => 'Address',
-    'template' => '<afl-address contact-id="entities.parent.id" afl-label="Address"/>',
-  ],
-];
+function computePalette($entityType) {
+  return [
+    [
+      'group' => 'Blocks',
+      'title' => 'Name',
+      'template' => '<afl-name entity="%%ENTITY%%" afl-label="Name"/>',
+    ],
+    [
+      'title' => 'Address',
+      'template' => '<afl-address entity="%%ENTITY%%" afl-label="Address"/>',
+    ], 
+    [
+      'group' => 'Fields',
+      'title' => 'First Name',
+      'template' => '<afl-api-field entity="%%ENTITY%%" afl-field="first_name" afl-label="First Name"/>',
+    ],
+  ];
+}
 ```
 
 ## Form Metadata: *.aff.json
