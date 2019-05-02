@@ -807,6 +807,16 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
+  public function alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) {
+    // Set menubar breakpoint to match WP admin theme
+    if ($e->asset == 'crm-menubar.css') {
+      $e->params['breakpoint'] = 783;
+    }
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function synchronizeUsers() {
     $config = CRM_Core_Config::singleton();
     if (PHP_SAPI != 'cli') {
