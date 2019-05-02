@@ -936,7 +936,7 @@ class CRM_Core_DAO extends DB_DataObject {
 
     if (!array_key_exists($tableName, $show)) {
       $query = "SHOW CREATE TABLE $tableName";
-      $dao = CRM_Core_DAO::executeQuery($query);
+      $dao = CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
 
       if (!$dao->fetch()) {
         CRM_Core_Error::fatal();
@@ -963,7 +963,7 @@ class CRM_Core_DAO extends DB_DataObject {
     foreach ($tables as $tableName) {
       if (!array_key_exists($tableName, $show)) {
         $query = "SHOW CREATE TABLE $tableName";
-        $dao = CRM_Core_DAO::executeQuery($query);
+        $dao = CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
 
         if (!$dao->fetch()) {
           CRM_Core_Error::fatal();
