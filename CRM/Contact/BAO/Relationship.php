@@ -44,6 +44,12 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
   const NONE = 0, EDIT = 1, VIEW = 2;
 
   /**
+   * The list of column headers
+   * @var array
+   */
+  private static $columnHeaders;
+
+  /**
    * Create function - use the API instead.
    *
    * Note that the previous create function has been renamed 'legacyCreateMultiple'
@@ -2200,12 +2206,69 @@ AND cc.sort_name LIKE '%$name%'";
       }
     }
 
+    $columnHeaders = self::getColumnHeaders();
+    $selector = NULL;
+    CRM_Utils_Hook::searchColumns('relationship.rows', $columnHeaders, $contactRelationships, $selector);
+
     $relationshipsDT = [];
     $relationshipsDT['data'] = $contactRelationships;
     $relationshipsDT['recordsTotal'] = $params['total'];
     $relationshipsDT['recordsFiltered'] = $params['total'];
 
     return $relationshipsDT;
+  }
+
+  /**
+   * @return array
+   */
+  public static function getColumnHeaders() {
+    return [
+      'relation' => [
+        'name' => ts('Relationship'),
+        'sort' => 'relation',
+        'direction' => CRM_Utils_Sort::ASCENDING,
+      ],
+      'sort_name' => [
+        'name' => '',
+        'sort' => 'sort_name',
+        'direction' => CRM_Utils_Sort::ASCENDING,
+      ],
+      'start_date' => [
+        'name' => ts('Start'),
+        'sort' => 'start_date',
+        'direction' => CRM_Utils_Sort::DONTCARE,
+      ],
+      'end_date' => [
+        'name' => ts('End'),
+        'sort' => 'end_date',
+        'direction' => CRM_Utils_Sort::DONTCARE,
+      ],
+      'city' => [
+        'name' => ts('City'),
+        'sort' => 'city',
+        'direction' => CRM_Utils_Sort::DONTCARE,
+      ],
+      'state' => [
+        'name' => ts('State/Prov'),
+        'sort' => 'state',
+        'direction' => CRM_Utils_Sort::DONTCARE,
+      ],
+      'email' => [
+        'name' => ts('Email'),
+        'sort' => 'email',
+        'direction' => CRM_Utils_Sort::DONTCARE,
+      ],
+      'phone' => [
+        'name' => ts('Phone'),
+        'sort' => 'phone',
+        'direction' => CRM_Utils_Sort::DONTCARE,
+      ],
+      'links' => [
+        'name' => '',
+        'sort' => 'links',
+        'direction' => CRM_Utils_Sort::DONTCARE,
+      ],
+    ];
   }
 
   /**
