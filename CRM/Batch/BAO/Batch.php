@@ -560,7 +560,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       while ($dao->fetch()) {
         $totals[$dao->batch_id] = (array) $dao;
       }
-      $dao->free();
     }
     return $totals;
   }

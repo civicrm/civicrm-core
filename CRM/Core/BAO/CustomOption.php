@@ -348,10 +348,8 @@ SET    {$dao->columnName} = REPLACE( {$dao->columnName}, %1, %2 )";
         ];
       }
       $sql = "UPDATE `{$customGroup->table_name}` SET `{$customField->column_name}` = REPLACE(`{$customField->column_name}`, %1, %2) WHERE `{$customField->column_name}` LIKE %3";
-      $customGroup->free();
       CRM_Core_DAO::executeQuery($sql, $params);
     }
-    $customField->free();
   }
 
 }

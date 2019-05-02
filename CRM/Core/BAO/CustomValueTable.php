@@ -176,7 +176,6 @@ class CRM_Core_BAO_CustomValueTable {
               $entityFileDAO->entity_id = $field['entity_id'];
               $entityFileDAO->file_id = $field['file_id'];
               $entityFileDAO->save();
-              $entityFileDAO->free();
               $value = $field['file_id'];
               $type = 'String';
               break;

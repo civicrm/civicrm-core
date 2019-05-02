@@ -655,7 +655,6 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
         $fieldValueMap[$responseField->option_group_id][$responseField->value] = $value;
       }
     }
-    $responseField->free();
 
     //actual data formatting.
     $hasData = FALSE;

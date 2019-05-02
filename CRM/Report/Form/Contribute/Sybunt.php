@@ -446,7 +446,6 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
       while ($dao->fetch()) {
         $contactIds[] = $dao->cid;
       }
-      $dao->free();
       $this->setPager();
     }
 
@@ -497,7 +496,6 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           $contributionSum = 0;
         }
       }
-      $dao->free();
     }
     // format result set.
     $this->formatDisplay($rows, FALSE);

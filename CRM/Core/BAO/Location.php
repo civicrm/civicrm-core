@@ -211,7 +211,6 @@ WHERE e.id = %1";
         $dao->id = $id;
         $dao->find(TRUE);
         $dao->delete();
-        $dao->free();
       }
     }
   }

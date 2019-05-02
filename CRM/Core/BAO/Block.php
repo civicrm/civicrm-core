@@ -277,7 +277,6 @@ class CRM_Core_BAO_Block {
             $block->is_primary = FALSE;
             $block->save();
           }
-          $block->free();
         }
       }
     }
