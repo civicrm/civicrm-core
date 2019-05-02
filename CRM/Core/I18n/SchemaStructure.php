@@ -85,6 +85,7 @@ class CRM_Core_I18n_SchemaStructure {
         'civicrm_case_type' => [
           'title' => "varchar(64)",
           'description' => "varchar(255)",
+          'category' => "int unsigned",
         ],
         'civicrm_tell_friend' => [
           'title' => "varchar(255)",
@@ -366,6 +367,10 @@ class CRM_Core_I18n_SchemaStructure {
           ],
           'description' => [
             'type' => "Text",
+          ],
+          'category' => [
+            'type' => "Select",
+            'required' => "false",
           ],
         ],
         'civicrm_tell_friend' => [

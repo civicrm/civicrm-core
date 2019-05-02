@@ -82,7 +82,9 @@ class CRM_Upgrade_Incremental_php_FiveFourteen extends CRM_Upgrade_Incremental_B
       $this->addTask('Rebuild case activity views', 'rebuildCaseActivityView', $rev);
     }
 
-    $this->addTask('Create Case Type category field', 'createCaseTypeCategoryField', $rev);
+    $this->addTask('CORE-630 - Add category column to Case Types', 'addColumn',
+      'civicrm_case_type', 'category', "INT(10) DEFAULT NULL COMMENT 'Case Type category'");
+    $this->addTask('CORE-630 - Create Case Type category options', 'createCaseTypeCategoryOptions', $rev);
     // Additional tasks here...
     // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
     // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
@@ -106,32 +108,13 @@ class CRM_Upgrade_Incremental_php_FiveFourteen extends CRM_Upgrade_Incremental_B
   }
 
   /**
-   * This task adds the category column to case types. The category is an option
-   * value that can either be Workflow or Vacancy.
+   * Creates the option group and values for the Case Type categories. The
+   * values are be Vacancy and Workflow types.
    *
    * @param CRM_Queue_TaskContext $ctx
    * @return bool
    */
-  public static function createCaseTypeCategoryField($ctx) {
-    self::addCategoryColumnToCaseType();
-    self::createCaseTypeCategories();
-    self::setDefaultCategoriesForExistingCaseTypes();
-  }
-
-  /**
-   * Adds a new category column to the case type entity. This column references
-   * option values.
-   */
-  private static function addCategoryColumnToCaseType() {
-    CRM_Core_DAO::executeQuery('ALTER TABLE civicrm_case_type
-      ADD COLUMN category INT(10)');
-  }
-
-  /**
-   * Creates the option group and values for the case type categories. The
-   * values are be Vacancy and Workflow types.
-   */
-  private function createCaseTypeCategories() {
+  public static function createCaseTypeCategoryOptions($ctx) {
     CRM_Core_BAO_OptionGroup::ensureOptionGroupExists([
       'name' => 'case_type_category',
       'title' => ts('Case Type Category'),
@@ -140,8 +123,7 @@ class CRM_Upgrade_Incremental_php_FiveFourteen extends CRM_Upgrade_Incremental_B
     // flush the pseudo constant cache so it includes the newly created option group:
     CRM_Core_PseudoConstant::flush();
     $options = [
-      ['name' => 'WORKFLOW', 'label' => ts('Workflow'), 'is_default' => TRUE],
-      ['name' => 'VACANCY', 'label' => ts('Vacancy'), 'is_default' => FALSE]
+      ['name' => 'Workflow', 'label' => ts('Workflow'), 'is_default' => TRUE],
     ];
     foreach ($options as $option) {
       CRM_Core_BAO_OptionValue::ensureOptionValueExists([
@@ -150,26 +132,10 @@ class CRM_Upgrade_Incremental_php_FiveFourteen extends CRM_Upgrade_Incremental_B
         'label' => $option['label'],
         'is_default' => $option['is_default'],
         'is_active' => TRUE,
-        'is_reserved' => TRUE
+        'is_reserved' => TRUE,
       ]);
     }
-  }
-
-  /**
-   * Updates current case types so they have a category assigned. All case types
-   * are assigned the Workflow category by default.
-   */
-  private function setDefaultCategoriesForExistingCaseTypes() {
-    $caseTypes = civicrm_api3('CaseType', 'get', [
-      'options' => [ 'limit' => 0 ]
-    ]);
-
-    foreach ($caseTypes['values'] as $caseType) {
-      civicrm_api3('CaseType', 'create', [
-        'id' => $caseType['id'],
-        'category' => 'WORKFLOW'
-      ]);
-    }
+    return TRUE;
   }
 
 }
