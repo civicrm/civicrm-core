@@ -732,11 +732,30 @@ civicrm_relationship.is_active = 1 AND
   }
 
   /**
+   * Test we can narrow a group get by status.
+   *
+   * @throws \Exception
+   */
+  public function testGetByGroupWithStatusSmartGroup() {
+    $groupID = $this->smartGroupCreate();
+    // This means they are actually all hard-added, which is fine for this purpose.
+    $this->groupContactCreate($groupID, 3);
+    $groupContactID = $this->callAPISuccessGetSingle('GroupContact', ['group_id' => $groupID, 'options' => ['limit' => 1]])['id'];
+    $this->callAPISuccess('GroupContact', 'create', ['id' => $groupContactID, 'status' => 'Removed']);
+
+    $queryObj = new CRM_Contact_BAO_Query([['group', '=', $groupID, 0, 0], ['group_contact_status', 'IN', ['Removed' => 1], 0, 0]]);
+    $resultDAO = $queryObj->searchQuery();
+    $this->assertEquals(1, $resultDAO->N);
+  }
+
+  /**
    * Test the group contact clause does not contain an OR.
    *
    * The search should return 3 contacts - 2 households in the smart group of
    * Contact Type = Household and one Individual hard-added to it. The
    * Household that meets both criteria should be returned once.
+   *
+   * @throws \Exception
    */
   public function testGroupClause() {
     $this->householdCreate();
