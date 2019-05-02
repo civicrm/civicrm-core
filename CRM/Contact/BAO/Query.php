@@ -2961,6 +2961,8 @@ class CRM_Contact_BAO_Query {
    * Where / qill clause for groups.
    *
    * @param $values
+   *
+   * @throws \CRM_Core_Exception
    */
   public function group($values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -3007,8 +3009,10 @@ class CRM_Contact_BAO_Query {
     $isNotOp = ($op == 'NOT IN' || $op == '!=');
 
     $statusJoinClause = $this->getGroupStatusClause($grouping);
+    // If we are searching for 'Removed' contacts then despite it being a smart group we only care about the group_contact table.
+    $isGroupStatusSearch = (!empty($this->getSelectedGroupStatuses($grouping)) && $this->getSelectedGroupStatuses($grouping) !== ["'Added'"]);
     $groupClause = [];
-    if ($hasNonSmartGroups || empty($value)) {
+    if ($hasNonSmartGroups || empty($value) || $isGroupStatusSearch) {
       // include child groups IDs if any
       $childGroupIds = (array) CRM_Contact_BAO_Group::getChildGroupIds($regularGroupIDs);
       foreach ($childGroupIds as $key => $id) {
@@ -3022,7 +3026,13 @@ class CRM_Contact_BAO_Query {
       }
 
       if (empty($regularGroupIDs)) {
-        $regularGroupIDs = [0];
+        if ($isGroupStatusSearch) {
+          $regularGroupIDs = $smartGroupIDs;
+        }
+        // If it is still empty we want a filter that blocks all results.
+        if (empty($regularGroupIDs)) {
+          $regularGroupIDs = [0];
+        }
       }
 
       // if $regularGroupIDs is populated with regular child group IDs
@@ -3058,8 +3068,9 @@ class CRM_Contact_BAO_Query {
     }
 
     //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
-    $groupContactCacheClause = '';
-    if (count($smartGroupIDs) || empty($value)) {
+    // If we are only searching for Removed or Pending contacts we don't need to resolve the smart group
+    // as that info is in the group_contact table.
+    if ((count($smartGroupIDs) || empty($value)) && !$isGroupStatusSearch) {
       $this->_groupUniqueKey = uniqid();
       $this->_groupKeys[] = $this->_groupUniqueKey;
       $gccTableAlias = "civicrm_group_contact_cache_{$this->_groupUniqueKey}";

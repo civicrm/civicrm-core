@@ -1177,13 +1177,15 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    *
    * @param array $smartGroupParams
    * @param array $groupParams
+   * @param string $contactType
+   *
    * @return int
    */
-  public function smartGroupCreate($smartGroupParams = array(), $groupParams = array()) {
-    $smartGroupParams = array_merge(array(
-      'formValues' => array('contact_type' => array('IN' => array('Household'))),
-    ),
-    $smartGroupParams);
+  public function smartGroupCreate($smartGroupParams = [], $groupParams = [], $contactType = 'Household') {
+    $smartGroupParams = array_merge([
+      'formValues' => ['contact_type' => ['IN' => [$contactType]]],
+    ],
+      $smartGroupParams);
     $savedSearch = CRM_Contact_BAO_SavedSearch::create($smartGroupParams);
 
     $groupParams['saved_search_id'] = $savedSearch->id;
