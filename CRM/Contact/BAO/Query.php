@@ -3002,25 +3002,13 @@ class CRM_Contact_BAO_Query {
         $regularGroupIDs[] = trim($id);
       }
     }
+    $hasNonSmartGroups = count($regularGroupIDs);
 
     $isNotOp = ($op == 'NOT IN' || $op == '!=');
 
-    $statii = [];
-    $gcsValues = $this->getWhereValues('group_contact_status', $grouping);
-    if ($gcsValues &&
-      is_array($gcsValues[2])
-    ) {
-      foreach ($gcsValues[2] as $k => $v) {
-        if ($v) {
-          $statii[] = "'" . CRM_Utils_Type::escape($k, 'String') . "'";
-        }
-      }
-    }
-    else {
-      $statii[] = "'Added'";
-    }
+    $statusJoinClause = $this->getGroupStatusClause($grouping);
     $groupClause = [];
-    if (count($regularGroupIDs) || empty($value)) {
+    if ($hasNonSmartGroups || empty($value)) {
       // include child groups IDs if any
       $childGroupIds = (array) CRM_Contact_BAO_Group::getChildGroupIds($regularGroupIDs);
       foreach ($childGroupIds as $key => $id) {
@@ -3063,8 +3051,8 @@ class CRM_Contact_BAO_Query {
       }
       $groupClause[] = "( {$clause} )";
 
-      if ($statii) {
-        $joinClause[] = "{$gcTable}.status IN (" . implode(', ', $statii) . ")";
+      if ($statusJoinClause) {
+        $joinClause[] = "{$gcTable}.$statusJoinClause";
       }
       $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
     }
@@ -3101,7 +3089,7 @@ class CRM_Contact_BAO_Query {
     list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Group', 'id', $value, $op);
     $this->_qill[$grouping][] = ts("Group(s) %1 %2", [1 => $qillop, 2 => $qillVal]);
     if (strpos($op, 'NULL') === FALSE) {
-      $this->_qill[$grouping][] = ts("Group Status %1", [1 => implode(' ' . ts('or') . ' ', $statii)]);
+      $this->_qill[$grouping][] = ts("Group Status %1", [1 => implode(' ' . ts('or') . ' ', $this->getSelectedGroupStatuses($grouping))]);
     }
   }
 
@@ -6970,6 +6958,43 @@ AND   displayRelType.is_active = 1
       $aName,
       $addressJoin,
     ];
+  }
+
+  /**
+   * Get the clause for group status.
+   *
+   * @param int $grouping
+   *
+   * @return string
+   */
+  protected function getGroupStatusClause($grouping) {
+    $statuses = $this->getSelectedGroupStatuses($grouping);
+    return "status IN (" . implode(', ', $statuses) . ")";
+  }
+
+  /**
+   * Get an array of the statuses that have been selected.
+   *
+   * @param string $grouping
+   *
+   * @return array
+   */
+  protected function getSelectedGroupStatuses($grouping) {
+    $statuses = [];
+    $gcsValues = $this->getWhereValues('group_contact_status', $grouping);
+    if ($gcsValues &&
+      is_array($gcsValues[2])
+    ) {
+      foreach ($gcsValues[2] as $k => $v) {
+        if ($v) {
+          $statuses[] = "'" . CRM_Utils_Type::escape($k, 'String') . "'";
+        }
+      }
+    }
+    else {
+      $statuses[] = "'Added'";
+    }
+    return $statuses;
   }
 
 }
