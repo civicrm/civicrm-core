@@ -88,8 +88,8 @@ class civicrm_CLI {
   function authenticate($user, $pass) {
     session_start();
     require_once 'CRM/Core/Config.php';
-
-    $config = &CRM_Core_Config::singleton();
+    // Does calling this do anything here?
+    CRM_Core_Config::singleton();
 
     // this does not return on failure
     // require_once 'CRM/Utils/System.php';

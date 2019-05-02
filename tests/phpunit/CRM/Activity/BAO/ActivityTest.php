@@ -1163,8 +1163,7 @@ $text
   public function testSendSMSWithoutPermission() {
     $dummy = NULL;
     $session = CRM_Core_Session::singleton();
-    $config = &CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array('access CiviCRM');
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
 
     CRM_Activity_BAO_Activity::sendSMS(
       $dummy,

@@ -244,7 +244,7 @@ function run(&$contactIDs) {
   }
 }
 
-$config = &CRM_Core_Config::singleton();
+$config = CRM_Core_Config::singleton();
 $config->userFramework = 'Soap';
 $config->userFrameworkClass = 'CRM_Utils_System_Soap';
 $config->userHookClass = 'CRM_Utils_Hook_Soap';
