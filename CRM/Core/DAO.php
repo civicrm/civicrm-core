@@ -1600,11 +1600,12 @@ FROM   civicrm_domain
    *   Fields that you want to block from.
    *   getting copied
    *
-   * @return CRM_Core_DAO
-   *   the newly created copy of the object
+   * @return CRM_Core_DAO|bool
+   *   the newly created copy of the object. False if none created.
    */
-  public static function &copyGeneric($daoName, $criteria, $newData = NULL, $fieldsFix = NULL, $blockCopyOfDependencies = NULL) {
+  public static function copyGeneric($daoName, $criteria, $newData = NULL, $fieldsFix = NULL, $blockCopyOfDependencies = NULL) {
     $object = new $daoName();
+    $newObject = FALSE;
     if (!$newData) {
       $object->id = $criteria['id'];
     }
@@ -1670,9 +1671,7 @@ FROM   civicrm_domain
         }
       }
       $newObject->save();
-      if (!empty($newData['custom'])) {
-        CRM_Core_BAO_CustomValueTable::store($newData['custom'], $newObject::getTableName(), $newObject->id);
-      }
+      $newObject->copyCustomFields($object->id, $newObject->id);
       CRM_Utils_Hook::post('create', CRM_Core_DAO_AllCoreTables::getBriefName($daoName), $newObject->id, $newObject);
     }
 
