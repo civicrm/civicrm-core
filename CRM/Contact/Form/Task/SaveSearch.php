@@ -67,7 +67,7 @@ class CRM_Contact_Form_Task_SaveSearch extends CRM_Contact_Form_Task {
     }
 
     // Get Task name
-    $modeValue = CRM_Contact_Form_Search::getModeValue($values['component_mode']);
+    $modeValue = CRM_Contact_Form_Search::getModeValue(CRM_Utils_Array::value('component_mode', $values, CRM_Contact_BAO_Query::MODE_CONTACTS));
     $className = $modeValue['taskClassName'];
     $taskList = $className::taskTitles();
     $this->_task = CRM_Utils_Array::value('task', $values);
