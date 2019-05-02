@@ -629,7 +629,7 @@ civicrm_relationship.is_active = 1 AND
    */
   public function testGetByGroupWithStatus() {
     $groupID = $this->groupCreate();
-    $this->groupContactCreate($groupID , 3);
+    $this->groupContactCreate($groupID, 3);
     $groupContactID = $this->callAPISuccessGetSingle('GroupContact', ['group_id' => $groupID, 'options' => ['limit' => 1]])['id'];
     $this->callAPISuccess('GroupContact', 'create', ['id' => $groupContactID, 'status' => 'Removed']);
     $queryObj = new CRM_Contact_BAO_Query([['group', '=', $groupID, 0, 0], ['group_contact_status', 'IN', ['Removed' => 1], 0, 0]]);
