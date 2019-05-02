@@ -42,10 +42,10 @@ define('CHUNK_SIZE', 128);
 function &splitContactIDs(&$contactIDs) {
   // contactIDs could be a real large array, so we split it up into
   // smaller chunks and then general xml for each chunk
-  $chunks           = array();
-  $current          = 0;
-  $chunks[$current] = array();
-  $count            = 0;
+  $chunks = [];
+  $current = 0;
+  $chunks[$current] = [];
+  $count = 0;
 
   foreach ($contactIDs as $cid) {
     $chunks[$current][] = $cid;
@@ -53,7 +53,7 @@ function &splitContactIDs(&$contactIDs) {
 
     if ($count == CHUNK_SIZE) {
       $current++;
-      $chunks[$current] = array();
+      $chunks[$current] = [];
       $count = 0;
     }
   }
@@ -103,10 +103,10 @@ EOT;
  * @return array
  */
 function getValues(&$contactIDs, &$values) {
-  $values = array();
+  $values = [];
 
   foreach ($contactIDs as $cid) {
-    $values[$cid] = array();
+    $values[$cid] = [];
   }
 
   getContactInfo($contactIDs, $values);
@@ -146,7 +146,7 @@ SELECT $selectString, $whereField as contact_id
       if (!$name) {
         $name = $fld;
       }
-      $values[$dao->contact_id][] = array($name, $dao->$fld);
+      $values[$dao->contact_id][] = [$name, $dao->$fld];
     }
   }
 }
@@ -156,34 +156,38 @@ SELECT $selectString, $whereField as contact_id
  * @param $values
  */
 function getContactInfo(&$contactIDs, &$values) {
-  $fields = array('sort_name' => NULL,
+  $fields = [
+    'sort_name' => NULL,
     'display_name' => NULL,
     'contact_type' => NULL,
     'legal_identifier' => NULL,
     'external_identifier' => NULL,
     'source' => 'contact_source',
-  );
+  ];
   getTableInfo($contactIDs, $values, 'civicrm_contact', $fields, 'id');
 
-  $fields = array('first_name' => NULL,
+  $fields = [
+    'first_name' => NULL,
     'last_name' => NULL,
     'middle_name' => NULL,
     'job_title' => NULL,
-  );
+  ];
   getTableInfo($contactIDs, $values, 'civicrm_individual', $fields, 'contact_id');
 
-  $fields = array('household_name' => NULL);
+  $fields = ['household_name' => NULL];
   getTableInfo($contactIDs, $values, 'civicrm_household', $fields, 'contact_id');
 
-  $fields = array('organization_name' => NULL,
+  $fields = [
+    'organization_name' => NULL,
     'legal_name' => NULL,
     'sic_code' => NULL,
-  );
+  ];
   getTableInfo($contactIDs, $values, 'civicrm_organization', $fields, 'contact_id');
 
-  $fields = array('note' => 'note_body',
+  $fields = [
+    'note' => 'note_body',
     'subject' => 'note_subject',
-  );
+  ];
   getTableInfo($contactIDs, $values, 'civicrm_note', $fields, 'entity_id', "entity_table = 'civicrm_contact'");
 }
 
@@ -215,17 +219,28 @@ WHERE l.entity_table = 'civicrm_contact'
   AND l.entity_id IN ( $ids )
 ";
 
-  $fields = array('location_name', 'street_address', 'supplemental_address_1',
-    'supplemental_address_2', 'supplemental_address_3', 'city', 'postal_code', 'county', 'state',
-    'country', 'email', 'phone', 'im',
-  );
+  $fields = [
+    'location_name',
+    'street_address',
+    'supplemental_address_1',
+    'supplemental_address_2',
+    'supplemental_address_3',
+    'city',
+    'postal_code',
+    'county',
+    'state',
+    'country',
+    'email',
+    'phone',
+    'im',
+  ];
   $dao = CRM_Core_DAO::executeQuery($sql);
   while ($dao->fetch()) {
     foreach ($fields as $fld) {
       if (empty($dao->$fld)) {
         continue;
       }
-      $values[$dao->contact_id][] = array($fld, $dao->$fld);
+      $values[$dao->contact_id][] = [$fld, $dao->$fld];
     }
   }
 }
@@ -237,7 +252,7 @@ function run(&$contactIDs) {
   $chunks = &splitContactIDs($contactIDs);
 
   foreach ($chunks as $chunk) {
-    $values = array();
+    $values = [];
     getValues($chunk, $values);
     $xml = &generateSolrXML($values);
     echo $xml;
@@ -255,7 +270,7 @@ FROM civicrm_contact
 EOT;
 $dao = CRM_Core_DAO::executeQuery($sql);
 
-$contactIDs = array();
+$contactIDs = [];
 while ($dao->fetch()) {
   $contactIDs[] = $dao->id;
 }
