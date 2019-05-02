@@ -56,9 +56,10 @@
     <name>category</name>
     <title>Category</title>
     <type>int unsigned</type>
-    <required>true</required>
+    <required>false</required>
     <add>5.14</add>
     <comment>FK to a civicrm_option_value (case_type_category)</comment>
+    <localizable>true</localizable>
     <pseudoconstant>
       <optionGroupName>case_type_category</optionGroupName>
     </pseudoconstant>
