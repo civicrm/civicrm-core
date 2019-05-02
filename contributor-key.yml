@@ -526,6 +526,15 @@
   organization: Greenleaf Advancement
   jira        : guyiac
 
+- github      : GValFr35
+
+- github      : kewljuice
+  name        : Wouter Hechtermans
+  organization: Calibrate
+
+- github      : khorporative
+  name        : Aivars
+
 - github      : h-c-c
   name        : Peter Hartmann
   organization: Hartmann Computer Consulting
@@ -1063,6 +1072,9 @@
 - name        : Pratiksha Dubey
   organization: Web Access
   jira        : pratiksha
+
+- github      : prondubuisi
+  name        : Onyemenam Ndubuisi
 
 - name        : Richard Edgar
   jira        : redgar
