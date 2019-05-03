@@ -1,0 +1,4 @@
+{
+  "server_route": "civicrm/afex",
+  "requires":["fakelibFoo", "fakelibBareFile", "af", "afBlock", "afField"]
+}
