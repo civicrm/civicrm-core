@@ -15,7 +15,7 @@ use Civi\Api4\Generic\BasicUpdateAction;
 class Afform extends AbstractEntity {
 
   /**
-   * @return BasicGetAction
+   * @return \Civi\Api4\Generic\BasicGetAction
    */
   public static function get() {
     return new BasicGetAction('Afform', __FUNCTION__, function(BasicGetAction $action) {
@@ -47,14 +47,14 @@ class Afform extends AbstractEntity {
   }
 
   /**
-   * @return BasicBatchAction
+   * @return \Civi\Api4\Generic\BasicBatchAction
    */
   public static function revert() {
     return new BasicBatchAction('Afform', __FUNCTION__, ['name'], function($item, BasicBatchAction $action) {
       $scanner = \Civi::service('afform_scanner');
       $files = [
         \CRM_Afform_AfformScanner::METADATA_FILE,
-        \CRM_Afform_AfformScanner::LAYOUT_FILE
+        \CRM_Afform_AfformScanner::LAYOUT_FILE,
       ];
 
       foreach ($files as $file) {
@@ -77,10 +77,10 @@ class Afform extends AbstractEntity {
   }
 
   /**
-   * @return BasicUpdateAction
+   * @return \Civi\Api4\Generic\BasicUpdateAction
    */
   public static function update() {
-    $save = function ($item, BasicUpdateAction $action) {
+    return new BasicUpdateAction('Afform', __FUNCTION__, 'name', function ($item, BasicUpdateAction $action) {
       /** @var \CRM_Afform_AfformScanner $scanner */
       $scanner = \Civi::service('afform_scanner');
       $converter = new \CRM_Afform_ArrayHtml();
@@ -130,8 +130,7 @@ class Afform extends AbstractEntity {
       // FIXME if asset-caching is enabled, then flush the asset cache.
 
       return $updates;
-    };
-    return new BasicUpdateAction('Afform', __FUNCTION__, $save, 'name');
+    });
   }
 
   public static function getFields() {
