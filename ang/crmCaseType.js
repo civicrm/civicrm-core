@@ -74,22 +74,11 @@
                 limit: 0
               }
             }];
-            reqs.relTypes = ['Relationship', 'getoptions', {
+            reqs.relTypes = ['RelationshipType', 'get', {
               sequential: 1,
-              field: 'relationship_type_id',
-              context: 'create',
               is_active: 1,
               options: {
-                limit: 0
-              }
-            }];
-            reqs.relTypesForm = ['Relationship', 'getoptions', {
-              sequential: 1,
-              field: 'relationship_type_id',
-              context: 'create',
-              isForm: 1,
-              is_active: 1,
-              options: {
+                sort: 'label_a_b',
                 limit: 0
               }
             }];
@@ -272,15 +261,56 @@
       $scope.activityTypes = _.indexBy(apiCalls.actTypes.values, 'name');
       $scope.activityTypeOptions = _.map(apiCalls.actTypes.values, formatActivityTypeOption);
       $scope.defaultAssigneeTypes = apiCalls.defaultAssigneeTypes.values;
-      $scope.relationshipTypeOptions = _.map(apiCalls.relTypes.values, function(type) {
-         return {id: type.key, text: type.value};
-      });
-      $scope.defaultRelationshipTypeOptions = _.map(apiCalls.relTypesForm.values, function(type) {
-        return {value: type.key, label: type.value};
-      });
+      $scope.relationshipTypeOptions = getRelationshipTypeOptions(false);
+      $scope.defaultRelationshipTypeOptions = getRelationshipTypeOptions(true);
       // stores the default assignee values indexed by their option name:
       $scope.defaultAssigneeTypeValues = _.chain($scope.defaultAssigneeTypes)
         .indexBy('name').mapValues('value').value();
+    }
+
+    // Returns the relationship type options. If the relationship is
+    // bidirectional (Ex: Spouse of) it adds a single option otherwise it adds
+    // two options representing the relationship type directions (Ex: Employee
+    // of, Employer of).
+    //
+    // The default relationship field needs values that are IDs with direction,
+    // while the role field needs values that are names (with implicit
+    // direction).
+    //
+    // At any rate, the labels should follow the convention in the UI of
+    // describing case roles from the perspective of the client, while the
+    // values must follow the convention in the XML of describing case roles
+    // from the perspective of the non-client.
+    function getRelationshipTypeOptions($isDefault) {
+      return _.transform(apiCalls.relTypes.values, function(result, relType) {
+        var isBidirectionalRelationship = relType.label_a_b === relType.label_b_a;
+        if ($isDefault) {
+          result.push({
+            label: relType.label_b_a,
+            value: relType.id + '_a_b'
+          });
+
+          if (!isBidirectionalRelationship) {
+            result.push({
+              label: relType.label_a_b,
+              value: relType.id + '_b_a'
+            });
+          }
+        }
+        else {
+          result.push({
+            text: relType.label_b_a,
+            id: relType.name_a_b
+          });
+
+          if (!isBidirectionalRelationship) {
+            result.push({
+              text: relType.label_a_b,
+              id: relType.name_b_a
+            });
+          }
+        }
+      }, []);
     }
 
     /// initializes the case type object
@@ -313,6 +343,15 @@
 
           if (isDefaultAssigneeTypeUndefined) {
             type.default_assignee_type = defaultAssigneeDefaultValue.value;
+          }
+        });
+      });
+
+      // go lookup and add client-perspective labels for $scope.caseType.definition.caseRoles
+      _.each($scope.caseType.definition.caseRoles, function (set) {
+        _.each($scope.relationshipTypeOptions, function (relTypes) {
+          if (relTypes.text == set.name) {
+            set.displaylabel = relTypes.id;
           }
         });
       });
@@ -420,13 +459,15 @@
     $scope.addRole = function(roles, roleName) {
       var names = _.pluck($scope.caseType.definition.caseRoles, 'name');
       if (!_.contains(names, roleName)) {
-        if (_.where($scope.relationshipTypeOptions, {id: roleName}).length) {
-          roles.push({name: roleName});
+        var matchingRoles = _.filter($scope.relationshipTypeOptions, {id: roleName});
+        if (matchingRoles.length) {
+          var matchingRole = matchingRoles.shift();
+          roles.push({name: roleName, displaylabel: matchingRole.text});
         } else {
            CRM.loadForm(CRM.url('civicrm/admin/reltype', {action: 'add', reset: 1, label_a_b: roleName}))
             .on('crmFormSuccess', function(e, data) {
               var newType = _.values(data.relationshipType)[0];
-              roles.push({name: newType.label_a_b});
+              roles.push({name: newType.label_a_b, displaylabel: newType.label_b_a});
               // Assume that the case role should be A-B but add both directions as options.
               $scope.relationshipTypeOptions.push({id: newType.label_a_b, text: newType.label_a_b});
               if (newType.label_a_b != newType.label_b_a) {
@@ -526,6 +567,13 @@
       if ($scope.caseType.definition.activityAsgmtGrps) {
         $scope.caseType.definition.activityAsgmtGrps = $scope.caseType.definition.activityAsgmtGrps.toString().split(",");
       }
+
+      function dropDisplaylabel (v) {
+        delete v.displaylabel;
+      }
+
+      // strip out labels from $scope.caseType.definition.caseRoles
+      _.map($scope.caseType.definition.caseRoles, dropDisplaylabel);
 
       var result = crmApi('CaseType', 'create', $scope.caseType, true);
       result.then(function(data) {
