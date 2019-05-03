@@ -125,6 +125,8 @@ class AssetBuilder {
    *   Ex: 'http://example.org/files/civicrm/dyn/angular.abcd1234abcd1234.json'.
    */
   public function getUrl($name, $params = []) {
+    \CRM_Utils_Hook::getAssetUrl($name, $params);
+
     if (!$this->isValidName($name)) {
       throw new \RuntimeException("Invalid dynamic asset name");
     }

@@ -919,6 +919,14 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Modify dynamic assets.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   */
+  public function alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) {
+  }
+
+  /**
    * @param string $name
    * @param string $value
    */

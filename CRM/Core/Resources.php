@@ -767,6 +767,9 @@ class CRM_Core_Resources {
       $items[] = 'js/crm.menubar.js';
       $items[] = Civi::service('asset_builder')->getUrl('crm-menubar.css', [
         'color' => Civi::settings()->get('menubar_color'),
+        'height' => 40,
+        'breakpoint' => 768,
+        'opacity' => .88,
       ]);
       $items[] = [
         'menubar' => [
@@ -852,9 +855,11 @@ class CRM_Core_Resources {
     }
     $vars = [
       'resourceBase' => rtrim($config->resourceBase, '/'),
-      'menubarHeight' => '40px',
+      'menubarHeight' => $e->params['height'] . 'px',
+      'breakMin' => $e->params['breakpoint'] . 'px',
+      'breakMax' => ($e->params['breakpoint'] - 1) . 'px',
       'menubarColor' => $color,
-      'semiTransparentMenuColor' => 'rgba(' . implode(', ', CRM_Utils_Color::getRgb($color)) . ', .85)',
+      'menuItemColor' => 'rgba(' . implode(', ', CRM_Utils_Color::getRgb($color)) . ", {$e->params['opacity']})",
       'highlightColor' => CRM_Utils_Color::getHighlight($color),
       'textColor' => CRM_Utils_Color::getContrast($color, '#333', '#ddd'),
     ];

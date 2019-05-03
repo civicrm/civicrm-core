@@ -1,4 +1,4 @@
-@media (min-width: 768px) {
+@media (min-width: $breakMin) {
 
   body.crm-menubar-visible.crm-menubar-over-cms-menu #toolbar {
     display: none;
@@ -67,7 +67,7 @@
 }
 
 /* For adminimal_admin_menu */
-@media (min-width: 768px) and (max-width: 1024px) {
+@media (min-width: $breakMin) and (max-width: 1024px) {
 
   body.crm-menubar-visible.crm-menubar-over-cms-menu.admin-menu.adminimal-menu > .slicknav_menu {
     display: none;
@@ -80,7 +80,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: $breakMax) {
 
   body.toolbar.crm-menubar-visible #toolbar-home {
     visibility: hidden;
