@@ -14,7 +14,6 @@ return [
   'requires' => [
     'crmUi',
     'crmUtil',
-    'ngRoute',
   ],
   'settings' => [],
   'basePages' => [],

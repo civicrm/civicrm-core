@@ -9,9 +9,9 @@ return [
     'ang/af/*.js',
     'ang/af/*/*.js',
   ],
-  'css' => ['ang/af.css'],
-  'partials' => ['ang/af'],
-  'requires' => ['crmUi', 'crmUtil', 'ngRoute'],
+  // 'css' => ['ang/af.css'],
+  // 'partials' => ['ang/af'],
+  'requires' => ['crmUtil'],
   'settings' => [],
   'basePages' => [],
 ];
