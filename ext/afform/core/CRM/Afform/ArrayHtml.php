@@ -112,6 +112,9 @@ class CRM_Afform_ArrayHtml {
     elseif ($node instanceof DOMText) {
       return $node->textContent;
     }
+    elseif ($node instanceof DOMComment) {
+      // FIXME: How to preserve comments? For the moment, discarding them.
+    }
     else {
       throw new \RuntimeException("Unrecognized DOM node");
     }
