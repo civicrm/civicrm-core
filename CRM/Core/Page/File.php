@@ -68,22 +68,22 @@ class CRM_Core_Page_File extends CRM_Core_Page {
       $mimeType = '';
       $path = CRM_Core_Config::singleton()->customFileUploadDir . $fileName;
     }
-    $passedInMimeType = CRM_Utils_Request::retrieveValue('mime-type', 'String', $mimeType, FALSE);
 
     if (!$path) {
       CRM_Core_Error::statusBounce('Could not retrieve the file');
     }
-    if (!empty($mimeType) && !empty($passedInMimeType)) {
-      if ($passedInMimeType != $mimeType) {
-        throw new CRM_Core_Exception("Supplied Mime Type does not match file Mime Type");
+
+    if (empty($mimeType)) {
+      $passedInMimeType = CRM_Utils_Request::retrieveValue('mime-type', 'String', $mimeType, FALSE);
+      if (!in_array($passedInMimeType, explode(',', Civi::settings()->get('requestableMimeTypes')))) {
+        throw new CRM_Core_Exception("Supplied mime-type is not accepted");
       }
-    }
-    elseif (!empty($passedInMimeType)) {
-      $testMimeType = CRM_Utils_File::getMimeType($path);
-      if ($testMimeType != $passedInMimeType) {
-        throw new CRM_Core_Exception("Supplied Mime Type does not match file Mime Type");
+      $extension = CRM_Utils_File::getExtensionFromPath($path);
+      $candidateExtensions = CRM_Utils_File::getAcceptableExtensionsForMimeType($passedInMimeType);
+      if (!in_array($extension, $candidateExtensions)) {
+        throw new CRM_Core_Exception("Supplied mime-type does not match file extension");
       }
-      // Now that we have ensured that the mime-type matches to what we believe is the mime-type of the file
+      // Now that we have validated mime-type supplied as much as possible lets now set the MimeType variable/
       $mimeType = $passedInMimeType;
     }
 

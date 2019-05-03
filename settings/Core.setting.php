@@ -1052,4 +1052,18 @@ return [
     'help_text' => NULL,
     'validate_callback' => 'CRM_Utils_Rule::color',
   ],
+  'requestableMimeTypes' => [
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'requestableMimeTypes',
+    'type' => 'String',
+    'html_type' => 'Text',
+    'default' => 'image/jpeg,image/pjpeg,image/gif,image/x-png,image/png,image/jpg,text/html,application/pdf',
+    'add' => '5.13',
+    'title' => ts('Mime Types that can be passed as URL params'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('Acceptable Mime Types that can be used as part of file urls'),
+    'help_text' => NULL,
+  ],
 ];
