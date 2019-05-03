@@ -58,7 +58,7 @@ function computePalette($entityType) {
     [
       'group' => 'Fields',
       'title' => 'First Name',
-      'template' => '<afl-api-field entity="%%ENTITY%%" afl-field="first_name" afl-label="First Name"/>',
+      'template' => '<afl-api-field entity="%%ENTITY%%" afl-field="first_name" afl-label="First Name" afl-type="String" />',
     ],
   ];
 }
