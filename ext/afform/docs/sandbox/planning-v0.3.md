@@ -143,3 +143,52 @@
 <!--</af-model-list>-->
 
 ```
+
+------
+
+```html
+<af-model-list ctrl="modelListCtrl">
+  <af-model-prop
+    af-type="Individual"
+    af-name="parent"
+    af-label="Parent"
+    af-api4-params="{where: ['id','=', routeParams.cid]}"
+  />
+  <af-model-prop
+    af-type="Individual"
+    af-name="spouse"
+    af-label="Spouse"
+    af-contact-relationship="['Spouse of', 'parent']"
+  />
+  <!-- "parent" and "spouse" should be exported as variables in this scope -->
+
+  <crm-ui-tab-set>
+    <crm-ui-tab title="About You">
+      <af-model af-name="parent">
+        <af-std-contact-name af-label="Name" />
+        <af-std-contact-email af-label="Email" />
+        <af-field field-name="do_not_email" field-type="checkbox" field-default="1" />
+      </af-model>
+    </crm-ui-tab>
+    <crm-ui-tab title="Spouse">
+      <af-model af-name="spouse">
+        <af-std-contact-name af-label="Spouse Name" />
+        <af-std-contact-email af-label="Spouse Email" only-primary="true" />
+        <af-field field-name="do_not_email" field-type="checkbox" field-default="1" />
+      </af-model>
+    </crm-ui-tab>
+  </crm-ui-tab-set>
+
+  <p ng-if="spouse.display_name.contains('Thor')">
+    Your spouse should go to the gym.
+  </p>
+
+  <af-model af-name="parent">
+    <af-block-contact-address af-label="Address" />
+  </af-model>
+
+  <!-- General elements: FIELDSET, UL, BUTTON, P, H1 should work anywhere -->
+  <button ng-model="modelListCtrl.submit()">Submit</button>
+
+</af-model-list>
+```
