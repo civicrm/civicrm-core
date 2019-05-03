@@ -938,7 +938,10 @@ LIMIT {$offset}, {$rowCount}
   public static function flipDupePairs($prevNextId = NULL) {
     if (!$prevNextId) {
       // @todo figure out if this is always POST & specify that rather than inexact GET
-      $prevNextId = CRM_Utils_Request::retrieve('pnid', 'Integer');
+
+      // We cannot use CRM_Utils_Request::retrieve() because it might be an array.
+      // It later gets validated in escapeAll below.
+      $prevNextId = $_REQUEST['pnid'];
     }
 
     $onlySelected = FALSE;
