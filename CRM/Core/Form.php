@@ -640,9 +640,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function addButtons($params) {
     $prevnext = $spacing = [];
+    $alreadyHaveSubmitOnce = FALSE;
     foreach ($params as $button) {
       if (!empty($button['submitOnce'])) {
-        $button['js']['onclick'] = "return submitOnce(this,'{$this->_name}','" . ts('Processing') . "');";
+        if ($alreadyHaveSubmitOnce) {
+          throw new Exception(ts("Multiple submitOnce buttons are not currently supported."));
+        }
+        else {
+          $alreadyHaveSubmitOnce = TRUE;
+          $button['js']['onclick'] = "return submitOnce(this,'{$this->_name}','" . ts('Processing') . "');";
+        }
       }
 
       $attrs = ['class' => 'crm-form-submit'] + (array) CRM_Utils_Array::value('js', $button);
