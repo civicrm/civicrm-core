@@ -1,0 +1,17 @@
+<div ng-if="!routeParams.name">
+  {{ts('Please provide the form "name" parameter.')}}
+</div>
+
+<div ng-if="routeParams.name"
+     aff-api4="['Afform', 'get', {layoutFormat: 'html', where: [['name', '=', routeParams.name]]}]"
+     aff-api4-ctrl="apiData">
+
+  <div ng-if="apiData.result.length == 0">
+    {{ts('Failed to find requested form.')}}
+  </div>
+
+  <div ng-repeat="resultForm in apiData.result" ng-if="apiData.result.length > 0">
+    <div crm-ui-debug="resultForm.layout"></div>
+    <div af-monaco ng-model="resultForm.layout"></div>
+  </div>
+</div>
