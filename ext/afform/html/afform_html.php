@@ -161,3 +161,19 @@ function afform_html_civicrm_navigationMenu(&$menu) {
   ));
   _afform_html_civix_navigationMenu($menu);
 } // */
+
+/**
+ * Implements hook_civicrm_check().
+ */
+function afform_html_civicrm_check(&$messages) {
+  $dir = E::path(CRM_AfformHtml_Page_HtmlEditor::MONACO_DIR);
+  if (!file_exists($dir)) {
+    $messages[] = new CRM_Utils_Check_Message(
+      'afform_html_monaco',
+      ts('Afform HTML is missing its "node_modules" folder. Please consult the README.md for current installation instructions.'),
+      ts('Afform HTML: Packages are missing'),
+      \Psr\Log\LogLevel::CRITICAL,
+      'fa-chain-broken'
+    );
+  }
+}
