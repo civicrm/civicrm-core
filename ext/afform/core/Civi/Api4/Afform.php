@@ -4,9 +4,7 @@ namespace Civi\Api4;
 
 use Civi\Api4\Generic\AbstractEntity;
 use Civi\Api4\Generic\BasicBatchAction;
-use Civi\Api4\Generic\BasicGetAction;
 use Civi\Api4\Generic\BasicGetFieldsAction;
-use Civi\Api4\Generic\BasicUpdateAction;
 
 /**
  * Class Afform
@@ -15,35 +13,10 @@ use Civi\Api4\Generic\BasicUpdateAction;
 class Afform extends AbstractEntity {
 
   /**
-   * @return \Civi\Api4\Generic\BasicGetAction
+   * @return \Civi\Api4\Action\Afform\Get
    */
   public static function get() {
-    return new BasicGetAction('Afform', __FUNCTION__, function(BasicGetAction $action) {
-      /** @var \CRM_Afform_AfformScanner $scanner */
-      $scanner = \Civi::service('afform_scanner');
-      $converter = new \CRM_Afform_ArrayHtml();
-
-      $where = $action->getWhere();
-      if (count($where) === 1 && $where[0][0] === 'name' && $where[0][1] == '=') {
-        $names = [$where[0][2]];
-      }
-      else {
-        $names = array_keys($scanner->findFilePaths());
-      }
-
-      $values = [];
-      foreach ($names as $name) {
-        $record = $scanner->getMeta($name);
-        $layout = $scanner->findFilePath($name, 'aff.html');
-        if ($layout) {
-          // FIXME check for file existence+substance+validity
-          $record['layout'] = $converter->convertHtmlToArray(file_get_contents($layout));
-        }
-        $values[] = $record;
-      }
-
-      return $values;
-    });
+    return new \Civi\Api4\Action\Afform\Get('Afform', __FUNCTION__);
   }
 
   /**
@@ -77,60 +50,10 @@ class Afform extends AbstractEntity {
   }
 
   /**
-   * @return \Civi\Api4\Generic\BasicUpdateAction
+   * @return \Civi\Api4\Action\Afform\Update
    */
   public static function update() {
-    return new BasicUpdateAction('Afform', __FUNCTION__, 'name', function ($item, BasicUpdateAction $action) {
-      /** @var \CRM_Afform_AfformScanner $scanner */
-      $scanner = \Civi::service('afform_scanner');
-      $converter = new \CRM_Afform_ArrayHtml();
-
-      if (empty($item['name']) || !preg_match('/^[a-zA-Z][a-zA-Z0-9\-]*$/', $item['name'])) {
-        throw new \API_Exception("Afform.create: name is a mandatory field. It should use alphanumerics and dashes.");
-      }
-      $name = $item['name'];
-
-      // FIXME validate all field data.
-      $updates = _afform_fields_filter($item);
-
-      // Create or update aff.html.
-      if (isset($updates['layout'])) {
-        $layoutPath = $scanner->createSiteLocalPath($name, 'aff.html');
-        \ CRM_Utils_File::createDir(dirname($layoutPath));
-        file_put_contents($layoutPath, $converter->convertArrayToHtml($updates['layout']));
-        // FIXME check for writability then success. Report errors.
-      }
-
-      // Create or update *.aff.json.
-      $orig = \Civi\Api4\Afform::get()
-        ->setCheckPermissions($action->getCheckPermissions())
-        ->addWhere('name', '=', $name)
-        ->execute();
-
-      if (isset($orig[0])) {
-        $meta = _afform_fields_filter(array_merge($orig[0], $updates));
-      }
-      else {
-        $meta = $updates;
-      }
-      unset($meta['layout']);
-      unset($meta['name']);
-      if (!empty($meta)) {
-        $metaPath = $scanner->createSiteLocalPath($name, \CRM_Afform_AfformScanner::METADATA_FILE);
-        // printf("[%s] Update meta %s: %s\n", $name, $metaPath, print_R(['updates'=>$updates, 'meta'=>$meta], 1));
-        \CRM_Utils_File::createDir(dirname($metaPath));
-        file_put_contents($metaPath, json_encode($meta, JSON_PRETTY_PRINT));
-        // FIXME check for writability then success. Report errors.
-      }
-
-      // We may have changed list of files covered by the cache.
-      $scanner->clear();
-
-      // FIXME if `server_route` changes, then flush the menu cache.
-      // FIXME if asset-caching is enabled, then flush the asset cache.
-
-      return $updates;
-    });
+    return new \Civi\Api4\Action\Afform\Update('Afform', __FUNCTION__, 'name');
   }
 
   public static function getFields() {

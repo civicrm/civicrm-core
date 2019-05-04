@@ -63,4 +63,54 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertTrue(is_array($result[0]['layout']), $message);
   }
 
+  public function getFormatExamples() {
+    $es = [];
+
+    $asHtml = '<strong>New text!</strong>';
+    $asArray = ['#tag' => 'strong', '#children' => ['New text!']];
+
+    $es[] = ['fakelibBareFile', 'html', $asHtml, 'array', $asArray];
+    $es[] = ['fakelibBareFile', 'array', $asArray, 'html', $asHtml];
+    $es[] = ['fakelibBareFile', 'html', $asHtml, 'html', $asHtml];
+    $es[] = ['fakelibBareFile', 'array', $asArray, 'array', $asArray];
+
+    return $es;
+  }
+
+  /**
+   * In this test, we update the layout and in one format and then read it back
+   * in another format.
+   *
+   * @param string $directiveName
+   * @param string $updateFormat
+   *   The format with which to write the data.
+   *   'html' or 'array'
+   * @param mixed $updateLayout
+   *   The new value to set
+   * @param string $readFormat
+   *   The format with which to read the data.
+   *   'html' or 'array'
+   * @param mixed $readLayout
+   *   The value that we expect to read.
+   * @dataProvider getFormatExamples
+   */
+  public function testUpdateAndGetFormat($directiveName, $updateFormat, $updateLayout, $readFormat, $readLayout) {
+    Civi\Api4\Afform::revert()->addWhere('name', '=', $directiveName)->execute();
+
+    Civi\Api4\Afform::update()
+      ->addWhere('name', '=', $directiveName)
+      ->setLayoutFormat($updateFormat)
+      ->setValues(['layout' => $updateLayout])
+      ->execute();
+
+    $result = Civi\Api4\Afform::get()
+      ->addWhere('name', '=', $directiveName)
+      ->setLayoutFormat($readFormat)
+      ->execute();
+
+    $this->assertEquals($readLayout, $result[0]['layout']);
+
+    Civi\Api4\Afform::revert()->addWhere('name', '=', $directiveName)->execute();
+  }
+
 }
