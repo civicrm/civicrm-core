@@ -3,12 +3,21 @@ use CRM_AfformHtml_ExtensionUtil as E;
 
 class CRM_AfformHtml_Page_HtmlEditor extends CRM_Core_Page {
 
-  public function run() {
-    // Example: Set the page-title dynamically; alternatively, declare a static title in xml/Menu/*.xml
-    CRM_Utils_System::setTitle(E::ts('HtmlEditor'));
+  const MONACO_DIR = 'node_modules/monaco-editor/min/vs';
 
-    // Example: Assign a variable for use in a template
-    $this->assign('currentTime', date('Y-m-d H:i:s'));
+  public function run() {
+    CRM_Utils_System::setTitle(E::ts('Afform HTML Editor'));
+
+    CRM_Core_Region::instance('html-header')->add([
+      'markup' => '<meta http-equiv="X-UA-Compatible" content="IE=edge" />',
+    ]);
+    Civi::resources()
+      ->addVars('afform_html', [
+        'paths' => [
+          'vs' => E::url(self::MONACO_DIR),
+        ],
+      ])
+      ->addScriptFile(E::LONG_NAME, self::MONACO_DIR . '/loader.js', CRM_Core_Resources::DEFAULT_WEIGHT, 'html-header');
 
     parent::run();
   }
