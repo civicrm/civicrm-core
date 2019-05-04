@@ -5,7 +5,7 @@ eval(`cv php:boot`);
 global $civicrm_root;
 $realArgs = $argv;
 $diffCmd = FALSE;
-$files = array();
+$files = [];
 
 array_shift($realArgs);
 foreach ($realArgs as $arg) {
@@ -52,7 +52,7 @@ function compareFile($file, $diffCmd) {
     echo "File \"$file\" appears to have consistency issues. Created $newFile.\n";
     file_put_contents($newFile, $newMarkup);
     if ($diffCmd) {
-      passthru($diffCmd . ' '  . escapeshellarg($file) . ' ' . escapeshellarg($newFile));
+      passthru($diffCmd . ' ' . escapeshellarg($file) . ' ' . escapeshellarg($newFile));
     }
   }
 }
