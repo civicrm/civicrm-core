@@ -17,6 +17,10 @@ class CRM_Afform_ArrayHtml {
    *   Ex: '<div class="greeting">Hello world</div>'
    */
   public function convertArrayToHtml($array) {
+    if ($array === []) {
+      return '';
+    }
+
     $tag = empty($array['#tag']) ? self::DEFAULT_TAG : $array['#tag'];
     unset($array['#tag']);
     $children = empty($array['#children']) ? self::DEFAULT_TAG : $array['#children'];
@@ -31,10 +35,12 @@ class CRM_Afform_ArrayHtml {
         throw new \RuntimeException("Malformed HTML attribute");
       }
       if (is_string($attrValue)) {
-        $buf .= sprintf(' %s="%s"', $attrName, htmlentities($attrValue)); // FIXME attribute encoding
+        // FIXME attribute encoding
+        $buf .= sprintf(' %s="%s"', $attrName, htmlentities($attrValue));
       }
       elseif (is_array($attrValue) && $this->allowStructuredAttribute($tag, $attrName)) {
-        $buf .= sprintf(' %s="%s"', $attrName, htmlentities(json_encode($attrValue))); // FIXME attribute encoding
+        // FIXME attribute encoding
+        $buf .= sprintf(' %s="%s"', $attrName, htmlentities(json_encode($attrValue)));
       }
       else {
         Civi::log()->warning('Afform: Cannot serialize attribute {attrName}', [
@@ -64,6 +70,10 @@ class CRM_Afform_ArrayHtml {
    *   Ex: ['#tag' => 'div', 'class' => 'greeting', '#children' => ['Hello world']]
    */
   public function convertHtmlToArray($html) {
+    if ($html === '') {
+      return [];
+    }
+
     $doc = new DOMDocument();
     $doc->loadHTML("<html><body>$html</body></html>");
 
