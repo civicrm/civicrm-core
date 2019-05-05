@@ -18,6 +18,16 @@
             theme: 'vs-dark',
             minimap: {
               enabled: false
+            },
+            scrollbar: {
+              useShadows: false,
+              verticalHasArrows: true,
+              horizontalHasArrows: true,
+              vertical: 'visible',
+              horizontal: 'visible',
+              verticalScrollbarSize: 17,
+              horizontalScrollbarSize: 17,
+              arrowSize: 30
             }
           });
 
