@@ -428,7 +428,10 @@ class CRM_Case_Form_Activity extends CRM_Activity_Form_Activity {
     }
 
     // store the submitted values in an array
-    $params = $this->controller->exportValues($this->_name);
+    // Explanation for why we only check the is_unittest element: Prior to adding that check, there was no check and so any $params passed in would have been overwritten. Just in case somebody is passing in some non-null params and that broken code would have inadvertently been working, we can maintain backwards compatibility by only checking for the is_unittest parameter, and so that broken code will still work. At the same time this allows unit tests to pass in a $params without it getting overwritten. See also PR #2077 for some discussion of when the $params parameter was added as a passed in variable.
+    if (empty($params['is_unittest'])) {
+      $params = $this->controller->exportValues($this->_name);
+    }
 
     //set parent id if its edit mode
     if ($parentId = CRM_Utils_Array::value('parent_id', $this->_defaults)) {
