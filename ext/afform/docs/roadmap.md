@@ -20,6 +20,11 @@ This extension is expected to be the base for a suite of related extensions:
 * `afform_auditor`: Report on upgrade compatibility. Test changesets. Highlight dangerous/unknown/unsupported form elements.
    Score maintainability of the system.
 
+## Documentation
+
+* Development and Refactoring: A guide for making changes to supported markup in a maintainable fashion.
+  (*What if I need to rename a tag? What if I need to deprecate a tag? Ad nauseum*)
+
 ## Known Issues
 
 Within this extension, there are things which need updating/addressing:
