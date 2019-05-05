@@ -1,11 +1,11 @@
 (function(angular, $, _) {
   // Declare a list of dependencies.
   angular.module('afformCore', [
-    'crmUi', 'crmUtil', 'ngRoute'
+    'crmUi', 'crmUtil', 'ngRoute', 'api4'
   ]);
 
   // Use `afformCoreDirective(string name)` to generate an AngularJS directive.
-  angular.module('afformCore').service('afformCoreDirective', function($routeParams){
+  angular.module('afformCore').service('afformCoreDirective', function($routeParams, crmApi4, crmStatus){
     return function(camelName, meta, d){
       d.restrict = 'AE';
       d.scope = {};
@@ -14,6 +14,8 @@
         $scope.ts = CRM.ts(camelName);
         $scope.routeParams = $routeParams;
         $scope.meta = meta;
+        $scope.crmApi4 = crmApi4;
+        $scope.crmStatus = crmStatus;
       };
       return d;
     };
