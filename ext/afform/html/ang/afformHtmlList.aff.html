@@ -1,0 +1,38 @@
+<div
+  aff-api4="['Afform', 'get', {select: ['name','title','is_public','server_route'], orderBy: {name:'ASC'}}]"
+  aff-api4-ctrl="listCtrl">
+
+  <div ng-if="apiData.result.length == 0">
+    {{ts('There are no forms! Tell Aristotle!')}}
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>{{ts('Name')}}</th>
+        <th>{{ts('Title')}}</th>
+        <th>{{ts('Server Route')}}</th>
+        <th>{{ts('Frontend?')}}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat="availForm in listCtrl.result">
+      <td>
+        <a ng-href="#/?name={{availForm.name}}">{{availForm.name}}</a>
+      </td>
+      <td>{{availForm.title}}</td>
+      <td><code>{{availForm.server_route}}</code></td>
+      <td>{{availForm.is_public ? ts('Frontend') : ts('Backend')}}</td>
+      <td>
+        <!--<a ng-click="crmStatus({start: ts('Reverting...'), success: ts('Reverted')}, crmApi4('Afform', 'revert', {where: [['name', '=', availForm.name]]}))">{{ts('Revert')}}</a>-->
+        <a aff-api4-action="['Afform', 'revert', {where: [['name','=', availForm.name]]}]"
+           msg-start="ts('Reverting...')"
+           msg-success="ts('Reverted')"
+          >{{ts('Revert')}}</a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>
