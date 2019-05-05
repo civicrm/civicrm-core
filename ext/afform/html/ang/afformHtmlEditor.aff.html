@@ -2,15 +2,17 @@
      aff-api4="['Afform', 'get', {layoutFormat: 'html', where: [['name', '=', options.name]]}]"
      aff-api4-ctrl="apiData">
 
-  <div>
-    <a ng-href="#/">{{ts('Back')}}</a>
-  </div>
-
   <div ng-if="apiData.result.length == 0">
     {{ts('Failed to find requested form.')}}
   </div>
 
   <div ng-repeat="resultForm in apiData.result" ng-if="apiData.result.length > 0">
+    <div>
+      <a ng-href="#/">{{ts('Back')}}</a>
+      |
+      <a aff-api4-action="['Afform', 'update', {layoutFormat: 'html', where: [['name', '=', resultForm.name]], values:{layout: resultForm.layout}}]">{{ts('Save')}}</a>
+    </div>
+
     <div crm-ui-debug="resultForm.layout"></div>
     <div af-monaco ng-model="resultForm.layout"></div>
   </div>
