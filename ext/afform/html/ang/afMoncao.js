@@ -7,19 +7,23 @@
     return {
       restrict: 'AE',
       require: 'ngModel',
-      template: '<div class="af-monaco-container" style="width:800px;height:600px;border:1px solid grey"></div>',
+      template: '<div class="af-monaco-container"></div>',
       link: function($scope, $el, $attr, ngModel) {
+        var heightPct = 0.70;
         var editor;
         require.config({paths: CRM.afMoncao.paths});
         require(['vs/editor/editor.main'], function() {
           var editorEl = $el.find('.af-monaco-container');
+          editorEl.css({height: Math.round(heightPct * $(window).height())});
           editor = monaco.editor.create(editorEl[0], {
             value: ngModel.$modelValue,
             language: 'html',
-            theme: 'vs-dark',
+            // theme: 'vs-dark',
+            theme: 'vs',
             minimap: {
               enabled: false
             },
+            automaticLayout: true,
             scrollbar: {
               useShadows: false,
               verticalHasArrows: true,
