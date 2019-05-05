@@ -5,7 +5,7 @@
   ]);
 
   // Use `afformCoreDirective(string name)` to generate an AngularJS directive.
-  angular.module('afformCore').service('afformCoreDirective', function($routeParams, crmApi4, crmStatus){
+  angular.module('afformCore').service('afformCoreDirective', function($routeParams, crmApi4, crmStatus, crmUiAlert){
     return function(camelName, meta, d){
       d.restrict = 'AE';
       d.scope = {};
@@ -16,6 +16,7 @@
         $scope.meta = meta;
         $scope.crmApi4 = crmApi4;
         $scope.crmStatus = crmStatus;
+        $scope.crmUiAlert = crmUiAlert;
       };
       return d;
     };

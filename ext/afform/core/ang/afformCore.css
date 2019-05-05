@@ -1,0 +1,7 @@
+.aff-api4-action-running {
+    cursor: not-allowed;
+    color: black;
+}
+a.aff-api4-action-idle {
+    cursor: pointer;
+}

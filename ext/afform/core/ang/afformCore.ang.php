@@ -9,7 +9,7 @@ return array(
     1 => 'ang/afformCore/*.js',
     2 => 'ang/afformCore/*/*.js',
   ),
-  'css' => array(),
+  'css' => array('ang/afformCore.css'),
   'requires' => array('crmUi', 'crmUtil', 'api4'),
   'partials' => array('ang/afformCore'),
   'settings' => array(),
