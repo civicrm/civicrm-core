@@ -10,6 +10,6 @@
   "repository": "https://github.com/totten/afform",
   "license": "AGPL-3.0",
   "dependencies": {
-    "monaco-editor": "^0.14.3"
+    "monaco-editor": "^0.16.2"
   }
 }
