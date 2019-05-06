@@ -897,18 +897,18 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $inputParams['id'] = $participantId;
       $values = [];
       $ids = [];
-      $component = 'event';
       $entityObj = CRM_Event_BAO_Participant::getValues($inputParams, $values, $ids);
       $entityObj = $entityObj[$participantId];
+      $title = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Event', $entityObj->event_id, 'title');
     }
     else {
       $entityObj = new CRM_Contribute_BAO_Contribution();
       $entityObj->id = $contributionId;
       $entityObj->find(TRUE);
-      $component = 'contribution';
+      $title = ts('Contribution');
     }
 
-    self::addActivityForPayment($entityObj, $financialTrxn, $activityType, $component, $contributionId);
+    self::addActivityForPayment($entityObj->contact_id, $financialTrxn, $activityType, $title, $contributionId);
   }
 
   /**
@@ -3942,25 +3942,18 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * @param $entityObj
+   * @param int $targetCid
    * @param $trxnObj
    * @param $activityType
-   * @param $component
+   * @param string $title
    * @param int $contributionId
    *
    * @throws CRM_Core_Exception
    */
-  public static function addActivityForPayment($entityObj, $trxnObj, $activityType, $component, $contributionId) {
-    if ($component == 'event') {
-      $title = CRM_Core_DAO::getFieldValue('CRM_Event_BAO_Event', $entityObj->event_id, 'title');
-    }
-    else {
-      $title = ts('Contribution');
-    }
+  public static function addActivityForPayment($targetCid, $trxnObj, $activityType, $title, $contributionId) {
     $paymentAmount = CRM_Utils_Money::format($trxnObj->total_amount, $trxnObj->currency);
     $subject = "{$paymentAmount} - Offline {$activityType} for {$title}";
     $date = CRM_Utils_Date::isoToMysql($trxnObj->trxn_date);
-    $targetCid = $entityObj->contact_id;
     // source record id would be the contribution id
     $srcRecId = $contributionId;
 
