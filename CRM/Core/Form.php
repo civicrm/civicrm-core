@@ -767,6 +767,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * @return int
+   */
+  public function getPaymentProcessorID() {
+    return $this->_paymentProcessorID;
+  }
+
+  /**
    * This if a front end form function for setting the payment processor.
    *
    * It would be good to sync it with the back-end function on abstractEditPayment & use one everywhere.
@@ -878,9 +885,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       else {
         $this->_paymentProcessor = [];
       }
-      CRM_Financial_Form_Payment::addCreditCardJs($this->_paymentProcessorID);
     }
-    $this->assign('paymentProcessorID', $this->_paymentProcessorID);
+
     // We save the fact that the profile 'billing' is required on the payment form.
     // Currently pay-later is the only 'processor' that takes notice of this - but ideally
     // 1) it would be possible to select the minimum_billing_profile_id for the contribution form

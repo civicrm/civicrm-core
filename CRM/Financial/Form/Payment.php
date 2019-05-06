@@ -79,11 +79,6 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
 
     CRM_Core_Payment_ProcessorForm::preProcess($this);
 
-    self::addCreditCardJs($this->_paymentProcessorID);
-
-    $this->assign('paymentProcessorID', $this->_paymentProcessorID);
-    $this->assign('currency', $this->currency);
-
     $this->assign('suppressForm', TRUE);
     $this->controller->_generateQFKey = FALSE;
   }
