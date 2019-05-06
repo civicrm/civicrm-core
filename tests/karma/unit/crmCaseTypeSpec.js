@@ -352,13 +352,13 @@ describe('crmCaseType', function() {
 
         result.push({
           label: relType.label_b_a,
-          value: relType.id + '_b_a'
+          value: relType.id + '_a_b'
         });
 
         if (!isBidirectionalRelationship) {
           result.push({
             label: relType.label_a_b,
-            value: relType.id + '_a_b'
+            value: relType.id + '_b_a'
           });
         }
       }, []);

@@ -39,7 +39,7 @@ class CRM_Case_BAO_CaseTypeForkTest extends CiviCaseTestCase {
     ]);
     //Check if manager is correctly retrieved from xml processor.
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
-    $this->assertEquals($relTypeID . '_b_a', $xmlProcessor->getCaseManagerRoleId('ForkableCaseType'));
+    $this->assertEquals($relTypeID . '_a_b', $xmlProcessor->getCaseManagerRoleId('ForkableCaseType'));
   }
 
   /**
