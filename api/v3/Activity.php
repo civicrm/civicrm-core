@@ -363,8 +363,9 @@ function _civicrm_activity_get_handleSourceContactNameOrderBy(&$params, &$option
     $sql->join(
       'source_contact',
       "LEFT JOIN
-      civicrm_activity_contact ac ON (ac.activity_id = a.id AND record_type_id = $sourceContactID )
-       LEFT JOIN civicrm_contact c ON c.id = ac.contact_id"
+      civicrm_activity_contact ac ON (ac.activity_id = a.id AND record_type_id = #sourceContactID)
+       LEFT JOIN civicrm_contact c ON c.id = ac.contact_id",
+      ['sourceContactID' => $sourceContactID]
     );
     $sql->orderBy("c.display_name $order");
     unset($options['sort'], $params['options']['sort']);
