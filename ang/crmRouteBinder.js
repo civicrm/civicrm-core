@@ -50,18 +50,18 @@
         registerGlobalListener($injector);
 
         options.format = options.format || 'json';
-        var fmt = formats[options.format];
+        var fmt = _.clone(formats[options.format]);
         if (options.deep) {
           fmt.watcher = '$watch';
         }
         if (options.default === undefined) {
           options.default = fmt.default;
         }
-        var _scope = this;
+        var value,
+          _scope = this,
+          $route = $injector.get('$route'),
+          $timeout = $injector.get('$timeout');
 
-        var $route = $injector.get('$route'), $timeout = $injector.get('$timeout');
-
-        var value;
         if (options.param in $route.current.params) {
           value = fmt.decode($route.current.params[options.param]);
         }
@@ -74,12 +74,25 @@
         // Keep the URL bar up-to-date.
         _scope[fmt.watcher](options.expr, function (newValue) {
           var encValue = fmt.encode(newValue);
-          if ($route.current.params[options.param] === encValue) return;
+          if (!_.isEqual(newValue, options.default) && $route.current.params[options.param] === encValue) {
+            return;
+          }
 
           pendingUpdates = pendingUpdates || {};
           pendingUpdates[options.param] = encValue;
           var p = angular.extend({}, $route.current.params, pendingUpdates);
-          angular.forEach(ignorable, function(v,k){ if (p[k] === v) delete p[k]; });
+
+          angular.forEach(ignorable, function(v, k) {
+            if (p[k] === v) {
+              delete p[k];
+            }
+          });
+
+          // Remove params from url if they equal their defaults
+          if (_.isEqual(newValue, options.default)) {
+            p[options.param] = null;
+          }
+
           $route.updateParams(p);
 
           if (activeTimer) $timeout.cancel(activeTimer);
