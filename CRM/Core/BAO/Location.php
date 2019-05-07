@@ -313,6 +313,7 @@ WHERE e.id = %1";
    *   newly created/updated location block id.
    */
   public static function copyLocBlock($locBlockId, $updateLocBlockId = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('unused function which will be removed');
     //get the location info.
     $defaults = $updateValues = [];
     $locBlock = ['id' => $locBlockId];
@@ -344,7 +345,7 @@ WHERE e.id = %1";
       }
     }
 
-    $copyLocation = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_LocBlock',
+    $copyLocation = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_LocBlock',
       ['id' => $locBlock['id']],
       $copyLocationParams
     );
