@@ -54,8 +54,15 @@ class I18nSubscriber implements EventSubscriberInterface {
   public function onApiPrepare(\Civi\API\Event\Event $event) {
     $apiRequest = $event->getApiRequest();
 
-    // support multi-lingual requests
-    if ($language = \CRM_Utils_Array::value('option.language', $apiRequest['params'])) {
+    // support multi-lingual requests in old & new formats.
+    if (is_array(\CRM_Utils_Array::value('options', $apiRequest['params']))) {
+      $language = \CRM_Utils_Array::value('language', $apiRequest['params']['options']);
+    }
+    else {
+      $language = \CRM_Utils_Array::value('option.language', $apiRequest['params']);
+    }
+
+    if ($language) {
       $this->setLocale($language);
     }
   }
