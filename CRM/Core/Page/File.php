@@ -74,7 +74,7 @@ class CRM_Core_Page_File extends CRM_Core_Page {
     }
 
     if (empty($mimeType)) {
-      $passedInMimeType = CRM_Utils_Request::retrieveValue('mime-type', 'String', $mimeType, FALSE);
+      $passedInMimeType = self::convertBadMimeAliasTypes(CRM_Utils_Request::retrieveValue('mime-type', 'String', $mimeType, FALSE));
       if (!in_array($passedInMimeType, explode(',', Civi::settings()->get('requestableMimeTypes')))) {
         throw new CRM_Core_Exception("Supplied mime-type is not accepted");
       }
@@ -112,6 +112,35 @@ class CRM_Core_Page_File extends CRM_Core_Page {
         $disposition
       );
     }
+  }
+
+  /**
+   * Translate one mime type to another.
+   *
+   * Certain non-standard/weird MIME types have been common. Unfortunately, because
+   * of the way this controller is used, the weird types may baked-into URLs.
+   * We clean these up for compatibility.
+   *
+   * @param string $type
+   *   Ex: 'image/jpg'
+   * @return string
+   *   Ex: 'image/jpeg'.
+   */
+  protected static function convertBadMimeAliasTypes($type) {
+    $badTypes = [
+      // Before PNG format was ubiquitous, it was image/x-png?
+      'image/x-png' => 'image/png',
+
+      // People see "image/gif" and "image/png" and wrongly guess "image/jpg"?
+      'image/jpg' => 'image/jpeg',
+      'image/tif' => 'image/tiff',
+      'image/svg' => 'image/svg+xml',
+
+      // StackExchange attributes "pjpeg" to some quirk in an old version of IE?
+      'image/pjpeg' => 'image/jpeg',
+
+    ];
+    return isset($badTypes[$type]) ? $badTypes[$type] : $type;
   }
 
 }
