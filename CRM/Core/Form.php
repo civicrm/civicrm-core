@@ -1314,7 +1314,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $label,
       $options,
       $required,
-      NULL
+      ['class' => 'crm-select2']
     );
     $attributes = ['format' => 'searchDate'];
     $extra = ['time' => $isDateTime];
