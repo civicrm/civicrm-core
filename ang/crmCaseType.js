@@ -297,16 +297,18 @@
             });
           }
         }
+        // TODO The ids below really should use names not labels see
+        //  https://lab.civicrm.org/dev/core/issues/774
         else {
           result.push({
             text: relType.label_b_a,
-            id: relType.name_a_b
+            id: relType.label_a_b
           });
 
           if (!isBidirectionalRelationship) {
             result.push({
               text: relType.label_a_b,
-              id: relType.name_b_a
+              id: relType.label_b_a
             });
           }
         }
@@ -454,6 +456,10 @@
       activity.default_assignee_relationship = null;
       activity.default_assignee_contact = null;
     };
+
+    // TODO roleName passed to addRole is a misnomer, its passed as the
+    // label HOWEVER it should be saved to xml as the name see
+    // https://lab.civicrm.org/dev/core/issues/774
 
     /// Add a new role
     $scope.addRole = function(roles, roleName) {
