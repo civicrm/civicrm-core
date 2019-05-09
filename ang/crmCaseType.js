@@ -473,7 +473,7 @@
            CRM.loadForm(CRM.url('civicrm/admin/reltype', {action: 'add', reset: 1, label_a_b: roleName}))
             .on('crmFormSuccess', function(e, data) {
               var newType = _.values(data.relationshipType)[0];
-              roles.push({name: newType.label_a_b, displaylabel: newType.label_b_a});
+              roles.push({name: newType.label_b_a, displaylabel: newType.label_a_b});
               // Assume that the case role should be A-B but add both directions as options.
               $scope.relationshipTypeOptions.push({id: newType.label_a_b, text: newType.label_a_b});
               if (newType.label_a_b != newType.label_b_a) {
