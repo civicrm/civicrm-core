@@ -54,7 +54,7 @@
  *
  * Example 3: Create an empty temp table with list of columns.
  *
- * $tmpTbl = CRM_Utils_SQL_TempTable::build()->setDurable()->setUtf8()->createWithColumns('id int(10, name varchar(64)');
+ * $tmpTbl = CRM_Utils_SQL_TempTable::build()->setDurable()->createWithColumns('id int(10, name varchar(64)');
  *
  * Example 4: Drop a table that you previously created.
  *
@@ -105,8 +105,7 @@ class CRM_Utils_SQL_TempTable {
     $t->id = md5(uniqid('', TRUE));
     // The constant CIVICRM_TEMP_FORCE_DURABLE is for local debugging.
     $t->durable = CRM_Utils_Constant::value('CIVICRM_TEMP_FORCE_DURABLE', FALSE);
-    // @deprecated This constant is deprecated and will be removed.
-    $t->utf8 = CRM_Utils_Constant::value('CIVICRM_TEMP_FORCE_UTF8', TRUE);
+    $t->utf8 = TRUE;
     $t->autodrop = FALSE;
     $t->memory = FALSE;
     return $t;
@@ -319,7 +318,9 @@ class CRM_Utils_SQL_TempTable {
   /**
    * Set table collation to UTF8.
    *
-   * This would make sense as a default but cautiousness during phasing in has made it opt-in.
+   * @deprecated This method is deprecated as tables should be assumed to have
+   * UTF-8 as the default character set and collation; some other character set
+   * or collation may be specified in the column definition.
    *
    * @param bool $value
    *

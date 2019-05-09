@@ -154,7 +154,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
     $form->assign('taskName', CRM_Utils_Array::value($form->_task, $crmContactTaskTasks));
 
     if ($useTable) {
-      $tempTable = CRM_Utils_SQL_TempTable::build()->setCategory('tskact')->setDurable()->setId($qfKey)->setUtf8();
+      $tempTable = CRM_Utils_SQL_TempTable::build()->setCategory('tskact')->setDurable()->setId($qfKey);
       $form->_componentTable = $tempTable->getName();
       $tempTable->drop();
       $tempTable->createWithColumns('contact_id int primary key');

@@ -1164,7 +1164,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @return string
    */
   public function createTemporaryTable($identifier, $sql, $isColumns = FALSE, $isMemory = FALSE) {
-    $tempTable = CRM_Utils_SQL_TempTable::build()->setUtf8();
+    $tempTable = CRM_Utils_SQL_TempTable::build();
     if ($isMemory) {
       $tempTable->setMemory();
     }
