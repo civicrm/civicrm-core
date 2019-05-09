@@ -646,6 +646,7 @@ function _civicrm_api3_activity_fill_activity_contact_names(&$activities, $param
       'contact_id.display_name',
       'contact_id',
     ],
+    'options' => ['limit' => 0],
     'check_permissions' => !empty($params['check_permissions']),
   ];
   if (count($activityContactTypes) < 3) {
