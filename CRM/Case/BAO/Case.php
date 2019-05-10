@@ -2184,33 +2184,6 @@ SELECT  id
         }
       }
 
-      //Migrate custom attachments
-      $customFileTables = civicrm_api3('CustomField', 'get', [
-        'sequential' => 1,
-        'return' => ["custom_group_id.table_name"],
-        'custom_group_id.extends' => "Case",
-        'data_type' => "File",
-      ]);
-      $customFileTables = array_column($customFileTables['values'], 'custom_group_id.table_name');
-      $customFileTables = array_unique($customFileTables);
-
-      foreach ($customFileTables as $customFileTable) {
-        $entityFile = new CRM_Core_DAO_EntityFile();
-        $entityFile->entity_id = $otherCaseId;
-        $entityFile->entity_table = $customFileTable;
-        $entityFile->find();
-
-        while ($entityFile->fetch()) {
-          $updatedEntityFile = new CRM_Core_DAO_EntityFile();
-          $updatedEntityFile->id = $entityFile->id;
-          if ($updatedEntityFile->find(TRUE)) {
-            $updatedEntityFile->entity_table = $customFileTable;
-            $updatedEntityFile->entity_id = $mainCaseId;
-            $updatedEntityFile->save();
-          }
-        }
-      }
-
       // migrate all activities and connect to main contact.
       $copiedActivityIds = $activityMappingIds = array();
       sort($otherActivityIds);
