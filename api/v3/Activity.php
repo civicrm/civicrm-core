@@ -646,23 +646,31 @@ function _civicrm_api3_activity_fill_activity_contact_names(&$activities, $param
       'contact_id.display_name',
       'contact_id',
     ],
+    'options' => [
+      'limit' => 100,
+      'offset' => 0,
+    ],
     'check_permissions' => !empty($params['check_permissions']),
   ];
   if (count($activityContactTypes) < 3) {
     $activityContactParams['record_type_id'] = ['IN' => $activityContactTypes];
   }
-  $activityContacts = civicrm_api3('ActivityContact', 'get', $activityContactParams)['values'];
-  foreach ($activityContacts as $activityContact) {
-    $contactID = $activityContact['contact_id'];
-    $recordType = $typeMap[$activityContact['record_type_id']];
-    if (in_array($recordType, ['target', 'assignee'])) {
-      $activities[$activityContact['activity_id']][$recordType . '_contact_id'][] = $contactID;
-      $activities[$activityContact['activity_id']][$recordType . '_contact_name'][$contactID] = isset($activityContact['contact_id.display_name']) ? $activityContact['contact_id.display_name'] : '';
+  $activityContacts = civicrm_api3('ActivityContact', 'get', $activityContactParams);
+  while ($activityContacts['count']) {
+    foreach ($activityContacts['values'] as $activityContact) {
+      $contactID = $activityContact['contact_id'];
+      $recordType = $typeMap[$activityContact['record_type_id']];
+      if (in_array($recordType, ['target', 'assignee'])) {
+        $activities[$activityContact['activity_id']][$recordType . '_contact_id'][] = $contactID;
+        $activities[$activityContact['activity_id']][$recordType . '_contact_name'][$contactID] = isset($activityContact['contact_id.display_name']) ? $activityContact['contact_id.display_name'] : '';
+      }
+      else {
+        $activities[$activityContact['activity_id']]['source_contact_id'] = $contactID;
+        $activities[$activityContact['activity_id']]['source_contact_name'] = isset($activityContact['contact_id.display_name']) ? $activityContact['contact_id.display_name'] : '';
+      }
     }
-    else {
-      $activities[$activityContact['activity_id']]['source_contact_id'] = $contactID;
-      $activities[$activityContact['activity_id']]['source_contact_name'] = isset($activityContact['contact_id.display_name']) ? $activityContact['contact_id.display_name'] : '';
-    }
+    $activityContactParams['options']['offset'] += 100;
+    $activityContacts = civicrm_api3('ActivityContact', 'get', $activityContactParams);
   }
 }
 
