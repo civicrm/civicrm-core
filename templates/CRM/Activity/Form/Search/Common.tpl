@@ -89,9 +89,8 @@
 </tr>
 
 <tr>
-  <td>
-    {include file="CRM/Core/DatePickerRange.tpl" fieldName="activity_date_time"}
-  </td>
+  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="activity_date_time" colspan="2"}
+  <td>&nbsp;</td>
 </tr>
 <tr>
   <td>
