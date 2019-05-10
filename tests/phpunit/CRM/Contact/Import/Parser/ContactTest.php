@@ -162,10 +162,10 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testImportParserWithUpdateWithExternalIdentifierButNoPrimaryMatch() {
-    list($originalValues, $result) = $this->setUpBaseContact(array(
+    list($originalValues, $result) = $this->setUpBaseContact([
       'external_identifier' => 'windows',
       'email' => NULL,
-    ));
+    ]);
 
     $this->assertEquals('windows', $result['external_identifier']);
 
@@ -174,6 +174,30 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $originalValues['id'] = $result['id'];
 
     $this->assertEquals('Old Bill', $this->callAPISuccessGetValue('Contact', array('id' => $result['id'], 'return' => 'nick_name')));
+    $this->callAPISuccessGetSingle('Contact', $originalValues);
+  }
+
+  /**
+   * Test import parser will fallback to external identifier.
+   *
+   * In this case no primary match exists (e.g the details are not supplied) so it falls back on external identifier.
+   *
+   * CRM-17275
+   *
+   * @throws \Exception
+   */
+  public function testImportParserWithUpdateWithContactID() {
+    list($originalValues, $result) = $this->setUpBaseContact(array(
+      'external_identifier' => '',
+      'email' => NULL,
+    ));
+    $updateValues = ['id' => $result['id'], 'email' => 'bill@example.com'];
+    // This is some deep weirdness - this sets a flag for updatingBlankLocinfo - allowing input to be blanked
+    // (which IS a good thing but it's pretty weird & all to do with legacy profile stuff).
+    CRM_Core_Session::singleton()->set('authSrc', CRM_Core_Permission::AUTH_SRC_CHECKSUM);
+    $this->runImport($updateValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, [NULL, 1]);
+    $originalValues['id'] = $result['id'];
+    $this->callAPISuccessGetSingle('Email', ['contact_id' => $originalValues['id'], 'is_primary' => 1]);
     $this->callAPISuccessGetSingle('Contact', $originalValues);
   }
 
