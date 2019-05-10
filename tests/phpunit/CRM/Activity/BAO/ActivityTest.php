@@ -331,12 +331,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method for getting count
    */
   public function testGetActivitiesCountforNonAdminDashboard() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
-      )
-    );
+    $this->createTestActivities();
 
     $params = array(
       'contact_id' => 9,
@@ -360,12 +355,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method for getting count
    */
   public function testGetActivitiesCountforContactSummary() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
-      )
-    );
+    $this->createTestActivities();
 
     $params = array(
       'contact_id' => 9,
@@ -387,12 +377,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * CRM-18706 - Test Include/Exclude Activity Filters
    */
   public function testActivityFilters() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
-      )
-    );
+    $this->createTestActivities();
     Civi::settings()->set('preserve_activity_tab_filter', 1);
     $this->createLoggedInUser();
 
@@ -429,12 +414,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method for getting count
    */
   public function testGetActivitiesCountforContactSummaryWithNoActivities() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
-      )
-    );
+    $this->createTestActivities();
 
     $params = array(
       'contact_id' => 17,
@@ -501,12 +481,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method.
    */
   public function testGetActivitiesforNonAdminDashboard() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
-      )
-    );
+    $this->createTestActivities();
 
     $contactID = 9;
     $params = array(
@@ -575,13 +550,32 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method.
    */
+  public function testGetActivitiesforContactSummaryWithSortOptions() {
+    $this->createTestActivities();
+    $params = [
+      'contact_id' => 9,
+      'admin' => FALSE,
+      'caseId' => NULL,
+      'context' => 'activity',
+      'activity_type_id' => NULL,
+      'offset' => 0,
+      'rowCount' => 0,
+      'sort' => 'source_contact_name desc',
+    ];
+
+    $activities = CRM_Activity_BAO_Activity::getActivities($params);
+    $alphaOrder = ['Test Contact 11', 'Test Contact 12', 'Test Contact 3', 'Test Contact 4', 'Test Contact 9'];
+    foreach ($activities as $activity) {
+      $this->assertEquals(array_pop($alphaOrder), $activity['source_contact_name']);
+    }
+
+  }
+
+  /**
+   * Test getActivities BAO method.
+   */
   public function testGetActivitiesforContactSummary() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
-      )
-    );
+    $this->createTestActivities();
 
     $contactID = 9;
     $params = array(
@@ -592,7 +586,6 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'activity_type_id' => NULL,
       'offset' => 0,
       'rowCount' => 0,
-      'sort' => NULL,
     );
 
     //since we are loading activities from dataset, we know total number of activities for this contact
@@ -633,12 +626,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Test getActivities BAO method.
    */
   public function testGetActivitiesforContactSummaryWithActivities() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
-      )
-    );
+    $this->createTestActivities();
 
     // parameters for different test cases, check each array key for the specific test-case
     $testCases = array(
@@ -763,12 +751,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    */
   public function testByActivityDateAndStatus() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['view all contacts', 'access CiviCRM'];
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
-      )
-    );
+    $this->createTestActivities();
 
     // activity IDs catagorised by date
     $lastWeekActivities = array(1, 2, 3);
@@ -1030,12 +1013,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
    * Set up for testing activity queries.
    */
   protected function setUpForActivityDashboardTests() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
-      )
-    );
+    $this->createTestActivities();
 
     $this->_params = array(
       'contact_id' => NULL,
@@ -1163,8 +1141,7 @@ $text
   public function testSendSMSWithoutPermission() {
     $dummy = NULL;
     $session = CRM_Core_Session::singleton();
-    $config = &CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array('access CiviCRM');
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
 
     CRM_Activity_BAO_Activity::sendSMS(
       $dummy,
@@ -1333,6 +1310,15 @@ $text
     );
 
     return array($sent, $activityId, $success);
+  }
+
+  protected function createTestActivities() {
+    $op = new PHPUnit_Extensions_Database_Operation_Insert();
+    $op->execute($this->_dbconn,
+      $this->createFlatXMLDataSet(
+        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
+      )
+    );
   }
 
 }

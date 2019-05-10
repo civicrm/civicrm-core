@@ -254,10 +254,9 @@ abstract class CRM_Utils_System_Base {
     }
     $out = $content;
 
-    $config = &CRM_Core_Config::singleton();
     if (
       !$print &&
-      $config->userFramework == 'WordPress'
+      CRM_Core_Config::singleton()->userFramework == 'WordPress'
     ) {
       if (!function_exists('is_admin')) {
         throw new \Exception('Function "is_admin()" is missing, even though WordPress is the user framework.');
@@ -917,6 +916,14 @@ abstract class CRM_Utils_System_Base {
    * @param \Civi\Core\Event\GenericHookEvent $e
    */
   public function appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) {
+  }
+
+  /**
+   * Modify dynamic assets.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   */
+  public function alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) {
   }
 
   /**

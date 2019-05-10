@@ -183,7 +183,7 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   transform: rotate(180deg);
 }
 
-@media (min-width: 768px) {
+@media (min-width: $breakMin) {
 
   /* Switch to desktop layout
   -----------------------------------------------
@@ -219,7 +219,7 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   }
 
   #civicrm-menu li a {
-    background-color: $semiTransparentMenuColor;
+    background-color: $menuItemColor;
     color: $textColor;
   }
 
@@ -263,7 +263,7 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: $breakMax) {
   /* hide the menu in mobile view */
   #crm-menubar-state:not(:checked) ~ #civicrm-menu {
     display: none;

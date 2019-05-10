@@ -314,7 +314,7 @@
 
 - github      : demeritcowboy
   name        : Dave D
-  jira        : demeritcowboy
+  jira        : Dave D
 
 - github      : dereklewis123
   name        : Derek Lewis
@@ -525,6 +525,15 @@
   name        : Guy Iaccarino
   organization: Greenleaf Advancement
   jira        : guyiac
+
+- github      : GValFr35
+
+- github      : kewljuice
+  name        : Wouter Hechtermans
+  organization: Calibrate
+
+- github      : khorporative
+  name        : Aivars
 
 - github      : h-c-c
   name        : Peter Hartmann
@@ -1063,6 +1072,9 @@
 - name        : Pratiksha Dubey
   organization: Web Access
   jira        : pratiksha
+
+- github      : prondubuisi
+  name        : Onyemenam Ndubuisi
 
 - name        : Richard Edgar
   jira        : redgar

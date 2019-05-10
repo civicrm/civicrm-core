@@ -179,6 +179,15 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     // pay additional amount
     $this->submitPayment(20);
     $this->checkResults(array(30, 50, 20), 3);
+    $activities = $this->callAPISuccess('Activity', 'get', [
+      'source_record_id' => $this->_contributionId,
+      'activity_type_id' => 'Payment',
+      'options' => ['sort' => 'id'],
+      'sequential' => 1,
+    ])['values'];
+    $this->assertEquals(2, count($activities));
+    $this->assertEquals('$ 50.00 - Offline Payment for Contribution', $activities[0]['subject']);
+    $this->assertEquals('$ 20.00 - Offline Payment for Contribution', $activities[1]['subject']);
   }
 
   /**

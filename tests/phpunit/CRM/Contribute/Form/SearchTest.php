@@ -409,7 +409,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
    *
    * @dataProvider getSearchData
    */
-  public function testContributionRecurStatusFilter($formValues, $expectedCount, $expectedContact, $expectedQill) {
+  public function testContributionRecurSearchFilters($formValues, $expectedCount, $expectedContact, $expectedQill) {
     $this->setUpRecurringContributions();
 
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($formValues));
@@ -553,12 +553,14 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'sequential' => 1,
       'contact_id' => $this->ids['Contact']['contactID2'],
       'frequency_interval' => 1,
-      'frequency_unit' => "month",
+      'frequency_unit' => 'month',
       'amount' => 22,
       'currency' => "CAD",
       'payment_instrument_id' => 1,
       'contribution_status_id' => 1,
-      'financial_type_id' => "Donation",
+      'financial_type_id' => 'Donation',
+      'trxn_id' => 'a transaction',
+      'processor_id' => 'a processor',
     ]);
     $Contribution2 = $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 'Donation',
@@ -606,6 +608,18 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
         'expected_count' => 0,
         'expected_contact' => [],
         'expected_qill' => "Recurring Contribution Status = 'Cancelled'",
+      ],
+      'trxn_id_search' => [
+        'form_value' => ['contribution_recur_trxn_id' => 'a transaction'],
+        'expected_count' => 1,
+        'expected_contact' => ['Mr. Terrence Smith II'],
+        'expected_qill' => "Recurring Contribution Transaction ID = 'a transaction'",
+      ],
+      'processor_id_search' => [
+        'form_value' => ['contribution_recur_processor_id' => 'a processor'],
+        'expected_count' => 1,
+        'expected_contact' => ['Mr. Terrence Smith II'],
+        'expected_qill' => "Recurring Contribution Processor ID = 'a processor'",
       ],
     ];
     return $useCases;

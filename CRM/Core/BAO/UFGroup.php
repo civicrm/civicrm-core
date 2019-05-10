@@ -2692,7 +2692,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       ),
     );
 
-    $copy = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFGroup',
+    $copy = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFGroup',
       array('id' => $id),
       NULL,
       $fieldsFix
@@ -2704,14 +2704,14 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $copy->name = CRM_Utils_String::munge($copy->name, '_', 56) . "_{$copy->id}";
     $copy->save();
 
-    $copyUFJoin = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin',
+    $copyUFJoin = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin',
       array('uf_group_id' => $id),
       array('uf_group_id' => $copy->id),
       NULL,
       'entity_table'
     );
 
-    $copyUFField = &CRM_Core_DAO::copyGeneric('CRM_Core_BAO_UFField',
+    $copyUFField = CRM_Core_DAO::copyGeneric('CRM_Core_BAO_UFField',
       array('uf_group_id' => $id),
       array('uf_group_id' => $copy->id)
     );

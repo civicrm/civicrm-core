@@ -315,12 +315,10 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
       $childNote = new CRM_Core_DAO_Note();
       $childNote->id = $childId;
       $childNote->delete();
-      $childNote->free();
       $recent[] = $childId;
     }
 
     $return = $note->delete();
-    $note->free();
     if ($showStatus) {
       CRM_Core_Session::setStatus($status, ts('Deleted'), 'success');
     }

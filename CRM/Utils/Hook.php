@@ -2218,6 +2218,24 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called when building a link to a semi-static asset.
+   *
+   * @param string $asset
+   *   The name of the asset.
+   *   Ex: 'angular.json'
+   * @param array $params
+   *   List of optional arguments which influence the content.
+   * @return null
+   *   the return value is ignored
+   */
+  public static function getAssetUrl(&$asset, &$params) {
+    return self::singleton()->invoke(['asset', 'params'],
+      $asset, $params, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_getAssetUrl'
+    );
+  }
+
+  /**
    * This hook is called whenever the system builds a new copy of
    * semi-static asset.
    *

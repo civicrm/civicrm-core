@@ -25,13 +25,12 @@
 
 /**
  * A PHP shell script
-
- On drupal if you have a symlink to your civi module, don't forget to create a new file - settings_location.php
- Enter the following code (substitute the actual location of your <drupal root>/sites directory)
- <?php
- define( 'CIVICRM_CONFDIR', '/var/www/drupal.6/sites' );
- ?>
-
+ *
+ * On drupal if you have a symlink to your civi module, don't forget to create a new file - settings_location.php
+ * Enter the following code (substitute the actual location of your <drupal root>/sites directory)
+ * <?php
+ * define( 'CIVICRM_CONFDIR', '/var/www/drupal.6/sites' );
+ * ?>
  */
 $include_path = "../packages/:" . get_include_path();
 set_include_path($include_path);
@@ -49,19 +48,19 @@ class civicrm_CLI {
     //	set_include_path( $include_path );
     require_once 'Console/Getopt.php';
     $shortOptions = "s:u:p:k:";
-    $longOptions = array('site=', 'user', 'pass');
+    $longOptions = ['site=', 'user', 'pass'];
 
     $getopt = new Console_Getopt();
     $args = $getopt->readPHPArgv();
     array_shift($args);
     list($valid, $this->args) = $getopt->getopt2($args, $shortOptions, $longOptions);
 
-    $vars = array(
+    $vars = [
       'user' => 'u',
       'pass' => 'p',
       'key' => 'k',
       'site' => 's',
-    );
+    ];
 
     foreach ($vars as $var => $short) {
       $$var = NULL;
@@ -88,8 +87,8 @@ class civicrm_CLI {
   function authenticate($user, $pass) {
     session_start();
     require_once 'CRM/Core/Config.php';
-
-    $config = &CRM_Core_Config::singleton();
+    // Does calling this do anything here?
+    CRM_Core_Config::singleton();
 
     // this does not return on failure
     // require_once 'CRM/Utils/System.php';
@@ -102,7 +101,7 @@ class civicrm_CLI {
     $_SERVER['PHP_SELF'] = "/index.php";
     $_SERVER['HTTP_HOST'] = $this->site;
     $_REQUEST['key'] = $this->key;
-    require_once ("./civicrm.config.php");
+    require_once("./civicrm.config.php");
   }
 }
 

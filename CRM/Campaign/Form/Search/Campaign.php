@@ -37,6 +37,15 @@
 class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
 
   /**
+   * Explicitly declare the entity api name.
+   *
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'Campaign';
+  }
+
+  /**
    * Are we forced to run a search.
    *
    * @var int
@@ -78,11 +87,8 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
     //campaign description.
     $this->add('text', 'description', ts('Description'), $attributes['description']);
 
-    //campaign start date.
-    $this->addDate('start_date', ts('From'), FALSE, ['formatType' => 'searchDate']);
-
-    //campaign end date.
-    $this->addDate('end_date', ts('To'), FALSE, ['formatType' => 'searchDate']);
+    $this->add('datepicker', 'start_date', ts('Campaign Start Date'), [], FALSE, ['time' => FALSE]);
+    $this->add('datepicker', 'end_date', ts('Campaign End Date'), [], FALSE, ['time' => FALSE]);
 
     //campaign type.
     $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();

@@ -55,7 +55,7 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->_params = array(
       'subject' => 'Hello {contact.display_name}',
       'body_text' => "This is {contact.display_name}.\nhttps://civicrm.org\n{domain.address}{action.optOutUrl}",
-      'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
+      'body_html' => "<link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700' rel='stylesheet' type='text/css'><p><a href=\"http://{action.forward}\">Forward this email</a><a href=\"{action.forward}\">Forward this email with no protocol</a></p<p>This is {contact.display_name}.</p><p><a href='https://civicrm.org/'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>",
       'name' => 'mailing name',
       'created_id' => $this->_contactID,
       'header_id' => '',
@@ -269,11 +269,30 @@ class api_v3_MailingTest extends CiviUnitTestCase {
     $this->assertDBQuery($maxIDs['group'], 'SELECT MAX(id) FROM civicrm_mailing_group');
     // 'Preview should not create any mailing_recipient records'
     $this->assertDBQuery($maxIDs['recipient'], 'SELECT MAX(id) FROM civicrm_mailing_recipients');
-
+    $baseurl = CRM_Utils_System::baseCMSURL();
     $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
     $this->assertEquals("Hello $displayName", $previewResult['values']['subject']);
     $this->assertContains("This is $displayName", $previewResult['values']['body_text']);
     $this->assertContains("<p>This is $displayName.</p>", $previewResult['values']['body_html']);
+    $this->assertContains('<a href="' . $baseurl . 'index.php?q=civicrm/mailing/forward&amp;amp;reset=1&amp;jid=&amp;qid=&amp;h=">Forward this email with no protocol</a>', $previewResult['values']['body_html']);
+    $this->assertNotContains("http://http://", $previewResult['values']['body_html']);
+  }
+
+  public function testMailerPreviewUnknownContact() {
+    $params = $this->_params;
+    $params['api.Mailing.preview'] = array(
+      'id' => '$value.id',
+    );
+
+    $result = $this->callAPISuccess('mailing', 'create', $params);
+
+    // NOTE: It's highly debatable what's best to do with contact-tokens for an
+    // unknown-contact. However, changes should be purposeful, so we'll test
+    // for the current behavior (i.e. returning blanks).
+    $previewResult = $result['values'][$result['id']]['api.Mailing.preview'];
+    $this->assertEquals("Hello ", $previewResult['values']['subject']);
+    $this->assertContains("This is .", $previewResult['values']['body_text']);
+    $this->assertContains("<p>This is .</p>", $previewResult['values']['body_html']);
   }
 
   public function testMailerPreviewRecipients() {

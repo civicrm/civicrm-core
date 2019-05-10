@@ -47,8 +47,12 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    *   Associative array of contribution fields
    */
   public static function getFields($checkPermission = TRUE) {
-    if (!isset(\Civi::$statics[__CLASS__]) || !isset(\Civi::$statics[__CLASS__]['fields']) || !isset(\Civi::$statics[__CLASS__]['contribution'])) {
-      $fields = CRM_Contribute_BAO_Contribution::exportableFields($checkPermission);
+    if (!isset(\Civi::$statics[__CLASS__]) || !isset(\Civi::$statics[__CLASS__]['fields']) || !isset(\Civi::$statics[__CLASS__]['fields']['contribution'])) {
+      // Adding fields with some care as those without unique names could clobber others.
+      // Refer to CRM_Contribute_Form_SearchTest for existing tests ... and to add more!
+      $testedRecurFields = array_fill_keys(['contribution_recur_trxn_id', 'contribution_recur_processor_id', 'contribution_recur_payment_processor_id'], 1);
+      $recurFields = array_intersect_key(CRM_Contribute_DAO_ContributionRecur::fields(), $testedRecurFields);
+      $fields = array_merge($recurFields, CRM_Contribute_BAO_Contribution::exportableFields($checkPermission));
       CRM_Contribute_BAO_Contribution::appendPseudoConstantsToFields($fields);
       unset($fields['contribution_contact_id']);
       \Civi::$statics[__CLASS__]['fields']['contribution'] = $fields;
@@ -382,13 +386,12 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
       case 'contribution_recur_processor_id':
       case 'contribution_recur_trxn_id':
-        $fieldName = str_replace('contribution_recur_', '', $name);
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution_recur.{$fieldName}",
+        $spec = $fields[$name];
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($spec['where'],
           $op, $value, "String"
         );
-        $recurFields = CRM_Contribute_DAO_ContributionRecur::fields();
-        $query->_qill[$grouping][] = ts("Recurring Contribution %1 %2 '%3'", [1 => $recurFields[$fieldName]['title'], 2 => $op, 3 => $value]);
-        $query->_tables['civicrm_contribution_recur'] = $query->_whereTables['civicrm_contribution_recur'] = 1;
+        $query->_qill[$grouping][] = ts("Recurring Contribution %1 %2 '%3'", [1 => $fields[$name]['title'], 2 => $op, 3 => $value]);
+        $query->_tables[$spec['table_name']] = $query->_whereTables[$spec['table_name']] = 1;
         return;
 
       case 'contribution_recur_payment_made':

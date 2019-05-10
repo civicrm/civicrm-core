@@ -1,9 +1,8 @@
-<?php
-/*
+{*
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
+ | Copyright CiviCRM LLC (c) 2004-2018                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,19 +22,8 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
-
-require_once '../civicrm.config.php';
-$config = CRM_Core_Config::singleton();
-
-if (defined('PANTHEON_ENVIRONMENT')) {
-  ini_set('session.save_handler', 'files');
-}
-$rest = new CRM_Utils_REST();
-
-// Json-appropriate header will be set by CRM_Utils_Rest
-// But we need to set header here for non-json
-if (empty($_GET['json'])) {
-  header('Content-Type: text/xml');
-}
-echo $rest->bootAndRun();
+*}
+{* Wrapper around DatePickerRange TPL file *}
+<td {if $colspan} colspan="{$colspan}" {else} colspan="2" {/if} {if $class} class="{$class}" {/if}>
+    {include file="CRM/Core/DatePickerRange.tpl" fieldName=$fieldName}
+</td>

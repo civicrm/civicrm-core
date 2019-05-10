@@ -2038,7 +2038,6 @@ AND    cf.id = %1";
       if (!$dao->fetch()) {
         CRM_Core_Error::fatal();
       }
-      $dao->free();
       $fieldValues = array($dao->table_name, $dao->column_name, $dao->id);
       $cache->set($cacheKey, $fieldValues);
     }

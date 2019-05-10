@@ -78,7 +78,7 @@
             })
             .on('show.smapi', function(e, menu) {
               // Focus menu when opened with an accesskey
-              $(menu).siblings('a[accesskey]:not(:hover)').focus();
+              $(menu).siblings('a[accesskey]').focus();
             })
             .smartmenus(CRM.menubar.settings);
           initialized = true;

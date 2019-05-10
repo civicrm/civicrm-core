@@ -10,22 +10,25 @@
  */
 function _angularex_civix_civicrm_config(&$config = NULL) {
   static $configured = FALSE;
-  if ($configured) return;
+  if ($configured) {
+    return;
+  }
   $configured = TRUE;
 
   $template =& CRM_Core_Smarty::singleton();
 
-  $extRoot = dirname( __FILE__ ) . DIRECTORY_SEPARATOR;
+  $extRoot = dirname(__FILE__) . DIRECTORY_SEPARATOR;
   $extDir = $extRoot . 'templates';
 
-  if ( is_array( $template->template_dir ) ) {
-      array_unshift( $template->template_dir, $extDir );
-  } else {
-      $template->template_dir = array( $extDir, $template->template_dir );
+  if (is_array($template->template_dir)) {
+    array_unshift($template->template_dir, $extDir);
+  }
+  else {
+    $template->template_dir = [$extDir, $template->template_dir];
   }
 
-  $include_path = $extRoot . PATH_SEPARATOR . get_include_path( );
-  set_include_path( $include_path );
+  $include_path = $extRoot . PATH_SEPARATOR . get_include_path();
+  set_include_path($include_path);
 }
 
 /**
@@ -72,7 +75,7 @@ function _angularex_civix_civicrm_uninstall() {
 function _angularex_civix_civicrm_enable() {
   _angularex_civix_civicrm_config();
   if ($upgrader = _angularex_civix_upgrader()) {
-    if (is_callable(array($upgrader, 'onEnable'))) {
+    if (is_callable([$upgrader, 'onEnable'])) {
       return $upgrader->onEnable();
     }
   }
@@ -86,7 +89,7 @@ function _angularex_civix_civicrm_enable() {
 function _angularex_civix_civicrm_disable() {
   _angularex_civix_civicrm_config();
   if ($upgrader = _angularex_civix_upgrader()) {
-    if (is_callable(array($upgrader, 'onDisable'))) {
+    if (is_callable([$upgrader, 'onDisable'])) {
       return $upgrader->onDisable();
     }
   }
@@ -113,9 +116,10 @@ function _angularex_civix_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
  * @return CRM_Angularex_Upgrader
  */
 function _angularex_civix_upgrader() {
-  if (!file_exists(__DIR__.'/CRM/Angularex/Upgrader.php')) {
+  if (!file_exists(__DIR__ . '/CRM/Angularex/Upgrader.php')) {
     return NULL;
-  } else {
+  }
+  else {
     return CRM_Angularex_Upgrader_Base::instance();
   }
 }
@@ -131,12 +135,12 @@ function _angularex_civix_upgrader() {
  * @return array(string)
  */
 function _angularex_civix_find_files($dir, $pattern) {
-  if (is_callable(array('CRM_Utils_File', 'findFiles'))) {
+  if (is_callable(['CRM_Utils_File', 'findFiles'])) {
     return CRM_Utils_File::findFiles($dir, $pattern);
   }
 
-  $todos = array($dir);
-  $result = array();
+  $todos = [$dir];
+  $result = [];
   while (!empty($todos)) {
     $subdir = array_shift($todos);
     foreach (_angularex_civix_glob("$subdir/$pattern") as $match) {
@@ -148,7 +152,8 @@ function _angularex_civix_find_files($dir, $pattern) {
       while (FALSE !== ($entry = readdir($dh))) {
         $path = $subdir . DIRECTORY_SEPARATOR . $entry;
         if ($entry{0} == '.') {
-        } elseif (is_dir($path)) {
+        }
+        elseif (is_dir($path)) {
           $todos[] = $path;
         }
       }
@@ -202,11 +207,11 @@ function _angularex_civix_civicrm_caseTypes(&$caseTypes) {
       CRM_Core_Error::fatal($errorMessage);
       // throw new CRM_Core_Exception($errorMessage);
     }
-    $caseTypes[$name] = array(
+    $caseTypes[$name] = [
       'module' => 'org.civicrm.angularex',
       'name' => $name,
       'file' => $file,
-    );
+    ];
   }
 }
 
@@ -224,7 +229,7 @@ function _angularex_civix_civicrm_caseTypes(&$caseTypes) {
  */
 function _angularex_civix_glob($pattern) {
   $result = glob($pattern);
-  return is_array($result) ? $result : array();
+  return is_array($result) ? $result : [];
 }
 
 /**
@@ -245,25 +250,30 @@ function _angularex_civix_insert_navigation_menu(&$menu, $path, $item, $parentId
 
   // If we are done going down the path, insert menu
   if (empty($path)) {
-    if (!$navId) $navId = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_navigation");
-    $navId ++;
-    $menu[$navId] = array (
-      'attributes' => array_merge($item, array(
-        'label'      => CRM_Utils_Array::value('name', $item),
-        'active'     => 1,
-        'parentID'   => $parentId,
-        'navID'      => $navId,
-      ))
-    );
-    return true;
-  } else {
+    if (!$navId) {
+      $navId = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_navigation");
+    }
+    $navId++;
+    $menu[$navId] = [
+      'attributes' => array_merge($item, [
+        'label' => CRM_Utils_Array::value('name', $item),
+        'active' => 1,
+        'parentID' => $parentId,
+        'navID' => $navId,
+      ]),
+    ];
+    return TRUE;
+  }
+  else {
     // Find an recurse into the next level down
-    $found = false;
+    $found = FALSE;
     $path = explode('/', $path);
     $first = array_shift($path);
     foreach ($menu as $key => &$entry) {
       if ($entry['attributes']['name'] == $first) {
-        if (!$entry['child']) $entry['child'] = array();
+        if (!$entry['child']) {
+          $entry['child'] = [];
+        }
         $found = _angularex_civix_insert_navigation_menu($entry['child'], implode('/', $path), $item, $key);
       }
     }
@@ -279,11 +289,13 @@ function _angularex_civix_insert_navigation_menu(&$menu, $path, $item, $parentId
  */
 function _angularex_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   static $configured = FALSE;
-  if ($configured) return;
+  if ($configured) {
+    return;
+  }
   $configured = TRUE;
 
   $settingsDir = __DIR__ . DIRECTORY_SEPARATOR . 'settings';
-  if(is_dir($settingsDir) && !in_array($settingsDir, $metaDataFolders)) {
+  if (is_dir($settingsDir) && !in_array($settingsDir, $metaDataFolders)) {
     $metaDataFolders[] = $settingsDir;
   }
 }

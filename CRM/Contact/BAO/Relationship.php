@@ -473,7 +473,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    */
   public static function getdefaults() {
     return array(
-      'is_active' => 0,
+      'is_active' => 1,
       'is_permission_a_b' => self::NONE,
       'is_permission_b_a' => self::NONE,
       'description' => '',
