@@ -170,7 +170,7 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
           $seatClause[] = "( participant.is_test = {$this->_formValues['participant_test']} )";
         }
         if (!empty($this->_formValues['participant_status_id'])) {
-          $seatClause[] = CRM_Contact_BAO_Query::buildClause("participant.status_id", '=', $this->_formValues['participant_status_id'], 'Int');
+          $seatClause[] = CRM_Contact_BAO_Query::buildClause("participant.status_id", 'IN', $this->_formValues['participant_status_id'], 'Int');
           if ($status = CRM_Utils_Array::value('IN', $this->_formValues['participant_status_id'])) {
             $this->_formValues['participant_status_id'] = $status;
           }
