@@ -539,12 +539,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
       'contact_id' => $contactId,
       'context' => 'activity',
     );
-    foreach (array(CRM_Activity_BAO_Activity::getActivities($params)) as $activities) {
-      //verify target count
-      $this->assertEquals($targetCount, $activities[1]['target_contact_counter']);
-      $this->assertEquals([$targetContactIDs[0] => 'Anderson, Anthony'], $activities[1]['target_contact_name']);
-    }
-
+    $activities = CRM_Activity_BAO_Activity::getActivities($params);
+    //verify target count
+    $this->assertEquals($targetCount, $activities[1]['target_contact_count']);
+    $this->assertEquals([$targetContactIDs[0] => 'Anderson, Anthony'], $activities[1]['target_contact_name']);
+    $this->assertEquals('Anderson, Anthony', $activities[1]['source_contact_name']);
+    $this->assertEquals('Anderson, Anthony', $activities[1]['assignee_contact_name'][4]);
   }
 
   /**
@@ -574,7 +574,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
   /**
    * Test getActivities BAO method.
    */
-  public function testGetActivitiesforContactSummary() {
+  public function testGetActivitiesForContactSummary() {
     $this->createTestActivities();
 
     $contactID = 9;
@@ -591,33 +591,37 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     //since we are loading activities from dataset, we know total number of activities for this contact
     // 5 activities, Contact Summary should show all activities
     $count = 5;
-    foreach (array(CRM_Activity_BAO_Activity::getActivities($params)) as $activities) {
+    $activities = CRM_Activity_BAO_Activity::getActivities($params);
+    $this->assertEquals($count, count($activities));
+    foreach ($activities as $key => $value) {
+      $this->assertEquals($value['subject'], "subject {$key}", 'Verify activity subject is correct.');
 
-      $this->assertEquals($count, count($activities));
+      if ($key > 8) {
+        $this->assertEquals($value['status_id'], 2, 'Verify all activities are scheduled.');
+      }
+      else {
+        $this->assertEquals($value['status_id'], 1, 'Verify all activities are scheduled.');
+      }
 
-      foreach ($activities as $key => $value) {
-        $this->assertEquals($value['subject'], "subject {$key}", 'Verify activity subject is correct.');
+      if ($key === 12) {
+        $this->assertEquals($value['activity_type'], 'Bulk Email', 'Verify activity type is correct.');
+        $this->assertEquals('(2 recipients)', $value['recipients']);
+        $targetContactID = key($value['target_contact_name']);
+        // The 2 targets have ids 10 & 11. Since they are not sorted it could be either on some systems.
+        $this->assertTrue(in_array($targetContactID, [10, 11]));
+      }
+      elseif ($key > 8) {
+        $this->assertEquals($value['activity_type_id'], 1, 'Verify activity type is correct.');
+      }
+      else {
+        $this->assertEquals($value['activity_type_id'], 2, 'Verify activity type is correct.');
+      }
 
-        if ($key > 8) {
-          $this->assertEquals($value['status_id'], 2, 'Verify all activities are scheduled.');
-        }
-        else {
-          $this->assertEquals($value['status_id'], 1, 'Verify all activities are scheduled.');
-        }
-
-        if ($key > 8) {
-          $this->assertEquals($value['activity_type_id'], 1, 'Verify activity type is correct.');
-        }
-        else {
-          $this->assertEquals($value['activity_type_id'], 2, 'Verify activity type is correct.');
-        }
-
-        if ($key == 3) {
-          $this->assertArrayHasKey($contactID, $value['target_contact_name']);
-        }
-        elseif ($key == 4) {
-          $this->assertArrayHasKey($contactID, $value['assignee_contact_name']);
-        }
+      if ($key == 3) {
+        $this->assertEquals([$contactID => 'Test Contact ' . $contactID], $value['target_contact_name']);
+      }
+      elseif ($key == 4) {
+        $this->assertArrayHasKey($contactID, $value['assignee_contact_name']);
       }
     }
   }
@@ -1320,6 +1324,8 @@ $text
         dirname(__FILE__) . '/activities_for_dashboard_count.xml'
       )
     );
+    // Make changes to improve variation in php since the xml method is brittle & relies on option values being unchanged.
+    $this->callAPISuccess('Activity', 'create', ['id' => 12, 'activity_type_id' => 'Bulk Email']);
   }
 
 }
