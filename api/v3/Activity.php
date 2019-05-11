@@ -664,8 +664,8 @@ function _civicrm_api3_activity_fill_activity_contact_names(&$activities, $param
     }
     else {
       $activities[$activityContact['activity_id']]['source_contact_id'] = $contactID;
-      $activities[$activityContact['activity_id']]['source_contact_name'] = isset($activityContact['contact_id.display_name']) ? $activityContact['contact_id.display_name'] : '';
-      $activities[$activityContact['activity_id']]['source_contact_sort_name'] = isset($activityContact['contact_id.sort_name']) ? $activityContact['contact_id.sort_name'] : '';
+      $activities[$activityContact['activity_id']]['source_contact_name'] = isset($activityContact['contact_id.sort_name']) ? $activityContact['contact_id.sort_name'] : '';
+      $activities[$activityContact['activity_id']]['source_contact_display_name'] = isset($activityContact['contact_id.display_name']) ? $activityContact['contact_id.display_name'] : '';
     }
   }
 }
