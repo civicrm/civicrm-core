@@ -766,7 +766,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         'subject' => CRM_Utils_Array::value('subject', $activity),
         'assignee_contact_name' => CRM_Utils_Array::value('assignee_contact_sort_name', $activity, []),
         'source_contact_id' => CRM_Utils_Array::value('source_contact_id', $activity),
-        'source_contact_name' => CRM_Utils_Array::value('source_contact_name', $activity),
+        'source_contact_name' => CRM_Utils_Array::value('source_contact_sort_name', $activity),
       ];
       $activities[$id]['activity_type_name'] = CRM_Core_PseudoConstant::getName('CRM_Activity_BAO_Activity', 'activity_type_id', $activity['activity_type_id']);
       $activities[$id]['activity_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $activity['activity_type_id']);
