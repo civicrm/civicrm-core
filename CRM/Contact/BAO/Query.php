@@ -541,8 +541,8 @@ class CRM_Contact_BAO_Query {
     if (array_key_exists('civicrm_membership', $this->_whereTables)) {
       $component = 'membership';
     }
-    if (isset($component)) {
-      // @todo should be if (isset($component && !$this->_skipPermission)
+    if (isset($component) && !$this->_skipPermission) {
+      // Unit test coverage in api_v3_FinancialTypeACLTest::testGetACLContribution.
       CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClause, $component);
     }
 
