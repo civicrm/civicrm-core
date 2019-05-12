@@ -19,14 +19,14 @@ class CRM_Mailing_Event_DAO_Unsubscribe extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_mailing_event_unsubscribe';
+  public static $_tableName = 'civicrm_mailing_event_unsubscribe';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned

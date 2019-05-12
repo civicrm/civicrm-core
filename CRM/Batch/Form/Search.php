@@ -31,13 +31,14 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Batch_Form_Search extends CRM_Core_Form {
+
   /**
    * Set default values.
    *
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     $status = CRM_Utils_Request::retrieve('status', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, 1);
 
@@ -51,13 +52,13 @@ class CRM_Batch_Form_Search extends CRM_Core_Form {
     );
 
     $this->addButtons(
-      array(
-        array(
+      [
+        [
           'type' => 'refresh',
           'name' => ts('Search'),
           'isDefault' => TRUE,
-        ),
-      )
+        ],
+      ]
     );
 
     parent::buildQuickForm();

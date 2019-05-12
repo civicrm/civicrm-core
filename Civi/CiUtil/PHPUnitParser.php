@@ -5,6 +5,7 @@ namespace Civi\CiUtil;
  * Parse phpunit result files
  */
 class PHPUnitParser {
+
   /**
    * @param string $content
    *   Phpunit streaming JSON.
@@ -13,7 +14,7 @@ class PHPUnitParser {
    */
   protected static function parseJsonStream($content) {
     $content = '['
-      . strtr($content, array("}{" => "},{"))
+      . strtr($content, ["}{" => "},{"])
       . ']';
     return json_decode($content, TRUE);
   }
@@ -26,7 +27,7 @@ class PHPUnitParser {
    */
   public static function parseJsonResults($content) {
     $records = self::parseJsonStream($content);
-    $results = array();
+    $results = [];
     foreach ($records as $r) {
       if ($r['event'] == 'test') {
         $results[$r['test']] = $r['status'];

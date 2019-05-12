@@ -7,9 +7,9 @@ namespace Civi\CiUtil;
  * @package Civi\CiUtil
  */
 class CsvPrinter {
-  var $file;
-  var $headers;
-  var $hasHeader = FALSE;
+  public $file;
+  public $headers;
+  public $hasHeader = FALSE;
 
   /**
    * @param $file

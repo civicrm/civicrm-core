@@ -29,9 +29,9 @@
  * @ingroup civicrm_field_handlers
  */
 class civicrm_handler_field_location extends civicrm_handler_field {
-  static $_locationTypes;
-  static $_locationOps;
-  static $location_op;
+  public static $_locationTypes;
+  public static $_locationOps;
+  public static $location_op;
 
   public function construct() {
     parent::construct();

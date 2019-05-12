@@ -1,11 +1,9 @@
-Dear {$contactDisplayName}
-{if $isRefund}
+{if $emailGreeting}{$emailGreeting},
+{/if}{if $isRefund}
 {ts}A refund has been issued based on changes in your registration selections.{/ts}
 {else}
 {ts}A payment has been received.{/ts}
 {/if}
-
-{ts}Please print this confirmation for your records.{/ts}
 
 {if $isRefund}
 ===============================================================================
@@ -46,7 +44,7 @@ Dear {$contactDisplayName}
 {if $checkNumber}
 {ts}Check Number{/ts}: {$checkNumber}
 {/if}
-{if $contributeMode eq 'direct' and !$isAmountzero}
+{if $billingName || $address}
 
 ===============================================================================
 
@@ -58,7 +56,7 @@ Dear {$contactDisplayName}
 {$address}
 {/if}
 
-{if $contributeMode eq 'direct' and !$isAmountzero}
+{if $credit_card_number}
 ===========================================================
 {ts}Credit Card Information{/ts}
 

@@ -43,23 +43,23 @@ class CRM_Tag_Page_Tag extends CRM_Core_Page {
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'bower_components/jstree/dist/jstree.min.js', 0, 'html-header')
       ->addStyleFile('civicrm', 'bower_components/jstree/dist/themes/default/style.min.css')
-      ->addPermissions(array('administer reserved tags', 'administer Tagsets'));
+      ->addPermissions(['administer reserved tags', 'administer Tagsets']);
 
-    $usedFor = $tagsets = array();
+    $usedFor = $tagsets = [];
 
-    $result = civicrm_api3('OptionValue', 'get', array(
-      'return' => array("value", "name"),
+    $result = civicrm_api3('OptionValue', 'get', [
+      'return' => ["value", "name"],
       'option_group_id' => "tag_used_for",
-    ));
+    ]);
     foreach ($result['values'] as $value) {
       $usedFor[$value['value']] = $value['name'];
     }
 
-    $result = civicrm_api3('Tag', 'get', array(
-      'return' => array("name", "used_for", "description", "created_id.display_name", "created_date", "is_reserved"),
+    $result = civicrm_api3('Tag', 'get', [
+      'return' => ["name", "used_for", "description", "created_id.display_name", "created_date", "is_reserved"],
       'is_tagset' => 1,
-      'options' => array('limit' => 0),
-    ));
+      'options' => ['limit' => 0],
+    ]);
     foreach ($result['values'] as $id => $tagset) {
       $used = explode(',', CRM_Utils_Array::value('used_for', $tagset, ''));
       $tagset['used_for_label'] = array_values(array_intersect_key($usedFor, array_flip($used)));

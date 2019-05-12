@@ -6,11 +6,11 @@
  *   API result array
  */
 function uf_field_replace_example() {
-  $params = array(
+  $params = [
     'uf_group_id' => 11,
     'option.autoweight' => '',
-    'values' => array(
-      '0' => array(
+    'values' => [
+      '0' => [
         'field_name' => 'first_name',
         'field_type' => 'Contact',
         'visibility' => 'Public Pages and Listings',
@@ -18,8 +18,8 @@ function uf_field_replace_example() {
         'label' => 'Test First Name',
         'is_searchable' => 1,
         'is_active' => 1,
-      ),
-      '1' => array(
+      ],
+      '1' => [
         'field_name' => 'country',
         'field_type' => 'Contact',
         'visibility' => 'Public Pages and Listings',
@@ -28,8 +28,8 @@ function uf_field_replace_example() {
         'is_searchable' => 1,
         'is_active' => 1,
         'location_type_id' => 1,
-      ),
-      '2' => array(
+      ],
+      '2' => [
         'field_name' => 'phone',
         'field_type' => 'Contact',
         'visibility' => 'Public Pages and Listings',
@@ -39,10 +39,10 @@ function uf_field_replace_example() {
         'is_active' => 1,
         'location_type_id' => 1,
         'phone_type_id' => 1,
-      ),
-    ),
+      ],
+    ],
     'check_permissions' => TRUE,
-  );
+  ];
 
   try{
     $result = civicrm_api3('UFField', 'replace', $params);
@@ -52,12 +52,12 @@ function uf_field_replace_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -71,12 +71,12 @@ function uf_field_replace_example() {
  */
 function uf_field_replace_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 3,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'uf_group_id' => '11',
         'field_name' => 'first_name',
@@ -96,8 +96,8 @@ function uf_field_replace_expectedresult() {
         'field_type' => 'Contact',
         'is_reserved' => '',
         'is_multi_summary' => '',
-      ),
-      '2' => array(
+      ],
+      '2' => [
         'id' => '2',
         'uf_group_id' => '11',
         'field_name' => 'country',
@@ -117,8 +117,8 @@ function uf_field_replace_expectedresult() {
         'field_type' => 'Contact',
         'is_reserved' => '',
         'is_multi_summary' => '',
-      ),
-      '3' => array(
+      ],
+      '3' => [
         'id' => '3',
         'uf_group_id' => '11',
         'field_name' => 'phone',
@@ -138,9 +138,9 @@ function uf_field_replace_expectedresult() {
         'field_type' => 'Contact',
         'is_reserved' => '',
         'is_multi_summary' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

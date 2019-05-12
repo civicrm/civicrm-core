@@ -6,7 +6,7 @@
  *   API result array
  */
 function activity_create_example() {
-  $params = array(
+  $params = [
     'source_contact_id' => 1,
     'activity_type_id' => 'Test activity type',
     'subject' => 'test activity type id',
@@ -17,7 +17,7 @@ function activity_create_example() {
     'location' => 'Pennsylvania',
     'details' => 'a test activity',
     'custom_1' => 'custom string',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Activity', 'create', $params);
@@ -27,12 +27,12 @@ function activity_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -46,13 +46,13 @@ function activity_create_example() {
  */
 function activity_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'source_record_id' => '',
         'activity_type_id' => '9999',
@@ -78,9 +78,9 @@ function activity_create_expectedresult() {
         'engagement_level' => '',
         'weight' => '',
         'is_star' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

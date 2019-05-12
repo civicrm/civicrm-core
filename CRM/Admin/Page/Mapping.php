@@ -43,7 +43,7 @@ class CRM_Admin_Page_Mapping extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO.
@@ -65,20 +65,20 @@ class CRM_Admin_Page_Mapping extends CRM_Core_Page_Basic {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
       $deleteExtra = ts('Are you sure you want to delete this mapping?') . ' ' . ts('This operation cannot be undone.');
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/mapping',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Mapping'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/mapping',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Mapping'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }

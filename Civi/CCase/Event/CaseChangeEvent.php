@@ -26,6 +26,7 @@
  */
 
 namespace Civi\CCase\Event;
+
 use Civi\Core\Event\GenericHookEvent;
 
 /**
@@ -49,7 +50,7 @@ class CaseChangeEvent extends GenericHookEvent {
    * @inheritDoc
    */
   public function getHookValues() {
-    return array($this->analyzer);
+    return [$this->analyzer];
   }
 
 }

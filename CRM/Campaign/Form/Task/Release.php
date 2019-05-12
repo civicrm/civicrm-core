@@ -66,11 +66,11 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
     $this->_interviewToRelease = $this->get('interviewToRelease');
     if ($this->_interviewToRelease) {
       //user came from interview form.
-      foreach (array(
-                 'surveyId',
-                 'contactIds',
-                 'interviewerId',
-               ) as $fld) {
+      foreach ([
+        'surveyId',
+        'contactIds',
+        'interviewerId',
+      ] as $fld) {
         $this->{"_$fld"} = $this->get($fld);
       }
 
@@ -95,15 +95,13 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
       CRM_Core_Error::statusBounce(ts('Could not find respondents to release.'));
     }
 
-    $surveyDetails = array();
-    $params = array('id' => $this->_surveyId);
+    $surveyDetails = [];
+    $params = ['id' => $this->_surveyId];
     $this->_surveyDetails = CRM_Campaign_BAO_Survey::retrieve($params, $surveyDetails);
 
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
-    $statusIds = array();
-    foreach (array(
-               'Scheduled',
-             ) as $name) {
+    $statusIds = [];
+    foreach (['Scheduled'] as $name) {
       if ($statusId = array_search($name, $activityStatus)) {
         $statusIds[] = $statusId;
       }
@@ -123,7 +121,7 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
     //append breadcrumb to survey dashboard.
     if (CRM_Campaign_BAO_Campaign::accessCampaign()) {
       $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
-      CRM_Utils_System::appendBreadCrumb(array(array('title' => ts('Survey(s)'), 'url' => $url)));
+      CRM_Utils_System::appendBreadCrumb([['title' => ts('Survey(s)'), 'url' => $url]]);
     }
 
     //set the title.
@@ -139,7 +137,7 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
   }
 
   public function postProcess() {
-    $deleteActivityIds = array();
+    $deleteActivityIds = [];
     foreach ($this->_contactIds as $cid) {
       if (array_key_exists($cid, $this->_surveyActivities)) {
         $deleteActivityIds[] = $this->_surveyActivities[$cid]['activity_id'];
@@ -152,19 +150,19 @@ class CRM_Campaign_Form_Task_Release extends CRM_Campaign_Form_Task {
       CRM_Core_DAO::executeQuery($query);
 
       if ($deleteActivityIds) {
-        $status = ts("Respondent has been released.", array(
+        $status = ts("Respondent has been released.", [
           'count' => count($deleteActivityIds),
           'plural' => '%count respondents have been released.',
-        ));
+        ]);
         CRM_Core_Session::setStatus($status, ts('Released'), 'success');
       }
 
       if (count($this->_contactIds) > count($deleteActivityIds)) {
         $status = ts('1 respondent did not release.',
-          array(
+          [
             'count' => (count($this->_contactIds) - count($deleteActivityIds)),
             'plural' => '%count respondents did not release.',
-          )
+          ]
         );
         CRM_Core_Session::setStatus($status, ts('Notice'), 'alert');
       }

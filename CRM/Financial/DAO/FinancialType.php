@@ -19,14 +19,14 @@ class CRM_Financial_DAO_FinancialType extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_financial_type';
+  public static $_tableName = 'civicrm_financial_type';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * ID of original financial_type so you can search this table by the financial_type.id and then select the relevant version based on the timestamp

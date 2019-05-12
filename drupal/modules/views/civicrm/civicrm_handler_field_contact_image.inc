@@ -1,6 +1,7 @@
 <?php
 
 class civicrm_handler_field_contact_image extends views_handler_field {
+
   public function option_definition() {
     $options = parent::option_definition();
     $options['url_only'] = array(

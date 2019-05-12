@@ -31,6 +31,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contribute_Page_PaymentInfo extends CRM_Core_Page {
+
   public function preProcess() {
     $this->_component = CRM_Utils_Request::retrieve('component', 'String', $this, TRUE);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');

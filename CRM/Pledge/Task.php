@@ -36,7 +36,7 @@
  */
 class CRM_Pledge_Task extends CRM_Core_Task {
 
-  static $objectType = 'pledge';
+  public static $objectType = 'pledge';
 
   /**
    * These tasks are the core set of tasks that the user can perform
@@ -47,26 +47,26 @@ class CRM_Pledge_Task extends CRM_Core_Task {
    */
   public static function tasks() {
     if (!self::$_tasks) {
-      self::$_tasks = array(
-        self::TASK_DELETE => array(
+      self::$_tasks = [
+        self::TASK_DELETE => [
           'title' => ts('Delete pledges'),
           'class' => 'CRM_Pledge_Form_Task_Delete',
           'result' => FALSE,
-        ),
-        self::TASK_PRINT => array(
+        ],
+        self::TASK_PRINT => [
           'title' => ts('Print selected rows'),
           'class' => 'CRM_Pledge_Form_Task_Print',
           'result' => FALSE,
-        ),
-        self::TASK_EXPORT => array(
+        ],
+        self::TASK_EXPORT => [
           'title' => ts('Export pledges'),
-          'class' => array(
+          'class' => [
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
-          ),
+          ],
           'result' => FALSE,
-        ),
-      );
+        ],
+      ];
 
       // CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete in CiviPledge')) {
@@ -89,16 +89,16 @@ class CRM_Pledge_Task extends CRM_Core_Task {
    * @return array
    *   set of tasks that are valid for the user
    */
-  public static function permissionedTaskTitles($permission, $params = array()) {
+  public static function permissionedTaskTitles($permission, $params = []) {
     if (($permission == CRM_Core_Permission::EDIT)
       || CRM_Core_Permission::check('edit pledges')
     ) {
       $tasks = self::taskTitles();
     }
     else {
-      $tasks = array(
+      $tasks = [
         self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
-      );
+      ];
       //CRM-4418,
       if (CRM_Core_Permission::check('delete in CiviPledge')) {
         $tasks[self::TASK_DELETE] = self::$_tasks[self::TASK_DELETE]['title'];

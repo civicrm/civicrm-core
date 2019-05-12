@@ -34,6 +34,7 @@
  * Simple static helpers for network operations
  */
 class CRM_Utils_Network {
+
   /**
    * Try connecting to a TCP service; if it fails, retry. Repeat until serverStartupTimeOut elapses.
    *

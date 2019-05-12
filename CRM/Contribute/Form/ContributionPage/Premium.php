@@ -40,7 +40,7 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
    * Set default values for the form.
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     if (isset($this->_id)) {
       $dao = new CRM_Contribute_DAO_Premium();
       $dao->entity_table = 'civicrm_contribution_page';
@@ -74,7 +74,7 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
 
     // CRM-10999 Control label and position for No Thank-you radio button
     $this->add('text', 'premiums_nothankyou_label', ts('No Thank-you Label'), $attributes['premiums_nothankyou_label']);
-    $positions = array(1 => ts('Before Premiums'), 2 => ts('After Premiums'));
+    $positions = [1 => ts('Before Premiums'), 2 => ts('After Premiums')];
     $this->add('select', 'premiums_nothankyou_position', ts('No Thank-you Option'), $positions);
     $showForm = TRUE;
 
@@ -92,7 +92,7 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
     $this->assign('showForm', $showForm);
 
     parent::buildQuickForm();
-    $this->addFormRule(array('CRM_Contribute_Form_ContributionPage_Premium', 'formRule'), $this);
+    $this->addFormRule(['CRM_Contribute_Form_ContributionPage_Premium', 'formRule'], $this);
 
     $premiumPage = new CRM_Contribute_Page_Premium();
     $premiumPage->browse();
@@ -108,7 +108,7 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
    *   mixed true or array of errors
    */
   public static function formRule($params) {
-    $errors = array();
+    $errors = [];
     if (!empty($params['premiums_active'])) {
       if (empty($params['premiums_nothankyou_label'])) {
         $errors['premiums_nothankyou_label'] = ts('No Thank-you Label is a required field.');

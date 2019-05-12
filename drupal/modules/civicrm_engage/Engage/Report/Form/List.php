@@ -95,12 +95,14 @@ class Engage_Report_Form_List extends CRM_Report_Form {
    * Constituent individual table name has changed
    * between versions of civicrm. Populate this field
    * dynamically to ensure backward compatability
+   * @var bool
    */
   protected $_constituentIndividualTable = FALSE;
 
   /**
    * Langauage field might be primary or secondary
    * depending on version...
+   * @var bool
    */
   protected $_langaugeName = FALSE;
 

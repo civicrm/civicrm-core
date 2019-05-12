@@ -12,13 +12,12 @@ class SqlFileStep implements StepInterface {
     $this->file = $file;
   }
 
-
   public function getSig() {
-    return implode(' ', array(
+    return implode(' ', [
       $this->file,
       filemtime($this->file),
       filectime($this->file),
-    ));
+    ]);
   }
 
   public function isValid() {

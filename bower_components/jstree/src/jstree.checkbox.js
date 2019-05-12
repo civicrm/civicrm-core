@@ -272,7 +272,7 @@
 							if(s.indexOf('down') !== -1) {
 								var selectedIds = this._cascade_new_checked_state(obj.id, false);
 
-								cur = cur.filter(function(id) {
+								cur = $.vakata.array_filter(cur, function(id) {
 									return allIds.indexOf(id) === -1 || selectedIds.indexOf(id) > -1;
 								});
 							}
@@ -292,7 +292,7 @@
 									}
 								}
 
-								cur = cur.filter(function(id) {
+								cur = $.vakata.array_filter(cur, function(id) {
 									return obj.parents.indexOf(id) === -1;
 								});
 							}
@@ -578,7 +578,7 @@
 		};
 		/**
 		 * enable a node's checkbox
-		 * @name disable_checkbox(obj)
+		 * @name enable_checkbox(obj)
 		 * @param {mixed} obj an array can be used too
 		 * @trigger enable_checkbox.jstree
 		 * @plugin checkbox
@@ -718,7 +718,7 @@
 			var t = self.settings.checkbox.tie_selection;
 			var node = self._model.data[id];
 
-			return node.children_d.filter(function(_id) {
+			return $.vakata.array_filter(node.children_d, function(_id) {
 				return self._model.data[_id].state[ t ? 'selected' : 'checked' ];
 			});
 		};
@@ -877,7 +877,7 @@
 		 */
 		this.get_checked = function (full) {
 			if(this.settings.checkbox.tie_selection) { return this.get_selected(full); }
-			return full ? $.map(this._data.checkbox.selected, $.proxy(function (i) { return this.get_node(i); }, this)) : this._data.checkbox.selected;
+			return full ? $.map(this._data.checkbox.selected, $.proxy(function (i) { return this.get_node(i); }, this)) : this._data.checkbox.selected.slice();
 		};
 		/**
 		 * get an array of all top level checked nodes (ignoring children of checked nodes) (if tie_selection is on in the settings this function will return the same as get_top_selected)

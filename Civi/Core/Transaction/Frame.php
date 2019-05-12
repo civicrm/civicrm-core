@@ -83,12 +83,12 @@ class Frame {
     $this->commitStmt = $commitStmt;
     $this->rollbackStmt = $rollbackStmt;
 
-    $this->callbacks = array(
-      \CRM_Core_Transaction::PHASE_PRE_COMMIT => array(),
-      \CRM_Core_Transaction::PHASE_POST_COMMIT => array(),
-      \CRM_Core_Transaction::PHASE_PRE_ROLLBACK => array(),
-      \CRM_Core_Transaction::PHASE_POST_ROLLBACK => array(),
-    );
+    $this->callbacks = [
+      \CRM_Core_Transaction::PHASE_PRE_COMMIT => [],
+      \CRM_Core_Transaction::PHASE_POST_COMMIT => [],
+      \CRM_Core_Transaction::PHASE_PRE_ROLLBACK => [],
+      \CRM_Core_Transaction::PHASE_POST_ROLLBACK => [],
+    ];
   }
 
   public function inc() {
@@ -186,16 +186,16 @@ class Frame {
    */
   public function addCallback($phase, $callback, $params = NULL, $id = NULL) {
     if ($id) {
-      $this->callbacks[$phase][$id] = array(
+      $this->callbacks[$phase][$id] = [
         'callback' => $callback,
-        'parameters' => (is_array($params) ? $params : array($params)),
-      );
+        'parameters' => (is_array($params) ? $params : [$params]),
+      ];
     }
     else {
-      $this->callbacks[$phase][] = array(
+      $this->callbacks[$phase][] = [
         'callback' => $callback,
-        'parameters' => (is_array($params) ? $params : array($params)),
-      );
+        'parameters' => (is_array($params) ? $params : [$params]),
+      ];
     }
   }
 

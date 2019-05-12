@@ -47,11 +47,13 @@ class CRM_Member_Form_Task_PickProfile extends CRM_Member_Form_Task {
 
   /**
    * Maximum members that should be allowed to update
+   * @var int
    */
   protected $_maxMembers = 100;
 
   /**
    * Variable to store redirect path
+   * @var string
    */
   protected $_userContext;
 
@@ -71,10 +73,10 @@ class CRM_Member_Form_Task_PickProfile extends CRM_Member_Form_Task {
     $validate = FALSE;
     //validations
     if (count($this->_memberIds) > $this->_maxMembers) {
-      CRM_Core_Session::setStatus(ts("The maximum number of members you can select for Update multiple memberships is %1. You have selected %2. Please select fewer members from your search results and try again.", array(
+      CRM_Core_Session::setStatus(ts("The maximum number of members you can select for Update multiple memberships is %1. You have selected %2. Please select fewer members from your search results and try again.", [
         1 => $this->_maxMembers,
         2 => count($this->_memberIds),
-      )), ts('Update multiple records error'), 'error');
+      ]), ts('Update multiple records error'), 'error');
       $validate = TRUE;
     }
 
@@ -91,18 +93,18 @@ class CRM_Member_Form_Task_PickProfile extends CRM_Member_Form_Task {
    * @return void
    */
   public function buildQuickForm() {
-    $types = array('Membership');
+    $types = ['Membership'];
     $profiles = CRM_Core_BAO_UFGroup::getProfiles($types, TRUE);
 
     if (empty($profiles)) {
-      CRM_Core_Session::setStatus(ts("You will need to create a Profile containing the %1 fields you want to edit before you can use Update multiple memberships. Navigate to Administer CiviCRM >> CiviCRM Profile to configure a Profile. Consult the online Administrator documentation for more information.", array(1 => $types[0])), ts('Update multiple records error'), 'error');
+      CRM_Core_Session::setStatus(ts("You will need to create a Profile containing the %1 fields you want to edit before you can use Update multiple memberships. Navigate to Administer CiviCRM >> CiviCRM Profile to configure a Profile. Consult the online Administrator documentation for more information.", [1 => $types[0]]), ts('Update multiple records error'), 'error');
       CRM_Utils_System::redirect($this->_userContext);
     }
 
     $ufGroupElement = $this->add('select', 'uf_group_id', ts('Select Profile'),
-      array(
+      [
         '' => ts('- select profile -'),
-      ) + $profiles, TRUE
+      ] + $profiles, TRUE
     );
     $this->addDefaultButtons(ts('Continue'));
   }
@@ -114,7 +116,7 @@ class CRM_Member_Form_Task_PickProfile extends CRM_Member_Form_Task {
    * @return void
    */
   public function addRules() {
-    $this->addFormRule(array('CRM_Member_Form_Task_PickProfile', 'formRule'));
+    $this->addFormRule(['CRM_Member_Form_Task_PickProfile', 'formRule']);
   }
 
   /**

@@ -253,15 +253,14 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
 
     $cs = CRM_Core_DAO::executeQuery($query, $params);
 
-    $count = 0;
+    $count = $countCancelled = 0;
     $amount = $average = $cancelAmount = array();
 
     while ($cs->fetch()) {
       if ($cs->amount > 0) {
         $count++;
-        $amount[] = $cs->amount;
-        $average[] = $cs->average;
-        $currency[] = $cs->currency;
+        $amount[] = CRM_Utils_Money::format($cs->amount, $cs->currency);
+        $average[] = CRM_Utils_Money::format($cs->average, $cs->currency);
       }
     }
 
@@ -271,16 +270,17 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
     $cancelAmountSQL  = CRM_Core_DAO::executeQuery($query, $params);
     while ($cancelAmountSQL->fetch()) {
       if ($cancelAmountSQL->amount > 0) {
-        $count++;
-        $cancelAmount[] = $cancelAmountSQL->amount;
+        $countCancelled++;
+        $cancelAmount[] = CRM_Utils_Money::format($cancelAmountSQL->amount, $cancelAmountSQL->currency);
       }
     }
 
-    if ($count > 0) {
+    if ($count > 0 || $countCancelled > 0) {
       return array(
+        $count,
+        $countCancelled,
         implode(',&nbsp;', $amount),
         implode(',&nbsp;', $average),
-        implode(',&nbsp;', $currency),
         implode(',&nbsp;', $cancelAmount),
       );
     }
@@ -520,7 +520,7 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
       $result[$cs->id]['links'] = CRM_Core_Action::formLink($links, NULL, $replace);
 
       if ($isTest) {
-        $result[$cs->id]['contribution_status'] = $result[$cs->id]['contribution_status'] . '<br /> (test)';
+        $result[$cs->id]['contribution_status'] = CRM_Core_TestEntity::appendTestText($result[$cs->id]['contribution_status']);
       }
     }
     return $result;

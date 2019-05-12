@@ -41,7 +41,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    *
    * @var array
    */
-  static $_columnHeaders;
+  public static $_columnHeaders;
 
   /**
    * ContactId - contact id of contact whose activies are displayed
@@ -112,8 +112,8 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
     $activityId = NULL,
     $key = NULL,
     $compContext = NULL) {
-    static $activityActTypes = NULL;
-    //CRM-14277 added addtitional param to handle activity search
+
+    //CRM-14277 added additional param to handle activity search
     $extraParams = "&searchContext=activity";
 
     $extraParams .= ($key) ? "&key={$key}" : NULL;
@@ -124,11 +124,10 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
     $showView = TRUE;
     $showUpdate = $showDelete = FALSE;
     $qsUpdate = NULL;
+    $url = NULL;
+    $qsView = NULL;
 
-    if (!$activityActTypes) {
-      $activeActTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name', TRUE);
-    }
-    $activityTypeName = CRM_Utils_Array::value($activityTypeId, $activeActTypes);
+    $activityTypeName = CRM_Core_PseudoConstant::getName('CRM_Activity_BAO_Activity', 'activity_type_id', $activityTypeId);
 
     // CRM-7607
     // Lets allow to have normal operation for only activity types.
@@ -215,18 +214,18 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
 
     $qsDelete = "atype={$activityTypeId}&action=delete&reset=1&id=%%id%%&cid=%%cid%%&context=%%cxt%%{$extraParams}";
 
-    $actionLinks = array();
+    $actionLinks = [];
 
     if ($showView) {
-      $actionLinks += array(
+      $actionLinks += [
         CRM_Core_Action::
-        VIEW => array(
+        VIEW => [
           'name' => ts('View'),
           'url' => $url,
           'qs' => $qsView,
           'title' => ts('View Activity'),
-        ),
-      );
+        ],
+      ];
     }
 
     if ($showUpdate) {
@@ -238,15 +237,15 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
         $updateUrl = 'civicrm/activity/pdf/add';
       }
       if (CRM_Activity_BAO_Activity::checkPermission($activityId, CRM_Core_Action::UPDATE)) {
-        $actionLinks += array(
+        $actionLinks += [
           CRM_Core_Action::
-          UPDATE => array(
+          UPDATE => [
             'name' => ts('Edit'),
             'url' => $updateUrl,
             'qs' => $qsUpdate,
             'title' => ts('Update Activity'),
-          ),
-        );
+          ],
+        ];
       }
     }
 
@@ -254,42 +253,42 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
       $activityTypeName &&
       CRM_Case_BAO_Case::checkPermission($activityId, 'File On Case', $activityTypeId)
     ) {
-      $actionLinks += array(
+      $actionLinks += [
         CRM_Core_Action::
-        ADD => array(
+        ADD => [
           'name' => ts('File on Case'),
           'url' => '#',
           'extra' => 'onclick="javascript:fileOnCase( \'file\', \'%%id%%\', null, this ); return false;"',
           'title' => ts('File on Case'),
-        ),
-      );
+        ],
+      ];
     }
 
     if ($showDelete) {
       if (!isset($delUrl) || !$delUrl) {
         $delUrl = $url;
       }
-      $actionLinks += array(
+      $actionLinks += [
         CRM_Core_Action::
-        DELETE => array(
+        DELETE => [
           'name' => ts('Delete'),
           'url' => $delUrl,
           'qs' => $qsDelete,
           'title' => ts('Delete Activity'),
-        ),
-      );
+        ],
+      ];
     }
 
     if ($accessMailingReport) {
-      $actionLinks += array(
+      $actionLinks += [
         CRM_Core_Action::
-        BROWSE => array(
+        BROWSE => [
           'name' => ts('Mailing Report'),
           'url' => 'civicrm/mailing/report',
           'qs' => "mid={$sourceRecordId}&reset=1&cid=%%cid%%&context=activitySelector",
           'title' => ts('View Mailing Report'),
-        ),
-      );
+        ],
+      ];
     }
 
     return $actionLinks;
@@ -324,7 +323,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     if ($output == CRM_Core_Selector_Controller::EXPORT || $output == CRM_Core_Selector_Controller::SCREEN) {
-      $csvHeaders = array(ts('Activity Type'), ts('Description'), ts('Activity Date'));
+      $csvHeaders = [ts('Activity Type'), ts('Description'), ts('Activity Date')];
       foreach (self::_getColumnHeaders() as $column) {
         if (array_key_exists('name', $column)) {
           $csvHeaders[] = $column['name'];
@@ -349,7 +348,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    *   Total number of rows
    */
   public function getTotalCount($action, $case = NULL) {
-    $params = array(
+    $params = [
       'contact_id' => $this->_contactId,
       'admin' => $this->_admin,
       'caseId' => $case,
@@ -358,8 +357,8 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
       'offset' => 0,
       'rowCount' => 0,
       'sort' => NULL,
-    );
-    return CRM_Activity_BAO_Activity::deprecatedGetActivitiesCount($params);
+    ];
+    return CRM_Activity_BAO_Activity::getActivitiesCount($params);
   }
 
   /**
@@ -382,7 +381,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    *   the total number of rows for this action
    */
   public function &getRows($action, $offset, $rowCount, $sort, $output = NULL, $case = NULL) {
-    $params = array(
+    $params = [
       'contact_id' => $this->_contactId,
       'admin' => $this->_admin,
       'caseId' => $case,
@@ -391,9 +390,9 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
       'offset' => $offset,
       'rowCount' => $rowCount,
       'sort' => $sort,
-    );
+    ];
     $config = CRM_Core_Config::singleton();
-    $rows = CRM_Activity_BAO_Activity::deprecatedGetActivities($params);
+    $rows = CRM_Activity_BAO_Activity::getActivities($params);
 
     if (empty($rows)) {
       return $rows;
@@ -404,7 +403,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
     $engagementLevels = CRM_Campaign_PseudoConstant::engagementLevel();
 
     // CRM-4418
-    $permissions = array($this->_permission);
+    $permissions = [$this->_permission];
     if (CRM_Core_Permission::check('delete activities')) {
       $permissions[] = CRM_Core_Permission::DELETE;
     }
@@ -474,12 +473,12 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
       if ($output != CRM_Core_Selector_Controller::EXPORT && $output != CRM_Core_Selector_Controller::SCREEN) {
         $row['action'] = CRM_Core_Action::formLink($actionLinks,
           $actionMask,
-          array(
+          [
             'id' => $row['activity_id'],
             'cid' => $this->_contactId,
             'cxt' => $this->_context,
             'caseid' => CRM_Utils_Array::value('case_id', $row),
-          ),
+          ],
           ts('more'),
           FALSE,
           'activity.selector.action',
@@ -515,36 +514,36 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
    */
   private static function &_getColumnHeaders() {
     if (!isset(self::$_columnHeaders)) {
-      self::$_columnHeaders = array(
-        array(
+      self::$_columnHeaders = [
+        [
           'name' => ts('Type'),
           'sort' => 'activity_type',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Subject'),
           'sort' => 'subject',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Added By'),
           'sort' => 'source_contact_name',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array('name' => ts('With')),
-        array('name' => ts('Assigned')),
-        array(
+        ],
+        ['name' => ts('With')],
+        ['name' => ts('Assigned')],
+        [
           'name' => ts('Date'),
           'sort' => 'activity_date_time',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Status'),
           'sort' => 'status_id',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array('desc' => ts('Actions')),
-      );
+        ],
+        ['desc' => ts('Actions')],
+      ];
     }
 
     return self::$_columnHeaders;

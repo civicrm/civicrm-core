@@ -1,8 +1,11 @@
-This file documents all the changes made on top of core 4.7.27 by Australian Greens  
-  
-Commit# | Commit information and case info | Current Case Info  
-b2c114b | Redmine-9013 Fix issue where mail_report cron returns a copy of the html of the report even when not requested | Unlikely to be fixed soon  
-9903e81 | Atrium 4516/Redmine 11737 Stop ACL Cache from being cleared | No upstream fix and unlikely to be soon  
-26bb201 | Add in AUG Change log |  
-45c2935 | CRM-19835 port of PR 9801 | No sign its being merged in core soon  
-e899ec4 | Fix issue where disabled groups were appearing in CiviMail Receipients box | Pr waiting merger as per Redmine 24407 Atrium 4462  
+This file documents all the changes made on top of core 5.13 by Australian Greens  
+
+Commit# | Commit information and case info | Current Case Info |  
+d0d7ad1 | Redmine-9013 Fix issue where `mail_report` cron returns a copy of the html of the report even when not requested | Unlikely to be fixed soon |  
+7656ee8 | Atrium 4516/Redmine 11737 Stop ACL Cache from being cleared | No upstream fix and unlikely to be soon |  
+8a60827 | Add in AUG Change log | Specific local Changes |   
+054c036 | CRM-19835 port of PR 9801 | No sign its being merged in core soon |  
+3bbaa1d | Add in `settings_location.php` file | Not going to be fixed in Core |  
+6141c54 | Ùpdate file path in `settings_location.php` file for cluster | Not going to be fixed in core - local change | 
+69614f1 | Update composer.json and remove composer.lock as is required for composer in docker | Not going to be fixed local changes needed to support AUG docker |  
+ad4fab7 | dev/core/#273: Set doNotSms To False When Phone Number Is Given | Need to check against core pr to determine if still needed |  

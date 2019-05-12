@@ -19,8 +19,8 @@
     
     ; in case you want to use a different HTMLPurifier source, specify it here
     ; By default, those files are used that are being shipped with PHPIDS
-    HTML_Purifier_Path	= vendors/htmlpurifier/HTMLPurifier.auto.php
-    HTML_Purifier_Cache = vendors/htmlpurifier/HTMLPurifier/DefinitionCache/Serializer
+    HTML_Purifier_Path	= [civicrm.root]/vendor/ezyang/htmlpurifier/library/HTMLPurifier.auto.php
+    HTML_Purifier_Cache = [civicrm.root]/vendor/ezyang/htmlpurifier/library/HTMLPurifier/DefinitionCache/Serializer
     
     ; define which fields contain html and need preparation before 
     ; hitting the PHPIDS rules (new in PHPIDS 0.5)

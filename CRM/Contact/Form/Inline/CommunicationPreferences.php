@@ -42,7 +42,7 @@ class CRM_Contact_Form_Inline_CommunicationPreferences extends CRM_Contact_Form_
   public function buildQuickForm() {
     parent::buildQuickForm();
     CRM_Contact_Form_Edit_CommunicationPreferences::buildQuickForm($this);
-    $this->addFormRule(array('CRM_Contact_Form_Edit_CommunicationPreferences', 'formRule'), $this);
+    $this->addFormRule(['CRM_Contact_Form_Edit_CommunicationPreferences', 'formRule'], $this);
   }
 
   /**

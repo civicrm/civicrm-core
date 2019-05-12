@@ -67,49 +67,49 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
    */
   public static function &actionLinks() {
     if (!isset(self::$_actionLinks)) {
-      self::$_actionLinks = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_actionLinks = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit Field'),
           'url' => 'civicrm/admin/custom/group/field/update',
           'qs' => 'action=update&reset=1&gid=%%gid%%&id=%%id%%',
           'title' => ts('Edit Custom Field'),
-        ),
-        CRM_Core_Action::BROWSE => array(
+        ],
+        CRM_Core_Action::BROWSE => [
           'name' => ts('Edit Multiple Choice Options'),
           'url' => 'civicrm/admin/custom/group/field/option',
           'qs' => 'reset=1&action=browse&gid=%%gid%%&fid=%%id%%',
           'title' => ts('List Custom Options'),
-        ),
-        CRM_Core_Action::PREVIEW => array(
+        ],
+        CRM_Core_Action::PREVIEW => [
           'name' => ts('Preview Field Display'),
           'url' => 'civicrm/admin/custom/group/field',
           'qs' => 'action=preview&reset=1&gid=%%gid%%&id=%%id%%',
           'title' => ts('Preview Custom Field'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Disable Custom Field'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
           'title' => ts('Enable Custom Field'),
-        ),
-        CRM_Core_Action::EXPORT => array(
+        ],
+        CRM_Core_Action::EXPORT => [
           'name' => ts('Move'),
           'url' => 'civicrm/admin/custom/group/field/move',
           'class' => 'small-popup',
           'qs' => 'reset=1&fid=%%id%%',
           'title' => ts('Move Custom Field'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/custom/group/field',
           'qs' => 'action=delete&reset=1&gid=%%gid%%&id=%%id%%',
           'title' => ts('Delete Custom Field'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_actionLinks;
   }
@@ -125,7 +125,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
       $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999, 'html-header');
     }
 
-    $customField = array();
+    $customField = [];
     $customFieldBAO = new CRM_Core_BAO_CustomField();
 
     // fkey is gid
@@ -134,7 +134,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
     $customFieldBAO->find();
 
     while ($customFieldBAO->fetch()) {
-      $customField[$customFieldBAO->id] = array();
+      $customField[$customFieldBAO->id] = [];
       CRM_Core_DAO::storeValues($customFieldBAO, $customField[$customFieldBAO->id]);
       $action = array_sum(array_keys(self::actionLinks()));
       if ($customFieldBAO->is_active) {
@@ -171,10 +171,10 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
       $customField[$customFieldBAO->id]['data_type'] = $customFieldDataType[$customField[$customFieldBAO->id]['data_type']];
       $customField[$customFieldBAO->id]['order'] = $customField[$customFieldBAO->id]['weight'];
       $customField[$customFieldBAO->id]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
-        array(
+        [
           'id' => $customFieldBAO->id,
           'gid' => $this->_gid,
-        ),
+        ],
         ts('more'),
         FALSE,
         'customField.row.actions',
@@ -231,7 +231,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
     );
 
     if ($id) {
-      $values = civicrm_api3('custom_field', 'getsingle', array('id' => $id));
+      $values = civicrm_api3('custom_field', 'getsingle', ['id' => $id]);
       $this->_gid = $values['custom_group_id'];
     }
     // get the group id
@@ -262,7 +262,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
       $controller->setEmbedded(TRUE);
       $controller->process();
       $controller->run();
-      $fieldValues = array('custom_group_id' => $this->_gid);
+      $fieldValues = ['custom_group_id' => $this->_gid];
       $wt = CRM_Utils_Weight::delWeight('CRM_Core_DAO_CustomField', $id, $fieldValues);
     }
 
@@ -271,7 +271,7 @@ class CRM_Custom_Page_Field extends CRM_Core_Page {
       $this->assign('gid', $this->_gid);
       $this->assign('groupTitle', $groupTitle);
       if ($action & CRM_Core_Action::BROWSE) {
-        CRM_Utils_System::setTitle(ts('%1 - Custom Fields', array(1 => $groupTitle)));
+        CRM_Utils_System::setTitle(ts('%1 - Custom Fields', [1 => $groupTitle]));
       }
     }
 

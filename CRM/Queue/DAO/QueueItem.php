@@ -19,14 +19,14 @@ class CRM_Queue_DAO_QueueItem extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_queue_item';
+  public static $_tableName = 'civicrm_queue_item';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned

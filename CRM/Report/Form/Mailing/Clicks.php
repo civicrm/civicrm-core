@@ -40,18 +40,18 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
 
   protected $_phoneField = FALSE;
 
-  protected $_customGroupExtends = array(
+  protected $_customGroupExtends = [
     'Contact',
     'Individual',
     'Household',
     'Organization',
-  );
+  ];
 
-  protected $_charts = array(
+  protected $_charts = [
     '' => 'Tabular',
     'barChart' => 'Bar Chart',
     'pieChart' => 'Pie Chart',
-  );
+  ];
 
   /**
    * This report has not been optimised for group filtering.
@@ -70,153 +70,153 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
    * Class constructor.
    */
   public function __construct() {
-    $this->_columns = array();
+    $this->_columns = [];
 
-    $this->_columns['civicrm_contact'] = array(
+    $this->_columns['civicrm_contact'] = [
       'dao' => 'CRM_Contact_DAO_Contact',
-      'fields' => array(
-        'id' => array(
+      'fields' => [
+        'id' => [
           'title' => ts('Contact ID'),
           'required' => TRUE,
-        ),
-        'sort_name' => array(
+        ],
+        'sort_name' => [
           'title' => ts('Contact Name'),
           'required' => TRUE,
-        ),
-      ),
-      'filters' => array(
-        'sort_name' => array(
+        ],
+      ],
+      'filters' => [
+        'sort_name' => [
           'title' => ts('Contact Name'),
-        ),
-        'source' => array(
+        ],
+        'source' => [
           'title' => ts('Contact Source'),
           'type' => CRM_Utils_Type::T_STRING,
-        ),
-        'id' => array(
+        ],
+        'id' => [
           'title' => ts('Contact ID'),
           'no_display' => TRUE,
-        ),
-      ),
-      'order_bys' => array(
-        'sort_name' => array(
+        ],
+      ],
+      'order_bys' => [
+        'sort_name' => [
           'title' => ts('Contact Name'),
           'default' => TRUE,
           'default_order' => 'ASC',
-        ),
-      ),
+        ],
+      ],
       'grouping' => 'contact-fields',
-    );
+    ];
 
-    $this->_columns['civicrm_mailing'] = array(
+    $this->_columns['civicrm_mailing'] = [
       'dao' => 'CRM_Mailing_DAO_Mailing',
-      'fields' => array(
-        'mailing_name' => array(
+      'fields' => [
+        'mailing_name' => [
           'name' => 'name',
           'title' => ts('Mailing Name'),
           'default' => TRUE,
-        ),
-        'mailing_name_alias' => array(
+        ],
+        'mailing_name_alias' => [
           'name' => 'name',
           'required' => TRUE,
           'no_display' => TRUE,
-        ),
-        'mailing_subject' => array(
+        ],
+        'mailing_subject' => [
           'name' => 'subject',
           'title' => ts('Mailing Subject'),
           'default' => TRUE,
-        ),
-      ),
-      'filters' => array(
-        'mailing_id' => array(
+        ],
+      ],
+      'filters' => [
+        'mailing_id' => [
           'name' => 'id',
           'title' => ts('Mailing Name'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'type' => CRM_Utils_Type::T_INT,
           'options' => CRM_Mailing_BAO_Mailing::getMailingsList(),
           'operator' => 'like',
-        ),
-        'mailing_subject' => array(
+        ],
+        'mailing_subject' => [
           'name' => 'subject',
           'title' => ts('Mailing Subject'),
           'type' => CRM_Utils_Type::T_STRING,
           'operator' => 'like',
-        ),
-      ),
-      'order_bys' => array(
-        'mailing_name' => array(
+        ],
+      ],
+      'order_bys' => [
+        'mailing_name' => [
           'name' => 'name',
           'title' => ts('Mailing Name'),
-        ),
-        'mailing_subject' => array(
+        ],
+        'mailing_subject' => [
           'name' => 'subject',
           'title' => ts('Mailing Subject'),
-        ),
-      ),
+        ],
+      ],
       'grouping' => 'mailing-fields',
-    );
+    ];
 
-    $this->_columns['civicrm_email'] = array(
+    $this->_columns['civicrm_email'] = [
       'dao' => 'CRM_Core_DAO_Email',
-      'fields' => array(
-        'email' => array(
+      'fields' => [
+        'email' => [
           'title' => ts('Email'),
           'no_repeat' => TRUE,
-        ),
-      ),
+        ],
+      ],
       'grouping' => 'contact-fields',
-    );
+    ];
 
-    $this->_columns['civicrm_phone'] = array(
+    $this->_columns['civicrm_phone'] = [
       'dao' => 'CRM_Core_DAO_Phone',
-      'fields' => array('phone' => NULL),
+      'fields' => ['phone' => NULL],
       'grouping' => 'contact-fields',
-    );
+    ];
 
-    $this->_columns['civicrm_mailing_trackable_url'] = array(
+    $this->_columns['civicrm_mailing_trackable_url'] = [
       'dao' => 'CRM_Mailing_DAO_TrackableURL',
-      'fields' => array(
-        'url' => array(
+      'fields' => [
+        'url' => [
           'title' => ts('Click through URL'),
-        ),
-      ),
+        ],
+      ],
       // To do this filter should really be like mailing id filter a multi select, However
       // Not clear on how to make filter dependant on selected mailings at this stage so have set a
       // text filter which works for now
-      'filters' => array(
-        'url' => array(
+      'filters' => [
+        'url' => [
           'title' => ts('URL'),
           'type' => CRM_Utils_Type::T_STRING,
           'operator' => 'like',
-        ),
-      ),
-      'order_bys' => array(
-        'url' => array('title' => ts('Click through URL')),
-      ),
+        ],
+      ],
+      'order_bys' => [
+        'url' => ['title' => ts('Click through URL')],
+      ],
       'grouping' => 'mailing-fields',
-    );
+    ];
 
-    $this->_columns['civicrm_mailing_event_trackable_url_open'] = array(
+    $this->_columns['civicrm_mailing_event_trackable_url_open'] = [
       'dao' => 'CRM_Mailing_Event_DAO_TrackableURLOpen',
-      'fields' => array(
-        'time_stamp' => array(
+      'fields' => [
+        'time_stamp' => [
           'title' => ts('Click Date'),
           'default' => TRUE,
-        ),
-      ),
-      'filters' => array(
-        'time_stamp' => array(
+        ],
+      ],
+      'filters' => [
+        'time_stamp' => [
           'title' => ts('Click Date'),
           'operatorType' => CRM_Report_Form::OP_DATE,
           'type' => CRM_Utils_Type::T_DATE,
-        ),
-      ),
-      'order_bys' => array(
-        'time_stamp' => array(
+        ],
+      ],
+      'order_bys' => [
+        'time_stamp' => [
           'title' => ts('Click Date'),
-        ),
-      ),
+        ],
+      ],
       'grouping' => 'mailing-fields',
-    );
+    ];
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
@@ -229,8 +229,8 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
   }
 
   public function select() {
-    $select = array();
-    $this->_columnHeaders = array();
+    $select = [];
+    $this->_columnHeaders = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
@@ -270,7 +270,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
    * @return array
    */
   public static function formRule($fields, $files, $self) {
-    $errors = $grouping = array();
+    $errors = $grouping = [];
     return $errors;
   }
 
@@ -321,7 +321,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
 
     $sql = $this->buildQuery(TRUE);
 
-    $rows = $graphRows = array();
+    $rows = $graphRows = [];
     $this->buildRows($sql, $rows);
 
     $this->formatDisplay($rows);
@@ -337,13 +337,13 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
       return;
     }
 
-    $chartInfo = array(
+    $chartInfo = [
       'legend' => ts('Mail Click-Through Report'),
       'xname' => ts('Mailing'),
       'yname' => ts('Clicks'),
       'xLabelAngle' => 20,
-      'tip' => ts('Clicks: %1', array(1 => '#val#')),
-    );
+      'tip' => ts('Clicks: %1', [1 => '#val#']),
+    ];
     foreach ($rows as $row) {
       $chartInfo['values'][$row['civicrm_mailing_mailing_name_alias']] = $row['civicrm_mailing_click_count'];
     }

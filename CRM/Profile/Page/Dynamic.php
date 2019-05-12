@@ -72,8 +72,9 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
   /**
    * Store profile ids if multiple profile ids are passed using comma separated.
    * Currently lets implement this functionality only for dialog mode
+   * @var array
    */
-  protected $_profileIds = array();
+  protected $_profileIds = [];
 
   /**
    * Contact profile having activity fields?
@@ -93,8 +94,10 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
 
   protected $_recordId = NULL;
 
-  /*
+  /**
+   *
    * fetch multirecord as well as non-multirecord fields
+   * @var int
    */
   protected $_allFields = NULL;
 
@@ -147,7 +150,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $this->_profileIds = $profileIds;
     }
     else {
-      $this->_profileIds = array($gid);
+      $this->_profileIds = [$gid];
     }
 
     $this->_activityId = CRM_Utils_Request::retrieve('aid', 'Positive', $this, FALSE, 0, 'GET');
@@ -236,7 +239,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
         $admin = TRUE;
       }
 
-      $values = array();
+      $values = [];
       $fields = CRM_Core_BAO_UFGroup::getFields($this->_profileIds, FALSE, CRM_Core_Action::VIEW,
         NULL, NULL, FALSE, $this->_restrict,
         $this->_skipPermission, NULL,
@@ -268,7 +271,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       }
 
       if ($this->_isContactActivityProfile) {
-        $contactFields = $activityFields = array();
+        $contactFields = $activityFields = [];
 
         foreach ($fields as $fieldName => $field) {
           if (CRM_Utils_Array::value('field_type', $field) == 'Activity') {
@@ -286,7 +289,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
             $activityFields,
             $values,
             TRUE,
-            array(array('activity_id', '=', $this->_activityId, 0, 0))
+            [['activity_id', '=', $this->_activityId, 0, 0]]
           );
         }
       }
@@ -311,8 +314,8 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       }
 
       // $profileFields array can be used for customized display of field labels and values in Profile/View.tpl
-      $profileFields = array();
-      $labels = array();
+      $profileFields = [];
+      $labels = [];
 
       foreach ($fields as $name => $field) {
         //CRM-14338
@@ -329,10 +332,10 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       }
 
       foreach ($values as $title => $value) {
-        $profileFields[$labels[$title]] = array(
+        $profileFields[$labels[$title]] = [
           'label' => $title,
           'value' => $value,
-        );
+        ];
       }
 
       $template->assign_by_ref('row', $values);
@@ -350,7 +353,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
     if (($this->_multiRecord & CRM_Core_Action::VIEW) && $this->_recordId && !$this->_allFields) {
       $fieldDetail = reset($fields);
       $fieldId = CRM_Core_BAO_CustomField::getKeyID($fieldDetail['name']);
-      $customGroupDetails = CRM_Core_BAO_CustomGroup::getGroupTitles(array($fieldId));
+      $customGroupDetails = CRM_Core_BAO_CustomGroup::getGroupTitles([$fieldId]);
       $multiRecTitle = $customGroupDetails[$fieldId]['groupTitle'];
     }
     else {
@@ -374,7 +377,7 @@ class CRM_Profile_Page_Dynamic extends CRM_Core_Page {
       $title .= ' - ' . $displayName;
     }
 
-    $title = isset($multiRecTitle) ? ts('View %1 Record', array(1 => $multiRecTitle)) : $title;
+    $title = isset($multiRecTitle) ? ts('View %1 Record', [1 => $multiRecTitle]) : $title;
     CRM_Utils_System::setTitle($title);
 
     // invoke the pagRun hook, CRM-3906

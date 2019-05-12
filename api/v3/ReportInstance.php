@@ -67,13 +67,14 @@ function civicrm_api3_report_instance_create($params) {
 function _civicrm_api3_report_instance_create_spec(&$params) {
   $params['report_id']['api.required'] = 1;
   $params['title']['api.required'] = 1;
+  $params['domain_id']['api.default'] = CRM_Core_Config::domainID();
   $params['view_mode']['api.default'] = 'view';
   $params['view_mode']['title'] = ts('View Mode for Navigation URL');
   $params['view_mode']['type'] = CRM_Utils_Type::T_STRING;
-  $params['view_mode']['options'] = array(
+  $params['view_mode']['options'] = [
     'view' => ts('View'),
     'criteria' => ts('Show Criteria'),
-  );
+  ];
 }
 
 /**

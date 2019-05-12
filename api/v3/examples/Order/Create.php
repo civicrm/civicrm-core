@@ -6,16 +6,16 @@
  *   API result array
  */
 function order_create_example() {
-  $params = array(
+  $params = [
     'contact_id' => 8,
     'receive_date' => '2010-01-20',
     'total_amount' => 200,
     'financial_type_id' => 1,
     'contribution_status_id' => 1,
-    'line_items' => array(
-      '0' => array(
-        'line_item' => array(
-          '0' => array(
+    'line_items' => [
+      '0' => [
+        'line_item' => [
+          '0' => [
             'price_field_id' => '4',
             'price_field_value_id' => '5',
             'label' => 'Price Field 2',
@@ -26,9 +26,9 @@ function order_create_example() {
             'financial_type_id' => '4',
             'entity_table' => 'civicrm_membership',
             'membership_type_id' => 1,
-          ),
-        ),
-        'params' => array(
+          ],
+        ],
+        'params' => [
           'contact_id' => 8,
           'membership_type_id' => 2,
           'join_date' => '2006-01-21',
@@ -37,10 +37,10 @@ function order_create_example() {
           'source' => 'Payment',
           'is_override' => 1,
           'status_id' => 1,
-        ),
-      ),
-    ),
-  );
+        ],
+      ],
+    ],
+  ];
 
   try{
     $result = civicrm_api3('Order', 'create', $params);
@@ -50,12 +50,12 @@ function order_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -69,13 +69,13 @@ function order_create_example() {
  */
 function order_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'contact_id' => '8',
         'financial_type_id' => '1',
@@ -106,9 +106,9 @@ function order_create_expectedresult() {
         'tax_amount' => '',
         'revenue_recognition_date' => '',
         'contribution_type_id' => '1',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

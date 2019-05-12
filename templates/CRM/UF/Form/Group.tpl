@@ -47,10 +47,12 @@
 {else}
     <table class="form-layout">
       {foreach from=$entityFields item=fieldSpec}
-        {assign var=fieldName value=$fieldSpec.name}
-        <tr class="crm-{$entityInClassFormat}-form-block-{$fieldName}">
-          {include file="CRM/Core/Form/Field.tpl"}
-        </tr>
+        {if not in_array($fieldSpec.name, $advancedFieldsConverted)}
+          {assign var=fieldName value=$fieldSpec.name}
+          <tr class="crm-{$entityInClassFormat}-form-block-{$fieldName}">
+            {include file="CRM/Core/Form/Field.tpl"}
+          </tr>
+        {/if}
       {/foreach}
         <tr class="crm-uf_group-form-block-weight" >
             <td class="label">{$form.weight.label}{if $config->userSystem->is_drupal EQ '1'} {help id='id-profile_weight' file="CRM/UF/Form/Group.hlp"}{/if}</td>

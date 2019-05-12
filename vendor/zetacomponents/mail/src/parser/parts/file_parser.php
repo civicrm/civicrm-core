@@ -2,10 +2,26 @@
 /**
  * File containing the ezcMailFileParser class
  *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
  * @package Mail
  * @version //autogen//
- * @copyright Copyright (C) 2005-2009 eZ Systems AS. All rights reserved.
- * @license http://ez.no/licenses/new_bsd New BSD License
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
  */
 
 /**
@@ -104,18 +120,23 @@ class ezcMailFileParser extends ezcMailPartParser
         // figure out the base filename
         // search Content-Disposition first as specified by RFC 2183
         $matches = array();
-        if ( preg_match( '/\s*filename="?([^;"]*);?/i',
+        if ( preg_match( '/\s*filename=\s?"?([^;"]*);?/i',
                         $this->headers['Content-Disposition'], $matches ) )
         {
             $fileName = trim( $matches[1], '"' );
         }
         // fallback to the name parameter in Content-Type as specified by RFC 2046 4.5.1
-        else if ( preg_match( '/\s*name="?([^;"]*);?/i',
+        else if ( preg_match( '/\s*name=\s?"?([^;"]*);?/i',
                              $this->headers['Content-Type'], $matches ) )
         {
             $fileName = trim( $matches[1], '"' );
         }
         else // default
+        {
+            $fileName = "filename";
+        }
+
+        if ( empty( $fileName ) )  // $fileName can be empty in reality, then the openFile() call fails because it's trying to open a directory with fopen
         {
             $fileName = "filename";
         }
@@ -168,7 +189,7 @@ class ezcMailFileParser extends ezcMailPartParser
     {
         // finish() was not called. The mail is completely broken.
         // we will clean up the mess
-        if ( $this->fp !== null )
+        if ( is_resource( $this->fp ) )
         {
             fclose( $this->fp );
             $this->fp = null;

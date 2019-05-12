@@ -200,10 +200,10 @@ class CRM_Report_Utils_Get {
    */
   public static function processChart(&$defaults) {
     $chartType = CRM_Utils_Array::value("charts", $_GET);
-    if (in_array($chartType, array(
+    if (in_array($chartType, [
       'barChart',
       'pieChart',
-    ))) {
+    ])) {
       $defaults["charts"] = $chartType;
     }
   }
@@ -298,7 +298,7 @@ class CRM_Report_Utils_Get {
       }
       if (CRM_Utils_Array::value("ufld", $_GET) == 1) {
         // unset all display columns
-        $defaults['fields'] = array();
+        $defaults['fields'] = [];
       }
       if (!empty($urlFields)) {
         foreach ($reportFields as $tableName => $fields) {

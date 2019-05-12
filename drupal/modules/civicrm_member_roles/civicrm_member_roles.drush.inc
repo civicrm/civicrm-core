@@ -30,6 +30,7 @@ function civicrm_member_roles_drush_command() {
   );
   return $items;
 }
+
 /**
  * (Drush callback)
  *

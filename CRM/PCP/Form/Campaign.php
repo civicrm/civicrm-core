@@ -71,7 +71,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
    *   Default values for the form.
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     $dao = new CRM_PCP_DAO_PCP();
 
     if ($this->_pageId) {
@@ -110,21 +110,21 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     $this->add('text', 'goal_amount', ts('Your Goal'), NULL, TRUE);
     $this->addRule('goal_amount', ts('Goal Amount should be a numeric value'), 'money');
 
-    $attributes = array();
+    $attributes = [];
     if ($this->_component == 'event') {
       if ($this->get('action') & CRM_Core_Action::ADD) {
-        $attributes = array('value' => ts('Join Us'), 'onClick' => 'select();');
+        $attributes = ['value' => ts('Join Us'), 'onClick' => 'select();'];
       }
       $this->add('text', 'donate_link_text', ts('Sign up Button'), $attributes);
     }
     else {
       if ($this->get('action') & CRM_Core_Action::ADD) {
-        $attributes = array('value' => ts('Donate Now'), 'onClick' => 'select();');
+        $attributes = ['value' => ts('Donate Now'), 'onClick' => 'select();'];
       }
       $this->add('text', 'donate_link_text', ts('Donation Button'), $attributes);
     }
 
-    $attrib = array('rows' => 8, 'cols' => 60);
+    $attrib = ['rows' => 8, 'cols' => 60];
     $this->add('textarea', 'page_text', ts('Your Message'), NULL, FALSE);
 
     $maxAttachments = 1;
@@ -133,7 +133,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     $this->addElement('checkbox', 'is_thermometer', ts('Progress Bar'));
     $this->addElement('checkbox', 'is_honor_roll', ts('Honor Roll'), NULL);
     if ($this->_pageId) {
-      $params = array('id' => $this->_pageId);
+      $params = ['id' => $this->_pageId];
       CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $params, $pcpInfo);
       $owner_notification_option = CRM_Core_DAO::getFieldValue('CRM_PCP_BAO_PCPBlock', $pcpInfo['pcp_block_id'], 'owner_notify_id');
     }
@@ -151,19 +151,19 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     }
 
     $this->addButtons(
-      array(
-        array(
+      [
+        [
           'type' => 'upload',
           'name' => ts('Save'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
-    $this->addFormRule(array('CRM_PCP_Form_Campaign', 'formRule'), $this);
+    $this->addFormRule(['CRM_PCP_Form_Campaign', 'formRule'], $this);
   }
 
   /**
@@ -180,7 +180,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
     if ($fields['goal_amount'] <= 0) {
       $errors['goal_amount'] = ts('Goal Amount should be a numeric value greater than zero.');
     }
@@ -195,7 +195,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
-    $checkBoxes = array('is_thermometer', 'is_honor_roll', 'is_active', 'is_notify');
+    $checkBoxes = ['is_thermometer', 'is_honor_roll', 'is_active', 'is_notify'];
 
     foreach ($checkBoxes as $key) {
       if (!isset($params[$key])) {
@@ -215,7 +215,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
 
     // since we are allowing html input from the user
     // we also need to purify it, so lets clean it up
-    $htmlFields = array('intro_text', 'page_text', 'title');
+    $htmlFields = ['intro_text', 'page_text', 'title'];
     foreach ($htmlFields as $field) {
       if (!empty($params[$field])) {
         $params[$field] = CRM_Utils_String::purifyHTML($params[$field]);
@@ -256,10 +256,10 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     $statusId = CRM_Core_DAO::getFieldValue('CRM_PCP_DAO_PCP', $pcp->id, 'status_id');
 
     //send notification of PCP create/update.
-    $pcpParams = array('entity_table' => $entity_table, 'entity_id' => $pcp->page_id);
-    $notifyParams = array();
+    $pcpParams = ['entity_table' => $entity_table, 'entity_id' => $pcp->page_id];
+    $notifyParams = [];
     $notifyStatus = "";
-    CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $pcpParams, $notifyParams, array('notify_email'));
+    CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $pcpParams, $notifyParams, ['notify_email']);
 
     if ($emails = $pcpBlock->notify_email) {
       $this->assign('pcpTitle', $pcp->title);
@@ -316,7 +316,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
 
       if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
         $fixUrl = CRM_Utils_System::url('civicrm/admin/domain', 'action=update&reset=1');
-        CRM_Core_Error::fatal(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', array(1 => $fixUrl)));
+        CRM_Core_Error::fatal(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
       }
 
       //if more than one email present for PCP notification ,
@@ -329,14 +329,14 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
       $cc = implode(',', $emailArray);
 
       list($sent, $subject, $message, $html) = CRM_Core_BAO_MessageTemplate::sendTemplate(
-        array(
+        [
           'groupName' => 'msg_tpl_workflow_contribution',
           'valueName' => 'pcp_notify',
           'contactId' => $contactID,
           'from' => "$domainEmailName <$domainEmailAddress>",
           'toEmail' => $to,
           'cc' => $cc,
-        )
+        ]
       );
 
       if ($sent) {
@@ -361,7 +361,7 @@ class CRM_PCP_Form_Campaign extends CRM_Core_Form {
     }
 
     CRM_Core_Session::setStatus(ts("Your Personal Campaign Page has been %1 %2 %3",
-      array(1 => $pageStatus, 2 => $approvalMessage, 3 => $notifyStatus)
+      [1 => $pageStatus, 2 => $approvalMessage, 3 => $notifyStatus]
     ), '', 'info');
     if (!$this->_pageId) {
       $session->pushUserContext(CRM_Utils_System::url('civicrm/pcp/info', "reset=1&id={$pcp->id}&ap={$anonymousPCP}"));

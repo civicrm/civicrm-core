@@ -14,14 +14,14 @@ class CRM_Case_ManagedEntities {
    * @throws CRM_Core_Exception
    */
   public static function createManagedCaseTypes() {
-    $entities = array();
+    $entities = [];
 
     // Use hook_civicrm_caseTypes to build a list of OptionValues
     // In the long run, we may want more specialized logic for this, but
     // this design is fairly convenient and will allow us to replace it
     // without changing the hook_civicrm_caseTypes interface.
 
-    $caseTypes = array();
+    $caseTypes = [];
     CRM_Utils_Hook::caseTypes($caseTypes);
 
     $proc = new CRM_Case_XMLProcessor();
@@ -32,11 +32,11 @@ class CRM_Case_ManagedEntities {
       }
 
       if (isset($caseType['module'], $caseType['name'], $caseType['file'])) {
-        $entities[] = array(
+        $entities[] = [
           'module' => $caseType['module'],
           'name' => $caseType['name'],
           'entity' => 'CaseType',
-          'params' => array(
+          'params' => [
             'version' => 3,
             'name' => $caseType['name'],
             'title' => (string) $xml->name,
@@ -44,8 +44,8 @@ class CRM_Case_ManagedEntities {
             'is_reserved' => 1,
             'is_active' => 1,
             'weight' => $xml->weight ? $xml->weight : 1,
-          ),
-        );
+          ],
+        ];
       }
       else {
         throw new CRM_Core_Exception("Invalid case type");
@@ -64,26 +64,26 @@ class CRM_Case_ManagedEntities {
    * @see CRM_Utils_Hook::managed
    */
   public static function createManagedActivityTypes(CRM_Case_XMLRepository $xmlRepo, CRM_Core_ManagedEntities $me) {
-    $result = array();
+    $result = [];
     $validActTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name');
 
     $actTypes = $xmlRepo->getAllDeclaredActivityTypes();
     foreach ($actTypes as $actType) {
-      $managed = array(
+      $managed = [
         'module' => 'civicrm',
         'name' => "civicase:act:$actType",
         'entity' => 'OptionValue',
         'update' => 'never',
         'cleanup' => 'unused',
-        'params' => array(
+        'params' => [
           'version' => 3,
           'option_group_id' => 'activity_type',
           'label' => $actType,
           'name' => $actType,
           'description' => $actType,
           'component_id' => 'CiviCase',
-        ),
-      );
+        ],
+      ];
 
       // We'll create managed-entity if this record doesn't exist yet
       // or if we previously decided to manage this record.
@@ -108,7 +108,7 @@ class CRM_Case_ManagedEntities {
    * @see CRM_Utils_Hook::managed
    */
   public static function createManagedRelationshipTypes(CRM_Case_XMLRepository $xmlRepo, CRM_Core_ManagedEntities $me) {
-    $result = array();
+    $result = [];
 
     if (!isset(Civi::$statics[__CLASS__]['reltypes'])) {
       $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE, NULL);
@@ -118,13 +118,13 @@ class CRM_Case_ManagedEntities {
 
     $relTypes = $xmlRepo->getAllDeclaredRelationshipTypes();
     foreach ($relTypes as $relType) {
-      $managed = array(
+      $managed = [
         'module' => 'civicrm',
         'name' => "civicase:rel:$relType",
         'entity' => 'RelationshipType',
         'update' => 'never',
         'cleanup' => 'unused',
-        'params' => array(
+        'params' => [
           'version' => 3,
           'name_a_b' => "$relType is",
           'name_b_a' => $relType,
@@ -135,8 +135,8 @@ class CRM_Case_ManagedEntities {
           'contact_type_b' => 'Individual',
           'contact_sub_type_a' => NULL,
           'contact_sub_type_b' => NULL,
-        ),
-      );
+        ],
+      ];
 
       // We'll create managed-entity if this record doesn't exist yet
       // or if we previously decided to manage this record.

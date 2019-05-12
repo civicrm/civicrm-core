@@ -28,6 +28,7 @@
  *
  */
 class civicrm_handler_sort_pcp_raised_amount extends views_handler_sort {
+
   public function query() {
     $this->ensure_my_table();
 

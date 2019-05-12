@@ -121,7 +121,7 @@ class CRM_Core_Selector_Base {
     $columnHeaders = &$this->getColumnHeaders(NULL);
 
     if (!isset($this->_order)) {
-      $this->_order = array();
+      $this->_order = [];
       $start = 2;
       $firstElementNotFound = TRUE;
       if (!empty($columnHeaders)) {

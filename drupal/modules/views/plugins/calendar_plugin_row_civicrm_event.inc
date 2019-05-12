@@ -10,12 +10,19 @@
  * and formats it as a Calendar node.
  */
 class calendar_plugin_row_civicrm_event extends calendar_plugin_row_node {
-  // Basic properties that let the row style follow relationships.
-  var $base_table = 'civicrm_event';
-  var $base_field = 'id';
+  /**
+   * Basic properties that let the row style follow relationships.
+   * @var string
+   */
+  public $base_table = 'civicrm_event';
+  public $base_field = 'id';
 
-  // Stores the nodes loaded with pre_render.
-  var $nodes = array();
+  /**
+   * Stores the nodes loaded with pre_render.
+   * @var array
+   */
+  public $nodes = array();
+
   public function construct() {
     parent::construct();
     if (!civicrm_initialize()) {
@@ -101,7 +108,7 @@ class calendar_plugin_row_civicrm_event extends calendar_plugin_row_node {
     // and object, hence using DAO
     foreach ($ids as $key => $id) {
       require_once 'CRM/Event/DAO/Event.php';
-      $dao = New CRM_Event_DAO_Event();
+      $dao = new CRM_Event_DAO_Event();
       $dao->id = $id;
       $dao->find();
       $dao->fetch();

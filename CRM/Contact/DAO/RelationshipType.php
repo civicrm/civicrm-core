@@ -19,14 +19,14 @@ class CRM_Contact_DAO_RelationshipType extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_relationship_type';
+  public static $_tableName = 'civicrm_relationship_type';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * Primary key

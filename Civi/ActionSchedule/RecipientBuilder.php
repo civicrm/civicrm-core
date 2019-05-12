@@ -182,7 +182,7 @@ class RecipientBuilder {
     // which means reference date mismatches with the end_date where end_date may be used as the start_action_date
     // criteria  for some schedule reminder so in order to send new reminder we INSERT new reminder with new reference_date
     // value via UNION operation
-    $referenceReminderIDs = array();
+    $referenceReminderIDs = [];
     $referenceDate = NULL;
     if (!empty($query['casUseReferenceDate'])) {
       // First retrieve all the action log's ids which are outdated or in other words reference_date now don't match with entity date.
@@ -241,7 +241,7 @@ class RecipientBuilder {
     $query = $this->prepareQuery(self::PHASE_ADDITION_FIRST);
 
     $insertAdditionalSql = \CRM_Utils_SQL_Select::from("civicrm_contact c")
-      ->merge($query, array('params'))
+      ->merge($query, ['params'])
       ->merge($this->selectIntoActionLog(self::PHASE_ADDITION_FIRST, $query))
       ->merge($this->joinReminder('LEFT JOIN', 'addl', $query))
       ->where('reminder.id IS NULL')
@@ -279,13 +279,13 @@ class RecipientBuilder {
       ->merge($this->selectActionLogFields(self::PHASE_RELATION_REPEAT, $query))
       ->select("MAX(reminder.action_date_time) as latest_log_time")
       ->merge($this->prepareRepetitionEndFilter($query['casDateField']))
-      ->where($this->actionSchedule->start_action_date ? $startDateClauses[0] : array())
+      ->where($this->actionSchedule->start_action_date ? $startDateClauses[0] : [])
       ->groupBy("reminder.contact_id, reminder.entity_id, reminder.entity_table")
       // @todo replace use of timestampdiff with a direct comparison as TIMESTAMPDIFF cannot use an index.
       ->having("TIMESTAMPDIFF(HOUR, latest_log_time, CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, latest_log_time, DATE_ADD(latest_log_time, INTERVAL !casRepetitionInterval))")
-      ->param(array(
+      ->param([
         'casRepetitionInterval' => $this->parseRepetitionInterval(),
-      ))
+      ])
       ->strict()
       ->toSQL();
 
@@ -296,7 +296,7 @@ class RecipientBuilder {
     if ($arrValues) {
       \CRM_Core_DAO::executeQuery(
         \CRM_Utils_SQL_Insert::into('civicrm_action_log')
-          ->columns(array('contact_id', 'entity_id', 'entity_table', 'action_schedule_id'))
+          ->columns(['contact_id', 'entity_id', 'entity_table', 'action_schedule_id'])
           ->rows($arrValues)
           ->toSQL()
       );
@@ -314,7 +314,7 @@ class RecipientBuilder {
 
     $addlCheck = \CRM_Utils_SQL_Select::from($query['casAddlCheckFrom'])
       ->select('*')
-      ->merge($query, array('params', 'wheres', 'joins'))
+      ->merge($query, ['params', 'wheres', 'joins'])
       ->merge($this->prepareRepetitionEndFilter($query['casDateField']))
       ->limit(1)
       ->strict()
@@ -326,14 +326,14 @@ class RecipientBuilder {
         ->merge($this->selectActionLogFields(self::PHASE_ADDITION_REPEAT, $query))
         ->merge($this->joinReminder('INNER JOIN', 'addl', $query))
         ->select("MAX(reminder.action_date_time) as latest_log_time")
-        ->merge($this->prepareAddlFilter('c.id'), array('params'))
+        ->merge($this->prepareAddlFilter('c.id'), ['params'])
         ->where("c.is_deleted = 0 AND c.is_deceased = 0")
         ->groupBy("reminder.contact_id")
         // @todo replace use of timestampdiff with a direct comparison as TIMESTAMPDIFF cannot use an index.
         ->having("TIMESTAMPDIFF(HOUR, latest_log_time, CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, latest_log_time, DATE_ADD(latest_log_time, INTERVAL !casRepetitionInterval))")
-        ->param(array(
+        ->param([
           'casRepetitionInterval' => $this->parseRepetitionInterval(),
-        ))
+        ])
         ->strict()
         ->toSQL();
 
@@ -344,7 +344,7 @@ class RecipientBuilder {
       if ($addValues) {
         \CRM_Core_DAO::executeQuery(
           \CRM_Utils_SQL_Insert::into('civicrm_action_log')
-            ->columns(array('contact_id', 'entity_id', 'entity_table', 'action_schedule_id'))
+            ->columns(['contact_id', 'entity_id', 'entity_table', 'action_schedule_id'])
             ->rows($addValues)
             ->toSQL()
         );
@@ -358,12 +358,12 @@ class RecipientBuilder {
    * @throws \CRM_Core_Exception
    */
   protected function prepareQuery($phase) {
-    $defaultParams = array(
+    $defaultParams = [
       'casActionScheduleId' => $this->actionSchedule->id,
       'casMappingId' => $this->mapping->getId(),
       'casMappingEntity' => $this->mapping->getEntity(),
       'casNow' => $this->now,
-    );
+    ];
 
     /** @var \CRM_Utils_SQL_Select $query */
     $query = $this->mapping->createQuery($this->actionSchedule, $phase, $defaultParams);
@@ -419,12 +419,12 @@ class RecipientBuilder {
     $actionSchedule = $this->actionSchedule;
 
     if ($actionSchedule->group_id) {
-      $regularGroupIDs = $smartGroupIDs = $groupWhereCLause = array();
+      $regularGroupIDs = $smartGroupIDs = $groupWhereCLause = [];
       $query = \CRM_Utils_SQL_Select::fragment();
 
       // get child group IDs if any
       $childGroupIDs = \CRM_Contact_BAO_Group::getChildGroupIds($actionSchedule->group_id);
-      foreach (array_merge(array($actionSchedule->group_id), $childGroupIDs) as $groupID) {
+      foreach (array_merge([$actionSchedule->group_id], $childGroupIDs) as $groupID) {
         if ($this->isSmartGroup($groupID)) {
           // Check that the group is in place in the cache and up to date
           \CRM_Contact_BAO_GroupContactCache::check($groupID);
@@ -481,7 +481,7 @@ class RecipientBuilder {
    */
   protected function prepareStartDateClauses() {
     $actionSchedule = $this->actionSchedule;
-    $startDateClauses = array();
+    $startDateClauses = [];
     if ($actionSchedule->start_action_date) {
       $op = ($actionSchedule->start_action_condition == 'before' ? '<=' : '>=');
       $operator = ($actionSchedule->start_action_condition == 'before' ? 'DATE_SUB' : 'DATE_ADD');
@@ -536,9 +536,9 @@ WHERE      $group.id = {$groupId}
 
     return \CRM_Utils_SQL_Select::fragment()
       ->where("@casNow <= !repetitionEndDate")
-      ->param(array(
+      ->param([
         '!repetitionEndDate' => $repeatEventDateExpr,
-      ));
+      ]);
   }
 
   /**
@@ -574,30 +574,30 @@ WHERE      $group.id = {$groupId}
           $fragment->select($query['casDateField']);
         }
         $fragment->select(
-          array(
+          [
             "!casContactIdField as contact_id",
             "!casEntityIdField as entity_id",
             "@casMappingEntity as entity_table",
             "#casActionScheduleId as action_schedule_id",
-          )
+          ]
         );
         break;
 
       case self::PHASE_ADDITION_FIRST:
       case self::PHASE_ADDITION_REPEAT:
         //CRM-19017: Load default params for fragment query object.
-        $params = array(
+        $params = [
           'casActionScheduleId' => $this->actionSchedule->id,
           'casNow' => $this->now,
-        );
+        ];
         $fragment = \CRM_Utils_SQL_Select::fragment()->param($params);
         $fragment->select(
-          array(
+          [
             "c.id as contact_id",
             "c.id as entity_id",
             "'civicrm_contact' as entity_table",
             "#casActionScheduleId as action_schedule_id",
-          )
+          ]
         );
         break;
 
@@ -619,12 +619,12 @@ WHERE      $group.id = {$groupId}
    * @throws \CRM_Core_Exception
    */
   protected function selectIntoActionLog($phase, $query) {
-    $actionLogColumns = array(
+    $actionLogColumns = [
       "contact_id",
       "entity_id",
       "entity_table",
       "action_schedule_id",
-    );
+    ];
     if ($phase === self::PHASE_RELATION_FIRST || $phase === self::PHASE_RELATION_REPEAT) {
       if (!empty($query['casUseReferenceDate'])) {
         array_unshift($actionLogColumns, 'reference_date');

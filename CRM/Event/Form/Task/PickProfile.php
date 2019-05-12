@@ -47,11 +47,13 @@ class CRM_Event_Form_Task_PickProfile extends CRM_Event_Form_Task {
 
   /**
    * Maximum event participations that should be allowed to update.
+   * @var int
    */
   protected $_maxParticipations = 100;
 
   /**
    * Variable to store redirect path.
+   * @var string
    */
   protected $_userContext;
 
@@ -89,7 +91,7 @@ class CRM_Event_Form_Task_PickProfile extends CRM_Event_Form_Task {
    * @return void
    */
   public function buildQuickForm() {
-    $types = array('Participant');
+    $types = ['Participant'];
     $profiles = CRM_Core_BAO_UFGroup::getProfiles($types, TRUE);
 
     if (empty($profiles)) {
@@ -98,9 +100,9 @@ class CRM_Event_Form_Task_PickProfile extends CRM_Event_Form_Task {
     }
 
     $ufGroupElement = $this->add('select', 'uf_group_id', ts('Select Profile'),
-      array(
+      [
         '' => ts('- select profile -'),
-      ) + $profiles, TRUE
+      ] + $profiles, TRUE
     );
     $this->addDefaultButtons(ts('Continue'));
   }
@@ -112,7 +114,7 @@ class CRM_Event_Form_Task_PickProfile extends CRM_Event_Form_Task {
    * @return void
    */
   public function addRules() {
-    $this->addFormRule(array('CRM_Event_Form_Task_PickProfile', 'formRule'));
+    $this->addFormRule(['CRM_Event_Form_Task_PickProfile', 'formRule']);
   }
 
   /**

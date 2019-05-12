@@ -38,7 +38,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
   use CRM_Admin_Form_SettingTrait;
 
-  protected $_settings = array();
+  protected $_settings = [];
 
   protected $includesReadOnlyFields;
 
@@ -49,8 +49,8 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    */
   public function setDefaultValues() {
     if (!$this->_defaults) {
-      $this->_defaults = array();
-      $formArray = array('Component', 'Localization');
+      $this->_defaults = [];
+      $formArray = ['Component', 'Localization'];
       $formMode = FALSE;
       if (in_array($this->_name, $formArray)) {
         $formMode = TRUE;
@@ -73,23 +73,22 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'next',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
     $this->addFieldsDefinedInSettingsMetadata();
 
     if ($this->includesReadOnlyFields) {
-      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', array('expires' => 0));
+      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', ['expires' => 0]);
     }
   }
 
@@ -115,13 +114,13 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
     // save components to be enabled
     if (array_key_exists('enableComponents', $params)) {
-      civicrm_api3('setting', 'create', array(
+      civicrm_api3('setting', 'create', [
         'enable_components' => $params['enableComponents'],
-      ));
+      ]);
       unset($params['enableComponents']);
     }
 
-    foreach (array('verifySSL', 'enableSSL') as $name) {
+    foreach (['verifySSL', 'enableSSL'] as $name) {
       if (isset($params[$name])) {
         Civi::settings()->set($name, $params[$name]);
         unset($params[$name]);
@@ -143,7 +142,8 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     }
 
     CRM_Core_Config::clearDBCache();
-    Civi::cache('session')->clear(); // This doesn't make a lot of sense to me, but it maintains pre-existing behavior.
+    // This doesn't make a lot of sense to me, but it maintains pre-existing behavior.
+    Civi::cache('session')->clear();
     CRM_Utils_System::flushCache();
     CRM_Core_Resources::singleton()->resetCacheCode();
 

@@ -30,6 +30,7 @@
  * based on civicrm_handler_filter_custom_option and civicrm_handler_filter_state
  */
 class civicrm_handler_filter_state_multi extends views_handler_filter_in_operator {
+
   public function construct() {
     parent::construct();
     if (!civicrm_initialize()) {

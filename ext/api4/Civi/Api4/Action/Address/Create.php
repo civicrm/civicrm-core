@@ -3,12 +3,11 @@
 namespace Civi\Api4\Action\Address;
 
 use Civi\Api4\Generic\Result;
-use Civi\Api4\Action\Create as DefaultCreate;
 
 /**
  * @inheritDoc
  */
-class Create extends DefaultCreate {
+class Create extends \Civi\Api4\Generic\DAOCreateAction {
 
   /**
    * Optional param to indicate you want the street_address field parsed into individual params

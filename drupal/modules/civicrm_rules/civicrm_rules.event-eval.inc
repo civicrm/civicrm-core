@@ -34,6 +34,7 @@
  */
 
 require_once 'civicrm_rules_utils.inc';
+
 function civicrm_rules_condition_event_node(&$entityobj, $roleID, $field) {
   //just a hack for our site
   //SELECT * FROM `content_type_og_node` WHERE `field_civicrm_event_value` =993

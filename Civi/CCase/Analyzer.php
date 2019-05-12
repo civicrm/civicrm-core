@@ -80,20 +80,20 @@ class Analyzer {
    * @return bool
    */
   public function hasActivity($type, $status = NULL) {
-    $idx = $this->getActivityIndex(array('activity_type_id', 'status_id'));
-    $activityTypeGroup = civicrm_api3('option_group', 'get', array('name' => 'activity_type'));
-    $activityType = array(
+    $idx = $this->getActivityIndex(['activity_type_id', 'status_id']);
+    $activityTypeGroup = civicrm_api3('option_group', 'get', ['name' => 'activity_type']);
+    $activityType = [
       'name' => $type,
       'option_group_id' => $activityTypeGroup['id'],
-    );
+    ];
     $activityTypeID = civicrm_api3('option_value', 'get', $activityType);
     $activityTypeID = $activityTypeID['values'][$activityTypeID['id']]['value'];
     if ($status) {
-      $activityStatusGroup = civicrm_api3('option_group', 'get', array('name' => 'activity_status'));
-      $activityStatus = array(
+      $activityStatusGroup = civicrm_api3('option_group', 'get', ['name' => 'activity_status']);
+      $activityStatus = [
         'name' => $status,
         'option_group_id' => $activityStatusGroup['id'],
-      );
+      ];
       $activityStatusID = civicrm_api3('option_value', 'get', $activityStatus);
       $activityStatusID = $activityStatusID['values'][$activityStatusID['id']]['value'];
     }
@@ -115,13 +115,13 @@ class Analyzer {
     if ($this->activities === NULL) {
       // TODO find batch-oriented API for getting all activities in a case
       $case = $this->getCase();
-      $activities = array();
+      $activities = [];
       if (isset($case['activities'])) {
         foreach ($case['activities'] as $actId) {
-          $result = civicrm_api3('Activity', 'get', array(
+          $result = civicrm_api3('Activity', 'get', [
             'id' => $actId,
             'is_current_revision' => 1,
-          ));
+          ]);
           $activities = array_merge($activities, $result['values']);
         }
       }
@@ -132,14 +132,15 @@ class Analyzer {
 
   /**
    * Get a single activity record by type.
+   * This function is only used by SequenceListenerTest
    *
    * @param string $type
    * @throws \Civi\CCase\Exception\MultipleActivityException
    * @return array|NULL, activity record (api/v3)
    */
   public function getSingleActivity($type) {
-    $idx = $this->getActivityIndex(array('activity_type_id', 'id'));
-    $actTypes = array_flip(\CRM_Core_PseudoConstant::activityType(TRUE, TRUE, FALSE, 'name'));
+    $idx = $this->getActivityIndex(['activity_type_id', 'id']);
+    $actTypes = array_flip(\CRM_Activity_BAO_Activity::buildOptions('activity_type_id', 'validate'));
     $typeId = $actTypes[$type];
     $count = isset($idx[$typeId]) ? count($idx[$typeId]) : 0;
 
@@ -168,7 +169,7 @@ class Analyzer {
    */
   public function getCase() {
     if ($this->case === NULL) {
-      $this->case = civicrm_api3('case', 'getsingle', array('id' => $this->caseId));
+      $this->case = civicrm_api3('case', 'getsingle', ['id' => $this->caseId]);
     }
     return $this->case;
   }
@@ -222,7 +223,7 @@ class Analyzer {
     $this->case = NULL;
     $this->caseType = NULL;
     $this->activities = NULL;
-    $this->indices = array();
+    $this->indices = [];
   }
 
 }

@@ -1,3 +1,82 @@
+1.8.4 - [RELEASEDATE]
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Fixed #61: create_function() is deprecated in PHP 7.2. (Derick Rethans)
+
+
+1.8.3 - Saturday 18 November 2017
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Fixed 'Undefined offset: -1' notice when parsing Delivery Status parts
+  (Marcel Toben, Daniel Tschinder).
+- Fix error when trying to access email from null (Daniel Tschinder).
+- Checking if variable is resource mitigates against possible PHP Object
+  Injection exploits (Casper Langemeijer).
+- Fixed a code-bug when counting parts for RFC2231 reading (Derick Rethans).
+
+
+1.8.2 - Sunday 12 November 2017
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Added support for XOAUTH2 authentication method for SMTP transport (Ian
+  Berry).
+- Fixed a bug with a space around file names in Content-Disposition headers
+  (Alexey Alyoshin)
+- Allow ezcMailVirtualFile and ezcMailStreamFile to be handled in
+  ezcMail::walkParts (Brend Rathmanner)
+- Fixed empty filename in file_parser (Michael Kliewe)
+- Update STARTTLS parsing to allow "250 STARTTLS" (John Corser)/\t
+- Fixed issue #58: Restrict the set of characters that can be used as the email
+  address for the ezcMail returnPath property. (CVE-2017-15806, reported by
+  "Kay")
+
+
+1.8.1 - Tuesday 04 November 2014
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Fixed double folding on e-mail headers.
+- Make ezcMailComposer::generateHtmlPart protected instead of private.
+- Fixed issues with NTML authentication.
+- Fixed issues with TLS sessions and unencrypted SMTP connections.
+
+
+1.8 - Saturday 27 September 2014
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- fixed mailbox names with spaces not being properly quoted
+- Fixed bug parsing img tags in the html
+- Trim header values before they are being set in the headers_holder
+- Fixed #16154: Bcc headers are not stripped when using SMTP.
+- Fixed #16347: Inline images in the mail composer are not added other
+  attributes precede the src attribute.
+- Fixed #16348: Adding inline images in the mail composer with whitespace in
+  the path fails.
+- Fixed #16470: Mail test suite causes fatal errors because of transport
+  errors in destructor.
+- Fixed #ZETACOMP-75: Mail parser doesn't understand uppercase "CHARSET" that
+  alpine uses.
+- Fixed #ZETACOMP-76: MailTools::replyTo will always use REPLY_ALL instead of
+  distinguishing between REPLY_ALL and REPLY_SENDER.
+- Fixed #ZETACOMP-77: Mail still uses "eZ Components" as User-Agent, which
+  should be "Apache Zeta Components".
+- Fixed #7: PREG_REPLACE_EVAL is deprecated, use preg_replace_callback
+- Fixed #8: Fixed header Mime encoding failing using multi-byte characters
+- Fixed #9: Fixed composer.json to use dev-master for unit-test component,
+  since there is no stable release of it.
+
+
+1.7 - Monday 21 December 2009
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- No changes.
+
+
+1.7rc1 - Monday 07 December 2009
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- No changes.
+
+
 1.7beta1 - Monday 23 November 2009
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

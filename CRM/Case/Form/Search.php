@@ -59,6 +59,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Prefix for the controller
+   * @var sting
    */
   protected $_prefix = 'case_';
 
@@ -87,7 +88,6 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
-    $this->defaults = array();
 
     $this->loadStandardSearchOptionsFromUrl();
     $this->loadFormValues();
@@ -291,7 +291,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    * @see valid_date
    */
   public function addRules() {
-    $this->addFormRule(array('CRM_Case_Form_Search', 'formRule'));
+    $this->addFormRule(['CRM_Case_Form_Search', 'formRule']);
   }
 
   /**
@@ -299,11 +299,13 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    *
    * @param array $fields
    *   Posted values of the form.
+   * @param array $files
+   * @param object $form
    *
    * @return array|bool
    */
-  public static function formRule($fields) {
-    $errors = array();
+  public static function formRule($fields, $files, $form) {
+    $errors = [];
 
     if (!empty($errors)) {
       return $errors;
@@ -320,7 +322,7 @@ class CRM_Case_Form_Search extends CRM_Core_Form_Search {
    *   the default array reference
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     $defaults = $this->_formValues;
     return $defaults;
   }

@@ -25,7 +25,6 @@
  +--------------------------------------------------------------------+
  */
 
-use Civi\ActionSchedule\RecipientBuilder;
 
 /**
  * Class CRM_Member_ActionMapping
@@ -50,7 +49,7 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
    * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
    */
   public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
-    $registrations->register(CRM_Member_ActionMapping::create(array(
+    $registrations->register(CRM_Member_ActionMapping::create([
       'id' => CRM_Member_ActionMapping::MEMBERSHIP_TYPE_MAPPING_ID,
       'entity' => 'civicrm_membership',
       'entity_label' => ts('Membership'),
@@ -58,7 +57,7 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
       'entity_value_label' => ts('Membership Type'),
       'entity_status' => 'auto_renew_options',
       'entity_status_label' => ts('Auto Renew Options'),
-    )));
+    ]));
   }
 
   /**
@@ -68,11 +67,11 @@ class CRM_Member_ActionMapping extends \Civi\ActionSchedule\Mapping {
    *   Array(string $fieldName => string $fieldLabel).
    */
   public function getDateFields() {
-    return array(
+    return [
       'join_date' => ts('Membership Join Date'),
       'start_date' => ts('Membership Start Date'),
       'end_date' => ts('Membership End Date'),
-    );
+    ];
   }
 
   /**

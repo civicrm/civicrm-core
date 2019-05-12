@@ -51,7 +51,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
    *   DAO with the default mail settings set
    */
   public static function defaultDAO($reset = FALSE) {
-    static $mailSettings = array();
+    static $mailSettings = [];
     $domainID = CRM_Core_Config::domainID();
     if (empty($mailSettings[$domainID]) || $reset) {
       $dao = new self();
@@ -151,7 +151,7 @@ class CRM_Core_BAO_MailSettings extends CRM_Core_DAO_MailSettings {
     //handle is_default.
     if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_mail_settings SET is_default = 0 WHERE domain_id = %1';
-      $queryParams = array(1 => array(CRM_Core_Config::domainID(), 'Integer'));
+      $queryParams = [1 => [CRM_Core_Config::domainID(), 'Integer']];
       CRM_Core_DAO::executeQuery($query, $queryParams);
     }
 

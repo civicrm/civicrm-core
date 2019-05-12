@@ -59,10 +59,23 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Prefix for the controller.
+   * @var string
    */
   protected $_prefix = "grant_";
 
-  protected $entity = 'grant';
+  /**
+   * Metadata of all fields to include on the form.
+   *
+   * @var array
+   */
+  protected $searchFieldMetadata = [];
+
+  /**
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'Grant';
+  }
 
   /**
    * Processing needed for buildForm and later.
@@ -77,7 +90,6 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
-    $this->defaults = array();
 
     $this->loadStandardSearchOptionsFromUrl();
     $this->loadFormValues();
@@ -284,6 +296,15 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
    */
   public function getTitle() {
     return ts('Find Grants');
+  }
+
+  /**
+   * Get metadata for fields being assigned by metadata.
+   *
+   * @return array
+   */
+  protected function getEntityMetadata() {
+    return CRM_Grant_BAO_Query::getSearchFieldMetadata();
   }
 
 }

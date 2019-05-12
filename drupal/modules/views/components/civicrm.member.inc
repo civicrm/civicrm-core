@@ -143,8 +143,8 @@ function _civicrm_member_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_membership'], array(
     'title' => 'Join Date',
-      'name' => 'join_date',
-    ));
+    'name' => 'join_date',
+  ));
 
   //Membership start date
   $data['civicrm_membership']['start_date'] = array(
@@ -165,8 +165,8 @@ function _civicrm_member_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_membership'], array(
     'title' => 'Start Date',
-      'name' => 'start_date',
-    ));
+    'name' => 'start_date',
+  ));
 
   //Membership end date
   $data['civicrm_membership']['end_date'] = array(
@@ -187,8 +187,8 @@ function _civicrm_member_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_membership'], array(
     'title' => 'End Date',
-      'name' => 'end_date',
-    ));
+    'name' => 'end_date',
+  ));
 
   //membership Source
   $data['civicrm_membership']['source'] = array(
@@ -271,8 +271,8 @@ function _civicrm_member_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_membership'], array(
     'title' => 'Reminder Date',
-      'name' => 'reminder_date',
-    ));
+    'name' => 'reminder_date',
+  ));
 
   //Numeric Membership Owner ID
   $data['civicrm_membership']['owner_membership_id'] = array(

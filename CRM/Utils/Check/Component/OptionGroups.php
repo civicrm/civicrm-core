@@ -36,13 +36,13 @@ class CRM_Utils_Check_Component_OptionGroups extends CRM_Utils_Check_Component {
    * @return array
    */
   public function checkOptionGroupValues() {
-    $messages = array();
-    $problemValues = array();
-    $optionGroups  = civicrm_api3('OptionGroup', 'get', array(
+    $messages = [];
+    $problemValues = [];
+    $optionGroups  = civicrm_api3('OptionGroup', 'get', [
       'sequential' => 1,
-      'data_type' => array('IS NOT NULL' => 1),
-      'options' => array('limit' => 0),
-    ));
+      'data_type' => ['IS NOT NULL' => 1],
+      'options' => ['limit' => 0],
+    ]);
     if ($optionGroups['count'] > 0) {
       foreach ($optionGroups['values'] as $optionGroup) {
         $values = CRM_Core_BAO_OptionValue::getOptionValuesArray($optionGroup['id']);
@@ -50,10 +50,10 @@ class CRM_Utils_Check_Component_OptionGroups extends CRM_Utils_Check_Component {
           foreach ($values as $value) {
             $validate = CRM_Utils_Type::validate($value['value'], $optionGroup['data_type'], FALSE);
             if (is_null($validate)) {
-              $problemValues[] = array(
+              $problemValues[] = [
                 'group_name' => $optionGroup['title'],
                 'value_name' => $value['label'],
-              );
+              ];
             }
           }
         }
@@ -62,10 +62,10 @@ class CRM_Utils_Check_Component_OptionGroups extends CRM_Utils_Check_Component {
     if (!empty($problemValues)) {
       $strings = '';
       foreach ($problemValues as $problemValue) {
-        $strings .= ts('<tr><td> "%1" </td><td> "%2" </td></tr>', array(
+        $strings .= ts('<tr><td> "%1" </td><td> "%2" </td></tr>', [
           1 => $problemValue['group_name'],
           2 => $problemValue['value_name'],
-        ));
+        ]);
       }
 
       $messages[] = new CRM_Utils_Check_Message(

@@ -32,12 +32,12 @@
  */
 class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
 
-  protected $_customGroupExtends = array(
+  protected $_customGroupExtends = [
     'Contact',
     'Individual',
     'Household',
     'Organization',
-  );
+  ];
 
   protected $_exposeContactID = FALSE;
 
@@ -58,221 +58,221 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
    * Class constructor.
    */
   public function __construct() {
-    $this->_columns = array();
+    $this->_columns = [];
 
-    $this->_columns['civicrm_contact'] = array(
+    $this->_columns['civicrm_contact'] = [
       'dao' => 'CRM_Contact_DAO_Contact',
-      'fields' => array(
-        'id' => array(
+      'fields' => [
+        'id' => [
           'name' => 'id',
           'title' => ts('Contact ID'),
           'required' => TRUE,
           'no_display' => TRUE,
-        ),
-        'sort_name' => array(
+        ],
+        'sort_name' => [
           'title' => ts('Contact Name'),
           'required' => TRUE,
-        ),
-      ),
-      'filters' => array(
-        'sort_name' => array(
+        ],
+      ],
+      'filters' => [
+        'sort_name' => [
           'title' => ts('Contact Name'),
-        ),
-        'id' => array(
+        ],
+        'id' => [
           'title' => ts('Contact ID'),
           'no_display' => TRUE,
-        ),
-      ),
-      'order_bys' => array(
-        'sort_name' => array(
+        ],
+      ],
+      'order_bys' => [
+        'sort_name' => [
           'title' => ts('Contact Name'),
           'default' => TRUE,
           'default_order' => 'ASC',
-        ),
-      ),
+        ],
+      ],
       'grouping' => 'contact-fields',
-    );
+    ];
 
-    $this->_columns['civicrm_mailing'] = array(
+    $this->_columns['civicrm_mailing'] = [
       'dao' => 'CRM_Mailing_DAO_Mailing',
-      'fields' => array(
-        'mailing_name' => array(
+      'fields' => [
+        'mailing_name' => [
           'name' => 'name',
           'title' => ts('Mailing Name'),
           'default' => TRUE,
-        ),
-        'mailing_subject' => array(
+        ],
+        'mailing_subject' => [
           'name' => 'subject',
           'title' => ts('Mailing Subject'),
           'default' => TRUE,
-        ),
-      ),
-      'filters' => array(
-        'mailing_id' => array(
+        ],
+      ],
+      'filters' => [
+        'mailing_id' => [
           'name' => 'id',
           'title' => ts('Mailing Name'),
           'operatorType' => CRM_Report_Form::OP_MULTISELECT,
           'type' => CRM_Utils_Type::T_INT,
           'options' => CRM_Mailing_BAO_Mailing::getMailingsList(),
-        ),
-        'mailing_subject' => array(
+        ],
+        'mailing_subject' => [
           'name' => 'subject',
           'title' => ts('Mailing Subject'),
           'type' => CRM_Utils_Type::T_STRING,
           'operator' => 'like',
-        ),
-      ),
-      'order_bys' => array(
-        'mailing_name' => array(
+        ],
+      ],
+      'order_bys' => [
+        'mailing_name' => [
           'name' => 'name',
           'title' => ts('Mailing Name'),
-        ),
-        'mailing_subject' => array(
+        ],
+        'mailing_subject' => [
           'name' => 'subject',
           'title' => ts('Mailing Subject'),
-        ),
-      ),
+        ],
+      ],
       'grouping' => 'mailing-fields',
-    );
+    ];
 
     // adding dao just to have alias
-    $this->_columns['civicrm_mailing_event_bounce'] = array(
+    $this->_columns['civicrm_mailing_event_bounce'] = [
       'dao' => 'CRM_Mailing_Event_DAO_Bounce',
-    );
+    ];
 
-    $this->_columns['civicrm_mailing_event_delivered'] = array(
+    $this->_columns['civicrm_mailing_event_delivered'] = [
       'dao' => 'CRM_Mailing_Event_DAO_Delivered',
-      'fields' => array(
-        'delivery_id' => array(
+      'fields' => [
+        'delivery_id' => [
           'name' => 'id',
           'title' => ts('Delivery Status'),
           'default' => TRUE,
-        ),
-      ),
-      'filters' => array(
-        'delivery_status' => array(
+        ],
+      ],
+      'filters' => [
+        'delivery_status' => [
           'name' => 'delivery_status',
           'title' => ts('Delivery Status'),
           'operatorType' => CRM_Report_Form::OP_SELECT,
           'type' => CRM_Utils_Type::T_STRING,
-          'options' => array(
+          'options' => [
             '' => 'Any',
             'successful' => 'Successful',
             'bounced' => 'Bounced',
-          ),
-        ),
-      ),
+          ],
+        ],
+      ],
       'grouping' => 'mailing-fields',
-    );
+    ];
 
-    $this->_columns['civicrm_mailing_event_unsubscribe'] = array(
+    $this->_columns['civicrm_mailing_event_unsubscribe'] = [
       'dao' => 'CRM_Mailing_Event_DAO_Unsubscribe',
-      'fields' => array(
-        'unsubscribe_id' => array(
+      'fields' => [
+        'unsubscribe_id' => [
           'name' => 'id',
           'title' => ts('Unsubscribe'),
           'default' => TRUE,
-        ),
-        'optout_id' => array(
+        ],
+        'optout_id' => [
           'name' => 'id',
           'title' => ts('Opt-out'),
           'default' => TRUE,
           'alias' => 'mailing_event_unsubscribe_civireport2',
-        ),
-      ),
-      'filters' => array(
-        'is_unsubscribed' => array(
+        ],
+      ],
+      'filters' => [
+        'is_unsubscribed' => [
           'name' => 'id',
           'title' => ts('Unsubscribed'),
           'type' => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_SELECT,
-          'options' => array(
+          'options' => [
             '' => ts('Any'),
             '0' => ts('No'),
             '1' => ts('Yes'),
-          ),
+          ],
           'clause' => 'mailing_event_unsubscribe_civireport.id IS NULL',
-        ),
-        'is_optout' => array(
+        ],
+        'is_optout' => [
           'title' => ts('Opted-out'),
           'type' => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_SELECT,
-          'options' => array(
+          'options' => [
             '' => ts('Any'),
             '0' => ts('No'),
             '1' => ts('Yes'),
-          ),
+          ],
           'clause' => 'mailing_event_unsubscribe_civireport2.id IS NULL',
-        ),
-      ),
+        ],
+      ],
       'grouping' => 'mailing-fields',
-    );
+    ];
 
-    $this->_columns['civicrm_mailing_event_reply'] = array(
+    $this->_columns['civicrm_mailing_event_reply'] = [
       'dao' => 'CRM_Mailing_Event_DAO_Reply',
-      'fields' => array(
-        'reply_id' => array(
+      'fields' => [
+        'reply_id' => [
           'name' => 'id',
           'title' => ts('Reply'),
-        ),
-      ),
-      'filters' => array(
-        'is_replied' => array(
+        ],
+      ],
+      'filters' => [
+        'is_replied' => [
           'name' => 'id',
           'title' => ts('Replied'),
           'type' => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_SELECT,
-          'options' => array(
+          'options' => [
             '' => ts('Any'),
             '0' => ts('No'),
             '1' => ts('Yes'),
-          ),
+          ],
           'clause' => 'mailing_event_reply_civireport.id IS NULL',
-        ),
-      ),
+        ],
+      ],
       'grouping' => 'mailing-fields',
-    );
+    ];
 
-    $this->_columns['civicrm_mailing_event_forward'] = array(
+    $this->_columns['civicrm_mailing_event_forward'] = [
       'dao' => 'CRM_Mailing_Event_DAO_Forward',
-      'fields' => array(
-        'forward_id' => array(
+      'fields' => [
+        'forward_id' => [
           'name' => 'id',
           'title' => ts('Forwarded to Email'),
-        ),
-      ),
-      'filters' => array(
-        'is_forwarded' => array(
+        ],
+      ],
+      'filters' => [
+        'is_forwarded' => [
           'name' => 'id',
           'title' => ts('Forwarded'),
           'type' => CRM_Utils_Type::T_INT,
           'operatorType' => CRM_Report_Form::OP_SELECT,
-          'options' => array(
+          'options' => [
             '' => ts('Any'),
             '0' => ts('No'),
             '1' => ts('Yes'),
-          ),
+          ],
           'clause' => 'mailing_event_forward_civireport.id IS NULL',
-        ),
-      ),
+        ],
+      ],
       'grouping' => 'mailing-fields',
-    );
+    ];
 
-    $this->_columns['civicrm_email'] = array(
+    $this->_columns['civicrm_email'] = [
       'dao' => 'CRM_Core_DAO_Email',
-      'fields' => array(
-        'email' => array(
+      'fields' => [
+        'email' => [
           'title' => ts('Email'),
-        ),
-      ),
+        ],
+      ],
       'grouping' => 'contact-fields',
-    );
+    ];
 
-    $this->_columns['civicrm_phone'] = array(
+    $this->_columns['civicrm_phone'] = [
       'dao' => 'CRM_Core_DAO_Phone',
-      'fields' => array('phone' => NULL),
+      'fields' => ['phone' => NULL],
       'grouping' => 'contact-fields',
-    );
+    ];
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
@@ -281,19 +281,19 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
   }
 
   public function select() {
-    $select = $columns = array();
+    $select = $columns = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
           if (!empty($field['required']) ||
             !empty($this->_params['fields'][$fieldName])
           ) {
-            if (in_array($fieldName, array(
+            if (in_array($fieldName, [
               'unsubscribe_id',
               'optout_id',
               'forward_id',
               'reply_id',
-            ))) {
+            ])) {
               $select[] = "IF({$field['dbAlias']} IS NULL, 'No', 'Yes') as {$tableName}_{$fieldName}";
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['no_display'] = CRM_Utils_Array::value('no_display', $field);
@@ -456,7 +456,7 @@ class CRM_Report_Form_Mailing_Detail extends CRM_Report_Form {
    */
   public function mailingList() {
 
-    $data = array();
+    $data = [];
     $mailing = new CRM_Mailing_BAO_Mailing();
     $query = "SELECT name FROM civicrm_mailing ";
     $mailing->query($query);

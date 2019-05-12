@@ -59,6 +59,7 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Prefix for the controller.
+   * @var string
    */
   protected $_prefix = "activity_";
 
@@ -87,7 +88,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
-    $this->defaults = array();
 
     $this->loadStandardSearchOptionsFromUrl();
 
@@ -199,16 +199,16 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
     if (!empty($_POST)) {
       $this->_formValues = $this->controller->exportValues($this->_name);
-      $specialParams = array(
+      $specialParams = [
         'activity_type_id',
         'status_id',
         'priority_id',
         'activity_text',
-      );
-      $changeNames = array(
+      ];
+      $changeNames = [
         'status_id' => 'activity_status_id',
         'priority_id' => 'activity_priority_id',
-      );
+      ];
 
       CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams, $changeNames);
     }
@@ -321,59 +321,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
         // also assign individual mode to the template
         $this->_single = TRUE;
       }
-    }
-
-    // Added for membership search
-
-    $signupType = CRM_Utils_Request::retrieve('signupType', 'Positive');
-
-    if ($signupType) {
-      $this->_formValues['activity_role'] = 1;
-      $this->_defaults['activity_role'] = 1;
-      $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
-
-      $renew = CRM_Utils_Array::key('Membership Renewal', $activityTypes);
-      $signup = CRM_Utils_Array::key('Membership Signup', $activityTypes);
-
-      switch ($signupType) {
-        case 3: // signups and renewals
-          $this->_formValues['activity_type_id'][$renew] = 1;
-          $this->_defaults['activity_type_id'][$renew] = 1;
-        case 1: // signups only
-          $this->_formValues['activity_type_id'][$signup] = 1;
-          $this->_defaults['activity_type_id'][$signup] = 1;
-          break;
-
-        case 2: // renewals only
-          $this->_formValues['activity_type_id'][$renew] = 1;
-          $this->_defaults['activity_type_id'][$renew] = 1;
-          break;
-      }
-    }
-
-    $dateLow = CRM_Utils_Request::retrieve('dateLow', 'String');
-
-    if ($dateLow) {
-      $dateLow = date('m/d/Y', strtotime($dateLow));
-      $this->_formValues['activity_date_relative'] = 0;
-      $this->_defaults['activity_date_relative'] = 0;
-      $this->_formValues['activity_date_low'] = $dateLow;
-      $this->_defaults['activity_date_low'] = $dateLow;
-    }
-
-    $dateHigh = CRM_Utils_Request::retrieve('dateHigh', 'String');
-
-    if ($dateHigh) {
-      // Activity date time assumes midnight at the beginning of the date
-      // This sets it to almost midnight at the end of the date
-      /*   if ($dateHigh <= 99999999) {
-      $dateHigh = 1000000 * $dateHigh + 235959;
-      } */
-      $dateHigh = date('m/d/Y', strtotime($dateHigh));
-      $this->_formValues['activity_date_relative'] = 0;
-      $this->_defaults['activity_date_relative'] = 0;
-      $this->_formValues['activity_date_high'] = $dateHigh;
-      $this->_defaults['activity_date_high'] = $dateHigh;
     }
 
     // Enable search activity by custom value

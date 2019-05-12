@@ -2,33 +2,33 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
-use Civi\Api4\Action\Create;
+use Civi\Api4\Generic\DAOCreateAction;
 use Civi\Api4\OptionGroup;
 
 class OptionValuePreCreationSubscriber extends PreCreationSubscriber {
 
   /**
-   * @param Create $request
+   * @param DAOCreateAction $request
    */
-  protected function modify(Create $request) {
+  protected function modify(DAOCreateAction $request) {
     $this->setOptionGroupId($request);
   }
 
   /**
-   * @param Create $request
+   * @param DAOCreateAction $request
    *
    * @return bool
    */
-  protected function applies(Create $request) {
-    return $request->getEntity() === 'OptionValue';
+  protected function applies(DAOCreateAction $request) {
+    return $request->getEntityName() === 'OptionValue';
   }
 
   /**
-   * @param Create $request
+   * @param DAOCreateAction $request
    * @throws \API_Exception
    * @throws \Exception
    */
-  private function setOptionGroupId(Create $request) {
+  private function setOptionGroupId(DAOCreateAction $request) {
     $optionGroupName = $request->getValue('option_group');
     if (!$optionGroupName || $request->getValue('option_group_id')) {
       return;

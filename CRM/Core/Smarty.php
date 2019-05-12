@@ -75,7 +75,7 @@ class CRM_Core_Smarty extends Smarty {
   /**
    * @var array (string $name => mixed $value) a list of variables ot save temporarily
    */
-  private $backupFrames = array();
+  private $backupFrames = [];
 
   /**
    * Class constructor.
@@ -90,7 +90,7 @@ class CRM_Core_Smarty extends Smarty {
     $config = CRM_Core_Config::singleton();
 
     if (isset($config->customTemplateDir) && $config->customTemplateDir) {
-      $this->template_dir = array_merge(array($config->customTemplateDir),
+      $this->template_dir = array_merge([$config->customTemplateDir],
         $config->templateDir
       );
     }
@@ -134,10 +134,10 @@ class CRM_Core_Smarty extends Smarty {
     $pluginsDir = __DIR__ . DIRECTORY_SEPARATOR . 'Smarty' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR;
 
     if ($customPluginsDir) {
-      $this->plugins_dir = array($customPluginsDir, $smartyDir . 'plugins', $pluginsDir);
+      $this->plugins_dir = [$customPluginsDir, $smartyDir . 'plugins', $pluginsDir];
     }
     else {
-      $this->plugins_dir = array($smartyDir . 'plugins', $pluginsDir);
+      $this->plugins_dir = [$smartyDir . 'plugins', $pluginsDir];
     }
 
     // add the session and the config here
@@ -154,7 +154,7 @@ class CRM_Core_Smarty extends Smarty {
       $this->assign('langSwitch', CRM_Core_I18n::uiLanguages());
     }
 
-    $this->register_function('crmURL', array('CRM_Utils_System', 'crmURL'));
+    $this->register_function('crmURL', ['CRM_Utils_System', 'crmURL']);
     $this->load_filter('pre', 'resetExtScope');
 
     $this->assign('crmPermissions', new CRM_Core_Smarty_Permissions());
@@ -259,7 +259,7 @@ class CRM_Core_Smarty extends Smarty {
       array_unshift($this->template_dir, $path);
     }
     else {
-      $this->template_dir = array($path, $this->template_dir);
+      $this->template_dir = [$path, $this->template_dir];
     }
 
   }
@@ -283,7 +283,7 @@ class CRM_Core_Smarty extends Smarty {
    */
   public function pushScope($vars) {
     $oldVars = $this->get_template_vars();
-    $backupFrame = array();
+    $backupFrame = [];
     foreach ($vars as $key => $value) {
       $backupFrame[$key] = isset($oldVars[$key]) ? $oldVars[$key] : NULL;
     }

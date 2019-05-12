@@ -27,7 +27,7 @@ class SchemaMapBuilder {
    */
   public function __construct(EventDispatcherInterface $dispatcher) {
     $this->dispatcher = $dispatcher;
-    $this->apiEntities = array_keys((array) Entity::get()->addSelect('name')->execute()->indexBy('name'));
+    $this->apiEntities = array_keys((array) Entity::get()->setCheckPermissions(FALSE)->addSelect('name')->execute()->indexBy('name'));
   }
 
   /**
@@ -182,7 +182,10 @@ class SchemaMapBuilder {
       ->select(['g.name as custom_group_name', 'g.table_name', 'g.is_multiple', 'f.name', 'label', 'column_name', 'option_group_id'])
       ->where('g.extends IN (@entity)', ['@entity' => $queryEntity])
       ->where('g.is_active')
+      ->where('f.is_active')
       ->execute();
+
+    $links = [];
 
     while ($fieldData->fetch()) {
       $tableName = $fieldData->table_name;
@@ -198,9 +201,15 @@ class SchemaMapBuilder {
       }
 
       $map->addTable($customTable);
+
       $alias = $fieldData->custom_group_name;
-      $isMultiple = !empty($fieldData->is_multiple);
-      $joinable = new CustomGroupJoinable($tableName, $alias, $isMultiple, $entity, $fieldData->column_name);
+      $links[$alias]['tableName'] = $tableName;
+      $links[$alias]['isMultiple'] = !empty($fieldData->is_multiple);
+      $links[$alias]['columns'][$fieldData->name] = $fieldData->column_name;
+    }
+
+    foreach ($links as $alias => $link) {
+      $joinable = new CustomGroupJoinable($link['tableName'], $alias, $link['isMultiple'], $entity, $link['columns']);
       $baseTable->addTableLink('id', $joinable);
     }
   }

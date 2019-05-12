@@ -39,118 +39,120 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
 
   /**
    * Static holder for the Label Formats Option Group ID.
+   * @var int
    */
   private static $_gid = NULL;
 
   /**
    * Label Format fields stored in the 'value' field of the Option Value table.
+   * @var array
    */
-  private static $optionValueFields = array(
-    'paper-size' => array(
+  private static $optionValueFields = [
+    'paper-size' => [
       // Paper size: names defined in option_value table (option_group = 'paper_size')
       'name' => 'paper-size',
       'type' => CRM_Utils_Type::T_STRING,
       'default' => 'letter',
-    ),
-    'orientation' => array(
+    ],
+    'orientation' => [
       // Paper orientation: 'portrait' or 'landscape'
       'name' => 'orientation',
       'type' => CRM_Utils_Type::T_STRING,
       'default' => 'portrait',
-    ),
-    'font-name' => array(
+    ],
+    'font-name' => [
       // Font name: 'courier', 'helvetica', 'times'
       'name' => 'font-name',
       'type' => CRM_Utils_Type::T_STRING,
       'default' => 'helvetica',
-    ),
-    'font-size' => array(
+    ],
+    'font-size' => [
       // Font size: always in points
       'name' => 'font-size',
       'type' => CRM_Utils_Type::T_INT,
       'default' => 8,
-    ),
-    'font-style' => array(
+    ],
+    'font-style' => [
       // Font style: 'B' bold, 'I' italic, 'BI' bold+italic
       'name' => 'font-style',
       'type' => CRM_Utils_Type::T_STRING,
       'default' => '',
-    ),
-    'NX' => array(
+    ],
+    'NX' => [
       // Number of labels horizontally
       'name' => 'NX',
       'type' => CRM_Utils_Type::T_INT,
       'default' => 3,
-    ),
-    'NY' => array(
+    ],
+    'NY' => [
       // Number of labels vertically
       'name' => 'NY',
       'type' => CRM_Utils_Type::T_INT,
       'default' => 10,
-    ),
-    'metric' => array(
+    ],
+    'metric' => [
       // Unit of measurement for all of the following fields
       'name' => 'metric',
       'type' => CRM_Utils_Type::T_STRING,
       'default' => 'mm',
-    ),
-    'lMargin' => array(
+    ],
+    'lMargin' => [
       // Left margin
       'name' => 'lMargin',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 4.7625,
-    ),
-    'tMargin' => array(
+    ],
+    'tMargin' => [
       // Right margin
       'name' => 'tMargin',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 12.7,
-    ),
-    'SpaceX' => array(
+    ],
+    'SpaceX' => [
       // Horizontal space between two labels
       'name' => 'SpaceX',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 3.96875,
-    ),
-    'SpaceY' => array(
+    ],
+    'SpaceY' => [
       // Vertical space between two labels
       'name' => 'SpaceY',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 0,
-    ),
-    'width' => array(
+    ],
+    'width' => [
       // Width of label
       'name' => 'width',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 65.875,
-    ),
-    'height' => array(
+    ],
+    'height' => [
       // Height of label
       'name' => 'height',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 25.4,
-    ),
-    'lPadding' => array(
+    ],
+    'lPadding' => [
       // Space between text and left edge of label
       'name' => 'lPadding',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 5.08,
-    ),
-    'tPadding' => array(
+    ],
+    'tPadding' => [
       // Space between text and top edge of label
       'name' => 'tPadding',
       'type' => CRM_Utils_Type::T_FLOAT,
       'metric' => TRUE,
       'default' => 5.08,
-    ),
-  );
+    ],
+  ];
 
   /**
    * Get page orientations recognized by the DOMPDF package used to create PDF letters.
@@ -159,10 +161,10 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *   array of page orientations
    */
   public static function getPageOrientations() {
-    return array(
+    return [
       'portrait' => ts('Portrait'),
       'landscape' => ts('Landscape'),
-    );
+    ];
   }
 
   /**
@@ -186,9 +188,9 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *   array of font sizes
    */
   public static function getFontSizes() {
-    $fontSizes = array();
+    $fontSizes = [];
     for ($i = 6; $i <= 60; $i++) {
-      $fontSizes[$i] = ts('%1 pt', array(1 => $i));
+      $fontSizes[$i] = ts('%1 pt', [1 => $i]);
     }
 
     return $fontSizes;
@@ -201,12 +203,12 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *   array of measurement units
    */
   public static function getUnits() {
-    return array(
+    return [
       'in' => ts('Inches'),
       'cm' => ts('Centimeters'),
       'mm' => ts('Millimeters'),
       'pt' => ts('Points'),
-    );
+    ];
   }
 
   /**
@@ -216,11 +218,11 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *   array of alignments
    */
   public static function getTextAlignments() {
-    return array(
+    return [
       'R' => ts('Right'),
       'L' => ts('Left'),
       'C' => ts('Center'),
-    );
+    ];
   }
 
   /**
@@ -230,11 +232,11 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *   array of alignments
    */
   public static function getFontStyles() {
-    return array(
+    return [
       '' => ts('Normal'),
       'B' => ts('Bold'),
       'I' => ts('Italic'),
-    );
+    ];
   }
 
   /**
@@ -258,7 +260,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Add ordering fields to Label Format list.
    *
-   * @param array (reference) $list List of Label Formats
+   * @param array $list List of Label Formats
    * @param string $returnURL
    *   URL of page calling this function.
    *
@@ -283,7 +285,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *   (reference)   label format list
    */
   public static function &getList($namesOnly = FALSE, $groupName = 'label_format') {
-    static $list = array();
+    static $list = [];
     if (self::_getGid($groupName)) {
       // get saved label formats from Option Value table
       $dao = new CRM_Core_DAO_OptionValue();
@@ -313,13 +315,13 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *   Name/value pairs containing the default Label Format values.
    */
   public static function &getDefaultValues($groupName = 'label_format') {
-    $params = array('is_active' => 1, 'is_default' => 1);
-    $defaults = array();
+    $params = ['is_active' => 1, 'is_default' => 1];
+    $defaults = [];
     if (!self::retrieve($params, $defaults, $groupName)) {
       foreach (self::$optionValueFields as $name => $field) {
         $defaults[$name] = $field['default'];
       }
-      $filter = array('option_group_id' => self::_getGid($groupName));
+      $filter = ['option_group_id' => self::_getGid($groupName)];
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Core_DAO_OptionValue', $filter);
     }
     return $defaults;
@@ -339,8 +341,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *   (reference) associative array of name/value pairs
    */
   public static function &getLabelFormat($field, $val, $groupName = 'label_format') {
-    $params = array('is_active' => 1, $field => $val);
-    $labelFormat = array();
+    $params = ['is_active' => 1, $field => $val];
+    $labelFormat = [];
     if (self::retrieve($params, $labelFormat, $groupName)) {
       return $labelFormat;
     }
@@ -382,7 +384,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    *
    * @param string $field
    *   Name of a label format field.
-   * @param array (reference) $values associative array of name/value pairs containing
+   * @param array $values associative array of name/value pairs containing
    *                                           label format field selections
    *
    * @param null $default
@@ -458,7 +460,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Save the Label Format in the DB.
    *
-   * @param array (reference) $values associative array of name/value pairs
+   * @param array $values associative array of name/value pairs
    * @param int $id
    *   Id of the database record (null = new record).
    * @param string $groupName
@@ -519,7 +521,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
     $this->save();
 
     // fix duplicate weights
-    $filter = array('option_group_id' => self::_getGid());
+    $filter = ['option_group_id' => self::_getGid()];
     CRM_Utils_Weight::correctDuplicateWeights('CRM_Core_DAO_OptionValue', $filter);
   }
 
@@ -537,7 +539,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
       $dao->id = $id;
       if ($dao->find(TRUE)) {
         if ($dao->option_group_id == self::_getGid($groupName)) {
-          $filter = array('option_group_id' => self::_getGid($groupName));
+          $filter = ['option_group_id' => self::_getGid($groupName)];
           CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $id, $filter);
           $dao->delete();
           return;

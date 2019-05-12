@@ -51,11 +51,11 @@ class CRM_Contact_Form_Location {
 
     if (is_a($form, 'CRM_Event_Form_ManageEvent_Location')
     || is_a($form, 'CRM_Contact_Form_Domain')) {
-      $form->_blocks = array(
+      $form->_blocks = [
         'Address' => ts('Address'),
         'Email' => ts('Email'),
         'Phone' => ts('Phone'),
-      );
+      ];
     }
 
     $form->assign('blocks', $form->_blocks);
@@ -76,14 +76,14 @@ class CRM_Contact_Form_Location {
    */
   public static function buildQuickForm(&$form) {
     // required for subsequent AJAX requests.
-    $ajaxRequestBlocks = array();
+    $ajaxRequestBlocks = [];
     $generateAjaxRequest = 0;
 
     //build 1 instance of all blocks, without using ajax ...
     foreach ($form->_blocks as $blockName => $label) {
       $name = strtolower($blockName);
 
-      $instances = array(1);
+      $instances = [1];
       if (!empty($_POST[$name]) && is_array($_POST[$name])) {
         $instances = array_keys($_POST[$name]);
       }

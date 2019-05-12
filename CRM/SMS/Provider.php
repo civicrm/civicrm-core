@@ -218,7 +218,8 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       // find sender by phone number if $fromContactID not set by hook
       $formatFrom = '%' . $this->formatPhone($this->stripPhone($message->from), $like, "like");
       $message->fromContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE %1", array(
-        1 => array($formatFrom, 'String')));
+        1 => array($formatFrom, 'String'),
+      ));
     }
 
     if (!$message->fromContactID) {
@@ -254,7 +255,8 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       // find recipient if $toContactID not set by hook
       if ($message->to) {
         $message->toContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE %1", array(
-          1 => array('%' . $message->to, 'String')));
+          1 => array('%' . $message->to, 'String'),
+        ));
       }
       else {
         $message->toContactID = $message->fromContactID;

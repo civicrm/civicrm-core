@@ -78,13 +78,13 @@ trait Api3DocTrait {
       // Attempt to convert lowercase action name to CamelCase.
       // This is clunky/imperfect due to the convention of all lowercase actions.
       $exampleName = \CRM_Utils_String::convertStringToCamel($action);
-      $knownPrefixes = array(
+      $knownPrefixes = [
         'Get',
         'Set',
         'Create',
         'Update',
         'Send',
-      );
+      ];
       foreach ($knownPrefixes as $prefix) {
         if (strpos($exampleName, $prefix) === 0 && $prefix != $exampleName) {
           $exampleName[strlen($prefix)] = strtoupper($exampleName[strlen($prefix)]);
@@ -97,7 +97,7 @@ trait Api3DocTrait {
       unset($params['version']);
     }
     // Format multiline description as array
-    $desc = array();
+    $desc = [];
     if (is_string($description) && strlen($description)) {
       foreach (explode("\n", $description) as $line) {
         $desc[] = trim($line);
@@ -139,7 +139,7 @@ trait Api3DocTrait {
     if (!is_array($result)) {
       return;
     }
-    $fieldsToChange = array(
+    $fieldsToChange = [
       'hash' => '67eac7789eaee00',
       'modified_date' => '2012-11-14 16:02:35',
       'created_date' => '2013-07-28 08:49:19',
@@ -154,9 +154,9 @@ trait Api3DocTrait {
       'end_date' => '2013-08-04 00:00:00',
       'event_end_date' => '2013-08-04 00:00:00',
       'decision_date' => '20130805000000',
-    );
+    ];
 
-    $keysToUnset = array('xdebug', 'undefined_fields');
+    $keysToUnset = ['xdebug', 'undefined_fields'];
     foreach ($keysToUnset as $unwantedKey) {
       if (isset($result[$unwantedKey])) {
         unset($result[$unwantedKey]);

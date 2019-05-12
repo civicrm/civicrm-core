@@ -35,8 +35,8 @@
  * Settings metadata file
  */
 
-return array(
-  'is_enabled' => array(
+return [
+  'is_enabled' => [
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',
     'name' => 'is_enabled',
@@ -50,23 +50,23 @@ return array(
     'description' => ts('Make CiviCRM aware of multiple domains. You should configure a domain group if enabled'),
     'documentation_link' => ['page' => 'Multi Site Installation', 'resource' => 'wiki'],
     'help_text' => NULL,
-  ),
-  'domain_group_id' => array(
+  ],
+  'domain_group_id' => [
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',
     'name' => 'domain_group_id',
     'title' => ts('Multisite Domain Group'),
     'type' => 'Integer',
     'html_type' => 'entity_reference',
-    'entity_reference_options' => ['entity' => 'group', 'select' => array('minimumInputLength' => 0)],
+    'entity_reference_options' => ['entity' => 'Group', 'select' => ['minimumInputLength' => 0]],
     'default' => '0',
     'add' => '4.1',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => ts('Contacts created on this site are added to this group'),
     'help_text' => NULL,
-  ),
-  'event_price_set_domain_id' => array(
+  ],
+  'event_price_set_domain_id' => [
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',
     'name' => 'event_price_set_domain_id',
@@ -78,8 +78,8 @@ return array(
     'is_contact' => 0,
     'description' => '',
     'help_text' => NULL,
-  ),
-  'uniq_email_per_site' => array(
+  ],
+  'uniq_email_per_site' => [
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',
     'name' => 'uniq_email_per_site',
@@ -91,5 +91,5 @@ return array(
     'is_contact' => 0,
     'description' => '',
     'help_text' => NULL,
-  ),
-);
+  ],
+];

@@ -36,8 +36,8 @@
  * Settings metadata file
  */
 
-return array(
-  'uploadDir' => array(
+return [
+  'uploadDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
@@ -52,8 +52,8 @@ return array(
     'is_contact' => 0,
     'description' => NULL,
     'help_text' => 'File system path where temporary CiviCRM files - such as import data files - are uploaded.',
-  ),
-  'imageUploadDir' => array(
+  ],
+  'imageUploadDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
@@ -68,8 +68,8 @@ return array(
     'is_contact' => 0,
     'description' => 'File system path where image files are uploaded. Currently, this path is used for images associated with premiums (CiviContribute thank-you gifts).',
     'help_text' => NULL,
-  ),
-  'customFileUploadDir' => array(
+  ],
+  'customFileUploadDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
@@ -84,8 +84,8 @@ return array(
     'is_contact' => 0,
     'description' => 'Path where documents and images which are attachments to contact records are stored (e.g. contact photos, resumes, contracts, etc.). These attachments are defined using \'file\' type custom fields.',
     'help_text' => NULL,
-  ),
-  'customTemplateDir' => array(
+  ],
+  'customTemplateDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
@@ -100,8 +100,8 @@ return array(
     'is_contact' => 0,
     'description' => 'Path where site specific templates are stored if any. This directory is searched first if set. Custom JavaScript code can be added to templates by creating files named templateFile.extra.tpl. (learn more...)',
     'help_text' => NULL,
-  ),
-  'customPHPPathDir' => array(
+  ],
+  'customPHPPathDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
@@ -116,8 +116,8 @@ return array(
     'is_contact' => 0,
     'description' => 'Path where site specific PHP code files are stored if any. This directory is searched first if set.',
     'help_text' => NULL,
-  ),
-  'extensionsDir' => array(
+  ],
+  'extensionsDir' => [
     'bootstrap_comment' => 'This is a boot setting which may be loaded during bootstrap. Defaults are loaded via SettingsBag::getSystemDefaults().',
     'group_name' => 'Directory Preferences',
     'group' => 'directory',
@@ -132,6 +132,6 @@ return array(
     'is_contact' => 0,
     'description' => 'Path where CiviCRM extensions are stored.',
     'help_text' => NULL,
-  ),
+  ],
 
-);
+];

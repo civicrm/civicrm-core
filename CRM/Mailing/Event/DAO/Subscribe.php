@@ -19,14 +19,14 @@ class CRM_Mailing_Event_DAO_Subscribe extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_mailing_event_subscribe';
+  public static $_tableName = 'civicrm_mailing_event_subscribe';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = FALSE;
+  public static $_log = FALSE;
 
   /**
    * @var int unsigned

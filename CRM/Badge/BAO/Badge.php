@@ -88,7 +88,7 @@ class CRM_Badge_BAO_Badge {
    *   row with meta data
    */
   public static function formatLabel(&$row, &$layout) {
-    $formattedRow = array('labelFormat' => $layout['label_format_name']);
+    $formattedRow = ['labelFormat' => $layout['label_format_name']];
     $formattedRow['labelTitle'] = $layout['title'];
     $formattedRow['labelId'] = $layout['id'];
 
@@ -103,14 +103,14 @@ class CRM_Badge_BAO_Badge {
           }
         }
 
-        $formattedRow['token'][$key] = array(
+        $formattedRow['token'][$key] = [
           'value' => $value,
           'font_name' => $layout['data']['font_name'][$key],
           'font_size' => $layout['data']['font_size'][$key],
           'font_style' => $layout['data']['font_style'][$key],
           'text_alignment' => $layout['data']['text_alignment'][$key],
           'token' => $layout['data']['token'][$key],
-        );
+        ];
       }
     }
 
@@ -147,10 +147,10 @@ class CRM_Badge_BAO_Badge {
     }
 
     if (!empty($layout['data']['add_barcode'])) {
-      $formattedRow['barcode'] = array(
+      $formattedRow['barcode'] = [
         'alignment' => $layout['data']['barcode_alignment'],
         'type' => $layout['data']['barcode_type'],
-      );
+      ];
     }
 
     // finally assign all the row values, so that we can use it for barcode etc
@@ -230,13 +230,13 @@ class CRM_Badge_BAO_Badge {
       }
     }
 
-    $this->pdf->SetLineStyle(array(
+    $this->pdf->SetLineStyle([
       'width' => 0.1,
       'cap' => 'round',
       'join' => 'round',
       'dash' => '2,2',
-      'color' => array(0, 0, 200),
-    ));
+      'color' => [0, 0, 200],
+    ]);
 
     $rowCount = CRM_Badge_Form_Layout::FIELD_ROWCOUNT;
     for ($i = 1; $i <= $rowCount; $i++) {
@@ -304,7 +304,7 @@ class CRM_Badge_BAO_Badge {
             break;
         }
 
-        $style = array(
+        $style = [
           'position' => '',
           'align' => '',
           'stretch' => FALSE,
@@ -313,13 +313,13 @@ class CRM_Badge_BAO_Badge {
           'border' => FALSE,
           'hpadding' => 13.5,
           'vpadding' => 'auto',
-          'fgcolor' => array(0, 0, 0),
+          'fgcolor' => [0, 0, 0],
           'bgcolor' => FALSE,
           'text' => FALSE,
           'font' => 'helvetica',
           'fontsize' => 8,
           'stretchtext' => 0,
-        );
+        ];
 
         $this->pdf->write1DBarcode($data['current_value'], 'C128', $xAlign, $y + $this->pdf->height - 10, '70',
           12, 0.4, $style, 'B');
@@ -342,14 +342,14 @@ class CRM_Badge_BAO_Badge {
             break;
         }
 
-        $style = array(
+        $style = [
           'border' => FALSE,
           'hpadding' => 13.5,
           'vpadding' => 'auto',
-          'fgcolor' => array(0, 0, 0),
+          'fgcolor' => [0, 0, 0],
           'bgcolor' => FALSE,
           'position' => '',
-        );
+        ];
 
         $this->pdf->write2DBarcode($data['current_value'], 'QRCODE,H', $xAlign, $y + $this->pdf->height - 26, 30,
           30, $style, 'B');
@@ -400,7 +400,7 @@ class CRM_Badge_BAO_Badge {
     $f = $imgRes / 25.4;
     $w = !empty($w) ? $w : $imgsize[0] / $f;
     $h = !empty($h) ? $h : $imgsize[1] / $f;
-    return array($w, $h);
+    return [$w, $h];
   }
 
   /**
@@ -415,7 +415,7 @@ class CRM_Badge_BAO_Badge {
     $layoutInfo = CRM_Badge_BAO_Layout::buildLayout($params);
 
     // split/get actual field names from token and individual contact image URLs
-    $returnProperties = array();
+    $returnProperties = [];
     if (!empty($layoutInfo['data']['token'])) {
       foreach ($layoutInfo['data']['token'] as $index => $value) {
         $element = '';
@@ -445,7 +445,7 @@ class CRM_Badge_BAO_Badge {
     }
 
     // add additional required fields for query execution
-    $additionalFields = array('participant_register_date', 'participant_id', 'event_id', 'contact_id', 'image_URL');
+    $additionalFields = ['participant_register_date', 'participant_id', 'event_id', 'contact_id', 'image_URL'];
     foreach ($additionalFields as $field) {
       $returnProperties[$field] = 1;
     }
@@ -479,10 +479,10 @@ class CRM_Badge_BAO_Badge {
     $queryString = "$select $from $where $having $sortOrder";
 
     $dao = CRM_Core_DAO::executeQuery($queryString);
-    $rows = array();
+    $rows = [];
     while ($dao->fetch()) {
       $query->convertToPseudoNames($dao);
-      $rows[$dao->participant_id] = array();
+      $rows[$dao->participant_id] = [];
       foreach ($returnProperties as $key => $dontCare) {
         $value = isset($dao->$key) ? $dao->$key : NULL;
         // Format custom fields

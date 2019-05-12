@@ -41,7 +41,7 @@
 <tr class="{cycle values="odd-row,even-row"} {$row.class}">
     <td><a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.event_id`"}" title="{ts}read more{/ts}"><strong>{$event.title}</strong></a></td>
     <td>{if $event.summary}{$event.summary} (<a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$event.event_id`"}" title="{ts}details...{/ts}">{ts}read more{/ts}...</a>){else}&nbsp;{/if}</td>
-    <td class="nowrap">
+    <td class="nowrap" data-order="{$event.start_date|crmDate:'%Y-%m-%d'}">
         {if $event.start_date}{$event.start_date|crmDate}{if $event.end_date}<br /><em>{ts}through{/ts}</em><br />{strip}
             {* Only show end time if end date = start date *}
             {if $event.end_date|date_format:"%Y%m%d" == $event.start_date|date_format:"%Y%m%d"}

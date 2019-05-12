@@ -33,7 +33,6 @@
  */
 class CRM_Core_Payment_Form {
 
-
   /**
    * Add payment fields depending on payment processor.
    *
@@ -55,8 +54,8 @@ class CRM_Core_Payment_Form {
    * @param int $paymentInstrumentID
    *   ID of the payment processor.
    */
-  static public function setPaymentFieldsByProcessor(&$form, $processor, $billing_profile_id = NULL, $isBackOffice = FALSE, $paymentInstrumentID = NULL) {
-    $form->billingFieldSets = array();
+  public static function setPaymentFieldsByProcessor(&$form, $processor, $billing_profile_id = NULL, $isBackOffice = FALSE, $paymentInstrumentID = NULL) {
+    $form->billingFieldSets = [];
     // Load the pay-later processor
     // @todo load this right up where the other processors are loaded initially.
     if (empty($processor)) {
@@ -75,7 +74,7 @@ class CRM_Core_Payment_Form {
     $form->assign('paymentFields', self::getPaymentFields($processor));
     self::setBillingAddressFields($form, $processor);
     // @todo - this may be obsolete - although potentially it could be used to re-order things in the form.
-    $form->billingFieldSets['billing_name_address-group']['fields'] = array();
+    $form->billingFieldSets['billing_name_address-group']['fields'] = [];
   }
 
   /**
@@ -84,7 +83,7 @@ class CRM_Core_Payment_Form {
    * @param CRM_Core_Form $form
    * @param CRM_Core_Payment $processor
    */
-  static protected function setBillingAddressFields(&$form, $processor) {
+  protected static function setBillingAddressFields(&$form, $processor) {
     $billingID = $form->_bltID;
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('billingDetailsFields', self::getBillingAddressFields($processor, $billingID));
@@ -117,7 +116,7 @@ class CRM_Core_Payment_Form {
     foreach ($paymentFields as $name => $field) {
       $field['extra'] = isset($field['extra']) ? $field['extra'] : NULL;
       if ($field['htmlType'] == 'chainSelect') {
-        $form->addChainSelect($field['name'], array('required' => FALSE));
+        $form->addChainSelect($field['name'], ['required' => FALSE]);
       }
       else {
         $form->add($field['htmlType'],
@@ -345,7 +344,7 @@ class CRM_Core_Payment_Form {
    * @param bool $reverse
    */
   public static function mapParams($id, $src, &$dst, $reverse = FALSE) {
-    $map = array(
+    $map = [
       'first_name' => 'billing_first_name',
       'middle_name' => 'billing_middle_name',
       'last_name' => 'billing_last_name',
@@ -357,7 +356,7 @@ class CRM_Core_Payment_Form {
       'postal_code' => "billing_postal_code-$id",
       'country' => "billing_country-$id",
       'contactID' => 'contact_id',
-    );
+    ];
 
     foreach ($map as $n => $v) {
       if (!$reverse) {

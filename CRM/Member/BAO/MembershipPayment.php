@@ -34,7 +34,6 @@
  */
 class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment {
 
-
   /**
    * Class constructor.
    */
@@ -59,7 +58,7 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
     // We check for membership_id in case we are being called too early in the process. This is
     // cludgey but is part of the deprecation process (ie. we are trying to do everything
     // from LineItem::create with a view to eventually removing this fn & the table.
-    if (!civicrm_api3('Membership', 'getcount', array('id' => $params['membership_id']))) {
+    if (!civicrm_api3('Membership', 'getcount', ['id' => $params['membership_id']])) {
       return $dao;
     }
 
@@ -74,10 +73,10 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
     // however, we can assume at this stage that any contribution id will have only one line item with that membership type in the line item table
     // OR the caller will have taken responsibility for updating the line items themselves so we will update using SQL here
     if (!isset($params['membership_type_id'])) {
-      $membership_type_id = civicrm_api3('membership', 'getvalue', array(
+      $membership_type_id = civicrm_api3('membership', 'getvalue', [
         'id' => $dao->membership_id,
         'return' => 'membership_type_id',
-      ));
+      ]);
     }
     else {
       $membership_type_id = $params['membership_type_id'];
@@ -87,11 +86,11 @@ class CRM_Member_BAO_MembershipPayment extends CRM_Member_DAO_MembershipPayment 
       SET entity_table = 'civicrm_membership', entity_id = %1
       WHERE pv.membership_type_id = %2
       AND contribution_id = %3";
-    CRM_Core_DAO::executeQuery($sql, array(
-      1 => array($dao->membership_id, 'Integer'),
-      2 => array($membership_type_id, 'Integer'),
-      3 => array($dao->contribution_id, 'Integer'),
-    ));
+    CRM_Core_DAO::executeQuery($sql, [
+      1 => [$dao->membership_id, 'Integer'],
+      2 => [$membership_type_id, 'Integer'],
+      3 => [$dao->contribution_id, 'Integer'],
+    ]);
     return $dao;
   }
 

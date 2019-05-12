@@ -29,6 +29,7 @@
  * @ingroup civicrm_field_handlers
  */
 class civicrm_handler_field_component extends views_handler_field {
+
   public function render($values) {
     $value = $this->get_value($values);
     return CRM_Core_Component::getComponentName($value);

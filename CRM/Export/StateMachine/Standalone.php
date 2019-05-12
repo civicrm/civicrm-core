@@ -41,10 +41,10 @@ class CRM_Export_StateMachine_Standalone extends CRM_Core_StateMachine {
   public function __construct($controller, $action = CRM_Core_Action::NONE) {
     parent::__construct($controller, $action);
 
-    $this->_pages = array(
+    $this->_pages = [
       'CRM_Export_Form_Select' => NULL,
       'CRM_Export_Form_Map' => NULL,
-    );
+    ];
 
     $this->addSequentialPages($this->_pages, $action);
   }

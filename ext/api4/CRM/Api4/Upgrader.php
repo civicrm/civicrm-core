@@ -26,7 +26,7 @@ class CRM_Api4_Upgrader extends CRM_Api4_Upgrader_Base {
         'weight' => 2,
         'name' => "Api Explorer v4",
         'permission' => "administer CiviCRM",
-        'url' => "civicrm/a/#/api4",
+        'url' => "civicrm/api4#/explorer",
         'is_active' => 1,
       ]);
     }
@@ -84,13 +84,13 @@ class CRM_Api4_Upgrader extends CRM_Api4_Upgrader_Base {
    *
    * @return TRUE on success
    * @throws Exception
-   *
-  public function upgrade_4200() {
-    $this->ctx->log->info('Applying update 4200');
-    CRM_Core_DAO::executeQuery('UPDATE foo SET bar = "whiz"');
-    CRM_Core_DAO::executeQuery('DELETE FROM bang WHERE willy = wonka(2)');
+   */
+  public function upgrade_1000() {
+    $this->ctx->log->info('Applying update 1000');
+    $domain = CRM_Core_Config::domainID();
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_navigation SET url = "civicrm/api4#/explorer" WHERE url = "civicrm/a/#/api4" AND domain_id = ' . $domain);
     return TRUE;
-  } // */
+  }
 
 
   /**

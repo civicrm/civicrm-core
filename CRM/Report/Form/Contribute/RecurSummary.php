@@ -33,53 +33,54 @@
  *
  */
 class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
+
   /**
    */
   public function __construct() {
 
-    $this->_columns = array(
-      'civicrm_contribution_recur' => array(
+    $this->_columns = [
+      'civicrm_contribution_recur' => [
         'dao' => 'CRM_Contribute_DAO_ContributionRecur',
-        'fields' => array(
-          'id' => array(
+        'fields' => [
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-          'payment_instrument_id' => array(
+          ],
+          'payment_instrument_id' => [
             'title' => ts('Payment Instrument'),
             'default' => TRUE,
             'required' => TRUE,
-          ),
-          'start_date' => array(
+          ],
+          'start_date' => [
             'title' => ts('Started'),
             'default' => TRUE,
             'required' => TRUE,
-          ),
-          'cancel_date' => array(
+          ],
+          'cancel_date' => [
             'title' => ts('Cancelled'),
             'default' => TRUE,
             'required' => TRUE,
-          ),
-          'contribution_status_id' => array(
+          ],
+          'contribution_status_id' => [
             'title' => ts('Active'),
             'default' => TRUE,
             'required' => TRUE,
-          ),
-          'amount' => array(
+          ],
+          'amount' => [
             'title' => ts('Total Amount'),
             'default' => TRUE,
             'required' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'start_date' => array(
+          ],
+        ],
+        'filters' => [
+          'start_date' => [
             'title' => ts('Start Date'),
             'operatorType' => CRM_Report_Form::OP_DATETIME,
             'type' => CRM_Utils_Type::T_TIME,
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
     $this->_currencyColumn = 'civicrm_contribution_recur_currency';
     parent::__construct();
   }
@@ -95,8 +96,8 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
 
   public function select() {
     // @todo remove & only adjust parent with selectWhere fn (if needed)
-    $select = array();
-    $this->_columnHeaders = array();
+    $select = [];
+    $this->_columnHeaders = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('group_bys', $table)) {
         foreach ($table['group_bys'] as $fieldName => $field) {
@@ -139,8 +140,8 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
               // just to make sure these values are transfered to rows.
               // since we need that for calculation purpose,
               // e.g making subtotals look nicer or graphs
-              $this->_columnHeaders["{$tableName}_{$fieldName}_interval"] = array('no_display' => TRUE);
-              $this->_columnHeaders["{$tableName}_{$fieldName}_subtotal"] = array('no_display' => TRUE);
+              $this->_columnHeaders["{$tableName}_{$fieldName}_interval"] = ['no_display' => TRUE];
+              $this->_columnHeaders["{$tableName}_{$fieldName}_subtotal"] = ['no_display' => TRUE];
             }
           }
         }
@@ -210,7 +211,7 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
   public function postProcess() {
     $this->beginPostProcess();
     $sql = $this->buildQuery(TRUE);
-    $rows = array();
+    $rows = [];
 
     $this->buildRows($sql, $rows);
     $this->formatDisplay($rows);
@@ -325,13 +326,13 @@ class CRM_Report_Form_Contribute_RecurSummary extends CRM_Report_Form {
     }
     // Add total line only if results are available
     if (count($rows) > 0) {
-      $lastRow = array(
+      $lastRow = [
         'civicrm_contribution_recur_payment_instrument_id' => '',
         'civicrm_contribution_recur_start_date' => $started,
         'civicrm_contribution_recur_cancel_date' => $cancelled,
         'civicrm_contribution_recur_contribution_status_id' => $active,
         'civicrm_contribution_recur_amount' => CRM_Utils_Money::format($total),
-      );
+      ];
       $rows[] = $lastRow;
     }
   }

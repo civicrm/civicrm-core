@@ -40,6 +40,7 @@ require_once 'Engage/Report/Form/List.php';
  *  Generate a phone call list report
  */
 class Engage_Report_Form_CallList extends Engage_Report_Form_List {
+
   public function __construct() {
 
     parent::__construct();

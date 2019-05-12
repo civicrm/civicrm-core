@@ -2,7 +2,7 @@
 
 namespace Civi\Api4\Event\Subscriber;
 
-use Civi\Api4\Action\Create;
+use Civi\Api4\Generic\DAOCreateAction;
 
 class CustomFieldPreCreationSubscriber extends PreCreationSubscriber {
 
@@ -10,29 +10,29 @@ class CustomFieldPreCreationSubscriber extends PreCreationSubscriber {
   const OPTION_STATUS_ACTIVE = 1;
 
   /**
-   * @param Create $request
+   * @param DAOCreateAction $request
    */
-  public function modify(Create $request) {
+  public function modify(DAOCreateAction $request) {
     $this->formatOptionParams($request);
     $this->setDefaults($request);
   }
 
   /**
-   * @param Create $request
+   * @param DAOCreateAction $request
    *
    * @return bool
    */
-  protected function applies(Create $request) {
-    return $request->getEntity() === 'CustomField';
+  protected function applies(DAOCreateAction $request) {
+    return $request->getEntityName() === 'CustomField';
   }
 
   /**
    * Sets defaults required for option group and value creation
    * @see CRM_Core_BAO_CustomField::create()
    *
-   * @param Create $request
+   * @param DAOCreateAction $request
    */
-  protected function formatOptionParams(Create $request) {
+  protected function formatOptionParams(DAOCreateAction $request) {
     $options = $request->getValue('options');
 
     if (!is_array($options)) {
@@ -80,9 +80,9 @@ class CustomFieldPreCreationSubscriber extends PreCreationSubscriber {
   }
 
   /**
-   * @param Create $request
+   * @param DAOCreateAction $request
    */
-  private function setDefaults(Create $request) {
+  private function setDefaults(DAOCreateAction $request) {
     if (!$request->getValue('option_type')) {
       $request->addValue('option_type', NULL);
     }

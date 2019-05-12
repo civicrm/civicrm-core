@@ -8,7 +8,7 @@
  *   API result array
  */
 function contribution_create_example() {
-  $params = array(
+  $params = [
     'contact_id' => 11,
     'receive_date' => '20120511',
     'total_amount' => '100',
@@ -22,21 +22,21 @@ function contribution_create_example() {
     'source' => 'SSF',
     'contribution_status_id' => 1,
     'skipLineItem' => 1,
-    'api.line_item.create' => array(
-      '0' => array(
+    'api.line_item.create' => [
+      '0' => [
         'price_field_id' => 1,
         'qty' => 2,
         'line_total' => '20',
         'unit_price' => '10',
-      ),
-      '1' => array(
+      ],
+      '1' => [
         'price_field_id' => 1,
         'qty' => 1,
         'line_total' => '80',
         'unit_price' => '80',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   try{
     $result = civicrm_api3('Contribution', 'create', $params);
@@ -46,12 +46,12 @@ function contribution_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -65,13 +65,13 @@ function contribution_create_example() {
  */
 function contribution_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'contact_id' => '11',
         'financial_type_id' => '1',
@@ -102,14 +102,14 @@ function contribution_create_expectedresult() {
         'tax_amount' => 0,
         'revenue_recognition_date' => '',
         'contribution_type_id' => '1',
-        'api.line_item.create' => array(
-          '0' => array(
+        'api.line_item.create' => [
+          '0' => [
             'is_error' => 0,
             'version' => 3,
             'count' => 1,
             'id' => 1,
-            'values' => array(
-              '0' => array(
+            'values' => [
+              '0' => [
                 'id' => '1',
                 'entity_table' => 'civicrm_contribution',
                 'entity_id' => '1',
@@ -124,16 +124,16 @@ function contribution_create_expectedresult() {
                 'financial_type_id' => '',
                 'non_deductible_amount' => '',
                 'tax_amount' => '',
-              ),
-            ),
-          ),
-          '1' => array(
+              ],
+            ],
+          ],
+          '1' => [
             'is_error' => 0,
             'version' => 3,
             'count' => 1,
             'id' => 2,
-            'values' => array(
-              '0' => array(
+            'values' => [
+              '0' => [
                 'id' => '2',
                 'entity_table' => 'civicrm_contribution',
                 'entity_id' => '1',
@@ -148,13 +148,13 @@ function contribution_create_expectedresult() {
                 'financial_type_id' => '',
                 'non_deductible_amount' => '',
                 'tax_amount' => '',
-              ),
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
+              ],
+            ],
+          ],
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

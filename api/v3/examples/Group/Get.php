@@ -6,9 +6,9 @@
  *   API result array
  */
 function group_get_example() {
-  $params = array(
+  $params = [
     'name' => 'Test Group 1',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Group', 'get', $params);
@@ -18,12 +18,12 @@ function group_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,13 +37,13 @@ function group_get_example() {
  */
 function group_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 4,
-    'values' => array(
-      '4' => array(
+    'values' => [
+      '4' => [
         'id' => '4',
         'name' => 'Test Group 1',
         'title' => 'New Test Group Created',
@@ -53,15 +53,15 @@ function group_get_expectedresult() {
         'where_clause' => ' ( `civicrm_group_contact-4`.group_id IN ( 4 )   ) ',
         'select_tables' => 'a:8:{s:15:\"civicrm_contact\";i:1;s:15:\"civicrm_address\";i:1;s:15:\"civicrm_country\";i:1;s:13:\"civicrm_email\";i:1;s:13:\"civicrm_phone\";i:1;s:10:\"civicrm_im\";i:1;s:19:\"civicrm_worldregion\";i:1;s:25:\"`civicrm_group_contact-4`\";s:165:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-4` ON (contact_a.id = `civicrm_group_contact-4`.contact_id AND `civicrm_group_contact-4`.status IN (\'Added\'))\";}',
         'where_tables' => 'a:2:{s:15:\"civicrm_contact\";i:1;s:25:\"`civicrm_group_contact-4`\";s:165:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-4` ON (contact_a.id = `civicrm_group_contact-4`.contact_id AND `civicrm_group_contact-4`.status IN (\'Added\'))\";}',
-        'group_type' => array(
+        'group_type' => [
           '0' => '1',
           '1' => '2',
-        ),
+        ],
         'is_hidden' => 0,
         'is_reserved' => 0,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

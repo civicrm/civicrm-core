@@ -61,19 +61,19 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
       return $this->_defaults;
     }
 
-    $this->_defaults = array();
+    $this->_defaults = [];
 
     $config = CRM_Core_Config::singleton();
 
     $values = CRM_Core_BAO_WordReplacement::getLocaleCustomStrings($config->lcMessages);
     $i = 1;
 
-    $enableDisable = array(
+    $enableDisable = [
       1 => 'enabled',
       0 => 'disabled',
-    );
+    ];
 
-    $cardMatch = array('wildcardMatch', 'exactMatch');
+    $cardMatch = ['wildcardMatch', 'exactMatch'];
 
     foreach ($enableDisable as $key => $val) {
       foreach ($cardMatch as $kc => $vc) {
@@ -112,9 +112,9 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     }
 
     $soInstances = range(1, $this->_numStrings, 1);
-    $stringOverrideInstances = array();
+    $stringOverrideInstances = [];
     if ($this->_soInstance) {
-      $soInstances = array($this->_soInstance);
+      $soInstances = [$this->_soInstance];
     }
     elseif (!empty($_POST['old'])) {
       $soInstances = $stringOverrideInstances = array_keys($_POST['old']);
@@ -138,19 +138,18 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
 
     $this->assign('stringOverrideInstances', empty($stringOverrideInstances) ? FALSE : $stringOverrideInstances);
 
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
-    $this->addFormRule(array('CRM_Admin_Form_WordReplacements', 'formRule'), $this);
+    $this->addButtons([
+      [
+        'type' => 'next',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
+    $this->addFormRule(['CRM_Admin_Form_WordReplacements', 'formRule'], $this);
   }
 
   /**
@@ -163,7 +162,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
    *   list of errors to be posted back to the form
    */
   public static function formRule($values) {
-    $errors = array();
+    $errors = [];
 
     $oldValues = CRM_Utils_Array::value('old', $values);
     $newValues = CRM_Utils_Array::value('new', $values);
@@ -195,32 +194,32 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
     $this->_numStrings = count($params['old']);
 
-    $enabled['exactMatch'] = $enabled['wildcardMatch'] = $disabled['exactMatch'] = $disabled['wildcardMatch'] = array();
+    $enabled['exactMatch'] = $enabled['wildcardMatch'] = $disabled['exactMatch'] = $disabled['wildcardMatch'] = [];
     for ($i = 1; $i <= $this->_numStrings; $i++) {
       if (!empty($params['new'][$i]) && !empty($params['old'][$i])) {
         if (isset($params['enabled']) && !empty($params['enabled'][$i])) {
           if (!empty($params['cb']) && !empty($params['cb'][$i])) {
-            $enabled['exactMatch'] += array($params['old'][$i] => $params['new'][$i]);
+            $enabled['exactMatch'] += [$params['old'][$i] => $params['new'][$i]];
           }
           else {
-            $enabled['wildcardMatch'] += array($params['old'][$i] => $params['new'][$i]);
+            $enabled['wildcardMatch'] += [$params['old'][$i] => $params['new'][$i]];
           }
         }
         else {
           if (isset($params['cb']) && is_array($params['cb']) && array_key_exists($i, $params['cb'])) {
-            $disabled['exactMatch'] += array($params['old'][$i] => $params['new'][$i]);
+            $disabled['exactMatch'] += [$params['old'][$i] => $params['new'][$i]];
           }
           else {
-            $disabled['wildcardMatch'] += array($params['old'][$i] => $params['new'][$i]);
+            $disabled['wildcardMatch'] += [$params['old'][$i] => $params['new'][$i]];
           }
         }
       }
     }
 
-    $overrides = array(
+    $overrides = [
       'enabled' => $enabled,
       'disabled' => $disabled,
-    );
+    ];
 
     $config = CRM_Core_Config::singleton();
     CRM_Core_BAO_WordReplacement::setLocaleCustomStrings($config->lcMessages, $overrides);

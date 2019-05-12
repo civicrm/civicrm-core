@@ -153,8 +153,8 @@ function _civicrm_case_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_case'], array(
     'title' => 'Start Date',
-      'name' => 'start_date',
-    ));
+    'name' => 'start_date',
+  ));
 
   //CASE END DATE
   $data['civicrm_case']['end_date'] = array(
@@ -175,8 +175,8 @@ function _civicrm_case_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_case'], array(
     'title' => 'End Date',
-      'name' => 'end_date',
-    ));
+    'name' => 'end_date',
+  ));
 
   //Case Details / Notes
   $data['civicrm_case']['details'] = array(

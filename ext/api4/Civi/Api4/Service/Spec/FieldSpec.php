@@ -36,6 +36,11 @@ class FieldSpec {
   protected $required = FALSE;
 
   /**
+   * @var bool
+   */
+  protected $requiredIf;
+
+  /**
    * @var array|boolean
    */
   protected $options;
@@ -170,6 +175,24 @@ class FieldSpec {
    */
   public function setRequired($required) {
     $this->required = $required;
+
+    return $this;
+  }
+
+  /**
+   * @return bool
+   */
+  public function getRequiredIf() {
+    return $this->requiredIf;
+  }
+
+  /**
+   * @param bool $required
+   *
+   * @return $this
+   */
+  public function setRequiredIf($requiredIf) {
+    $this->requiredIf = $requiredIf;
 
     return $this;
   }

@@ -37,6 +37,7 @@
  * @ingroup civicrm_field_handlers
  */
 class civicrm_handler_field_email extends civicrm_handler_field_location {
+
   public function option_definition() {
     $options = parent::option_definition();
     $options['link_to_user'] = array('default' => 'mailto');

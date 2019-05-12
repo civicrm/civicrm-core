@@ -6,7 +6,7 @@
  * to the join clause based on relationship_type_id and is_active.
  */
 class civicrm_handler_relationship_relationship extends views_handler_relationship {
-  static $relationship_types;
+  public static $relationship_types;
 
   /**
    * Preload the list of relationship_types and store in the static variable

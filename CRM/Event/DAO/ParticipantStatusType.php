@@ -19,14 +19,14 @@ class CRM_Event_DAO_ParticipantStatusType extends CRM_Core_DAO {
    *
    * @var string
    */
-  static $_tableName = 'civicrm_participant_status_type';
+  public static $_tableName = 'civicrm_participant_status_type';
 
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
    * @var bool
    */
-  static $_log = TRUE;
+  public static $_log = TRUE;
 
   /**
    * unique participant status type id

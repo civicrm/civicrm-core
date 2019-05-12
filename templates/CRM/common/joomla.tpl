@@ -29,10 +29,6 @@
 
 <div id="crm-container" class="crm-container{if $urlIsPublic} crm-public{/if}" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
 
-{* Joomla-only container to hold the civicrm menu *}
-<div id="crm-nav-menu-container"></div>
-{crmNavigationMenu is_default=1}
-
 <table border="0" cellpadding="0" cellspacing="0" id="crm-content">
   <tr>
 {if $sidebarLeft}

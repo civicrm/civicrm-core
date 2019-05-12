@@ -6,14 +6,14 @@
  *   API result array
  */
 function batch_update_example() {
-  $params = array(
+  $params = [
     'name' => 'New_Batch_04',
     'title' => 'New Batch 04',
     'description' => 'This is description for New Batch 04',
     'total' => '400.44',
     'item_count' => 4,
     'id' => 3,
-  );
+  ];
 
   try{
     $result = civicrm_api3('batch', 'update', $params);
@@ -23,11 +23,11 @@ function batch_update_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'error' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -41,13 +41,13 @@ function batch_update_example() {
  */
 function batch_update_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 3,
-    'values' => array(
-      '3' => array(
+    'values' => [
+      '3' => [
         'id' => '3',
         'name' => 'New_Batch_04',
         'title' => 'New Batch 04',
@@ -65,9 +65,9 @@ function batch_update_expectedresult() {
         'payment_instrument_id' => '',
         'exported_date' => '',
         'data' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

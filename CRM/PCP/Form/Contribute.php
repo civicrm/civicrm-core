@@ -58,10 +58,10 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    * @return void
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     if (isset($this->_id)) {
-      $params = array('entity_id' => $this->_id, 'entity_table' => 'civicrm_contribution_page');
+      $params = ['entity_id' => $this->_id, 'entity_table' => 'civicrm_contribution_page'];
       CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCPBlock', $params, $defaults);
       $defaults['pcp_active'] = CRM_Utils_Array::value('is_active', $defaults);
       // Assign contribution page ID to pageId for referencing in PCP.hlp - since $id is overwritten there. dgg
@@ -92,10 +92,10 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
     $this->_last = TRUE;
     CRM_PCP_BAO_PCP::buildPCPForm($this);
 
-    $this->addElement('checkbox', 'pcp_active', ts('Enable Personal Campaign Pages? (for this contribution page)'), NULL, array('onclick' => "return showHideByValue('pcp_active',true,'pcpFields','table-row','radio',false);"));
+    $this->addElement('checkbox', 'pcp_active', ts('Enable Personal Campaign Pages? (for this contribution page)'), NULL, ['onclick' => "return showHideByValue('pcp_active',true,'pcpFields','table-row','radio',false);"]);
 
     parent::buildQuickForm();
-    $this->addFormRule(array('CRM_PCP_Form_Contribute', 'formRule'), $this);
+    $this->addFormRule(['CRM_PCP_Form_Contribute', 'formRule'], $this);
   }
 
   /**
@@ -111,7 +111,7 @@ class CRM_PCP_Form_Contribute extends CRM_Contribute_Form_ContributionPage {
    *   mixed true or array of errors
    */
   public static function formRule($params, $files, $self) {
-    $errors = array();
+    $errors = [];
     if (!empty($params['is_active'])) {
 
       if (!empty($params['is_tellfriend_enabled']) &&

@@ -109,8 +109,24 @@ class Api4SelectQuery extends SelectQuery {
    * Gets all FK fields and does the required joins
    */
   protected function preRun() {
-    $whereFields = array_column($this->where, 0);
-    $allFields = array_merge($whereFields, $this->select, $this->orderBy);
+    $allFields = array_merge($this->select, array_keys($this->orderBy));
+    $recurse = function($clauses) use (&$allFields, &$recurse) {
+      foreach ($clauses as $clause) {
+        if ($clause[0] === 'NOT' && is_string($clause[1][0])) {
+          $recurse($clause[1][1]);
+        }
+        elseif (in_array($clause[0], ['AND', 'OR', 'NOT'])) {
+          $recurse($clause[1]);
+        }
+        elseif (is_array($clause[0])) {
+          array_walk($clause, $recurse);
+        }
+        else {
+          $allFields[] = $clause[0];
+        }
+      }
+    };
+    $recurse($this->where);
     $dotFields = array_unique(array_filter($allFields, function ($field) {
       return strpos($field, '.') !== FALSE;
     }));
@@ -338,7 +354,7 @@ class Api4SelectQuery extends SelectQuery {
 
     // custom groups use aliases for field names
     if ($lastLink instanceof CustomGroupJoinable) {
-      $field = $lastLink->getSqlColumn();
+      $field = $lastLink->getSqlColumn($field);
     }
 
     $this->fkSelectAliases[$key] = sprintf('%s.%s', $lastLink->getAlias(), $field);

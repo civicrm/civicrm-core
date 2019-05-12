@@ -9,14 +9,14 @@
  *   API result array
  */
 function activity_type_create_example() {
-  $params = array(
+  $params = [
     'weight' => '2',
     'label' => 'send out letters',
     'filter' => 0,
     'is_active' => 1,
     'is_optgroup' => 1,
     'is_default' => 0,
-  );
+  ];
 
   try{
     $result = civicrm_api3('ActivityType', 'create', $params);
@@ -26,12 +26,12 @@ function activity_type_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -45,13 +45,13 @@ function activity_type_create_example() {
  */
 function activity_type_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 849,
-    'values' => array(
-      '849' => array(
+    'values' => [
+      '849' => [
         'id' => '849',
         'option_group_id' => '2',
         'label' => 'send out letters',
@@ -70,10 +70,10 @@ function activity_type_create_expectedresult() {
         'visibility_id' => '',
         'icon' => '',
         'color' => '',
-      ),
-    ),
+      ],
+    ],
     'deprecated' => 'The ActivityType api is deprecated. Please use the OptionValue api instead.',
-  );
+  ];
 
   return $expectedResult;
 }

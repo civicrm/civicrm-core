@@ -66,6 +66,9 @@ function checkAuthentication() {
     case 'WordPress':
       $auth_function = 'authenticate_wordpress';
       break;
+    case 'Drupal8':
+      $auth_function = 'authenticate_drupal8';
+      break;
     }
     if(!$auth_function($config)) {
       CRM_Core_Error::fatal(ts("You must be logged in with proper permissions to edit, add, or delete uploaded images."));
@@ -78,6 +81,35 @@ function checkAuthentication() {
     $authenticated = true;
     chdir( $current_cwd );
   }
+}
+
+
+function authenticate_drupal8($config) {
+  CRM_Utils_System::loadBootStrap(CRM_Core_DAO::$_nullArray, true, false);
+
+  // https://drupal.stackexchange.com/questions/231710/how-does-drupal-verify-sessions-from-the-cookie-value
+  foreach ($_COOKIE as $key => $val) {
+    if (substr($key, 0, 5) == "SSESS" || substr($key, 0, 4) == 'SESS') {
+      $session = $val;
+    }
+  }
+
+  if ($session) {
+    $connection = \Drupal::database();
+    $query = $connection->query("SELECT uid FROM {sessions} WHERE sid = :sid", array(":sid" => \Drupal\Component\Utility\Crypt::hashBase64($session)));
+    if (($uid = $query->fetchField()) > 0) {
+      $username = \Drupal\user\Entity\User::load($uid)->getUsername();
+      if ($username) {
+        $config->userSystem->loadUser($username);
+      }
+    }
+  }
+  // check if user has access permission...
+  if (CRM_Core_Permission::check('access CiviCRM')) {
+    return true;
+  }
+  return false;
+
 }
 
 /**

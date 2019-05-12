@@ -35,6 +35,7 @@
  * Page for displaying list of categories for Settings.
  */
 class CRM_Admin_Page_Setting extends CRM_Core_Page {
+
   /**
    * Run page.
    *

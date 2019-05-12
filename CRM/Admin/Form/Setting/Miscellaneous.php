@@ -36,7 +36,7 @@
  */
 class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
 
-  protected $_settings = array(
+  protected $_settings = [
     'max_attachments' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'contact_undelete' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'empoweredBy' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -57,7 +57,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     'remote_profile_submissions' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'allow_alert_autodismissal' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'prevNextBackend' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
-  );
+  ];
 
   public $_uploadMaxSize;
 
@@ -70,7 +70,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
     CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
     // This is a temp hack for the fact we really don't need to hard-code each setting in the tpl but
     // we haven't worked through NOT doing that. These settings have been un-hardcoded.
-    $this->assign('pure_config_settings', array(
+    $this->assign('pure_config_settings', [
       'empoweredBy',
       'max_attachments',
       'maxFileSize',
@@ -79,7 +79,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
       'recentItemsProviders',
       'dedupe_default_limit',
       'prevNextBackend',
-    ));
+    ]);
   }
 
   /**
@@ -90,7 +90,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
 
     $this->assign('validTriggerPermission', CRM_Core_DAO::checkTriggerViewPermission(FALSE));
 
-    $this->addFormRule(array('CRM_Admin_Form_Setting_Miscellaneous', 'formRule'), $this);
+    $this->addFormRule(['CRM_Admin_Form_Setting_Miscellaneous', 'formRule'], $this);
 
     parent::buildQuickForm();
     $this->addRule('checksum_timeout', ts('Value should be a positive number'), 'positiveInteger');
@@ -110,7 +110,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
    *   true if no errors, else array of errors
    */
   public static function formRule($fields, $files, $options) {
-    $errors = array();
+    $errors = [];
 
     // validate max file size
     if ($fields['maxFileSize'] > $options->_uploadMaxSize) {
@@ -119,7 +119,7 @@ class CRM_Admin_Form_Setting_Miscellaneous extends CRM_Admin_Form_Setting {
 
     // validate recent items stack size
     if ($fields['recentItemsMaxCount'] && ($fields['recentItemsMaxCount'] < 1 || $fields['recentItemsMaxCount'] > CRM_Utils_Recent::MAX_ITEMS)) {
-      $errors['recentItemsMaxCount'] = ts("Illegal stack size. Use values between 1 and %1.", array(1 => CRM_Utils_Recent::MAX_ITEMS));
+      $errors['recentItemsMaxCount'] = ts("Illegal stack size. Use values between 1 and %1.", [1 => CRM_Utils_Recent::MAX_ITEMS]);
     }
 
     if (!empty($fields['wkhtmltopdfPath'])) {

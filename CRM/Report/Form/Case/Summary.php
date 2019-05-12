@@ -36,7 +36,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
   protected $_relField = FALSE;
   protected $_exposeContactID = FALSE;
 
-  protected $_customGroupExtends = array('Case');
+  protected $_customGroupExtends = ['Case'];
 
   /**
    * Class constructor.
@@ -49,161 +49,161 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
       $this->rel_types[$relid] = $v['label_b_a'];
     }
 
-    $this->deleted_labels = array(
+    $this->deleted_labels = [
       '' => ts('- select -'),
       0 => ts('No'),
       1 => ts('Yes'),
-    );
+    ];
 
-    $this->_columns = array(
-      'civicrm_c2' => array(
+    $this->_columns = [
+      'civicrm_c2' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'client_name' => array(
+        'fields' => [
+          'client_name' => [
             'name' => 'sort_name',
             'title' => ts('Contact Name'),
             'required' => TRUE,
-          ),
-          'id' => array(
+          ],
+          'id' => [
             'no_display' => TRUE,
             'required' => TRUE,
-          ),
-        ),
-        'order_bys' => array(
-          'client_name' => array(
+          ],
+        ],
+        'order_bys' => [
+          'client_name' => [
             'title' => ts('Contact Name'),
             'name' => 'sort_name',
-          ),
-        ),
+          ],
+        ],
         'grouping'  => 'case-fields',
-      ),
-      'civicrm_case' => array(
+      ],
+      'civicrm_case' => [
         'dao' => 'CRM_Case_DAO_Case',
-        'fields' => array(
-          'id' => array(
+        'fields' => [
+          'id' => [
             'title' => ts('Case ID'),
             'required' => TRUE,
-          ),
-          'subject' => array(
+          ],
+          'subject' => [
             'title' => ts('Case Subject'),
             'default' => TRUE,
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => ts('Status'),
             'default' => TRUE,
-          ),
-          'case_type_id' => array(
+          ],
+          'case_type_id' => [
             'title' => ts('Case Type'),
             'default' => TRUE,
-          ),
-          'start_date' => array(
+          ],
+          'start_date' => [
             'title' => ts('Start Date'),
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'end_date' => array(
+          ],
+          'end_date' => [
             'title' => ts('End Date'),
             'default' => TRUE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'duration' => array(
+          ],
+          'duration' => [
             'title' => ts('Duration (Days)'),
             'default' => FALSE,
-          ),
-          'is_deleted' => array(
+          ],
+          'is_deleted' => [
             'title' => ts('Deleted?'),
             'default' => FALSE,
             'type' => CRM_Utils_Type::T_INT,
-          ),
-        ),
-        'filters' => array(
-          'start_date' => array(
+          ],
+        ],
+        'filters' => [
+          'start_date' => [
             'title' => ts('Start Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'end_date' => array(
+          ],
+          'end_date' => [
             'title' => ts('End Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
-          ),
-          'case_type_id' => array(
+          ],
+          'case_type_id' => [
             'title' => ts('Case Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Case_BAO_Case::buildOptions('case_type_id', 'search'),
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => ts('Status'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Case_BAO_Case::buildOptions('status_id', 'search'),
-          ),
-          'is_deleted' => array(
+          ],
+          'is_deleted' => [
             'title' => ts('Deleted?'),
             'type' => CRM_Report_Form::OP_INT,
             'operatorType' => CRM_Report_Form::OP_SELECT,
             'options' => $this->deleted_labels,
             'default' => 0,
-          ),
-        ),
-        'order_bys'  => array(
-          'start_date' => array(
+          ],
+        ],
+        'order_bys'  => [
+          'start_date' => [
             'title' => ts('Start Date'),
-          ),
-          'end_date' => array(
+          ],
+          'end_date' => [
             'title' => ts('End Date'),
-          ),
-          'status_id' => array(
+          ],
+          'status_id' => [
             'title' => ts('Status'),
-          ),
-        ),
+          ],
+        ],
         'grouping'  => 'case-fields',
-      ),
-      'civicrm_contact' => array(
+      ],
+      'civicrm_contact' => [
         'dao' => 'CRM_Contact_DAO_Contact',
-        'fields' => array(
-          'sort_name' => array(
+        'fields' => [
+          'sort_name' => [
             'title' => ts('Staff Member'),
             'default' => TRUE,
-          ),
-        ),
-        'filters' => array(
-          'sort_name' => array(
+          ],
+        ],
+        'filters' => [
+          'sort_name' => [
             'title' => ts('Staff Member'),
-          ),
-        ),
-      ),
-      'civicrm_relationship' => array(
+          ],
+        ],
+      ],
+      'civicrm_relationship' => [
         'dao' => 'CRM_Contact_DAO_Relationship',
-        'filters' => array(
-          'relationship_type_id' => array(
+        'filters' => [
+          'relationship_type_id' => [
             'title' => ts('Staff Relationship'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => $this->rel_types,
-          ),
-          'is_active' => array(
+          ],
+          'is_active' => [
             'title' => ts('Active Relationship?'),
             'type' => CRM_Utils_Type::T_BOOLEAN,
             //MV dev/core#603, not set default values Yes/No, this cause issue when relationship fields are not selected
             // 'default' => TRUE,
-            'options' => array('' => ts('- Select -')) + CRM_Core_SelectValues::boolean(),
-          ),
-        ),
-      ),
-      'civicrm_relationship_type' => array(
+            'options' => ['' => ts('- Select -')] + CRM_Core_SelectValues::boolean(),
+          ],
+        ],
+      ],
+      'civicrm_relationship_type' => [
         'dao' => 'CRM_Contact_DAO_RelationshipType',
-        'fields' => array(
-          'label_b_a' => array(
+        'fields' => [
+          'label_b_a' => [
             'title' => ts('Relationship'),
             'default' => TRUE,
-          ),
-        ),
-      ),
-      'civicrm_case_contact' => array(
+          ],
+        ],
+      ],
+      'civicrm_case_contact' => [
         'dao' => 'CRM_Case_DAO_CaseContact',
-      ),
-    );
+      ],
+    ];
 
     parent::__construct();
   }
@@ -213,8 +213,8 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
   }
 
   public function select() {
-    $select = array();
-    $this->_columnHeaders = array();
+    $select = [];
+    $this->_columnHeaders = [];
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
@@ -251,7 +251,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
    * @return array
    */
   public static function formRule($fields, $files, $self) {
-    $errors = $grouping = array();
+    $errors = $grouping = [];
     if (empty($fields['relationship_type_id_value']) &&
       (array_key_exists('sort_name', $fields['fields']) ||
         array_key_exists('label_b_a', $fields['fields']))
@@ -304,7 +304,7 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
   }
 
   public function where() {
-    $clauses = array();
+    $clauses = [];
     $this->_having = '';
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -372,7 +372,7 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
 
     $sql = $this->buildQuery(TRUE);
 
-    $rows = $graphRows = array();
+    $rows = $graphRows = [];
     $this->buildRows($sql, $rows);
 
     $this->formatDisplay($rows);
@@ -404,7 +404,7 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
       ) {
         $value = $row['civicrm_case_case_type_id'];
         $typeIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value);
-        $value = array();
+        $value = [];
         foreach ($typeIds as $typeId) {
           if ($typeId) {
             $value[$typeId] = $this->case_types[$typeId];

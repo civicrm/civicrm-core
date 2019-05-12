@@ -8,10 +8,10 @@
  *   API result array
  */
 function mail_settings_get_example() {
-  $params = array(
+  $params = [
     'title' => 'MailSettings title',
     'api.MailSettings.delete' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('MailSettings', 'get', $params);
@@ -21,12 +21,12 @@ function mail_settings_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -40,25 +40,25 @@ function mail_settings_get_example() {
  */
 function mail_settings_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 2,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'domain_id' => '1',
         'name' => 'default',
         'is_default' => 0,
         'domain' => 'EXAMPLE.ORG',
-        'api.MailSettings.delete' => array(
+        'api.MailSettings.delete' => [
           'is_error' => 0,
           'version' => 3,
           'count' => 1,
           'values' => 1,
-        ),
-      ),
-      '6' => array(
+        ],
+      ],
+      '6' => [
         'id' => '6',
         'domain_id' => '1',
         'name' => 'my mail setting',
@@ -68,15 +68,15 @@ function mail_settings_get_expectedresult() {
         'username' => 'sue',
         'password' => 'pass',
         'is_ssl' => 0,
-        'api.MailSettings.delete' => array(
+        'api.MailSettings.delete' => [
           'is_error' => 0,
           'version' => 3,
           'count' => 1,
           'values' => 1,
-        ),
-      ),
-    ),
-  );
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

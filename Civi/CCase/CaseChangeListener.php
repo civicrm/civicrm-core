@@ -32,6 +32,7 @@ namespace Civi\CCase;
  * @package Civi\CCase
  */
 interface CaseChangeListener {
+
   /**
    * @param \Civi\CCase\Event\CaseChangeEvent $event
    *

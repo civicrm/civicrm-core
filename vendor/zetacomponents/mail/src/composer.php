@@ -2,10 +2,26 @@
 /**
  * File containing the ezcMailComposer class
  *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
  * @package Mail
  * @version //autogen//
- * @copyright Copyright (C) 2005-2009 eZ Systems AS. All rights reserved.
- * @license http://ez.no/licenses/new_bsd New BSD License
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
  */
 
 /**
@@ -165,7 +181,7 @@ class ezcMailComposer extends ezcMail
 
         $this->options = $options;
 
-        parent::__construct();
+        parent::__construct( $options );
     }
 
     /**
@@ -460,7 +476,7 @@ class ezcMailComposer extends ezcMail
      *         if $fileName could not be read.
      * @return ezcMailPart
      */
-    private function generateHtmlPart()
+    protected function generateHtmlPart()
     {
         $result = false;
         if ( $this->htmlText != '' )
@@ -469,9 +485,19 @@ class ezcMailComposer extends ezcMail
             if ( $this->options->automaticImageInclude === true )
             {
                 // recognize file:// and file:///, pick out the image, add it as a part and then..:)
-                preg_match_all( "/<img[\s\*\s]src=[\'\"]file:\/\/([^ >\'\"]+)/i", $this->htmlText, $matches );
+                preg_match_all( '(
+                    <img \\s+[^>]*
+                        src\\s*=\\s*
+                            (?:
+                                (?# Match quoted attribute)
+                                ([\'"])file://(?P<quoted>[^"]+)\\1
+
+                                (?# Match unquoted attribute, which may not contain spaces)
+                            |   file://(?P<unquoted>[^>\\s]+)
+                        )
+                    [^>]* >)ix', $this->htmlText, $matches );
                 // pictures/files can be added multiple times. We only need them once.
-                $matches = array_unique( $matches[1] );
+                $matches = array_filter( array_unique( array_merge( $matches['quoted'], $matches['unquoted'] ) ) );
             }
 
             $result = new ezcMailText( $this->htmlText, $this->charset, $this->encoding );

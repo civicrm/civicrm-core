@@ -551,9 +551,9 @@ function civicrm_group_roles_add_rule_form_submit($form, &$form_state) {
   if (isset($form_state['values']['edit_flag'])) {
 
     $edit_rule = db_update('civicrm_group_roles_rules')->fields(array(
-                   'role_id' => (int) $form_state['values']['add_rule']['select_role'],
-                   'group_id' => (int) $form_state['values']['add_rule']['select_group'],
-                 ))->condition('id', (int) $form_state['values']['edit_flag'])->execute();
+      'role_id' => (int) $form_state['values']['add_rule']['select_role'],
+      'group_id' => (int) $form_state['values']['add_rule']['select_group'],
+    ))->condition('id', (int) $form_state['values']['edit_flag'])->execute();
 
     if ($edit_rule) {
       drupal_set_message(t('Your association rule has been edited.'));
@@ -561,9 +561,9 @@ function civicrm_group_roles_add_rule_form_submit($form, &$form_state) {
   }
   else {
     $add_rule = db_insert('civicrm_group_roles_rules')->fields(array(
-                  'role_id' => (int) $form_state['values']['add_rule']['select_role'],
-                  'group_id' => (int) $form_state['values']['add_rule']['select_group'],
-                ))->execute();
+      'role_id' => (int) $form_state['values']['add_rule']['select_role'],
+      'group_id' => (int) $form_state['values']['add_rule']['select_group'],
+    ))->execute();
 
     if ($add_rule) {
       drupal_set_message(t('Your association rule has been added.'));
@@ -648,7 +648,8 @@ function civicrm_group_roles_add_remove_groups($roles, $user, $op) {
         } //end foreach
       } //end foreach
 
-    } //end if contact_id
+    }
+    //end if contact_id
 
     else {
       watchdog('civicrm_group_roles', $msg, $variables, WATCHDOG_ERROR);
@@ -659,7 +660,6 @@ function civicrm_group_roles_add_remove_groups($roles, $user, $op) {
 
   } //endif $roles
 }
-
 
 /**
  * Manual sync form. Provides a submit button to manually sync groups to roles.

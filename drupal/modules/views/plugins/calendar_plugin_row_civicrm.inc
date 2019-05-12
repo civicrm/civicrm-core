@@ -19,9 +19,13 @@
  * and formats it as a Calendar node.
  */
 class calendar_plugin_row_civicrm extends calendar_plugin_row {
-  // Basic properties that let the row style follow relationships.
-  var $base_table = '';
-  var $base_field = 'id';
+  /**
+   * Basic properties that let the row style follow relationships.
+   * @var string
+   */
+  public $base_table = '';
+  public $base_field = 'id';
+
   public function construct() {
     parent::construct();
     if (!civicrm_initialize()) {
@@ -29,6 +33,7 @@ class calendar_plugin_row_civicrm extends calendar_plugin_row {
     }
     $this->base_table = $this->definition['base'][0];
   }
+
   public function option_definition() {
     $options = parent::option_definition();
     $options['date_fields'] = array('default' => array());
@@ -81,7 +86,7 @@ class calendar_plugin_row_civicrm extends calendar_plugin_row {
     // Sadly neither DAO nor API allows you to load multiple at once eg node_load_multiple()
     foreach ($ids as $key => $id) {
       require_once str_replace('_', DIRECTORY_SEPARATOR, $this->definition['dao class']) . '.php';
-      $dao = New $this->definition['dao class']();
+      $dao = new $this->definition['dao class']();
       $dao->id = $id;
       $dao->find();
       $dao->fetch();

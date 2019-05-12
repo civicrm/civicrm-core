@@ -37,6 +37,7 @@
  * @ingroup civicrm_field_handlers
  */
 class civicrm_handler_field_file extends views_handler_field {
+
   public function construct() {
     parent::construct();
     civicrm_initialize();
@@ -56,7 +57,8 @@ class civicrm_handler_field_file extends views_handler_field {
       );
 
       if ($fileType && in_array($fileType, array(
-        "image/jpeg", "image/pjpeg", "image/gif", "image/x-png", "image/png"))) {
+        "image/jpeg", "image/pjpeg", "image/gif", "image/x-png", "image/png",
+      ))) {
         $uri = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_File',
           $fileId,
           'uri'
@@ -64,6 +66,11 @@ class civicrm_handler_field_file extends views_handler_field {
 
         $path = sprintf('%s/imagefile', $path);
       }
+      //Reset session params as we send only id and eid to retrieve the file.
+      $file = new CRM_Core_Page_File();
+      $file->set('filename', NULL);
+      $file->set('mime-type', NULL);
+
       $fileHash = CRM_Core_BAO_File::generateFileHash($value, $fileId);
       return CRM_Utils_System::url($path,
         "id={$fileId}&eid={$value}&fcs={$fileHash}",

@@ -260,7 +260,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *   array of all Premiums if any
    */
   public static function products($pageID = NULL) {
-    $products = array();
+    $products = [];
     $dao = new CRM_Contribute_DAO_Product();
     $dao->is_active = 1;
     $dao->orderBy('id');
@@ -276,7 +276,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
       $dao->find(TRUE);
       $premiumID = $dao->id;
 
-      $productID = array();
+      $productID = [];
 
       $dao = new CRM_Contribute_DAO_PremiumsProduct();
       $dao->premiums_id = $premiumID;
@@ -285,7 +285,7 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
         $productID[$dao->product_id] = $dao->product_id;
       }
 
-      $tempProduct = array();
+      $tempProduct = [];
       foreach ($products as $key => $value) {
         if (!array_key_exists($key, $productID)) {
           $tempProduct[$key] = $value;
@@ -365,10 +365,10 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    */
   public static function &pcpStatus($column = 'label') {
     if (NULL === self::$pcpStatus) {
-      self::$pcpStatus = array();
+      self::$pcpStatus = [];
     }
     if (!array_key_exists($column, self::$pcpStatus)) {
-      self::$pcpStatus[$column] = array();
+      self::$pcpStatus[$column] = [];
 
       self::$pcpStatus[$column] = CRM_Core_OptionGroup::values('pcp_status', FALSE,
         FALSE, FALSE, NULL, $column
@@ -390,11 +390,11 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @return int
    */
   public static function getRelationalFinancialAccount($entityId, $accountRelationType, $entityTable = 'civicrm_financial_type', $returnField = 'financial_account_id') {
-    $params = array(
-      'return' => array($returnField),
+    $params = [
+      'return' => [$returnField],
       'entity_table' => $entityTable,
       'entity_id' => $entityId,
-    );
+    ];
     if ($accountRelationType) {
       $params['account_relationship.name'] = $accountRelationType;
     }

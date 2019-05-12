@@ -6,14 +6,14 @@
  *   API result array
  */
 function note_create_example() {
-  $params = array(
+  $params = [
     'entity_table' => 'civicrm_contact',
     'entity_id' => 9,
     'note' => 'Hello!!! m testing Note',
     'contact_id' => 9,
     'modified_date' => '2011-01-31',
     'subject' => 'Test Note',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Note', 'create', $params);
@@ -23,12 +23,12 @@ function note_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -42,13 +42,13 @@ function note_create_example() {
  */
 function note_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 8,
-    'values' => array(
-      '8' => array(
+    'values' => [
+      '8' => [
         'id' => '8',
         'entity_table' => 'civicrm_contact',
         'entity_id' => '9',
@@ -57,9 +57,9 @@ function note_create_expectedresult() {
         'modified_date' => '2012-11-14 16:02:35',
         'subject' => 'Test Note',
         'privacy' => 0,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

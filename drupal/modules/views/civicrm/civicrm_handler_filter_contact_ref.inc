@@ -27,15 +27,18 @@
  * Filters Contact reference custom field.
  */
 class civicrm_handler_filter_contact_ref extends views_handler_filter_string {
+
   public function construct() {
     parent::construct();
     if (!civicrm_initialize()) {
       return;
     }
   }
+
   public function op_equal($field) {
     $this->filterContactRef($field);
   }
+
   public function op_contains($field) {
     $this->filterContactRef($field);
   }

@@ -47,7 +47,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    *
    * @var array
    */
-  public $blackList = array(
+  public $blackList = [
     'on',
     'skin',
     'extraPlugins',
@@ -59,7 +59,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
     'filebrowserUploadUrl',
     'filebrowserImageUploadUrl',
     'filebrowserFlashUploadUrl',
-  );
+  ];
 
   public $preset;
 
@@ -90,11 +90,11 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
       ->addScriptFile('civicrm', 'js/wysiwyg/admin.ckeditor-configurator.js', 10)
       ->addStyleFile('civicrm', 'bower_components/ckeditor/samples/toolbarconfigurator/css/fontello.css')
       ->addStyleFile('civicrm', 'bower_components/ckeditor/samples/css/samples.css')
-      ->addVars('ckConfig', array(
+      ->addVars('ckConfig', [
         'plugins' => array_values($this->getCKPlugins()),
         'blacklist' => $this->blackList,
         'settings' => $settings,
-      ));
+      ]);
 
     $configUrl = self::getConfigUrl($this->preset) ?: self::getConfigUrl('default');
 
@@ -104,12 +104,14 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
     $this->assign('skin', CRM_Utils_Array::value('skin', $settings));
     $this->assign('extraPlugins', CRM_Utils_Array::value('extraPlugins', $settings));
     $this->assign('configUrl', $configUrl);
-    $this->assign('revertConfirm', htmlspecialchars(ts('Are you sure you want to revert all changes?', array('escape' => 'js'))));
+    $this->assign('revertConfirm', htmlspecialchars(ts('Are you sure you want to revert all changes?', ['escape' => 'js'])));
 
-    CRM_Utils_System::appendBreadCrumb(array(array(
-      'url' => CRM_Utils_System::url('civicrm/admin/setting/preferences/display', 'reset=1'),
-      'title' => ts('Display Preferences'),
-    )));
+    CRM_Utils_System::appendBreadCrumb([
+      [
+        'url' => CRM_Utils_System::url('civicrm/admin/setting/preferences/display', 'reset=1'),
+        'title' => ts('Display Preferences'),
+      ],
+    ]);
 
     return parent::run();
   }
@@ -155,7 +157,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    * @return array
    */
   private function getCKPlugins() {
-    $plugins = array();
+    $plugins = [];
     $pluginDir = Civi::paths()->getPath('[civicrm.root]/bower_components/ckeditor/plugins');
 
     foreach (glob($pluginDir . '/*', GLOB_ONLYDIR) as $dir) {
@@ -163,11 +165,11 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
       $name = substr($dir, strrpos($dir, '/') + 1);
       $dir = CRM_Utils_file::addTrailingSlash($dir, '/');
       if (is_file($dir . 'plugin.js')) {
-        $plugins[$name] = array(
+        $plugins[$name] = [
           'id' => $name,
           'text' => ucfirst($name),
           'icon' => NULL,
-        );
+        ];
         if (is_dir($dir . "icons")) {
           if (is_file($dir . "icons/$name.png")) {
             $plugins[$name]['icon'] = "bower_components/ckeditor/plugins/$name/icons/$name.png";
@@ -190,7 +192,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    * @return array
    */
   private function getCKSkins() {
-    $skins = array();
+    $skins = [];
     $skinDir = Civi::paths()->getPath('[civicrm.root]/bower_components/ckeditor/skins');
     foreach (glob($skinDir . '/*', GLOB_ONLYDIR) as $dir) {
       $dir = rtrim(str_replace('\\', '/', $dir), '/');
@@ -203,7 +205,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    * @return array
    */
   private function getConfigSettings() {
-    $matches = $result = array();
+    $matches = $result = [];
     $file = self::getConfigFile($this->preset) ?: self::getConfigFile('default');
     $result['skin'] = 'moono';
     if ($file) {
@@ -222,7 +224,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    * @return array|null|string
    */
   public static function getConfigUrl($preset = NULL) {
-    $items = array();
+    $items = [];
     $presets = CRM_Core_OptionGroup::values('wysiwyg_presets', FALSE, FALSE, FALSE, NULL, 'name');
     foreach ($presets as $key => $name) {
       if (self::getConfigFile($name)) {
@@ -243,6 +245,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
   }
 
   /**
+   * @param string $preset
    * @param string $contents
    */
   public static function saveConfigFile($preset, $contents) {

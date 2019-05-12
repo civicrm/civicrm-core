@@ -53,6 +53,7 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
    *
    * @return mixed
    */
+
   /**
    * @param int $numParams
    * @param mixed $arg1
@@ -112,10 +113,10 @@ class CRM_Utils_Hook_Joomla extends CRM_Utils_Hook {
       if (!empty($result)) {
         // collapse result returned from hooks
         // CRM-9XXX
-        $finalResult = array();
+        $finalResult = [];
         foreach ($result as $res) {
           if (!is_array($res)) {
-            $res = array($res);
+            $res = [$res];
           }
           $finalResult = array_merge($finalResult, $res);
         }

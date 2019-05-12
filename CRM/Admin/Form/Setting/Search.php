@@ -37,7 +37,7 @@
  */
 class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
 
-  protected $_settings = array(
+  protected $_settings = [
     'contact_reference_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'contact_autocomplete_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'search_autocomplete_count' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
@@ -51,7 +51,7 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
     'defaultSearchProfileID' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'searchPrimaryDetailsOnly' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'quicksearch_options' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
-  );
+  ];
 
   /**
    * Build the form object.
@@ -87,12 +87,12 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
    * @return array
    */
   public static function getAvailableProfiles() {
-    return array('' => ts('- none -')) + CRM_Core_BAO_UFGroup::getProfiles(array(
+    return ['' => ts('- none -')] + CRM_Core_BAO_UFGroup::getProfiles([
       'Contact',
       'Individual',
       'Organization',
       'Household',
-    ));
+    ]);
   }
 
   /**

@@ -56,7 +56,7 @@ class UnhandledExceptionEvent extends GenericHookEvent {
    * @inheritDoc
    */
   public function getHookValues() {
-    return array($this->exception, $this->request);
+    return [$this->exception, $this->request];
   }
 
 }

@@ -41,11 +41,11 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
-  static $_entityID;
+  public static $_links = NULL;
+  public static $_entityID;
 
-  static $_columnHeader = NULL;
-  static $_returnvalues = NULL;
+  public static $_columnHeader = NULL;
+  public static $_returnvalues = NULL;
 
   /**
    * Get BAO Name.
@@ -65,19 +65,19 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        'view' => array(
+      self::$_links = [
+        'view' => [
           'name' => ts('View'),
           'url' => 'civicrm/contact/view/contribution',
           'qs' => 'reset=1&id=%%contid%%&cid=%%cid%%&action=view&context=contribution&selectedChild=contribute',
           'title' => ts('View Contribution'),
-        ),
-        'remove' => array(
+        ],
+        'remove' => [
           'name' => ts('Remove'),
           'title' => ts('Remove Transaction'),
           'extra' => 'onclick = "assignRemove( %%id%%,\'' . 'remove' . '\' );"',
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -91,7 +91,8 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
    */
   public function run() {
     // get the requested action
-    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse'); // default to 'browse'
+    // default to 'browse'
+    $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
 
     // assign vars to templates
     $this->assign('action', $action);
@@ -102,13 +103,13 @@ class CRM_Financial_Page_BatchTransaction extends CRM_Core_Page_Basic {
       $statusID = CRM_Core_DAO::getFieldValue('CRM_Batch_BAO_Batch', self::$_entityID, 'status_id');
     }
     $breadCrumb
-      = array(
-        array(
+      = [
+        [
           'title' => ts('Accounting Batches'),
           'url' => CRM_Utils_System::url('civicrm/financial/financialbatches',
             "reset=1&batchStatus=$statusID"),
-        ),
-      );
+        ],
+      ];
 
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
     $this->edit($action, self::$_entityID);

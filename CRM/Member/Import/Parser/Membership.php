@@ -51,7 +51,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
   /**
    * Array of successfully imported membership id's
    *
-   * @array
+   * @var array
    */
   protected $_newMemberships;
 
@@ -82,7 +82,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
     }
 
-    $this->_newMemberships = array();
+    $this->_newMemberships = [];
 
     $this->setActiveFields($this->_mapperKeys);
 
@@ -289,17 +289,17 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
 
       $session = CRM_Core_Session::singleton();
       $dateType = $session->get('dateTypes');
-      $formatted = array();
+      $formatted = [];
       $customDataType = !empty($params['contact_type']) ? $params['contact_type'] : 'Membership';
       $customFields = CRM_Core_BAO_CustomField::getFields($customDataType);
 
       // don't add to recent items, CRM-4399
       $formatted['skipRecentView'] = TRUE;
-      $dateLabels = array(
+      $dateLabels = [
         'join_date' => ts('Member Since'),
         'membership_start_date' => ts('Start Date'),
         'membership_end_date' => ts('End Date'),
-      );
+      ];
       foreach ($params as $key => $val) {
         if ($val) {
           switch ($key) {
@@ -353,7 +353,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         $indieFields = $tempIndieFields;
       }
 
-      $formatValues = array();
+      $formatValues = [];
       foreach ($params as $key => $field) {
         if ($field == NULL || $field === '') {
           continue;
@@ -383,7 +383,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         if (!empty($formatValues['membership_id'])) {
           $dao = new CRM_Member_BAO_Membership();
           $dao->id = $formatValues['membership_id'];
-          $dates = array('join_date', 'start_date', 'end_date');
+          $dates = ['join_date', 'start_date', 'end_date'];
           foreach ($dates as $v) {
             if (empty($formatted[$v])) {
               $formatted[$v] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $formatValues['membership_id'], $v);
@@ -395,10 +395,10 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             'Membership'
           );
           if ($dao->find(TRUE)) {
-            $ids = array(
+            $ids = [
               'membership' => $formatValues['membership_id'],
               'userId' => $session->get('userID'),
-            );
+            ];
 
             if (empty($params['line_item']) && !empty($formatted['membership_type_id'])) {
               CRM_Price_BAO_LineItem::getLineItemArray($formatted, NULL, 'membership', $formatted['membership_type_id']);
@@ -485,10 +485,10 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         }
         else {
           // Using new Dedupe rule.
-          $ruleParams = array(
+          $ruleParams = [
             'contact_type' => $this->_contactType,
             'used' => 'Unsupervised',
-          );
+          ];
           $fieldsArray = CRM_Dedupe_BAO_Rule::dedupeRuleFields($ruleParams);
           $disp = '';
 
@@ -605,11 +605,11 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    *
    */
   public function formattedDates($calcDates, &$formatted) {
-    $dates = array(
+    $dates = [
       'join_date',
       'start_date',
       'end_date',
-    );
+    ];
 
     foreach ($dates as $d) {
       if (isset($formatted[$d]) &&
@@ -661,7 +661,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         if ($type == 'CheckBox' || $type == 'Multi-Select') {
           $mulValues = explode(',', $value);
           $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-          $values[$key] = array();
+          $values[$key] = [];
           foreach ($mulValues as $v1) {
             foreach ($customOption as $customValueID => $customLabel) {
               $customValue = $customLabel['value'];
@@ -686,7 +686,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             throw new Exception("contact_id not valid: $value");
           }
           $dao = new CRM_Core_DAO();
-          $qParams = array();
+          $qParams = [];
           $svq = $dao->singleValueQuery("SELECT id FROM civicrm_contact WHERE id = $value",
             $qParams
           );
@@ -757,11 +757,11 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       // membership_end_date and membership_source. So, if $values contains
       // membership_start_date, membership_end_date  or membership_source,
       // convert it to start_date, end_date or source
-      $changes = array(
+      $changes = [
         'membership_start_date' => 'start_date',
         'membership_end_date' => 'end_date',
         'membership_source' => 'source',
-      );
+      ];
 
       foreach ($changes as $orgVal => $changeVal) {
         if (isset($values[$orgVal])) {

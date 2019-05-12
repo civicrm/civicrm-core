@@ -29,6 +29,7 @@
  * civicrm_campaign
  */
 require_once 'CRM/Campaign/PseudoConstant.php';
+
 function _civicrm_campaign_data(&$data, $enabled) {
 
   /**
@@ -132,8 +133,8 @@ function _civicrm_campaign_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_campaign'], array(
     'title' => 'Campaign Start Date',
-      'name' => 'start_date',
-    ));
+    'name' => 'start_date',
+  ));
 
   //Mailing finish date
   $data['civicrm_campaign']['end_date'] = array(
@@ -157,8 +158,8 @@ function _civicrm_campaign_data(&$data, $enabled) {
 
   civicrm_views_add_date_arguments($data['civicrm_campaign'], array(
     'title' => 'Campaign End Date',
-      'name' => 'end_date',
-    ));
+    'name' => 'end_date',
+  ));
 
   //Campaign Type
   $data['civicrm_campaign']['campaign_type'] = array(

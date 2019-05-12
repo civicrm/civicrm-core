@@ -56,11 +56,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
 
   public static function getSubscribedEvents() {
-    return array(
+    return [
       Events::TOKEN_REGISTER => 'registerTokens',
       Events::TOKEN_EVALUATE => 'evaluateTokens',
       \Civi\ActionSchedule\Events::MAILING_QUERY => 'alterActionScheduleQuery',
-    );
+    ];
   }
 
   /**
@@ -71,16 +71,24 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
 
   /**
    * @var array
-   *   Ex: array('viewUrl', 'editUrl').
+   *   List of tokens provided by this class
+   *   Array(string $fieldName => string $label).
    */
   public $tokenNames;
 
   /**
+   * @var array
+   *   List of active tokens - tokens provided by this class and used in the message
+   *   Array(string $tokenName);
+   */
+  public $activeTokens;
+
+  /**
    * @param $entity
    * @param array $tokenNames
-   *   Array(string $fieldName => string $label).
+   *   Array(string $tokenName => string $label).
    */
-  public function __construct($entity, $tokenNames = array()) {
+  public function __construct($entity, $tokenNames = []) {
     $this->entity = $entity;
     $this->tokenNames = $tokenNames;
   }
@@ -102,7 +110,7 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
   /**
    * Register the declared tokens.
    *
-   * @param TokenRegisterEvent $e
+   * @param \Civi\Token\Event\TokenRegisterEvent $e
    *   The registration event. Add new tokens using register().
    */
   public function registerTokens(TokenRegisterEvent $e) {
@@ -110,11 +118,11 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
       return;
     }
     foreach ($this->tokenNames as $name => $label) {
-      $e->register(array(
+      $e->register([
         'entity' => $this->entity,
         'field' => $name,
         'label' => $label,
-      ));
+      ]);
     }
   }
 
@@ -125,7 +133,7 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
    * This is method is not always appropriate, but if you're specifically
    * focused on scheduled reminders, it can be convenient.
    *
-   * @param MailingQueryEvent $e
+   * @param \Civi\ActionSchedule\Event\MailingQueryEvent $e
    *   The pending query which may be modified. See discussion on
    *   MailingQueryEvent::$query.
    */
@@ -135,7 +143,7 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
   /**
    * Populate the token data.
    *
-   * @param TokenValueEvent $e
+   * @param \Civi\Token\Event\TokenValueEvent $e
    *   The event, which includes a list of rows and tokens.
    */
   public function evaluateTokens(TokenValueEvent $e) {
@@ -143,14 +151,14 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    $activeTokens = $this->getActiveTokens($e);
-    if (!$activeTokens) {
+    $this->activeTokens = $this->getActiveTokens($e);
+    if (!$this->activeTokens) {
       return;
     }
     $prefetch = $this->prefetch($e);
 
     foreach ($e->getRows() as $row) {
-      foreach ((array) $activeTokens as $field) {
+      foreach ($this->activeTokens as $field) {
         $this->evaluateToken($row, $this->entity, $field, $prefetch);
       }
     }
@@ -196,6 +204,6 @@ abstract class AbstractTokenSubscriber implements EventSubscriberInterface {
    *   Any data that was returned by the prefetch().
    * @return mixed
    */
-  public abstract function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL);
+  abstract public function evaluateToken(TokenRow $row, $entity, $field, $prefetch = NULL);
 
 }

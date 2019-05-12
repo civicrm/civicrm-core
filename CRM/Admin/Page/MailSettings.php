@@ -43,7 +43,7 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -64,20 +64,20 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
   public function &links() {
     if (!(self::$_links)) {
       // helper variable for nicer formatting
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/mailSettings',
           'qs' => 'action=update&id=%%id%%&reset=1',
           'title' => ts('Edit Mail Settings'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/mailSettings',
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Mail Settings'),
-        ),
-      );
+        ],
+      ];
     }
 
     return self::$_links;
@@ -88,7 +88,7 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
    */
   public function browse() {
     //get all mail settings.
-    $allMailSettings = array();
+    $allMailSettings = [];
     $mailSetting = new CRM_Core_DAO_MailSettings();
 
     $allProtocols = CRM_Core_PseudoConstant::get('CRM_Core_DAO_MailSettings', 'protocol');
@@ -113,7 +113,7 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
 
       //add action links.
       $allMailSettings[$mailSetting->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $mailSetting->id),
+        ['id' => $mailSetting->id],
         ts('more'),
         FALSE,
         'mailSetting.manage.action',

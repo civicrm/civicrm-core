@@ -57,7 +57,7 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
     $this->addRule('name',
       ts('Name already exists in Database.'),
       'objectExists',
-      array('CRM_Core_DAO_LocationType', $this->_id)
+      ['CRM_Core_DAO_LocationType', $this->_id]
     );
     $this->addRule('name',
       ts('Name can only consist of alpha-numeric characters'),
@@ -74,10 +74,10 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $this->_id, 'is_reserved')) {
-        $this->freeze(array('name', 'description', 'is_active'));
+        $this->freeze(['name', 'description', 'is_active']);
       }
       if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $this->_id, 'is_default')) {
-        $this->freeze(array('is_default'));
+        $this->freeze(['is_default']);
       }
     }
   }
@@ -120,7 +120,7 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
     $locationType->save();
 
     CRM_Core_Session::setStatus(ts("The location type '%1' has been saved.",
-      array(1 => $locationType->name)
+      [1 => $locationType->name]
     ), ts('Saved'), 'success');
   }
 

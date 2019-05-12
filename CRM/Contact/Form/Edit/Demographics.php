@@ -43,12 +43,12 @@ class CRM_Contact_Form_Edit_Demographics {
    *   Reference to the form object.
    */
   public static function buildQuickForm(&$form) {
-    $form->addField('gender_id', array('entity' => 'contact', 'type' => 'Radio', 'allowClear' => TRUE));
+    $form->addField('gender_id', ['entity' => 'contact', 'type' => 'Radio', 'allowClear' => TRUE]);
 
-    $form->addField('birth_date', array('entity' => 'contact'), FALSE, FALSE);
+    $form->addField('birth_date', ['entity' => 'contact'], FALSE, FALSE);
 
-    $form->addField('is_deceased', array('entity' => 'contact', 'label' => ts('Contact is Deceased'), 'onclick' => "showDeceasedDate()"));
-    $form->addField('deceased_date', array('entity' => 'contact'), FALSE, FALSE);
+    $form->addField('is_deceased', ['entity' => 'contact', 'label' => ts('Contact is Deceased'), 'onclick' => "showDeceasedDate()"]);
+    $form->addField('deceased_date', ['entity' => 'contact'], FALSE, FALSE);
   }
 
   /**

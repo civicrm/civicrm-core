@@ -76,13 +76,13 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    */
   public function group($groupType = NULL, $excludeHidden = TRUE) {
     if (!isset($this->_viewPermissionedGroups)) {
-      $this->_viewPermissionedGroups = $this->_editPermissionedGroups = array();
+      $this->_viewPermissionedGroups = $this->_editPermissionedGroups = [];
     }
 
     $groupKey = $groupType ? $groupType : 'all';
 
     if (!isset($this->_viewPermissionedGroups[$groupKey])) {
-      $this->_viewPermissionedGroups[$groupKey] = $this->_editPermissionedGroups[$groupKey] = array();
+      $this->_viewPermissionedGroups[$groupKey] = $this->_editPermissionedGroups[$groupKey] = [];
 
       $groups = CRM_Core_PseudoConstant::allGroup($groupType, $excludeHidden);
 
@@ -162,7 +162,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
         $clause = ' ( 0 ) ';
       }
       else {
-        $clauses = array();
+        $clauses = [];
         $groups = implode(', ', $this->_editPermissionedGroups[$groupKey]);
         $clauses[] = ' ( civicrm_group_contact.group_id IN ( ' . implode(', ', array_keys($this->_editPermissionedGroups[$groupKey])) . " ) AND civicrm_group_contact.status = 'Added' ) ";
         $tables['civicrm_group_contact'] = 1;
@@ -193,7 +193,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
         $clause = ' ( 0 ) ';
       }
       else {
-        $clauses = array();
+        $clauses = [];
         $groups = implode(', ', $this->_viewPermissionedGroups[$groupKey]);
         $clauses[] = ' civicrm_group.id IN (' . implode(', ', array_keys($this->_viewPermissionedGroups[$groupKey])) . " )  ";
         $tables['civicrm_group'] = 1;
@@ -245,7 +245,7 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
 
     $dao = CRM_Core_DAO::executeQuery($sql);
 
-    $emails = array();
+    $emails = [];
     while ($dao->fetch()) {
       $emails[] = $dao->email;
     }
@@ -292,13 +292,13 @@ class CRM_Core_Permission_DrupalBase extends CRM_Core_Permission_Base {
    *   a comma separated list of email addresses
    */
   public function permissionEmails($permissionName) {
-    static $_cache = array();
+    static $_cache = [];
 
     if (isset($_cache[$permissionName])) {
       return $_cache[$permissionName];
     }
 
-    $uids = array();
+    $uids = [];
     $sql = "
       SELECT {users}.uid, {role_permission}.permission
       FROM {users}

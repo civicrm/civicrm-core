@@ -1,0 +1,46 @@
+{
+    "authors": [
+        {
+            "email": "chuck@horde.org",
+            "name": "Chuck Hagenbuch",
+            "role": "Lead"
+        },
+        {
+            "email": "richard@phpguru.org",
+            "name": "Richard Heyes",
+            "role": "Developer"
+        },
+        {
+            "email": "alec@alec.pl",
+            "name": "Aleksander Machniak",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "Mail": "./"
+        }
+    },
+    "description": "Class that provides multiple interfaces for sending emails.",
+    "homepage": "http://pear.php.net/package/Mail",
+    "include-path": [
+        "./"
+    ],
+    "license": "BSD-2-Clause",
+    "name": "pear/mail",
+    "support": {
+        "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Mail",
+        "source": "https://github.com/pear/Mail"
+    },
+    "type": "library",
+    "require": {
+        "php": ">=5.2.1",
+        "pear/pear-core-minimal": "~1.9"
+    },
+    "require-dev": {
+        "pear/pear": "*"
+    },
+    "suggest": {
+        "pear/net_smtp": "Install optionally via your project's composer.json"
+    }
+}

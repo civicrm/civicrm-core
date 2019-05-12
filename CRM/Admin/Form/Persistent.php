@@ -56,10 +56,10 @@ class CRM_Admin_Form_Persistent extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     if ($this->_indexID && ($this->_action & (CRM_Core_Action::UPDATE))) {
-      $params = array('id' => $this->_indexID);
+      $params = ['id' => $this->_indexID];
       CRM_Core_BAO_Persistent::retrieve($params, $defaults);
       if (CRM_Utils_Array::value('is_config', $defaults) == 1) {
         $defaults['data'] = implode(',', $defaults['data']);
@@ -71,23 +71,22 @@ class CRM_Admin_Form_Persistent extends CRM_Core_Form {
   public function buildQuickForm() {
     $this->add('text', 'context', ts('Context:'), NULL, TRUE);
     $this->add('text', 'name', ts('Name:'), NULL, TRUE);
-    $this->add('textarea', 'data', ts('Data:'), array('rows' => 4, 'cols' => 50), TRUE);
-    $this->addButtons(array(
-        array(
-          'type' => 'submit',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->add('textarea', 'data', ts('Data:'), ['rows' => 4, 'cols' => 50], TRUE);
+    $this->addButtons([
+      [
+        'type' => 'submit',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   public function postProcess() {
-    $params = $ids = array();
+    $params = $ids = [];
     $params = $this->controller->exportValues($this->_name);
 
     $params['is_config'] = $this->_config;

@@ -62,7 +62,7 @@ class CRM_SMS_Controller_Send extends CRM_Core_Controller {
     $this->addPages($this->_stateMachine, $action);
 
     // add all the actions
-    $uploadNames = array_merge(array('textFile'),
+    $uploadNames = array_merge(['textFile'],
       CRM_Core_BAO_File::uploadNames()
     );
 

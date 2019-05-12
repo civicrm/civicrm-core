@@ -1,7 +1,6 @@
 <?php
 
 namespace Civi\Api4;
-use Civi\Api4\Generic\AbstractEntity;
 
 /**
  * Address Entity.
@@ -12,11 +11,22 @@ use Civi\Api4\Generic\AbstractEntity;
  * Creating a new address requires at minimum a contact's ID and location type ID
  *  and other attributes (although optional) like street address, city, country etc.
  *
- * @method static Action\Address\Create create
- * @method static Action\Address\Update update
- *
  * @package Civi\Api4
  */
-class Address extends AbstractEntity {
+class Address extends Generic\DAOEntity {
+
+  /**
+   * @return \Civi\Api4\Action\Address\Create
+   */
+  public static function create() {
+    return new \Civi\Api4\Action\Address\Create(__CLASS__, __FUNCTION__);
+  }
+
+  /**
+   * @return \Civi\Api4\Action\Address\Update
+   */
+  public static function update() {
+    return new \Civi\Api4\Action\Address\Update(__CLASS__, __FUNCTION__);
+  }
 
 }

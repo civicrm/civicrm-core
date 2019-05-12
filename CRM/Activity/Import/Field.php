@@ -40,6 +40,7 @@ class CRM_Activity_Import_Field {
 
   /**
    * Title of the field to be used in display
+   * @var string
    */
   public $_title;
 

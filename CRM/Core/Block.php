@@ -54,8 +54,9 @@ class CRM_Core_Block {
 
   /**
    * Template file names for the above blocks.
+   * @var array
    */
-  static $_properties = NULL;
+  public static $_properties = NULL;
 
   /**
    * Class constructor.

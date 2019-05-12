@@ -43,20 +43,20 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    */
-  static $_columnHeaders;
+  public static $_columnHeaders;
 
   /**
    * Properties of contact we're interested in displaying
    * @var array
    */
-  static $_properties = array(
+  public static $_properties = [
     'contact_id',
     'membership_id',
     'contact_type',
@@ -71,7 +71,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     'owner_membership_id',
     'membership_status',
     'member_campaign_id',
-  );
+  ];
 
   /**
    * Are we restricting ourselves to a single contact
@@ -205,42 +205,42 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     }
 
     if (!self::$_links['view']) {
-      self::$_links['view'] = array(
-        CRM_Core_Action::VIEW => array(
+      self::$_links['view'] = [
+        CRM_Core_Action::VIEW => [
           'name' => ts('View'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=view&context=%%cxt%%&selectedChild=member' . $extraParams,
           'title' => ts('View Membership'),
-        ),
-      );
+        ],
+      ];
     }
     if (!isset(self::$_links['all']) || !self::$_links['all']) {
-      $extraLinks = array(
-        CRM_Core_Action::UPDATE => array(
+      $extraLinks = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Edit Membership'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&action=delete&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Delete Membership'),
-        ),
-        CRM_Core_Action::RENEW => array(
+        ],
+        CRM_Core_Action::RENEW => [
           'name' => ts('Renew'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'reset=1&action=renew&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'title' => ts('Renew Membership'),
-        ),
-        CRM_Core_Action::FOLLOWUP => array(
+        ],
+        CRM_Core_Action::FOLLOWUP => [
           'name' => ts('Renew-Credit Card'),
           'url' => 'civicrm/contact/view/membership',
           'qs' => 'action=renew&reset=1&cid=%%cid%%&id=%%id%%&context=%%cxt%%&mode=live' . $extraParams,
           'title' => ts('Renew Membership Using Credit Card'),
-        ),
-      );
+        ],
+      ];
       if (!$isPaymentProcessor || !$accessContribution) {
         //unset the renew with credit card when payment
         //processor is not available or user not permitted to make contributions
@@ -251,12 +251,12 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     }
 
     if ($isCancelSupported) {
-      self::$_links['all'][CRM_Core_Action::DISABLE] = array(
+      self::$_links['all'][CRM_Core_Action::DISABLE] = [
         'name' => ts('Cancel Auto-renewal'),
         'url' => 'civicrm/contribute/unsubscribe',
         'qs' => 'reset=1&mid=%%id%%&context=%%cxt%%' . $extraParams,
         'title' => ts('Cancel Auto Renew Subscription'),
-      );
+      ];
     }
     elseif (isset(self::$_links['all'][CRM_Core_Action::DISABLE])) {
       unset(self::$_links['all'][CRM_Core_Action::DISABLE]);
@@ -350,10 +350,10 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     );
 
     // process the result of the query
-    $rows = array();
+    $rows = [];
 
     //CRM-4418 check for view, edit, delete
-    $permissions = array(CRM_Core_Permission::VIEW);
+    $permissions = [CRM_Core_Permission::VIEW];
     if (CRM_Core_Permission::check('edit memberships')) {
       $permissions[] = CRM_Core_Permission::EDIT;
     }
@@ -363,7 +363,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
     $mask = CRM_Core_Action::mask($permissions);
 
     while ($result->fetch()) {
-      $row = array();
+      $row = [];
 
       // the columns we are interested in
       foreach (self::$_properties as $property) {
@@ -377,7 +377,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       $row['campaign_id'] = $result->member_campaign_id;
 
       if (!empty($row['member_is_test'])) {
-        $row['membership_type'] = $row['membership_type'] . " (test)";
+        $row['membership_type'] = CRM_Core_TestEntity::appendTestText($row['membership_type']);
       }
 
       $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->membership_id;
@@ -413,11 +413,11 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
         }
         $row['action'] = CRM_Core_Action::formLink($links,
           $currentMask,
-          array(
+          [
             'id' => $result->membership_id,
             'cid' => $result->contact_id,
             'cxt' => $this->_context,
-          ),
+          ],
           ts('Renew') . '...',
           FALSE,
           'membership.selector.row',
@@ -428,11 +428,11 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
       else {
         $links = self::links('view');
         $row['action'] = CRM_Core_Action::formLink($links, $mask,
-          array(
+          [
             'id' => $result->membership_id,
             'cid' => $result->contact_id,
             'cxt' => $this->_context,
-          ),
+          ],
           ts('more'),
           FALSE,
           'membership.selector.row',
@@ -485,52 +485,52 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     if (!isset(self::$_columnHeaders)) {
-      self::$_columnHeaders = array(
-        array(
+      self::$_columnHeaders = [
+        [
           'name' => ts('Type'),
           'sort' => 'membership_type',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Member Since'),
           'sort' => 'join_date',
           'direction' => CRM_Utils_Sort::DESCENDING,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Start Date'),
           'sort' => 'membership_start_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('End Date'),
           'sort' => 'membership_end_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Source'),
           'sort' => 'membership_source',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Status'),
           'sort' => 'membership_status',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Auto-renew?'),
-        ),
-        array('desc' => ts('Actions')),
-      );
+        ],
+        ['desc' => ts('Actions')],
+      ];
 
       if (!$this->_single) {
-        $pre = array(
-          array('desc' => ts('Contact Type')),
-          array(
+        $pre = [
+          ['desc' => ts('Contact Type')],
+          [
             'name' => ts('Name'),
             'sort' => 'sort_name',
             'direction' => CRM_Utils_Sort::DONTCARE,
-          ),
-        );
+          ],
+        ];
         self::$_columnHeaders = array_merge($pre, self::$_columnHeaders);
       }
     }
@@ -543,7 +543,7 @@ class CRM_Member_Selector_Search extends CRM_Core_Selector_Base implements CRM_C
    * @return mixed
    */
   public function alphabetQuery() {
-    return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
+    return $this->_query->alphabetQuery();
   }
 
   /**

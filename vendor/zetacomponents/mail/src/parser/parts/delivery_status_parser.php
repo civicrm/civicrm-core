@@ -2,10 +2,26 @@
 /**
  * File containing the ezcMailDeliveryStatusParser class
  *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ * 
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
  * @package Mail
  * @version //autogen//
- * @copyright Copyright (C) 2005-2009 eZ Systems AS. All rights reserved.
- * @license http://ez.no/licenses/new_bsd New BSD License
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache License, Version 2.0
  */
 
 /**
@@ -74,7 +90,7 @@ class ezcMailDeliveryStatusParser extends ezcMailPartParser
     protected function parseHeader( $line, ezcMailHeadersHolder $headers )
     {
         $matches = array();
-        preg_match_all( "/^([\w-_]*):\s?(.*)/", $line, $matches, PREG_SET_ORDER );
+        preg_match_all( "/^([\w_-]*):\s?(.*)/", $line, $matches, PREG_SET_ORDER );
         if ( count( $matches ) > 0 )
         {
             $this->lastParsedHeader = $matches[0][1];
@@ -107,7 +123,10 @@ class ezcMailDeliveryStatusParser extends ezcMailPartParser
      */
     public function finish()
     {
-        unset( $this->part->recipients[$this->section - 1] ); // because one extra recipient is created in parseHeader()
+        if ( array_key_exists( $this->section - 1, $this->part->recipients ) )
+        {
+            unset( $this->part->recipients[$this->section - 1] ); // because one extra recipient is created in parseHeader()
+        }
         $this->part->size = $this->size;
         return $this->part;
     }

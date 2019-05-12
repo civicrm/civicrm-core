@@ -64,7 +64,7 @@
     </html>
     <default>NULL</default>
     <localizable>true</localizable>
-    <comment>>Price field option description.</comment>
+    <comment>Price field option description.</comment>
     <add>3.3</add>
   </field>
   <field>

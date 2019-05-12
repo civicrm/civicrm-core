@@ -56,7 +56,7 @@ class CRM_Queue_Page_Runner extends CRM_Core_Page {
     }
 
     CRM_Utils_System::setTitle($runner->title);
-    $this->assign('queueRunnerData', array(
+    $this->assign('queueRunnerData', [
       'qrid' => $runner->qrid,
       'runNextAjax' => CRM_Utils_System::url($runner->pathPrefix . '/ajax/runNext', NULL, FALSE, NULL, FALSE),
       'skipNextAjax' => CRM_Utils_System::url($runner->pathPrefix . '/ajax/skipNext', NULL, FALSE, NULL, FALSE),
@@ -64,7 +64,7 @@ class CRM_Queue_Page_Runner extends CRM_Core_Page {
       'completed' => 0,
       'numberOfItems' => $runner->queue->numberOfItems(),
       'buttons' => $runner->buttons,
-    ));
+    ]);
 
     if ($runner->isMinimal) {
       // Render page header

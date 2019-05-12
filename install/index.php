@@ -63,14 +63,16 @@ global $installURLPath;
 // Set the install type
 // this is sent as a query string when the page is first loaded
 // and subsequently posted to the page as a hidden field
-if (isset($_POST['civicrm_install_type'])) {
+// only permit acceptable installation types to prevent issues;
+$acceptableInstallTypes = ['drupal', 'wordpress', 'backdrop'];
+if (isset($_POST['civicrm_install_type']) && in_array($_POST['civicrm_install_type'], $acceptableInstallTypes)) {
   $installType = $_POST['civicrm_install_type'];
 }
-elseif (isset($_GET['civicrm_install_type'])) {
+elseif (isset($_GET['civicrm_install_type']) && in_array(strtolower($_GET['civicrm_install_type']), $acceptableInstallTypes)) {
   $installType = strtolower($_GET['civicrm_install_type']);
 }
 else {
-  // default value if not set
+  // default value if not set and not an acceptable install type.
   $installType = "drupal";
 }
 
@@ -163,7 +165,7 @@ elseif ($installType == 'backdrop') {
   $object = new CRM_Utils_System_Backdrop();
   $cmsPath = $object->cmsRootPath();
   $siteDir = getSiteDir($cmsPath, $_SERVER['SCRIPT_FILENAME']);
-  $alreadyInstalled = file_exists($cmsPath . CIVICRM_DIRECTORY_SEPARATOR .     'civicrm.settings.php');
+  $alreadyInstalled = file_exists($cmsPath . CIVICRM_DIRECTORY_SEPARATOR . 'civicrm.settings.php');
 }
 elseif ($installType == 'wordpress') {
   $cmsPath = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . 'civicrm';
@@ -424,7 +426,10 @@ else {
  *  $description[2] - The test error to show, if it goes wrong
  */
 class InstallRequirements {
-  var $errors, $warnings, $tests, $conn;
+  public $errors;
+  public $warnings;
+  public $tests;
+  public $conn;
 
   // @see CRM_Upgrade_Form::MINIMUM_THREAD_STACK
   const MINIMUM_THREAD_STACK = 192;
@@ -517,6 +522,17 @@ class InstallRequirements {
         $onlyRequire
       );
       if ($dbName != 'Drupal' && $dbName != 'Backdrop') {
+        $this->requireNoExistingData(
+          $databaseConfig['server'],
+          $databaseConfig['username'],
+          $databaseConfig['password'],
+          $databaseConfig['database'],
+          array(
+            ts("MySQL %1 Configuration", array(1 => $dbName)),
+            ts("Does the database have data from a previous installation?"),
+            ts("CiviCRM data from previous installation exists in '%1'.", array(1 => $databaseConfig['database'])),
+          )
+        );
         $this->requireMySQLInnoDB($databaseConfig['server'],
           $databaseConfig['username'],
           $databaseConfig['password'],
@@ -555,6 +571,16 @@ class InstallRequirements {
             ts("MySQL %1 Configuration", array(1 => $dbName)),
             ts('Can I create triggers in the database?'),
             ts('Unable to create triggers. This MySQL user is missing the CREATE TRIGGERS  privilege.'),
+          )
+        );
+        $this->requireMySQLUtf8mb4($databaseConfig['server'],
+          $databaseConfig['username'],
+          $databaseConfig['password'],
+          $databaseConfig['database'],
+          array(
+            ts("MySQL %1 Configuration", array(1 => $dbName)),
+            ts('Is the <code>utf8mb4</code> character set supported?'),
+            ts('This MySQL server does not support the <code>utf8mb4</code> character set.'),
           )
         );
       }
@@ -1149,7 +1175,6 @@ class InstallRequirements {
     mysqli_query($conn, 'DROP TABLE civicrm_install_temp_table_test');
   }
 
-
   /**
    * @param $server
    * @param string $username
@@ -1253,7 +1278,8 @@ class InstallRequirements {
       return;
     }
 
-    $result = mysqli_query($conn, "SHOW VARIABLES LIKE 'thread_stack'"); // bytes => kb
+    // bytes => kb
+    $result = mysqli_query($conn, "SHOW VARIABLES LIKE 'thread_stack'");
     if (!$result) {
       $testDetails[2] = ts('Could not get information about the thread_stack of the database.');
       $this->error($testDetails);
@@ -1265,6 +1291,37 @@ class InstallRequirements {
         $this->error($testDetails);
       }
     }
+  }
+
+  /**
+   * @param $server
+   * @param $username
+   * @param $password
+   * @param $database
+   * @param $testDetails
+   */
+  public function requireNoExistingData(
+    $server,
+    $username,
+    $password,
+    $database,
+    $testDetails
+  ) {
+    $this->testing($testDetails);
+    $conn = $this->connect($server, $username, $password);
+
+    @mysqli_select_db($conn, $database);
+    $contactRecords = mysqli_query($conn, "SELECT count(*) as contactscount FROM civicrm_contact");
+    if ($contactRecords) {
+      $contactRecords = mysqli_fetch_object($contactRecords);
+      if ($contactRecords->contactscount > 0) {
+        $this->error($testDetails);
+        return;
+      }
+    }
+
+    $testDetails[3] = ts('CiviCRM data from previous installation does not exist in %1.', array(1 => $database));
+    $this->testing($testDetails);
   }
 
   /**
@@ -1330,6 +1387,57 @@ class InstallRequirements {
     else {
       $testDetails[2] = " (" . ts('the following PHP variables are missing: %1', array(1 => implode(", ", $missing))) . ")";
       $this->error($testDetails);
+    }
+  }
+
+  /**
+   * @param $server
+   * @param string $username
+   * @param $password
+   * @param $database
+   * @param $testDetails
+   */
+  public function requireMysqlUtf8mb4($server, $username, $password, $database, $testDetails) {
+    $this->testing($testDetails);
+    $conn = $this->connect($server, $username, $password);
+    if (!$conn) {
+      $testDetails[2] = ts('Could not connect to the database server.');
+      $this->error($testDetails);
+      return;
+    }
+
+    if (!@mysqli_select_db($conn, $database)) {
+      $testDetails[2] = ts('Could not select the database.');
+      $this->error($testDetails);
+      return;
+    }
+
+    $result = mysqli_query($conn, 'CREATE TABLE civicrm_utf8mb4_test (id VARCHAR(255), PRIMARY KEY(id(255))) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC ENGINE=INNODB');
+    if (!$result) {
+      $testDetails[2] = ts('It is recommended, though not yet required, to configure your MySQL server for utf8mb4 support. You will need the following MySQL server configuration: innodb_large_prefix=true innodb_file_format=barracuda innodb_file_per_table=true');
+      $this->warning($testDetails);
+      return;
+    }
+    $result = mysqli_query($conn, 'DROP TABLE civicrm_utf8mb4_test');
+
+    // Ensure that the MySQL driver supports utf8mb4 encoding.
+    $version = mysqli_get_client_info($conn);
+    if (strpos($version, 'mysqlnd') !== FALSE) {
+      // The mysqlnd driver supports utf8mb4 starting at version 5.0.9.
+      $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);
+      if (version_compare($version, '5.0.9', '<')) {
+        $testDetails[2] = 'It is recommended, though not yet required, to upgrade your PHP MySQL driver (mysqlnd) to >= 5.0.9 for utf8mb4 support.';
+        $this->warning($testDetails);
+        return;
+      }
+    }
+    else {
+      // The libmysqlclient driver supports utf8mb4 starting at version 5.5.3.
+      if (version_compare($version, '5.5.3', '<')) {
+        $testDetails[2] = 'It is recommended, though not yet required, to upgrade your PHP MySQL driver (libmysqlclient) to >= 5.5.3 for utf8mb4 support.';
+        $this->warning($testDetails);
+        return;
+      }
     }
   }
 
@@ -1416,6 +1524,7 @@ class InstallRequirements {
  * Class Installer
  */
 class Installer extends InstallRequirements {
+
   /**
    * @param $server
    * @param $username
@@ -1626,10 +1735,9 @@ class Installer extends InstallRequirements {
         //change the default language to one chosen
         if (isset($config['seedLanguage']) && $config['seedLanguage'] != 'en_US') {
           civicrm_api3('Setting', 'create', array(
-              'domain_id' => 'current_domain',
-              'lcMessages' => $config['seedLanguage'],
-            )
-          );
+            'domain_id' => 'current_domain',
+            'lcMessages' => $config['seedLanguage'],
+          ));
         }
 
         $output .= '</ul>';

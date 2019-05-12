@@ -1,0 +1,19 @@
+language: php
+sudo: false
+php:
+  - 5.4
+  - 5.5
+  - 5.6
+  - 7.0
+  - 7.1
+  - nightly
+install:
+  - pear list
+  - pear channel-update pear.php.net
+  - pear upgrade --force pear/pear
+  - pear list
+  - pear upgrade --force xml_util
+  - pear install --force --alldeps package.xml
+  - pear list
+script:
+  - pear run-tests -d tests/

@@ -44,12 +44,12 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
 
     $this->addElement(
       'submit', $this->getButtonName('next', 'cleanup'), 'Cleanup Caches',
-      array('class' => 'crm-form-submit', 'id' => 'cleanup-cache')
+      ['class' => 'crm-form-submit', 'id' => 'cleanup-cache']
     );
 
     $this->addElement(
       'submit', $this->getButtonName('next', 'resetpaths'), 'Reset Paths',
-      array('class' => 'crm-form-submit', 'id' => 'resetpaths')
+      ['class' => 'crm-form-submit', 'id' => 'resetpaths']
     );
 
     //parent::buildQuickForm();

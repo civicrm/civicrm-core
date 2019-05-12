@@ -68,16 +68,67 @@ class ActionObjectProvider implements EventSubscriberInterface, ProviderInterfac
   /**
    * @inheritDoc
    *
-   * @param array|AbstractAction $apiRequest
+   * @param AbstractAction $action
    *
    * @return array|mixed
    */
-  public function invoke($apiRequest) {
+  public function invoke($action) {
     $result = new Result();
-    $result->action = $apiRequest['action'];
-    $result->entity = $apiRequest['entity'];
-    $apiRequest->_run($result);
+    $result->action = $action->getActionName();
+    $result->entity = $action->getEntityName();
+    $action->_run($result);
+    $this->handleChains($action, $result);
     return $result;
+  }
+
+  /**
+   * Run each chained action once per row
+   *
+   * @param AbstractAction $action
+   * @param Result $result
+   */
+  protected function handleChains($action, $result) {
+    foreach ($action->getChain() as $name => $request) {
+      $request += [NULL, NULL, [], NULL];
+      $request[2]['checkPermissions'] = $action->getCheckPermissions();
+      foreach ($result as &$row) {
+        $row[$name] = $this->runChain($request, $row);
+      }
+    }
+  }
+
+  /**
+   * Run a chained action
+   *
+   * @param $request
+   * @param $row
+   * @return array|\Civi\Api4\Generic\Result|null
+   * @throws \API_Exception
+   */
+  protected function runChain($request, $row) {
+    list($entity, $action, $params, $index) = $request;
+    // Swap out variables in $entity, $action & $params
+    $this->resolveChainLinks($entity, $row);
+    $this->resolveChainLinks($action, $row);
+    $this->resolveChainLinks($params, $row);
+    return (array) civicrm_api4($entity, $action, $params, $index);
+  }
+
+  /**
+   * Swap out variable names
+   *
+   * @param mixed $val
+   * @param array $result
+   */
+  protected function resolveChainLinks(&$val, $result) {
+    if (is_array($val)) {
+      foreach ($val as &$v) {
+        $this->resolveChainLinks($v, $result);
+      }
+    }
+    elseif (is_string($val) && strlen($val) > 1 && substr($val, 0, 1) === '$') {
+      $val = \CRM_Utils_Array::pathGet($result, explode('.', substr($val, 1)));
+    }
   }
 
   /**

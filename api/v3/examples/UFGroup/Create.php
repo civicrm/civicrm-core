@@ -6,7 +6,7 @@
  *   API result array
  */
 function uf_group_create_example() {
-  $params = array(
+  $params = [
     'add_captcha' => 1,
     'add_contact_to_group' => 1,
     'group' => 1,
@@ -27,7 +27,7 @@ function uf_group_create_example() {
     'notify' => 'admin@example.org',
     'post_URL' => 'http://example.org/post',
     'title' => 'Test Group',
-  );
+  ];
 
   try{
     $result = civicrm_api3('UFGroup', 'create', $params);
@@ -37,12 +37,12 @@ function uf_group_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -56,13 +56,13 @@ function uf_group_create_example() {
  */
 function uf_group_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 2,
-    'values' => array(
-      '2' => array(
+    'values' => [
+      '2' => [
         'id' => '2',
         'is_active' => 0,
         'group_type' => 'Individual,Contact',
@@ -86,9 +86,9 @@ function uf_group_create_expectedresult() {
         'created_id' => '1',
         'created_date' => '2013-07-28 08:49:19',
         'is_proximity_search' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

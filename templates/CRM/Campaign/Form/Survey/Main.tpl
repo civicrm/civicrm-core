@@ -39,7 +39,7 @@
    </tr>
    <tr class="crm-campaign-survey-main-form-block-campaign_id">
      <td class="label">{$form.campaign_id.label}</td>
-     <td class="view-value">{$form.campaign_id.html} &nbsp; <span class="action-link crm-campaign-survey-new_campaign_link"><a href="{crmURL p='civicrm/campaign/add' q='reset=1'}" target="_blank" title="{ts}Opens New Campaign form in a separate window{/ts}">{ts}new campaign{/ts}</a></span>
+     <td class="view-value">{$form.campaign_id.html}
         <div class="description">{ts}Select the campaign for which survey is created.{/ts}</div>
       </td>
    </tr>
@@ -79,22 +79,10 @@
    </tr>
    <tr class="crm-campaign-form-block-custom_data">
        <td colspan="2">
-           <div id="customData"></div>
+         {include file="CRM/common/customDataBlock.tpl"}
        </td>
    </tr>
   </table>
-  <div id="customData"></div>
-  {*include custom data js file*}
-  {include file="CRM/common/customData.tpl"}
-  {literal}
-    <script type="text/javascript">
-      CRM.$(function($) {
-        {/literal}
-        CRM.buildCustomData( 'Survey' );
-        {literal}
-      });
-    </script>
-  {/literal}
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 
@@ -115,13 +103,4 @@
         buildLinks( profileField, profileField.val());
     });
 </script>
-{/literal}
-{literal}
-  <script type="text/javascript">
-    CRM.$(function($) {
-      {/literal}
-        CRM.buildCustomData( 'Survey' );
-      {literal}
-    });
-  </script>
 {/literal}

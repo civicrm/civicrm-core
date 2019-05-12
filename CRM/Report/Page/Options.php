@@ -43,28 +43,28 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * The option group name.
    *
    * @var array
    */
-  static $_gName = NULL;
+  public static $_gName = NULL;
 
   /**
    * The option group name in display format (capitalized, without underscores...etc)
    *
    * @var array
    */
-  static $_GName = NULL;
+  public static $_GName = NULL;
 
   /**
    * The option group id.
    *
    * @var array
    */
-  static $_gId = NULL;
+  public static $_gId = NULL;
 
   /**
    * Obtains the group name from url and sets the title.
@@ -110,30 +110,30 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::UPDATE => array(
+      self::$_links = [
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/admin/report/register/' . self::$_gName,
           'qs' => 'action=update&id=%%id%%&reset=1',
-          'title' => ts('Edit %1', array(1 => self::$_gName)),
-        ),
-        CRM_Core_Action::DISABLE => array(
+          'title' => ts('Edit %1', [1 => self::$_gName]),
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'ref' => 'crm-enable-disable',
-          'title' => ts('Disable %1', array(1 => self::$_gName)),
-        ),
-        CRM_Core_Action::ENABLE => array(
+          'title' => ts('Disable %1', [1 => self::$_gName]),
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'ref' => 'crm-enable-disable',
-          'title' => ts('Enable %1', array(1 => self::$_gName)),
-        ),
-        CRM_Core_Action::DELETE => array(
+          'title' => ts('Enable %1', [1 => self::$_gName]),
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/admin/report/register/' . self::$_gName,
           'qs' => 'action=delete&id=%%id%%&reset=1',
-          'title' => ts('Delete %1 Type', array(1 => self::$_gName)),
-        ),
-      );
+          'title' => ts('Delete %1 Type', [1 => self::$_gName]),
+        ],
+      ];
     }
 
     return self::$_links;
@@ -151,7 +151,7 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
    * Browse all options.
    */
   public function browse() {
-    $groupParams = array('name' => self::$_gName);
+    $groupParams = ['name' => self::$_gName];
     $optionValue = CRM_Core_OptionValue::getRows($groupParams, $this->links(), 'weight');
     $gName = self::$_gName;
     $returnURL = CRM_Utils_System::url("civicrm/admin/report/options/$gName",

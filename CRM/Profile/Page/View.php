@@ -72,7 +72,7 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
 
     $gids = explode(',', CRM_Utils_Request::retrieve('gid', 'String', CRM_Core_DAO::$_nullObject, FALSE, 0, 'GET'));
 
-    $profileIds = array();
+    $profileIds = [];
     if (count($gids) > 1) {
       if (!empty($gids)) {
         foreach ($gids as $pfId) {
@@ -95,7 +95,7 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
     $anyContent = TRUE;
     if ($this->_gid) {
       $page = new CRM_Profile_Page_Dynamic($this->_id, $this->_gid, 'Profile', FALSE, $profileIds);
-      $profileGroup = array();
+      $profileGroup = [];
       $profileGroup['title'] = NULL;
       $profileGroup['content'] = $page->run();
       if (empty($profileGroup['content'])) {
@@ -130,10 +130,10 @@ class CRM_Profile_Page_View extends CRM_Core_Page {
     else {
       $ufGroups = CRM_Core_BAO_UFGroup::getModuleUFGroup('Profile');
 
-      $profileGroups = array();
+      $profileGroups = [];
       foreach ($ufGroups as $groupid => $group) {
         $page = new CRM_Profile_Page_Dynamic($this->_id, $groupid, 'Profile', FALSE, $profileIds);
-        $profileGroup = array();
+        $profileGroup = [];
         $profileGroup['title'] = $group['title'];
         $profileGroup['content'] = $page->run();
         if (empty($profileGroup['content'])) {

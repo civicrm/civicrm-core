@@ -35,11 +35,13 @@ class CRM_Utils_SoapServer {
 
   /**
    * Number of seconds we should let a soap process idle
+   * @var int
    */
-  static $soap_timeout = 0;
+  public static $soap_timeout = 0;
 
   /**
    * Cache the actual UF Class
+   * @var string
    */
   public $ufClass;
 
@@ -149,14 +151,14 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_bounce($key, $job, $queue, $hash, $body) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'job_id' => $job,
       'time_stamp' => date('YmdHis'),
       'event_queue_id' => $queue,
       'hash' => $hash,
       'body' => $body,
       'version' => 3,
-    );
+    ];
     $result = civicrm_api('Mailing', 'event_bounce', $params);
     return CRM_Utils_Array::encode_items($result);
   }
@@ -174,14 +176,14 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_unsubscribe($key, $job, $queue, $hash) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'job_id' => $job,
       'time_stamp' => date('YmdHis'),
       'org_unsubscribe' => 0,
       'event_queue_id' => $queue,
       'hash' => $hash,
       'version' => 3,
-    );
+    ];
     $result = civicrm_api('MailingGroup', 'event_unsubscribe', $params);
     return CRM_Utils_Array::encode_items($result);
   }
@@ -197,14 +199,14 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_domain_unsubscribe($key, $job, $queue, $hash) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'job_id' => $job,
       'time_stamp' => date('YmdHis'),
       'org_unsubscribe' => 1,
       'event_queue_id' => $queue,
       'hash' => $hash,
       'version' => 3,
-    );
+    ];
     $result = civicrm_api('MailingGroup', 'event_domain_unsubscribe', $params);
     return CRM_Utils_Array::encode_items($result);
   }
@@ -220,14 +222,14 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_resubscribe($key, $job, $queue, $hash) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'job_id' => $job,
       'time_stamp' => date('YmdHis'),
       'org_unsubscribe' => 0,
       'event_queue_id' => $queue,
       'hash' => $hash,
       'version' => 3,
-    );
+    ];
     $result = civicrm_api('MailingGroup', 'event_resubscribe', $params);
     return CRM_Utils_Array::encode_items($result);
   }
@@ -243,11 +245,11 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_subscribe($key, $email, $domain, $group) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'email' => $email,
       'group_id' => $group,
       'version' => 3,
-    );
+    ];
     $result = civicrm_api('MailingGroup', 'event_subscribe', $params);
     return CRM_Utils_Array::encode_items($result);
   }
@@ -263,14 +265,14 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_confirm($key, $contact, $subscribe, $hash) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'contact_id' => $contact,
       'subscribe_id' => $subscribe,
       'time_stamp' => date('YmdHis'),
       'event_subscribe_id' => $subscribe,
       'hash' => $hash,
       'version' => 3,
-    );
+    ];
     $result = civicrm_api('Mailing', 'event_confirm', $params);
     return CRM_Utils_Array::encode_items($result);
   }
@@ -290,7 +292,7 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_reply($key, $job, $queue, $hash, $bodyTxt, $rt, $bodyHTML = NULL, $fullEmail = NULL) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'job_id' => $job,
       'event_queue_id' => $queue,
       'hash' => $hash,
@@ -300,7 +302,7 @@ class CRM_Utils_SoapServer {
       'fullEmail' => $fullEmail,
       'time_stamp' => date('YmdHis'),
       'version' => 3,
-    );
+    ];
     $result = civicrm_api('Mailing', 'event_reply', $params);
     return CRM_Utils_Array::encode_items($result);
   }
@@ -317,13 +319,13 @@ class CRM_Utils_SoapServer {
    */
   public function mailer_event_forward($key, $job, $queue, $hash, $email) {
     $this->verify($key);
-    $params = array(
+    $params = [
       'job_id' => $job,
       'event_queue_id' => $queue,
       'hash' => $hash,
       'email' => $email,
       'version' => 3,
-    );
+    ];
     $result = civicrm_api('Mailing', 'event_forward', $params);
     return CRM_Utils_Array::encode_items($result);
   }

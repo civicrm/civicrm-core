@@ -34,6 +34,7 @@
  * Convenience class for PHP-Gettext compatibility.
  */
 class CRM_Core_I18n_NativeGettext {
+
   /**
    * @param $string
    *

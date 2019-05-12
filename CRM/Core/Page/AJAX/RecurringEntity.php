@@ -13,7 +13,7 @@
 class CRM_Core_Page_AJAX_RecurringEntity {
 
   public static function updateMode() {
-    $finalResult = array();
+    $finalResult = [];
     if (CRM_Utils_Array::value('mode', $_REQUEST) && CRM_Utils_Array::value('entityId', $_REQUEST) && CRM_Utils_Array::value('entityTable', $_REQUEST)) {
       $mode = CRM_Utils_Type::escape($_REQUEST['mode'], 'Integer');
       $entityId = CRM_Utils_Type::escape($_REQUEST['entityId'], 'Integer');

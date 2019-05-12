@@ -49,50 +49,17 @@
         {$form.grant_amount_high.html}
     </td>
 </tr>
+{foreach from=$grantSearchFields key=fieldName item=fieldSpec}
+  {assign var=notSetFieldName value=$fieldName|cat:'_notset'}
 <tr>
-    <td>
-        {$form.grant_application_received_date_low.label}<br />
-        {include file="CRM/common/jcalendar.tpl" elementName=grant_application_received_date_low}
-    </td>
-    <td colspan="2">
-        {$form.grant_application_received_date_high.label}<br />
-        {include file="CRM/common/jcalendar.tpl" elementName=grant_application_received_date_high}
-        &nbsp;{$form.grant_application_received_notset.html}&nbsp;&nbsp;{$form.grant_application_received_notset.label}
-    </td>
+  <td>
+    {include file="CRM/Core/DatePickerRange.tpl" from='_low' to='_high'}
+  </td>
+  <td>
+    &nbsp;{$form.$notSetFieldName.html}&nbsp;&nbsp;{$form.$notSetFieldName.label}
+  </td>
 </tr>
-<tr>
-    <td>
-        {$form.grant_decision_date_low.label}<br />
-        {include file="CRM/common/jcalendar.tpl" elementName=grant_decision_date_low}
-    </td>
-    <td colspan="2">
-        {$form.grant_decision_date_high.label}<br />
-        {include file="CRM/common/jcalendar.tpl" elementName=grant_decision_date_high}
-        &nbsp;{$form.grant_decision_date_notset.html}&nbsp;&nbsp;{$form.grant_decision_date_notset.label}
-    </td>
-</tr>
-<tr>
-    <td>
-        {$form.grant_money_transfer_date_low.label}<br />
-        {include file="CRM/common/jcalendar.tpl" elementName=grant_money_transfer_date_low}
-    </td>
-    <td colspan="2">
-        {$form.grant_money_transfer_date_high.label}<br />
-        {include file="CRM/common/jcalendar.tpl" elementName=grant_money_transfer_date_high}
-        &nbsp;{$form.grant_money_transfer_date_notset.html}&nbsp;&nbsp;{$form.grant_money_transfer_date_notset.label}
-    </td>
-</tr>
-<tr>
-    <td>
-        {$form.grant_due_date_low.label}<br />
-        {include file="CRM/common/jcalendar.tpl" elementName=grant_due_date_low}
-    </td>
-    <td colspan="2">
-        {$form.grant_due_date_high.label}<br />
-        {include file="CRM/common/jcalendar.tpl" elementName=grant_due_date_high}
-        &nbsp;{$form.grant_due_date_notset.html}&nbsp;&nbsp;{$form.grant_due_date_notset.label}
-    </td>
-</tr>
+{/foreach}
 {if $grantGroupTree}
 <tr>
     <td colspan="3">

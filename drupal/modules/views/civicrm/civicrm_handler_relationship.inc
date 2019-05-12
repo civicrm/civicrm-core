@@ -34,7 +34,7 @@
  *   the relationship.
  */
 class civicrm_handler_relationship extends views_handler_relationship {
-  static $_relationshipType;
+  public static $_relationshipType;
 
   /**
    * Init handler to let relationships live on tables other than

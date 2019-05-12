@@ -40,7 +40,7 @@ class CRM_Upgrade_Incremental_php_FourFive extends CRM_Upgrade_Incremental_Base 
    */
   public function setPostUpgradeMessage(&$postUpgradeMessage, $rev) {
     if ($rev == '4.5.alpha1') {
-      $postUpgradeMessage .= '<br /><br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Contributions - Receipt (off-line)</li><li>Contributions - Receipt (on-line)</li><li>Contributions - Recurring Start and End Notification</li><li>Contributions - Recurring Updates</li><li>Memberships - Receipt (on-line)</li><li>Memberships - Signup and Renewal Receipts (off-line)</li><li>Pledges - Acknowledgement</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages). (<a href="%1">learn more...</a>)', array(1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Updating+System+Workflow+Message+Templates+after+Upgrades+-+method+1+-+kdiff'));
+      $postUpgradeMessage .= '<br /><br />' . ts('Default versions of the following System Workflow Message Templates have been modified to handle new functionality: <ul><li>Contributions - Receipt (off-line)</li><li>Contributions - Receipt (on-line)</li><li>Contributions - Recurring Start and End Notification</li><li>Contributions - Recurring Updates</li><li>Memberships - Receipt (on-line)</li><li>Memberships - Signup and Renewal Receipts (off-line)</li><li>Pledges - Acknowledgement</li></ul> If you have modified these templates, please review the new default versions and implement updates as needed to your copies (Administer > Communications > Message Templates > System Workflow Messages). (<a href="%1">learn more...</a>)', [1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Updating+System+Workflow+Message+Templates+after+Upgrades+-+method+1+-+kdiff']);
       $postUpgradeMessage .= '<br /><br />' . ts('This release allows you to view and edit multiple-record custom field sets in a table format which will be more usable in some cases. You can try out the format by navigating to Administer > Custom Data & Screens > Custom Fields. Click Settings for a custom field set and change Display Style to "Tab with Tables".');
       $postUpgradeMessage .= '<br /><br />' . ts('This release changes the way that anonymous event registrations match participants with existing contacts.  By default, all event participants will be matched with existing individuals using the Unsupervised rule, even if multiple registrations with the same email address are allowed.  However, you can now select a different matching rule to use for each event.  Please review your events to make sure you choose the appropriate matching rule and collect sufficient information for it to match contacts.');
     }
@@ -60,7 +60,7 @@ class CRM_Upgrade_Incremental_php_FourFive extends CRM_Upgrade_Incremental_Base 
   public function upgrade_4_5_alpha1($rev) {
     // task to process sql
     $this->addTask('Migrate honoree information to module_data', 'migrateHonoreeInfo');
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.5.alpha1')), 'runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => '4.5.alpha1']), 'runSql', $rev);
     $this->addTask('Set default for Individual name fields configuration', 'addNameFieldOptions');
 
     // CRM-14522 - The below schema checking is done as foreign key name
@@ -75,7 +75,7 @@ WHERE TABLE_NAME = 'civicrm_msg_template'
 AND CONSTRAINT_TYPE = 'FOREIGN KEY'
 AND TABLE_SCHEMA = %1
 ";
-    $params = array(1 => array($dbUf['database'], 'String'));
+    $params = [1 => [$dbUf['database'], 'String']];
     $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
     if ($dao->fetch()) {
       if ($dao->CONSTRAINT_NAME == 'FK_civicrm_msg_template_pdf_format_id' ||
@@ -97,23 +97,23 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    * @return bool
    */
   public function upgrade_4_5_beta9($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.5.beta9')), 'runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => '4.5.beta9']), 'runSql', $rev);
 
-    $entityTable = array(
+    $entityTable = [
       'Participant' => 'civicrm_participant_payment',
       'Contribution' => 'civicrm_contribution',
       'Membership' => 'civicrm_membership',
-    );
+    ];
 
     foreach ($entityTable as $label => $tableName) {
       list($minId, $maxId) = CRM_Core_DAO::executeQuery("SELECT coalesce(min(id),0), coalesce(max(id),0)
         FROM {$tableName}")->getDatabaseResult()->fetchRow();
       for ($startId = $minId; $startId <= $maxId; $startId += self::BATCH_SIZE) {
         $endId = $startId + self::BATCH_SIZE - 1;
-        $title = ts("Upgrade DB to 4.5.beta9: Fix line items for {$label} (%1 => %2)", array(
-            1 => $startId,
-            2 => $endId,
-          ));
+        $title = ts("Upgrade DB to 4.5.beta9: Fix line items for {$label} (%1 => %2)", [
+          1 => $startId,
+          2 => $endId,
+        ]);
         $this->addTask($title, 'task_4_5_0_fixLineItem', $startId, $endId, $label);
       }
     }
@@ -131,16 +131,16 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
    *   the first/lowest entity ID to convert.
    * @param int $endId
    *   the last/highest entity ID to convert.
-   * @param
+   * @param string $entityTable
    *
    * @return bool
    */
   public static function task_4_5_0_fixLineItem(CRM_Queue_TaskContext $ctx, $startId, $endId, $entityTable) {
 
-    $sqlParams = array(
-      1 => array($startId, 'Integer'),
-      2 => array($endId, 'Integer'),
-    );
+    $sqlParams = [
+      1 => [$startId, 'Integer'],
+      2 => [$endId, 'Integer'],
+    ];
     switch ($entityTable) {
       case 'Contribution':
         // update all the line item entity_table and entity_id with contribution due to bug CRM-15055
@@ -213,7 +213,7 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
     $newValue = $oldValue . '1214151617';
 
     $query = "UPDATE `civicrm_setting` SET `value` = %1 WHERE `group_name` = 'CiviCRM Preferences' AND `name` = 'contact_edit_options'";
-    $params = array(1 => array(serialize($newValue), 'String'));
+    $params = [1 => [serialize($newValue), 'String']];
     CRM_Core_DAO::executeQuery($query, $params);
 
     return TRUE;
@@ -245,36 +245,36 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
       $domain = new CRM_Core_DAO_Domain();
       $domain->find(TRUE);
       while ($dao->fetch()) {
-        $honorParams = array('soft_credit' => array('soft_credit_types' => $honorTypes));
+        $honorParams = ['soft_credit' => ['soft_credit_types' => $honorTypes]];
         if ($domain->locales) {
           $locales = explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales);
           foreach ($locales as $locale) {
             $honor_block_title = "honor_block_title_{$locale}";
             $honor_block_text = "honor_block_text_{$locale}";
-            $honorParams['soft_credit'] += array(
-              $locale => array(
+            $honorParams['soft_credit'] += [
+              $locale => [
                 'honor_block_title' => $dao->$honor_block_title,
                 'honor_block_text' => $dao->$honor_block_text,
-              ),
-            );
+              ],
+            ];
           }
         }
         else {
-          $honorParams['soft_credit'] += array(
-            'default' => array(
+          $honorParams['soft_credit'] += [
+            'default' => [
               'honor_block_title' => $dao->honor_block_title,
               'honor_block_text' => $dao->honor_block_text,
-            ),
-          );
+            ],
+          ];
         }
-        $ufJoinParam = array(
+        $ufJoinParam = [
           'module' => 'soft_credit',
           'entity_table' => 'civicrm_contribution_page',
           'is_active' => $dao->honor_block_is_active,
           'entity_id' => $dao->id,
           'uf_group_id' => $ufGroupDAO->id,
           'module_data' => json_encode($honorParams),
-        );
+        ];
         CRM_Core_BAO_UFJoin::create($ufJoinParam);
       }
     }
@@ -360,10 +360,10 @@ DROP KEY `{$dao->CONSTRAINT_NAME}`";
       if ($update) {
         $sql = "UPDATE civicrm_saved_search SET form_values = %0 WHERE id = %1";
         CRM_Core_DAO::executeQuery($sql,
-          array(
-            array(serialize($formValues), 'String'),
-            array($dao->id, 'Integer'),
-          )
+          [
+            [serialize($formValues), 'String'],
+            [$dao->id, 'Integer'],
+          ]
         );
       }
     }

@@ -18,7 +18,7 @@ class CRM_Core_CodeGen_Util_ArraySyntaxConverter {
     $tokens = token_get_all($code);
 
     // - - - - - PARSE CODE - - - - -
-    $replacements = array();
+    $replacements = [];
     $offset = 0;
     for ($i = 0; $i < count($tokens); ++$i) {
       // Keep track of the current byte offset in the source code
@@ -43,11 +43,11 @@ class CRM_Core_CodeGen_Util_ArraySyntaxConverter {
         }
         if ($isArraySyntax) {
           // Replace "array" and the opening bracket (including preceeding whitespace) with "["
-          $replacements[] = array(
+          $replacements[] = [
             'start' => $offset - strlen($tokens[$i][1]),
             'end' => $subOffset,
             'string' => '[',
-          );
+          ];
           // Look for matching closing bracket (")")
           $subOffset = $offset;
           $openBracketsCount = 0;
@@ -60,11 +60,11 @@ class CRM_Core_CodeGen_Util_ArraySyntaxConverter {
               --$openBracketsCount;
               if ($openBracketsCount == 0) {
                 // Replace ")" with "]"
-                $replacements[] = array(
+                $replacements[] = [
                   'start' => $subOffset - 1,
                   'end' => $subOffset,
                   'string' => ']',
-                );
+                ];
                 break;
               }
             }

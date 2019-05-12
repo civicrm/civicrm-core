@@ -62,7 +62,7 @@ class CRM_Utils_Check_Message {
    * @var array
    *   actions which can be performed with this message
    */
-  private $actions = array();
+  private $actions = [];
 
   /**
    * @var string
@@ -173,12 +173,12 @@ class CRM_Utils_Check_Message {
    *   Params to be passed to CRM.api3 or CRM.url depending on type
    */
   public function addAction($title, $confirmation, $type, $params) {
-    $this->actions[] = array(
+    $this->actions[] = [
       'title' => $title,
       'confirm' => $confirmation,
       'type' => $type,
       'params' => $params,
-    );
+    ];
   }
 
   /**
@@ -207,7 +207,7 @@ class CRM_Utils_Check_Message {
    * @return array
    */
   public function toArray() {
-    $array = array(
+    $array = [
       'name' => $this->name,
       'message' => $this->message,
       'title' => $this->title,
@@ -215,7 +215,7 @@ class CRM_Utils_Check_Message {
       'severity_id' => $this->level,
       'is_visible' => (int) $this->isVisible(),
       'icon' => $this->icon,
-    );
+    ];
     if ($this->getHiddenUntil()) {
       $array['hidden_until'] = $this->getHiddenUntil();
     }
@@ -267,14 +267,14 @@ class CRM_Utils_Check_Message {
     if ($this->level < 2) {
       return FALSE;
     }
-    $statusPreferenceParams = array(
+    $statusPreferenceParams = [
       'name' => $this->getName(),
       'domain_id' => CRM_Core_Config::domainID(),
       'sequential' => 1,
-    );
+    ];
     // Check if there's a StatusPreference matching this name/domain.
     $statusPreference = civicrm_api3('StatusPreference', 'get', $statusPreferenceParams);
-    $prefs = CRM_Utils_Array::value('values', $statusPreference, array());
+    $prefs = CRM_Utils_Array::value('values', $statusPreference, []);
     if ($prefs) {
       // If so, compare severity to StatusPreference->severity.
       if ($this->level <= $prefs[0]['ignore_severity']) {

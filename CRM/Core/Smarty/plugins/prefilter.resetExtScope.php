@@ -8,8 +8,7 @@
  * @return string
  */
 function smarty_prefilter_resetExtScope($tpl_source, &$smarty) {
-  return
-    '{crmScope extensionKey=""}'
+  return '{crmScope extensionKey=""}'
     . $tpl_source
     . '{/crmScope}';
 }

@@ -52,17 +52,17 @@
   <div id="claim_level-wrapper" class="dataTables_wrapper">
     <table id="claim_level-table" class="display">
       <thead>
-      <tr>
-        <th>{ts}Contact 1{/ts}</th>
-        <th>{ts}Contact 2 (Duplicate){/ts}</th>
-        <th data-orderable="false"></th>
-      </tr>
+        <tr>
+          <th>{ts}Contact 1{/ts}</th>
+          <th>{ts}Contact 2 (Duplicate){/ts}</th>
+          <th data-orderable="false"></th>
+        </tr>
       </thead>
       <tbody>
-      {assign var="rowClass" value="odd-row"}
-      {assign var="rowCount" value=0}
+        {assign var="rowClass" value="odd-row"}
+        {assign var="rowCount" value=0}
 
-      {foreach from=$exceptions key=errorId item=exception}
+        {foreach from=$exceptions key=errorId item=exception}
         {assign var="rowCount" value=$rowCount+1}
 
         <tr id="row{$rowCount}" class="{cycle values="odd,even"}">

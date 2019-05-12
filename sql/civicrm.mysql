@@ -1497,8 +1497,8 @@ CREATE TABLE `civicrm_dedupe_exception` (
 
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Unique dedupe exception id',
-     `contact_id1` int unsigned    COMMENT 'FK to Contact ID',
-     `contact_id2` int unsigned    COMMENT 'FK to Contact ID' 
+     `contact_id1` int unsigned NOT NULL   COMMENT 'FK to Contact ID',
+     `contact_id2` int unsigned NOT NULL   COMMENT 'FK to Contact ID' 
 ,
         PRIMARY KEY (`id`)
  
@@ -2982,6 +2982,7 @@ CREATE TABLE `civicrm_payment_processor` (
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Payment Processor ID',
      `domain_id` int unsigned NOT NULL   COMMENT 'Which Domain is this match entry for',
      `name` varchar(64)    COMMENT 'Payment Processor Name.',
+     `title` varchar(127)    COMMENT 'Payment Processor Descriptive Name.',
      `description` varchar(255)    COMMENT 'Payment Processor Description.',
      `payment_processor_type_id` int unsigned    ,
      `is_active` tinyint    COMMENT 'Is this processor active?',
@@ -4084,7 +4085,7 @@ CREATE TABLE `civicrm_contribution_recur` (
 
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Contribution Recur ID',
-     `contact_id` int unsigned NOT NULL   COMMENT 'Foreign key to civicrm_contact.id .',
+     `contact_id` int unsigned NOT NULL   COMMENT 'Foreign key to civicrm_contact.id.',
      `amount` decimal(20,2) NOT NULL   COMMENT 'Amount to be contributed or charged each recurrence.',
      `currency` varchar(3)   DEFAULT NULL COMMENT '3 character string, value from config setting or input via user.',
      `frequency_unit` varchar(8)   DEFAULT 'month' COMMENT 'Time units for recurrence of payment.',
@@ -4094,6 +4095,7 @@ CREATE TABLE `civicrm_contribution_recur` (
      `create_date` datetime NOT NULL   COMMENT 'When this recurring contribution record was created.',
      `modified_date` datetime    COMMENT 'Last updated date for this record. mostly the last time a payment was received',
      `cancel_date` datetime    COMMENT 'Date this recurring contribution was cancelled by contributor- if we can get access to it',
+     `cancel_reason` text    COMMENT 'Free text field for a reason for cancelling',
      `end_date` datetime    COMMENT 'Date this recurring contribution finished successfully',
      `processor_id` varchar(255)    COMMENT 'Possibly needed to store a unique identifier for this recurring payment order - if this is available from the processor??',
      `payment_token_id` int unsigned    COMMENT 'Optionally used to store a link to a payment token used for this recurring contribution.',
@@ -4399,7 +4401,7 @@ CREATE TABLE `civicrm_price_field_value` (
      `price_field_id` int unsigned NOT NULL   COMMENT 'FK to civicrm_price_field',
      `name` varchar(255)    COMMENT 'Price field option name',
      `label` varchar(255)    COMMENT 'Price field option label',
-     `description` text   DEFAULT NULL COMMENT '>Price field option description.',
+     `description` text   DEFAULT NULL COMMENT 'Price field option description.',
      `help_pre` text   DEFAULT NULL COMMENT 'Price field option pre help text.',
      `help_post` text   DEFAULT NULL COMMENT 'Price field option post field help.',
      `amount` decimal(18,9) NOT NULL   COMMENT 'Price field option amount',

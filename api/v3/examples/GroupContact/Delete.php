@@ -6,10 +6,10 @@
  *   API result array
  */
 function group_contact_delete_example() {
-  $params = array(
+  $params = [
     'id' => 9,
     'skip_undelete' => TRUE,
-  );
+  ];
 
   try{
     $result = civicrm_api3('GroupContact', 'delete', $params);
@@ -19,12 +19,12 @@ function group_contact_delete_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -38,7 +38,7 @@ function group_contact_delete_example() {
  */
 function group_contact_delete_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
@@ -46,7 +46,7 @@ function group_contact_delete_expectedresult() {
     'total_count' => 1,
     'removed' => 0,
     'not_removed' => 0,
-  );
+  ];
 
   return $expectedResult;
 }

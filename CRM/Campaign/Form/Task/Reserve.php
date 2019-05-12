@@ -82,13 +82,13 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
       CRM_Core_Error::statusBounce(ts("Could not find contacts for reservation."));
     }
 
-    $params = array('id' => $this->_surveyId);
+    $params = ['id' => $this->_surveyId];
     CRM_Campaign_BAO_Survey::retrieve($params, $this->_surveyDetails);
 
     //get the survey activities.
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
-    $statusIds = array();
-    foreach (array('Scheduled') as $name) {
+    $statusIds = [];
+    foreach (['Scheduled'] as $name) {
       if ($statusId = array_search($name, $activityStatus)) {
         $statusIds[] = $statusId;
       }
@@ -111,7 +111,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     //append breadcrumb to survey dashboard.
     if (CRM_Campaign_BAO_Campaign::accessCampaign()) {
       $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
-      CRM_Utils_System::appendBreadCrumb(array(array('title' => ts('Survey(s)'), 'url' => $url)));
+      CRM_Utils_System::appendBreadCrumb([['title' => ts('Survey(s)'), 'url' => $url]]);
     }
 
     //set the title.
@@ -127,10 +127,10 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
       }
       elseif (count($this->_contactIds) > ($maxVoters - $this->_numVoters)) {
         $errorMsg = ts('You can reserve a maximum of %count contact at a time for this survey.',
-          array(
+          [
             'plural' => 'You can reserve a maximum of %count contacts at a time for this survey.',
             'count' => $maxVoters - $this->_numVoters,
-          )
+          ]
         );
       }
     }
@@ -138,10 +138,10 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     $defaultNum = CRM_Utils_Array::value('default_number_of_contacts', $this->_surveyDetails);
     if (!$errorMsg && $defaultNum && (count($this->_contactIds) > $defaultNum)) {
       $errorMsg = ts('You can reserve a maximum of %count contact at a time for this survey.',
-        array(
+        [
           'plural' => 'You can reserve a maximum of %count contacts at a time for this survey.',
           'count' => $defaultNum,
-        )
+        ]
       );
     }
 
@@ -163,37 +163,37 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     if (is_array($groups) && !empty($groups)) {
       $hasExistingGroups = TRUE;
       $this->addElement('select', 'groups', ts('Add respondent(s) to existing group(s)'),
-        $groups, array('multiple' => "multiple", 'class' => 'crm-select2')
+        $groups, ['multiple' => "multiple", 'class' => 'crm-select2']
       );
     }
     $this->assign('hasExistingGroups', $hasExistingGroups);
 
-    $buttons = array(
-      array(
+    $buttons = [
+      [
         'type' => 'done',
         'name' => ts('Reserve'),
         'subName' => 'reserve',
         'isDefault' => TRUE,
-      ),
-    );
+      ],
+    ];
 
     if (CRM_Core_Permission::check('manage campaign') ||
       CRM_Core_Permission::check('administer CiviCampaign') ||
       CRM_Core_Permission::check('interview campaign contacts')
     ) {
-      $buttons[] = array(
+      $buttons[] = [
         'type' => 'next',
         'name' => ts('Reserve and Interview'),
         'subName' => 'reserveToInterview',
-      );
+      ];
     }
-    $buttons[] = array(
+    $buttons[] = [
       'type' => 'back',
       'name' => ts('Cancel'),
-    );
+    ];
 
     $this->addButtons($buttons);
-    $this->addFormRule(array('CRM_Campaign_Form_Task_Reserve', 'formRule'), $this);
+    $this->addFormRule(['CRM_Campaign_Form_Task_Reserve', 'formRule'], $this);
   }
 
   /**
@@ -209,19 +209,19 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $files, $self) {
-    $errors = array();
+    $errors = [];
     $invalidGroupName = FALSE;
     if (!empty($fields['newGroupName'])) {
       $title = trim($fields['newGroupName']);
       $name = CRM_Utils_String::titleToVar($title);
       $query = 'select count(*) from civicrm_group where name like %1 OR title like %2';
-      $grpCnt = CRM_Core_DAO::singleValueQuery($query, array(
-        1 => array($name, 'String'),
-        2 => array($title, 'String'),
-      ));
+      $grpCnt = CRM_Core_DAO::singleValueQuery($query, [
+        1 => [$name, 'String'],
+        2 => [$title, 'String'],
+      ]);
       if ($grpCnt) {
         $invalidGroupName = TRUE;
-        $errors['newGroupName'] = ts('Group \'%1\' already exists.', array(1 => $fields['newGroupName']));
+        $errors['newGroupName'] = ts('Group \'%1\' already exists.', [1 => $fields['newGroupName']]);
       }
     }
     $self->assign('invalidGroupName', $invalidGroupName);
@@ -239,14 +239,14 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     $activityStatus = CRM_Core_PseudoConstant::activityStatus('name');
     $statusHeld = array_search('Scheduled', $activityStatus);
 
-    $reservedVoterIds = array();
+    $reservedVoterIds = [];
     foreach ($this->_contactIds as $cid) {
       $subject = $this->_surveyDetails['title'] . ' - ' . ts('Respondent Reservation');
       $session = CRM_Core_Session::singleton();
-      $activityParams = array(
+      $activityParams = [
         'source_contact_id' => $session->get('userID'),
-        'assignee_contact_id' => array($this->_interviewerId),
-        'target_contact_id' => array($cid),
+        'assignee_contact_id' => [$this->_interviewerId],
+        'target_contact_id' => [$cid],
         'source_record_id' => $this->_surveyId,
         'activity_type_id' => $this->_surveyDetails['activity_type_id'],
         'subject' => $subject,
@@ -254,7 +254,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
         'status_id' => $statusHeld,
         'skipRecentView' => 1,
         'campaign_id' => CRM_Utils_Array::value('campaign_id', $this->_surveyDetails),
-      );
+      ];
       $activity = CRM_Activity_BAO_Activity::create($activityParams);
       if ($activity->id) {
         $countVoters++;
@@ -270,10 +270,10 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
 
     // Success message
     if ($countVoters > 0) {
-      $status = '<p>' . ts("%count contact has been reserved.", array('plural' => '%count contacts have been reserved.', 'count' => $countVoters)) . '</p>';
+      $status = '<p>' . ts("%count contact has been reserved.", ['plural' => '%count contacts have been reserved.', 'count' => $countVoters]) . '</p>';
       if ($groupAdditions) {
         $status .= '<p>' . ts('They have been added to %1.',
-            array(1 => implode(' ' . ts('and') . ' ', $groupAdditions))
+            [1 => implode(' ' . ts('and') . ' ', $groupAdditions)]
           ) . '</p>';
       }
       CRM_Core_Session::setStatus($status, ts('Reservation Added'), 'success');
@@ -281,10 +281,10 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     // Error message
     if (count($this->_contactIds) > $countVoters) {
       CRM_Core_Session::setStatus(ts('Reservation did not add for %count contact.',
-        array(
+        [
           'plural' => 'Reservation did not add for %count contacts.',
           'count' => (count($this->_contactIds) - $countVoters),
-        )
+        ]
       ), ts('Notice'));
     }
 
@@ -306,24 +306,24 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
    * @return array
    */
   private function _addRespondentToGroup($contactIds) {
-    $groupAdditions = array();
+    $groupAdditions = [];
     if (empty($contactIds)) {
       return $groupAdditions;
     }
 
     $params = $this->controller->exportValues($this->_name);
-    $groups = CRM_Utils_Array::value('groups', $params, array());
+    $groups = CRM_Utils_Array::value('groups', $params, []);
     $newGroupName = CRM_Utils_Array::value('newGroupName', $params);
     $newGroupDesc = CRM_Utils_Array::value('newGroupDesc', $params);
 
     $newGroupId = NULL;
     //create new group.
     if ($newGroupName) {
-      $grpParams = array(
+      $grpParams = [
         'title' => $newGroupName,
         'description' => $newGroupDesc,
         'is_active' => TRUE,
-      );
+      ];
       $group = CRM_Contact_BAO_Group::create($grpParams);
       $groups[] = $newGroupId = $group->id;
     }

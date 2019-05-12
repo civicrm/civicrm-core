@@ -58,15 +58,15 @@ class CRM_Contact_Form_Edit_Household {
     if (!$inlineEditMode || $inlineEditMode == 2) {
       // nick_name
       $form->addField('nick_name');
-      $form->addField('contact_source', array('label' => ts('Source')));
+      $form->addField('contact_source', ['label' => ts('Source')]);
     }
 
     if (!$inlineEditMode) {
-      $form->addField('external_identifier', array('label' => ts('External ID')));
+      $form->addField('external_identifier', ['label' => ts('External ID')]);
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),
         'objectExists',
-        array('CRM_Contact_DAO_Contact', $form->_contactId, 'external_identifier')
+        ['CRM_Contact_DAO_Contact', $form->_contactId, 'external_identifier']
       );
     }
   }
@@ -84,7 +84,7 @@ class CRM_Contact_Form_Edit_Household {
    *   $error
    */
   public static function formRule($fields, $files, $contactID = NULL) {
-    $errors = array();
+    $errors = [];
     $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID, 'Household');
 
     // make sure that household name is set

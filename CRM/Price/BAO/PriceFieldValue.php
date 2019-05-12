@@ -47,7 +47,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @return CRM_Price_DAO_PriceFieldValue
    */
-  public static function add(&$params, $ids = array()) {
+  public static function add(&$params, $ids = []) {
 
     $fieldValueBAO = new CRM_Price_BAO_PriceFieldValue();
     $fieldValueBAO->copyValues($params);
@@ -66,7 +66,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     }
     if (!empty($params['is_default'])) {
       $query = 'UPDATE civicrm_price_field_value SET is_default = 0 WHERE  price_field_id = %1';
-      $p = array(1 => array($params['price_field_id'], 'Integer'));
+      $p = [1 => [$params['price_field_id'], 'Integer']];
       CRM_Core_DAO::executeQuery($query, $p);
     }
 
@@ -86,7 +86,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    *
    * @return CRM_Price_DAO_PriceFieldValue
    */
-  public static function create(&$params, $ids = array()) {
+  public static function create(&$params, $ids = []) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
     if (!is_array($params) || empty($params)) {
       return NULL;
@@ -104,7 +104,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       if ($id) {
         $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $id, 'weight', 'id');
       }
-      $fieldValues = array('price_field_id' => CRM_Utils_Array::value('price_field_id', $params, 0));
+      $fieldValues = ['price_field_id' => CRM_Utils_Array::value('price_field_id', $params, 0)];
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceFieldValue', $oldWeight, $params['weight'], $fieldValues);
     }
     else {
@@ -132,10 +132,10 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @return array
    */
   public static function getDefaults() {
-    return array(
+    return [
       'is_active' => 1,
       'weight' => 1,
-    );
+    ];
 
   }
 
@@ -283,11 +283,11 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
     if (!$entityId || !$entityTable || !$financialTypeID) {
       return;
     }
-    $params = array(
-      1 => array($entityId, 'Integer'),
-      2 => array($entityTable, 'String'),
-      3 => array($financialTypeID, 'Integer'),
-    );
+    $params = [
+      1 => [$entityId, 'Integer'],
+      2 => [$entityTable, 'String'],
+      3 => [$financialTypeID, 'Integer'],
+    ];
     // for event discount
     $join = $where = '';
     if ($entityTable == 'civicrm_event') {
@@ -330,10 +330,10 @@ WHERE cpse.id IS NOT NULL {$where}";
       CRM_Price_BAO_LineItem::create($lineItemParams);
 
       // update amount and fee level in civicrm_contribution and civicrm_participant
-      $params = array(
-        1 => array(CRM_Core_DAO::VALUE_SEPARATOR . $prevLabel . ' -', 'String'),
-        2 => array(CRM_Core_DAO::VALUE_SEPARATOR . $newLabel . ' -', 'String'),
-      );
+      $params = [
+        1 => [CRM_Core_DAO::VALUE_SEPARATOR . $prevLabel . ' -', 'String'],
+        2 => [CRM_Core_DAO::VALUE_SEPARATOR . $newLabel . ' -', 'String'],
+      ];
       // Update contribution
       if (!empty($lineItem->contribution_id)) {
         CRM_Core_DAO::executeQuery("UPDATE `civicrm_contribution` SET `amount_level` = REPLACE(amount_level, %1, %2) WHERE id = {$lineItem->contribution_id}", $params);
