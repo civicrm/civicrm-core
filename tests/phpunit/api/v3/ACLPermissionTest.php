@@ -571,15 +571,19 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
   }
 
   /**
-   * View all activities is required unless id is passed in, in which case ACLs are used.
+   * Check the error message is not a permission error.
    */
-  public function testGetActivityAccessCiviCRMNotEnough() {
+  public function testGetActivityAccessCiviCRMEnough() {
     $activity = $this->activityCreate();
     $this->setPermissions(['access CiviCRM']);
     $this->callAPIFailure('Activity', 'getsingle', [
       'check_permissions' => 1,
       'id' => $activity['id'],
-    ]);
+    ], 'Expected one Activity but found 0');
+    $this->callAPISuccessGetCount('Activity', [
+      'check_permissions' => 1,
+      'id' => $activity['id'],
+    ], 0);
   }
 
   /**
