@@ -705,7 +705,6 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       'source_contact_id',
       'source_contact_name',
       'assignee_contact_id',
-      'target_contact_id',
       'assignee_contact_name',
       'status_id',
       'subject',
@@ -719,7 +718,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
         $activityParams['return'][] = $attr;
       }
     }
-    $result = civicrm_api3('Activity', 'Get', $activityParams);
+    $result = civicrm_api3('Activity', 'Get', $activityParams)['values'];
 
     $bulkActivityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Bulk Email');
     $allCampaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
@@ -730,44 +729,83 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       (CRM_Mailing_Info::workflowEnabled() && CRM_Core_Permission::check('create mailings'))
     );
 
+    // @todo - get rid of this & just handle in the array declaration like we do with 'subject' etc.
     $mappingParams = [
-      'id' => 'activity_id',
       'source_record_id' => 'source_record_id',
       'activity_type_id' => 'activity_type_id',
-      'activity_date_time' => 'activity_date_time',
       'status_id' => 'status_id',
-      'subject' => 'subject',
       'campaign_id' => 'campaign_id',
-      'assignee_contact_name' => 'assignee_contact_name',
-      'source_contact_id' => 'source_contact_id',
-      'source_contact_name' => 'source_contact_name',
       'case_id' => 'case_id',
     ];
 
-    foreach ($result['values'] as $id => $activity) {
-
-      $activities[$id] = [];
-
-      $isBulkActivity = (!$bulkActivityTypeID || ($bulkActivityTypeID === $activity['activity_type_id']));
-      $activities[$id]['target_contact_counter'] = count($activity['target_contact_id']);
-      if ($activities[$id]['target_contact_counter']) {
-        try {
-          $activities[$id]['target_contact_name'][$activity['target_contact_id'][0]] = civicrm_api3('Contact', 'getvalue', ['id' => $activity['target_contact_id'][0], 'return' => 'sort_name']);
+    if (empty($result)) {
+      $targetCount = [];
+    }
+    else {
+      $targetCount = CRM_Core_DAO::executeQuery('
+      SELECT activity_id, count(*) as target_contact_count
+      FROM civicrm_activity_contact
+      INNER JOIN civicrm_contact c ON contact_id = c.id AND c.is_deleted = 0
+      WHERE activity_id IN (' . implode(',', array_keys($result)) . ')
+      AND record_type_id = %1
+      GROUP BY activity_id', [
+        1 => [
+          CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets'),
+          'Integer'
+        ]
+      ])->fetchAll();
+    }
+    foreach ($targetCount as $activityTarget) {
+      $result[$activityTarget['activity_id']]['target_contact_count'] = $activityTarget['target_contact_count'];
+    }
+    // Iterate through & do basic mappings & determine which ones we want to retrieve target count for.
+    foreach ($result as $id => $activity) {
+      $activities[$id] = [
+        'activity_id' => $activity['id'],
+        'activity_date_time' => CRM_Utils_Array::value('activity_date_time', $activity),
+        'subject' => CRM_Utils_Array::value('subject', $activity),
+        'assignee_contact_name' => CRM_Utils_Array::value('assignee_contact_sort_name', $activity, []),
+        'source_contact_id' => CRM_Utils_Array::value('source_contact_id', $activity),
+        'source_contact_name' => CRM_Utils_Array::value('source_contact_sort_name', $activity),
+      ];
+      $activities[$id]['activity_type_name'] = CRM_Core_PseudoConstant::getName('CRM_Activity_BAO_Activity', 'activity_type_id', $activity['activity_type_id']);
+      $activities[$id]['activity_type'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $activity['activity_type_id']);
+      $activities[$id]['target_contact_count'] = CRM_Utils_Array::value('target_contact_count', $activity, 0);
+      if (!empty($activity['target_contact_count'])) {
+        $displayedTarget = civicrm_api3('ActivityContact', 'get', [
+          'activity_id' => $id,
+          'check_permissions' => TRUE,
+          'options' => ['limit' => 1],
+          'record_type_id' => 'Activity Targets',
+          'return' => ['contact_id.sort_name', 'contact_id'],
+          'sequential' => 1,
+        ])['values'];
+        if (empty($displayedTarget[0])) {
+          $activities[$id]['target_contact_name'] = [];
         }
-        catch (CiviCRM_API3_Exception $e) {
-          // Really they should have names but a fatal here feels wrong.
-          $activities[$id]['target_contact_name'] = '';
+        else {
+          $activities[$id]['target_contact_name'] = [$displayedTarget[0]['contact_id'] => $displayedTarget[0]['contact_id.sort_name']];
         }
       }
+      if ($activities[$id]['activity_type_name'] === 'Bulk Email') {
+        $bulkActivities[] = $id;
+        // Get the total without permissions being passed but only display names after permissioning.
+        $activities[$id]['recipients'] = ts('(%1 recipients)', [1 => $activities[$id]['target_contact_count']]);
+      }
+    }
+
+    // Eventually this second iteration should just handle the target contacts. It's a bit muddled at
+    // the moment as the bulk activity stuff needs unravelling & test coverage.
+    foreach ($result as $id => $activity) {
+      $isBulkActivity = (!$bulkActivityTypeID || ($bulkActivityTypeID === $activity['activity_type_id']));
       foreach ($mappingParams as $apiKey => $expectedName) {
         if (in_array($apiKey, [
-          'assignee_contact_name',
           'target_contact_name',
         ])) {
-          $activities[$id][$expectedName] = CRM_Utils_Array::value($apiKey, $activity, []);
 
           if ($isBulkActivity) {
-            $activities[$id]['recipients'] = ts('(%1 recipients)', [1 => count($activity['target_contact_name'])]);
+            // @todo  - how is this used? Couldn't we use 'is_bulk' or something clearer?
+            // or the calling function could handle
             $activities[$id]['mailingId'] = FALSE;
             if ($accessCiviMail &&
               ($mailingIDs === TRUE || in_array($activity['source_record_id'], $mailingIDs))
@@ -786,11 +824,9 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
           }
         }
         else {
+          // @todo this generic assign could just be handled in array declaration earlier.
           $activities[$id][$expectedName] = CRM_Utils_Array::value($apiKey, $activity);
-          if ($apiKey == 'activity_type_id') {
-            $activities[$id]['activity_type'] = CRM_Core_PseudoConstant::getName('CRM_Activity_BAO_Activity', 'activity_type_id', $activities[$id][$expectedName]);
-          }
-          elseif ($apiKey == 'campaign_id') {
+          if ($apiKey == 'campaign_id') {
             $activities[$id]['campaign'] = CRM_Utils_Array::value($activities[$id][$expectedName], $allCampaigns);
           }
         }
@@ -2525,7 +2561,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
         elseif (!empty($values['recipients'])) {
           $activity['target_contact_name'] = $values['recipients'];
         }
-        elseif (isset($values['target_contact_counter']) && $values['target_contact_counter']) {
+        elseif (isset($values['target_contact_count']) && $values['target_contact_count']) {
           $activity['target_contact_name'] = '';
           $firstTargetName = reset($values['target_contact_name']);
           $firstTargetContactID = key($values['target_contact_name']);
@@ -2542,7 +2578,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
             $activity['target_contact_name'] .= $targetLink;
           }
 
-          if ($extraCount = $values['target_contact_counter'] - 1) {
+          if ($extraCount = $values['target_contact_count'] - 1) {
             $activity['target_contact_name'] .= ";<br />" . "(" . ts('%1 more', [1 => $extraCount]) . ")";
           }
           if ($showContactOverlay) {
