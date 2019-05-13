@@ -1357,12 +1357,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     $params = array_merge($defaults, $params);
 
-    //have a crack @ deleting it first in the hope this will prevent derailing our tests
-    $this->callAPISuccess('custom_group', 'get', array(
-      'title' => $params['title'],
-      array('api.custom_group.delete' => 1),
-    ));
-
     return $this->callAPISuccess('custom_group', 'create', $params);
   }
 
