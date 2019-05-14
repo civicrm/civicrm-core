@@ -516,6 +516,9 @@
   organization: Edinburgh College
   jira        : grahamsmith
 
+- name        : Guillaume Rischard
+  github      : grischard
+
 - github      : guanhuan
   name        : Guanhuan Chen
   organization: CompuCorp
@@ -1219,6 +1222,10 @@
 - github      : rubofvil
   name        : Rubén Pineda
   organization: iXiam
+
+- github      : scoobird
+  name        : Morgan Robinson
+  organization: Palante
 
 - name        : Steve Binkowski
   jira        : s.bink
