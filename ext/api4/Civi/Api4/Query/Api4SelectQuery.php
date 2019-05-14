@@ -77,6 +77,7 @@ class Api4SelectQuery extends SelectQuery {
   public function __construct($entity, $checkPermissions) {
     require_once 'api/v3/utils.php';
     $this->entity = $entity;
+    $this->checkPermissions = $checkPermissions;
 
     $baoName = CoreUtil::getDAOFromApiName($entity);
     $bao = new $baoName();
@@ -87,7 +88,6 @@ class Api4SelectQuery extends SelectQuery {
     \CRM_Utils_SQL_Select::from($this->getTableName($baoName) . ' ' . self::MAIN_TABLE_ALIAS);
 
     // Add ACLs first to avoid redundant subclauses
-    $this->checkPermissions = $checkPermissions;
     $this->query->where($this->getAclClause(self::MAIN_TABLE_ALIAS, $baoName));
   }
 
@@ -294,7 +294,7 @@ class Api4SelectQuery extends SelectQuery {
    * @inheritDoc
    */
   protected function getFields() {
-    $fields = civicrm_api4($this->entity, 'getFields', ['action' => 'get', 'includeCustom' => FALSE])->indexBy('name');
+    $fields = civicrm_api4($this->entity, 'getFields', ['action' => 'get', 'checkPermissions' => $this->checkPermissions, 'includeCustom' => FALSE])->indexBy('name');
     return (array) $fields;
   }
 
@@ -318,6 +318,7 @@ class Api4SelectQuery extends SelectQuery {
 
   /**
    * @param $key
+   * @throws \API_Exception
    */
   protected function joinFK($key) {
     $pathArray = explode('.', $key);
@@ -350,6 +351,10 @@ class Api4SelectQuery extends SelectQuery {
       foreach ($lastLink->getEntityFields() as $fieldObject) {
         $this->apiFieldSpec[$prefix . $fieldObject->getName()] = $fieldObject->toArray() + ['entity' => $joinEntity];
       }
+    }
+
+    if (!$lastLink->getField($field)) {
+      throw new \API_Exception('Invalid join');
     }
 
     // custom groups use aliases for field names

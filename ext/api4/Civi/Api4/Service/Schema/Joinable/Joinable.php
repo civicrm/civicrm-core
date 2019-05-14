@@ -248,7 +248,7 @@ class Joinable {
   }
 
   /**
-   * @return FieldSpec[]
+   * @return \Civi\Api4\Service\Spec\FieldSpec[]
    */
   public function getEntityFields() {
     if (!$this->entityFields) {
@@ -260,6 +260,18 @@ class Joinable {
       }
     }
     return $this->entityFields;
+  }
+
+  /**
+   * @return \Civi\Api4\Service\Spec\FieldSpec|NULL
+   */
+  public function getField($fieldName) {
+    foreach ($this->getEntityFields() as $field) {
+      if ($field->getName() === $fieldName) {
+        return $field;
+      }
+    }
+    return NULL;
   }
 
 }

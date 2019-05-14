@@ -29,4 +29,11 @@ class Contact extends Generic\DAOEntity {
     return new Generic\DAOUpdateAction(__CLASS__, __FUNCTION__, ['id', 'contact_type']);
   }
 
+  /**
+   * @return \Civi\Api4\Action\Contact\GetFields
+   */
+  public static function getFields() {
+    return new Action\Contact\GetFields(__CLASS__, __FUNCTION__);
+  }
+
 }
