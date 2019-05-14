@@ -32,6 +32,9 @@ class CustomGroupJoinable extends Joinable {
       self::JOIN_TYPE_ONE_TO_MANY : self::JOIN_TYPE_ONE_TO_ONE;
   }
 
+  /**
+   * @inheritDoc
+   */
   public function getEntityFields() {
     if (!$this->entityFields) {
       $fields = CustomField::get()
@@ -43,6 +46,19 @@ class CustomGroupJoinable extends Joinable {
       }
     }
     return $this->entityFields;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function getField($fieldName) {
+    foreach ($this->getEntityFields() as $field) {
+      $name = $field->getName();
+      if ($name === $fieldName || strrpos($name, '.' . $fieldName) === strlen($name) - strlen($fieldName) - 1) {
+        return $field;
+      }
+    }
+    return NULL;
   }
 
   /**
