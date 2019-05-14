@@ -258,7 +258,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->_id = NULL;
     }
     else {
-      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive');
     }
 
     if ($this->_id) {
