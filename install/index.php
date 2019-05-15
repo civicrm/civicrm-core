@@ -63,14 +63,16 @@ global $installURLPath;
 // Set the install type
 // this is sent as a query string when the page is first loaded
 // and subsequently posted to the page as a hidden field
-if (isset($_POST['civicrm_install_type'])) {
+// only permit acceptable installation types to prevent issues;
+$acceptableInstallTypes = ['drupal', 'wordpress', 'backdrop'];
+if (isset($_POST['civicrm_install_type']) && in_array($_POST['civicrm_install_type'], $acceptableInstallTypes)) {
   $installType = $_POST['civicrm_install_type'];
 }
-elseif (isset($_GET['civicrm_install_type'])) {
+elseif (isset($_GET['civicrm_install_type']) && in_array(strtolower($_GET['civicrm_install_type']), $acceptableInstallTypes)) {
   $installType = strtolower($_GET['civicrm_install_type']);
 }
 else {
-  // default value if not set
+  // default value if not set and not an acceptable install type.
   $installType = "drupal";
 }
 

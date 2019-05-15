@@ -1318,6 +1318,9 @@ SELECT is_primary,
           }
         }
         if (!empty($props['country_id'])) {
+          if (!CRM_Utils_Rule::commaSeparatedIntegers(implode(',', (array) $props['country_id']))) {
+            throw new CRM_Core_Exception(ts('Province limit or default country setting is incorrect'));
+          }
           $params['condition'] = 'country_id IN (' . implode(',', (array) $props['country_id']) . ')';
         }
         break;
@@ -1330,6 +1333,9 @@ SELECT is_primary,
         if ($context != 'get' && $context != 'validate') {
           $config = CRM_Core_Config::singleton();
           if (!empty($config->countryLimit) && is_array($config->countryLimit)) {
+            if (!CRM_Utils_Rule::commaSeparatedIntegers(implode(',', $config->countryLimit))) {
+              throw new CRM_Core_Exception(ts('Available Country setting is incorrect'));
+            }
             $params['condition'] = 'id IN (' . implode(',', $config->countryLimit) . ')';
           }
         }
@@ -1338,6 +1344,9 @@ SELECT is_primary,
       // Filter county list based on chosen state
       case 'county_id':
         if (!empty($props['state_province_id'])) {
+          if (!CRM_Utils_Rule::commaSeparatedIntegers(implode(',', (array) $props['state_province_id']))) {
+            throw new CRM_Core_Exception(ts('Can only accept Integers for state_province_id filtering'));
+          }
           $params['condition'] = 'state_province_id IN (' . implode(',', (array) $props['state_province_id']) . ')';
         }
         break;
