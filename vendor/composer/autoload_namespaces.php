@@ -12,7 +12,7 @@ return array(
     'Sabberworm\\CSS' => array($vendorDir . '/sabberworm/php-css-parser/lib'),
     'PHPUnit_' => array($baseDir . '/packages'),
     'PEAR' => array($vendorDir . '/pear/pear_exception'),
-    'Net' => array($vendorDir . '/pear/net_smtp', $vendorDir . '/pear/net_socket', $vendorDir . '/phpseclib/phpseclib/phpseclib'),
+    'Net' => array($vendorDir . '/phpseclib/phpseclib/phpseclib', $vendorDir . '/pear/net_socket', $vendorDir . '/pear/net_smtp'),
     'Math' => array($vendorDir . '/phpseclib/phpseclib/phpseclib'),
     'Mail' => array($vendorDir . '/pear/mail'),
     'Log' => array($vendorDir . '/pear/log'),
