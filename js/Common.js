@@ -145,40 +145,6 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
 }
 
 /**
- * Function to change button text and disable one it is clicked
- * @deprecated
- * @param obj object - the button clicked
- * @param formID string - the id of the form being submitted
- * @param string procText - button text after user clicks it
- * @return bool
- */
-var submitcount = 0;
-/* Changes button label on submit, and disables button after submit for newer browsers.
- Puts up alert for older browsers. */
-function submitOnce(obj, formId, procText) {
-  // if named button clicked, change text
-  if (obj.value != null) {
-    cj('input[name=' + obj.name + ']').val(procText + " ...");
-  }
-  cj(obj).closest('form').attr('data-warn-changes', 'false');
-  if (document.getElementById) { // disable submit button for newer browsers
-    cj('input[name=' + obj.name + ']').attr("disabled", true);
-    document.getElementById(formId).submit();
-    return true;
-  }
-  else { // for older browsers
-    if (submitcount == 0) {
-      submitcount++;
-      return true;
-    }
-    else {
-      alert("Your request is currently being processed ... Please wait.");
-      return false;
-    }
-  }
-}
-
-/**
  * Function to show / hide the row in optionFields
  * @deprecated
  * @param index string, element whose innerHTML is to hide else will show the hidden row.

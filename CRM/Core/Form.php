@@ -640,9 +640,15 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function addButtons($params) {
     $prevnext = $spacing = [];
+    $addedButtonOverride = FALSE;
     foreach ($params as $button) {
       if (!empty($button['submitOnce'])) {
         $button['js']['onclick'] = "return submitOnce(this,'{$this->_name}','" . ts('Processing') . "');";
+        if (! $addedButtonOverride) {
+          $addedButtonOverride = TRUE;
+          // @see js/Common.js::submitOnce() and CRM_Core_Controller::getButtonName() and HTML_QuickForm_Controller::getActionName().
+          $this->addElement('hidden', '_qf_button_override', '', ['id' => '_qf_button_override']);
+        }
       }
 
       $attrs = ['class' => 'crm-form-submit'] + (array) CRM_Utils_Array::value('js', $button);
@@ -1270,7 +1276,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         'isDefault' => TRUE,
       ];
       if ($submitOnce) {
-        $nextButton['js'] = ['onclick' => "return submitOnce(this,'{$this->_name}','" . ts('Processing') . "');"];
+        $nextButton['submitOnce'] = TRUE;
       }
       $buttons[] = $nextButton;
     }

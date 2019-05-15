@@ -204,6 +204,7 @@ class CRM_Case_Form_Activity_OpenCase {
         'type' => 'upload',
         'name' => ts('Save and New'),
         'subName' => 'new',
+        'submitOnce' => TRUE,
       ],
       [
         'type' => 'cancel',

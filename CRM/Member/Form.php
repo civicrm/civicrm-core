@@ -290,11 +290,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
           'type' => 'upload',
           'name' => ts('Save'),
           'isDefault' => TRUE,
+          'submitOnce' => TRUE,
         ],
         [
           'type' => 'upload',
           'name' => ts('Save and New'),
           'subName' => 'new',
+          'submitOnce' => TRUE,
         ],
         [
           'type' => 'cancel',

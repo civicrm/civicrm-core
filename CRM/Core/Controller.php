@@ -478,6 +478,10 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    */
   public function getButtonName() {
     $data = &$this->container();
+    if (!empty($_REQUEST['_qf_button_override'])) {
+      // @see js/Common.js::submitOnce() and CRM_Core_Form::addButtons() and HTML_QuickForm_Controller::getActionName().
+      return $_REQUEST['_qf_button_override'];
+    }
     return CRM_Utils_Array::value('_qf_button_name', $data);
   }
 
