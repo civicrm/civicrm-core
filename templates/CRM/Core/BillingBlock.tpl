@@ -28,7 +28,7 @@
   {if $paymentFields|@count}
     <fieldset class="billing_mode-group {$paymentTypeName}_info-group">
       <legend>
-        {$paymentTypeLabel}
+        {ts}{$paymentTypeLabel}{/ts}
       </legend>
       {crmRegion name="billing-block-pre"}
       {/crmRegion}
