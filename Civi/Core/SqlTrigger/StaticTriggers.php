@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@ namespace Civi\Core\SqlTrigger;
  * Build a set of simple, literal SQL triggers.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class StaticTriggers {
 
@@ -55,7 +55,6 @@ class StaticTriggers {
   public function __construct($triggers) {
     $this->triggers = $triggers;
   }
-
 
   /**
    * Add our list of triggers to the global list.
@@ -89,7 +88,7 @@ class StaticTriggers {
 
       if (\CRM_Core_Config::isUpgradeMode() && isset($trigger['upgrade_check'])) {
         $uc = $trigger['upgrade_check'];
-        if (!\CRM_Core_DAO::checkFieldExists($uc['table'], $uc['column'])
+        if (!\CRM_Core_BAO_SchemaHandler::checkIfFieldExists($uc['table'], $uc['column'])
         ) {
           continue;
         }

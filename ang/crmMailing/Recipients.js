@@ -136,7 +136,7 @@
             var gids = [];
             var mids = [];
 
-            for (var i in values) {
+            for (var i = 0; i < values.length; i++) {
               var dv = convertValueToObj(values[i]);
               if (dv.entity_type == 'civicrm_group') {
                 gids.push(dv.entity_id);
@@ -145,10 +145,18 @@
                 mids.push(dv.entity_id);
               }
             }
+            // push non existant 0 group/mailing id in order when no recipents group or prior mailing is selected
+            //  this will allow to resuse the below code to handle datamap
+            if (gids.length === 0) {
+              gids.push(0);
+            }
+            if (mids.length === 0) {
+              mids.push(0);
+            }
 
-            CRM.api3('Group', 'getlist', { params: { id: { IN: gids } }, extra: ["is_hidden"] }).then(
+            CRM.api3('Group', 'getlist', { params: { id: { IN: gids }, options: { limit: 0 } }, extra: ["is_hidden"] } ).then(
               function(glist) {
-                CRM.api3('Mailing', 'getlist', { params: { id: { IN: mids } } }).then(
+                CRM.api3('Mailing', 'getlist', { params: { id: { IN: mids }, options: { limit: 0 } } }).then(
                   function(mlist) {
                     var datamap = [];
 
@@ -221,6 +229,11 @@
                 page_num: rcpAjaxState.page_i,
                 params: filterParams,
               };
+
+              if('civicrm_mailing' === rcpAjaxState.entity) {
+                params["api.MailingRecipients.getcount"] = {};
+              }
+
               return params;
             },
             transport: function(params) {
@@ -238,12 +251,18 @@
             results: function(data) {
               results = {
                 children: $.map(data.values, function(obj) {
-                  return {   id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type,
-                             text: obj.label };
+                  if('civicrm_mailing' === rcpAjaxState.entity) {
+                    return obj["api.MailingRecipients.getcount"] > 0 ? {   id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type,
+                               text: obj.label } : '';
+                  }
+                  else {
+                    return {   id: obj.id + ' ' + rcpAjaxState.entity + ' ' + rcpAjaxState.type,
+                               text: obj.label };
+                  }
                 })
               };
 
-              if (rcpAjaxState.page_i == 1 && data.count) {
+              if (rcpAjaxState.page_i == 1 && data.count && results.children.length > 0) {
                 results.text = ts((rcpAjaxState.type == 'include'? 'Include ' : 'Exclude ') +
                   (rcpAjaxState.entity == 'civicrm_group'? 'Group' : 'Mailing'));
               }

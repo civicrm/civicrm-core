@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,7 +41,7 @@
 
 <div class="crm-public-form-item" id="on-behalf-block">
   {crmRegion name="onbehalf-block"}
-    {if $onBehalfOfFields|@count}
+    {if $onBehalfOfFields && $onBehalfOfFields|@count}
       <fieldset>
       <legend>{$fieldSetTitle}</legend>
       {if $form.org_option}

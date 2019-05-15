@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,6 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="crm-activity-userdashboard-pre"}
+{/crmRegion}
 <div class="view-content">
     {if $activity_rows}
         {strip}
@@ -67,3 +69,5 @@ q="action=view&reset=1&id=`$row.activity_id`&cid=`$row.contact_id`&context=dashb
         </div>
     {/if}
 </div>
+{crmRegion name="crm-activity-userdashboard-post"}
+{/crmRegion}

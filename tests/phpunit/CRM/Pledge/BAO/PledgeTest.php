@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -103,7 +103,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
     $params = array('pledge_id' => 0);
     $pledgeId = CRM_Pledge_BAO_Pledge::retrieve($params, $defaults);
 
-    $this->assertEquals(count($pledgeId), 0, "Pledge Id must be greater than 0");
+    $this->assertEquals(is_null($pledgeId), 1, "Pledge Id must be greater than 0");
   }
 
   /**
@@ -114,7 +114,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
     $params = array('pledge_id' => 'random text');
     $pledgeId = CRM_Pledge_BAO_Pledge::retrieve($params, $defaults);
 
-    $this->assertEquals(count($pledgeId), 0, "Pledge Id must be a string");
+    $this->assertEquals(is_null($pledgeId), 1, "Pledge Id must be a string");
   }
 
   /**
@@ -144,7 +144,7 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
 
     $pledgeId = CRM_Pledge_BAO_Pledge::retrieve($pledgeParams, $defaults);
 
-    $this->assertEquals(count($pledgeId), 1, "Pledge was retrieved");
+    $this->assertEquals($pledgeId->N, 1, "Pledge was retrieved");
   }
 
   /**

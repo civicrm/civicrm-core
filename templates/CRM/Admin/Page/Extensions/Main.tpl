@@ -19,7 +19,7 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
       </thead>
       <tbody>
         {foreach from=$localExtensionRows key=extKey item=row}
-        <tr id="extension-{$row.id}" class="crm-entity crm-extension_{$row.id}{if $row.status eq 'disabled'} disabled{/if}{if $row.status eq 'installed-missing' or $row.status eq 'disabled-missing'} extension-missing{/if}{if $row.upgradable} extension-upgradable{elseif $row.status eq 'installed'} extension-installed{/if}">
+        <tr id="extension-{$row.file}" class="crm-entity crm-extension-{$row.file}{if $row.status eq 'disabled'} disabled{/if}{if $row.status eq 'installed-missing' or $row.status eq 'disabled-missing'} extension-missing{/if}{if $row.upgradable} extension-upgradable{elseif $row.status eq 'installed'} extension-installed{/if}">
           <td class="crm-extensions-label">
               <a class="collapsed" href="#"></a>&nbsp;<strong>{$row.label}</strong><br/>({$row.key})
               {if $extAddNewEnabled && $remoteExtensionRows[$extKey] && $remoteExtensionRows[$extKey].is_upgradeable}
@@ -32,9 +32,9 @@ Depends: CRM/common/enableDisableApi.tpl and CRM/common/jsortable.tpl
           <td class="crm-extensions-description">{$row.type|capitalize}</td>
           <td>{$row.action|replace:'xx':$row.id}</td>
         </tr>
-        <tr class="hiddenElement" id="crm-extensions-details-{$row.id}">
+        <tr class="hiddenElement" id="crm-extensions-details-{$row.file}">
             <td>
-                {include file="CRM/Admin/Page/ExtensionDetails.tpl" extension=$row}
+                {include file="CRM/Admin/Page/ExtensionDetails.tpl" extension=$row localExtensionRows=$localExtensionRows remoteExtensionRows=$remoteExtensionRows}
             </td>
             <td></td><td></td><td></td><td></td>
         </tr>

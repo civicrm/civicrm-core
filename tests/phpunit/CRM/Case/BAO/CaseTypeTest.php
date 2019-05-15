@@ -23,6 +23,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
         'activitySets' => array(),
         'activityTypes' => array(),
         'caseRoles' => array(),
+        'timelineActivityTypes' => array(),
       )),
       'xml' => file_get_contents(__DIR__ . '/xml/empty-lists.xml'),
     );
@@ -41,6 +42,9 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
               array('name' => 'Open Case', 'status' => 'Completed'),
             ),
           ),
+        ),
+        'timelineActivityTypes' => array(
+          array('name' => 'Open Case', 'status' => 'Completed'),
         ),
         'caseRoles' => array(
           array('name' => 'First role', 'creator' => 1, 'manager' => 1),
@@ -80,6 +84,15 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
             ),
           ),
         ),
+        'timelineActivityTypes' => array(
+          array('name' => 'Open Case', 'status' => 'Completed'),
+          array(
+            'name' => 'Meeting',
+            'reference_activity' => 'Open Case',
+            'reference_offset' => 1,
+            'reference_select' => 'newest',
+          ),
+        ),
         'caseRoles' => array(
           array('name' => 'First role', 'creator' => 1, 'manager' => 1),
           array('name' => 'Second role'),
@@ -104,13 +117,13 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
 
     $cases = array();
     foreach (array(
-               'empty-defn',
-               'empty-lists',
-               'one-item-in-each',
-               'two-items-in-each',
-               'forkable-0',
-               'forkable-1',
-             ) as $key) {
+      'empty-defn',
+      'empty-lists',
+      'one-item-in-each',
+      'two-items-in-each',
+      'forkable-0',
+      'forkable-1',
+    ) as $key) {
       $cases[] = array($key, $fixtures[$key]['json'], $fixtures[$key]['xml']);
     }
     return $cases;
@@ -174,8 +187,10 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
    */
   public function normalizeXml($xml) {
     return trim(
-      preg_replace(":\n*<:", "\n<", // tags on new lines
-        preg_replace("/\n[\n ]+/", "\n", // no leading whitespace
+      // tags on new lines
+      preg_replace(":\n*<:", "\n<",
+        // no leading whitespace
+        preg_replace("/\n[\n ]+/", "\n",
           $xml
         )
       )

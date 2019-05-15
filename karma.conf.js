@@ -32,6 +32,7 @@ module.exports = function(config) {
       'bower_components/jquery-validation/dist/jquery.validate.min.js',
       'packages/jquery/plugins/jquery.timeentry.js',
       'js/Common.js',
+      'js/crm.datepicker.js',
       'bower_components/angular/angular.js',
       'js/crm.angular.js',
       angularTempFile,
@@ -63,6 +64,7 @@ module.exports = function(config) {
     port: 9876,
     reporters: ['progress'],
     junitReporter: {
+      useBrowserName: false,
       outputFile: 'tests/output/karma.xml',
       suite: ''
     },

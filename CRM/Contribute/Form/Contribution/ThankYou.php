@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -38,8 +38,15 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
   /**
    * Membership price set status.
+   * @var bool
    */
   public $_useForMember;
+
+  /**
+   * Tranxaaction Id of the current contribution
+   * @var string
+   */
+  public $_trxnId;
 
   /**
    * Set variables up before form is built.
@@ -49,6 +56,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
     $this->_params = $this->get('params');
     $this->_lineItem = $this->get('lineItem');
+    $this->_useForMember = $this->get('useForMember');
     $is_deductible = $this->get('is_deductible');
     $this->assign('is_deductible', $is_deductible);
     $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $this->_values));
@@ -99,8 +107,31 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     if ($productID) {
       CRM_Contribute_BAO_Premium::buildPremiumBlock($this, $this->_id, FALSE, $productID, $option);
     }
+
+    $params = $this->_params;
+    $invoicing = CRM_Invoicing_Utils::isInvoicingEnabled();
+    // Make a copy of line items array to use for display only
+    $tplLineItems = $this->_lineItem;
+    if ($invoicing) {
+      $getTaxDetails = FALSE;
+      foreach ($this->_lineItem as $key => $value) {
+        foreach ($value as $k => $v) {
+          if (isset($v['tax_rate'])) {
+            if ($v['tax_rate'] != '') {
+              $getTaxDetails = TRUE;
+              // Cast to float to display without trailing zero decimals
+              $tplLineItems[$key][$k]['tax_rate'] = (float) $v['tax_rate'];
+            }
+          }
+        }
+      }
+      $this->assign('getTaxDetails', $getTaxDetails);
+      $this->assign('taxTerm', CRM_Invoicing_Utils::getTaxTerm());
+      $this->assign('totalTaxAmount', $params['tax_amount']);
+    }
+
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
-      $this->assign('lineItem', $this->_lineItem);
+      $this->assign('lineItem', $tplLineItems);
     }
     else {
       if (is_array($membershipTypeID)) {
@@ -112,32 +143,13 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('priceSetID', $this->_priceSetId);
     $this->assign('useForMember', $this->get('useForMember'));
 
-    $params = $this->_params;
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-    if ($invoicing) {
-      $getTaxDetails = FALSE;
-      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-      foreach ($this->_lineItem as $value) {
-        foreach ($value as $v) {
-          if (isset($v['tax_rate'])) {
-            if ($v['tax_rate'] != '') {
-              $getTaxDetails = TRUE;
-            }
-          }
-        }
-      }
-      $this->assign('getTaxDetails', $getTaxDetails);
-      $this->assign('taxTerm', $taxTerm);
-      $this->assign('totalTaxAmount', $params['tax_amount']);
-    }
     if (!empty($this->_values['honoree_profile_id']) && !empty($params['soft_credit_type_id'])) {
       $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
 
       $this->assign('soft_credit_type', $softCreditTypes[$params['soft_credit_type_id']]);
       CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields($this, $params['honor']);
 
-      $fieldTypes = array('Contact');
+      $fieldTypes = ['Contact'];
       $fieldTypes[] = CRM_Core_BAO_UFGroup::getContactType($this->_values['honoree_profile_id']);
       $this->buildCustom($this->_values['honoree_profile_id'], 'honoreeProfileFields', TRUE, 'honor', $fieldTypes);
     }
@@ -147,12 +159,12 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     if ($this->_pcpId) {
       $qParams .= "&amp;pcpId={$this->_pcpId}";
       $this->assign('pcpBlock', TRUE);
-      foreach (array(
-                 'pcp_display_in_roll',
-                 'pcp_is_anonymous',
-                 'pcp_roll_nickname',
-                 'pcp_personal_note',
-               ) as $val) {
+      foreach ([
+        'pcp_display_in_roll',
+        'pcp_is_anonymous',
+        'pcp_roll_nickname',
+        'pcp_personal_note',
+      ] as $val) {
         if (!empty($this->_params[$val])) {
           $this->assign($val, $this->_params[$val]);
         }
@@ -195,30 +207,29 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
         !empty($params['is_for_organization'])
       ) && empty($this->_ccid)
     ) {
-      $fieldTypes = array('Contact', 'Organization');
+      $fieldTypes = ['Contact', 'Organization'];
       $contactSubType = CRM_Contact_BAO_ContactType::subTypes('Organization');
       $fieldTypes = array_merge($fieldTypes, $contactSubType);
       if (is_array($this->_membershipBlock) && !empty($this->_membershipBlock)) {
-        $fieldTypes = array_merge($fieldTypes, array('Membership'));
+        $fieldTypes = array_merge($fieldTypes, ['Membership']);
       }
       else {
-        $fieldTypes = array_merge($fieldTypes, array('Contribution'));
+        $fieldTypes = array_merge($fieldTypes, ['Contribution']);
       }
 
       $this->buildCustom($this->_values['onbehalf_profile_id'], 'onbehalfProfile', TRUE, 'onbehalf', $fieldTypes);
     }
 
-    $this->assign('trxn_id',
-      CRM_Utils_Array::value('trxn_id',
-        $this->_params
-      )
-    );
+    $this->_trxnId = CRM_Utils_Array::value('trxn_id', $this->_params);
+
+    $this->assign('trxn_id', $this->_trxnId);
+
     $this->assign('receive_date',
       CRM_Utils_Date::mysqlToIso(CRM_Utils_Array::value('receive_date', $this->_params))
     );
 
-    $defaults = array();
-    $fields = array();
+    $defaults = [];
+    $fields = [];
     foreach ($this->_fields as $name => $dontCare) {
       if ($name != 'onbehalf' || $name != 'honor') {
         $fields[$name] = 1;
@@ -236,11 +247,11 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
             $defaults[$timeField] = $contact[$timeField];
           }
         }
-        elseif (in_array($name, array(
-              'addressee',
-              'email_greeting',
-              'postal_greeting',
-            )) && !empty($contact[$name . '_custom'])
+        elseif (in_array($name, [
+          'addressee',
+          'email_greeting',
+          'postal_greeting',
+        ]) && !empty($contact[$name . '_custom'])
         ) {
           $defaults[$name . '_custom'] = $contact[$name . '_custom'];
         }
@@ -287,11 +298,12 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $isPendingOutcome = TRUE;
     try {
       // A payment notification update could have come in at any time. Check at the last minute.
-      $contributionStatusID = civicrm_api3('Contribution', 'getvalue', array(
+      $contributionStatusID = civicrm_api3('Contribution', 'getvalue', [
         'id' => CRM_Utils_Array::value('contributionID', $params),
         'return' => 'contribution_status_id',
+        'is_test'   => ($this->_mode == 'test') ? 1 : 0,
         'invoice_id' => CRM_Utils_Array::value('invoiceID', $params),
-      ));
+      ]);
       if (CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionStatusID) === 'Pending'
         && !empty($params['payment_processor_id'])
       ) {

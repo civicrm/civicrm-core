@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -54,15 +54,15 @@ WHERE  e.contact_id = c.id
 AND    e.is_primary = 1
 AND    c.id IN ( $contactIDs )";
 
-    $rows = array();
+    $rows = [];
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      $rows[] = array(
+      $rows[] = [
         'id' => $dao->contact_id,
         'name' => $dao->name,
         'contact_type' => $dao->contact_type,
         'email' => $dao->email,
-      );
+      ];
     }
 
     $this->assign('rows', $rows);

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,12 +32,9 @@
  * @group headless
  */
 class api_v3_MessageTemplateTest extends CiviUnitTestCase {
-  /**
-   * Assume empty database with just civicrm_data.
-   */
+
   protected $entity = 'MessageTemplate';
   protected $params;
-
 
   public function setUp() {
     $this->_apiversion = 3;
@@ -53,6 +50,11 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
       'is_default' => $template['is_default'],
       'is_reserved' => $template['is_reserved'],
     );
+  }
+
+  public function tearDown() {
+    parent::tearDown();
+    unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
   }
 
   /**
@@ -87,6 +89,32 @@ class api_v3_MessageTemplateTest extends CiviUnitTestCase {
       'id' => $entity['id'],
     ));
     $this->assertEquals(0, $checkDeleted['count']);
+  }
+
+  public function testPermissionChecks() {
+    $entity = $this->createTestEntity();
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('edit user-driven message templates');
+    // Ensure that it cannot create a system message or update a system message tempalte given current permissions.
+    $this->callAPIFailure('MessageTemplate', 'create', ['id' => $entity['id'], 'msg_subject' => 'test msg permission subject', 'check_permissions' => TRUE]);
+    $testUserEntity = $entity['values'][$entity['id']];
+    unset($testUserEntity['id']);
+    $testUserEntity['msg_subject'] = 'Test user message template';
+    unset($testUserEntity['workflow_id']);
+    $testuserEntity['check_permissions'] = TRUE;
+    // ensure that it can create user templates;
+    $userEntity = $this->callAPISuccess('MessageTemplate', 'create', $testUserEntity);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('edit system workflow message templates');
+    // Now check that when its swapped around permissions that the correct reponses are detected.
+    $this->callAPIFailure('MessageTemplate', 'create', ['id' => $userEntity['id'], 'msg_subject' => 'User template updated by system message permission', 'check_permissions' => TRUE]);
+    $this->callAPISuccess('MessageTemplate', 'create', ['id' => $entity['id'], 'msg_subject' => 'test msg permission subject', 'check_permissions' => TRUE]);
+    // verify with all 3 permissions someone can do everything.
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('edit system workflow message templates', 'edit user-driven message templates');
+    $this->callAPISuccess('MessageTemplate', 'create', ['id' => $userEntity['id'], 'msg_subject' => 'User template updated by system message permission', 'check_permissions' => TRUE]);
+    $this->callAPISuccess('MessageTemplate', 'create', ['id' => $entity['id'], 'msg_subject' => 'test msg permission subject', 'check_permissions' => TRUE]);
+    // Verify that the backwards compatabiltiy still works i.e. having edit message templates allows for editing of both kinds of message templates
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('edit message templates');
+    $this->callAPISuccess('MessageTemplate', 'create', ['id' => $userEntity['id'], 'msg_subject' => 'User template updated by edit message permission', 'check_permissions' => TRUE]);
+    $this->callAPISuccess('MessageTemplate', 'create', ['id' => $entity['id'], 'msg_subject' => 'test msg permission subject backwards compatabilty', 'check_permissions' => TRUE]);
   }
 
 }

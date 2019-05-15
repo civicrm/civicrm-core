@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -51,7 +51,7 @@ class CRM_Core_BAO_PrevNextCache extends CRM_Core_DAO_PrevNextCache {
    */
   public static function getPositions($cacheKey, $id1, $id2, &$mergeId = NULL, $join = NULL, $where = NULL, $flip = FALSE) {
     if ($flip) {
-      list($id1, $id2) = array($id2, $id1);
+      list($id1, $id2) = [$id2, $id1];
     }
 
     if ($mergeId == NULL) {
@@ -64,16 +64,16 @@ WHERE  cacheKey     = %3 AND
        entity_table = 'civicrm_contact'
 ";
 
-      $params = array(
-        1 => array($id1, 'Integer'),
-        2 => array($id2, 'Integer'),
-        3 => array($cacheKey, 'String'),
-      );
+      $params = [
+        1 => [$id1, 'Integer'],
+        2 => [$id2, 'Integer'],
+        3 => [$cacheKey, 'String'],
+      ];
 
       $mergeId = CRM_Core_DAO::singleValueQuery($query, $params);
     }
 
-    $pos = array('foundEntry' => 0);
+    $pos = ['foundEntry' => 0];
     if ($mergeId) {
       $pos['foundEntry'] = 1;
 
@@ -82,10 +82,10 @@ WHERE  cacheKey     = %3 AND
         $where = " AND {$where}";
 
       }
-      $p = array(
-        1 => array($mergeId, 'Integer'),
-        2 => array($cacheKey, 'String'),
-      );
+      $p = [
+        1 => [$mergeId, 'Integer'],
+        2 => [$cacheKey, 'String'],
+      ];
       $sql = "SELECT pn.id, pn.entity_id1, pn.entity_id2, pn.data FROM civicrm_prevnext_cache pn {$join} ";
       $wherePrev = " WHERE pn.id < %1 AND pn.cacheKey = %2 {$where} ORDER BY ID DESC LIMIT 1";
       $sqlPrev = $sql . $wherePrev;
@@ -123,16 +123,16 @@ WHERE  cacheKey     = %3 AND
 
     //clear cache
     $sql = "DELETE FROM civicrm_prevnext_cache WHERE  entity_table = %1";
-    $params = array(1 => array($entityTable, 'String'));
+    $params = [1 => [$entityTable, 'String']];
 
     if (is_numeric($id)) {
       $sql .= " AND ( entity_id1 = %2 OR entity_id2 = %2 )";
-      $params[2] = array($id, 'Integer');
+      $params[2] = [$id, 'Integer'];
     }
 
     if (isset($cacheKey)) {
       $sql .= " AND cacheKey LIKE %3";
-      $params[3] = array("{$cacheKey}%", 'String');
+      $params[3] = ["{$cacheKey}%", 'String'];
     }
     CRM_Core_DAO::executeQuery($sql, $params);
   }
@@ -148,16 +148,17 @@ WHERE  cacheKey     = %3 AND
    */
   public static function deletePair($id1, $id2, $cacheKey = NULL, $isViceVersa = FALSE, $entityTable = 'civicrm_contact') {
     $sql = "DELETE FROM civicrm_prevnext_cache WHERE  entity_table = %1";
-    $params = array(1 => array($entityTable, 'String'));
+    $params = [1 => [$entityTable, 'String']];
 
     $pair = !$isViceVersa ? "entity_id1 = %2 AND entity_id2 = %3" : "(entity_id1 = %2 AND entity_id2 = %3) OR (entity_id1 = %3 AND entity_id2 = %2)";
     $sql .= " AND ( {$pair} )";
-    $params[2] = array($id1, 'Integer');
-    $params[3] = array($id2, 'Integer');
+    $params[2] = [$id1, 'Integer'];
+    $params[3] = [$id2, 'Integer'];
 
     if (isset($cacheKey)) {
       $sql .= " AND cacheKey LIKE %4";
-      $params[4] = array("{$cacheKey}%", 'String'); // used % to address any row with conflict-cacheKey e.g "merge Individual_8_0_conflicts"
+      // used % to address any row with conflict-cacheKey e.g "merge Individual_8_0_conflicts"
+      $params[4] = ["{$cacheKey}%", 'String'];
     }
 
     CRM_Core_DAO::executeQuery($sql, $params);
@@ -183,12 +184,12 @@ WHERE  cacheKey     = %3 AND
       WHERE
       ((pn.entity_id1 = %1 AND pn.entity_id2 = %2) OR (pn.entity_id1 = %2 AND pn.entity_id2 = %1)) AND
       (cacheKey = %3 OR cacheKey = %4)";
-    $params = array(
-      1 => array($id1, 'Integer'),
-      2 => array($id2, 'Integer'),
-      3 => array("{$cacheKey}", 'String'),
-      4 => array("{$cacheKey}_conflicts", 'String'),
-    );
+    $params = [
+      1 => [$id1, 'Integer'],
+      2 => [$id2, 'Integer'],
+      3 => ["{$cacheKey}", 'String'],
+      4 => ["{$cacheKey}_conflicts", 'String'],
+    ];
     $pncFind = CRM_Core_DAO::executeQuery($sql, $params);
 
     while ($pncFind->fetch()) {
@@ -232,27 +233,27 @@ WHERE  cacheKey     = %3 AND
    *
    * @return array
    */
-  public static function retrieve($cacheKey, $join = NULL, $whereClause = NULL, $offset = 0, $rowCount = 0, $select = array(), $orderByClause = '', $includeConflicts = TRUE, $params = array()) {
+  public static function retrieve($cacheKey, $join = NULL, $whereClause = NULL, $offset = 0, $rowCount = 0, $select = [], $orderByClause = '', $includeConflicts = TRUE, $params = []) {
     $selectString = 'pn.*';
 
     if (!empty($select)) {
-      $aliasArray = array();
+      $aliasArray = [];
       foreach ($select as $column => $alias) {
         $aliasArray[] = $column . ' as ' . $alias;
       }
       $selectString .= " , " . implode(' , ', $aliasArray);
     }
 
-    $params = array(
-      1 => array($cacheKey, 'String'),
-    ) + $params;
+    $params = [
+      1 => [$cacheKey, 'String'],
+    ] + $params;
 
     if (!empty($whereClause)) {
       $whereClause = " AND " . $whereClause;
     }
     if ($includeConflicts) {
       $where = ' WHERE (pn.cacheKey = %1 OR pn.cacheKey = %2)' . $whereClause;
-      $params[2] = array("{$cacheKey}_conflicts", 'String');
+      $params[2] = ["{$cacheKey}_conflicts", 'String'];
     }
     else {
       $where = ' WHERE (pn.cacheKey = %1)' . $whereClause;
@@ -275,7 +276,7 @@ FROM   civicrm_prevnext_cache pn
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
-    $main  = array();
+    $main  = [];
     $count = 0;
     while ($dao->fetch()) {
       if (self::is_serialized($dao->data)) {
@@ -286,17 +287,17 @@ FROM   civicrm_prevnext_cache pn
       }
 
       if (!empty($select)) {
-        $extraData = array();
+        $extraData = [];
         foreach ($select as $sfield) {
-          $extraData[$sfield]  = $dao->$sfield;
+          $extraData[$sfield] = $dao->$sfield;
         }
-        $main[$count] = array(
+        $main[$count] = [
           'prevnext_id' => $dao->id,
           'is_selected' => $dao->is_selected,
           'entity_id1'  => $dao->entity_id1,
           'entity_id2'  => $dao->entity_id2,
           'data'        => $main[$count],
-        );
+        ];
         $main[$count] = array_merge($main[$count], $extraData);
       }
       $count++;
@@ -337,7 +338,7 @@ FROM   civicrm_prevnext_cache pn
    *
    * @return int
    */
-  public static function getCount($cacheKey, $join = NULL, $where = NULL, $op = "=", $params = array()) {
+  public static function getCount($cacheKey, $join = NULL, $where = NULL, $op = "=", $params = []) {
     $query = "
 SELECT COUNT(*) FROM civicrm_prevnext_cache pn
        {$join}
@@ -347,10 +348,10 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
       $query .= " AND {$where}";
     }
 
-    $params = array(
-      1 => array($cacheKey, 'String'),
-      2 => array("{$cacheKey}_conflicts", 'String'),
-    ) + $params;
+    $params = [
+      1 => [$cacheKey, 'String'],
+      2 => ["{$cacheKey}_conflicts", 'String'],
+    ] + $params;
     return (int) CRM_Core_DAO::singleValueQuery($query, $params, TRUE, FALSE);
   }
 
@@ -366,11 +367,16 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
    * @param bool $checkPermissions
    *   Respect logged in user's permissions.
    *
+   * @param int $searchLimit
+   *  Limit for the number of contacts to be used for comparison.
+   *  The search methodology finds all matches for the searchedContacts so this limits
+   *  the number of searched contacts, not the matches found.
+   *
    * @return bool
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function refillCache($rgid, $gid, $cacheKeyString, $criteria, $checkPermissions) {
+  public static function refillCache($rgid, $gid, $cacheKeyString, $criteria, $checkPermissions, $searchLimit = 0) {
     if (!$cacheKeyString && $rgid) {
       $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions);
     }
@@ -381,23 +387,32 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
 
     // 1. Clear cache if any
     $sql = "DELETE FROM civicrm_prevnext_cache WHERE  cacheKey LIKE %1";
-    CRM_Core_DAO::executeQuery($sql, array(1 => array("{$cacheKeyString}%", 'String')));
+    CRM_Core_DAO::executeQuery($sql, [1 => ["{$cacheKeyString}%", 'String']]);
 
     // FIXME: we need to start using temp tables / queries here instead of arrays.
     // And cleanup code in CRM/Contact/Page/DedupeFind.php
 
     // 2. FILL cache
-    $foundDupes = array();
+    $foundDupes = [];
     if ($rgid && $gid) {
-      $foundDupes = CRM_Dedupe_Finder::dupesInGroup($rgid, $gid);
+      $foundDupes = CRM_Dedupe_Finder::dupesInGroup($rgid, $gid, $searchLimit);
     }
     elseif ($rgid) {
-      $contactIDs = array();
+      $contactIDs = [];
+      // The thing we really need to filter out is any chaining that would 'DO SOMETHING' to the DB.
+      // criteria could be passed in via url so we want to ensure nothing could be in that url that
+      // would chain to a delete. Limiting to getfields for 'get' limits us to declared fields,
+      // although we might wish to revisit later to allow joins.
+      $validFieldsForRetrieval = civicrm_api3('Contact', 'getfields', ['action' => 'get'])['values'];
       if (!empty($criteria)) {
-        $contacts = civicrm_api3('Contact', 'get', array_merge(array('options' => array('limit' => 0), 'return' => 'id'), $criteria['contact']));
+        $contacts = civicrm_api3('Contact', 'get', array_merge([
+          'options' => ['limit' => 0],
+          'return' => 'id',
+          'check_permissions' => TRUE,
+        ], array_intersect_key($criteria['contact'], $validFieldsForRetrieval)));
         $contactIDs = array_keys($contacts['values']);
       }
-      $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs, $checkPermissions);
+      $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs, $checkPermissions, $searchLimit);
     }
 
     if (!empty($foundDupes)) {
@@ -417,171 +432,24 @@ INNER JOIN civicrm_prevnext_cache pn ON c.path = pn.cacheKey
 WHERE      c.group_name = %1
 AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
 ";
-    $params = array(
-      1 => array('CiviCRM Search PrevNextCache', 'String'),
-      2 => array($cacheTimeIntervalDays, 'Integer'),
-    );
-    CRM_Core_DAO::executeQuery($sql, $params);
-  }
-
-  /**
-   * Save checkbox selections.
-   *
-   * @param $cacheKey
-   * @param string $action
-   * @param array $cIds
-   * @param string $entity_table
-   */
-  public static function markSelection($cacheKey, $action = 'unselect', $cIds = NULL, $entity_table = 'civicrm_contact') {
-    if (!$cacheKey) {
-      return;
-    }
-    $params = array();
-
-    $entity_whereClause = " AND entity_table = '{$entity_table}'";
-    if ($cIds && $cacheKey && $action) {
-      if (is_array($cIds)) {
-        $cIdFilter = "(" . implode(',', $cIds) . ")";
-        $whereClause = "
-WHERE cacheKey LIKE %1
-AND (entity_id1 IN {$cIdFilter} OR entity_id2 IN {$cIdFilter})
-";
-      }
-      else {
-        $whereClause = "
-WHERE cacheKey LIKE %1
-AND (entity_id1 = %2 OR entity_id2 = %2)
-";
-        $params[2] = array("{$cIds}", 'Integer');
-      }
-      if ($action == 'select') {
-        $whereClause .= "AND is_selected = 0";
-        $sql = "UPDATE civicrm_prevnext_cache SET is_selected = 1 {$whereClause} {$entity_whereClause}";
-        $params[1] = array("{$cacheKey}%", 'String');
-      }
-      elseif ($action == 'unselect') {
-        $whereClause .= "AND is_selected = 1";
-        $sql = "UPDATE civicrm_prevnext_cache SET is_selected = 0 {$whereClause} {$entity_whereClause}";
-        $params[1] = array("%{$cacheKey}%", 'String');
-      }
-      // default action is reseting
-    }
-    elseif (!$cIds && $cacheKey && $action == 'unselect') {
-      $sql = "
-UPDATE civicrm_prevnext_cache
-SET    is_selected = 0
-WHERE  cacheKey LIKE %1 AND is_selected = 1
-       {$entity_whereClause}
-";
-      $params[1] = array("{$cacheKey}%", 'String');
-    }
+    $params = [
+      1 => ['CiviCRM Search PrevNextCache', 'String'],
+      2 => [$cacheTimeIntervalDays, 'Integer'],
+    ];
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 
   /**
    * Get the selections.
    *
-   * @param string $cacheKey
-   *   Cache key.
-   * @param string $action
-   *   Action.
-   *  $action : get - get only selection records
-   *            getall - get all the records of the specified cache key
-   * @param string $entity_table
-   *   Entity table.
+   * NOTE: This stub has been preserved because one extension in `universe`
+   * was referencing the function.
    *
-   * @return array|NULL
+   * @deprecated
+   * @see CRM_Core_PrevNextCache_Sql::getSelection()
    */
-  public static function getSelection($cacheKey, $action = 'get', $entity_table = 'civicrm_contact') {
-    if (!$cacheKey) {
-      return NULL;
-    }
-    $params = array();
-
-    $entity_whereClause = " AND entity_table = '{$entity_table}'";
-    if ($cacheKey && ($action == 'get' || $action == 'getall')) {
-      $actionGet = ($action == "get") ? " AND is_selected = 1 " : "";
-      $sql = "
-SELECT entity_id1, entity_id2 FROM civicrm_prevnext_cache
-WHERE cacheKey LIKE %1
-      $actionGet
-      $entity_whereClause
-ORDER BY id
-";
-      $params[1] = array("{$cacheKey}%", 'String');
-
-      $contactIds = array($cacheKey => array());
-      $cIdDao = CRM_Core_DAO::executeQuery($sql, $params);
-      while ($cIdDao->fetch()) {
-        if ($cIdDao->entity_id1 == $cIdDao->entity_id2) {
-          $contactIds[$cacheKey][$cIdDao->entity_id1] = 1;
-        }
-      }
-      return $contactIds;
-    }
-  }
-
-  /**
-   * @return array
-   */
-  public static function getSelectedContacts() {
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String');
-    $cacheKey = "civicrm search {$qfKey}";
-    $query = "
-SELECT *
-FROM   civicrm_prevnext_cache
-WHERE  cacheKey LIKE %1
-  AND  is_selected=1
-  AND  cacheKey NOT LIKE %2
-";
-    $params1[1] = array("{$cacheKey}%", 'String');
-    $params1[2] = array("{$cacheKey}_alphabet%", 'String');
-    $dao = CRM_Core_DAO::executeQuery($query, $params1);
-
-    $val = array();
-    while ($dao->fetch()) {
-      $val[] = $dao->data;
-    }
-    return $val;
-  }
-
-  /**
-   * @param CRM_Core_Form $form
-   * @param array $params
-   *
-   * @return mixed
-   */
-  public static function buildSelectedContactPager(&$form, &$params) {
-    $params['status'] = ts('Contacts %%StatusMessage%%');
-    $params['csvString'] = NULL;
-    $params['buttonTop'] = 'PagerTopButton';
-    $params['buttonBottom'] = 'PagerBottomButton';
-    $params['rowCount'] = $form->get(CRM_Utils_Pager::PAGE_ROWCOUNT);
-
-    if (!$params['rowCount']) {
-      $params['rowCount'] = CRM_Utils_Pager::ROWCOUNT;
-    }
-
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
-    $cacheKey = "civicrm search {$qfKey}";
-
-    $query = "
-SELECT count(*)
-FROM   civicrm_prevnext_cache
-WHERE  cacheKey LIKE %1
-  AND  is_selected = 1
-  AND  cacheKey NOT LIKE %2
-";
-    $params1[1] = array("{$cacheKey}%", 'String');
-    $params1[2] = array("{$cacheKey}_alphabet%", 'String');
-    $paramsTotal = CRM_Core_DAO::singleValueQuery($query, $params1);
-    $params['total'] = $paramsTotal;
-    $form->_pager = new CRM_Utils_Pager($params);
-    $form->assign_by_ref('pager', $form->_pager);
-    list($offset, $rowCount) = $form->_pager->getOffsetAndRowCount();
-    $params['offset'] = $offset;
-    $params['rowCount1'] = $rowCount;
-    return $params;
+  public static function getSelection($cacheKey, $action = 'get') {
+    return Civi::service('prevnext')->getSelection($cacheKey, $action);
   }
 
   /**
@@ -600,8 +468,8 @@ WHERE  cacheKey LIKE %1
       $dao->id = $id;
       if ($dao->find(TRUE)) {
         $originalData = unserialize($dao->data);
-        $srcFields = array('ID', 'Name');
-        $swapFields = array('srcID', 'srcName', 'dstID', 'dstName');
+        $srcFields = ['ID', 'Name'];
+        $swapFields = ['srcID', 'srcName', 'dstID', 'dstName'];
         $data = array_diff_assoc($originalData, array_fill_keys($swapFields, 1));
         foreach ($srcFields as $key) {
           $data['src' . $key] = $originalData['dst' . $key];
@@ -613,6 +481,20 @@ WHERE  cacheKey LIKE %1
         $dao->save();
       }
     }
+  }
+
+  /**
+   * Get a list of available backend services.
+   *
+   * @return array
+   *   Array(string $id => string $label).
+   */
+  public static function getPrevNextBackends() {
+    return [
+      'default' => ts('Default (Auto-detect)'),
+      'sql' => ts('SQL'),
+      'redis' => ts('Redis'),
+    ];
   }
 
 }

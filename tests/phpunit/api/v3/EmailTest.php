@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.7                                                |
+| CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2017                                |
+| Copyright CiviCRM LLC (c) 2004-2019                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -87,9 +87,9 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     //now we check & make sure it has been set to primary
     $expected = 1;
     $check = $this->callAPISuccess('email', 'getcount', array(
-        'is_primary' => 1,
-        'id' => $email1['id'],
-      ),
+      'is_primary' => 1,
+      'id' => $email1['id'],
+    ),
       $expected
     );
   }
@@ -374,6 +374,40 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $this->assertEquals(1, $get['values'][$emailID]['is_primary']);
     $this->assertEquals(1, $get['values'][$emailID]['on_hold']);
     $this->assertEquals('1-2@example.com', $get['values'][$emailID]['email']);
+  }
+
+  public function testEmailOnHold() {
+    $params = array();
+    $params_change = array();
+    $params = array(
+      'contact_id' => $this->_contactID,
+      'email' => 'api@a-team.com',
+      'on_hold' => '2',
+    );
+    $result = $this->callAPIAndDocument('email', 'create', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertNotNull($result['id']);
+    $this->assertNotNull($result['values'][$result['id']]['id']);
+    $this->assertEquals(2, $result['values'][$result['id']]['on_hold']);
+    $this->assertEquals(date('Y-m-d H:i'), date('Y-m-d H:i', strtotime($result['values'][$result['id']]['hold_date'])));
+
+    // set on_hold is '0'
+    // if isMultipleBulkMail is active, the value in On-hold select is string
+    $params_change = array(
+      'id' => $result['id'],
+      'contact_id' => $this->_contactID,
+      'email' => 'api@a-team.com',
+      'is_primary' => 1,
+      'on_hold' => '0',
+    );
+    $result_change = $this->callAPISuccess('email', 'create', $params_change + array('action' => 'get'));
+    $this->assertEquals(1, $result_change['count']);
+    $this->assertEquals($result['id'], $result_change['id']);
+    $this->assertEmpty($result_change['values'][$result_change['id']]['on_hold']);
+    $this->assertEquals(date('Y-m-d H:i'), date('Y-m-d H:i', strtotime($result_change['values'][$result_change['id']]['reset_date'])));
+    $this->assertEmpty($result_change['values'][$result_change['id']]['hold_date']);
+
+    $delresult = $this->callAPISuccess('email', 'delete', array('id' => $result['id']));
   }
 
 }

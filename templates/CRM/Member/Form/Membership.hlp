@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,4 +35,13 @@
       <li>{ts}If you do not see the "Cancel Auto-renew Subscription" action, you will need to cancel the associated Recurring Contribution record from the Contributions tab. <strong>In this case you must also manually cancel the recurring payment from the payment processor website</strong>.{/ts}</li>
     </ul>
   {/if}
+{/htxt}
+{htxt id ="id-from_email"}
+  <p>{ts}Select the "FROM" Email Address for this mailing from the dropdown list. Available email addresses are configurable by users with Administer CiviCRM permission. EXAMPLE: "Client Services" &lt;clientservices@example.org&gt;{/ts}</p>
+{if $params.isAdmin}
+  {capture assign="fromConfig"}{crmURL p="civicrm/admin/options/from_email_address" q="reset=1"}{/capture}
+  <p>{ts 1=$fromConfig}Go to <a href='%1'>Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a> to add or edit email addresses. Make sure these email addresses are valid email accounts with your email service provider.{/ts}</p>
+{else}
+  {ts}Contact your site administrator if you need to use a "FROM" Email Address which is not in the dropdown list.{/ts}
+{/if}
 {/htxt}

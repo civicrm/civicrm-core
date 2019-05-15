@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
+  protected $defaultAssigneeOptionsValues = [];
+
   /**
    * Run.
    *
@@ -46,7 +48,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     if ($xml === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
       CRM_Core_Error::fatal(ts("Configuration file could not be retrieved for case type = '%1' %2.",
-        array(1 => $caseType, 2 => $docLink)
+        [1 => $caseType, 2 => $docLink]
       ));
       return FALSE;
     }
@@ -71,7 +73,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     if ($xml === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
       CRM_Core_Error::fatal(ts("Unable to load configuration file for the referenced case type: '%1' %2.",
-        array(1 => $caseType, 2 => $docLink)
+        [1 => $caseType, 2 => $docLink]
       ));
       return FALSE;
     }
@@ -97,7 +99,6 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   public function process($xml, &$params) {
     $standardTimeline = CRM_Utils_Array::value('standardTimeline', $params);
     $activitySetName = CRM_Utils_Array::value('activitySetName', $params);
-    $activityTypeName = CRM_Utils_Array::value('activityTypeName', $params);
 
     if ('Open Case' == CRM_Utils_Array::value('activityTypeName', $params)) {
       // create relationships for the ones that are required
@@ -182,7 +183,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   public function &caseRoles($caseRolesXML, $isCaseManager = FALSE) {
     $relationshipTypes = &$this->allRelationshipTypes();
 
-    $result = array();
+    $result = [];
     foreach ($caseRolesXML as $caseRoleXML) {
       foreach ($caseRoleXML->RelationshipType as $relationshipTypeXML) {
         $relationshipTypeName = (string ) $relationshipTypeXML->name;
@@ -196,7 +197,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
         if (!$isCaseManager) {
           $result[$relationshipTypeID] = $relationshipTypeName;
         }
-        elseif ($relationshipTypeXML->manager) {
+        elseif ($relationshipTypeXML->manager == 1) {
           return $relationshipTypeID;
         }
       }
@@ -219,25 +220,26 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     if ($relationshipTypeID === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
       CRM_Core_Error::fatal(ts('Relationship type %1, found in case configuration file, is not present in the database %2',
-        array(1 => $relationshipTypeName, 2 => $docLink)
+        [1 => $relationshipTypeName, 2 => $docLink]
       ));
       return FALSE;
     }
 
     $client = $params['clientID'];
     if (!is_array($client)) {
-      $client = array($client);
+      $client = [$client];
     }
 
     foreach ($client as $key => $clientId) {
-      $relationshipParams = array(
+      $relationshipParams = [
         'relationship_type_id' => $relationshipTypeID,
         'contact_id_a' => $clientId,
         'contact_id_b' => $params['creatorID'],
         'is_active' => 1,
         'case_id' => $params['caseID'],
         'start_date' => date("Ymd"),
-      );
+        'end_date' => CRM_Utils_Array::value('relationship_end_date', $params),
+      ];
 
       if (!$this->createRelationship($relationshipParams)) {
         CRM_Core_Error::fatal();
@@ -272,7 +274,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    */
   public function activityTypes($activityTypesXML, $maxInst = FALSE, $isLabel = FALSE, $maskAction = FALSE) {
     $activityTypes = &$this->allActivityTypes(TRUE, TRUE);
-    $result = array();
+    $result = [];
     foreach ($activityTypesXML as $activityTypeXML) {
       foreach ($activityTypeXML as $recordXML) {
         $activityTypeName = (string ) $recordXML->name;
@@ -313,10 +315,11 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
   /**
    * @param SimpleXMLElement $caseTypeXML
+   *
    * @return array<string> symbolic activity-type names
    */
   public function getDeclaredActivityTypes($caseTypeXML) {
-    $result = array();
+    $result = [];
 
     if (!empty($caseTypeXML->ActivityTypes) && $caseTypeXML->ActivityTypes->ActivityType) {
       foreach ($caseTypeXML->ActivityTypes->ActivityType as $activityTypeXML) {
@@ -341,10 +344,11 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
   /**
    * @param SimpleXMLElement $caseTypeXML
+   *
    * @return array<string> symbolic relationship-type names
    */
   public function getDeclaredRelationshipTypes($caseTypeXML) {
-    $result = array();
+    $result = [];
 
     if (!empty($caseTypeXML->CaseRoles) && $caseTypeXML->CaseRoles->RelationshipType) {
       foreach ($caseTypeXML->CaseRoles->RelationshipType as $relTypeXML) {
@@ -375,7 +379,7 @@ AND    a.is_auto = 1
 AND    a.is_current_revision = 1
 AND    ca.case_id = %2
 ";
-    $sqlParams = array(1 => array($params['clientID'], 'Integer'), 2 => array($params['caseID'], 'Integer'));
+    $sqlParams = [1 => [$params['clientID'], 'Integer'], 2 => [$params['caseID'], 'Integer']];
     CRM_Core_DAO::executeQuery($query, $sqlParams);
   }
 
@@ -394,10 +398,10 @@ AND        ca.case_id = %2
 AND        a.is_deleted = 0
 ";
 
-    $sqlParams = array(
-      1 => array($params['activityTypeID'], 'Integer'),
-      2 => array($params['caseID'], 'Integer'),
-    );
+    $sqlParams = [
+      1 => [$params['activityTypeID'], 'Integer'],
+      2 => [$params['caseID'], 'Integer'],
+    ];
     $count = CRM_Core_DAO::singleValueQuery($query, $sqlParams);
 
     // check for max instance
@@ -423,7 +427,7 @@ AND        a.is_deleted = 0
     if (!$activityTypeInfo) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
       CRM_Core_Error::fatal(ts('Activity type %1, found in case configuration file, is not present in the database %2',
-        array(1 => $activityTypeName, 2 => $docLink)
+        [1 => $activityTypeName, 2 => $docLink]
       ));
       return FALSE;
     }
@@ -446,7 +450,7 @@ AND        a.is_deleted = 0
     }
 
     if ($activityTypeName == 'Open Case') {
-      $activityParams = array(
+      $activityParams = [
         'activity_type_id' => $activityTypeID,
         'source_contact_id' => $params['creatorID'],
         'is_auto' => FALSE,
@@ -459,10 +463,10 @@ AND        a.is_deleted = 0
         'details' => CRM_Utils_Array::value('details', $params),
         'duration' => CRM_Utils_Array::value('duration', $params),
         'weight' => $orderVal,
-      );
+      ];
     }
     else {
-      $activityParams = array(
+      $activityParams = [
         'activity_type_id' => $activityTypeID,
         'source_contact_id' => $params['creatorID'],
         'is_auto' => TRUE,
@@ -470,8 +474,10 @@ AND        a.is_deleted = 0
         'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', $statusName),
         'target_contact_id' => $client,
         'weight' => $orderVal,
-      );
+      ];
     }
+
+    $activityParams['assignee_contact_id'] = $this->getDefaultAssigneeForActivity($activityParams, $activityTypeXML);
 
     //parsing date to default preference format
     $params['activity_date_time'] = CRM_Utils_Date::processDate($params['activity_date_time']);
@@ -506,7 +512,7 @@ AND        a.is_deleted = 0
         else {
           $referenceActivityInfo = CRM_Utils_Array::value($referenceActivityName, $activityTypes);
           if ($referenceActivityInfo['id']) {
-            $caseActivityParams = array('activity_type_id' => $referenceActivityInfo['id']);
+            $caseActivityParams = ['activity_type_id' => $referenceActivityInfo['id']];
 
             //if reference_select is set take according activity.
             if ($referenceSelect = (string) $activityTypeXML->reference_select) {
@@ -559,12 +565,161 @@ AND        a.is_deleted = 0
     }
 
     // create case activity record
-    $caseParams = array(
+    $caseParams = [
       'activity_id' => $activity->id,
       'case_id' => $params['caseID'],
-    );
+    ];
     CRM_Case_BAO_Case::processCaseActivity($caseParams);
     return TRUE;
+  }
+
+  /**
+   * Return the default assignee contact for the activity.
+   *
+   * @param array $activityParams
+   * @param object $activityTypeXML
+   *
+   * @return int|null the ID of the default assignee contact or null if none.
+   */
+  protected function getDefaultAssigneeForActivity($activityParams, $activityTypeXML) {
+    if (!isset($activityTypeXML->default_assignee_type)) {
+      return NULL;
+    }
+
+    $defaultAssigneeOptionsValues = $this->getDefaultAssigneeOptionValues();
+
+    switch ($activityTypeXML->default_assignee_type) {
+      case $defaultAssigneeOptionsValues['BY_RELATIONSHIP']:
+        return $this->getDefaultAssigneeByRelationship($activityParams, $activityTypeXML);
+
+      break;
+      case $defaultAssigneeOptionsValues['SPECIFIC_CONTACT']:
+        return $this->getDefaultAssigneeBySpecificContact($activityTypeXML);
+
+      break;
+      case $defaultAssigneeOptionsValues['USER_CREATING_THE_CASE']:
+        return $activityParams['source_contact_id'];
+
+      break;
+      case $defaultAssigneeOptionsValues['NONE']:
+      default:
+        return NULL;
+    }
+  }
+
+  /**
+   * Fetches and caches the activity's default assignee options.
+   *
+   * @return array
+   */
+  protected function getDefaultAssigneeOptionValues() {
+    if (!empty($this->defaultAssigneeOptionsValues)) {
+      return $this->defaultAssigneeOptionsValues;
+    }
+
+    $defaultAssigneeOptions = civicrm_api3('OptionValue', 'get', [
+      'option_group_id' => 'activity_default_assignee',
+      'options' => ['limit' => 0],
+    ]);
+
+    foreach ($defaultAssigneeOptions['values'] as $option) {
+      $this->defaultAssigneeOptionsValues[$option['name']] = $option['value'];
+    }
+
+    return $this->defaultAssigneeOptionsValues;
+  }
+
+  /**
+   * Returns the default assignee for the activity by searching for the target's
+   * contact relationship type defined in the activity's details.
+   *
+   * @param array $activityParams
+   * @param object $activityTypeXML
+   *
+   * @return int|null the ID of the default assignee contact or null if none.
+   */
+  protected function getDefaultAssigneeByRelationship($activityParams, $activityTypeXML) {
+    $isDefaultRelationshipDefined = isset($activityTypeXML->default_assignee_relationship)
+      && preg_match('/\d+_[ab]_[ab]/', $activityTypeXML->default_assignee_relationship);
+
+    if (!$isDefaultRelationshipDefined) {
+      return NULL;
+    }
+
+    $targetContactId = is_array($activityParams['target_contact_id'])
+      ? CRM_Utils_Array::first($activityParams['target_contact_id'])
+      : $activityParams['target_contact_id'];
+    list($relTypeId, $a, $b) = explode('_', $activityTypeXML->default_assignee_relationship);
+
+    $params = [
+      'relationship_type_id' => $relTypeId,
+      "contact_id_$b" => $targetContactId,
+      'is_active' => 1,
+    ];
+
+    if ($this->isBidirectionalRelationshipType($relTypeId)) {
+      $params["contact_id_$a"] = $targetContactId;
+      $params['options']['or'] = [['contact_id_a', 'contact_id_b']];
+    }
+
+    $relationships = civicrm_api3('Relationship', 'get', $params);
+
+    if ($relationships['count']) {
+      $relationship = CRM_Utils_Array::first($relationships['values']);
+
+      // returns the contact id on the other side of the relationship:
+      return (int) $relationship['contact_id_a'] === (int) $targetContactId
+        ? $relationship['contact_id_b']
+        : $relationship['contact_id_a'];
+    }
+    else {
+      return NULL;
+    }
+  }
+
+  /**
+   * Determines if the given relationship type is bidirectional or not by
+   * comparing their labels.
+   *
+   * @return bool
+   */
+  protected function isBidirectionalRelationshipType($relationshipTypeId) {
+    $relationshipTypeResult = civicrm_api3('RelationshipType', 'get', [
+      'id' => $relationshipTypeId,
+      'options' => ['limit' => 1],
+    ]);
+
+    if ($relationshipTypeResult['count'] === 0) {
+      return FALSE;
+    }
+
+    $relationshipType = CRM_Utils_Array::first($relationshipTypeResult['values']);
+
+    return $relationshipType['label_b_a'] === $relationshipType['label_a_b'];
+  }
+
+  /**
+   * Returns the activity's default assignee for a specific contact if the contact exists,
+   * otherwise returns null.
+   *
+   * @param object $activityTypeXML
+   *
+   * @return int|null
+   */
+  protected function getDefaultAssigneeBySpecificContact($activityTypeXML) {
+    if (!$activityTypeXML->default_assignee_contact) {
+      return NULL;
+    }
+
+    $contact = civicrm_api3('Contact', 'get', [
+      'id' => $activityTypeXML->default_assignee_contact,
+    ]);
+
+    if ($contact['count'] == 1) {
+      return $activityTypeXML->default_assignee_contact;
+    }
+
+    return NULL;
   }
 
   /**
@@ -573,7 +728,7 @@ AND        a.is_deleted = 0
    * @return array
    */
   public static function activitySets($activitySetsXML) {
-    $result = array();
+    $result = [];
     foreach ($activitySetsXML as $activitySetXML) {
       foreach ($activitySetXML as $recordXML) {
         $activitySetName = (string ) $recordXML->name;
@@ -616,11 +771,12 @@ AND        a.is_deleted = 0
 
   /**
    * @param string $caseType
+   *
    * @return array<\Civi\CCase\CaseChangeListener>
    */
   public function getListeners($caseType) {
     $xml = $this->retrieve($caseType);
-    $listeners = array();
+    $listeners = [];
     if ($xml->Listeners && $xml->Listeners->Listener) {
       foreach ($xml->Listeners->Listener as $listenerXML) {
         $class = (string) $listenerXML;
@@ -661,6 +817,7 @@ AND        a.is_deleted = 0
    * @param string $settingKey
    * @param string $xmlTag
    * @param mixed $default
+   *
    * @return int
    */
   private function getBoolSetting($settingKey, $xmlTag, $default = 0) {

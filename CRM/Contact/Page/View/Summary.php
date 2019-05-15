@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -122,7 +122,7 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       ->addScriptFile('civicrm', 'templates/CRM/common/TabHeader.js', 1, 'html-header')
       ->addSetting(array(
         'summaryPrint' => array('mode' => $this->_print),
-        'tabSettings' => array('active' => CRM_Utils_Request::retrieve('selectedChild', 'String', $this, FALSE, 'summary')),
+        'tabSettings' => array('active' => CRM_Utils_Request::retrieve('selectedChild', 'Alphanumeric', $this, FALSE, 'summary')),
       ));
     $this->assign('summaryPrint', $this->_print);
     $session = CRM_Core_Session::singleton();
@@ -264,138 +264,16 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
     $lastModified = CRM_Core_BAO_Log::lastModified($this->_contactId, 'civicrm_contact');
     $this->assign_by_ref('lastModified', $lastModified);
 
-    $allTabs = array();
-    $weight = 10;
-
     $this->_viewOptions = CRM_Core_BAO_Setting::valueOptions(
       CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'contact_view_options',
       TRUE
     );
 
-    // show the tabs only if user has generic access to CiviCRM
-    $accessCiviCRM = CRM_Core_Permission::check('access CiviCRM');
-
     $changeLog = $this->_viewOptions['log'];
     $this->assign_by_ref('changeLog', $changeLog);
-    $components = CRM_Core_Component::getEnabledComponents();
 
-    foreach ($components as $name => $component) {
-      if (!empty($this->_viewOptions[$name]) &&
-        CRM_Core_Permission::access($component->name)
-      ) {
-        $elem = $component->registerTab();
-
-        // FIXME: not very elegant, probably needs better approach
-        // allow explicit id, if not defined, use keyword instead
-        if (array_key_exists('id', $elem)) {
-          $i = $elem['id'];
-        }
-        else {
-          $i = $component->getKeyword();
-        }
-        $u = $elem['url'];
-
-        //appending isTest to url for test soft credit CRM-3891.
-        //FIXME: hack ajax url.
-        $q = "reset=1&force=1&cid={$this->_contactId}";
-        if (CRM_Utils_Request::retrieve('isTest', 'Positive', $this)) {
-          $q .= "&isTest=1";
-        }
-        $allTabs[] = array(
-          'id' => $i,
-          'url' => CRM_Utils_System::url("civicrm/contact/view/$u", $q),
-          'title' => $elem['title'],
-          'weight' => $elem['weight'],
-          'count' => CRM_Contact_BAO_Contact::getCountComponent($u, $this->_contactId),
-          'class' => 'livePage',
-        );
-        // make sure to get maximum weight, rest of tabs go after
-        // FIXME: not very elegant again
-        if ($weight < $elem['weight']) {
-          $weight = $elem['weight'];
-        }
-      }
-    }
-
-    $rest = array(
-      'activity' => array(
-        'title' => ts('Activities'),
-        'class' => 'livePage',
-      ),
-      'rel' => array(
-        'title' => ts('Relationships'),
-        'class' => 'livePage',
-      ),
-      'group' => array(
-        'title' => ts('Groups'),
-        'class' => 'ajaxForm',
-      ),
-      'note' => array(
-        'title' => ts('Notes'),
-        'class' => 'livePage',
-      ),
-      'tag' => array(
-        'title' => ts('Tags'),
-      ),
-      'log' => array(
-        'title' => ts('Change Log'),
-      ),
-    );
-
-    foreach ($rest as $k => $v) {
-      if ($accessCiviCRM && !empty($this->_viewOptions[$k])) {
-        $allTabs[] = $v + array(
-          'id' => $k,
-          'url' => CRM_Utils_System::url(
-            "civicrm/contact/view/$k",
-            "reset=1&cid={$this->_contactId}"
-          ),
-          'weight' => $weight,
-          'count' => CRM_Contact_BAO_Contact::getCountComponent($k, $this->_contactId),
-        );
-        $weight += 10;
-      }
-    }
-
-    // now add all the custom tabs
-    $entityType = $this->get('contactType');
-    $activeGroups = CRM_Core_BAO_CustomGroup::getActiveGroups(
-      $entityType,
-      'civicrm/contact/view/cd',
-      $this->_contactId
-    );
-
-    foreach ($activeGroups as $group) {
-      $id = "custom_{$group['id']}";
-      $allTabs[] = array(
-        'id' => $id,
-        'url' => CRM_Utils_System::url($group['path'], $group['query'] . "&selectedChild=$id"),
-        'title' => $group['title'],
-        'weight' => $weight,
-        'count' => CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $group['table_name']),
-        'hideCount' => !$group['is_multiple'],
-        'class' => 'livePage',
-      );
-      $weight += 10;
-    }
-
-    $context = array('contact_id' => $this->_contactId);
-    // see if any other modules want to add any tabs
-    CRM_Utils_Hook::tabs($allTabs, $this->_contactId);
-    CRM_Utils_Hook::tabset('civicrm/contact/view', $allTabs, $context);
-
-    $allTabs[] = array(
-      'id' => 'summary',
-      'url' => '#contact-summary',
-      'title' => ts('Summary'),
-      'weight' => 0,
-    );
-
-    // now sort the tabs based on weight
-    usort($allTabs, array('CRM_Utils_Sort', 'cmpFunc'));
-
-    $this->assign('allTabs', $allTabs);
+    $this->assign('allTabs', $this->getTabs());
 
     // hook for contact summary
     // ignored but needed to prevent warnings
@@ -426,6 +304,151 @@ class CRM_Contact_Page_View_Summary extends CRM_Contact_Page_View {
       }
     }
     return parent::getTemplateFileName();
+  }
+
+  /**
+   * @return array
+   */
+  public static function basicTabs() {
+    return [
+      [
+        'id' => 'summary',
+        'url' => '#contact-summary',
+        'title' => ts('Summary'),
+        'weight' => 0,
+        'icon' => 'crm-i fa-address-card-o',
+      ],
+      [
+        'id' => 'activity',
+        'title' => ts('Activities'),
+        'class' => 'livePage',
+        'weight' => 70,
+        'icon' => 'crm-i fa-tasks',
+      ],
+      [
+        'id' => 'rel',
+        'title' => ts('Relationships'),
+        'class' => 'livePage',
+        'weight' => 80,
+        'icon' => 'crm-i fa-handshake-o',
+      ],
+      [
+        'id' => 'group',
+        'title' => ts('Groups'),
+        'class' => 'ajaxForm',
+        'weight' => 90,
+        'icon' => 'crm-i fa-users',
+      ],
+      [
+        'id' => 'note',
+        'title' => ts('Notes'),
+        'class' => 'livePage',
+        'weight' => 100,
+        'icon' => 'crm-i fa-sticky-note-o',
+      ],
+      [
+        'id' => 'tag',
+        'title' => ts('Tags'),
+        'weight' => 110,
+        'icon' => 'crm-i fa-tags',
+      ],
+      [
+        'id' => 'log',
+        'title' => ts('Change Log'),
+        'weight' => 120,
+        'icon' => 'crm-i fa-history',
+      ],
+    ];
+  }
+
+  /**
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  public function getTabs() {
+    $allTabs = [];
+    $weight = 10;
+
+    foreach (CRM_Core_Component::getEnabledComponents() as $name => $component) {
+      if (!empty($this->_viewOptions[$name]) &&
+        CRM_Core_Permission::access($component->name)
+      ) {
+        $elem = $component->registerTab();
+
+        // FIXME: not very elegant, probably needs better approach
+        // allow explicit id, if not defined, use keyword instead
+        if (array_key_exists('id', $elem)) {
+          $i = $elem['id'];
+        }
+        else {
+          $i = $component->getKeyword();
+        }
+        $u = $elem['url'];
+
+        //appending isTest to url for test soft credit CRM-3891.
+        //FIXME: hack ajax url.
+        $q = "reset=1&force=1&cid={$this->_contactId}";
+        if (CRM_Utils_Request::retrieve('isTest', 'Positive', $this)) {
+          $q .= "&isTest=1";
+        }
+        $allTabs[] = [
+          'id' => $i,
+          'url' => CRM_Utils_System::url("civicrm/contact/view/$u", $q),
+          'title' => $elem['title'],
+          'weight' => $elem['weight'],
+          'count' => CRM_Contact_BAO_Contact::getCountComponent($u, $this->_contactId),
+          'class' => 'livePage',
+          'icon' => $component->getIcon(),
+        ];
+      }
+    }
+
+    // show the tabs only if user has generic access to CiviCRM
+    $accessCiviCRM = CRM_Core_Permission::check('access CiviCRM');
+    foreach (self::basicTabs() as $tab) {
+      if ($tab['id'] == 'summary') {
+        $allTabs[] = $tab;
+      }
+      elseif ($accessCiviCRM && !empty($this->_viewOptions[$tab['id']])) {
+        $allTabs[] = $tab + [
+          'url' => CRM_Utils_System::url("civicrm/contact/view/{$tab['id']}", "reset=1&cid={$this->_contactId}"),
+          'count' => CRM_Contact_BAO_Contact::getCountComponent($tab['id'], $this->_contactId),
+        ];
+        $weight = $tab['weight'] + 10;
+      }
+    }
+
+    // now add all the custom tabs
+    $entityType = $this->get('contactType');
+    $activeGroups = CRM_Core_BAO_CustomGroup::getActiveGroups(
+      $entityType,
+      'civicrm/contact/view/cd',
+      $this->_contactId
+    );
+
+    foreach ($activeGroups as $group) {
+      $id = "custom_{$group['id']}";
+      $allTabs[] = [
+        'id' => $id,
+        'url' => CRM_Utils_System::url($group['path'], $group['query'] . "&selectedChild=$id"),
+        'title' => $group['title'],
+        'weight' => $weight,
+        'count' => CRM_Contact_BAO_Contact::getCountComponent($id, $this->_contactId, $group['table_name']),
+        'hideCount' => !$group['is_multiple'],
+        'class' => 'livePage',
+        'icon' => 'crm-i fa-gear',
+      ];
+      $weight += 10;
+    }
+
+    $context = ['contact_id' => $this->_contactId];
+    // see if any other modules want to add any tabs
+    CRM_Utils_Hook::tabs($allTabs, $this->_contactId);
+    CRM_Utils_Hook::tabset('civicrm/contact/view', $allTabs, $context);
+
+    // now sort the tabs based on weight
+    usort($allTabs, ['CRM_Utils_Sort', 'cmpFunc']);
+    return $allTabs;
   }
 
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -46,7 +46,7 @@
  */
 function smarty_modifier_crmAddClass($string, $class) {
   // Standardize white space
-  $string = str_replace(array('class ="', 'class= "', 'class = "'), 'class="', $string);
+  $string = str_replace(['class ="', 'class= "', 'class = "'], 'class="', $string);
   if (strpos($string, 'class="') !== FALSE) {
     $string = str_replace('class="', 'class="' . "$class ", $string);
   }

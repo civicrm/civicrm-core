@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Core_Smarty_plugins_CrmScopeTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
     require_once 'CRM/Core/Smarty.php';

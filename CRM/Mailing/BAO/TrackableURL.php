@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
 
@@ -55,7 +55,7 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
    */
   public static function getTrackerURL($url, $mailing_id, $queue_id) {
 
-    static $urlCache = array();
+    static $urlCache = [];
 
     if (array_key_exists($mailing_id . $url, $urlCache)) {
       return $urlCache[$mailing_id . $url] . "&qid=$queue_id";
@@ -88,7 +88,6 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
         $tracker->save();
       }
       $id = $tracker->id;
-      $tracker->free();
 
       $redirect = $config->userFrameworkResourceURL . "extern/url.php?u=$id";
       $urlCache[$mailing_id . $url] = $redirect;
@@ -97,7 +96,7 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
     $returnUrl = "{$urlCache[$mailing_id . $url]}&qid={$queue_id}";
 
     if ($hrefExists) {
-      $returnUrl = "href='{$returnUrl}'";
+      $returnUrl = "href='{$returnUrl}' rel='nofollow'";
     }
 
     return $returnUrl;

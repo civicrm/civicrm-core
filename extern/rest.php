@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,6 @@ $config = CRM_Core_Config::singleton();
 if (defined('PANTHEON_ENVIRONMENT')) {
   ini_set('session.save_handler', 'files');
 }
-session_start();
 $rest = new CRM_Utils_REST();
 
 // Json-appropriate header will be set by CRM_Utils_Rest

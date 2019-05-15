@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -98,7 +98,7 @@
         });
       }
       else {
-        if (elementId.is('select') === true && firstElement.parent().find(':input').select().index() >= 1 && firstElement.parent().find('select').select().index < 1) {
+        if (elementId.is('select') === true && firstElement.parent().find(':input').select().index() >= 1 && firstElement.parent().find('select').select().length > 1) {
           // its a multiselect case
           firstElement.parent().find(':input').select().each( function(count) {
             var firstElementValue = $(this).val();

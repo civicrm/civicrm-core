@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,12 +41,12 @@
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_membership_delete_spec(&$params) {
-  $params['preserve_contribution'] = array(
+  $params['preserve_contribution'] = [
     'api.required' => 0,
     'title' => 'Preserve Contribution',
     'description' => 'By default this is 0, or 0 if not set. Set to 1 to preserve the associated contribution record when membership is deleted.',
     'type' => CRM_Utils_Type::T_BOOLEAN,
-  );
+  ];
 }
 
 /**
@@ -97,13 +97,16 @@ function civicrm_api3_membership_create($params) {
     }
   }
 
-  $values = array();
+  $values = [];
   _civicrm_api3_custom_format_params($params, $values, 'Membership');
   $params = array_merge($params, $values);
 
+  // Calculate membership dates
   // Fixme: This code belongs in the BAO
   if (empty($params['id']) || !empty($params['num_terms'])) {
+    // If this is a new membership or we have a specified number of terms calculate membership dates.
     if (empty($params['id'])) {
+      // This is a new membership, calculate the membership dates.
       $calcDates = CRM_Member_BAO_MembershipType::getDatesForMembershipType(
         $params['membership_type_id'],
         CRM_Utils_Array::value('join_date', $params),
@@ -113,6 +116,7 @@ function civicrm_api3_membership_create($params) {
       );
     }
     else {
+      // This is an existing membership, calculate the membership dates after renewal
       $calcDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType(
         $params['id'],
         NULL,
@@ -120,7 +124,7 @@ function civicrm_api3_membership_create($params) {
         $params['num_terms']
       );
     }
-    foreach (array('join_date', 'start_date', 'end_date') as $date) {
+    foreach (['join_date', 'start_date', 'end_date'] as $date) {
       if (empty($params[$date]) && isset($calcDates[$date])) {
         $params[$date] = $calcDates[$date];
       }
@@ -128,20 +132,20 @@ function civicrm_api3_membership_create($params) {
   }
 
   // Fixme: This code belongs in the BAO
-  $action = CRM_Core_Action::ADD;
-  // we need user id during add mode
-  $ids = array();
-  if (!empty($params['contact_id'])) {
-    $ids['userId'] = $params['contact_id'];
+  if (empty($params['id'])) {
+    $params['action'] = CRM_Core_Action::ADD;
+    // we need user id during add mode
+    $ids = [];
+    if (!empty($params['contact_id'])) {
+      $ids['userId'] = $params['contact_id'];
+    }
   }
-  //for edit membership id should be present
-  // probably not required now.
-  if (!empty($params['id'])) {
+  else {
+    // edit mode
+    $params['action'] = CRM_Core_Action::UPDATE;
+    // $ids['membership'] is required in CRM_Price_BAO_LineItem::processPriceSet
     $ids['membership'] = $params['id'];
-    $action = CRM_Core_Action::UPDATE;
   }
-  //need to pass action to handle related memberships.
-  $params['action'] = $action;
 
   $membershipBAO = CRM_Member_BAO_Membership::create($params, $ids, TRUE);
 
@@ -151,7 +155,7 @@ function civicrm_api3_membership_create($params) {
     return civicrm_api3_create_error(ts('The membership can not be saved, no valid membership status for given dates'));
   }
 
-  $membership = array();
+  $membership = [];
   _civicrm_api3_object_to_array($membershipBAO, $membership[$membershipBAO->id]);
 
   return civicrm_api3_create_success($membership, $params, 'Membership', 'create', $membershipBAO);
@@ -170,18 +174,18 @@ function _civicrm_api3_membership_create_spec(&$params) {
   $params['contact_id']['api.required'] = 1;
   $params['membership_type_id']['api.required'] = 1;
   $params['is_test']['api.default'] = 0;
-  $params['membership_type_id']['api.aliases'] = array('membership_type');
-  $params['status_id']['api.aliases'] = array('membership_status');
-  $params['skipStatusCal'] = array(
+  $params['membership_type_id']['api.aliases'] = ['membership_type'];
+  $params['status_id']['api.aliases'] = ['membership_status'];
+  $params['skipStatusCal'] = [
     'title' => 'Skip status calculation',
     'description' => 'By default this is 0 if id is not set and 1 if it is set.',
     'type' => CRM_Utils_Type::T_BOOLEAN,
-  );
-  $params['num_terms'] = array(
+  ];
+  $params['num_terms'] = [
     'title' => 'Number of terms',
     'description' => 'Terms to add/renew. If this parameter is passed, dates will be calculated automatically. If no id is passed (new membership) and no dates are given, num_terms will be assumed to be 1.',
     'type' => CRM_Utils_Type::T_INT,
-  );
+  ];
 }
 
 /**
@@ -193,12 +197,12 @@ function _civicrm_api3_membership_create_spec(&$params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_membership_get_spec(&$params) {
-  $params['membership_type_id']['api.aliases'] = array('membership_type');
-  $params['active_only'] = array(
+  $params['membership_type_id']['api.aliases'] = ['membership_type'];
+  $params['active_only'] = [
     'title' => 'Active Only',
     'description' => 'Only retrieve active memberships',
     'type' => CRM_Utils_Type::T_BOOLEAN,
-  );
+  ];
 }
 
 /**
@@ -225,7 +229,7 @@ function civicrm_api3_membership_get($params) {
   }
   $activeOnly = CRM_Utils_Array::value('active_only', $params, $activeOnly);
   if ($activeOnly && empty($params['status_id'])) {
-    $params['status_id'] = array('IN' => CRM_Member_BAO_MembershipStatus::getMembershipStatusCurrent());
+    $params['status_id'] = ['IN' => CRM_Member_BAO_MembershipStatus::getMembershipStatusCurrent()];
   }
 
   $options = _civicrm_api3_get_options_from_params($params, TRUE, 'Membership', 'get');
@@ -267,15 +271,14 @@ function civicrm_api3_membership_get($params) {
  */
 function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTypeId, $activeOnly) {
   // get the membership for the given contact ID
-  $membershipParams = array('contact_id' => $params['contact_id']);
+  $membershipParams = ['contact_id' => $params['contact_id']];
   if ($membershipTypeId) {
     $membershipParams['membership_type_id'] = $membershipTypeId;
   }
-  $membershipValues = array();
+  $membershipValues = [];
   CRM_Member_BAO_Membership::getValues($membershipParams, $membershipValues, $activeOnly);
   return $membershipValues;
 }
-
 
 /**
  * Non-standard behaviour inherited from v2.
@@ -289,7 +292,7 @@ function _civicrm_api3_membership_get_customv2behaviour(&$params, $membershipTyp
  *   result for calling function
  */
 function _civicrm_api3_membership_relationsship_get_customv2behaviour(&$params, $membershipValues, $contactID) {
-  $relationships = array();
+  $relationships = [];
   foreach ($membershipValues as $membershipId => $values) {
     // populate the membership type name for the membership type id
     $membershipType = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($values['membership_type_id']);

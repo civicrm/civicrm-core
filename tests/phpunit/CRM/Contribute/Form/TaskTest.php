@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,10 +28,8 @@
 /**
  * Class CRM_Contribute_Form_Tasktest
  */
-class CRM_Contribute_Form_Tasktest extends CiviUnitTestCase {
-  /**
-   * Assume empty database with just civicrm_data.
-   */
+class CRM_Contribute_Form_TaskTest extends CiviUnitTestCase {
+
   protected $_individualId;
 
   /**

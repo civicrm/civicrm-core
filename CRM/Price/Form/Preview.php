@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -67,12 +67,12 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
       $this->_groupTree[$groupId]['fields'][$fieldId] = $groupTree[$groupId]['fields'][$fieldId];
       $this->assign('preview_type', 'field');
       $url = CRM_Utils_System::url('civicrm/admin/price/field', "reset=1&action=browse&sid={$groupId}");
-      $breadCrumb = array(
-        array(
+      $breadCrumb = [
+        [
           'title' => ts('Price Set Fields'),
           'url' => $url,
-        ),
-      );
+        ],
+      ];
     }
     else {
       // group preview
@@ -80,12 +80,12 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
       $this->assign('preview_type', 'group');
       $this->assign('setTitle', CRM_Price_BAO_PriceSet::getTitle($groupId));
       $url = CRM_Utils_System::url('civicrm/admin/price', 'reset=1');
-      $breadCrumb = array(
-        array(
+      $breadCrumb = [
+        [
           'title' => ts('Price Sets'),
           'url' => $url,
-        ),
-      );
+        ],
+      ];
     }
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
   }
@@ -97,7 +97,7 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
    *   the default array reference
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     $groupId = $this->get('groupId');
     $fieldId = $this->get('fieldId');
     if (!empty($this->_groupTree[$groupId]['fields'])) {
@@ -139,13 +139,13 @@ class CRM_Price_Form_Preview extends CRM_Core_Form {
       }
     }
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'cancel',
         'name' => ts('Done with Preview'),
         'isDefault' => TRUE,
-      ),
-    ));
+      ],
+    ]);
   }
 
 }

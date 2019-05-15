@@ -6,7 +6,7 @@
  *   API result array
  */
 function participant_create_example() {
-  $params = array(
+  $params = [
     'contact_id' => 2,
     'event_id' => 2,
     'status_id' => 1,
@@ -14,7 +14,7 @@ function participant_create_example() {
     'register_date' => '2007-07-21 00:00:00',
     'source' => 'Online Event Registration: API Testing',
     'custom_1' => 'custom string',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Participant', 'create', $params);
@@ -24,12 +24,12 @@ function participant_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -43,13 +43,13 @@ function participant_create_example() {
  */
 function participant_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 4,
-    'values' => array(
-      '4' => array(
+    'values' => [
+      '4' => [
         'id' => '4',
         'contact_id' => '2',
         'event_id' => '2',
@@ -69,9 +69,9 @@ function participant_create_expectedresult() {
         'cart_id' => '',
         'must_wait' => '',
         'transferred_to_contact_id' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

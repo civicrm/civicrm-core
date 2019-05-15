@@ -1,9 +1,9 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.7                                                |
+| CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2017                                |
+| Copyright CiviCRM LLC (c) 2004-2019                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -28,7 +28,7 @@
 /**
  * Tests for the CRM_Import_Datasource_Csv class.
  */
-class CRM_Import_Datasource_CsvTest extends CiviUnitTestCase {
+class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
 
   /**
    * Test the to csv function.

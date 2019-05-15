@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,10 +23,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-block crm-form-block crm-debugging-form-block">
 <div class="help">
     {ts}In addition to the settings on this screen, there are a number of settings you can add to your sites's settings file (civicrm.settings.php) to provide additional debugging information.{/ts} {docURL page="Debugging for developers" resource="wiki"}
 </div>
+<div class="crm-block crm-form-block crm-debugging-form-block">
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
          <table class="form-layout">
             {if $form.userFrameworkLogging}

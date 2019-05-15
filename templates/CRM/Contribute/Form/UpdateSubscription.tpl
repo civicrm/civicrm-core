@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,12 @@
   {if $changeHelpText}
     <div class="help">
       {$changeHelpText}
-  </div>
+      {if $recurMembership}
+        <br/><strong> {ts}WARNING: This recurring contribution is linked to membership:{/ts}
+        <a class="crm-hover-button" href='{crmURL p="civicrm/contact/view/membership" q="action=view&reset=1&cid=`$contactId`&id=`$recurMembership.membership_id`&context=membership&selectedChild=member"}'>{$recurMembership.membership_name}</a>
+        </strong>
+      {/if}
+    </div>
   {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout">
@@ -46,6 +51,8 @@
     <tr><td class="label">{$form.financial_type_id.label}</td><td>{$form.financial_type_id.html}</td></tr>
     {/if}
   </table>
+
+  {include file="CRM/common/customDataBlock.tpl"}
 
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

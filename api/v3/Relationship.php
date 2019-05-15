@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -121,7 +121,7 @@ function civicrm_api3_relationship_get($params) {
   }
   //perhaps we should add a 'getcount' but at this stage lets just handle getcount output
   if ($options['is_count']) {
-    return array('count' => $relationships);
+    return ['count' => $relationships];
   }
   foreach ($relationships as $relationshipId => $values) {
     _civicrm_api3_custom_data_get($relationships[$relationshipId], CRM_Utils_Array::value('check_permissions', $params), 'Relationship', $relationshipId, NULL, CRM_Utils_Array::value('relationship_type_id', $values));
@@ -158,7 +158,7 @@ function _civicrm_api3_handle_relationship_type(&$params) {
  */
 function civicrm_api3_relationship_setvalue($params) {
   require_once 'api/v3/Generic/Setvalue.php';
-  $result = civicrm_api3_generic_setValue(array("entity" => 'Relationship', 'params' => $params));
+  $result = civicrm_api3_generic_setValue(["entity" => 'Relationship', 'params' => $params]);
 
   if (empty($result['is_error']) && CRM_Utils_String::munge($params['field']) == 'is_active') {
     $action = CRM_Core_Action::DISABLE;
@@ -168,4 +168,54 @@ function civicrm_api3_relationship_setvalue($params) {
     CRM_Contact_BAO_Relationship::disableEnableRelationship($params['id'], $action);
   }
   return $result;
+}
+
+function _civicrm_api3_relationship_getoptions_spec(&$params) {
+  $params['field']['options']['relationship_type_id'] = ts('Relationship Type ID');
+
+  // Add parameters for limiting relationship type ID
+  $relationshipTypePrefix = ts('(For relationship_type_id only) ');
+  $params['contact_id'] = [
+    'title' => ts('Contact ID'),
+    'description' => $relationshipTypePrefix . ts('Limits options to those'
+      . ' available to give contact'),
+    'type' => CRM_Utils_Type::T_INT,
+    'FKClassName' => 'CRM_Contact_DAO_Contact',
+    'FKApiName' => 'Contact',
+  ];
+  $params['relationship_direction'] = [
+    'title' => ts('Relationship Direction'),
+    'description' => $relationshipTypePrefix . ts('For relationships where the '
+      . 'name is the same for both sides (i.e. "Spouse Of") show the option '
+      . 'from "A" (origin) side or "B" (target) side of the relationship?'),
+    'type' => CRM_Utils_Type::T_STRING,
+    'options' => ['a_b' => 'a_b', 'b_a' => 'b_a'],
+    'api.default' => 'a_b',
+  ];
+  $params['relationship_id'] = [
+    'title' => ts('Reference Relationship ID'),
+    'description' => $relationshipTypePrefix . ts('If provided alongside '
+      . 'contact ID it will be used to establish the contact type of the "B" '
+      . 'side of the relationship and limit options based on it. If the '
+      . 'provided contact ID does not match the "A" side of this relationship '
+      . 'then the "A" side of this relationship will be used to limit options'),
+    'type' => CRM_Utils_Type::T_INT,
+    'FKClassName' => 'CRM_Contact_DAO_Relationship',
+    'FKApiName' => 'Relationship',
+  ];
+  $contactTypes = CRM_Contact_BAO_ContactType::contactTypes();
+  $params['contact_type'] = [
+    'title' => ts('Contact Type'),
+    'description' => $relationshipTypePrefix . ts('Limits options to those '
+    . 'available to this contact type. Overridden by the contact type of '
+    . 'contact ID (if provided)'),
+    'type' => CRM_Utils_Type::T_STRING,
+    'options' => array_combine($contactTypes, $contactTypes),
+  ];
+  $params['is_form'] = [
+    'title' => ts('Is Form?'),
+    'description' => $relationshipTypePrefix . ts('Formats the options for use'
+      . ' in a form if true. The format is &lt;id&gt;_a_b => &lt;label&gt;'),
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  ];
 }

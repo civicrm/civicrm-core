@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -300,9 +300,26 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       'help_post' => 'This is Post Help For Test Group 8',
     );
 
-    $customGroup = $this->callAPISuccess('custom_group', 'create', $params);
+    $customGroup = $this->callAPISuccess('CustomGroup', 'create', $params);
     $this->assertNotNull($customGroup['id']);
     $this->assertEquals($customGroup['values'][$customGroup['id']]['extends'], 'Group');
+  }
+
+  /**
+   * Test an empty update does not trigger e-notices when is_multiple has been set.
+   */
+  public function testCustomGroupEmptyUpdate() {
+    $customGroup = $this->callAPISuccess('CustomGroup', 'create', array_merge($this->_params, ['is_multiple' => 1]));
+    $this->callAPISuccess('CustomGroup', 'create', ['id' => $customGroup['id']]);
+  }
+
+  /**
+   * Test an update when is_multiple is an emtpy string this can occur in form submissions for custom groups that extend activites.
+   * dev/core#227.
+   */
+  public function testCustomGroupEmptyisMultipleUpdate() {
+    $customGroup = $this->callAPISuccess('CustomGroup', 'create', array_merge($this->_params, ['is_multiple' => 0]));
+    $this->callAPISuccess('CustomGroup', 'create', ['id' => $customGroup['id'], 'is_multiple' => '']);
   }
 
   /**
@@ -371,6 +388,19 @@ class api_v3_CustomGroupTest extends CiviUnitTestCase {
       }
       $this->assertEquals($value, $values[$key], $key . " doesn't match " . print_r($values, TRUE) . 'in line' . __LINE__);
     }
+  }
+
+  public function testUpdateCustomGroup() {
+    $customGroup = $this->customGroupCreate();
+    $customGroupId = $customGroup['id'];
+
+    //update is_active
+    $params = ['id' => $customGroupId, 'is_active' => 0];
+    $result = $this->callAPISuccess('CustomGroup', 'create', $params);
+    $result = array_shift($result['values']);
+
+    $this->assertEquals(0, $result['is_active']);
+    $this->customGroupDelete($customGroupId);
   }
 
 }

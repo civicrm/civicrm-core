@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,7 +49,7 @@
               {literal}
               <script type="text/javascript">
                 (function($) {
-                  var ZeroRecordText = {/literal}'{ts 1=$customGroupTitle}No records of type \'%1\' found.{/ts}'{literal};
+                  var ZeroRecordText = {/literal}'{ts 1=$customGroupTitle|escape}No records of type \'%1\' found.{/ts}'{literal};
                   var $table = $('#records-' + {/literal}'{$customGroupId}'{literal});
                   $('table.crm-multifield-selector').data({
                     "ajax": {
@@ -72,7 +72,7 @@
                           }
                         }
                       });
-                    },
+                    }
                   })
                 })(CRM.$);
               </script>

@@ -1,0 +1,44 @@
+@media (min-width: $breakMin) {
+
+  body.crm-menubar-visible.crm-menubar-over-cms-menu {
+    border-top: 0 none !important;
+    margin-top: $menubarHeight;
+  }
+  body.crm-menubar-visible.crm-menubar-over-cms-menu.crm-menubar-wrapped {
+    margin-top: calc($menubarHeight * 2);
+  }
+  body.crm-menubar-visible.crm-menubar-over-cms-menu #admin-bar {
+    visibility: hidden;
+  }
+
+  body.crm-menubar-visible.crm-menubar-below-cms-menu {
+    padding-top: 37px;
+  }
+  body.crm-menubar-visible.crm-menubar-below-cms-menu.crm-menubar-wrapped {
+    padding-top: 77px;
+  }
+  .admin-bar body.crm-menubar-below-cms-menu #civicrm-menu {
+    z-index: 999;
+  }
+  .admin-bar body.backdrop-admin-bar-position-absolute #civicrm-menu {
+    position: absolute;
+  }
+  body.crm-menubar-below-cms-menu #admin-bar {
+    z-index: 1000;
+  }
+
+}
+@media (max-width: $breakMax) {
+
+  body.backdrop-admin-bar-position-absolute #civicrm-menu-nav {
+    position: absolute;
+  }
+
+  body #civicrm-menu-nav .crm-menubar-toggle-btn {
+    position: absolute;
+    right: 120px;
+    top: 0;
+    margin-top: 3px;
+  }
+
+}

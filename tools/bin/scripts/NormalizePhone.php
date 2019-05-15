@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,7 +44,7 @@ function run() {
 
   require_once 'Console/Getopt.php';
   $shortOptions = "n:p:k:pre";
-  $longOptions = array('name=', 'pass=', 'key=', 'prefix=');
+  $longOptions = ['name=', 'pass=', 'key=', 'prefix='];
 
   $getopt = new Console_Getopt();
   $args = $getopt->readPHPArgv();
@@ -52,12 +52,12 @@ function run() {
   array_shift($args);
   list($valid, $dontCare) = $getopt->getopt2($args, $shortOptions, $longOptions);
 
-  $vars = array(
+  $vars = [
     'name' => 'n',
     'pass' => 'p',
     'key' => 'k',
     'prefix' => 'pre',
-  );
+  ];
 
   foreach ($vars as $var => $short) {
     $$var = NULL;
@@ -100,9 +100,10 @@ AND        phone NOT REGEXP '^[[:digit:]]{3}-[[:digit:]]{3}-[[:digit:]]{4}$'
   $dao = &CRM_Core_DAO::executeQuery($query);
 
   $updateQuery = "UPDATE civicrm_phone SET phone = %1 where id = %2";
-  $params = array(1 => array('', 'String'),
-    2 => array(0, 'Integer'),
-  );
+  $params = [
+    1 => ['', 'String'],
+    2 => [0, 'Integer'],
+  ];
   $totalPhone = $validPhone = $nonPrefixedPhone = 0;
   while ($dao->fetch()) {
     $newPhone = processPhone($dao->phone, $prefix);

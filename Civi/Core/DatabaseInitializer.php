@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,11 +42,11 @@ class DatabaseInitializer {
    * @throws \CRM_Core_Exception
    */
   public static function initialize(SystemInstallEvent $event) {
-    $api_params = array(
+    $api_params = [
       'version' => 3,
       'triggers' => 1,
       'session' => 1,
-    );
+    ];
     civicrm_api('System', 'flush', $api_params);
   }
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_Form_Search_Custom_FullText_Contribution extends CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery {
 
@@ -74,38 +74,39 @@ class CRM_Contact_Form_Search_Custom_FullText_Contribution extends CRM_Contact_F
   public function prepareQueries($queryText, $entityIDTableName) {
     // Note: For available full-text indices, see CRM_Core_InnoDBIndexer
 
-    $contactSQL = array();
+    $contactSQL = [];
     $contactSQL[] = "
 SELECT     distinct cc.id
 FROM       civicrm_contribution cc
 INNER JOIN civicrm_contact c ON cc.contact_id = c.id
-WHERE      ({$this->matchText('civicrm_contact c', array('sort_name', 'display_name', 'nick_name'), $queryText)})
+WHERE      ({$this->matchText('civicrm_contact c', ['sort_name', 'display_name', 'nick_name'], $queryText)})
 ";
-    $tables = array(
-      'civicrm_contribution' => array(
+    $tables = [
+      'civicrm_contribution' => [
         'id' => 'id',
-        'fields' => array(
+        'fields' => [
           'source' => NULL,
           'amount_level' => NULL,
           'trxn_Id' => NULL,
           'invoice_id' => NULL,
-          'check_number' => 'Int', // Odd: This is really a VARCHAR, so why are we searching like an INT?
+          // Odd: This is really a VARCHAR, so why are we searching like an INT?
+          'check_number' => 'Int',
           'total_amount' => 'Int',
-        ),
-      ),
-      'file' => array(
+        ],
+      ],
+      'file' => [
         'xparent_table' => 'civicrm_contribution',
-      ),
+      ],
       'sql' => $contactSQL,
-      'civicrm_note' => array(
+      'civicrm_note' => [
         'id' => 'entity_id',
         'entity_table' => 'civicrm_contribution',
-        'fields' => array(
+        'fields' => [
           'subject' => NULL,
           'note' => NULL,
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
     // get the custom data info
     $this->fillCustomInfo($tables, "( 'Contribution' )");

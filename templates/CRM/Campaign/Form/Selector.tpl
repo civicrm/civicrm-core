@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,6 +34,7 @@
     {if !$single and $context eq 'Search' }
         <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
     {/if}
+    <th scope="col"></th>
     {foreach from=$columnHeaders item=header}
 
         <th scope="col">
@@ -56,16 +57,17 @@
           {assign var=cbName value=$row.checkbox}
           <td>{$form.$cbName.html}</td>
    {/if}
-    <td>{$row.contact_type} &nbsp;<a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
-  <td>{$row.street_number}</td>
-  <td>{$row.street_name}</td>
-  <td>{$row.street_address}</td>
-  <td>{$row.city}</td>
-  <td>{$row.postal_code}</td>
-  <td>{$row.state_province}</td>
-  <td>{$row.country}</td>
-  <td>{$row.email}</td>
-  <td>{$row.phone}</td>
+    <td>{$row.contact_type}</td>
+    <td><a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.sort_name}</a></td>
+    <td>{$row.street_number}</td>
+    <td>{$row.street_name}</td>
+    <td>{$row.street_address}</td>
+    <td>{$row.city}</td>
+    <td>{$row.postal_code}</td>
+    <td>{$row.state_province}</td>
+    <td>{$row.country}</td>
+    <td>{$row.email}</td>
+    <td>{$row.phone}</td>
     {/if}
   </tr>
   {/foreach}

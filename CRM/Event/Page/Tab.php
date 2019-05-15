@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -58,9 +58,9 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
       $this->assign('displayName', $displayName);
       $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('participant', $this->_contactId);
       // Refresh other tabs with related data
-      $this->ajaxResponse['updateTabs'] = array(
+      $this->ajaxResponse['updateTabs'] = [
         '#tab_activity' => CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId),
-      );
+      ];
       if (CRM_Core_Permission::access('CiviContribute')) {
         $this->ajaxResponse['updateTabs']['#tab_contribute'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId);
       }
@@ -95,7 +95,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
    */
   public function edit() {
     // set https for offline cc transaction
-    $mode = CRM_Utils_Request::retrieve('mode', 'String', $this);
+    $mode = CRM_Utils_Request::retrieve('mode', 'Alphanumeric', $this);
     if ($mode == 'test' || $mode == 'live') {
       CRM_Utils_System::redirectToSSL();
     }
@@ -118,8 +118,21 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     return $controller->run();
   }
 
+  public function delete() {
+    $controller = new CRM_Core_Controller_Simple(
+      'CRM_Event_Form_Participant',
+      ts('Delete Participant'),
+      $this->_action
+    );
+
+    $controller->setEmbedded(TRUE);
+    $controller->set('id', $this->_id);
+    $controller->set('cid', $this->_contactId);
+    $controller->run();
+  }
+
   public function preProcess() {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
 
@@ -167,12 +180,11 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->view();
     }
-    elseif ($this->_action & (CRM_Core_Action::UPDATE |
-        CRM_Core_Action::ADD |
-        CRM_Core_Action::DELETE
-      )
-    ) {
+    elseif ($this->_action & (CRM_Core_Action::UPDATE | CRM_Core_Action::ADD)) {
       $this->edit();
+    }
+    elseif ($this->_action & (CRM_Core_Action::DELETE | CRM_Core_Action::DETACH)) {
+      $this->delete();
     }
     else {
       $this->browse();

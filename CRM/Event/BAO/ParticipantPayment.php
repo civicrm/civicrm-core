@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -41,14 +41,15 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
    * @param array $params
    *   of values to initialize the record with.
    * @param array $ids
-   *   with one values of id for this participantPayment record (for update).
+   *   deprecated array.
    *
    * @return object
    *   the partcipant payment record
    */
-  public static function create(&$params, &$ids) {
-    if (isset($ids['id'])) {
-      CRM_Utils_Hook::pre('edit', 'ParticipantPayment', $ids['id'], $params);
+  public static function create(&$params, $ids = []) {
+    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
+    if ($id) {
+      CRM_Utils_Hook::pre('edit', 'ParticipantPayment', $id, $params);
     }
     else {
       CRM_Utils_Hook::pre('create', 'ParticipantPayment', NULL, $params);
@@ -56,37 +57,42 @@ class CRM_Event_BAO_ParticipantPayment extends CRM_Event_DAO_ParticipantPayment 
 
     $participantPayment = new CRM_Event_BAO_ParticipantPayment();
     $participantPayment->copyValues($params);
-    if (isset($ids['id'])) {
-      $participantPayment->id = CRM_Utils_Array::value('id', $ids);
+    if ($id) {
+      $participantPayment->id = $id;
     }
     else {
       $participantPayment->find(TRUE);
     }
     $participantPayment->save();
 
-    if (isset($ids['id'])) {
-      CRM_Utils_Hook::post('edit', 'ParticipantPayment', $ids['id'], $participantPayment);
+    if (empty($participantPayment->contribution_id)) {
+      // For an id update contribution_id may be unknown. We want it
+      // further down so perhaps get it before the hooks.
+      $participantPayment->find(TRUE);
+    }
+    if ($id) {
+      CRM_Utils_Hook::post('edit', 'ParticipantPayment', $participantPayment->id, $participantPayment);
     }
     else {
-      CRM_Utils_Hook::post('create', 'ParticipantPayment', NULL, $participantPayment);
+      CRM_Utils_Hook::post('create', 'ParticipantPayment', $participantPayment->id, $participantPayment);
     }
 
     //generally if people are creating participant_payments via the api they won't be setting the line item correctly - we can't help them if they are doing complex transactions
     // but if they have a single line item for the contribution we can assume it should refer to the participant line
-    $lineItemCount = CRM_Core_DAO::singleValueQuery("select count(*) FROM civicrm_line_item WHERE contribution_id = %1", array(
-        1 => array(
-          $participantPayment->contribution_id,
-          'Integer',
-        ),
-      ));
+    $lineItemCount = CRM_Core_DAO::singleValueQuery("select count(*) FROM civicrm_line_item WHERE contribution_id = %1", [
+      1 => [
+        $participantPayment->contribution_id,
+        'Integer',
+      ],
+    ]);
     if ($lineItemCount == 1) {
       $sql = "UPDATE civicrm_line_item li
       SET entity_table = 'civicrm_participant', entity_id = %1
       WHERE contribution_id = %2 AND entity_table = 'civicrm_contribution'";
-      CRM_Core_DAO::executeQuery($sql, array(
-          1 => array($participantPayment->participant_id, 'Integer'),
-          2 => array($participantPayment->contribution_id, 'Integer'),
-        ));
+      CRM_Core_DAO::executeQuery($sql, [
+        1 => [$participantPayment->participant_id, 'Integer'],
+        2 => [$participantPayment->contribution_id, 'Integer'],
+      ]);
     }
 
     return $participantPayment;

@@ -41,24 +41,38 @@ switch (@$argv[2]) {
 /* *********************************************************************** */
 /* Main */
 
-echo "Updating from $oldVersion to $newVersion...\n";
+echo "Changing version from $oldVersion to $newVersion...\n";
+
+$verName = makeVerName($newVersion);
+$phpFile = initFile("CRM/Upgrade/Incremental/php/{$verName}.php", function () use ($verName) {
+  ob_start();
+  global $camelNumber;
+  $camelNumber = $verName;
+  require 'CRM/Upgrade/Incremental/php/Template.php';
+  unset($camelNumber);
+  return ob_get_clean();
+});
+
+$sqlFile = initFile("CRM/Upgrade/Incremental/sql/{$newVersion}.mysql.tpl", function () use ($newVersion) {
+  return "{* file to handle db changes in $newVersion during upgrade *}\n";
+});
 
 updateFile("xml/version.xml", function ($content) use ($newVersion, $oldVersion) {
   return str_replace($oldVersion, $newVersion, $content);
 });
 
+if (file_exists("civicrm-version.php")) {
+  updateFile("civicrm-version.php", function ($content) use ($newVersion, $oldVersion) {
+    return str_replace($oldVersion, $newVersion, $content);
+  });
+}
+
 updateFile("sql/civicrm_generated.mysql", function ($content) use ($newVersion, $oldVersion) {
   return str_replace($oldVersion, $newVersion, $content);
 });
 
-$sqlFile = "CRM/Upgrade/Incremental/sql/{$newVersion}.mysql.tpl";
-if (!file_exists($sqlFile)) {
-  echo "Create \"$sqlFile\"\n";
-  file_put_contents($sqlFile, "{* file to handle db changes in $newVersion during upgrade *}\n");
-}
-
 if ($doCommit) {
-  $files = "xml/version.xml sql/civicrm_generated.mysql " . escapeshellarg($sqlFile);
+  $files = "xml/version.xml sql/civicrm_generated.mysql " . escapeshellarg($phpFile) . ' ' . escapeshellarg($sqlFile);
   passthru("git add $files");
   passthru("git commit $files -m " . escapeshellarg("Set version to $newVersion"));
 }
@@ -66,6 +80,13 @@ if ($doCommit) {
 /* *********************************************************************** */
 /* Helper functions */
 
+/**
+ * Update the content of a file.
+ *
+ * @param string $file
+ * @param callable $callback
+ *   Function(string $originalContent) => string $newContent.
+ */
 function updateFile($file, $callback) {
   if (!file_exists($file)) {
     die("File does not exist: $file\n");
@@ -74,6 +95,38 @@ function updateFile($file, $callback) {
   $content = file_get_contents($file);
   $content = $callback($content);
   file_put_contents($file, $content);
+}
+
+/**
+ * Initialize a file (if it doesn't already exist).
+ * @param string $file
+ * @param callable $callback
+ *   Function() => string $newContent.
+ */
+function initFile($file, $callback) {
+  if (file_exists($file)) {
+    echo "File \"$file\" already exists.\n";
+  }
+  else {
+    echo "Initialize \"$file\"\n";
+    $content = $callback();
+    file_put_contents($file, $content);
+  }
+  return $file;
+}
+
+/**
+ * Render a pretty string for a major/minor version number.
+ *
+ * @param string $version
+ *   Ex: '5.10.alpha1'
+ * @return string
+ *   Ex: 'FiveTen'.
+ */
+function makeVerName($version) {
+  list ($a, $b) = explode('.', $version);
+  require_once 'CRM/Utils/EnglishNumber.php';
+  return CRM_Utils_EnglishNumber::toCamelCase($a) . CRM_Utils_EnglishNumber::toCamelCase($b);
 }
 
 function isVersionValid($v) {

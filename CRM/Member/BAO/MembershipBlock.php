@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,12 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
 class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
+
   /**
    * Class constructor.
    */
@@ -53,7 +54,7 @@ class CRM_Member_BAO_MembershipBlock extends CRM_Member_DAO_MembershipBlock {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'MembershipBlock', CRM_Utils_Array::value('id', $params), $params);
     $dao = new CRM_Member_DAO_MembershipBlock();
-    $dao->copyValues($params);
+    $dao->copyValues($params, TRUE);
     $dao->id = CRM_Utils_Array::value('id', $params);
     $dao->save();
     CRM_Utils_Hook::post($hook, 'MembershipBlock', $dao->id, $dao);

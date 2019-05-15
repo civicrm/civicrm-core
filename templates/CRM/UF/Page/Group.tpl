@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -51,6 +51,7 @@
         {ts}CiviCRM Profile(s) allow you to aggregate groups of fields and include them in your site as input forms, contact display pages, and search and listings features. They provide a powerful set of tools for you to collect information from constituents and selectively share contact information.{/ts} {help id='profile_overview'}
     </div>
 
+<div class="crm-content-block crm-block">
     {if NOT ($action eq 1 or $action eq 2)}
     <div class="crm-submit-buttons">
         <a href="{crmURL p='civicrm/admin/uf/group/add' q="action=add&reset=1"}" id="newCiviCRMProfile-top" class="button"><span><i class="crm-i fa-plus-circle"></i> {ts}Add Profile{/ts}</span></a>
@@ -72,6 +73,7 @@
              <thead>
               <tr>
                 <th id="sortable">{ts}Profile Title{/ts}</th>
+                <th>{ts}Public Title{/ts}</th>
                 <th>{ts}Created By{/ts}</th>
                 <th>{ts}Description{/ts}</th>
                 <th>{ts}Type{/ts}</th>
@@ -85,6 +87,7 @@
             {if !$row.is_reserved }
               <tr id="UFGroup-{$row.id}" data-action="setvalue" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
                 <td class="crmf-title crm-editable">{$row.title}</td>
+                <td class="crmf-frontend_title crm-editable">{$row.frontend_title}</td>
                 <td>
                   {if $row.created_id && $row.created_by}
                     <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
@@ -115,6 +118,7 @@
              <thead>
               <tr>
                 <th id="sortable">{ts}Profile Title{/ts}</th>
+                <th>{ts}Public Title{/ts}</th>
                 <th>{ts}Created By{/ts}</th>
                 <th>{ts}Description{/ts}</th>
                 <th>{ts}Type{/ts}</th>
@@ -128,6 +132,7 @@
             {if $row.is_reserved}
               <tr id="UFGroup-{$row.id}" class="crm-entity {$row.class}{if NOT $row.is_active} disabled{/if}">
                 <td>{$row.title}</td>
+                <td>{$row.frontend_title}</td>
                 <td>
                   {if $row.created_id && $row.created_by}
                     <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.created_id`"}">{ts}{$row.created_by}{/ts}</a>
@@ -152,17 +157,8 @@
             </div>
         </div>{* reserved profile*}
 
-  </div> {* maincontainer*}
-  <script type='text/javascript'>
-    var selectedTab = 'user-profiles';
-    {if $selectedChild}selectedTab = '{$selectedChild}';{/if}
-    {literal}
-      CRM.$(function($) {
-        var tabIndex = $('#tab_' + selectedTab).prevAll().length
-        $("#mainTabContainer").tabs( {active: tabIndex} );
-      });
-    {/literal}
-  </script>
+  </div>
+{include file="CRM/common/TabSelected.tpl" defaultTab="user-profiles"}
 
     {else}
     {if $action ne 1} {* When we are adding an item, we should not display this message *}
@@ -173,3 +169,4 @@
     {/if}
     {/if}
 {/if}
+</div>

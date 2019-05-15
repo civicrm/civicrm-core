@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_ReCAPTCHA {
 
@@ -63,6 +63,28 @@ class CRM_Utils_ReCAPTCHA {
   }
 
   /**
+   * Check if reCaptcha settings is avilable to add on form.
+   */
+  public static function hasSettingsAvailable() {
+    $config = CRM_Core_Config::singleton();
+    if ($config->recaptchaPublicKey == NULL || $config->recaptchaPublicKey == "") {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
+   * Check if reCaptcha has to be added on form forcefully.
+   */
+  public static function hasToAddForcefully() {
+    $config = CRM_Core_Config::singleton();
+    if (!$config->forceRecaptcha) {
+      return FALSE;
+    }
+    return TRUE;
+  }
+
+  /**
    * Add element to form.
    *
    * @param CRM_Core_Form $form
@@ -75,11 +97,10 @@ class CRM_Utils_ReCAPTCHA {
       require_once 'packages/recaptcha/recaptchalib.php';
     }
 
-    // See if we are using SSL
-    if (CRM_Utils_System::isSSL()) {
-      $useSSL = TRUE;
-    }
-    $html = recaptcha_get_html($config->recaptchaPublicKey, $error, $useSSL);
+    // Load the Recaptcha api.js over HTTPS
+    $useHTTPS = TRUE;
+
+    $html = recaptcha_get_html($config->recaptchaPublicKey, $error, $useHTTPS);
 
     $form->assign('recaptchaHTML', $html);
     $form->assign('recaptchaOptions', $config->recaptchaOptions);

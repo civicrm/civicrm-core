@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -61,7 +61,7 @@
       <div class="bold" style="padding: 1em; background-color: rgba(255, 255, 255, 0.76);">
         <p>
           <img style="display:block; float:left; width:40px; margin-right:10px;" src="{$config->resourceBase}i/logo_lg.png">
-          {ts 1="https://civicrm.org/core-team" 2="https://civicrm.org/providers/contributors" 3="https://civicrm.org/become-a-member?src=ug&sid=$sid"}Thank you for upgrading to 4.7, the latest version of CiviCRM. Packed with new features and improvements, this release was made possible by both the <a href="%1">CiviCRM Core Team</a> and an incredible group of <a href="%2">contributors</a>, combined with the financial support of CiviCRM Members and Partners, without whom the project could not exist. We invite you to join their ranks by <a href="%3">becoming a member of CiviCRM today</a>. There is no better way to say thanks than to support those that have made CiviCRM 4.7 possible. <a href="%3">Join today</a>.{/ts}
+          {ts 1="https://civicrm.org/core-team" 2="https://civicrm.org/providers/contributors" 3="https://civicrm.org/become-a-member?src=ug&sid=$sid" 4=$newVersion}Thank you for upgrading to %4, the latest version of CiviCRM. Packed with new features and improvements, this release was made possible by both the <a href="%1">CiviCRM Core Team</a> and an incredible group of <a href="%2">contributors</a>, combined with the financial support of CiviCRM Members and Partners, without whom the project could not exist. We invite you to join their ranks by <a href="%3">becoming a member of CiviCRM today</a>. There is no better way to say thanks than to support those that have made CiviCRM %4 possible. <a href="%3">Join today</a>.{/ts}
         </p>
       </div>
       <p><span class="crm-status-icon success"> </span>{$message}</p>

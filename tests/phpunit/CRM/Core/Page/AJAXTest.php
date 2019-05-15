@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Core_Page_AJAXTest extends CiviUnitTestCase {
+
   public function testCheckAuthz() {
     $cases = array();
 

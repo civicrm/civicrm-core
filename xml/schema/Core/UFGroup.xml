@@ -33,7 +33,8 @@
     <type>varchar</type>
     <length>255</length>
     <import>true</import>
-    <comment>This column will store a comma separated list of the type(s) of profile fields.</comment>
+    <comment>Comma separated list of the type(s) of profile fields.</comment>
+    <serialize>COMMA</serialize>
     <add>2.1</add>
   </field>
   <field>
@@ -45,12 +46,28 @@
   </field>
   <field>
     <name>title</name>
+    <title>Profile Name</title>
     <type>varchar</type>
     <length>64</length>
     <localizable>true</localizable>
     <required>true</required>
+    <html>
+      <type>Text</type>
+    </html>
     <comment>Form title.</comment>
     <add>1.1</add>
+  </field>
+  <field>
+    <name>frontend_title</name>
+    <title>Public Title</title>
+    <type>varchar</type>
+    <length>64</length>
+    <localizable>true</localizable>
+    <comment>Profile Form Public title</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>4.7</add>
   </field>
   <field>
     <name>description</name>
@@ -103,6 +120,9 @@
     <type>int</type>
     <required>true</required>
     <default>1</default>
+    <html>
+      <type>Text</type>
+    </html>
     <comment>Controls display order when multiple user framework groups are setup for concurrent display.</comment>
     <add>1.2</add>
     <drop>1.3</drop>
@@ -261,6 +281,9 @@
     <default>NULL</default>
     <localizable>true</localizable>
     <add>4.7</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>submit_button_text</name>
@@ -271,5 +294,16 @@
     <default>NULL</default>
     <localizable>true</localizable>
     <add>4.7</add>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+  <field>
+    <name>add_cancel_button</name>
+    <title>Include Cancel Button</title>
+    <type>boolean</type>
+    <default>1</default>
+    <comment>Should a Cancel button be included in this Profile form.</comment>
+    <add>5.0</add>
   </field>
 </table>

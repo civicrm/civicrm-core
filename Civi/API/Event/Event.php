@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -86,6 +86,19 @@ class Event extends \Symfony\Component\EventDispatcher\Event {
    */
   public function getApiRequest() {
     return $this->apiRequest;
+  }
+
+  /**
+   * Create a brief string identifying the entity/action. Useful for
+   * pithy matching/switching.
+   *
+   * Ex: if ($e->getApiRequestSig() === '3.contact.get') { ... }
+   *
+   * @return string
+   *   Ex: '3.contact.get'
+   */
+  public function getApiRequestSig() {
+    return mb_strtolower($this->apiRequest['version'] . '.' . $this->apiRequest['entity'] . '.' . $this->apiRequest['action']);
   }
 
 }

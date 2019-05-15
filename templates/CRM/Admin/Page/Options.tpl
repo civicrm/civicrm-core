@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -59,7 +59,11 @@
   {elseif $gName eq 'participant_status'}
     {ts}Define statuses for event participants here (e.g. Registered, Attended, Cancelled...). You can then assign statuses and search for participants by status.{/ts} {ts}"Counted?" controls whether a person with that status is counted as participant for the purpose of controlling the Maximum Number of Participants.{/ts}
   {elseif $gName eq 'from_email_address'}
-    {ts}By default, CiviCRM uses the primary email address of the logged in user as the FROM address when sending emails to contacts. However, you can use this page to define one or more general Email Addresses that can be selected as an alternative. EXAMPLE: <em>"Client Services" &lt;clientservices@example.org&gt;</em>{/ts}
+    {if $allowLoggedIn}
+      {ts}By default, CiviCRM uses the primary email address of the logged in user as the FROM address when sending emails to contacts. However, you can use this page to define one or more general Email Addresses that can be selected as an alternative. EXAMPLE: <em>"Client Services" &lt;clientservices@example.org&gt;</em>{/ts}
+    {else}
+      {ts}You can use this page to define one or more general Email Addresses that can be selected as the From Address. EXAMPLE: <em>"Client Services" &lt;clientservices@example.org&gt;</em>{/ts}
+    {/if}
   {elseif $isLocked}
     {ts}This option group is reserved for system use. You cannot add or delete options in this list.{/ts}
   {else}
@@ -171,7 +175,7 @@
       {if $isLocked ne 1}
         {crmButton p="civicrm/admin/options/$gName" q='action=add&reset=1' class="new-option" icon="plus-circle"}{ts 1=$gLabel}Add %1{/ts}{/crmButton}
       {/if}
-      {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
+      {crmButton p="civicrm/admin/options" q="action=browse&reset=1" class="cancel" icon="check"}{ts}Done{/ts}{/crmButton}
     </div>
 </div>
 {/if}

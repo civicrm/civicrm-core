@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -115,7 +115,7 @@
   {/if}
   <div class="clear"></div>
   <div class="crm-section event_date_time-section">
-      <div class="label"><label>{ts}When{/ts}</label></div>
+      <div class="label">{ts}When{/ts}</div>
       <div class="content">
             <abbr class="dtstart" title="{$event.event_start_date|crmDate}">
             {$event.event_start_date|crmDate}</abbr>
@@ -140,7 +140,7 @@
 
         {if $location.address.1}
             <div class="crm-section event_address-section">
-                <div class="label"><label>{ts}Location{/ts}</label></div>
+                <div class="label">{ts}Location{/ts}</div>
                 <div class="content">{$location.address.1.display|nl2br}</div>
                 <div class="clear"></div>
             </div>
@@ -164,7 +164,7 @@
 
   {if $location.phone.1.phone || $location.email.1.email}
       <div class="crm-section event_contact-section">
-          <div class="label"><label>{ts}Contact{/ts}</label></div>
+          <div class="label">{ts}Contact{/ts}</div>
           <div class="content">
               {* loop on any phones and emails for this event *}
               {foreach from=$location.phone item=phone}
@@ -186,7 +186,7 @@
 
   {if $event.is_monetary eq 1 && $feeBlock.value}
       <div class="crm-section event_fees-section">
-          <div class="label"><label>{$event.fee_label}</label></div>
+          <div class="label">{$event.fee_label}</div>
           <div class="content">
               <table class="form-layout-compressed fee_block-table">
                   {foreach from=$feeBlock.value name=fees item=value}

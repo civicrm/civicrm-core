@@ -6,7 +6,7 @@
  *   API result array
  */
 function pledge_payment_get_example() {
-  $params = array();
+  $params = [];
 
   try{
     $result = civicrm_api3('PledgePayment', 'get', $params);
@@ -16,12 +16,12 @@ function pledge_payment_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -35,12 +35,12 @@ function pledge_payment_get_example() {
  */
 function pledge_payment_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 5,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'pledge_id' => '1',
         'scheduled_amount' => '20.00',
@@ -48,8 +48,8 @@ function pledge_payment_get_expectedresult() {
         'scheduled_date' => '20130728085413',
         'reminder_count' => 0,
         'status_id' => '2',
-      ),
-      '2' => array(
+      ],
+      '2' => [
         'id' => '2',
         'pledge_id' => '1',
         'scheduled_amount' => '20.00',
@@ -57,8 +57,8 @@ function pledge_payment_get_expectedresult() {
         'scheduled_date' => '20130728085413',
         'reminder_count' => 0,
         'status_id' => '2',
-      ),
-      '3' => array(
+      ],
+      '3' => [
         'id' => '3',
         'pledge_id' => '1',
         'scheduled_amount' => '20.00',
@@ -66,8 +66,8 @@ function pledge_payment_get_expectedresult() {
         'scheduled_date' => '20130728085413',
         'reminder_count' => 0,
         'status_id' => '2',
-      ),
-      '4' => array(
+      ],
+      '4' => [
         'id' => '4',
         'pledge_id' => '1',
         'scheduled_amount' => '20.00',
@@ -75,8 +75,8 @@ function pledge_payment_get_expectedresult() {
         'scheduled_date' => '20130728085413',
         'reminder_count' => 0,
         'status_id' => '2',
-      ),
-      '5' => array(
+      ],
+      '5' => [
         'id' => '5',
         'pledge_id' => '1',
         'scheduled_amount' => '20.00',
@@ -84,9 +84,9 @@ function pledge_payment_get_expectedresult() {
         'scheduled_date' => '20130728085413',
         'reminder_count' => 0,
         'status_id' => '2',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

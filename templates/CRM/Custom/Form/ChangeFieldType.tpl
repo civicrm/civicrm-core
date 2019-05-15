@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,9 +43,9 @@
 {literal}
 <script type="text/Javascript">
   function checkCustomDataField( ) {
-    var srcHtmlType = '{/literal}{$srcHtmlType}{literal}';
+    var srcHtmlType = {/literal}{$srcHtmlType|@json_encode}{literal};
     var singleValOps = ['Text', 'Select', 'Radio', 'Autocomplete-Select'];
-    var multiValOps  = ['CheckBox', 'Multi-Select', 'AdvMulti-Select'];
+    var multiValOps  = ['CheckBox', 'Multi-Select'];
     var dstHtmlType = cj('#dst_html_type').val( );
     if ( !dstHtmlType ) {
       return true;

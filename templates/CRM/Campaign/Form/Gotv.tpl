@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -72,7 +72,9 @@
 
     {* build search form *}
     {include file='CRM/Campaign/Form/Search/Common.tpl' context='gotv'}
-    <div id='voterList'></div>
+    <div class="crm-block crm-form-block crm-search-form-block">
+      <div id='voterList'></div>
+    </div>
 
 {/if} {* end of search form build *}
 

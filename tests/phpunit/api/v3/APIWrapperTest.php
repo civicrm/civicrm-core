@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -89,6 +89,7 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
  * Class api_v3_APIWrapperTest_Impl
  */
 class api_v3_APIWrapperTest_Impl implements API_Wrapper {
+
   /**
    * @inheritDoc
    */

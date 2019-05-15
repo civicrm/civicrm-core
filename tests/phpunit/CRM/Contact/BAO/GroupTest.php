@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -70,6 +70,59 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       array('id' => $group->id),
       $checkParams
     );
+  }
+
+  /**
+   * Test case to ensure child group is present in the hierarchy
+   *  if it has multiple parent groups and not all are disabled.
+   */
+  public function testGroupHirearchy() {
+    // Use-case :
+    // 1. Create two parent group A and B and disable B
+    // 2. Create a child group C
+    // 3. Ensure that Group C is present in the group hierarchy
+    $params = array(
+      'name' => uniqid(),
+      'title' => 'Parent Group A',
+      'description' => 'Parent Group One',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+    );
+    $group1 = CRM_Contact_BAO_Group::create($params);
+
+    $params = array_merge($params, array(
+      'name' => uniqid(),
+      'title' => 'Parent Group B',
+      'description' => 'Parent Group Two',
+      // disable
+      'is_active' => 0,
+    ));
+    $group2 = CRM_Contact_BAO_Group::create($params);
+
+    $params = array_merge($params, array(
+      'name' => uniqid(),
+      'title' => 'Child Group C',
+      'description' => 'Child Group C',
+      'parents' => array(
+        $group1->id => 1,
+        $group2->id => 1,
+      ),
+    ));
+    $group3 = CRM_Contact_BAO_Group::create($params);
+
+    $params = array(
+      $group1->id => 1,
+      $group3->id => 1,
+    );
+    $groupsHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($params, NULL, '&nbsp;&nbsp;', TRUE);
+    // check if child group is present in the tree with formatted group title prepended with spacer '&nbsp;&nbsp;'
+    $this->assertEquals('&nbsp;&nbsp;Child Group C', $groupsHierarchy[$group3->id]);
+
+    // Disable parent group A and ensure that child group C is not present as both of its parent groups are disabled
+    $group1->is_active = 0;
+    $group1->save();
+    $groupsHierarchy = CRM_Contact_BAO_Group::getGroupsHierarchy($params, NULL, '&nbsp;&nbsp;', TRUE);
+    $this->assertFalse(array_key_exists($group3->id, $groupsHierarchy));
   }
 
   /**
@@ -145,6 +198,81 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
 
       CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
     }
+  }
+
+  /**
+   * Ensure that when updating a group with a linked organisation record even tho that record's id doesn't match the group id no db error is produced
+   */
+  public function testGroupUpdateWithOrganization() {
+    $params = array(
+      'name' => uniqid(),
+      'title' => 'Group A',
+      'description' => 'Group One',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+    );
+    $group1 = CRM_Contact_BAO_Group::create($params);
+
+    $domain1 = $this->callAPISuccess('Domain', 'get', ['id' => 1]);
+    $params2 = array(
+      'name' => uniqid(),
+      'title' => 'Group B',
+      'description' => 'Group Two',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+      'organization_id' => $domain1['values'][1]['contact_id'],
+    );
+    $group2 = CRM_Contact_BAO_Group::create($params2);
+
+    $domain2 = $this->callAPISuccess('Domain', 'get', ['id' => 2]);
+    $params3 = array(
+      'name' => uniqid(),
+      'title' => 'Group C',
+      'description' => 'Group Three',
+      'visibility' => 'User and User Admin Only',
+      'is_active' => 1,
+      'organization_id' => $domain2['values'][2]['contact_id'],
+    );
+    $group3 = CRM_Contact_BAO_Group::create($params3);
+    $params2['id'] = $group2->id;
+    $testUpdate = CRM_Contact_BAO_Group::create($params2);
+  }
+
+  /**
+   * Ensure that when hidden smart group is created, wildcard string value is not ignored
+   */
+  public function testHiddenSmartGroup() {
+    $customGroup = $this->customGroupCreate();
+    $fields = array(
+      'label' => 'testFld',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+      'custom_group_id' => $customGroup['id'],
+    );
+    $customFieldID = CRM_Core_BAO_CustomField::create($fields)->id;
+
+    $contactID = $this->individualCreate(['custom_' . $customFieldID => 'abc']);
+
+    $hiddenSmartParams = [
+      'group_type' => ['2' => 1],
+      'form_values' => ['custom_' . $customFieldID => ['LIKE' => '%a%']],
+      'saved_search_id' => NULL,
+      'search_custom_id' => NULL,
+      'search_context' => 'advanced',
+    ];
+    list($smartGroupID, $savedSearchID) = CRM_Contact_BAO_Group::createHiddenSmartGroup($hiddenSmartParams);
+
+    $mailingID = $this->callAPISuccess('Mailing', 'create', [])['id'];
+    $this->callAPISuccess('MailingGroup', 'create', array(
+      'mailing_id' => $mailingID,
+      'group_type' => 'Include',
+      'entity_table' => 'civicrm_group',
+      'entity_id' => $smartGroupID,
+    ));
+
+    CRM_Mailing_BAO_Mailing::getRecipients($mailingID);
+    $recipients = $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailingID]);
+    $this->assertEquals(1, $recipients['count'], 'Check recipient count');
   }
 
 }

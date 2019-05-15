@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 require_once 'Mail/mime.php';
@@ -91,7 +91,7 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $ce->save();
 
     CRM_Contact_BAO_GroupContact::addContactsToGroup(
-      array($contact_id),
+      [$contact_id],
       $se->group_id,
       'Email',
       'Added',
@@ -111,14 +111,12 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $group->id = $se->group_id;
     $group->find(TRUE);
 
-    $component = new CRM_Mailing_BAO_Component();
+    $component = new CRM_Mailing_BAO_MailingComponent();
     $component->is_default = 1;
     $component->is_active = 1;
     $component->component_type = 'Welcome';
 
     $component->find(TRUE);
-
-    $emailDomain = CRM_Core_BAO_MailSettings::defaultDomain();
 
     $html = $component->body_html;
 
@@ -140,17 +138,17 @@ class CRM_Mailing_Event_BAO_Confirm extends CRM_Mailing_Event_DAO_Confirm {
     $text = CRM_Utils_Token::replaceDomainTokens($text, $domain, FALSE, $tokens['text']);
     $text = CRM_Utils_Token::replaceWelcomeTokens($text, $group->title, FALSE);
 
-    $mailParams = array(
+    $mailParams = [
       'groupName' => 'Mailing Event ' . $component->component_type,
       'subject' => $component->subject,
-      'from' => "\"$domainEmailName\" <do-not-reply@$emailDomain>",
+      'from' => "\"$domainEmailName\" <" . CRM_Core_BAO_Domain::getNoReplyEmailAddress() . '>',
       'toEmail' => $email,
       'toName' => $display_name,
-      'replyTo' => "do-not-reply@$emailDomain",
-      'returnPath' => "do-not-reply@$emailDomain",
+      'replyTo' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
+      'returnPath' => CRM_Core_BAO_Domain::getNoReplyEmailAddress(),
       'html' => $html,
       'text' => $text,
-    );
+    ];
     // send - ignore errors because the desired status change has already been successful
     $unused_result = CRM_Utils_Mail::send($mailParams);
 

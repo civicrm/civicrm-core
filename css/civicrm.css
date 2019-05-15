@@ -5,8 +5,7 @@
  * Other civi blocks outside the main container also have the class crm-container (but not the id)
  * All styles should start with .crm-container unless they are specific to the main div only
  */
-.crm-container input,
-#civicrm-menu input {
+.crm-container input {
   box-sizing: content-box;
 }
 
@@ -17,6 +16,10 @@ div.crm-container label {
 
 div.crm-container fieldset label{
   float: none;
+}
+
+input.crm-form-radio + label, input.crm-form-checkbox + label{
+  margin-left: 7px;
 }
 
 .crm-container .crm-quickSearchField {
@@ -382,6 +385,10 @@ input.crm-form-entityref {
   float: left;
   width: 17%;
   text-align: right;
+}
+
+.crm-container .crm-section .label label{
+  white-space: normal;
 }
 
 .crm-container .label-left .label {
@@ -1073,6 +1080,7 @@ input.crm-form-entityref {
 #crm-recently-viewed ul {
   list-style-image: none;
   font-size: .9em;
+  padding: 0;
 }
 
 #crm-recently-viewed li.crm-recently-viewed {
@@ -1123,6 +1131,11 @@ input.crm-form-entityref {
 
 #crm-recently-viewed li.crm-recently-viewed:hover .crm-recentview-wrapper {
   display: block;
+}
+
+.crm-recentview-item {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #crm-recently-viewed .crm-recentview-wrapper a:hover {
@@ -1628,11 +1641,6 @@ input.crm-form-entityref {
   clear: both;
 }
 
-#crm-container table.caseSelector td.status-urgent {
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
 .crm-container .crm-clearfix:after {
   clear: both;
   content: ".";
@@ -2115,6 +2123,10 @@ a.crm-i:hover {
 
 .crm-i.crm-i-blue {
   color: #6177D5;
+}
+
+.crm-i.crm-i-green {
+  color: #86c661;
 }
 
 .crm-i-button {
@@ -2674,10 +2686,14 @@ div.crm-container form {
 /* Date plugin */
 .crm-container input.dateplugin,
 .crm-container input.crm-form-date {
-  background: white url(../i/cal.gif) no-repeat scroll right center;
-  padding-right: 16px;
-  /* so that text doesn't flow on top of icon */
   width: 9em;
+}
+
+.crm-container input.dateplugin::placeholder,
+.crm-container input.crm-form-date::placeholder,
+.crm-container input.crm-form-time::placeholder {
+  font-family: "FontAwesome";
+  text-align: right;
 }
 
 .crm-container div.batch-update {
@@ -2905,7 +2921,6 @@ tbody.scrollContent tr.alternateRow {
 
 
 .crm-container div.status,
-div.m ul#civicrm-menu,
 .crm-container #help,
 .crm-container .help,
 .crm-container .ui-tabs-panel,
@@ -3122,6 +3137,10 @@ div.m ul#civicrm-menu,
 }
 .crm-container .select2-container[class*=" fa-"]:before {
   display: none;
+}
+.crm-container .select2-results .select2-result.select2-disabled > .select2-result-label {
+  opacity: .6;
+  cursor: default;
 }
 
 /* Restore this property otherwise our css overrides it */

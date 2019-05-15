@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -50,10 +50,10 @@ class CRM_Core_I18n_PseudoConstant {
   public static function &longForShortMapping() {
     static $longForShortMapping = NULL;
     if ($longForShortMapping === NULL) {
-      $rows = array();
-      CRM_Core_OptionValue::getValues(array('name' => 'languages'), $rows);
+      $rows = [];
+      CRM_Core_OptionValue::getValues(['name' => 'languages'], $rows);
 
-      $longForShortMapping = array();
+      $longForShortMapping = [];
       foreach ($rows as $row) {
         $longForShortMapping[$row['value']] = $row['name'];
       }
@@ -84,12 +84,12 @@ class CRM_Core_I18n_PseudoConstant {
    * @return array
    */
   public static function getRTLlanguages() {
-    $rtl = array(
+    $rtl = [
       'ar',
       'fa',
       'he',
       'ur',
-    );
+    ];
 
     return $rtl;
   }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,6 +41,7 @@ define('API_V3_EXTENSION_DELIMITER', ',');
  *   Input parameters.
  *    - key: string, eg "com.example.myextension"
  *    - keys: array of string, eg array("com.example.myextension1", "com.example.myextension2")
+ *    - path: string, e.g. "/var/www/extensions/*"
  *
  * Using 'keys' should be more performant than making multiple API calls with 'key'
  *
@@ -53,7 +54,8 @@ function civicrm_api3_extension_install($params) {
   }
 
   try {
-    CRM_Extension_System::singleton()->getManager()->install($keys);
+    $manager = CRM_Extension_System::singleton()->getManager();
+    $manager->install($manager->findInstallRequirements($keys));
   }
   catch (CRM_Extension_Exception $e) {
     return civicrm_api3_create_error($e->getMessage());
@@ -67,13 +69,17 @@ function civicrm_api3_extension_install($params) {
  * @param $fields
  */
 function _civicrm_api3_extension_install_spec(&$fields) {
-  $fields['keys'] = array(
+  $fields['keys'] = [
     'title' => 'Extension Key(s)',
-    'api.required' => 1,
-    'api.aliases' => array('key'),
+    'api.aliases' => ['key'],
     'type' => CRM_Utils_Type::T_STRING,
     'description' => 'Fully qualified name of one or more extensions',
-  );
+  ];
+  $fields['path'] = [
+    'title' => 'Extension Path',
+    'type' => CRM_Utils_Type::T_STRING,
+    'description' => 'The path to the extension. May use wildcard ("*").',
+  ];
 }
 
 /**
@@ -85,11 +91,11 @@ function _civicrm_api3_extension_install_spec(&$fields) {
 function civicrm_api3_extension_upgrade() {
   CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
   $queue = CRM_Extension_Upgrades::createQueue();
-  $runner = new CRM_Queue_Runner(array(
+  $runner = new CRM_Queue_Runner([
     'title' => 'Extension Upgrades',
     'queue' => $queue,
     'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
-  ));
+  ]);
 
   try {
     $result = $runner->runAll();
@@ -113,6 +119,7 @@ function civicrm_api3_extension_upgrade() {
  *   Input parameters.
  *    - key: string, eg "com.example.myextension"
  *    - keys: array of string, eg array("com.example.myextension1", "com.example.myextension2")
+ *    - path: string, e.g. "/var/www/vendor/foo/myext" or "/var/www/vendor/*"
  *
  * Using 'keys' should be more performant than making multiple API calls with 'key'
  *
@@ -124,7 +131,8 @@ function civicrm_api3_extension_enable($params) {
     return civicrm_api3_create_success();
   }
 
-  CRM_Extension_System::singleton()->getManager()->enable($keys);
+  $manager = CRM_Extension_System::singleton()->getManager();
+  $manager->enable($manager->findInstallRequirements($keys));
   return civicrm_api3_create_success();
 }
 
@@ -143,6 +151,7 @@ function _civicrm_api3_extension_enable_spec(&$fields) {
  *   Input parameters.
  *    - key: string, eg "com.example.myextension"
  *    - keys: array of string, eg array("com.example.myextension1", "com.example.myextension2")
+ *    - path: string, e.g. "/var/www/vendor/foo/myext" or "/var/www/vendor/*"
  *
  * Using 'keys' should be more performant than making multiple API calls with 'key'
  *
@@ -173,6 +182,7 @@ function _civicrm_api3_extension_disable_spec(&$fields) {
  *   Input parameters.
  *    - key: string, eg "com.example.myextension"
  *    - keys: array of string, eg array("com.example.myextension1", "com.example.myextension2")
+ *    - path: string, e.g. "/var/www/vendor/foo/myext" or "/var/www/vendor/*"
  *
  * Using 'keys' should be more performant than making multiple API calls with 'key'
  *
@@ -245,7 +255,7 @@ function civicrm_api3_extension_download($params) {
   CRM_Extension_System::singleton()->getCache()->flush();
   CRM_Extension_System::singleton(TRUE);
   if (CRM_Utils_Array::value('install', $params, TRUE)) {
-    CRM_Extension_System::singleton()->getManager()->install(array($params['key']));
+    CRM_Extension_System::singleton()->getManager()->install([$params['key']]);
   }
 
   return civicrm_api3_create_success();
@@ -256,23 +266,23 @@ function civicrm_api3_extension_download($params) {
  * @param $fields
  */
 function _civicrm_api3_extension_download_spec(&$fields) {
-  $fields['key'] = array(
+  $fields['key'] = [
     'title' => 'Extension Key',
     'api.required' => 1,
     'type' => CRM_Utils_Type::T_STRING,
     'description' => 'Fully qualified name of the extension',
-  );
-  $fields['url'] = array(
+  ];
+  $fields['url'] = [
     'title' => 'Download URL',
     'type' => CRM_Utils_Type::T_STRING,
     'description' => 'Optional as the system can determine the url automatically for public extensions',
-  );
-  $fields['install'] = array(
+  ];
+  $fields['install'] = [
     'title' => 'Auto-install',
     'type' => CRM_Utils_Type::T_STRING,
     'description' => 'Automatically install the downloaded extension',
     'api.default' => TRUE,
-  );
+  ];
 }
 
 /**
@@ -291,13 +301,15 @@ function civicrm_api3_extension_refresh($params) {
 
   if ($params['local']) {
     $system->getManager()->refresh();
-    $system->getManager()->getStatuses(); // force immediate scan
+    // force immediate scan
+    $system->getManager()->getStatuses();
   }
 
   if ($params['remote']) {
     if ($system->getBrowser()->isEnabled() && empty($system->getBrowser()->checkRequirements)) {
       $system->getBrowser()->refresh();
-      $system->getBrowser()->getExtensions(); // force immediate download
+      // force immediate download
+      $system->getBrowser()->getExtensions();
     }
   }
 
@@ -309,18 +321,18 @@ function civicrm_api3_extension_refresh($params) {
  * @param $fields
  */
 function _civicrm_api3_extension_refresh_spec(&$fields) {
-  $fields['local'] = array(
+  $fields['local'] = [
     'title' => 'Rescan Local',
     'api.default' => 1,
     'type' => CRM_Utils_Type::T_BOOLEAN,
     'description' => 'Whether to rescan the local filesystem (default TRUE)',
-  );
-  $fields['remote'] = array(
+  ];
+  $fields['remote'] = [
     'title' => 'Rescan Remote',
     'api.default' => 1,
     'type' => CRM_Utils_Type::T_BOOLEAN,
     'description' => 'Whether to rescan the remote repository (default TRUE)',
-  );
+  ];
 }
 
 /**
@@ -337,18 +349,19 @@ function civicrm_api3_extension_get($params) {
   $keys = array_merge($full_names, $keys);
   $statuses = CRM_Extension_System::singleton()->getManager()->getStatuses();
   $mapper = CRM_Extension_System::singleton()->getMapper();
-  $result = array();
+  $result = [];
   $id = 0;
   foreach ($statuses as $key => $status) {
     try {
       $obj = $mapper->keyToInfo($key);
     }
     catch (CRM_Extension_Exception $ex) {
-      CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', array(1 => $key)));
+      CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', [1 => $key]));
       continue;
     }
     $info = CRM_Extension_System::createExtendedInfo($obj);
-    $info['id'] = $id++; // backward compatibility with indexing scheme
+    // backward compatibility with indexing scheme
+    $info['id'] = $id++;
     if (!empty($keys)) {
       if (in_array($key, $keys)) {
         $result[] = $info;
@@ -358,12 +371,14 @@ function civicrm_api3_extension_get($params) {
       $result[] = $info;
     }
   }
-  $options = _civicrm_api3_get_options_from_params($params);
-  $returnFields = !empty($options['return']) ? $options['return'] : array();
-  if (!in_array('id', $returnFields)) {
-    $returnFields = array_merge($returnFields, array('id'));
-  }
-  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', $returnFields);
+
+  // These fields have been filtered already, and they have special semantics.
+  unset($params['key']);
+  unset($params['keys']);
+  unset($params['full_name']);
+
+  $filterableFields = ['id', 'type', 'status', 'path'];
+  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', $filterableFields);
 }
 
 /**
@@ -376,15 +391,16 @@ function civicrm_api3_extension_get($params) {
  */
 function civicrm_api3_extension_getremote($params) {
   $extensions = CRM_Extension_System::singleton()->getBrowser()->getExtensions();
-  $result = array();
+  $result = [];
   $id = 0;
   foreach ($extensions as $key => $obj) {
-    $info = array();
-    $info['id'] = $id++; // backward compatibility with indexing scheme
+    $info = [];
+    // backward compatibility with indexing scheme
+    $info['id'] = $id++;
     $info = array_merge($info, (array) $obj);
     $result[] = $info;
   }
-  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', CRM_Utils_Array::value('return', $params, array()));
+  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', CRM_Utils_Array::value('return', $params, []));
 }
 
 /**
@@ -392,21 +408,26 @@ function civicrm_api3_extension_getremote($params) {
  *
  * @param array $params
  * @param string $key
- *   API request params with 'keys'.
+ *   API request params with 'keys' or 'path'.
+ *   - keys: A comma-delimited list of extension names
+ *   - path: An absolute directory path. May append '*' to match all sub-directories.
  *
  * @return array
  */
 function _civicrm_api3_getKeys($params, $key = 'keys') {
+  if ($key == 'path') {
+    return CRM_Extension_System::singleton()->getMapper()->getKeysByPath($params['path']);
+  }
   if (isset($params[$key])) {
     if (is_array($params[$key])) {
       return $params[$key];
     }
     if ($params[$key] == '') {
-      return array();
+      return [];
     }
     return explode(API_V3_EXTENSION_DELIMITER, $params[$key]);
   }
   else {
-    return array();
+    return [];
   }
 }

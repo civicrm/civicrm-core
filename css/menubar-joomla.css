@@ -1,0 +1,29 @@
+@media (min-width: $breakMin) {
+
+  body.crm-menubar-over-cms-menu.crm-menubar-visible {
+    padding-top: $menubarHeight;
+  }
+  body.crm-menubar-over-cms-menu.crm-menubar-visible.crm-menubar-wrapped {
+    padding-top: calc($menubarHeight * 2);
+  }
+
+  body.crm-menubar-below-cms-menu.crm-menubar-visible {
+    margin-top: $menubarHeight;
+  }
+  body.crm-menubar-below-cms-menu.crm-menubar-visible.crm-menubar-wrapped {
+    margin-top: calc($menubarHeight * 2);
+  }
+
+}
+@media (max-width: $breakMax) {
+
+  body #civicrm-menu-nav {
+    position: absolute;
+  }
+
+  body #civicrm-menu-nav .crm-menubar-toggle-btn {
+    margin-top: 3px;
+    margin-left: 6px;
+  }
+
+}

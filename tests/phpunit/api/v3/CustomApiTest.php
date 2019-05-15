@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -60,15 +60,13 @@ class api_v3_CustomApiTest extends CiviUnitTestCase {
     $this->callAPISuccess('Mailing', 'create', array('name' => 'CiviMail', 'hash' => 'abx'));
     $result = $this->callAPISuccess('MailingProviderData', 'get', array('return' => array('mailing_identifier.name', 'contact_identifier', 'mailing_identifier')));
     $this->assertEquals(1, $result['count']);
-    $this->assertEquals('xyzabx0000-00-00 00:00:00', $result['id']);
-    $this->assertEquals('xyzabx0000-00-00 00:00:00', $result['id']);
+    $this->assertEquals('xyzabx2017-01-01 00:00:00', $result['id']);
+    $this->assertEquals('xyzabx2017-01-01 00:00:00', $result['id']);
     $this->assertEquals(array(
-        'contact_identifier' => 'xyz',
-        'mailing_identifier' => 'abx',
-        'mailing_identifier.name' => 'CiviMail',
-      ),
-      reset($result['values'])
-    );
+      'contact_identifier' => 'xyz',
+      'mailing_identifier' => 'abx',
+      'mailing_identifier.name' => 'CiviMail',
+    ), reset($result['values']));
   }
 
   /**
@@ -97,7 +95,7 @@ class api_v3_CustomApiTest extends CiviUnitTestCase {
    `mailing_identifier` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
    `email` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
    `event_type` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `recipient_action_datetime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `recipient_action_datetime` timestamp NOT NULL DEFAULT '2017-01-01 00:00:00',
    `contact_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
    `is_civicrm_updated`  TINYINT(4) DEFAULT '0',
  PRIMARY KEY (`contact_identifier`,`recipient_action_datetime`,`event_type`),

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,21 +38,7 @@
     <div class="crm-accordion-header">
       {$cd_edit.title}
     </div>
-
     <div id="customData{$group_id}" class="crm-accordion-body">
-      {if $cd_edit.is_multiple eq 1}
-        {if $cd_edit.table_id}
-          <table class="no-border">
-            <tr>
-              <a href="#" class="crm-hover-button crm-custom-value-del" title="{ts 1=$cd_edit.title}Delete %1{/ts}"
-               data-post='{ldelim}"valueID": "{$tableID}", "groupID": "{$group_id}", "contactId": "{$contactId}", "key": "{crmKey name='civicrm/ajax/customvalue'}"{rdelim}'>
-                <span class="icon delete-icon"></span> {ts}Delete{/ts}
-              </a>
-              <!-- crm-submit-buttons -->
-            </tr>
-          </table>
-        {/if}
-      {/if}
       {include file="CRM/Custom/Form/CustomData.tpl" formEdit=true}
     </div>
     <!-- crm-accordion-body-->

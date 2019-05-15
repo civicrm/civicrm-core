@@ -6,7 +6,7 @@
  *   API result array
  */
 function event_create_example() {
-  $params = array(
+  $params = [
     'title' => 'Annual CiviCRM meet',
     'summary' => 'If you have any CiviCRM realted issues or want to track where CiviCRM is heading, Sign up now',
     'description' => 'This event is intended to give brief idea about progess of CiviCRM and giving solutions to common user issues',
@@ -22,7 +22,7 @@ function event_create_example() {
     'is_monetary' => 0,
     'is_active' => 1,
     'is_show_location' => 0,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Event', 'create', $params);
@@ -32,12 +32,12 @@ function event_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -51,13 +51,13 @@ function event_create_example() {
  */
 function event_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 3,
-    'values' => array(
-      '3' => array(
+    'values' => [
+      '3' => [
         'id' => '3',
         'title' => 'Annual CiviCRM meet',
         'summary' => 'If you have any CiviCRM realted issues or want to track where CiviCRM is heading, Sign up now',
@@ -127,9 +127,9 @@ function event_create_expectedresult() {
         'slot_label_id' => '',
         'dedupe_rule_group_id' => '',
         'is_billing_required' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

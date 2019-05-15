@@ -21,7 +21,7 @@
     {/if}
 
     {if $mode ne 8 && $action ne 1028 && $action ne 4 && !$hideFieldset}
-      <fieldset class="crm-profile crm-profile-id-{$field.group_id} crm-profile-name-{$field.groupName}"><legend>{$field.groupTitle}</legend>
+      <fieldset class="crm-profile crm-profile-id-{$field.group_id} crm-profile-name-{$field.groupName}"><legend>{$field.groupDisplayTitle}</legend>
     {/if}
 
     {if ($form.formName eq 'Confirm' OR $form.formName eq 'ThankYou') AND $prefix neq 'honor'}

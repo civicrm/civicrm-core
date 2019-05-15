@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -41,7 +41,7 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -101,9 +101,9 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
     CRM_Utils_System::setTitle(ts('Settings - Payment Processor'));
     //CRM-15546
     $paymentProcessorTypes = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', array(
-        'labelColumn' => 'name',
-        'flip' => 1,
-      ));
+      'labelColumn' => 'name',
+      'flip' => 1,
+    ));
     $this->assign('defaultPaymentProcessorType', $paymentProcessorTypes['PayPal']);
     $breadCrumb = array(
       array(
@@ -134,8 +134,9 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
     while ($dao->fetch()) {
       $paymentProcessor[$dao->id] = array();
       CRM_Core_DAO::storeValues($dao, $paymentProcessor[$dao->id]);
-      $paymentProcessor[$dao->id]['payment_processor_type'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_PaymentProcessorType',
-        $paymentProcessor[$dao->id]['payment_processor_type_id']);
+      $paymentProcessor[$dao->id]['payment_processor_type'] = CRM_Core_PseudoConstant::getLabel(
+        'CRM_Financial_DAO_PaymentProcessor', 'payment_processor_type_id', $dao->payment_processor_type_id
+      );
 
       // form all action links
       $action = array_sum(array_keys($this->links()));
@@ -157,6 +158,13 @@ class CRM_Admin_Page_PaymentProcessor extends CRM_Core_Page_Basic {
         $dao->id
       );
       $paymentProcessor[$dao->id]['financialAccount'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($dao->id, NULL, 'civicrm_payment_processor', 'financial_account_id.name');
+
+      try {
+        $paymentProcessor[$dao->id]['test_id'] = CRM_Financial_BAO_PaymentProcessor::getTestProcessorId($dao->id);
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        CRM_Core_Session::setStatus(ts('No test processor entry exists for %1. Not having a test entry for each processor could cause problems', [$dao->name]));
+      }
     }
 
     $this->assign('rows', $paymentProcessor);

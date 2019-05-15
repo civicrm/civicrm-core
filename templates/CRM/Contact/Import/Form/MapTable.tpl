@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -175,7 +175,7 @@
             var select = $(this).next();
             $('option', select).each(function() {
               if ($(this).attr('value') == defaultLocationType
-              && $(this).text() == "{/literal}{$defaultLocationTypeLabel}{literal}") {
+                && $(this).text() == {/literal}{$defaultLocationTypeLabel|@json_encode}{literal}) {
                 select.val(defaultLocationType);
               }
             });

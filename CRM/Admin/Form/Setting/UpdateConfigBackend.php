@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -44,12 +44,12 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
 
     $this->addElement(
       'submit', $this->getButtonName('next', 'cleanup'), 'Cleanup Caches',
-      array('class' => 'crm-form-submit', 'id' => 'cleanup-cache')
+      ['class' => 'crm-form-submit', 'id' => 'cleanup-cache']
     );
 
     $this->addElement(
       'submit', $this->getButtonName('next', 'resetpaths'), 'Reset Paths',
-      array('class' => 'crm-form-submit', 'id' => 'resetpaths')
+      ['class' => 'crm-form-submit', 'id' => 'resetpaths']
     );
 
     //parent::buildQuickForm();
@@ -65,6 +65,7 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
 
       // clear all caches
       CRM_Core_Config::clearDBCache();
+      Civi::cache('session')->clear();
       CRM_Utils_System::flushCache();
 
       parent::rebuildMenu();

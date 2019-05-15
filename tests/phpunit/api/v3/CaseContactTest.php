@@ -9,6 +9,7 @@ class api_v3_CaseContactTest extends CiviCaseTestCase {
   protected $_params;
   protected $_entity;
   protected $_cid;
+  protected $_cid2;
   /**
    * Activity ID of created case.
    *
@@ -28,12 +29,18 @@ class api_v3_CaseContactTest extends CiviCaseTestCase {
     parent::setUp();
 
     $this->_cid = $this->individualCreate();
+    $this->_cid2 = $this->individualCreate(array(), 1);
 
     $this->_case = $this->callAPISuccess('case', 'create', array(
       'case_type_id' => $this->caseTypeId,
       'subject' => __CLASS__,
       'contact_id' => $this->_cid,
     ));
+
+    $this->_params = array(
+      'case_id' => $this->_case['id'],
+      'contact_id' => $this->_cid2,
+    );
   }
 
   public function testCaseContactGet() {
@@ -41,6 +48,20 @@ class api_v3_CaseContactTest extends CiviCaseTestCase {
       'contact_id' => $this->_cid,
     ), __FUNCTION__, __FILE__);
     $this->assertEquals($this->_case['id'], $result['id']);
+  }
+
+  /**
+   * Test create function with valid parameters.
+   */
+  public function testCaseContactCreate() {
+    $params = $this->_params;
+    $result = $this->callAPIAndDocument('CaseContact', 'create', $params, __FUNCTION__, __FILE__);
+    $id = $result['id'];
+
+    // Check result
+    $result = $this->callAPISuccess('CaseContact', 'get', array('id' => $id));
+    $this->assertEquals($result['values'][$id]['case_id'], $params['case_id']);
+    $this->assertEquals($result['values'][$id]['contact_id'], $params['contact_id']);
   }
 
 }

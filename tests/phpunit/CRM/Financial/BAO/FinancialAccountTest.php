@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -145,7 +145,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
       'financial_type_id' => $financialType->id,
       'contribution_status_id' => 1,
     );
-    $contributions = CRM_Contribute_BAO_Contribution::create($contributionParams);
+    $this->callAPISuccess('Contribution', 'create', $contributionParams);
     CRM_Financial_BAO_FinancialAccount::del($result->id);
     $params = array('id' => $result->id);
     $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
@@ -371,7 +371,7 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
       'source' => 'SSF',
       'contribution_status_id' => 1,
     ));
-    $balance = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($contribution['id'], 'contribution', FALSE, $totalAmount);
+    $balance = CRM_Contribute_BAO_Contribution::getContributionBalance($contribution['id'], $totalAmount);
     $this->assertEquals(0.0, $balance);
     Civi::settings()->revert('contribution_invoice_settings');
   }

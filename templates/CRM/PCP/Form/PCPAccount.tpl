@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,14 +40,16 @@
   <strong>{ts}Profile is not configured with Email address.{/ts}</strong>
 </div>
 {else}
-<div class="form-item">
+<div class="form-item crm-block crm-form-block">
 {include file="CRM/common/CMSUser.tpl"}
 {include file="CRM/UF/Form/Block.tpl" fields=$fields}
 {if $isCaptcha}
 {include file='CRM/common/ReCAPTCHA.tpl'}
 {/if}
-</div>
+
 <div class="crm-submit-buttons">
 {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
+</div>
+
 {/if}

@@ -48,6 +48,18 @@
     </html>
   </field>
   <field>
+    <name>title</name>
+    <title>Payment Processor Title</title>
+    <type>varchar</type>
+    <length>127</length>
+    <localizable>true</localizable>
+    <html>
+      <type>Text</type>
+    </html>
+    <comment>Payment Processor Descriptive Name.</comment>
+    <add>5.13</add>
+  </field>
+  <field>
     <name>description</name>
     <title>Processor Description</title>
     <type>varchar</type>
@@ -238,6 +250,7 @@
     <type>text</type>
     <default>NULL</default>
     <comment>array of accepted credit card types</comment>
+    <serialize>JSON</serialize>
     <add>4.7</add>
   </field>
 </table>

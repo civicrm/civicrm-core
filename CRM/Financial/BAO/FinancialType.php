@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,22 +28,21 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
 
   /**
-   * Static holder for the default LT.
-   */
-  static $_defaultContributionType = NULL;
-  /**
    * Static cache holder of available financial types for this session
+   * @var array
    */
-  static $_availableFinancialTypes = array();
+  public static $_availableFinancialTypes = [];
+
   /**
    * Static cache holder of status of ACL-FT enabled/disabled for this session
+   * @var array
    */
-  static $_statusACLFt = array();
+  public static $_statusACLFt = [];
 
   /**
    * Class constructor.
@@ -60,7 +59,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @param array $defaults
    *   (reference ) an assoc array to hold the flattened values.
    *
-   * @return CRM_Contribute_BAO_ContributionType
+   * @return CRM_Financial_DAO_FinancialType
    */
   public static function retrieve(&$params, &$defaults) {
     $financialType = new CRM_Financial_DAO_FinancialType();
@@ -80,8 +79,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on success, null otherwise
+   * @return bool
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Financial_DAO_FinancialType', $id, 'is_active', $is_active);
@@ -97,7 +95,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    * @return object
    */
-  public static function add(&$params, &$ids = array()) {
+  public static function add(&$params, &$ids = []) {
     if (empty($params['id'])) {
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
       $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
@@ -139,15 +137,15 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->id = $financialTypeId;
     $financialType->find(TRUE);
-    // tables to ingore checks for financial_type_id
-    $ignoreTables = array('CRM_Financial_DAO_EntityFinancialAccount');
+    // tables to ignore checks for financial_type_id
+    $ignoreTables = ['CRM_Financial_DAO_EntityFinancialAccount'];
 
     // TODO: if (!$financialType->find(true)) {
 
     // ensure that we have no objects that have an FK to this financial type id TODO: that cannot be null
     $occurrences = $financialType->findReferences();
     if ($occurrences) {
-      $tables = array();
+      $tables = [];
       foreach ($occurrences as $occurrence) {
         $className = get_class($occurrence);
         if (!in_array($className, $tables) && !in_array($className, $ignoreTables)) {
@@ -155,9 +153,9 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
         }
       }
       if (!empty($tables)) {
-        $message = ts('The following tables have an entry for this financial type: %1', array('%1' => implode(', ', $tables)));
+        $message = ts('The following tables have an entry for this financial type: %1', ['%1' => implode(', ', $tables)]);
 
-        $errors = array();
+        $errors = [];
         $errors['is_error'] = 1;
         $errors['error_message'] = $message;
         return $errors;
@@ -184,7 +182,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   public static function getIncomeFinancialType() {
     // Financial Type
     $financialType = CRM_Contribute_PseudoConstant::financialType();
-    $revenueFinancialType = array();
+    $revenueFinancialType = [];
     $relationTypeId = key(CRM_Core_PseudoConstant::accountOptionValues('account_relationship', NULL, " AND v.name LIKE 'Income Account is' "));
     CRM_Core_PseudoConstant::populate(
       $revenueFinancialType,
@@ -220,14 +218,14 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     }
     $financialTypes = CRM_Contribute_PseudoConstant::financialType();
     $prefix = ts('CiviCRM') . ': ';
-    $actions = array('add', 'view', 'edit', 'delete');
+    $actions = ['add', 'view', 'edit', 'delete'];
     foreach ($financialTypes as $id => $type) {
       foreach ($actions as $action) {
         if ($descriptions) {
-          $permissions[$action . ' contributions of type ' . $type] = array(
+          $permissions[$action . ' contributions of type ' . $type] = [
             $prefix . ts($action . ' contributions of type ') . $type,
             ts(ucfirst($action) . ' contributions of type ') . $type,
-          );
+          ];
         }
         else {
           $permissions[$action . ' contributions of type ' . $type] = $prefix . ts($action . ' contributions of type ') . $type;
@@ -238,10 +236,10 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       $permissions['administer CiviCRM Financial Types'] = $prefix . ts('administer CiviCRM Financial Types');
     }
     else {
-      $permissions['administer CiviCRM Financial Types'] = array(
+      $permissions['administer CiviCRM Financial Types'] = [
         $prefix . ts('administer CiviCRM Financial Types'),
         ts('Administer access to Financial Types'),
-      );
+      ];
     }
   }
 
@@ -298,24 +296,23 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     if (!self::isACLFinancialTypeStatus()) {
       return $financialTypes;
     }
-    $actions = array(
+    $actions = [
       CRM_Core_Action::VIEW => 'view',
       CRM_Core_Action::UPDATE => 'edit',
       CRM_Core_Action::ADD => 'add',
       CRM_Core_Action::DELETE => 'delete',
-    );
-    // check cached value
-    if (CRM_Utils_Array::value($action, self::$_availableFinancialTypes) && !$resetCache) {
-      $financialTypes = self::$_availableFinancialTypes[$action];
-      return self::$_availableFinancialTypes[$action];
-    }
-    foreach ($financialTypes as $finTypeId => $type) {
-      if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type)) {
-        unset($financialTypes[$finTypeId]);
+    ];
+
+    if (!isset(\Civi::$statics[__CLASS__]['available_types_' . $action])) {
+      foreach ($financialTypes as $finTypeId => $type) {
+        if (!CRM_Core_Permission::check($actions[$action] . ' contributions of type ' . $type)) {
+          unset($financialTypes[$finTypeId]);
+        }
       }
+      \Civi::$statics[__CLASS__]['available_types_' . $action] = $financialTypes;
     }
-    self::$_availableFinancialTypes[$action] = $financialTypes;
-    return $financialTypes;
+    $financialTypes = \Civi::$statics[__CLASS__]['available_types_' . $action];
+    return \Civi::$statics[__CLASS__]['available_types_' . $action];
   }
 
   /**
@@ -335,12 +332,12 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
     if (!self::isACLFinancialTypeStatus()) {
       return $membershipTypes;
     }
-    $actions = array(
+    $actions = [
       CRM_Core_Action::VIEW => 'view',
       CRM_Core_Action::UPDATE => 'edit',
       CRM_Core_Action::ADD => 'add',
       CRM_Core_Action::DELETE => 'delete',
-    );
+    ];
     foreach ($membershipTypes as $memTypeId => $type) {
       $finTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $memTypeId, 'financial_type_id');
       $finType = CRM_Contribute_PseudoConstant::financialType($finTypeId);
@@ -349,6 +346,26 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       }
     }
     return $membershipTypes;
+  }
+
+  /**
+   * This function adds the Financial ACL clauses to the where clause.
+   *
+   * This is currently somewhat mocking the native hook implementation
+   * for the acls that are in core. If the financialaclreport extension is installed
+   * core acls are not applied as that would result in them being applied twice.
+   *
+   * Long term we should either consolidate the financial acls in core or use only the extension.
+   * Both require substantial clean up before implementing and by the time the code is clean enough to
+   * take the final step we should
+   * be able to implement by removing one half of the other of this function.
+   *
+   * @param array $whereClauses
+   */
+  public static function addACLClausesToWhereClauses(&$whereClauses) {
+    $contributionBAO = new CRM_Contribute_BAO_Contribution();
+    $whereClauses = array_merge($whereClauses, $contributionBAO->addSelectWhereClause());
+
   }
 
   /**
@@ -363,6 +380,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    *
    */
   public static function buildPermissionedClause(&$whereClauses, $component = NULL, $alias = NULL) {
+    // @todo the relevant addSelectWhere clause should be called.
     if (!self::isACLFinancialTypeStatus()) {
       return FALSE;
     }
@@ -459,15 +477,17 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @return bool
    */
   public static function isACLFinancialTypeStatus() {
-    if (array_key_exists('acl_financial_type', self::$_statusACLFt)) {
-      return self::$_statusACLFt['acl_financial_type'];
+    if (!isset(\Civi::$statics[__CLASS__]['is_acl_enabled'])) {
+      \Civi::$statics[__CLASS__]['is_acl_enabled'] = FALSE;
+      $realSetting = \Civi::$statics[__CLASS__]['is_acl_enabled'] = Civi::settings()->get('acl_financial_type');
+      if (!$realSetting) {
+        $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
+        if (CRM_Utils_Array::value('acl_financial_type', $contributeSettings)) {
+          \Civi::$statics[__CLASS__]['is_acl_enabled'] = TRUE;
+        }
+      }
     }
-    $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
-    self::$_statusACLFt['acl_financial_type'] = FALSE;
-    if (CRM_Utils_Array::value('acl_financial_type', $contributeSettings)) {
-      self::$_statusACLFt['acl_financial_type'] = TRUE;
-    }
-    return self::$_statusACLFt['acl_financial_type'];
+    return \Civi::$statics[__CLASS__]['is_acl_enabled'];
   }
 
 }

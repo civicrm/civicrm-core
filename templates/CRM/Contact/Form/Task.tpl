@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,22 +27,23 @@
 
 {if $searchtype eq 'ts_sel'}
 <div id="popupContainer">
-  <table id="selectedRecords-{$group.id}" class="display crm-copy-fields crm-sortable">
-    <thead>
-    <tr class="columnheader">
-      <th class="contact_details">{ts}Name{/ts}</th>
-    </tr>
-    </thead>
-
-    <tbody>
-      {foreach from=$value item='row'}
-      <tr class="{cycle values="odd-row,even-row"}">
-        <td class="name">{$row}</td>
+  <div class="crm-block crm-form-block crm-search-form-block">
+    <table id="selectedRecords-{$group.id}" class="display crm-copy-fields crm-sortable">
+      <thead>
+      <tr class="columnheader">
+        <th class="contact_details">{ts}Name{/ts}</th>
       </tr>
-      {/foreach}
-    </tbody>
-  </table>
+      </thead>
 
+      <tbody>
+        {foreach from=$value item='row'}
+        <tr class="{cycle values="odd-row,even-row"}">
+          <td class="name">{$row}</td>
+        </tr>
+        {/foreach}
+      </tbody>
+    </table>
+  </div>
 </div><br />
 <a href="#" id="popup-button" title="{ts}View Selected Contacts{/ts}">{ts}View Selected Contacts{/ts}</a>
 {/if}

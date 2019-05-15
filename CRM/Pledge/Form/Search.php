@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -59,6 +59,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Prefix for the controller.
+   * @var string
    */
   protected $_prefix = "pledge_";
 
@@ -71,17 +72,8 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
-    $this->defaults = array();
 
-    // we allow the controller to set force/reset externally, useful when we are being
-    // driven by the wizard framework
-
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
-    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
-    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
-
-    $this->assign("context", $this->_context);
+    $this->loadStandardSearchOptionsFromUrl();
 
     // get user submitted values
     // get it from controller only if form has been submitted, else preProcess has set this
@@ -145,7 +137,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->addSortNameField();
+    $this->addContactSearchFields();
 
     CRM_Pledge_BAO_Query::buildSearchForm($this);
 
@@ -155,9 +147,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
         $this->addRowSelectors($rows);
       }
 
-      $permission = CRM_Core_Permission::getPermission();
-
-      $this->addTaskMenu(CRM_Pledge_Task::permissionedTaskTitles($permission));
+      $this->addTaskMenu(CRM_Pledge_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission()));
     }
 
   }
@@ -182,6 +172,36 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    */
   protected function getSortNameLabelWithOutEmail() {
     return ts('Pledger Name');
+  }
+
+  /**
+   * Get the label for the tag field.
+   *
+   * We do this in a function so the 'ts' wraps the whole string to allow
+   * better translation.
+   *
+   * @return string
+   */
+  protected function getTagLabel() {
+    return ts('Pledger Tag(s)');
+  }
+
+  /**
+   * Get the label for the group field.
+   *
+   * @return string
+   */
+  protected function getGroupLabel() {
+    return ts('Pledger Group(s)');
+  }
+
+  /**
+   * Get the label for the group field.
+   *
+   * @return string
+   */
+  protected function getContactTypeLabel() {
+    return ts('Pledger Contact Type');
   }
 
   /**
@@ -212,7 +232,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues["pledge_test"] = 0;
     }
 
-    foreach (array('pledge_amount_low', 'pledge_amount_high') as $f) {
+    foreach (['pledge_amount_low', 'pledge_amount_high'] as $f) {
       if (isset($this->_formValues[$f])) {
         $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);
       }
@@ -291,25 +311,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * @see valid_date
    */
   public function addRules() {
-    $this->addFormRule(array('CRM_Pledge_Form_Search', 'formRule'));
-  }
-
-  /**
-   * Global validation rules for the form.
-   *
-   * @param array $fields
-   *   Posted values of the form.
-   *
-   * @return array|bool
-   */
-  public static function formRule($fields) {
-    $errors = array();
-
-    if (!empty($errors)) {
-      return $errors;
-    }
-
-    return TRUE;
+    $this->addFormRule(['CRM_Pledge_Form_Search', 'formRule']);
   }
 
   /**
@@ -320,7 +322,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    *   the default array reference
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     $defaults = $this->_formValues;
     return $defaults;
   }
@@ -333,8 +335,8 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
     // set pledge payment related fields
     $status = CRM_Utils_Request::retrieve('status', 'String');
     if ($status) {
-      $this->_formValues['pledge_payment_status_id'] = array($status => 1);
-      $this->_defaults['pledge_payment_status_id'] = array($status => 1);
+      $this->_formValues['pledge_payment_status_id'] = [$status => 1];
+      $this->_defaults['pledge_payment_status_id'] = [$status => 1];
     }
 
     $fromDate = CRM_Utils_Request::retrieve('start', 'Date');
@@ -360,7 +362,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
       // we need set all statuses except Cancelled
       unset($statusValues[$pledgeStatus]);
 
-      $statuses = array();
+      $statuses = [];
       foreach ($statusValues as $statusId => $value) {
         $statuses[$statusId] = 1;
       }

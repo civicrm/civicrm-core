@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -71,7 +71,7 @@ class CRM_Batch_Form_Batch extends CRM_Admin_Form {
    * Set default values for the form.
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
 
     if ($this->_action & CRM_Core_Action::ADD) {
       // Set batch name default.

@@ -4,6 +4,7 @@
  * @group headless
  */
 class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
+
   protected function setUp() {
     $this->useTransaction();
     parent::setUp();
@@ -101,16 +102,25 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     $this->assertEquals(1, $count);
   }
 
-  /**
-   * Check the behavior in the erroneous situation where someone uses
-   * a mailing-related token without providing a mailing ID.
-   */
-  public function testTokensWithoutMailing() {
-    // We only need one case to see that the mailing-object works as
-    // an alternative to the mailing-id.
-    $inputTemplateFormat = 'text/plain';
-    $inputTemplate = 'To optout: {action.optOutUrl}!';
+  public function getExampleTokensForUseWithoutMailingJob() {
+    $cases = [];
+    $cases[] = ['text/plain', 'To opt out: {action.optOutUrl}!', '@To opt out: .*civicrm/mailing/optout.*&jid=&qid=@'];
+    $cases[] = ['text/html', 'To opt out: <a href="{action.optOutUrl}">click here</a>!', '@To opt out: <a href=".*civicrm/mailing/optout.*&amp;jid=&amp;qid=.*">click@'];
+    return $cases;
+  }
 
+  /**
+   * When previewing a mailing, there is no active mailing job, so one cannot
+   * generate fully formed URLs which reference the job. The current behavior
+   * is to link to a placeholder URL which has blank values for key fields
+   * like `jid` and `qid`.
+   *
+   * This current behavior may be wise or unwise - either way, having ensures
+   * that changes are intentional.
+   *
+   * @dataProvider getExampleTokensForUseWithoutMailingJob
+   */
+  public function testTokensWithoutMailingJob($inputTemplateFormat, $inputTemplateText, $expectRegex) {
     $mailing = CRM_Core_DAO::createTestObject('CRM_Mailing_DAO_Mailing', array(
       'name' => 'Example Name',
     ));
@@ -119,17 +129,23 @@ class CRM_Mailing_TokensTest extends \CiviUnitTestCase {
     $p = new \Civi\Token\TokenProcessor(Civi::service('dispatcher'), array(
       'mailing' => $mailing,
     ));
-    $p->addMessage('example', $inputTemplate, $inputTemplateFormat);
+    $p->addMessage('example', $inputTemplateText, $inputTemplateFormat);
     $p->addRow()->context(array(
       'contactId' => $contact->id,
     ));
-    try {
-      $p->evaluate();
-      $this->fail('TokenProcessor::evaluate() should have thrown an exception');
-    }
-    catch (CRM_Core_Exception $e) {
-      $this->assertRegExp(';Cannot use action tokens unless context defines mailingJobId and mailingActionTarget;', $e->getMessage());
-    }
+    //    try {
+    //      $p->evaluate();
+    //      $this->fail('TokenProcessor::evaluate() should have thrown an exception');
+    //    }
+    //    catch (CRM_Core_Exception $e) {
+    //      $this->assertRegExp(';Cannot use action tokens unless context defines mailingJobId and mailingActionTarget;', $e->getMessage());
+    //    }
+
+    $p->evaluate();
+
+    // FIXME: For compatibility with
+    $actual = $p->getRow(0)->render('example');
+    $this->assertRegExp($expectRegex, $actual);
   }
 
 }

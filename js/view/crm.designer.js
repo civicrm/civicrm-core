@@ -1,4 +1,4 @@
-(function($, _) {
+(function($, _, Backbone) {
   if (!CRM.Designer) CRM.Designer = {};
 
   /**
@@ -866,7 +866,7 @@
     initialize: function() {
       this.form = new Backbone.Form({
         model: this.model,
-        fields: ['title', 'help_pre', 'help_post', 'is_active']
+        fields: ['title', 'frontend_title', 'help_pre', 'help_post', 'is_active']
       });
       this.form.on('change', this.form.commit, this.form);
     },
@@ -875,4 +875,4 @@
     }
   });
 
-})(CRM.$, CRM._);
+})(CRM.$, CRM._, CRM.BB);

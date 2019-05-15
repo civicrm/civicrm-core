@@ -47,6 +47,12 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $test_activity_type_value;
   protected $_contactID;
+  /**
+   * Activity type id created for use in this test class.
+   *
+   * @var int
+   */
+  protected $test_activity_type_id;
 
   /**
    * Test setup for every test.
@@ -128,7 +134,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'subject' => 'this case should fail',
       'scheduled_date_time' => date('Ymd'),
     );
-    $result = $this->callAPIFailure('activity', 'create', $params);
+    $this->callAPIFailure('activity', 'create', $params);
   }
 
   /**
@@ -149,7 +155,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'scheduled_date_time' => date('Ymd'),
     );
 
-    $result = $this->callAPIFailure('activity', 'create', $params);
+    $this->callAPIFailure('activity', 'create', $params);
   }
 
   /**
@@ -225,14 +231,14 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'activity_type_id' => 'Invalid Test activity type',
     );
 
-    $result = $this->callAPIFailure('activity', 'create', $params);
+    $this->callAPIFailure('activity', 'create', $params);
   }
 
   /**
    * Check with incorrect required fields.
    */
   public function testActivityCreateWithUnknownActivityTypeId() {
-    $params = array(
+    $this->callAPIFailure('activity', 'create', [
       'source_contact_id' => $this->_contactID,
       'subject' => 'Make-it-Happen Meeting',
       'activity_date_time' => date('Ymd'),
@@ -241,9 +247,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'details' => 'a test activity',
       'status_id' => 1,
       'activity_type_id' => 699,
-    );
-
-    $result = $this->callAPIFailure('activity', 'create', $params);
+    ]);
   }
 
   public function testActivityCreateWithInvalidPriority() {
@@ -263,7 +267,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       "'44' is not a valid option for field priority_id");
     $this->assertEquals('priority_id', $result['error_field']);
   }
-
 
   /**
    * Test create succeeds with valid string for priority.
@@ -552,10 +555,9 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
       'activity_name' => 'Test activity type',
     );
 
-    $result = $this->callAPIFailure('activity', 'create', $params,
+    $this->callAPIFailure('activity', 'create', $params,
       "'Invalid' is not a valid option for field status_id");
   }
-
 
   /**
    * Test civicrm_activity_create() with using a text status_id.
@@ -585,7 +587,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    * Test civicrm_activity_get() with no params
    */
   public function testActivityGetEmpty() {
-    $result = $this->callAPISuccess('activity', 'get', array());
+    $this->callAPISuccess('activity', 'get', array());
   }
 
   /**
@@ -651,7 +653,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->callAPISuccess('Activity', 'Delete', array('id' => $result['id']));
   }
 
-
   /**
    * Test civicrm_activity_get() with filter target_contact_id
    */
@@ -680,25 +681,27 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
     $contact2 = $this->individualCreate($contact2Params);
 
+    $this->callAPISuccess('OptionValue', 'get', ['name' => 'Activity Targets', 'api.OptionValue.create' => ['label' => 'oh so creative']]);
+
     $params['assignee_contact_id'] = array($contact1, $contact2);
     $params['target_contact_id'] = array($contact2 => $contact2);
     $activity = $this->callAPISuccess('Activity', 'Create', $params);
 
-    $activityget = $this->callAPISuccess('Activity', 'get', array(
+    $activityGet = $this->callAPISuccess('Activity', 'get', array(
       'id' => $activity['id'],
       'target_contact_id' => $contact2,
       'return.target_contact_id' => 1,
     ));
-    $this->assertEquals($activity['id'], $activityget['id']);
-    $this->assertEquals($contact2, $activityget['values'][$activityget['id']]['target_contact_id'][0]);
+    $this->assertEquals($activity['id'], $activityGet['id']);
+    $this->assertEquals($contact2, $activityGet['values'][$activityGet['id']]['target_contact_id'][0]);
 
-    $activityget = $this->callAPISuccess('activity', 'get', array(
+    $activityGet = $this->callAPISuccess('activity', 'get', array(
       'target_contact_id' => $this->_contactID,
       'return.target_contact_id' => 1,
       'id' => $activity['id'],
     ));
-    if ($activityget['count'] > 0) {
-      $this->assertNotEquals($contact2, $activityget['values'][$activityget['id']]['target_contact_id'][0]);
+    if ($activityGet['count'] > 0) {
+      $this->assertNotEquals($contact2, $activityGet['values'][$activityGet['id']]['target_contact_id'][0]);
     }
   }
 
@@ -709,11 +712,11 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $subject = 'test activity ' . __FUNCTION__ . mt_rand();
     $params = $this->_params;
     $params['subject'] = $subject;
-    $activity = $this->callAPISuccess('Activity', 'Create', $params);
-    $activityget = $this->callAPISuccess('activity', 'getsingle', array(
+    $this->callAPISuccess('Activity', 'Create', $params);
+    $activityGet = $this->callAPISuccess('activity', 'getsingle', array(
       'subject' => $subject,
     ));
-    $this->assertEquals($activityget['subject'], $subject);
+    $this->assertEquals($activityGet['subject'], $subject);
   }
 
   /**
@@ -761,7 +764,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals($tagColor, $activityget['tag_id'][$tag['id']]['tag_id.color']);
     $this->assertEquals($tagDescription, $activityget['tag_id'][$tag['id']]['tag_id.description']);
   }
-
 
   /**
    * Test that activity.get api works to filter on and return files.
@@ -921,42 +923,17 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   }
 
   /**
-   * Check activity deletion with empty params.
-   */
-  public function testDeleteActivityForEmptyParams() {
-    $params = array('version' => $this->_apiversion);
-    $this->callAPIFailure('activity', 'delete', $params);
-  }
-
-  /**
    * Check activity deletion without activity id.
    */
   public function testDeleteActivityWithoutId() {
-    $params = array(
-      'activity_name' => 'Meeting',
-      'version' => $this->_apiversion,
-    );
-    $result = $this->callAPIFailure('activity', 'delete', $params);
+    $this->callAPIFailure('activity', 'delete', ['activity_name' => 'Meeting'], 'Mandatory key(s) missing from params array: id');
   }
 
   /**
    * Check activity deletion without activity type.
    */
-  public function testDeleteActivityWithoutActivityType() {
-    $params = array('id' => 1);
-    $result = $this->callAPIFailure('activity', 'delete', $params);
-  }
-
-  /**
-   * Check activity deletion with incorrect data.
-   */
-  public function testDeleteActivityWithIncorrectActivityType() {
-    $params = array(
-      'id' => 1,
-      'activity_name' => 'Test Activity',
-    );
-
-    $result = $this->callAPIFailure('activity', 'delete', $params);
+  public function testDeleteActivityWithInvalidID() {
+    $this->callAPIFailure('activity', 'delete', ['id' => 1], 'Could not delete Activity: 1');
   }
 
   /**
@@ -964,11 +941,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    */
   public function testDeleteActivity() {
     $result = $this->callAPISuccess('activity', 'create', $this->_params);
-    $params = array(
-      'id' => $result['id'],
-      'version' => $this->_apiversion,
-    );
-
+    $params = ['id' => $result['id']];
     $this->callAPIAndDocument('activity', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
@@ -976,12 +949,10 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    * Check if required fields are not passed.
    */
   public function testActivityUpdateWithoutRequired() {
-    $params = array(
+    $this->callAPIFailure('activity', 'create', [
       'subject' => 'this case should fail',
       'scheduled_date_time' => date('Ymd'),
-    );
-
-    $result = $this->callAPIFailure('activity', 'create', $params);
+    ]);
   }
 
   /**
@@ -1416,15 +1387,13 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    */
   public function testGetOverdue() {
     $overdueAct = $this->callAPISuccess('Activity', 'create', array(
-        'activity_date_time' => 'now - 1 week',
-        'status_id' => 'Scheduled',
-      ) + $this->_params
-    );
+      'activity_date_time' => 'now - 1 week',
+      'status_id' => 'Scheduled',
+    ) + $this->_params);
     $completedAct = $this->callAPISuccess('Activity', 'create', array(
-        'activity_date_time' => 'now - 1 week',
-        'status_id' => 'Completed',
-      ) + $this->_params
-    );
+      'activity_date_time' => 'now - 1 week',
+      'status_id' => 'Completed',
+    ) + $this->_params);
     $ids = array($overdueAct['id'], $completedAct['id']);
 
     // Test sorting

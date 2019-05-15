@@ -32,7 +32,7 @@
    * Add a help link to a form label
    */
   function addHelp(title, options) {
-    return title + ' <a href="#" onclick=\'CRM.help("' + title + '", ' + JSON.stringify(options) + '); return false;\' title="' + ts('%1 Help', {1: title}) + '" class="helpicon"></a>';
+    return title + ' <a href="#" onclick=\'CRM.help("' + title + '", ' + JSON.stringify(options) + '); return false;\' title="' + ts('%1 Help', {1: title}) + '" aria-label="' + ts('%1 Help', {1: title}) + '" class="helpicon"></a>';
   }
 
   function watchChanges() {
@@ -491,6 +491,13 @@
         editorAttrs: {maxlength: 64},
         validators: ['required']
       },
+      'frontend_title': {
+        title: ts('Public Title'),
+        help: ts(''),
+        type: 'Text',
+        editorAttrs: {maxlength: 64},
+        validators: []
+      },
       'group_type': {
         // For a description of group_type, see CRM_Core_BAO_UFGroup::updateGroupTypes
         // title: ts(''),
@@ -510,6 +517,16 @@
       'cancel_URL': {
         title: ts('Cancel Redirect URL'),
         help: ts('If you are using this profile as a contact signup or edit form, and want to redirect the user to a static URL if they click the Cancel button - enter the complete URL here. If this field is left blank, the built-in Profile form will be redisplayed.'),
+        type: 'Text'
+      },
+      'cancel_button_text': {
+        title: ts('Cancel Button Text'),
+        help: ts('Text to display on the cancel button when used in create or edit mode'),
+        type: 'Text'
+      },
+      'submit_button_text': {
+        title: ts('Submit Button Text'),
+        help: ts('Text to display on the submit button when used in create or edit mode'),
         type: 'Text'
       },
       'created_date': {
@@ -670,8 +687,17 @@
           return _.omit(ufFieldModel.toStrictJSON(), ['id', 'uf_group_id']);
         })
       );
-      var copyLabel = ' ' + ts('(Copy)');
-      copy.set('title', copy.get('title').slice(0, 64 - copyLabel.length) + copyLabel);
+      var new_id = 1;
+      CRM.api3('UFGroup', 'getsingle', {
+        "return": ["id"],
+        "options": {"limit": 1, "sort": "id DESC"}
+      }).done(function(result) {
+        new_id = Number(result.id) + 1;
+        var copyLabel = ' ' + ts('(Copy)');
+        var nameSuffix = '_' + new_id;
+        copy.set('title', copy.get('title').slice(0, 64 - copyLabel.length) + copyLabel);
+        copy.set('name', copy.get('name').slice(0, 64 - nameSuffix.length) + nameSuffix);
+      });
       return copy;
     },
     getModelClass: function(entity_name) {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -50,7 +50,7 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   CRM_Utils_Hook::alterAPIPermissions($entity, $action, $params, $permissions);
 
   // Merge permissions for this entity with the defaults
-  $perm = CRM_Utils_Array::value($entity, $permissions, array()) + $permissions['default'];
+  $perm = CRM_Utils_Array::value($entity, $permissions, []) + $permissions['default'];
 
   // Return exact match if permission for this action has been declared
   if (isset($perm[$action])) {

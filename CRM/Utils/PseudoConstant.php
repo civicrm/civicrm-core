@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -36,13 +36,14 @@
 class CRM_Utils_PseudoConstant {
   /**
    * CiviCRM pseudoconstant classes for wrapper functions.
+   * @var array
    */
-  private static $constantClasses = array(
+  private static $constantClasses = [
     'CRM_Core_PseudoConstant',
     'CRM_Event_PseudoConstant',
     'CRM_Contribute_PseudoConstant',
     'CRM_Member_PseudoConstant',
-  );
+  ];
 
   /**
    * @var array
@@ -130,7 +131,7 @@ class CRM_Utils_PseudoConstant {
    */
   public static function findConstants() {
     if (self::$constants === NULL) {
-      self::$constants = array();
+      self::$constants = [];
       foreach (self::$constantClasses as $class) {
         foreach (self::findConstantsByClass($class) as $constant) {
           self::$constants[$constant] = $class;

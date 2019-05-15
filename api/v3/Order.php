@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,8 +42,8 @@
  *   Array of Order, if error an array with an error id and error message
  */
 function civicrm_api3_order_get($params) {
-  $contributions = array();
-  $params['api.line_item.get'] = array('qty' => array('<>' => 0));
+  $contributions = [];
+  $params['api.line_item.get'] = ['qty' => ['<>' => 0]];
   $isSequential = FALSE;
   if (CRM_Utils_Array::value('sequential', $params)) {
     $params['sequential'] = 0;
@@ -62,6 +62,19 @@ function civicrm_api3_order_get($params) {
 }
 
 /**
+ * Adjust Metadata for Get action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_order_get_spec(&$params) {
+  $params['id']['api.aliases'] = ['order_id'];
+  $params['id']['title'] = ts('Contribution / Order ID');
+}
+
+/**
  * Add or update a Order.
  *
  * @param array $params
@@ -72,20 +85,20 @@ function civicrm_api3_order_get($params) {
  *   Api result array
  */
 function civicrm_api3_order_create(&$params) {
-  $contribution = array();
+
   $entity = NULL;
-  $entityIds = array();
+  $entityIds = [];
   if (CRM_Utils_Array::value('line_items', $params) && is_array($params['line_items'])) {
     $priceSetID = NULL;
     CRM_Contribute_BAO_Contribution::checkLineItems($params);
     foreach ($params['line_items'] as $lineItems) {
-      $entityParams = CRM_Utils_Array::value('params', $lineItems, array());
+      $entityParams = CRM_Utils_Array::value('params', $lineItems, []);
       if (!empty($entityParams) && !empty($lineItems['line_item'])) {
         $item = reset($lineItems['line_item']);
         $entity = str_replace('civicrm_', '', $item['entity_table']);
       }
       if ($entityParams) {
-        if (in_array($entity, array('participant', 'membership'))) {
+        if (in_array($entity, ['participant', 'membership'])) {
           $entityParams['skipLineItem'] = TRUE;
           $entityResult = civicrm_api3($entity, 'create', $entityParams);
           $params['contribution_mode'] = $entity;
@@ -100,11 +113,11 @@ function civicrm_api3_order_create(&$params) {
       }
       if (empty($priceSetID)) {
         $item = reset($lineItems['line_item']);
-        $priceSetID = civicrm_api3('PriceField', 'getvalue', array(
+        $priceSetID = civicrm_api3('PriceField', 'getvalue', [
           'return' => 'price_set_id',
           'id' => $item['price_field_id'],
-        ));
-        $params['line_item'][$priceSetID] = array();
+        ]);
+        $params['line_item'][$priceSetID] = [];
       }
       $params['line_item'][$priceSetID] = array_merge($params['line_item'][$priceSetID], $lineItems['line_item']);
     }
@@ -113,10 +126,10 @@ function civicrm_api3_order_create(&$params) {
   // add payments
   if ($entity && CRM_Utils_Array::value('id', $contribution)) {
     foreach ($entityIds as $entityId) {
-      $paymentParams = array(
+      $paymentParams = [
         'contribution_id' => $contribution['id'],
         $entity . '_id' => $entityId,
-      );
+      ];
       // if entity is pledge then build pledge param
       if ($entity == 'pledge') {
         $paymentParams += $entityParams;
@@ -137,10 +150,10 @@ function civicrm_api3_order_create(&$params) {
  * @throws CiviCRM_API3_Exception
  */
 function civicrm_api3_order_delete($params) {
-  $contribution = civicrm_api3('Contribution', 'get', array(
-    'return' => array('is_test'),
+  $contribution = civicrm_api3('Contribution', 'get', [
+    'return' => ['is_test'],
     'id' => $params['id'],
-  ));
+  ]);
   if ($contribution['id'] && $contribution['values'][$contribution['id']]['is_test'] == TRUE) {
     $result = civicrm_api3('Contribution', 'delete', $params);
   }
@@ -175,11 +188,11 @@ function civicrm_api3_order_cancel($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_order_cancel_spec(&$params) {
-  $params['contribution_id'] = array(
-    'api.required' => 1 ,
+  $params['contribution_id'] = [
+    'api.required' => 1,
     'title' => 'Contribution ID',
     'type' => CRM_Utils_Type::T_INT,
-  );
+  ];
 }
 
 /**
@@ -191,23 +204,31 @@ function _civicrm_api3_order_cancel_spec(&$params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_order_create_spec(&$params) {
-  $params['contact_id'] = array(
+  $params['contact_id'] = [
     'name' => 'contact_id',
     'title' => 'Contact ID',
     'type' => CRM_Utils_Type::T_INT,
     'api.required' => TRUE,
-  );
-  $params['total_amount'] = array(
+  ];
+  $params['total_amount'] = [
     'name' => 'total_amount',
     'title' => 'Total Amount',
     'api.required' => TRUE,
-  );
-  $params['financial_type_id'] = array(
+  ];
+  $params['financial_type_id'] = [
     'name' => 'financial_type_id',
     'title' => 'Financial Type',
     'type' => CRM_Utils_Type::T_INT,
     'api.required' => TRUE,
-  );
+    'table_name' => 'civicrm_contribution',
+    'entity' => 'Contribution',
+    'bao' => 'CRM_Contribute_BAO_Contribution',
+    'pseudoconstant' => [
+      'table' => 'civicrm_financial_type',
+      'keyColumn' => 'id',
+      'labelColumn' => 'name',
+    ],
+  ];
 }
 
 /**
@@ -219,10 +240,10 @@ function _civicrm_api3_order_create_spec(&$params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_order_delete_spec(&$params) {
-  $params['contribution_id'] = array(
+  $params['contribution_id'] = [
     'api.required' => TRUE,
     'title' => 'Contribution ID',
     'type' => CRM_Utils_Type::T_INT,
-  );
-  $params['id']['api.aliases'] = array('contribution_id');
+  ];
+  $params['id']['api.aliases'] = ['contribution_id'];
 }

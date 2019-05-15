@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,6 +38,7 @@
       {ts}Scheduled reminders allow you to automatically send messages to contacts regarding their memberships, participation in events, or other activities.{/ts} {$schedRemindersDocLink}
     </div>
   {/if}
+  <div class="crm-content-block crm-block">
   {if $rows}
     <div id="reminder">
       {include file="CRM/Admin/Page/Reminders.tpl"}
@@ -56,6 +57,7 @@
       {assign var='urlParams' value="action=add&reset=1"}
     {/if}
     {crmButton p=$link q=$urlParams id="newScheduleReminder"  icon="plus-circle"}{ts}Add Reminder{/ts}{/crmButton}
+  </div>
   </div>
 {/if}
 {/if}

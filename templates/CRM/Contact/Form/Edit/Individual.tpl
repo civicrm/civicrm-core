@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,45 +27,9 @@
 <script type="text/javascript">
 {literal}
 CRM.$(function($) {
-  {/literal}
-    var cid = "{$contactId}",
-      viewIndividual = "{crmURL p='civicrm/contact/view' q='reset=1&cid=' h=0}",
-      checkSimilar = {$checkSimilar},
-      lastnameMsg;
-  {literal}
   if ($('#contact_sub_type *').length == 0) {//if they aren't any subtype we don't offer the option
     $('#contact_sub_type').parent().hide();
   }
-  if (cid.length || !checkSimilar) {
-   return;//no dupe check if this is a modif or if checkSimilar is disabled (contact_ajax_check_similar in civicrm_setting table)
-  }
-  $('#last_name').change(function() {
-    // Close msg if it exists
-    lastnameMsg && lastnameMsg.close && lastnameMsg.close();
-    if (this.value == '') return;
-    CRM.api3('contact', 'get', {
-      sort_name: $('#last_name').val(),
-      contact_type: 'Individual',
-      'return': 'display_name,sort_name,email'
-    }).done(function(data) {
-      var title = data.count == 1 ? {/literal}"{ts escape='js'}Similar Contact Found{/ts}" : "{ts escape='js'}Similar Contacts Found{/ts}"{literal},
-        msg = "<em>{/literal}{ts escape='js'}If the person you were trying to add is listed below, click their name to view or edit their record{/ts}{literal}:</em>";
-      if (data.is_error == 1 || data.count == 0) {
-        return;
-      }
-      msg += '<ul class="matching-contacts-actions">';
-      $.each(data.values, function(i, contact) {
-        contact.email = contact.email || '';
-        msg += '<li><a href="'+viewIndividual+contact.id+'">'+ contact.display_name +'</a> '+contact.email+'</li>';
-      });
-      msg += '</ul>';
-      lastnameMsg = CRM.alert(msg, title);
-      $('.matching-contacts-actions a').click(function() {
-        // No confirmation dialog on click
-        $('[data-warn-changes=true]').attr('data-warn-changes', 'false');
-      });
-    });
-  });
 });
 </script>
 {/literal}

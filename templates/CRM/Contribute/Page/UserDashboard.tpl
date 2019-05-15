@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,6 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="crm-contribute-userdashboard-pre"}
+{/crmRegion}
 <div class="view-content">
     {if $contribute_rows}
         {strip}
@@ -33,12 +35,12 @@
                     <th>{ts}Received date{/ts}</th>
                     <th>{ts}Receipt Sent{/ts}</th>
                     <th>{ts}Status{/ts}</th>
-                    {if $invoicing && $invoices}
+                    {if $isIncludeInvoiceLinks}
                       <th></th>
                     {/if}
-                    {if $invoicing && $defaultInvoicePage}
+                    {foreach from=$row.buttons item=button}
                       <th></th>
-                    {/if}
+                    {/foreach}
                 </tr>
 
                 {foreach from=$contribute_rows item=row}
@@ -54,8 +56,9 @@
                         <td>{$row.receive_date|truncate:10:''|crmDate}</td>
                         <td>{$row.receipt_date|truncate:10:''|crmDate}</td>
                         <td>{$row.contribution_status}</td>
-                        {if $invoicing && $invoices}
+                        {if $isIncludeInvoiceLinks}
                           <td>
+                            {* @todo Instead of this tpl handling assign actions as an array attached the row, iterate through - will better accomodate extension overrides and competition for scarce real estate on this page*}
                             {assign var='id' value=$row.contribution_id}
                             {assign var='contact_id' value=$row.contact_id}
                             {assign var='urlParams' value="reset=1&id=$id&cid=$contact_id"}
@@ -63,7 +66,7 @@
                                 <a class="button no-popup nowrap"
                                    href="{crmURL p='civicrm/contribute/invoice' q=$urlParams}">
                                     <i class="crm-i fa-print"></i>
-                                    {if $row.contribution_status != 'Refunded' && $row.contribution_status != 'Cancelled' }
+                                    {if $row.contribution_status_name != 'Refunded' && $row.contribution_status_name != 'Cancelled' }
                                         <span>{ts}Print Invoice{/ts}</span>
                                     {else}
                                         <span>{ts}Print Invoice and Credit Note{/ts}</span>
@@ -72,13 +75,9 @@
                             {/if}
                           </td>
                         {/if}
-                        {if $defaultInvoicePage && $row.contribution_status == 'Pending (Pay Later)'}
-                          <td>
-                            {assign var='id' value=$row.contribution_id}
-                            {capture assign=payNowLink}{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$defaultInvoicePage`&ccid=`$id`"}{/capture}
-                            <a class="button" href="{$payNowLink}"><span class='nowrap'>{ts}Pay Now{/ts}</span></a>
-                          </td>
-                        {/if}
+                        {foreach from=$row.buttons item=button}
+                          <td><a class="{$button.class}" href="{$button.url}"><span class='nowrap'>{$button.label}</span></a></td>
+                        {/foreach}
                     </tr>
                 {/foreach}
             </table>
@@ -158,3 +157,5 @@
         {/if}
     {/if}
 </div>
+{crmRegion name="crm-contribute-userdashboard-post"}
+{/crmRegion}

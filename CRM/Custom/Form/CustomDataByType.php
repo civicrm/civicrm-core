@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -48,6 +48,7 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
     $this->_entityId = CRM_Utils_Request::retrieve('entityID', 'Positive');
     $this->_groupID = CRM_Utils_Request::retrieve('groupID', 'Positive');
     $this->_onlySubtype = CRM_Utils_Request::retrieve('onlySubtype', 'Boolean');
+    $this->_action = CRM_Utils_Request::retrieve('action', 'Alphanumeric');
     $this->assign('cdType', FALSE);
     $this->assign('cgCount', $this->_groupCount);
 
@@ -70,7 +71,7 @@ class CRM_Custom_Form_CustomDataByType extends CRM_Core_Form {
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     CRM_Core_BAO_CustomGroup::setDefaults($this->_groupTree, $defaults, FALSE, FALSE, $this->get('action'));
     return $defaults;
   }

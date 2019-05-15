@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -64,13 +64,13 @@ class CRM_Mailing_MailStore_Imap extends CRM_Mailing_MailStore {
 
     }
 
-    $options = array('ssl' => $ssl, 'uidReferencing' => TRUE);
+    $options = ['ssl' => $ssl, 'uidReferencing' => TRUE];
     $this->_transport = new ezcMailImapTransport($host, NULL, $options);
     $this->_transport->authenticate($username, $password);
     $this->_transport->selectMailbox($folder);
 
-    $this->_ignored = implode($this->_transport->getHierarchyDelimiter(), array($folder, 'CiviMail', 'ignored'));
-    $this->_processed = implode($this->_transport->getHierarchyDelimiter(), array($folder, 'CiviMail', 'processed'));
+    $this->_ignored = implode($this->_transport->getHierarchyDelimiter(), [$folder, 'CiviMail', 'ignored']);
+    $this->_processed = implode($this->_transport->getHierarchyDelimiter(), [$folder, 'CiviMail', 'processed']);
     $boxes = $this->_transport->listMailboxes();
 
     if ($this->_debug) {

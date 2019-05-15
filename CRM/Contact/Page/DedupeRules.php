@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
 
@@ -37,7 +37,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -60,30 +60,30 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
       $deleteExtra = ts('Are you sure you want to delete this Rule?');
 
       // helper variable for nicer formatting
-      $links = array();
+      $links = [];
 
       if (CRM_Core_Permission::check('merge duplicate contacts')) {
-        $links[CRM_Core_Action::VIEW] = array(
+        $links[CRM_Core_Action::VIEW] = [
           'name' => ts('Use Rule'),
           'url' => 'civicrm/contact/dedupefind',
           'qs' => 'reset=1&rgid=%%id%%&action=preview',
           'title' => ts('Use DedupeRule'),
-        );
+        ];
       }
       if (CRM_Core_Permission::check('administer dedupe rules')) {
-        $links[CRM_Core_Action::UPDATE] = array(
+        $links[CRM_Core_Action::UPDATE] = [
           'name' => ts('Edit Rule'),
           'url' => 'civicrm/contact/deduperules',
           'qs' => 'action=update&id=%%id%%',
           'title' => ts('Edit DedupeRule'),
-        );
-        $links[CRM_Core_Action::DELETE] = array(
+        ];
+        $links[CRM_Core_Action::DELETE] = [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/deduperules',
           'qs' => 'action=delete&id=%%id%%',
           'extra' => 'onclick = "return confirm(\'' . $deleteExtra . '\');"',
           'title' => ts('Delete DedupeRule'),
-        );
+        ];
       }
 
       self::$_links = $links;
@@ -101,7 +101,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
   public function run() {
     $id = $this->getIdAndAction();
 
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE);
     if ($context == 'nonDupe') {
       CRM_Core_Session::setStatus(ts('Selected contacts have been marked as not duplicates'), ts('Changes Saved'), 'success');
     }
@@ -130,14 +130,14 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
    */
   public function browse() {
     // get all rule groups
-    $ruleGroups = array();
+    $ruleGroups = [];
     $dao = new CRM_Dedupe_DAO_RuleGroup();
-    $dao->orderBy('contact_type,used ASC');
+    $dao->orderBy('contact_type ASC, used ASC, title ASC');
     $dao->find();
 
     $dedupeRuleTypes = CRM_Core_SelectValues::getDedupeRuleTypes();
     while ($dao->fetch()) {
-      $ruleGroups[$dao->contact_type][$dao->id] = array();
+      $ruleGroups[$dao->contact_type][$dao->id] = [];
       CRM_Core_DAO::storeValues($dao, $ruleGroups[$dao->contact_type][$dao->id]);
 
       // form all action links
@@ -155,7 +155,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
       $ruleGroups[$dao->contact_type][$dao->id]['action'] = CRM_Core_Action::formLink(
         $links,
         $action,
-        array('id' => $dao->id),
+        ['id' => $dao->id],
         ts('more'),
         FALSE,
         'dedupeRule.manage.action',
@@ -212,7 +212,7 @@ class CRM_Contact_Page_DedupeRules extends CRM_Core_Page_Basic {
     $rgDao->id = $id;
     if ($rgDao->find(TRUE)) {
       $rgDao->delete();
-      CRM_Core_Session::setStatus(ts("The rule '%1' has been deleted.", array(1 => $rgDao->title)), ts('Rule Deleted'), 'success');
+      CRM_Core_Session::setStatus(ts("The rule '%1' has been deleted.", [1 => $rgDao->title]), ts('Rule Deleted'), 'success');
       CRM_Utils_System::redirect(CRM_Utils_System::url($this->userContext(), 'reset=1'));
     }
   }

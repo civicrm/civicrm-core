@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,10 +23,12 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+
+<div class="help">
+  {ts}Create reports for your users from any of the report templates listed below. Click on a template title to get started. Click Existing Report(s) to see any reports that have already been created from that template.{/ts}
+</div>
+
 <div class="crm-block crm-form-block crm-report-templateList-form-block">
-  <div class="help">
-    {ts}Create reports for your users from any of the report templates listed below. Click on a template title to get started. Click Existing Report(s) to see any reports that have already been created from that template.{/ts}
-  </div>
   {strip}
     {if $list}
       {counter start=0 skip=1 print=false}

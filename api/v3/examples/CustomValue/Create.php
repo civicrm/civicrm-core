@@ -6,10 +6,10 @@
  *   API result array
  */
 function custom_value_create_example() {
-  $params = array(
+  $params = [
     'custom_1' => 'customString',
     'entity_id' => 3,
-  );
+  ];
 
   try{
     $result = civicrm_api3('CustomValue', 'create', $params);
@@ -19,11 +19,11 @@ function custom_value_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'error' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,12 +37,12 @@ function custom_value_create_example() {
  */
 function custom_value_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'values' => TRUE,
-  );
+  ];
 
   return $expectedResult;
 }

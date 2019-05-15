@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,8 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-block crm-form-block crm-path-form-block">
-  <div class="help">
+<div class="help">
     <p>
       {ts}You may configure these upload directories using absolute paths or path variables.{/ts}
       {help id='id-path_vars'}
@@ -32,8 +31,8 @@
     <p>
       {ts}If you modify the defaults, make sure that your web server has write access to the directories.{/ts}
     </p>
-
-  </div>
+</div>
+<div class="crm-block crm-form-block crm-path-form-block">
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
            <table class="form-layout">
             <tr class="crm-path-form-block-uploadDir">

@@ -43,20 +43,28 @@
   <field>
     <name>application_received_date</name>
     <title>Application received date</title>
+    <uniqueName>grant_application_received_date</uniqueName>
     <type>date</type>
     <export>true</export>
+    <import>true</import>
     <comment>Date on which grant application was received by donor.</comment>
     <add>1.8</add>
+    <html>
+      <type>Select Date</type>
+      <formatType>activityDate</formatType>
+    </html>
   </field>
   <field>
     <name>decision_date</name>
     <title>Decision date</title>
+    <uniqueName>grant_decision_date</uniqueName>
     <type>date</type>
     <comment>Date on which grant decision was made.</comment>
     <import>true</import>
     <add>1.8</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>
@@ -69,16 +77,19 @@
     <add>1.8</add>
     <html>
       <type>Select Date</type>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>
     <name>grant_due_date</name>
     <type>date</type>
-    <title>Grant Due Date</title>
+    <title>Grant Report Due Date</title>
     <comment>Date on which grant report is due.</comment>
     <add>1.8</add>
+    <import>true</import>
     <html>
       <type>Select Date</type>
+      <formatType>activityDate</formatType>
     </html>
   </field>
   <field>

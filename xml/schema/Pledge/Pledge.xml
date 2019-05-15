@@ -116,6 +116,7 @@
     <html>
       <type>Text</type>
     </html>
+    <export>true</export>
   </field>
   <field>
     <name>currency</name>
@@ -187,6 +188,7 @@
     <html>
      <type>Text</type>
    </html>
+   <export>true</export>
   </field>
   <field>
     <name>start_date</name>

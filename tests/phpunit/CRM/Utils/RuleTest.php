@@ -113,6 +113,36 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
   }
 
   /**
+   * @dataProvider colorDataProvider
+   * @param $inputData
+   * @param $expectedResult
+   */
+  public function testColor($inputData, $expectedResult) {
+    $this->assertEquals($expectedResult, CRM_Utils_Rule::color($inputData));
+  }
+
+  /**
+   * @return array
+   */
+  public function colorDataProvider() {
+    return [
+      ['#000000', TRUE],
+      ['#ffffff', TRUE],
+      ['#123456', TRUE],
+      ['#00aaff', TRUE],
+      // Some of these are valid css colors but we reject anything that doesn't conform to the html5 spec for <input type="color">
+      ['#ffffff00', FALSE],
+      ['#fff', FALSE],
+      ['##000000', FALSE],
+      ['ffffff', FALSE],
+      ['red', FALSE],
+      ['#orange', FALSE],
+      ['', FALSE],
+      ['rgb(255, 255, 255)', FALSE],
+    ];
+  }
+
+  /**
    * @return array
    */
   public function extenionKeyTests() {
@@ -129,7 +159,53 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @dataProvider extenionKeyTests
    */
   public function testExtenionKeyValid($key, $expectedResult) {
-    $this->assertEquals($expectedResult, CRM_Utils_Rule::checkExtesnionKeyIsValid($key));
+    $this->assertEquals($expectedResult, CRM_Utils_Rule::checkExtensionKeyIsValid($key));
+  }
+
+  /**
+   * @return array
+   */
+  public function alphanumericData() {
+    $expectTrue = [
+      0,
+      999,
+      -5,
+      '',
+      'foo',
+      '0',
+      '-',
+      '_foo',
+      'one-two',
+      'f00',
+    ];
+    $expectFalse = [
+      ' ',
+      5.7,
+      'one two',
+      'one.two',
+      'A<B',
+      "<script>alert('XSS');</script>",
+      '(foo)',
+      'foo;',
+      '[foo]',
+    ];
+    $data = [];
+    foreach ($expectTrue as $value) {
+      $data[] = [$value, TRUE];
+    }
+    foreach ($expectFalse as $value) {
+      $data[] = [$value, FALSE];
+    }
+    return $data;
+  }
+
+  /**
+   * @dataProvider alphanumericData
+   * @param $value
+   * @param $expected
+   */
+  public function testAlphanumeric($value, $expected) {
+    $this->assertEquals($expected, CRM_Utils_Rule::alphanumeric($value));
   }
 
 }

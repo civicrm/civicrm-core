@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.7                                                |
+-- | CiviCRM version 5                                                  |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2017                                |
+-- | Copyright CiviCRM LLC (c) 2004-2019                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -212,7 +212,8 @@ VALUES
    ('wysiwyg_presets'               , '{ts escape="sql"}WYSIWYG Editor Presets{/ts}'             , NULL, 1, 1, 0),
    ('relative_date_filters'         , '{ts escape="sql"}Relative Date Filters{/ts}'              , NULL, 1, 1, 0),
    ('pledge_status'                 , '{ts escape="sql"}Pledge Status{/ts}'                      , NULL, 1, 1, 1),
-   ('environment'                   , '{ts escape="sql"}Environment{/ts}'                        , NULL, 0, 1, 0);
+   ('environment'                   , '{ts escape="sql"}Environment{/ts}'                        , NULL, 1, 1, 0),
+   ('activity_default_assignee'     , '{ts escape="sql"}Activity default assignee{/ts}'          , NULL, 1, 1, 0);
 
 SELECT @option_group_id_pcm            := max(id) from civicrm_option_group where name = 'preferred_communication_method';
 SELECT @option_group_id_act            := max(id) from civicrm_option_group where name = 'activity_type';
@@ -294,6 +295,7 @@ SELECT @option_group_id_date_filter    := max(id) from civicrm_option_group wher
 SELECT @option_group_id_wysiwyg_presets    := max(id) from civicrm_option_group where name = 'wysiwyg_presets';
 SELECT @option_group_id_ps    := max(id) from civicrm_option_group where name = 'pledge_status';
 SELECT @option_group_id_env    := max(id) from civicrm_option_group where name = 'environment';
+SELECT @option_group_id_default_assignee := max(id) from civicrm_option_group where name = 'activity_default_assignee';
 
 SELECT @contributeCompId := max(id) FROM civicrm_component where name = 'CiviContribute';
 SELECT @eventCompId      := max(id) FROM civicrm_component where name = 'CiviEvent';
@@ -984,9 +986,9 @@ VALUES
    (@option_group_id_date_filter, '{ts escape="sql"}Previous fiscal year{/ts}', 'previous.fiscal_year', 'previous.fiscal_year', NULL, NULL, NULL,11, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_date_filter, '{ts escape="sql"}Previous calendar year{/ts}', 'previous.year', 'previous.year', NULL, NULL, NULL,12, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_date_filter, '{ts escape="sql"}Last 7 days including today{/ts}', 'ending.week', 'ending.week', NULL, NULL, NULL,13, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Last 30 days including today{/ts}', 'ending.month', 'ending.month', NULL, NULL, NULL,14, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Last 60 days including today{/ts}', 'ending_2.month', 'ending_2.month', NULL, NULL, NULL,15, NULL, 0, 0, 1, NULL, NULL, NULL),
-   (@option_group_id_date_filter, '{ts escape="sql"}Last 90 days including today{/ts}', 'ending.quarter', 'ending.quarter', NULL, NULL, NULL,16, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_date_filter, '{ts escape="sql"}Last 30 days including today{/ts}', 'ending_30.day', 'ending.month', NULL, NULL, NULL,14, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_date_filter, '{ts escape="sql"}Last 60 days including today{/ts}', 'ending_60.day', 'ending_2.month', NULL, NULL, NULL,15, NULL, 0, 0, 1, NULL, NULL, NULL),
+   (@option_group_id_date_filter, '{ts escape="sql"}Last 90 days including today{/ts}', 'ending_90.day', 'ending.quarter', NULL, NULL, NULL,16, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_date_filter, '{ts escape="sql"}Last 12 months including today{/ts}', 'ending.year', 'ending.year', NULL, NULL, NULL,17, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_date_filter, '{ts escape="sql"}Last 2 years including today{/ts}', 'ending_2.year', 'ending_2.year', NULL, NULL, NULL,18, NULL, 0, 0, 1, NULL, NULL, NULL),
    (@option_group_id_date_filter, '{ts escape="sql"}Last 3 years including today{/ts}', 'ending_3.year', 'ending_3.year', NULL, NULL, NULL,19, NULL, 0, 0, 1, NULL, NULL, NULL),
@@ -1039,7 +1041,14 @@ VALUES
   (@option_group_id_ps, '{ts escape="sql"}Pending{/ts}'    , 2, 'Pending'    , NULL, 0, NULL, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_ps, '{ts escape="sql"}Cancelled{/ts}'  , 3, 'Cancelled'  , NULL, 0, NULL, 3, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_ps, '{ts escape="sql"}In Progress{/ts}', 5, 'In Progress', NULL, 0, NULL, 4, NULL, 0, 1, 1, NULL, NULL, NULL),
-  (@option_group_id_ps, '{ts escape="sql"}Overdue{/ts}'    , 6, 'Overdue'    , NULL, 0, NULL, 5, NULL, 0, 1, 1, NULL, NULL, NULL);
+  (@option_group_id_ps, '{ts escape="sql"}Overdue{/ts}'    , 6, 'Overdue'    , NULL, 0, NULL, 5, NULL, 0, 1, 1, NULL, NULL, NULL),
+
+-- CiviCase - Activity Assignee Default
+--  (`option_group_id`,             `label`,                                                `value`, `name`,                    `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
+(@option_group_id_default_assignee, '{ts escape="sql"}None{/ts}',                           '1',     'NONE',                    NULL,       0,         1,           1,         NULL,          0,             0,             1,           NULL,            NULL,           NULL),
+(@option_group_id_default_assignee, '{ts escape="sql"}By relationship to case client{/ts}', '2',     'BY_RELATIONSHIP',         NULL,       0,         0,           1,         NULL,          0,             0,             1,           NULL,            NULL,           NULL),
+(@option_group_id_default_assignee, '{ts escape="sql"}Specific contact{/ts}',               '3',     'SPECIFIC_CONTACT',        NULL,       0,         0,           1,         NULL,          0,             0,             1,           NULL,            NULL,           NULL),
+(@option_group_id_default_assignee, '{ts escape="sql"}User creating the case{/ts}',          '4',     'USER_CREATING_THE_CASE',  NULL,       0,         0,           1,         NULL,          0,             0,             1,           NULL,            NULL,           NULL);
 
 -- financial accounts
 SELECT @opval := value FROM civicrm_option_value WHERE name = 'Revenue' and option_group_id = @option_group_id_fat;
@@ -1365,7 +1374,7 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'unknown( or illegal)? user( account)?'),
     (@bounceTypeID, 'unrecognized recipient'),
     (@bounceTypeID, 'unregistered address'),
-    (@bounceTypeID, 'user (unknown|does not exist)'),
+    (@bounceTypeID, 'user (unknown|(does not|doesn\'t) exist)'),
     (@bounceTypeID, 'user doesn\'t have an? \w+ account'),
     (@bounceTypeID, 'user(\'s e-?mail name is)? not found'),
     (@bounceTypeID, '^Validation failed for:'),
@@ -1480,7 +1489,8 @@ INSERT INTO civicrm_mailing_bounce_pattern
     (@bounceTypeID, 'has a policy that( [^ ]*)? prohibited the mail that you sent'),
     (@bounceTypeID, 'is likely unsolicited mail'),
     (@bounceTypeID, 'Local Policy Violation'),
-    (@bounceTypeID, 'ni bilo mogo..?e dostaviti zaradi varnostnega pravilnika');
+    (@bounceTypeID, 'ni bilo mogo..?e dostaviti zaradi varnostnega pravilnika'),
+    (@bounceTypeID, 'abuse report');
 
 INSERT INTO civicrm_mailing_bounce_type
         (name, description, hold_threshold)

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,8 +44,11 @@
  *   api result array
  */
 function civicrm_api3_line_item_create($params) {
+  // @todo the following line is not really appropriate for the api. The BAO should
+  // do the work, and it should be in a tighter function. The below function is  not really
+  // readable because it is handling contribution and line item together.
   $params = CRM_Contribute_BAO_Contribution::checkTaxAmount($params, TRUE);
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'LineItem');
 }
 
 /**

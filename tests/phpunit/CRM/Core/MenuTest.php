@@ -57,10 +57,14 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $this->assertEquals(array(), $menu['civicrm/foo/bar']['ids_arguments']['html']);
 
     $idsConfig = CRM_Core_IDS::createRouteConfig($menu['civicrm/foo/bar']);
-    $this->assertTrue(in_array('alpha', $idsConfig['General']['json'])); // XML
-    $this->assertTrue(in_array('beta', $idsConfig['General']['json'])); // XML
-    $this->assertTrue(in_array('gamma', $idsConfig['General']['exceptions'])); // XML
-    $this->assertTrue(in_array('thankyou_text', $idsConfig['General']['exceptions'])); // Inherited
+    // XML
+    $this->assertTrue(in_array('alpha', $idsConfig['General']['json']));
+    // XML
+    $this->assertTrue(in_array('beta', $idsConfig['General']['json']));
+    // XML
+    $this->assertTrue(in_array('gamma', $idsConfig['General']['exceptions']));
+    // Inherited
+    $this->assertTrue(in_array('thankyou_text', $idsConfig['General']['exceptions']));
   }
 
   /**
@@ -73,7 +77,7 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
     $this->assertFalse(isset($item['ids_arguments']['exceptions']));
     $this->assertFalse(isset($item['whimsy']));
 
-    CRM_Utils_Hook::singleton()->setHook('civicrm_alterMenu', function(&$items){
+    CRM_Utils_Hook::singleton()->setHook('civicrm_alterMenu', function(&$items) {
       $items['civicrm/case']['ids_arguments']['exceptions'][] = 'foobar';
       $items['civicrm/case']['whimsy'] = 'godliness';
     });
@@ -88,7 +92,8 @@ class CRM_Core_MenuTest extends CiviUnitTestCase {
    * @return array
    */
   public function pathArguments() {
-    $cases = array(); // array(0 => string $input, 1 => array $expectedOutput)
+    // array(0 => string $input, 1 => array $expectedOutput)
+    $cases = array();
     //$cases[] = array(NULL, array());
     //$cases[] = array('', array());
     //$cases[] = array('freestanding', array('freestanding' => NULL));

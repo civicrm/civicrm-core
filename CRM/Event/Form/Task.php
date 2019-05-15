@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,37 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
 
 /**
- * This class generates task actions for CiviEvent
- *
+ * Class for event form task actions.
+ * FIXME: This needs refactoring to properly inherit from CRM_Core_Form_Task and share more functions.
  */
-class CRM_Event_Form_Task extends CRM_Core_Form {
-
-  /**
-   * The task being performed.
-   *
-   * @var int
-   */
-  protected $_task;
-
-  /**
-   * The additional clause that we restrict the search with.
-   *
-   * @var string
-   */
-  protected $_componentClause = NULL;
-
-  /**
-   * The array that holds all the component ids.
-   *
-   * @var array
-   */
-  protected $_componentIds;
+class CRM_Event_Form_Task extends CRM_Core_Form_Task {
 
   /**
    * The array that holds all the participant ids.
@@ -80,18 +59,20 @@ class CRM_Event_Form_Task extends CRM_Core_Form {
 
   /**
    * @param CRM_Core_Form $form
-   * @param bool $useTable
    */
-  public static function preProcessCommon(&$form, $useTable = FALSE) {
-    $form->_participantIds = array();
+  public static function preProcessCommon(&$form) {
+    $form->_participantIds = [];
 
     $values = $form->controller->exportValues($form->get('searchFormName'));
 
     $form->_task = $values['task'];
-    $eventTasks = CRM_Event_Task::tasks();
-    $form->assign('taskName', $eventTasks[$form->_task]);
+    $tasks = CRM_Event_Task::permissionedTaskTitles(CRM_Core_Permission::getPermission());
+    if (!array_key_exists($form->_task, $tasks)) {
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
+    }
+    $form->assign('taskName', $tasks[$form->_task]);
 
-    $ids = array();
+    $ids = [];
     if ($values['radio_ts'] == 'ts_sel') {
       foreach ($values as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
@@ -127,7 +108,7 @@ class CRM_Event_Form_Task extends CRM_Core_Form {
     //set the context for redirection for any task actions
     $session = CRM_Core_Session::singleton();
 
-    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
+    $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $form);
     $urlParams = 'force=1';
     if (CRM_Utils_Rule::qfKey($qfKey)) {
       $urlParams .= "&qfKey=$qfKey";
@@ -149,7 +130,7 @@ class CRM_Event_Form_Task extends CRM_Core_Form {
    * since its used for things like send email
    */
   public function setContactIDs() {
-    $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent($this->_participantIds,
+    $this->_contactIds = CRM_Core_DAO::getContactIDsFromComponent($this->_participantIds,
       'civicrm_participant'
     );
   }
@@ -167,18 +148,17 @@ class CRM_Event_Form_Task extends CRM_Core_Form {
    * @return void
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons(array(
-        array(
-          'type' => $nextType,
-          'name' => $title,
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => $backType,
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => $nextType,
+        'name' => $title,
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => $backType,
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
 }

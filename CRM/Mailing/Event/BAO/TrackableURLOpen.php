@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_TrackableURLOpen {
 
@@ -64,9 +64,9 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
         "SELECT url
            FROM $turl
           WHERE $turl.id = %1",
-        array(
-          1 => array($url_id, 'Integer'),
-        )
+        [
+          1 => [$url_id, 'Integer'],
+        ]
       );
 
       if (!$search->fetch()) {
@@ -82,10 +82,10 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
         INNER JOIN $job ON $turl.mailing_id = $job.mailing_id
         INNER JOIN $eq ON $job.id = $eq.job_id
         WHERE $eq.id = %1 AND $turl.id = %2",
-      array(
-        1 => array($queue_id, 'Integer'),
-        2 => array($url_id, 'Integer'),
-      )
+      [
+        1 => [$queue_id, 'Integer'],
+        2 => [$url_id, 'Integer'],
+      ]
     );
 
     if (!$search->fetch()) {
@@ -95,9 +95,9 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
         "SELECT $turl.url as url
            FROM $turl
           WHERE $turl.id = %1",
-        array(
-          1 => array($url_id, 'Integer'),
-        )
+        [
+          1 => [$url_id, 'Integer'],
+        ]
       );
 
       if (!$search->fetch()) {
@@ -144,8 +144,12 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();
     $job = CRM_Mailing_BAO_MailingJob::getTableName();
 
+    $distinct = NULL;
+    if ($is_distinct) {
+      $distinct = 'DISTINCT ';
+    }
     $query = "
-            SELECT      COUNT($click.id) as opened
+            SELECT      COUNT($distinct $click.event_queue_id) as opened
             FROM        $click
             INNER JOIN  $queue
                     ON  $click.event_queue_id = $queue.id
@@ -166,10 +170,6 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
 
     if (!empty($url_id)) {
       $query .= " AND $click.trackable_url_id = " . CRM_Utils_Type::escape($url_id, 'Integer');
-    }
-
-    if ($is_distinct) {
-      $query .= " GROUP BY $queue.id ";
     }
 
     // query was missing
@@ -194,7 +194,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    */
   public static function getMailingTotalCount($mailingIDs) {
     $dao = new CRM_Core_DAO();
-    $clickCount = array();
+    $clickCount = [];
 
     $click = self::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
@@ -234,7 +234,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
    */
   public static function getMailingContactCount($mailingIDs, $contactID) {
     $dao = new CRM_Core_DAO();
-    $clickCount = array();
+    $clickCount = [];
 
     $click = self::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
@@ -305,9 +305,16 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
     $query = "
             SELECT      $contact.display_name as display_name,
                         $contact.id as contact_id,
-                        $email.email as email,
-                        $click.time_stamp as date,
-                        $url.url as url
+                        $email.email as email,";
+
+    if ($is_distinct) {
+      $query .= "MIN($click.time_stamp) as date,";
+    }
+    else {
+      $query .= "$click.time_stamp as date,";
+    }
+
+    $query .= "$url.url as url
             FROM        $contact
             INNER JOIN  $queue
                     ON  $queue.contact_id = $contact.id
@@ -337,7 +344,7 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
     }
 
     if ($is_distinct) {
-      $query .= " GROUP BY $queue.id, $click.time_stamp, $url.url ";
+      $query .= " GROUP BY $queue.id, $url.url ";
     }
 
     $orderBy = "sort_name ASC, {$click}.time_stamp DESC";
@@ -357,21 +364,21 @@ class CRM_Mailing_Event_BAO_TrackableURLOpen extends CRM_Mailing_Event_DAO_Track
       //Added "||$rowCount" to avoid displaying all records on first page
       $query .= ' LIMIT ' . CRM_Utils_Type::escape($offset, 'Integer') . ', ' . CRM_Utils_Type::escape($rowCount, 'Integer');
     }
-
+    CRM_Core_DAO::disableFullGroupByMode();
     $dao->query($query);
-
-    $results = array();
+    CRM_Core_DAO::reenableFullGroupByMode();
+    $results = [];
 
     while ($dao->fetch()) {
       $url = CRM_Utils_System::url('civicrm/contact/view',
         "reset=1&cid={$dao->contact_id}"
       );
-      $results[] = array(
+      $results[] = [
         'name' => "<a href=\"$url\">{$dao->display_name}</a>",
         'email' => $dao->email,
         'url' => $dao->url,
         'date' => CRM_Utils_Date::customFormat($dao->date),
-      );
+      ];
     }
     return $results;
   }

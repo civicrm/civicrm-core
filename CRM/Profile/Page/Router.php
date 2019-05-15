@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  *
  */
 
@@ -111,10 +111,10 @@ class CRM_Profile_Page_Router extends CRM_Core_Page {
         $wrapper = new CRM_Utils_Wrapper();
         return $wrapper->run('CRM_Profile_Form_Edit',
           ts('Create Profile'),
-          array(
+          [
             'mode' => CRM_Core_Action::ADD,
             'ignoreKey' => $allowRemoteSubmit,
-          )
+          ]
         );
       }
     }

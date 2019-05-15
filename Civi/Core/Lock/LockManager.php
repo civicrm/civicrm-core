@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,7 +37,7 @@ use Civi\Core\Resolver;
  */
 class LockManager {
 
-  private $rules = array();
+  private $rules = [];
 
   /**
    * @param string $name
@@ -53,7 +53,7 @@ class LockManager {
     $factory = $this->getFactory($name);
     if ($factory) {
       /** @var LockInterface $lock */
-      $lock = call_user_func_array($factory, array($name));
+      $lock = call_user_func_array($factory, [$name]);
       return $lock;
     }
     else {
@@ -111,10 +111,10 @@ class LockManager {
    * @see Resolver
    */
   public function register($pattern, $factory) {
-    $this->rules[] = array(
+    $this->rules[] = [
       'pattern' => $pattern,
       'factory' => $factory,
-    );
+    ];
     return $this;
   }
 

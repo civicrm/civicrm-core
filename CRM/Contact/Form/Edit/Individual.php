@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -69,10 +69,10 @@ class CRM_Contact_Form_Edit_Individual {
       }
 
       foreach ($nameFields as $name) {
-        $props = array();
+        $props = [];
         if ($name == 'prefix_id' || $name == 'suffix_id') {
           //override prefix/suffix label name as Prefix/Suffix respectively and adjust select size
-          $props = array('class' => 'eight', 'placeholder' => ' ', 'label' => $name == 'prefix_id' ? ts('Prefix') : ts('Suffix'));
+          $props = ['class' => 'eight', 'placeholder' => ' ', 'label' => $name == 'prefix_id' ? ts('Prefix') : ts('Suffix')];
         }
         $form->addField($name, $props);
       }
@@ -84,32 +84,25 @@ class CRM_Contact_Form_Edit_Individual {
 
       // job title
       // override the size for UI to look better
-      $form->addField('job_title', array('size' => '30'));
+      $form->addField('job_title', ['size' => '30']);
 
       //Current Employer Element
-      $props = array(
-        'api' => array('params' => array('contact_type' => 'Organization')),
+      $props = [
+        'api' => ['params' => ['contact_type' => 'Organization']],
         'create' => TRUE,
-      );
+      ];
       $form->addField('employer_id', $props);
-      $form->addField('contact_source', array('class' => 'big'));
+      $form->addField('contact_source', ['class' => 'big']);
     }
 
     if (!$inlineEditMode) {
-      $checkSimilar = Civi::settings()->get('contact_ajax_check_similar');
-
-      if ($checkSimilar == NULL) {
-        $checkSimilar = 0;
-      }
-      $form->assign('checkSimilar', $checkSimilar);
-
       //External Identifier Element
-      $form->addField('external_identifier', array('label' => 'External ID'));
+      $form->addField('external_identifier', ['label' => 'External ID']);
 
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),
         'objectExists',
-        array('CRM_Contact_DAO_Contact', $form->_contactId, 'external_identifier')
+        ['CRM_Contact_DAO_Contact', $form->_contactId, 'external_identifier']
       );
       CRM_Core_ShowHideBlocks::links($form, 'demographics', '', '');
     }
@@ -128,16 +121,13 @@ class CRM_Contact_Form_Edit_Individual {
    *   TRUE if no errors, else array of errors.
    */
   public static function formRule($fields, $files, $contactID = NULL) {
-    $errors = array();
-    $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID);
+    $errors = [];
+    $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID, 'Individual');
 
     // make sure that firstName and lastName or a primary OpenID is set
     if (!$primaryID && (empty($fields['first_name']) || empty($fields['last_name']))) {
       $errors['_qf_default'] = ts('First Name and Last Name OR an email OR an OpenID in the Primary Location should be set.');
     }
-
-    //check for duplicate - dedupe rules
-    CRM_Contact_Form_Contact::checkDuplicateContacts($fields, $errors, $contactID, 'Individual');
 
     return empty($errors) ? TRUE : $errors;
   }

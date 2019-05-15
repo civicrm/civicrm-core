@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard {
 
@@ -36,20 +36,51 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
    * called when action is browse.
    */
   public function listContribution() {
-    $controller = new CRM_Core_Controller_Simple(
-      'CRM_Contribute_Form_Search',
-      ts('Contributions'),
-      NULL,
-      FALSE, FALSE, TRUE, FALSE
-    );
-    $controller->setEmbedded(TRUE);
-    $controller->reset();
-    $controller->set('limit', 12);
-    $controller->set('cid', $this->_contactId);
-    $controller->set('context', 'user');
-    $controller->set('force', 1);
-    $controller->process();
-    $controller->run();
+    $rows = civicrm_api3('Contribution', 'get', [
+      'options' => [
+        'limit' => 12,
+        'sort' => 'receive_date DESC',
+      ],
+      'sequential' => 1,
+      'contact_id' => $this->_contactId,
+      'return' => [
+        'total_amount',
+        'contribution_recur_id',
+        'financial_type',
+        'receive_date',
+        'receipt_date',
+        'contribution_status',
+        'currency',
+        'amount_level',
+        'contact_id,',
+        'contribution_source',
+      ],
+    ])['values'];
+
+    // We want oldest first, just among the most recent contributions
+    $rows = array_reverse($rows);
+
+    foreach ($rows as $index => &$row) {
+      // This is required for tpl logic. We should move away from hard-code this to adding an array of actions to the row
+      // which the tpl can iterate through - this should allow us to cope with competing attempts to add new buttons
+      // and allow extensions to assign new ones through the pageRun hook
+      if ('Pending' === CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $row['contribution_status_id'])) {
+        $row['buttons']['pay'] = [
+          'class' => 'button',
+          'label' => ts('Pay Now'),
+          'url' => CRM_Utils_System::url('civicrm/contribute/transact', [
+            'reset' => 1,
+            'id' => CRM_Invoicing_Utils::getDefaultPaymentPage(),
+            'ccid' => $row['contribution_id'],
+            'cs' => $this->getUserChecksum(),
+            'cid' => $row['contact_id'],
+          ])
+        ];
+      }
+    }
+
+    $this->assign('contribute_rows', $rows);
+    $this->assign('contributionSummary', ['total_amount' => civicrm_api3('Contribution', 'getcount', ['contact_id' => $this->_contactId])]);
 
     //add honor block
     $params = CRM_Contribute_BAO_Contribution::getHonorContacts($this->_contactId);
@@ -65,18 +96,14 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
     $recur->is_test = 0;
     $recur->find();
 
-    $config = CRM_Core_Config::singleton();
-
     $recurStatus = CRM_Contribute_PseudoConstant::contributionStatus();
 
-    $recurRow = array();
-    $recurIDs = array();
+    $recurRow = [];
+    $recurIDs = [];
     while ($recur->fetch()) {
-      $mode = $recur->is_test ? 'test' : 'live';
-      $paymentProcessor = CRM_Contribute_BAO_ContributionRecur::getPaymentProcessor($recur->id,
-        $mode
-      );
-      if (!$paymentProcessor) {
+      if (empty($recur->payment_processor_id)) {
+        // it's not clear why we continue here as any without a processor id would likely
+        // be imported from another system & still seem valid.
         continue;
       }
 
@@ -97,11 +124,11 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       }
 
       $recurRow[$values['id']]['action'] = CRM_Core_Action::formLink(CRM_Contribute_Page_Tab::recurLinks($recur->id, 'dashboard'),
-        $action, array(
+        $action, [
           'cid' => $this->_contactId,
           'crid' => $values['id'],
           'cxt' => 'contribution',
-        ),
+        ],
         ts('more'),
         FALSE,
         'contribution.dashboard.recurring',
@@ -110,10 +137,6 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
       );
 
       $recurIDs[] = $values['id'];
-
-      //reset $paymentObject for checking other paymenet processor
-      //recurring url
-      $paymentObject = NULL;
     }
     if (is_array($recurIDs) && !empty($recurIDs)) {
       $getCount = CRM_Contribute_BAO_ContributionRecur::getCount($recurIDs);
@@ -135,15 +158,27 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
   }
 
   /**
+   * Should invoice links be displayed on the template.
+   *
+   * @todo This should be moved to a hook-like structure on the invoicing class
+   * (currently CRM_Utils_Invoicing) with a view to possible removal from core.
+   */
+  public function isIncludeInvoiceLinks() {
+    if (!CRM_Invoicing_Utils::isInvoicingEnabled()) {
+      return FALSE;
+    }
+    $dashboardOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+      'user_dashboard_options'
+    );
+    return $dashboardOptions['Invoices / Credit Notes'];
+  }
+
+  /**
    * the main function that is called when the page
    * loads, it decides the which action has to be taken for the page.
    */
   public function run() {
-    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-    $defaultInvoicePage = CRM_Utils_Array::value('default_invoice_page', $invoiceSettings);
-    $this->assign('invoicing', $invoicing);
-    $this->assign('defaultInvoicePage', $defaultInvoicePage);
+    $this->assign('isIncludeInvoiceLinks', $this->isIncludeInvoiceLinks());
     parent::preProcess();
     $this->listContribution();
   }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,7 +35,7 @@
  * implement the Selector/Api.interface.php class
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -104,6 +104,7 @@ class CRM_Core_Selector_Controller {
 
   /**
    * The objectAction for the WebObject
+   * @var int
    */
   protected $_action;
 
@@ -164,7 +165,7 @@ class CRM_Core_Selector_Controller {
    *
    * @var array
    */
-  public static $_properties = array('columnHeaders', 'rows', 'rowsEmpty');
+  public static $_properties = ['columnHeaders', 'rows', 'rowsEmpty'];
 
   /**
    * Should we compute actions dynamically (since they are quite verbose)
@@ -209,9 +210,9 @@ class CRM_Core_Selector_Controller {
       $this->_sortID .= '_u';
     }
 
-    $params = array(
+    $params = [
       'pageID' => $this->_pageID,
-    );
+    ];
 
     // let the constructor initialize this, should happen only once
     if (!isset(self::$_template)) {
@@ -339,8 +340,8 @@ class CRM_Core_Selector_Controller {
       // output requires paging/sorting capability
       $rows = self::getRows($this);
       CRM_Utils_Hook::searchColumns($contextName, $columnHeaders, $rows, $this);
-      $reorderedHeaders = array();
-      $noWeightHeaders = array();
+      $reorderedHeaders = [];
+      $noWeightHeaders = [];
       foreach ($columnHeaders as $key => $columnHeader) {
         // So far only contribution selector sets weight, so just use key if not.
         // Extension writers will need to fix other getColumnHeaders (or add a wrapper)

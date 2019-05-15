@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -130,10 +130,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     if ($this->_onDuplicate != CRM_Import_Parser::DUPLICATE_NOCHECK) {
       //Mark Dedupe Rule Fields as required, since it's used in matching contact
       foreach (array(
-                 'Individual',
-                 'Household',
-                 'Organization',
-               ) as $cType) {
+        'Individual',
+        'Household',
+        'Organization',
+      ) as $cType) {
         $ruleParams = array(
           'contact_type' => $cType,
           'used' => 'Unsupervised',
@@ -608,7 +608,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           'type' => 'cancel',
           'name' => ts('Cancel'),
         ),
-      )
+    )
     );
   }
 

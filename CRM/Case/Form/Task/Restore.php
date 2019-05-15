@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -63,7 +63,7 @@ class CRM_Case_Form_Task_Restore extends CRM_Case_Form_Task {
    */
   public function postProcess() {
     $restoredCases = $failed = 0;
-    foreach ($this->_caseIds as $caseId) {
+    foreach ($this->_entityIds as $caseId) {
       if (CRM_Case_BAO_Case::restoreCase($caseId)) {
         $restoredCases++;
       }
@@ -73,15 +73,15 @@ class CRM_Case_Form_Task_Restore extends CRM_Case_Form_Task {
     }
 
     if ($restoredCases) {
-      $msg = ts('%count case restored from trash.', array(
+      $msg = ts('%count case restored from trash.', [
         'plural' => '%count cases restored from trash.',
         'count' => $restoredCases,
-      ));
+      ]);
       CRM_Core_Session::setStatus($msg, ts('Restored'), 'success');
     }
 
     if ($failed) {
-      CRM_Core_Session::setStatus(ts('1 could not be restored.', array('plural' => '%count could not be restored.', 'count' => $failed)), ts('Error'), 'error');
+      CRM_Core_Session::setStatus(ts('1 could not be restored.', ['plural' => '%count could not be restored.', 'count' => $failed]), ts('Error'), 'error');
     }
   }
 

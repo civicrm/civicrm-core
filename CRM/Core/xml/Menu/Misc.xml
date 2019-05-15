@@ -18,6 +18,11 @@
      <weight>0</weight>
   </item>
   <item>
+    <path>civicrm/export/standalone</path>
+    <title>Export</title>
+    <page_callback>CRM_Export_Controller_Standalone</page_callback>
+  </item>
+  <item>
      <path>civicrm/admin/options/acl_role</path>
      <title>ACL Roles</title>
      <page_callback>CRM_Admin_Page_Options</page_callback>
@@ -198,7 +203,7 @@
   <item>
      <path>civicrm/recurringentity/preview</path>
      <page_callback>CRM_Core_Page_RecurringEntityPreview</page_callback>
-     <access_arguments>access CiviCRM,access CiviEvent</access_arguments>
+     <access_arguments>access CiviCRM</access_arguments>
      <title>Confirm dates</title>
   </item>
   <item>

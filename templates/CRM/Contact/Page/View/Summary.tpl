@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -80,7 +80,7 @@
 
         {elseif call_user_func(array('CRM_Core_Permission','check'), 'delete contacts')}
           <li class="crm-delete-action crm-contact-delete">
-            {crmButton p='civicrm/contact/view/delete' q="&reset=1&delete=1&cid=$contactId" class="delete" icon="trash"}
+            {crmButton p='civicrm/contact/view/delete' q="reset=1&delete=1&cid=$contactId" class="delete" icon="trash"}
               {ts}Delete Contact{/ts}
             {/crmButton}
           </li>
@@ -126,7 +126,8 @@
         {foreach from=$allTabs key=tabName item=tabValue}
           <li id="tab_{$tabValue.id}" class="crm-tab-button ui-corner-all crm-count-{$tabValue.count}{if isset($tabValue.class)} {$tabValue.class}{/if}">
             <a href="{$tabValue.url}" title="{$tabValue.title|escape}">
-              {$tabValue.title}
+              <i class="{if $tabValue.icon}{$tabValue.icon}{else}crm-i fa-puzzle-piece{/if}"></i>
+              <span>{$tabValue.title}</span>
               {if empty($tabValue.hideCount)}<em>{$tabValue.count}</em>{/if}
             </a>
           </li>
@@ -158,46 +159,8 @@
                 </div>
               {/if}
                 <div class="{if !empty($imageURL)} float-left{/if}">
-                  <div class="crm-clear crm-summary-block">
-                    <div class="crm-summary-row">
-                      <div class="crm-label" id="tagLink">
-                        <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=$contactId&selectedChild=tag"}"
-                           title="{ts}Edit Tags{/ts}">{ts}Tags{/ts}</a>
-                      </div>
-                      <div class="crm-content" id="tags">
-                        {foreach from=$contactTag item=tagName key=tagId}
-                          <span class="crm-tag-item" {if !empty($allTags.$tagId.color)}style="background-color: {$allTags.$tagId.color}; color: {$allTags.$tagId.color|colorContrast};"{/if} title="{$allTags.$tagId.description|escape}">
-                            {$tagName}
-                          </span>
-                        {/foreach}
-                      </div>
-                    </div>
-                    <div class="crm-summary-row">
-                      <div class="crm-label">{ts}Contact Type{/ts}</div>
-                      <div class="crm-content crm-contact_type_label">
-                        {if isset($contact_type_label)}{$contact_type_label}{/if}
-                      </div>
-                    </div>
-                    <div class="crm-summary-row">
-                      <div class="crm-label">
-                        {ts}Contact ID{/ts}{if !empty($userRecordUrl)} / {ts}User ID{/ts}{/if}
-                      </div>
-                      <div class="crm-content">
-                        <span class="crm-contact-contact_id">{$contactId}</span>
-                        {if !empty($userRecordUrl)}
-                          <span class="crm-contact-user_record_id">
-                            &nbsp;/&nbsp;<a title="View user record" class="user-record-link"
-                                            href="{$userRecordUrl}">{$userRecordId}</a>
-                          </span>
-                        {/if}
-                      </div>
-                    </div>
-                    <div class="crm-summary-row">
-                      <div class="crm-label">{ts}External ID{/ts}</div>
-                      <div class="crm-content crm-contact_external_identifier_label">
-                        {if isset($external_identifier)}{$external_identifier}{/if}
-                      </div>
-                    </div>
+                  <div class="crm-summary-basic-block crm-summary-block">
+                    {include file="CRM/Contact/Page/Inline/Basic.tpl"}
                   </div>
                 </div>
               {/crmRegion}

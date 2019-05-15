@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Address Utilities
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_Address {
 
@@ -39,6 +39,9 @@ class CRM_Utils_Address {
    * Format an address basing on the address fields provided.
    * Use Setting's address_format if there's no format specified.
    *
+   * This function is also used to generate a contact's display_name and
+   * sort_name.
+   *
    * @param array $fields
    *   The address fields.
    * @param string $format
@@ -47,9 +50,6 @@ class CRM_Utils_Address {
    *   If true indicates, the address to be built in hcard-microformat standard.
    * @param bool $mailing
    *   If true indicates, the call has been made from mailing label.
-   * @param bool $individualFormat
-   *   If true indicates, the call has been made for the contact of type 'individual'.
-   *
    * @param null $tokenFields
    *
    * @return string
@@ -61,7 +61,6 @@ class CRM_Utils_Address {
     $format = NULL,
     $microformat = FALSE,
     $mailing = FALSE,
-    $individualFormat = FALSE,
     $tokenFields = NULL
   ) {
     static $config = NULL;
@@ -82,13 +81,13 @@ class CRM_Utils_Address {
     }
 
     // make sure that some of the fields do have values
-    $emptyFields = array(
+    $emptyFields = [
       'supplemental_address_1',
       'supplemental_address_2',
       'supplemental_address_3',
       'state_province_name',
       'county',
-    );
+    ];
     foreach ($emptyFields as $f) {
       if (!isset($fields[$f])) {
         $fields[$f] = NULL;
@@ -99,7 +98,7 @@ class CRM_Utils_Address {
     if ($mailing && !empty($fields['country'])) {
       if (Civi::settings()->get('hideCountryMailingLabels')) {
         $domain = CRM_Core_BAO_Domain::getDomain();
-        $domainLocation = CRM_Core_BAO_Location::getValues(array('contact_id' => $domain->contact_id));
+        $domainLocation = CRM_Core_BAO_Location::getValues(['contact_id' => $domain->contact_id]);
         $domainAddress = $domainLocation['address'][1];
         $domainCountryId = $domainAddress['country_id'];
         if ($fields['country'] == CRM_Core_PseudoConstant::country($domainCountryId)) {
@@ -115,23 +114,9 @@ class CRM_Utils_Address {
       }
     }
 
-    $contactName = CRM_Utils_Array::value('display_name', $fields);
-    if (!$individualFormat) {
-      if (isset($fields['id'])) {
-        $type = CRM_Contact_BAO_Contact::getContactType($fields['id']);
-      }
-      else {
-        $type = 'Individual';
-      }
-
-      if ($type == 'Individual') {
-        $contactName = CRM_Utils_Array::value('addressee_display', $fields);
-      }
-    }
-
     if (!$microformat) {
       // replacements in case of Individual Name Format
-      $replacements = array(
+      $replacements = [
         'contact.display_name' => CRM_Utils_Array::value('display_name', $fields),
         'contact.individual_prefix' => CRM_Utils_Array::value('individual_prefix', $fields),
         'contact.formal_title' => CRM_Utils_Array::value('formal_title', $fields),
@@ -180,10 +165,10 @@ class CRM_Utils_Address {
         'contact.addressee' => CRM_Utils_Array::value('addressee_display', $fields),
         'contact.email_greeting' => CRM_Utils_Array::value('email_greeting_display', $fields),
         'contact.postal_greeting' => CRM_Utils_Array::value('postal_greeting_display', $fields),
-      );
+      ];
     }
     else {
-      $replacements = array(
+      $replacements = [
         'contact.address_name' => "<span class=\"address-name\">" . $fields['address_name'] . "</span>",
         'contact.street_address' => "<span class=\"street-address\">" . $fields['street_address'] . "</span>",
         'contact.supplemental_address_1' => "<span class=\"extended-address\">" . $fields['supplemental_address_1'] . "</span>",
@@ -196,7 +181,7 @@ class CRM_Utils_Address {
         'contact.postal_code' => "<span class=\"postal-code\">" . $fullPostalCode . "</span>",
         'contact.country' => "<span class=\"country-name\">" . $fields['country'] . "</span>",
         'contact.world_region' => "<span class=\"region\">" . $fields['world_region'] . "</span>",
-      );
+      ];
 
       // erase all empty ones, so we dont get blank lines
       foreach (array_keys($replacements) as $key) {
@@ -264,7 +249,7 @@ class CRM_Utils_Address {
     $formatted = preg_replace('/{([^{}]*)}({[^{}]*})+/u', '\1', $formatted);
 
     // drop any remaining curly braces leaving their contents
-    $formatted = str_replace(array('{', '}'), '', $formatted);
+    $formatted = str_replace(['{', '}'], '', $formatted);
 
     // drop any empty lines left after the replacements
     $formatted = preg_replace('/^[ \t]*[\r\n]+/m', '', $formatted);
@@ -275,7 +260,7 @@ class CRM_Utils_Address {
     else {
       // remove \n from each line and only add at the end
       // this hack solves formatting issue, when we convert nl2br
-      $lines = array();
+      $lines = [];
       $count = 1;
       $finalFormatted = NULL;
       $formattedArray = explode("\n", $formatted);
@@ -302,7 +287,7 @@ class CRM_Utils_Address {
    */
   public static function sequence($format) {
     // also compute and store the address sequence
-    $addressSequence = array(
+    $addressSequence = [
       'address_name',
       'street_address',
       'supplemental_address_1',
@@ -313,10 +298,10 @@ class CRM_Utils_Address {
       'state_province',
       'postal_code',
       'country',
-    );
+    ];
 
     // get the field sequence from the format
-    $newSequence = array();
+    $newSequence = [];
     foreach ($addressSequence as $field) {
       if (substr_count($format, $field)) {
         $newSequence[strpos($format, $field)] = $field;
@@ -341,15 +326,15 @@ class CRM_Utils_Address {
    * @return string
    */
   public static function getFormattedBillingAddressFieldsFromParameters($params, $billingLocationTypeID) {
-    $addressParts = array(
+    $addressParts = [
       "street_address" => "billing_street_address-{$billingLocationTypeID}",
       "city" => "billing_city-{$billingLocationTypeID}",
       "postal_code" => "billing_postal_code-{$billingLocationTypeID}",
       "state_province" => "state_province-{$billingLocationTypeID}",
       "country" => "country-{$billingLocationTypeID}",
-    );
+    ];
 
-    $addressFields = array();
+    $addressFields = [];
     foreach ($addressParts as $name => $field) {
       $value = CRM_Utils_Array::value($field, $params);
       $alternateName = 'billing_' . $name . '_id-' . $billingLocationTypeID;
@@ -366,6 +351,7 @@ class CRM_Utils_Address {
       if (is_numeric($value) && ($name == 'state_province' || $name == 'country')) {
         if ($name == 'state_province') {
           $addressFields[$name] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($value);
+          $addressFields[$name . '_name'] = CRM_Core_PseudoConstant::stateProvince($value);
         }
         if ($name == 'country') {
           $addressFields[$name] = CRM_Core_PseudoConstant::countryIsoCode($value);

@@ -6,9 +6,9 @@
  *   API result array
  */
 function batch_get_example() {
-  $params = array(
+  $params = [
     'id' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Batch', 'get', $params);
@@ -18,12 +18,12 @@ function batch_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,21 +37,21 @@ function batch_get_example() {
  */
 function batch_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'name' => 'Batch_433397',
         'title' => 'Batch_433397',
         'modified_date' => '2012-11-14 16:02:35',
         'status_id' => '1',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

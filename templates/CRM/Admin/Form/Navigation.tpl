@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -66,12 +66,7 @@
       .on('change', function() {
         $('span.permission_operator_wrapper').toggle(CRM._.includes($(this).val(), ','));
       })
-      .change()
-      .crmSelect2({
-        formatResult: CRM.utils.formatSelect2Result,
-        formatSelection: function(row) {return row.label},
-        multiple: true
-      });
+      .change();
   });
 </script>
 {/literal}

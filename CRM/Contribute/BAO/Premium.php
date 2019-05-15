@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
 
@@ -74,8 +74,8 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on success, null otherwise
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Premium', $id, 'premiums_active ', $is_active);
@@ -102,34 +102,35 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    * @param string $selectedOption
    */
   public static function buildPremiumBlock(&$form, $pageID, $formItems = FALSE, $selectedProductID = NULL, $selectedOption = NULL) {
-    $form->add('hidden', "selectProduct", $selectedProductID, array('id' => 'selectProduct'));
+    $form->add('hidden', "selectProduct", $selectedProductID, ['id' => 'selectProduct']);
 
-    $dao = new CRM_Contribute_DAO_Premium();
-    $dao->entity_table = 'civicrm_contribution_page';
-    $dao->entity_id = $pageID;
-    $dao->premiums_active = 1;
-    CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
-    $addWhere = "financial_type_id IN (0)";
-    if (!empty($financialTypes)) {
-      $addWhere = "financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
-    }
+    $premiumDao = new CRM_Contribute_DAO_Premium();
+    $premiumDao->entity_table = 'civicrm_contribution_page';
+    $premiumDao->entity_id = $pageID;
+    $premiumDao->premiums_active = 1;
 
-    if ($dao->find(TRUE)) {
-      $premiumID = $dao->id;
-      $premiumBlock = array();
-      CRM_Core_DAO::storeValues($dao, $premiumBlock);
+    if ($premiumDao->find(TRUE)) {
+      $premiumID = $premiumDao->id;
+      $premiumBlock = [];
+      CRM_Core_DAO::storeValues($premiumDao, $premiumBlock);
 
-      $dao = new CRM_Contribute_DAO_PremiumsProduct();
-      $dao->premiums_id = $premiumID;
-      $dao->whereAdd($addWhere);
-      $dao->orderBy('weight');
-      $dao->find();
+      CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
+      $addWhere = "financial_type_id IN (0)";
+      if (!empty($financialTypes)) {
+        $addWhere = "financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
+      }
+      $addWhere = "{$addWhere} OR financial_type_id IS NULL";
 
-      $products = array();
-      $radio = array();
-      while ($dao->fetch()) {
+      $premiumsProductDao = new CRM_Contribute_DAO_PremiumsProduct();
+      $premiumsProductDao->premiums_id = $premiumID;
+      $premiumsProductDao->whereAdd($addWhere);
+      $premiumsProductDao->orderBy('weight');
+      $premiumsProductDao->find();
+
+      $products = [];
+      while ($premiumsProductDao->fetch()) {
         $productDAO = new CRM_Contribute_DAO_Product();
-        $productDAO->id = $dao->product_id;
+        $productDAO->id = $premiumsProductDao->product_id;
         $productDAO->is_active = 1;
         if ($productDAO->find(TRUE)) {
           if ($selectedProductID != NULL) {
@@ -147,7 +148,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
             CRM_Core_DAO::storeValues($productDAO, $products[$productDAO->id]);
           }
         }
-        $options = $temp = array();
+        $options = $temp = [];
         $temp = explode(',', $productDAO->options);
         foreach ($temp as $value) {
           $options[trim($value)] = trim($value);
@@ -187,7 +188,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
     }
 
     $radio[$productDAO->id] = $form->createElement('radio', NULL, NULL, NULL, $productDAO->id, NULL);
-    $options = $temp = array();
+    $options = $temp = [];
     $temp = explode(',', $productDAO->options);
     foreach ($temp as $value) {
       $options[$value] = $value;
@@ -217,10 +218,10 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
     //need to delete entries from civicrm_premiums
     //as well as from civicrm_premiums_product, CRM-4586
 
-    $params = array(
+    $params = [
       'entity_id' => $contributionPageID,
       'entity_table' => 'civicrm_contribution_page',
-    );
+    ];
 
     $premium = new CRM_Contribute_DAO_Premium();
     $premium->copyValues($params);
@@ -244,7 +245,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
    */
   public static function getPremiumProductInfo() {
     if (!self::$productInfo) {
-      $products = $options = array();
+      $products = $options = [];
 
       $dao = new CRM_Contribute_DAO_Product();
       $dao->is_active = 1;
@@ -261,7 +262,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
         }
       }
 
-      self::$productInfo = array($products, $options);
+      self::$productInfo = [$products, $options];
     }
     return self::$productInfo;
   }

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,12 +26,13 @@
 {if $action eq 1 or $action eq 2 or $action eq 8}
     {include file="CRM/Admin/Form/Mapping.tpl"}
 {else}
+
     <div class="help">
         {ts}Saved mappings allow you to easily run the same import or export job multiple times. Mappings are created and updated as part of an Import or Export task. This screen allows you to rename or delete existing mappings.{/ts}
     </div>
+    <div class="crm-content-block crm-block">
     {if $rows}
     <div id="mapping">
-    <p></p>
         <div class="form-item">
             {strip}
             <table cellpadding="0" cellspacing="0" border="0">
@@ -59,4 +60,5 @@
             {ts}There are currently no saved import or export mappings. You create saved mappings as part of an Import or Export task.{/ts}
         </div>
     {/if}
+    </div>
 {/if}

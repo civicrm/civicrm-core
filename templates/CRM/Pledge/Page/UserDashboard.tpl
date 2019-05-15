@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,6 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="crm-pledge-userdashboard-pre"}
+{/crmRegion}
 {if $context eq 'user'}
 <div class="view-content">
 {if $pledge_rows}
@@ -44,12 +46,14 @@
     <td class="crm-pledge-pledge_next_pay_date">{$row.pledge_next_pay_date|truncate:10:''|crmDate}</td>
     <td class="crm-pledge-pledge_next_pay_amount">{$row.pledge_next_pay_amount|crmMoney:$row.pledge_currency}</td>
     <td class="crm-pledge-pledge_status crm-pledge-pledge_status_{$row.pledge_status}">{$row.pledge_status}</td>
-    <td>
-      {if $row.pledge_contribution_page_id and ($row.pledge_status_name neq 'Completed') and ( $row.contact_id eq $loggedUserID ) }
-        <a href="{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$row.pledge_contribution_page_id`&pledgeId=`$row.pledge_id`"}">{ts}Make Payment{/ts}</a><br/>
-      {/if}
-      <a class="crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}">{ts}Payments{/ts}</a>
-    </td>
+    {if !$userChecksum}
+      <td>
+        {if $row.pledge_contribution_page_id and ($row.pledge_status_name neq 'Completed') and ( $row.contact_id eq $loggedUserID ) }
+          <a href="{crmURL p='civicrm/contribute/transact' q="reset=1&id=`$row.pledge_contribution_page_id`&pledgeId=`$row.pledge_id`"}">{ts}Make Payment{/ts}</a><br/>
+        {/if}
+        <a class="crm-expand-row" title="{ts}view payments{/ts}" href="{crmURL p='civicrm/pledge/payment' q="action=browse&context=`$context`&pledgeId=`$row.pledge_id`&cid=`$row.contact_id`"}">{ts}Payments{/ts}</a>
+      </td>
+    {/if}
    </tr>
   {/foreach}
 </table>
@@ -99,3 +103,5 @@
 </div>
 {* main if close*}
 {/if}
+{crmRegion name="crm-pledge-userdashboard-post"}
+{/crmRegion}

@@ -38,7 +38,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
  * @throws CiviCRM_API3_Exception
  * @return array
  */
-function civicrm_api3($entity, $action, $params = array()) {
+function civicrm_api3($entity, $action, $params = []) {
   $params['version'] = 3;
   $result = \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params);
   if (is_array($result) && !empty($result['is_error'])) {
@@ -73,9 +73,9 @@ function _civicrm_api3_api_getfields(&$apiRequest) {
       //  $apiRequest['params']['action'] = $apiRequest['params']['api_action'];
       // unset($apiRequest['params']['api_action']);
     }
-    return array('action' => array('api.aliases' => array('api_action')));
+    return ['action' => ['api.aliases' => ['api_action']]];
   }
-  $getFieldsParams = array('action' => $apiRequest['action']);
+  $getFieldsParams = ['action' => $apiRequest['action']];
   $entity = $apiRequest['entity'];
   if ($entity == 'Profile' && array_key_exists('profile_id', $apiRequest['params'])) {
     $getFieldsParams['profile_id'] = $apiRequest['params']['profile_id'];
@@ -129,6 +129,10 @@ function _civicrm_api_get_camel_name($entity) {
  */
 function _civicrm_api_replace_variables(&$params, &$parentResult, $separator = '.') {
   foreach ($params as $field => &$value) {
+    if (substr($field, 0, 4) == 'api.') {
+      // CRM-21246 - Leave nested calls alone.
+      continue;
+    }
     if (is_string($value) && substr($value, 0, 6) == '$value') {
       $value = _civicrm_api_replace_variable($value, $parentResult, $separator);
     }

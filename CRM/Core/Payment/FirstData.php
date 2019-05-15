@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | FirstData Core Payment Module for CiviCRM version 4.7              |
+ | FirstData Core Payment Module for CiviCRM version 5                |
  +--------------------------------------------------------------------+
  | Licensed to CiviCRM under the Academic Free License version 3.0    |
  |                                                                    |
@@ -160,7 +160,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
     }
 
     if (!defined('CURLOPT_SSLCERT')) {
-      CRM_Core_Error::fatal(ts('%1 - Gateway requires curl with SSL support', array(1 => $paymentProcessor)));
+      CRM_Core_Error::fatal(ts('%1 - Gateway requires curl with SSL support', [1 => $paymentProcessor]));
     }
 
     /**********************************************************
@@ -309,6 +309,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
       return $params;
     }
   }
+
   // end function doDirectPayment
 
   /**
@@ -346,7 +347,7 @@ class CRM_Core_Payment_FirstData extends CRM_Core_Payment {
    * CiviCRM V2.0 Declaration
    */
   public function checkConfig() {
-    $errorMsg = array();
+    $errorMsg = [];
 
     if (empty($this->_paymentProcessor['user_name'])) {
       $errorMsg[] = ts(' Store Name is not set for this payment processor');

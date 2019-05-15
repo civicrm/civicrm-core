@@ -129,6 +129,15 @@
     <type>varchar</type>
     <length>128</length>
     <comment>Supported recurring frequency units.</comment>
+    <pseudoconstant>
+      <optionGroupName>recur_frequency_units</optionGroupName>
+      <keyColumn>name</keyColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+      <multiple>1</multiple>
+    </html>
+    <serialize>SEPARATOR_TRIMMED</serialize>
     <add>2.1</add>
   </field>
   <field>

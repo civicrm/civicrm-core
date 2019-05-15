@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
 
@@ -46,7 +46,7 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
 
     // keep track of all 'added' contact groups so we can remove them from the smart group
     // section
-    $staticGroups = array();
+    $staticGroups = [];
     if (!empty($in)) {
       foreach ($in as $group) {
         $staticGroups[$group['group_id']] = 1;
@@ -58,7 +58,7 @@ class CRM_Contact_Page_View_ContactSmartGroup extends CRM_Core_Page {
     $this->assign('groupParent', NULL);
 
     if (!empty($allGroup)) {
-      $smart = $parent = array();
+      $smart = $parent = [];
       foreach ($allGroup['group'] as $group) {
         // delete all smart groups which are also in static groups
         if (isset($staticGroups[$group['id']])) {

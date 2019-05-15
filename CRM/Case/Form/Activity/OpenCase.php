@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -44,7 +44,9 @@ class CRM_Case_Form_Activity_OpenCase {
   public $_contactID;
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function preProcess(&$form) {
     //get multi client case configuration
@@ -53,10 +55,7 @@ class CRM_Case_Form_Activity_OpenCase {
 
     if ($form->_context == 'caseActivity') {
       $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $form);
-      $atype = CRM_Core_OptionGroup::getValue('activity_type',
-        'Change Case Start Date',
-        'name'
-      );
+      $atype = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Case Start Date');
       $caseId = CRM_Utils_Array::first($form->_caseId);
       $form->assign('changeStartURL', CRM_Utils_System::url('civicrm/case/activity',
           "action=add&reset=1&cid=$contactID&caseid={$caseId}&atype=$atype"
@@ -65,7 +64,7 @@ class CRM_Case_Form_Activity_OpenCase {
       return;
     }
 
-    $form->_context = CRM_Utils_Request::retrieve('context', 'String', $form);
+    $form->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $form);
     $form->_contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $form);
     $form->assign('context', $form->_context);
 
@@ -89,16 +88,17 @@ class CRM_Case_Form_Activity_OpenCase {
    * Set default values for the form. For edit/view mode
    * the default values are retrieved from the database
    *
+   * @param CRM_Case_Form_Case $form
    *
-   * @param CRM_Core_Form $form
+   * @return array $defaults
    */
   public static function setDefaultValues(&$form) {
-    $defaults = array();
+    $defaults = [];
     if ($form->_context == 'caseActivity') {
       return $defaults;
     }
 
-    list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults(NULL, 'activityDateTime');
+    $defaults['start_date'] = date('Y-m-d H:i:s');
 
     // set default case status, case type, encounter medium, location type and phone type defaults are set in DB
     if ($form->_caseStatusId) {
@@ -107,7 +107,8 @@ class CRM_Case_Form_Activity_OpenCase {
     else {
       $caseStatus = CRM_Core_OptionGroup::values('case_status', FALSE, FALSE, FALSE, 'AND is_default = 1');
       if (count($caseStatus) == 1) {
-        $caseStatus = key($caseStatus); //$defaults['status_id'] = key($caseStatus);
+        //$defaults['status_id'] = key($caseStatus);
+        $caseStatus = key($caseStatus);
       }
     }
     $defaults['status_id'] = $caseStatus;
@@ -152,30 +153,30 @@ class CRM_Case_Form_Activity_OpenCase {
       return;
     }
     if ($form->_context == 'standalone') {
-      $form->addEntityRef('client_id', ts('Client'), array(
-          'create' => TRUE,
-          'multiple' => $form->_allowMultiClient,
-        ), TRUE);
+      $form->addEntityRef('client_id', ts('Client'), [
+        'create' => TRUE,
+        'multiple' => $form->_allowMultiClient,
+      ], TRUE);
     }
 
-    $element = $form->addField('case_type_id', array(
+    $element = $form->addField('case_type_id', [
       'context' => 'create',
       'entity' => 'Case',
       'onchange' => "CRM.buildCustomData('Case', this.value);",
-    ), TRUE);
+    ], TRUE);
     if ($form->_caseTypeId) {
       $element->freeze();
     }
 
-    $csElement = $form->addField('status_id', array(
+    $csElement = $form->addField('status_id', [
       'context' => 'create',
       'entity' => 'Case',
-    ), TRUE);
+    ], TRUE);
     if ($form->_caseStatusId) {
       $csElement->freeze();
     }
 
-    $form->add('text', 'duration', ts('Activity Duration'), array('size' => 4, 'maxlength' => 8));
+    $form->add('number', 'duration', ts('Activity Duration'), ['class' => 'four', 'min' => 1]);
     $form->addRule('duration', ts('Please enter the duration as number of minutes (integers only).'), 'positiveInteger');
 
     if ($form->_currentlyViewedContactId) {
@@ -183,39 +184,38 @@ class CRM_Case_Form_Activity_OpenCase {
       $form->assign('clientName', $displayName);
     }
 
-    $form->addDate('start_date', ts('Case Start Date'), TRUE, array('formatType' => 'activityDateTime'));
+    $form->add('datepicker', 'start_date', ts('Case Start Date'), [], TRUE);
 
-    $form->addField('medium_id', array('entity' => 'activity', 'context' => 'create'), TRUE);
+    $form->addField('medium_id', ['entity' => 'activity', 'context' => 'create'], TRUE);
 
     // calling this field activity_location to prevent conflict with contact location fields
     $form->add('text', 'activity_location', ts('Location'), CRM_Core_DAO::getAttribute('CRM_Activity_DAO_Activity', 'location'));
 
-    $form->add('wysiwyg', 'activity_details', ts('Details'), array('rows' => 4, 'cols' => 60), FALSE);
+    $form->add('wysiwyg', 'activity_details', ts('Details'), ['rows' => 4, 'cols' => 60], FALSE);
 
-    $form->addButtons(array(
-        array(
-          'type' => 'upload',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'upload',
-          'name' => ts('Save and New'),
-          'subName' => 'new',
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $form->addButtons([
+      [
+        'type' => 'upload',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+        'submitOnce' => TRUE,
+      ],
+      [
+        'type' => 'upload',
+        'name' => ts('Save and New'),
+        'subName' => 'new',
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
   /**
    * Process the form submission.
    *
-   *
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
    * @param array $params
    */
   public static function beginPostProcess(&$form, &$params) {
@@ -226,14 +226,6 @@ class CRM_Case_Form_Activity_OpenCase {
     if ($form->_context == 'standalone') {
       $params['client_id'] = explode(',', $params['client_id']);
       $form->_currentlyViewedContactId = $params['client_id'][0];
-    }
-
-    // for open case start date should be set to current date
-    $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
-    $caseStatus = CRM_Case_PseudoConstant::caseStatus('name');
-    // for resolved case the end date should set to now
-    if ($params['status_id'] == array_search('Closed', $caseStatus)) {
-      $params['end_date'] = $params['now'];
     }
 
     // rename activity_location param to the correct column name for activity DAO
@@ -254,7 +246,7 @@ class CRM_Case_Form_Activity_OpenCase {
    *
    * @param $fields
    * @param $files
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
    *
    * @return array
    *   list of errors to be posted back to the form
@@ -264,15 +256,17 @@ class CRM_Case_Form_Activity_OpenCase {
       return TRUE;
     }
 
-    $errors = array();
+    $errors = [];
     return $errors;
   }
 
   /**
    * Process the form submission.
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Case_Form_Case $form
    * @param array $params
+   *
+   * @throws \Exception
    */
   public static function endPostProcess(&$form, &$params) {
     if ($form->_context == 'caseActivity') {
@@ -299,25 +293,25 @@ class CRM_Case_Form_Activity_OpenCase {
         if (empty($cliId)) {
           CRM_Core_Error::fatal('client_id cannot be empty');
         }
-        $contactParams = array(
+        $contactParams = [
           'case_id' => $params['case_id'],
           'contact_id' => $cliId,
-        );
+        ];
         CRM_Case_BAO_CaseContact::create($contactParams);
       }
     }
     else {
-      $contactParams = array(
+      $contactParams = [
         'case_id' => $params['case_id'],
         'contact_id' => $form->_currentlyViewedContactId,
-      );
+      ];
       CRM_Case_BAO_CaseContact::create($contactParams);
     }
 
     // 2. initiate xml processor
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
 
-    $xmlProcessorParams = array(
+    $xmlProcessorParams = [
       'clientID' => $form->_currentlyViewedContactId,
       'creatorID' => $form->_currentUserId,
       'standardTimeline' => 1,
@@ -329,7 +323,8 @@ class CRM_Case_Form_Activity_OpenCase {
       'duration' => CRM_Utils_Array::value('duration', $params),
       'medium_id' => $params['medium_id'],
       'details' => $params['activity_details'],
-    );
+      'relationship_end_date' => CRM_Utils_Array::value('end_date', $params),
+    ];
 
     if (array_key_exists('custom', $params) && is_array($params['custom'])) {
       $xmlProcessorParams['custom'] = $params['custom'];

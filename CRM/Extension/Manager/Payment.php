@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * This class stores logic for managing CiviCRM extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
 
@@ -178,7 +178,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
    *   ($attr => $id)
    */
   private function _getAllPaymentProcessorTypes($attr) {
-    $ppt = array();
+    $ppt = [];
     $dao = new CRM_Financial_DAO_PaymentProcessorType();
     $dao->find();
     while ($dao->fetch()) {
@@ -204,11 +204,11 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
       $paymentClass = $this->mapper->keyToClass($info->key, 'payment');
       $file = $this->mapper->classToPath($paymentClass);
       if (!file_exists($file)) {
-        CRM_Core_Session::setStatus(ts('Failed to load file (%3) for payment processor (%1) while running "%2"', array(
-              1 => $info->key,
-              2 => $method,
-              3 => $file,
-            )), '', 'error');
+        CRM_Core_Session::setStatus(ts('Failed to load file (%3) for payment processor (%1) while running "%2"', [
+          1 => $info->key,
+          2 => $method,
+          3 => $file,
+        ]), '', 'error');
         return;
       }
       else {
@@ -216,10 +216,10 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
       }
     }
     catch (CRM_Extension_Exception $e) {
-      CRM_Core_Session::setStatus(ts('Failed to determine file path for payment processor (%1) while running "%2"', array(
-            1 => $info->key,
-            2 => $method,
-          )), '', 'error');
+      CRM_Core_Session::setStatus(ts('Failed to determine file path for payment processor (%1) while running "%2"', [
+        1 => $info->key,
+        2 => $method,
+      ]), '', 'error');
       return;
     }
 
@@ -233,9 +233,9 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
                  WHERE ext.type = 'payment'
                    AND ext.full_name = %1
         ",
-      array(
-        1 => array($info->key, 'String'),
-      )
+      [
+        1 => [$info->key, 'String'],
+      ]
     );
 
     while ($processorDAO->fetch()) {
@@ -262,11 +262,10 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
         $processorInstance = Civi\Payment\System::singleton()->getByClass($class_name);
 
         // Does PP implement this method, and can we call it?
-        if (method_exists($processorInstance, $method) && is_callable(array(
-            $processorInstance,
-            $method,
-          ))
-        ) {
+        if (method_exists($processorInstance, $method) && is_callable([
+          $processorInstance,
+          $method,
+        ])) {
           // If so, call it ...
           $processorInstance->$method();
         }
@@ -274,7 +273,7 @@ class CRM_Extension_Manager_Payment extends CRM_Extension_Manager_Base {
 
       default:
         CRM_Core_Session::setStatus(ts("Unrecognized payment hook (%1) in %2::%3",
-            array(1 => $method, 2 => __CLASS__, 3 => __METHOD__)),
+            [1 => $method, 2 => __CLASS__, 3 => __METHOD__]),
           '', 'error');
     }
   }

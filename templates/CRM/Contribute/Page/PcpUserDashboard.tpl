@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,6 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="crm-contribute-pcp-userdashboard-pre"}
+{/crmRegion}
 <div class="view-content">
 
 {if $pcpInfo}
@@ -35,7 +37,7 @@
     <th>{ts}In Support of{/ts}</th>
     <th>{ts}Campaign Ends{/ts}</th>
     <th>{ts}Status{/ts}</th>
-    <th></th>
+    {if !$userChecksum} <th></th> {/if}
   </tr>
 
   {foreach from=$pcpInfo item=row}
@@ -44,7 +46,9 @@
         <td>{$row.pageTitle}</td>
         <td>{if $row.end_date}{$row.end_date|truncate:10:''|crmDate}{else}({ts}ongoing{/ts}){/if}</td>
         <td>{$row.pcpStatus}</td>
-        <td>{$row.action|replace:'xx':$row.pcpId}</td>
+        {if !$userChecksum}
+          <td>{$row.action|replace:'xx':$row.pcpId}</td>
+        {/if}
   </tr>
   {/foreach}
 </table>
@@ -56,7 +60,6 @@
   {ts}You do not have any active Personal Campaign pages.{/ts}
 </div>
 {/if}
-
 
 {if $pcpBlock}
 {strip}
@@ -88,3 +91,5 @@
 {/if}
 
 </div>
+{crmRegion name="crm-contribute-pcp-userdashboard-post"}
+{/crmRegion}

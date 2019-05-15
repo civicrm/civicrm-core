@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -192,7 +192,6 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'delete', array('id' => $childSmartGroupContact));
   }
 
-
   /**
    *  CRM-19698: Test case for combine contact search in regular and smart group
    */
@@ -329,7 +328,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     foreach ($useCases as $case) {
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
       list($select, $from, $where, $having) = $query->query();
-      $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where ORDER BY contact_a.first_name")->fetchAll();
+      $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id, contact_a.first_name $from $where ORDER BY contact_a.first_name")->fetchAll();
       foreach ($groupContacts as $key => $value) {
         $groupContacts[$key] = $value['id'];
       }

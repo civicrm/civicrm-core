@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -41,7 +41,7 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Get BAO Name.
@@ -96,6 +96,12 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
           'qs' => 'action=delete&id=%%id%%',
           'title' => ts('Delete Scheduled Job'),
         ),
+        CRM_Core_Action::COPY => array(
+          'name' => ts('Copy'),
+          'url' => 'civicrm/admin/job',
+          'qs' => 'action=copy&id=%%id%%',
+          'title' => ts('Copy Scheduled Job'),
+        ),
       );
     }
     return self::$_links;
@@ -128,9 +134,23 @@ class CRM_Admin_Page_Job extends CRM_Core_Page_Basic {
       $this, FALSE, 0
     );
 
+    // FIXME: Why are we comparing an integer with a string here?
     if ($this->_action == 'export') {
       $session = CRM_Core_Session::singleton();
       $session->pushUserContext(CRM_Utils_System::url('civicrm/admin/job', 'reset=1'));
+    }
+
+    if (($this->_action & CRM_Core_Action::COPY) && (!empty($this->_id))) {
+      try {
+        $jobResult = civicrm_api3('Job', 'clone', array('id' => $this->_id));
+        if ($jobResult['count'] > 0) {
+          CRM_Core_Session::setStatus($jobResult['values'][$jobResult['id']]['name'], ts('Job copied successfully'), 'success');
+        }
+        CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/job', 'reset=1'));
+      }
+      catch (Exception $e) {
+        CRM_Core_Session::setStatus(ts('Failed to copy job'), 'Error');
+      }
     }
 
     return parent::run();

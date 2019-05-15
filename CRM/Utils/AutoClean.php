@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -87,13 +87,13 @@ class CRM_Utils_AutoClean {
   public static function swap($getter, $setter, $tmpValue) {
     $resolver = \Civi\Core\Resolver::singleton();
 
-    $origValue = $resolver->call($getter, array());
+    $origValue = $resolver->call($getter, []);
 
     $ac = new CRM_Utils_AutoClean();
     $ac->callback = $setter;
-    $ac->args = array($origValue);
+    $ac->args = [$origValue];
 
-    $resolver->call($setter, array($tmpValue));
+    $resolver->call($setter, [$tmpValue]);
 
     return $ac;
   }

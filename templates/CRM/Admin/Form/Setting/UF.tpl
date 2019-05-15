@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,10 +23,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-block crm-form-block crm-uf-form-block">
 <div class="help">
     {ts}These settings define the CMS variables that are used with CiviCRM.{/ts}
 </div>
+<div class="crm-block crm-form-block crm-uf-form-block">
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
       <table class="form-layout-compressed">
          <tr class="crm-uf-form-block-userFrameworkUsersTableName">
@@ -52,7 +52,7 @@
 <div class="form-item">
 <fieldset>
     <legend>{ts}Views integration settings{/ts}</legend>
-    <div>{ts}To enable CiviCRM Views integration, add the following to the site <code>settings.php</code> file:{/ts}</div>
+    <div>{ts}To enable CiviCRM Views integration, add or update the following item in the <code>settings.php</code> file:{/ts}</div>
     <pre>{$tablePrefixes}</pre>
 </fieldset>
 </div>

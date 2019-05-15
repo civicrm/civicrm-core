@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id: Selector.php 11510 2007-09-18 09:21:34Z lobo $
  */
 
@@ -44,20 +44,20 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    */
-  static $_columnHeaders;
+  public static $_columnHeaders;
 
   /**
    * Properties of contact we're interested in displaying
    * @var array
    */
-  static $_properties = array('contact_id', 'contact_type', 'display_name');
+  public static $_properties = ['contact_id', 'contact_type', 'display_name'];
 
   /**
    * FormValues is the array returned by exportValues called on
@@ -92,6 +92,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
 
   /**
    * The object that implements the search interface
+   * @var object
    */
   protected $_search;
 
@@ -165,33 +166,33 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     $extraParams = ($key) ? "&key={$key}" : NULL;
 
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::VIEW => array(
+      self::$_links = [
+        CRM_Core_Action::VIEW => [
           'name' => ts('View'),
           'url' => 'civicrm/contact/view',
           'qs' => "reset=1&cid=%%id%%{$extraParams}{$searchContext}",
           'class' => 'no-popup',
           'title' => ts('View Contact Details'),
-        ),
-        CRM_Core_Action::UPDATE => array(
+        ],
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Edit'),
           'url' => 'civicrm/contact/add',
           'qs' => 'reset=1&action=update&cid=%%id%%',
           'class' => 'no-popup',
           'title' => ts('Edit Contact Details'),
-        ),
-      );
+        ],
+      ];
 
       $config = CRM_Core_Config::singleton();
       //CRM-16552: mapAPIKey is not mandatory as google no longer requires an API Key
       if ($config->mapProvider && ($config->mapAPIKey || $config->mapProvider == 'Google')) {
-        self::$_links[CRM_Core_Action::MAP] = array(
+        self::$_links[CRM_Core_Action::MAP] = [
           'name' => ts('Map'),
           'url' => 'civicrm/contact/map',
           'qs' => 'reset=1&cid=%%id%%&searchType=custom',
           'class' => 'no-popup',
           'title' => ts('Map Contact'),
-        );
+        ];
       }
     }
     return self::$_links;
@@ -227,21 +228,24 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     $columns = $this->_search->columns();
-    if ($output == CRM_Core_Selector_Controller::EXPORT) {
-      return array_keys($columns);
+    $headers = [];
+    if ($output == CRM_Core_Selector_Controller::EXPORT || $output == CRM_Core_Selector_Controller::SCREEN) {
+      foreach ($columns as $name => $key) {
+        $headers[$key] = $name;
+      }
+      return $headers;
     }
     else {
-      $headers = array();
       foreach ($columns as $name => $key) {
         if (!empty($name)) {
-          $headers[] = array(
+          $headers[] = [
             'name' => $name,
             'sort' => $key,
             'direction' => CRM_Utils_Sort::ASCENDING,
-          );
+          ];
         }
         else {
-          $headers[] = array();
+          $headers[] = [];
         }
       }
       return $headers;
@@ -297,13 +301,13 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
       $contactQueryObj = $this->_search->getQueryObj();
     }
 
-    $dao = CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
+    $dao = CRM_Core_DAO::executeQuery($sql);
 
     $columns = $this->_search->columns();
     $columnNames = array_values($columns);
     $links = self::links($this->_key);
 
-    $permissions = array(CRM_Core_Permission::getPermission());
+    $permissions = [CRM_Core_Permission::getPermission()];
     if (CRM_Core_Permission::check('delete contacts')) {
       $permissions[] = CRM_Core_Permission::DELETE;
     }
@@ -320,9 +324,9 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
       $image = TRUE;
     }
     // process the result of the query
-    $rows = array();
+    $rows = [];
     while ($dao->fetch()) {
-      $row = array();
+      $row = [];
       $empty = TRUE;
 
       // if contact query object present
@@ -346,7 +350,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
         $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $contactID;
         $row['action'] = CRM_Core_Action::formLink($links,
           $mask,
-          array('id' => $contactID),
+          ['id' => $contactID],
           ts('more'),
           FALSE,
           'contact.custom.actions',
@@ -424,12 +428,12 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
    *
    * @return Object
    */
-  public function contactIDQuery($params, $action, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
+  public function contactIDQuery($params, $sortID, $displayRelationshipType = NULL, $queryOperator = 'AND') {
     // $action, $displayRelationshipType and $queryOperator are unused. I have
     // no idea why they are there.
 
     // I wonder whether there is some helper function for this:
-    $matches = array();
+    $matches = [];
     if (preg_match('/([0-9]*)(_(u|d))?/', $sortID, $matches)) {
       $columns = array_values($this->_search->columns());
       $sort = $columns[$matches[1] - 1];
@@ -453,7 +457,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
   public function addActions(&$rows) {
     $links = self::links($this->_key);
 
-    $permissions = array(CRM_Core_Permission::getPermission());
+    $permissions = [CRM_Core_Permission::getPermission()];
     if (CRM_Core_Permission::check('delete contacts')) {
       $permissions[] = CRM_Core_Permission::DELETE;
     }
@@ -462,7 +466,7 @@ class CRM_Contact_Selector_Custom extends CRM_Contact_Selector {
     foreach ($rows as $id => & $row) {
       $row['action'] = CRM_Core_Action::formLink($links,
         $mask,
-        array('id' => $row['contact_id']),
+        ['id' => $row['contact_id']],
         ts('more'),
         FALSE,
         'contact.custom.actions',

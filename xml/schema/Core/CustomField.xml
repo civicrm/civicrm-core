@@ -100,6 +100,7 @@
     <title>Custom Field Is Required?</title>
     <type>boolean</type>
     <comment>Is a value required for this property.</comment>
+    <default>0</default>
     <add>1.1</add>
   </field>
   <field>
@@ -107,6 +108,7 @@
     <title>Allow Searching on Field?</title>
     <type>boolean</type>
     <comment>Is this property searchable.</comment>
+    <default>0</default>
     <add>1.1</add>
   </field>
   <field>
@@ -171,12 +173,14 @@
     <type>boolean</type>
     <title>Custom Field Is Active?</title>
     <comment>Is this property active?</comment>
+    <default>1</default>
     <add>1.1</add>
   </field>
   <field>
     <name>is_view</name>
     <type>boolean</type>
     <title>Field is Viewable</title>
+    <default>0</default>
     <comment>Is this property set by PHP Code? A code field is viewable but not editable</comment>
     <add>1.1</add>
   </field>
@@ -258,7 +262,19 @@
     <title>Field Option Group</title>
     <comment>For elements with options, the option group id that is used</comment>
     <add>1.4</add>
+    <pseudoconstant>
+      <table>civicrm_option_group</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>title</labelColumn>
+    </pseudoconstant>
   </field>
+  <foreignKey>
+    <name>option_group_id</name>
+    <table>civicrm_option_group</table>
+    <key>id</key>
+    <add>5.6</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
   <field>
     <name>filter</name>
     <type>varchar</type>

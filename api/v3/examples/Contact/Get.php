@@ -6,9 +6,9 @@
  *   API result array
  */
 function contact_get_example() {
-  $params = array(
+  $params = [
     'email' => 'man2@yahoo.com',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Contact', 'get', $params);
@@ -18,12 +18,12 @@ function contact_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,13 +37,13 @@ function contact_get_example() {
  */
 function contact_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 3,
-    'values' => array(
-      '3' => array(
+    'values' => [
+      '3' => [
         'contact_id' => '3',
         'contact_type' => 'Individual',
         'contact_sub_type' => '',
@@ -112,9 +112,9 @@ function contact_get_expectedresult() {
         'state_province' => '',
         'country' => '',
         'id' => '3',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

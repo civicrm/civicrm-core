@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,10 +23,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-block crm-form-block crm-map-form-block">
 <div class="help">
     {ts}CiviCRM includes plugins for several mapping and geocoding web services. When your users save a contact or event location address, a geocoding service will convert the address into geographical coordinates, which are required for mapping. Yahoo&rsquo;s geocoder will also automatically populate the postal code field. Mapping services allow your users to display addresses on a map.{/ts} {help id='map-intro-id'}
 </div>
+<div class="crm-block crm-form-block crm-map-form-block">
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout-compressed">
          <tr class="crm-map-form-block-mapProvider">
@@ -37,12 +37,12 @@
          <tr class="crm-map-form-block-mapAPIKey">
              <td>{$form.mapAPIKey.label}</td>
              <td>{$form.mapAPIKey.html|crmAddClass:huge}<br />
-             <span class="description">{ts}Enter your API Key or Application ID. An API Key is currently optional for Google Maps API, but may be helpful diagnosing any problems and required for higher volumes of requests. Refer to developers.google.com for the latest information.{/ts}</span></td>
+             <span class="description">{ts}Enter your API Key or Application ID. An API Key is required for the Google Maps API. Refer to developers.google.com for the latest information.{/ts}</span></td>
          </tr>
          <tr class="crm-map-form-block-geoProvider">
              <td>{$form.geoProvider.label}</td>
              <td>{$form.geoProvider.html}<br />
-             <span class="description">{ts}You may choose a different webservice for geocoding. This is required if there is no geo-coding plugin for your selected mapping provider. You can leave the Geocoding fields blank if you are using Google as your mapping provider.{/ts}</span></td>
+             <span class="description">{ts}This can be the same or different from the mapping provider selected.{/ts}</span></td>
          </tr>
          <tr class="crm-map-form-block-geoAPIKey">
              <td>{$form.geoAPIKey.label}</td>

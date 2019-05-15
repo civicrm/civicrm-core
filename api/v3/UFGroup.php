@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -58,7 +58,7 @@ function _civicrm_api3_uf_group_create_spec(&$params) {
  *   API result array
  */
 function civicrm_api3_uf_group_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'UFGroup');
 }
 
 /**
@@ -96,15 +96,15 @@ function civicrm_api3_uf_group_delete($params) {
  * @return array
  */
 function _civicrm_api3_uf_group_getlist_defaults(&$request) {
-  return array(
-    'description_field' => array(
+  return [
+    'description_field' => [
       'description',
       'group_type',
-    ),
-    'params' => array(
+    ],
+    'params' => [
       'is_active' => 1,
-    ),
-  );
+    ],
+  ];
 }
 
 /**
@@ -120,15 +120,15 @@ function _civicrm_api3_uf_group_getlist_defaults(&$request) {
  * @return array
  */
 function _civicrm_api3_uf_group_getlist_output($result, $request, $entity, $fields) {
-  $output = array();
+  $output = [];
   if (!empty($result['values'])) {
     foreach ($result['values'] as $row) {
-      $data = array(
+      $data = [
         'id' => $row[$request['id_field']],
         'label' => $row[$request['label_field']],
-      );
+      ];
       if (!empty($request['description_field'])) {
-        $data['description'] = array();
+        $data['description'] = [];
         foreach ((array) $request['description_field'] as $field) {
           if (!empty($row[$field])) {
             // Special formatting for group_type field

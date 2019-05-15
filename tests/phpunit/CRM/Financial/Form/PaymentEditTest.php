@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -58,9 +58,8 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
     $form = new CRM_Contribute_Form_Contribution();
     $form->testSubmit(array(
       'total_amount' => 50,
+      'receive_date' => '2015-04-21 23:27:00',
       'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualID,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'check_number' => '123XA',
@@ -88,7 +87,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
     $expectedPaymentParams = array(
       array(
         'total_amount' => 50.00,
-        'financial_type' => 'Donation,Donation,Donation',
+        'financial_type' => 'Donation',
         'payment_instrument' => 'Check',
         'status' => 'Completed',
         'receive_date' => '2015-04-21 23:27:00',
@@ -96,7 +95,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
       ),
       array(
         'total_amount' => -50.00,
-        'financial_type' => NULL,
+        'financial_type' => 'Donation',
         'payment_instrument' => 'Check',
         'status' => 'Completed',
         'receive_date' => $params['trxn_date'],
@@ -104,7 +103,7 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
       ),
       array(
         'total_amount' => 50.00,
-        'financial_type' => NULL,
+        'financial_type' => 'Donation',
         'payment_instrument' => sprintf('Credit Card (Visa: %s)', $params['pan_truncation']),
         'status' => 'Completed',
         'receive_date' => $params['trxn_date'],
@@ -131,8 +130,6 @@ class CRM_Financial_Form_PaymentEditTest extends CiviUnitTestCase {
     $form->testSubmit(array(
       'total_amount' => 50,
       'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
-      'receive_date' => '04/21/2015',
-      'receive_date_time' => '11:27PM',
       'contact_id' => $this->_individualID,
       'payment_instrument_id' => $checkPaymentInstrumentID,
       'check_number' => $checkNumber1,

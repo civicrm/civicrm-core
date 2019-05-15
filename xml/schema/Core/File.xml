@@ -64,4 +64,18 @@
     <comment>Date and time that this attachment was uploaded or written to server.</comment>
     <add>1.5</add>
   </field>
+  <field>
+    <name>created_id</name>
+    <type>int unsigned</type>
+    <title>Created By Contact ID</title>
+    <comment>FK to civicrm_contact, who uploaded this file</comment>
+    <add>5.3</add>
+  </field>
+  <foreignKey>
+    <name>created_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <add>5.3</add>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
 </table>

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -68,9 +68,14 @@
   </div>
 </div>
 <table class="crm-info-panel">
+  {if $is_test}
+    <div class="help">
+      <strong>{ts}This is a TEST transaction{/ts}</strong>
+    </div>
+  {/if}
   <tr>
     <td class="label">{ts}From{/ts}</td>
-    <td class="bold">{$displayName}</td>
+    <td class="bold"><a href="{crmURL p='civicrm/contact/view' q="cid=$contact_id"}">{$displayName}</a></td>
   </tr>
   <tr>
     <td class="label">{ts}Financial Type{/ts}</td>
@@ -90,12 +95,11 @@
   {else}
     <tr>
       <td class="label">{ts}Total Amount{/ts}</td>
-      <td><strong><a class="nowrap bold crm-expand-row" title="{ts}view payments{/ts}"
-        href="{crmURL p='civicrm/payment' q="view=transaction&component=contribution&action=browse&cid=`$contact_id`&id=`$contribution_id`&selector=1"}">
-               &nbsp; {$total_amount|crmMoney:$currency}
-            </strong></a>&nbsp;
+      <td><strong>{$total_amount|crmMoney:$currency}</strong>
         {if $contribution_recur_id}
-          <strong>{ts}Recurring Contribution{/ts}</strong>
+          <a class="crm-hover-button" href='{crmURL p="civicrm/contact/view/contributionrecur" q="reset=1&id=`$contribution_recur_id`&cid=`$contact_id`&context=contribution"}'>
+            <strong>{ts}Recurring Contribution{/ts}</strong>
+          </a>
           <br/>
           {ts}Installments{/ts}: {if $recur_installments}{$recur_installments}{else}{ts}(ongoing){/ts}{/if}, {ts}Interval{/ts}: {$recur_frequency_interval} {$recur_frequency_unit}(s)
         {/if}
@@ -237,15 +241,19 @@
       <td>{$thankyou_date|crmDate}</td>
     </tr>
   {/if}
+  <tr>
+    <td class="label">{ts}Payment Details{/ts}</td>
+    <td>{include file="CRM/Contribute/Form/PaymentInfoBlock.tpl"}</td>
+  </tr>
   {if $addRecordPayment}
     <tr>
-      <td class='label'>{ts}Fees{/ts}</td>
+      <td class='label'>{ts}Payment Summary{/ts}</td>
       <td id='payment-info'></td>
     </tr>
   {/if}
 </table>
 
-{if count($softContributions)} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
+{if $softContributions && count($softContributions)} {* We show soft credit name with PCP section if contribution is linked to a PCP. *}
   <div class="crm-accordion-wrapper crm-soft-credit-pane">
     <div class="crm-accordion-header">
       {ts}Soft Credit{/ts}

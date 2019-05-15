@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -58,6 +58,7 @@ function civicrm_api3_campaign_create($params) {
  */
 function _civicrm_api3_campaign_create_spec(&$params) {
   $params['title']['api.required'] = 1;
+  $params['is_active']['api.default'] = 1;
 }
 
 /**
@@ -86,4 +87,62 @@ function civicrm_api3_campaign_get($params) {
  */
 function civicrm_api3_campaign_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+}
+
+/**
+ * Get campaign list parameters.
+ *
+ * @see _civicrm_api3_generic_getlist_params
+ *
+ * @param array $request
+ */
+function _civicrm_api3_campaign_getlist_params(&$request) {
+  $fieldsToReturn = ['title', 'campaign_type_id', 'status_id', 'start_date', 'end_date'];
+  $request['params']['return'] = array_unique(array_merge($fieldsToReturn, $request['extra']));
+  if (empty($request['params']['id'])) {
+    $request['params']['options']['sort'] = 'start_date DESC, title';
+    $request['params'] += [
+      'is_active' => 1,
+    ];
+  }
+}
+
+/**
+ * Get campaign list output.
+ *
+ * @see _civicrm_api3_generic_getlist_output
+ *
+ * @param array $result
+ * @param array $request
+ *
+ * @return array
+ */
+function _civicrm_api3_campaign_getlist_output($result, $request) {
+  $output = [];
+  if (!empty($result['values'])) {
+    $config = CRM_Core_Config::singleton();
+    foreach ($result['values'] as $row) {
+      $data = [
+        'id' => $row[$request['id_field']],
+        'label' => $row[$request['label_field']],
+        'description' => [
+          CRM_Core_Pseudoconstant::getLabel('CRM_Campaign_BAO_Campaign', 'campaign_type_id', $row['campaign_type_id']),
+        ],
+      ];
+      if (!empty($row['status_id'])) {
+        $data['description'][0] .= ': ' . CRM_Core_Pseudoconstant::getLabel('CRM_Campaign_BAO_Campaign', 'status_id', $row['status_id']);
+      }
+      $dateString = CRM_Utils_Date::customFormat($row['start_date'], $config->dateformatFull) . ' -';
+      if (!empty($row['end_date'])) {
+        // Remove redundant years
+        if (substr($row['start_date'], 0, 4) == substr($row['end_date'], 0, 4)) {
+          $dateString = preg_replace('/[, ]*' . substr($row['start_date'], 0, 4) . '/', '', $dateString);
+        }
+        $dateString .= ' ' . CRM_Utils_Date::customFormat($row['end_date'], $config->dateformatFull);
+      }
+      $data['description'][] = $dateString;
+      $output[] = $data;
+    }
+  }
+  return $output;
 }

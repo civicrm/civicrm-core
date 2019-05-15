@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -57,7 +57,7 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
     $this->addRule('name',
       ts('Name already exists in Database.'),
       'objectExists',
-      array('CRM_Core_DAO_LocationType', $this->_id)
+      ['CRM_Core_DAO_LocationType', $this->_id]
     );
     $this->addRule('name',
       ts('Name can only consist of alpha-numeric characters'),
@@ -74,10 +74,10 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $this->_id, 'is_reserved')) {
-        $this->freeze(array('name', 'description', 'is_active'));
+        $this->freeze(['name', 'description', 'is_active']);
       }
       if (CRM_Core_DAO::getFieldValue('CRM_Core_DAO_LocationType', $this->_id, 'is_default')) {
-        $this->freeze(array('is_default'));
+        $this->freeze(['is_default']);
       }
     }
   }
@@ -86,7 +86,7 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
    * Process the form submission.
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache('CRM_Core_DAO_LocationType');
+    CRM_Utils_System::flushCache();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_Core_BAO_LocationType::del($this->_id);
@@ -120,7 +120,7 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
     $locationType->save();
 
     CRM_Core_Session::setStatus(ts("The location type '%1' has been saved.",
-      array(1 => $locationType->name)
+      [1 => $locationType->name]
     ), ts('Saved'), 'success');
   }
 

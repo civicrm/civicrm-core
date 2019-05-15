@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,13 +26,13 @@
  */
 
 /**
- *  Test APIv3 civicrm_website_* functions
+ *  Test APIv3 civicrm_user_* functions
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Contact
  * @group headless
  */
-class api_v3_UserWebsiteTest extends CiviUnitTestCase {
+class api_v3_UserTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   protected $params;
   protected $_entity = 'User';

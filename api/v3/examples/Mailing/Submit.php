@@ -6,11 +6,11 @@
  *   API result array
  */
 function mailing_submit_example() {
-  $params = array(
+  $params = [
     'scheduled_date' => '2014-12-13 10:00:00',
     'approval_date' => '2014-12-13 00:00:00',
     'id' => 18,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Mailing', 'submit', $params);
@@ -20,12 +20,12 @@ function mailing_submit_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -39,13 +39,13 @@ function mailing_submit_example() {
  */
 function mailing_submit_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 18,
-    'values' => array(
-      '18' => array(
+    'values' => [
+      '18' => [
         'id' => '18',
         'domain_id' => '1',
         'header_id' => '',
@@ -90,9 +90,9 @@ https://civicrm.org
         'location_type_id' => '',
         'email_selection_method' => 'automatic',
         'language' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

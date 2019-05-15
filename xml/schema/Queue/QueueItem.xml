@@ -62,9 +62,10 @@
 
   <field>
     <name>data</name>
-    <title>Queue item datas</title>
+    <title>Queue item data</title>
     <type>text</type>
-    <comment>Serialized queue</comment>
+    <comment>Serialized queue data</comment>
+    <serialize>PHP</serialize>
   </field>
   <index>
     <name>index_queueids</name>

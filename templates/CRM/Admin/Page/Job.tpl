@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,8 @@
    {include file="CRM/Admin/Form/Job.tpl"}
 {else}
 
-  {if $rows}
+<div class="crm-content-block crm-block">
+{if $rows}
 
       {if $action ne 1 and $action ne 2}
         <div class="action-link">
@@ -45,7 +46,7 @@
     {strip}
         {* handle enable/disable actions*}
        {include file="CRM/common/enableDisableApi.tpl"}
-        <br/><table class="selector row-highlight">
+        <table class="selector row-highlight">
         <tr class="columnheader">
             <th >{ts}Name (Frequency)/Description{/ts}</th>
             <th >{ts}Command/Parameters{/ts}</th>
@@ -86,4 +87,5 @@
      </div>
 
 {/if}
+</div>
 {/if}

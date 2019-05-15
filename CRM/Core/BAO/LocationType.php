@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -36,9 +36,10 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
 
   /**
    * Static holder for the default LT.
+   * @var int
    */
-  static $_defaultLocationType = NULL;
-  static $_billingLocationType = NULL;
+  public static $_defaultLocationType = NULL;
+  public static $_billingLocationType = NULL;
 
   /**
    * Class constructor.
@@ -76,9 +77,8 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    * @param bool $is_active
    *   Value we want to set the is_active field.
    *
-   * @return Object
-   *   DAO object on success, null otherwise
-   *
+   * @return bool
+   *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_LocationType', $id, 'is_active', $is_active);
@@ -93,8 +93,8 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    */
   public static function &getDefault() {
     if (self::$_defaultLocationType == NULL) {
-      $params = array('is_default' => 1);
-      $defaults = array();
+      $params = ['is_default' => 1];
+      $defaults = [];
       self::$_defaultLocationType = self::retrieve($params, $defaults);
     }
     return self::$_defaultLocationType;
@@ -107,7 +107,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    */
   public static function getBilling() {
     if (self::$_billingLocationType == NULL) {
-      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', array(), 'validate');
+      $locationTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id', [], 'validate');
       self::$_billingLocationType = array_search('Billing', $locationTypes);
     }
     return self::$_billingLocationType;
@@ -148,7 +148,7 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    *
    */
   public static function del($locationTypeId) {
-    $entity = array('address', 'phone', 'email', 'im');
+    $entity = ['address', 'phone', 'email', 'im'];
     //check dependencies
     foreach ($entity as $key) {
       if ($key == 'im') {

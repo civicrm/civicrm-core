@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,7 @@
         {if !$type || $type eq 'tag'}
           <td>
             <div class="crm-section tag-section">
-              {if $title}{$form.tag.label}{/if}
+              {if $title}{$form.tag.label}<br>{/if}
               {$form.tag.html}
             </div>
             {if $context NEQ 'profile'}
@@ -45,7 +45,7 @@
           <td>
             {if $groupElementType eq 'select'}
               <div class="crm-section group-section">
-              {if $title}{$form.group.label}{/if}
+              {if $title}{$form.group.label}<br>{/if}
               {$form.group.html}
             </div>
             {else}

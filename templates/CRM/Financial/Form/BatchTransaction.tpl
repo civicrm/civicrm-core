@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,18 +35,22 @@
         <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
         <table class="form-layout-compressed">
           <tr>
-            <td class="font-size12pt" colspan="2">{$form.sort_name.label}&nbsp;&nbsp;{$form.sort_name.html|crmAddClass:'twenty'}</td>
+            <td class="font-size12pt" colspan="2">
+              {$form.sort_name.label}<br>
+              {$form.sort_name.html|crmAddClass:'twenty'}
+            </td>
           </tr>
           <tr>
           {if $form.contact_tags}
-            <td><label>{ts}Contributor Tag(s){/ts}</label>
+            <td>
+              <label>{ts}Contributor Tag(s){/ts}</label><br>
               {$form.contact_tags.html}
             </td>
             {else}
             <td>&nbsp;</td>
           {/if}
           {if $form.group}
-            <td><label>{ts}Contributor Group(s){/ts}</label>
+            <td><label>{ts}Contributor Group(s){/ts}</label><br>
               {$form.group.html}
             </td>
             {else}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -154,10 +154,13 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
   public $_pcpId;
 
-  /* Is event already full.
+  /**
+   * Is event already full.
    *
    * @var boolean
+   *
    */
+
 
   public $_isEventFull;
 
@@ -168,9 +171,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_forcePayement;
 
   /**
+   * @var bool
    * @deprecated
-   *
-   * @var
    */
   public $_isBillingAddressRequiredForPayLater;
 
@@ -196,7 +198,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public function preProcess() {
     $this->_eventId = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
-    $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
+    $this->_action = CRM_Utils_Request::retrieve('action', 'Alphanumeric', $this, FALSE, CRM_Core_Action::ADD);
 
     //CRM-4320
     $this->_participantId = CRM_Utils_Request::retrieve('participantId', 'Positive', $this);
@@ -391,9 +393,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->_contributeMode = $this->get('contributeMode');
     $this->assign('contributeMode', $this->_contributeMode);
 
-    // setting CMS page title
-    CRM_Utils_System::setTitle($this->_values['event']['title']);
-    $this->assign('title', $this->_values['event']['title']);
+    $this->setTitle($this->_values['event']['title']);
 
     $this->assign('paidEvent', $this->_values['event']['is_monetary']);
 
@@ -761,8 +761,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         'participant_id' => $participant->id,
         'contribution_id' => $contribution->id,
       );
-      $ids = array();
-      $paymentPartcipant = CRM_Event_BAO_ParticipantPayment::create($paymentParams, $ids);
+      $paymentPartcipant = CRM_Event_BAO_ParticipantPayment::create($paymentParams);
     }
 
     //set only primary participant's params for transfer checkout.
@@ -1258,10 +1257,10 @@ WHERE  v.option_group_id = g.id
       return;
     }
     foreach (array(
-               'constantValues',
-               'submitValues',
-               'defaultValues',
-             ) as $val) {
+      'constantValues',
+      'submitValues',
+      'defaultValues',
+    ) as $val) {
       $values = $form->{"_$val"};
       if (!is_array($values) || empty($values)) {
         continue;

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -36,22 +36,26 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
 
   protected $_fileName;
 
-  /**#@+
+  /**
+   * #@+
    * @var integer
    */
 
   /**
    * Imported file size
+   * @var int
    */
   protected $_fileSize;
 
   /**
    * Seperator being used
+   * @var string
    */
   protected $_seperator;
 
   /**
    * Total number of lines in file
+   * @var int
    */
   protected $_lineCount;
 
@@ -70,6 +74,8 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
    * @param int $mode
    * @param int $contactType
    * @param int $onDuplicate
+   * @param int $statusID
+   * @param int $totalRowCount
    *
    * @return mixed
    * @throws Exception
@@ -81,7 +87,9 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
     $skipColumnHeader = FALSE,
     $mode = self::MODE_PREVIEW,
     $contactType = self::CONTACT_INDIVIDUAL,
-    $onDuplicate = self::DUPLICATE_SKIP
+    $onDuplicate = self::DUPLICATE_SKIP,
+    $statusID = NULL,
+    $totalRowCount = NULL
   ) {
     if (!is_array($fileName)) {
       CRM_Core_Error::fatal();
@@ -116,17 +124,21 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
     $this->_invalidRowCount = $this->_validCount = 0;
     $this->_totalCount = $this->_conflictCount = 0;
 
-    $this->_errors = array();
-    $this->_warnings = array();
-    $this->_conflicts = array();
+    $this->_errors = [];
+    $this->_warnings = [];
+    $this->_conflicts = [];
 
     $this->_fileSize = number_format(filesize($fileName) / 1024.0, 2);
 
     if ($mode == self::MODE_MAPFIELD) {
-      $this->_rows = array();
+      $this->_rows = [];
     }
     else {
       $this->_activeFieldCount = count($this->_activeFields);
+    }
+    if ($statusID) {
+      $this->progressImport($statusID);
+      $startTimestamp = $currTimestamp = $prevTimestamp = time();
     }
 
     while (!feof($fd)) {
@@ -146,7 +158,6 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
       }
 
       /* trim whitespace around the values */
-
       $empty = TRUE;
       foreach ($values as $k => $v) {
         $values[$k] = trim($v, " \t\r\n");
@@ -168,6 +179,9 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
       }
       elseif ($mode == self::MODE_IMPORT) {
         $returnCode = $this->import($onDuplicate, $values);
+        if ($statusID && (($this->_lineCount % 50) == 0)) {
+          $prevTimestamp = $this->progressImport($statusID, FALSE, $startTimestamp, $prevTimestamp, $totalRowCount);
+        }
       }
       else {
         $returnCode = self::ERROR;
@@ -191,11 +205,9 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
 
       if ($returnCode & self::ERROR) {
         $this->_invalidRowCount++;
-        if ($this->_invalidRowCount < $this->_maxErrorCount) {
-          $recordNumber = $this->_lineCount;
-          array_unshift($values, $recordNumber);
-          $this->_errors[] = $values;
-        }
+        $recordNumber = $this->_lineCount;
+        array_unshift($values, $recordNumber);
+        $this->_errors[] = $values;
       }
 
       if ($returnCode & self::CONFLICT) {
@@ -244,27 +256,27 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
       }
       if ($this->_invalidRowCount) {
         // removed view url for invlaid contacts
-        $headers = array_merge(array(
+        $headers = array_merge([
           ts('Line Number'),
           ts('Reason'),
-        ), $customHeaders);
+        ], $customHeaders);
         $this->_errorFileName = self::errorFileName(self::ERROR);
 
         self::exportCSV($this->_errorFileName, $headers, $this->_errors);
       }
       if ($this->_conflictCount) {
-        $headers = array_merge(array(
+        $headers = array_merge([
           ts('Line Number'),
           ts('Reason'),
-        ), $customHeaders);
+        ], $customHeaders);
         $this->_conflictFileName = self::errorFileName(self::CONFLICT);
         self::exportCSV($this->_conflictFileName, $headers, $this->_conflicts);
       }
       if ($this->_duplicateCount) {
-        $headers = array_merge(array(
+        $headers = array_merge([
           ts('Line Number'),
           ts('View Membership URL'),
-        ), $customHeaders);
+        ], $customHeaders);
 
         $this->_duplicateFileName = self::errorFileName(self::DUPLICATE);
         self::exportCSV($this->_duplicateFileName, $headers, $this->_duplicates);
@@ -300,7 +312,7 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
    *   (reference ) associative array of name/value pairs
    */
   public function &getActiveFieldParams() {
-    $params = array();
+    $params = [];
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
       if (isset($this->_activeFields[$i]->_value)
         && !isset($params[$this->_activeFields[$i]->_name])
@@ -405,7 +417,7 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
    * @return void
    */
   public static function exportCSV($fileName, $header, $data) {
-    $output = array();
+    $output = [];
     $fd = fopen($fileName, 'w');
 
     foreach ($header as $key => $value) {

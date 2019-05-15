@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
         {$statusMsg}
   </div>
 
-  <div id="crm-submit-buttons">
+  <div id="crm-submit-buttons" class="crm-submit-buttons">
   {include file="CRM/common/formButtons.tpl" location="bottom"}
   </div>
 </div>

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,10 +35,6 @@
       </div>
     {/if}
     <table class="form-layout-compressed">
-      <tr class="crm-core-form-recurringentity-block-repetition_start_date" id="tr-repetition_start_date">
-        <td class="label">{$form.repetition_start_date.label}</td>
-        <td>{include file="CRM/common/jcalendar.tpl" elementName=repetition_start_date}</td>
-      </tr>
       <tr class="crm-core-form-recurringentity-block-repetition_frequency">
         <td class="label">{$form.repetition_frequency_unit.label}&nbsp;<span class="crm-marker">*</span>  {help id="id-repeats" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
         <td>{$form.repetition_frequency_interval.html} {$form.repetition_frequency_unit.html}</td>
@@ -52,23 +48,27 @@
         </td>
       </tr>
       <tr class="crm-core-form-recurringentity-block-repeats_by">
-        <td class="label">{$form.repeats_by.label} {help id="id-repeats-by-month" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
-        <td>{$form.repeats_by.1.html}&nbsp;&nbsp;{$form.limit_to.html}
+        <td class="label">{$form.repeats_by.label}&nbsp;<span class="crm-marker">*</span></td>
+        <td>{help id="id-repeats-by-month" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"} {$form.repeats_by.1.html} {$form.limit_to.html}
         </td>
       </tr>
       <tr class="crm-core-form-recurringentity-block-repeats_by">
-        <td class="label">{help id="id-repeats-by-week" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
-        <td>{$form.repeats_by.2.html}&nbsp;&nbsp;{$form.entity_status_1.html}&nbsp;&nbsp;{$form.entity_status_2.html}
+        <td class="label"></td>
+        <td>{help id="id-repeats-by-week" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"} {$form.repeats_by.2.html} {$form.entity_status_1.html} {$form.entity_status_2.html}
         </td>
+      </tr>
+      <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+      <tr class="crm-core-form-recurringentity-block-repetition_start_date" id="tr-repetition_start_date">
+        <td class="label">{$form.repetition_start_date.label}</td>
+        <td>{$form.repetition_start_date.html}</td>
       </tr>
       <tr class="crm-core-form-recurringentity-block-ends">
-        <td class="label">{$form.ends.label}&nbsp;<span class="crm-marker">*</span> {help id="id-ends-after" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
-        <td>{$form.ends.1.html}&nbsp;{$form.start_action_offset.html} {ts}occurrences{/ts}</td>
+        <td class="label">{$form.ends.label}&nbsp;<span class="crm-marker">*</span></td>
+        <td>{help id="id-ends-after" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"} {$form.ends.1.html} {$form.start_action_offset.html} {ts}occurrences{/ts}</td>
       </tr>
       <tr class="crm-core-form-recurringentity-block-absolute_date">
-        <td class="label"> {help id="id-ends-on" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
-        <td>{$form.ends.2.html}&nbsp;{include file="CRM/common/jcalendar.tpl" elementName=repeat_absolute_date}
-        </td>
+        <td class="label"> </td>
+        <td>{help id="id-ends-on" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"} {$form.ends.2.html} {$form.repeat_absolute_date.html}</td>
       </tr>
       <tr class="crm-core-form-recurringentity-block-exclude_date">
         <td class="label">{$form.exclude_date_list.label} {help id="id-exclude-date" entityType=$recurringEntityType file="CRM/Core/Form/RecurringEntity.hlp"}</td>
@@ -111,19 +111,21 @@
     }
     $('#repetition_frequency_unit', $form).each(changeFrequencyUnit).change(changeFrequencyUnit);
 
-    function disableUnselected() {
-      $('input:radio[name=ends], input[name=repeats_by]', $form).not(':checked').siblings(':input').prop('disabled', true).removeClass('required');
+    function disableEnds() {
+      $("#repeat_absolute_date, #start_action_offset").prop('disabled', true).removeClass('required');
+
+      if ($('input[name=ends][value=2]').prop('checked')) {
+        $("#repeat_absolute_date").prop('disabled', false).addClass('required').focus();
+      }
+      else if ($('input[name=ends][value=1]').prop('checked')) {
+        $('#start_action_offset').prop('disabled', false).addClass('required').focus();
+      }
     }
-    disableUnselected();
 
-    $('input:radio[name=ends], input[name=repeats_by]', $form).click(function() {
-      $(this).siblings(':input').prop('disabled', false).filter(':visible').addClass('required').focus();
-      disableUnselected();
+    $('input[name=ends]').click(function() {
+      disableEnds();
     });
-
-    $('input:radio[name=ends]').siblings('.crm-clear-link').click(function() {
-      $('input:radio[name=ends][value=1]').prop('checked', true).trigger('click');
-    });
+    disableEnds();
 
     function validate() {
       var valid = $(':input', '#recurring-entity-block').valid(),

@@ -109,11 +109,11 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
 
     // If user supplies wildcards, then ignore mode.
     foreach (array(
-               'simple',
-               'wildphrase',
-               'wildwords',
-               'wildwords-suffix',
-             ) as $mode) {
+      'simple',
+      'wildphrase',
+      'wildwords',
+      'wildwords-suffix',
+    ) as $mode) {
       $cases[] = array('first% second', 'like', $mode, 'first% second', array(3, 7));
       $cases[] = array('first% second', 'fts', $mode, 'first* second', array(3, 7));
       $cases[] = array('first% second', 'ftsbool', $mode, '+first* +second', array(3, 7));
@@ -134,6 +134,7 @@ class CRM_Utils_QueryFormatterTest extends CiviUnitTestCase {
    * @param string $language
    * @param string $mode
    * @param string $expectedText
+   * @param array|NULL $expectedRowIds
    *
    * @dataProvider dataProvider
    */

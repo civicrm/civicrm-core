@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,7 @@
 -->
 </style>
 {/literal}
-<form action="{crmURL p='civicrm/contact/view' q="&cid=`$contactId`&reset=1"}" method="post" id="Print1" >
+<form action="{crmURL p='civicrm/contact/view' q="cid=`$contactId`&reset=1"}" method="post" id="Print1" >
   <div class="form-item">
        <span class="element-right"><input onclick="window.print(); return false" class="crm-form-submit default" name="_qf_Print_next" value="{ts}Print{/ts}" type="submit" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="crm-form-submit" name="_qf_Print_back" value="{ts}Done{/ts}" type="submit" /></span>
   </div>
@@ -41,7 +41,7 @@
 <br />
 <div class="solid-border-top"><br />
     {include file="CRM/Contact/Page/View/Summary.tpl"}
-    <form action="{crmURL p='civicrm/contact/view' q="&cid=`$contactId`&reset=1"}" method="post" id="Print2" >
+    <form action="{crmURL p='civicrm/contact/view' q="cid=`$contactId`&reset=1"}" method="post" id="Print2" >
       <div class="form-item">
            <span class="element-right"><input onclick="window.print(); return false" class="crm-form-submit default" name="_qf_Print_next" value="{ts}Print{/ts}" type="submit" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input class="crm-form-submit" name="_qf_Print_back" value="{ts}Done{/ts}" type="submit" /></span>
       </div>
@@ -50,7 +50,6 @@
 {literal}
 <script type="text/javascript">
 cj('#mainTabContainer').children(':first').remove();
-cj('#contact-summary' ).children(':first').remove();
 
 </script>
 {/literal}

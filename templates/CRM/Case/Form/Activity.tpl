@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,10 +30,6 @@
   {if $action neq 8 and $action  neq 32768 }
   {* Include form buttons on top for new and edit modes. *}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-
-    {* added onload javascript for source contact*}
-    {include file="CRM/Activity/Form/ActivityJs.tpl" tokenContext="case_activity"}
-
   {/if}
 
   {if $action eq 8 or $action eq 32768 }
@@ -127,7 +123,7 @@
                   <td>{$form.assignee_contact_id.html}
                     {if $activityAssigneeNotification}
                       <br />
-                      <span class="description"><i class="crm-i fa-paper-plane"></i> {ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
+                      <span id="notify_assignee_msg" class="description"><i class="crm-i fa-paper-plane"></i> {ts}A copy of this activity will be emailed to each Assignee.{/ts}</span>
                     {/if}
                   </td>
                 </tr>
@@ -145,15 +141,12 @@
               </tr>
               <tr class="crm-case-activity-form-block-activity_date_time">
                 <td class="label">{$form.activity_date_time.label}</td>
-                {if $action eq 2 && $activityTypeFile eq 'OpenCase'}
-                  <td class="view-value">{$current_activity_date_time|crmDate}
-                    <div class="description">Use a <a href="{$changeStartURL}">Change Start Date</a> activity to change the date</div>
-                    {* avoid errors about missing field *}
-                    <div style="display: none;">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</div>
-                  </td>
-                {else}
-                  <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</td>
-                {/if}
+                <td class="view-value">
+                  {$form.activity_date_time.html}
+                  {if $action eq 2 && $activityTypeFile eq 'OpenCase'}
+                    <div class="description">Use a <a class="open-inline" href="{$changeStartURL}">Change Start Date</a> activity to change the date</div>
+                  {/if}
+                </td>
               </tr>
               {if $action eq 2 && $activityTypeFile eq 'OpenCase'}
               <tr class="crm-case-activity-form-block-details">
@@ -164,7 +157,7 @@
               </tr>
               {/if}
               <tr>
-                <td colspan="2"><div id="customData"></div></td>
+                <td colspan="2">{include file="CRM/common/customDataBlock.tpl"}</td>
               </tr>
               {if NOT $activityTypeFile}
                 <tr class="crm-case-activity-form-block-details">
@@ -271,19 +264,19 @@
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 
   {if $action eq 1 or $action eq 2}
-  {*include custom data js file*}
-  {include file="CRM/common/customData.tpl"}
     {literal}
     <script type="text/javascript">
-    CRM.$(function($) {
-    {/literal}
-    {if $customDataSubType}
-      CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-      {else}
-      CRM.buildCustomData( '{$customDataType}' );
-    {/if}
-    {literal}
-    });
+      CRM.$(function($) {
+        var doNotNotifyAssigneeFor = {/literal}{$doNotNotifyAssigneeFor|@json_encode}{literal};
+        $('#activity_type_id').change(function() {
+          if ($.inArray($(this).val(), doNotNotifyAssigneeFor) != -1) {
+            $('#notify_assignee_msg').hide();
+          }
+          else {
+            $('#notify_assignee_msg').show();
+          }
+        });
+      });
     </script>
     {/literal}
   {/if}

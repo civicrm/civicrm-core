@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Mailing_MailStore {
-  // flag to decide whether to print debug messages
-  var $_debug = FALSE;
+  /**
+   * flag to decide whether to print debug messages
+   * @var bool
+   */
+  public $_debug = FALSE;
 
   /**
    * Return the proper mail store implementation, based on config settings.
@@ -122,9 +125,9 @@ class CRM_Mailing_MailStore {
       if ($this->_debug) {
         print "got to the end of the mailbox\n";
       }
-      return array();
+      return [];
     }
-    $mails = array();
+    $mails = [];
     $parser = new ezcMailParser();
     //set property text attachment as file CRM-5408
     $parser->options->parseTextAttachmentsAsFiles = TRUE;
@@ -152,11 +155,11 @@ class CRM_Mailing_MailStore {
   public function maildir($name) {
     $config = CRM_Core_Config::singleton();
     $dir = $config->customFileUploadDir . DIRECTORY_SEPARATOR . $name;
-    foreach (array(
-               'cur',
-               'new',
-               'tmp',
-             ) as $sub) {
+    foreach ([
+      'cur',
+      'new',
+      'tmp',
+    ] as $sub) {
       if (!file_exists($dir . DIRECTORY_SEPARATOR . $sub)) {
         if ($this->_debug) {
           print "creating $dir/$sub\n";

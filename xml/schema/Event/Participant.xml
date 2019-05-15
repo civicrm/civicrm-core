@@ -95,7 +95,9 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <multiple>1</multiple>
     </html>
+    <serialize>SEPARATOR_TRIMMED</serialize>
     <headerPattern>/(participant.)?(role)$/i</headerPattern>
     <import>true</import>
     <type>varchar</type>
@@ -133,6 +135,9 @@
     <type>varchar</type>
     <length>128</length>
     <comment>Source of this event registration.</comment>
+    <html>
+      <type>Text</type>
+    </html>
     <add>1.7</add>
   </field>
   <field>
@@ -142,6 +147,7 @@
     <headerPattern>/^(f(ee\s)?level)$/i</headerPattern>
     <type>text</type>
     <import>true</import>
+    <serialize>SEPARATOR_BOOKEND</serialize>
     <comment>Populate with the label (text) associated with a fee level for paid events with multiple levels. Note that
       we store the label value and not the key
     </comment>

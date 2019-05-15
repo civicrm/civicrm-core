@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -611,6 +611,49 @@ class CRM_Core_BAO_CustomGroupTest extends CiviUnitTestCase {
 
     $this->assertEquals($groupTitles[$customFieldId]['groupTitle'], 'Test Group', 'Check Group Title.');
     $this->customGroupDelete($customGroup['id']);
+  }
+
+  /**
+   * Test that passed dates are extracted from the url when processing custom data.
+   */
+  public function testExtractGetParamsReturnsDates() {
+    // Create a custom group to contain the custom field.
+    $groupParams = array(
+      'title' => 'My Custom Group',
+      'name' => 'my_custom_group',
+      'extends' => 'Individual',
+      'is_active' => 1,
+      'collapse_display' => 1,
+    );
+    $customGroup = $this->customGroupCreate($groupParams);
+    $customGroupId = $customGroup['id'];
+
+    // Create teh custom field.
+    $fieldParams = array(
+      'custom_group_id' => $customGroupId,
+      'label' => 'My Custom Date Field',
+      'html_type' => 'Select Date',
+      'data_type' => 'Date',
+      'is_required' => 1,
+      'is_searchable' => 0,
+      'is_active' => 1,
+      'default_value' => '',
+    );
+    $customField = $this->customFieldCreate($fieldParams);
+    $customFieldId = $customField['id'];
+
+    // Create a form object. CRM_Core_BAO_CustomGroup::extractGetParams() will
+    // need this, along with the REQUEST_METHOD and controller too.
+    $form = new CRM_Contribute_Form_Contribution();
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $form->controller = new CRM_Core_Controller();
+
+    // Set the value in $_GET, then extract query string params with
+    $fieldName = 'custom_' . $customFieldId;
+    $_GET[$fieldName] = '2017-06-13';
+    $extractedGetParams = CRM_Core_BAO_CustomGroup::extractGetParams($form, 'Individual');
+
+    $this->assertEquals($extractedGetParams[$fieldName], '2017-06-13');
   }
 
 }

@@ -71,6 +71,7 @@
     <type>longtext</type>
     <comment>contains json encode configurations options</comment>
     <add>4.4</add>
+    <serialize>JSON</serialize>
   </field>
   <field>
     <name>is_default</name>

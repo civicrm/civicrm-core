@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
 
@@ -38,11 +38,17 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
    * @param CRM_Core_Form $form
    */
   public static function buildAdvanceSetting(&$form) {
+    $entityFields = [
+      'cancel_button_text',
+      'submit_button_text',
+    ];
+    $form->assign('advancedFieldsConverted', $entityFields);
+
     // should mapping be enabled for this group
     $form->addElement('checkbox', 'is_map', ts('Enable mapping for this profile?'));
 
     // should we allow updates on a exisitng contact
-    $options = array();
+    $options = [];
     $options[] = $form->createElement('radio', NULL, NULL, ts('Issue warning and do not save'), 0);
     $options[] = $form->createElement('radio', NULL, NULL, ts('Update the matching contact'), 1);
     $options[] = $form->createElement('radio', NULL, NULL, ts('Allow duplicate contact to be created'), 2);
@@ -50,10 +56,12 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
     $form->addGroup($options, 'is_update_dupe', ts('What to do upon duplicate match'));
     // we do not have any url checks to allow relative urls
     $form->addElement('text', 'post_URL', ts('Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'post_URL'));
+
+    $form->add('advcheckbox', 'add_cancel_button', ts('Include Cancel Button?'));
     $form->addElement('text', 'cancel_URL', ts('Cancel Redirect URL'), CRM_Core_DAO::getAttribute('CRM_Core_DAO_UFGroup', 'cancel_URL'));
 
     // add select for groups
-    $group = array('' => ts('- select -')) + $form->_group;
+    $group = ['' => ts('- select -')] + $form->_group;
     $form->_groupElement = &$form->addElement('select', 'group', ts('Limit listings to a specific Group?'), $group);
 
     //add notify field
@@ -70,7 +78,7 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
 
     // should we display a link to the website profile
     $config = CRM_Core_Config::singleton();
-    $form->addElement('checkbox', 'is_uf_link', ts('Include %1 user account information links in search results?', array(1 => $config->userFramework)));
+    $form->addElement('checkbox', 'is_uf_link', ts('Include %1 user account information links in search results?', [1 => $config->userFramework]));
 
     // want to create cms user
     $session = CRM_Core_Session::singleton();
@@ -79,15 +87,15 @@ class CRM_UF_Form_AdvanceSetting extends CRM_UF_Form_Group {
       $form->_cmsId = TRUE;
     }
 
-    $options = array();
+    $options = [];
     $options[] = $form->createElement('radio', NULL, NULL, ts('No account create option'), 0);
     $options[] = $form->createElement('radio', NULL, NULL, ts('Give option, but not required'), 1);
     $options[] = $form->createElement('radio', NULL, NULL, ts('Account creation required'), 2);
 
-    $form->addGroup($options, 'is_cms_user', ts('%1 user account registration option?', array(1 => $config->userFramework)));
+    $form->addGroup($options, 'is_cms_user', ts('%1 user account registration option?', [1 => $config->userFramework]));
 
     // options for including Proximity Search in the profile search form
-    $proxOptions = array();
+    $proxOptions = [];
     $proxOptions[] = $form->createElement('radio', NULL, NULL, ts('None'), 0);
     $proxOptions[] = $form->createElement('radio', NULL, NULL, ts('Optional'), 1);
     $proxOptions[] = $form->createElement('radio', NULL, NULL, ts('Required'), 2);

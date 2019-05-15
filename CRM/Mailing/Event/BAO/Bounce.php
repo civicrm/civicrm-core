@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
 
@@ -61,6 +61,9 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
     $bounce = new CRM_Mailing_Event_BAO_Bounce();
     $bounce->time_stamp = date('YmdHis');
 
+    $action = empty($params['id']) ? 'create' : 'edit';
+    CRM_Utils_Hook::pre($action, 'MailingEventBounce', CRM_Utils_Array::value('id', $params), $params);
+
     // if we dont have a valid bounce type, we should set it
     // to bounce_type_id 11 which is Syntax error. this allows such email
     // addresses to be bounce a few more time before being put on hold
@@ -74,11 +77,20 @@ class CRM_Mailing_Event_BAO_Bounce extends CRM_Mailing_Event_DAO_Bounce {
       }
     }
 
+    // replace any invalid unicode characters with replacement characters
+    $params['bounce_reason'] = mb_convert_encoding($params['bounce_reason'], 'UTF-8', 'UTF-8');
+
+    // dev/mail#37 Replace 4-byte utf8 characaters with the unicode replacement character
+    // while CiviCRM does not support utf8mb4 for MySQL
+    $params['bounce_reason'] = preg_replace('/[\x{10000}-\x{10FFFF}]/u', "\xEF\xBF\xBD", $params['bounce_reason']);
+
     // CRM-11989
     $params['bounce_reason'] = mb_strcut($params['bounce_reason'], 0, 254);
 
     $bounce->copyValues($params);
     $bounce->save();
+
+    CRM_Utils_Hook::post($action, 'MailingEventBounce', $bounce->id, $bounce);
 
     if ($q->email_id) {
       self::putEmailOnHold($q->email_id);

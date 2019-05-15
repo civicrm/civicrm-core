@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -38,6 +38,13 @@
  */
 class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
 
+  // 6*60*60
+  const DEFAULT_TTL = 21600;
+
+  const TS_FMT = 'Y-m-d H:i:s';
+  // TODO Consider native implementation.
+  use CRM_Utils_Cache_NaiveMultipleTrait;
+
   /**
    * The host name of the memcached server.
    *
@@ -46,14 +53,25 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   protected $group;
 
   /**
-   * @var int $componentID The optional component ID (so componenets can share the same name space)
+   * @var int
    */
   protected $componentID;
 
   /**
    * @var array in-memory cache to optimize redundant get()s
    */
-  protected $frontCache;
+  protected $valueCache;
+
+  /**
+   * @var array in-memory cache to optimize redundant get()s
+   *   Note: expiresCache[$key]===NULL means cache-miss
+   */
+  protected $expiresCache;
+
+  /**
+   * @var string
+   */
+  protected $table;
 
   /**
    * Constructor.
@@ -68,6 +86,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    * @return \CRM_Utils_Cache_SqlGroup
    */
   public function __construct($config) {
+    $this->table = CRM_Core_DAO_Cache::getTableName();
     if (isset($config['group'])) {
       $this->group = $config['group'];
     }
@@ -80,7 +99,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     else {
       $this->componentID = NULL;
     }
-    $this->frontCache = array();
+    $this->valueCache = [];
     if (CRM_Utils_Array::value('prefetch', $config, TRUE)) {
       $this->prefetch();
     }
@@ -89,22 +108,80 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   /**
    * @param string $key
    * @param mixed $value
+   * @param null|int|\DateInterval $ttl
+   * @return bool
    */
-  public function set($key, &$value) {
-    CRM_Core_BAO_Cache::setItem($value, $this->group, $key, $this->componentID);
-    $this->frontCache[$key] = $value;
+  public function set($key, $value, $ttl = NULL) {
+    CRM_Utils_Cache::assertValidKey($key);
+
+    $lock = Civi::lockManager()->acquire("cache.{$this->group}_{$key}._null");
+    if (!$lock->isAcquired()) {
+      throw new \CRM_Utils_Cache_CacheException("SqlGroup: Failed to acquire lock on cache key.");
+    }
+
+    if (is_int($ttl) && $ttl <= 0) {
+      return $this->delete($key);
+    }
+
+    $dataExists = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM {$this->table} WHERE {$this->where($key)}");
+    $expires = round(microtime(1)) + CRM_Utils_Date::convertCacheTtl($ttl, self::DEFAULT_TTL);
+
+    $dataSerialized = CRM_Core_BAO_Cache::encode($value);
+
+    // This table has a wonky index, so we cannot use REPLACE or
+    // "INSERT ... ON DUPE". Instead, use SELECT+(INSERT|UPDATE).
+    if ($dataExists) {
+      $sql = "UPDATE {$this->table} SET data = %1, created_date = FROM_UNIXTIME(%2), expired_date = FROM_UNIXTIME(%3) WHERE {$this->where($key)}";
+      $args = [
+        1 => [$dataSerialized, 'String'],
+        2 => [time(), 'Positive'],
+        3 => [$expires, 'Positive'],
+      ];
+      $dao = CRM_Core_DAO::executeQuery($sql, $args, FALSE, NULL, FALSE, FALSE);
+    }
+    else {
+      $sql = "INSERT INTO {$this->table} (group_name,path,data,created_date,expired_date) VALUES (%1,%2,%3,FROM_UNIXTIME(%4),FROM_UNIXTIME(%5))";
+      $args = [
+        1 => [$this->group, 'String'],
+        2 => [$key, 'String'],
+        3 => [$dataSerialized, 'String'],
+        4 => [time(), 'Positive'],
+        5 => [$expires, 'Positive'],
+      ];
+      $dao = CRM_Core_DAO::executeQuery($sql, $args, FALSE, NULL, FALSE, FALSE);
+    }
+
+    $lock->release();
+
+    $dao->free();
+
+    $this->valueCache[$key] = CRM_Core_BAO_Cache::decode($dataSerialized);
+    $this->expiresCache[$key] = $expires;
+    return TRUE;
   }
 
   /**
    * @param string $key
+   * @param mixed $default
    *
    * @return mixed
    */
-  public function get($key) {
-    if (!array_key_exists($key, $this->frontCache)) {
-      $this->frontCache[$key] = CRM_Core_BAO_Cache::getItem($this->group, $key, $this->componentID);
+  public function get($key, $default = NULL) {
+    CRM_Utils_Cache::assertValidKey($key);
+    if (!isset($this->expiresCache[$key]) || time() >= $this->expiresCache[$key]) {
+      $sql = "SELECT path, data, UNIX_TIMESTAMP(expired_date) as expires FROM {$this->table} WHERE " . $this->where($key);
+      $dao = CRM_Core_DAO::executeQuery($sql);
+      while ($dao->fetch()) {
+        $this->expiresCache[$key] = $dao->expires;
+        $this->valueCache[$key] = CRM_Core_BAO_Cache::decode($dao->data);
+      }
+      $dao->free();
     }
-    return $this->frontCache[$key];
+    return (isset($this->expiresCache[$key]) && time() < $this->expiresCache[$key]) ? $this->reobjectify($this->valueCache[$key]) : $default;
+  }
+
+  private function reobjectify($value) {
+    return is_object($value) ? unserialize(serialize($value)) : $value;
   }
 
   /**
@@ -114,24 +191,60 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    * @return mixed
    */
   public function getFromFrontCache($key, $default = NULL) {
-    return CRM_Utils_Array::value($key, $this->frontCache, $default);
+    if (isset($this->expiresCache[$key]) && time() < $this->expiresCache[$key] && $this->valueCache[$key]) {
+      return $this->reobjectify($this->valueCache[$key]);
+    }
+    else {
+      return $default;
+    }
+  }
+
+  public function has($key) {
+    $this->get($key);
+    return isset($this->expiresCache[$key]) && time() < $this->expiresCache[$key];
   }
 
   /**
    * @param string $key
+   * @return bool
    */
   public function delete($key) {
-    CRM_Core_BAO_Cache::deleteGroup($this->group, $key);
-    unset($this->frontCache[$key]);
+    CRM_Utils_Cache::assertValidKey($key);
+    CRM_Core_DAO::executeQuery("DELETE FROM {$this->table} WHERE {$this->where($key)}");
+    unset($this->valueCache[$key]);
+    unset($this->expiresCache[$key]);
+    return TRUE;
   }
 
   public function flush() {
-    CRM_Core_BAO_Cache::deleteGroup($this->group);
-    $this->frontCache = array();
+    CRM_Core_DAO::executeQuery("DELETE FROM {$this->table} WHERE {$this->where()}");
+    $this->valueCache = [];
+    $this->expiresCache = [];
+    return TRUE;
+  }
+
+  public function clear() {
+    return $this->flush();
   }
 
   public function prefetch() {
-    $this->frontCache = CRM_Core_BAO_Cache::getItems($this->group, $this->componentID);
+    $dao = CRM_Core_DAO::executeQuery("SELECT path, data, UNIX_TIMESTAMP(expired_date) AS expires FROM {$this->table} WHERE " . $this->where(NULL));
+    $this->valueCache = [];
+    $this->expiresCache = [];
+    while ($dao->fetch()) {
+      $this->valueCache[$dao->path] = CRM_Core_BAO_Cache::decode($dao->data);
+      $this->expiresCache[$dao->path] = $dao->expires;
+    }
+    $dao->free();
+  }
+
+  protected function where($path = NULL) {
+    $clauses = [];
+    $clauses[] = ('group_name = "' . CRM_Core_DAO::escapeString($this->group) . '"');
+    if ($path) {
+      $clauses[] = ('path = "' . CRM_Core_DAO::escapeString($path) . '"');
+    }
+    return $clauses ? implode(' AND ', $clauses) : '(1)';
   }
 
 }

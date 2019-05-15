@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -64,7 +64,6 @@ class CRM_Core_BAO_OptionValueTest extends CiviUnitTestCase {
     $this->fail('Should not have gotten this far');
   }
 
-
   /**
    * Ensure only one option value copes with disabled.
    *
@@ -72,12 +71,15 @@ class CRM_Core_BAO_OptionValueTest extends CiviUnitTestCase {
    * decision to disable it & leaving it in that state.
    */
   public function testEnsureOptionValueExistsDisabled() {
-    CRM_Core_BAO_OptionValue::ensureOptionValueExists(array('name' => 'Crashed', 'option_group_id' => 'contribution_status', 'is_active' => 0));
+    $optionValue = CRM_Core_BAO_OptionValue::ensureOptionValueExists(array('name' => 'Crashed', 'option_group_id' => 'contribution_status', 'is_active' => 0));
     $value = $this->callAPISuccessGetSingle('OptionValue', array('name' => 'Crashed', 'option_group_id' => 'contribution_status'));
     $this->assertEquals(0, $value['is_active']);
-    CRM_Core_BAO_OptionValue::ensureOptionValueExists(array('name' => 'Crashed', 'option_group_id' => 'contribution_status'));
+    $this->assertEquals($value['id'], $optionValue['id']);
+
+    $optionValue = CRM_Core_BAO_OptionValue::ensureOptionValueExists(array('name' => 'Crashed', 'option_group_id' => 'contribution_status'));
     $value = $this->callAPISuccessGetSingle('OptionValue', array('name' => 'Crashed', 'option_group_id' => 'contribution_status'));
     $this->assertEquals(0, $value['is_active']);
+    $this->assertEquals($value['id'], $optionValue['id']);
   }
 
 }

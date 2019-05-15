@@ -35,14 +35,21 @@ div#crm-contact-thumbnail {
 #crm-container div.crm-inline-edit.form {
   cursor: default;
   border: 2px dashed #6665BF;
-  overflow: auto;
+  box-shadow: rgba(255, 255, 255, 0.3) 0 0 0 99999px;
+  background-color: white;
+  float: left;
+  z-index: 99;
+}
+
+#mainTabContainer:not(.narrowpage) .contactCardRight div.crm-inline-edit.form {
+  float: right;
 }
 
 #crm-container .crm-inline-edit.add-new {
   min-height: 2.5em;
 }
 
-#crm-container div.crm-inline-edit .crm-edit-help {
+#crm-container div.crm-summary-block .crm-edit-help {
   display: none;
   position: absolute;
   right: 0;
@@ -52,18 +59,22 @@ div#crm-contact-thumbnail {
   border-bottom-left-radius: 1em;
 }
 
-#crm-container .crm-inline-edit.add-new .crm-edit-help {
+#crm-container .crm-address-block+.crm-address-block .add-new .crm-edit-help {
   display: block;
   background-color: #EBEBEB;
 }
 
-#crm-container .crm-edit-ready .crm-inline-edit:hover .crm-edit-help {
+#crm-container .crm-edit-ready .crm-summary-block .crm-inline-edit:hover .crm-edit-help {
   display: block;
   background-color: #DFE1FF;
 }
 
 #crm-container div.crm-inline-edit.form .crm-edit-help {
   display: none !important;
+}
+
+#crm-container .crm-address-block+.crm-address-block .add-new .crm-summary-row {
+  display: none;
 }
 
 #crm-container span.crm-custom-greeting {
@@ -76,7 +87,8 @@ div#crm-contact-thumbnail {
   white-space: nowrap;
 }
 #crm-container table.crm-inline-edit-form td.crm-label,
-#crm-container div.crm-inline-edit-form .crm-label {
+#crm-container div.crm-inline-edit-form .crm-label,
+#crm-container div.crm-inline-edit-form .messages {
   white-space: normal;
 }
 

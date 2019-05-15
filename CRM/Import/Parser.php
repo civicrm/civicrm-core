@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 abstract class CRM_Import_Parser {
   /**
    * Settings
    */
-  const MAX_ERRORS = 250, MAX_WARNINGS = 25, DEFAULT_TIMEOUT = 30;
+  const MAX_WARNINGS = 25, DEFAULT_TIMEOUT = 30;
 
   /**
    * Return codes
@@ -59,16 +59,19 @@ abstract class CRM_Import_Parser {
 
   /**
    * Total number of non empty lines
+   * @var int
    */
   protected $_totalCount;
 
   /**
    * Running total number of valid lines
+   * @var int
    */
   protected $_validCount;
 
   /**
    * Running total number of invalid rows
+   * @var int
    */
   protected $_invalidRowCount;
 
@@ -80,47 +83,50 @@ abstract class CRM_Import_Parser {
   protected $_maxLinesToProcess;
 
   /**
-   * Maximum number of invalid rows to store
-   */
-  protected $_maxErrorCount;
-
-  /**
    * Array of error lines, bounded by MAX_ERROR
+   * @var array
    */
   protected $_errors;
 
   /**
    * Total number of conflict lines
+   * @var int
    */
   protected $_conflictCount;
 
   /**
    * Array of conflict lines
+   * @var array
    */
   protected $_conflicts;
 
   /**
    * Total number of duplicate (from database) lines
+   * @var int
    */
   protected $_duplicateCount;
 
   /**
    * Array of duplicate lines
+   * @var array
    */
   protected $_duplicates;
 
   /**
    * Running total number of warnings
+   * @var int
    */
   protected $_warningCount;
 
   /**
    * Maximum number of warnings to store
+   * @var int
    */
   protected $_maxWarningCount = self::MAX_WARNINGS;
 
   /**
    * Array of warning lines, bounded by MAX_WARNING
+   * @var array
    */
   protected $_warnings;
 
@@ -192,7 +198,6 @@ abstract class CRM_Import_Parser {
    */
   public function __construct() {
     $this->_maxLinesToProcess = 0;
-    $this->_maxErrorCount = self::MAX_ERRORS;
   }
 
   /**
@@ -279,7 +284,7 @@ abstract class CRM_Import_Parser {
    *   (reference) associative array of name/value pairs
    */
   public function &getActiveFieldParams() {
-    $params = array();
+    $params = [];
     for ($i = 0; $i < $this->_activeFieldCount; $i++) {
       if (isset($this->_activeFields[$i]->_value)
         && !isset($params[$this->_activeFields[$i]->_name])
@@ -293,10 +298,65 @@ abstract class CRM_Import_Parser {
   }
 
   /**
+   * Add progress bar to the import process. Calculates time remaining, status etc.
+   *
+   * @param $statusID
+   *   status id of the import process saved in $config->uploadDir.
+   * @param bool $startImport
+   *   True when progress bar is to be initiated.
+   * @param $startTimestamp
+   *   Initial timstamp when the import was started.
+   * @param $prevTimestamp
+   *   Previous timestamp when this function was last called.
+   * @param $totalRowCount
+   *   Total number of rows in the import file.
+   *
+   * @return NULL|$currTimestamp
+   */
+  public function progressImport($statusID, $startImport = TRUE, $startTimestamp = NULL, $prevTimestamp = NULL, $totalRowCount = NULL) {
+    $config = CRM_Core_Config::singleton();
+    $statusFile = "{$config->uploadDir}status_{$statusID}.txt";
+
+    if ($startImport) {
+      $status = "<div class='description'>&nbsp; " . ts('No processing status reported yet.') . "</div>";
+      //do not force the browser to display the save dialog, CRM-7640
+      $contents = json_encode([0, $status]);
+      file_put_contents($statusFile, $contents);
+    }
+    else {
+      $rowCount = isset($this->_rowCount) ? $this->_rowCount : $this->_lineCount;
+      $currTimestamp = time();
+      $totalTime = ($currTimestamp - $startTimestamp);
+      $time = ($currTimestamp - $prevTimestamp);
+      $recordsLeft = $totalRowCount - $rowCount;
+      if ($recordsLeft < 0) {
+        $recordsLeft = 0;
+      }
+      $estimatedTime = ($recordsLeft / 50) * $time;
+      $estMinutes = floor($estimatedTime / 60);
+      $timeFormatted = '';
+      if ($estMinutes > 1) {
+        $timeFormatted = $estMinutes . ' ' . ts('minutes') . ' ';
+        $estimatedTime = $estimatedTime - ($estMinutes * 60);
+      }
+      $timeFormatted .= round($estimatedTime) . ' ' . ts('seconds');
+      $processedPercent = (int ) (($rowCount * 100) / $totalRowCount);
+      $statusMsg = ts('%1 of %2 records - %3 remaining',
+        [1 => $rowCount, 2 => $totalRowCount, 3 => $timeFormatted]
+      );
+      $status = "<div class=\"description\">&nbsp; <strong>{$statusMsg}</strong></div>";
+      $contents = json_encode([$processedPercent, $status]);
+
+      file_put_contents($statusFile, $contents);
+      return $currTimestamp;
+    }
+  }
+
+  /**
    * @return array
    */
   public function getSelectValues() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_title;
     }
@@ -307,7 +367,7 @@ abstract class CRM_Import_Parser {
    * @return array
    */
   public function getSelectTypes() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_hasLocationType)) {
         $values[$name] = $field->_hasLocationType;
@@ -320,7 +380,7 @@ abstract class CRM_Import_Parser {
    * @return array
    */
   public function getHeaderPatterns() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       if (isset($field->_headerPattern)) {
         $values[$name] = $field->_headerPattern;
@@ -333,7 +393,7 @@ abstract class CRM_Import_Parser {
    * @return array
    */
   public function getDataPatterns() {
-    $values = array();
+    $values = [];
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_dataPattern;
     }

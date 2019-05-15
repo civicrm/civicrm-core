@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -154,7 +154,7 @@ There's the potential for collisions (two different labels having the same short
 
        if ( button.name == 'case_report' ) {
             var dataUrl = {/literal}"{crmURL p='civicrm/case/report/print' h=0 q='caseID='}"{literal}+id;
-            dataUrl     = dataUrl + '&cid={/literal}{$clientID}{literal}'+'&asn={/literal}{$activitySetName}{literal}';
+            dataUrl     = dataUrl + '&cid={/literal}{$clientID}{literal}&asn=' + {/literal}{$activitySetName|@json_encode}{literal};
             var redact  = '{/literal}{$_isRedact}{literal}'
 
             var isRedact = 1;

@@ -64,7 +64,7 @@
     </html>
     <default>NULL</default>
     <localizable>true</localizable>
-    <comment>>Price field option description.</comment>
+    <comment>Price field option description.</comment>
     <add>3.3</add>
   </field>
   <field>
@@ -95,9 +95,9 @@
   </field>
   <field>
     <name>amount</name>
-    <type>varchar</type>
+    <type>decimal</type>
     <title>Amount</title>
-    <length>512</length>
+    <length>18,9</length>
     <html>
       <type>Text</type>
       <size>8</size>

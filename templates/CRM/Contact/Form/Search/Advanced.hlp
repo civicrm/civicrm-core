@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -110,4 +110,18 @@
 {htxt id="is-test"}
     <p>{ts}In the process of setting up CiviCRM components or configuring pages and profiles, you might have created test contributions, activities, participants, pledges, etc.{/ts}</p>
     <p>{ts}Once you have finished your testing, it is a good idea to clean up by finding your test records and deleting them.{/ts}</p>
+{/htxt}
+
+{htxt id="processor-id-title"}
+{ts}Processor ID{/ts}
+{/htxt}
+{htxt id="processor-id"}
+    <p>{ts}This is the payment processor's own ID for the recurring contribution. Ideally it should be unique, but in practice may not be.{/ts}</p>
+{/htxt}
+
+{htxt id="transaction-id-title"}
+{ts}Transaction ID{/ts}
+{/htxt}
+{htxt id="transaction-id"}
+    <p>{ts}Unique reference for the recurring contribution. May be made up of other fields, e.g. bank ID, account number, etc.{/ts}</p>
 {/htxt}

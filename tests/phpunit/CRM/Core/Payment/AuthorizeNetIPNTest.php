@@ -33,6 +33,7 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
   }
+
   /**
    * Ensure recurring contributions from Contribution Pages
    * with receipt turned off don't send a receipt.
@@ -131,12 +132,32 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction());
     $IPN->main();
     $contribution = $this->callAPISuccess('contribution', 'get', array(
-        'contribution_recur_id' => $this->_contributionRecurID,
-        'sequential' => 1,
-      ));
+      'contribution_recur_id' => $this->_contributionRecurID,
+      'sequential' => 1,
+    ));
     $this->assertEquals(2, $contribution['count']);
     $this->assertEquals('second_one', $contribution['values'][1]['trxn_id']);
     $this->assertEquals(date('Y-m-d'), date('Y-m-d', strtotime($contribution['values'][1]['receive_date'])));
+  }
+
+  /**
+   * Test payment processor is correctly assigned for the IPN payment.
+   */
+  public function testIPNPaymentRecurSuccessMultiAuthNetProcessor() {
+    //Create and set up recur payment using second instance of AuthNet Processor.
+    $this->_paymentProcessorID2 = $this->paymentProcessorAuthorizeNetCreate(array('name' => 'Authorize2', 'is_test' => 0));
+    $this->setupRecurringPaymentProcessorTransaction(array('payment_processor_id' => $this->_paymentProcessorID2));
+
+    //Call IPN with processor id.
+    $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction(array('processor_id' => $this->_paymentProcessorID2)));
+    $IPN->main();
+    $contribution = $this->callAPISuccess('contribution', 'getsingle', array('id' => $this->_contributionID));
+    $this->assertEquals(1, $contribution['contribution_status_id']);
+    $this->assertEquals('6511143069', $contribution['trxn_id']);
+    // source gets set by processor
+    $this->assertTrue(substr($contribution['contribution_source'], 0, 20) == "Online Contribution:");
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'getsingle', array('id' => $this->_contributionRecurID));
+    $this->assertEquals(5, $contributionRecur['contribution_status_id']);
   }
 
   /**
@@ -164,7 +185,6 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $this->assertEquals('2010-07-01', date('Y-m-d', strtotime($contribution['values'][1]['receive_date'])));
   }
 
-
   /**
    * Test IPN response updates contribution_recur & contribution for first & second contribution
    */
@@ -182,16 +202,19 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurSubsequentTransaction());
     $IPN->main();
     $contribution = $this->callAPISuccess('contribution', 'get', array(
-        'contribution_recur_id' => $this->_contributionRecurID,
-        'sequential' => 1,
-      ));
+      'contribution_recur_id' => $this->_contributionRecurID,
+      'sequential' => 1,
+    ));
     $this->assertEquals(2, $contribution['count']);
+    // Ensure both contributions are coded as credit card contributions.
+    $this->assertEquals(1, $contribution['values'][0]['payment_instrument_id']);
+    $this->assertEquals(1, $contribution['values'][1]['payment_instrument_id']);
     $this->assertEquals('second_one', $contribution['values'][1]['trxn_id']);
     $this->callAPISuccessGetSingle('membership_payment', array('contribution_id' => $contribution['values'][1]['id']));
     $this->callAPISuccessGetSingle('line_item', array(
-        'contribution_id' => $contribution['values'][1]['id'],
-        'entity_table' => 'civicrm_membership',
-      ));
+      'contribution_id' => $contribution['values'][1]['id'],
+      'entity_table' => 'civicrm_membership',
+    ));
   }
 
   /**
@@ -201,6 +224,15 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     $mut = new CiviMailUtils($this, TRUE);
     $this->setupMembershipRecurringPaymentProcessorTransaction(array('is_email_receipt' => TRUE));
     $this->addProfile('supporter_profile', $this->_contributionPageID);
+    $this->addProfile('honoree_individual', $this->_contributionPageID, 'soft_credit');
+
+    $this->callAPISuccess('ContributionSoft', 'create', [
+      'contact_id' => $this->individualCreate(),
+      'contribution_id' => $this->_contributionID,
+      'soft_credit_type_id' => 'in_memory_of',
+      'amount' => 200,
+    ]);
+
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction());
     $IPN->main();
     $mut->checkAllMailLog(array(
@@ -212,14 +244,18 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'First Name: Anthony',
       'Last Name: Anderson',
       'Email Address: anthony_anderson@civicrm.org',
+      'Honor',
       'This membership will be automatically renewed every',
       'Dear Mr. Anthony Anderson II',
       'Thanks for your auto renew membership sign-up',
+      'In Memory of',
     ));
     $mut->clearMessages();
     $this->_contactID = $this->individualCreate(array('first_name' => 'Antonia', 'prefix_id' => 'Mrs.', 'email' => 'antonia_anderson@civicrm.org'));
     $this->_invoiceID = uniqid();
 
+    // Note, the second contribution is not in honor of anyone and the
+    // receipt should not mention honor at all.
     $this->setupMembershipRecurringPaymentProcessorTransaction(array('is_email_receipt' => TRUE));
     $IPN = new CRM_Core_Payment_AuthorizeNetIPN($this->getRecurTransaction(array('x_trans_id' => 'hers')));
     $IPN->main();
@@ -240,6 +276,14 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
       'Thanks for your auto renew membership sign-up',
     ));
 
+    $shouldNotBeInMailing = array(
+      'Honor',
+      'In Memory of',
+    );
+    $mails = $mut->getAllMessages('raw');
+    foreach ($mails as $mail) {
+      $mut->checkMailForStrings(array(), $shouldNotBeInMailing, '', $mail);
+    }
     $mut->stop();
     $mut->clearMessages();
   }

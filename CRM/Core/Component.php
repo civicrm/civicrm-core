@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * CiviCRM components
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -42,17 +42,20 @@ class CRM_Core_Component {
    */
   const COMPONENT_INFO_CLASS = 'Info';
 
-  static $_contactSubTypes = NULL;
+  /**
+   * @var array
+   */
+  public static $_contactSubTypes = NULL;
 
   /**
    * @param bool $force
    *
-   * @return array|null
+   * @return CRM_Core_Component_Info[]
    */
   private static function &_info($force = FALSE) {
     if (!isset(Civi::$statics[__CLASS__]['info'])|| $force) {
-      Civi::$statics[__CLASS__]['info'] = array();
-      $c = array();
+      Civi::$statics[__CLASS__]['info'] = [];
+      $c = [];
 
       $config = CRM_Core_Config::singleton();
       $c = self::getComponents();
@@ -84,12 +87,12 @@ class CRM_Core_Component {
   /**
    * @param bool $force
    *
-   * @return array
+   * @return CRM_Core_Component_Info[]
    * @throws Exception
    */
   public static function &getComponents($force = FALSE) {
     if (!isset(Civi::$statics[__CLASS__]['all']) || $force) {
-      Civi::$statics[__CLASS__]['all'] = array();
+      Civi::$statics[__CLASS__]['all'] = [];
 
       $cr = new CRM_Core_DAO_Component();
       $cr->find(FALSE);
@@ -117,7 +120,7 @@ class CRM_Core_Component {
    *   Array(string $name => int $id).
    */
   public static function &getComponentIDs() {
-    $componentIDs = array();
+    $componentIDs = [];
 
     $cr = new CRM_Core_DAO_Component();
     $cr->find(FALSE);
@@ -128,18 +131,17 @@ class CRM_Core_Component {
     return $componentIDs;
   }
 
-
   /**
    * @param bool $force
    *
-   * @return array|null
+   * @return CRM_Core_Component_Info[]
    */
-  static public function &getEnabledComponents($force = FALSE) {
+  public static function &getEnabledComponents($force = FALSE) {
     return self::_info($force);
   }
 
-  static public function flushEnabledComponents() {
-    self::getEnabledComponents(TRUE);
+  public static function flushEnabledComponents() {
+    unset(Civi::$statics[__CLASS__]);
   }
 
   /**
@@ -150,7 +152,7 @@ class CRM_Core_Component {
   public static function &getNames($translated = FALSE) {
     $allComponents = self::getComponents();
 
-    $names = array();
+    $names = [];
     foreach ($allComponents as $name => $comp) {
       if ($translated) {
         $names[$comp->componentID] = $comp->info['translatedName'];
@@ -208,7 +210,7 @@ class CRM_Core_Component {
     // lets build the menu for all components
     $info = self::getComponents(TRUE);
 
-    $files = array();
+    $files = [];
     foreach ($info as $name => $comp) {
       $files = array_merge($files,
         $comp->menuFiles()
@@ -223,7 +225,7 @@ class CRM_Core_Component {
    */
   public static function &menu() {
     $info = self::_info();
-    $items = array();
+    $items = [];
     foreach ($info as $name => $comp) {
       $mnu = $comp->getMenuObject();
 
@@ -275,7 +277,7 @@ class CRM_Core_Component {
    */
   public static function &getQueryFields($checkPermission = TRUE) {
     $info = self::_info();
-    $fields = array();
+    $fields = [];
     foreach ($info as $name => $comp) {
       if ($comp->usesSearch()) {
         $bqr = $comp->getBAOQueryObject();
@@ -383,11 +385,10 @@ class CRM_Core_Component {
    */
   public static function &contactSubTypes() {
     if (self::$_contactSubTypes == NULL) {
-      self::$_contactSubTypes = array();
+      self::$_contactSubTypes = [];
     }
     return self::$_contactSubTypes;
   }
-
 
   /**
    * @param $subType
@@ -403,21 +404,6 @@ class CRM_Core_Component {
       return $properties[$subType][$op];
     }
     return CRM_Core_DAO::$_nullObject;
-  }
-
-  /**
-   * FIXME: This function does not appear to do anything. The is_array() check runs on a bunch of objects and (always?) returns false
-   */
-  public static function &taskList() {
-    $info = self::_info();
-
-    $tasks = array();
-    foreach ($info as $name => $value) {
-      if (is_array($info[$name]) && isset($info[$name]['task'])) {
-        $tasks += $info[$name]['task'];
-      }
-    }
-    return $tasks;
   }
 
   /**
@@ -446,7 +432,7 @@ class CRM_Core_Component {
    * @return array
    */
   public static function getComponentsFromFile($crmFolderDir) {
-    $components = array();
+    $components = [];
     //traverse CRM folder and check for Info file
     if (is_dir($crmFolderDir) && $dir = opendir($crmFolderDir)) {
       while ($subDir = readdir($dir)) {

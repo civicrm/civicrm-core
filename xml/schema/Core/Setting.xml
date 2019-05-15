@@ -46,6 +46,7 @@
     <name>value</name>
     <type>text</type>
     <comment>data associated with this group / name combo</comment>
+    <serialize>PHP</serialize>
     <add>4.1</add>
   </field>
   <field>

@@ -1,44 +1,15 @@
 <?php
-/*
- +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
-*/
-
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  *
  * Generated from {$table.sourceFile}
  * {$generated}
  * (GenCodeChecksum:{$genCodeChecksum})
  */
 
-require_once 'CRM/Core/DAO.php';
-require_once 'CRM/Utils/Type.php';
-
 /**
- * {$table.className} constructor.
+ * Database access object for the {$table.entity} entity.
  */
 class {$table.className} extends CRM_Core_DAO {ldelim}
 
@@ -47,21 +18,21 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       *
       * @var string
       */
-      static $_tableName = '{$table.name}';
+      public static $_tableName = '{$table.name}';
 
       /**
        * Should CiviCRM log any modifications to this table in the civicrm_log table.
        *
-       * @var boolean
+       * @var bool
        */
-      static $_log = {$table.log};
+      public static $_log = {$table.log|strtoupper};
 
 {foreach from=$table.fields item=field}
     /**
 {if $field.comment}
      * {$field.comment}
-{/if}
      *
+{/if}
      * @var {$field.phpType}
      */
     public ${$field.name};
@@ -71,7 +42,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
     /**
      * Class constructor.
      */
-    function __construct( ) {ldelim}
+    public function __construct( ) {ldelim}
         $this->__table = '{$table.name}';
 
         parent::__construct( );
@@ -84,7 +55,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
      * @return array
      *   [CRM_Core_Reference_Interface]
      */
-    static function getReferenceColumns() {ldelim}
+    public static function getReferenceColumns() {ldelim}
       if (!isset(Civi::$statics[__CLASS__]['links'])) {ldelim}
         Civi::$statics[__CLASS__]['links'] = static::createReferenceColumns(__CLASS__);
 {foreach from=$table.foreignKey item=foreign}
@@ -105,9 +76,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        *
        * @return array
        */
-      static function &fields( ) {ldelim}
+      public static function &fields( ) {ldelim}
         if ( ! isset(Civi::$statics[__CLASS__]['fields']) ) {ldelim}
-          Civi::$statics[__CLASS__]['fields'] = array (
+          Civi::$statics[__CLASS__]['fields'] = array(
 {foreach from=$table.fields item=field}
 
 {if $field.uniqueName}
@@ -119,13 +90,13 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
                  'name'      => '{$field.name}',
                                                                       'type'      => {$field.crmType},
 {if $field.title}
-                                                                      'title'     => ts('{$field.title}'),
+                                                                      'title'     => {$tsFunctionName}('{$field.title}'),
 {/if}
 {if $field.comment}
-                                                                      'description'     => '{$field.comment|replace:"'":"\'"}',
+                                                                      'description'     => {$tsFunctionName}('{$field.comment|replace:"'":"\'"}'),
 {/if}
 {if $field.required}
-                                        'required'  => {$field.required},
+                                        'required'  => {$field.required|strtoupper},
 {/if} {* field.required *}
 {if $field.length}
                       'maxlength' => {$field.length},
@@ -144,50 +115,43 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {/if} {* field.cols *}
 
 {if $field.import}
-                      'import'    => {$field.import},
-                                                                      'where'     => '{$table.name}.{$field.name}',
-                                      'headerPattern' => '{$field.headerPattern}',
-                                      'dataPattern' => '{$field.dataPattern}',
+                      'import'    => {$field.import|strtoupper},
+
 {/if} {* field.import *}
+  'where'     => '{$table.name}.{$field.name}',
+  {if $field.headerPattern}'headerPattern' => '{$field.headerPattern}',{/if}
+  {if $field.dataPattern}'dataPattern' => '{$field.dataPattern}',{/if}
 {if $field.export}
-                      'export'    => {$field.export},
-                                      {if ! $field.import}
-                      'where'     => '{$table.name}.{$field.name}',
-                                      'headerPattern' => '{$field.headerPattern}',
-                                      'dataPattern' => '{$field.dataPattern}',
-              {/if}
+                      'export'    => {$field.export|strtoupper},
 {/if} {* field.export *}
+
 {if $field.rule}
                       'rule'      => '{$field.rule}',
 {/if} {* field.rule *}
-{if $field.default}
+{if $field.default || $field.default === '0'}
                          'default'   => '{if ($field.default[0]=="'" or $field.default[0]=='"')}{$field.default|substring:1:-1}{else}{$field.default}{/if}',
 {/if} {* field.default *}
   'table_name' => '{$table.name}',
   'entity' => '{$table.entity}',
   'bao' => '{$table.bao}',
-  'localizable' => {if ($field.localizable)}{1}{else}{0}{/if},
+  'localizable' => {if $field.localizable}1{else}0{/if},
+  {if $field.localize_context}'localize_context' => '{$field.localize_context}',{/if}
 
 {if $field.FKClassName}
                       'FKClassName' => '{$field.FKClassName}',
-{/if} {* field.FKClassName *}
+{/if}
+{if $field.serialize}
+  'serialize' => self::SERIALIZE_{$field.serialize|strtoupper},
+{/if}
 {if $field.html}
-  {assign var=htmlOptions value=$field.html}
   'html' => array(
-{*{$htmlOptions|@print_array}*}
-  {foreach from=$htmlOptions key=optionKey item=optionValue}
-    '{$optionKey}' => '{$optionValue}',
+  {foreach from=$field.html item=val key=key}
+    '{$key}' => {if $key eq 'label'}{$tsFunctionName}("{$val}"){else}'{$val}'{/if},
   {/foreach}
   ),
-{/if} {* field.html *}
+{/if}
 {if $field.pseudoconstant}
-{assign var=pseudoOptions value=$field.pseudoconstant}
-'pseudoconstant' => array(
-{*{$pseudoOptions|@print_array}*}
-{foreach from=$pseudoOptions key=optionKey item=optionValue}
-  '{$optionKey}' => '{$optionValue}',
-{/foreach}
-                )
+  'pseudoconstant' => {$field.pseudoconstant|@print_array}
 {/if} {* field.pseudoconstant *}                                                                    ),
 {/foreach} {* table.fields *}
                                       );
@@ -202,7 +166,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        * @return array
        *   Array(string $name => string $uniqueName).
        */
-      static function &fieldKeys( ) {ldelim}
+      public static function &fieldKeys( ) {ldelim}
         if (!isset(Civi::$statics[__CLASS__]['fieldKeys'])) {ldelim}
           Civi::$statics[__CLASS__]['fieldKeys'] = array_flip(CRM_Utils_Array::collect('name', self::fields()));
         {rdelim}
@@ -214,7 +178,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        *
        * @return string
        */
-      static function getTableName( ) {ldelim}
+      public static function getTableName( ) {ldelim}
         {if $table.localizable}
           return CRM_Core_DAO::getLocaleTableName( self::$_tableName );
         {else}
@@ -225,9 +189,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
       /**
        * Returns if this table needs to be logged
        *
-       * @return boolean
+       * @return bool
        */
-      function getLog( ) {ldelim}
+      public function getLog( ) {ldelim}
           return self::$_log;
       {rdelim}
 
@@ -238,7 +202,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
        *
        * @return array
        */
-       static function &import( $prefix = false ) {ldelim}
+       public static function &import( $prefix = FALSE ) {ldelim}
             $r = CRM_Core_DAO_AllCoreTables::getImports(__CLASS__, '{$table.labelName}', $prefix, array(
             {if $table.foreignKey}{foreach from=$table.foreignKey item=foreign}
               {if $foreign.import}'{$foreign.className}',{/if}
@@ -254,7 +218,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
         *
         * @return array
         */
-       static function &export( $prefix = false ) {ldelim}
+       public static function &export( $prefix = FALSE ) {ldelim}
             $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, '{$table.labelName}', $prefix, array(
             {if $table.foreignKey}{foreach from=$table.foreignKey item=foreign}
               {if $foreign.export}'{$foreign.className}',{/if}
@@ -265,9 +229,14 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 
       /**
        * Returns the list of indices
+       *
+       * @param bool $localize
+       *
+       * @return array
        */
       public static function indices($localize = TRUE) {ldelim}
         $indices = {$indicesPhp};
         return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
       {rdelim}
+
 {rdelim}

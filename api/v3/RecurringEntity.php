@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -52,10 +52,10 @@ function civicrm_api3_recurring_entity_get($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_recurring_entity_get_spec(&$params) {
-  $params['entity_table']['options'] = array(
+  $params['entity_table']['options'] = [
     'civicrm_event' => 'civicrm_event',
     'civicrm_activity' => 'civicrm_activity',
-  );
+  ];
 }
 
 /**
@@ -66,7 +66,7 @@ function _civicrm_api3_recurring_entity_get_spec(&$params) {
  * @return array
  */
 function civicrm_api3_recurring_entity_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'RecurringEntity');
 }
 
 /**
@@ -78,10 +78,10 @@ function civicrm_api3_recurring_entity_create($params) {
  *   Array of parameters determined by getfields.
  */
 function _civicrm_api3_recurring_entity_create_spec(&$params) {
-  $params['entity_table']['options'] = array(
+  $params['entity_table']['options'] = [
     'civicrm_event' => 'civicrm_event',
     'civicrm_activity' => 'civicrm_activity',
-  );
+  ];
   $params['entity_table']['api.required'] = 1;
 }
 

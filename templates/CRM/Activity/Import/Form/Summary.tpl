@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -74,13 +74,13 @@
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
  {* Summary of Import Results (record counts) *}
  <table id="summary-counts" class="report">
-    <tr><td class="label">{ts}Total Rows{/ts}</td>
+    <tr><td class="label crm-grid-cell">{ts}Total Rows{/ts}</td>
         <td class="data">{$totalRowCount}</td>
         <td class="explanation">{ts}Total rows (activity records) in uploaded file.{/ts}</td>
     </tr>
 
     {if $invalidRowCount }
-    <tr class="error"><td class="label">{ts}Invalid Rows (skipped){/ts}</td>
+    <tr class="error"><td class="label crm-grid-cell">{ts}Invalid Rows (skipped){/ts}</td>
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields. These rows will be skipped (not imported).{/ts}
             {if $invalidRowCount}
@@ -91,7 +91,7 @@
     {/if}
 
     {if $unMatchCount }
-    <tr class="error"><td class="label">{ts}Mismatched Rows (skipped){/ts}</td>
+    <tr class="error"><td class="label crm-grid-cell">{ts}Mismatched Rows (skipped){/ts}</td>
         <td class="data">{$unMatchCount}</td>
         <td class="explanation">{ts}Rows with mismatched activity IDs (NOT updated).{/ts}
             {if $unMatchCount}
@@ -102,7 +102,7 @@
     {/if}
 
     {if $conflictRowCount}
-    <tr class="error"><td class="label">{ts}Conflicting Rows (skipped){/ts}</td>
+    <tr class="error"><td class="label crm-grid-cell">{ts}Conflicting Rows (skipped){/ts}</td>
         <td class="data">{$conflictRowCount}</td>
         <td class="explanation">{ts}Rows with conflicting transaction IDs (NOT imported).{/ts}
             {if $conflictRowCount}
@@ -113,7 +113,7 @@
     {/if}
 
     {if $duplicateRowCount}
-    <tr class="error"><td class="label">{ts}Duplicate Rows{/ts}</td>
+    <tr class="error"><td class="label crm-grid-cell">{ts}Duplicate Rows{/ts}</td>
         <td class="data">{$duplicateRowCount}</td>
         <td class="explanation">{ts}Rows which are duplicates of existing CiviCRM activity records.{/ts} {$dupeActionString}
             {if $duplicateRowCount}
@@ -123,7 +123,7 @@
     </tr>
     {/if}
 
-    <tr><td class="label">{ts}Records Imported{/ts}</td>
+    <tr><td class="label crm-grid-cell">{ts}Records Imported{/ts}</td>
         <td class="data">{$validRowCount}</td>
         <td class="explanation">{ts}Rows imported successfully.{/ts}</td>
     </tr>

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -45,7 +45,9 @@
              image: function(src) { return "<img src='data:image/png;base64," + $('#'+src)[0].get_img_binary() + "' />"},
              popup: function(src) {
              var img_win = window.open('', 'Save Chart as Image');
-           img_win.document.write('<html><head><title>Save Chart as Image<\/title><\/head><body>' + OFC.jquery.image(src) + ' <\/body><\/html>');
+             // HTML, HEAD, and BODY tags in JS literals obfuscated to avoid being parsed as DOM elements.
+             var html = 'html', head = 'head', body = 'body';
+           img_win.document.write('<' + html + '><' + head + '><title>Save Chart as Image<\/title><\/' + head + '><' + body + '>' + OFC.jquery.image(src) + ' <\/' + body + '><\/' + html + '>');
            img_win.document.close();
                        }
                  }

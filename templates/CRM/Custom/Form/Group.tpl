@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,8 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 {* add/update/view custom data group *}
+<div class="help">{ts}Use Custom Field Sets to add logically related fields for a specific type of CiviCRM record (e.g. contact records, contribution records, etc.).{/ts} {help id="id-group_intro"}</div>
 <div class="crm-block crm-form-block">
-    <div class="help">{ts}Use Custom Field Sets to add logically related fields for a specific type of CiviCRM record (e.g. contact records, contribution records, etc.).{/ts} {help id="id-group_intro"}</div>
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
     <table class="form-layout">
     <tr>
@@ -66,7 +66,7 @@
     </tr>
     <tr>
         <td>&nbsp;</td>
-        <td>{$form.is_public.html} {$form.is_public.label}</td>
+        <td>{$form.is_public.html} {$form.is_public.label} {help id="id-is-public"}</td>
     </tr>
     <tr class="html-adjust">
         <td class="label">{$form.help_pre.label} <!--{if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_custom_group' field='help_pre' id=$gid}{/if}-->{help id="id-help_pre"}</td>
@@ -93,7 +93,7 @@ CRM.$(function($) {
 
   $('#extends_0').each(showHideStyle).change(showHideStyle);
 
-  var isGroupEmpty = "{/literal}{$isGroupEmpty}{literal}";
+  var isGroupEmpty = {/literal}{$isGroupEmpty|@json_encode}{literal};
   if (isGroupEmpty) {
     showRange(true);
   }

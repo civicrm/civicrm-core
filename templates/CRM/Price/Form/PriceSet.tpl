@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -82,7 +82,7 @@
                           {$amount|crmMoney}
                         {elseif $displayOpt == 'Inclusive'}
                           {$amount|crmMoney}
-                          <span class='crm-price-amount-label'> (includes {$taxTerm} of {$option.tax_amount|crmMoney})</span>
+                          <span class='crm-price-amount-label'> {ts 1=$taxTerm 2=$option.tax_amount|crmMoney}(includes %1 of %2){/ts}</span>
                         {else}
                           {$option.amount|crmMoney}
                           <span class='crm-price-amount-label'> + {$option.tax_amount|crmMoney} {$taxTerm}</span>

@@ -67,8 +67,16 @@
                 limit: 0
               }
             }];
+            reqs.defaultAssigneeTypes = ['OptionValue', 'get', {
+              option_group_id: 'activity_default_assignee',
+              sequential: 1,
+              options: {
+                limit: 0
+              }
+            }];
             reqs.relTypes = ['RelationshipType', 'get', {
               sequential: 1,
+              is_active: 1,
               options: {
                 sort: CRM.crmCaseType.REL_TYPE_CNAME,
                 limit: 0
@@ -103,7 +111,9 @@
         };
 
         $(input).crmSelect2({
-          data: scope[attrs.crmOptions],
+          data: function () {
+            return { results: scope[attrs.crmOptions] };
+          },
           createSearchChoice: function(term) {
             return {id: term, text: term + ' (' + ts('new') + ')'};
           },
@@ -116,51 +126,217 @@
           scope.$evalAsync('_resetSelection()');
           e.preventDefault();
         });
-
-        scope.$watch(attrs.crmOptions, function(value) {
-          $(input).select2('data', scope[attrs.crmOptions]);
-          $(input).select2('val', '');
-        });
       }
     };
   });
 
-  crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls) {
-    // CRM_Case_XMLProcessor::REL_TYPE_CNAME
-    var REL_TYPE_CNAME = CRM.crmCaseType.REL_TYPE_CNAME,
+  crmCaseType.directive('crmEditableTabTitle', function($timeout) {
+    return {
+      restrict: 'AE',
+      link: function(scope, element, attrs) {
+        element.addClass('crm-editable crm-editable-enabled');
+        var titleLabel = $(element).find('span');
+        var penIcon = $('<i class="crm-i fa-pencil crm-editable-placeholder"></i>').prependTo(element);
+        var saveButton = $('<button type="button"><i class="crm-i fa-check"></i></button>').appendTo(element);
+        var cancelButton = $('<button type="cancel"><i class="crm-i fa-times"></i></button>').appendTo(element);
+        $('button', element).wrapAll('<div class="crm-editable-form" style="display:none" />');
+        var buttons = $('.crm-editable-form', element);
+        titleLabel.on('click', startEditMode);
+        penIcon.on('click', startEditMode);
 
-    ts = $scope.ts = CRM.ts(null);
+        function detectEscapeKeyPress (event) {
+          var isEscape = false;
 
-    $scope.activityStatuses = apiCalls.actStatuses.values;
-    $scope.caseStatuses = _.indexBy(apiCalls.caseStatuses.values, 'name');
-    $scope.activityTypes = _.indexBy(apiCalls.actTypes.values, 'name');
-    $scope.activityTypeOptions = _.map(apiCalls.actTypes.values, formatActivityTypeOption);
-    $scope.relationshipTypeOptions = _.map(apiCalls.relTypes.values, function(type) {
-      return {id: type[REL_TYPE_CNAME], text: type.label_b_a};
-    });
-    $scope.locks = {caseTypeName: true, activitySetName: true};
+          if ("key" in event) {
+              isEscape = (event.key == "Escape" || event.key == "Esc");
+          } else {
+              isEscape = (event.keyCode == 27);
+          }
 
-    $scope.workflows = {
-      'timeline': 'Timeline',
-      'sequence': 'Sequence'
+          return isEscape;
+        }
+
+        function detectEnterKeyPress (event) {
+          var isEnter = false;
+
+          if ("key" in event) {
+            isEnter = (event.key == "Enter");
+          } else {
+            isEnter = (event.keyCode == 13);
+          }
+
+          return isEnter;
+        }
+
+        function startEditMode () {
+          if (titleLabel.is(":focus")) {
+            return;
+          }
+
+          penIcon.hide();
+          buttons.show();
+
+          saveButton.click(function () {
+            updateTextValue();
+            stopEditMode();
+          });
+
+          cancelButton.click(function () {
+            revertTextValue();
+            stopEditMode();
+          });
+
+          $(element).addClass('crm-editable-editing');
+
+          titleLabel
+            .attr("contenteditable", "true")
+            .focus()
+            .focusout(function (event) {
+              $timeout(function () {
+                revertTextValue();
+                stopEditMode();
+              }, 500);
+            })
+            .keydown(function(event) {
+              event.stopImmediatePropagation();
+
+              if(detectEscapeKeyPress(event)) {
+                revertTextValue();
+                stopEditMode();
+              } else if(detectEnterKeyPress(event)) {
+                event.preventDefault();
+                updateTextValue();
+                stopEditMode();
+              }
+            });
+        }
+
+        function stopEditMode () {
+          titleLabel.removeAttr("contenteditable").off("focusout");
+          titleLabel.off("keydown");
+          saveButton.off("click");
+          cancelButton.off("click");
+          $(element).removeClass('crm-editable-editing');
+
+          penIcon.show();
+          buttons.hide();
+        }
+
+        function revertTextValue () {
+          titleLabel.text(scope.activitySet.label);
+        }
+
+        function updateTextValue () {
+          var updatedTitle = titleLabel.text();
+
+          scope.$evalAsync(function () {
+            scope.activitySet.label = updatedTitle;
+          });
+        }
+      }
     };
+  });
 
-    $scope.caseType = apiCalls.caseType ? apiCalls.caseType : _.cloneDeep(newCaseTypeTemplate);
-    $scope.caseType.definition = $scope.caseType.definition || [];
-    $scope.caseType.definition.activityTypes = $scope.caseType.definition.activityTypes || [];
-    $scope.caseType.definition.activitySets = $scope.caseType.definition.activitySets || [];
-    _.each($scope.caseType.definition.activitySets, function (set) {
-      _.each(set.activityTypes, function (type, name) {
-        type.label = $scope.activityTypes[type.name].label;
+  crmCaseType.controller('CaseTypeCtrl', function($scope, crmApi, apiCalls, crmUiHelp) {
+    var REL_TYPE_CNAME, defaultAssigneeDefaultValue, ts;
+
+    (function init () {
+      // CRM_Case_XMLProcessor::REL_TYPE_CNAME
+      REL_TYPE_CNAME = CRM.crmCaseType.REL_TYPE_CNAME;
+
+      ts = $scope.ts = CRM.ts(null);
+      $scope.hs = crmUiHelp({file: 'CRM/Case/CaseType'});
+      $scope.locks = { caseTypeName: true, activitySetName: true };
+      $scope.workflows = { timeline: 'Timeline', sequence: 'Sequence' };
+      defaultAssigneeDefaultValue = _.find(apiCalls.defaultAssigneeTypes.values, { is_default: '1' }) || {};
+
+      storeApiCallsResults();
+      initCaseType();
+      initCaseTypeDefinition();
+      initSelectedStatuses();
+    })();
+
+    /// Stores the api calls results in the $scope object
+    function storeApiCallsResults() {
+      $scope.activityStatuses = apiCalls.actStatuses.values;
+      $scope.caseStatuses = _.indexBy(apiCalls.caseStatuses.values, 'name');
+      $scope.activityTypes = _.indexBy(apiCalls.actTypes.values, 'name');
+      $scope.activityTypeOptions = _.map(apiCalls.actTypes.values, formatActivityTypeOption);
+      $scope.defaultAssigneeTypes = apiCalls.defaultAssigneeTypes.values;
+      $scope.relationshipTypeOptions = _.map(apiCalls.relTypes.values, function(type) {
+        return {id: type[REL_TYPE_CNAME], text: type.label_b_a};
       });
-    });
-    $scope.caseType.definition.caseRoles = $scope.caseType.definition.caseRoles || [];
-    $scope.caseType.definition.statuses = $scope.caseType.definition.statuses || [];
+      $scope.defaultRelationshipTypeOptions = getDefaultRelationshipTypeOptions();
+      // stores the default assignee values indexed by their option name:
+      $scope.defaultAssigneeTypeValues = _.chain($scope.defaultAssigneeTypes)
+        .indexBy('name').mapValues('value').value();
+    }
 
-    $scope.selectedStatuses = {};
-    _.each(apiCalls.caseStatuses.values, function (status) {
-      $scope.selectedStatuses[status.name] = !$scope.caseType.definition.statuses.length || $scope.caseType.definition.statuses.indexOf(status.name) > -1;
-    });
+    /// Returns the default relationship type options. If the relationship is
+    /// bidirectional (Ex: Spouse of) it adds a single option otherwise it adds
+    /// two options representing the relationship type directions
+    /// (Ex: Employee of, Employer is)
+    function getDefaultRelationshipTypeOptions() {
+      return _.transform(apiCalls.relTypes.values, function(result, relType) {
+        var isBidirectionalRelationship = relType.label_a_b === relType.label_b_a;
+
+        result.push({
+          label: relType.label_b_a,
+          value: relType.id + '_b_a'
+        });
+
+        if (!isBidirectionalRelationship) {
+          result.push({
+            label: relType.label_a_b,
+            value: relType.id + '_a_b'
+          });
+        }
+      }, []);
+    }
+
+    /// initializes the case type object
+    function initCaseType() {
+      var isNewCaseType = !apiCalls.caseType;
+
+      if (isNewCaseType) {
+        $scope.caseType = _.cloneDeep(newCaseTypeTemplate);
+      } else {
+        $scope.caseType = apiCalls.caseType;
+      }
+    }
+
+    /// initializes the case type definition object
+    function initCaseTypeDefinition() {
+      $scope.caseType.definition = $scope.caseType.definition || [];
+      $scope.caseType.definition.activityTypes = $scope.caseType.definition.activityTypes || [];
+      $scope.caseType.definition.activitySets = $scope.caseType.definition.activitySets || [];
+      $scope.caseType.definition.caseRoles = $scope.caseType.definition.caseRoles || [];
+      $scope.caseType.definition.statuses = $scope.caseType.definition.statuses || [];
+      $scope.caseType.definition.timelineActivityTypes = $scope.caseType.definition.timelineActivityTypes || [];
+      $scope.caseType.definition.restrictActivityAsgmtToCmsUser = $scope.caseType.definition.restrictActivityAsgmtToCmsUser || 0;
+      $scope.caseType.definition.activityAsgmtGrps = $scope.caseType.definition.activityAsgmtGrps || [];
+
+      _.each($scope.caseType.definition.activitySets, function (set) {
+        _.each(set.activityTypes, function (type, name) {
+          var isDefaultAssigneeTypeUndefined = _.isUndefined(type.default_assignee_type);
+          var typeDefinition = $scope.activityTypes[type.name];
+          type.label = (typeDefinition && typeDefinition.label) || type.name;
+
+          if (isDefaultAssigneeTypeUndefined) {
+            type.default_assignee_type = defaultAssigneeDefaultValue.value;
+          }
+        });
+      });
+    }
+
+    /// initializes the selected statuses
+    function initSelectedStatuses() {
+      $scope.selectedStatuses = {};
+
+      _.each(apiCalls.caseStatuses.values, function (status) {
+        $scope.selectedStatuses[status.name] = !$scope.caseType.definition.statuses.length || $scope.caseType.definition.statuses.indexOf(status.name) > -1;
+      });
+    }
 
     $scope.addActivitySet = function(workflow) {
       var activitySet = {};
@@ -184,14 +360,29 @@
     }
 
     function addActivityToSet(activitySet, activityTypeName) {
-      activitySet.activityTypes.push({
-        name: activityTypeName,
-        label: $scope.activityTypes[activityTypeName].label,
-        status: 'Scheduled',
-        reference_activity: 'Open Case',
-        reference_offset: '1',
-        reference_select: 'newest'
-      });
+      activitySet.activityTypes = activitySet.activityTypes || [];
+	    var activity = {
+          name: activityTypeName,
+          label: $scope.activityTypes[activityTypeName].label,
+          status: 'Scheduled',
+          reference_activity: 'Open Case',
+          reference_offset: '1',
+          reference_select: 'newest',
+          default_assignee_type: $scope.defaultAssigneeTypeValues.NONE
+      };
+      activitySet.activityTypes.push(activity);
+      if(typeof activitySet.timeline !== "undefined" && activitySet.timeline == "1") {
+        $scope.caseType.definition.timelineActivityTypes.push(activity);
+      }
+    }
+
+    function resetTimelineActivityTypes() {
+        $scope.caseType.definition.timelineActivityTypes = [];
+        angular.forEach($scope.caseType.definition.activitySets, function(activitySet) {
+            angular.forEach(activitySet.activityTypes, function(activityType) {
+                $scope.caseType.definition.timelineActivityTypes.push(activityType);
+            });
+        });
     }
 
     function createActivity(name, callback) {
@@ -230,6 +421,12 @@
       }
     };
 
+    /// Clears the activity's default assignee values for relationship and contact
+    $scope.clearActivityDefaultAssigneeValues = function(activity) {
+      activity.default_assignee_relationship = null;
+      activity.default_assignee_contact = null;
+    };
+
     /// Add a new role
     $scope.addRole = function(roles, roleName) {
       var names = _.pluck($scope.caseType.definition.caseRoles, 'name');
@@ -239,8 +436,9 @@
         } else {
           CRM.loadForm(CRM.url('civicrm/admin/reltype', {action: 'add', reset: 1, label_a_b: roleName, label_b_a: roleName}))
             .on('crmFormSuccess', function(e, data) {
-              roles.push({name: data.relationshipType[REL_TYPE_CNAME]});
-              $scope.relationshipTypeOptions.push({id: data.relationshipType[REL_TYPE_CNAME], text: data.relationshipType.label_b_a});
+              var newType = _.values(data.relationshipType)[0];
+              roles.push({name: newType[REL_TYPE_CNAME]});
+              $scope.relationshipTypeOptions.push({id: newType[REL_TYPE_CNAME], text: newType.label_b_a});
               $scope.$digest();
             });
         }
@@ -259,6 +457,7 @@
       var idx = _.indexOf(array, item);
       if (idx != -1) {
         array.splice(idx, 1);
+        resetTimelineActivityTypes();
       }
     };
 
@@ -288,11 +487,7 @@
     };
 
     $scope.isActivityRemovable = function(activitySet, activity) {
-      if (activitySet.name == 'standard_timeline' && activity.name == 'Open Case') {
-        return false;
-      } else {
-        return true;
-      }
+      return true;
     };
 
     $scope.isValidName = function(name) {
@@ -334,6 +529,11 @@
       });
       // Ignore if ALL or NONE selected
       $scope.caseType.definition.statuses = selectedStatuses.length == _.size($scope.selectedStatuses) ? [] : selectedStatuses;
+
+      if ($scope.caseType.definition.activityAsgmtGrps) {
+        $scope.caseType.definition.activityAsgmtGrps = $scope.caseType.definition.activityAsgmtGrps.toString().split(",");
+      }
+
       var result = crmApi('CaseType', 'create', $scope.caseType, true);
       result.then(function(data) {
         if (data.is_error === 0 || data.is_error == '0') {
@@ -362,6 +562,7 @@
     if (!$scope.isForkable()) {
       CRM.alert(ts('The CiviCase XML file for this case-type prohibits editing the definition.'));
     }
+
   });
 
   crmCaseType.controller('CaseTypeListCtrl', function($scope, crmApi, caseTypes) {
@@ -384,7 +585,6 @@
       })
         .then(function (data) {
           delete caseTypes.values[caseType.id];
-          $scope.$digest();
         });
     };
     $scope.revertCaseType = function (caseType) {

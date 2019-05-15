@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -68,6 +68,34 @@
         <td>{ts}Cancel Date{/ts}</td>
         <td>
           {include file="CRM/Core/DateRange.tpl" fieldName="contribution_recur_cancel_date" from='_low' to='_high'}
+        </td>
+      </tr>
+      <tr>
+        <td>{ts}Status{/ts}</td>
+        <td></td>
+        <td col='span2'>
+          {$form.contribution_recur_contribution_status_id.html|crmAddClass:twenty}
+        </td>
+      </tr>
+      <tr>
+        <td>{ts}Payment Processor{/ts}</td>
+        <td></td>
+        <td col='span2'>
+          {$form.contribution_recur_payment_processor_id.html}
+        </td>
+      </tr>
+      <tr>
+        <td>{ts}Processor ID{/ts} {help id="processor-id" file="CRM/Contact/Form/Search/Advanced"}</td>
+        <td></td>
+        <td col='span2'>
+          {$form.contribution_recur_processor_id.html}
+        </td>
+      </tr>
+      <tr>
+        <td>{ts}Transaction ID{/ts} {help id="transaction-id" file="CRM/Contact/Form/Search/Advanced"}</td>
+        <td></td>
+        <td col='span2'>
+          {$form.contribution_recur_trxn_id.html}
         </td>
       </tr>
       {if $contributionRecurGroupTree}

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,18 +38,22 @@
     <div class="status message status-warning">
       <i class="crm-i fa-exclamation-triangle"></i> {ts}Total for amounts entered below does not match the expected batch total.{/ts}
     </div>
-    <div class="crm-button crm-button_qf_Entry_upload_force-save">
+    <span class="crm-button crm-button_qf_Entry_upload_force-save">
       {$form._qf_Entry_upload_force.html}
-    </div>
+    </span>
     <div class="clear"></div>
   {/if}
   <table class="form-layout-compressed batch-totals">
     <tr>
-      <td class="label">{ts}Total amount expected{/ts}</td>
+      <td class="label">
+        <label>{ts}Total amount expected{/ts}</label>
+      </td>
       <td class="right"><span class="batch-expected-total">{$batchTotal|crmMoney}</span></td>
     </tr>
     <tr>
-      <td class="label">{ts}Total amount entered{/ts}</td>
+      <td class="label">
+        <label>{ts}Total amount entered{/ts}</label>
+      </td>
       <td class="right">{$config->defaultCurrencySymbol} <span class="batch-actual-total"></span></td>
     </tr>
   </table>
@@ -118,7 +122,12 @@
                {/if}
              </div>
           {else}
-            <div class="compressed crm-grid-cell">{$form.field.$rowNumber.$n.html}</div>
+            <div class="compressed crm-grid-cell">
+              {$form.field.$rowNumber.$n.html}
+              {if $fields.$n.html_type eq 'File' && !empty($form.field.$rowNumber.$fieldName.value.size)}
+                {ts}Attached{/ts}: {$form.field.$rowNumber.$fieldName.value.name}
+              {/if}
+            </div>
           {/if}
         {/foreach}
       </div>
@@ -332,7 +341,7 @@ function updateContactInfo(blockNo, prefix) {
   {/literal}
   {if $contactFields}
   {foreach from=$contactFields item=val key=fldName}
-  var fldName = "{$fldName}";
+  var fldName = {$fldName|@json_encode};
   {literal}
   if (returnProperties) {
     returnProperties = returnProperties + ',';
@@ -372,6 +381,7 @@ function updateContactInfo(blockNo, prefix) {
             //get the information on membership type
             var membershipTypeId = data.values[0].membership_type_id;
             var membershipJoinDate = data.values[0].join_date;
+            var membershipStartDate = data.values[0].start_date;
             CRM.api('MembershipType', 'get', {
                 'sequential': '1',
                 'id': membershipTypeId
@@ -382,6 +392,7 @@ function updateContactInfo(blockNo, prefix) {
                 cj('select[id="field_' + blockNo + '_membership_type_0"]').val(memTypeContactId).change();
                 cj('select[id="field_' + blockNo + '_membership_type_1"]').val(membershipTypeId).change();
                 cj('#field_' + blockNo + '_' + 'join_date').val(membershipJoinDate).trigger('change');
+                cj('#field_' + blockNo + '_' + 'membership_start_date').val(membershipStartDate).trigger('change');
               }
               });
           }

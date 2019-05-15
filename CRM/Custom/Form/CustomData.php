@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,15 +28,59 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
- * $Id$
- *
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
  * this class builds custom data
  */
 class CRM_Custom_Form_CustomData {
+
+  /**
+   * Generic wrapper to add custom data to a form via a single line in preProcess.
+   *
+   * $this->getDefaultEntity() must be defined for the form class for this to work.
+   *
+   * If the postProcess form cannot use the api & instead uses a BAO function it will need.
+   *   $params['custom'] = CRM_Core_BAO_CustomField::postProcess($submitted, $this->_id, $this->getDefaultEntity());
+   *
+   * @param CRM_Core_Form $form
+   * @param null|string $subType values stored in civicrm_custom_group.extends_entity_column_value
+   *   e.g Student for contact type
+   * @param null|string $subName value in civicrm_custom_group.extends_entity_column_id
+   * @param null|int $groupCount number of entities that could have custom data
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public static function addToForm(&$form, $subType = NULL, $subName = NULL, $groupCount = 1) {
+    $entityName = $form->getDefaultEntity();
+    $entityID = $form->getEntityId();
+    // FIXME: If the form has been converted to use entityFormTrait then getEntitySubTypeId() will exist.
+    // However, if it is only partially converted (ie. we've switched customdata to use CRM_Custom_Form_CustomData)
+    // it won't, so we check if we have a subtype before calling the function.
+    $entitySubType = NULL;
+    if ($subType) {
+      $entitySubType = $form->getEntitySubTypeId($subType);
+    }
+
+    if ($form->getAction() == CRM_Core_Action::VIEW) {
+      // Viewing custom data (Use with {include file="CRM/Custom/Page/CustomDataView.tpl"} in template)
+      $groupTree = CRM_Core_BAO_CustomGroup::getTree($entityName, NULL, $entityID, 0, $entitySubType);
+      CRM_Core_BAO_CustomGroup::buildCustomDataView($form, $groupTree, FALSE, NULL, NULL, NULL, $entityID);
+    }
+    else {
+      // Editing custom data (Use with {include file="CRM/common/customDataBlock.tpl"} in template)
+      if (!empty($_POST['hidden_custom'])) {
+        self::preProcess($form, $subName, $entitySubType, $groupCount, $entityName, $entityID);
+        self::buildQuickForm($form);
+        self::setDefaultValues($form);
+      }
+    }
+    // need to assign custom data type and subtype to the template
+    $form->assign('customDataType', $entityName);
+    $form->assign('customDataSubType', $entitySubType);
+    $form->assign('entityID', $entityID);
+  }
 
   /**
    * @param CRM_Core_Form $form
@@ -46,6 +90,8 @@ class CRM_Custom_Form_CustomData {
    * @param string $type
    * @param null|int $entityID
    * @param null $onlySubType
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function preProcess(
     &$form, $subName = NULL, $subType = NULL,
@@ -127,7 +173,7 @@ class CRM_Custom_Form_CustomData {
    * @return array
    */
   public static function setDefaultValues(&$form) {
-    $defaults = array();
+    $defaults = [];
     CRM_Core_BAO_CustomGroup::setDefaults($form->_groupTree, $defaults, FALSE, FALSE, $form->get('action'));
     return $defaults;
   }
@@ -186,11 +232,11 @@ class CRM_Custom_Form_CustomData {
       foreach ($keys as $key) {
         $form->_groupTree[$key] = $groupTree[$key];
       }
-      return array($form, $groupTree);
+      return [$form, $groupTree];
     }
     else {
       $form->_groupTree = $groupTree;
-      return array($form, $groupTree);
+      return [$form, $groupTree];
     }
   }
 

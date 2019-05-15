@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -168,6 +168,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
    *
    * @return string
    */
+
   /**
    * @return string
    */
@@ -206,7 +207,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
     $this->normalizeDefaultValues($defaults);
 
     if ($this->_context === 'amtg') {
-      $defaults['task'] = CRM_Contact_Task::GROUP_CONTACTS;
+      $defaults['task'] = CRM_Contact_Task::GROUP_ADD;
     }
 
     return $defaults;
@@ -236,9 +237,9 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       // FIXME: so leaving this as a dependency for now
       if (array_key_exists('contribution_amount_low', $this->_formValues)) {
         foreach (array(
-                   'contribution_amount_low',
-                   'contribution_amount_high',
-                 ) as $f) {
+          'contribution_amount_low',
+          'contribution_amount_high',
+        ) as $f) {
           $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);
         }
       }
@@ -269,11 +270,11 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
         !$this->_force
       ) {
         foreach (array(
-                   'case_type_id',
-                   'case_status_id',
-                   'case_deleted',
-                   'case_tags',
-                 ) as $caseCriteria) {
+          'case_type_id',
+          'case_status_id',
+          'case_deleted',
+          'case_tags',
+        ) as $caseCriteria) {
           if (!empty($this->_formValues[$caseCriteria])) {
             $allCases = TRUE;
             $this->_formValues['case_owner'] = 1;

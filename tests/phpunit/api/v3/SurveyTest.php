@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,12 +49,11 @@ class api_v3_SurveyTest extends CiviUnitTestCase {
   protected $entity = 'survey';
   public $DBResetRequired = FALSE;
 
-
   public function setUp() {
     $phoneBankActivityTypeID = $this->callAPISuccessGetValue('Option_value', array(
-        'label' => 'PhoneBank',
-        'return' => 'value',
-      ), 'integer');
+      'label' => 'PhoneBank',
+      'return' => 'value',
+    ), 'integer');
     $this->useTransaction();
     $this->enableCiviCampaign();
     $this->params = array(

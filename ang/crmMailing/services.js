@@ -5,7 +5,7 @@
   // the available "From:" addrs. Records are like the underlying OptionValues -- but add "email"
   // and "author".
   angular.module('crmMailing').factory('crmFromAddresses', function ($q, crmApi) {
-    var emailRegex = /^"(.*)" <([^@>]*@[^@>]*)>$/;
+    var emailRegex = /^"(.*)" *<([^@>]*@[^@>]*)>$/;
     var addrs = _.map(CRM.crmMailing.fromAddress, function (addr) {
       var match = emailRegex.exec(addr.label);
       return angular.extend({}, addr, {
@@ -262,24 +262,24 @@
       // @param mailing Object (per APIv3)
       // @return Promise an object with "subject", "body_text", "body_html"
       preview: function preview(mailing) {
+        return this.getPreviewContent(qApi, mailing);
+      },
+
+      // @param backend
+      // @param mailing Object (per APIv3)
+      // @return preview content
+      getPreviewContent: function getPreviewContent(backend, mailing) {
         if (CRM.crmMailing.workflowEnabled && !CRM.checkPerm('create mailings') && !CRM.checkPerm('access CiviMail')) {
-          return qApi('Mailing', 'preview', {id: mailing.id}).then(function(result) {
+          return backend('Mailing', 'preview', {id: mailing.id}).then(function(result) {
             return result.values;
           });
         }
         else {
-          // Protect against races in saving and previewing by chaining create+preview.
-          var params = angular.extend({}, mailing, mailing.recipients, {
-            options: {force_rollback: 1},
-            'api.Mailing.preview': {
-              id: '$value.id'
-            }
-          });
-          delete params.recipients; // the content was merged in
-          return qApi('Mailing', 'create', params).then(function(result) {
-            mailing.modified_date = result.values[result.id].modified_date;
+          var params = angular.extend({}, mailing);
+          delete params.id;
+          return backend('Mailing', 'preview', params).then(function(result) {
             // changes rolled back, so we don't care about updating mailing
-            return result.values[result.id]['api.Mailing.preview'].values;
+            return result.values;
           });
         }
       },
@@ -290,11 +290,8 @@
       previewRecipients: function previewRecipients(mailing, previewLimit) {
         // To get list of recipients, we tentatively save the mailing and
         // get the resulting recipients -- then rollback any changes.
-        var params = angular.extend({}, mailing, mailing.recipients, {
-          name: 'placeholder', // for previewing recipients on new, incomplete mailing
-          subject: 'placeholder', // for previewing recipients on new, incomplete mailing
-          options: {force_rollback: 1},
-          'api.mailing_job.create': 1, // note: exact match to API default
+        var params = angular.extend({}, mailing.recipients, {
+          id: mailing.id,
           'api.MailingRecipients.get': {
             mailing_id: '$value.id',
             options: {limit: previewLimit},
@@ -302,6 +299,7 @@
             'api.email.getvalue': {'return': 'email'}
           }
         });
+        delete params.scheduled_date;
         delete params.recipients; // the content was merged in
         return qApi('Mailing', 'create', params).then(function (recipResult) {
           // changes rolled back, so we don't care about updating mailing
@@ -310,24 +308,44 @@
         });
       },
 
-      previewRecipientCount: function previewRecipientCount(mailing) {
-        // To get list of recipients, we tentatively save the mailing and
-        // get the resulting recipients -- then rollback any changes.
-        var params = angular.extend({}, mailing, mailing.recipients, {
-          name: 'placeholder', // for previewing recipients on new, incomplete mailing
-          subject: 'placeholder', // for previewing recipients on new, incomplete mailing
-          options: {force_rollback: 1},
-          'api.mailing_job.create': 1, // note: exact match to API default
-          'api.MailingRecipients.getcount': {
-            mailing_id: '$value.id'
+      previewRecipientCount: function previewRecipientCount(mailing, crmMailingCache, rebuild) {
+        var cachekey = 'mailing-' + mailing.id + '-recipient-count';
+        var recipientCount = crmMailingCache.get(cachekey);
+        if (rebuild || _.isEmpty(recipientCount)) {
+          // To get list of recipients, we tentatively save the mailing and
+          // get the resulting recipients -- then rollback any changes.
+          var params = angular.extend({}, mailing, mailing.recipients, {
+            id: mailing.id,
+            'api.MailingRecipients.getcount': {
+              mailing_id: '$value.id'
+            }
+          });
+          // if this service is executed on rebuild then also fetch the recipients list
+          if (rebuild) {
+            params = angular.extend(params, {
+              'api.MailingRecipients.get': {
+                mailing_id: '$value.id',
+                options: {limit: 50},
+                'api.contact.getvalue': {'return': 'display_name'},
+                'api.email.getvalue': {'return': 'email'}
+              }
+            });
+            crmMailingCache.put('mailing-' + mailing.id + '-recipient-params', params.recipients);
           }
-        });
-        delete params.recipients; // the content was merged in
-        return qApi('Mailing', 'create', params).then(function (recipResult) {
-          // changes rolled back, so we don't care about updating mailing
-          mailing.modified_date = recipResult.values[recipResult.id].modified_date;
-          return recipResult.values[recipResult.id]['api.MailingRecipients.getcount'];
-        });
+          delete params.scheduled_date;
+          delete params.recipients; // the content was merged in
+          recipientCount = qApi('Mailing', 'create', params).then(function (recipResult) {
+            // changes rolled back, so we don't care about updating mailing
+            mailing.modified_date = recipResult.values[recipResult.id].modified_date;
+            if (rebuild) {
+              crmMailingCache.put('mailing-' + mailing.id + '-recipient-list', recipResult.values[recipResult.id]['api.MailingRecipients.get'].values);
+            }
+            return recipResult.values[recipResult.id]['api.MailingRecipients.getcount'];
+          });
+          crmMailingCache.put(cachekey, recipientCount);
+        }
+
+        return recipientCount;
       },
 
       // Save a (draft) mailing
@@ -351,7 +369,7 @@
         delete params.jobs;
 
         delete params.recipients; // the content was merged in
-
+        params._skip_evil_bao_auto_recipients_ = 1; // skip recipient rebuild on simple save
         return qApi('Mailing', 'create', params).then(function(result) {
           if (result.id && !mailing.id) {
             mailing.id = result.id;
@@ -405,6 +423,8 @@
 
         delete params.recipients; // the content was merged in
 
+        params._skip_evil_bao_auto_recipients_ = 1; // skip recipient rebuild while sending test mail
+
         return qApi('Mailing', 'create', params).then(function (result) {
           if (result.id && !mailing.id) {
             mailing.id = result.id;
@@ -429,7 +449,7 @@
         };
         var result = null;
         var p = crmMailingMgr
-          .preview(mailing)
+          .getPreviewContent(CRM.api3, mailing)
           .then(function (content) {
             var options = CRM.utils.adjustDialogDefaults({
               autoOpen: false,
@@ -517,7 +537,7 @@
             return crmLegacy.url('civicrm/contact/search/advanced',
               'force=1&mailing_id=' + mailing.id + statType.searchFilter);
           case 'report':
-            var reportIds = CRM.crmMailing.reportIds; 
+            var reportIds = CRM.crmMailing.reportIds;
             return crmLegacy.url('civicrm/report/instance/' + reportIds[statType.reportType],
                 'reset=1&mailing_id_value=' + mailing.id + statType.reportFilter);
           default:
@@ -554,5 +574,9 @@
       };
     };
   });
+
+  angular.module('crmMailing').factory('crmMailingCache', ['$cacheFactory', function($cacheFactory) {
+    return $cacheFactory('crmMailingCache');
+  }]);
 
 })(angular, CRM.$, CRM._);

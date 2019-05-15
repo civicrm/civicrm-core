@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -73,27 +73,21 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
    * @return array
    */
   protected function getData() {
-    // Fetch data from cache
-    $cache = CRM_Core_DAO::executeQuery("SELECT data, created_date FROM civicrm_cache
-      WHERE group_name = 'dashboard' AND path = 'newsfeed'");
-    if ($cache->fetch()) {
-      $expire = time() - (60 * 60 * 24 * self::CACHE_DAYS);
-      // Refresh data after CACHE_DAYS
-      if (strtotime($cache->created_date) < $expire) {
-        $new_data = $this->getFeeds();
-        // If fetching the new rss feed was successful, return it
-        // Otherwise use the old cached data - it's better than nothing
-        if ($new_data) {
-          return $new_data;
-        }
+    $value = Civi::cache('community_messages')->get('dashboard_newsfeed');
+
+    if (!$value) {
+      $value = $this->getFeeds();
+
+      if ($value) {
+        Civi::cache('community_messages')->set('dashboard_newsfeed', $value, (60 * 60 * 24 * self::CACHE_DAYS));
       }
-      return unserialize($cache->data);
     }
-    return $this->getFeeds();
+
+    return $value;
   }
 
   /**
-   * Fetch all feeds & cache results.
+   * Fetch all feeds.
    *
    * @return array
    */
@@ -101,10 +95,9 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
     $newsFeed = $this->getFeed($this->getNewsUrl());
     // If unable to fetch the feed, return empty results.
     if (!$newsFeed) {
-      return array();
+      return [];
     }
     $feeds = $this->formatItems($newsFeed);
-    CRM_Core_BAO_Cache::setItem($feeds, 'dashboard', 'newsfeed');
     return $feeds;
   }
 
@@ -130,15 +123,15 @@ class CRM_Dashlet_Page_Blog extends CRM_Core_Page {
    * @return array
    */
   protected function formatItems($feed) {
-    $result = array();
+    $result = [];
     if ($feed && !empty($feed->channel)) {
       foreach ($feed->channel as $channel) {
-        $content = array(
+        $content = [
           'title' => (string) $channel->title,
           'description' => (string) $channel->description,
           'name' => strtolower(CRM_Utils_String::munge($channel->title, '-')),
-          'items' => array(),
-        );
+          'items' => [],
+        ];
         foreach ($channel->item as $item) {
           $item = (array) $item;
           $item['title'] = strip_tags($item['title']);

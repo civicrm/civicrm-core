@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,41 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
  * This class generates form components for relationship.
  */
-class CRM_Campaign_Form_Task extends CRM_Core_Form {
-
-  /**
-   * The additional clause that we restrict the search.
-   *
-   * @var string
-   */
-  protected $_componentClause = NULL;
-
-  /**
-   * The task being performed
-   *
-   * @var int
-   */
-  protected $_task;
-
-  /**
-   * The array that holds all the contact ids
-   *
-   * @var array
-   */
-  public $_contactIds;
-
-  /**
-   * The array that holds all the component ids
-   *
-   * @var array
-   */
-  protected $_componentIds;
+class CRM_Campaign_Form_Task extends CRM_Core_Form_Task {
 
   /**
    * The array that holds all the voter ids
@@ -82,7 +54,7 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
     $taskName = CRM_Utils_Array::value($this->_task, $campaignTasks);
     $this->assign('taskName', $taskName);
 
-    $ids = array();
+    $ids = [];
     if ($values['radio_ts'] == 'ts_sel') {
       foreach ($values as $name => $value) {
         if (substr($name, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX) {
@@ -93,7 +65,7 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
     else {
       $qfKey = CRM_Utils_Request::retrieve('qfKey', 'String', $this);
       $cacheKey = "civicrm search {$qfKey}";
-      $allCids = CRM_Core_BAO_PrevNextCache::getSelection($cacheKey, "getall");
+      $allCids = Civi::service('prevnext')->getSelection($cacheKey, "getall");
       $ids = array_keys($allCids[$cacheKey]);
       $this->assign('totalSelectedVoters', count($ids));
     }
@@ -136,18 +108,17 @@ class CRM_Campaign_Form_Task extends CRM_Core_Form {
    * @param bool $submitOnce
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
-    $this->addButtons(array(
-        array(
-          'type' => $nextType,
-          'name' => $title,
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => $backType,
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => $nextType,
+        'name' => $title,
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => $backType,
+        'name' => ts('Cancel'),
+      ],
+    ]);
   }
 
 }

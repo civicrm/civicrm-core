@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CiviCRM_Hook
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_Http {
 
@@ -61,7 +61,7 @@ class CRM_Utils_Http {
    *   Ex: Array("max-age"=>86400, "public"=>1).
    */
   public static function parseCacheControl($value) {
-    $result = array();
+    $result = [];
 
     $parts = preg_split('/, */', $value);
     foreach ($parts as $part) {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -137,6 +137,19 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualID,
     );
     $this->callAPIAndDocument('entity_tag', 'get', $paramsEntity, __FUNCTION__, __FILE__);
+  }
+
+  /**
+   * Test memory usage does not escalate crazily.
+   */
+  public function testMemoryLeak() {
+    $start = memory_get_usage();
+    for ($i = 0; $i < 100; $i++) {
+      $this->callAPISuccess('EntityTag', 'get', []);
+      $memUsage = memory_get_usage();
+    }
+    $max = $start + 2000000;
+    $this->assertTrue($memUsage < $max, "mem usage ( $memUsage ) should be less than $max (start was $start) ");
   }
 
   /**

@@ -1,9 +1,9 @@
 
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,6 @@
  +--------------------------------------------------------------------+
 *}
 {crmRegion name="contribute-form-contributionpage-settings-main"}
-<div class="crm-block crm-form-block crm-contribution-contributionpage-settings-form-block">
 <div class="help">
     {if $action eq 0}
         <p>{ts}This is the first step in creating a new online Contribution Page. You can create one or more different Contribution Pages for different purposes, audiences, campaigns, etc. Each page can have it's own introductory message, pre-configured contribution amounts, custom data collection fields, etc.{/ts}</p>
@@ -34,6 +33,8 @@
         {ts}Use this form to edit the page title, financial type (e.g. donation, campaign contribution, etc.), goal amount, introduction, and status (active/inactive) for this online contribution page.{/ts}
     {/if}
 </div>
+<div class="crm-block crm-form-block crm-contribution-contributionpage-settings-form-block">
+
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout-compressed">
   <tr class="crm-contribution-contributionpage-settings-form-block-title"><td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='title' id=$contributionPageID}{/if}</td><td>{$form.title.html}<br/>
@@ -94,15 +95,11 @@
   </tr>
   <tr class="crm-contribution-contributionpage-settings-form-block-start_date">
       <td class ="label">{$form.start_date.label} {help id="id-start_date"}</td>
-      <td>
-          {include file="CRM/common/jcalendar.tpl" elementName=start_date}
-      </td>
+      <td>{$form.start_date.html}</td>
     </tr>
   <tr class="crm-contribution-contributionpage-settings-form-block-end_date">
       <td class ="label">{$form.end_date.label}</td>
-      <td>
-          {include file="CRM/common/jcalendar.tpl" elementName=end_date}
-      </td>
+      <td>{$form.end_date.html}</td>
     </tr>
   <tr class="crm-contribution-contributionpage-settings-form-block-honor_block_is_active">
       <td>&nbsp;</td><td>{$form.honor_block_is_active.html}{$form.honor_block_is_active.label} {help id="id-honoree_section"}</td>

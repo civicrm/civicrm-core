@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,22 +36,27 @@
 <table class="form-layout-compressed">
   {if $selectedOutput ne 'email'}
     <tr>
+      <td class="label">{$form.output.email_invoice.label}</td>
       <td>{$form.output.email_invoice.html}</td>
     </tr>
   {/if}
-  <tr class="crm-email-element">
-    <td>{$form.from_email_address.label}{$form.from_email_address.html}{help id ="id-from_email" isAdmin=$isAdmin}</td>
+  <tr id="selectEmailFrom" style="display: none" class="crm-contactEmail-form-block-fromEmailAddress crm-email-element">
+    <td class="label">{$form.from_email_address.label}</td>
+    <td>{$form.from_email_address.html} {help id="id-from_email" file="CRM/Contact/Form/Task/Email.hlp" isAdmin=$isAdmin}</td>
   </tr>
   <tr class="crm-email-element">
-    <td>{$form.email_comment.label}{$form.email_comment.html}</td>
+    <td class="label">{$form.email_comment.label}</td>
+    <td>{$form.email_comment.html}</td>
   </tr>
   {if $selectedOutput ne 'email'}
     <tr>
+      <td class="label">{$form.output.pdf_invoice.label}</td>
       <td>{$form.output.pdf_invoice.html}</td>
     </tr>
   {/if}
   <tr class="crm-pdf-element">
-    <td>{$form.pdf_format_id.html} {$form.pdf_format_id.label} </td>
+    <td class="label">{$form.pdf_format_id.label}</td>
+    <td>{$form.pdf_format_id.html}</td>
   </tr>
 </table>
 

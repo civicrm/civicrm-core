@@ -6,10 +6,10 @@
  *   API result array
  */
 function address_get_example() {
-  $params = array(
+  $params = [
     'contact_id' => 17,
     'street_name' => 'Ambachtstraat',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Address', 'get', $params);
@@ -19,12 +19,12 @@ function address_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -38,13 +38,13 @@ function address_get_example() {
  */
 function address_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'contact_id' => '17',
         'location_type_id' => '15',
@@ -57,9 +57,9 @@ function address_get_expectedresult() {
         'postal_code' => '6971 BN',
         'country_id' => '1152',
         'manual_geo_code' => 0,
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

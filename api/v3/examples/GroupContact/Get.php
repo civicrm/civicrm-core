@@ -6,9 +6,9 @@
  *   API result array
  */
 function group_contact_get_example() {
-  $params = array(
+  $params = [
     'contact_id' => 3,
-  );
+  ];
 
   try{
     $result = civicrm_api3('GroupContact', 'get', $params);
@@ -18,12 +18,12 @@ function group_contact_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,13 +37,13 @@ function group_contact_get_example() {
  */
 function group_contact_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'group_id' => '1',
         'title' => 'New Test Group Created',
@@ -51,9 +51,9 @@ function group_contact_get_expectedresult() {
         'is_hidden' => 0,
         'in_date' => '2013-07-28 08:50:19',
         'in_method' => 'API',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

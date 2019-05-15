@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |                                    |
+ | CiviCRM version 5                                                  |                                    |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -46,7 +46,7 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
    * Test generating domain emails
    */
   public function testDomainEmailGeneration() {
-    $emails = CRM_Contact_Form_Task_EmailCommon::domainEmails();
+    $emails = CRM_Core_BAO_Email::domainEmails();
     $this->assertNotEmpty($emails);
     $optionValue = $this->callAPISuccess('OptionValue', 'Get', array(
       'id' => $this->_optionValue['id'],

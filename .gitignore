@@ -1,16 +1,15 @@
 *~
 *.bak
+.use-civicrm-setup
+/ext/
 backdrop/
 bower_components
 CRM/Case/xml/configuration
 CRM/Core/DAO/.listAll.php
 CRM/Core/DAO/listAll.php
-CRM/Core/I18n/SchemaStructure.php
 bin/setup.conf
-civicrm-version.php
 civicrm-version.txt
 civicrm.config.php
-install/langs.php
 node_modules
 settings_location.php
 sql/case_sample.mysql
@@ -22,7 +21,6 @@ sql/civicrm_data.mysql
 sql/civicrm_drop.mysql
 sql/civicrm_navigation.mysql
 sql/civicrm_sample.mysql
-templates/CRM/common/version.tpl
 tests/phpunit/CiviTest/CiviSeleniumSettings.php
 tests/phpunit/CiviTest/civicrm.settings.php
 tools/stats/config.php
@@ -44,3 +42,4 @@ civicrm.settings.php
 sql/dummy_processor.mysql
 distmaker/distmaker.conf
 distmaker/out
+/tmp

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -42,7 +42,7 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
   public function preProcess() {
     // Get the activity values.
     $activityId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
     // Check for required permissions, CRM-6264.
@@ -53,11 +53,11 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     }
 
     $session = CRM_Core_Session::singleton();
-    if (!in_array($context, array(
+    if (!in_array($context, [
       'home',
       'dashlet',
       'dashletFullscreen',
-    ))
+    ])
     ) {
       $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$cid}&selectedChild=activity");
     }
@@ -66,8 +66,8 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
     }
 
     $session->pushUserContext($url);
-    $defaults = array();
-    $params = array('id' => $activityId);
+    $defaults = [];
+    $params = ['id' => $activityId];
     CRM_Activity_BAO_Activity::retrieve($params, $defaults);
 
     // Set activity type name and description to template.
@@ -108,20 +108,29 @@ class CRM_Activity_Form_ActivityView extends CRM_Core_Form {
 
     $values['attachment'] = CRM_Core_BAO_File::attachmentInfo('civicrm_activity', $activityId);
     $this->assign('values', $values);
+
+    $url = CRM_Utils_System::url(implode("/", $this->urlPath), "reset=1&id={$activityId}&action=view&cid={$values['source_contact_id']}");
+    CRM_Utils_Recent::add($this->_values['subject'],
+      $url,
+      $values['id'],
+      'Activity',
+      $values['source_contact_id'],
+      $values['source_contact']
+    );
   }
 
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
-    $this->addButtons(array(
-        array(
+    $this->addButtons([
+        [
           'type' => 'cancel',
           'name' => ts('Done'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-      )
+        ],
+    ]
     );
   }
 

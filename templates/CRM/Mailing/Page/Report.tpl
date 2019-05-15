@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,15 +36,15 @@
         <td>{$report.event_totals.actionlinks.delivered}</td></tr>
   {if $report.mailing.open_tracking}
     <tr><td class="label"><a href="{$report.event_totals.links.opened}&distinct=1">{ts}Unique Opens{/ts}</a></td>
-        <td>{$report.event_totals.opened}</td>
-        <td>{$report.event_totals.actionlinks.opened}</td></tr>
+        <td>{$report.event_totals.opened} ({$report.event_totals.opened_rate|string_format:"%0.2f"}%)</td>
+        <td>{$report.event_totals.actionlinks.opened_unique}</td></tr>
     <tr><td class="label"><a href="{$report.event_totals.links.opened}">{ts}Total Opens{/ts}</a></td>
         <td>{$report.event_totals.total_opened}</td>
         <td>{$report.event_totals.actionlinks.opened}</td></tr>
   {/if}
   {if $report.mailing.url_tracking}
     <tr><td class="label"><a href="{$report.event_totals.links.clicks}">{ts}Click-throughs{/ts}</a></td>
-        <td>{$report.event_totals.url}</td>
+        <td>{$report.event_totals.url} ({$report.event_totals.clickthrough_rate|string_format:"%0.2f"}%)</td>
         <td>{$report.event_totals.actionlinks.clicks}</td></tr>
   {/if}
   <tr><td class="label"><a href="{$report.event_totals.links.forward}">{ts}Forwards{/ts}</a></td>

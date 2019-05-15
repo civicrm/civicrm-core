@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,6 +23,8 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
+{crmRegion name="crm-event-userdashboard-pre"}
+{/crmRegion}
 <div class="view-content">
     {if $event_rows}
         {strip}
@@ -38,7 +40,7 @@
                 </tr>
                 {counter start=0 skip=1 print=false}
                 {foreach from=$event_rows item=row}
-                    <tr id='rowid{$row.participant_id}' class=" crm-event-participant-id_{$row.participant_id} {cycle values="odd-row,even-row"}{if $row.status eq Cancelled} disabled{/if}">
+                    <tr id='rowid{$row.participant_id}' class=" crm-event-participant-id_{$row.participant_id} {cycle values="odd-row,even-row"}{if $row.status eq 'Cancelled'} disabled{/if}">
                        <td class="crm-participant-event-id_{$row.event_id}"><a href="{crmURL p='civicrm/event/info' q="reset=1&id=`$row.event_id`&context=dashboard"}">{$row.event_title}</a></td>
                        <td class="crm-participant-event_start_date">
                             {$row.event_start_date|crmDate}
@@ -70,3 +72,5 @@
         </div>
     {/if}
 </div>
+{crmRegion name="crm-event-userdashboard-post"}
+{/crmRegion}

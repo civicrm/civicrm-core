@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,7 +42,7 @@
  * module-extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Extension_Mapper {
 
@@ -63,7 +63,7 @@ class CRM_Extension_Mapper {
   /**
    * @var array (key => CRM_Extension_Info)
    */
-  protected $infos = array();
+  protected $infos = [];
 
   /**
    * @var array
@@ -275,19 +275,19 @@ class CRM_Extension_Mapper {
    *   array(array('prefix' => $, 'file' => $))
    */
   public function getActiveModuleFiles($fresh = FALSE) {
-    $config = CRM_Core_Config::singleton();
-    if ($config->isUpgradeMode() || !defined('CIVICRM_DSN')) {
-      return array(); // hmm, ok
+    if (!defined('CIVICRM_DSN')) {
+      // hmm, ok
+      return [];
     }
 
     $moduleExtensions = NULL;
     if ($this->cache && !$fresh) {
-      $moduleExtensions = $this->cache->get($this->cacheKey . '/moduleFiles');
+      $moduleExtensions = $this->cache->get($this->cacheKey . '_moduleFiles');
     }
 
     if (!is_array($moduleExtensions)) {
       // Check canonical module list
-      $moduleExtensions = array();
+      $moduleExtensions = [];
       $sql = '
         SELECT full_name, file
         FROM civicrm_extension
@@ -297,25 +297,25 @@ class CRM_Extension_Mapper {
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
         try {
-          $moduleExtensions[] = array(
+          $moduleExtensions[] = [
             'prefix' => $dao->file,
             'filePath' => $this->keyToPath($dao->full_name),
-          );
+          ];
         }
         catch (CRM_Extension_Exception $e) {
           // Putting a stub here provides more consistency
           // in how getActiveModuleFiles when racing between
           // dirty file-removals and cache-clears.
           CRM_Core_Session::setStatus($e->getMessage(), '', 'error');
-          $moduleExtensions[] = array(
+          $moduleExtensions[] = [
             'prefix' => $dao->file,
             'filePath' => NULL,
-          );
+          ];
         }
       }
 
       if ($this->cache) {
-        $this->cache->set($this->cacheKey . '/moduleFiles', $moduleExtensions);
+        $this->cache->set($this->cacheKey . '_moduleFiles', $moduleExtensions);
       }
     }
     return $moduleExtensions;
@@ -329,7 +329,7 @@ class CRM_Extension_Mapper {
    */
   public function getActiveModuleUrls() {
     // TODO optimization/caching
-    $urls = array();
+    $urls = [];
     $urls['civicrm'] = $this->keyToUrl('civicrm');
     foreach ($this->getModules() as $module) {
       /** @var $module CRM_Core_Module */
@@ -338,6 +338,54 @@ class CRM_Extension_Mapper {
       }
     }
     return $urls;
+  }
+
+  /**
+   * Get a list of extension keys, filtered by the corresponding file path.
+   *
+   * @param string $pattern
+   *   A file path. To search subdirectories, append "*".
+   *   Ex: "/var/www/extensions/*"
+   *   Ex: "/var/www/extensions/org.foo.bar"
+   * @return array
+   *   Array(string $key).
+   *   Ex: array("org.foo.bar").
+   */
+  public function getKeysByPath($pattern) {
+    $keys = [];
+
+    if (CRM_Utils_String::endsWith($pattern, '*')) {
+      $prefix = rtrim($pattern, '*');
+      foreach ($this->container->getKeys() as $key) {
+        $path = CRM_Utils_File::addTrailingSlash($this->container->getPath($key));
+        if (realpath($prefix) == realpath($path) || CRM_Utils_File::isChildPath($prefix, $path)) {
+          $keys[] = $key;
+        }
+      }
+    }
+    else {
+      foreach ($this->container->getKeys() as $key) {
+        $path = CRM_Utils_File::addTrailingSlash($this->container->getPath($key));
+        if (realpath($pattern) == realpath($path)) {
+          $keys[] = $key;
+        }
+      }
+    }
+
+    return $keys;
+  }
+
+  /**
+   * @return array
+   *   Ex: $result['org.civicrm.foobar'] = new CRM_Extension_Info(...).
+   * @throws \CRM_Extension_Exception
+   * @throws \Exception
+   */
+  public function getAllInfos() {
+    foreach ($this->container->getKeys() as $key) {
+      $this->keyToInfo($key);
+    }
+    return $this->infos;
   }
 
   /**
@@ -362,7 +410,7 @@ class CRM_Extension_Mapper {
    *   CRM_Core_Module
    */
   public function getModules() {
-    $result = array();
+    $result = [];
     $dao = new CRM_Core_DAO_Extension();
     $dao->type = 'module';
     $dao->find();
@@ -410,10 +458,10 @@ class CRM_Extension_Mapper {
   }
 
   public function refresh() {
-    $this->infos = array();
+    $this->infos = [];
     $this->moduleExtensions = NULL;
     if ($this->cache) {
-      $this->cache->delete($this->cacheKey . '/moduleFiles');
+      $this->cache->delete($this->cacheKey . '_moduleFiles');
     }
     // FIXME: How can code so code wrong be so right?
     CRM_Extension_System::singleton()->getClassLoader()->refresh();

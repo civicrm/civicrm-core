@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -41,8 +41,8 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
    */
   public function preProcess() {
     $id = $this->get('id');
-    $params = array('id' => $id);
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $params = ['id' => $id];
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $this->assign('context', $context);
 
     $values = CRM_Contribute_BAO_Contribution::getValuesWithMappings($params);
@@ -94,7 +94,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     if (!empty($values['contribution_recur_id'])) {
       $sql = "SELECT  installments, frequency_interval, frequency_unit FROM civicrm_contribution_recur WHERE id = %1";
-      $params = array(1 => array($values['contribution_recur_id'], 'Integer'));
+      $params = [1 => [$values['contribution_recur_id'], 'Integer']];
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
       if ($dao->fetch()) {
         $values['recur_installments'] = $dao->installments;
@@ -132,7 +132,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     // show billing address location details, if exists
     if (!empty($values['address_id'])) {
-      $addressParams = array('id' => CRM_Utils_Array::value('address_id', $values));
+      $addressParams = ['id' => CRM_Utils_Array::value('address_id', $values)];
       $addressDetails = CRM_Core_BAO_Address::getValues($addressParams, FALSE, 'id');
       $addressDetails = array_values($addressDetails);
       $values['billing_address'] = $addressDetails[0]['display'];
@@ -150,10 +150,10 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $this->assign($name, $value);
     }
 
-    $lineItems = array();
+    $lineItems = [];
     $displayLineItems = FALSE;
     if ($id) {
-      $lineItems = array(CRM_Price_BAO_LineItem::getLineItemsByContributionID(($id)));
+      $lineItems = [CRM_Price_BAO_LineItem::getLineItemsByContributionID(($id))];
       $firstLineItem = reset($lineItems[0]);
       if (empty($firstLineItem['price_set_id'])) {
         // CRM-20297 All we care is that it's not QuickConfig, so no price set
@@ -162,10 +162,10 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       }
       else {
         try {
-          $priceSet = civicrm_api3('PriceSet', 'getsingle', array(
+          $priceSet = civicrm_api3('PriceSet', 'getsingle', [
             'id' => $firstLineItem['price_set_id'],
             'return' => 'is_quick_config, id',
-          ));
+          ]);
           $displayLineItems = !$priceSet['is_quick_config'];
         }
         catch (CiviCRM_API3_Exception $e) {
@@ -190,7 +190,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
     // assign values to the template
     $this->assign($values);
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
+    $invoicing = CRM_Invoicing_Utils::isInvoicingEnabled();
     $this->assign('invoicing', $invoicing);
     $this->assign('isDeferred', CRM_Utils_Array::value('deferred_revenue_enabled', $invoiceSettings));
     if ($invoicing && isset($values['tax_amount'])) {
@@ -215,7 +215,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
 
     $title = $displayName . ' - (' . CRM_Utils_Money::format($values['total_amount'], $values['currency']) . ' ' . ' - ' . $values['financial_type'] . ')';
 
-    $recentOther = array();
+    $recentOther = [];
     if (CRM_Core_Permission::checkActionPermission('CiviContribute', CRM_Core_Action::UPDATE)) {
       $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/contact/view/contribution',
         "action=update&reset=1&id={$values['id']}&cid={$values['contact_id']}&context=home"
@@ -235,7 +235,7 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $recentOther
     );
     $contributionStatus = $status[$values['contribution_status_id']];
-    if (in_array($contributionStatus, array('Partially paid', 'Pending refund'))
+    if (in_array($contributionStatus, ['Partially paid', 'Pending refund'])
         || ($contributionStatus == 'Pending' && $values['is_pay_later'])
         ) {
       if ($contributionStatus == 'Pending refund') {
@@ -249,21 +249,44 @@ class CRM_Contribute_Form_ContributionView extends CRM_Core_Form {
       $this->assign('componentId', $id);
       $this->assign('component', 'contribution');
     }
+    $this->assignPaymentInfoBlock($id);
   }
 
   /**
    * Build the form object.
    */
   public function buildQuickForm() {
-
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'cancel',
         'name' => ts('Done'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
-      ),
-    ));
+      ],
+    ]);
+  }
+
+  /**
+   * Assign the values to build the payment info block.
+   *
+   * @todo - this is a bit too much copy & paste from AbstractEditPayment
+   * (justifying on the basis it's 'pretty short' and in a different inheritance
+   * tree. I feel like traits are probably the longer term answer).
+   *
+   * @param int $id
+   *
+   * @return string
+   *   Block title.
+   */
+  protected function assignPaymentInfoBlock($id) {
+    // component is used in getPaymentInfo primarily to retrieve the contribution id, we
+    // already have that.
+    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($id, 'contribution', TRUE);
+    $title = ts('View Payment');
+    $this->assign('transaction', TRUE);
+    $this->assign('payments', $paymentInfo['transaction']);
+    $this->assign('paymentLinks', $paymentInfo['payment_links']);
+    return $title;
   }
 
 }

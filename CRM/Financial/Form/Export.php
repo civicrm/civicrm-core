@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -47,18 +47,27 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
 
   /**
    * Financial batch ids.
+   * @var array
    */
-  protected $_batchIds = array();
+  protected $_batchIds = [];
 
   /**
    * Export status id.
+   * @var int
    */
   protected $_exportStatusId;
 
   /**
    * Export format.
+   * @var string
    */
   protected $_exportFormat;
+
+  /**
+   * Download export File.
+   * @var bool
+   */
+  protected $_downloadFile = TRUE;
 
   /**
    * Build all the data structures needed to build the form.
@@ -81,7 +90,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
       else {
         $this->_batchIds = $this->get('batchIds');
       }
-      if (!empty($_GET['export_format']) && in_array($_GET['export_format'], array('IIF', 'CSV'))) {
+      if (!empty($_GET['export_format']) && in_array($_GET['export_format'], ['IIF', 'CSV'])) {
         $this->_exportFormat = $_GET['export_format'];
       }
     }
@@ -89,8 +98,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
       $this->_batchIds = $this->_id;
     }
 
-    $allBatchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
-    $this->_exportStatusId = CRM_Utils_Array::key('Exported', $allBatchStatus);
+    $this->_exportStatusId = CRM_Core_PseudoConstant::getKey('CRM_Batch_DAO_Batch', 'status_id', 'Exported');
 
     // check if batch status is valid, do not allow exported batches to export again
     $batchStatus = CRM_Batch_BAO_Batch::getBatchStatuses($this->_batchIds);
@@ -121,26 +129,26 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
       }
     }
 
-    $optionTypes = array(
+    $optionTypes = [
       'IIF' => ts('Export to IIF'),
       'CSV' => ts('Export to CSV'),
-    );
+    ];
 
     $this->addRadio('export_format', NULL, $optionTypes, NULL, '<br/>', TRUE);
 
     $this->addButtons(
-      array(
-        array(
+      [
+        [
           'type' => 'next',
           'name' => ts('Export Batch'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      )
+        ],
+      ]
     );
   }
 
@@ -154,7 +162,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
     }
 
     if ($this->_id) {
-      $batchIds = array($this->_id);
+      $batchIds = [$this->_id];
     }
     elseif (!empty($this->_batchIds)) {
       $batchIds = explode(',', $this->_batchIds);
@@ -175,7 +183,7 @@ class CRM_Financial_Form_Export extends CRM_Core_Form {
       CRM_Batch_BAO_Batch::create($batchParams);
     }
 
-    CRM_Batch_BAO_Batch::exportFinancialBatch($batchIds, $this->_exportFormat);
+    CRM_Batch_BAO_Batch::exportFinancialBatch($batchIds, $this->_exportFormat, $this->_downloadFile);
   }
 
 }

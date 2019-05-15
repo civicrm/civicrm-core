@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -53,6 +53,9 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
               array('name' => 'Open Case', 'status' => 'Completed'),
             ),
           ),
+        ),
+        'timelineActivityTypes' => array(
+          array('name' => 'Open Case', 'status' => 'Completed'),
         ),
         'caseRoles' => array(
           array('name' => 'First role', 'creator' => 1, 'manager' => 1),
@@ -124,14 +127,14 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
     // Create Case Type
     $params = array(
       'title' => 'Application',
-      'name' => 'Appl ication', // spaces are not allowed
+      // spaces are not allowed
+      'name' => 'Appl ication',
       'is_active' => 1,
       'weight' => 4,
     );
 
     $this->callAPIFailure('CaseType', 'create', $params);
   }
-
 
   /**
    * Test update (create with id) function with valid parameters.

@@ -5,10 +5,24 @@
  */
 class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
 
+  /**
+   * Original $_REQUEST
+   *
+   * We are messing with globals so fix afterwards.
+   *
+   * @var array
+   */
+  protected $originalRequest = [];
 
   public function setUp() {
     $this->useTransaction(TRUE);
     parent::setUp();
+    $this->originalRequest = $_REQUEST;
+  }
+
+  public function tearDown() {
+    $_REQUEST = $this->originalRequest;
+    parent::tearDown();
   }
 
   /**
@@ -283,6 +297,21 @@ class CRM_Contact_Page_AjaxTest extends CiviUnitTestCase {
     $_GET['parent_id'] = $childTag1['id'];
     $childTagTree = CRM_Admin_Page_AJAX::getTagTree();
     $this->assertEquals(1, $childTagTree[0]['data']['usages']);
+
+    // CASE 3 : check the tag IDs returned on searching with 'Level'
+    //  which needs to array('parent tag id', 'level 1 child tag id', 'level 2 child tag id')
+    unset($_GET['parent_id']);
+    $_GET['str'] = 'Level';
+    $tagIDs = CRM_Admin_Page_AJAX::getTagTree();
+    $expectedTagIDs = array($parentTag['id'], $childTag1['id'], $childTag2['id']);
+    $this->checkArrayEquals($tagIDs, $expectedTagIDs);
+
+    // CASE 4 : check the tag IDs returned on searching with 'Level 1'
+    //  which needs to array('parent tag id', 'level 1 child tag id')
+    $_GET['str'] = 'Level 1';
+    $tagIDs = CRM_Admin_Page_AJAX::getTagTree();
+    $expectedTagIDs = array($parentTag['id'], $childTag1['id']);
+    $this->checkArrayEquals($tagIDs, $expectedTagIDs);
 
     //cleanup
     foreach ($contacts as $id) {

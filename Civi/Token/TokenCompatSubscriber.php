@@ -24,16 +24,16 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
    * @inheritDoc
    */
   public static function getSubscribedEvents() {
-    return array(
+    return [
       Events::TOKEN_EVALUATE => 'onEvaluate',
       Events::TOKEN_RENDER => 'onRender',
-    );
+    ];
   }
 
   /**
    * Load token data.
    *
-   * @param TokenValueEvent $e
+   * @param \Civi\Token\Event\TokenValueEvent $e
    * @throws TokenException
    */
   public function onEvaluate(TokenValueEvent $e) {
@@ -41,7 +41,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     // hook *categories* (aka entities aka namespaces). We'll cache
     // this in the TokenProcessor's context.
 
-    $hookTokens = array();
+    $hookTokens = [];
     \CRM_Utils_Hook::tokens($hookTokens);
     $categories = array_keys($hookTokens);
     $e->getTokenProcessor()->context['hookTokenCategories'] = $categories;
@@ -49,14 +49,18 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
     $messageTokens = $e->getTokenProcessor()->getMessageTokens();
 
     foreach ($e->getRows() as $row) {
+      if (empty($row->context['contactId'])) {
+        continue;
+      }
       /** @var int $contactId */
       $contactId = $row->context['contactId'];
       if (empty($row->context['contact'])) {
-        $params = array(
-          array('contact_id', '=', $contactId, 0, 0),
-        );
+        $params = [
+          ['contact_id', '=', $contactId, 0, 0],
+        ];
         list($contact, $_) = \CRM_Contact_BAO_Query::apiQuery($params);
-        $contact = reset($contact); //CRM-4524
+        //CRM-4524
+        $contact = reset($contact);
         if (!$contact || is_a($contact, 'CRM_Core_Error')) {
           // FIXME: Need to differentiate errors which kill the batch vs the individual row.
           throw new TokenException("Failed to generate token data. Invalid contact ID: " . $row->context['contactId']);
@@ -66,10 +70,10 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         if (!empty($messageTokens['contact'])) {
           foreach ($messageTokens['contact'] as $token) {
             if (\CRM_Core_BAO_CustomField::getKeyID($token)) {
-              $contact[$token] = civicrm_api3('Contact', 'getvalue', array(
+              $contact[$token] = civicrm_api3('Contact', 'getvalue', [
                 'return' => $token,
                 'id' => $contactId,
-              ));
+              ]);
             }
           }
         }
@@ -84,13 +88,13 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
         $contact = array_merge($contact, $row->context['tmpTokenParams']);
       }
 
-      $contactArray = !is_array($contactId) ? array($contactId => $contact) : $contact;
+      $contactArray = !is_array($contactId) ? [$contactId => $contact] : $contact;
 
       // Note: This is a small contract change from the past; data should be missing
       // less randomly.
       \CRM_Utils_Hook::tokenValues($contactArray,
         (array) $contactId,
-        empty($row->context['mailingJob']) ? NULL : $row->context['mailingJob']->id,
+        empty($row->context['mailingJobId']) ? NULL : $row->context['mailingJobId'],
         $messageTokens,
         $row->context['controller']
       );
@@ -106,7 +110,7 @@ class TokenCompatSubscriber implements EventSubscriberInterface {
   /**
    * Apply the various CRM_Utils_Token helpers.
    *
-   * @param TokenRenderEvent $e
+   * @param \Civi\Token\Event\TokenRenderEvent $e
    */
   public function onRender(TokenRenderEvent $e) {
     $isHtml = ($e->message['format'] == 'text/html');

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -158,7 +158,8 @@ class api_v3_SettingTest extends CiviUnitTestCase {
         'is_contact' => 0,
         'description' => NULL,
         'help_text' => NULL,
-        'on_change' => array(// list of callbacks
+        // list of callbacks
+        'on_change' => array(
           array(__CLASS__, '_testOnChange_onChangeExample'),
         ),
       ),
@@ -351,9 +352,6 @@ class api_v3_SettingTest extends CiviUnitTestCase {
   public function testGetExtensionSetting() {
     $this->hookClass->setHook('civicrm_alterSettingsFolders', array($this, 'setExtensionMetadata'));
     $data = NULL;
-    // the caching of data to all duplicates the caching of data to the empty string
-    CRM_Core_BAO_Cache::setItem($data, 'CiviCRM setting Spec', 'All');
-    CRM_Core_BAO_Cache::setItem($data, 'CiviCRM setting Specs', 'settingsMetadata__');
     Civi::cache('settings')->flush();
     $fields = $this->callAPISuccess('setting', 'getfields', array('filters' => array('group_name' => 'Test Settings')));
     $this->assertArrayHasKey('test_key', $fields['values']);
@@ -368,10 +366,9 @@ class api_v3_SettingTest extends CiviUnitTestCase {
    */
   public function testGetConfigSetting() {
     $settings = $this->callAPISuccess('setting', 'get', array(
-        'name' => 'defaultCurrency',
-        'sequential' => 1,
-      )
-    );
+      'name' => 'defaultCurrency',
+      'sequential' => 1,
+    ));
     $this->assertEquals('USD', $settings['values'][0]['defaultCurrency']);
   }
 
@@ -380,20 +377,17 @@ class api_v3_SettingTest extends CiviUnitTestCase {
    */
   public function testGetSetConfigSettingMultipleDomains() {
     $settings = $this->callAPISuccess('setting', 'create', array(
-        'defaultCurrency' => 'USD',
-        'domain_id' => $this->_currentDomain,
-      )
-    );
+      'defaultCurrency' => 'USD',
+      'domain_id' => $this->_currentDomain,
+    ));
     $settings = $this->callAPISuccess('setting', 'create', array(
-        'defaultCurrency' => 'CAD',
-        'domain_id' => $this->_domainID2,
-      )
-    );
+      'defaultCurrency' => 'CAD',
+      'domain_id' => $this->_domainID2,
+    ));
     $settings = $this->callAPISuccess('setting', 'get', array(
-        'return' => 'defaultCurrency',
-        'domain_id' => 'all',
-      )
-    );
+      'return' => 'defaultCurrency',
+      'domain_id' => 'all',
+    ));
     $this->assertEquals('USD', $settings['values'][$this->_currentDomain]['defaultCurrency']);
     $this->assertEquals('CAD', $settings['values'][$this->_domainID2]['defaultCurrency'],
       "second domain (id {$this->_domainID2} ) should be set to CAD. First dom was {$this->_currentDomain} & was USD");

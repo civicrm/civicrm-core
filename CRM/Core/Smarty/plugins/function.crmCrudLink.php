@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -51,11 +51,11 @@ function smarty_function_crmCrudLink($params, &$smarty) {
     $params['action'] = 'VIEW';
   }
 
-  $link = CRM_Utils_System::createDefaultCrudLink(array(
+  $link = CRM_Utils_System::createDefaultCrudLink([
     'action' => constant('CRM_Core_Action::' . $params['action']),
     'entity_table' => $params['table'],
     'entity_id' => $params['id'],
-  ));
+  ]);
 
   if ($link) {
     return sprintf('<a href="%s">%s</a>',

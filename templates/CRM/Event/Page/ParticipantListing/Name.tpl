@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 {* Displays participant listing for an event. *}
 {if $rows}
     {include file="CRM/common/pager.tpl" location="top"}
-       <table cellpadding="0" cellspacing="0" border="0">
+       <table class="selector" cellpadding="0" cellspacing="0" border="0">
          <tr class="columnheader">
         {foreach from=$headers item=header}
         <th scope="col">

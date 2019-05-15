@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,11 @@
 {else}
   <div class="help">{ts}Manage event participant statuses below. Enable selected statuses to allow event waitlisting and/or participant approval.{/ts} {help id="id-disabled_statuses"}</div>
 
-<div class="crm-section participant-status">
+<div class="crm-block crm-content-block participant-status">
   {strip}
     {* handle enable/disable actions*}
     {include file="CRM/common/enableDisableApi.tpl"}
-    <table cellpadding="0" cellspacing="0" border="0">
+    <table cellpadding="0" cellspacing="0" border="0" class="row-highlight">
       <thead class="sticky">
         <th>{ts}Label{/ts}</th>
         <th>{ts}Name (Status ID){/ts}</th>

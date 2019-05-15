@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,12 @@
         <span class="crm-i fa-pencil"></span> {if $add}{ts}Edit address{/ts}{else}{ts}Add address{/ts}{/if}
       </div>
     {/if}
-    {if $add }
+    {if !$add}
+      <div class="crm-summary-row">
+        <div class="crm-label">{ts}Address{/ts}</div>
+        <div class="crm-content"></div>
+      </div>
+    {else}
       <div class="crm-summary-row {if $add.is_primary eq 1} primary{/if}">
         <div class="crm-label">
           {ts 1=$add.location_type}%1 Address{/ts}

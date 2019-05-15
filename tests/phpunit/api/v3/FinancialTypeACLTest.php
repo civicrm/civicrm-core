@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,9 +33,8 @@
  */
 class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
 
-  /**
-   * Assume empty database with just civicrm_data.
-   */
+  use CRMTraits_Financial_FinancialACLTrait;
+
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
@@ -109,29 +108,14 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(array('civicrm_uf_match'));
-    CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = array();
-    CRM_Financial_BAO_FinancialType::$_statusACLFt = array();
-    $params = array(
-      'domain_id' => 1,
-      'contribution_invoice_settings' => array('acl_financial_type' => 0),
-    );
-  }
-
-  public function setACL() {
-    CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = array();
-    CRM_Financial_BAO_FinancialType::$_statusACLFt = array();
-    $params = array(
-      'domain_id' => 1,
-      'contribution_invoice_settings' => array('acl_financial_type' => 1),
-    );
-    $this->callAPISuccess('setting', 'create', $params);
+    $this->disableFinancialACLs();
   }
 
   /**
    * Test Get.
    */
   public function testCreateACLContribution() {
-    $this->setACL();
+    $this->enableFinancialACLs();
     $p = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
@@ -146,28 +130,29 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'check_permissions' => TRUE,
     );
-    $config = &CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array(
+
+    $this->setPermissions([
       'access CiviCRM',
       'access CiviContribute',
       'edit contributions',
-    );
+    ]);
     $result = $this->callAPIFailure('contribution', 'create', $p);
     $this->assertEquals('You do not have permission to create this contribution', $result['error_message']);
-    $config->userPermissionClass->permissions[] = 'add contributions of type Donation';
+    $this->addFinancialAclPermissions([['add', 'Donation']]);
+
     $contribution = $this->callAPISuccess('contribution', 'create', $p);
 
     $params = array(
       'contribution_id' => $contribution['id'],
     );
 
-    $config->userPermissionClass->permissions = array(
+    $this->setPermissions([
       'access CiviCRM',
       'access CiviContribute',
       'edit contributions',
       'view contributions of type Donation',
       'delete contributions of type Donation',
-    );
+    ]);
 
     $contribution = $this->callAPISuccess('contribution', 'get', $params);
 
@@ -191,15 +176,16 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
    * Test that acl contributions can be retrieved.
    */
   public function testGetACLContribution() {
-    $this->setACL();
-    $config = &CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array(
+    $this->enableFinancialACLs();
+
+    $this->setPermissions([
       'access CiviCRM',
       'access CiviContribute',
       'view all contacts',
       'add contributions of type Donation',
-    );
+    ]);
     $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
+    $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, ['financial_type_id' => 'Member Dues']));
 
     $params = array(
       'id' => $contribution['id'],
@@ -208,19 +194,17 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'get', $params);
     $this->assertEquals($contribution['count'], 0);
 
-    CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
-
-    $config->userPermissionClass->permissions[3] = 'view contributions of type Donation';
-    $contribution = $this->callAPISuccess('contribution', 'get', $params);
-
-    $this->assertEquals($contribution['count'], 1);
+    $this->addFinancialAclPermissions([['view', 'Donation']]);
+    $this->callAPISuccessGetSingle('contribution', $params);
+    $this->callAPISuccessGetCount('contribution', ['financial_type_id' => 'Member Dues', 'check_permissions' => 1], 0);
+    $this->callAPISuccessGetCount('contribution', ['financial_type_id' => 'Member Dues'], 1);
   }
 
   /**
    * Test checks that passing in line items suppresses the create mechanism.
    */
   public function testCreateACLContributionChainedLineItems() {
-    $this->setACL();
+    $this->enableFinancialACLs();
     $params = array(
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
@@ -251,30 +235,26 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       ),
     );
 
-    $config = CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array(
+    $this->setPermissions([
       'access CiviCRM',
       'access CiviContribute',
       'edit contributions',
       'delete in CiviContribute',
       'add contributions of type Donation',
       'delete contributions of type Donation',
-    );
+    ]);
     $this->callAPIFailure('contribution', 'create', $params, 'Error in call to LineItem_create : You do not have permission to create this line item');
 
     // Check that the entire contribution has rolled back.
     $contribution = $this->callAPISuccess('contribution', 'get', array());
     $this->assertEquals(0, $contribution['count']);
 
-    CRM_Financial_BAO_FinancialType::$_availableFinancialTypes = NULL;
-
-    $config = CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array_merge($config->userPermissionClass->permissions, array(
-      'add contributions of type Member Dues',
-      'view contributions of type Donation',
-      'view contributions of type Member Dues',
-      'delete contributions of type Member Dues',
-    ));
+    $this->addFinancialAclPermissions([
+      ['add', 'Member Dues'],
+      ['view', 'Donation'],
+      ['view', 'Member Dues'],
+      ['delete', 'Member Dues'],
+    ]);
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
 
     $lineItemParams = array(
@@ -299,7 +279,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
    * Test that acl contributions can be edited.
    */
   public function testEditACLContribution() {
-    $this->setACL();
+    $this->enableFinancialACLs();
     $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
 
     $params = array(
@@ -307,16 +287,16 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'check_permissions' => TRUE,
       'total_amount' => 200.00,
     );
-    $config = CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array(
+
+    $this->setPermissions([
       'access CiviCRM',
       'access CiviContribute',
       'edit contributions',
       'view contributions of type Donation',
-    );
+    ]);
     $this->callAPIFailure('Contribution', 'create', $params);
 
-    $config->userPermissionClass->permissions[] = 'edit contributions of type Donation';
+    $this->addFinancialAclPermissions([['edit', 'Donation']]);
     $contribution = $this->callAPISuccess('Contribution', 'create', $params);
 
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 200.00);
@@ -326,24 +306,24 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
    * Test that acl contributions can be deleted.
    */
   public function testDeleteACLContribution() {
-    $this->setACL();
-    $config = CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array(
+    $this->enableFinancialACLs();
+
+    $this->setPermissions([
       'access CiviCRM',
       'access CiviContribute',
       'view all contacts',
       'add contributions of type Donation',
-    );
+    ]);
     $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
 
     $params = array(
       'contribution_id' => $contribution['id'],
       'check_permissions' => TRUE,
     );
-    $config->userPermissionClass->permissions[3] = 'delete in CiviContribute';
+    $this->addPermissions(['delete in CiviContribute']);
     $this->callAPIFailure('Contribution', 'delete', $params);
 
-    $config->userPermissionClass->permissions[] = 'delete contributions of type Donation';
+    $this->addFinancialAclPermissions([['delete', 'Donation']]);
     $contribution = $this->callAPISuccess('Contribution', 'delete', $params);
 
     $this->assertEquals($contribution['count'], 1);

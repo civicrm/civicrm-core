@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -44,13 +44,13 @@ class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviPledge'));
 
-    $startToDate = array();
-    $yearToDate = array();
-    $monthToDate = array();
-    $previousToDate = array();
+    $startToDate = [];
+    $yearToDate = [];
+    $monthToDate = [];
+    $previousToDate = [];
 
-    $prefixes = array('start', 'month', 'year', 'previous');
-    $status = array('Completed', 'Cancelled', 'Pending', 'In Progress', 'Overdue');
+    $prefixes = ['start', 'month', 'year', 'previous'];
+    $status = ['Completed', 'Cancelled', 'Pending', 'In Progress', 'Overdue'];
 
     // cumulative (since inception) - prefix = 'start'
     $startDate = NULL;
@@ -58,7 +58,7 @@ class CRM_Pledge_Page_DashBoard extends CRM_Core_Page {
 
     // current year - prefix = 'year'
     $yearDate = \Civi::settings()->get('fiscalYearStart');
-    $year = array('Y' => date('Y'));
+    $year = ['Y' => date('Y')];
     $this->assign('curYear', $year['Y']);
     $yearDate = array_merge($year, $yearDate);
     $yearDate = CRM_Utils_Date::format($yearDate);

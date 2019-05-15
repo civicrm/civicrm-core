@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Mailing_Form_Search extends CRM_Core_Form {
 
@@ -64,7 +64,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
     $enabledLanguages = CRM_Core_I18n::languages(TRUE);
 
     if (count($enabledLanguages) > 1) {
-      $this->addElement('select', 'language', ts('Language'), array('' => ts('- all languages -')) + $enabledLanguages, array('class' => 'crm-select2'));
+      $this->addElement('select', 'language', ts('Language'), ['' => ts('- all languages -')] + $enabledLanguages, ['class' => 'crm-select2']);
     }
 
     if ($parent->_sms) {
@@ -72,27 +72,27 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
     }
     $this->add('hidden', 'hidden_find_mailings', 1);
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'refresh',
         'name' => ts('Search'),
         'isDefault' => TRUE,
-      ),
-    ));
+      ],
+    ]);
   }
 
   /**
    * @return array
    */
   public function setDefaultValues() {
-    $defaults = $statusVals = array();
+    $defaults = $statusVals = [];
     $parent = $this->controller->getParent();
 
     if ($parent->get('unscheduled')) {
       $defaults['status_unscheduled'] = 1;
     }
     if ($parent->get('scheduled')) {
-      $statusVals = array('Scheduled', 'Complete', 'Running', 'Canceled');
+      $statusVals = array_keys(CRM_Core_SelectValues::getMailingJobStatus());
       $defaults['is_archived'] = 0;
     }
     if ($parent->get('archived')) {
@@ -115,7 +115,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
 
     $parent = $this->controller->getParent();
     if (!empty($params)) {
-      $fields = array(
+      $fields = [
         'mailing_name',
         'mailing_from',
         'mailing_to',
@@ -127,16 +127,15 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
         'is_archived',
         'language',
         'hidden_find_mailings',
-      );
+      ];
       foreach ($fields as $field) {
         if (isset($params[$field]) &&
           !CRM_Utils_System::isNull($params[$field])
         ) {
-          if (in_array($field, array(
-              'mailing_from',
-              'mailing_to',
-            )) && !$params["mailing_relative"]
-          ) {
+          if (in_array($field, [
+            'mailing_from',
+            'mailing_to',
+          ]) && !$params["mailing_relative"]) {
             $time = ($field == 'mailing_to') ? '235959' : NULL;
             $parent->set($field, CRM_Utils_Date::processDate($params[$field], $time));
           }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,7 +41,7 @@ class CRM_Cxn_ApiRouter {
    * @return mixed
    */
   public static function route($cxn, $entity, $action, $params) {
-    $SUPER_PERM = array('administer CiviCRM');
+    $SUPER_PERM = ['administer CiviCRM'];
 
     require_once 'api/v3/utils.php';
 

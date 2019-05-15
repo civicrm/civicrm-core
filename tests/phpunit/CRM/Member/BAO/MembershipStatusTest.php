@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -128,6 +128,48 @@ class CRM_Member_BAO_MembershipStatusTest extends CiviUnitTestCase {
     $defaults = array();
     $result = CRM_Member_BAO_MembershipStatus::retrieve($params, $defaults);
     $this->assertEquals(empty($result), TRUE, 'Verify membership status record deletion.');
+  }
+
+  public function testExpiredDisabled() {
+    $result = civicrm_api3('MembershipStatus', 'get', [
+      'name' => "Expired",
+      'api.MembershipStatus.create' => ['label' => 'Expiiiired'],
+    ]);
+
+    // Calling it 'Expiiiired' is OK.
+    $result = $this->callAPISuccess('job', 'process_membership', []);
+
+    $result = civicrm_api3('MembershipStatus', 'get', [
+      'name' => "Expired",
+      'api.MembershipStatus.create' => ['is_active' => 0],
+    ]);
+
+    // Disabling 'Expired' is OK.
+    $result = $this->callAPISuccess('job', 'process_membership', []);
+
+    $result = civicrm_api3('MembershipStatus', 'get', [
+      'name' => "Expired",
+      'api.MembershipStatus.delete' => [],
+    ]);
+
+    // Deleting 'Expired' is OK.
+    $result = $this->callAPISuccess('job', 'process_membership', []);
+
+    // Put things back like normal
+    $result = civicrm_api3('MembershipStatus', 'create', [
+      'name' => 'Expired',
+      'label' => 'Expired',
+      'start_event' => 'end_date',
+      'start_event_adjust_unit' => 'month',
+      'start_event_adjust_interval' => 1,
+      'is_current_member' => 0,
+      'is_admin' => 0,
+      'weight' => 4,
+      'is_default' => 0,
+      'is_active' => 1,
+      'is_reserved' => 0,
+    ]);
+
   }
 
   public function testGetMembershipStatusByDate() {

@@ -37,7 +37,7 @@
     <name>entity_id2</name>
     <title>Prev Next Entity ID 2</title>
     <type>int unsigned</type>
-    <required>true</required>
+    <required>false</required>
     <comment>FK to entity table specified in entity_table column.</comment>
     <add>3.4</add>
   </field>
@@ -54,6 +54,7 @@
     <title>Prev Next Data</title>
     <type>longtext</type>
     <comment>cached snapshot of the serialized data</comment>
+    <serialize>PHP</serialize>
     <add>3.4</add>
   </field>
   <field>

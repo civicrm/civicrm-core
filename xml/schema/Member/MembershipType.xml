@@ -47,6 +47,10 @@
     <length>128</length>
     <localizable>true</localizable>
     <comment>Name of Membership Type</comment>
+    <html>
+      <type>Text</type>
+      <label>Name</label>
+    </html>
     <add>1.5</add>
   </field>
   <field>
@@ -57,6 +61,7 @@
       <type>TextArea</type>
       <rows>6</rows>
       <cols>50</cols>
+      <label>Description</label>
     </html>
     <length>255</length>
     <localizable>true</localizable>
@@ -114,10 +119,15 @@
   </foreignKey>
   <field>
     <name>minimum_fee</name>
-    <title>membership Type Minimum Fee</title>
+    <title>Membership Type Minimum Fee</title>
     <type>decimal</type>
+    <length>18,9</length>
     <comment>Minimum fee for this membership (0 for free/complimentary memberships).</comment>
     <default>0</default>
+    <html>
+      <type>Text</type>
+      <label>Minimum Fee</label>
+    </html>
     <add>1.5</add>
   </field>
   <field>
@@ -138,6 +148,9 @@
     <name>duration_interval</name>
     <title>Membership Type Duration Interval</title>
     <type>int</type>
+    <html>
+      <type>Text</type>
+    </html>
     <comment>Number of duration units in membership period (e.g. 1 year, 12 months).</comment>
     <add>1.5</add>
   </field>
@@ -147,6 +160,9 @@
     <type>varchar</type>
     <length>8</length>
     <comment>Rolling membership period starts on signup date. Fixed membership periods start on fixed_period_start_day.</comment>
+    <html>
+      <type>Select</type>
+    </html>
     <pseudoconstant>
       <callback>CRM_Core_SelectValues::periodType</callback>
     </pseudoconstant>
@@ -198,6 +214,10 @@
     <type>int</type>
     <comment>Maximum number of related memberships.</comment>
     <add>4.3</add>
+    <html>
+      <type>Text</type>
+      <label>Max Related</label>
+    </html>
   </field>
   <field>
     <name>visibility</name>
@@ -216,6 +236,9 @@
     <name>weight</name>
     <title>Order</title>
     <type>int</type>
+    <html>
+      <type>Text</type>
+    </html>
     <add>1.5</add>
   </field>
   <field>
@@ -248,6 +271,9 @@
     <name>auto_renew</name>
     <type>boolean</type>
     <default>0</default>
+    <html>
+      <type>Radio</type>
+    </html>
     <pseudoconstant>
       <callback>CRM_Core_SelectValues::memberAutoRenew</callback>
     </pseudoconstant>
@@ -261,5 +287,9 @@
     <default>1</default>
     <comment>Is this membership_type enabled</comment>
     <add>1.5</add>
+    <html>
+      <type>CheckBox</type>
+      <label>Enabled?</label>
+    </html>
   </field>
 </table>

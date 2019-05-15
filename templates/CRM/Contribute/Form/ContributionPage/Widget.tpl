@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -66,7 +66,7 @@
                         {ts}Click <strong>Save & Preview</strong> to save your settings and preview the widget on this page.{/ts}<br />
                     </div>
                 {/if}
-                <div style="text-align: center;width:260px">{$form._qf_Widget_refresh.html}</div>
+                <div>{$form._qf_Widget_refresh.html}</div>
             </div>
             <div class="col2">
                 {* Include "get widget code" section if widget has been created for this page and is_active. *}
@@ -92,9 +92,6 @@
           {ts}Edit Widget Colors{/ts}
          </div><!-- /.crm-accordion-header -->
          <div class="crm-accordion-body">
-            <div class="description">
-                {ts}Enter colors in hexadecimal format prefixed with <em>#</em>. EXAMPLE: <em>#FF0000</em> = Red. You can do a web search on 'hexadecimal colors' to find a chart of color codes.{/ts}
-            </div>
             <table class="form-layout-compressed">
             {foreach from=$colorFields item=field key=fieldName}
               <tr><td class="label">{$form.$fieldName.label}<span class="crm-marker"> *</span></td><td>{$form.$fieldName.html}</td></tr>
@@ -138,5 +135,5 @@
 </script>
 {/literal}
 {/crmRegion}
-{crmRegion name="contribute-form-contributionpage-widget-post}
+{crmRegion name="contribute-form-contributionpage-widget-post"}
 {/crmRegion}

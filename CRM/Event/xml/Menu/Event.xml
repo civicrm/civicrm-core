@@ -138,7 +138,7 @@
   <item>
      <path>civicrm/admin/setting/preferences/event</path>
      <title>CiviEvent Component Settings</title>
-     <page_callback>CRM_Admin_Form_Preferences_Event</page_callback>
+     <page_callback>CRM_Admin_Form_Generic</page_callback>
      <desc>Configure global CiviEvent behaviors.</desc>
      <access_arguments>access CiviEvent,administer CiviCRM</access_arguments>
      <adminGroup>CiviEvent</adminGroup>

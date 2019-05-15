@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -51,13 +51,14 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
     }
     $dao = new CRM_Core_DAO_UFMatch();
     $dao->copyValues($params);
+    // Fixme: this function cannot update records
     if (!$dao->find(TRUE)) {
       $dao->save();
+      Civi::$statics[__CLASS__][$params['domain_id']][(int) $dao->contact_id] = (int) $dao->uf_id;
+      CRM_Utils_Hook::post($hook, 'UFMatch', $dao->id, $dao);
     }
-    CRM_Utils_Hook::post($hook, 'UFMatch', $dao->id, $dao);
     return $dao;
   }
-
 
   /**
    * Given a UF user object, make sure there is a contact
@@ -145,11 +146,11 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
       list($displayName, $contactImage, $contactType, $contactSubtype, $contactImageUrl)
         = CRM_Contact_BAO_Contact::getDisplayAndImage($ufmatch->contact_id, TRUE, TRUE);
 
-      $otherRecent = array(
+      $otherRecent = [
         'imageUrl' => $contactImageUrl,
         'subtype' => $contactSubtype,
         'editUrl' => CRM_Utils_System::url('civicrm/contact/add', "reset=1&action=update&cid={$ufmatch->contact_id}"),
-      );
+      ];
 
       CRM_Utils_Recent::add($displayName,
         CRM_Utils_System::url('civicrm/contact/view', "reset=1&cid={$ufmatch->contact_id}"),
@@ -205,7 +206,7 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
         $params = $_POST;
         $params['email'] = $uniqId;
 
-        $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, 'Individual', 'Unsupervised', array(), FALSE);
+        $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($params, 'Individual', 'Unsupervised', [], FALSE);
 
         if (!empty($ids) && Civi::settings()->get('uniq_email_per_site')) {
           // restrict dupeIds to ones that belong to current domain/site.
@@ -238,10 +239,10 @@ FROM   civicrm_uf_match
 WHERE  contact_id = %1
 AND    domain_id = %2
 ";
-        $params = array(
-          1 => array($dao->contact_id, 'Integer'),
-          2 => array(CRM_Core_Config::domainID(), 'Integer'),
-        );
+        $params = [
+          1 => [$dao->contact_id, 'Integer'],
+          2 => [CRM_Core_Config::domainID(), 'Integer'],
+        ];
         $conflict = CRM_Core_DAO::singleValueQuery($sql, $params);
 
         if (!$conflict) {
@@ -264,7 +265,7 @@ AND    domain_id = %2
           else {
             $primary_email = $user->email;
           }
-          $params = array('email-Primary' => $primary_email);
+          $params = ['email-Primary' => $primary_email];
         }
 
         if ($ctype == 'Organization') {
@@ -311,12 +312,12 @@ OR     uf_name      = %2
 OR     uf_id        = %3 )
 AND    domain_id    = %4
 ";
-      $params = array(
-        1 => array($ufmatch->contact_id, 'Integer'),
-        2 => array($ufmatch->uf_name, 'String'),
-        3 => array($ufmatch->uf_id, 'Integer'),
-        4 => array($ufmatch->domain_id, 'Integer'),
-      );
+      $params = [
+        1 => [$ufmatch->contact_id, 'Integer'],
+        2 => [$ufmatch->uf_name, 'String'],
+        3 => [$ufmatch->uf_id, 'Integer'],
+        4 => [$ufmatch->domain_id, 'Integer'],
+      ];
 
       $conflict = CRM_Core_DAO::singleValueQuery($sql, $params);
 
@@ -328,12 +329,12 @@ AND    domain_id    = %4
       }
       else {
         $msg = ts("Contact ID %1 is a match for %2 user %3 but has already been matched to %4",
-          array(
+          [
             1 => $ufmatch->contact_id,
             2 => $uf,
             3 => $ufmatch->uf_id,
             4 => $conflict,
-          )
+          ]
         );
         unset($conflict);
       }
@@ -435,10 +436,10 @@ AND    domain_id    = %4
         $query = "UPDATE  civicrm_email
                      SET email = %1
                      WHERE id =  %2";
-        $p = array(
-          1 => array($emailAddress, 'String'),
-          2 => array($emailID, 'Integer'),
-        );
+        $p = [
+          1 => [$emailAddress, 'String'],
+          2 => [$emailID, 'Integer'],
+        ];
         $dao = CRM_Core_DAO::executeQuery($query, $p);
       }
       else {
@@ -468,8 +469,11 @@ AND    domain_id    = %4
     $ufmatch = new CRM_Core_DAO_UFMatch();
 
     $ufmatch->uf_id = $ufID;
-    $ufmatch->domain_id = CRM_Core_Config::domainID();
+    $ufmatch->domain_id = $domainId = CRM_Core_Config::domainID();
     $ufmatch->delete();
+
+    // Flush cache
+    Civi::$statics[__CLASS__][$domainId] = [];
   }
 
   /**
@@ -478,20 +482,29 @@ AND    domain_id    = %4
    * @param int $ufID
    *   Id of UF for which related contact_id is required.
    *
-   * @return int
+   * @return int|NULL
    *   contact_id on success, null otherwise
    */
   public static function getContactId($ufID) {
-    if (!isset($ufID)) {
+    if (!$ufID) {
       return NULL;
     }
+    $domainId = CRM_Core_Config::domainID();
 
+    if (!isset(Civi::$statics[__CLASS__][$domainId])) {
+      Civi::$statics[__CLASS__][$domainId] = [];
+    }
+    $contactId = array_search($ufID, Civi::$statics[__CLASS__][$domainId]);
+    if ($contactId) {
+      return $contactId;
+    }
     $ufmatch = new CRM_Core_DAO_UFMatch();
-
     $ufmatch->uf_id = $ufID;
-    $ufmatch->domain_id = CRM_Core_Config::domainID();
+    $ufmatch->domain_id = $domainId;
     if ($ufmatch->find(TRUE)) {
-      return (int ) $ufmatch->contact_id;
+      $contactId = (int) $ufmatch->contact_id;
+      Civi::$statics[__CLASS__][$domainId][$contactId] = (int) $ufID;
+      return $contactId;
     }
     return NULL;
   }
@@ -502,22 +515,26 @@ AND    domain_id    = %4
    * @param int $contactID
    *   ID of the contact for which related uf_id is required.
    *
-   * @return int
+   * @return int|NULL
    *   uf_id of the given contact_id on success, null otherwise
    */
   public static function getUFId($contactID) {
-    if (!isset($contactID)) {
+    if (!$contactID) {
       return NULL;
     }
-    $domain = CRM_Core_BAO_Domain::getDomain();
-    $ufmatch = new CRM_Core_DAO_UFMatch();
+    $domainId = CRM_Core_Config::domainID();
+    $contactID = (int) $contactID;
 
-    $ufmatch->contact_id = $contactID;
-    $ufmatch->domain_id = $domain->id;
-    if ($ufmatch->find(TRUE)) {
-      return $ufmatch->uf_id;
+    if (empty(Civi::$statics[__CLASS__][$domainId]) || !array_key_exists($contactID, Civi::$statics[__CLASS__][$domainId])) {
+      Civi::$statics[__CLASS__][$domainId][$contactID] = NULL;
+      $ufmatch = new CRM_Core_DAO_UFMatch();
+      $ufmatch->contact_id = $contactID;
+      $ufmatch->domain_id = $domainId;
+      if ($ufmatch->find(TRUE)) {
+        Civi::$statics[__CLASS__][$domainId][$contactID] = (int) $ufmatch->uf_id;
+      }
     }
-    return NULL;
+    return Civi::$statics[__CLASS__][$domainId][$contactID];
   }
 
   /**
@@ -536,7 +553,7 @@ AND    domain_id    = %4
    *   contact_id on success, null otherwise
    */
   public static function getContactIDs() {
-    $id = array();
+    $id = [];
     $dao = new CRM_Core_DAO_UFMatch();
     $dao->find();
     while ($dao->fetch()) {
@@ -618,7 +635,7 @@ AND    domain_id    = %4
       $ufID = CRM_Utils_System::getLoggedInUfID();
     }
     if (!$ufID) {
-      return array();
+      return [];
     }
 
     static $ufValues;
@@ -627,12 +644,12 @@ AND    domain_id    = %4
       $ufmatch->uf_id = $ufID;
       $ufmatch->domain_id = CRM_Core_Config::domainID();
       if ($ufmatch->find(TRUE)) {
-        $ufValues[$ufID] = array(
+        $ufValues[$ufID] = [
           'uf_id' => $ufmatch->uf_id,
           'uf_name' => $ufmatch->uf_name,
           'contact_id' => $ufmatch->contact_id,
           'domain_id' => $ufmatch->domain_id,
-        );
+        ];
       }
     }
     return $ufValues[$ufID];
@@ -643,7 +660,7 @@ AND    domain_id    = %4
    */
   public function addSelectWhereClause() {
     // Prevent default behavior of joining ACLs onto the contact_id field
-    $clauses = array();
+    $clauses = [];
     CRM_Utils_Hook::selectWhereClause($this, $clauses);
     return $clauses;
   }

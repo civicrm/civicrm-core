@@ -1,112 +1,246 @@
 The following people and organizations sponsored and/or contributed new and improved features to the project.
 
 ************************************************
+Code Contributors for 5.x
+************************************************
+
+CiviCRM - Coleman Watts, Tim Otten
+
+AGH Strategies - Alice Frumin, Andrew Hunt, Eli Lisseck
+Agileware - Alok Patel, Francis Whittle, Justin Freeman
+Andrew Thompson
+applicado
+Australian Greens - Seamus Lee
+Bastien Ho
+Blackfly Solutions - Alan Dixon
+Calibrate - Wannes De Roy
+Caltha - Tomasz Pietrzkowski
+CEDC - Laryn Kragt Bakker
+Chris Burgess
+CiviCoop - Jaap Jansma
+CiviDesk - Sunil Pawar, Yashodha Chaku
+CompuCorp - Camilo Rodriguez, Davi Alexandre, Debarshi Bhaumik, Michael Devery,
+    Mukesh Ram, Omar Abu Hussein, René Olivo, Vinu Varshith Sekar
+Coop SymbioTIC - Mathieu Lutfy, Samuel Vanhove
+Davis Media Access - Darrick Servis
+Electronic Frontier Foundation - Mark Burdett
+eQuality Technology - Greg Rundlett
+Freeform Solutions - Herb van den Dool
+Fuzion - Jitendra Purohit
+Ginkgo Street Labs - Frank Gómez
+Hossein Amin
+JMA Consulting - Joe Murray, Monish Deb
+Johan Vervloet
+John Kingsnorth
+Joinery - Allen Shaw
+Kanzu Code - Carl Andrew Lema
+Kompetenzzentrum Technik-Diversity-Chancengleichheit - Niels Heinemann
+Left Join Labs - Sean Madsen
+Lighthouse Design and Consulting - Brian Shaughnessy
+Łukasz Krutul
+Megaphone Technology Consulting - Jon Goldberg
+MJW Consulting - Matthew Wire
+myDropWizard - David Snopek
+Naomi Rosenberg
+Olivier Tétard
+OSSeed Technologies - Madhavi Malgaonkar
+Oxfam Germany - Thomas Schüttler, Yuliyana Liyana
+Pradeep Nayak
+Progressive Technology Project - Jamie McClelland
+Richard van Oosterhout
+Romain Thouvenin
+Squiffle Consulting - Aidan Saunders
+Systopia - Björn Endres
+Tadpole Collective - Kevin Cristiano
+Third Sector Design - Michael McAndrew
+Tom Bloor
+Wikimedia Foundation - Eileen McNaughton
+Wildsight - Lars Sanders-Green
+Will Long
+
+************************************************
 Key Contributors and Sponsors for 4.7
 ************************************************
 
-CiviCRM Team - Atif Shaikh, Coleman Watts, David Greenberg, Eileen McNaughton,
-	       Jitendra Purohit, Josh Gowan, Kurund Jalmi,
-               Michael McAndrew, Monish Deb, Rohan Ramesh Katkar, Tim Otten,
-               Yashodha Chaku
+CiviCRM - Coleman Watts, Josh Gowans, Tim Otten
 
-AGH Strategies - Andrew Hunt, Tyrell Cook, Nikki Murray
-Agileware - Justin Freeman, Francis Whittle, Iris Abarquez, Vaibhav Sagar
+Aaron Jones
+Abhikalak Consultants - Amal Sharma
+AGH Strategies - Alice Frumin, Andrew Hunt, Eli Lisseck, Nikki Murray, Tommy
+    Bobo, Tyrell Cook
+Agileware - Alok Patel, Francis Whittle, Iris Abarquez, Justin Freeman, Vaibhav
+    Sagar
+András Molnár
 Andrew West
+AppChecker
 Aputsiaĸ Niels Janussen
-Aron Novak
-Backoffice Thinking
+Arkadiusz Rzadkowolski
+Arun Singh
+ATD Fourth World - Véronique Gratioulet
+Atif Shaikh
+Australian Greens - Seamus Lee
+Awebon Technologies - Karthikeyan Balasubramanian
+BackOffice Thinking - Hassan Farooq
 Barbara Miller
+Black Brick Software - David Hayes
+Blackfly Solutions - Alan Dixon
+British Humanist Association - Andrew West
 Borislav Zlatanov
 Brian Dombrowski
+Brooks Digital - Spencer Brooks
 Caroline Badley
-Christian Wach
+CEDC - Laryn Kragt Bakker
+Chanun Chirattikanon
 Charlie DeTar
 Chirojeugd Vlaanderen - Johan Vervloet
+Chris Burgess
+Christian Wach
 Circle Interactive - Dave Jenkins
-CiviCoop - Jaap Jansma
-CiviDesk - Nicolas Ganivet, Sunil Pawar, Virginie Ganivet
-Compucorp - Guanhuan Chen, Jamie Novick
-CiviCoop - Jaap Jansma
+CiviCoop - Erik Hommel, Jaap Jansma
+CiviDesk - Nicolas Ganivet, Sunil Pawar, Virginie Ganivet, Yashodha Chaku
+CiviFirst - John Kirk
+Community Builders - Dejan Lukic
+Community IT Academy - William Mortada
+CompuCorp - Camilo Rodriguez, Guanhuan Chen, Kacper Warda, Jamie Novick, Michael
+    Devery, Mukesh Ram, Omar Abu Hussein
 Coop SymbioTIC - Mathieu Lutfy, Samuel Vanhove
 Dave D
+Dave Greenberg
 David Hayes
+Deepak Srivastava
+Denver DataMan - Steve Kessler
 Dhanesh Dhuri
+Daniël van Vuuren
 Dmitry Smirnov
+Donald Lobo
+E-Dynamics - Franky Van Liedekerke
+Eaiman Shoshi
+Effy Elden
+Electronic Frontier Foundation - Mark Burdett
 Elin Waring
-Emphanos LLC - Allen Shaw
+Emphanos LLC
+Ergon Logic Enterprises - Christopher Gervais
+Erich Schulz
 Esantanche
+Francesc Bassas i Bullich
 Freeform Solutions - Lola Slade, Stephanie Gray, Herb van den Dool
 Future First - David Knoll, John Prescott
-Fuzion NZ - Chris Burgess, Eileen McNaughton, Peter Davis, Torrance Hodgson
+Fuzion - Peter Davis, Torrance Hodgson, Jitendra Purohit
 Giant Rabbit - Peter Haight
-Ginkgo Street Labs - Frank Gomez, Galata Tona, Michael Daryabeygi, Roshani Kothari, Toby Lounsbury
+Ginkgo Street Labs - Frank Gómez, Galata Tona, Michael Daryabeygi, Roshani
+    Kothari
+Gizra - Aron Novak
+Greenleaf Advancement - Guy Iaccarino, Karen Stevenson
+Hartmann Computer Consulting - Peter Hartmann
+iXiam - Luciano Spiegel
 Jake Martin White
+JazzMan
+jernic
+Jérôme Lebleu
+JMA Consulting - Edsel Lopez, Joe Murray, Monish Deb
 Joanne Chester
 Joe McLaughlin
-John P Kirk
+John Kingsnorth
+Joinery - Allen Shaw
+Joost Fock
 Joris
-JMA Consulting - Joe Murray, Pradeep Nayak, Edsel Lopez
-gah242s
-Greenleaf Advancement - Guy Iaccarino
-K Sneed Consulting - Kate Sneed
+Kanzu Code - Carl Andrew Lema
 Kemal Bay
 Ken West
 Kevin Levie
+Kevin Reynen
+Klaas Eikelboom
+Klangsoft - David Reedy Jr
+Kompetenzzentrum Technik-Diversity-Chancengleichheit - Niels Heinemann
 Korlon - Stuart Gaston
-kreynen
-Laryn
-Lesley Evensen (zorgalina)
+K Sneed Consulting - Kate Sneed
+Left Join Labs - Sean Madsen
+Lemniscus - Noah Miller
+Lesley Evensen
 Lighthouse Consulting and Design - Brian Shaughnessy
+Marc Brazeau
 Marty Wright
-Matthew Wire
 Mattias Michaux
 Megaphone Technology Consulting - Jon Goldberg
+Michael Hurwicz
+Mihael Mladenov
+Milton Zurita
+MJW Consulting - Matthew Wire
 Mohit Aggarwal
+MongoDB - A. Jesse Jiryu Davis
+mountev
+myDropWizard - David Snopek
+Nathan Brettell
 National Urban League - Lisa Taliano
+Neuwald Tecnologia da Informação - Arthur Almeida
 Nicholai Burton
 Niels Heinemann
 New York City Council
 New York State Senate - Ken Zalewski
+Noah's Light Foundation - Carlos Loeza
 Northbridge Digital - Oliver Gibson
 Olaf Buddenhagen
+Olivier Hertrich
+Oxfam Germany - Thomas Schüttler
 Palante Technology Cooperative - Joseph Lacey
 Paul Campbell
-Progressive Tech Project - Alice Aguilar, Jamie McClelland
+Pawel Nowak
+PowDevel - Beto Aveiga
+Pradeep Nayak
+Progressive Technology Project - Alice Aguilar, Jamie McClelland
+Randy Tobias
+Redfin Solutions - Chris Wells
 Richard Van Oosterhout
-RocXa
+Rohan Ramesh Katkar
+Romain Thouvenin
+Rupal Javiya
+Samson Alajede
 Saurabh Batra
-Seamus Lee
-Seb35
+Sébastien Beyou
 Semper IT - Karin Gerritsen
+Sharique Ahmed Farooqui
 Shawn Holt
-Skvare - Jeremy Proffitt, Peter Petrik
+Skvare - Jeremy Proffitt, Mark Hanna, Peter Petrik
 Smiling Heart Enterprises - Neil Planchon
+Spry Digital - Ellen Hendricks
 Squiffle Consulting - Aidan Saunders
+Stan Dragnev
 Stephen Palmstrom
 Symbiotic - Mathieu Lutfy, Samuel Vanhove
-Systopia - Björn Endres, Niko Bochan
-Tadpole - Dana Skallman, Kevin Cristiano
+Systopia - Björn Endres, Niko Bochan, Philipp Batroff
+Tadpole Collective - Dana Skallman, Kevin Cristiano
+Team Expansion - Greg Harris
 Tech to the People - Xavier Dutoit
+Third Sector Design - Michael McAndrew
 Thomas Leichtuss
+Thomas Schüttler
 Tim Mallezie
+Timbsoft Technologies - Tunbola Ogunwande
+Tobias Lounsbury
 Torenware Networks - Rob Thorne
-University of Cambridge – Alex Corr, John Kingsnorth
-Veda Consulting - Parvez Saleh, Deepak Srivastava, Kajan
+University of Cambridge – Alex Corr
+Vasantha Kaje
+Veda Consulting - Parvez Saleh, Kajan
+Vedant Rathore
+Vikas Kumar
+Vinu Varshith Sekar
 Wanna Pixel - Nathan Porter, Marisa Porter
-Web Access - Sudha Bisht
-Wikimedia Foundation - Adam Wight
+We Move Europe/Caltha - Tomasz Pietrzkowski
+Web Access - Kurund Jalmi, Sudha Bisht
+Wikimedia Foundation - Adam Wight, Eileen McNaughton, Elliott Eggleston, Maggie
+    Epps
+Will Long
 yurg
-zarandras
 
 ************************************************
 Key Contributors and Sponsors for 4.6
 ************************************************
 
 CiviCRM Team - Atif Shaikh, Coleman Watts, David Greenberg, Donald Lobo,
-               Eileen McNaughton, Jitendra Purohit, Josh Gowan, Kurund Jalmi, 
+               Eileen McNaughton, Jitendra Purohit, Josh Gowan, Kurund Jalmi,
                Michael McAndrew, Monish Deb, Rohan Ramesh Katkar, Tim Otten,
                Yashodha Chaku
-ADG Communications - Steve Binkowski  
+ADG Communications - Steve Binkowski
 AGH Strategies - Andrew Hunt, Jane Hanley, Tommy Bobo, Tyrell Cook
 Agileware - Justin Freeman, Francis Whittle, Iris Abarquez, Vaibhav Sagar
 Alex C

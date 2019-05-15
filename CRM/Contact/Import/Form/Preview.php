@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -121,13 +121,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       $this->assign($property, $this->get($property));
     }
 
-    $statusID = $this->get('statusID');
-    if (!$statusID) {
-      $statusID = md5(uniqid(rand(), TRUE));
-      $this->set('statusID', $statusID);
-    }
-    $statusUrl = CRM_Utils_System::url('civicrm/ajax/status', "id={$statusID}", FALSE, NULL, FALSE);
-    $this->assign('statusUrl', $statusUrl);
+    $this->setStatusUrl();
 
     $showColNames = TRUE;
     if ('CRM_Import_DataSource_CSV' == $this->get('dataSource') &&
@@ -157,9 +151,9 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
 
     if (!empty($groups)) {
       $this->addElement('select', 'groups', ts('Add imported records to existing group(s)'), $groups, array(
-          'multiple' => "multiple",
-          'class' => 'crm-select2',
-        ));
+        'multiple' => "multiple",
+        'class' => 'crm-select2',
+      ));
     }
 
     //display new tag
@@ -193,7 +187,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
         'name' => ts('Import Now'),
         'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
         'isDefault' => TRUE,
-        'js' => array('onclick' => "return verify( );"),
       ),
       array(
         'type' => 'cancel',

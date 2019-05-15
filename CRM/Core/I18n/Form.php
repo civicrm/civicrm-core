@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,12 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
 class CRM_Core_I18n_Form extends CRM_Core_Form {
+
   public function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
     $tsLocale = CRM_Core_I18n::getLocale();
@@ -51,7 +52,7 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
     $this->addElement('hidden', 'field', $field);
     $this->addElement('hidden', 'id', $id);
 
-    $cols = array();
+    $cols = [];
     foreach ($this->_locales as $locale) {
       $cols[] = "{$field}_{$locale} {$locale}";
     }
@@ -66,7 +67,7 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
     $widget = $widgets[$table][$field];
 
     // attributes
-    $attributes = array('class' => '');
+    $attributes = ['class' => ''];
     if (isset($widget['rows'])) {
       $attributes['rows'] = $widget['rows'];
     }
@@ -123,12 +124,12 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
       CRM_Core_Error::fatal("$table.$field is not internationalized.");
     }
 
-    $cols = array();
-    $params = array(array($values['id'], 'Int'));
+    $cols = [];
+    $params = [[$values['id'], 'Int']];
     $i = 1;
     foreach ($this->_locales as $locale) {
       $cols[] = "{$field}_{$locale} = %$i";
-      $params[$i] = array($values["{$field}_{$locale}"], 'String');
+      $params[$i] = [$values["{$field}_{$locale}"], 'String'];
       $i++;
     }
     $query = "UPDATE $table SET " . implode(', ', $cols) . " WHERE id = %0";

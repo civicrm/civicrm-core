@@ -1,3 +1,4 @@
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
 {if $receipt_text}
 {$receipt_text}
 {/if}
@@ -64,10 +65,15 @@
 {ts}Transaction #{/ts}: {$trxn_id}
 {/if}
 
-{if $is_recur and ($contributeMode eq 'notify' or $contributeMode eq 'directIPN')}
-{ts}This is a recurring contribution. You can cancel future contributions at:{/ts}
+{if $is_recur}
+{ts}This is a recurring contribution.{/ts}
+
+{if $cancelSubscriptionUrl}
+{ts}You can cancel future contributions at:{/ts}
 
 {$cancelSubscriptionUrl}
+
+{/if}
 
 {if $updateSubscriptionBillingUrl}
 {ts}You can update billing details for this recurring contribution at:{/ts}
@@ -75,10 +81,13 @@
 {$updateSubscriptionBillingUrl}
 
 {/if}
+
+{if $updateSubscriptionUrl}
 {ts}You can update recurring contribution amount or change the number of installments for this recurring contribution at:{/ts}
 
 {$updateSubscriptionUrl}
 
+{/if}
 {/if}
 
 {if $honor_block_is_active}

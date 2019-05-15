@@ -28,7 +28,8 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
       'nick_name' => 'Firstie',
     ));
     $this->assertEquals('First', $result['values'][$result['id']]['first_name']);
-    $this->assertEquals('Firstie', $result['values'][$result['id']]['nick_name']); // munged by hook, but we haven't realized it
+    // munged by hook, but we haven't realized it
+    $this->assertEquals('Firstie', $result['values'][$result['id']]['nick_name']);
   }
 
   /**

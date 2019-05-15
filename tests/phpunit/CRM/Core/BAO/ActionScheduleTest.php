@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -79,8 +79,10 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'start_date' => '20120315',
         'end_date' => '20120615',
       ),
-      'role_id' => '1', // Attendee.
-      'status_id' => '8', // No-show.
+      // Attendee.
+      'role_id' => '1',
+      // No-show.
+      'status_id' => '8',
     );
 
     $this->fixtures['phonecall'] = array(
@@ -222,6 +224,35 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'start_action_offset' => '2',
       'start_action_unit' => 'week',
       'subject' => 'subject sched_membership_join_2week (joined {membership.join_date})',
+    );
+    $this->fixtures['sched_membership_start_1week'] = array(
+      'name' => 'sched_membership_start_1week',
+      'title' => 'sched_membership_start_1week',
+      'absolute_date' => '',
+      'body_html' => '<p>body sched_membership_start_1week</p>',
+      'body_text' => 'body sched_membership_start_1week',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => '',
+      'entity_value' => '',
+      'group_id' => '',
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 4,
+      'msg_template_id' => '',
+      'recipient' => '',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'after',
+      'start_action_date' => 'membership_start_date',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'week',
+      'subject' => 'subject sched_membership_start_1week (joined {membership.start_date})',
     );
     $this->fixtures['sched_membership_end_2week'] = array(
       'name' => 'sched_membership_end_2week',
@@ -499,12 +530,15 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'end_date' => '',
       'end_frequency_interval' => '',
       'end_frequency_unit' => '',
-      'entity_status' => '', // participant status id
-      'entity_value' => '', // event type id
+      // participant status id
+      'entity_status' => '',
+      // event type id
+      'entity_value' => '',
       'group_id' => '',
       'is_active' => 1,
       'is_repeat' => '0',
-      'mapping_id' => 2, // event type
+      // event type
+      'mapping_id' => 2,
       'msg_template_id' => '',
       'recipient' => '',
       'recipient_listing' => '',
@@ -528,12 +562,15 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       'end_date' => 'event_end_date',
       'end_frequency_interval' => '3',
       'end_frequency_unit' => 'month',
-      'entity_status' => '', // participant status id
-      'entity_value' => '', // event type id
+      // participant status id
+      'entity_status' => '',
+      // event type id
+      'entity_value' => '',
       'group_id' => '',
       'is_active' => 1,
       'is_repeat' => '1',
-      'mapping_id' => 2, // event type
+      // event type
+      'mapping_id' => 2,
       'msg_template_id' => '',
       'recipient' => '',
       'recipient_listing' => '',
@@ -680,11 +717,16 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
 
     // Some tokens - short as subject has 128char limit in DB.
     $someTokensTmpl = implode(';;', array(
-      '{contact.display_name}', // basic contact token
-      '{contact.gender}', // funny legacy contact token
-      '{contact.gender_id}', // funny legacy contact token
-      '{domain.name}', // domain token
-      '{activity.activity_type}', // action-scheduler token
+      // basic contact token
+      '{contact.display_name}',
+      // funny legacy contact token
+      '{contact.gender}',
+      // funny legacy contact token
+      '{contact.gender_id}',
+      // domain token
+      '{domain.name}',
+      // action-scheduler token
+      '{activity.activity_type}',
     ));
     // Further tokens can be tested in the body text/html.
     $manyTokensTmpl = implode(';;', array(
@@ -965,18 +1007,18 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
   // TODO // function testActivityDateTime_NonMatch() { }
 
   /**
-   * For contacts/members which match schedule based on join date,
+   * For contacts/members which match schedule based on join/start date,
    * an email should be sent.
    */
-  public function testMembershipJoinDateMatch() {
+  public function testMembershipDateMatch() {
     $membership = $this->createTestObject('CRM_Member_DAO_Membership', array_merge($this->fixtures['rolling_membership'], array('status_id' => 1)));
     $this->assertTrue(is_numeric($membership->id));
     $result = $this->callAPISuccess('Email', 'create', array(
       'contact_id' => $membership->contact_id,
       'email' => 'test-member@example.com',
       'location_type_id' => 1,
+      'is_primary' => 1,
     ));
-    $this->assertAPISuccess($result);
 
     $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
     $actionSchedule = $this->fixtures['sched_membership_join_2week'];
@@ -984,7 +1026,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
     $this->assertTrue(is_numeric($actionScheduleDao->id));
 
-    // start_date=2012-03-15 ; schedule is 2 weeks after start_date
+    // start_date=2012-03-15 ; schedule is 2 weeks after join_date
     $this->assertCronRuns(array(
       array(
         // Before the 2-week mark, no email.
@@ -999,6 +1041,114 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
         'subjects' => array('subject sched_membership_join_2week (joined March 15th, 2012)'),
       ),
     ));
+
+    $actionSchedule = $this->fixtures['sched_membership_start_1week'];
+    $actionSchedule['entity_value'] = $membership->membership_type_id;
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+
+    // start_date=2012-03-15 ; schedule is 1 weeks after start_date
+    $this->assertCronRuns(array(
+      array(
+        // Before the 2-week mark, no email.
+        'time' => '2012-03-21 01:00:00',
+        'recipients' => array(),
+        'subjects' => array(),
+      ),
+      array(
+        // After the 2-week mark, send an email.
+        'time' => '2012-03-22 01:00:00',
+        'recipients' => array(array('test-member@example.com')),
+        'subjects' => array('subject sched_membership_start_1week (joined March 15th, 2012)'),
+      ),
+    ));
+  }
+
+  /**
+   * CRM-21675: Support parent and smart group in 'Limit to' field
+   */
+  public function testScheduleReminderWithParentGroup() {
+    // Contact A with birth-date at '07-07-2005' and gender - Male, later got added in smart group
+    $contactID1 = $this->individualCreate(array('birth_date' => '20050707', 'gender_id' => 1, 'email' => 'abc@test.com'));
+    // Contact B with birth-date at '07-07-2005', later got added in regular group
+    $contactID2 = $this->individualCreate(array('birth_date' => '20050707', 'email' => 'def@test.com'), 1);
+    // Contact C with birth-date at '07-07-2005', but not included in any group
+    $contactID3 = $this->individualCreate(array('birth_date' => '20050707', 'email' => 'ghi@test.com'), 2);
+
+    // create regular group and add Contact B to it
+    $groupID = $this->groupCreate();
+    $this->callAPISuccess('GroupContact', 'Create', array(
+      'group_id' => $groupID,
+      'contact_id' => $contactID2,
+    ));
+
+    // create smart group which will contain all Male contacts
+    $smartGroupParams = array('formValues' => array('gender_id' => 1));
+    $smartGroupID = $this->smartGroupCreate(
+      $smartGroupParams,
+      array(
+        'name' => 'new_smart_group',
+        'title' => 'New Smart Group',
+        'parents' => array($groupID => 1),
+      )
+    );
+
+    $actionScheduleParams = array(
+      'name' => 'sched_contact_bday_yesterday',
+      'title' => 'sched_contact_bday_yesterday',
+      'absolute_date' => '',
+      'body_html' => '<p>you look like you were born yesterday!</p>',
+      'body_text' => 'you look like you were born yesterday!',
+      'end_action' => '',
+      'end_date' => '',
+      'end_frequency_interval' => '',
+      'end_frequency_unit' => '',
+      'entity_status' => 1,
+      'entity_value' => 'birth_date',
+      'limit_to' => 1,
+      'group_id' => $groupID,
+      'is_active' => 1,
+      'is_repeat' => '0',
+      'mapping_id' => 6,
+      'msg_template_id' => '',
+      'recipient' => '2',
+      'recipient_listing' => '',
+      'recipient_manual' => '',
+      'record_activity' => 1,
+      'repetition_frequency_interval' => '',
+      'repetition_frequency_unit' => '',
+      'start_action_condition' => 'after',
+      'start_action_date' => 'date_field',
+      'start_action_offset' => '1',
+      'start_action_unit' => 'day',
+      'subject' => 'subject sched_contact_bday_yesterday',
+    );
+
+    // Create schedule reminder where parent group ($groupID) is selectd to limit recipients,
+    // which contain a individual contact - $contactID2 and is parent to smart group.
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionScheduleParams);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+    $this->assertCronRuns(array(
+      array(
+        // On the birthday, no email.
+        'time' => '2005-07-07 01:00:00',
+        'recipients' => array(),
+      ),
+      array(
+        // The next day, send an email.
+        'time' => '2005-07-08 20:00:00',
+        'recipients' => array(
+          array(
+            'def@test.com',
+          ),
+          array(
+            'abc@test.com',
+          ),
+        ),
+      ),
+    ));
+    $this->groupDelete($smartGroupID);
+    $this->groupDelete($groupID);
   }
 
   /**
@@ -1168,7 +1318,6 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       //),
     ));
   }
-
 
   /**
    * Test membership end date email.
@@ -1435,9 +1584,12 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('contact', 'create', array_merge($this->fixtures['contact'], array('contact_id' => $membership->contact_id)));
     $this->assertAPISuccess($result);
 
-    $actionScheduleBefore = $this->fixtures['sched_membership_end_2week'];           // Send email 2 weeks before end_date
-    $actionScheduleOn = $this->fixtures['sched_on_membership_end_date'];             // Send email on end_date/expiry date
-    $actionScheduleAfter = $this->fixtures['sched_after_1day_membership_end_date'];  // Send email 1 day after end_date/grace period
+    // Send email 2 weeks before end_date
+    $actionScheduleBefore = $this->fixtures['sched_membership_end_2week'];
+    // Send email on end_date/expiry date
+    $actionScheduleOn = $this->fixtures['sched_on_membership_end_date'];
+    // Send email 1 day after end_date/grace period
+    $actionScheduleAfter = $this->fixtures['sched_after_1day_membership_end_date'];
     $actionScheduleBefore['entity_value'] = $actionScheduleOn['entity_value'] = $actionScheduleAfter['entity_value'] = $membership->membership_type_id;
     foreach (array('actionScheduleBefore', 'actionScheduleOn', 'actionScheduleAfter') as $value) {
       $$value = CRM_Core_BAO_ActionSchedule::add($$value);
@@ -1484,17 +1636,20 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->assertApproxEquals(
       strtotime('2012-06-01 01:00:00'),
       strtotime(CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleBefore->id, 'action_date_time', 'action_schedule_id', TRUE)),
-      3 // Variation in test execution time.
+      // Variation in test execution time.
+      3
     );
     $this->assertApproxEquals(
       strtotime('2012-06-15 00:00:00'),
       strtotime(CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleOn->id, 'action_date_time', 'action_schedule_id', TRUE)),
-      3 // Variation in test execution time.
+      // Variation in test execution time.
+      3
     );
     $this->assertApproxEquals(
       strtotime('2012-06-16 01:00:00'),
       strtotime(CRM_Core_DAO::getFieldValue('CRM_Core_DAO_ActionLog', $actionScheduleAfter->id, 'action_date_time', 'action_schedule_id', TRUE)),
-      3 // Variation in test execution time.
+      // Variation in test execution time.
+      3
     );
 
     //extend MED to 2 weeks after the current MED (that may signifies as membership renewal activity)
@@ -1579,6 +1734,82 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
     $this->callAPISuccess('custom_group', 'delete', array('id' => $createGroup['id']));
   }
 
+  /**
+   * Test sched reminder set via registration date.
+   */
+  public function testEventTypeRegistrationDate() {
+    //Create contact
+    $contactParams = array(
+      'email' => 'test-event@example.com',
+    );
+    $contact = $this->individualCreate($contactParams);
+    //Add it as a participant to an event ending registration - 7 days from now.
+    $params = array(
+      'start_date' => date('Ymd', strtotime('-5 day')),
+      'end_date' => date('Ymd', strtotime('+7 day')),
+      'registration_start_date' => date('Ymd', strtotime('-5 day')),
+      'registration_end_date' => date('Ymd', strtotime('+7 day')),
+    );
+    $event = $this->eventCreate($params);
+    $this->participantCreate(array('contact_id' => $contact, 'event_id' => $event['id']));
+
+    //Create a scheduled reminder to send email 7 days before registration date.
+    $actionSchedule = $this->fixtures['sched_eventtype_start_1week_before'];
+    $actionSchedule['start_action_offset'] = 7;
+    $actionSchedule['start_action_unit'] = 'day';
+    $actionSchedule['start_action_date'] = 'registration_end_date';
+    $actionSchedule['entity_value'] = $event['values'][$event['id']]['event_type_id'];
+    $actionSchedule['entity_status'] = $this->callAPISuccessGetValue('ParticipantStatusType', array(
+      'return' => "id",
+      'name' => "Attended",
+    ));
+    $actionSched = $this->callAPISuccess('action_schedule', 'create', $actionSchedule);
+    //Run the cron and verify if an email was sent.
+    $this->assertCronRuns(array(
+      array(
+        'time' => date('Y-m-d'),
+        'recipients' => array(array('test-event@example.com')),
+      ),
+    ));
+
+    //Create contact 2
+    $contactParams = array(
+      'email' => 'test-event2@example.com',
+    );
+    $contact2 = $this->individualCreate($contactParams);
+    //Create an event with registration end date = 2 week from now.
+    $params['end_date'] = date('Ymd', strtotime('+2 week'));
+    $params['registration_end_date'] = date('Ymd', strtotime('+2 week'));
+    $event2 = $this->eventCreate($params);
+    $this->participantCreate(array('contact_id' => $contact2, 'event_id' => $event2['id']));
+
+    //Assert there is no reminder sent to the contact.
+    $this->assertCronRuns(array(
+      array(
+        'time' => date('Y-m-d'),
+        'recipients' => array(),
+      ),
+    ));
+
+    //Modify the sched reminder to be sent 2 week from registration end date.
+    $this->callAPISuccess('action_schedule', 'create', array(
+      'id' => $actionSched['id'],
+      'start_action_offset' => 2,
+      'start_action_unit' => 'week',
+    ));
+
+    //Contact should receive the reminder now.
+    $this->assertCronRuns(array(
+      array(
+        'time' => date('Y-m-d'),
+        'recipients' => array(array('test-event2@example.com')),
+      ),
+    ));
+  }
+
+  /**
+   * Test sched reminder set via start date.
+   */
   public function testEventTypeStartDate() {
     // Create event+participant with start_date = 20120315, end_date = 20120615.
     $participant = $this->createTestObject('CRM_Event_DAO_Participant', array_merge($this->fixtures['participant'], array('status_id' => 2)));
@@ -1788,6 +2019,7 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       $this->assertTrue(is_numeric($contact->id));
       $emailParams = array(
         'contact_id' => $contact->id,
+        'is_primary' => 1,
         'email' => "test-member-{$interval_unit}@example.com",
         'location_type_id' => 1,
       );
@@ -1835,6 +2067,123 @@ class CRM_Core_BAO_ActionScheduleTest extends CiviUnitTestCase {
       $actionSchedule->delete();
       $membership->delete();
     }
+  }
+
+  /**
+   * Inherited members without permission to edit the main member contact should
+   * not get reminders.
+   *
+   * However, just because a contact inherits one membership doesn't mean
+   * reminders for other memberships should be suppressed.
+   *
+   * See CRM-14098
+   */
+  public function testInheritedMembershipPermissions() {
+    // Set up common parameters for memberships.
+    $membershipParams = $this->fixtures['rolling_membership'];
+    $membershipParams['status_id'] = 1;
+
+    $membershipParams['membership_type_id']['relationship_type_id'] = 1;
+    $membershipParams['membership_type_id']['relationship_direction'] = 'b_a';
+    $membershipType1 = $this->createTestObject('CRM_Member_DAO_MembershipType', $membershipParams['membership_type_id']);
+
+    // We'll create a new membership type that can be held at the same time as
+    // the first one.
+    $membershipParams['membership_type_id']['relationship_type_id'] = 'NULL';
+    $membershipParams['membership_type_id']['relationship_direction'] = 'NULL';
+    $membershipType2 = $this->createTestObject('CRM_Member_DAO_MembershipType', $membershipParams['membership_type_id']);
+
+    // Create the parent membership and contact
+    $membershipParams['membership_type_id'] = $membershipType1->id;
+    $mainMembership = $this->createTestObject('CRM_Member_DAO_Membership', $membershipParams);
+
+    $contactParams = [
+      'contact_type' => 'Individual',
+      'first_name' => 'Mom',
+      'last_name' => 'Rel',
+      'is_deceased' => 0,
+    ];
+    $this->createTestObject('CRM_Contact_DAO_Contact', array_merge($contactParams, ['id' => $mainMembership->contact_id]));
+
+    $emailParams = [
+      'contact_id' => $mainMembership->contact_id,
+      'email' => 'test-member@example.com',
+      'location_type_id' => 1,
+      'is_primary' => 1,
+    ];
+    $email = $this->createTestObject('CRM_Core_DAO_Email', $emailParams);
+
+    // Set up contacts and emails for the two children
+    $contactParams['first_name'] = 'Favorite';
+    $permChild = $this->createTestObject('CRM_Contact_DAO_Contact', $contactParams);
+    $emailParams['email'] = 'favorite@example.com';
+    $emailParams['contact_id'] = $permChild->id;
+    $this->createTestObject('CRM_Core_DAO_Email', $emailParams);
+
+    $contactParams['first_name'] = 'Black Sheep';
+    $nonPermChild = $this->createTestObject('CRM_Contact_DAO_Contact', $contactParams);
+    $emailParams['email'] = 'black.sheep@example.com';
+    $emailParams['contact_id'] = $nonPermChild->id;
+    $this->createTestObject('CRM_Core_DAO_Email', $emailParams);
+
+    // Each child gets a relationship, one with permission to edit the parent.  This
+    // will trigger inherited memberships for the first membership type
+    $relParams = [
+      'relationship_type_id' => 1,
+      'contact_id_a' => $nonPermChild->id,
+      'contact_id_b' => $mainMembership->contact_id,
+      'is_active' => 1,
+    ];
+    $this->callAPISuccess('relationship', 'create', $relParams);
+
+    $relParams['contact_id_a'] = $permChild->id;
+    $relParams['is_permission_a_b'] = CRM_Contact_BAO_Relationship::EDIT;
+    $this->callAPISuccess('relationship', 'create', $relParams);
+
+    // Mom and Black Sheep get their own memberships of the second type.
+    $membershipParams['membership_type_id'] = $membershipType2->id;
+    $membershipParams['owner_membership_id'] = 'NULL';
+    $membershipParams['contact_id'] = $mainMembership->contact_id;
+    $this->createTestObject('CRM_Member_DAO_Membership', $membershipParams);
+
+    $membershipParams['contact_id'] = $nonPermChild->id;
+    $this->createTestObject('CRM_Member_DAO_Membership', $membershipParams);
+
+    // Test a reminder for the first membership type - that should exclude Black
+    // Sheep.
+    $actionSchedule = $this->fixtures['sched_membership_join_2week'];
+    $actionSchedule['entity_value'] = $membershipType1->id;
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+
+    $this->assertCronRuns([
+      [
+        'time' => '2012-03-29 01:00:00',
+        'recipients' => [['test-member@example.com'], ['favorite@example.com']],
+        'subjects' => [
+          'subject sched_membership_join_2week (joined March 15th, 2012)',
+          'subject sched_membership_join_2week (joined March 15th, 2012)',
+        ],
+      ],
+    ]);
+
+    // Test a reminder for the second membership type - that should include
+    // Black Sheep.
+    $actionSchedule = $this->fixtures['sched_membership_start_1week'];
+    $actionSchedule['entity_value'] = $membershipType2->id;
+    $actionScheduleDao = CRM_Core_BAO_ActionSchedule::add($actionSchedule);
+    $this->assertTrue(is_numeric($actionScheduleDao->id));
+
+    $this->assertCronRuns([
+      [
+        'time' => '2012-03-22 01:00:00',
+        'recipients' => [['test-member@example.com'], ['black.sheep@example.com']],
+        'subjects' => [
+          'subject sched_membership_start_1week (joined March 15th, 2012)',
+          'subject sched_membership_start_1week (joined March 15th, 2012)',
+        ],
+      ],
+    ]);
   }
 
   public function createModifiedDateTime($origDateTime, $modifyRule) {

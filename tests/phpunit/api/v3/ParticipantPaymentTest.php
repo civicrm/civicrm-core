@@ -1,9 +1,9 @@
 <?php
 /**
  * +--------------------------------------------------------------------+
- * | CiviCRM version 4.7                                                |
+ * | CiviCRM version 5                                                  |
  * +--------------------------------------------------------------------+
- * | Copyright CiviCRM LLC (c) 2004-2017                                |
+ * | Copyright CiviCRM LLC (c) 2004-2019                                |
  * +--------------------------------------------------------------------+
  * | This file is a part of CiviCRM.                                    |
  * |                                                                    |
@@ -56,24 +56,24 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $this->_financialTypeId = 1;
 
     $this->_participantID = $this->participantCreate(array(
-        'contactID' => $this->_contactID,
-        'eventID' => $this->_eventID,
-      ));
+      'contactID' => $this->_contactID,
+      'eventID' => $this->_eventID,
+    ));
     $this->_contactID2 = $this->individualCreate();
     $this->_participantID2 = $this->participantCreate(array(
-        'contactID' => $this->_contactID2,
-        'eventID' => $this->_eventID,
-      ));
+      'contactID' => $this->_contactID2,
+      'eventID' => $this->_eventID,
+    ));
     $this->_participantID3 = $this->participantCreate(array(
-        'contactID' => $this->_contactID2,
-        'eventID' => $this->_eventID,
-      ));
+      'contactID' => $this->_contactID2,
+      'eventID' => $this->_eventID,
+    ));
 
     $this->_contactID3 = $this->individualCreate();
     $this->_participantID4 = $this->participantCreate(array(
-        'contactID' => $this->_contactID3,
-        'eventID' => $this->_eventID,
-      ));
+      'contactID' => $this->_contactID3,
+      'eventID' => $this->_eventID,
+    ));
   }
 
   /**
@@ -123,6 +123,26 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     $this->contributionDelete($contributionID);
   }
 
+  /**
+   * Test getPaymentInfo() returns correct
+   * information of the participant payment
+   */
+  public function testPaymentInfoForEvent() {
+    //Create Contribution & get contribution ID
+    $contributionID = $this->contributionCreate(array('contact_id' => $this->_contactID));
+
+    //Create Participant Payment record With Values
+    $params = array(
+      'participant_id' => $this->_participantID4,
+      'contribution_id' => $contributionID,
+    );
+    $this->callAPISuccess('participant_payment', 'create', $params);
+
+    //Check if participant payment is correctly retrieved.
+    $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_participantID4, 'event');
+    $this->assertEquals('Completed', $paymentInfo['contribution_status']);
+    $this->assertEquals('100.00', $paymentInfo['total']);
+  }
 
   ///////////////// civicrm_participant_payment_create methods
 
@@ -263,7 +283,6 @@ class api_v3_ParticipantPaymentTest extends CiviUnitTestCase {
     );
     $this->callAPISuccess('participant_payment', 'delete', $params);
   }
-
 
   /**
    * Test civicrm_participant_payment_delete with wrong params type.

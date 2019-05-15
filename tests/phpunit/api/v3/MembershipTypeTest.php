@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -126,9 +126,10 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test update fails with no ID.
+   * Domain ID can be intuited..
+   * DomainID is now optional on API, check that it gets set correctly and that the domain_id is not overwritten when not specified in create.
    */
-  public function testUpdateWithoutId() {
+  public function testCreateWithoutDomainId() {
     $params = array(
       'name' => '60+ Membership',
       'description' => 'people above 60 are given health instructions',
@@ -141,8 +142,18 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       'visibility' => 'public',
     );
 
-    $membershipType = $this->callAPIFailure('membership_type', 'create', $params);
-    $this->assertEquals($membershipType['error_message'], 'Mandatory key(s) missing from params array: domain_id');
+    $membershipType = $this->callAPISuccess('membership_type', 'create', $params);
+    $domainID = $this->callAPISuccessGetValue('MembershipType', ['return' => 'domain_id', 'id' => $membershipType['id']]);
+    $this->assertEquals(CRM_Core_Config::domainID(), $domainID);
+
+    $this->callAPISuccess('membership_type', 'create', ['domain_id' => 2, 'id' => $membershipType['id']]);
+    $domainID = $this->callAPISuccessGetValue('MembershipType', ['return' => 'domain_id', 'id' => $membershipType['id']]);
+    $this->assertEquals(2, $domainID);
+
+    $this->callAPISuccess('membership_type', 'create', ['id' => $membershipType['id'], 'description' => 'Cool member']);
+    $domainID = $this->callAPISuccessGetValue('MembershipType', ['return' => 'domain_id', 'id' => $membershipType['id']]);
+    $this->assertEquals(2, $domainID);
+
   }
 
   /**
@@ -258,10 +269,14 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
   public function testEnableMembershipTypeOnContributionPage() {
     $memType = array();
     $memType[1] = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID, 'minimum_fee' => 100));
-    $priceSet = $this->callAPISuccess('price_set', 'getvalue', array(
-      'name' => 'default_membership_type_amount',
-      'return' => 'id',
+    $priceSet = $this->callAPISuccess('price_set', 'create', array(
+      'title' => "test priceset",
+      'name' => "test_priceset",
+      'extends' => "CiviMember",
+      'is_quick_config' => 1,
+      'financial_type_id' => "Member Dues",
     ));
+    $priceSet = $priceSet['id'];
     $field = $this->callAPISuccess('price_field', 'create', array(
       'price_set_id' => $priceSet,
       'name' => 'membership_amount',
@@ -296,6 +311,32 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
     }
     $priceField = CRM_Price_BAO_PriceField::create($fieldParams);
     $this->assertEquals($priceField->id, $fieldParams['id']);
+
+    //Update membership type name and visibility
+    $updateParams = array(
+      'id' => $memType[1],
+      'name' => 'General - Edited',
+      'visibility' => 'Admin',
+      'financial_type_id' => 1,
+      'minimum_fee' => 300,
+      'description' => 'Test edit description',
+    );
+    $this->callAPISuccess('membership_type', 'create', $updateParams);
+    $priceFieldValue = $this->callAPISuccess('PriceFieldValue', 'get', array(
+      'sequential' => 1,
+      'membership_type_id' => $memType[1],
+    ));
+    //Verify if membership type updates are copied to pricefield value.
+    foreach ($priceFieldValue['values'] as $key => $value) {
+      $setId = $this->callAPISuccessGetValue('PriceField', array('return' => "price_set_id", 'id' => $value['price_field_id']));
+      if ($setId == $priceSet) {
+        $this->assertEquals($value['label'], $updateParams['name']);
+        $this->assertEquals($value['description'], $updateParams['description']);
+        $this->assertEquals((int) $value['amount'], $updateParams['minimum_fee']);
+        $this->assertEquals($value['financial_type_id'], $updateParams['financial_type_id']);
+        $this->assertEquals($value['visibility_id'], CRM_Price_BAO_PriceField::getVisibilityOptionID(strtolower($updateParams['visibility'])));
+      }
+    }
 
     foreach ($memType as $type) {
       $this->callAPISuccess('membership_type', 'delete', array('id' => $type));

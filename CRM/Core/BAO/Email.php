@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -151,25 +151,25 @@ LEFT JOIN civicrm_email ON ( civicrm_email.contact_id = civicrm_contact.id )
 LEFT JOIN civicrm_location_type ON ( civicrm_email.location_type_id = civicrm_location_type.id )
 WHERE     civicrm_contact.id = %1
 ORDER BY  civicrm_email.is_primary DESC, email_id ASC ";
-    $params = array(
-      1 => array(
+    $params = [
+      1 => [
         $id,
         'Integer',
-      ),
-    );
+      ],
+    ];
 
-    $emails = $values = array();
+    $emails = $values = [];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $count = 1;
     while ($dao->fetch()) {
-      $values = array(
+      $values = [
         'locationType' => $dao->locationType,
         'is_primary' => $dao->is_primary,
         'on_hold' => $dao->on_hold,
         'id' => $dao->email_id,
         'email' => $dao->email,
         'locationTypeId' => $dao->locationTypeId,
-      );
+      ];
 
       if ($updateBlankLocInfo) {
         $emails[$count++] = $values;
@@ -207,24 +207,24 @@ AND   e.id IN (loc.email_id, loc.email_2_id)
 AND   ltype.id = e.location_type_id
 ORDER BY e.is_primary DESC, email_id ASC ";
 
-    $params = array(
-      1 => array(
+    $params = [
+      1 => [
         $entityId,
         'Integer',
-      ),
-    );
+      ],
+    ];
 
-    $emails = array();
+    $emails = [];
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
     while ($dao->fetch()) {
-      $emails[$dao->email_id] = array(
+      $emails[$dao->email_id] = [
         'locationType' => $dao->locationType,
         'is_primary' => $dao->is_primary,
         'on_hold' => $dao->on_hold,
         'id' => $dao->email_id,
         'email' => $dao->email,
         'locationTypeId' => $dao->locationTypeId,
-      );
+      ];
     }
 
     return $emails;
@@ -237,10 +237,20 @@ ORDER BY e.is_primary DESC, email_id ASC ";
    *   Email object.
    */
   public static function holdEmail(&$email) {
+    if ($email->id && $email->on_hold === NULL) {
+      // email is being updated but no change to on_hold.
+      return;
+    }
+    if ($email->on_hold === 'null' || $email->on_hold === NULL) {
+      // legacy handling, deprecated.
+      $email->on_hold = 0;
+    }
+    $email->on_hold = (int) $email->on_hold;
+
     //check for update mode
     if ($email->id) {
-      $params = array(1 => array($email->id, 'Integer'));
-      if ($email->on_hold && $email->on_hold != 'null') {
+      $params = [1 => [$email->id, 'Integer']];
+      if ($email->on_hold) {
         $sql = "
 SELECT id
 FROM   civicrm_email
@@ -252,7 +262,8 @@ AND    hold_date IS NULL
           $email->reset_date = 'null';
         }
       }
-      elseif ($email->on_hold == 'null') {
+      elseif ($email->on_hold === 0) {
+        // we do this lookup to see if reset_date should be changed.
         $sql = "
 SELECT id
 FROM   civicrm_email
@@ -269,10 +280,24 @@ AND    reset_date IS NULL
       }
     }
     else {
-      if (($email->on_hold != 'null') && $email->on_hold) {
+      if ($email->on_hold) {
         $email->hold_date = date('YmdHis');
       }
     }
+  }
+
+  /**
+   * Generate an array of Domain email addresses.
+   * @return array $domainEmails;
+   */
+  public static function domainEmails() {
+    $domainEmails = [];
+    $domainFrom = (array) CRM_Core_OptionGroup::values('from_email_address');
+    foreach (array_keys($domainFrom) as $k) {
+      $domainEmail = $domainFrom[$k];
+      $domainEmails[$domainEmail] = htmlspecialchars($domainEmail);
+    }
+    return $domainEmails;
   }
 
   /**
@@ -283,22 +308,21 @@ AND    reset_date IS NULL
    *   an array of email ids
    */
   public static function getFromEmail() {
-    $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
-    $fromEmailValues = array();
-
     // add all configured FROM email addresses
-    $domainFrom = CRM_Core_OptionGroup::values('from_email_address');
-    foreach (array_keys($domainFrom) as $k) {
-      $domainEmail = $domainFrom[$k];
-      $fromEmailValues[$domainEmail] = htmlspecialchars($domainEmail);
+    $fromEmailValues = self::domainEmails();
+
+    if (!Civi::settings()->get('allow_mail_from_logged_in_contact')) {
+      return $fromEmailValues;
     }
 
+    $contactFromEmails = [];
     // add logged in user's active email ids
+    $contactID = CRM_Core_Session::singleton()->getLoggedInContactID();
     if ($contactID) {
       $contactEmails = self::allEmails($contactID);
-      $fromDisplayName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $contactID, 'display_name');
+      $fromDisplayName  = CRM_Core_Session::singleton()->getLoggedInContactDisplayName();
 
-      foreach ($contactEmails as $emailVal) {
+      foreach ($contactEmails as $emailId => $emailVal) {
         $email = trim($emailVal['email']);
         if (!$email || $emailVal['on_hold']) {
           continue;
@@ -309,10 +333,10 @@ AND    reset_date IS NULL
         if (!empty($emailVal['is_primary'])) {
           $fromEmailHtml .= ' ' . ts('(preferred)');
         }
-        $fromEmailValues[$fromEmail] = $fromEmailHtml;
+        $contactFromEmails[$emailId] = $fromEmailHtml;
       }
     }
-    return $fromEmailValues;
+    return CRM_Utils_Array::crmArrayMerge($contactFromEmails, $fromEmailValues);
   }
 
   /**

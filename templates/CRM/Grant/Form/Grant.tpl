@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,7 +34,7 @@
      </div>
   {else}
      <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-        <table class="form-layout-compressed">
+      <table class="form-layout-compressed">
       {if $context eq 'standalone'}
         <tr class="crm-grant-form-block-contact_id">
           <td class="label">{$form.contact_id.label}</td>
@@ -63,34 +63,25 @@
       </tr>
       <tr class="crm-grant-form-block-application_received_date">
          <td class="label">{$form.application_received_date.label}</td>
-         <td>{if $hideCalendar neq true}
-                      {include file="CRM/common/jcalendar.tpl" elementName=application_received_date}
-                   {else}
-                      {$form.application_received_date.value|crmDate}
-                   {/if}</td>
+         <td>{$form.application_received_date.html}</td>
       </tr>
       <tr class="crm-grant-form-block-decision_date">
          <td class="label">{$form.decision_date.label}</td>
-         <td>{if $hideCalendar neq true}
-                      {include file="CRM/common/jcalendar.tpl" elementName=decision_date}
-                   {else}
-                      {$form.decision_date.value|crmDate}
-                   {/if}<br />
-                   <span class="description">{ts}Date on which the grant decision was finalized.{/ts}</span></td>
+         <td>
+           {$form.decision_date.html}<br />
+           <span class="description">{ts}Date on which the grant decision was finalized.{/ts}</span>
+         </td>
       </tr>
-      <tr class="crm-grant-form-block-money_transfer_date"><td class="label">{$form.money_transfer_date.label}</td>
-        <td>{if $hideCalendar neq true}
-                       {include file="CRM/common/jcalendar.tpl" elementName=money_transfer_date}
-                    {else}
-                       {$form.money_transfer_date.value|crmDate}
-                    {/if}<br /><span class="description">{ts}Date on which the grant money was transferred.{/ts}</span></td>
+      <tr class="crm-grant-form-block-money_transfer_date">
+        <td class="label">{$form.money_transfer_date.label}</td>
+        <td>
+          {$form.money_transfer_date.html}<br />
+          <span class="description">{ts}Date on which the grant money was transferred.{/ts}</span>
+        </td>
       </tr>
-      <tr class="crm-grant-form-block-grant_due_date"><td class="label">{$form.grant_due_date.label}</td>
-    <td>{if $hideCalendar neq true}
-                       {include file="CRM/common/jcalendar.tpl" elementName=grant_due_date}
-                    {else}
-                       {$form.grant_due_date.value|crmDate}
-                    {/if}</td>
+      <tr class="crm-grant-form-block-grant_due_date">
+        <td class="label">{$form.grant_due_date.label}</td>
+        <td>{$form.grant_due_date.html}</td>
       </tr>
       <tr class="crm-grant-form-block-grant_report_received">
           <td class="label">{$form.grant_report_received.label}</td>
@@ -106,27 +97,11 @@
       </tr>
   </table>
 
-        <div id="customData" class="crm-grant-form-block-custom_data"></div>
-        {*include custom data js file*}
-        {include file="CRM/common/customData.tpl"}
+  {include file="CRM/common/customDataBlock.tpl"}
 
-{literal}
-<script type="text/javascript">
-    CRM.$(function($) {
-        {/literal}
-        CRM.buildCustomData( '{$customDataType}' );
-        {if $customDataSubType}
-        CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-        {/if}
-        {literal}
-    });
-
-</script>
-{/literal}
-
- <div class="crm-grant-form-block-attachment">
-     {include file="CRM/Form/attachment.tpl"}
- </div>
+  <div class="crm-grant-form-block-attachment">
+    {include file="CRM/Form/attachment.tpl"}
+  </div>
 
    {/if}
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

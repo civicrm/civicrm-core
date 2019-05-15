@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -50,7 +50,7 @@ class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-    $duplicateOptions = array();
+    $duplicateOptions = [];
     $duplicateOptions[] = $this->createElement('radio',
       NULL, NULL, ts('Skip'), CRM_Import_Parser::DUPLICATE_SKIP
     );
@@ -64,7 +64,7 @@ class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
       ts('On Duplicate Entries')
     );
 
-    $this->setDefaults(array('onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP));
+    $this->setDefaults(['onDuplicate' => CRM_Import_Parser::DUPLICATE_SKIP]);
 
     $this->addContactTypeSelector();
   }
@@ -75,12 +75,12 @@ class CRM_Event_Import_Form_DataSource extends CRM_Import_Form_DataSource {
    * @return void
    */
   public function postProcess() {
-    $this->storeFormValues(array(
+    $this->storeFormValues([
       'onDuplicate',
       'contactType',
       'dateFormats',
       'savedMapping',
-    ));
+    ]);
 
     $this->submitFileForMapping('CRM_Event_Import_Parser_Participant');
   }

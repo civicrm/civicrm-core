@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -36,8 +36,13 @@
  */
 class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
 
+  use CRM_Utils_Cache_NaiveMultipleTrait;
+  // TODO Native implementation
+  use CRM_Utils_Cache_NaiveHasTrait;
+
   /**
    * The cache storage container, an array by default, stored in a file under templates
+   * @var array
    */
   private $_cache;
 
@@ -50,7 +55,7 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
    * @return \CRM_Utils_Cache_SerializeCache
    */
   public function __construct($config) {
-    $this->_cache = array();
+    $this->_cache = [];
   }
 
   /**
@@ -67,10 +72,15 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
 
   /**
    * @param string $key
+   * @param mixed $default
    *
    * @return mixed
    */
-  public function get($key) {
+  public function get($key, $default = NULL) {
+    if ($default !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::get() only supports NULL default");
+    }
+
     if (array_key_exists($key, $this->_cache)) {
       return $this->_cache[$key];
     }
@@ -85,32 +95,43 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
   /**
    * @param string $key
    * @param mixed $value
+   * @param null|int|\DateInterval $ttl
+   * @return bool
    */
-  public function set($key, &$value) {
+  public function set($key, $value, $ttl = NULL) {
+    if ($ttl !== NULL) {
+      throw new \RuntimeException("FIXME: " . __CLASS__ . "::set() should support non-NULL TTL");
+    }
     if (file_exists($this->fileName($key))) {
-      return;
+      // WTF, write-once cache?!
+      return FALSE;
     }
     $this->_cache[$key] = $value;
-    file_put_contents($this->fileName($key), "<?php //" . serialize($value));
+    $bytes = file_put_contents($this->fileName($key), "<?php //" . serialize($value));
+    return ($bytes !== FALSE);
   }
 
   /**
    * @param string $key
+   * @return bool
    */
   public function delete($key) {
     if (file_exists($this->fileName($key))) {
       unlink($this->fileName($key));
     }
     unset($this->_cache[$key]);
+    return TRUE;
   }
 
   /**
    * @param null $key
+   * @return bool
    */
   public function flush($key = NULL) {
     $prefix = "CRM_";
     if (!$handle = opendir(CIVICRM_TEMPLATE_COMPILEDIR)) {
-      return; // die? Error?
+      // die? Error?
+      return FALSE;
     }
     while (FALSE !== ($entry = readdir($handle))) {
       if (substr($entry, 0, 4) == $prefix) {
@@ -119,7 +140,12 @@ class CRM_Utils_Cache_SerializeCache implements CRM_Utils_Cache_Interface {
     }
     closedir($handle);
     unset($this->_cache);
-    $this->_cache = array();
+    $this->_cache = [];
+    return TRUE;
+  }
+
+  public function clear() {
+    return $this->flush();
   }
 
 }

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,16 +33,10 @@
   <td class="crm-event-form-block-event_type_id"> {$form.event_type_id.label}<br />{$form.event_type_id.html} </td>
 </tr>
 <tr>
-  <td colspan="2"><label>{ts}Event Dates{/ts}</label></td>
+  {include file="CRM/Core/DateRange.tpl" fieldName="event" from='_start_date_low' to='_end_date_high' label="<label>Event Dates</label>"}
 </tr>
 <tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="event" from='_start_date_low' to='_end_date_high'}
-</tr>
-<tr>
-  <td><label>{ts}Registration Date{/ts}</label></td>
-</tr>
-<tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="participant" from='_register_date_low' to='_register_date_high'}
+  {include file="CRM/Core/DateRange.tpl" fieldName="participant" from='_register_date_low' to='_register_date_high' label="<label>Registration Date</label>"}
 </tr>
 <tr>
   <td class="crm-event-form-block-participant_status"><label>{$form.participant_status_id.label}</label>

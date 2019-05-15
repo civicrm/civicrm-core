@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,20 +42,20 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
     // Using a high priority allows adhoc implementations
     // to override standard implementations -- which is
     // handy for testing/mocking.
-    return array(
-      Events::RESOLVE => array(
-        array('onApiResolve', Events::W_EARLY),
-      ),
-      Events::AUTHORIZE => array(
-        array('onApiAuthorize', Events::W_EARLY),
-      ),
-    );
+    return [
+      Events::RESOLVE => [
+        ['onApiResolve', Events::W_EARLY],
+      ],
+      Events::AUTHORIZE => [
+        ['onApiAuthorize', Events::W_EARLY],
+      ],
+    ];
   }
 
   /**
    * @var array (string $name => array('perm' => string, 'callback' => callable))
    */
-  protected $actions = array();
+  protected $actions = [];
 
   /**
    * @var string
@@ -90,10 +90,10 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
    * @return AdhocProvider
    */
   public function addAction($name, $perm, $callback) {
-    $this->actions[strtolower($name)] = array(
+    $this->actions[strtolower($name)] = [
       'perm' => $perm,
       'callback' => $callback,
-    );
+    ];
     return $this;
   }
 
@@ -137,7 +137,7 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
    * @return array
    */
   public function getEntityNames($version) {
-    return array($this->entity);
+    return [$this->entity];
   }
 
   /**
@@ -151,7 +151,7 @@ class AdhocProvider implements EventSubscriberInterface, ProviderInterface {
       return array_keys($this->actions);
     }
     else {
-      return array();
+      return [];
     }
   }
 

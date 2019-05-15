@@ -73,7 +73,11 @@ class CRM_Utils_TypeTest extends CiviUnitTestCase {
       array('field(table.civicrm_column_name,4,5,6)', 'MysqlOrderBy', 'field(table.civicrm_column_name,4,5,6)'),
       array('table.civicrm_column_name desc,other_column, another_column desc', 'MysqlOrderBy', 'table.civicrm_column_name desc,other_column, another_column desc'),
       array('table.`Home-street_address` asc, `table-alias`.`Home-street_address` desc,`table-alias`.column', 'MysqlOrderBy', 'table.`Home-street_address` asc, `table-alias`.`Home-street_address` desc,`table-alias`.column'),
+      // Lab issue dev/core#93 allow for 3 column orderby
+      array('contact_id.gender_id.label', 'MysqlOrderBy', 'contact_id.gender_id.label'),
       array('a string', 'String', 'a string'),
+      array('{"contact":{"contact_id":205}}', 'Json', '{"contact":{"contact_id":205}}'),
+      array('{"contact":{"contact_id":!n†rude®}}', 'Json', NULL),
     );
   }
 

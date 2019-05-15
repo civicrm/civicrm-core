@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,6 +30,7 @@
     {ts}Location types provide convenient labels to differentiate contacts' location(s). Administrators may define as many additional types as appropriate for your constituents (examples might be Main Office, School, Vacation Home...).{/ts}
   </div>
 
+<div class="crm-block crm-content-block">
   {if $rows}
   <div id="ltype">
     {strip}
@@ -38,15 +39,15 @@
     {include file="CRM/common/jsortable.tpl"}
     <table id="options" class="display">
     <thead>
-    <tr>
-        <th id="sortable">{ts}Name{/ts}</th>
-        <th>{ts}Display Name{/ts}</th>
-        <th>{ts}vCard{/ts}</th>
-        <th id="nosort">{ts}Description{/ts}</th>
-        <th>{ts}Enabled?{/ts}</th>
-        <th>{ts}Default?{/ts}</th>
-        <th></th>
-    </tr>
+      <tr>
+          <th id="sortable">{ts}Name{/ts}</th>
+          <th>{ts}Display Name{/ts}</th>
+          <th>{ts}vCard{/ts}</th>
+          <th id="nosort">{ts}Description{/ts}</th>
+          <th>{ts}Enabled?{/ts}</th>
+          <th>{ts}Default?{/ts}</th>
+          <th></th>
+      </tr>
     </thead>
     {foreach from=$rows item=row}
     <tr id="location_type-{$row.id}"  data-action="setvalue" class="{cycle values="odd-row,even-row"} {$row.class} crm-entity {if NOT $row.is_active} disabled{/if}">
@@ -72,4 +73,5 @@
     {crmButton q="action=add&reset=1" id="newLocationType" icon="plus-circle"}{ts}Add Option{/ts}{/crmButton}
     {crmButton p="civicrm/admin" q="reset=1" class="cancel" icon="times"}{ts}Done{/ts}{/crmButton}
   </div>
+</div>
 {/if}

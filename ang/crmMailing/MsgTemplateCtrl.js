@@ -33,6 +33,7 @@
     // @return Promise
     $scope.loadTemplate = function loadTemplate(mailing, id) {
       return crmMsgTemplates.get(id).then(function(tpl) {
+        mailing.msg_template_id = tpl.id;
         mailing.subject = tpl.msg_subject;
         mailing.body_text = tpl.msg_text;
         mailing.body_html = tpl.msg_html;

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,7 +44,7 @@
  * @return array
  */
 function civicrm_api3_premium_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Premium');
 }
 
 /**
@@ -78,7 +78,7 @@ function civicrm_api3_premium_delete($params) {
  * @param array $params
  */
 function _civicrm_api3_premium_get_spec(&$params) {
-  $params['premiums_active']['api.aliases'] = array('is_active');
+  $params['premiums_active']['api.aliases'] = ['is_active'];
 }
 
 /**
@@ -87,5 +87,5 @@ function _civicrm_api3_premium_get_spec(&$params) {
  * @param array $params
  */
 function _civicrm_api3_premium_create_spec(&$params) {
-  $params['premiums_active']['api.aliases'] = array('is_active');
+  $params['premiums_active']['api.aliases'] = ['is_active'];
 }

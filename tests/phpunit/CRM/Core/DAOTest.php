@@ -300,14 +300,16 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $tempName = CRM_Core_DAO::createTempTableName('civicrm', FALSE);
     $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery("CREATE TABLE $tempName (`id` int(10) unsigned NOT NULL) ENGINE = MyISAM");
-    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM()); // Ignore temp tables
+    // Ignore temp tables
+    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery("DROP TABLE $tempName");
 
     // A temp table should not raise flag (randomized naming).
     $tempName = CRM_Core_DAO::createTempTableName('civicrm', TRUE);
     $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery("CREATE TABLE $tempName (`id` int(10) unsigned NOT NULL) ENGINE = MyISAM");
-    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM()); // Ignore temp tables
+    // Ignore temp tables
+    $this->assertEquals(0, CRM_Core_DAO::isDBMyISAM());
     CRM_Core_DAO::executeQuery("DROP TABLE $tempName");
   }
 
@@ -371,13 +373,106 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
 
     $dao = CRM_Core_DAO::executeQuery($sql);
     $contactsFetchedFromBufferedQuery = $dao->fetchAll();
-    $dao->free();
 
     $dao = CRM_Core_DAO::executeUnbufferedQuery($sql);
     $contactsFetchedFromUnbufferedQuery = $dao->fetchAll();
-    $dao->free();
 
     $this->checkArrayEquals($contactsFetchedFromBufferedQuery, $contactsFetchedFromUnbufferedQuery);
+  }
+
+  /**
+   * Test that known sql modes are present in session.
+   */
+  public function testSqlModePresent() {
+    $sqlModes = CRM_Utils_SQL::getSqlModes();
+    // assert we have strict trans
+    $this->assertContains('STRICT_TRANS_TABLES', $sqlModes);
+    if (CRM_Utils_SQL::supportsFullGroupBy()) {
+      $this->assertContains('ONLY_FULL_GROUP_BY', $sqlModes);
+    }
+  }
+
+  /**
+   * @return array
+   */
+  public function serializationMethods() {
+    $constants = array();
+    $simpleData = array(
+      NULL,
+      array('Foo', 'Bar', '3', '4', '5'),
+      array(),
+      array('0'),
+    );
+    $complexData = array(
+      array(
+        'foo' => 'bar',
+        'baz' => array('1', '2', '3', array('one', 'two')),
+        '3' => '0',
+      ),
+    );
+    $daoInfo = new ReflectionClass('CRM_Core_DAO');
+    foreach ($daoInfo->getConstants() as $constant => $val) {
+      if ($constant == 'SERIALIZE_JSON' || $constant == 'SERIALIZE_PHP') {
+        $constants[] = array($val, array_merge($simpleData, $complexData));
+      }
+      elseif (strpos($constant, 'SERIALIZE_') === 0) {
+        $constants[] = array($val, $simpleData);
+      }
+    }
+    return $constants;
+  }
+
+  public function testFetchGeneratorDao() {
+    $this->individualCreate([], 0);
+    $this->individualCreate([], 1);
+    $this->individualCreate([], 2);
+    $count = 0;
+    $g = CRM_Core_DAO::executeQuery('SELECT contact_type FROM civicrm_contact WHERE contact_type = "Individual" LIMIT 3')
+      ->fetchGenerator();
+    foreach ($g as $row) {
+      $this->assertEquals('Individual', $row->contact_type);
+      $count++;
+    }
+    $this->assertEquals(3, $count);
+  }
+
+  public function testFetchGeneratorArray() {
+    $this->individualCreate([], 0);
+    $this->individualCreate([], 1);
+    $this->individualCreate([], 2);
+    $count = 0;
+    $g = CRM_Core_DAO::executeQuery('SELECT contact_type FROM civicrm_contact WHERE contact_type = "Individual" LIMIT 3')
+      ->fetchGenerator('array');
+    foreach ($g as $row) {
+      $this->assertEquals('Individual', $row['contact_type']);
+      $count++;
+    }
+    $this->assertEquals(3, $count);
+  }
+
+  /**
+   * @dataProvider serializationMethods
+   */
+  public function testFieldSerialization($method, $sampleData) {
+    foreach ($sampleData as $value) {
+      $serialized = CRM_Core_DAO::serializeField($value, $method);
+      $newValue = CRM_Core_DAO::unSerializeField($serialized, $method);
+      $this->assertEquals($value, $newValue);
+    }
+  }
+
+  /**
+   * Test the DAO cloning method does not hit issues with freeing the result.
+   */
+  public function testCloneDAO() {
+    $dao = CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_domain');
+    $i = 0;
+    while ($dao->fetch()) {
+      $i++;
+      $cloned = clone($dao);
+      unset($cloned);
+    }
+    $this->assertEquals(2, $i);
   }
 
 }

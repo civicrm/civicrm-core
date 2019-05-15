@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -85,7 +85,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
    * @return array
    */
   public function checkRequirements() {
-    $errors = array();
+    $errors = [];
     foreach ($this->containers as $container) {
       $errors = array_merge($errors, $container->checkRequirements());
     }
@@ -163,7 +163,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
       $k2c = $this->cache->get($this->cacheKey);
     }
     if (!isset($k2c) || !is_array($k2c)) {
-      $k2c = array();
+      $k2c = [];
       $containerNames = array_reverse(array_keys($this->containers));
       foreach ($containerNames as $name) {
         $keys = $this->containers[$name]->getKeys();

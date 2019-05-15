@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -47,10 +47,10 @@ function civicrm_api3_mailing_event_queue_create($params) {
   }
   civicrm_api3_verify_mandatory($params,
     'CRM_Mailing_DAO_MailingJob',
-    array('job_id', 'contact_id'),
+    ['job_id', 'contact_id'],
     FALSE
   );
-  return _civicrm_api3_basic_create('CRM_Mailing_Event_BAO_Queue', $params);
+  return _civicrm_api3_basic_create('CRM_Mailing_Event_BAO_Queue', $params, 'Queue');
 }
 
 /**

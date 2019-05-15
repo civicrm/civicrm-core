@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -57,6 +57,22 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
    */
   protected $_surveyTitle;
 
+  /**
+   * Explicitly declare the entity api name.
+   */
+  public function getDefaultEntity() {
+    return 'Survey';
+  }
+
+  /**
+   * Get the entity id being edited.
+   *
+   * @return int|null
+   */
+  public function getEntityId() {
+    return $this->_surveyId;
+  }
+
   public function preProcess() {
     if (!CRM_Campaign_BAO_Campaign::accessCampaign()) {
       CRM_Utils_System::permissionDenied();
@@ -68,29 +84,23 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
     if ($this->_surveyId) {
       $this->_single = TRUE;
 
-      $params = array('id' => $this->_surveyId);
+      $params = ['id' => $this->_surveyId];
       CRM_Campaign_BAO_Survey::retrieve($params, $surveyInfo);
       $this->_surveyTitle = $surveyInfo['title'];
       $this->assign('surveyTitle', $this->_surveyTitle);
-      CRM_Utils_System::setTitle(ts('Configure Survey - %1', array(1 => $this->_surveyTitle)));
+      CRM_Utils_System::setTitle(ts('Configure Survey - %1', [1 => $this->_surveyTitle]));
     }
 
     $this->assign('action', $this->_action);
     $this->assign('surveyId', $this->_surveyId);
 
-    // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
-      $this->set('type', 'Survey');
-      $this->set('entityId', $this->_surveyId);
-      CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'Survey', $this->_surveyId);
-      CRM_Custom_Form_CustomData::buildQuickForm($this);
-      CRM_Custom_Form_CustomData::setDefaultValues($this);
-    }
+    // Add custom data to form
+    CRM_Custom_Form_CustomData::addToForm($this);
 
     // CRM-11480, CRM-11682
     // Preload libraries required by the "Questions" tab
     CRM_UF_Page_ProfileEditor::registerProfileScripts();
-    CRM_UF_Page_ProfileEditor::registerSchemas(array('IndividualModel', 'ActivityModel'));
+    CRM_UF_Page_ProfileEditor::registerSchemas(['IndividualModel', 'ActivityModel']);
 
     CRM_Campaign_Form_Survey_TabHeader::build($this);
   }
@@ -101,39 +111,39 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
   public function buildQuickForm() {
     $session = CRM_Core_Session::singleton();
     if ($this->_surveyId) {
-      $buttons = array(
-        array(
+      $buttons = [
+        [
           'type' => 'upload',
           'name' => ts('Save'),
           'isDefault' => TRUE,
-        ),
-        array(
+        ],
+        [
           'type' => 'upload',
           'name' => ts('Save and Done'),
           'subName' => 'done',
-        ),
-        array(
+        ],
+        [
           'type' => 'upload',
           'name' => ts('Save and Next'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'subName' => 'next',
-        ),
-      );
+        ],
+      ];
     }
     else {
-      $buttons = array(
-        array(
+      $buttons = [
+        [
           'type' => 'upload',
           'name' => ts('Continue'),
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-        ),
-      );
+        ],
+      ];
     }
-    $buttons[] = array(
+    $buttons[] = [
       'type' => 'cancel',
       'name' => ts('Cancel'),
-    );
+    ];
     $this->addButtons($buttons);
 
     $url = CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=survey');
@@ -148,7 +158,7 @@ class CRM_Campaign_Form_Survey extends CRM_Core_Form {
         $tabTitle = 'Main settings';
       }
       $subPage = strtolower($className);
-      CRM_Core_Session::setStatus(ts("'%1' have been saved.", array(1 => $tabTitle)), ts('Saved'), 'success');
+      CRM_Core_Session::setStatus(ts("'%1' have been saved.", [1 => $tabTitle]), ts('Saved'), 'success');
 
       $this->postProcessHook();
 

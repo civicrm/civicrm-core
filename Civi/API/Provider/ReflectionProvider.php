@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,20 +34,21 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * This class defines operations for inspecting the API's metadata.
  */
 class ReflectionProvider implements EventSubscriberInterface, ProviderInterface {
+
   /**
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::RESOLVE => array(
+    return [
+      Events::RESOLVE => [
         // TODO decide if we really want to override others
-        array('onApiResolve', Events::W_EARLY),
-      ),
-      Events::AUTHORIZE => array(
+        ['onApiResolve', Events::W_EARLY],
+      ],
+      Events::AUTHORIZE => [
         // TODO decide if we really want to override others
-        array('onApiAuthorize', Events::W_EARLY),
-      ),
-    );
+        ['onApiAuthorize', Events::W_EARLY],
+      ],
+    ];
   }
 
   /**
@@ -66,10 +67,11 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
    */
   public function __construct($apiKernel) {
     $this->apiKernel = $apiKernel;
-    $this->actions = array(
-      'Entity' => array('get', 'getactions'),
-      '*' => array('getactions'), // 'getfields'
-    );
+    $this->actions = [
+      'Entity' => ['get', 'getactions'],
+      // 'getfields'
+      '*' => ['getactions'],
+    ];
   }
 
   /**
@@ -133,7 +135,7 @@ class ReflectionProvider implements EventSubscriberInterface, ProviderInterface 
    * @return array
    */
   public function getEntityNames($version) {
-    return array('Entity');
+    return ['Entity'];
   }
 
   /**

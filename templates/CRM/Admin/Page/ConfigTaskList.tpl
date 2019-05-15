@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 {capture assign="linkTitle"}{ts}Edit settings{/ts}{/capture}
 {capture assign="adminMenu"}{crmURL p="civicrm/admin" q="reset=1"}{/capture}
 
-<div id="help" class="description">
+<div class="help">
     {ts 1=$adminMenu}Use this checklist to review and complete configuration tasks for your site. You will be redirected back to this checklist after saving each setting. Settings which you have not yet reviewed will be <span class="status-overdue">displayed in red</span>. After you have visited a page, the links will <span class="status-pending">display in green</span>  (although you may still need to revisit the page to complete or update the settings). You can access this page again from the <a href="%1">Administer CiviCRM</a> menu at any time.{/ts}
 </div>
 

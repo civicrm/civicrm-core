@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,6 +28,8 @@
 {capture assign=icalFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1" fe=1}{/capture}
 {capture assign=rssFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&rss=1" fe=1}{/capture}
 {capture assign=htmlFeed}{crmURL p='civicrm/event/ical' q="reset=1&list=1&html=1" fe=1}{/capture}
+
+<div class="crm-block crm-content-block">
 <div class="float-right">
   <a href="{$htmlFeed}"  target="_blank" title="{ts}HTML listing of current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar"></i></a>
   <a href="{$rssFeed}"  target="_blank" title="{ts}Get RSS 2.0 feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-rss"></i></a>
@@ -35,7 +37,6 @@
   <a href="{$icalFeed}"  target="_blank" title="{ts}Get iCalendar feed for current and future public events.{/ts}" class="crm-event-feed-link"><i class="crm-i fa-lg fa-calendar-o"></i></a>
   {help id='icalendar'}
 </div>
-{include file="CRM/Event/Form/SearchEvent.tpl"}
 
 <div class="action-link">
   <a accesskey="N" href="{$newEventURL}" id="newManageEvent" class="button crm-popup">
@@ -43,6 +44,9 @@
   </a>
   <div class="clear"></div>
 </div>
+
+{include file="CRM/Event/Form/SearchEvent.tpl"}
+
 {if $rows}
 <div id="event_status_id" class="crm-block crm-manage-events">
   {strip}
@@ -138,34 +142,8 @@
                 </ul>
               </span>
             </div>
-
             <div class="crm-event-links">
-              <span id="event-links-{$row.id}" class="btn-slide crm-hover-button">{ts}Event Links{/ts}
-                <ul class="panel" id="panel_links_{$row.id}">
-                  <li>
-                    <a title="Register Participant" class="action-item crm-hover-button" href="{crmURL p='civicrm/participant/add'
-                    q="reset=1&action=add&context=standalone&eid=`$row.id`"}">{ts}Register Participant{/ts}</a>
-                  </li>
-                  <li>
-                    <a title="Event Info" class="action-item crm-hover-button" href="{crmURL p='civicrm/event/info'
-                    q="reset=1&id=`$row.id`" fe='true'}" target="_blank">{ts}Event Info{/ts}
-                    </a>
-                  </li>
-                  {if $row.is_online_registration}
-                    <li>
-                      <a title="Online Registration (Test-drive)" class="action-item crm-hover-button"
-                         href="{crmURL p='civicrm/event/register'
-                         q="reset=1&action=preview&id=`$row.id`"}">{ts}Registration (Test-drive){/ts}
-                      </a>
-                    </li>
-                    <li>
-                      <a title="Online Registration (Live)" class="action-item crm-hover-button" href="{crmURL p='civicrm/event/register'
-                      q="reset=1&id=`$row.id`" fe='true'}" target="_blank">{ts}Registration (Live){/ts}
-                      </a>
-                    </li>
-                  {/if}
-                </ul>
-              </span>
+              {$row.eventlinks|replace:'xx':$row.id}
             </div>
             <div class="crm-event-more">
               {$row.action|replace:'xx':$row.id}
@@ -179,9 +157,6 @@
     </table>
   {include file="CRM/common/pager.tpl" location="bottom"}
   {/strip}
-  {if $isSearch eq 0}
-    <div class="status messages no-popup">{ts}Don't see your event listed? Try "Search All or by Date Range" above.{/ts}</div>
-  {/if}
 </div>
 {else}
   {if $isSearch eq 1}
@@ -205,3 +180,4 @@
   </div>
   {/if}
 {/if}
+</div>

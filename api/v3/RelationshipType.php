@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,31 +41,16 @@
  */
 function civicrm_api3_relationship_type_create($params) {
 
-  if (!isset($params['label_a_b'])) {
-
+  // @todo should we when id is empty?
+  if (!isset($params['label_a_b']) && !empty($params['name_a_b'])) {
     $params['label_a_b'] = $params['name_a_b'];
   }
 
-  if (!isset($params['label_b_a'])) {
-
+  if (!isset($params['label_b_a']) && !empty($params['name_b_a'])) {
     $params['label_b_a'] = $params['name_b_a'];
   }
 
-  $ids = array();
-  if (isset($params['id']) && !CRM_Utils_Rule::integer($params['id'])) {
-    return civicrm_api3_create_error('Invalid value for relationship type ID');
-  }
-  else {
-    $ids['relationshipType'] = CRM_Utils_Array::value('id', $params);
-  }
-
-  $relationType = CRM_Contact_BAO_RelationshipType::add($params, $ids);
-
-  $relType = array();
-
-  _civicrm_api3_object_to_array($relationType, $relType[$relationType->id]);
-
-  return civicrm_api3_create_success($relType, $params, 'RelationshipType', 'create', $relationType);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'RelationshipType');
 }
 
 /**
@@ -115,8 +100,8 @@ function civicrm_api3_relationship_type_delete($params) {
  * @return array
  */
 function _civicrm_api3_relationship_type_getlist_defaults($request) {
-  return array(
+  return [
     'label_field' => 'label_a_b',
     'search_field' => 'label_a_b',
-  );
+  ];
 }

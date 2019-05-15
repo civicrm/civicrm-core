@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -110,7 +110,7 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
     CRM_Mailing_BAO_Mailing::getMailingContent($report, $this);
 
     // assign backurl
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
 
     if ($context == 'activitySelector') {
@@ -139,7 +139,7 @@ class CRM_Mailing_Page_Report extends CRM_Core_Page_Basic {
 
     $this->assign('report', $report);
     CRM_Utils_System::setTitle(ts('CiviMail Report: %1',
-      array(1 => $report['mailing']['name'])
+      [1 => $report['mailing']['name']]
     ));
     $this->assign('public_url', CRM_Mailing_BAO_Mailing::getPublicViewUrl($this->_mailing_id));
 

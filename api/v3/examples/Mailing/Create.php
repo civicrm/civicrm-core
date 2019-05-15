@@ -6,7 +6,7 @@
  *   API result array
  */
 function mailing_create_example() {
-  $params = array(
+  $params = [
     'subject' => 'Hello {contact.display_name}',
     'body_text' => 'This is {contact.display_name}.
 https://civicrm.org
@@ -16,32 +16,32 @@ https://civicrm.org
     'created_id' => 3,
     'header_id' => '',
     'footer_id' => '',
-    'groups' => array(
-      'include' => array(
+    'groups' => [
+      'include' => [
         '0' => 2,
-      ),
-      'exclude' => array(
+      ],
+      'exclude' => [
         '0' => 3,
-      ),
-    ),
-    'mailings' => array(
-      'include' => array(),
-      'exclude' => array(),
-    ),
-    'options' => array(
+      ],
+    ],
+    'mailings' => [
+      'include' => [],
+      'exclude' => [],
+    ],
+    'options' => [
       'force_rollback' => 1,
-    ),
+    ],
     'api.mailing_job.create' => 1,
-    'api.MailingRecipients.get' => array(
+    'api.MailingRecipients.get' => [
       'mailing_id' => '$value.id',
-      'api.contact.getvalue' => array(
+      'api.contact.getvalue' => [
         'return' => 'display_name',
-      ),
-      'api.email.getvalue' => array(
+      ],
+      'api.email.getvalue' => [
         'return' => 'email',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   try{
     $result = civicrm_api3('Mailing', 'create', $params);
@@ -51,12 +51,12 @@ https://civicrm.org
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -70,13 +70,13 @@ https://civicrm.org
  */
 function mailing_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'domain_id' => '1',
         'header_id' => '',
@@ -121,13 +121,13 @@ https://civicrm.org
         'location_type_id' => '',
         'email_selection_method' => '',
         'language' => '',
-        'api.mailing_job.create' => array(
+        'api.mailing_job.create' => [
           'is_error' => 0,
           'version' => 3,
           'count' => 1,
           'id' => 1,
-          'values' => array(
-            '0' => array(
+          'values' => [
+            '0' => [
               'id' => '1',
               'mailing_id' => '1',
               'scheduled_date' => '20130728085413',
@@ -139,28 +139,28 @@ https://civicrm.org
               'parent_id' => '',
               'job_offset' => '',
               'job_limit' => '',
-            ),
-          ),
-        ),
-        'api.MailingRecipients.get' => array(
+            ],
+          ],
+        ],
+        'api.MailingRecipients.get' => [
           'is_error' => 0,
           'version' => 3,
           'count' => 1,
           'id' => 1,
-          'values' => array(
-            '0' => array(
+          'values' => [
+            '0' => [
               'id' => '1',
               'mailing_id' => '1',
               'contact_id' => '4',
               'email_id' => '4',
               'api.contact.getvalue' => 'Mr. Includer Person II',
               'api.email.getvalue' => 'include.me@example.org',
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
+            ],
+          ],
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

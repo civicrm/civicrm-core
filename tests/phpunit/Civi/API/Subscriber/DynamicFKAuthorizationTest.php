@@ -1,8 +1,8 @@
 <?php
 namespace Civi\API\Subscriber;
 
-use \Civi\API\Kernel;
-use \Symfony\Component\EventDispatcher\EventDispatcher;
+use Civi\API\Kernel;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  */
@@ -11,19 +11,21 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
 
   const FILE_FORBIDDEN_ID = 11;
 
+  const FILE_UNDELEGATED_ENTITY = 12;
+
   const WIDGET_ID = 20;
 
   const FORBIDDEN_ID = 30;
 
   /**
-   * @var EventDispatcher
+   * @var \Symfony\Component\EventDispatcher\EventDispatcher
    */
-  var $dispatcher;
+  public $dispatcher;
 
   /**
-   * @var Kernel
+   * @var \Civi\API\Kernel
    */
-  var $kernel;
+  public $kernel;
 
   protected function setUp() {
     parent::setUp();
@@ -212,6 +214,30 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
       '$result' => $result,
     ), TRUE));
     $this->assertRegExp($expectedError, $result['error_message']);
+  }
+
+  /**
+   * Test whether trusted API calls bypass the permission check
+   *
+   */
+  public function testNotDelegated() {
+    $entity = 'FakeFile';
+    $action = 'create';
+    $params = [
+      'entity_id' => self::FILE_UNDELEGATED_ENTITY,
+      'entity_table' => 'civicrm_membership',
+      'version' => 3,
+      'debug' => 1,
+      'check_permissions' => 1,
+    ];
+    // run with permission check
+    $result = $this->kernel->run('FakeFile', 'create', $params);
+    $this->assertTrue((bool) $result['is_error'], 'Undelegated entity with check_permissions = 1 should fail');
+    $this->assertRegExp('/Unrecognized target entity table \(civicrm_membership\)/', $result['error_message']);
+    // repeat without permission check
+    $params['check_permissions'] = 0;
+    $result = $this->kernel->run('FakeFile', 'create', $params);
+    $this->assertFalse((bool) $result['is_error'], 'Undelegated entity with check_permissions = 0 should succeed');
   }
 
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,22 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
  * Files required.
  */
 class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
+
+  /**
+   * Explicitly declare the entity api name.
+   *
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'Campaign';
+  }
 
   /**
    * Are we forced to run a search.
@@ -78,18 +87,15 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
     //campaign description.
     $this->add('text', 'description', ts('Description'), $attributes['description']);
 
-    //campaign start date.
-    $this->addDate('start_date', ts('From'), FALSE, array('formatType' => 'searchDate'));
-
-    //campaign end date.
-    $this->addDate('end_date', ts('To'), FALSE, array('formatType' => 'searchDate'));
+    $this->add('datepicker', 'start_date', ts('Campaign Start Date'), [], FALSE, ['time' => FALSE]);
+    $this->add('datepicker', 'end_date', ts('Campaign End Date'), [], FALSE, ['time' => FALSE]);
 
     //campaign type.
     $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
     $this->add('select', 'campaign_type_id', ts('Campaign Type'),
-      array(
+      [
         '' => ts('- select -'),
-      ) + $campaignTypes
+      ] + $campaignTypes
     );
 
     $this->set('campaignTypes', $campaignTypes);
@@ -98,23 +104,22 @@ class CRM_Campaign_Form_Search_Campaign extends CRM_Core_Form {
     //campaign status
     $campaignStatus = CRM_Campaign_PseudoConstant::campaignStatus();
     $this->addElement('select', 'status_id', ts('Campaign Status'),
-      array(
+      [
         '' => ts('- select -'),
-      ) + $campaignStatus
+      ] + $campaignStatus
     );
     $this->set('campaignStatus', $campaignStatus);
     $this->assign('campaignStatus', json_encode($campaignStatus));
 
     //active campaigns
-    $this->addElement('select', 'is_active', ts('Is Active?'), array(
+    $this->addElement('select', 'is_active', ts('Is Active?'), [
       '' => ts('- select -'),
       '0' => ts('Yes'),
       '1' => ts('No'),
-        )
-    );
+    ]);
 
     //build the array of all search params.
-    $this->_searchParams = array();
+    $this->_searchParams = [];
     foreach ($this->_elements as $element) {
       $name = $element->_attributes['name'];
       $label = $element->_label;

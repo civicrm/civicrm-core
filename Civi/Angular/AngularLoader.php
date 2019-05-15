@@ -62,6 +62,11 @@ class AngularLoader {
   protected $modules;
 
   /**
+   * @var array|NULL
+   */
+  protected $crmApp = NULL;
+
+  /**
    * AngularLoader constructor.
    */
   public function __construct() {
@@ -69,36 +74,57 @@ class AngularLoader {
     $this->angular = \Civi::service('angular');
     $this->region = \CRM_Utils_Request::retrieve('snippet', 'String') ? 'ajax-snippet' : 'html-header';
     $this->pageName = isset($_GET['q']) ? $_GET['q'] : NULL;
-    $this->modules = array();
+    $this->modules = [];
   }
 
   /**
    * Register resources required by Angular.
+   *
+   * @return AngularLoader
    */
   public function load() {
     $angular = $this->getAngular();
     $res = $this->getRes();
 
+    if ($this->crmApp !== NULL) {
+      $this->addModules($this->crmApp['modules']);
+      $region = \CRM_Core_Region::instance($this->crmApp['region']);
+      $region->update('default', ['disabled' => TRUE]);
+      $region->add(['template' => $this->crmApp['file'], 'weight' => 0]);
+      $this->res->addSetting([
+        'crmApp' => [
+          'defaultRoute' => $this->crmApp['defaultRoute'],
+        ],
+      ]);
+
+      // If trying to load an Angular page via AJAX, the route must be passed as a
+      // URL parameter, since the server doesn't receive information about
+      // URL fragments (i.e, what comes after the #).
+      $this->res->addSetting([
+        'angularRoute' => $this->crmApp['activeRoute'],
+      ]);
+    }
+
     $moduleNames = $this->findActiveModules();
     if (!$this->isAllModules($moduleNames)) {
-      $assetParams = array('modules' => implode(',', $moduleNames));
+      $assetParams = ['modules' => implode(',', $moduleNames)];
     }
     else {
       // The module list will be "all modules that the user can see".
-      $assetParams = array('nonce' => md5(implode(',', $moduleNames)));
+      $assetParams = ['nonce' => md5(implode(',', $moduleNames))];
     }
 
     $res->addSettingsFactory(function () use (&$moduleNames, $angular, $res, $assetParams) {
       // TODO optimization; client-side caching
-      $result = array_merge($angular->getResources($moduleNames, 'settings', 'settings'), array(
+      $result = array_merge($angular->getResources($moduleNames, 'settings', 'settings'), [
         'resourceUrls' => \CRM_Extension_System::singleton()->getMapper()->getActiveModuleUrls(),
-        'angular' => array(
+        'angular' => [
           'modules' => $moduleNames,
           'requires' => $angular->getResources($moduleNames, 'requires', 'requires'),
           'cacheCode' => $res->getCacheCode(),
           'bundleUrl' => \Civi::service('asset_builder')->getUrl('angular-modules.json', $assetParams),
-        ),
-      ));
+        ],
+      ]);
       return $result;
     });
 
@@ -135,6 +161,45 @@ class AngularLoader {
         $res->addStyleUrl($url, self::DEFAULT_MODULE_WEIGHT + (++$headOffset), $this->getRegion());
       }
     }
+
+    return $this;
+  }
+
+  /**
+   * Use Civi's generic "application" module.
+   *
+   * This is suitable for use on a basic, standalone Angular page
+   * like `civicrm/a`. (If you need to integrate Angular with pre-existing,
+   * non-Angular pages... then this probably won't help.)
+   *
+   * The Angular bootstrap process requires an HTML directive like
+   * `<div ng-app="foo">`.
+   *
+   * Calling useApp() will replace the page's main body with the
+   * `<div ng-app="crmApp">...</div>` and apply some configuration options
+   * for the `crmApp` module.
+   *
+   * @param array $settings
+   *   A list of settings. Accepted values:
+   *    - activeRoute: string, the route to open up immediately
+   *      Ex: '/case/list'
+   *    - defaultRoute: string, use this to redirect the default route (`/`) to another page
+   *      Ex: '/case/list'
+   *    - region: string, the place on the page where we should insert the angular app
+   *      Ex: 'page-body'
+   * @return AngularLoader
+   * @link https://code.angularjs.org/1.5.11/docs/guide/bootstrap
+   */
+  public function useApp($settings = []) {
+    $defaults = [
+      'modules' => ['crmApp'],
+      'activeRoute' => NULL,
+      'defaultRoute' => NULL,
+      'region' => 'page-body',
+      'file' => 'Civi/Angular/Page/Main.tpl',
+    ];
+    $this->crmApp = array_merge($defaults, $settings);
+    return $this;
   }
 
   /**
@@ -170,9 +235,11 @@ class AngularLoader {
 
   /**
    * @param \CRM_Core_Resources $res
+   * @return AngularLoader
    */
   public function setRes($res) {
     $this->res = $res;
+    return $this;
   }
 
   /**
@@ -184,9 +251,11 @@ class AngularLoader {
 
   /**
    * @param \Civi\Angular\Manager $angular
+   * @return AngularLoader
    */
   public function setAngular($angular) {
     $this->angular = $angular;
+    return $this;
   }
 
   /**
@@ -198,9 +267,11 @@ class AngularLoader {
 
   /**
    * @param string $region
+   * @return AngularLoader
    */
   public function setRegion($region) {
     $this->region = $region;
+    return $this;
   }
 
   /**
@@ -214,9 +285,21 @@ class AngularLoader {
   /**
    * @param string $pageName
    *   Ex: 'civicrm/a'.
+   * @return AngularLoader
    */
   public function setPageName($pageName) {
     $this->pageName = $pageName;
+    return $this;
+  }
+
+  /**
+   * @param array|string $modules
+   * @return AngularLoader
+   */
+  public function addModules($modules) {
+    $modules = (array) $modules;
+    $this->modules = array_unique(array_merge($this->modules, $modules));
+    return $this;
   }
 
   /**
@@ -228,9 +311,11 @@ class AngularLoader {
 
   /**
    * @param array $modules
+   * @return AngularLoader
    */
   public function setModules($modules) {
     $this->modules = $modules;
+    return $this;
   }
 
 }

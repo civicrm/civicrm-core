@@ -40,7 +40,11 @@
     }).then(function(stats) {
       $scope.stats = stats;
     });
-
+    $scope.rateStats = {
+      'Unique Clicks': 'clickthrough_rate',
+      'Delivered': 'delivered_rate',
+      'Opened': 'opened_rate',
+    };
     $scope.statTypes = crmMailingStats.getStatTypes();
     $scope.statUrl = function statUrl(mailing, statType, view) {
       return crmMailingStats.getUrl(mailing, statType, view, 'abtest/' + $scope.abtest.ab.id);

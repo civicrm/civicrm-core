@@ -31,6 +31,28 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
   }
 
+  /**
+   * Make sure that the latest case activity works accurately.
+   */
+  public function testCaseActivity() {
+    $userID = $this->createLoggedInUser();
+
+    $addTimeline = civicrm_api3('Case', 'addtimeline', [
+      'case_id' => 1,
+      'timeline' => "standard_timeline",
+    ]);
+
+    $query = CRM_Case_BAO_Case::getCaseActivityQuery('recent', $userID, ' civicrm_case.id IN( 1 )');
+    $res = CRM_Core_DAO::executeQuery($query);
+    $openCaseType = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Open Case');
+    while ($res->fetch()) {
+      $message = 'Failed asserting that the case activity query has a activity_type_id property:';
+      $this->assertObjectHasAttribute('activity_type_id', $res, $message . PHP_EOL . print_r($res, TRUE));
+      $message = 'Failed asserting that the latest activity from Case ID 1 was "Open Case":';
+      $this->assertEquals($openCaseType, $res->activity_type_id, $message . PHP_EOL . print_r($res, TRUE));
+    }
+  }
+
   protected function tearDown() {
     parent::tearDown();
     $this->quickCleanup($this->tablesToTruncate, TRUE);
@@ -45,6 +67,97 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
     $recent = CRM_Utils_Recent::get();
     $this->assertEquals('Test Contact - Housing Support', $recent[0]['title']);
+  }
+
+  /**
+   * Create and return case object of given Client ID.
+   * @param $clientId
+   * @param $loggedInUser
+   * @return CRM_Case_BAO_Case
+   */
+  private function createCase($clientId, $loggedInUser = NULL) {
+    if (empty($loggedInUser)) {
+      // backwards compatibility - but it's more typical that the creator is a different person than the client
+      $loggedInUser = $clientId;
+    }
+    $caseParams = array(
+      'activity_subject' => 'Case Subject',
+      'client_id'        => $clientId,
+      'case_type_id'     => 1,
+      'status_id'        => 1,
+      'case_type'        => 'housing_support',
+      'subject'          => 'Case Subject',
+      'start_date'       => date("Y-m-d"),
+      'start_date_time'  => date("YmdHis"),
+      'medium_id'        => 2,
+      'activity_details' => '',
+    );
+    $form = new CRM_Case_Form_Case();
+    $caseObj = $form->testSubmit($caseParams, "OpenCase", $loggedInUser, "standalone");
+    return $caseObj;
+  }
+
+  /**
+   * Create case role relationship between given contacts for provided case ID.
+   *
+   * @param $contactIdA
+   * @param $contactIdB
+   * @param $caseId
+   * @param bool $isActive
+   */
+  private function createCaseRoleRelationship($contactIdA, $contactIdB, $caseId, $isActive = TRUE) {
+    $relationshipType = $this->relationshipTypeCreate([
+      'contact_type_b' => 'Individual',
+    ]);
+
+    $this->callAPISuccess('Relationship', 'create', array(
+      'contact_id_a'         => $contactIdA,
+      'contact_id_b'         => $contactIdB,
+      'relationship_type_id' => $relationshipType,
+      'case_id'              => $caseId,
+      'is_active'            => $isActive,
+    ));
+  }
+
+  /**
+   * Asserts number of cases for given logged in user.
+   *
+   * @param $loggedInUser
+   * @param $caseId
+   * @param $caseCount
+   */
+  private function assertCasesOfUser($loggedInUser, $caseId, $caseCount) {
+    $summary = CRM_Case_BAO_Case::getCasesSummary(FALSE);
+    $upcomingCases = CRM_Case_BAO_Case::getCases(FALSE, array(), 'dashboard', TRUE);
+    $caseRoles = CRM_Case_BAO_Case::getCaseRoles($loggedInUser, $caseId);
+
+    $this->assertEquals($caseCount, $upcomingCases, 'Upcoming case count must be ' . $caseCount);
+    $this->assertEquals($caseCount, $summary['rows']['Housing Support']['Ongoing']['count'], 'Housing Support Ongoing case summary must be ' . $caseCount);
+    $this->assertEquals($caseCount, count($caseRoles), 'Total case roles for logged in users must be ' . $caseCount);
+  }
+
+  /**
+   * Test that Case count is exactly one for logged in user for user's active role.
+   */
+  public function testActiveCaseRole() {
+    $individual = $this->individualCreate();
+    $caseObj = $this->createCase($individual);
+    $caseId = $caseObj->id;
+    $loggedInUser = $this->createLoggedInUser();
+    $this->createCaseRoleRelationship($individual, $loggedInUser, $caseId);
+    $this->assertCasesOfUser($loggedInUser, $caseId, 1);
+  }
+
+  /**
+   * Test that case count is zero for logged in user for user's inactive role.
+   */
+  public function testInactiveCaseRole() {
+    $individual = $this->individualCreate();
+    $caseObj = $this->createCase($individual);
+    $caseId = $caseObj->id;
+    $loggedInUser = $this->createLoggedInUser();
+    $this->createCaseRoleRelationship($individual, $loggedInUser, $caseId, FALSE);
+    $this->assertCasesOfUser($loggedInUser, $caseId, 0);
   }
 
   public function testGetCaseType() {
@@ -74,5 +187,120 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    * function testGetRelatedCases() {
    * }
    */
+
+  /**
+   * Test various things after a case is closed.
+   *
+   * This annotation is not ideal, but without it there is some kind of
+   * messup that happens to quickform that persists between tests, e.g.
+   * it can't add maxfilesize validation rules.
+   * @runInSeparateProcess
+   * @preserveGlobalState disabled
+   */
+  public function testCaseClosure() {
+    $loggedInUser = $this->createLoggedInUser();
+    $client_id = $this->individualCreate();
+    $caseObj = $this->createCase($client_id, $loggedInUser);
+    $case_id = $caseObj->id;
+
+    // Get the case status option value for "Resolved" (name="Closed").
+    $closed_status = $this->callAPISuccess('OptionValue', 'getValue', [
+      'return' => 'value',
+      'option_group_id' => 'case_status',
+      'name' => 'Closed',
+    ]);
+    $this->assertNotEmpty($closed_status);
+
+    // Get the activity status option value for "Completed"
+    $completed_status = $this->callAPISuccess('OptionValue', 'getValue', [
+      'return' => 'value',
+      'option_group_id' => 'activity_status',
+      'name' => 'Completed',
+    ]);
+    $this->assertNotEmpty($completed_status);
+
+    // Get the value for the activity type id we need to create
+    $atype = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Change Case Status');
+
+    // Now it gets weird. There doesn't seem to be a good way to test this, so we simulate a form and the various bits that go with it.
+
+    // HTTP vars needed because that's how the form determines stuff
+    $oldMETHOD = empty($_SERVER['REQUEST_METHOD']) ? NULL : $_SERVER['REQUEST_METHOD'];
+    $oldGET = empty($_GET) ? [] : $_GET;
+    $oldREQUEST = empty($_REQUEST) ? [] : $_REQUEST;
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    $_GET['caseid'] = $case_id;
+    $_REQUEST['caseid'] = $case_id;
+    $_GET['cid'] = $client_id;
+    $_REQUEST['cid'] = $client_id;
+    $_GET['action'] = 'add';
+    $_REQUEST['action'] = 'add';
+    $_GET['reset'] = 1;
+    $_REQUEST['reset'] = 1;
+    $_GET['atype'] = $atype;
+    $_REQUEST['atype'] = $atype;
+
+    $form = new CRM_Case_Form_Activity();
+    $form->controller = new CRM_Core_Controller_Simple('CRM_Case_Form_Activity', 'Case Activity');
+    $form->_activityTypeId  = $atype;
+    $form->_activityTypeName = 'Change Case Status';
+    $form->_activityTypeFile = 'ChangeCaseStatus';
+
+    $form->preProcess();
+    $form->buildQuickForm();
+    $form->setDefaultValues();
+
+    // Now submit the form. Store the date used so we can check it later.
+
+    $t = time();
+    $now_date = date('Y-m-d H:i:s', $t);
+    $now_date_date_only = date('Y-m-d', $t);
+    $actParams = [
+      'is_unittest' => TRUE,
+      'case_status_id' => $closed_status,
+      'activity_date_time' => $now_date,
+      'target_contact_id' => $client_id,
+      'source_contact_id' => $loggedInUser,
+      'subject' => 'null', // yeah this is extra weird, but without it you get the wrong subject
+    ];
+
+    $form->postProcess($actParams);
+
+    // Ok now let's check some things
+
+    $result = $this->callAPISuccess('Case', 'get', [
+      'sequential' => 1,
+      'id' => $case_id,
+    ]);
+    $caseData = array_shift($result['values']);
+
+    $this->assertEquals($caseData['end_date'], $now_date_date_only);
+    $this->assertEquals($caseData['status_id'], $closed_status);
+
+    // now get the latest activity and check some things for it
+
+    $actId = max($caseData['activities']);
+    $this->assertNotEmpty($actId);
+
+    $result = $this->callAPISuccess('Activity', 'get', [
+      'sequential' => 1,
+      'id' => $actId,
+    ]);
+    $activity = array_shift($result['values']);
+
+    $this->assertEquals($activity['subject'], 'Case status changed from Ongoing to Resolved');
+    $this->assertEquals($activity['activity_date_time'], $now_date);
+    $this->assertEquals($activity['status_id'], $completed_status);
+
+    // Now replace old globals
+    if (is_null($oldMETHOD)) {
+      unset($_SERVER['REQUEST_METHOD']);
+    }
+    else {
+      $_SERVER['REQUEST_METHOD'] = $oldMETHOD;
+    }
+    $_GET = $oldGET;
+    $_REQUEST = $oldREQUEST;
+  }
 
 }

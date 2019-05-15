@@ -167,6 +167,18 @@
     <add>1.5</add>
   </field>
   <field>
+    <name>status_override_end_date</name>
+    <title>Status Override End Date</title>
+    <type>date</type>
+    <default>NULL</default>
+    <import>true</import>
+    <comment>Then end date of membership status override if 'Override until selected date' override type is selected.</comment>
+    <add>4.7</add>
+    <html>
+      <type>Select Date</type>
+    </html>
+  </field>
+  <field>
     <name>owner_membership_id</name>
     <type>int unsigned</type>
     <title>Primary Member ID</title>

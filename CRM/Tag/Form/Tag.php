@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -81,15 +81,15 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
     // need to append the array with the " checked " if contact is tagged with the tag
     foreach ($allTags as $tagID => $varValue) {
       if (in_array($tagID, $entityTag)) {
-        $tagAttribute = array(
+        $tagAttribute = [
           'checked' => 'checked',
           'id' => "tag_{$tagID}",
-        );
+        ];
       }
       else {
-        $tagAttribute = array(
+        $tagAttribute = [
           'id' => "tag_{$tagID}",
-        );
+        ];
       }
 
       $tagChk[$tagID] = $this->createElement('checkbox', $tagID, '', '', $tagAttribute);
@@ -113,7 +113,7 @@ class CRM_Tag_Form_Tag extends CRM_Core_Form {
    * @return void
    */
   public function postProcess() {
-    CRM_Utils_System::flushCache('CRM_Core_DAO_Tag');
+    CRM_Utils_System::flushCache();
 
     // array contains the posted values
     // exportvalues is not used because its give value 1 of the checkbox which were checked by default,

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Mailing_BAO_Recipients extends CRM_Mailing_DAO_Recipients {
 
@@ -50,7 +50,7 @@ SELECT count(*) as count
 FROM   civicrm_mailing_recipients
 WHERE  mailing_id = %1
 ";
-    $params = array(1 => array($mailingID, 'Integer'));
+    $params = [1 => [$mailingID, 'Integer']];
     return CRM_Core_DAO::singleValueQuery($sql, $params);
   }
 
@@ -79,7 +79,7 @@ FROM   civicrm_mailing_recipients
 WHERE  mailing_id = %1
        $limitString
 ";
-    $params = array(1 => array($mailingID, 'Integer'));
+    $params = [1 => [$mailingID, 'Integer']];
 
     return CRM_Core_DAO::executeQuery($sql, $params);
   }
@@ -102,7 +102,7 @@ WHERE  mailing_id = %1
     CRM_Core_DAO::executeQuery("DROP TEMPORARY TABLE IF EXISTS  srcMailing_$sourceMailingId");
     $sql = "
 CREATE TEMPORARY TABLE srcMailing_$sourceMailingId
-            (mailing_recipient_id int, id int PRIMARY KEY AUTO_INCREMENT, INDEX(mailing_recipient_id))
+            (mailing_recipient_id int unsigned, id int PRIMARY KEY AUTO_INCREMENT, INDEX(mailing_recipient_id))
             ENGINE=HEAP";
     CRM_Core_DAO::executeQuery($sql);
     $sql = "

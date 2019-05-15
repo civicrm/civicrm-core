@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,10 +42,7 @@
  */
 function civicrm_api3_pledge_create($params) {
   _civicrm_api3_pledge_format_params($params, TRUE);
-  $values = $params;
-  //format the custom fields
-  _civicrm_api3_custom_format_params($params, $values, 'Pledge');
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $values);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Pledge');
 }
 
 /**
@@ -58,9 +55,9 @@ function civicrm_api3_pledge_create($params) {
  */
 function civicrm_api3_pledge_delete($params) {
   if (CRM_Pledge_BAO_Pledge::deletePledge($params['id'])) {
-    return civicrm_api3_create_success(array(
+    return civicrm_api3_create_success([
       'id' => $params['id'],
-    ), $params, 'Pledge', 'delete');
+    ], $params, 'Pledge', 'delete');
   }
   else {
     return civicrm_api3_create_error('Could not delete pledge');
@@ -74,7 +71,7 @@ function civicrm_api3_pledge_delete($params) {
  */
 function _civicrm_api3_pledge_delete_spec(&$params) {
   // set as not required as pledge_id also acceptable & no either/or std yet
-  $params['id']['api.aliases'] = array('pledge_id');
+  $params['id']['api.aliases'] = ['pledge_id'];
 }
 
 /**
@@ -83,15 +80,15 @@ function _civicrm_api3_pledge_delete_spec(&$params) {
  * @param array $params
  */
 function _civicrm_api3_pledge_get_spec(&$params) {
-  $params['next_pay_date'] = array(
+  $params['next_pay_date'] = [
     'name' => 'next_pay_date',
     'type' => 12,
     'title' => 'Pledge Made',
     'api.filter' => 0,
     'api.return' => 1,
-  );
+  ];
   $params['pledge_is_test']['api.default'] = 0;
-  $params['pledge_financial_type_id']['api.aliases'] = array('contribution_type_id', 'contribution_type');
+  $params['pledge_financial_type_id']['api.aliases'] = ['contribution_type_id', 'contribution_type'];
 
 }
 
@@ -102,13 +99,13 @@ function _civicrm_api3_pledge_get_spec(&$params) {
  */
 function _civicrm_api3_pledge_create_spec(&$params) {
 
-  $required = array('contact_id', 'amount', 'installments', 'start_date', 'financial_type_id');
+  $required = ['contact_id', 'amount', 'installments', 'start_date', 'financial_type_id'];
   foreach ($required as $required_field) {
     $params[$required_field]['api.required'] = 1;
   }
   // @todo this can come from xml
-  $params['amount']['api.aliases'] = array('pledge_amount');
-  $params['financial_type_id']['api.aliases'] = array('contribution_type_id', 'contribution_type');
+  $params['amount']['api.aliases'] = ['pledge_amount'];
+  $params['financial_type_id']['api.aliases'] = ['contribution_type_id', 'contribution_type'];
 }
 
 /**
@@ -125,7 +122,7 @@ function civicrm_api3_pledge_get($params) {
 
   list($dao, $query) = _civicrm_api3_get_query_object($params, $mode, 'Pledge');
 
-  $pledge = array();
+  $pledge = [];
   while ($dao->fetch()) {
     $pledge[$dao->pledge_id] = $query->store($dao);
   }
@@ -137,7 +134,7 @@ function civicrm_api3_pledge_get($params) {
  * Set default to not return test params.
  */
 function _civicrm_api3_pledge_get_defaults() {
-  return array('pledge_test' => 0);
+  return ['pledge_test' => 0];
 }
 
 /**

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,17 +40,7 @@
  * @return array
  */
 function civicrm_api3_payment_processor_type_create($params) {
-  if (isset($params['id']) && !CRM_Utils_Rule::integer($params['id'])) {
-    return civicrm_api3_create_error('Invalid value for payment_processor type ID');
-  }
-
-  $paymentProcessorType = CRM_Financial_BAO_PaymentProcessorType::create($params);
-
-  $relType = array();
-
-  _civicrm_api3_object_to_array($paymentProcessorType, $relType[$paymentProcessorType->id]);
-
-  return civicrm_api3_create_success($relType, $params, 'PaymentProcessorType', 'create', $paymentProcessorType);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'PaymentProcessorType');
 }
 
 /**
@@ -66,7 +56,6 @@ function _civicrm_api3_payment_processor_type_create_spec(&$params) {
   $params['class_name']['api.required'] = 1;
   $params['is_active']['api.default'] = 1;
   $params['is_recur']['api.default'] = FALSE;
-  // FIXME bool support // $params['is_recur']['api.required'] = 1;
   $params['name']['api.required'] = 1;
   $params['title']['api.required'] = 1;
   $params['payment_instrument_id']['api.default'] = 'Credit Card';

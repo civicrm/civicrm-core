@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,7 +44,7 @@
 
     <tr class="crm-scheduleReminder-form-block-when">
         <td class="right">{$form.start_action_offset.label}</td>
-        <td colspan="3">{include file="CRM/common/jcalendar.tpl" elementName=absolute_date} <strong id='OR'>OR</strong><br /></td>
+        <td colspan="3">{$form.absolute_date.html} <strong id='OR'>OR</strong><br /></td>
     </tr>
 
     <tr id="relativeDate" class="crm-scheduleReminder-form-block-description">
@@ -60,11 +60,11 @@
     <tr id="repeatFields" class="crm-scheduleReminder-form-block-repeatFields"><td></td><td>
         <table class="form-layout-compressed">
           <tr class="crm-scheduleReminder-form-block-repetition_frequency_interval">
-            <td class="label">{$form.repetition_frequency_interval.label}&nbsp;&nbsp;&nbsp;{$form.repetition_frequency_interval.html}</td>
+            <td class="label">{$form.repetition_frequency_interval.label} <span class="crm-marker">*</span>&nbsp;&nbsp;{$form.repetition_frequency_interval.html}</td>
           <td>{$form.repetition_frequency_unit.html}</td>
           </tr>
           <tr class="crm-scheduleReminder-form-block-repetition_frequency_interval">
-             <td class="label">{$form.end_frequency_interval.label}&nbsp;&nbsp;&nbsp;{$form.end_frequency_interval.html}
+             <td class="label">{$form.end_frequency_interval.label} <span class="crm-marker">*</span>&nbsp;&nbsp;{$form.end_frequency_interval.html}
            <td>{$form.end_frequency_unit.html}&nbsp;&nbsp;&nbsp;{$form.end_action.html}&nbsp;&nbsp;&nbsp;{$form.end_date.html}</td>
           </tr>
         </table>

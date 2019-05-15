@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -46,6 +46,7 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
 
   /**
    * Component clause.
+   * @var string
    */
   public $_componentClause;
 
@@ -57,13 +58,13 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
    * @return void
    */
   public function preProcess() {
-    $this->_context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this);
     if ($this->_context == 'view') {
       $this->_single = TRUE;
 
       $participantID = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
       $contactID = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-      $this->_participantIds = array($participantID);
+      $this->_participantIds = [$participantID];
       $this->_componentClause = " civicrm_participant.id = $participantID ";
       $this->assign('totalSelectedParticipants', 1);
 
@@ -93,9 +94,9 @@ class CRM_Event_Form_Task_Badge extends CRM_Event_Form_Task {
     $this->add('select',
       'badge_id',
       ts('Name Badge Format'),
-      array(
+      [
         '' => ts('- select -'),
-      ) + $label, TRUE
+      ] + $label, TRUE
     );
 
     $next = 'next';

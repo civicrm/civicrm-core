@@ -11,6 +11,7 @@ Required vars: activitySet
     <th>{{ts('Reference')}}</th>
     <th>{{ts('Offset')}}</th>
     <th>{{ts('Select')}}</th>
+    <th>{{ts('Default assignee')}}</th>
     <th></th>
   </tr>
   </thead>
@@ -21,13 +22,13 @@ Required vars: activitySet
       <i class="crm-i fa-arrows grip-n-drag"></i>
     </td>
     <td>
-      <i class="crm-i {{ activityTypes[activity.name].icon }}"></i>
-      {{ activity.label }}
+      <i class="crm-i {{activityTypes[activity.name].icon}}"></i>
+      {{activity.label}}
     </td>
     <td>
       <select
         ui-jq="select2"
-        ui-options="{dropdownAutoWidth : true}"
+        ui-options="{dropdownAutoWidth: true}"
         ng-model="activity.status"
         ng-options="actStatus.name as actStatus.label for actStatus in activityStatuses|orderBy:'label'"
         >
@@ -37,12 +38,11 @@ Required vars: activitySet
     <td>
       <select
         ui-jq="select2"
-        ui-options="{dropdownAutoWidth : true}"
+        ui-options="{dropdownAutoWidth: true}"
         ng-model="activity.reference_activity"
-        ng-options="activityType.name as activityType.label for activityType in activitySet.activityTypes"
-        ng-hide="activity.name == 'Open Case'"
-        ng-required="activity.name != 'Open Case'"
+        ng-options="activityType.name as activityType.label for activityType in caseType.definition.timelineActivityTypes"
         >
+        <option value="">-- Case Start --</option>
       </select>
     </td>
     <td>
@@ -51,20 +51,45 @@ Required vars: activitySet
         type="text"
         ng-pattern="/^-?[0-9]*$/"
         ng-model="activity.reference_offset"
-        ng-hide="activity.name == 'Open Case'"
-        ng-required="activity.name != 'Open Case'"
         >
     </td>
     <td>
       <select
         ui-jq="select2"
-        ui-options="{dropdownAutoWidth : true}"
+        ui-options="{dropdownAutoWidth: true}"
         ng-model="activity.reference_select"
         ng-options="key as value for (key,value) in {newest: ts('Newest'), oldest: ts('Oldest')}"
-        ng-hide="activity.name == 'Open Case'"
-        ng-required="activity.name != 'Open Case'"
         >
       </select>
+    </td>
+    <td>
+      <select
+        ui-jq="select2"
+        ui-options="{dropdownAutoWidth: true}"
+        ng-model="activity.default_assignee_type"
+        ng-options="option.value as option.label for option in defaultAssigneeTypes"
+        ng-change="clearActivityDefaultAssigneeValues(activity)"
+      ></select>
+
+      <p ng-if="activity.default_assignee_type === defaultAssigneeTypeValues.BY_RELATIONSHIP">
+        <select
+          ui-jq="select2"
+          ui-options="{dropdownAutoWidth: true}"
+          ng-model="activity.default_assignee_relationship"
+          ng-options="option.value as option.label for option in defaultRelationshipTypeOptions"
+          required
+        ></select>
+      </p>
+
+      <p ng-if="activity.default_assignee_type === defaultAssigneeTypeValues.SPECIFIC_CONTACT">
+        <input
+          type="text"
+          ng-model="activity.default_assignee_contact"
+          placeholder="- Select contact -"
+          crm-entityref="{ entity: 'Contact' }"
+          data-create-links="true"
+          required />
+      </p>
     </td>
     <td>
       <a class="crm-hover-button"
@@ -79,7 +104,7 @@ Required vars: activitySet
 
   <tfoot>
   <tr class="addRow">
-    <td colspan="6">
+    <td colspan="8">
       <span crm-add-name=""
            crm-options="activityTypeOptions"
            crm-var="newActivity"

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -40,7 +40,7 @@ class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
   public $_permission = NULL;
   public $_contactId = NULL;
 
@@ -66,7 +66,7 @@ class CRM_Mailing_Page_Tab extends CRM_Contact_Page_View {
     // Check logged in url permission.
     CRM_Contact_Page_View::checkUserPermission($this);
 
-    CRM_Utils_System::setTitle(ts('Mailings sent to %1', array(1 => $displayName)));
+    CRM_Utils_System::setTitle(ts('Mailings sent to %1', [1 => $displayName]));
   }
 
   /**

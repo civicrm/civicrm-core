@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.7                                                |
+| CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2017                                |
+| Copyright CiviCRM LLC (c) 2004-2019                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -49,7 +49,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * @expectedException CRM_Extension_Exception
    */
   public function testInstallInvalidType() {
-    $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
+    $mockFunction = $this->mockMethod;
+    $testingTypeManager = $this->$mockFunction('CRM_Extension_Manager_Interface');
     $testingTypeManager->expects($this->never())
       ->method('onPreInstall');
     $manager = $this->_createManager(array(
@@ -66,7 +67,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * "the first row" or "all rows".
    */
   public function testInstall_Disable_Uninstall() {
-    $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
+    $mockFunction = $this->mockMethod;
+    $testingTypeManager = $this->$mockFunction('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
     ));
@@ -91,7 +93,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->method('onPostDisable');
     $manager->disable(array('test.foo.bar'));
     $this->assertEquals('disabled', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang')); // no side-effect
+    // no side-effect
+    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
 
     $testingTypeManager
       ->expects($this->once())
@@ -101,7 +104,124 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
       ->method('onPostUninstall');
     $manager->uninstall(array('test.foo.bar'));
     $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
-    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang')); // no side-effect
+    // no side-effect
+    $this->assertEquals('installed', $manager->getStatus('test.whiz.bang'));
+  }
+
+  /**
+   * This is the same as testInstall_Disable_Uninstall, but we also install and remove a dependency.
+   *
+   * @throws \CRM_Extension_Exception
+   */
+  public function test_InstallAuto_DisableDownstream_UninstallDownstream() {
+    $mockFunction = $this->mockMethod;
+    $testingTypeManager = $this->$mockFunction('CRM_Extension_Manager_Interface');
+    $manager = $this->_createManager(array(
+      self::TESTING_TYPE => $testingTypeManager,
+    ));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+
+    $testingTypeManager->expects($this->exactly(2))->method('onPreInstall');
+    $testingTypeManager->expects($this->exactly(2))->method('onPostInstall');
+    $this->assertEquals(array('test.foo.bar', 'test.foo.downstream'),
+      $manager->findInstallRequirements(array('test.foo.downstream')));
+    $manager->install(
+      $manager->findInstallRequirements(array('test.foo.downstream')));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+
+    $testingTypeManager->expects($this->once())->method('onPreDisable');
+    $testingTypeManager->expects($this->once())->method('onPostDisable');
+    $this->assertEquals(array('test.foo.downstream'),
+      $manager->findDisableRequirements(array('test.foo.downstream')));
+    $manager->disable(array('test.foo.downstream'));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('disabled', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+
+    $testingTypeManager->expects($this->once())->method('onPreUninstall');
+    $testingTypeManager->expects($this->once())->method('onPostUninstall');
+    $manager->uninstall(array('test.foo.downstream'));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+  }
+
+  /**
+   * This is the same as testInstallAuto_Twice
+   *
+   * @throws \CRM_Extension_Exception
+   */
+  public function testInstallAuto_Twice() {
+    $mockFunction = $this->mockMethod;
+    $testingTypeManager = $this->$mockFunction('CRM_Extension_Manager_Interface');
+    $manager = $this->_createManager(array(
+      self::TESTING_TYPE => $testingTypeManager,
+    ));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+
+    $testingTypeManager->expects($this->exactly(2))->method('onPreInstall');
+    $testingTypeManager->expects($this->exactly(2))->method('onPostInstall');
+    $this->assertEquals(array('test.foo.bar', 'test.foo.downstream'),
+      $manager->findInstallRequirements(array('test.foo.downstream')));
+    $manager->install(
+      $manager->findInstallRequirements(array('test.foo.downstream')));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+
+    // And install a second time...
+    $testingTypeManager->expects($this->exactly(0))->method('onPreInstall');
+    $testingTypeManager->expects($this->exactly(0))->method('onPostInstall');
+    $manager->install(
+      $manager->findInstallRequirements(array('test.foo.downstream')));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+  }
+
+  public function test_InstallAuto_DisableUpstream() {
+    $mockFunction = $this->mockMethod;
+    $testingTypeManager = $this->$mockFunction('CRM_Extension_Manager_Interface');
+    $manager = $this->_createManager(array(
+      self::TESTING_TYPE => $testingTypeManager,
+    ));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+
+    $testingTypeManager->expects($this->exactly(2))->method('onPreInstall');
+    $testingTypeManager->expects($this->exactly(2))->method('onPostInstall');
+    $this->assertEquals(array('test.foo.bar', 'test.foo.downstream'),
+      $manager->findInstallRequirements(array('test.foo.downstream')));
+    $manager->install(
+      $manager->findInstallRequirements(array('test.foo.downstream')));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
+
+    $testingTypeManager->expects($this->never())->method('onPreDisable');
+    $testingTypeManager->expects($this->never())->method('onPostDisable');
+    $this->assertEquals(array('test.foo.downstream', 'test.foo.bar'),
+      $manager->findDisableRequirements(array('test.foo.bar')));
+
+    try {
+      $manager->disable(array('test.foo.bar'));
+      $this->fail('Expected disable to fail due to dependency');
+    }
+    catch (CRM_Extension_Exception $e) {
+      $this->assertRegExp('/test.foo.downstream/', $e->getMessage());
+    }
+
+    // Status unchanged
+    $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
+    $this->assertEquals('installed', $manager->getStatus('test.foo.downstream'));
+    $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
   }
 
   /**
@@ -109,7 +229,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * Subseuently disable and uninstall.
    */
   public function testInstall_DirtyRemove_Disable_Uninstall() {
-    $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
+    $mockFunction = $this->mockMethod;
+    $testingTypeManager = $this->$mockFunction('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
     ));
@@ -147,7 +268,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * Install an extension with a valid type name.
    */
   public function testInstall_Disable_Enable() {
-    $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
+    $mockFunction = $this->mockMethod;
+    $testingTypeManager = $this->$mockFunction('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
     ));
@@ -189,7 +311,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * Performing 'install' on a 'disabled' extension performs an 'enable'
    */
   public function testInstall_Disable_Install() {
-    $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
+    $mockFunction = $this->mockMethod;
+    $testingTypeManager = $this->$mockFunction('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
     ));
@@ -219,7 +342,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $testingTypeManager
       ->expects($this->once())
       ->method('onPostEnable');
-    $manager->install(array('test.foo.bar')); // install() instead of enable()
+    // install() instead of enable()
+    $manager->install(array('test.foo.bar'));
     $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
   }
 
@@ -227,7 +351,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * Install an extension with a valid type name.
    */
   public function testEnableBare() {
-    $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
+    $mockFunction = $this->mockMethod;
+    $testingTypeManager = $this->$mockFunction('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
     ));
@@ -245,7 +370,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $testingTypeManager
       ->expects($this->never())
       ->method('onPostEnable');
-    $manager->enable(array('test.foo.bar')); // enable not install
+    // enable not install
+    $manager->enable(array('test.foo.bar'));
     $this->assertEquals('installed', $manager->getStatus('test.foo.bar'));
   }
 
@@ -253,7 +379,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * Get the status of an unknown extension.
    */
   public function testStatusUnknownKey() {
-    $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
+    $mockFunction = $this->mockMethod;
+    $testingTypeManager = $this->$mockFunction('CRM_Extension_Manager_Interface');
     $testingTypeManager->expects($this->never())
       ->method('onPreInstall');
     $manager = $this->_createManager(array(
@@ -266,7 +393,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * Replace code for an extension that doesn't exist in the container
    */
   public function testReplace_Unknown() {
-    $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
+    $mockFunction = $this->mockMethod;
+    $testingTypeManager = $this->$mockFunction('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
     ));
@@ -275,10 +403,12 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->download = $this->_createDownload('test.newextension', 'newextension');
 
     $testingTypeManager
-      ->expects($this->never())// no data to replace
+    // no data to replace
+      ->expects($this->never())
       ->method('onPreReplace');
     $testingTypeManager
-      ->expects($this->never())// no data to replace
+    // no data to replace
+      ->expects($this->never())
       ->method('onPostReplace');
     $manager->replace($this->download);
     $this->assertEquals('uninstalled', $manager->getStatus('test.newextension'));
@@ -292,7 +422,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * Replace code for an extension that doesn't exist in the container
    */
   public function testReplace_Uninstalled() {
-    $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
+    $mockFunction = $this->mockMethod;
+    $testingTypeManager = $this->$mockFunction('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
     ));
@@ -302,10 +433,12 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     $this->download = $this->_createDownload('test.whiz.bang', 'newextension');
 
     $testingTypeManager
-      ->expects($this->never())// no data to replace
+    // no data to replace
+      ->expects($this->never())
       ->method('onPreReplace');
     $testingTypeManager
-      ->expects($this->never())// no data to replace
+    // no data to replace
+      ->expects($this->never())
       ->method('onPostReplace');
     $manager->replace($this->download);
     $this->assertEquals('uninstalled', $manager->getStatus('test.whiz.bang'));
@@ -323,7 +456,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * file="oddball", and the upgrade has file="newextension".
    */
   public function testReplace_Installed() {
-    $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
+    $mockFunction = $this->mockMethod;
+    $testingTypeManager = $this->$mockFunction('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
     ));
@@ -360,7 +494,8 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
    * file="oddball", and the upgrade has file="newextension".
    */
   public function testReplace_InstalledMissing() {
-    $testingTypeManager = $this->getMock('CRM_Extension_Manager_Interface');
+    $mockFunction = $this->mockMethod;
+    $testingTypeManager = $this->$mockFunction('CRM_Extension_Manager_Interface');
     $manager = $this->_createManager(array(
       self::TESTING_TYPE => $testingTypeManager,
     ));
@@ -420,6 +555,9 @@ class CRM_Extension_ManagerTest extends CiviUnitTestCase {
     mkdir("$basedir/weird/whizbang");
     file_put_contents("$basedir/weird/whizbang/info.xml", "<extension key='test.whiz.bang' type='" . self::TESTING_TYPE . "'><file>oddball</file></extension>");
     // not needed for now // file_put_contents("$basedir/weird/whizbang/oddball.php", "<?php\n");
+    mkdir("$basedir/weird/downstream");
+    file_put_contents("$basedir/weird/downstream/info.xml", "<extension key='test.foo.downstream' type='" . self::TESTING_TYPE . "'><file>oddball</file><requires><ext>test.foo.bar</ext></requires></extension>");
+    // not needed for now // file_put_contents("$basedir/weird/downstream/oddball.php", "<?php\n");
     $c = new CRM_Extension_Container_Basic($basedir, 'http://example/basedir', $cache, $cacheKey);
     return array($basedir, $c);
   }

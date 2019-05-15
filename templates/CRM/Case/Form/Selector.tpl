@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,7 +25,7 @@
 *}
 {include file="CRM/common/pager.tpl" location="top"}
 {strip}
-<table class="caseSelector">
+<table class="caseSelector row-highlight">
   <tr class="columnheader">
 
   {if ! $single and $context eq 'Search' }
@@ -66,7 +66,7 @@
     <td class="{$row.class} crm-case-status_{$row.case_status}">{$row.case_status}</td>
     <td class="crm-case-case_type">{$row.case_type}</td>
     <td class="crm-case-case_role">{if $row.case_role}{$row.case_role}{else}---{/if}</td>
-    <td class="crm-case-case_manager">{if $row.casemanager_id}<a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.casemanager_id`"}">{$row.casemanager}</a>{else}---{/if}</td>
+    <td class="crm-case-case_manager">{$row.casemanager}</td>
     <td class="crm-case-case_recent_activity_type">{if $row.case_recent_activity_type}
   {$row.case_recent_activity_type}<br />{$row.case_recent_activity_date|crmDate}{else}---{/if}</td>
     <td class="crm-case-case_scheduled_activity_type">{if $row.case_scheduled_activity_type}

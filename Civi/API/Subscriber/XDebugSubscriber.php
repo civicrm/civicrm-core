@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,13 +35,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @package Civi\API\Subscriber
  */
 class XDebugSubscriber implements EventSubscriberInterface {
+
   /**
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::RESPOND => array('onApiRespond', Events::W_LATE),
-    );
+    return [
+      Events::RESPOND => ['onApiRespond', Events::W_LATE],
+    ];
   }
 
   /**

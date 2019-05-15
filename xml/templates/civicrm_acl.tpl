@@ -1,7 +1,7 @@
 -- +--------------------------------------------------------------------+
--- | CiviCRM version 4.7                                                |
+-- | CiviCRM version 5                                                  |
 -- +--------------------------------------------------------------------+
--- | Copyright CiviCRM LLC (c) 2004-2017                                |
+-- | Copyright CiviCRM LLC (c) 2004-2019                                |
 -- +--------------------------------------------------------------------+
 -- | This file is a part of CiviCRM.                                    |
 -- |                                                                    |
@@ -104,4 +104,3 @@ INSERT INTO civicrm_acl_entity_role
     (`acl_role_id`, `entity_table`, `entity_id`, `is_active`)
 VALUES
     (1, 'civicrm_group', 1, 1);
-

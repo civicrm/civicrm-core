@@ -9,12 +9,12 @@
  *   API result array
  */
 function mailing_gettokens_example() {
-  $params = array(
-    'entity' => array(
+  $params = [
+    'entity' => [
       '0' => 'Contact',
       '1' => 'Mailing',
-    ),
-  );
+    ],
+  ];
 
   try{
     $result = civicrm_api3('Mailing', 'gettokens', $params);
@@ -24,12 +24,12 @@ function mailing_gettokens_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -43,11 +43,11 @@ function mailing_gettokens_example() {
  */
 function mailing_gettokens_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 82,
-    'values' => array(
+    'values' => [
       '{action.unsubscribe}' => 'Unsubscribe via email',
       '{action.unsubscribeUrl}' => 'Unsubscribe via web page',
       '{action.resubscribe}' => 'Resubscribe via email',
@@ -131,8 +131,8 @@ function mailing_gettokens_expectedresult() {
       '{contact.url}' => 'Website',
       '{contact.checksum}' => 'Checksum',
       '{contact.contact_id}' => 'Internal Contact ID',
-    ),
-  );
+    ],
+  ];
 
   return $expectedResult;
 }

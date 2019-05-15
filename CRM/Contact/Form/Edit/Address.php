@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -56,46 +56,44 @@ class CRM_Contact_Form_Edit_Address {
       $blockId = $addressBlockCount;
     }
 
-    $config = CRM_Core_Config::singleton();
-    $countryDefault = $config->defaultContactCountry;
-
     $form->applyFilter('__ALL__', 'trim');
 
-    $js = array();
+    $js = [];
     if (!$inlineEdit) {
-      $js = array('onChange' => 'checkLocation( this.id );', 'placeholder' => NULL);
+      $js = ['onChange' => 'checkLocation( this.id );', 'placeholder' => NULL];
     }
 
     //make location type required for inline edit
-    $form->addField("address[$blockId][location_type_id]", array('entity' => 'address', 'class' => 'eight', 'option_url' => NULL) + $js, $inlineEdit);
+    $form->addField("address[$blockId][location_type_id]", ['entity' => 'address', 'class' => 'eight', 'option_url' => NULL] + $js, $inlineEdit);
     if (!$inlineEdit) {
-      $js = array('id' => 'Address_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );');
+      $js = ['id' => 'Address_' . $blockId . '_IsPrimary', 'onClick' => 'singleSelect( this.id );'];
     }
 
     $form->addField(
-      "address[$blockId][is_primary]", array(
+      "address[$blockId][is_primary]", [
         'entity' => 'address',
         'label' => ts('Primary location for this contact'),
-        'text' => ts('Primary location for this contact')) + $js);
+        'text' => ts('Primary location for this contact'),
+      ] + $js);
 
     if (!$inlineEdit) {
-      $js = array('id' => 'Address_' . $blockId . '_IsBilling', 'onClick' => 'singleSelect( this.id );');
+      $js = ['id' => 'Address_' . $blockId . '_IsBilling', 'onClick' => 'singleSelect( this.id );'];
     }
 
     $form->addField(
-      "address[$blockId][is_billing]", array(
+      "address[$blockId][is_billing]", [
         'entity' => 'address',
         'label' => ts('Billing location for this contact'),
-        'text' => ts('Billing location for this contact')) + $js);
+        'text' => ts('Billing location for this contact'),
+      ] + $js);
 
     // hidden element to store master address id
-    $form->addField("address[$blockId][master_id]", array('entity' => 'address', 'type' => 'hidden'));
+    $form->addField("address[$blockId][master_id]", ['entity' => 'address', 'type' => 'hidden']);
     $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
       'address_options', TRUE, NULL, TRUE
     );
-    $attributes = CRM_Core_DAO::getAttribute('CRM_Core_DAO_Address');
 
-    $elements = array(
+    $elements = [
       'address_name',
       'street_address',
       'supplemental_address_1',
@@ -112,21 +110,20 @@ class CRM_Contact_Form_Edit_Address {
       'street_number',
       'street_name',
       'street_unit',
-    );
+    ];
 
     foreach ($elements as $name) {
-      //Remove id from name, to allow comparison against enabled addressOtions.
+      //Remove id from name, to allow comparison against enabled addressOptions.
       $nameWithoutID = strpos($name, '_id') !== FALSE ? substr($name, 0, -3) : $name;
       // Skip fields which are not enabled in the address options.
       if (empty($addressOptions[$nameWithoutID])) {
         $continue = TRUE;
         //Don't skip street parsed fields when parsing is enabled.
-        if (in_array($nameWithoutID, array(
-            'street_number',
-            'street_name',
-            'street_unit',
-          )) && !empty($addressOptions['street_address_parsing'])
-        ) {
+        if (in_array($nameWithoutID, [
+          'street_number',
+          'street_name',
+          'street_unit',
+        ]) && !empty($addressOptions['street_address_parsing'])) {
           $continue = FALSE;
         }
         if ($continue) {
@@ -137,7 +134,7 @@ class CRM_Contact_Form_Edit_Address {
         $name = 'name';
       }
 
-      $params = array('entity' => 'address');
+      $params = ['entity' => 'address'];
 
       if ($name == 'postal_code_suffix') {
         $params['label'] = ts('Suffix');
@@ -153,7 +150,7 @@ class CRM_Contact_Form_Edit_Address {
 
     // CRM-11665 geocode override option
     $geoCode = FALSE;
-    if (!empty($config->geocodeMethod)) {
+    if (CRM_Utils_GeocodeProvider::getUsableClassName()) {
       $geoCode = TRUE;
       $form->addElement('checkbox',
         "address[$blockId][manual_geo_code]",
@@ -162,69 +159,18 @@ class CRM_Contact_Form_Edit_Address {
     }
     $form->assign('geoCode', $geoCode);
 
-    // Process any address custom data -
-    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Address', NULL, $entityId);
-
-    if (isset($groupTree) && is_array($groupTree)) {
-      // use simplified formatted groupTree
-      $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, $form);
-
-      // make sure custom fields are added /w element-name in the format - 'address[$blockId][custom-X]'
-      foreach ($groupTree as $id => $group) {
-        foreach ($group['fields'] as $fldId => $field) {
-          $groupTree[$id]['fields'][$fldId]['element_custom_name'] = $field['element_name'];
-          $groupTree[$id]['fields'][$fldId]['element_name'] = "address[$blockId][{$field['element_name']}]";
-        }
-      }
-
-      $defaults = array();
-      CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $defaults);
-
-      // since we change element name for address custom data, we need to format the setdefault values
-      $addressDefaults = array();
-      foreach ($defaults as $key => $val) {
-        if (empty($val)) {
-          continue;
-        }
-
-        // inorder to set correct defaults for checkbox custom data, we need to converted flat key to array
-        // this works for all types custom data
-        $keyValues = explode('[', str_replace(']', '', $key));
-        $addressDefaults[$keyValues[0]][$keyValues[1]][$keyValues[2]] = $val;
-      }
-
-      $form->setDefaults($addressDefaults);
-
-      // we setting the prefix to 'dnc_' below, so that we don't overwrite smarty's grouptree var.
-      // And we can't set it to 'address_' because we want to set it in a slightly different format.
-      CRM_Core_BAO_CustomGroup::buildQuickForm($form, $groupTree, FALSE, 'dnc_');
-
-      // during contact editing : if no address is filled
-      // required custom data must not produce 'required' form rule error
-      // more handling done in formRule func
-      CRM_Contact_Form_Edit_Address::storeRequiredCustomDataInfo($form, $groupTree);
-
-      $template = CRM_Core_Smarty::singleton();
-      $tplGroupTree = $template->get_template_vars('address_groupTree');
-      $tplGroupTree = empty($tplGroupTree) ? array() : $tplGroupTree;
-
-      $form->assign('address_groupTree', $tplGroupTree + array($blockId => $groupTree));
-      // unset the temp smarty var that got created
-      $form->assign('dnc_groupTree', NULL);
-    }
-    // address custom data processing ends ..
+    self::addCustomDataToForm($form, $entityId, $blockId);
 
     if ($sharing) {
       // shared address
       $form->addElement('checkbox', "address[$blockId][use_shared_address]", NULL, ts('Use another contact\'s address'));
 
       // Override the default profile links to add address form
-      $profileLinks = CRM_Core_BAO_UFGroup::getCreateLinks(array(
-          'new_individual',
-          'new_organization',
-          'new_household',
-        ), 'shared_address');
-      $form->addEntityRef("address[$blockId][master_contact_id]", ts('Share With'), array('create' => $profileLinks));
+      $profileLinks = CRM_Contact_BAO_Contact::getEntityRefCreateLinks('shared_address');
+      $form->addEntityRef("address[$blockId][master_contact_id]", ts('Share With'), ['create' => $profileLinks, 'api' => ['extra' => ['contact_type']]]);
+
+      // do we want to update employer for shared address
+      $form->addElement('checkbox', "address[$blockId][update_current_employer]", NULL, ts('Set this organization as current employer'));
     }
   }
 
@@ -238,10 +184,10 @@ class CRM_Contact_Form_Edit_Address {
    * @return array|bool
    *   if no errors
    */
-  public static function formRule($fields, $files = array(), $self = NULL) {
-    $errors = array();
+  public static function formRule($fields, $files = [], $self = NULL) {
+    $errors = [];
 
-    $customDataRequiredFields = array();
+    $customDataRequiredFields = [];
     if ($self && property_exists($self, '_addressRequireOmission')) {
       $customDataRequiredFields = explode(',', $self->_addressRequireOmission);
     }
@@ -295,14 +241,14 @@ class CRM_Contact_Form_Edit_Address {
    *   Form object.
    */
   public static function setDefaultValues(&$defaults, &$form) {
-    $addressValues = array();
+    $addressValues = [];
     if (isset($defaults['address']) && is_array($defaults['address']) &&
       !CRM_Utils_System::isNull($defaults['address'])
     ) {
 
       // start of contact shared adddress defaults
-      $sharedAddresses = array();
-      $masterAddress = array();
+      $sharedAddresses = [];
+      $masterAddress = [];
 
       // get contact name of shared contact names
       $shareAddressContactNames = CRM_Contact_BAO_Contact_Utils::getAddressShareContactNames($defaults['address']);
@@ -310,15 +256,15 @@ class CRM_Contact_Form_Edit_Address {
       foreach ($defaults['address'] as $key => $addressValue) {
         if (!empty($addressValue['master_id']) && !$shareAddressContactNames[$addressValue['master_id']]['is_deleted']) {
           $master_cid = $shareAddressContactNames[$addressValue['master_id']]['contact_id'];
-          $sharedAddresses[$key]['shared_address_display'] = array(
+          $sharedAddresses[$key]['shared_address_display'] = [
             'address' => $addressValue['display'],
             'name' => $shareAddressContactNames[$addressValue['master_id']]['name'],
-            'options' => CRM_Core_BAO_Address::getValues(array(
-                'entity_id' => $master_cid,
-                'contact_id' => $master_cid,
-              )),
+            'options' => CRM_Core_BAO_Address::getValues([
+              'entity_id' => $master_cid,
+              'contact_id' => $master_cid,
+            ]),
             'master_id' => $addressValue['master_id'],
-          );
+          ];
           $defaults['address'][$key]['master_contact_id'] = $master_cid;
         }
         else {
@@ -336,19 +282,19 @@ class CRM_Contact_Form_Edit_Address {
       // start of parse address functionality
       // build street address, CRM-5450.
       if ($form->_parseStreetAddress) {
-        $parseFields = array('street_address', 'street_number', 'street_name', 'street_unit');
+        $parseFields = ['street_address', 'street_number', 'street_name', 'street_unit'];
         foreach ($defaults['address'] as $cnt => & $address) {
           $streetAddress = NULL;
-          foreach (array(
-                     'street_number',
-                     'street_number_suffix',
-                     'street_name',
-                     'street_unit',
-                   ) as $fld) {
-            if (in_array($fld, array(
+          foreach ([
+            'street_number',
+            'street_number_suffix',
+            'street_name',
+            'street_unit',
+          ] as $fld) {
+            if (in_array($fld, [
               'street_name',
               'street_unit',
-            ))) {
+            ])) {
               $streetAddress .= ' ';
             }
             // CRM-17619 - if the street number suffix begins with a number, add a space
@@ -379,7 +325,7 @@ class CRM_Contact_Form_Edit_Address {
             $addressValues["{$field}_{$cnt}"] = CRM_Utils_Array::value($field, $address);
           }
           // don't load fields, use js to populate.
-          foreach (array('street_number', 'street_name', 'street_unit') as $f) {
+          foreach (['street_number', 'street_name', 'street_unit'] as $f) {
             if (isset($address[$f])) {
               unset($address[$f]);
             }
@@ -388,12 +334,12 @@ class CRM_Contact_Form_Edit_Address {
         $form->assign('allAddressFieldValues', json_encode($addressValues));
 
         //hack to handle show/hide address fields.
-        $parsedAddress = array();
+        $parsedAddress = [];
         if ($form->_contactId && !empty($_POST['address']) && is_array($_POST['address'])
         ) {
           foreach ($_POST['address'] as $cnt => $values) {
             $showField = 'streetAddress';
-            foreach (array('street_number', 'street_name', 'street_unit') as $fld) {
+            foreach (['street_number', 'street_name', 'street_unit'] as $fld) {
               if (!empty($values[$fld])) {
                 $showField = 'addressElements';
                 break;
@@ -416,7 +362,7 @@ class CRM_Contact_Form_Edit_Address {
    * @param array $groupTree
    */
   public static function storeRequiredCustomDataInfo(&$form, $groupTree) {
-    if (in_array(CRM_Utils_System::getClassName($form), array('CRM_Contact_Form_Contact', 'CRM_Contact_Form_Inline_Address'))) {
+    if (in_array(CRM_Utils_System::getClassName($form), ['CRM_Contact_Form_Contact', 'CRM_Contact_Form_Inline_Address'])) {
       $requireOmission = NULL;
       foreach ($groupTree as $csId => $csVal) {
         // only process Address entity fields
@@ -437,6 +383,66 @@ class CRM_Contact_Form_Edit_Address {
 
       $form->_addressRequireOmission = rtrim($requireOmission, ',');
     }
+  }
+
+  /**
+   * Add custom data to the form.
+   *
+   * @param CRM_Core_Form $form
+   * @param int $entityId
+   * @param int $blockId
+   */
+  protected static function addCustomDataToForm(&$form, $entityId, $blockId) {
+    $groupTree = CRM_Core_BAO_CustomGroup::getTree('Address', NULL, $entityId);
+
+    if (isset($groupTree) && is_array($groupTree)) {
+      // use simplified formatted groupTree
+      $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, $form);
+
+      // make sure custom fields are added /w element-name in the format - 'address[$blockId][custom-X]'
+      foreach ($groupTree as $id => $group) {
+        foreach ($group['fields'] as $fldId => $field) {
+          $groupTree[$id]['fields'][$fldId]['element_custom_name'] = $field['element_name'];
+          $groupTree[$id]['fields'][$fldId]['element_name'] = "address[$blockId][{$field['element_name']}]";
+        }
+      }
+
+      $defaults = [];
+      CRM_Core_BAO_CustomGroup::setDefaults($groupTree, $defaults);
+
+      // since we change element name for address custom data, we need to format the setdefault values
+      $addressDefaults = [];
+      foreach ($defaults as $key => $val) {
+        if (!isset($val)) {
+          continue;
+        }
+
+        // inorder to set correct defaults for checkbox custom data, we need to converted flat key to array
+        // this works for all types custom data
+        $keyValues = explode('[', str_replace(']', '', $key));
+        $addressDefaults[$keyValues[0]][$keyValues[1]][$keyValues[2]] = $val;
+      }
+
+      $form->setDefaults($addressDefaults);
+
+      // we setting the prefix to 'dnc_' below, so that we don't overwrite smarty's grouptree var.
+      // And we can't set it to 'address_' because we want to set it in a slightly different format.
+      CRM_Core_BAO_CustomGroup::buildQuickForm($form, $groupTree, FALSE, 'dnc_');
+
+      // during contact editing : if no address is filled
+      // required custom data must not produce 'required' form rule error
+      // more handling done in formRule func
+      CRM_Contact_Form_Edit_Address::storeRequiredCustomDataInfo($form, $groupTree);
+
+      $tplGroupTree = CRM_Core_Smarty::singleton()
+        ->get_template_vars('address_groupTree');
+      $tplGroupTree = empty($tplGroupTree) ? [] : $tplGroupTree;
+
+      $form->assign('address_groupTree', $tplGroupTree + [$blockId => $groupTree]);
+      // unset the temp smarty var that got created
+      $form->assign('dnc_groupTree', NULL);
+    }
+    // address custom data processing ends ..
   }
 
 }

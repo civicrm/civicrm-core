@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -64,7 +64,7 @@
    */
   function skipPaymentMethod() {
     var isHide = false;
-    var isMultiple = '{/literal}{$event.is_multiple_registrations}{literal}';
+    var isMultiple = {/literal}{$event.is_multiple_registrations|@json_encode}{literal};
     var alwaysShowFlag = (isMultiple && cj("#additional_participants").val());
     var alwaysHideFlag = (cj("#bypass_payment").val() == 1);
     var total_amount_tmp =  cj('#pricevalue').data('raw-total');
@@ -111,7 +111,7 @@
 
       var payment_instrument_id = $('#payment_instrument_id').val();
 
-      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="&currency=`$currency`&`$urlPathVar``$isBackOfficePathVar``$profilePathVar``$contributionPageID``$preProfileID`processor_id="}" + type;
+      var dataUrl = "{crmURL p='civicrm/payment/form' h=0 q="formName=`$form.formName`&currency=`$currency`&`$urlPathVar``$isBackOfficePathVar``$profilePathVar``$contributionPageID``$preProfileID`processor_id="}" + type;
       {literal}
       if (typeof(CRM.vars) != "undefined") {
         if (typeof(CRM.vars.coreForm) != "undefined") {

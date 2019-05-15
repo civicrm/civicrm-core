@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -66,31 +66,31 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
 
     $attachmentUrl = CRM_Core_BAO_File::attachmentInfo('civicrm_activity', $activityID);
     if ($attachmentUrl) {
-      $report['fields'][] = array(
+      $report['fields'][] = [
         'label' => 'Attachment(s)',
         'value' => $attachmentUrl,
         'type' => 'Link',
-      );
+      ];
     }
 
     $tags = CRM_Core_BAO_EntityTag::getTag($activityID, 'civicrm_activity');
     if (!empty($tags)) {
-      $allTag = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
+      $allTag = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
       foreach ($tags as $tid) {
         $tags[$tid] = $allTag[$tid];
       }
-      $report['fields'][] = array(
+      $report['fields'][] = [
         'label' => 'Tags',
         'value' => implode('<br />', $tags),
         'type' => 'String',
-      );
+      ];
     }
 
     $this->assign('report', $report);
 
     $latestRevisionID = CRM_Activity_BAO_Activity::getLatestActivityId($activityID);
 
-    $viewPriorActivities = array();
+    $viewPriorActivities = [];
     $priorActivities = CRM_Activity_BAO_Activity::getPriorAcitivities($activityID);
     foreach ($priorActivities as $activityId => $activityValues) {
       if (CRM_Case_BAO_Case::checkPermission($activityId, 'view', NULL, $contactID)) {
@@ -152,7 +152,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
 
     $title = $title . $recentContactDisplay . ' (' . $activityTypes[$activityTypeID] . ')';
 
-    $recentOther = array();
+    $recentOther = [];
     if (CRM_Case_BAO_Case::checkPermission($activityID, 'edit')) {
       $recentOther['editUrl'] = CRM_Utils_System::url('civicrm/case/activity',
         "reset=1&action=update&id={$activityID}&cid={$recentContactId}&caseid={$caseID}&context=home"
@@ -172,6 +172,38 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
       $recentContactDisplay,
       $recentOther
     );
+
+    // Set breadcrumb to take the user back to the case being viewed
+    $caseTypeId = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $caseID, 'case_type_id');
+    $caseType = CRM_Core_PseudoConstant::getLabel('CRM_Case_BAO_Case', 'case_type_id', $caseTypeId);
+    $caseContact = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseContact', $caseID, 'contact_id', 'case_id');
+
+    CRM_Utils_System::resetBreadCrumb();
+    $breadcrumb = [
+      [
+        'title' => ts('Home'),
+        'url' => CRM_Utils_System::url(),
+      ],
+      [
+        'title' => ts('CiviCRM'),
+        'url' => CRM_Utils_System::url('civicrm', 'reset=1'),
+      ],
+      [
+        'title' => ts('CiviCase Dashboard'),
+        'url' => CRM_Utils_System::url('civicrm/case', 'reset=1'),
+      ],
+      [
+        'title' => $caseType,
+        'url' => CRM_Utils_System::url('civicrm/contact/view/case', [
+          'reset' => 1,
+          'id' => $caseID,
+          'context' => 'case',
+          'action' => 'view',
+          'cid' => $caseContact,
+        ]),
+      ],
+    ];
+    CRM_Utils_System::appendBreadCrumb($breadcrumb);
   }
 
 }

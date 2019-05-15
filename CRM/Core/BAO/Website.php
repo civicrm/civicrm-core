@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -40,12 +40,11 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * Takes an associative array and adds im.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   an assoc array of name/value pairs.
    *
-   * @return object
-   *   CRM_Core_BAO_Website object on success, null otherwise
+   * @return CRM_Core_BAO_Website
    */
-  public static function add(&$params) {
+  public static function add($params) {
     $hook = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($hook, 'Website', CRM_Utils_Array::value('id', $params), $params);
 
@@ -55,6 +54,31 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 
     CRM_Utils_Hook::post($hook, 'Website', $website->id, $website);
     return $website;
+  }
+
+  /**
+   * Create website.
+   *
+   * If called in a legacy manner this, temporarily, fails back to calling the legacy function.
+   *
+   * @param array $params
+   * @param int $contactID
+   * @param bool $skipDelete
+   *
+   * @return bool|CRM_Core_BAO_Website
+   */
+  public static function create($params, $contactID = NULL, $skipDelete = NULL) {
+    if ($skipDelete !== NULL || ($contactID && !is_array($contactID))) {
+      \Civi::log()->warning(ts('Calling website:create with vars other than $params is deprecated. Use process'), ['civi.tag' => 'deprecated']);
+      return self::process($params, $contactID, $skipDelete);
+    }
+    foreach ($params as $key => $value) {
+      if (is_numeric($key)) {
+        \Civi::log()->warning(ts('Calling website:create for multiple websites $params is deprecated. Use process'), ['civi.tag' => 'deprecated']);
+        return self::process($params, $contactID, $skipDelete);
+      }
+    }
+    return self::add($params);
   }
 
   /**
@@ -68,17 +92,22 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    *
    * @return bool
    */
-  public static function create(&$params, $contactID, $skipDelete) {
+  public static function process($params, $contactID, $skipDelete) {
     if (empty($params)) {
       return FALSE;
     }
 
     $ids = self::allWebsites($contactID);
     foreach ($params as $key => $values) {
+      $id = CRM_Utils_Array::value('id', $values);
+      if (array_key_exists($id, $ids)) {
+        unset($ids[$id]);
+      }
       if (empty($values['id']) && is_array($ids) && !empty($ids)) {
         foreach ($ids as $id => $value) {
           if (($value['website_type_id'] == $values['website_type_id'])) {
             $values['id'] = $id;
+            unset($ids[$id]);
           }
         }
       }
@@ -87,7 +116,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
         self::add($values);
       }
       elseif ($skipDelete && !empty($values['id'])) {
-        self::del(array($values['id']));
+        self::del($values['id']);
       }
     }
   }
@@ -95,15 +124,24 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
   /**
    * Delete website.
    *
-   * @param array $ids
-   *   Website ids.
+   * @param int $id
    *
    * @return bool
    */
-  public static function del($ids) {
-    $query = 'DELETE FROM civicrm_website WHERE id IN ( ' . implode(',', $ids) . ')';
-    CRM_Core_DAO::executeQuery($query);
-    // FIXME: we should return false if the del was unsuccessful
+  public static function del($id) {
+    $obj = new self();
+    $obj->id = $id;
+    $obj->find();
+    if ($obj->fetch()) {
+      $params = [];
+      CRM_Utils_Hook::pre('delete', 'Website', $id, $params);
+      $obj->delete();
+    }
+    else {
+      return FALSE;
+    }
+    CRM_Utils_Hook::post('delete', 'Website', $id, $obj);
+    $obj->free();
     return TRUE;
   }
 
@@ -117,14 +155,14 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * @return bool
    */
   public static function &getValues(&$params, &$values) {
-    $websites = array();
+    $websites = [];
     $website = new CRM_Core_DAO_Website();
     $website->contact_id = $params['contact_id'];
     $website->find();
 
     $count = 1;
     while ($website->fetch()) {
-      $values['website'][$count] = array();
+      $values['website'][$count] = [];
       CRM_Core_DAO::storeValues($website, $values['website'][$count]);
 
       $websites[$count] = $values['website'][$count];
@@ -154,16 +192,16 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
 SELECT  id, website_type_id
   FROM  civicrm_website
  WHERE  civicrm_website.contact_id = %1';
-    $params = array(1 => array($id, 'Integer'));
+    $params = [1 => [$id, 'Integer']];
 
-    $websites = $values = array();
+    $websites = $values = [];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $count = 1;
     while ($dao->fetch()) {
-      $values = array(
+      $values = [
         'id' => $dao->id,
         'website_type_id' => $dao->website_type_id,
-      );
+      ];
 
       if ($updateBlankLocInfo) {
         $websites[$count++] = $values;

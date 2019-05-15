@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,10 +25,7 @@
 *}
 
 <tr>
-  <td><label>{ts}Payment Scheduled{/ts}</label></td>
-</tr>
-<tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="pledge_payment_date" from='_low' to='_high'}
+{include file="CRM/Core/DateRange.tpl" fieldName="pledge_payment_date" from='_low' to='_high' label="<label>Payment Scheduled</label>"}
 </tr>
 <tr>
   <td colspan="2">
@@ -48,22 +45,13 @@
   </td>
 </tr>
 <tr>
-  <td><label>{ts}Pledge Made{/ts}</label></td>
+{include file="CRM/Core/DateRange.tpl" fieldName="pledge_create_date" from='_low' to='_high' label="<label>Pledge Made</label>"}
 </tr>
 <tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="pledge_create_date" from='_low' to='_high'}
+{include file="CRM/Core/DateRange.tpl" fieldName="pledge_start_date" from='_low' to='_high' label="<label>Payments Start Date</label>"}
 </tr>
 <tr>
-  <td><label>{ts}Payments Start Date{/ts}</label></td>
-</tr>
-<tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="pledge_start_date" from='_low' to='_high'}
-</tr>
-<tr>
-  <td><label>{ts}Payments Ended Date{/ts}</label></td>
-</tr>
-<tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="pledge_end_date" from='_low' to='_high'}
+{include file="CRM/Core/DateRange.tpl" fieldName="pledge_end_date" from='_low' to='_high' label="<label>Payments Ended Date</label>"}
 </tr>
 <tr>
   <td>
@@ -90,7 +78,8 @@
 </tr>
 <tr>
   <td colspan="2">
-    {ts}Number of Installments{/ts}
+    <label>{ts}Number of Installments{/ts}</label>
+    <br />
     {$form.pledge_installments_low.label} {$form.pledge_installments_low.html}
     &nbsp;&nbsp; {$form.pledge_installments_high.label} {$form.pledge_installments_high.html}
   </td>
@@ -98,7 +87,7 @@
 
 <tr>
   <td colspan="2">
-    <br /> {$form.pledge_acknowledge_date_is_not_null.label} &nbsp; {$form.pledge_acknowledge_date_is_not_null.html}
+    {$form.pledge_acknowledge_date_is_not_null.label} &nbsp; {$form.pledge_acknowledge_date_is_not_null.html}
     &nbsp;
   </td>
 </tr>

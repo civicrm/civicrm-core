@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -73,13 +73,13 @@
  <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
  {* Summary of Import Results (record counts) *}
  <table id="summary-counts" class="report">
-    <tr><td class="label">{ts}Total Rows{/ts}</td>
+    <tr><td class="label crm-grid-cell">{ts}Total Rows{/ts}</td>
         <td class="data">{$totalRowCount}</td>
         <td class="explanation">{ts}Total rows (contribution records) in uploaded file.{/ts}</td>
     </tr>
 
     {if $invalidRowCount }
-    <tr class="error"><td class="label">{ts}Invalid Rows (skipped){/ts}</td>
+    <tr class="error"><td class="label crm-grid-cell">{ts}Invalid Rows (skipped){/ts}</td>
         <td class="data">{$invalidRowCount}</td>
         <td class="explanation">{ts}Rows with invalid data in one or more fields. These rows have been skipped (not imported).{/ts}
             {if $invalidRowCount}
@@ -90,14 +90,14 @@
     {/if}
 
     {if $validSoftCreditRowCount }
-    <tr><td class="label">{ts}Soft Credits{/ts}</td>
+    <tr><td class="label crm-grid-cell">{ts}Soft Credits{/ts}</td>
         <td class="data">{$validSoftCreditRowCount}</td>
         <td class="explanation">{ts}Rows where a soft credit was successfully assigned to a contact.{/ts}</td>
     </tr>
     {/if}
 
     {if $invalidSoftCreditRowCount }
-    <tr class="error"><td class="label">{ts}Unmatched Soft Credit Rows (skipped){/ts}</td>
+    <tr class="error"><td class="label crm-grid-cell">{ts}Unmatched Soft Credit Rows (skipped){/ts}</td>
         <td class="data">{$invalidSoftCreditRowCount}</td>
         <td class="explanation">{ts}Rows with a requested soft credit assignment where no matching contact was found (based on the supplied soft credit contact data). These contribution rows have been skipped (not imported).{/ts}
             {if $invalidSoftCreditRowCount}
@@ -108,14 +108,14 @@
     {/if}
 
     {if $validPledgePaymentRowCount }
-    <tr><td class="label">{ts}Pledge Payments Applied{/ts}</td>
+    <tr><td class="label crm-grid-cell">{ts}Pledge Payments Applied{/ts}</td>
         <td class="data">{$validPledgePaymentRowCount}</td>
         <td class="explanation">{ts}Rows with a pledge payment successfully applied.{/ts}</td>
     </tr>
     {/if}
 
     {if $invalidPledgePaymentRowCount }
-    <tr class="error"><td class="label">{ts}Invalid Pledge Payment Rows (skipped){/ts}</td>
+    <tr class="error"><td class="label crm-grid-cell">{ts}Invalid Pledge Payment Rows (skipped){/ts}</td>
         <td class="data">{$invalidPledgePaymentRowCount}</td>
         <td class="explanation">{ts}Rows marked as pledge payments where the contributor and / or contribution amount could not be matched to a pending pledge payment. These contribution rows have been skipped (not imported).{/ts}
             {if $invalidPledgePaymentRowCount}
@@ -125,7 +125,7 @@
     </tr>
     {/if}
     {if $unMatchCount }
-    <tr class="error"><td class="label">{ts}Mismatched Rows (skipped){/ts}</td>
+    <tr class="error"><td class="label crm-grid-cell">{ts}Mismatched Rows (skipped){/ts}</td>
         <td class="data">{$unMatchCount}</td>
         <td class="explanation">{ts}Rows with mismatched contribution IDs... (NOT updated).{/ts}
             {if $unMatchCount}
@@ -136,7 +136,7 @@
     {/if}
 
     {if $conflictRowCount}
-    <tr class="error"><td class="label">{ts}Conflicting Rows (skipped){/ts}</td>
+    <tr class="error"><td class="label crm-grid-cell">{ts}Conflicting Rows (skipped){/ts}</td>
         <td class="data">{$conflictRowCount}</td>
         <td class="explanation">{ts}Rows with conflicting transaction IDs (NOT imported).{/ts}
             {if $conflictRowCount}
@@ -147,7 +147,7 @@
     {/if}
 
     {if $duplicateRowCount}
-    <tr class="error"><td class="label">{ts}Duplicate Rows{/ts}</td>
+    <tr class="error"><td class="label crm-grid-cell">{ts}Duplicate Rows{/ts}</td>
         <td class="data">{$duplicateRowCount}</td>
         <td class="explanation">{ts}Rows which are duplicates of existing CiviCRM contribution records.{/ts} {$dupeActionString}
             {if $duplicateRowCount}
@@ -157,7 +157,7 @@
     </tr>
     {/if}
 
-    <tr><td class="label">{ts}Records Imported{/ts}</td>
+    <tr><td class="label crm-grid-cell">{ts}Records Imported{/ts}</td>
         <td class="data">{$validRowCount}</td>
         <td class="explanation">{ts}Total number of rows imported successfully.{/ts}</td>
     </tr>

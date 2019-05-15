@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {* CiviGrant DashBoard (launch page) *}
-<div id="help" class="solid-border-bottom">
+<div class="help">
     {capture assign=findContactURL}{crmURL p="civicrm/contact/search/basic" q="reset=1"}{/capture}
     <p>{ts 1=$findContactURL }CiviGrant allows you to input and track grants to Organizations, Individuals or Households. The grantee must first be entered as a contact in CiviCRM. Use <a href='%1'>Find Contacts</a> to see if there's already a record for the grantee. Once you've located or created the contact record, click <strong>View</strong> to go to their summary page, select the <strong>Grants</strong> tab and click <strong>New Grant</strong>.{/ts}
     </p>

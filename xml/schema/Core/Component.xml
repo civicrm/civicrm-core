@@ -7,6 +7,7 @@
   <add>2.0</add>
   <field>
     <name>id</name>
+    <title>Component ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Component ID</comment>

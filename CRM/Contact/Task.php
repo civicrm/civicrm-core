@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,79 +28,59 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
  * Class to represent the actions that can be performed on a group of contacts used by the search forms.
  */
-class CRM_Contact_Task {
+class CRM_Contact_Task extends CRM_Core_Task {
+
+  /**
+   * Contact tasks
+   */
   const
-    GROUP_CONTACTS = 1,
-    REMOVE_CONTACTS = 2,
-    TAG_CONTACTS = 3,
-    REMOVE_TAGS = 4,
-    EXPORT_CONTACTS = 5,
-    EMAIL_CONTACTS = 6,
-    SMS_CONTACTS = 7,
-    DELETE_CONTACTS = 8,
-    HOUSEHOLD_CONTACTS = 9,
-    ORGANIZATION_CONTACTS = 10,
-    RECORD_CONTACTS = 11,
-    MAP_CONTACTS = 12,
-    SAVE_SEARCH = 13,
-    SAVE_SEARCH_UPDATE = 14,
-    PRINT_CONTACTS = 15,
-    LABEL_CONTACTS = 16,
-    BATCH_UPDATE = 17,
-    ADD_EVENT = 18,
-    PRINT_FOR_CONTACTS = 19,
-    CREATE_MAILING = 20,
-    MERGE_CONTACTS = 21,
-    EMAIL_UNHOLD = 22,
-    RESTORE = 23,
-    DELETE_PERMANENTLY = 24,
-    COMMUNICATION_PREFS = 25,
-    INDIVIDUAL_CONTACTS = 26;
+    HOUSEHOLD_CONTACTS = 101,
+    ORGANIZATION_CONTACTS = 102,
+    RECORD_CONTACTS = 103,
+    MAP_CONTACTS = 104,
+    ADD_EVENT = 105,
+    MERGE_CONTACTS = 106,
+    EMAIL_UNHOLD = 107,
+    RESTORE = 108,
+    COMMUNICATION_PREFS = 109,
+    INDIVIDUAL_CONTACTS = 110,
+    ADD_TO_CASE = 111;
 
   /**
-   * The task array
-   *
-   * @var array
+   * @var string
    */
-  static $_tasks = NULL;
+  public static $objectType = 'contact';
 
-  /**
-   * The optional task array
-   *
-   * @var array
-   */
-  static $_optionalTasks = NULL;
-
-  public static function initTasks() {
+  public static function tasks() {
     if (!self::$_tasks) {
       self::$_tasks = array(
-        self::GROUP_CONTACTS => array(
+        self::GROUP_ADD => array(
           'title' => ts('Group - add contacts'),
           'class' => 'CRM_Contact_Form_Task_AddToGroup',
           'url' => 'civicrm/task/add-to-group',
         ),
-        self::REMOVE_CONTACTS => array(
+        self::GROUP_REMOVE => array(
           'title' => ts('Group - remove contacts'),
           'class' => 'CRM_Contact_Form_Task_RemoveFromGroup',
           'url' => 'civicrm/task/remove-from-group',
         ),
-        self::TAG_CONTACTS => array(
+        self::TAG_ADD => array(
           'title' => ts('Tag - add to contacts'),
           'class' => 'CRM_Contact_Form_Task_AddToTag',
           'url' => 'civicrm/task/add-to-tag',
         ),
-        self::REMOVE_TAGS => array(
+        self::TAG_REMOVE => array(
           'title' => ts('Tag - remove from contacts'),
           'class' => 'CRM_Contact_Form_Task_RemoveFromTag',
           'url' => 'civicrm/task/remove-from-tag',
         ),
-        self::EXPORT_CONTACTS => array(
+        self::TASK_EXPORT => array(
           'title' => ts('Export contacts'),
           'class' => array(
             'CRM_Export_Form_Select',
@@ -108,13 +88,16 @@ class CRM_Contact_Task {
           ),
           'result' => FALSE,
         ),
-        self::EMAIL_CONTACTS => array(
-          'title' => ts('Email - send now (to %1 or less)', array(1 => Civi::settings()->get('simple_mail_limit'))),
+        self::TASK_EMAIL => array(
+          'title' => ts('Email - send now (to %1 or less)', array(
+            1 => Civi::settings()
+              ->get('simple_mail_limit'),
+          )),
           'class' => 'CRM_Contact_Form_Task_Email',
           'result' => TRUE,
           'url' => 'civicrm/task/send-email',
         ),
-        self::DELETE_CONTACTS => array(
+        self::TASK_DELETE => array(
           'title' => ts('Delete contacts'),
           'class' => 'CRM_Contact_Form_Task_Delete',
           'result' => FALSE,
@@ -134,7 +117,7 @@ class CRM_Contact_Task {
           'class' => 'CRM_Contact_Form_Task_SaveSearch_Update',
           'result' => TRUE,
         ),
-        self::PRINT_CONTACTS => array(
+        self::TASK_PRINT => array(
           'title' => ts('Print selected rows'),
           'class' => 'CRM_Contact_Form_Task_Print',
           'result' => FALSE,
@@ -154,7 +137,7 @@ class CRM_Contact_Task {
           'result' => TRUE,
           'url' => 'civicrm/task/pick-profile',
         ),
-        self::PRINT_FOR_CONTACTS => array(
+        self::PDF_LETTER => array(
           'title' => ts('Print/merge document'),
           'class' => 'CRM_Contact_Form_Task_PDF',
           'result' => TRUE,
@@ -184,8 +167,8 @@ class CRM_Contact_Task {
 
       //CRM-16329, if SMS provider is configured show sms action.
       $providersCount = CRM_SMS_BAO_Provider::activeProviderCount();
-      if ($providersCount) {
-        self::$_tasks[self::SMS_CONTACTS] = array(
+      if ($providersCount && CRM_Core_Permission::check('send SMS')) {
+        self::$_tasks[self::TASK_SMS] = array(
           'title' => ts('SMS - schedule/send'),
           'class' => 'CRM_Contact_Form_Task_SMS',
           'result' => TRUE,
@@ -232,7 +215,7 @@ class CRM_Contact_Task {
 
       //CRM-4418, check for delete
       if (!CRM_Core_Permission::check('delete contacts')) {
-        unset(self::$_tasks[self::DELETE_CONTACTS]);
+        unset(self::$_tasks[self::TASK_DELETE]);
       }
 
       //show map action only if map provider and geoprovider are set (Google doesn't need geoprovider)
@@ -270,43 +253,18 @@ class CRM_Contact_Task {
         );
       }
 
-      self::$_tasks += CRM_Core_Component::taskList();
+      if (CRM_Core_Permission::access('CiviCase')) {
+        self::$_tasks[self::ADD_TO_CASE] = array(
+          'title' => 'Add to case as role',
+          'class' => 'CRM_Case_Form_AddToCaseAsRole',
+          'result' => FALSE,
+        );
+      }
 
-      CRM_Utils_Hook::searchTasks('contact', self::$_tasks);
-
-    }
-  }
-
-  /**
-   * These tasks are the core set of tasks that the user can perform
-   * on a contact / group of contacts
-   *
-   * @return array
-   *   the set of tasks for a group of contacts
-   */
-  public static function &taskTitles() {
-    self::initTasks();
-
-    $titles = array();
-    foreach (self::$_tasks as $id => $value) {
-      $titles[$id] = $value['title'];
+      parent::tasks();
     }
 
-    // hack unset update saved search
-    unset($titles[self::SAVE_SEARCH_UPDATE]);
-
-    if (!CRM_Utils_Mail::validOutBoundMail()) {
-      unset($titles[self::EMAIL_CONTACTS]);
-      unset($titles[self::CREATE_MAILING]);
-    }
-
-    // CRM-6806
-    if (!CRM_Core_Permission::check('access deleted contacts') ||
-      !CRM_Core_Permission::check('delete contacts')
-    ) {
-      unset($titles[self::DELETE_PERMANENTLY]);
-    }
-    return $titles;
+    return self::$_tasks;
   }
 
   /**
@@ -314,16 +272,19 @@ class CRM_Contact_Task {
    * of the user
    *
    * @param int $permission
-   * @param bool $deletedContacts
-   *   Are these tasks for operating on deleted contacts?.
+   * @param array $params
+   *             bool deletedContacts: Are these tasks for operating on deleted contacts?.
    *
    * @return array
    *   set of tasks that are valid for the user
    */
-  public static function &permissionedTaskTitles($permission, $deletedContacts = FALSE) {
-    self::initTasks();
+  public static function permissionedTaskTitles($permission, $params = array()) {
+    if (!isset($params['deletedContacts'])) {
+      $params['deletedContacts'] = FALSE;
+    }
+    self::tasks();
     $tasks = array();
-    if ($deletedContacts) {
+    if ($params['deletedContacts']) {
       if (CRM_Core_Permission::check('access deleted contacts')) {
         $tasks[self::RESTORE] = self::$_tasks[self::RESTORE]['title'];
         if (CRM_Core_Permission::check('delete contacts')) {
@@ -336,36 +297,25 @@ class CRM_Contact_Task {
     }
     else {
       $tasks = array(
-        self::EXPORT_CONTACTS => self::$_tasks[self::EXPORT_CONTACTS]['title'],
-        self::EMAIL_CONTACTS => self::$_tasks[self::EMAIL_CONTACTS]['title'],
+        self::TASK_EXPORT => self::$_tasks[self::TASK_EXPORT]['title'],
+        self::TASK_EMAIL => self::$_tasks[self::TASK_EMAIL]['title'],
         self::LABEL_CONTACTS => self::$_tasks[self::LABEL_CONTACTS]['title'],
       );
 
-      if (isset(self::$_tasks[self::MAP_CONTACTS]) &&
-        !empty(self::$_tasks[self::MAP_CONTACTS]['title'])
-      ) {
-        $tasks[self::MAP_CONTACTS] = self::$_tasks[self::MAP_CONTACTS]['title'];
-      }
-
-      if (isset(self::$_tasks[self::CREATE_MAILING]) &&
-        !empty(self::$_tasks[self::CREATE_MAILING]['title'])
-      ) {
-        $tasks[self::CREATE_MAILING] = self::$_tasks[self::CREATE_MAILING]['title'];
+      foreach ([
+        self::MAP_CONTACTS,
+        self::CREATE_MAILING,
+        self::TASK_SMS,
+      ] as $task) {
+        if (isset(self::$_tasks[$task]) &&
+          !empty(self::$_tasks[$task]['title'])
+        ) {
+          $tasks[$task] = self::$_tasks[$task]['title'];
+        }
       }
     }
-    return $tasks;
-  }
 
-  /**
-   * These tasks get added based on the context the user is in.
-   *
-   * @return array
-   *   the set of optional tasks for a group of contacts
-   */
-  public static function &optionalTaskTitle() {
-    $tasks = array(
-      self::SAVE_SEARCH_UPDATE => self::$_tasks[self::SAVE_SEARCH_UPDATE]['title'],
-    );
+    $tasks = parent::corePermissionedTaskTitles($tasks, $permission, $params);
     return $tasks;
   }
 
@@ -375,40 +325,13 @@ class CRM_Contact_Task {
    * @return array
    */
   public static function getTask($value) {
-    self::initTasks();
+    self::tasks();
 
     if (!CRM_Utils_Array::value($value, self::$_tasks)) {
       // make it the print task by default
-      $value = self::PRINT_CONTACTS;
+      $value = self::TASK_PRINT;
     }
-    return array(
-      CRM_Utils_Array::value('class', self::$_tasks[$value]),
-      CRM_Utils_Array::value('result', self::$_tasks[$value]),
-    );
-  }
-
-  /**
-   * Function to return the task information on basis of provided task's form name
-   *
-   * @param string $className
-   *
-   * @return array
-   */
-  public static function getTaskAndTitleByClass($className) {
-    self::initTasks();
-
-    foreach (self::$_tasks as $task => $value) {
-      if (!empty($value['url']) && (
-        (is_array($value['class']) && in_array($className, $value['class'])) ||
-         ($value['class'] == $className)
-        )
-      ) {
-        return array(
-          $task,
-          CRM_Utils_Array::value('title', $value),
-        );
-      }
-    }
+    return parent::getTask($value);
   }
 
 }

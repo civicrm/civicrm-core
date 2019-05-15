@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,7 +42,7 @@
  * @throws \API_Exception
  */
 function civicrm_api3_country_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_DAO(__FUNCTION__), $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_DAO(__FUNCTION__), $params, 'Country');
 }
 
 /**

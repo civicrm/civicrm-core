@@ -65,12 +65,12 @@ function dm_install_core() {
   local repo="$1"
   local to="$2"
 
-  for dir in ang css i js PEAR templates bin CRM api extern Reports install settings Civi partials release-notes ; do
+  for dir in ang css i js PEAR templates bin CRM api extern Reports install settings Civi partials release-notes xml ; do
     [ -d "$repo/$dir" ] && dm_install_dir "$repo/$dir" "$to/$dir"
   done
 
   dm_install_files "$repo" "$to" {agpl-3.0,agpl-3.0.exception,gpl,CONTRIBUTORS}.txt
-  dm_install_files "$repo" "$to" composer.json composer.lock bower.json package.json Civi.php README.md release-notes.md
+  dm_install_files "$repo" "$to" composer.json composer.lock bower.json package.json Civi.php README.md release-notes.md extension-compatibility.json
 
   mkdir -p "$to/sql"
   pushd "$repo" >> /dev/null
@@ -96,7 +96,7 @@ function dm_install_packages() {
   local to="$2"
 
   local excludes_rsync=""
-  for exclude in .git .svn _ORIGINAL_ SeleniumRC PHPUnit PhpDocumentor SymfonyComponents amavisd-new git-footnote PHP/CodeCoverage ; do
+  for exclude in .git .svn _ORIGINAL_ SeleniumRC PHPUnit PhpDocumentor SymfonyComponents git-footnote PHP/CodeCoverage ; do
     excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
   done
 
@@ -119,13 +119,7 @@ function dm_install_drupal() {
   # Set full version in .info files. See CRM-15768.
   local MODULE_DIRS=`find "$to" -type f -name "*.info"`
   for INFO in $MODULE_DIRS; do
-    if [ $(uname) = "Darwin" ]; then
-      ## BSD sed
-      sed -i '' "s/version = \([0-9]*\.x-\)[1-9.]*/version = \1$DM_VERSION/g" $INFO
-    else
-      ## GNU sed
-      sed -i'' "s/version = \([0-9]*\.x-\)[1-9.]*/version = \1$DM_VERSION/g" $INFO
-    fi
+    dm_preg_edit '/version = ([0-9]*\.x)-[1-9.]*/m' "version = \$1-$DM_VERSION" "$INFO"
   done
 
   for f in "$to/.gitignore" "$to/.toxic.json" ; do
@@ -168,7 +162,8 @@ function dm_install_vendor() {
   local to="$2"
 
   local excludes_rsync=""
-  for exclude in .git .svn {T,t}est{,s} {D,d}oc{,s} {E,e}xample{,s} ; do
+  ## CRM-21729 - .idea test-cases unit-test come from phpquery package.
+  for exclude in .git .svn {T,t}est{,s} {D,d}oc{,s} {E,e}xample{,s} .idea test-cases unit-test; do
     excludes_rsync="--exclude=${exclude} ${excludes_rsync}"
   done
 
@@ -193,6 +188,8 @@ function dm_install_wordpress() {
     --exclude=civicrm \
     "$repo/./"  "$to/./"
   ## Need --exclude=civicrm for self-building on WP site
+
+  dm_preg_edit '/^Version: [0-9\.]+/m' "Version: $DM_VERSION" "$to/civicrm.php"
 }
 
 
@@ -223,6 +220,7 @@ function dm_generate_version() {
 
   # final touch
   echo "<?php
+/** @deprecated */
 function civicrmVersion( ) {
   return array( 'version'  => '$DM_VERSION',
                 'cms'      => '$ufname',
@@ -238,4 +236,20 @@ function dm_git_checkout() {
     git checkout .
     git checkout "$2"
   popd
+}
+
+## Download a Civi extension
+## usage: dm_install_cvext <full-ext-key> <target-path>
+function dm_install_cvext() {
+  # cv dl -b '@https://civicrm.org/extdir/ver=4.7.25|cms=Drupal/com.iatspayments.civicrm.xml' --destination=$PWD/iatspayments
+  cv dl -b "@https://civicrm.org/extdir/ver=$DM_VERSION|cms=Drupal/$1.xml" --to="$2"
+}
+
+## Edit a file by applying a regular expression.
+## Note: We'd rather just call "sed", but it differs on GNU+BSD.
+## usage: dm_preg_edit <search-pattern> <replacement-pattern> <file>
+## example: '/version = \([0-9]*\.x-\)[1-9.]*/' 'version = \1$DM_VERSION'
+function dm_preg_edit() {
+  env RPAT="$1" RREPL="$2" RFILE="$3" \
+    php -r '$c = file_get_contents(getenv("RFILE")); $c = preg_replace(getenv("RPAT"), getenv("RREPL"), $c); file_put_contents(getenv("RFILE"), $c);'
 }

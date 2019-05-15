@@ -64,6 +64,7 @@
       <type>Select</type>
       <multiple>1</multiple>
     </html>
+    <serialize>SEPARATOR_BOOKEND</serialize>
     <add>1.5</add>
   </field>
   <index>
@@ -288,7 +289,9 @@
     </pseudoconstant>
     <html>
       <type>Select</type>
+      <multiple>1</multiple>
     </html>
+    <serialize>SEPARATOR_BOOKEND</serialize>
   </field>
   <index>
     <name>index_preferred_communication_method</name>
@@ -532,6 +535,7 @@
     <name>email_greeting_id</name>
     <type>int unsigned</type>
     <title>Email Greeting ID</title>
+    <export>true</export>
     <comment>FK to civicrm_option_value.id, that has to be valid registered Email Greeting.</comment>
     <add>3.0</add>
     <pseudoconstant>
@@ -565,6 +569,7 @@
     <name>postal_greeting_id</name>
     <type>int unsigned</type>
     <title>Postal Greeting ID</title>
+    <export>true</export>
     <comment>FK to civicrm_option_value.id, that has to be valid registered Postal Greeting.</comment>
     <add>3.0</add>
     <html>
@@ -603,6 +608,10 @@
     <title>Addressee ID</title>
     <comment>FK to civicrm_option_value.id, that has to be valid registered Addressee.</comment>
     <add>3.0</add>
+    <export>true</export>
+    <pseudoconstant>
+      <optionGroupName>addressee</optionGroupName>
+    </pseudoconstant>
   </field>
   <field>
     <name>addressee_custom</name>
@@ -615,9 +624,6 @@
     <html>
       <type>Text</type>
     </html>
-    <pseudoconstant>
-      <optionGroupName>addressee</optionGroupName>
-    </pseudoconstant>
   </field>
   <field>
     <name>addressee_display</name>

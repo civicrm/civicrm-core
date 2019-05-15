@@ -9,7 +9,7 @@
  *   API result array
  */
 function activity_type_get_example() {
-  $params = array();
+  $params = [];
 
   try{
     $result = civicrm_api3('ActivityType', 'get', $params);
@@ -19,12 +19,12 @@ function activity_type_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -38,11 +38,11 @@ function activity_type_get_example() {
  */
 function activity_type_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 54,
-    'values' => array(
+    'values' => [
       '1' => 'Meeting',
       '2' => 'Phone Call',
       '3' => 'Email',
@@ -97,9 +97,9 @@ function activity_type_get_expectedresult() {
       '52' => 'Contact Deleted by Merge',
       '53' => 'Failed Payment',
       '54' => 'Close Accounting Period',
-    ),
+    ],
     'deprecated' => 'The ActivityType api is deprecated. Please use the OptionValue api instead.',
-  );
+  ];
 
   return $expectedResult;
 }

@@ -6,7 +6,7 @@
  *   API result array
  */
 function relationship_type_create_example() {
-  $params = array(
+  $params = [
     'name_a_b' => 'Relation 1 for relationship type create',
     'name_b_a' => 'Relation 2 for relationship type create',
     'contact_type_a' => 'Individual',
@@ -14,7 +14,7 @@ function relationship_type_create_example() {
     'is_reserved' => 1,
     'is_active' => 1,
     'sequential' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('RelationshipType', 'create', $params);
@@ -24,12 +24,12 @@ function relationship_type_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -43,13 +43,13 @@ function relationship_type_create_example() {
  */
 function relationship_type_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '0' => array(
+    'values' => [
+      '0' => [
         'id' => '1',
         'name_a_b' => 'Relation 1 for relationship type create',
         'label_a_b' => 'Relation 1 for relationship type create',
@@ -62,9 +62,9 @@ function relationship_type_create_expectedresult() {
         'contact_sub_type_b' => '',
         'is_reserved' => '1',
         'is_active' => '1',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

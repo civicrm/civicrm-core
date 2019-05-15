@@ -61,7 +61,13 @@
     <title>Custom Group Subtype List</title>
     <default>NULL</default>
     <comment>FK to civicrm_option_value.id (for option group custom_data_type.)</comment>
+    <pseudoconstant>
+      <optionGroupName>custom_data_type</optionGroupName>
+    </pseudoconstant>
     <add>2.2</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <field>
     <name>extends_entity_column_value</name>
@@ -69,6 +75,7 @@
     <title>Custom Group Subtype</title>
     <length>255</length>
     <comment>linking custom group for dynamic object</comment>
+    <serialize>SEPARATOR_BOOKEND</serialize>
     <add>1.6</add>
   </field>
   <field>
@@ -133,6 +140,7 @@
     <type>boolean</type>
     <title>Custom Group Is Active?</title>
     <comment>Is this property active?</comment>
+    <default>1</default>
     <add>1.1</add>
   </field>
   <field>
@@ -147,6 +155,7 @@
     <type>boolean</type>
     <title>Supports Multiple Records</title>
     <comment>Does this group hold multiple values?</comment>
+    <default>0</default>
     <add>2.0</add>
   </field>
   <field>

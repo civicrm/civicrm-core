@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,7 +40,7 @@ class CRM_Mailing_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    * Class constructor.
    */
   public function __construct() {
-    parent::__construct('mailing', array(
+    parent::__construct('mailing', [
       'id' => ts('Mailing ID'),
       'name' => ts('Mailing Name'),
       'group' => ts('Mailing Group(s)'),
@@ -54,14 +54,15 @@ class CRM_Mailing_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       'approveUrl' => ts('Mailing Approval URL'),
       'creator' => ts('Mailing Creator (Name)'),
       'creatorEmail' => ts('Mailing Creator (Email)'),
-    ));
+    ]);
   }
 
   /**
    * @inheritDoc
    */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
-    return !empty($processor->context['mailingId']) || !empty($processor->context['mailing']);
+    return !empty($processor->context['mailingId']) || !empty($processor->context['mailing'])
+      || in_array('mailingId', $processor->context['schema']) || in_array('mailing', $processor->context['schema']);
   }
 
   /**
@@ -78,9 +79,9 @@ class CRM_Mailing_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       ? $processor->context['mailing']
       : CRM_Mailing_BAO_Mailing::findById($processor->context['mailingId']);
 
-    return array(
+    return [
       'mailing' => $mailing,
-    );
+    ];
   }
 
   /**

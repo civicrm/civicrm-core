@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -50,12 +50,12 @@
             <td class="crm-case-caseview-form-block-activity_date_low">
               {assign var=activitylow  value=activity_date_low_$caseID}
               {$form.$activitylow.label}<br />
-              {include file="CRM/common/jcalendar.tpl" elementName=$activitylow}
+              {$form.$activitylow.html}
             </td>
             <td class="crm-case-caseview-form-block-activity_date_high">
               {assign var=activityhigh  value=activity_date_high_$caseID}
               {$form.$activityhigh.label}<br />
-              {include file="CRM/common/jcalendar.tpl" elementName=$activityhigh}
+              {$form.$activityhigh.html}
             </td>
             <td class="crm-case-caseview-form-block-activity_type_filter_id">
               {$form.activity_type_filter_id.label}<br />
@@ -74,7 +74,7 @@
     </div><!-- /.crm-accordion-wrapper -->
 {/if}
 
-    <table id="case_id_{$caseid}"  class="nestedActivitySelector crm-ajax-table" data-order='[[0,"desc"]]' data-page-length="10">
+    <table id="case_id_{$caseid}"  class="nestedActivitySelector crm-ajax-table" data-page-length="10">
       <thead><tr>
         <th data-data="activity_date_time" class="crm-case-activities-date">{ts}Date{/ts}</th>
         <th data-data="subject" cell-class="crmf-subject crm-editable" class="crm-case-activities-subject">{ts}Subject{/ts}</th>

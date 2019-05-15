@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -90,7 +90,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    */
   public function testCancelRecur() {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
-    CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution($contributionRecur['id'], NULL);
+    CRM_Contribute_BAO_ContributionRecur::cancelRecurContribution(['id' => $contributionRecur['id']]);
   }
 
   /**
@@ -99,7 +99,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    */
   public function testSupportFinancialTypeChange() {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
-    $this->callAPISuccess('contribution', 'create', array(
+    $this->callAPISuccess('Contribution', 'create', array(
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
       'financial_type_id' => 1,

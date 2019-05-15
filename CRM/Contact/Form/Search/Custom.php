@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
 
@@ -83,12 +83,21 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     // instantiate the new class
     $this->_customClass = new $this->_customSearchClass($this->_formValues);
 
+    $this->addFormRule(array($this->_customClass, 'formRule'), $this);
+
     // CRM-12747
     if (isset($this->_customClass->_permissionedComponent) &&
       !self::isPermissioned($this->_customClass->_permissionedComponent)
     ) {
       CRM_Utils_System::permissionDenied();
     }
+  }
+
+  /**
+   * Add local and global form rules.
+   */
+  public function addRules() {
+    $this->addFormRule(array($this->_customClass, 'formRule'));
   }
 
   /**
@@ -127,6 +136,7 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
    *
    * @return string
    */
+
   /**
    * @return string
    */

@@ -68,7 +68,7 @@
       url: CRM.url('civicrm/ajax/rest'),
       dataType: 'json',
       data: params,
-      type: params.action.indexOf('get') < 0 ? 'POST' : 'GET'
+      type: params.action.indexOf('get') === 0 ? 'GET' : 'POST'
     });
     if (status) {
       // Default status messages
@@ -164,11 +164,11 @@
         return false;
       }
       // Compare arguments
-      $.each(newUrl.split('?')[1].split('&'), function(k, v) {
+      $.each((newUrl.split('?')[1] || '').split('&'), function(k, v) {
         var arg = v.split('=');
         args[arg[0]] = arg[1];
       });
-      $.each(oldUrl.split('?')[1].split('&'), function(k, v) {
+      $.each((oldUrl.split('?')[1] || '').split('&'), function(k, v) {
         var arg = v.split('=');
         if (args[arg[0]] !== undefined && arg[1] !== args[arg[0]]) {
           same = false;
@@ -498,7 +498,7 @@
       settings = $el.data('popup-settings') || {},
       formData = false;
     settings.dialog = settings.dialog || {};
-    if (e.isDefaultPrevented() || !CRM.config.ajaxPopupsEnabled || !url || $el.is(exclude)) {
+    if (e.isDefaultPrevented() || !CRM.config.ajaxPopupsEnabled || !url || $el.is(exclude + ', .open-inline, .open-inline-noreturn')) {
       return;
     }
     // Sized based on css class
@@ -572,8 +572,11 @@
           var currentHeight = $wrapper.outerHeight(),
             padding = currentHeight - $dialog.height(),
             newHeight = $dialog.prop('scrollHeight') + padding,
-            menuHeight = $('#civicrm-menu').outerHeight(),
-            maxHeight = $(window).height() - menuHeight;
+            menuHeight = $('#civicrm-menu').outerHeight();
+          if ($('body').hasClass('crm-menubar-below-cms-menu')) {
+            menuHeight += $('#civicrm-menu').offset().top;
+          }
+          var maxHeight = $(window).height() - menuHeight;
           newHeight = newHeight > maxHeight ? maxHeight : newHeight;
           if (newHeight > (currentHeight + 15)) {
             $dialog.dialog('option', {

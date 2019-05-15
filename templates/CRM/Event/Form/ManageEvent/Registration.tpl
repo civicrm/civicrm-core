@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -72,11 +72,11 @@
   {if !$isTemplate}
     <tr class="crm-event-manage-registration-form-block-registration_start_date">
       <td scope="row" class="label" width="20%">{$form.registration_start_date.label}</td>
-      <td>{include file="CRM/common/jcalendar.tpl" elementName=registration_start_date}</td>
+      <td>{$form.registration_start_date.html}</td>
     </tr>
     <tr class="crm-event-manage-registration-form-block-registration_end_date">
       <td scope="row" class="label" width="20%">{$form.registration_end_date.label}</td>
-      <td>{include file="CRM/common/jcalendar.tpl" elementName=registration_end_date}</td>
+      <td>{$form.registration_end_date.html}</td>
     </tr>
   {/if}
   <tr class="crm-event-manage-registration-form-block-is_multiple_registrations">

@@ -26,7 +26,7 @@ class CiviEventDispatcher extends ContainerAwareEventDispatcher {
    * @var array
    *   Array(string $eventName => trueish).
    */
-  private $autoListeners = array();
+  private $autoListeners = [];
 
   /**
    * Determine whether $eventName should delegate to the CMS hook system.
@@ -124,10 +124,10 @@ class CiviEventDispatcher extends ContainerAwareEventDispatcher {
         // WISHLIST: For native extensions (and possibly D6/D7/D8/BD), enumerate
         // the listeners and list them one-by-one. This would make it easier to
         // inspect via "cv debug:event-dispatcher".
-        $this->addListener($eventName, array(
+        $this->addListener($eventName, [
           '\Civi\Core\CiviEventDispatcher',
           'delegateToUF',
-        ), self::DEFAULT_HOOK_PRIORITY);
+        ], self::DEFAULT_HOOK_PRIORITY);
       }
     }
   }

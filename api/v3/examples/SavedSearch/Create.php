@@ -6,12 +6,12 @@
  *   API result array
  */
 function saved_search_create_example() {
-  $params = array(
-    'form_values' => array(
+  $params = [
+    'form_values' => [
       'relation_type_id' => '6_a_b',
       'relation_target_name' => 'Default Organization',
-    ),
-    'api.Group.create' => array(
+    ],
+    'api.Group.create' => [
       'name' => 'my_smartgroup',
       'title' => 'my smartgroup',
       'description' => 'Volunteers for the default organization',
@@ -20,8 +20,8 @@ function saved_search_create_example() {
       'visibility' => 'User and User Admin Only',
       'is_hidden' => 0,
       'is_reserved' => 0,
-    ),
-  );
+    ],
+  ];
 
   try{
     $result = civicrm_api3('SavedSearch', 'create', $params);
@@ -31,12 +31,12 @@ function saved_search_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -50,30 +50,30 @@ function saved_search_create_example() {
  */
 function saved_search_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 3,
-    'values' => array(
-      '3' => array(
+    'values' => [
+      '3' => [
         'id' => '3',
-        'form_values' => array(
+        'form_values' => [
           'relation_type_id' => '6_a_b',
           'relation_target_name' => 'Default Organization',
-        ),
+        ],
         'mapping_id' => '',
         'search_custom_id' => '',
         'where_clause' => '',
         'select_tables' => '',
         'where_tables' => '',
-        'api.Group.create' => array(
+        'api.Group.create' => [
           'is_error' => 0,
           'version' => 3,
           'count' => 1,
           'id' => 1,
-          'values' => array(
-            '0' => array(
+          'values' => [
+            '0' => [
               'id' => '1',
               'name' => 'my_smartgroup',
               'title' => 'my smartgroup',
@@ -94,12 +94,12 @@ function saved_search_create_expectedresult() {
               'is_reserved' => 0,
               'created_id' => '',
               'modified_id' => '',
-            ),
-          ),
-        ),
-      ),
-    ),
-  );
+            ],
+          ],
+        ],
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

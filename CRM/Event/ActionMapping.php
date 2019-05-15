@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -53,7 +53,7 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
    * @param \Civi\ActionSchedule\Event\MappingRegisterEvent $registrations
    */
   public static function onRegisterActionMappings(\Civi\ActionSchedule\Event\MappingRegisterEvent $registrations) {
-    $registrations->register(CRM_Event_ActionMapping::create(array(
+    $registrations->register(CRM_Event_ActionMapping::create([
       'id' => CRM_Event_ActionMapping::EVENT_TYPE_MAPPING_ID,
       'entity' => 'civicrm_participant',
       'entity_label' => ts('Event Type'),
@@ -61,10 +61,8 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
       'entity_value_label' => ts('Event Type'),
       'entity_status' => 'civicrm_participant_status_type',
       'entity_status_label' => ts('Participant Status'),
-      'entity_date_start' => 'event_start_date',
-      'entity_date_end' => 'event_end_date',
-    )));
-    $registrations->register(CRM_Event_ActionMapping::create(array(
+    ]));
+    $registrations->register(CRM_Event_ActionMapping::create([
       'id' => CRM_Event_ActionMapping::EVENT_NAME_MAPPING_ID,
       'entity' => 'civicrm_participant',
       'entity_label' => ts('Event Name'),
@@ -72,10 +70,8 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
       'entity_value_label' => ts('Event Name'),
       'entity_status' => 'civicrm_participant_status_type',
       'entity_status_label' => ts('Participant Status'),
-      'entity_date_start' => 'event_start_date',
-      'entity_date_end' => 'event_end_date',
-    )));
-    $registrations->register(CRM_Event_ActionMapping::create(array(
+    ]));
+    $registrations->register(CRM_Event_ActionMapping::create([
       'id' => CRM_Event_ActionMapping::EVENT_TPL_MAPPING_ID,
       'entity' => 'civicrm_participant',
       'entity_label' => ts('Event Template'),
@@ -83,9 +79,22 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
       'entity_value_label' => ts('Event Template'),
       'entity_status' => 'civicrm_participant_status_type',
       'entity_status_label' => ts('Participant Status'),
-      'entity_date_start' => 'event_start_date',
-      'entity_date_end' => 'event_end_date',
-    )));
+    ]));
+  }
+
+  /**
+   * Get a list of available date fields.
+   *
+   * @return array
+   *   Array(string $fieldName => string $fieldLabel).
+   */
+  public function getDateFields() {
+    return [
+      'start_date' => ts('Event Start Date'),
+      'end_date' => ts('Event End Date'),
+      'registration_start_date' => ts('Registration Start Date'),
+      'registration_end_date' => ts('Registration End Date'),
+    ];
   }
 
   /**
@@ -121,7 +130,7 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
         return \CRM_Event_PseudoConstant::participantRole();
 
       default:
-        return array();
+        return [];
     }
   }
 
@@ -148,6 +157,9 @@ class CRM_Event_ActionMapping extends \Civi\ActionSchedule\Mapping {
     $query['casEntityIdField'] = 'e.id';
     $query['casContactTableAlias'] = NULL;
     $query['casDateField'] = str_replace('event_', 'r.', $schedule->start_action_date);
+    if (empty($query['casDateField']) && $schedule->absolute_date) {
+      $query['casDateField'] = $schedule->absolute_date;
+    }
 
     $query->join('r', 'INNER JOIN civicrm_event r ON e.event_id = r.id');
     if ($schedule->recipient_listing && $schedule->limit_to) {

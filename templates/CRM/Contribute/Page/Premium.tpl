@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,6 +37,7 @@
             <th>{ts}SKU{/ts}</th>
             <th>{ts}Market Value{/ts}</th>
             <th>{ts}Min Contribution{/ts}</th>
+            <th>{ts}Actual Cost{/ts}</th>
             <th>{ts}Financial Type{/ts}</th>
             <th>{ts}Order{/ts}</th>
             <th></th>
@@ -45,9 +46,10 @@
         <tr class="{cycle values='odd-row,even-row'} {$row.class}{if NOT $row.is_active} disabled{/if}">
           <td class="crm-contribution-form-block-product_name">{$row.product_name}</td>
           <td class="crm-contribution-form-block-sku">{$row.sku}</td>
-          <td class="crm-contribution-form-block-price">{$row.price }</td>
-          <td class="crm-contribution-form-block-min_contribution">{$row.min_contribution}</td>
-          <td class="crm-contribution-form-block-financial_type">{$row.financial_type_id}</td>
+          <td class="crm-contribution-form-block-price">{$row.price|crmMoney}</td>
+          <td class="crm-contribution-form-block-min_contribution">{$row.min_contribution|crmMoney}</td>
+          <td class="crm-contribution-form-block-cost">{$row.cost|crmMoney}</td>
+          <td class="crm-contribution-form-block-financial_type">{$row.financial_type}</td>
           <td class="nowrap crm-contribution-form-block-weight">{$row.weight}</td>
           <td class="crm-contribution-form-block-action">{$row.action}</td>
         </tr>

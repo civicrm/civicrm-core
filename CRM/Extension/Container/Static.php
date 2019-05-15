@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -35,6 +35,7 @@
  * scanned for extensions.
  */
 class CRM_Extension_Container_Static implements CRM_Extension_Container_Interface {
+
   /**
    * @param array $exts
    *   Array(string $key => array $spec) List of extensions.
@@ -47,7 +48,7 @@ class CRM_Extension_Container_Static implements CRM_Extension_Container_Interfac
    * @inheritDoc
    */
   public function checkRequirements() {
-    return array();
+    return [];
   }
 
   /**

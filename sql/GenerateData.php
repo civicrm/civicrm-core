@@ -1,9 +1,9 @@
 <?php
 /**
  * +--------------------------------------------------------------------+
- * | CiviCRM version 4.7                                                |
+ * | CiviCRM version 5                                                  |
  * +--------------------------------------------------------------------+
- * | Copyright CiviCRM LLC (c) 2004-2017                                |
+ * | Copyright CiviCRM LLC (c) 2004-2019                                |
  * +--------------------------------------------------------------------+
  * | This file is a part of CiviCRM.                                    |
  * |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -196,16 +196,23 @@ class CRM_GCD {
     $this->householdIndividual = array_combine($this->Household, $this->householdIndividual);
   }
 
-  /*********************************
+  /*
    * private members
-   *********************************/
+   *
+   */
 
-  // enum's from database
+  /**
+   * enum's from database
+   * @var array
+   */
   private $preferredCommunicationMethod = array('1', '2', '3', '4', '5');
   private $contactType = array('Individual', 'Household', 'Organization');
   private $phoneType = array('1', '2', '3', '4');
 
-  // customizable enums (foreign keys)
+  /**
+   * customizable enums (foreign keys)
+   * @var array
+   */
   private $prefix = array(
     // Female
     1 => array(
@@ -219,35 +226,56 @@ class CRM_GCD {
       4 => 'Dr.',
     ),
   );
+  /**
+   * @var array
+   */
   private $suffix = array(1 => 'Jr.', 2 => 'Sr.', 3 => 'II', 4 => 'III');
   private $gender = array(1 => 'female', 2 => 'male');
 
-  // store domain id's
+  /**
+   * store domain id's
+   * @var array
+   */
   private $domain = array();
 
-  // store contact id's
+  /**
+   * store contact id's
+   * @var array
+   */
   private $contact = array();
   private $Individual = array();
   private $Household = array();
   private $Organization = array();
 
   // store which contacts have a location entity
-  // for automatic management of is_primary field
+  /**
+   * for automatic management of is_primary field
+   * @var array
+   */
   private $location = array(
     'Email' => array(),
     'Phone' => array(),
     'Address' => array(),
   );
 
-  // stores the strict individual id and household id to individual id mapping
+  /**
+   * stores the strict individual id and household id to individual id mapping
+   * @var array
+   */
   private $strictIndividual = array();
   private $householdIndividual = array();
   private $householdName = array();
 
-  // sample data in xml format
+  /**
+   * sample data in xml format
+   * @var array
+   */
   private $sampleData = array();
 
-  // private vars
+  /**
+   * private vars
+   * @var array
+   */
   private $startCid;
   private $numIndividual = 0;
   private $numHousehold = 0;
@@ -261,7 +289,7 @@ class CRM_GCD {
 
   /*********************************
    * private methods
-   ********************************
+   * *******************************
    * @param int $size
    * @return string
    */
@@ -1951,7 +1979,7 @@ AND    a.details = 'Membership Payment'
     $sql = "INSERT INTO civicrm_contribution (contact_id, financial_type_id, payment_instrument_id, receive_date, total_amount, currency, receipt_date, source, contribution_status_id)
 SELECT  `contact_id`, $financialTypeID, $paymentInstrumentID, now(), `fee_amount`, 'USD', now(), CONCAT(ce.title, ' : Offline registration'), 1  FROM `civicrm_participant` cp
 LEFT JOIN civicrm_event ce ON ce.id = cp.event_id
-group by `contact_id`;";
+group by `contact_id`, `fee_amount`, `title`;";
 
     $this->_query($sql);
 

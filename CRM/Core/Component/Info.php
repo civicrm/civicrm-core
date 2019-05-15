@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * for a component to introduce itself to the system.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -113,7 +113,7 @@ abstract class CRM_Core_Component_Info {
    * @see CRM_Utils_Hook::angularModules
    */
   public function getAngularModules() {
-    return array();
+    return [];
   }
 
   /**
@@ -134,7 +134,7 @@ abstract class CRM_Core_Component_Info {
    * @see CRM_Utils_Hook::managedEntities
    */
   public function getManagedEntities() {
-    return array();
+    return [];
   }
 
   /**
@@ -145,7 +145,7 @@ abstract class CRM_Core_Component_Info {
    * @see CRM_Component_Info::getPermissions
    */
   public function getAnonymousPermissionWarnings() {
-    return array();
+    return [];
   }
 
   /**
@@ -175,7 +175,7 @@ abstract class CRM_Core_Component_Info {
    *   - count: int, eg "5" if there are 5 email addresses that refer to $dao
    */
   public function getReferenceCounts($dao) {
-    return array();
+    return [];
   }
 
   /**
@@ -197,6 +197,15 @@ abstract class CRM_Core_Component_Info {
    *                    null if no element offered
    */
   abstract public function registerTab();
+
+  /**
+   * Get icon font class representing this component.
+   *
+   * @return string
+   */
+  public function getIcon() {
+    return 'crm-i fa-puzzle-piece';
+  }
 
   /**
    * Provides information about advanced search pane

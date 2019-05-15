@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,7 +36,7 @@
 {htxt id='id-used_for'}
 {ts}Profiles can be used in many different ways (and a single profile can be used in multiple contexts){/ts}:<br />
     <ul class="left-alignment">
-    <li>{ts}You can collect additional information about a donor or event participant by including profiles directly in Online Contribution Pages and Event Registration forms. When using a profile in this manner you do not need to check any of the "Used For" checkboxes.{/ts}</li> 
+    <li>{ts}You can collect additional information about a donor or event participant by including profiles directly in Online Contribution Pages and Event Registration forms. When using a profile in this manner you do not need to check any of the "Used For" checkboxes.{/ts}</li>
     <li>{ts}Check <strong>Standalone Form or Directory</strong> if you want it to use this profile for custom forms, or contact listing and view screens (from the civicrm/profile path).{/ts}</li>
     <li>{ts}Check <strong>Search Results</strong> to use this profile to display an alternate set of results columns for CiviCRM Basic and Advanced Search.{/ts}</li>
     {if $config->userSystem->supports_form_extensions EQ '1'}
@@ -96,11 +96,32 @@
 {ts}If you are using this profile as a contact signup or edit form, and want to redirect the user to a static URL after they've submitted the form, you can also use contact tokens in URL - enter the complete URL here. If this field is left blank, the built-in Profile form will be redisplayed with a generic status message - 'Your contact information has been saved.'{/ts}
 {/htxt}
 
+{htxt id='id-add_cancel_button-title'}
+  {ts}Add Cancel Button{/ts}
+{/htxt}
+{htxt id='id-add_cancel_button'}
+{ts}Enable/Disable this checkbox to add/remove cancel button on the profile form.{/ts}
+{/htxt}
+
 {htxt id='id-cancel_URL-title'}
   {ts}Cancel Redirect{/ts}
 {/htxt}
 {htxt id='id-cancel_URL'}
 {ts}If you are using this profile as a contact signup or edit form, and want to redirect the user to a static URL if they click the Cancel button - enter the complete URL here. If this field is left blank, the built-in Profile form will be redisplayed.{/ts}
+{/htxt}
+
+{htxt id='id-cancel_button_text-title'}
+  {ts}Cancel Button Text{/ts}
+{/htxt}
+{htxt id='id-cancel_button_text'}
+  {ts}Override the default button text for the cancel button for this profile{/ts}
+{/htxt}
+
+{htxt id='id-submit_button_text-title'}
+  {ts}Submit Button Text{/ts}
+{/htxt}
+{htxt id='id-submit_button_text'}
+  {ts}Override the default button text for the submit button for this profile{/ts}
 {/htxt}
 
 {htxt id='id-add_captcha-title'}
@@ -111,7 +132,7 @@
 <p>{ts}When reCAPTCHA is enabled for a profile form, anonymous users are required to read an image with letters and numbers and enter the value in a field. This helps prevent abuse by automated scripts.{/ts}</p>
 <p>{ts 1="https://www.google.com/recaptcha" 2=$miscURL}To use reCAPTCHA you must sign up at <a href="%1" target="_blank">Google's reCaptcha site</a> to get your public and private keys. Then enter both keys in <a href="%2">Administer CiviCRM &raquo; System Settings &raquo; Misc (Undelete, PDFs, Limits, Logging, Captcha, etc.)</a>.{/ts}</p>
 <p><strong>{ts}Do not enable this feature if you are using this profile as an HTML Form Snippet embedded in a non-CiviCRM web page. reCAPTCHA requires dynamic page generation. Submitting a stand-alone form with reCAPTCHA included will always result in a reCAPTCHA validation error.{/ts}</strong></p>
-{if $config->userSystem->supports_form_extensions EQ '1'} 
+{if $config->userSystem->supports_form_extensions EQ '1'}
   <p><strong>{ts}reCAPTCHA is also not available when a profile is used inside the User Registration and My Account screens.{/ts}</strong></p>
 {/if}
 {/htxt}

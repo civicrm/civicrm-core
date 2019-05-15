@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -60,7 +60,9 @@
           <table class="form-layout-compressed">
             {foreach from=$caseRoles.client item=client}
               <tr class="crm-case-caseview-display_name">
-                <td class="label-left bold" style="padding: 0px; border: none;">{$client.display_name}</td>
+                <td class="label-left bold" style="padding: 0px; border: none;">
+                  <a href="{crmURL p='civicrm/contact/view' q="action=view&reset=1&cid=`$client.contact_id`"}" title="{ts}View contact record{/ts}">{$client.display_name}</a>
+                </td>
               </tr>
               {if $client.phone}
                 <tr class="crm-case-caseview-phone">

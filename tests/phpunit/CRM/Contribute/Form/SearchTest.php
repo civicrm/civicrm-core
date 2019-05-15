@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,14 +37,18 @@
 class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
 
   protected $_individual;
-  protected $_tablesToTruncate = array('civicrm_contribution', 'civicrm_line_item');
+  protected $_tablesToTruncate = ['civicrm_contribution', 'civicrm_line_item'];
 
   public function setUp() {
     parent::setUp();
     $this->_individual = $this->individualCreate();
+    $this->ids['Contact']['contactID1'] = $this->individualCreate([], 1);
+    $this->ids['Contact']['contactID2'] = $this->individualCreate([], 2);
   }
 
   public function tearDown() {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   /**
@@ -52,12 +56,12 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
    */
   public function testBatchFilter() {
     $this->quickCleanup($this->_tablesToTruncate);
-    $contactID1 = $this->individualCreate(array(), 1);
-    $contactID2 = $this->individualCreate(array(), 2);
+    $contactID1 = $this->individualCreate([], 1);
+    $contactID2 = $this->individualCreate([], 2);
     $batchTitle = CRM_Batch_BAO_Batch::generateBatchName();
 
     // create batch
-    $batch = civicrm_api3('Batch', 'create', array(
+    $batch = $this->callAPISuccess('Batch', 'create', [
       'created_id' => $this->_individual,
       'created_date' => CRM_Utils_Date::processDate(date("Y-m-d"), date("H:i:s")),
       'status_id' => CRM_Core_Pseudoconstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Data Entry'),
@@ -65,17 +69,17 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'item_count' => 2,
       'total' => 100,
       'type_id' => array_search('Contribution', CRM_Batch_BAO_Batch::buildOptions('type_id')),
-    ));
+    ]);
     $batchID = $batch['id'];
 
-    $batchEntry = array(
-      'primary_profiles' => array(1 => NULL, 2 => NULL, 3 => NULL),
-      'primary_contact_id' => array(
+    $batchEntry = [
+      'primary_profiles' => [1 => NULL, 2 => NULL, 3 => NULL],
+      'primary_contact_id' => [
         1 => $contactID1,
         2 => $contactID2,
-      ),
-      'field' => array(
-        1 => array(
+      ],
+      'field' => [
+        1 => [
           'financial_type' => 1,
           'total_amount' => 70,
           'receive_date' => '2013-07-24',
@@ -83,8 +87,8 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
           'payment_instrument' => 1,
           'check_number' => NULL,
           'contribution_status_id' => 1,
-        ),
-        2 => array(
+        ],
+        2 => [
           'financial_type' => 1,
           'total_amount' => 30,
           'receive_date' => '2014-07-24',
@@ -92,13 +96,13 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
           'payment_instrument' => 1,
           'check_number' => NULL,
           'contribution_status_id' => 1,
-        ),
-      ),
+        ],
+      ],
       'actualBatchTotal' => 100,
-    );
+    ];
 
     // create random contribution to check IS NULL filter more precisely
-    $nonBatchContri = civicrm_api3('Contribution', 'create', array(
+    $nonBatchContri = $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 1,
       'total_amount' => 123,
       'receive_date' => '2014-07-24',
@@ -107,7 +111,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'check_number' => NULL,
       'contribution_status_id' => 1,
       'contact_id' => $this->_individual,
-    ));
+    ]);
     $nonBatchContriID = $nonBatchContri['id'];
 
     // process batch entries
@@ -116,41 +120,41 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $form->testProcessContribution($batchEntry);
 
     // fetch created contributions
-    $entities = civicrm_api3('EntityBatch', 'get', array('batch_id' => $batchID));
-    $ids = array();
+    $entities = $this->callAPISuccess('EntityBatch', 'get', array('batch_id' => $batchID));
+    $ids = [];
     foreach ($entities['values'] as $value) {
       $ids[] = $value['entity_id'];
     }
     list($batchContriID1, $batchContriID2) = $ids;
 
-    $useCases = array(
+    $useCases = [
       // Case 1: Search for ONLY those contributions which are created from batch
-      array(
+      [
         'form_value' => array('contribution_batch_id' => 'IS NOT NULL'),
         'expected_count' => 2,
         'expected_contribution' => array($batchContriID1, $batchContriID2),
         'expected_qill' => 'Batch Name Not Null',
-      ),
+      ],
       // Case 2: Search for ONLY those contributions which are NOT created from batch
-      array(
+      [
         'form_value' => array('contribution_batch_id' => 'IS NULL'),
         'expected_count' => 1,
         'expected_contribution' => array($nonBatchContriID),
         'expected_qill' => 'Batch Name Is Null',
-      ),
+      ],
       // Case 3: Search for ONLY those contributions which are created from batch ID - $batchID
-      array(
+      [
         'form_value' => array('contribution_batch_id' => $batchID),
         'expected_count' => 2,
         'expected_contribution' => array($batchContriID1, $batchContriID2),
         'expected_qill' => 'Batch Name = ' . $batchTitle,
-      ),
-    );
+      ],
+    ];
     foreach ($useCases as $case) {
       $fv = $case['form_value'];
       CRM_Contact_BAO_Query::processSpecialFormValue($fv, array('contribution_batch_id'));
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
-      list($select, $from, $where, $having) = $query->query();
+      list($select, $from, $where) = $query->query();
 
       // get and assert contribution count
       $contributions = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT civicrm_contribution.id %s %s AND civicrm_contribution.id IS NOT NULL', $from, $where))->fetchAll();
@@ -192,7 +196,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'total_amount' => 100,
     );
     CRM_Core_BAO_FinancialTrxn::create($params);
-    $Contribution2 = $this->callAPISuccess('Contribution', 'create', array(
+    $this->callAPISuccess('Contribution', 'create', array(
       'financial_type_id' => 1,
       'total_amount' => 150,
       'receive_date' => date('Ymd'),
@@ -201,7 +205,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'contact_id' => $contactID1,
     ));
-    $Contribution3 = civicrm_api3('Contribution', 'create', array(
+    $Contribution3 = $this->callAPISuccess('Contribution', 'create', array(
       'financial_type_id' => 1,
       'total_amount' => 200,
       'receive_date' => date('Ymd'),
@@ -255,7 +259,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $fv = $case['form_value'];
       CRM_Contact_BAO_Query::processSpecialFormValue($fv, array('financial_trxn_card_type_id'));
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
-      list($select, $from, $where, $having) = $query->query();
+      list($select, $from, $where) = $query->query();
 
       // get and assert contribution count
       $contributions = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT civicrm_contribution.id %s %s AND civicrm_contribution.id IS NOT NULL', $from, $where))->fetchAll();
@@ -298,7 +302,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'pan_truncation' => 1234,
     );
     CRM_Core_BAO_FinancialTrxn::create($params);
-    $Contribution2 = $this->callAPISuccess('Contribution', 'create', array(
+    $this->callAPISuccess('Contribution', 'create', array(
       'financial_type_id' => 1,
       'total_amount' => 150,
       'receive_date' => date('Ymd'),
@@ -307,7 +311,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'contribution_status_id' => 1,
       'contact_id' => $contactID1,
     ));
-    $Contribution3 = civicrm_api3('Contribution', 'create', array(
+    $Contribution3 = $this->callAPISuccess('Contribution', 'create', array(
       'financial_type_id' => 1,
       'total_amount' => 200,
       'receive_date' => date('Ymd'),
@@ -355,7 +359,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $fv = $case['form_value'];
       CRM_Contact_BAO_Query::processSpecialFormValue($fv, array('financial_trxn_pan_truncation'));
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
-      list($select, $from, $where, $having) = $query->query();
+      list($select, $from, $where) = $query->query();
 
       // get and assert contribution count
       $contributions = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT civicrm_contribution.id %s %s AND civicrm_contribution.id IS NOT NULL', $from, $where))->fetchAll();
@@ -370,6 +374,255 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
       $this->assertEquals($case['expected_qill'], $qill);
     }
+  }
+
+  /**
+   *  Test contact contributions.
+   */
+  public function testContributionSearchWithContactID() {
+    $contactID = $this->individualCreate([], 1);
+    $fv = ['contact_id' => $contactID];
+    $queryParams = CRM_Contact_BAO_Query::convertFormValues($fv);
+    $selector = new CRM_Contribute_Selector_Search($queryParams, CRM_Core_Action::ADD);
+    list($select, $from, $where) = $selector->getQuery()->query();
+
+    // get and assert contribution count
+    $contributions = CRM_Core_DAO::executeQuery("{$select} {$from} {$where}")->fetchAll();
+    $this->assertEquals(count($contributions), 0);
+
+    $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => "Donation",
+      'receive_date' => date('Y-m-d'),
+      'total_amount' => 10,
+      'contact_id' => $contactID,
+    ]);
+    $selector = new CRM_Contribute_Selector_Search($queryParams, CRM_Core_Action::ADD);
+    list($select, $from, $where) = $selector->getQuery()->query();
+
+    // get and assert contribution count
+    $contributions = CRM_Core_DAO::executeQuery("{$select} {$from} {$where}")->fetchAll();
+    $this->assertEquals(count($contributions), 1);
+  }
+
+  /**
+   *  Test CRM_Contribute_Form_Search Recurring Contribution Status Id filters
+   *
+   * @dataProvider getSearchData
+   */
+  public function testContributionRecurSearchFilters($formValues, $expectedCount, $expectedContact, $expectedQill) {
+    $this->setUpRecurringContributions();
+
+    $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($formValues));
+    list($select, $from, $where, $having) = $query->query();
+
+    // get and assert contribution count
+    $contacts = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT contact_a.id, contact_a.display_name %s %s AND contact_a.id IS NOT NULL', $from, $where))->fetchAll();
+    foreach ($contacts as $key => $value) {
+      $this->assertEquals($expectedContact[$key], $value['display_name']);
+    }
+    // assert the contribution count
+    $this->assertEquals($expectedCount, count($contacts));
+    // get and assert qill string
+    $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
+    $this->assertEquals($expectedQill, $qill);
+  }
+
+  /**
+   *  CRM-21343: Test CRM_Contribute_Form_Search Cancelled filters
+   */
+  public function testCancelledFilter() {
+    $this->quickCleanup($this->_tablesToTruncate);
+    $contactID1 = $this->individualCreate([], 1);
+    $contactID2 = $this->individualCreate([], 2);
+    $Contribution1 = $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => 1,
+      'total_amount' => 100,
+      'receive_date' => date('Ymd'),
+      'receive_date_time' => NULL,
+      'payment_instrument' => 1,
+      'contribution_status_id' => 3,
+      'cancel_date' => date('Ymd'),
+      'cancel_reason' => 'Insufficient funds',
+      'contact_id' => $contactID1,
+    ]);
+    $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => 1,
+      'total_amount' => 150,
+      'receive_date' => date('Ymd', strtotime(date('Y-m-d') . ' - 1 days')),
+      'receive_date_time' => NULL,
+      'payment_instrument' => 1,
+      'contribution_status_id' => 3,
+      'cancel_date' => date('Ymd', strtotime(date('Y-m-d') . ' - 1 days')),
+      'cancel_reason' => 'Insufficient funds',
+      'contact_id' => $contactID2,
+    ]);
+    $Contribution3 = $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => 1,
+      'total_amount' => 200,
+      'receive_date' => date('Ymd'),
+      'receive_date_time' => NULL,
+      'payment_instrument' => 1,
+      'contribution_status_id' => 3,
+      'cancel_date' => date('Ymd'),
+      'cancel_reason' => 'Invalid Credit Card Number',
+      'contact_id' => $contactID1,
+    ]);
+
+    $useCases = [
+      // Case 1: Search for Cancelled Date
+      [
+        'form_value' => ['cancel_date' => date('Y-m-d')],
+        'expected_count' => 2,
+        'expected_contribution' => [$Contribution1['id'], $Contribution3['id']],
+        'expected_qill' => "Cancel Date Like '%" . date('Y-m-d') . "%'",
+      ],
+      // Case 2: Search for Cancelled Reason
+      [
+        'form_value' => ['cancel_reason' => 'Invalid Credit Card Number'],
+        'expected_count' => 1,
+        'expected_contribution' => [$Contribution3['id']],
+        'expected_qill' => "Cancellation / Refund Reason Like '%Invalid Credit Card Number%'",
+      ],
+      // Case 3: Search for Cancelled Date and Cancelled Reason
+      [
+        'form_value' => ['cancel_date' => date('Y-m-d'), 'cancel_reason' => 'Insufficient funds'],
+        'expected_count' => 1,
+        'expected_contribution' => [$Contribution1['id']],
+        'expected_qill' => "Cancel Date Like '%" . date('Y-m-d') . "%'ANDCancellation / Refund Reason Like '%Insufficient funds%'",
+      ],
+    ];
+
+    foreach ($useCases as $case) {
+      $fv = $case['form_value'];
+      CRM_Contact_BAO_Query::processSpecialFormValue($fv, ['cancel_date', 'cancel_reason']);
+      $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
+      list($select, $from, $where) = $query->query();
+
+      // get and assert contribution count
+      $contributions = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT civicrm_contribution.id %s %s AND civicrm_contribution.id IS NOT NULL AND civicrm_contribution.contribution_status_id = 3', $from, $where))->fetchAll();
+      foreach ($contributions as $key => $value) {
+        $contributions[$key] = $value['id'];
+      }
+      // assert the contribution count
+      $this->assertEquals($case['expected_count'], count($contributions));
+      // assert the contribution IDs
+      $this->checkArrayEquals($case['expected_contribution'], $contributions);
+      // get and assert qill string
+      $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
+      $this->assertEquals($case['expected_qill'], $qill);
+    }
+  }
+
+  /**
+   * Set up recurring contributions for the test.
+   */
+  protected function setUpRecurringContributions() {
+    // "In Progress" recurring contribution for contactID1
+    $ContributionRecur1 = $this->callAPISuccess('ContributionRecur', 'create', [
+      'sequential' => 1,
+      'contact_id' => $this->ids['Contact']['contactID1'],
+      'frequency_interval' => 1,
+      'frequency_unit' => "month",
+      'amount' => 11,
+      'currency' => "CAD",
+      'payment_instrument_id' => 1,
+      'contribution_status_id' => 5,
+      'financial_type_id' => "Donation",
+    ]);
+    $Contribution1 = $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => 'Donation',
+      'total_amount' => 11,
+      'receive_date' => date('Ymd'),
+      'receive_date_time' => NULL,
+      'payment_instrument_id' => 1,
+      'contribution_status_id' => 1,
+      'contact_id' => $this->ids['Contact']['contactID1'],
+      'contribution_recur_id' => $ContributionRecur1['id'],
+    ]);
+    $params = [
+      'to_financial_account_id' => 1,
+      'status_id' => 1,
+      'contribution_id' => $Contribution1['id'],
+      'payment_instrument_id' => 1,
+      'card_type_id' => 1,
+      'total_amount' => 11,
+    ];
+    CRM_Core_BAO_FinancialTrxn::create($params);
+    // "Completed" recurring contribution for contactID2
+    $ContributionRecur2 = $this->callAPISuccess('ContributionRecur', 'create', [
+      'sequential' => 1,
+      'contact_id' => $this->ids['Contact']['contactID2'],
+      'frequency_interval' => 1,
+      'frequency_unit' => 'month',
+      'amount' => 22,
+      'currency' => "CAD",
+      'payment_instrument_id' => 1,
+      'contribution_status_id' => 1,
+      'financial_type_id' => 'Donation',
+      'trxn_id' => 'a transaction',
+      'processor_id' => 'a processor',
+    ]);
+    $Contribution2 = $this->callAPISuccess('Contribution', 'create', [
+      'financial_type_id' => 'Donation',
+      'total_amount' => 22,
+      'receive_date' => date('Ymd'),
+      'receive_date_time' => NULL,
+      'payment_instrument' => 1,
+      'contribution_status_id' => 1,
+      'contact_id' => $this->ids['Contact']['contactID2'],
+      'contribution_recur_id' => $ContributionRecur2['id'],
+    ]);
+    $params = [
+      'to_financial_account_id' => 1,
+      'status_id' => 1,
+      'contribution_id' => $Contribution2['id'],
+      'payment_instrument_id' => 1,
+      'card_type_id' => 1,
+      'total_amount' => 22,
+    ];
+    CRM_Core_BAO_FinancialTrxn::create($params);
+  }
+
+  /**
+   * @return array
+   */
+  public function getSearchData() {
+    $useCases = [
+      // Case 1: Search for ONLY those recurring contributions with status "In Progress"
+      'in_progress_search' => [
+        'form_value' => ['contribution_recur_contribution_status_id' => 5],
+        'expected_count' => 1,
+        'expected_contact' => ['Mr. Joe Miller II'],
+        'expected_qill' => "Recurring Contribution Status = 'In Progress'",
+      ],
+      // Case 2: Search for ONLY those recurring contributions with status "Completed"
+      [
+        'form_value' => ['contribution_recur_contribution_status_id' => 1],
+        'expected_count' => 1,
+        'expected_contact' => ['Mr. Terrence Smith II'],
+        'expected_qill' => "Recurring Contribution Status = 'Completed'",
+      ],
+      // Case 3: Search for ONLY those recurring contributions with status "Cancelled"
+      [
+        'form_value' => ['contribution_recur_contribution_status_id' => 3],
+        'expected_count' => 0,
+        'expected_contact' => [],
+        'expected_qill' => "Recurring Contribution Status = 'Cancelled'",
+      ],
+      'trxn_id_search' => [
+        'form_value' => ['contribution_recur_trxn_id' => 'a transaction'],
+        'expected_count' => 1,
+        'expected_contact' => ['Mr. Terrence Smith II'],
+        'expected_qill' => "Recurring Contribution Transaction ID = 'a transaction'",
+      ],
+      'processor_id_search' => [
+        'form_value' => ['contribution_recur_processor_id' => 'a processor'],
+        'expected_count' => 1,
+        'expected_contact' => ['Mr. Terrence Smith II'],
+        'expected_qill' => "Recurring Contribution Processor ID = 'a processor'",
+      ],
+    ];
+    return $useCases;
   }
 
 }

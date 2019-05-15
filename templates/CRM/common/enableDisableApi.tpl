@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,7 +36,13 @@
     }
 
     function refresh() {
-      $a.trigger('crmPopupFormSuccess');
+      // the opposite of the current status based on row class
+      var newStatus = $row.hasClass('disabled');
+      $a.trigger('crmPopupFormSuccess', {
+        'entity': info.entity,
+        'id': info.id,
+        'enabled': newStatus
+      });
       CRM.refreshParent($row);
     }
 

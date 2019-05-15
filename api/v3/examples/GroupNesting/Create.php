@@ -6,10 +6,10 @@
  *   API result array
  */
 function group_nesting_create_example() {
-  $params = array(
+  $params = [
     'parent_group_id' => 1,
     'child_group_id' => 3,
-  );
+  ];
 
   try{
     $result = civicrm_api3('GroupNesting', 'create', $params);
@@ -19,12 +19,12 @@ function group_nesting_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -38,15 +38,15 @@ function group_nesting_create_example() {
  */
 function group_nesting_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 'is_error',
-    'values' => array(
+    'values' => [
       'is_error' => 0,
-    ),
-  );
+    ],
+  ];
 
   return $expectedResult;
 }

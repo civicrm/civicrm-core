@@ -76,25 +76,12 @@ class Main extends \CRM_Core_Page {
   public function registerResources() {
     $loader = new \Civi\Angular\AngularLoader();
     $loader->setPageName('civicrm/a');
-    $loader->setModules(array('crmApp'));
+    $loader->useApp([
+      'activeRoute' => \CRM_Utils_Request::retrieve('route', 'String'),
+      'defaultRoute' => NULL,
+    ]);
     $loader->load();
 
-    // If trying to load an Angular page via AJAX, the route must be passed as a
-    // URL parameter, since the server doesn't receive information about
-    // URL fragments (i.e, what comes after the #).
-    \CRM_Core_Resources::singleton()->addSetting(array(
-      'crmApp' => array(
-        'defaultRoute' => NULL,
-      ),
-      'angularRoute' => \CRM_Utils_Request::retrieve('route', 'String'),
-    ));
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public function getTemplateFileName() {
-    return 'Civi/Angular/Page/Main.tpl';
   }
 
 }

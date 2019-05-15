@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -66,8 +66,8 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
    * Perform any registation or resource-allocation for a new queue
    */
   public function createQueue() {
-    $this->items = array();
-    $this->releaseTimes = array();
+    $this->items = [];
+    $this->releaseTimes = [];
   }
 
   /**
@@ -104,7 +104,7 @@ class CRM_Queue_Queue_Memory extends CRM_Queue_Queue {
    *   Queue-dependent options; for example, if this is a
    *   priority-queue, then $options might specify the item's priority.
    */
-  public function createItem($data, $options = array()) {
+  public function createItem($data, $options = []) {
     $id = $this->nextQueueItemId++;
     // force copy, no unintendedsharing effects from pointers
     $this->items[$id] = serialize($data);

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
@@ -45,7 +45,6 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    * @return CRM_Report_DAO_ReportInstance
    */
   public static function add(&$params) {
-    $instance = new CRM_Report_DAO_ReportInstance();
     if (empty($params)) {
       return NULL;
     }
@@ -54,7 +53,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
 
     // convert roles array to string
     if (isset($params['grouprole']) && is_array($params['grouprole'])) {
-      $grouprole_array = array();
+      $grouprole_array = [];
       foreach ($params['grouprole'] as $key => $value) {
         $grouprole_array[$value] = $value;
       }
@@ -78,7 +77,7 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     }
 
     $instance = new CRM_Report_DAO_ReportInstance();
-    $instance->copyValues($params);
+    $instance->copyValues($params, TRUE);
 
     if (CRM_Core_Config::singleton()->userFramework == 'Joomla') {
       $instance->permission = 'null';
@@ -109,10 +108,10 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     $instance->save();
 
     if ($instanceID) {
-      CRM_Utils_Hook::pre('edit', 'ReportInstance', $instance->id, $instance);
+      CRM_Utils_Hook::post('edit', 'ReportInstance', $instance->id, $instance);
     }
     else {
-      CRM_Utils_Hook::pre('create', 'ReportInstance', $instance->id, $instance);
+      CRM_Utils_Hook::post('create', 'ReportInstance', $instance->id, $instance);
     }
     return $instance;
   }
@@ -140,11 +139,11 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     // build navigation parameters
     if (!empty($params['is_navigation'])) {
       if (!array_key_exists('navigation', $params)) {
-        $params['navigation'] = array();
+        $params['navigation'] = [];
       }
       $navigationParams =& $params['navigation'];
 
-      $navigationParams['permission'] = array();
+      $navigationParams['permission'] = [];
       $navigationParams['label'] = $params['title'];
       $navigationParams['name'] = $params['title'];
 
@@ -168,12 +167,12 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     }
 
     // add to dashboard
-    $dashletParams = array();
+    $dashletParams = [];
     if (!empty($params['addToDashboard'])) {
-      $dashletParams = array(
+      $dashletParams = [
         'label' => $params['title'],
         'is_active' => 1,
-      );
+      ];
       if ($permission = CRM_Utils_Array::value('permission', $params)) {
         $dashletParams['permission'][] = $permission;
       }
@@ -364,32 +363,43 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
    *  - general script-add.
    */
   public static function getActionMetadata() {
-    $actions = array(
-      'report_instance.save' => array('title' => ts('Save')),
-      'report_instance.copy' => array(
+    $actions = [];
+    if (CRM_Core_Permission::check('save Report Criteria')) {
+      $actions['report_instance.save'] = ['title' => ts('Save')];
+      $actions['report_instance.copy'] = [
         'title' => ts('Save a Copy'),
-        'data' => array(
+        'data' => [
           'is_confirm' => TRUE,
           'confirm_title' => ts('Save a copy...'),
-          'confirm_refresh_fields' => json_encode(array(
-            'title' => array('selector' => '.crm-report-instanceForm-form-block-title', 'prepend' => ts('(Copy) ')),
-            'description' => array('selector' => '.crm-report-instanceForm-form-block-description', 'prepend' => ''),
-            'parent_id' => array('selector' => '.crm-report-instanceForm-form-block-parent_id', 'prepend' => ''),
-          )),
-        ),
-      ),
-      'report_instance.print' => array('title' => ts('Print Report')),
-      'report_instance.pdf' => array('title' => ts('Print to PDF')),
-      'report_instance.csv' => array('title' => ts('Export as CSV')),
-    );
+          'confirm_refresh_fields' => json_encode([
+            'title' => [
+              'selector' => '.crm-report-instanceForm-form-block-title',
+              'prepend' => ts('(Copy) '),
+            ],
+            'description' => [
+              'selector' => '.crm-report-instanceForm-form-block-description',
+              'prepend' => '',
+            ],
+            'parent_id' => [
+              'selector' => '.crm-report-instanceForm-form-block-parent_id',
+              'prepend' => '',
+            ],
+          ]),
+        ],
+      ];
+    }
+    $actions['report_instance.print'] = ['title' => ts('Print Report')];
+    $actions['report_instance.pdf'] = ['title' => ts('Print to PDF')];
+    $actions['report_instance.csv'] = ['title' => ts('Export as CSV')];
+
     if (CRM_Core_Permission::check('administer Reports')) {
-      $actions['report_instance.delete'] = array(
+      $actions['report_instance.delete'] = [
         'title' => ts('Delete report'),
-        'data' => array(
+        'data' => [
           'is_confirm' => TRUE,
           'confirm_message' => ts('Are you sure you want delete this report? This action cannot be undone.'),
-        ),
-      );
+        ],
+      ];
     }
     return $actions;
   }

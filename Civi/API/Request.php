@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -62,7 +62,7 @@ class Request {
     $version = \CRM_Utils_Array::value('version', $params);
     switch ($version) {
       default:
-        $apiRequest = array();
+        $apiRequest = [];
         $apiRequest['id'] = self::$nextId++;
         $apiRequest['version'] = (int) $version;
         $apiRequest['params'] = $params;
@@ -73,7 +73,7 @@ class Request {
         return $apiRequest;
 
       case 4:
-        $callable = array("Civi\\Api4\\Entity\\$entity", $action);
+        $callable = ["Civi\\Api4\\$entity", $action];
         if (!is_callable($callable)) {
           throw new Exception\NotImplementedException("API ($entity, $action) does not exist (join the API team and implement it!)");
         }

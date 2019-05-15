@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,13 +27,11 @@
 {assign var='hideTotal' value=$quickConfig+$noCalcValueDisplay}
 <div id="pricesetTotal" class="crm-section section-pricesetTotal">
   <div class="label
-  {if $hideTotal},  hiddenElement{/if}" id="pricelabel">
-    <label>
-      {if ( $extends eq 'Contribution' ) || ( $extends eq 'Membership' )}
-      <span id='amount_sum_label'>{ts}Total Amount{/ts}{else}{ts}Total Fee(s){/ts}</span>
-       {if $isAdditionalParticipants} {ts}for this participant{/ts}{/if}
-      {/if}
-    </label>
+{if $hideTotal},  hiddenElement{/if}" id="pricelabel">
+    {if ( $extends eq 'Contribution' ) || ( $extends eq 'Membership' )}
+    <span id='amount_sum_label'>{ts}Total Amount{/ts}{else}{ts}Total Fee(s){/ts}</span>
+     {if $isAdditionalParticipants} {ts}for this participant{/ts}{/if}
+    {/if}
   </div>
   <div class="content calc-value" {if $hideTotal}style="display:none;"{/if} id="pricevalue" ></div>
 </div>

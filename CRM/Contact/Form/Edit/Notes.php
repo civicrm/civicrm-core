@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_Form_Edit_Notes {
 
@@ -39,8 +39,8 @@ class CRM_Contact_Form_Edit_Notes {
    */
   public static function buildQuickForm(&$form) {
     $form->applyFilter('__ALL__', 'trim');
-    $form->addField('subject', array('entity' => 'note', 'size' => '60'));
-    $form->addField('note', array('entity' => 'note', 'rows' => 3));
+    $form->addField('subject', ['entity' => 'note', 'size' => '60']);
+    $form->addField('note', ['entity' => 'note', 'rows' => 3]);
   }
 
 }

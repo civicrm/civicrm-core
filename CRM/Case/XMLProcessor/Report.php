@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
 
@@ -65,9 +65,9 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
 
   public function getRedactionRules() {
     foreach (array(
-               'redactionStringRules',
-               'redactionRegexRules',
-             ) as $key => $rule) {
+      'redactionStringRules',
+      'redactionRegexRules',
+    ) as $key => $rule) {
       $$rule = CRM_Case_PseudoConstant::redactionRule($key);
 
       if (!empty($$rule)) {
@@ -129,20 +129,9 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
       $case['subject'] = $dao->subject;
       $case['start_date'] = $dao->start_date;
       $case['end_date'] = $dao->end_date;
-      // FIXME: when we resolve if case_type_is single or multi-select
-      if (strpos($dao->case_type_id, CRM_Core_DAO::VALUE_SEPARATOR) !== FALSE) {
-        $caseTypeID = substr($dao->case_type_id, 1, -1);
-      }
-      else {
-        $caseTypeID = $dao->case_type_id;
-      }
-      $caseTypeIDs = explode(CRM_Core_DAO::VALUE_SEPARATOR,
-        $dao->case_type_id
-      );
-
       $case['caseType'] = CRM_Case_BAO_Case::getCaseType($caseID);
       $case['caseTypeName'] = CRM_Case_BAO_Case::getCaseType($caseID, 'name');
-      $case['status'] = CRM_Core_OptionGroup::getLabel('case_status', $dao->status_id, FALSE);
+      $case['status'] = CRM_Core_PseudoConstant::getLabel('CRM_Case_BAO_Case', 'status_id', $dao->status_id);
     }
     return $case;
   }
@@ -285,7 +274,7 @@ WHERE      a.id = %1
 
       if ($dao->fetch()) {
         //if activity type is email get info of all activities.
-        if ($dao->activity_type_id == CRM_Core_OptionGroup::getValue('activity_type', 'Email', 'name')) {
+        if ($dao->activity_type_id == CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_type_id', 'Email')) {
           $anyActivity = TRUE;
         }
         $activityTypes = CRM_Case_PseudoConstant::caseActivityType(FALSE, $anyActivity);
@@ -477,9 +466,7 @@ WHERE      a.id = %1
     if ($activityDAO->medium_id) {
       $activity['fields'][] = array(
         'label' => ts('Medium'),
-        'value' => CRM_Core_OptionGroup::getLabel('encounter_medium',
-          $activityDAO->medium_id, FALSE
-        ),
+        'value' => CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'medium_id', $activityDAO->medium_id),
         'type' => 'String',
       );
     }
@@ -512,7 +499,7 @@ WHERE      a.id = %1
     }
     $activity['fields'][] = array(
       'label' => ts('Status'),
-      'value' => CRM_Core_OptionGroup::getLabel('activity_status',
+      'value' => CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'activity_status_id',
         $activityDAO->status_id
       ),
       'type' => 'String',
@@ -520,7 +507,7 @@ WHERE      a.id = %1
 
     $activity['fields'][] = array(
       'label' => ts('Priority'),
-      'value' => CRM_Core_OptionGroup::getLabel('priority',
+      'value' => CRM_Core_PseudoConstant::getLabel('CRM_Activity_DAO_Activity', 'priority_id',
         $activityDAO->priority_id
       ),
       'type' => 'String',
@@ -558,7 +545,7 @@ WHERE      a.id = %1
             $value = $dao->$columnName;
           }
           else {
-            $value = CRM_Core_BAO_CustomField::displayValue($dao->$columnName, $typeValue['fieldID']);
+            $value = CRM_Core_BAO_CustomField::displayValue($dao->$columnName, $typeValue['fieldID'], $activityDAO->id);
           }
 
           if ($value) {
@@ -571,10 +558,6 @@ WHERE      a.id = %1
               CRM_Utils_Array::value('type', $typeValue) == 'Memo'
             ) {
               $value = $this->redact($value);
-            }
-            elseif (CRM_Utils_Array::value('type', $typeValue) == 'File') {
-              $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $typeValue, 'entity_table');
-              $value = CRM_Core_BAO_File::attachmentInfo($tableName, $activityDAO->id);
             }
             elseif (CRM_Utils_Array::value('type', $typeValue) == 'Link') {
               $value = CRM_Utils_System::formatWikiURL($value);
@@ -598,10 +581,11 @@ WHERE      a.id = %1
   /**
    * @param int $activityTypeID
    * @param null $dateFormat
+   * @param bool $onlyActive
    *
    * @return mixed
    */
-  public function getActivityTypeCustomSQL($activityTypeID, $dateFormat = NULL) {
+  public function getActivityTypeCustomSQL($activityTypeID, $dateFormat = NULL, $onlyActive = TRUE) {
     static $cache = array();
 
     if (is_null($activityTypeID)) {
@@ -625,6 +609,9 @@ WHERE  cf.custom_group_id = cg.id
 AND    cg.extends = 'Activity'
 AND " . CRM_Core_Permission::customGroupClause(CRM_Core_Permission::VIEW, 'cg.');
 
+      if ($onlyActive) {
+        $query .= " AND cf.is_active = 1 ";
+      }
       if ($activityTypeID) {
         $query .= "AND ( cg.extends_entity_column_value IS NULL OR cg.extends_entity_column_value LIKE '%" . CRM_Core_DAO::VALUE_SEPARATOR . "%1" . CRM_Core_DAO::VALUE_SEPARATOR . "%' )";
       }
@@ -979,8 +966,8 @@ LIMIT  1
     $extends = array('case');
     $groupTree = CRM_Core_BAO_CustomGroup::getGroupDetail(NULL, NULL, $extends);
     $caseCustomFields = array();
-    while (list($gid, $group_values) = each($groupTree)) {
-      while (list($id, $field_values) = each($group_values['fields'])) {
+    foreach ($groupTree as $gid => $group_values) {
+      foreach ($group_values['fields'] as $id => $field_values) {
         if (array_key_exists($id, $customValues)) {
           $caseCustomFields[$gid]['title'] = $group_values['title'];
           $caseCustomFields[$gid]['values'][$id] = array(

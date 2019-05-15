@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,6 +28,13 @@
 {/htxt}
 {htxt id="id-contrib_source"}
 {ts}Optional identifier for the contribution source (campaign name, event, mailer, etc.).{/ts}
+{/htxt}
+
+{htxt id="id-total_amount-title"}
+  {ts}Total Amount{/ts}
+{/htxt}
+{htxt id="id-total_amount"}
+{ts 1='target="_blank" href="https://civicrm.org/extensions/line-item-editor"'}You are not allowed to change the total amount as it will lead to incorrect line item entries. You can either delete or recreate or install <a %1>Line Item Editor</a>.{/ts}
 {/htxt}
 
 {htxt id="id-financial_type-title"}
@@ -78,7 +85,7 @@
 <p>
 {ts}When contributions are made via a Personal Campaign Page a soft credit (of type 'Personal Campaign Page') is automatically created and assigned to the 'owner' of the the Personal Campaign Page.{/ts}
 </p>
-{/htxt} 
+{/htxt}
 
 {htxt id="adjust-payment-amount-title"}
   {ts}Payment Amount{/ts}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 abstract class CRM_SMS_Provider {
 
@@ -72,14 +72,18 @@ abstract class CRM_SMS_Provider {
     if (!isset(self::$_singleton[$cacheKey]) || $force) {
       $ext = CRM_Extension_System::singleton()->getMapper();
       if ($ext->isExtensionKey($providerName)) {
-        $paymentClass = $ext->keyToClass($providerName);
-        require_once "{$paymentClass}.php";
+        $providerClass = $ext->keyToClass($providerName);
+        require_once "{$providerClass}.php";
       }
       else {
-        CRM_Core_Error::fatal("Could not locate extension for {$providerName}.");
+        // If we are running unit tests we simulate an SMS provider with the name "CiviTestSMSProvider"
+        if ($providerName !== 'CiviTestSMSProvider') {
+          CRM_Core_Error::fatal("Could not locate extension for {$providerName}.");
+        }
+        $providerClass = 'CiviTestSMSProvider';
       }
 
-      self::$_singleton[$cacheKey] = $paymentClass::singleton($providerParams, $force);
+      self::$_singleton[$cacheKey] = $providerClass::singleton($providerParams, $force);
     }
     return self::$_singleton[$cacheKey];
   }
@@ -158,12 +162,11 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       return FALSE;
     }
 
-    $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type', 'SMS delivery', 'name');
     // note: lets not pass status here, assuming status will be updated by callback
     $activityParams = array(
       'source_contact_id' => $sourceContactID,
       'target_contact_id' => $headers['contact_id'],
-      'activity_type_id' => $activityTypeID,
+      'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'SMS delivery'),
       'activity_date_time' => date('YmdHis'),
       'details' => $message,
       'result' => $apiMsgID,
@@ -186,7 +189,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       FALSE, $default, $location
     );
     if ($abort && $value === NULL) {
-      CRM_Core_Error::debug_log_message("Could not find an entry for $name in $location");
+      Civi::log()->warning("Could not find an entry for $name in $location");
       echo "Failure: Missing Parameter<p>";
       exit();
     }
@@ -215,7 +218,8 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       // find sender by phone number if $fromContactID not set by hook
       $formatFrom = '%' . $this->formatPhone($this->stripPhone($message->from), $like, "like");
       $message->fromContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE %1", array(
-        1 => array($formatFrom, 'String')));
+        1 => array($formatFrom, 'String'),
+      ));
     }
 
     if (!$message->fromContactID) {
@@ -251,7 +255,8 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       // find recipient if $toContactID not set by hook
       if ($message->to) {
         $message->toContactID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_phone JOIN civicrm_contact ON civicrm_contact.id = civicrm_phone.contact_id WHERE !civicrm_contact.is_deleted AND phone LIKE %1", array(
-          1 => array('%' . $message->to, 'String')));
+          1 => array('%' . $message->to, 'String'),
+        ));
       }
       else {
         $message->toContactID = $message->fromContactID;
@@ -259,16 +264,13 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
     }
 
     if ($message->fromContactID) {
-      $actStatusIDs = array_flip(CRM_Core_OptionGroup::values('activity_status'));
-      $activityTypeID = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound SMS');
-
       // note: lets not pass status here, assuming status will be updated by callback
       $activityParams = array(
         'source_contact_id' => $message->toContactID,
         'target_contact_id' => $message->fromContactID,
-        'activity_type_id' => $activityTypeID,
+        'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound SMS'),
         'activity_date_time' => date('YmdHis'),
-        'status_id' => $actStatusIDs['Completed'],
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_status_id', 'Completed'),
         'details' => $message->body,
         'phone_number' => $message->from,
       );
@@ -277,7 +279,7 @@ INNER JOIN civicrm_mailing_job mj ON mj.mailing_id = m.id AND mj.id = %1";
       }
 
       $result = CRM_Activity_BAO_Activity::create($activityParams);
-      CRM_Core_Error::debug_log_message("Inbound SMS recorded for cid={$message->fromContactID}.");
+      Civi::log()->info("Inbound SMS recorded for cid={$message->fromContactID}.");
       return $result;
     }
   }

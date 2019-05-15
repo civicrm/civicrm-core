@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
-| CiviCRM version 4.7                                                |
+| CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2017                                |
+| Copyright CiviCRM LLC (c) 2004-2019                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -36,7 +36,8 @@ class CRM_Core_JobManagerTest extends CiviUnitTestCase {
   }
 
   public function testHookCron() {
-    $hook = $this->getMock('stdClass', array('civicrm_cron'));
+    $mockFunction = $this->mockMethod;
+    $hook = $this->$mockFunction('stdClass', array('civicrm_cron'));
     $hook->expects($this->once())
       ->method('civicrm_cron')
       ->with($this->isInstanceOf('CRM_Core_JobManager'));

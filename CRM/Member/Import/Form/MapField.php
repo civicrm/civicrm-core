@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -44,8 +44,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @var int
    */
-  static $_contactType = NULL;
-
+  public static $_contactType = NULL;
 
   /**
    * Set variables up before form is built.
@@ -383,9 +382,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
         $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
       }
       else {
-        $mappingTypeId = CRM_Core_OptionGroup::getValue('mapping_type', 'Import Membership', 'name');
-
-        if (CRM_Core_BAO_Mapping::checkMapping($nameField, $mappingTypeId)) {
+        if (CRM_Core_BAO_Mapping::checkMapping($nameField, CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Membership'))) {
           $errors['saveMappingName'] = ts('Duplicate Import Membership Mapping Name');
         }
       }
@@ -487,10 +484,7 @@ class CRM_Member_Import_Form_MapField extends CRM_Import_Form_MapField {
       $mappingParams = array(
         'name' => $params['saveMappingName'],
         'description' => $params['saveMappingDesc'],
-        'mapping_type_id' => CRM_Core_OptionGroup::getValue('mapping_type',
-          'Import Membership',
-          'name'
-        ),
+        'mapping_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', 'Import Membership'),
       );
       $saveMapping = CRM_Core_BAO_Mapping::add($mappingParams);
 

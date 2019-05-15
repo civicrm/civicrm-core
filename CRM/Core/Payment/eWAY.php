@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,7 +26,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | eWAY Core Payment Module for CiviCRM version 4.7 & 1.9             |
+ | eWAY Core Payment Module for CiviCRM version 5 & 1.9               |
  +--------------------------------------------------------------------+
  | Licensed to CiviCRM under the Academic Free License version 3.0    |
  |                                                                    |
@@ -410,6 +410,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
 
     return $params;
   }
+
   // end function doDirectPayment
 
   /**
@@ -465,7 +466,7 @@ class CRM_Core_Payment_eWAY extends CRM_Core_Payment {
    * *****************************************************************************************
    */
   public function checkConfig() {
-    $errorMsg = array();
+    $errorMsg = [];
 
     if (empty($this->_paymentProcessor['user_name'])) {
       $errorMsg[] = ts('eWAY CustomerID is not set for this payment processor');

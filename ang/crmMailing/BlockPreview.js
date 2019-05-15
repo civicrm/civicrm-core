@@ -21,6 +21,7 @@
           });
         };
         scope.doSend = function doSend(recipient) {
+          recipient = JSON.parse(JSON.stringify(recipient).replace(/\,\s/g, ','));
           scope.$eval(attr.onSend, {
             preview: {recipient: recipient}
           });
@@ -29,16 +30,15 @@
         scope.previewTestGroup = function(e) {
           var $dialog = $(this);
           $dialog.html('<div class="crm-loading-element"></div>').parent().find('button[data-op=yes]').prop('disabled', true);
-          $dialog.dialog('option', 'title', ts('Send to %1', {1: _.pluck(_.where(scope.crmMailingConst.testGroupNames, {id: scope.testGroup.gid}), 'title')[0]}));
-          CRM.api3('contact', 'get', {
-            group: scope.testGroup.gid,
-            options: {limit: 0},
-            return: 'display_name,email'
+          CRM.api3({
+            contact: ['contact', 'get', {group: scope.testGroup.gid, options: {limit: 0}, return: 'display_name,email'}],
+            group: ['group', 'getsingle', {id: scope.testGroup.gid, return: 'title'}]
           }).done(function(data) {
+            $dialog.dialog('option', 'title', ts('Send to %1', {1: data.group.title}));
             var count = 0,
             // Fixme: should this be in a template?
-              markup = '<ol>';
-            _.each(data.values, function(row) {
+            markup = '<ol>';
+            _.each(data.contact.values, function(row) {
               // Fixme: contact api doesn't seem capable of filtering out contacts with no email, so we're doing it client-side
               if (row.email) {
                 count++;
@@ -49,7 +49,7 @@
             markup = '<h4>' + ts('A test message will be sent to %1 people:', {1: count}) + '</h4>' + markup;
             if (!count) {
               markup = '<div class="messages status"><i class="crm-i fa-exclamation-triangle"></i> ' +
-              (data.count ? ts('None of the contacts in this group have an email address.') : ts('Group is empty.')) +
+              (data.contact.count ? ts('None of the contacts in this group have an email address.') : ts('Group is empty.')) +
               '</div>';
             }
             $dialog

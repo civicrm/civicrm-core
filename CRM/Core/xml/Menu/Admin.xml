@@ -262,7 +262,7 @@
      <page_callback>CRM_Admin_Page_MessageTemplates</page_callback>
      <adminGroup>Communications</adminGroup>
      <icon>admin/small/template.png</icon>
-     <access_arguments>edit message templates</access_arguments>
+     <access_arguments>edit message templates;edit user-driven message templates;edit system workflow message templates</access_arguments>
      <weight>30</weight>
   </item>
   <item>
@@ -270,7 +270,7 @@
      <title>Message Templates</title>
      <desc>Add/Edit Message Templates</desc>
      <page_callback>CRM_Admin_Form_MessageTemplates</page_callback>
-     <access_arguments>edit message templates</access_arguments>
+     <access_arguments>edit message templates;edit user-driven message templates;edit system workflow message templates</access_arguments>
      <weight>262</weight>
   </item>
   <item>
@@ -563,7 +563,7 @@
   <item>
      <path>civicrm/admin/setting/preferences/event</path>
      <title>CiviEvent Component Settings</title>
-     <page_callback>CRM_Admin_Form_Preferences_Event</page_callback>
+     <page_callback>CRM_Admin_Form_Generic</page_callback>
   </item>
   <item>
      <path>civicrm/admin/setting/preferences/mailing</path>
@@ -633,9 +633,9 @@
      <weight>9000</weight>
   </item>
   <item>
-     <path>civicrm/ajax/menujs</path>
-     <page_callback>CRM_Admin_Page_AJAX::getNavigationMenu</page_callback>
-     <access_arguments>access CiviCRM</access_arguments>
+    <path>civicrm/ajax/navmenu</path>
+    <page_callback>CRM_Admin_Page_AJAX::navMenu</page_callback>
+    <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
      <path>civicrm/ajax/menutree</path>
@@ -711,7 +711,7 @@
      <path>civicrm/sms/send</path>
      <title>New Mass SMS</title>
      <page_callback>CRM_SMS_Controller_Send</page_callback>
-     <access_arguments>administer CiviCRM</access_arguments>
+     <access_arguments>send SMS</access_arguments>
      <page_type>1</page_type>
      <weight>610</weight>
   </item>

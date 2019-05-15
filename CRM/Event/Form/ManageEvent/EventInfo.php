@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -37,6 +37,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
   /**
    * Event type.
+   * @var int
    */
   protected $_eventType = NULL;
 
@@ -45,6 +46,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
    */
   public function preProcess() {
     parent::preProcess();
+    $this->assign('selectedChild', 'settings');
 
     if ($this->_id) {
       $this->assign('entityID', $this->_id);
@@ -112,11 +114,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $defaults['event_full_text'] = CRM_Utils_Array::value('event_full_text', $defaults, ts('This event is currently full.'));
 
     $defaults['waitlist_text'] = CRM_Utils_Array::value('waitlist_text', $defaults, ts('This event is currently full. However you can register now and get added to a waiting list. You will be notified if spaces become available.'));
-    list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults(CRM_Utils_Array::value('start_date', $defaults), 'activityDateTime');
-
-    if (!empty($defaults['end_date'])) {
-      list($defaults['end_date'], $defaults['end_date_time']) = CRM_Utils_Date::setDateDefaults($defaults['end_date'], 'activityDateTime');
-    }
+    $defaults['template_id'] = $this->_templateId;
     return $defaults;
   }
 
@@ -142,11 +140,11 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     if ($this->_action & CRM_Core_Action::ADD) {
       $eventTemplates = CRM_Event_PseudoConstant::eventTemplates();
       if (CRM_Utils_System::isNull($eventTemplates) && !$this->_isTemplate) {
-        $url = CRM_Utils_System::url('civicrm/admin/eventTemplate', array('reset' => 1));
-        CRM_Core_Session::setStatus(ts('If you find that you are creating multiple events with similar settings, you may want to use the <a href="%1">Event Templates</a> feature to streamline your workflow.', array(1 => $url)), ts('Tip'), 'info');
+        $url = CRM_Utils_System::url('civicrm/admin/eventTemplate', ['reset' => 1]);
+        CRM_Core_Session::setStatus(ts('If you find that you are creating multiple events with similar settings, you may want to use the <a href="%1">Event Templates</a> feature to streamline your workflow.', [1 => $url]), ts('Tip'), 'info');
       }
       if (!CRM_Utils_System::isNull($eventTemplates)) {
-        $this->add('select', 'template_id', ts('From Template'), array('' => ts('- select -')) + $eventTemplates, FALSE, array('class' => 'crm-select2 huge'));
+        $this->add('select', 'template_id', ts('From Template'), ['' => ts('- select -')] + $eventTemplates, FALSE, ['class' => 'crm-select2 huge']);
       }
       // Make sure this form redirects properly
       $this->preventAjaxSubmit();
@@ -156,7 +154,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $this->add('text', 'title', ts('Event Title'), $attributes['event_title'], !$this->_isTemplate);
 
     $this->addSelect('event_type_id',
-      array('onChange' => "CRM.buildCustomData( 'Event', this.value );"),
+      ['onChange' => "CRM.buildCustomData( 'Event', this.value );"],
       TRUE
     );
 
@@ -167,28 +165,28 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     }
     CRM_Campaign_BAO_Campaign::addCampaign($this, $campaignId);
 
-    $this->addSelect('default_role_id', array(), TRUE);
+    $this->addSelect('default_role_id', [], TRUE);
 
-    $this->addSelect('participant_listing_id', array('placeholder' => ts('Disabled'), 'option_url' => NULL));
+    $this->addSelect('participant_listing_id', ['placeholder' => ts('Disabled'), 'option_url' => NULL]);
 
     $this->add('textarea', 'summary', ts('Event Summary'), $attributes['summary']);
-    $this->add('wysiwyg', 'description', ts('Complete Description'), $attributes['event_description'] + array('preset' => 'civievent'));
+    $this->add('wysiwyg', 'description', ts('Complete Description'), $attributes['event_description'] + ['preset' => 'civievent']);
     $this->addElement('checkbox', 'is_public', ts('Public Event'));
     $this->addElement('checkbox', 'is_share', ts('Allow sharing through social media?'));
     $this->addElement('checkbox', 'is_map', ts('Include Map to Event Location'));
 
-    $this->addDateTime('start_date', ts('Start Date'), FALSE, array('formatType' => 'activityDateTime'));
-    $this->addDateTime('end_date', ts('End Date / Time'), FALSE, array('formatType' => 'activityDateTime'));
+    $this->add('datepicker', 'start_date', ts('Start'), [], !$this->_isTemplate, ['time' => TRUE]);
+    $this->add('datepicker', 'end_date', ts('End'), [], FALSE, ['time' => TRUE]);
 
-    $this->add('text', 'max_participants', ts('Max Number of Participants'),
-      array('onchange' => "if (this.value != '') {cj('#id-waitlist').show(); showHideByValue('has_waitlist','0','id-waitlist-text','table-row','radio',false); showHideByValue('has_waitlist','0','id-event_full','table-row','radio',true); return;} else {cj('#id-event_full, #id-waitlist, #id-waitlist-text').hide(); return;}")
+    $this->add('number', 'max_participants', ts('Max Number of Participants'),
+      ['onchange' => "if (this.value != '') {cj('#id-waitlist').show(); showHideByValue('has_waitlist','0','id-waitlist-text','table-row','radio',false); showHideByValue('has_waitlist','0','id-event_full','table-row','radio',true); return;} else {cj('#id-event_full, #id-waitlist, #id-waitlist-text').hide(); return;}"]
     );
     $this->addRule('max_participants', ts('Max participants should be a positive number'), 'positiveInteger');
 
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     $waitlist = 0;
     if (in_array('On waitlist', $participantStatuses) and in_array('Pending from waitlist', $participantStatuses)) {
-      $this->addElement('checkbox', 'has_waitlist', ts('Offer a Waitlist?'), NULL, array('onclick' => "showHideByValue('has_waitlist','0','id-event_full','table-row','radio',true); showHideByValue('has_waitlist','0','id-waitlist-text','table-row','radio',false);"));
+      $this->addElement('checkbox', 'has_waitlist', ts('Offer a Waitlist?'), NULL, ['onclick' => "showHideByValue('has_waitlist','0','id-event_full','table-row','radio',true); showHideByValue('has_waitlist','0','id-waitlist-text','table-row','radio',false);"]);
       $this->add('textarea', 'waitlist_text', ts('Waitlist Message'), $attributes['waitlist_text']);
       $waitlist = 1;
     }
@@ -198,7 +196,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
 
     $this->addElement('checkbox', 'is_active', ts('Is this Event Active?'));
 
-    $this->addFormRule(array('CRM_Event_Form_ManageEvent_EventInfo', 'formRule'));
+    $this->addFormRule(['CRM_Event_Form_ManageEvent_EventInfo', 'formRule']);
 
     parent::buildQuickForm();
   }
@@ -212,19 +210,10 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
    *   list of errors to be posted back to the form
    */
   public static function formRule($values) {
-    $errors = array();
+    $errors = [];
 
-    if (!$values['is_template']) {
-      if (CRM_Utils_System::isNull($values['start_date'])) {
-        $errors['start_date'] = ts('Start Date and Time are required fields');
-      }
-      else {
-        $start = CRM_Utils_Date::processDate($values['start_date']);
-        $end = CRM_Utils_Date::processDate($values['end_date']);
-        if (($end < $start) && ($end != 0)) {
-          $errors['end_date'] = ts('End date should be after Start date.');
-        }
-      }
+    if (!empty($values['end_date']) && ($values['end_date'] < $values['start_date'])) {
+      $errors['end_date'] = ts('End date should be after Start date.');
     }
 
     //CRM-4286
@@ -242,11 +231,8 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $params = $this->controller->exportValues($this->_name);
 
     //format params
-    $params['start_date'] = CRM_Utils_Date::processDate($params['start_date'], $params['start_date_time']);
-    $params['end_date'] = CRM_Utils_Date::processDate(CRM_Utils_Array::value('end_date', $params),
-      CRM_Utils_Array::value('end_date_time', $params),
-      TRUE
-    );
+    $params['start_date'] = CRM_Utils_Array::value('start_date', $params);
+    $params['end_date'] = CRM_Utils_Array::value('end_date', $params);
     $params['has_waitlist'] = CRM_Utils_Array::value('has_waitlist', $params, FALSE);
     $params['is_map'] = CRM_Utils_Array::value('is_map', $params, FALSE);
     $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
@@ -268,11 +254,12 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
       $params = array_merge(CRM_Event_BAO_Event::getTemplateDefaultValues($params['template_id']), $params);
     }
 
-    $event = CRM_Event_BAO_Event::create($params);
-
     // now that we have the event’s id, do some more template-based stuff
     if (!empty($params['template_id'])) {
-      CRM_Event_BAO_Event::copy($params['template_id'], $event, TRUE);
+      $event = CRM_Event_BAO_Event::copy($params['template_id'], $params);
+    }
+    else {
+      $event = CRM_Event_BAO_Event::create($params);
     }
 
     $this->set('id', $event->id);
@@ -287,7 +274,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
         $url = 'civicrm/event/manage';
         $urlParams = 'reset=1';
         CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
-          array(1 => $this->getTitle())
+          [1 => $this->getTitle()]
         ), ts('Saved'), 'success');
       }
 

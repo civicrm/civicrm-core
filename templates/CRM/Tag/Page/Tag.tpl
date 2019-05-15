@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -53,6 +53,8 @@
       <div class="help">
         {ts}Organize the tag hierarchy by clicking and dragging. Shift-click to select multiple tags to merge/move/delete.{/ts}
       </div>
+      <input class="crm-form-text big" name="filter_tag_tree" placeholder="{ts}Filter List{/ts}" allowclear="1"/>
+      <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a>
     </div>
     {foreach from=$tagsets item=set}
       <div id="tagset-{$set.id}">
@@ -76,7 +78,7 @@
         noneSelectedTpl = _.template($('#noneSelectedTpl').html()),
         oneSelectedTpl = _.template($('#oneSelectedTpl').html()),
         moreSelectedTpl = _.template($('#moreSelectedTpl').html()),
-        tagsetHelpTpl = _.template($('#tagsetHelpTpl').html());
+        tagsetHeaderTpl = _.template($('#tagsetHeaderTpl').html());
 
       function formatTagSet(info) {
         info.date = CRM.utils.formatDate(info.created_date);
@@ -182,19 +184,20 @@
           tagSets[tagset].used_for = info.used_for;
           tagSets[tagset].is_reserved = info.is_reserved;
           formatTagSet(tagSets[tagset]);
-          $('.help', $panel).remove();
-          addHelp();
+          addTagsetHeader();
+          $(".tag-tree", $panel).jstree("search", '');
         }
 
-        function addHelp() {
-          $panel.prepend(tagsetHelpTpl(tagSets[tagset]));
+        function addTagsetHeader() {
+          $('.tagset-header', $panel).remove();
+          $panel.prepend(tagsetHeaderTpl(tagSets[tagset]));
           $("a[href='#tagset-" + tagset + "']").text(tagSets[tagset].name)
             .parent().toggleClass('is-reserved', tagSets[tagset].is_reserved == 1)
             .attr('title', ts('{/literal}{ts escape='js' 1='%1'}Tag Set for %1{/ts}{literal}', {'1': tagSets[tagset].used_for_label.join(', ')}));
         }
 
         if (tagset) {
-          addHelp();
+          addTagsetHeader();
         }
 
         function moveTagDialog(e) {
@@ -231,6 +234,16 @@
             });
         }
 
+        function isDraggable(nodes, event) {
+          var draggable = true;
+          _.each(nodes, function(node) {
+            if (node.data.is_reserved && !CRM.checkPerm('administer reserved tags')) {
+              draggable = false;
+            }
+          });
+          return draggable;
+        }
+
         $panel
           .append('<div class="tag-tree-wrapper"><div class="tag-tree"></div><div class="tag-info"></div></div>')
           .on('change', 'input[type=color]', changeColor)
@@ -239,6 +252,9 @@
           .on('click', '.move-tag-button', moveTagDialog)
           .on('click', '.used-for-toggle', function() {
             $(this).attr('style', 'display: none !important;').next().show();
+          })
+          .on('click', 'a.crm-clear-link', function() {
+            $('.tag-tree', $panel).jstree(true).refresh();
           })
           .on('crmPopupFormSuccess crmFormSuccess', function(e, cts, data) {
             if ($(e.target).hasClass('tagset-action-delete')) {
@@ -250,7 +266,7 @@
             }
           });
 
-        plugins = ['wholerow', 'changed'];
+        plugins = ['wholerow', 'changed', 'search'];
         if (!tagset) {
           // Allow drag-n-drop nesting of the tag tree
           plugins.push('dnd');
@@ -259,6 +275,9 @@
         $('.tag-tree', $panel)
           .on('changed.jstree loaded.jstree', changeSelection)
           .on('move_node.jstree', moveTag)
+          .on('search.jstree', function() {
+            $(this).unblock();
+          })
           .jstree({
             core: {
               data: {
@@ -267,13 +286,48 @@
                   return {parent_id: node.id === '#' ? tagset : node.id};
                 }
               },
+              themes: {icons: false},
               check_callback: true
+            },
+            'search': {
+              'ajax' : {
+                url : CRM.url('civicrm/ajax/tagTree')
+              },
+              'show_only_matches': true
             },
             plugins: plugins,
             dnd: {
+              is_draggable: isDraggable,
               copy: false
             }
           });
+
+        $('input[name=filter_tag_tree]', $panel).on('keyup change', function(e) {
+          var element = $(this);
+          var searchString = element.val();
+          if (e.type == 'change') {
+            if (window.searchedString === searchString) {
+              if (searchString === '') {
+                $('.tag-tree', $panel).jstree("clear_search");
+                $('.tag-tree', $panel).jstree("refresh", true, true);
+              }
+              else {
+                $('.tag-tree', $panel).block();
+                $(".tag-tree", $panel).jstree("search", searchString);
+                delete window.searchedString;
+              }
+            }
+          }
+          else {
+            if (this.timer) clearTimeout(this.timer);
+            this.timer = setTimeout(function() {
+              if (_.isEmpty(window.searchedString) || window.searchedString !== searchString) {
+                window.searchedString = searchString;
+                element.trigger('change');
+              }
+            }, 1000);
+          }
+        });
       }
 
       function newTagset() {
@@ -372,6 +426,14 @@
   li.is-reserved > a:after {
     content: ' *';
   }
+  {/literal}{if !call_user_func(array('CRM_Core_Permission', 'check'), 'administer reserved tags')}{literal}
+    #tree li.is-reserved > a.crm-tag-item {
+      cursor: not-allowed;
+    }
+    li.is-reserved > a:after {
+      color: #8A1F11;
+    }
+  {/literal}{/if}{literal}
   .tag-tree-wrapper ul {
     margin: 0;
     padding: 0;
@@ -476,7 +538,7 @@
         <span><i class="crm-i fa-plus"></i>&nbsp; {ts}Add Child{/ts}</span>
       </a>
     <% {rdelim} %>
-    <a href="{crmURL p="civicrm/tag/edit" q="action=add&clone_from="}<%= id %>" class="button crm-popup" title="{ts}Duplicate ths tag{/ts}">
+    <a href="{crmURL p="civicrm/tag/edit" q="action=add&clone_from="}<%= id %>" class="button crm-popup" title="{ts}Duplicate this tag{/ts}">
       <span><i class="crm-i fa-copy"></i>&nbsp; {ts}Clone Tag{/ts}</span>
     </a>
     <% if(!data.is_reserved || adminReserved) {ldelim} %>
@@ -521,11 +583,15 @@
   </div>
 </script>
 
-<script type="text/template" id="tagsetHelpTpl">
-  <div class="help">
-    <% if(is_reserved == 1) {ldelim} %><strong>{ts}Reserved{/ts}</strong><% {rdelim} %>
-    <% if(undefined === display_name) {ldelim} var display_name = null; {rdelim} %>
-    {ts 1="<%= used_for_label.join(', ') %>" 2="<%= date %>" 3="<%= display_name %>"}Tag Set for %1 (created %2 by %3).{/ts}
-    <% if(typeof description === 'string' && description.length) {ldelim} %><p><em><%- description %></em></p><% {rdelim} %>
+<script type="text/template" id="tagsetHeaderTpl">
+  <div class="tagset-header">
+    <div class="help">
+      <% if(is_reserved == 1) {ldelim} %><strong>{ts}Reserved{/ts}</strong><% {rdelim} %>
+      <% if(undefined === display_name) {ldelim} var display_name = null; {rdelim} %>
+      {ts 1="<%= used_for_label.join(', ') %>" 2="<%= date %>" 3="<%= display_name %>"}Tag Set for %1 (created %2 by %3).{/ts}
+      <% if(typeof description === 'string' && description.length) {ldelim} %><p><em><%- description %></em></p><% {rdelim} %>
+    </div>
+    <input class="crm-form-text big" name="filter_tag_tree" placeholder="{ts}Filter List{/ts}" allowclear="1"/>
+    <a class="crm-hover-button crm-clear-link" style="visibility:hidden;" title="{ts}Clear{/ts}"><i class="crm-i fa-times"></i></a>
   </div>
 </script>

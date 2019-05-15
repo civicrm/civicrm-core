@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -60,6 +60,10 @@
     border-bottom: 0 none;
     padding: 3px 10px 1px !important;
   }
+  .crm-config-option-row span.crm-error:after {
+    font-family: FontAwesome;
+    content: " \f071 Invalid JSON"
+  }
 {/literal}</style>
 {* Force the custom config file to reload by appending a new query string *}
 <script type="text/javascript">
@@ -105,7 +109,7 @@
     <div class="crm-block crm-form-block">
       <fieldset>
         <legend>{ts}Advanced Options{/ts}</legend>
-        <div class="description">{ts 1='href="http://docs.ckeditor.com/#!/api/CKEDITOR.config" target="_blank"'}Refer to the <a %1>CKEditor Api Documentation</a> for details.{/ts}</div>
+        <div class="description">{ts 1='href="https://docs.ckeditor.com/ckeditor4/latest/api/CKEDITOR_config.html" target="_blank"'}Refer to the <a %1>CKEditor Api Documentation</a> for details.{/ts}</div>
         <div id="crm-custom-config-options"></div>
       </fieldset>
     </div>

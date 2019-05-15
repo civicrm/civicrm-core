@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
 
@@ -37,7 +37,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
    *
    * @var array
    */
-  static $_exportableFields = NULL;
+  public static $_exportableFields = NULL;
 
   /**
    * Class constructor.
@@ -798,10 +798,10 @@ GROUP BY  currency
 
     // get pending and in progress status
     foreach (array(
-               'Pending',
-               'In Progress',
-               'Overdue',
-             ) as $name) {
+      'Pending',
+      'In Progress',
+      'Overdue',
+    ) as $name) {
       if ($statusId = array_search($name, $pledgeStatuses)) {
         $status[] = $statusId;
       }
@@ -1174,7 +1174,6 @@ SELECT  pledge.contact_id              as contact_id,
     return array_flip(array_intersect($paymentStatus, array('Overdue', 'Pending')));
   }
 
-
   /**
    * Create array for recur record for pledge.
    * @return array
@@ -1200,32 +1199,33 @@ SELECT  pledge.contact_id              as contact_id,
    */
   public static function getPledgeStartDate($date, $pledgeBlock) {
     $startDate = (array) json_decode($pledgeBlock['pledge_start_date']);
-    list($field, $value) = each($startDate);
-    if (!empty($date) && !CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
-      return $date;
-    }
-    if (empty($date)) {
-      $date = $value;
-    }
-    switch ($field) {
-      case 'contribution_date':
-        if (empty($date)) {
-          $date = date('Ymd');
-        }
-        break;
+    foreach ($startDate as $field => $value) {
+      if (!empty($date) && !CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
+        return $date;
+      }
+      if (empty($date)) {
+        $date = $value;
+      }
+      switch ($field) {
+        case 'contribution_date':
+          if (empty($date)) {
+            $date = date('Ymd');
+          }
+          break;
 
-      case 'calendar_date':
-        $date = date('Ymd', strtotime($date));
-        break;
+        case 'calendar_date':
+          $date = date('Ymd', strtotime($date));
+          break;
 
-      case 'calendar_month':
-        $date = self::getPaymentDate($date);
-        $date = date('Ymd', strtotime($date));
-        break;
+        case 'calendar_month':
+          $date = self::getPaymentDate($date);
+          $date = date('Ymd', strtotime($date));
+          break;
 
-      default:
-        break;
+        default:
+          break;
 
+      }
     }
     return $date;
   }

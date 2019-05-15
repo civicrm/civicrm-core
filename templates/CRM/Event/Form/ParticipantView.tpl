@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -116,6 +116,9 @@
                 {if call_user_func(array('CRM_Core_Permission','check'), 'edit event participants')}
                     {if $hasPayment or $parentHasPayment}
                         <a class="action-item crm-hover-button" href='{crmURL p="civicrm/event/participant/feeselection" q="reset=1&id=`$participantId`&cid=`$contactId`&action=update"}'><i class="crm-i fa-pencil"></i> {ts}Change Selections{/ts}</a>
+                    {/if}
+                    {if $transferOrCancelLink}
+                      <a class="action-item crm-hover-button" href={$transferOrCancelLink}><i class="crm-i fa-times"></i> {ts}Transfer or Cancel{/ts}</a>
                     {/if}
                 {/if}
                 </td>

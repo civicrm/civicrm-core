@@ -56,8 +56,8 @@ class Coder {
   }
 
   protected function cleanup($html) {
-    $html = preg_replace_callback("/([\\-a-zA-Z0-9]+)=(')([^']*)(')/", array($this, 'cleanupAttribute'), $html);
-    $html = preg_replace_callback('/([\-a-zA-Z0-9]+)=(")([^"]*)(")/', array($this, 'cleanupAttribute'), $html);
+    $html = preg_replace_callback("/([\\-a-zA-Z0-9]+)=(')([^']*)(')/", [$this, 'cleanupAttribute'], $html);
+    $html = preg_replace_callback('/([\-a-zA-Z0-9]+)=(")([^"]*)(")/', [$this, 'cleanupAttribute'], $html);
     return $html;
   }
 

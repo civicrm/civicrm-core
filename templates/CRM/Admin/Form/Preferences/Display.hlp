@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                               |
+ | CiviCRM version 5                                                 |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,5 +42,5 @@
 {/htxt}
 {htxt id="id-invoices_id"}
   {capture assign=invoiceURL}{crmURL p='civicrm/admin/setting/preferences/contribute' q="reset=1"}{/capture} 
-  {ts 1=$invoiceURL}In order to enable logged in users to download invoices and credit notes from the dashboard. Please first enable CiviCRM invoicing functionality <a href='%1'>Administer > CiviContribute > CiviContribute Component Settings</a>{/ts}
+  {ts 1=$invoiceURL}In order to enable logged in users to download invoices and credit notes from the dashboard, please first enable CiviCRM invoicing functionality <a href='%1'>Administer > CiviContribute > CiviContribute Component Settings</a>{/ts}
 {/htxt}

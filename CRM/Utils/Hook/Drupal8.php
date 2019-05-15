@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,8 +28,17 @@
 /**
  *
  * @package CiviCRM_Hook
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_Hook_Drupal8 extends CRM_Utils_Hook_DrupalBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getDrupalModules() {
+    if (class_exists('\Drupal') && \Drupal::hasContainer()) {
+      return array_keys(\Drupal::moduleHandler()->getModuleList());
+    }
+  }
 
 }

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -55,10 +55,10 @@
 {/htxt}
 
 {capture assign=importMultipleURL}{crmURL p="civicrm/import/custom" q="reset=1"}{/capture}
-{htxt id=id-is_multiple-title"}
+{htxt id="id-is_multiple-title"}
   {ts}Allow Multiple Records{/ts}
 {/htxt}
-{htxt id=id-is_multiple"}
+{htxt id="id-is_multiple"}
     <p>{ts}Checking this box allows you to enter multiple sets of values for a given contact.{/ts}</p>
     <p>{ts}<strong>EXAMPLE:</strong> When creating a set of custom fields used to collect <strong>Employment History</strong> - you might have fields for Job Title, Start Date, End Date, and Reason for Leaving. Checking the "multiple records" box allows you to collect information for multiple jobs.{/ts}</p>
     <p>{ts}You can also set the maximum number of records which can be recorded per contact. Using the previous example, you might only want data for the three most recent jobs.{/ts}</p>
@@ -72,10 +72,10 @@
     </p>
 {/htxt}
 
-{htxt id=id-max_multiple-title"}
+{htxt id="id-max_multiple-title"}
 {ts}Maximum Records{/ts}
 {/htxt}
-{htxt id=id-max_multiple"}
+{htxt id="id-max_multiple"}
  {ts}If you want to set a specific limit on the maximum number of records, enter that number. Otherwise leave this field blank.{/ts}
 {/htxt}
 
@@ -100,12 +100,19 @@
     {ts}Check this box if you want only the title for this fieldset to be displayed when the page is initially loaded (fields are hidden) on advanced search.{/ts}
 {/htxt}
 
+{htxt id="id-is-public-title"}
+  {ts}Is this Custom Group Public{/ts}
+{/htxt}
+{htxt id="id-is-public"}
+  {ts}Check this box if you want this custom group to be displayed on public forms e.g. Event Information page. Only public custom groups will be included in event receipts.{/ts}  {docURL page="user/organising-your-data/creating-custom-fields/#is-this-custom-field-set-public"}
+{/htxt}
+
 {htxt id="id-help_pre-title"}
   {ts}Pre Help{/ts}
 {/htxt}
 {htxt id="id-help_pre"}
    {ts}Explanatory text displayed at the beginning of this sets of fields.{/ts}
- {/htxt}
+{/htxt}
 
 {htxt id="id-help_post-title"}
   {ts}Post Help{/ts}

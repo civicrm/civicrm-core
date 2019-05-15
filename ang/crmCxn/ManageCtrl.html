@@ -84,6 +84,7 @@
 <div ng-show="hasAvailApps()">
   <span crm-ui-order="{var: 'availOrder', defaults: ['title']}"></span>
 
+<div class="crm-content-block crm-block crm-connection-block">
   <h3>{{ts('New Connections')}}</h3>
   <table class="display">
     <thead>
@@ -109,6 +110,8 @@
     </tr>
     </tbody>
   </table>
+</div>
+
 </div>
 
 <div ng-show="appMetas.length === 0" class="messages status no-popup">

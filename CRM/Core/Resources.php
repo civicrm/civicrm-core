@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.7                                                |
+  | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2017                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -24,6 +24,7 @@
   | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
   +--------------------------------------------------------------------+
  */
+use Civi\Core\Event\GenericHookEvent;
 
 /**
  * This class facilitates the loading of resources
@@ -37,7 +38,7 @@
  * should incorporte services for aggregation, minimization, etc.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -65,23 +66,23 @@ class CRM_Core_Resources {
   /**
    * @var array free-form data tree
    */
-  protected $settings = array();
+  protected $settings = [];
   protected $addedSettings = FALSE;
 
   /**
    * @var array of callables
    */
-  protected $settingsFactories = array();
+  protected $settingsFactories = [];
 
   /**
    * @var array ($regionName => bool)
    */
-  protected $addedCoreResources = array();
+  protected $addedCoreResources = [];
 
   /**
    * @var array ($regionName => bool)
    */
-  protected $addedCoreStyles = array();
+  protected $addedCoreStyles = [];
 
   /**
    * @var string a value to append to JS/CSS URLs to coerce cache resets
@@ -110,18 +111,12 @@ class CRM_Core_Resources {
    *   New copy of the manager.
    * @return CRM_Core_Resources
    */
-  static public function singleton(CRM_Core_Resources $instance = NULL) {
+  public static function singleton(CRM_Core_Resources $instance = NULL) {
     if ($instance !== NULL) {
       self::$_singleton = $instance;
     }
     if (self::$_singleton === NULL) {
-      $sys = CRM_Extension_System::singleton();
-      $cache = Civi::cache('js_strings');
-      self::$_singleton = new CRM_Core_Resources(
-        $sys->getMapper(),
-        $cache,
-        CRM_Core_Config::isUpgradeMode() ? NULL : 'resCacheCode'
-      );
+      self::$_singleton = Civi::service('resources');
     }
     return self::$_singleton;
   }
@@ -163,13 +158,13 @@ class CRM_Core_Resources {
    */
   public function addPermissions($permNames) {
     $permNames = (array) $permNames;
-    $perms = array();
+    $perms = [];
     foreach ($permNames as $permName) {
       $perms[$permName] = CRM_Core_Permission::check($permName);
     }
-    return $this->addSetting(array(
+    return $this->addSetting([
       'permissions' => $perms,
-    ));
+    ]);
   }
 
   /**
@@ -211,13 +206,13 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addScriptUrl($url, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
-    CRM_Core_Region::instance($region)->add(array(
-        'name' => $url,
-        'type' => 'scriptUrl',
-        'scriptUrl' => $url,
-        'weight' => $weight,
-        'region' => $region,
-      ));
+    CRM_Core_Region::instance($region)->add([
+      'name' => $url,
+      'type' => 'scriptUrl',
+      'scriptUrl' => $url,
+      'weight' => $weight,
+      'region' => $region,
+    ]);
     return $this;
   }
 
@@ -233,13 +228,13 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addScript($code, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
-    CRM_Core_Region::instance($region)->add(array(
+    CRM_Core_Region::instance($region)->add([
         // 'name' => automatic
-        'type' => 'script',
-        'script' => $code,
-        'weight' => $weight,
-        'region' => $region,
-      ));
+      'type' => 'script',
+      'script' => $code,
+      'weight' => $weight,
+      'region' => $region,
+    ]);
     return $this;
   }
 
@@ -260,9 +255,9 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addVars($nameSpace, $vars) {
-    $existing = CRM_Utils_Array::value($nameSpace, CRM_Utils_Array::value('vars', $this->settings), array());
+    $existing = CRM_Utils_Array::value($nameSpace, CRM_Utils_Array::value('vars', $this->settings), []);
     $vars = $this->mergeSettings($existing, $vars);
-    $this->addSetting(array('vars' => array($nameSpace => $vars)));
+    $this->addSetting(['vars' => [$nameSpace => $vars]]);
     return $this;
   }
 
@@ -279,12 +274,12 @@ class CRM_Core_Resources {
     if (!$this->addedSettings) {
       $region = self::isAjaxMode() ? 'ajax-snippet' : 'html-header';
       $resources = $this;
-      CRM_Core_Region::instance($region)->add(array(
+      CRM_Core_Region::instance($region)->add([
         'callback' => function (&$snippet, &$html) use ($resources) {
           $html .= "\n" . $resources->renderSetting();
         },
         'weight' => -100000,
-      ));
+      ]);
       $this->addedSettings = TRUE;
     }
     return $this;
@@ -298,7 +293,7 @@ class CRM_Core_Resources {
    */
   public function addSettingsFactory($callable) {
     // Make sure our callback has been registered
-    $this->addSetting(array());
+    $this->addSetting([]);
     $this->settingsFactories[] = $callable;
     return $this;
   }
@@ -381,18 +376,18 @@ class CRM_Core_Resources {
    */
   public function addString($text, $domain = 'civicrm') {
     foreach ((array) $text as $str) {
-      $translated = ts($str, array(
-        'domain' => ($domain == 'civicrm') ? NULL : array($domain, NULL),
+      $translated = ts($str, [
+        'domain' => ($domain == 'civicrm') ? NULL : [$domain, NULL],
         'raw' => TRUE,
-      ));
+      ]);
 
       // We only need to push this string to client if the translation
       // is actually different from the original
       if ($translated != $str) {
         $bucket = $domain == 'civicrm' ? 'strings' : 'strings::' . $domain;
-        $this->addSetting(array(
-          $bucket => array($str => $translated),
-        ));
+        $this->addSetting([
+          $bucket => [$str => $translated],
+        ]);
       }
     }
     return $this;
@@ -427,13 +422,13 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addStyleUrl($url, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
-    CRM_Core_Region::instance($region)->add(array(
-        'name' => $url,
-        'type' => 'styleUrl',
-        'styleUrl' => $url,
-        'weight' => $weight,
-        'region' => $region,
-      ));
+    CRM_Core_Region::instance($region)->add([
+      'name' => $url,
+      'type' => 'styleUrl',
+      'styleUrl' => $url,
+      'weight' => $weight,
+      'region' => $region,
+    ]);
     return $this;
   }
 
@@ -449,13 +444,13 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addStyle($code, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
-    CRM_Core_Region::instance($region)->add(array(
+    CRM_Core_Region::instance($region)->add([
         // 'name' => automatic
-        'type' => 'style',
-        'style' => $code,
-        'weight' => $weight,
-        'region' => $region,
-      ));
+      'type' => 'style',
+      'style' => $code,
+      'weight' => $weight,
+      'region' => $region,
+    ]);
     return $this;
   }
 
@@ -526,8 +521,11 @@ class CRM_Core_Resources {
   public function glob($ext, $patterns, $flags = NULL) {
     $path = $this->getPath($ext);
     $patterns = (array) $patterns;
-    $files = array();
+    $files = [];
     foreach ($patterns as $pattern) {
+      if (preg_match(';^(assetBuilder|ext)://;', $pattern)) {
+        $files[] = $pattern;
+      }
       if (CRM_Utils_File::isAbsolute($pattern)) {
         // Absolute path.
         $files = array_merge($files, (array) glob($pattern, $flags));
@@ -537,7 +535,8 @@ class CRM_Core_Resources {
         $files = array_merge($files, (array) glob("$path/$pattern", $flags));
       }
     }
-    sort($files); // Deterministic order.
+    // Deterministic order.
+    sort($files);
     $files = array_unique($files);
     return array_map(function ($file) use ($path) {
       return CRM_Utils_File::relativize($file, "$path/");
@@ -594,26 +593,24 @@ class CRM_Core_Resources {
         if (is_array($item)) {
           $this->addSetting($item);
         }
-        elseif (substr($item, -2) == 'js') {
+        elseif (strpos($item, '.css')) {
+          $this->isFullyFormedUrl($item) ? $this->addStyleUrl($item, -100, $region) : $this->addStyleFile('civicrm', $item, -100, $region);
+        }
+        elseif ($this->isFullyFormedUrl($item)) {
+          $this->addScriptUrl($item, $jsWeight++, $region);
+        }
+        else {
           // Don't bother  looking for ts() calls in packages, there aren't any
           $translate = (substr($item, 0, 3) == 'js/');
           $this->addScriptFile('civicrm', $item, $jsWeight++, $region, $translate);
         }
-        else {
-          $this->addStyleFile('civicrm', $item, -100, $region);
-        }
       }
-
-      $tsLocale = CRM_Core_I18n::getLocale();
-      // Dynamic localization script
-      $this->addScriptUrl(CRM_Utils_System::url('civicrm/ajax/l10n-js/' . $tsLocale, array('r' => $this->getCacheCode())), $jsWeight++, $region);
-
       // Add global settings
-      $settings = array(
-        'config' => array(
+      $settings = [
+        'config' => [
           'isFrontend' => $config->userFrameworkFrontend,
-        ),
-      );
+        ],
+      ];
       // Disable profile creation if user lacks permission
       if (!CRM_Core_Permission::check('edit all contacts') && !CRM_Core_Permission::check('add contacts')) {
         $settings['config']['entityRef']['contactCreate'] = FALSE;
@@ -678,16 +675,17 @@ class CRM_Core_Resources {
   public static function outputLocalizationJS() {
     CRM_Core_Page_AJAX::setJsHeaders();
     $config = CRM_Core_Config::singleton();
-    $vars = array(
+    $vars = [
       'moneyFormat' => json_encode(CRM_Utils_Money::format(1234.56)),
       'contactSearch' => json_encode($config->includeEmailInName ? ts('Start typing a name or email...') : ts('Start typing a name...')),
       'otherSearch' => json_encode(ts('Enter search term...')),
-      'entityRef' => array(
-        'contactCreate' => CRM_Core_BAO_UFGroup::getCreateLinks(),
-        'filters' => self::getEntityRefFilters(),
-      ),
+      'entityRef' => self::getEntityRefMetadata(),
       'ajaxPopupsEnabled' => self::singleton()->ajaxPopupsEnabled,
-    );
+      'allowAlertAutodismissal' => (bool) Civi::settings()->get('allow_alert_autodismissal'),
+      'resourceCacheCode' => self::singleton()->getCacheCode(),
+      'locale' => CRM_Core_I18n::getLocale(),
+      'cid' => (int) CRM_Core_Session::getLoggedInContactID(),
+    ];
     print CRM_Core_Smarty::singleton()->fetchWith('CRM/common/l10n.js.tpl', $vars);
     CRM_Utils_System::civiExit();
   }
@@ -705,7 +703,7 @@ class CRM_Core_Resources {
 
     // Scripts needed by everyone, everywhere
     // FIXME: This is too long; list needs finer-grained segmentation
-    $items = array(
+    $items = [
       "bower_components/jquery/dist/jquery.min.js",
       "bower_components/jquery-ui/jquery-ui.min.js",
       "bower_components/jquery-ui/themes/smoothness/jquery-ui.min.css",
@@ -722,27 +720,64 @@ class CRM_Core_Resources {
       "bower_components/jquery-validation/dist/jquery.validate.min.js",
       "packages/jquery/plugins/jquery.ui.datepicker.validation.min.js",
       "js/Common.js",
+      "js/crm.datepicker.js",
       "js/crm.ajax.js",
       "js/wysiwyg/crm.wysiwyg.js",
+    ];
+
+    // Dynamic localization script
+    $items[] = $this->addCacheCode(
+      CRM_Utils_System::url('civicrm/ajax/l10n-js/' . CRM_Core_I18n::getLocale(),
+        ['cid' => CRM_Core_Session::getLoggedInContactID()], FALSE, NULL, FALSE)
     );
+
     // add wysiwyg editor
     $editor = Civi::settings()->get('editor_id');
     if ($editor == "CKEditor") {
       CRM_Admin_Page_CKEditorConfig::setConfigDefault();
-      $items[] = array(
-        'config' => array(
+      $items[] = [
+        'config' => [
           'wysisygScriptLocation' => Civi::paths()->getUrl("[civicrm.root]/js/wysiwyg/crm.ckeditor.js"),
           'CKEditorCustomConfig' => CRM_Admin_Page_CKEditorConfig::getConfigUrl(),
-        ),
-      );
+        ],
+      ];
     }
 
     // These scripts are only needed by back-office users
     if (CRM_Core_Permission::check('access CiviCRM')) {
       $items[] = "packages/jquery/plugins/jquery.tableHeader.js";
-      $items[] = "packages/jquery/plugins/jquery.menu.min.js";
-      $items[] = "css/civicrmNavigation.css";
       $items[] = "packages/jquery/plugins/jquery.notify.min.js";
+    }
+
+    $contactID = CRM_Core_Session::getLoggedInContactID();
+
+    // Menubar
+    $position = 'none';
+    if (
+      $contactID && !$config->userFrameworkFrontend
+      && CRM_Core_Permission::check('access CiviCRM')
+      && !@constant('CIVICRM_DISABLE_DEFAULT_MENU')
+      && !CRM_Core_Config::isUpgradeMode()
+    ) {
+      $position = Civi::settings()->get('menubar_position') ?: 'over-cms-menu';
+    }
+    if ($position !== 'none') {
+      $items[] = 'bower_components/smartmenus/dist/jquery.smartmenus.min.js';
+      $items[] = 'bower_components/smartmenus/dist/addons/keyboard/jquery.smartmenus.keyboard.min.js';
+      $items[] = 'js/crm.menubar.js';
+      $items[] = Civi::service('asset_builder')->getUrl('crm-menubar.css', [
+        'color' => Civi::settings()->get('menubar_color'),
+        'height' => 40,
+        'breakpoint' => 768,
+        'opacity' => .88,
+      ]);
+      $items[] = [
+        'menubar' => [
+          'position' => $position,
+          'qfKey' => CRM_Core_Key::get('CRM_Contact_Controller_Search', TRUE),
+          'cacheCode' => CRM_Core_BAO_Navigation::getCacheKey($contactID),
+        ],
+      ];
     }
 
     // JS for multilingual installations
@@ -761,7 +796,7 @@ class CRM_Core_Resources {
       // Search for i18n file in order of specificity (try fr-CA, then fr)
       list($lang) = explode('_', $tsLocale);
       $path = "bower_components/jquery-ui/ui/i18n";
-      foreach (array(str_replace('_', '-', $tsLocale), $lang) as $language) {
+      foreach ([str_replace('_', '-', $tsLocale), $lang] as $language) {
         $localizationFile = "$path/datepicker-{$language}.js";
         if ($this->getPath('civicrm', $localizationFile)) {
           $items[] = $localizationFile;
@@ -781,93 +816,104 @@ class CRM_Core_Resources {
    *   is this page request an ajax snippet?
    */
   public static function isAjaxMode() {
-    if (in_array(CRM_Utils_Array::value('snippet', $_REQUEST), array(
-        CRM_Core_Smarty::PRINT_SNIPPET,
-        CRM_Core_Smarty::PRINT_NOFORM,
-        CRM_Core_Smarty::PRINT_JSON,
-      ))
+    if (in_array(CRM_Utils_Array::value('snippet', $_REQUEST), [
+      CRM_Core_Smarty::PRINT_SNIPPET,
+      CRM_Core_Smarty::PRINT_NOFORM,
+      CRM_Core_Smarty::PRINT_JSON,
+    ])
     ) {
       return TRUE;
     }
-    return strpos(CRM_Utils_System::getUrlPath(), 'civicrm/ajax') === 0;
+    list($arg0, $arg1) = array_pad(explode('/', CRM_Utils_System::getUrlPath()), 2, '');
+    return ($arg0 === 'civicrm' && in_array($arg1, ['ajax', 'angularprofiles', 'asset']));
+  }
+
+  /**
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   * @see \CRM_Utils_Hook::buildAsset()
+   */
+  public static function renderMenubarStylesheet(GenericHookEvent $e) {
+    if ($e->asset !== 'crm-menubar.css') {
+      return;
+    }
+    $e->mimeType = 'text/css';
+    $e->content = '';
+    $config = CRM_Core_Config::singleton();
+    $cms = strtolower($config->userFramework);
+    $cms = $cms === 'drupal' ? 'drupal7' : $cms;
+    $items = [
+      'bower_components/smartmenus/dist/css/sm-core-css.css',
+      'css/crm-menubar.css',
+      "css/menubar-$cms.css",
+    ];
+    foreach ($items as $item) {
+      $e->content .= file_get_contents(self::singleton()->getPath('civicrm', $item));
+    }
+    $color = $e->params['color'];
+    if (!CRM_Utils_Rule::color($color)) {
+      $color = Civi::settings()->getDefault('menubar_color');
+    }
+    $vars = [
+      'resourceBase' => rtrim($config->resourceBase, '/'),
+      'menubarHeight' => $e->params['height'] . 'px',
+      'breakMin' => $e->params['breakpoint'] . 'px',
+      'breakMax' => ($e->params['breakpoint'] - 1) . 'px',
+      'menubarColor' => $color,
+      'menuItemColor' => 'rgba(' . implode(', ', CRM_Utils_Color::getRgb($color)) . ", {$e->params['opacity']})",
+      'highlightColor' => CRM_Utils_Color::getHighlight($color),
+      'textColor' => CRM_Utils_Color::getContrast($color, '#333', '#ddd'),
+    ];
+    $vars['highlightTextColor'] = CRM_Utils_Color::getContrast($vars['highlightColor'], '#333', '#ddd');
+    foreach ($vars as $var => $val) {
+      $e->content = str_replace('$' . $var, $val, $e->content);
+    }
   }
 
   /**
    * Provide a list of available entityRef filters.
-   * @todo: move component filters into their respective components (e.g. CiviEvent)
    *
    * @return array
    */
-  public static function getEntityRefFilters() {
-    $filters = array();
+  public static function getEntityRefMetadata() {
+    $data = [
+      'filters' => [],
+      'links' => [],
+    ];
     $config = CRM_Core_Config::singleton();
 
-    if (in_array('CiviEvent', $config->enableComponents)) {
-      $filters['event'] = array(
-        array('key' => 'event_type_id', 'value' => ts('Event Type')),
-        array(
-          'key' => 'start_date',
-          'value' => ts('Start Date'),
-          'options' => array(
-            array('key' => '{">":"now"}', 'value' => ts('Upcoming')),
-            array(
-              'key' => '{"BETWEEN":["now - 3 month","now"]}',
-              'value' => ts('Past 3 Months'),
-            ),
-            array(
-              'key' => '{"BETWEEN":["now - 6 month","now"]}',
-              'value' => ts('Past 6 Months'),
-            ),
-            array(
-              'key' => '{"BETWEEN":["now - 1 year","now"]}',
-              'value' => ts('Past Year'),
-            ),
-          ),
-        ),
-      );
-    }
-
-    $filters['activity'] = array(
-      array('key' => 'activity_type_id', 'value' => ts('Activity Type')),
-      array('key' => 'status_id', 'value' => ts('Activity Status')),
-    );
-
-    $filters['contact'] = array(
-      array('key' => 'contact_type', 'value' => ts('Contact Type')),
-      array('key' => 'group', 'value' => ts('Group'), 'entity' => 'group_contact'),
-      array('key' => 'tag', 'value' => ts('Tag'), 'entity' => 'entity_tag'),
-      array('key' => 'state_province', 'value' => ts('State/Province'), 'entity' => 'address'),
-      array('key' => 'country', 'value' => ts('Country'), 'entity' => 'address'),
-      array('key' => 'gender_id', 'value' => ts('Gender')),
-      array('key' => 'is_deceased', 'value' => ts('Deceased')),
-      array('key' => 'contact_id', 'value' => ts('Contact ID'), 'type' => 'text'),
-      array('key' => 'external_identifier', 'value' => ts('External ID'), 'type' => 'text'),
-      array('key' => 'source', 'value' => ts('Contact Source'), 'type' => 'text'),
-    );
-
-    if (in_array('CiviCase', $config->enableComponents)) {
-      $filters['case'] = array(
-        array(
-          'key' => 'case_id.case_type_id',
-          'value' => ts('Case Type'),
-          'entity' => 'Case',
-        ),
-        array(
-          'key' => 'case_id.status_id',
-          'value' => ts('Case Status'),
-          'entity' => 'Case',
-        ),
-      );
-      foreach ($filters['contact'] as $filter) {
-        $filter += array('entity' => 'contact');
-        $filter['key'] = 'contact_id.' . $filter['key'];
-        $filters['case'][] = $filter;
+    $disabledComponents = [];
+    $dao = CRM_Core_DAO::executeQuery("SELECT name, namespace FROM civicrm_component");
+    while ($dao->fetch()) {
+      if (!in_array($dao->name, $config->enableComponents)) {
+        $disabledComponents[$dao->name] = $dao->namespace;
       }
     }
 
-    CRM_Utils_Hook::entityRefFilters($filters);
+    foreach (CRM_Core_DAO_AllCoreTables::daoToClass() as $entity => $daoName) {
+      // Skip DAOs of disabled components
+      foreach ($disabledComponents as $nameSpace) {
+        if (strpos($daoName, $nameSpace) === 0) {
+          continue 2;
+        }
+      }
+      $baoName = str_replace('_DAO_', '_BAO_', $daoName);
+      if (class_exists($baoName)) {
+        $filters = $baoName::getEntityRefFilters();
+        if ($filters) {
+          $data['filters'][$entity] = $filters;
+        }
+        if (is_callable([$baoName, 'getEntityRefCreateLinks'])) {
+          $createLinks = $baoName::getEntityRefCreateLinks();
+          if ($createLinks) {
+            $data['links'][$entity] = $createLinks;
+          }
+        }
+      }
+    }
 
-    return $filters;
+    CRM_Utils_Hook::entityRefFilters($data['filters']);
+
+    return $data;
   }
 
   /**
@@ -894,6 +940,17 @@ class CRM_Core_Resources {
     $operator = $hasQuery ? '&' : '?';
 
     return $url . $operator . 'r=' . $this->cacheCode;
+  }
+
+  /**
+   * Checks if the given URL is fully-formed
+   *
+   * @param string $url
+   *
+   * @return bool
+   */
+  public static function isFullyFormedUrl($url) {
+    return (substr($url, 0, 4) === 'http') || (substr($url, 0, 1) === '/');
   }
 
 }

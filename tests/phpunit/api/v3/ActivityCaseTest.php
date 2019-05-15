@@ -49,6 +49,28 @@ class api_v3_ActivityCaseTest extends CiviCaseTestCase {
     ));
   }
 
+  /**
+   * Test activity creation on case based
+   * on id or hash present in case subject.
+   */
+  public function testActivityCreateOnCase() {
+    $hash = substr(sha1(CIVICRM_SITE_KEY . $this->_case['id']), 0, 7);
+    $subjectArr = array(
+      "[case #{$this->_case['id']}] test activity recording under case with id",
+      "[case #{$hash}] test activity recording under case with id",
+    );
+    foreach ($subjectArr as $subject) {
+      $activity = $this->callAPISuccess('Activity', 'create', array(
+        'source_contact_id' => $this->_cid,
+        'activity_type_id' => 'Phone Call',
+        'subject' => $subject,
+      ));
+      $case = $this->callAPISuccessGetSingle('Activity', array('return' => array("case_id"), 'id' => $activity['id']));
+      //Check if case id is present for the activity.
+      $this->assertEquals($this->_case['id'], $case['case_id'][0]);
+    }
+  }
+
   public function testGet() {
     $this->assertTrue(is_numeric($this->_case['id']));
     $this->assertTrue(is_numeric($this->_otherActivity['id']));

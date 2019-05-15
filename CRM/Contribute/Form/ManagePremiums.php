@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -49,9 +49,8 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
   public function setDefaultValues() {
     $defaults = parent::setDefaultValues();
     if ($this->_id) {
-      $params = array('id' => $this->_id);
-      CRM_Contribute_BAO_ManagePremiums::retrieve($params, $tempDefaults);
-      $imageUrl = (isset($tempDefaults['image'])) ? $tempDefaults['image'] : "";
+      $params = ['id' => $this->_id];
+      CRM_Contribute_BAO_Product::retrieve($params, $tempDefaults);
       if (isset($tempDefaults['image']) && isset($tempDefaults['thumbnail'])) {
         $defaults['imageUrl'] = $tempDefaults['image'];
         $defaults['thumbnailUrl'] = $tempDefaults['thumbnail'];
@@ -92,10 +91,10 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     $this->applyFilter('__ALL__', 'trim');
     $this->add('text', 'name', ts('Name'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'name'), TRUE);
-    $this->addRule('name', ts('A product with this name already exists. Please select another name.'), 'objectExists', array(
-        'CRM_Contribute_DAO_Product',
-        $this->_id,
-      ));
+    $this->addRule('name', ts('A product with this name already exists. Please select another name.'), 'objectExists', [
+      'CRM_Contribute_DAO_Product',
+      $this->_id,
+    ]);
     $this->add('text', 'sku', ts('SKU'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'sku'));
 
     $this->add('textarea', 'description', ts('Description'), 'rows=3, cols=60');
@@ -124,25 +123,25 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     $this->add('textarea', 'options', ts('Options'), 'rows=3, cols=60');
 
-    $this->add('select', 'period_type', ts('Period Type'), array(
-        '' => '- select -',
-        'rolling' => 'Rolling',
-        'fixed' => 'Fixed',
-      ));
+    $this->add('select', 'period_type', ts('Period Type'), [
+      '' => '- select -',
+      'rolling' => 'Rolling',
+      'fixed' => 'Fixed',
+    ]);
 
     $this->add('text', 'fixed_period_start_day', ts('Fixed Period Start Day'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'fixed_period_start_day'));
 
-    $this->add('Select', 'duration_unit', ts('Duration Unit'), array('' => '- select period -') + CRM_Core_SelectValues::getPremiumUnits());
+    $this->add('Select', 'duration_unit', ts('Duration Unit'), ['' => '- select period -'] + CRM_Core_SelectValues::getPremiumUnits());
 
     $this->add('text', 'duration_interval', ts('Duration'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'duration_interval'));
 
-    $this->add('Select', 'frequency_unit', ts('Frequency Unit'), array('' => '- select period -') + CRM_Core_SelectValues::getPremiumUnits());
+    $this->add('Select', 'frequency_unit', ts('Frequency Unit'), ['' => '- select period -'] + CRM_Core_SelectValues::getPremiumUnits());
 
     $this->add('text', 'frequency_interval', ts('Frequency'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Product', 'frequency_interval'));
 
     //Financial Type CRM-11106
     $financialType = CRM_Contribute_PseudoConstant::financialType();
-    $premiumFinancialType = array();
+    $premiumFinancialType = [];
     CRM_Core_PseudoConstant::populate(
       $premiumFinancialType,
       'CRM_Financial_DAO_EntityFinancialAccount',
@@ -152,7 +151,7 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       'account_relationship = 8'
     );
 
-    $costFinancialType = array();
+    $costFinancialType = [];
     CRM_Core_PseudoConstant::populate(
       $costFinancialType,
       'CRM_Financial_DAO_EntityFinancialAccount',
@@ -174,25 +173,24 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
       'select',
       'financial_type_id',
       ts('Financial Type'),
-      array('' => ts('- select -')) + $financialType
+      ['' => ts('- select -')] + $financialType
     );
 
     $this->add('checkbox', 'is_active', ts('Enabled?'));
 
-    $this->addFormRule(array('CRM_Contribute_Form_ManagePremiums', 'formRule'));
+    $this->addFormRule(['CRM_Contribute_Form_ManagePremiums', 'formRule']);
 
-    $this->addButtons(array(
-        array(
-          'type' => 'upload',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'upload',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
     $this->assign('productId', $this->_id);
   }
 
@@ -272,7 +270,15 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
 
     // If deleting, then only delete and skip the rest of the post-processing
     if ($this->_action & CRM_Core_Action::DELETE) {
-      CRM_Contribute_BAO_ManagePremiums::del($this->_id);
+      try {
+        CRM_Contribute_BAO_Product::del($this->_id);
+      }
+      catch (CRM_Core_Exception $e) {
+        $message = ts("This Premium is linked to an <a href='%1'>Online Contribution page</a>. Please remove it before deleting this Premium.", [1 => CRM_Utils_System::url('civicrm/admin/contribute', 'reset=1')]);
+        CRM_Core_Session::setStatus($message, ts('Cannot delete Premium'), 'error');
+        CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin/contribute/managePremiums', 'reset=1&action=browse'));
+        return;
+      }
       CRM_Core_Session::setStatus(
         ts('Selected Premium Product type has been deleted.'),
         ts('Deleted'), 'info');
@@ -282,23 +288,23 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
     $params = $this->controller->exportValues($this->_name);
 
     // Clean the the money fields
-    $moneyFields = array('cost', 'price', 'min_contribution');
+    $moneyFields = ['cost', 'price', 'min_contribution'];
     foreach ($moneyFields as $field) {
       $params[$field] = CRM_Utils_Rule::cleanMoney($params[$field]);
     }
 
-    $ids = array();
+    // If we're updating, we need to pass in the premium product Id
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $ids['premium'] = $this->_id;
+      $params['id'] = $this->_id;
     }
 
     $this->_processImages($params);
 
-    // Save to database
-    $premium = CRM_Contribute_BAO_ManagePremiums::add($params, $ids);
+    // Save the premium product to database
+    $premium = CRM_Contribute_BAO_Product::create($params);
 
     CRM_Core_Session::setStatus(
-      ts("The Premium '%1' has been saved.", array(1 => $premium->name)),
+      ts("The Premium '%1' has been saved.", [1 => $premium->name]),
       ts('Saved'), 'success');
   }
 
@@ -309,14 +315,14 @@ class CRM_Contribute_Form_ManagePremiums extends CRM_Contribute_Form {
    * @param array $params
    */
   protected function _processImages(&$params) {
-    $defaults = array(
+    $defaults = [
       'imageOption' => 'noImage',
-      'uploadFile' => array('name' => ''),
+      'uploadFile' => ['name' => ''],
       'image' => '',
       'thumbnail' => '',
       'imageUrl' => '',
       'thumbnailUrl' => '',
-    );
+    ];
     $params = array_merge($defaults, $params);
 
     // User is uploading an image

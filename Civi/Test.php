@@ -14,7 +14,7 @@ class Test {
   /**
    * @var array
    */
-  private static $singletons = array();
+  private static $singletons = [];
 
   /**
    * Get the data source used for testing.
@@ -45,7 +45,7 @@ class Test {
   /**
    * Get a connection to the test database.
    *
-   * @return PDO
+   * @return \PDO
    */
   public static function pdo() {
     if (!isset(self::$singletons['pdo'])) {
@@ -55,7 +55,7 @@ class Test {
       try {
         self::$singletons['pdo'] = new PDO("mysql:host={$host}" . ($port ? ";port=$port" : ""),
           $dsninfo['username'], $dsninfo['password'],
-          array(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE)
+          [PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => TRUE]
         );
       }
       catch (PDOException $e) {
@@ -126,7 +126,6 @@ class Test {
     }
     return self::$singletons['schema'];
   }
-
 
   /**
    * @return \Civi\Test\Data

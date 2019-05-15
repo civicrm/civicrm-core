@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -81,7 +81,7 @@ class PreEvent extends GenericHookEvent {
    * @inheritDoc
    */
   public function getHookValues() {
-    return array($this->action, $this->entity, $this->id, &$this->params);
+    return [$this->action, $this->entity, $this->id, &$this->params];
   }
 
 }

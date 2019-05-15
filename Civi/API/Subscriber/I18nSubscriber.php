@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,13 +35,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @package Civi\API\Subscriber
  */
 class I18nSubscriber implements EventSubscriberInterface {
+
   /**
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::PREPARE => array('onApiPrepare', Events::W_MIDDLE),
-    );
+    return [
+      Events::PREPARE => ['onApiPrepare', Events::W_MIDDLE],
+    ];
   }
 
   /**
@@ -80,7 +81,7 @@ class I18nSubscriber implements EventSubscriberInterface {
     // on multi-lang sites based on request and civicrm_uf_match
     if ($multiLang) {
       $config = \CRM_Core_Config::singleton();
-      $languageLimit = array();
+      $languageLimit = [];
       if (isset($config->languageLimit) and $config->languageLimit) {
         $languageLimit = $config->languageLimit;
       }
@@ -89,7 +90,7 @@ class I18nSubscriber implements EventSubscriberInterface {
         $lcMessages = $lcMessagesRequest;
       }
       else {
-        throw new \API_Exception(ts('Language not enabled: %1', array(1 => $lcMessagesRequest)));
+        throw new \API_Exception(ts('Language not enabled: %1', [1 => $lcMessagesRequest]));
       }
     }
 

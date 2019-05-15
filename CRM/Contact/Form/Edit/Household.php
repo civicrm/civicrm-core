@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -58,15 +58,15 @@ class CRM_Contact_Form_Edit_Household {
     if (!$inlineEditMode || $inlineEditMode == 2) {
       // nick_name
       $form->addField('nick_name');
-      $form->addField('contact_source', array('label' => ts('Source')));
+      $form->addField('contact_source', ['label' => ts('Source')]);
     }
 
     if (!$inlineEditMode) {
-      $form->addField('external_identifier', array('label' => ts('External ID')));
+      $form->addField('external_identifier', ['label' => ts('External ID')]);
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),
         'objectExists',
-        array('CRM_Contact_DAO_Contact', $form->_contactId, 'external_identifier')
+        ['CRM_Contact_DAO_Contact', $form->_contactId, 'external_identifier']
       );
     }
   }
@@ -84,16 +84,13 @@ class CRM_Contact_Form_Edit_Household {
    *   $error
    */
   public static function formRule($fields, $files, $contactID = NULL) {
-    $errors = array();
-    $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID);
+    $errors = [];
+    $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID, 'Household');
 
     // make sure that household name is set
     if (empty($fields['household_name'])) {
       $errors['household_name'] = 'Household Name should be set.';
     }
-
-    //check for duplicate - dedupe rules
-    CRM_Contact_Form_Contact::checkDuplicateContacts($fields, $errors, $contactID, 'Household');
 
     return empty($errors) ? TRUE : $errors;
   }

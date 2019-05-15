@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,11 +42,7 @@
         <div class="help">
         {ts}Please verify the information below. Click the <strong>Go Back</strong> button below if you need to make changes.{/ts}
         {if $contributeMode EQ 'notify' and !$is_pay_later and ! $isAmountzero }
-            {if $paymentProcessor.payment_processor_type EQ 'Google_Checkout'}
-                {ts 1=$paymentProcessor.name}Click the <strong>%1</strong> button to checkout to Google, where you will select your payment method and complete the registration.{/ts}
-            {else}
-                {ts 1=$paymentProcessor.name}Click the <strong>Continue</strong> button to checkout to %1, where you will select your payment method and complete the registration.{/ts}
-            {/if }
+          {ts 1=$paymentProcessor.name}Click the <strong>Continue</strong> button to checkout to %1, where you will select your payment method and complete the registration.{/ts}
         {else}
             {ts}Otherwise, click the <strong>Continue</strong> button below to complete your registration.{/ts}
         {/if}
@@ -172,17 +168,19 @@
     {/if}
 
     {if $contributeMode eq 'direct' and ! $is_pay_later and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
+      {crmRegion name="event-confirm-billing-block"}
         <div class="crm-group credit_card-group">
-            <div class="header-dark">
-                {ts}Credit Card Information{/ts}
-            </div>
-            <div class="crm-section no-label credit_card_details-section">
-                <div class="content">{$credit_card_type}</div>
+          <div class="header-dark">
+            {ts}Credit Card Information{/ts}
+          </div>
+          <div class="crm-section no-label credit_card_details-section">
+            <div class="content">{$credit_card_type}</div>
             <div class="content">{$credit_card_number}</div>
-            <div class="content">{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}</div>
+            <div class="content">{if $credit_card_exp_date}{ts}Expires{/ts}: {$credit_card_exp_date|truncate:7:''|crmDate}{/if}</div>
             <div class="clear"></div>
           </div>
         </div>
+      {/crmRegion}
     {/if}
 
     {if $contributeMode NEQ 'notify'} {* In 'notify mode, contributor is taken to processor payment forms next *}

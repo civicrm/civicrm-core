@@ -1,0 +1,115 @@
+@media (min-width: $breakMin) {
+
+  body.crm-menubar-visible.crm-menubar-over-cms-menu #toolbar {
+    display: none;
+  }
+
+  body.crm-menubar-visible.crm-menubar-over-cms-menu {
+    padding-top: $menubarHeight !important;
+  }
+  body.crm-menubar-visible.crm-menubar-over-cms-menu.crm-menubar-wrapped {
+    padding-top: calc($menubarHeight * 2) !important;
+  }
+
+  body.crm-menubar-visible.crm-menubar-over-cms-menu #toolbar .toolbar-drawer {
+    display: none !important;
+  }
+
+  body.toolbar.crm-menubar-visible.crm-menubar-below-cms-menu {
+    padding-top: 70px !important;
+  }
+  body.toolbar.crm-menubar-visible.crm-menubar-below-cms-menu.crm-menubar-wrapped {
+    padding-top: 110px !important;
+  }
+
+  body.toolbar.toolbar-drawer.crm-menubar-visible.crm-menubar-below-cms-menu {
+    padding-top: 104px !important;
+  }
+  body.toolbar.toolbar-drawer.crm-menubar-visible.crm-menubar-below-cms-menu.crm-menubar-wrapped {
+    padding-top: 144px !important;
+  }
+
+  body.toolbar.crm-menubar-visible.crm-menubar-below-cms-menu #toolbar {
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+  }
+
+  body.toolbar.toolbar-drawer.crm-menubar-below-cms-menu #civicrm-menu {
+    top: 64px !important;
+  }
+
+  /* For admin_menu */
+  body.admin-menu.crm-menubar-visible.crm-menubar-over-cms-menu {
+    margin-top: 0 !important;
+  }
+  body.crm-menubar-visible.crm-menubar-below-cms-menu #admin-menu {
+    min-height: 30px;
+  }
+  body.crm-menubar-visible.crm-menubar-below-cms-menu.admin-menu {
+    padding-top: $menubarHeight !important;
+  }
+  body.crm-menubar-visible.crm-menubar-below-cms-menu.crm-menubar-wrapped.admin-menu {
+    padding-top: calc($menubarHeight * 2) !important;
+  }
+  body.crm-menubar-visible.crm-menubar-over-cms-menu #admin-menu {
+    display: none;
+  }
+
+  /* For adminimal_admin_menu */
+  body.crm-menubar-visible.crm-menubar-over-cms-menu.admin-menu.adminimal-menu:before {
+    height: 0;
+  }
+  body.crm-menubar-visible.crm-menubar-below-cms-menu.admin-menu.adminimal-menu.menu-render-newline #civicrm-menu-nav #civicrm-menu {
+    top: 55px;
+  }
+
+}
+
+/* For adminimal_admin_menu */
+@media (min-width: $breakMin) and (max-width: 1024px) {
+
+  body.crm-menubar-visible.crm-menubar-over-cms-menu.admin-menu.adminimal-menu > .slicknav_menu {
+    display: none;
+  }
+  body.crm-menubar-visible.crm-menubar-below-cms-menu.admin-menu.adminimal-menu {
+    padding-top: 0px !important;
+  }
+  body.crm-menubar-below-cms-menu.admin-menu.adminimal-menu > #civicrm-menu-nav #civicrm-menu {
+    top: 0px !important;
+  }
+}
+
+@media (max-width: $breakMax) {
+
+  body.toolbar.crm-menubar-visible #toolbar-home {
+    visibility: hidden;
+  }
+  body.crm-menubar-visible #toolbar-menu {
+    display: none;
+  }
+
+  body #civicrm-menu-nav .crm-menubar-toggle-btn {
+    margin-top: 0;
+  }
+
+  /* For admin_menu */
+  body.admin-menu  #civicrm-menu-nav .crm-menubar-toggle-btn {
+    margin-left: 0;
+  }
+  body.admin-menu.crm-menubar-visible #admin-menu-icon > li.admin-menu-icon > a {
+    visibility: hidden;
+    width: 40px;
+  }
+
+  /* For adminimal_admin_menu */
+  body.admin-menu.adminimal-menu  #civicrm-menu-nav {
+    position: absolute;
+  }
+  body.admin-menu.adminimal-menu  #civicrm-menu-nav .crm-menubar-toggle-btn {
+    float: right;
+    margin-top: 9px;
+    margin-right: 50px;
+  }
+
+}

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,13 +24,24 @@
  +--------------------------------------------------------------------+
 *}
 <div class="crm-block crm-form-block crm-smtp-form-block">
-<div class="help">
-  <p>{ts}CiviCRM offers several options to send emails. The default option should work fine on linux systems. If you are using windows, you probably need to enter settings for your SMTP/Sendmail server. You can send a test email to check your settings by clicking "Save and Send Test Email". If you're unsure of the correct values, check with your system administrator, ISP or hosting provider.{/ts}</p>
-  <p>{ts}If you do not want users to send outbound mail from CiviCRM, select "Disable Outbound Email". NOTE: If you disable outbound email, and you are using Online Contribution pages or online Event Registration - you will need to disable automated receipts and registration confirmations.{/ts}</p>
-  <p>{ts}If you choose Redirect to Database, all emails will be recorded as archived mailings instead of being sent out. They can be found in the civicrm_mailing_spool table in the CiviCRM database.{/ts}</p>
-
-</div>
+  <div>
+  <h3>{ts}General{/ts}</h3>
      <table class="form-layout-compressed">
+       <tr class="crm-smtp-form-block-allow_mail_from_logged_in_contact">
+         <td class="label">{$form.allow_mail_from_logged_in_contact.html}</td>
+         <td>{$form.allow_mail_from_logged_in_contact.label} {help id=allow_mail_contact_email}</td>
+       </tr>
+     </table>
+  </div>
+  {crmRegion name="smtp-mailer-config"}
+  <div class="crm-smtp-mailer-form-block">
+  <h3>{ts}Mailer Configuration{/ts}</h3>
+  <div class="help">
+    <p>{ts}CiviCRM offers several options to send emails. You can send a test email to check your settings by clicking "Save and Send Test Email". If you're unsure of the correct values, check with your system administrator, ISP or hosting provider.{/ts}</p>
+    <p>{ts}If you do not want users to send outbound mail from CiviCRM, select "Disable Outbound Email". NOTE: If you disable outbound email, and you are using Online Contribution pages or online Event Registration - you will need to disable automated receipts and registration confirmations.{/ts}</p>
+    <p>{ts}If you choose Redirect to Database, all emails will be recorded as archived mailings instead of being sent out. They can be found in the civicrm_mailing_spool table in the CiviCRM database.{/ts}</p>
+  </div>
+     <table>
            <tr class="crm-smtp-form-block-outBound_option">
               <td class="label">{$form.outBound_option.label}</td>
               <td>{$form.outBound_option.html}</td>
@@ -92,7 +103,6 @@
         <div class="crm-submit-buttons">
             {include file="CRM/common/formButtons.tpl"}
         </div>
-</div>
 
 {literal}
 <script type="text/javascript">
@@ -142,3 +152,6 @@
 
 </script>
 {/literal}
+  </div>
+  {/crmRegion}
+</div>

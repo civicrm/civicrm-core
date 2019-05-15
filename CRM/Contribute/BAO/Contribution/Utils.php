@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.7                                                |
+ | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contribute_BAO_Contribution_Utils {
 
@@ -74,6 +74,8 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
     // add some financial type details to the params list
     // if folks need to use it
+    //CRM-15297 deprecate contributionTypeID
+    $paymentParams['financial_type_id'] = $paymentParams['financialTypeID'] = $paymentParams['contributionTypeID'] = $financialType->id;
     //CRM-15297 - contributionType is obsolete - pass financial type as well so people can deprecate it
     $paymentParams['financialType_name'] = $paymentParams['contributionType_name'] = $form->_params['contributionType_name'] = $financialType->name;
     //CRM-11456
@@ -98,14 +100,31 @@ class CRM_Contribute_BAO_Contribution_Utils {
     }
 
     if ($isPaymentTransaction) {
-      $contributionParams = array(
+      $contributionParams = [
         'id' => CRM_Utils_Array::value('contribution_id', $paymentParams),
         'contact_id' => $contactID,
         'is_test' => $isTest,
-        'campaign_id' => CRM_Utils_Array::value('campaign_id', $paymentParams, CRM_Utils_Array::value('campaign_id', $form->_values)),
-        'contribution_page_id' => $form->_id,
         'source' => CRM_Utils_Array::value('source', $paymentParams, CRM_Utils_Array::value('description', $paymentParams)),
-      );
+      ];
+
+      // CRM-21200: Don't overwrite contribution details during 'Pay now' payment
+      if (empty($form->_params['contribution_id'])) {
+        $contributionParams['contribution_page_id'] = $form->_id;
+        $contributionParams['campaign_id'] = CRM_Utils_Array::value('campaign_id', $paymentParams, CRM_Utils_Array::value('campaign_id', $form->_values));
+      }
+      // In case of 'Pay now' payment, append the contribution source with new text 'Paid later via page ID: N.'
+      else {
+        // contribution.source only allows 255 characters so we are using ellipsify(...) to ensure it.
+        $contributionParams['source'] = CRM_Utils_String::ellipsify(
+          ts('Paid later via page ID: %1. %2', [
+            1 => $form->_id,
+            2 => $contributionParams['source'],
+          ]),
+          // eventually activity.description append price information to source text so keep it 220 to ensure string length doesn't exceed 255 characters.
+          220
+        );
+      }
+
       if (isset($paymentParams['line_item'])) {
         // @todo make sure this is consisently set at this point.
         $contributionParams['line_item'] = $paymentParams['line_item'];
@@ -114,6 +133,9 @@ class CRM_Contribute_BAO_Contribution_Utils {
         $contributionParams['payment_instrument_id'] = $paymentParams['payment_instrument_id'] = $form->_paymentProcessor['payment_instrument_id'];
       }
 
+      // @todo this is the wrong place for this - it should be done as close to form submission
+      // as possible
+      $paymentParams['amount'] = CRM_Utils_Rule::cleanMoney($paymentParams['amount']);
       $contribution = CRM_Contribute_Form_Contribution_Confirm::processFormContribution(
         $form,
         $paymentParams,
@@ -127,16 +149,14 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
       $paymentParams['item_name'] = $form->_params['description'];
 
-      $paymentParams['qfKey'] = $form->controller->_key;
+      $paymentParams['qfKey'] = empty($paymentParams['qfKey']) ? $form->controller->_key : $paymentParams['qfKey'];
       if ($paymentParams['skipLineItem']) {
         // We are not processing the line item here because we are processing a membership.
         // Do not continue with contribution processing in this function.
-        return array('contribution' => $contribution);
+        return ['contribution' => $contribution];
       }
 
       $paymentParams['contributionID'] = $contribution->id;
-      //CRM-15297 deprecate contributionTypeID
-      $paymentParams['financialTypeID'] = $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
       $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
       if (isset($paymentParams['contribution_source'])) {
         $paymentParams['source'] = $paymentParams['contribution_source'];
@@ -210,11 +230,11 @@ class CRM_Contribute_BAO_Contribution_Utils {
       // This is kind of a back-up for pay-later $0 transactions.
       // In other flows they pick up the manual processor & get dealt with above (I
       // think that might be better...).
-      return array(
+      return [
         'payment_status_id' => 1,
         'contribution' => $contribution,
         'payment_processor_id' => 0,
-      );
+      ];
     }
 
     CRM_Contribute_BAO_ContributionPage::sendMail($contactID,
@@ -225,13 +245,14 @@ class CRM_Contribute_BAO_Contribution_Utils {
 
   /**
    * Is a payment being made.
+   *
    * Note that setting is_monetary on the form is somewhat legacy and the behaviour around this setting is confusing. It would be preferable
    * to look for the amount only (assuming this cannot refer to payment in goats or other non-monetary currency
    * @param CRM_Core_Form $form
    *
    * @return bool
    */
-  static protected function isPaymentTransaction($form) {
+  protected static function isPaymentTransaction($form) {
     return ($form->_amount >= 0.0) ? TRUE : FALSE;
   }
 
@@ -246,11 +267,11 @@ class CRM_Contribute_BAO_Contribution_Utils {
    */
   public static function contributionChartMonthly($param) {
     if ($param) {
-      $param = array(1 => array($param, 'Integer'));
+      $param = [1 => [$param, 'Integer']];
     }
     else {
       $param = date("Y");
-      $param = array(1 => array($param, 'Integer'));
+      $param = [1 => [$param, 'Integer']];
     }
 
     $query = "
@@ -365,12 +386,12 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
       $params['address'][1]['location_type_id'] = $billingLocTypeId;
     }
     if (!CRM_Utils_System::isNull($params['email'])) {
-      $params['email'] = array(
-        1 => array(
+      $params['email'] = [
+        1 => [
           'email' => $params['email'],
           'location_type_id' => $billingLocTypeId,
-        ),
-      );
+        ],
+      ];
     }
 
     if (isset($transaction['trxn_id'])) {
@@ -400,7 +421,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     }
 
     $source = ts('ContributionProcessor: %1 API',
-      array(1 => ucfirst($type))
+      [1 => ucfirst($type)]
     );
     if (isset($transaction['source'])) {
       $transaction['source'] = $source . ':: ' . $transaction['source'];
@@ -421,7 +442,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     static $_cache;
 
     if (!$_cache) {
-      $_cache = array();
+      $_cache = [];
     }
 
     if (!isset($_cache[$contactID])) {
@@ -432,28 +453,28 @@ WHERE    contact_id = %1
 ORDER BY receive_date ASC
 LIMIT 1
 ";
-      $params = array(1 => array($contactID, 'Integer'));
+      $params = [1 => [$contactID, 'Integer']];
 
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
-      $details = array(
+      $details = [
         'first' => NULL,
         'last' => NULL,
-      );
+      ];
       if ($dao->fetch()) {
-        $details['first'] = array(
+        $details['first'] = [
           'total_amount' => $dao->total_amount,
           'receive_date' => $dao->receive_date,
-        );
+        ];
       }
 
       // flip asc and desc to get the last query
       $sql = str_replace('ASC', 'DESC', $sql);
       $dao = CRM_Core_DAO::executeQuery($sql, $params);
       if ($dao->fetch()) {
-        $details['last'] = array(
+        $details['last'] = [
           'total_amount' => $dao->total_amount,
           'receive_date' => $dao->receive_date,
-        );
+        ];
       }
 
       $_cache[$contactID] = $details;
@@ -468,15 +489,24 @@ LIMIT 1
    *   Amount of field.
    * @param float $taxRate
    *   Tax rate of selected financial account for field.
+   * @param bool $ugWeDoNotKnowIfItNeedsCleaning_Help
+   *   This should ALWAYS BE FALSE and then be removed. A 'clean' money string uses a standardised format
+   *   such as '1000.99' for one thousand $/Euro/CUR and ninety nine cents/units.
+   *   However, we are in the habit of not necessarily doing that so need to grandfather in
+   *   the new expectation.
    *
    * @return array
    *   array of tax amount
    *
    */
-  public static function calculateTaxAmount($amount, $taxRate) {
-    $taxAmount = array();
+  public static function calculateTaxAmount($amount, $taxRate, $ugWeDoNotKnowIfItNeedsCleaning_Help = FALSE) {
+    $taxAmount = [];
+    if ($ugWeDoNotKnowIfItNeedsCleaning_Help) {
+      Civi::log()->warning('Deprecated function, make sure money is in usable format before calling this.', ['civi.tag' => 'deprecated']);
+      $amount = CRM_Utils_Rule::cleanMoney($amount);
+    }
     // There can not be any rounding at this stage - as this is prior to quantity multiplication
-    $taxAmount['tax_amount'] = ($taxRate / 100) * CRM_Utils_Rule::cleanMoney($amount);
+    $taxAmount['tax_amount'] = ($taxRate / 100) * $amount;
 
     return $taxAmount;
   }
@@ -504,7 +534,7 @@ LIMIT 1
    * @param int $id
    *   Contribution ID
    *
-   * @return array $statuses
+   * @return array
    *   Array of contribution statuses in array('status id' => 'label') format
    */
   public static function getContributionStatuses($usedFor = 'contribution', $id = NULL) {
@@ -515,35 +545,35 @@ LIMIT 1
       $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
     }
 
-    $statusNamesToUnset = array();
+    $statusNamesToUnset = [];
     // on create fetch statuses on basis of component
     if (!$id) {
-      $statusNamesToUnset = array(
+      $statusNamesToUnset = [
         'Refunded',
         'Chargeback',
         'Pending refund',
-      );
+      ];
 
       // Event registration and New Membership backoffice form support partially paid payment,
       //  so exclude this status only for 'New Contribution' form
       if ($usedFor == 'contribution') {
-        $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+        $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'In Progress',
           'Overdue',
           'Partially paid',
-        ));
+        ]);
       }
       elseif ($usedFor == 'participant') {
-        $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+        $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'Cancelled',
           'Failed',
-        ));
+        ]);
       }
       elseif ($usedFor == 'membership') {
-        $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+        $statusNamesToUnset = array_merge($statusNamesToUnset, [
           'In Progress',
           'Overdue',
-        ));
+        ]);
       }
     }
     else {
@@ -552,40 +582,40 @@ LIMIT 1
       switch ($name) {
         case 'Completed':
           // [CRM-17498] Removing unsupported status change options.
-          $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+          $statusNamesToUnset = array_merge($statusNamesToUnset, [
             'Pending',
             'Failed',
             'Partially paid',
             'Pending refund',
-          ));
+          ]);
           break;
 
         case 'Cancelled':
         case 'Chargeback':
         case 'Refunded':
-          $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+          $statusNamesToUnset = array_merge($statusNamesToUnset, [
             'Pending',
             'Failed',
-          ));
+          ]);
           break;
 
         case 'Pending':
         case 'In Progress':
-          $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+          $statusNamesToUnset = array_merge($statusNamesToUnset, [
             'Refunded',
             'Chargeback',
-          ));
+          ]);
           break;
 
         case 'Failed':
-          $statusNamesToUnset = array_merge($statusNamesToUnset, array(
+          $statusNamesToUnset = array_merge($statusNamesToUnset, [
             'Pending',
             'Refunded',
             'Chargeback',
             'Completed',
             'In Progress',
             'Cancelled',
-          ));
+          ]);
           break;
       }
     }
