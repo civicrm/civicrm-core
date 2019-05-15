@@ -25,13 +25,15 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
         array('second' => '2b', 'first' => '1b'),
         array('first' => '1c', 'second' => '2c'),
       ))
-      ->row(array('second' => '2d', 'first' => '1d'));
+      ->row(array('second' => '2d', 'first' => '1d'))
+      ->row(array('first' => NULL, 'second' => '2e'));
     $expected = '
       INSERT INTO foo (`first`,`second`) VALUES
       ("1","2"),
       ("1b","2b"),
       ("1c","2c"),
-      ("1d","2d")
+      ("1d","2d"),
+      (NULL,"2e")
     ';
     $this->assertLike($expected, $insert->toSQL());
   }
