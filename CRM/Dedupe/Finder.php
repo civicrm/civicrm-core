@@ -280,7 +280,8 @@ class CRM_Dedupe_Finder {
       $matches = [];
       if (preg_match('/(.*)-(Primary-[\d+])$|(.*)-(\d+|Primary)$/', $key, $matches)) {
         $return = array_values(array_filter($matches));
-        $flat[$return[1]] = $value;
+        // make sure the first occurrence is kept, not the last
+        $flat[$return[1]] = empty($flat[$return[1]]) ? $value : $flat[$return[1]];
         unset($flat[$key]);
       }
     }

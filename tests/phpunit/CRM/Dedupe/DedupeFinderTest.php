@@ -40,7 +40,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testUnsupervisedDupes() {
-    // make dupe checks based on based on following contact sets:
+    // make dupe checks based on following contact sets:
     // FIRST - LAST - EMAIL
     // ---------------------------------
     // robin  - hood - robin@example.com
@@ -56,6 +56,28 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
 
     $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
     $this->assertEquals(count($foundDupes), 3, 'Check Individual-Fuzzy dupe rule for dupesInGroup().');
+  }
+
+  /**
+   * Test duplicate contact retrieval with 2 email fields.
+   */
+  public function testUnsupervisedWithTwoEmailFields() {
+    $this->setupForGroupDedupe();
+    $emails = [
+      ['hood@example.com', ''],
+      ['', 'hood@example.com'],
+    ];
+    for ($i = 0; $i < 2; $i++) {
+      $fields = [
+        'first_name' => 'robin',
+        'last_name' => 'hood',
+        'email-1' => $emails[$i][0],
+        'email-2' => $emails[$i][1],
+      ];
+      $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
+      $dedupeResults = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
+      $this->assertEquals(count($dedupeResults), 1);
+    }
   }
 
   /**
