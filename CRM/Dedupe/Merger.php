@@ -2155,9 +2155,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       CRM_Core_BAO_PrevNextCache::markConflict($mainId, $otherId, $cacheKeyString, $conflicts);
     }
     else {
-      // delete entry from PrevNextCache table so we don't consider the pair next time
-      // pair may have been flipped, so make sure we delete using both orders
-      CRM_Core_BAO_PrevNextCache::deletePair($mainId, $otherId, $cacheKeyString, TRUE);
+      CRM_Core_BAO_PrevNextCache::deletePair($mainId, $otherId, $cacheKeyString);
     }
   }
 
