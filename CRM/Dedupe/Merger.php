@@ -1080,8 +1080,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     $main = self::getMergeContactDetails($mainId);
     $other = self::getMergeContactDetails($otherId);
-    $specialValues['main'] = self::getSpecialValues($main);
-    $specialValues['other'] = self::getSpecialValues($other);
 
     $compareFields = self::retrieveFields($main, $other);
 
@@ -1093,12 +1091,21 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         continue;
       }
       foreach (['main' => $main, 'other' => $other] as $moniker => $contact) {
-        $value = CRM_Utils_Array::value($field, $contact);
-        if (isset($specialValues[$moniker][$field]) && is_string($specialValues[$moniker][$field])) {
-          $value = CRM_Core_DAO::VALUE_SEPARATOR . trim($specialValues[$moniker][$field], CRM_Core_DAO::VALUE_SEPARATOR) . CRM_Core_DAO::VALUE_SEPARATOR;
+        $value = $label = CRM_Utils_Array::value($field, $contact);
+        $fieldSpec = $fields[$field];
+        if (!empty($fieldSpec['serialize']) && is_array($value)) {
+          // In practice this only applies to preferred_communication_method as the sub types are skipped above
+          // and no others are serialized.
+          $labels = [];
+          foreach ($value as $individualValue) {
+            $labels[] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $field, $individualValue);
+          }
+          $label = implode(', ', $labels);
+          // We serialize this due to historic handling but it's likely that if we just left it as an
+          // array all would be well & we would have less code.
+          $value = CRM_Core_DAO::serializeField($value, $fieldSpec['serialize']);
         }
-        $label = isset($specialValues[$moniker]["{$field}_display"]) ? $specialValues[$moniker]["{$field}_display"] : $value;
-        if (!empty($fields[$field]['type']) && $fields[$field]['type'] == CRM_Utils_Type::T_DATE) {
+        elseif (!empty($fieldSpec['type']) && $fieldSpec['type'] == CRM_Utils_Type::T_DATE) {
           if ($value) {
             $value = str_replace('-', '', $value);
             $label = CRM_Utils_Date::customFormat($label);
@@ -1115,15 +1122,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $label = ts('[x]');
           }
         }
-        elseif ($field == 'prefix_id') {
-          $label = CRM_Utils_Array::value('individual_prefix', $contact);
-        }
-        elseif ($field == 'suffix_id') {
-          $label = CRM_Utils_Array::value('individual_suffix', $contact);
-        }
-        elseif ($field == 'gender_id' && !empty($value)) {
-          $genderOptions = civicrm_api3('contact', 'getoptions', ['field' => 'gender_id']);
-          $label = $genderOptions['values'][$value];
+        elseif (!empty($fieldSpec['pseudoconstant'])) {
+          $label = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $field, $value);
         }
         elseif ($field == 'current_employer_id' && !empty($value)) {
           $label = "$value (" . CRM_Contact_BAO_Contact::displayName($value) . ")";
@@ -1879,38 +1879,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $cacheKeyString .= '_0';
     }
     return $cacheKeyString;
-  }
-
-  /**
-   * @param array $contact
-   * @return array
-   *   $specialValues
-   */
-  public static function getSpecialValues($contact) {
-    $preferred_communication_method = CRM_Utils_Array::value('preferred_communication_method', $contact);
-    $value = empty($preferred_communication_method) ? [] : $preferred_communication_method;
-    $specialValues = [
-      'preferred_communication_method' => $value,
-      'communication_style_id' => $value,
-    ];
-
-    if (!empty($contact['preferred_communication_method'])) {
-      // api 3 returns pref_comm_method as an array, which breaks the lookup; so we reconstruct
-      $prefCommList = is_array($specialValues['preferred_communication_method']) ? implode(CRM_Core_DAO::VALUE_SEPARATOR, $specialValues['preferred_communication_method']) : $specialValues['preferred_communication_method'];
-      $specialValues['preferred_communication_method'] = CRM_Core_DAO::VALUE_SEPARATOR . $prefCommList . CRM_Core_DAO::VALUE_SEPARATOR;
-    }
-    $names = [
-      'preferred_communication_method' => [
-        'newName' => 'preferred_communication_method_display',
-        'groupName' => 'preferred_communication_method',
-      ],
-    ];
-    CRM_Core_OptionGroup::lookupValues($specialValues, $names);
-
-    if (!empty($contact['communication_style'])) {
-      $specialValues['communication_style_id_display'] = $contact['communication_style'];
-    }
-    return $specialValues;
   }
 
   /**
