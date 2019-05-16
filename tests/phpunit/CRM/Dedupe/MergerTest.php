@@ -486,6 +486,26 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the special info handling is unchanged after cleanup.
+   *
+   * Note the handling is silly - we are testing to lock in over short term changes not to imply any contract on the
+   * function.
+   */
+  public function testgetRowsElementsAndInfoSpecialInfo() {
+    $contact1 = $this->individualCreate(['preferred_communication_method' => [], 'communication_style_id' => 'Familiar', 'prefix_id' => 'Mrs.', 'suffix_id' => 'III']);
+    $contact2 = $this->individualCreate(['preferred_communication_method' => ['SMS', 'Fax'], 'communication_style_id' => 'Formal', 'gender_id' => 'Female']);
+    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($contact1, $contact2);
+    $rows = $rowsElementsAndInfo['rows'];
+    $this->assertEquals(['main' => 'Mrs.', 'other' => 'Mr.', 'title' => 'Individual Prefix'], $rows['move_prefix_id']);
+    $this->assertEquals(['main' => 'III', 'other' => 'II', 'title' => 'Individual Suffix'], $rows['move_suffix_id']);
+    $this->assertEquals(['main' => '', 'other' => 'Female', 'title' => 'Gender'], $rows['move_gender_id']);
+    $this->assertEquals(['main' => 'Familiar', 'other' => 'Formal', 'title' => 'Communication Style'], $rows['move_communication_style_id']);
+    $this->assertEquals(1, $rowsElementsAndInfo['migration_info']['move_communication_style_id']);
+    $this->assertEquals(['main' => '', 'other' => 'SMS, Fax', 'title' => 'Preferred Communication Method'], $rows['move_preferred_communication_method']);
+    $this->assertEquals('45', $rowsElementsAndInfo['migration_info']['move_preferred_communication_method']);
+  }
+
+  /**
    * Test migration of Membership.
    */
   public function testMergeMembership() {
