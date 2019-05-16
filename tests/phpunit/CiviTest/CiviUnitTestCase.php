@@ -1942,12 +1942,12 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @return void
    */
   public function setMockSettingsMetaData($extras) {
-    Civi::service('settings_manager')->flush();
-
     CRM_Utils_Hook::singleton()
       ->setHook('civicrm_alterSettingsMetaData', function (&$metadata, $domainId, $profile) use ($extras) {
         $metadata = array_merge($metadata, $extras);
       });
+
+    Civi::service('settings_manager')->flush();
 
     $fields = $this->callAPISuccess('setting', 'getfields', array());
     foreach ($extras as $key => $spec) {
