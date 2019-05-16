@@ -1092,8 +1092,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         // CRM-15681 don't display sub-types in UI
         continue;
       }
-      foreach (['main', 'other'] as $moniker) {
-        $contact = &$$moniker;
+      foreach (['main' => $main, 'other' => $other] as $moniker => $contact) {
         $value = CRM_Utils_Array::value($field, $contact);
         if (isset($specialValues[$moniker][$field]) && is_string($specialValues[$moniker][$field])) {
           $value = CRM_Core_DAO::VALUE_SEPARATOR . trim($specialValues[$moniker][$field], CRM_Core_DAO::VALUE_SEPARATOR) . CRM_Core_DAO::VALUE_SEPARATOR;
