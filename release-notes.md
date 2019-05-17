@@ -1,11 +1,11 @@
 # Release Notes
 
-These release notes are manually compiled from pull requests and Jira issues
-starting with CiviCRM 4.7.14.
+These release notes are manually compiled from pull requests and CiviCRM GitLab issues
+starting after March 31 2018.
 
 Other resources for identifying changes are:
 
-* The Jira project management system at https://issues.civicrm.org
+* The CiviCRM GitLab project management system at https://lab.civicrm.org/groups/dev/-/issues
 * The following GitHub projects:
     * https://github.com/civicrm/civicrm-core
     * https://github.com/civicrm/civicrm-packages
@@ -13,6 +13,10 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-drupal
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
+    
+These release notes were manually compiled from pull requests and Jira issues
+starting with CiviCRM 4.7.14. Jira issue creation at https://issues.civicrm.org was 
+disabled on March 31 2018.
 
 ## CiviCRM 5.13.4
 
