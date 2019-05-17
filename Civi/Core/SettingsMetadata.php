@@ -53,6 +53,7 @@ class SettingsMetadata {
    *
    * @param array $filters
    * @param int $domainID
+   * @param bool $loadOptions
    *
    * @return array
    *   the following information as appropriate for each setting
@@ -64,8 +65,10 @@ class SettingsMetadata {
    *   - is_contact
    *   - description
    *   - help_text
+   *   - options
+   *   - pseudoconstant
    */
-  public static function getMetadata($filters = [], $domainID = NULL) {
+  public static function getMetadata($filters = [], $domainID = NULL, $loadOptions = FALSE) {
     if ($domainID === NULL) {
       $domainID = \CRM_Core_Config::domainID();
     }
@@ -95,6 +98,9 @@ class SettingsMetadata {
     }
 
     self::_filterSettingsSpecification($filters, $settingsMetadata);
+    if ($loadOptions) {
+      self::loadOptions($settingsMetadata);
+    }
 
     return $settingsMetadata;
   }
@@ -145,20 +151,41 @@ class SettingsMetadata {
    *   Metadata to filter.
    */
   protected static function _filterSettingsSpecification($filters, &$settingSpec) {
-    if (empty($filters)) {
-      return;
+    if (!empty($filters['name'])) {
+      $settingSpec = array_intersect_key($settingSpec, array_flip((array) $filters['name']));
+      // FIXME: This is a workaround for settingsBag::setDb() called by unit tests with settings names that don't exist
+      $settingSpec += array_fill_keys((array) $filters['name'], []);
+      unset($filters['name']);
     }
-    elseif (array_keys($filters) == ['name']) {
-      $settingSpec = [$filters['name'] => \CRM_Utils_Array::value($filters['name'], $settingSpec, '')];
-      return;
-    }
-    else {
+    if (!empty($filters)) {
       foreach ($settingSpec as $field => $fieldValues) {
         if (array_intersect_assoc($fieldValues, $filters) != $filters) {
           unset($settingSpec[$field]);
         }
       }
-      return;
+    }
+  }
+
+  /**
+   * Retrieve options from settings metadata
+   *
+   * @param array $settingSpec
+   */
+  protected static function loadOptions(&$settingSpec) {
+    foreach ($settingSpec as &$spec) {
+      if (empty($spec['pseudoconstant'])) {
+        continue;
+      }
+      // It would be nice if we could leverage CRM_Core_PseudoConstant::get() somehow,
+      // but it's tightly coupled to DAO/field. However, if you really need to support
+      // more pseudoconstant types, then probably best to refactor it. For now, KISS.
+      if (!empty($spec['pseudoconstant']['callback'])) {
+        $spec['options'] = Resolver::singleton()->call($spec['pseudoconstant']['callback'], []);
+      }
+      elseif (!empty($spec['pseudoconstant']['optionGroupName'])) {
+        $keyColumn = \CRM_Utils_Array::value('keyColumn', $spec['pseudoconstant'], 'value');
+        $spec['options'] = \CRM_Core_OptionGroup::values($spec['pseudoconstant']['optionGroupName'], FALSE, FALSE, TRUE, NULL, 'label', TRUE, FALSE, $keyColumn);
+      }
     }
   }
 
