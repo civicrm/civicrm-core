@@ -343,7 +343,13 @@ class CRM_Core_Payment_Elavon extends CRM_Core_Payment {
 
     $xml = '<txn>';
     foreach ($requestFields as $key => $value) {
-      $xml .= '<' . $key . '>' . self::tidyStringforXML($value, $xmlFieldLength[$key]) . '</' . $key . '>';
+      //dev/core/966 Don't send email through the urlencode.
+      if ($key == 'ssl_email') {
+        $xml .= '<' . $key . '>' . substr($value, 0, $xmlFieldLength[$key]) . '</' . $key . '>';
+      }
+      else {
+        $xml .= '<' . $key . '>' . self::tidyStringforXML($value, $xmlFieldLength[$key]) . '</' . $key . '>';
+      }
     }
     $xml .= '</txn>';
     return $xml;
