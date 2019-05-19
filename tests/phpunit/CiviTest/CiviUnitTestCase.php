@@ -27,6 +27,7 @@
  */
 
 use Civi\Payment\System;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  *  Include class definitions
@@ -51,7 +52,7 @@ define('API_LATEST_VERSION', 3);
  *  Common functions for unit tests
  * @package CiviCRM
  */
-class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
+class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
 
   use \Civi\Test\Api3DocTrait;
   use \Civi\Test\GenericAssertionsTrait;
@@ -317,7 +318,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     }
 
     //  Get and save a connection to the database
-    $this->_dbconn = $this->getConnection();
+    //$this->_dbconn = $this->getConnection();
 
     // reload database before each test
     //        $this->_populateDB();
@@ -371,17 +372,33 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public function loadAllFixtures() {
     $fixturesDir = __DIR__ . '/../../fixtures';
 
-    $this->getConnection()->getConnection()->query("SET FOREIGN_KEY_CHECKS = 0;");
+    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
 
     $yamlFiles = glob($fixturesDir . '/*.yaml');
     foreach ($yamlFiles as $yamlFixture) {
-      $op = new PHPUnit_Extensions_Database_Operation_Insert();
-      $dataset = new PHPUnit_Extensions_Database_DataSet_YamlDataSet($yamlFixture);
-      $this->_tablesToTruncate = array_merge($this->_tablesToTruncate, $dataset->getTableNames());
-      $op->execute($this->_dbconn, $dataset);
+      $yaml = Yaml::parse(file_get_contents($yamlFixture));
+      foreach ($yaml as $tableName => $vars) {
+        if ($tableName === 'civicrm_contact') {
+          CRM_Core_DAO::executeQuery('DELETE c FROM civicrm_contact c LEFT JOIN civicrm_domain d ON d.contact_id = c.id WHERE d.id IS NULL');
+        }
+        else {
+          CRM_Core_DAO::executeQuery("TRUNCATE $tableName");
+        }
+        foreach ($vars as $entity) {
+          $keys = $values = [];
+          foreach ($entity as $key => $value) {
+            $keys[] = $key;
+            $values[] = is_numeric($value) ? $value : "'{$value}'";
+          }
+          CRM_Core_DAO::executeQuery("
+            INSERT INTO $tableName (" . implode(',', $keys) . ') VALUES(' . implode(',', $values) . ')'
+          );
+        }
+
+      }
     }
 
-    $this->getConnection()->getConnection()->query("SET FOREIGN_KEY_CHECKS = 1;");
+    CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 1;");
   }
 
   /**
