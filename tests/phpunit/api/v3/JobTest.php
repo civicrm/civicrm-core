@@ -245,13 +245,19 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * We create 3 contacts - 1 is in our group, 1 has our membership & the chosen one has both
    * & check that only the chosen one got the reminder
    */
-  public function testCallSendReminderLimitTo() {
+  public function testCallSendReminderLimitToSMS() {
     $membershipTypeID = $this->membershipTypeCreate();
     $this->membershipStatusCreate();
     $createTotal = 3;
     $groupID = $this->groupCreate(array('name' => 'Texan drawlers', 'title' => 'a...'));
     for ($i = 1; $i <= $createTotal; $i++) {
       $contactID = $this->individualCreate();
+      $this->callAPISuccess('Phone', 'create', [
+        'contact_id' => $contactID,
+        'phone' => '555 123 1234',
+        'phone_type_id' => 'Mobile',
+        'location_type_id' => 'Billing',
+      ]);
       if ($i == 2) {
         $theChosenOneID = $contactID;
       }
@@ -271,6 +277,19 @@ class api_v3_JobTest extends CiviUnitTestCase {
         ));
       }
     }
+    $this->setupForSmsTests();
+    $provider = civicrm_api3('SmsProvider', 'create', array(
+      'name' => "CiviTestSMSProvider",
+      'api_type' => "1",
+      "username" => "1",
+      "password" => "1",
+      "api_type" => "1",
+      "api_url" => "1",
+      "api_params" => "a=1",
+      "is_default" => "1",
+      "is_active" => "1",
+      "domain_id" => "1",
+    ));
     $this->callAPISuccess('action_schedule', 'create', array(
       'title' => " remind all Texans",
       'subject' => "drawling renewal",
@@ -282,12 +301,16 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'start_action_unit' => 'day',
       'group_id' => $groupID,
       'limit_to' => TRUE,
+      'sms_provider_id' => $provider['id'],
+      'mode' => 'User_Preference',
     ));
     $this->callAPISuccess('job', 'send_reminder', array());
     $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
     $this->assertEquals($successfulCronCount, 1);
     $sentToID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_action_log");
     $this->assertEquals($sentToID, $theChosenOneID);
+    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery("SELECT is_error FROM civicrm_action_log"));
+    $this->setupForSmsTests(TRUE);
   }
 
   public function testCallDisableExpiredRelationships() {
@@ -312,6 +335,85 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertEquals('Go Go you good thing', $result['values'][$relationshipID]['description']);
     $this->contactDelete($individualID);
     $this->contactDelete($orgID);
+  }
+
+  /**
+   * Test scheduled reminders respect limit to (since above identified addition_to handling issue).
+   *
+   * We create 3 contacts - 1 is in our group, 1 has our membership & the chosen one has both
+   * & check that only the chosen one got the reminder
+   *
+   * Also check no hard fail on cron job with running a reminder that has a deleted SMS provider
+   */
+  public function testCallSendReminderLimitToSMSWithDeletedProviderr() {
+    $membershipTypeID = $this->membershipTypeCreate();
+    $this->membershipStatusCreate();
+    $createTotal = 3;
+    $groupID = $this->groupCreate(array('name' => 'Texan drawlers', 'title' => 'a...'));
+    for ($i = 1; $i <= $createTotal; $i++) {
+      $contactID = $this->individualCreate();
+      $this->callAPISuccess('Phone', 'create', [
+        'contact_id' => $contactID,
+        'phone' => '555 123 1234',
+        'phone_type_id' => 'Mobile',
+        'location_type_id' => 'Billing',
+      ]);
+      if ($i == 2) {
+        $theChosenOneID = $contactID;
+      }
+      if ($i < 3) {
+        $this->callAPISuccess('group_contact', 'create', array(
+          'contact_id' => $contactID,
+          'status' => 'Added',
+          'group_id' => $groupID,
+        ));
+      }
+      if ($i > 1) {
+        $this->callAPISuccess('membership', 'create', array(
+          'contact_id' => $contactID,
+          'membership_type_id' => $membershipTypeID,
+          'join_date' => 'now',
+          'start_date' => '+ 1 day',
+        ));
+      }
+    }
+    $this->setupForSmsTests();
+    $provider = civicrm_api3('SmsProvider', 'create', array(
+      'name' => "CiviTestSMSProvider",
+      'api_type' => "1",
+      "username" => "1",
+      "password" => "1",
+      "api_type" => "1",
+      "api_url" => "1",
+      "api_params" => "a=1",
+      "is_default" => "1",
+      "is_active" => "1",
+      "domain_id" => "1",
+    ));
+    $this->callAPISuccess('action_schedule', 'create', array(
+      'title' => " remind all Texans",
+      'subject' => "drawling renewal",
+      'entity_value' => $membershipTypeID,
+      'mapping_id' => 4,
+      'start_action_date' => 'membership_start_date',
+      'start_action_offset' => 1,
+      'start_action_condition' => 'before',
+      'start_action_unit' => 'day',
+      'group_id' => $groupID,
+      'limit_to' => TRUE,
+      'sms_provider_id' => $provider['id'],
+      'mode' => 'SMS',
+    ));
+    $this->callAPISuccess('SmsProvider', 'delete', ['id' => $provider['id']]);
+    $this->callAPISuccess('job', 'send_reminder', array());
+    $cronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
+    $this->assertEquals($cronCount, 1);
+    $sentToID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_action_log");
+    $this->assertEquals($sentToID, $theChosenOneID);
+    $cronlog = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_action_log")->fetchAll()[0];
+    $this->assertEquals(1, $cronlog['is_error']);
+    $this->assertEquals('SMS Provider is NULL in database cannot send reminder', $cronlog['message']);
+    $this->setupForSmsTests(TRUE);
   }
 
   /**
