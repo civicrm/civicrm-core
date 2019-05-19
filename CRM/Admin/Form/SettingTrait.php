@@ -66,8 +66,7 @@ trait CRM_Admin_Form_SettingTrait {
    */
   protected function getSettingsMetaData() {
     if (empty($this->settingsMetadata)) {
-      $allSettingMetaData = civicrm_api3('setting', 'getfields', []);
-      $this->settingsMetadata = array_intersect_key($allSettingMetaData['values'], $this->_settings);
+      $this->settingsMetadata = \Civi\Core\SettingsMetadata::getMetadata(['name' => array_keys($this->_settings)], NULL, TRUE);
       // This array_merge re-orders to the key order of $this->_settings.
       $this->settingsMetadata = array_merge($this->_settings, $this->settingsMetadata);
     }
@@ -174,10 +173,7 @@ trait CRM_Admin_Form_SettingTrait {
       $quickFormType = $this->getQuickFormType($props);
       if (isset($quickFormType)) {
         $options = CRM_Utils_Array::value('options', $props);
-        if (isset($props['pseudoconstant'])) {
-          $options = civicrm_api3('Setting', 'getoptions', [
-            'field' => $setting,
-          ])['values'];
+        if ($options) {
           if ($props['html_type'] === 'Select' && isset($props['is_required']) && $props['is_required'] === FALSE && !isset($options[''])) {
             // If the spec specifies the field is not required add a null option.
             // Why not if empty($props['is_required']) - basically this has been added to the spec & might not be set to TRUE
