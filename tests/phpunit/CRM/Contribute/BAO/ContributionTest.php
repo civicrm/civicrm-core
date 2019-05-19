@@ -1000,22 +1000,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
-   * Test checkContributeSettings.
-   */
-  public function testCheckContributeSettings() {
-    $settings = Civi::settings()->get('deferred_revenue_enabled');
-    $this->assertNull($settings);
-    $params = array(
-      'contribution_invoice_settings' => array(
-        'deferred_revenue_enabled' => '1',
-      ),
-    );
-    $this->callAPISuccess('Setting', 'create', $params);
-    $settings = Civi::settings()->get('deferred_revenue_enabled');
-    $this->assertEquals($settings, 1, 'Check for settings has failed');
-  }
-
-  /**
    * Test allowUpdateRevenueRecognitionDate.
    */
   public function testAllowUpdateRevenueRecognitionDate() {
