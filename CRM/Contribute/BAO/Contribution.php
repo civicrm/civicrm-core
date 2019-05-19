@@ -166,7 +166,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     if (!$contributionID
       && CRM_Utils_Array::value('membership_id', $params)
-      && self::checkContributeSettings('deferred_revenue_enabled')
+      && Civi::settings()->get('deferred_revenue_enabled')
     ) {
       $memberStartDate = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $params['membership_id'], 'start_date');
       if ($memberStartDate) {
@@ -5562,7 +5562,7 @@ LIMIT 1;";
    * @return null
    */
   public static function recordAlwaysAccountsReceivable(&$trxnParams, $contributionParams) {
-    if (!self::checkContributeSettings('always_post_to_accounts_receivable')) {
+    if (!Civi::settings()->get('always_post_to_accounts_receivable')) {
       return NULL;
     }
     $statusId = $contributionParams['contribution']->contribution_status_id;
