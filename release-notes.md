@@ -15,7 +15,6 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
     
-These release notes were manually compiled from pull requests and Jira issues
 starting with CiviCRM 4.7.14. Jira issue creation at https://issues.civicrm.org was 
 disabled on March 31 2018.
 
