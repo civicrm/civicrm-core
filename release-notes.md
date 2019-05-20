@@ -1,6 +1,6 @@
 # Release Notes
 
-These release notes are manually compiled from pull requests and CiviCRM GitLab issues
+These release notes are manually compiled from pull requests, Jira and GitLab issues
 starting after March 31 2018.
 
 Other resources for identifying changes are:
