@@ -88,4 +88,25 @@
 {/if}
 {/crmRegion}
 
+  {if $form.formName}
+  {literal}
+    <script type="text/javascript">
+      var alreadySubmitting = false;
+      console.log('alreadySubmitting loaded...');
+      CRM.$('#{/literal}{$form.formName}{literal}').on('submit', function(ev){
+        if (alreadySubmitting) {
+          ev.preventDefault();
+          return;
+        }
+        alreadySubmitting = true;
+        CRM.$('button.crm-button, .crm-button input').prop('disabled', true);
+      });
+      CRM.$('button .crm-button ui-button, .crm-button input ui-button').on('click', function(){
+        CRM.$('#_qf_button_override').val(CRM.$(this).attr('data-identifier'));
+        CRM.$(CRM.$(this).attr('data-form-name')).submit();
+      });
+    </script>
+  {/literal}
+  {/if}
+
 </div> {* end crm-container div *}

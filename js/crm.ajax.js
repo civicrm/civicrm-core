@@ -452,6 +452,7 @@
         });
       }
       if ($el.data('uiDialog')) {
+        var formName = $el.children('form').first().attr('name');
         // Show form buttons as part of the dialog
         var buttonContainers = '.crm-submit-buttons, .action-link',
           buttons = [],
@@ -462,7 +463,7 @@
             identifier = $el.attr('name') || $el.attr('href');
           if (!identifier || identifier === '#' || $.inArray(identifier, added) < 0) {
             var $icon = $el.find('.icon, .crm-i'),
-              button = {class: 'crm-button button', 'data-identifier': identifier, text: label, click: function() {
+              button = {class: 'crm-button button', 'data-identifier': identifier, 'data-form-name': formName, text: label, click: function() {
                 $el[0].click();
               }};
             if ($icon.length) {
