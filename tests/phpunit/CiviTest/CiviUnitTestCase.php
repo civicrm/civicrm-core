@@ -119,6 +119,16 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   private $tx = NULL;
 
   /**
+   * Array of IDs created to support the test.
+   *
+   * e.g
+   * $this->ids = ['Contact' => ['descriptive_key' => $contactID], 'Group' => [$groupID]];
+   *
+   * @var array
+   */
+  protected $ids = [];
+
+  /**
    * Class used for hooks during tests.
    *
    * This can be used to test hooks within tests. For example in the ACL_PermissionTrait:
