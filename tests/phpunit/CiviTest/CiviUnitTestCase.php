@@ -3160,4 +3160,37 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $dbLocale = '_en_US';
   }
 
+  /**
+   * Setup or clean up SMS tests
+   * @param bool $teardown
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function setupForSmsTests($teardown = FALSE) {
+    require_once 'CiviTest/CiviTestSMSProvider.php';
+
+    // Option value params for CiviTestSMSProvider
+    $groupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'sms_provider_name', 'id', 'name');
+    $params = array(
+      'option_group_id' => $groupID,
+      'label' => 'unittestSMS',
+      'value' => 'unit.test.sms',
+      'name'  => 'CiviTestSMSProvider',
+      'is_default' => 1,
+      'is_active'  => 1,
+      'version'    => 3,
+    );
+
+    if ($teardown) {
+      // Test completed, delete provider
+      $providerOptionValueResult = civicrm_api3('option_value', 'get', $params);
+      civicrm_api3('option_value', 'delete', array('id' => $providerOptionValueResult['id']));
+      return;
+    }
+
+    // Create an SMS provider "CiviTestSMSProvider". Civi handles "CiviTestSMSProvider" as a special case and allows it to be instantiated
+    //  in CRM/Sms/Provider.php even though it is not an extension.
+    return civicrm_api3('option_value', 'create', $params);
+  }
+
 }
