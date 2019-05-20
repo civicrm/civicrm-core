@@ -1479,16 +1479,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Verify successful update of individual contact.
    */
   public function testUpdateIndividualWithAll() {
-    // Insert a row in civicrm_contact creating individual contact.
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_ind.xml'
-      )
-    );
+    $contactID = $this->individualCreate();
 
-    $params = array(
-      'id' => 23,
+    $params = [
+      'id' => $contactID,
       'first_name' => 'abcd',
       'contact_type' => 'Individual',
       'nick_name' => 'This is nickname first',
@@ -1500,8 +1494,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'external_identifier' => '1928837465',
       'image_URL' => 'http://some.url.com/image.jpg',
       'home_url' => 'http://www.example.org',
-
-    );
+    ];
 
     $this->callAPISuccess('Contact', 'Update', $params);
     $getResult = $this->callAPISuccess('Contact', 'Get', $params);
@@ -1510,50 +1503,28 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     //reducing this test partially back to api v2 level to get it through
     unset($params['home_url']);
     foreach ($params as $key => $value) {
-      $this->assertEquals($value, $getResult['values'][23][$key]);
+      $this->assertEquals($value, $getResult['values'][$contactID][$key]);
     }
-    // Check updated civicrm_contact against expected.
-    $expected = $this->createXMLDataSet(
-      dirname(__FILE__) . '/dataset/contact_ind_upd.xml'
-    );
-    $actual = new PHPUnit_Extensions_Database_DataSet_QueryDataSet(
-      $this->_dbconn
-    );
-    $actual->addTable('civicrm_contact');
-    $expected->matches($actual);
   }
 
   /**
    * Verify successful update of organization contact.
+   *
+   * @throws \Exception
    */
   public function testUpdateOrganizationWithAll() {
-    // Insert a row in civicrm_contact creating organization contact
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_org.xml'
-      )
-    );
+    $contactID = $this->organizationCreate();
 
-    $params = array(
-      'id' => 24,
+    $params = [
+      'id' => $contactID,
       'organization_name' => 'WebAccess India Pvt Ltd',
       'legal_name' => 'WebAccess',
       'sic_code' => 'ABC12DEF',
       'contact_type' => 'Organization',
-    );
+    ];
 
     $this->callAPISuccess('Contact', 'Update', $params);
-
-    // Check updated civicrm_contact against expected.
-    $expected = $this->createXMLDataSet(
-      dirname(__FILE__) . '/dataset/contact_org_upd.xml'
-    );
-    $actual = new PHPUnit_Extensions_Database_DataSet_QueryDataSet(
-      $this->_dbconn
-    );
-    $actual->addTable('civicrm_contact');
-    $expected->matches($actual);
+    $this->getAndCheck($params, $contactID, 'Contact');
   }
 
   /**
@@ -1629,30 +1600,24 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Verify successful update of household contact.
    */
   public function testUpdateHouseholdWithAll() {
-    // Insert a row in civicrm_contact creating household contact
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_hld.xml'
-      )
-    );
+    $contactID = $this->householdCreate();
 
-    $params = array(
-      'id' => 25,
+    $params = [
+      'id' => $contactID ,
       'household_name' => 'ABC household',
       'nick_name' => 'ABC House',
       'contact_type' => 'Household',
-    );
+    ];
 
     $result = $this->callAPISuccess('Contact', 'Update', $params);
 
-    $expected = array(
+    $expected = [
       'contact_type' => 'Household',
       'is_opt_out' => 0,
       'sort_name' => 'ABC household',
       'display_name' => 'ABC household',
       'nick_name' => 'ABC House',
-    );
+    ];
     $this->getAndCheck($expected, $result['id'], 'contact');
   }
 
@@ -1664,20 +1629,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * CRM-7645.
    */
   public function testUpdateCreateWithID() {
-    // Insert a row in civicrm_contact creating individual contact.
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_ind.xml'
-      )
-    );
-
-    $params = array(
-      'id' => 23,
+    $contactID = $this->individualCreate();
+    $this->callAPISuccess('Contact', 'Update', [
+      'id' => $contactID,
       'first_name' => 'abcd',
       'last_name' => 'wxyz',
-    );
-    $this->callAPISuccess('Contact', 'Update', $params);
+    ]);
   }
 
   /**
@@ -1788,55 +1745,31 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test civicrm_contact_getquick() with empty name param.
    */
   public function testContactGetQuick() {
-    // Insert a row in civicrm_contact creating individual contact.
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_17.xml'
-      )
-    );
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/email_contact_17.xml'
-      )
-    );
-    $params = array(
-      'name' => "T",
-    );
+    $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact', 'email' => 'TestContact@example.com']);
 
-    $result = $this->callAPISuccess('contact', 'getquick', $params);
-    $this->assertEquals(17, $result['values'][0]['id']);
-    $params = array(
+    $result = $this->callAPISuccess('contact', 'getquick', ['name' => 'T']);
+    $this->assertEquals($contactID, $result['values'][0]['id']);
+    $params = [
       'name' => "TestContact@example.com",
       'field_name' => 'sort_name',
-    );
+    ];
     $result = $this->callAPISuccess('contact', 'getquick', $params);
-    $this->assertEquals(17, $result['values'][0]['id']);
+    $this->assertEquals($contactID, $result['values'][0]['id']);
   }
 
   /**
    * Test civicrm_contact_get) with empty params.
    */
   public function testContactGetEmptyParams() {
-    $this->callAPISuccess('contact', 'get', array());
+    $this->callAPISuccess('contact', 'get', []);
   }
 
   /**
    * Test civicrm_contact_get(,true) with no matches.
    */
   public function testContactGetOldParamsNoMatches() {
-    // Insert a row in civicrm_contact creating contact 17.
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_17.xml'
-      )
-    );
-
-    $params = array(
-      'first_name' => 'Fred',
-    );
-    $result = $this->callAPISuccess('contact', 'get', $params);
+    $this->individualCreate();
+    $result = $this->callAPISuccess('contact', 'get', ['first_name' => 'Fred']);
     $this->assertEquals(0, $result['count']);
   }
 
@@ -1844,19 +1777,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test civicrm_contact_get(,true) with one match.
    */
   public function testContactGetOldParamsOneMatch() {
-    // Insert a row in civicrm_contact creating contact 17
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(dirname(__FILE__) . '/dataset/contact_17.xml'
-      )
-    );
+    $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
 
-    $params = array(
-      'first_name' => 'Test',
-    );
-    $result = $this->callAPISuccess('contact', 'get', $params);
-    $this->assertEquals(17, $result['values'][17]['contact_id']);
-    $this->assertEquals(17, $result['id']);
+    $result = $this->callAPISuccess('contact', 'get', ['first_name' => 'Test']);
+    $this->assertEquals($contactID, $result['values'][$contactID]['contact_id']);
+    $this->assertEquals($contactID, $result['id']);
   }
 
   /**
@@ -2488,11 +2413,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test TrueFalse format - I couldn't come up with an easy way to get an error on Get.
    */
   public function testContactGetFormatIsSuccessTrue() {
-    $this->createContactFromXML();
+    $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $description = "This demonstrates use of the 'format.is_success' param.
     This param causes only the success or otherwise of the function to be returned as BOOLEAN";
     $subfile = "FormatIsSuccess_True";
-    $params = array('id' => 17, 'format.is_success' => 1);
+    $params = ['id' => $contactID, 'format.is_success' => 1];
     $result = $this->callAPIAndDocument('Contact', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals(1, $result);
     $this->callAPISuccess('Contact', 'Delete', $params);
@@ -2562,25 +2487,24 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test Single Entity format.
    */
   public function testContactGetSingleEntityArray() {
-    $this->createContactFromXML();
+    $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $description = "This demonstrates use of the 'format.single_entity_array' param.
       This param causes the only contact to be returned as an array without the other levels.
       It will be ignored if there is not exactly 1 result";
     $subfile = "GetSingleContact";
-    $params = array('id' => 17);
-    $result = $this->callAPIAndDocument('Contact', 'GetSingle', $params, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertEquals('Test Contact', $result['display_name']);
-    $this->callAPISuccess('Contact', 'Delete', $params);
+    $result = $this->callAPIAndDocument('Contact', 'GetSingle', ['id' => $contactID], __FUNCTION__, __FILE__, $description, $subfile);
+    $this->assertEquals('Mr. Test Contact II', $result['display_name']);
+    $this->callAPISuccess('Contact', 'Delete', ['id' => $contactID]);
   }
 
   /**
    * Test Single Entity format.
    */
   public function testContactGetFormatCountOnly() {
-    $this->createContactFromXML();
+    $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $description = "This demonstrates use of the 'getCount' action.
       This param causes the count of the only function to be returned as an integer.";
-    $params = array('id' => 17);
+    $params = ['id' => $contactID];
     $result = $this->callAPIAndDocument('Contact', 'GetCount', $params, __FUNCTION__, __FILE__, $description,
       'GetCountContact');
     $this->assertEquals('1', $result);
@@ -2591,14 +2515,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test id only format.
    */
   public function testContactGetFormatIDOnly() {
-    $this->createContactFromXML();
+    $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $description = "This demonstrates use of the 'format.id_only' param.
       This param causes the id of the only entity to be returned as an integer.
       It will be ignored if there is not exactly 1 result";
     $subfile = "FormatOnlyID";
-    $params = array('id' => 17, 'format.only_id' => 1);
+    $params = ['id' => $contactID, 'format.only_id' => 1];
     $result = $this->callAPIAndDocument('Contact', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertEquals('17', $result);
+    $this->assertEquals($contactID, $result);
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
 
@@ -2606,14 +2530,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test id only format.
    */
   public function testContactGetFormatSingleValue() {
-    $this->createContactFromXML();
+    $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $description = "This demonstrates use of the 'format.single_value' param.
       This param causes only a single value of the only entity to be returned as an string.
       It will be ignored if there is not exactly 1 result";
     $subFile = "FormatSingleValue";
-    $params = array('id' => 17, 'return' => 'display_name');
+    $params = ['id' => $contactID, 'return' => 'display_name'];
     $result = $this->callAPIAndDocument('Contact', 'getvalue', $params, __FUNCTION__, __FILE__, $description, $subFile);
-    $this->assertEquals('Test Contact', $result);
+    $this->assertEquals('Mr. Test Contact II', $result);
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
 
