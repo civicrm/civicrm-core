@@ -449,7 +449,34 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       self::processGreetings($contact);
     }
 
+    if (!empty($params['check_permissions'])) {
+      $contacts = [&$contact];
+      self::unsetProtectedFields($contacts);
+    }
+
     return $contact;
+  }
+
+  /**
+   * Format the output of the create contact function
+   * @param CRM_Contact_DAO_Contact[]|array[] $contacts
+   */
+  public static function unsetProtectedFields(&$contacts) {
+    if (!CRM_Core_Permission::check([['edit api keys', 'administer CiviCRM']])) {
+      $currentUser = CRM_Core_Session::getLoggedInContactID();
+      $editOwn = $currentUser && CRM_Core_Permission::check('edit own api keys');
+      foreach ($contacts as &$contact) {
+        $cid = is_object($contact) ? $contact->id : CRM_Utils_Array::value('id', $contact);
+        if (!($editOwn && $cid == $currentUser)) {
+          if (is_object($contact)) {
+            unset($contact->api_key);
+          }
+          else {
+            unset($contact['api_key']);
+          }
+        }
+      }
+    }
   }
 
   /**
