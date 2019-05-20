@@ -69,7 +69,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'civicrm_uf_match',
     ], TRUE);
     $this->callAPISuccess('membership_type', 'delete', ['id' => $this->_membershipTypeID]);
-    CRM_Core_DAO::executeQuery(" DELETE FROM civicrm_uf_group WHERE id IN ($this->_profileID, 26)");
+    CRM_Core_DAO::executeQuery(" DELETE FROM civicrm_uf_group WHERE id = $this->_profileID OR name = 'test_contact_activity_profile'");
     parent::tearDown();
   }
 
@@ -264,10 +264,8 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testContactActivityGetWrongActivityType() {
-    $sourceContactId = $this->householdCreate();
-
-    $activityParams = [
-      'source_contact_id' => $sourceContactId,
+    $activity = $this->callAPISuccess('activity', 'create', [
+      'source_contact_id' => $this->householdCreate(),
       'activity_type_id' => '2',
       'subject' => 'Test activity',
       'activity_date_time' => '20110316',
@@ -276,9 +274,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'details' => 'a test activity',
       'status_id' => '1',
       'priority_id' => '1',
-    ];
-
-    $activity = $this->callAPISuccess('activity', 'create', $activityParams)['values'];
+    ])['values'];
 
     $activityValues = array_pop($activity);
 
@@ -873,15 +869,84 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * @return array
    */
   public function _createContactWithActivity() {
-    // @TODO: Create profile with custom fields
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/dataset/uf_group_contact_activity_26.xml'
-      )
-    );
-    // hack: xml data set do not accept  (CRM_Core_DAO::VALUE_SEPARATOR)
-    CRM_Core_DAO::setFieldValue('CRM_Core_DAO_UFGroup', '26', 'group_type', 'Individual,Contact,Activity' . CRM_Core_DAO::VALUE_SEPARATOR . 'ActivityType:1');
+    $ufGroupID = $this->callAPISuccess('UFGroup', 'create', [
+      'group_type' => 'Individual,Contact,Activity',
+      'title' => 'Test Contact-Activity Profile',
+      'name' => 'test_contact_activity_profile',
+    ])['id'];
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'first_name',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'First Name',
+      'field_type' => 'Individual',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'last_name',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'Last Name',
+      'field_type' => 'Individual',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'email',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'Email',
+      'field_type' => 'Contact',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'activity_subject',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'Activity Subject',
+      'is_searchable' => TRUE,
+      'field_type' => 'Activity',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'activity_details',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'Activity Details',
+      'is_searchable' => TRUE,
+      'field_type' => 'Activity',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'activity_duration',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'Activity Duration',
+      'is_searchable' => TRUE,
+      'field_type' => 'Activity',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'activity_date_time',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'Activity Date',
+      'is_searchable' => TRUE,
+      'field_type' => 'Activity',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'activity_status_id',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'Activity Status',
+      'is_searchable' => TRUE,
+      'field_type' => 'Activity',
+    ]);
+
+    // hack: xml data set did not accept  (CRM_Core_DAO::VALUE_SEPARATOR) - should be possible
+    // to unhack now we use the api.
+    CRM_Core_DAO::setFieldValue('CRM_Core_DAO_UFGroup', $ufGroupID, 'group_type', 'Individual,Contact,Activity' . CRM_Core_DAO::VALUE_SEPARATOR . 'ActivityType:1');
 
     $sourceContactId = $this->individualCreate();
     $contactParams = [
@@ -928,7 +993,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
 
     // valid parameters for above profile
     $profileParams = [
-      'profile_id' => 26,
+      'profile_id' => $ufGroupID,
       'contact_id' => $contactId,
       'activity_id' => $activityValues['id'],
     ];
