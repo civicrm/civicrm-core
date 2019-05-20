@@ -1736,7 +1736,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @return array
    *   Contact details
    */
-  public static function getHierContactDetails($contactId, &$fields) {
+  public static function getHierContactDetails($contactId, $fields) {
     $params = array(array('contact_id', '=', $contactId, 0, 0));
     $options = array();
 
@@ -2073,7 +2073,7 @@ ORDER BY civicrm_email.is_primary DESC";
    */
   public static function formatProfileContactParams(
     &$params,
-    &$fields,
+    $fields,
     $contactID = NULL,
     $ufGroupId = NULL,
     $ctype = NULL,
