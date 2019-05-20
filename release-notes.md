@@ -14,7 +14,6 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-drupal
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
-    
 
 ## CiviCRM 5.13.4
 
