@@ -1,7 +1,7 @@
 # Release Notes
 
 These release notes are manually compiled from pull requests, Jira and GitLab issues
-starting after March 31 2018.
+starting with CiviCRM 4.7.14.
 
 Other resources for identifying changes are:
 
