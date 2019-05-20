@@ -129,8 +129,6 @@ function civicrm_api3_contact_create($params) {
     _civicrm_api3_object_to_array_unique_fields($contact, $values[$contact->id]);
   }
 
-  $values = _civicrm_api3_contact_formatResult($params, $values);
-
   return civicrm_api3_create_success($values, $params, 'Contact', 'create');
 }
 
@@ -179,10 +177,7 @@ function _civicrm_api3_contact_create_spec(&$params) {
  *   API Result Array
  */
 function civicrm_api3_contact_get($params) {
-  $options = [];
-  _civicrm_api3_contact_get_supportanomalies($params, $options);
-  $contacts = _civicrm_api3_get_using_query_object('Contact', $params, $options);
-  $contacts = _civicrm_api3_contact_formatResult($params, $contacts);
+  $contacts = CRM_Contact_BAO_Contact::apiGet($params);
   return civicrm_api3_create_success($contacts, $params, 'Contact');
 }
 

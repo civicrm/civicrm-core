@@ -442,7 +442,63 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       self::processGreetings($contact);
     }
 
+    $contact = self::formatContactOutput($contact, $params);
+
     return $contact;
+  }
+
+  /**
+   * Format the output of the create contact function
+   * @param object|array $contact CRM_Contact_DAO_Content | array of DAO objects.
+   * @param array $params submitted params
+   * @return object
+   */
+  public static function formatContactOutput($contact, $params) {
+    $apiKeyPerms = ['edit api keys', 'administer CiviCRM'];
+    $allowApiKey = empty($params['check_permissions']) || CRM_Core_Permission::check([$apiKeyPerms]);
+    $protectedFields = [];
+    foreach (self::fields() as $field => $details) {
+      if (isset($details['protected']) && $details['protected']) {
+        $protectedFields[] = $field;
+      }
+    }
+    if (!$allowApiKey) {
+      if (!is_array($contact)) {
+        foreach ($protectedFields as $field) {
+          if (isset($contact->$field)) {
+            unset($contact->$field);
+          }
+        }
+      }
+      else {
+        foreach ($protectedFields as $field) {
+          if (isset($contact[$field])) {
+            unset($contact[$field]);
+          }
+          else {
+            foreach ($contact as $key => $values) {
+              if (isset($contact[$key][$field])) {
+                unset($contact[$key][$field]);
+              }
+            }
+          }
+        }
+      }
+    }
+    return $contact;
+  }
+
+  /**
+   * BAO function to handle API Get Requests for contacts
+   * @param array $params API Params
+   * @return array
+   */
+  public static function apiGet($params) {
+    $options = [];
+    _civicrm_api3_contact_get_supportanomalies($params, $options);
+    $contacts = _civicrm_api3_get_using_query_object('Contact', $params, $options);
+    $contacts = self::formatContactOutput($contacts, $params);
+    return $contacts;
   }
 
   /**
