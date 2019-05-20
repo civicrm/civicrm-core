@@ -2612,19 +2612,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
-   * Set up helper to create a contact.
-   */
-  public function createContactFromXML() {
-    // Insert a row in civicrm_contact creating contact 17.
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_17.xml'
-      )
-    );
-  }
-
-  /**
    * Test contact proximity api.
    */
   public function testContactProximity() {
