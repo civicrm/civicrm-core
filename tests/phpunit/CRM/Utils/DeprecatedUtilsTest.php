@@ -38,28 +38,17 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
    *  and request the error in array format
    */
   public function testCheckParamsWithDuplicateContact2() {
-    //  Insert a row in civicrm_contact creating individual contact
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/../../api/v3/dataset/contact_17.xml'
-      )
-    );
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/../../api/v3/dataset/email_contact_17.xml'
-      )
-    );
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact', 'email' => 'TestContact@example.com']);
 
-    $params = array(
+    $params = [
       'first_name' => 'Test',
       'last_name' => 'Contact',
       'email' => 'TestContact@example.com',
       'contact_type' => 'Individual',
-    );
+    ];
     $contact = _civicrm_api3_deprecated_contact_check_params($params, TRUE);
     $this->assertEquals(1, $contact['is_error']);
-    $this->assertRegexp("/matching contacts.*17/s",
+    $this->assertRegexp("/matching contacts.*1/s",
       $contact['error_message']['message']
     );
   }
