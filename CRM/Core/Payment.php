@@ -261,7 +261,14 @@ abstract class CRM_Core_Payment {
     }
 
     $log = new CRM_Utils_SystemLogger();
-    $log->alert($message, $_REQUEST);
+    // $_REQUEST doesn't handle JSON, to support providers that POST JSON we need the raw POST data.
+    $rawRequestData = file_get_contents("php://input");
+    if (CRM_Utils_JSON::isValidJSON($rawRequestData)) {
+      $log->alert($message, json_decode($rawRequestData, TRUE));
+    }
+    else {
+      $log->alert($message, $_REQUEST);
+    }
   }
 
   /**
