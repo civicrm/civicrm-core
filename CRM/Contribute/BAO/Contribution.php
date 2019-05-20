@@ -3591,8 +3591,12 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     ) {
       return;
     }
-    if ((($previousContributionStatus == 'Partially paid'
-      && $currentContributionStatus == 'Completed')
+    // The 'right' way to add payments or refunds is through the Payment.create api. That api
+    // then updates the contribution but this process shoud not also record another financial trxn.
+    if ((($previousContributionStatus == 'Partially paid' && $currentContributionStatus == 'Completed')
+      || ($previousContributionStatus == 'Pending refund' && $currentContributionStatus == 'Completed')
+      // This concept of pay_later as different to any other sort of pending is deprecated & it's unclear
+      // why it is here or where it is handled instead.
       || ($previousContributionStatus == 'Pending' && $params['prevContribution']->is_pay_later == TRUE
       && $currentContributionStatus == 'Partially paid'))
       && $context == 'changedStatus'

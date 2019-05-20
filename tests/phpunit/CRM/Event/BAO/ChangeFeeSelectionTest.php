@@ -308,12 +308,12 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $contributionBalance = ($this->_cheapFee - $actualPaidAmount);
     $this->assertEquals($contributionBalance, CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId));
 
-    //Complete the refund payment.
-    $submittedValues = array(
-      'total_amount' => 120,
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $this->_contributionId,
+      'total_amount' => -120,
       'payment_instrument_id' => 3,
-    );
-    CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $submittedValues, 'refund', $this->_participantId);
+      'participant_id' => $this->_participantId,
+    ]);
     $contributionBalance += 120;
     $this->assertEquals($contributionBalance, CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId));
 
