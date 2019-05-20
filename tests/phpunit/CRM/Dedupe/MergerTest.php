@@ -11,6 +11,11 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
   protected $_contactIds = [];
 
+  /**
+   * Tear down.
+   *
+   * @throws \Exception
+   */
   public function tearDown() {
     $this->quickCleanup([
       'civicrm_contact',
@@ -315,6 +320,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    *
    * Note the rule will match on organization_name OR email - hence lots of
    * matches.
+   *
+   * @throws \Exception
    */
   public function testGetOrganizationMatches() {
     $this->setupMatchData();
@@ -389,6 +396,8 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
   /**
    *  Test function that gets organization duplicate pairs.
+   *
+   * @throws \Exception
    */
   public function testGetOrganizationMatchesInGroup() {
     $this->setupMatchData();
@@ -514,7 +523,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * Note the handling is silly - we are testing to lock in over short term
    * changes not to imply any contract on the function.
    */
-  public function testgetRowsElementsAndInfoSpecialInfo() {
+  public function testGetRowsElementsAndInfoSpecialInfo() {
     $contact1 = $this->individualCreate([
       'preferred_communication_method' => [],
       'communication_style_id' => 'Familiar',
@@ -571,7 +580,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
 
     //Add Membership for the duplicate contact.
     $memTypeId = $this->membershipTypeCreate();
-    $membership = $this->callAPISuccess('Membership', 'create', [
+    $this->callAPISuccess('Membership', 'create', [
       'membership_type_id' => $memTypeId,
       'contact_id' => $duplicateContactID,
     ]);
@@ -767,6 +776,9 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * @param $params
    *   Array of fields to be merged from source into target contact, of the form
    *   ['move_<fieldName>' => <fieldValue>]
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   private function mergeContacts($originalContactID, $duplicateContactID, $params) {
     $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($originalContactID, $duplicateContactID);
