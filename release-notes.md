@@ -6,6 +6,7 @@ starting with CiviCRM 4.7.14.
 Other resources for identifying changes are:
 
 * The CiviCRM GitLab project management system at https://lab.civicrm.org/groups/dev/-/issues
+* The Jira project management system at https://issues.civicrm.org
 * The following GitHub projects:
     * https://github.com/civicrm/civicrm-core
     * https://github.com/civicrm/civicrm-packages
