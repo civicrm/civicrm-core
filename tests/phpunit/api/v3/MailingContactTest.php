@@ -134,24 +134,12 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
    * Test that the API returns a mailing properly when there is only one.
    */
   public function testMailingContactDelivered() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    //Create the User
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/mailing_contact.xml'
-      )
-    );
-    // Create the Mailing and connections to the user.
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/mailing_delivered.xml'
-      )
-    );
+    $contactID = $this->individualCreate(['first_name' => 'Test']);
 
-    $params = array(
-      'contact_id' => 23,
+    $params = [
+      'contact_id' => $contactID,
       'type' => 'Delivered',
-    );
+    ];
 
     $result = $this->callAPISuccess('MailingContact', 'get', $params);
     $count = $this->callAPISuccess('MailingContact', 'getcount', $params);
