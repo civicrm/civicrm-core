@@ -1,6 +1,6 @@
 # Release Notes
 
-These release notes are manually compiled from pull requests, Jira and GitLab issues
+These release notes are manually compiled from pull requests, GitLab and Jira issues
 starting with CiviCRM 4.7.14.
 
 Other resources for identifying changes are:
