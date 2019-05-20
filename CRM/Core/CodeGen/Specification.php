@@ -369,6 +369,7 @@ class CRM_Core_CodeGen_Specification {
     $field['uniqueName'] = $this->value('uniqueName', $fieldXML);
     $field['serialize'] = $this->value('serialize', $fieldXML);
     $field['html'] = $this->value('html', $fieldXML);
+    $field['protected'] = $this->value('protected', $fieldXML);
     if (!empty($field['html'])) {
       $validOptions = [
         'type',
