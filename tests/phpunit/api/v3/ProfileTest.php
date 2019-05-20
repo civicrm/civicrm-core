@@ -32,13 +32,11 @@
  * @group headless
  */
 class api_v3_ProfileTest extends CiviUnitTestCase {
-  protected $_apiversion;
   protected $_profileID = 0;
   protected $_membershipTypeID;
   protected $_contactID;
 
   public function setUp() {
-    $this->_apiversion = 3;
     parent::setUp();
     $config = CRM_Core_Config::singleton();
     $countryLimit = $config->countryLimit;
@@ -49,16 +47,22 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $this->_membershipTypeID = $this->membershipTypeCreate();
   }
 
+  /**
+   * Cleanup after test.
+   *
+   * @throws \Exception
+   */
   public function tearDown() {
 
-    $this->quickCleanup(array(
+    $this->quickCleanup([
       'civicrm_contact',
       'civicrm_phone',
       'civicrm_address',
       'civicrm_membership',
       'civicrm_contribution',
       'civicrm_uf_match',
-    ), TRUE);
+      'civicrm_uf_group',
+    ], TRUE);
     $this->callAPISuccess('membership_type', 'delete', array('id' => $this->_membershipTypeID));
     // ok can't be bothered wring an api to do this & truncating is crazy
     CRM_Core_DAO::executeQuery(" DELETE FROM civicrm_uf_group WHERE id IN ($this->_profileID, 26)");
@@ -241,13 +245,9 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * Check contact activity profile with wrong activity type.
    */
   public function testContactActivityGetWrongActivityType() {
-    //flush cache by calling with reset
-    $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE, TRUE, 'name', TRUE);
 
-    $sourceContactId = $this->householdCreate();
-
-    $activityparams = array(
-      'source_contact_id' => $sourceContactId,
+    $activity = $this->callAPISuccess('activity', 'create', [
+      'source_contact_id' => $this->householdCreate(),
       'activity_type_id' => '2',
       'subject' => 'Test activity',
       'activity_date_time' => '20110316',
@@ -256,9 +256,7 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
       'details' => 'a test activity',
       'status_id' => '1',
       'priority_id' => '1',
-    );
-
-    $activity = $this->callAPISuccess('activity', 'create', $activityparams);
+    ]);
 
     $activityValues = array_pop($activity['values']);
 
@@ -851,15 +849,84 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
    * @return array
    */
   public function _createContactWithActivity() {
-    // @TODO: Create profile with custom fields
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/dataset/uf_group_contact_activity_26.xml'
-      )
-    );
-    // hack: xml data set do not accept  (CRM_Core_DAO::VALUE_SEPARATOR)
-    CRM_Core_DAO::setFieldValue('CRM_Core_DAO_UFGroup', '26', 'group_type', 'Individual,Contact,Activity' . CRM_Core_DAO::VALUE_SEPARATOR . 'ActivityType:1');
+    $ufGroupID = $this->callAPISuccess('UFGroup', 'create', [
+      'group_type' => 'Individual,Contact,Activity',
+      'title' => 'Test Contact-Activity Profile',
+      'name' => 'test_contact_activity_profile',
+    ])['id'];
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'first_name',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'First Name',
+      'field_type' => 'Individual',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'last_name',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'Last Name',
+      'field_type' => 'Individual',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'email',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'Email',
+      'field_type' => 'Contact',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'activity_subject',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'Activity Subject',
+      'is_searchable' => TRUE,
+      'field_type' => 'Activity',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'activity_details',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'Activity Details',
+      'is_searchable' => TRUE,
+      'field_type' => 'Activity',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'activity_duration',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'Activity Duration',
+      'is_searchable' => TRUE,
+      'field_type' => 'Activity',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'activity_date_time',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'Activity Date',
+      'is_searchable' => TRUE,
+      'field_type' => 'Activity',
+    ]);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $ufGroupID,
+      'field_name' => 'activity_status_id',
+      'is_required' => TRUE,
+      'visibility' => 'Public Pages and Listings',
+      'label' => 'Activity Status',
+      'is_searchable' => TRUE,
+      'field_type' => 'Activity',
+    ]);
+
+    // hack: xml data set did not accept  (CRM_Core_DAO::VALUE_SEPARATOR) - should be possible
+    // to unhack now we use the api.
+    CRM_Core_DAO::setFieldValue('CRM_Core_DAO_UFGroup', $ufGroupID, 'group_type', 'Individual,Contact,Activity' . CRM_Core_DAO::VALUE_SEPARATOR . 'ActivityType:1');
 
     $sourceContactId = $this->individualCreate();
     $contactParams = array(
@@ -905,11 +972,11 @@ class api_v3_ProfileTest extends CiviUnitTestCase {
     $activityValues = array_pop($activity['values']);
 
     // valid parameters for above profile
-    $profileParams = array(
-      'profile_id' => 26,
+    $profileParams = [
+      'profile_id' => $ufGroupID,
       'contact_id' => $contactId,
       'activity_id' => $activityValues['id'],
-    );
+    ];
 
     // expected result of above created profile
     $expected = array(
