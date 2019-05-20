@@ -464,7 +464,17 @@
           if (!identifier || identifier === '#' || $.inArray(identifier, added) < 0) {
             var $icon = $el.find('.icon, .crm-i'),
               button = {class: 'crm-button button', 'data-identifier': identifier, 'data-form-name': formName, text: label, click: function() {
-                $el[0].click();
+                console.log('submitting via ajaxform click');
+                CRM.$('form[name="' + formName + '"]#_qf_button_override').val(identifier);
+                CRM.$('form[name="' + formName + '"]').submit();
+              }, keydown: function(event) {
+                  console.log(event.which);
+                  if (event.which === 13) {
+                    event.preventDefault();
+                    console.log('submitting via ajaxform enter key');
+                    CRM.$('form[name="' + formName + '"]#_qf_button_override').val(identifier);
+                    CRM.$('form[name="' + formName + '"]').submit();
+                  }
               }};
             if ($icon.length) {
               button.icons = {primary: $icon.attr('class')};

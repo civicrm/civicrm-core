@@ -91,19 +91,46 @@
   {if $form.formName}
   {literal}
     <script type="text/javascript">
+      CRM.$(document).on('keydown', function(event) {
+        console.log('document keydown triggered: ' + event.which);
+        if (event.which === 13) {
+          event.preventDefault();
+          // On firefox, enter submits the form. So detect if the button is "linked" to a form and prevent the default action if so.
+          if (CRM.$(event.target).attr('data-form-name') !== undefined) {
+            var formName = CRM.$(event.target).attr('data-form-name');
+            console.log('formName: ' + formName);
+          }
+        }
+      });
       var alreadySubmitting = false;
       console.log('alreadySubmitting loaded...');
-      CRM.$('#{/literal}{$form.formName}{literal}').on('submit', function(ev){
+      CRM.$('form').on('submit', function(ev){
+        console.log('form submitted...');
         if (alreadySubmitting) {
           ev.preventDefault();
           return;
         }
         alreadySubmitting = true;
         CRM.$('button.crm-button, .crm-button input').prop('disabled', true);
+      }).on('keydown', function(event) {
+        console.log('form keydown triggered');
       });
       CRM.$('button .crm-button ui-button, .crm-button input ui-button').on('click', function(){
         CRM.$('#_qf_button_override').val(CRM.$(this).attr('data-identifier'));
+        console.log('submitting via standard');
+        var formName = CRM.$(this).attr('data-form-name');
         CRM.$(CRM.$(this).attr('data-form-name')).submit();
+      }).on('keydown', function(event) {
+        console.log(event.which);
+        if (event.which === 13) {
+          event.preventDefault();
+          var formName = CRM.$(this).attr('data-form-name');
+          console.log('submitting via standard enter key');
+          CRM.$('form[name="' + formName + '"]#_qf_button_override').val(identifier);
+          CRM.$('form[name="' + formName + '"]').submit();
+        }
+      }).on('submit', function(event) {
+        console.log('submit triggered');
       });
     </script>
   {/literal}
