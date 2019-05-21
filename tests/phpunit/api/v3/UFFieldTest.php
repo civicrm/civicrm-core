@@ -40,13 +40,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
    *
    * @var int
    */
-  protected $_ufGroupId = 11;
-
-  protected $_ufFieldId;
-
-  protected $_contactId = 69;
-
-  protected $_apiversion = 3;
+  protected $ufGroupID;
 
   protected $_params;
 
@@ -69,14 +63,18 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
         'civicrm_uf_match',
       ]
     );
-
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute(
-      $this->_dbconn,
-      $this->createFlatXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml')
-    );
-
-    $this->callAPISuccess('uf_field', 'getfields', ['cache_clear' => 1]);
+    $this->groupCreate();
+    $contactID = $this->individualCreate();
+    $this->ufGroupID = $this->callAPISuccess('UFGroup', 'create', [
+      'group_type' => 'Contact',
+      'help_pre' => 'Profile to Test API',
+      'title' => 'Test Profile',
+    ])['id'];
+    $this->callAPISuccess('UFMatch', 'create', [
+      'contact_id' => $contactID,
+      'uf_id' => $this->ufGroupID,
+      'uf_name' => 'a@example.com',
+    ]);
 
     $this->_params = [
       'field_name' => 'phone',
@@ -88,7 +86,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       'is_active' => 1,
       'location_type_id' => 1,
       'phone_type_id' => 1,
-      'uf_group_id' => $this->_ufGroupId,
+      'uf_group_id' => $this->ufGroupID,
     ];
   }
 
@@ -107,6 +105,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
         'civicrm_uf_match',
       ]
     );
+    parent::tearDown();
   }
 
   /**
@@ -116,7 +115,6 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     $params = $this->_params;
     $ufField = $this->callAPIAndDocument('uf_field', 'create', $params, __FUNCTION__, __FILE__);
     unset($params['uf_group_id']);
-    $this->_ufFieldId = $ufField['id'];
     foreach ($params as $key => $value) {
       $this->assertEquals($ufField['values'][$ufField['id']][$key], $params[$key]);
     }
@@ -178,6 +176,8 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
 
   /**
    * Test getting ufField.
+   *
+   * @throws \Exception
    */
   public function testGetUFFieldSuccess() {
     $this->callAPISuccess($this->_entity, 'create', $this->_params);
@@ -222,7 +222,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     ];
 
     $params = [
-      'uf_group_id' => $this->_ufGroupId,
+      'uf_group_id' => $this->ufGroupID,
       'option.autoweight' => FALSE,
       'values' => $baseFields,
       'check_permissions' => TRUE,
@@ -263,7 +263,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
     ];
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM'];
     $params = [
-      'uf_group_id' => $this->_ufGroupId,
+      'uf_group_id' => $this->ufGroupID,
       'option.autoweight' => FALSE,
       'values' => $baseFields,
       'check_permissions' => TRUE,
