@@ -8,4 +8,5 @@ d0d7ad1 | Redmine-9013 Fix issue where `mail_report` cron returns a copy of the 
 3bbaa1d | Add in `settings_location.php` file | Not going to be fixed in Core |  
 6141c54 | Ùpdate file path in `settings_location.php` file for cluster | Not going to be fixed in core - local change | 
 69614f1 | Update composer.json and remove composer.lock as is required for composer in docker | Not going to be fixed local changes needed to support AUG docker |  
-ad4fab7 | dev/core/#273: Set doNotSms To False When Phone Number Is Given | Need to check against core pr to determine if still needed |  
+ad4fab7 | dev/core/#273: Set doNotSms To False When Phone Number Is Given | Need to check against core pr to determine if still needed | 
+321913871a | Port fix for dev/core#369 Fix Fatal error on scheduled reminders when SMS provider has been deleted | PR meged into 5.15 |   
