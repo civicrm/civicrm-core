@@ -220,20 +220,248 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public function testReportTemplateGetRowsMailingUniqueOpened() {
     $description = "Retrieve rows from a mailing opened report template.";
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 9', 'gender_id' => 1, 'prefix_id' => 1, 'suffix_id' => 1]);
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 10', 'gender_id' => 2, 'prefix_id' => 2, 'suffix_id' => 2]);
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 11', 'gender_id' => 3, 'prefix_id' => 3, 'suffix_id' => 3]);
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 12', 'gender_id' => 3, 'prefix_id' => 4, 'suffix_id' => 4]);
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 13', 'gender_id' => 2, 'prefix_id' => 2, 'suffix_id' => 2]);
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 14', 'gender_id' => 3, 'prefix_id' => 4, 'suffix_id' => 4]);
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 15', 'gender_id' => 3, 'prefix_id' => 4, 'suffix_id' => 5]);
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 16', 'gender_id' => 3, 'prefix_id' => 4, 'suffix_id' => 6]);
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 17', 'gender_id' => 2, 'prefix_id' => 4, 'suffix_id' => 7]);
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 18', 'gender_id' => 2, 'prefix_id' => 4, 'suffix_id' => 4]);
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 19', 'gender_id' => 2, 'prefix_id' => 4, 'suffix_id' => 6]);
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 20', 'gender_id' => 1, 'prefix_id' => 4, 'suffix_id' => 6]);
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 21', 'gender_id' => 3, 'prefix_id' => 1, 'suffix_id' => 6]);
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 22', 'gender_id' => 1, 'prefix_id' => 1, 'suffix_id' => 1]);
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 23', 'gender_id' => 3, 'prefix_id' => 1, 'suffix_id' => 1]);
+    $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Test Contact 24', 'gender_id' => 3, 'prefix_id' => 3, 'suffix_id' => 2]);
+
+    $this->tagCreate(['name' => 'Test Tag 7']);
+    $this->tagCreate(['name' => 'Test Tag 9']);
+    $this->tagCreate(['name' => 'Test Tag 10']);
+/**
+    <civicrm_entity_tag
+        entity_id="10"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="12"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="14"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="16"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="18"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="20"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="22"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="24"
+        entity_table="civicrm_contact"
+        tag_id="9"
+    />
+    <civicrm_entity_tag
+        entity_id="11"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="12"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="15"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="16"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="19"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="20"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="23"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_entity_tag
+        entity_id="24"
+        entity_table="civicrm_contact"
+        tag_id="7"
+    />
+    <civicrm_saved_search
+        id="1"
+        form_values='a:9:{s:5:"qfKey";s:32:"0123456789abcdef0123456789abcdef";s:13:"includeGroups";a:1:{i:0;s:1:"3";}s:13:"excludeGroups";a:0:{}s:11:"includeTags";a:0:{}s:11:"excludeTags";a:0:{}s:4:"task";s:2:"14";s:8:"radio_ts";s:6:"ts_all";s:14:"customSearchID";s:1:"4";s:17:"customSearchClass";s:36:"CRM_Contact_Form_Search_Custom_Group";}'
+    />
+    <civicrm_saved_search
+        id="2"
+        form_values='a:9:{s:5:"qfKey";s:32:"0123456789abcdef0123456789abcdef";s:13:"includeGroups";a:0:{}s:13:"excludeGroups";a:1:{i:0;s:1:"3";}s:11:"includeTags";a:0:{}s:11:"excludeTags";a:0:{}s:4:"task";s:2:"14";s:8:"radio_ts";s:6:"ts_all";s:14:"customSearchID";s:1:"4";s:17:"customSearchClass";s:36:"CRM_Contact_Form_Search_Custom_Group";}'
+    />
+    <civicrm_group
+        id="3"
+        name="Test Group 3"
+        title="Test Group 3"
+        description="Test Group 3"
+        is_active="1"
+        visibility="User and User Admin Only"
+        is_hidden="0"
+    />
+    <civicrm_group
+        id="4"
+        name="Test Smart Group 4"
+        title="Test Smart Group 4"
+        description="Test Smart Group 4"
+        saved_search_id="1"
+        is_active="1"
+        visibility="User and User Admin Only"
+        is_hidden="0"
+    />
+    <civicrm_group
+        id="5"
+        name="Test Group 5"
+        title="Test Group 5"
+        description="Test Group 5"
+        is_active="1"
+        visibility="User and User Admin Only"
+        is_hidden="0"
+    />
+    <civicrm_group
+        id="6"
+        name="Test Smart Group 6"
+        title="Test Smart Group 6"
+        description="Test Smart Group 6"
+        saved_search_id="2"
+        is_active="1"
+        visibility="User and User Admin Only"
+        is_hidden="0"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="13"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="14"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="15"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="16"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="21"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="22"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="23"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="5"
+        contact_id="24"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="17"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="18"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="19"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="20"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="21"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="22"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="23"
+        status="Added"
+    />
+    <civicrm_group_contact
+        group_id="3"
+        contact_id="24"
+        status="Added"
+    />
+</dataset>
+
     $op->execute($this->_dbconn,
       $this->createFlatXMLDataSet(
         dirname(__FILE__) . '/../../CRM/Mailing/BAO/queryDataset.xml'
       )
     );
-
+*/
     // Check total rows without distinct
     global $_REQUEST;
     $_REQUEST['distinct'] = 0;
-    $result = $this->callAPIAndDocument('report_template', 'getrows', array(
+    $result = $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => 'Mailing/opened',
-      'options' => array('metadata' => array('labels', 'title')),
-    ), __FUNCTION__, __FILE__, $description, 'Getrows');
+      'options' => ['metadata' => array('labels', 'title')],
+    ]);
     $this->assertEquals(14, $result['count']);
 
     // Check total rows with distinct
@@ -396,6 +624,11 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     return array(array('member/detail'));
   }
 
+  /**
+   * Get the membership and contribution reports to test.
+   *
+   * @return array
+   */
   public static function getMembershipAndContributionReportTemplatesForGroupTests() {
     $templates = array_merge(self::getContributionReportTemplates(), self::getMembershipReportTemplates());
     foreach ($templates as $key => $value) {
@@ -1202,14 +1435,14 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     );
     $c3 = $this->contributionCreate($contribution3params);
     // Now the soft contribution.
-    $p = array(
+    $p = [
       'contribution_id' => $c3,
       'pcp_id' => $pcp2->id,
       'contact_id' => $pcpOwnerContact2Id,
       'amount' => 200.00,
       'currency' => 'USD',
       'soft_credit_type_id' => $pcp_soft_credit_type_id,
-    );
+    ];
     $this->callAPISuccess('contribution_soft', 'create', $p);
 
     $template = 'contribute/pcp';
@@ -1231,7 +1464,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public function testGetAddressColumns() {
     $template = 'event/participantlisting';
-    $rows = $this->callAPISuccess('report_template', 'getrows', [
+    $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
       'fields' => [
         'sort_name' => '1',
