@@ -412,7 +412,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertEquals($sentToID, $theChosenOneID);
     $cronlog = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_action_log")->fetchAll()[0];
     $this->assertEquals(1, $cronlog['is_error']);
-    $this->assertEquals('SMS Provider is NULL in database cannot send reminder', $cronlog['message']);
+    $this->assertEquals('SMS reminder cannot be sent because the SMS provider has been deleted.', $cronlog['message']);
     $this->setupForSmsTests(TRUE);
   }
 
