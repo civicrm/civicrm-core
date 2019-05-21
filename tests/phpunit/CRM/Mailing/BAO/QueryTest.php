@@ -6,6 +6,8 @@
  */
 class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
 
+  use CRMTraits_Mailing_MailingTrait;
+
   /**
    * @return CRM_Mailing_BAO_QueryTestDataProvider
    */
@@ -44,12 +46,7 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
    * @param $full
    */
   public function testSearch($fv, $count, $ids, $full) {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/queryDataset.xml'
-      )
-    );
+    $this->loadMailingDeliveryDataSet();
 
     $params = CRM_Contact_BAO_Query::convertFormValues($fv);
     $obj = new CRM_Contact_BAO_Query($params);
@@ -73,12 +70,7 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
    * CRM-20412: Test accurate count for unique open details
    */
   public function testOpenedMailingQuery() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/queryDataset.xml'
-      )
-    );
+    $this->loadMailingDeliveryDataSet();
 
     // ensure that total unique opened mail count is same while
     //   fetching rows and row count for mailing_id = 14
@@ -93,12 +85,7 @@ class CRM_Mailing_BAO_QueryTest extends CiviUnitTestCase {
    * CRM-21194: Test accurate count for unique trackable URLs
    */
   public function testTrackableUrlMailingQuery() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/queryDataset.xml'
-      )
-    );
+    $this->loadMailingDeliveryDataSet();
 
     // ensure that total unique clicked mail count is same while
     //   fetching rows and row count for mailing_id = 14 and
