@@ -549,7 +549,7 @@ FROM civicrm_action_schedule cas
     // dev/core#369 If an SMS provider is deleted then the relevant row in the action_schedule_table is set to NULL
     // So we need to exclude them.
     if (CRM_Utils_System::isNull($schedule->sms_provider_id)) {
-      return ["sms_provider_missing" => "SMS Provider is NULL in database cannot send reminder"];
+      return ["sms_provider_missing" => "SMS reminder cannot be sent because the SMS provider has been deleted."];
     }
 
     $messageSubject = $tokenRow->render('subject');
