@@ -62,7 +62,8 @@
     "cweagans/composer-patches": "~1.0",
     "pear/log": "1.13.1",
     "ezyang/htmlpurifier": "4.10",
-    "katzien/php-mime-type": "2.1.0"
+    "katzien/php-mime-type": "2.1.0",
+    "knplabs/knp-snappy": "v1.0.4"
   },
   "scripts": {
     "post-install-cmd": [
