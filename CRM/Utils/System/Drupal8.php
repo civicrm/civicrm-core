@@ -300,6 +300,12 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
   ) {
     $query = html_entity_decode($query);
 
+    // dev/drupal#21 Drupal8 does not like this path, so it would output '/*path*'
+    // instead of the expected '/en/*path*' when using multilingual.
+    if ($path == '*path*') {
+      $path = 'civicrm/*path*';
+    }
+
     $config = CRM_Core_Config::singleton();
     $base = $absolute ? $config->userFrameworkBaseURL : 'internal:/';
 
@@ -319,10 +325,13 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
     // Special case: CiviCRM passes us "*path*?*query*" as a skeleton, but asterisks
     // are invalid and Drupal will attempt to escape them. We unescape them here:
-    if ($path == '*path*') {
+    if ($path == 'civicrm/*path*') {
       // First remove trailing equals sign that has been added since the key '?*query*' has no value.
       $url = rtrim($url, '=');
       $url = urldecode($url);
+
+      // Remove the civicrm prefix that we added earlier in this function
+      $url = str_replace('civicrm/*path*', '*path*', $url);
     }
 
     return $url;
