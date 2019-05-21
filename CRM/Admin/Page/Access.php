@@ -45,6 +45,14 @@ class CRM_Admin_Page_Access extends CRM_Core_Page {
     $config = CRM_Core_Config::singleton();
 
     switch ($config->userFramework) {
+      case 'Drupal8':
+        $this->assign('ufAccessURL', \Drupal\Core\Url::fromUri('internal:/admin/people/permissions')->toString());
+        break;
+
+      case 'Backdrop':
+        $this->assign('ufAccessURL', url('admin/config/people/permissions'));
+        break;
+
       case 'Drupal':
         $this->assign('ufAccessURL', url('admin/people/permissions'));
         break;
