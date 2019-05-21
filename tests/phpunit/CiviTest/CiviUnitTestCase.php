@@ -373,14 +373,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
 
     $this->getConnection()->getConnection()->query("SET FOREIGN_KEY_CHECKS = 0;");
 
-    $xmlFiles = glob($fixturesDir . '/*.xml');
-    foreach ($xmlFiles as $xmlFixture) {
-      $op = new PHPUnit_Extensions_Database_Operation_Insert();
-      $dataset = $this->createXMLDataSet($xmlFixture);
-      $this->_tablesToTruncate = array_merge($this->_tablesToTruncate, $dataset->getTableNames());
-      $op->execute($this->_dbconn, $dataset);
-    }
-
     $yamlFiles = glob($fixturesDir . '/*.yaml');
     foreach ($yamlFiles as $yamlFixture) {
       $op = new PHPUnit_Extensions_Database_Operation_Insert();
