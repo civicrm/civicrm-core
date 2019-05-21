@@ -509,7 +509,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $config = CRM_Core_Config::singleton();
     }
 
-    if (property_exists($mailing, 'language') && $mailing->language && $mailing->language != 'en_US') {
+    if (property_exists($mailing, 'language') && $mailing->language && $mailing->language != CRM_Core_I18n::getLocale()) {
       $swapLang = CRM_Utils_AutoClean::swap('global://dbLocale?getter', 'call://i18n/setLocale', $mailing->language);
     }
 
