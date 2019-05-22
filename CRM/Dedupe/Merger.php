@@ -755,13 +755,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     }
 
     // get previous stats
-    $previousStats = CRM_Core_BAO_PrevNextCache::retrieve("{$cacheKeyString}_stats");
+    $previousStats = CRM_Dedupe_Merger::getMergeStats($cacheKeyString);
     if (!empty($previousStats)) {
-      if ($previousStats[0]['merged']) {
-        $merged = $merged + $previousStats[0]['merged'];
+      if ($previousStats['merged']) {
+        $merged = $merged + $previousStats['merged'];
       }
-      if ($previousStats[0]['skipped']) {
-        $skipped = $skipped + $previousStats[0]['skipped'];
+      if ($previousStats['skipped']) {
+        $skipped = $skipped + $previousStats['skipped'];
       }
     }
 
@@ -796,13 +796,15 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @return array
    *   Array of how many were merged and how many were skipped.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getMergeStats($cacheKeyString) {
-    $stats = CRM_Core_BAO_PrevNextCache::retrieve("{$cacheKeyString}_stats");
+    $stats = civicrm_api3('Dedupe', 'get', ['cachekey' => "{$cacheKeyString}_stats", 'sequential' => 1])['values'];
     if (!empty($stats)) {
-      $stats = $stats[0];
+      return $stats[0]['data'];
     }
-    return $stats;
+    return [];
   }
 
   /**

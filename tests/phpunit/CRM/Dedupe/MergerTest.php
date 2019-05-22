@@ -177,7 +177,6 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $select = ['pn.is_selected' => 'is_selected'];
     $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($dao->id, $this->_groupId);
     $pnDupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, NULL, NULL, 0, 0, $select);
-
     $this->assertEquals(count($foundDupes), count($pnDupePairs), 'Check number of dupe pairs in prev next cache.');
 
     // mark first two pairs as selected
@@ -190,6 +189,13 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     // batch merge selected dupes
     $result = CRM_Dedupe_Merger::batchMerge($dao->id, $this->_groupId, 'safe', 5, 1);
     $this->assertEquals(count($result['merged']), 2, 'Check number of merged pairs.');
+
+    $stats = $this->callAPISuccess('Dedupe', 'getstatistics', [
+      'group_id' => $this->_groupId,
+      'rule_group_id' => $dao->id,
+      'check_permissions' => TRUE,
+    ])['values'];
+    $this->assertEquals(['merged' => 2, 'skipped' => 0], $stats);
 
     // retrieve pairs from prev next cache table
     $pnDupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, NULL, NULL, 0, 0, $select);
@@ -248,6 +254,10 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     $result = CRM_Dedupe_Merger::batchMerge($dao->id, $this->_groupId, 'safe', 5, 2);
     $this->assertEquals(count($result['merged']), 3, 'Check number of merged pairs.');
 
+    $stats = $this->callAPISuccess('Dedupe', 'getstatistics', [
+      'rule_group_id' => $dao->id,
+      'group_id' => $this->_groupId,
+    ]);
     // retrieve pairs from prev next cache table
     $pnDupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, NULL, NULL, 0, 0, $select);
     $this->assertEquals(count($pnDupePairs), 0, 'Check number of remaining dupe pairs in prev next cache.');
