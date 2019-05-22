@@ -28,6 +28,7 @@
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Knp\Snappy\Pdf;
 
 /**
  *
@@ -221,9 +222,8 @@ class CRM_Utils_PDF_Utils {
    * @param string $fileName
    */
   public static function _html2pdf_wkhtmltopdf($paper_size, $orientation, $margins, $html, $output, $fileName) {
-    require_once 'packages/snappy/src/autoload.php';
     $config = CRM_Core_Config::singleton();
-    $snappy = new Knp\Snappy\Pdf($config->wkhtmltopdfPath);
+    $snappy = new Pdf($config->wkhtmltopdfPath);
     $snappy->setOption("page-width", $paper_size[2] . "pt");
     $snappy->setOption("page-height", $paper_size[3] . "pt");
     $snappy->setOption("orientation", $orientation);
