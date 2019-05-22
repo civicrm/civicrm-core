@@ -1574,6 +1574,104 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
+   *  https://lab.civicrm.org/dev/financial/issues/56
+   * Changing financial type on a contribution records correct financial items
+   */
+  public function testChangingFinancialTypeWithoutTax() {
+    $ids = $values = [];
+    $contactId = $this->individualCreate();
+    $params = array(
+      'contact_id' => $contactId,
+      'receive_date' => date('YmdHis'),
+      'total_amount' => 100.00,
+      'financial_type_id' => 'Donation',
+      'contribution_status_id' => 'Completed',
+    );
+    /* first test the scenario when sending an email */
+    $contributionId = $this->callAPISuccess(
+      'contribution',
+      'create',
+      $params
+    )['id'];
+
+    // Update Financial Type.
+    $this->callAPISuccess('contribution', 'create', [
+      'id' => $contributionId,
+      'financial_type_id' => 'Event Fee',
+    ]);
+
+    // Get line item
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', [
+      'contribution_id' => $contributionId,
+      'return' => ["financial_type_id.name", "line_total"],
+    ]);
+
+    $this->assertEquals(
+      $lineItem['line_total'],
+      100.00,
+      'Invalid line amount.'
+    );
+
+    $this->assertEquals(
+      $lineItem['financial_type_id.name'],
+      'Event Fee',
+      'Invalid Financial Type stored.'
+    );
+
+    // Get Financial Items.
+    $financialItems = $this->callAPISuccess('FinancialItem', 'get', [
+      'entity_id' => $lineItem['id'],
+      'sequential' => 1,
+      'entity_table' => 'civicrm_line_item',
+      'options' => ['sort' => "id"],
+      'return' => ["financial_account_id.name", "amount", "description"],
+    ]);
+
+    $this->assertEquals($financialItems['count'], 3, 'Count mismatch.');
+
+    $toCheck = [
+      ['Donation', 100.00],
+      ['Donation', -100.00],
+      ['Event Fee', 100.00],
+    ];
+
+    foreach ($financialItems['values'] as $key => $values) {
+      $this->assertEquals(
+        $values['financial_account_id.name'],
+        $toCheck[$key][0],
+        'Invalid Financial Account stored.'
+      );
+      $this->assertEquals(
+        $values['amount'],
+        $toCheck[$key][1],
+        'Amount mismatch.'
+      );
+      $this->assertEquals(
+        $values['description'],
+        'Contribution Amount',
+        'Description mismatch.'
+      );
+    }
+
+    // Check transactions.
+    $financialTransactions = $this->callAPISuccess('EntityFinancialTrxn', 'get', [
+      'return' => ["financial_trxn_id"],
+      'entity_table' => "civicrm_contribution",
+      'entity_id' => $contributionId,
+      'sequential' => 1,
+    ]);
+    $this->assertEquals($financialTransactions['count'], 3, 'Count mismatch.');
+
+    foreach ($financialTransactions['values'] as $key => $values) {
+      $this->callAPISuccessGetCount('EntityFinancialTrxn', [
+        'financial_trxn_id' => $values['financial_trxn_id'],
+        'amount' => $toCheck[$key][1],
+        'financial_trxn_id.total_amount' => $toCheck[$key][1],
+      ], 2);
+    }
+  }
+
+  /**
    *  CRM-21424 Check if the receipt update is set after composing the receipt message
    */
   public function testSendMailUpdateReceiptDate() {
