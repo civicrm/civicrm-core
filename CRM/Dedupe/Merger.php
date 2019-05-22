@@ -1833,17 +1833,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @throws \CiviCRM_API3_Exception
    */
   public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $includeConflicts = TRUE, $criteria = [], $checkPermissions = TRUE, $searchLimit = 0) {
-    $where = self::getWhereString($isSelected);
-    $cacheKeyString = self::getMergeCacheKeyString($rule_group_id, $group_id, $criteria, $checkPermissions);
-    $join = self::getJoinOnDedupeTable();
-    $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, $batchLimit, [], '', $includeConflicts);
+    $dupePairs = self::getCachedDuplicateMatches($rule_group_id, $group_id, $batchLimit, $isSelected, $includeConflicts, $criteria, $checkPermissions);
     if (empty($dupePairs) && $reloadCacheIfEmpty) {
+      $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rule_group_id, $group_id, $criteria, $checkPermissions);
       // If we haven't found any dupes, probably cache is empty.
       // Try filling cache and give another try. We don't need to specify include conflicts here are there will not be any
       // until we have done some processing.
       CRM_Core_BAO_PrevNextCache::refillCache($rule_group_id, $group_id, $cacheKeyString, $criteria, $checkPermissions, $searchLimit);
-      $dupePairs = CRM_Core_BAO_PrevNextCache::retrieve($cacheKeyString, $join, $where, 0, $batchLimit, [], '', $includeConflicts);
-      return $dupePairs;
+      return self::getCachedDuplicateMatches($rule_group_id, $group_id, $batchLimit, $isSelected, FALSE, $criteria, $checkPermissions);
     }
     return $dupePairs;
   }
@@ -2449,6 +2446,28 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       }
       CRM_Core_DAO::executeQuery($sql);
     }
+  }
+
+  /**
+   * @param $rule_group_id
+   * @param $group_id
+   * @param $batchLimit
+   * @param $isSelected
+   * @param $includeConflicts
+   * @param $criteria
+   * @param $checkPermissions
+   *
+   * @return array
+   */
+  protected static function getCachedDuplicateMatches($rule_group_id, $group_id, $batchLimit, $isSelected, $includeConflicts, $criteria, $checkPermissions) {
+    return CRM_Core_BAO_PrevNextCache::retrieve(
+      self::getMergeCacheKeyString($rule_group_id, $group_id, $criteria, $checkPermissions),
+      self::getJoinOnDedupeTable(),
+      self::getWhereString($isSelected),
+      0, $batchLimit,
+      [], '',
+      $includeConflicts
+    );
   }
 
 }
