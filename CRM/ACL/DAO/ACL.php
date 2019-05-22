@@ -223,7 +223,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
           ],
           'pseudoconstant' => [
             'callback' => 'CRM_ACL_BAO_ACL::operation',
-          ]
+          ],
         ],
         'object_table' => [
           'name' => 'object_table',
