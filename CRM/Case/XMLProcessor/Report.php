@@ -35,7 +35,7 @@ class CRM_Case_XMLProcessor_Report extends CRM_Case_XMLProcessor {
   /**
    * The default variable defined.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_isRedact;
 

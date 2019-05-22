@@ -300,14 +300,14 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * Flag to indicate if result-set is to be stored in a class variable which could be retrieved using getResultSet() method.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_storeResultSet = FALSE;
 
   /**
    * When _storeResultSet Flag is set use this var to store result set in form of array
    *
-   * @var boolean
+   * @var bool
    */
   protected $_resultSet = [];
 
@@ -388,7 +388,7 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * Is this being called without a form controller (ie. the report is being render outside the normal form
    * - e.g the api is retrieving the rows
-   * @var boolean
+   * @var bool
    */
   public $noController = FALSE;
 

@@ -69,7 +69,7 @@ class CRM_Admin_Page_Options extends CRM_Core_Page_Basic {
   /**
    * A boolean determining if you can add options to this group in the GUI.
    *
-   * @var boolean
+   * @var bool
    */
   public static $_isLocked = FALSE;
 

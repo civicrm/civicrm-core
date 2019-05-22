@@ -75,7 +75,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Is this contribution associated with an online.
    * financial transaction
    *
-   * @var boolean
+   * @var bool
    */
   public $_online = FALSE;
 

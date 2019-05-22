@@ -42,7 +42,7 @@ class CRM_Pledge_Form_Task_Delete extends CRM_Pledge_Form_Task {
    * Are we operating in "single mode", i.e. deleting one
    * specific pledge?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
