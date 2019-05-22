@@ -37,8 +37,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   use CRMTraits_ACL_PermissionTrait;
   use CRMTraits_PCP_PCPTestTrait;
 
-  protected $_apiversion = 3;
-
   protected $contactIDs = [];
 
   /**
@@ -196,7 +194,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public function testReportTemplateGetRowsContactSummary() {
     $description = "Retrieve rows from a report template (optionally providing the instance_id).";
-    $result = $this->callApiSuccess('report_template', 'getrows', array(
+    $result = $this->callAPISuccess('report_template', 'getrows', array(
       'report_id' => 'contact/summary',
       'options' => array('metadata' => array('labels', 'title')),
     ), __FUNCTION__, __FILE__, $description, 'Getrows');
@@ -396,6 +394,11 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     return array(array('member/detail'));
   }
 
+  /**
+   * Get the membership and contribution reports to test.
+   *
+   * @return array
+   */
   public static function getMembershipAndContributionReportTemplatesForGroupTests() {
     $templates = array_merge(self::getContributionReportTemplates(), self::getMembershipReportTemplates());
     foreach ($templates as $key => $value) {
@@ -1202,14 +1205,14 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     );
     $c3 = $this->contributionCreate($contribution3params);
     // Now the soft contribution.
-    $p = array(
+    $p = [
       'contribution_id' => $c3,
       'pcp_id' => $pcp2->id,
       'contact_id' => $pcpOwnerContact2Id,
       'amount' => 200.00,
       'currency' => 'USD',
       'soft_credit_type_id' => $pcp_soft_credit_type_id,
-    );
+    ];
     $this->callAPISuccess('contribution_soft', 'create', $p);
 
     $template = 'contribute/pcp';
@@ -1231,7 +1234,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public function testGetAddressColumns() {
     $template = 'event/participantlisting';
-    $rows = $this->callAPISuccess('report_template', 'getrows', [
+    $this->callAPISuccess('report_template', 'getrows', [
       'report_id' => $template,
       'fields' => [
         'sort_name' => '1',
