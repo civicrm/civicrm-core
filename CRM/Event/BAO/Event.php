@@ -330,6 +330,8 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
    *
    * @return array
    *   Array of event summary values
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getEventSummary() {
     $eventSummary = $eventIds = [];
@@ -338,7 +340,7 @@ WHERE  ( civicrm_event.is_template IS NULL OR civicrm_event.is_template = 0 )";
     // get permission and include them here
     // does not scale, but rearranging code for now
     // FIXME in a future release
-    $permissions = CRM_Event_BAO_Event::checkPermission();
+    $permissions = self::getAllPermissions();
     $validEventIDs = '';
     if (empty($permissions[CRM_Core_Permission::VIEW])) {
       $eventSummary['total_events'] = 0;

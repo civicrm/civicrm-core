@@ -62,7 +62,7 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
   /**
    * Whether the file has a column header or not
    *
-   * @var boolean
+   * @var bool
    */
   protected $_haveColumnHeader;
 

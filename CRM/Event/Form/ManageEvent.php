@@ -45,14 +45,14 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
   /**
    * Is this the first page?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_first = FALSE;
 
   /**
    * Are we in single form mode or wizard mode?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single;
 
@@ -60,7 +60,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
   /**
    * Are we actually managing an event template?
-   * @var boolean
+   * @var bool
    */
   protected $_isTemplate = FALSE;
 

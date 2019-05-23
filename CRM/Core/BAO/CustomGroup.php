@@ -481,6 +481,7 @@ LEFT JOIN civicrm_custom_field ON (civicrm_custom_field.custom_group_id = civicr
 
     $params = [];
     $sqlParamKey = 1;
+    $subType = '';
     if (!empty($subTypes)) {
       foreach ($subTypes as $key => $subType) {
         $subTypeClauses[] = self::whereListHas("civicrm_custom_group.extends_entity_column_value", self::validateSubTypeByEntity($entityType, $subType));
@@ -562,67 +563,7 @@ ORDER BY civicrm_custom_group.weight,
     }
 
     if (empty($groupTree)) {
-      $groupTree = $multipleFieldGroups = [];
-      $crmDAO = CRM_Core_DAO::executeQuery($queryString, $params);
-      $customValueTables = [];
-
-      // process records
-      while ($crmDAO->fetch()) {
-        // get the id's
-        $groupID = $crmDAO->civicrm_custom_group_id;
-        $fieldId = $crmDAO->civicrm_custom_field_id;
-        if ($crmDAO->civicrm_custom_group_is_multiple) {
-          $multipleFieldGroups[$groupID] = $crmDAO->civicrm_custom_group_table_name;
-        }
-        // create an array for groups if it does not exist
-        if (!array_key_exists($groupID, $groupTree)) {
-          $groupTree[$groupID] = [];
-          $groupTree[$groupID]['id'] = $groupID;
-
-          // populate the group information
-          foreach ($toReturn['custom_group'] as $fieldName) {
-            $fullFieldName = "civicrm_custom_group_$fieldName";
-            if ($fieldName == 'id' ||
-              is_null($crmDAO->$fullFieldName)
-            ) {
-              continue;
-            }
-            // CRM-5507
-            // This is an old bit of code - per the CRM number & probably does not work reliably if
-            // that one contact sub-type exists.
-            if ($fieldName == 'extends_entity_column_value' && !empty($subTypes[0])) {
-              $groupTree[$groupID]['subtype'] = self::validateSubTypeByEntity($entityType, $subType);
-            }
-            $groupTree[$groupID][$fieldName] = $crmDAO->$fullFieldName;
-          }
-          $groupTree[$groupID]['fields'] = [];
-
-          $customValueTables[$crmDAO->civicrm_custom_group_table_name] = [];
-        }
-
-        // add the fields now (note - the query row will always contain a field)
-        // we only reset this once, since multiple values come is as multiple rows
-        if (!array_key_exists($fieldId, $groupTree[$groupID]['fields'])) {
-          $groupTree[$groupID]['fields'][$fieldId] = [];
-        }
-
-        $customValueTables[$crmDAO->civicrm_custom_group_table_name][$crmDAO->civicrm_custom_field_column_name] = 1;
-        $groupTree[$groupID]['fields'][$fieldId]['id'] = $fieldId;
-        // populate information for a custom field
-        foreach ($toReturn['custom_field'] as $fieldName) {
-          $fullFieldName = "civicrm_custom_field_$fieldName";
-          if ($fieldName == 'id' ||
-            is_null($crmDAO->$fullFieldName)
-          ) {
-            continue;
-          }
-          $groupTree[$groupID]['fields'][$fieldId][$fieldName] = $crmDAO->$fullFieldName;
-        }
-      }
-
-      if (!empty($customValueTables)) {
-        $groupTree['info'] = ['tables' => $customValueTables];
-      }
+      list($multipleFieldGroups, $groupTree) = self::buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType);
 
       $cache->set($cacheKey, $groupTree);
       $cache->set($multipleFieldGroupCacheKey, $multipleFieldGroups);
@@ -2210,6 +2151,84 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
       $multipleGroup[$dao->id] = $dao->title;
     }
     return $multipleGroup;
+  }
+
+  /**
+   * Build the metadata tree for the custom group.
+   *
+   * @param string $entityType
+   * @param array $toReturn
+   * @param array $subTypes
+   * @param string $queryString
+   * @param array $params
+   * @param string $subType
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  private static function buildGroupTree($entityType, $toReturn, $subTypes, $queryString, $params, $subType) {
+    $groupTree = $multipleFieldGroups = [];
+    $crmDAO = CRM_Core_DAO::executeQuery($queryString, $params);
+    $customValueTables = [];
+
+    // process records
+    while ($crmDAO->fetch()) {
+      // get the id's
+      $groupID = $crmDAO->civicrm_custom_group_id;
+      $fieldId = $crmDAO->civicrm_custom_field_id;
+      if ($crmDAO->civicrm_custom_group_is_multiple) {
+        $multipleFieldGroups[$groupID] = $crmDAO->civicrm_custom_group_table_name;
+      }
+      // create an array for groups if it does not exist
+      if (!array_key_exists($groupID, $groupTree)) {
+        $groupTree[$groupID] = [];
+        $groupTree[$groupID]['id'] = $groupID;
+
+        // populate the group information
+        foreach ($toReturn['custom_group'] as $fieldName) {
+          $fullFieldName = "civicrm_custom_group_$fieldName";
+          if ($fieldName == 'id' ||
+            is_null($crmDAO->$fullFieldName)
+          ) {
+            continue;
+          }
+          // CRM-5507
+          // This is an old bit of code - per the CRM number & probably does not work reliably if
+          // that one contact sub-type exists.
+          if ($fieldName == 'extends_entity_column_value' && !empty($subTypes[0])) {
+            $groupTree[$groupID]['subtype'] = self::validateSubTypeByEntity($entityType, $subType);
+          }
+          $groupTree[$groupID][$fieldName] = $crmDAO->$fullFieldName;
+        }
+        $groupTree[$groupID]['fields'] = [];
+
+        $customValueTables[$crmDAO->civicrm_custom_group_table_name] = [];
+      }
+
+      // add the fields now (note - the query row will always contain a field)
+      // we only reset this once, since multiple values come is as multiple rows
+      if (!array_key_exists($fieldId, $groupTree[$groupID]['fields'])) {
+        $groupTree[$groupID]['fields'][$fieldId] = [];
+      }
+
+      $customValueTables[$crmDAO->civicrm_custom_group_table_name][$crmDAO->civicrm_custom_field_column_name] = 1;
+      $groupTree[$groupID]['fields'][$fieldId]['id'] = $fieldId;
+      // populate information for a custom field
+      foreach ($toReturn['custom_field'] as $fieldName) {
+        $fullFieldName = "civicrm_custom_field_$fieldName";
+        if ($fieldName == 'id' ||
+          is_null($crmDAO->$fullFieldName)
+        ) {
+          continue;
+        }
+        $groupTree[$groupID]['fields'][$fieldId][$fieldName] = $crmDAO->$fullFieldName;
+      }
+    }
+
+    if (!empty($customValueTables)) {
+      $groupTree['info'] = ['tables' => $customValueTables];
+    }
+    return [$multipleFieldGroups, $groupTree];
   }
 
 }

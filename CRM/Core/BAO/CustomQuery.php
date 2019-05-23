@@ -96,7 +96,7 @@ class CRM_Core_BAO_CustomQuery {
   /**
    * Searching for contacts?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_contactSearch;
 
@@ -351,6 +351,12 @@ SELECT f.id, f.label, f.data_type,
                 foreach ($value as $key => $val) {
                   $value[$key] = str_replace(['[', ']', ','], ['\[', '\]', '[:comma:]'], $val);
                   $value[$key] = str_replace('|', '[:separator:]', $value[$key]);
+                  if ($field['data_type'] == 'String') {
+                    $value[$key] = CRM_Utils_Type::escape($value[$key], 'String');
+                  }
+                  elseif ($value) {
+                    $value[$key] = CRM_Utils_Type::escape($value[$key], 'Integer');
+                  }
                 }
                 $value = implode(',', $value);
               }

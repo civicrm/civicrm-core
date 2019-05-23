@@ -520,7 +520,8 @@ ORDER BY start_date desc
       if (is_array($value)) {
         $type = implode(',', $value);
       }
-      $clauses[] = "event_type_id IN ({$type})";
+      $clauses[] = "event_type_id IN (%2)";
+      $params[2] = [$type, 'String'];
     }
 
     $eventsByDates = $this->get('eventsByDates');

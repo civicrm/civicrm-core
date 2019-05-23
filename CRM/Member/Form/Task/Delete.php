@@ -44,7 +44,7 @@ class CRM_Member_Form_Task_Delete extends CRM_Member_Form_Task {
    * Are we operating in "single mode", i.e. deleting one
    * specific membership?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 

@@ -128,6 +128,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if $field.rule}
                       'rule'      => '{$field.rule}',
 {/if} {* field.rule *}
+{if $field.protected}
+                      'protected'      => '{$field.protected}',
+{/if}
 {if $field.default || $field.default === '0'}
                          'default'   => '{if ($field.default[0]=="'" or $field.default[0]=='"')}{$field.default|substring:1:-1}{else}{$field.default}{/if}',
 {/if} {* field.default *}
@@ -151,7 +154,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
   ),
 {/if}
 {if $field.pseudoconstant}
-  'pseudoconstant' => {$field.pseudoconstant|@print_array}
+  'pseudoconstant' => {$field.pseudoconstant|@print_array},
 {/if} {* field.pseudoconstant *}                                                                    ),
 {/foreach} {* table.fields *}
                                       );

@@ -1066,4 +1066,29 @@ HTACCESS;
     return FALSE;
   }
 
+  /**
+   * Get the extensions that this MimeTpe is for
+   * @param string $mimeType the mime-type we want extensions for
+   * @return array
+   */
+  public static function getAcceptableExtensionsForMimeType($mimeType = NULL) {
+    $mapping = \MimeType\Mapping::$types;
+    $extensions = [];
+    foreach ($mapping as $extension => $type) {
+      if ($mimeType == $type) {
+        $extensions[] = $extension;
+      }
+    }
+    return $extensions;
+  }
+
+  /**
+   * Get the extension of a file based on its path
+   * @param string $path path of the file to query
+   * @return string
+   */
+  public static function getExtensionFromPath($path) {
+    return pathinfo($path, PATHINFO_EXTENSION);
+  }
+
 }

@@ -300,14 +300,14 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * Flag to indicate if result-set is to be stored in a class variable which could be retrieved using getResultSet() method.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_storeResultSet = FALSE;
 
   /**
    * When _storeResultSet Flag is set use this var to store result set in form of array
    *
-   * @var boolean
+   * @var bool
    */
   protected $_resultSet = [];
 
@@ -325,7 +325,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Variables to hold the acl inner join and where clause
-   * @var string|NULL
+   * @var string|null
    */
   protected $_aclFrom = NULL;
   protected $_aclWhere = NULL;
@@ -358,7 +358,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * (it's unclear if this could be merged with outputMode at this stage)
    *
-   * @var string|NULL
+   * @var string|null
    */
   protected $_format;
 
@@ -380,21 +380,24 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $_havingClauses = [];
 
   /**
-   * DashBoardRowCount Dashboard row count
-   * @var Integer
+   * DashBoardRowCount Dashboard row count.
+   *
+   * @var int
    */
   public $_dashBoardRowCount;
 
   /**
    * Is this being called without a form controller (ie. the report is being render outside the normal form
-   * - e.g the api is retrieving the rows
-   * @var boolean
+   * - e.g the api is retrieving the rows.
+   *
+   * @var bool
    */
   public $noController = FALSE;
 
   /**
-   * Variable to hold the currency alias
-   * @var string|NULL
+   * Variable to hold the currency alias.
+   *
+   * @var string|null
    */
   protected $_currencyColumn = NULL;
 

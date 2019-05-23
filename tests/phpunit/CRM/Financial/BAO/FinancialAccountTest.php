@@ -275,8 +275,8 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
    * Test for validating financial type has deferred revenue account relationship.
    */
   public function testcheckFinancialTypeHasDeferred() {
-    Civi::settings()->set('contribution_invoice_settings', array('deferred_revenue_enabled' => '1'));
-    $params = array();
+    Civi::settings()->set('deferred_revenue_enabled', 1);
+    $params = [];
     $valid = CRM_Financial_BAO_FinancialAccount::checkFinancialTypeHasDeferred($params);
     $this->assertFalse($valid, "This should have been false");
     $cid = $this->individualCreate();

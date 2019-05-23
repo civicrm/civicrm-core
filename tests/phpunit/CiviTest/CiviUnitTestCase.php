@@ -62,7 +62,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    *  Database has been initialized.
    *
-   * @var boolean
+   * @var bool
    */
   private static $dbInit = FALSE;
 
@@ -92,7 +92,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   protected $tempDirs;
 
   /**
-   * @var boolean populateOnce allows to skip db resets in setUp
+   * @var bool populateOnce allows to skip db resets in setUp
    *
    *  WARNING! USE WITH CAUTION - IT'LL RENDER DATA DEPENDENCIES
    *  BETWEEN TESTS WHEN RUN IN SUITE. SUITABLE FOR LOCAL, LIMITED
@@ -105,7 +105,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public static $populateOnce = FALSE;
 
   /**
-   * @var boolean DBResetRequired allows skipping DB reset
+   * @var bool DBResetRequired allows skipping DB reset
    *               in specific test case. If you still need
    *               to reset single test (method) of such case, call
    *               $this->cleanDB() in the first line of this
@@ -117,6 +117,16 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @var CRM_Core_Transaction|NULL
    */
   private $tx = NULL;
+
+  /**
+   * Array of IDs created to support the test.
+   *
+   * e.g
+   * $this->ids = ['Contact' => ['descriptive_key' => $contactID], 'Group' => [$groupID]];
+   *
+   * @var array
+   */
+  protected $ids = [];
 
   /**
    * Class used for hooks during tests.
@@ -321,6 +331,12 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     // disable any left-over test extensions
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_extension WHERE full_name LIKE "test.%"');
 
+    $extensions = \CRM_Extension_System::singleton()->getManager();
+    $api4Status = $extensions->getStatus('org.civicrm.api4');
+    if ($api4Status != $extensions::STATUS_INSTALLED && $api4Status != $extensions::STATUS_UNKNOWN) {
+      $extensions->enable(['org.civicrm.api4']);
+    }
+
     // reset all the caches
     CRM_Utils_System::flushCache();
 
@@ -356,14 +372,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
     $fixturesDir = __DIR__ . '/../../fixtures';
 
     $this->getConnection()->getConnection()->query("SET FOREIGN_KEY_CHECKS = 0;");
-
-    $xmlFiles = glob($fixturesDir . '/*.xml');
-    foreach ($xmlFiles as $xmlFixture) {
-      $op = new PHPUnit_Extensions_Database_Operation_Insert();
-      $dataset = $this->createXMLDataSet($xmlFixture);
-      $this->_tablesToTruncate = array_merge($this->_tablesToTruncate, $dataset->getTableNames());
-      $op->execute($this->_dbconn, $dataset);
-    }
 
     $yamlFiles = glob($fixturesDir . '/*.yaml');
     foreach ($yamlFiles as $yamlFixture) {
@@ -1942,12 +1950,12 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @return void
    */
   public function setMockSettingsMetaData($extras) {
-    Civi::service('settings_manager')->flush();
-
     CRM_Utils_Hook::singleton()
       ->setHook('civicrm_alterSettingsMetaData', function (&$metadata, $domainId, $profile) use ($extras) {
         $metadata = array_merge($metadata, $extras);
       });
+
+    Civi::service('settings_manager')->flush();
 
     $fields = $this->callAPISuccess('setting', 'getfields', array());
     foreach ($extras as $key => $spec) {
@@ -3148,6 +3156,39 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
 
     global $dbLocale;
     $dbLocale = '_en_US';
+  }
+
+  /**
+   * Setup or clean up SMS tests
+   * @param bool $teardown
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function setupForSmsTests($teardown = FALSE) {
+    require_once 'CiviTest/CiviTestSMSProvider.php';
+
+    // Option value params for CiviTestSMSProvider
+    $groupID = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup', 'sms_provider_name', 'id', 'name');
+    $params = array(
+      'option_group_id' => $groupID,
+      'label' => 'unittestSMS',
+      'value' => 'unit.test.sms',
+      'name'  => 'CiviTestSMSProvider',
+      'is_default' => 1,
+      'is_active'  => 1,
+      'version'    => 3,
+    );
+
+    if ($teardown) {
+      // Test completed, delete provider
+      $providerOptionValueResult = civicrm_api3('option_value', 'get', $params);
+      civicrm_api3('option_value', 'delete', array('id' => $providerOptionValueResult['id']));
+      return;
+    }
+
+    // Create an SMS provider "CiviTestSMSProvider". Civi handles "CiviTestSMSProvider" as a special case and allows it to be instantiated
+    //  in CRM/Sms/Provider.php even though it is not an extension.
+    return civicrm_api3('option_value', 'create', $params);
   }
 
 }

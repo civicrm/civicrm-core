@@ -18,7 +18,7 @@
     "d3-3.5.x": "d3#~3.5.17",
     "dc-2.1.x": "dc.js#~2.1.8",
     "crossfilter-1.3.x": "crossfilter2#~1.3.11",
-    "jquery": "~1.12",
+    "jquery": "civicrm/jquery#1.12.4-civicrm-1.1",
     "jquery-ui": "~1.12",
     "lodash-compat": "~3.0",
     "google-code-prettify": "~1.0",
@@ -35,6 +35,7 @@
     "es6-promise": "^4.2.4"
   },
   "resolutions": {
-    "angular": "~1.5.11"
+    "angular": "~1.5.11",
+    "jquery": "1.12.4-civicrm-1.1"
   }
 }

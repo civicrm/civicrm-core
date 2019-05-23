@@ -31,7 +31,7 @@
  */
 class api_v3_CustomValueTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
-  protected $ids;
+
   protected $optionGroup;
 
   public $DBResetRequired = FALSE;

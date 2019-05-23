@@ -54,7 +54,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form_Task {
   /**
    * The flag to tell if there are soft credits included.
    *
-   * @var boolean
+   * @var bool
    */
   public $_includesSoftCredits = FALSE;
 

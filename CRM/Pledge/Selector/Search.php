@@ -80,14 +80,14 @@ class CRM_Pledge_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @var boolean
+   * @var bool
    */
   protected $_limit = NULL;
 

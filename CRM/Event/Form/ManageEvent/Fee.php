@@ -374,7 +374,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     $this->addElement('submit', $this->getButtonName('submit'), ts('Add Discount Set to Fee Table'),
       ['class' => 'crm-form-submit cancel']
     );
-    if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+    if (Civi::settings()->get('deferred_revenue_enabled')) {
       $deferredFinancialType = CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType();
       $this->assign('deferredFinancialType', array_keys($deferredFinancialType));
     }

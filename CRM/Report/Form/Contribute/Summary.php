@@ -631,7 +631,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 
     $contriSQL = "SELECT {$contriQuery} {$group} {$this->_having}";
     $contriDAO = CRM_Core_DAO::executeQuery($contriSQL);
-
+    $this->addToDeveloperTab($contriSQL);
     $totalAmount = $average = $mode = $median = $softTotalAmount = $softAverage = array();
     $count = $softCount = 0;
     while ($contriDAO->fetch()) {
@@ -655,6 +655,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 
     if ($softCredit) {
       $softDAO = CRM_Core_DAO::executeQuery($softSQL);
+      $this->addToDeveloperTab($softSQL);
       while ($softDAO->fetch()) {
         $softTotalAmount[]
           = CRM_Utils_Money::format($softDAO->civicrm_contribution_soft_soft_amount_sum, $softDAO->currency) .
@@ -725,6 +726,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
    */
   public function buildRows($sql, &$rows) {
     $dao = CRM_Core_DAO::executeQuery($sql);
+    $this->addToDeveloperTab($sql);
     if (!is_array($rows)) {
       $rows = array();
     }
@@ -742,6 +744,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
       $this->customDataFrom();
       $contriSQL = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
       $contriDAO = CRM_Core_DAO::executeQuery($contriSQL);
+      $this->addToDeveloperTab($contriSQL);
       $contriFields = array(
         'civicrm_contribution_total_amount_sum',
         'civicrm_contribution_total_amount_avg',

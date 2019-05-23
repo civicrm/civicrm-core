@@ -151,6 +151,8 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
 
   /**
    * Test renaming multiple fields.
+   *
+   * @throws Exception
    */
   public function testRenameFields() {
     $this->callAPISuccess('SavedSearch', 'create', [
@@ -167,6 +169,17 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
     $savedSearch = $this->callAPISuccessGetSingle('SavedSearch', []);
     $this->assertEquals('activity_date_time_low', $savedSearch['form_values'][0][0]);
     $this->assertEquals('activity_date_time_relative', $savedSearch['form_values'][1][0]);
+  }
+
+  /**
+   * Test that a mis-saved variable in 'contribute settings' can be converted to a
+   * 'proper' setting.
+   */
+  public function testConvertUpgradeContributeSettings() {
+    Civi::settings()->set('contribution_invoice_settings', ['foo' => 'bar', 'deferred_revenue_enabled' => 1]);
+    $this->assertEquals(0, Civi::settings()->get('deferred_revenue_enabled'));
+    CRM_Upgrade_Incremental_Base::updateContributeSettings(NULL, 5.1);
+    $this->assertEquals(1, Civi::settings()->get('deferred_revenue_enabled'));
   }
 
 }

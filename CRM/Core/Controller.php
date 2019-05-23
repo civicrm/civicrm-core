@@ -82,7 +82,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * so the display routine needs to not do any work. (The
    * parent object takes care of the display)
    *
-   * @var boolean
+   * @var bool
    */
   protected $_embedded = FALSE;
 
@@ -94,7 +94,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Useful when we run form in non civicrm context
    * and we need to transfer control back.(eg. drupal)
    *
-   * @var boolean
+   * @var bool
    */
   protected $_skipRedirection = FALSE;
 
@@ -102,14 +102,14 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    * Are we in print mode? if so we need to modify the display
    * functionality to do a minimal display :)
    *
-   * @var boolean
+   * @var bool
    */
   public $_print = 0;
 
   /**
    * Should we generate a qfKey, true by default
    *
-   * @var boolean
+   * @var bool
    */
   public $_generateQFKey = TRUE;
 

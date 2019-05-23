@@ -318,7 +318,7 @@ class CRM_Core_CodeGen_Specification {
         // need this case since some versions of mysql do not have boolean as a valid column type and hence it
         // is changed to tinyint. hopefully after 2 yrs this case can be removed.
         $field['sqlType'] = 'tinyint';
-        $field['phpType'] = $type;
+        $field['phpType'] = 'bool';
         $field['crmType'] = 'CRM_Utils_Type::T_' . strtoupper($type);
         break;
 
@@ -340,6 +340,7 @@ class CRM_Core_CodeGen_Specification {
         $field['phpType'] = $this->value('phpType', $fieldXML, $type);
         $field['sqlType'] = $type;
         if ($type == 'int unsigned') {
+          $field['phpType'] = 'int';
           $field['crmType'] = 'CRM_Utils_Type::T_INT';
         }
         else {
@@ -369,6 +370,7 @@ class CRM_Core_CodeGen_Specification {
     $field['uniqueName'] = $this->value('uniqueName', $fieldXML);
     $field['serialize'] = $this->value('serialize', $fieldXML);
     $field['html'] = $this->value('html', $fieldXML);
+    $field['protected'] = $this->value('protected', $fieldXML);
     if (!empty($field['html'])) {
       $validOptions = [
         'type',

@@ -138,19 +138,18 @@ WHERE  cacheKey     = %3 AND
   }
 
   /**
-   * Delete from the previous next cache table for a pair of ids.
+   * Delete pair from the previous next cache table to remove it from further merge consideration.
+   *
+   * The pair may have been flipped, so make sure we delete using both orders
    *
    * @param int $id1
    * @param int $id2
    * @param string $cacheKey
-   * @param bool $isViceVersa
-   * @param string $entityTable
    */
-  public static function deletePair($id1, $id2, $cacheKey = NULL, $isViceVersa = FALSE, $entityTable = 'civicrm_contact') {
-    $sql = "DELETE FROM civicrm_prevnext_cache WHERE  entity_table = %1";
-    $params = [1 => [$entityTable, 'String']];
+  public static function deletePair($id1, $id2, $cacheKey = NULL) {
+    $sql = "DELETE FROM civicrm_prevnext_cache WHERE  entity_table = 'civicrm_contact'";
 
-    $pair = !$isViceVersa ? "entity_id1 = %2 AND entity_id2 = %3" : "(entity_id1 = %2 AND entity_id2 = %3) OR (entity_id1 = %3 AND entity_id2 = %2)";
+    $pair = "(entity_id1 = %2 AND entity_id2 = %3) OR (entity_id1 = %3 AND entity_id2 = %2)";
     $sql .= " AND ( {$pair} )";
     $params[2] = [$id1, 'Integer'];
     $params[3] = [$id2, 'Integer'];

@@ -67,7 +67,7 @@ class CRM_Core_Page {
    * so the display routine needs to not do any work. (The
    * parent object takes care of the display)
    *
-   * @var boolean
+   * @var bool
    */
   protected $_embedded = FALSE;
 
@@ -75,7 +75,7 @@ class CRM_Core_Page {
    * Are we in print mode? if so we need to modify the display
    * functionality to do a minimal display :)
    *
-   * @var boolean
+   * @var bool
    */
   protected $_print = FALSE;
 

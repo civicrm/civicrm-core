@@ -197,6 +197,29 @@ class CRM_Upgrade_Incremental_Base {
   }
 
   /**
+   * Re-save any valid values from contribute settings into the normal setting
+   * format.
+   *
+   * We render the array of contribution_invoice_settings and any that have
+   * metadata defined we add to the correct key. This is safe to run even if no
+   * settings are to be converted, per the test in
+   * testConvertUpgradeContributeSettings.
+   *
+   * @param $ctx
+   *
+   * @return bool
+   */
+  public static function updateContributeSettings($ctx) {
+    $settings = Civi::settings()->get('contribution_invoice_settings');
+    $metadata = \Civi\Core\SettingsMetadata::getMetadata();
+    $conversions = array_intersect_key((array) $settings, $metadata);
+    foreach ($conversions as $key => $conversion) {
+      Civi::settings()->set($key, $conversion);
+    }
+    return TRUE;
+  }
+
+  /**
    * Do any relevant smart group updates.
    *
    * @param CRM_Queue_TaskContext $ctx

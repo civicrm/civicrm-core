@@ -53,21 +53,21 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   /**
    * Are we in single form mode or wizard mode?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single;
 
   /**
    * Is this the first page?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_first = FALSE;
 
   /**
    * Is this the last page?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_last = FALSE;
 

@@ -213,28 +213,28 @@ class CRM_Contact_BAO_Query {
   /**
    * Are we in search mode.
    *
-   * @var boolean
+   * @var bool
    */
   public $_search = TRUE;
 
   /**
    * Should we skip permission checking.
    *
-   * @var boolean
+   * @var bool
    */
   public $_skipPermission = FALSE;
 
   /**
    * Should we skip adding of delete clause.
    *
-   * @var boolean
+   * @var bool
    */
   public $_skipDeleteClause = FALSE;
 
   /**
    * Are we in strict mode (use equality over LIKE)
    *
-   * @var boolean
+   * @var bool
    */
   public $_strict = FALSE;
 
@@ -250,21 +250,21 @@ class CRM_Contact_BAO_Query {
   /**
    * Should we only search on primary location.
    *
-   * @var boolean
+   * @var bool
    */
   public $_primaryLocation = TRUE;
 
   /**
    * Are contact ids part of the query.
    *
-   * @var boolean
+   * @var bool
    */
   public $_includeContactIds = FALSE;
 
   /**
    * Should we use the smart group cache.
    *
-   * @var boolean
+   * @var bool
    */
   public $_smartGroupCache = TRUE;
 
@@ -286,7 +286,7 @@ class CRM_Contact_BAO_Query {
    * Should we enable the distinct clause, used if we are including
    * more than one group
    *
-   * @var boolean
+   * @var bool
    */
   public $_useDistinct = FALSE;
 
@@ -402,8 +402,9 @@ class CRM_Contact_BAO_Query {
    */
   protected $_rangeCache = [];
   /**
-   * Set to true when $this->relationship is run to avoid adding twice
-   * @var Boolean
+   * Set to true when $this->relationship is run to avoid adding twice.
+   *
+   * @var bool
    */
   protected $_relationshipValuesAdded = FALSE;
 

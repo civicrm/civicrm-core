@@ -14,7 +14,9 @@ class Manager {
   protected $res = NULL;
 
   /**
-   * @var array|NULL
+   * Modules.
+   *
+   * @var array|null
    *   Each item has some combination of these keys:
    *   - ext: string
    *     The Civi extension which defines the Angular module.

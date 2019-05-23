@@ -214,20 +214,23 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $result = $this->addParticipantWithPayment($feeAmt, $amtPaid);
     $contributionID = $result['contribution']['id'];
 
-    //Complete the partial payment.
-    $submittedValues = array(
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contributionID,
       'total_amount' => 20,
       'payment_instrument_id' => 3,
-    );
-    CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionID, $submittedValues, 'owed', $result['participant']['id']);
+      'participant_id' => $result['participant']['id'],
+    ]);
 
     //Change selection to a lower amount.
     $params['price_2'] = 50;
     CRM_Price_BAO_LineItem::changeFeeSelections($params, $result['participant']['id'], 'participant', $contributionID, $result['feeBlock'], $result['lineItem']);
 
-    //Record a refund of the remaining amount.
-    $submittedValues['total_amount'] = 50;
-    CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionID, $submittedValues, 'refund', $result['participant']['id']);
+    $this->callAPISuccess('Payment', 'create', [
+      'total_amount' => -50,
+      'contribution_id' => $contributionID,
+      'participant_id' => $result['participant']['id'],
+      'payment_instrument_id' => 3,
+    ]);
     $paymentInfo = CRM_Contribute_BAO_Contribution::getPaymentInfo($result['participant']['id'], 'event', TRUE);
     $transaction = $paymentInfo['transaction'];
 
