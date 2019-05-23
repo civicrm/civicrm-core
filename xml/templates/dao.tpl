@@ -154,7 +154,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
   ),
 {/if}
 {if $field.pseudoconstant}
-  'pseudoconstant' => {$field.pseudoconstant|@print_array}
+  'pseudoconstant' => {$field.pseudoconstant|@print_array},
 {/if} {* field.pseudoconstant *}                                                                    ),
 {/foreach} {* table.fields *}
                                       );
