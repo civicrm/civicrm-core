@@ -2011,6 +2011,68 @@ WHERE  id IN ( %1, %2 )
   }
 
   /**
+   * Move custom data from one contact to another.
+   *
+   * This is currently the start of a refactoring. The theory is each
+   * entity could have a 'move' function with a DAO default one to fall back on.
+   *
+   * At the moment this only does a small part of the process - ie deleting a file field that
+   * is about to be overwritten. However, the goal is the whole process around the move for
+   * custom data should be in here.
+   *
+   * This is currently called by the merge class but it makes sense that api could
+   * expose move actions as moving (e.g) contributions feels like a common
+   * ask that should be handled by the form layer.
+   *
+   * @param int $oldContactID
+   * @param int $newContactID
+   * @param int[] $fieldIDs
+   *   Optional list field ids to move.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
+   */
+  public function move($oldContactID, $newContactID, $fieldIDs) {
+    if (empty($fieldIDs)) {
+      return;
+    }
+    $fields = civicrm_api3('CustomField', 'get', ['id' => ['IN' => $fieldIDs], 'return' => ['custom_group_id.is_multiple', 'custom_group_id.table_name', 'column_name', 'data_type'], 'options' => ['limit' => 0]])['values'];
+    $return = [];
+    foreach ($fieldIDs as $fieldID) {
+      $return[] = 'custom_' . $fieldID;
+    }
+    $oldContact = civicrm_api3('Contact', 'getsingle', ['id' => $oldContactID, 'return' => $return]);
+    $newContact = civicrm_api3('Contact', 'getsingle', ['id' => $newContactID, 'return' => $return]);
+
+    // The moveAllBelongings function has functionality to move custom fields. It doesn't work very well...
+    // @todo handle all fields here but more immediately Country since that is broken at the moment.
+    $fieldTypesNotHandledInMergeAttempt = ['File'];
+    foreach ($fields as $field) {
+      $isMultiple = !empty($field['custom_group_id.is_multiple']);
+      if ($field['data_type'] === 'File' && !$isMultiple) {
+        if (!empty($oldContact['custom_' . $field['id']]) && !empty($newContact['custom_' . $field['id']])) {
+          CRM_Core_BAO_File::deleteFileReferences($oldContact['custom_' . $field['id']], $oldContactID, $field['id']);
+        }
+        if (!empty($oldContact['custom_' . $field['id']])) {
+          CRM_Core_DAO::executeQuery("
+            UPDATE civicrm_entity_file
+            SET entity_id = $newContactID
+            WHERE file_id = {$oldContact['custom_' . $field['id']]}"
+          );
+        }
+      }
+      if (in_array($field['data_type'], $fieldTypesNotHandledInMergeAttempt) && !$isMultiple) {
+        CRM_Core_DAO::executeQuery(
+          "INSERT INTO {$field['custom_group_id.table_name']} (entity_id, {$field['column_name']})
+          VALUES ($newContactID, {$oldContact['custom_' . $field['id']]})
+          ON DUPLICATE KEY UPDATE
+          {$field['column_name']} = {$oldContact['custom_' . $field['id']]}
+        ");
+      }
+    }
+  }
+
+  /**
    * Get the database table name and column name for a custom field.
    *
    * @param int $fieldID
@@ -2020,6 +2082,7 @@ WHERE  id IN ( %1, %2 )
    *
    * @return array
    *   fatal is fieldID does not exists, else array of tableName, columnName
+   * @throws \Exception
    */
   public static function getTableColumnGroup($fieldID, $force = FALSE) {
     $cacheKey = "CRM_Core_DAO_CustomField_CustomGroup_TableColumn_{$fieldID}";

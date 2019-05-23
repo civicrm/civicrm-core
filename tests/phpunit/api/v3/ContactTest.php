@@ -3387,16 +3387,15 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    */
   public function testMergeCustomFields() {
     $contact1 = $this->individualCreate();
-    /* Not sure this is quite right but it does get it into the file table
+    // Not sure this is quite right but it does get it into the file table
     $file = $this->callAPISuccess('Attachment', 'create', [
-    'name' => 'header.txt',
-    'mime_type' => 'text/plain',
-    'description' => 'My test description',
-    'content' => 'My test content',
-    'entity_table' => 'civicrm_contact',
-    'entity_id' => $contact1,
+      'name' => 'header.txt',
+      'mime_type' => 'text/plain',
+      'description' => 'My test description',
+      'content' => 'My test content',
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $contact1,
     ]);
-     */
 
     $this->createCustomGroupWithFieldsOfAllTypes();
     $fileField = $this->getCustomFieldName('file');
@@ -3408,7 +3407,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $countriesByName = array_flip(CRM_Core_PseudoConstant::country(FALSE, FALSE));
     $customFieldValues = [
       // @todo fix the fatal bug on this & uncomment - see dev/core#723
-      // $fileField => $file['id'],
+      $fileField => $file['id'],
       $linkField => 'http://example.org',
       $dateField => '2018-01-01 17:10:56',
       $selectField => 'G',
@@ -3426,6 +3425,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'auto_flip' => FALSE,
     ]);
     $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact2, 'return' => array_keys($customFieldValues)]);
+    $this->assertEquals($contact2, CRM_Core_DAO::singleValueQuery('SELECT entity_id FROM civicrm_entity_file WHERE file_id = ' . $file['id']));
     foreach ($customFieldValues as $key => $value) {
       $this->assertEquals($value, $contact[$key]);
     }
