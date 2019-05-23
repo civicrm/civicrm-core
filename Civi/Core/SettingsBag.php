@@ -70,7 +70,7 @@ class SettingsBag {
    * The result of combining default values, mandatory
    * values, and user values.
    *
-   * @var array|NULL
+   * @var array|null
    *   Array(string $settingName => mixed $value).
    */
   protected $combined;

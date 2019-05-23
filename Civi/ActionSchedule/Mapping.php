@@ -149,14 +149,14 @@ abstract class Mapping implements MappingInterface {
 
   /**
    * Date filter -- the field name.
-   * @var string|NULL
+   * @var string|null
    *   Ex: 'event_start_date'
    */
   private $entity_date_start;
 
   /**
    * Date filter -- the field name.
-   * @var string|NULL
+   * @var string|null
    *   Ex: 'event_end_date'.
    */
   private $entity_date_end;
