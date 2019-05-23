@@ -38,7 +38,7 @@ class CRM_Core_Region {
   /**
    * Whether the snippets array has been sorted
    *
-   * @var boolean
+   * @var bool
    */
   public $_isSorted;
 

@@ -98,21 +98,21 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   /**
    * Do we enable mapping of users.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_map;
 
   /**
    * Do we enable edit link.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_editLink;
 
   /**
    * Should we link to the UF Profile.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_linkToUF;
 
