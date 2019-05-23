@@ -30,7 +30,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {foreach from=$table.fields item=field}
     /**
 {if $field.comment}
-     * {$field.comment}
+     * {$field.comment|regex_replace:"/\n[ ]*/":"\n* "}
      *
 {/if}
      * @var {$field.phpType}

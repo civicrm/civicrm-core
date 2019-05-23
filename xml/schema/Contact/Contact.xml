@@ -152,8 +152,7 @@
     <import>true</import>
     <headerPattern>/legal\s?id/i</headerPattern>
     <dataPattern>/\w+?\d{5,}/</dataPattern>
-    <comment>May be used for SSN, EIN/TIN, Household ID (census) or other applicable unique legal/government ID.
-    </comment>
+    <comment>May be used for SSN, EIN/TIN, Household ID (census) or other applicable unique legal/government ID.</comment>
     <add>1.1</add>
     <html>
       <type>Text</type>

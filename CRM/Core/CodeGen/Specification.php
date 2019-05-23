@@ -327,7 +327,7 @@ class CRM_Core_CodeGen_Specification {
         $field['sqlType'] = 'decimal(' . $length . ')';
         $field['phpType'] = 'float';
         $field['crmType'] = 'CRM_Utils_Type::T_MONEY';
-        $field['precision'] = $length;
+        $field['precision'] = $length . ',';
         break;
 
       case 'float':
