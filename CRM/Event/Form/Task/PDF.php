@@ -43,7 +43,7 @@ class CRM_Event_Form_Task_PDF extends CRM_Event_Form_Task {
    * Are we operating in "single mode", i.e. printing letter to one
    * specific participant?
    *
-   * @var boolean
+   * @var bool
    */
   public $_single = FALSE;
 

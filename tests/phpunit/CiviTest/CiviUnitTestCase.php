@@ -62,7 +62,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   /**
    *  Database has been initialized.
    *
-   * @var boolean
+   * @var bool
    */
   private static $dbInit = FALSE;
 
@@ -92,7 +92,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   protected $tempDirs;
 
   /**
-   * @var boolean populateOnce allows to skip db resets in setUp
+   * @var bool populateOnce allows to skip db resets in setUp
    *
    *  WARNING! USE WITH CAUTION - IT'LL RENDER DATA DEPENDENCIES
    *  BETWEEN TESTS WHEN RUN IN SUITE. SUITABLE FOR LOCAL, LIMITED
@@ -105,7 +105,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   public static $populateOnce = FALSE;
 
   /**
-   * @var boolean DBResetRequired allows skipping DB reset
+   * @var bool DBResetRequired allows skipping DB reset
    *               in specific test case. If you still need
    *               to reset single test (method) of such case, call
    *               $this->cleanDB() in the first line of this

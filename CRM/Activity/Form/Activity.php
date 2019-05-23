@@ -111,7 +111,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   /**
    * Survey activity.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_isSurveyActivity;
 
@@ -133,7 +133,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * Note: This is a class property so that child classes can turn off this
    * behavior (e.g. in CRM_Case_Form_Activity)
    *
-   * @var boolean
+   * @var bool
    *
    */
 
@@ -627,6 +627,12 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     return $defaults;
   }
 
+  /**
+   * Build Quick form.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
   public function buildQuickForm() {
     if ($this->_action & (CRM_Core_Action::DELETE | CRM_Core_Action::RENEW)) {
       //enable form element (ActivityLinks sets this true)
@@ -894,7 +900,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    *
    *
    * @param array $params
-
+   *
    * @return array|null
    * @throws \CiviCRM_API3_Exception
    */

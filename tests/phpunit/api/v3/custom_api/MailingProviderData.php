@@ -47,7 +47,7 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
   /**
    * Should CiviCRM log any modifications to this table in the civicrm_log table.
    *
-   * @var boolean
+   * @var bool
    */
   protected static $_log = FALSE;
   /**

@@ -96,7 +96,7 @@ class CRM_Core_BAO_CustomQuery {
   /**
    * Searching for contacts?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_contactSearch;
 
