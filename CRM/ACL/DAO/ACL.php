@@ -59,7 +59,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
   /**
    * ID of the object possessing this ACL
    *
-   * @var int unsigned
+   * @var int
    */
   public $entity_id;
 
@@ -80,7 +80,7 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
   /**
    * The ID of the object controlled by this ACL entry
    *
-   * @var int unsigned
+   * @var int
    */
   public $object_id;
 
@@ -94,14 +94,14 @@ class CRM_ACL_DAO_ACL extends CRM_Core_DAO {
   /**
    * ID of the ACL or ACL group being granted/revoked
    *
-   * @var int unsigned
+   * @var int
    */
   public $acl_id;
 
   /**
    * Is this property active?
    *
-   * @var boolean
+   * @var bool
    */
   public $is_active;
 
