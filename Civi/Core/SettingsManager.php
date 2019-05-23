@@ -80,7 +80,7 @@ class SettingsManager {
   protected $bagsByContact = [];
 
   /**
-   * @var array|NULL
+   * @var array|null
    *   Array(string $entity => array(string $settingName => mixed $value)).
    *   Ex: $mandatory['domain']['uploadDir'].
    *   NULL means "autoload from $civicrm_setting".
