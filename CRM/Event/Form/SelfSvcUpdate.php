@@ -283,7 +283,6 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
    * return @void
    */
   public function transferParticipant($params) {
-    $isBackOfficeArg = $this->isBackoffice ? '&is_backoffice=1' : '';
     CRM_Utils_System::redirect(CRM_Utils_System::url(
       'civicrm/event/selfsvctransfer',
       [
@@ -291,6 +290,7 @@ class CRM_Event_Form_SelfSvcUpdate extends CRM_Core_Form {
         'action' => 'add',
         'pid' => $this->_participant_id,
         'cs' => $this->_userChecksum,
+        'is_backoffice' => $this->isBackoffice,
       ]
     ));
   }
