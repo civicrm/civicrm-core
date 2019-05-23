@@ -52,7 +52,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * The values for the quickconfig for priceset.
    *
-   * @var boolean
+   * @var bool
    */
   public $_quickConfig = NULL;
 
@@ -106,7 +106,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Are we operating in "single mode", i.e. adding / editing only
    * one participant record, or is this a batch add operation
    *
-   * @var boolean
+   * @var bool
    */
   public $_single = FALSE;
 

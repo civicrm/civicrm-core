@@ -46,7 +46,7 @@ class CRM_Grant_Form_Search extends CRM_Core_Form_Search {
   /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
