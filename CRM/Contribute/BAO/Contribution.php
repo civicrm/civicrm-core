@@ -3788,15 +3788,17 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
             elseif ($previousLineItemTotal != $lineItemDetails['line_total']) {
               $taxAmount -= CRM_Utils_Array::value('tax_amount', CRM_Utils_Array::value($fieldValueId, $previousLineItems), 0);
             }
-            $itemParams['amount'] = self::getMultiplier($params['contribution']->contribution_status_id, $context) * $taxAmount;
-            $itemParams['description'] = $taxTerm;
-            if ($lineItemDetails['financial_type_id']) {
-              $itemParams['financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount(
-                $lineItemDetails['financial_type_id'],
-                'Sales Tax Account is'
-              );
+            if ($taxAmount != 0) {
+              $itemParams['amount'] = self::getMultiplier($params['contribution']->contribution_status_id, $context) * $taxAmount;
+              $itemParams['description'] = $taxTerm;
+              if ($lineItemDetails['financial_type_id']) {
+                $itemParams['financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount(
+                  $lineItemDetails['financial_type_id'],
+                  'Sales Tax Account is'
+                );
+              }
+              CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
             }
-            CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
           }
         }
       }
