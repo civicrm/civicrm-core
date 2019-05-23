@@ -659,7 +659,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function getCurrentLanguage() {
     // Drupal might not be bootstrapped if being called by the REST API.
-    if (!class_exists('Drupal')) {
+    if (!class_exists('Drupal') || !\Drupal::hasContainer()) {
       return NULL;
     }
 
@@ -706,7 +706,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     }
 
     // Drupal might not be bootstrapped if being called by the REST API.
-    if (!class_exists('Drupal')) {
+    if (!class_exists('Drupal') || !\Drupal::hasContainer()) {
       return NULL;
     }
 
