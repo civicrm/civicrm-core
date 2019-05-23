@@ -37,6 +37,8 @@
  * @group headless
  */
 class api_v3_ContactTest extends CiviUnitTestCase {
+  use CRMTraits_Custom_CustomDataTrait;
+
   public $DBResetRequired = FALSE;
   protected $_apiversion;
   protected $_entity;
@@ -44,6 +46,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   protected $_contactID;
   protected $_financialTypeId = 1;
+
+
+  /**
+   * Entity to be extended.
+   *
+   * @var string
+   */
+  protected $entity = 'Contact';
 
   /**
    * Test setup for every test.
@@ -3367,6 +3377,57 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'option_group_id' => 'priority',
     )));
 
+  }
+
+  /**
+   * Test merging 2 contacts with custom fields.
+   *
+   * @throws \Exception
+   */
+  public function testMergeCustomFields() {
+    $contact1 = $this->individualCreate();
+    /* Not sure this is quite right but it does get it into the file table
+    $file = $this->callAPISuccess('Attachment', 'create', [
+    'name' => 'header.txt',
+    'mime_type' => 'text/plain',
+    'description' => 'My test description',
+    'content' => 'My test content',
+    'entity_table' => 'civicrm_contact',
+    'entity_id' => $contact1,
+    ]);
+     */
+
+    $this->createCustomGroupWithFieldsOfAllTypes();
+    $fileField = $this->getCustomFieldName('file');
+    $linkField = $this->getCustomFieldName('link');
+    $dateField = $this->getCustomFieldName('select_date');
+    $selectField = $this->getCustomFieldName('select_string');
+    $countryField = $this->getCustomFieldName('country');
+
+    $countriesByName = array_flip(CRM_Core_PseudoConstant::country(FALSE, FALSE));
+    $customFieldValues = [
+      // @todo fix the fatal bug on this & uncomment - see dev/core#723
+      // $fileField => $file['id'],
+      $linkField => 'http://example.org',
+      $dateField => '2018-01-01 17:10:56',
+      $selectField => 'G',
+      // Currently broken.
+      //$countryField => $countriesByName['New Zealand'],
+    ];
+    $this->callAPISuccess('Contact', 'create', array_merge([
+      'id' => $contact1,
+    ], $customFieldValues));
+
+    $contact2 = $this->individualCreate();
+    $this->callAPISuccess('contact', 'merge', [
+      'to_keep_id' => $contact2,
+      'to_remove_id' => $contact1,
+      'auto_flip' => FALSE,
+    ]);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact2, 'return' => array_keys($customFieldValues)]);
+    foreach ($customFieldValues as $key => $value) {
+      $this->assertEquals($value, $contact[$key]);
+    }
   }
 
   /**

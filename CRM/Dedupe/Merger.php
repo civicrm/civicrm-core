@@ -579,13 +579,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // Allow hook_civicrm_merge() to add SQL statements for the merge operation.
     CRM_Utils_Hook::merge('sqls', $sqls, $mainId, $otherId, $tables);
 
-    // call the SQL queries in one transaction
-    $transaction = new CRM_Core_Transaction();
     foreach ($sqls as $sql) {
       CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE);
     }
     CRM_Dedupe_Merger::addMembershipToRealtedContacts($mainId);
-    $transaction->commit();
   }
 
   /**
@@ -1526,6 +1523,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     if (empty($migrationInfo)) {
       return FALSE;
     }
+    // Encapsulate in a transaction to avoid half-merges.
+    $transaction = new CRM_Core_Transaction();
 
     $contactType = $migrationInfo['main_details']['contact_type'];
     $relTables = CRM_Dedupe_Merger::relTables();
@@ -1670,7 +1669,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
       CRM_Contact_BAO_Contact::createProfileContact($submitted, CRM_Core_DAO::$_nullArray, $mainId);
     }
-
+    $transaction->commit();
     CRM_Utils_Hook::post('merge', 'Contact', $mainId);
     self::createMergeActivities($mainId, $otherId);
 
@@ -2416,6 +2415,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $sql = "SELECT entity_id, {$columnName} AS file_id FROM {$tableName} WHERE entity_id IN ({$mainId}, {$otherId})";
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
+        // @todo - this is actually broken - fix & or remove - see testMergeCustomFields
         $fileIds[$dao->entity_id] = $dao->file_id;
         if ($dao->entity_id == $mainId) {
           CRM_Core_BAO_File::deleteFileReferences($fileIds[$mainId], $mainId, $customId);

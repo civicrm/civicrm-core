@@ -398,35 +398,32 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * Check relationship creation with custom data.
    */
   public function testRelationshipCreateEditWithCustomData() {
-    $this->createCustomGroup();
-    $this->_ids = $this->createCustomFieldsOfAllTypes();
+    $this->createCustomGroupWithFieldsOfAllTypes();
     //few custom Values for comparing
-    $custom_params = array(
-      "custom_{$this->_ids[0]}" => 'Hello! this is custom data for relationship',
-      "custom_{$this->_ids[1]}" => 'Y',
-      "custom_{$this->_ids[2]}" => '2009-07-11 00:00:00',
-      "custom_{$this->_ids[3]}" => 'http://example.com',
-    );
+    $custom_params = [
+      $this->getCustomFieldName('text') => 'Hello! this is custom data for relationship',
+      $this->getCustomFieldName('select_string') => 'Y',
+      $this->getCustomFieldName('select_date') => '2009-07-11 00:00:00',
+      $this->getCustomFieldName('link') => 'http://example.com',
+    ];
 
-    $params = array(
+    $params = [
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b,
       'relationship_type_id' => $this->_relTypeID,
       'start_date' => '2008-12-20',
       'is_active' => 1,
-    );
+    ];
     $params = array_merge($params, $custom_params);
     $result = $this->callAPISuccess('relationship', 'create', $params);
 
-    $relationParams = array(
-      'id' => $result['id'],
-    );
+    $relationParams = ['id' => $result['id']];
     $this->assertDBState('CRM_Contact_DAO_Relationship', $result['id'], $relationParams);
 
     //Test Edit of custom field from the form.
     $getParams = array('id' => $result['id']);
     $updateParams = array_merge($getParams, array(
-      "custom_{$this->_ids[0]}" => 'Edited Text Value',
+      $this->getCustomFieldName('text') => 'Edited Text Value',
       'relationship_type_id' => $this->_relTypeID . '_b_a',
       'related_contact_id' => $this->_cId_a,
     ));
@@ -436,7 +433,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $reln->submit($updateParams);
 
     $check = $this->callAPISuccess('relationship', 'get', $getParams);
-    $this->assertEquals("Edited Text Value", $check['values'][$check['id']]["custom_{$this->_ids[0]}"]);
+    $this->assertEquals("Edited Text Value", $check['values'][$check['id']][$this->getCustomFieldName('text')]);
 
     $params['id'] = $result['id'];
     $this->callAPISuccess('relationship', 'delete', $params);
@@ -571,21 +568,20 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * should be OK if the custom field values differ.
    */
   public function testRelationshipCreateDuplicateWithCustomFields() {
-    $this->createCustomGroup();
-    $this->_ids = $this->createCustomFieldsOfAllTypes();
+    $this->createCustomGroupWithFieldsOfAllTypes();
 
     $custom_params_1 = array(
-      "custom_{$this->_ids[0]}" => 'Hello! this is custom data for relationship',
-      "custom_{$this->_ids[1]}" => 'Y',
-      "custom_{$this->_ids[2]}" => '2009-07-11 00:00:00',
-      "custom_{$this->_ids[3]}" => 'http://example.com',
+      $this->getCustomFieldName('text') => 'Hello! this is custom data for relationship',
+      $this->getCustomFieldName('select_string') => 'Y',
+      $this->getCustomFieldName('select_date') => '2009-07-11 00:00:00',
+      $this->getCustomFieldName('link') => 'http://example.com',
     );
 
     $custom_params_2 = array(
-      "custom_{$this->_ids[0]}" => 'Hello! this is other custom data',
-      "custom_{$this->_ids[1]}" => 'Y',
-      "custom_{$this->_ids[2]}" => '2009-07-11 00:00:00',
-      "custom_{$this->_ids[3]}" => 'http://example.org',
+      $this->getCustomFieldName('text') => 'Hello! this is other custom data',
+      $this->getCustomFieldName('select_string') => 'Y',
+      $this->getCustomFieldName('select_date') => '2009-07-11 00:00:00',
+      $this->getCustomFieldName('link') => 'http://example.org',
     );
 
     $params = array(
@@ -615,23 +611,22 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * does.
    */
   public function testRelationshipCreateDuplicateWithCustomFields2() {
-    $this->createCustomGroup();
-    $this->_ids = $this->createCustomFieldsOfAllTypes();
+    $this->createCustomGroupWithFieldsOfAllTypes();
 
     $custom_params_2 = array(
-      "custom_{$this->_ids[0]}" => 'Hello! this is other custom data',
-      "custom_{$this->_ids[1]}" => 'Y',
-      "custom_{$this->_ids[2]}" => '2009-07-11 00:00:00',
-      "custom_{$this->_ids[3]}" => 'http://example.org',
+      $this->getCustomFieldName('text') => 'Hello! this is other custom data',
+      $this->getCustomFieldName('select_string') => 'Y',
+      $this->getCustomFieldName('select_date') => '2009-07-11 00:00:00',
+      $this->getCustomFieldName('link') => 'http://example.org',
     );
 
-    $params_1 = array(
+    $params_1 = [
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b,
       'relationship_type_id' => $this->_relTypeID,
       'start_date' => '2008-12-20',
       'is_active' => 1,
-    );
+    ];
 
     $params_2 = array_merge($params_1, $custom_params_2);
 
@@ -651,15 +646,14 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
    * does not.
    */
   public function testRelationshipCreateDuplicateWithCustomFields3() {
-    $this->createCustomGroup();
-    $this->_ids = $this->createCustomFieldsOfAllTypes();
+    $this->createCustomGroupWithFieldsOfAllTypes();
 
-    $custom_params_1 = array(
-      "custom_{$this->_ids[0]}" => 'Hello! this is other custom data',
-      "custom_{$this->_ids[1]}" => 'Y',
-      "custom_{$this->_ids[2]}" => '2009-07-11 00:00:00',
-      "custom_{$this->_ids[3]}" => 'http://example.org',
-    );
+    $custom_params_1 = [
+      $this->getCustomFieldName('text') => 'Hello! this is other custom data',
+      $this->getCustomFieldName('select_string') => 'Y',
+      $this->getCustomFieldName('select_date') => '2009-07-11 00:00:00',
+      $this->getCustomFieldName('link') => 'http://example.org',
+    ];
 
     $params_2 = array(
       'contact_id_a' => $this->_cId_a,

@@ -33,6 +33,16 @@
 trait CRMTraits_Custom_CustomDataTrait {
 
   /**
+   * Create a custom group with fields of multiple types.
+   *
+   * @param array $groupParams
+   */
+  public function createCustomGroupWithFieldsOfAllTypes($groupParams = []) {
+    $this->createCustomGroup($groupParams);
+    $this->ids['CustomField'] = $this->createCustomFieldsOfAllTypes();
+  }
+
+  /**
    * Create a custom group.
    *
    * @param array $params
@@ -68,7 +78,7 @@ trait CRMTraits_Custom_CustomDataTrait {
     ];
 
     $customField = $this->callAPISuccess('CustomField', 'create', $params);
-    $ids[] = $customField['id'];
+    $ids['text'] = $customField['id'];
 
     $optionValue[] = [
       'label' => 'Red',
@@ -102,7 +112,7 @@ trait CRMTraits_Custom_CustomDataTrait {
     ];
 
     $customField = $this->callAPISuccess('custom_field', 'create', $params);
-    $ids[] = $customField['id'];
+    $ids['select_string'] = $customField['id'];
 
     $params = [
       'custom_group_id' => $customGroupID,
@@ -112,14 +122,12 @@ trait CRMTraits_Custom_CustomDataTrait {
       'data_type' => 'Date',
       'default_value' => '20090711',
       'weight' => 3,
-      'is_required' => 1,
-      'is_searchable' => 0,
-      'is_active' => 1,
+      'time_format' => 1,
     ];
 
     $customField = $this->callAPISuccess('custom_field', 'create', $params);
 
-    $ids[] = $customField['id'];
+    $ids['select_date'] = $customField['id'];
     $params = [
       'custom_group_id' => $customGroupID,
       'name' => 'test_link',
@@ -134,8 +142,42 @@ trait CRMTraits_Custom_CustomDataTrait {
     ];
 
     $customField = $this->callAPISuccess('custom_field', 'create', $params);
-    $ids[] = $customField['id'];
+
+    $ids['link'] = $customField['id'];
+    $fileField = $this->customFieldCreate([
+      'custom_group_id' => $customGroupID,
+      'data_type' => 'File',
+      'html_type' => 'File',
+      'default_value' => '',
+    ]);
+
+    $ids['file'] = $fileField['id'];
+    $ids['country'] = $this->customFieldCreate([
+      'custom_group_id' => $customGroupID,
+      'data_type' => 'Int',
+      'html_type' => 'Select Country',
+      'default_value' => '',
+      'label' => 'Country',
+      'option_type' => 0,
+    ])['id'];
+
     return $ids;
+  }
+
+  /**
+   * Get the custom field name for the relevant key.
+   *
+   * e.g returns 'custom_5' where 5 is the id of the field using the key.
+   *
+   * Generally keys map to data types.
+   *
+   * @param string $key
+   *
+   * @return string
+   */
+  protected function getCustomFieldName($key) {
+    $linkField = 'custom_' . $this->ids['CustomField'][$key];
+    return $linkField;
   }
 
 }
