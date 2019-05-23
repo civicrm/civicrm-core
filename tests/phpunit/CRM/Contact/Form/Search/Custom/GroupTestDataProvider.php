@@ -37,7 +37,9 @@
 class CRM_Contact_Form_Search_Custom_GroupTestDataProvider implements Iterator {
 
   /**
-   * @var integer
+   * Current count.
+   *
+   * @var int
    */
   private $i = 0;
 

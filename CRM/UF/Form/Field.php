@@ -82,7 +82,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * Is this profile has searchable field.
    * or is any field having in selector true.
    *
-   * @var bool.
+   * @var bool
    */
   protected $_hasSearchableORInSelector;
 

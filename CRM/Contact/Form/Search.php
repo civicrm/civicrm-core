@@ -120,7 +120,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   /**
    * The profile group id used for display.
    *
-   * @var integer
+   * @var int
    */
   protected $_ufGroupID;
 
@@ -132,13 +132,16 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
   public static $csv = ['contact_type', 'group', 'tag'];
 
   /**
-   * @var string how to display the results. Should we display as
-   *             contributons, members, cases etc
+   * How to display the results. Should we display as contributons, members, cases etc.
+   *
+   * @var string
    */
   protected $_componentMode;
 
   /**
-   * @var string what operator should we use, AND or OR
+   * What operator should we use, AND or OR.
+   *
+   * @var string
    */
   protected $_operator;
 

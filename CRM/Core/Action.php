@@ -41,7 +41,7 @@ class CRM_Core_Action {
    * Different possible actions are defined here. Keep in sync with the
    * constant from CRM_Core_Form for various modes.
    *
-   * @var integer const
+   * @var int
    */
   const
     NONE = 0,

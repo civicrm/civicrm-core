@@ -118,7 +118,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
   /**
    * Pcp id
    *
-   * @var integer
+   * @var int
    */
   public $_pcpId;
 

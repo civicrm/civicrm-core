@@ -49,14 +49,14 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * The id of the report instance
    *
-   * @var integer
+   * @var int
    */
   protected $_id;
 
   /**
    * The id of the report template
    *
-   * @var integer;
+   * @var int
    */
   protected $_templateID;
 
@@ -280,14 +280,15 @@ class CRM_Report_Form extends CRM_Core_Form {
    * when $_output mode is not 'html' or 'group' so as not to have to interpret / mess with that part
    * of the code (see limit() fn.
    *
-   * @var integer
+   * @var int
    */
   protected $_limitValue = NULL;
 
   /**
    * This can be set to specify row offset
    * See notes on _limitValue
-   * @var integer
+   *
+   * @var int
    */
   protected $_offsetValue = NULL;
   /**
@@ -422,33 +423,43 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $_section;
 
   /**
-   * @var string Report description.
+   * Report description.
+   *
+   * @var string
    */
   public $_description;
 
   /**
-   * @var bool Is an address field selected.
+   * Is an address field selected.
+   *
+   * @var bool
    *   This was intended to determine if the address table should be joined in
    *   The isTableSelected function is now preferred for this purpose
    */
   protected $_addressField;
 
   /**
-   * @var bool Is an email field selected.
+   * Is an email field selected.
+   *
+   * @var bool
    *   This was intended to determine if the email table should be joined in
    *   The isTableSelected function is now preferred for this purpose
    */
   protected $_emailField;
 
   /**
-   * @var bool Is a phone field selected.
+   * Is a phone field selected.
+   *
+   * @var bool
    *   This was intended to determine if the phone table should be joined in
    *   The isTableSelected function is now preferred for this purpose
    */
   protected $_phoneField;
 
   /**
-   * @var bool Create new report instance? (or update existing) on save.
+   * Create new report instance? (or update existing) on save.
+   *
+   * @var bool
    */
   protected $_createNew;
 
@@ -456,12 +467,15 @@ class CRM_Report_Form extends CRM_Core_Form {
    *  When a grand total row has calculated the status we pop it off to here.
    *
    * This allows us to access it from the stats function and avoid recalculating.
+   *
    * @var array
    */
   protected $rollupRow = [];
 
   /**
-   * @var string Database attributes - character set and collation
+   * Database attributes - character set and collation.
+   *
+   * @var string
    */
   protected $_databaseAttributes = ' DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci';
 

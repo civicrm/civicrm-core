@@ -37,12 +37,8 @@ abstract class CRM_Custom_Import_Parser extends CRM_Contact_Import_Parser {
   protected $_fileName;
 
   /**
-   * #@+
-   * @var integer
-   */
-
-  /**
-   * Imported file size
+   * Imported file size.
+   *
    * @var int
    */
   protected $_fileSize;

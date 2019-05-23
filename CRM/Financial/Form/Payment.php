@@ -51,7 +51,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   public $isBackOffice = FALSE;
 
   /**
-   * @var String
+   * @var string
    */
   public $_formName = '';
 

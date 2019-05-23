@@ -149,7 +149,8 @@ class CRM_Upgrade_Incremental_Base {
    * @param string $column
    * @param string $properties
    * @param bool $localizable is this a field that should be localized
-   * @param string|NULL $version CiviCRM version to use if rebuilding multilingual schema
+   * @param string|null $version CiviCRM version to use if rebuilding multilingual schema
+   *
    * @return bool
    */
   public static function addColumn($ctx, $table, $column, $properties, $localizable = FALSE, $version = NULL) {
@@ -281,7 +282,8 @@ class CRM_Upgrade_Incremental_Base {
   /**
    * Rebuild Multilingual Schema.
    * @param CRM_Queue_TaskContext $ctx
-   * @param string|NULL $version CiviCRM version to use if rebuilding multilingual schema
+   * @param string|null $version CiviCRM version to use if rebuilding multilingual schema
+   *
    * @return bool
    */
   public static function rebuildMultilingalSchema($ctx, $version = NULL) {

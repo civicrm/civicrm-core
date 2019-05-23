@@ -34,36 +34,42 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
   /**
    * Membership type name used in test function.
-   * @var String
+   *
+   * @var string
    */
   protected $_membershipTypeName = NULL;
 
   /**
    * Membership type id used in test function.
-   * @var String
+   *
+   * @var string
    */
   protected $_membershipTypeID = NULL;
 
   /**
    * Contact id used in test function.
-   * @var String
+   *
+   * @var string
    */
   protected $_contactID = NULL;
   /**
    * Contact id used in test function.
-   * @var String
+   *
+   * @var string
    */
   protected $_contactID2 = NULL;
 
   /**
    * Contact id used in test function.
-   * @var String
+   *
+   * @var string
    */
   protected $_contactID3 = NULL;
 
   /**
    * Contact id used in test function.
-   * @var String
+   *
+   * @var string
    */
   protected $_contactID4 = NULL;
 
