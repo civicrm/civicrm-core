@@ -336,7 +336,7 @@ WHERE     cpf.price_set_id = %1";
    *                      array may contain either option id or
    *                      price field id
    *
-   * @return int|NULL
+   * @return int|null
    *   price set id on success, null  otherwise
    */
   public static function getSetId(&$params) {

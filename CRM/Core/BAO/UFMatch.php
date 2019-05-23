@@ -482,7 +482,7 @@ AND    domain_id    = %4
    * @param int $ufID
    *   Id of UF for which related contact_id is required.
    *
-   * @return int|NULL
+   * @return int|null
    *   contact_id on success, null otherwise
    */
   public static function getContactId($ufID) {
@@ -515,7 +515,7 @@ AND    domain_id    = %4
    * @param int $contactID
    *   ID of the contact for which related uf_id is required.
    *
-   * @return int|NULL
+   * @return int|null
    *   uf_id of the given contact_id on success, null otherwise
    */
   public static function getUFId($contactID) {

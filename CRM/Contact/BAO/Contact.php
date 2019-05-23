@@ -582,9 +582,11 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * Alternatively we should choose from enabled countries, prioritising the default country.
    *
    * @param array $values
-   * @param int|NULL $countryID
+   * @param int|null $countryID
    *
    * @return int|null
+   *
+   * @throws \CRM_Core_Exception
    */
   protected static function resolveStateProvinceID($values, $countryID) {
 
@@ -3628,7 +3630,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    * @param array $contextParams
    *   The context if relevant, eg. ['event_id' => X]
    *
-   * @return int|NULL
+   * @return int|null
    */
   public static function getFirstDuplicateContact($input, $contactType, $rule = 'Unsupervised', $excludedContactIDs = [], $checkPermissions = TRUE, $ruleGroupID = NULL, $contextParams = []) {
     $ids = self::getDuplicateContacts($input, $contactType, $rule, $excludedContactIDs, $checkPermissions, $ruleGroupID, $contextParams);

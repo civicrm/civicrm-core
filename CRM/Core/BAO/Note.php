@@ -293,7 +293,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param bool $showStatus
    *   Do we need to set status or not.
    *
-   * @return int|NULL
+   * @return int|null
    *   no of deleted notes on success, null otherwise
    */
   public static function del($id, $showStatus = TRUE) {

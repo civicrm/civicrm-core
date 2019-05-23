@@ -33,7 +33,7 @@ class CRM_Contact_Form_Task_AddToParentClass extends CRM_Contact_Form_Task {
   /**
    * Exported parameters from the form.
    *
-   * @var array.
+   * @var array
    */
   protected $params;
 

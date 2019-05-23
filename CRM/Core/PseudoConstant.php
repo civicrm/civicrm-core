@@ -407,7 +407,7 @@ class CRM_Core_PseudoConstant {
    *
    * @param string $baoName
    * @param string $fieldName
-   * @param string|Int $key
+   * @param string|int $key
    *
    * TODO: Accept multivalued input?
    *
@@ -429,7 +429,7 @@ class CRM_Core_PseudoConstant {
    *
    * @param string $baoName
    * @param string $fieldName
-   * @param string|Int $key
+   * @param string|int $key
    *
    * @return bool|null|string
    *   FALSE if the given field has no associated option list
@@ -449,7 +449,7 @@ class CRM_Core_PseudoConstant {
    *
    * @param string $baoName
    * @param string $fieldName
-   * @param string|Int $value
+   * @param string|int $value
    *
    * @return bool|null|string|int
    *   FALSE if the given field has no associated option list

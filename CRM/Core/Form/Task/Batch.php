@@ -49,7 +49,9 @@ class CRM_Core_Form_Task_Batch extends CRM_Core_Form_Task {
   protected $_maxFields = 9;
 
   /**
-   * @var array Fields that belong to this UF Group
+   * Fields that belong to this UF Group.
+   *
+   * @var array
    */
   protected $_fields;
 

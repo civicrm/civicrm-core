@@ -2046,7 +2046,8 @@ SELECT civicrm_contact.id as casemanager_id,
    *
    * @param bool $changeClient
    *
-   * @return int|NULL
+   * @return int|null
+   * @throws \CRM_Core_Exception
    */
   public static function mergeCases(
     $mainContactId, $mainCaseId = NULL, $otherContactId = NULL,

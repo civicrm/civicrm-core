@@ -433,9 +433,9 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * full access to DAO services.
    *
    * @param string $group
-   * @param string|NULL $path
+   * @param string|null $path
    *   Filter by path. If NULL, then return any paths.
-   * @param int|NULL $componentID
+   * @param int|null $componentID
    *   Filter by component. If NULL, then look for explicitly NULL records.
    * @return string
    */

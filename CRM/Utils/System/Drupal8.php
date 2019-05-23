@@ -372,7 +372,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    * Determine the native ID of the CMS user.
    *
    * @param string $username
-   * @return int|NULL
+   * @return int|null
    */
   public function getUfId($username) {
     if ($id = user_load_by_name($username)->id()) {

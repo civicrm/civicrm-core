@@ -73,7 +73,11 @@ class CRM_Core_Smarty extends Smarty {
   static private $_singleton = NULL;
 
   /**
-   * @var array (string $name => mixed $value) a list of variables ot save temporarily
+   * Backup frames.
+   *
+   * A list of variables ot save temporarily in format (string $name => mixed $value).
+   *
+   * @var array
    */
   private $backupFrames = [];
 

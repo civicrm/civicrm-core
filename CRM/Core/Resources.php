@@ -64,37 +64,55 @@ class CRM_Core_Resources {
   private $strings = NULL;
 
   /**
-   * @var array free-form data tree
+   * Settings in free-form data tree.
+   *
+   * @var array
    */
   protected $settings = [];
   protected $addedSettings = FALSE;
 
   /**
-   * @var array of callables
+   * Setting factories.
+   *
+   * @var callable[]
    */
   protected $settingsFactories = [];
 
   /**
-   * @var array ($regionName => bool)
+   * Added core resources.
+   *
+   * Format is ($regionName => bool).
+   *
+   * @var array
    */
   protected $addedCoreResources = [];
 
   /**
-   * @var array ($regionName => bool)
+   * Added core styles.
+   *
+   * Format is ($regionName => bool).
+   *
+   * @var array
    */
   protected $addedCoreStyles = [];
 
   /**
-   * @var string a value to append to JS/CSS URLs to coerce cache resets
+   * A value to append to JS/CSS URLs to coerce cache resets.
+   *
+   * @var string
    */
   protected $cacheCode = NULL;
 
   /**
-   * @var string the name of a setting which persistently stores the cacheCode
+   * The name of a setting which persistently stores the cacheCode.
+   *
+   * @var string
    */
   protected $cacheCodeKey = NULL;
 
   /**
+   * Are ajax popup screens enabled.
+   *
    * @var bool
    */
   public $ajaxPopupsEnabled;
@@ -109,6 +127,7 @@ class CRM_Core_Resources {
    *
    * @param CRM_Core_Resources $instance
    *   New copy of the manager.
+   *
    * @return CRM_Core_Resources
    */
   public static function singleton(CRM_Core_Resources $instance = NULL) {
@@ -185,6 +204,7 @@ class CRM_Core_Resources {
    *   - string: Load translated strings. Use a specific domain.
    *
    * @return CRM_Core_Resources
+   * @throws \Exception
    */
   public function addScriptFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION, $translate = TRUE) {
     if ($translate) {
@@ -371,7 +391,7 @@ class CRM_Core_Resources {
    * And from javascript access it at CRM.myNamespace.myString
    *
    * @param string|array $text
-   * @param string|NULL $domain
+   * @param string|null $domain
    * @return CRM_Core_Resources
    */
   public function addString($text, $domain = 'civicrm') {
@@ -459,7 +479,7 @@ class CRM_Core_Resources {
    *
    * @param string $ext
    *   extension name; use 'civicrm' for core.
-   * @param string|NULL $file
+   * @param string|null $file
    *   file path -- relative to the extension base dir.
    *
    * @return bool|string

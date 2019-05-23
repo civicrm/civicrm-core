@@ -2133,7 +2133,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Get the contact id that the form is being submitted for.
    *
-   * @return int|NULL
+   * @return int|null
    */
   public function getContactID() {
     return $this->setContactID();

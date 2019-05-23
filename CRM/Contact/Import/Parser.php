@@ -1347,7 +1347,9 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    *   Input values
    * @param string $entity
    *  - address, email, phone
-   * @param int|NULL $contactID
+   * @param int|null $contactID
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   protected function fillPrimary(&$params, $values, $entity, $contactID) {
     if ($values['location_type_id'] === 'Primary') {

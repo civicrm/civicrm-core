@@ -30,12 +30,13 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
  */
 class CRM_Core_Resources_Strings {
 
   /**
-   * @var CRM_Utils_Cache_Interface|NULL
+   * Cache.
+   *
+   * @var CRM_Utils_Cache_Interface|null
    */
   private $cache = NULL;
 
@@ -63,8 +64,11 @@ class CRM_Core_Resources_Strings {
    *   File path.
    * @param string $format
    *   Type of file (e.g. 'text/javascript', 'text/html').
+   *
    * @return array
    *   List of translatable strings.
+   *
+   * @throws \Exception
    */
   public function get($bucket, $file, $format) {
     // array($file => array(...strings...))

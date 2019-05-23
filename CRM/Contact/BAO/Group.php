@@ -1044,7 +1044,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $groupIDs
    *   Array of group ids.
    *
-   * @param NULL $parents
+   * @param string $parents
    * @param string $spacer
    * @param bool $titleOnly
    *

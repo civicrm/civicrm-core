@@ -54,8 +54,11 @@ class CRM_Core_Payment_PayPalProIPN extends CRM_Core_Payment_BaseIPN {
   protected $_isPaymentExpress = FALSE;
 
   /**
-   * Are we dealing with an event an 'anything else' (contribute)
-   * @var string component
+   * Component.
+   *
+   * Are we dealing with an event an 'anything else' (contribute).
+   *
+   * @var string
    */
   protected $_component = 'contribute';
 

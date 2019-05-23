@@ -2153,7 +2153,8 @@ function _civicrm_api3_resolve_country_id($params) {
  * @param string $contactIdExpr
  *   E.g. "user_contact_id" or "@user:username".
  *
- * @return int|NULL|'unknown-user'
+ * @return int|null|'unknown-user'
+ * @throws \CRM_Core_Exception
  */
 function _civicrm_api3_resolve_contactID($contactIdExpr) {
   // If value = 'user_contact_id' replace value with logged in user id.

@@ -63,11 +63,14 @@ class CRM_Core_ClassLoader {
   }
 
   /**
-   * @var bool TRUE if previously registered
+   * Has this been registered already.
+   *
+   * @var bool
    */
   protected $_registered;
 
   /**
+   * Class constructor.
    */
   protected function __construct() {
     $this->_registered = FALSE;
