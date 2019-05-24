@@ -405,7 +405,7 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
               $values[] = is_numeric($value) ? $value : "'{$value}'";
             }
           }
-          else {
+          elseif (!empty($row)) {
             // cos we copied it & it is inconsistent....
             foreach ($row as $key => $value) {
               $keys[] = $key;
@@ -413,9 +413,11 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
             }
           }
 
-          CRM_Core_DAO::executeQuery("
+          if (!empty($values)) {
+            CRM_Core_DAO::executeQuery("
             INSERT INTO $tableName (" . implode(',', $keys) . ') VALUES(' . implode(',', $values) . ')'
-          );
+            );
+          }
         }
       }
     }

@@ -46,8 +46,6 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
 
   protected $_contactId = 69;
 
-  protected $_apiversion = 3;
-
   protected $_params;
 
   protected $_entity = 'uf_field';
@@ -70,11 +68,7 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
       ]
     );
 
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute(
-      $this->_dbconn,
-      $this->createFlatXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml')
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml');
 
     $this->callAPISuccess('uf_field', 'getfields', ['cache_clear' => 1]);
 

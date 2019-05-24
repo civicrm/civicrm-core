@@ -218,12 +218,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public function testReportTemplateGetRowsMailingUniqueOpened() {
     $description = "Retrieve rows from a mailing opened report template.";
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/../../CRM/Mailing/BAO/queryDataset.xml'
-      )
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/../../CRM/Mailing/BAO/queryDataset.xml');
 
     // Check total rows without distinct
     global $_REQUEST;

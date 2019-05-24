@@ -92,13 +92,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
   public function testCount($fv, $count, $ids, $full) {
     $this->quickCleanup($this->_tablesToTruncate);
 
-    // echo "testCount\n";
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/datasets/group-dataset.xml'
-      )
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/group-dataset.xml');
 
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);
 
@@ -111,9 +105,7 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
      * echo "{$dao->contact_id}, {$dao->contact_type}, {$dao->sort_name}, {$dao->group_names}\n";
      * }
      **/
-    $this->assertEquals($count, $obj->count(),
-      'In line ' . __LINE__
-    );
+    $this->assertEquals($count, $obj->count());
   }
 
   /**
@@ -128,14 +120,8 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
   public function testAll($fv, $count, $ids, $full) {
     // Truncate affected tables
     $this->quickCleanup($this->_tablesToTruncate);
+    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/group-dataset.xml');
 
-    // echo "testAll\n";
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/datasets/group-dataset.xml'
-      )
-    );
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);
     $sql = $obj->all();
     $this->assertTrue(is_string($sql));
@@ -165,13 +151,8 @@ class CRM_Contact_Form_Search_Custom_GroupTest extends CiviUnitTestCase {
     // Truncate affected tables
     $this->quickCleanup($this->_tablesToTruncate);
 
-    // echo "testContactIDs\n";
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/datasets/group-dataset.xml'
-      )
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/group-dataset.xml');
+
     $obj = new CRM_Contact_Form_Search_Custom_Group($fv);
     $sql = $obj->contactIDs();
     $this->assertTrue(is_string($sql));

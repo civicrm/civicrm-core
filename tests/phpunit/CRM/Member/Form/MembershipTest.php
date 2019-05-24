@@ -95,13 +95,9 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
     $this->_individualId = $this->individualCreate();
     $this->_paymentProcessorID = $this->processorCreate();
-    // Insert test data.
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/dataset/data.xml'
-      )
-    );
+
+    $this->loadXMLDataSet(dirname(__FILE__) . '/dataset/data.xml');
+
     $membershipTypeAnnualFixed = $this->callAPISuccess('membership_type', 'create', array(
       'domain_id' => 1,
       'name' => "AnnualFixed",
