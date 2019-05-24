@@ -3656,10 +3656,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     ) {
       return;
     }
-    if ($context == 'changedAmount' || $context == 'changeFinancialType') {
-      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-      $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
-    }
     if ($context == 'changedStatus') {
       if ($previousContributionStatus == 'Completed'
         && (self::isContributionStatusNegative($params['contribution']->contribution_status_id))
@@ -3692,9 +3688,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           $params['trxnParams']['from_financial_account_id'] = $arAccountId;
         }
       }
-    }
 
-    if ($context == 'changedStatus') {
       if (($previousContributionStatus == 'Pending'
           || $previousContributionStatus == 'In Progress')
         && ($currentContributionStatus == 'Completed')
@@ -3746,6 +3740,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         }
         return;
       }
+    }
+
+    if ($context == 'changedAmount' || $context == 'changeFinancialType') {
+      // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
+      $params['trxnParams']['total_amount'] = $params['trxnParams']['net_amount'] = ($params['total_amount'] - $params['prevContribution']->total_amount);
     }
 
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
