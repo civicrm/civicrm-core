@@ -409,8 +409,9 @@ class CRM_Contact_BAO_Query {
   protected $_relationshipValuesAdded = FALSE;
 
   /**
-   * Set to the name of the temp table if one has been created
-   * @var String
+   * Set to the name of the temp table if one has been created.
+   *
+   * @var string
    */
   public static $_relationshipTempTable = NULL;
 

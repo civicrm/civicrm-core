@@ -37,7 +37,8 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
   protected $_cId_a;
   /**
    * Second individual.
-   * @var integer
+   *
+   * @var int
    */
   protected $_cId_a_2;
   protected $_cId_b;

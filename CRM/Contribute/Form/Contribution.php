@@ -132,8 +132,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_fromEmails;
 
   /**
-   * ID of from email
-   * @var integer
+   * ID of from email.
+   *
+   * @var int
    */
   public $fromEmailId;
 
@@ -171,8 +172,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $userEmail;
 
   /**
-   * Price set ID
-   * @var integer
+   * Price set ID.
+   *
+   * @var int
    */
   public $_priceSetId;
 

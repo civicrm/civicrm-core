@@ -38,7 +38,9 @@
 class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
 
   /**
-   * @var integer
+   * Current count.
+   *
+   * @var int
    */
   private $i = 0;
 

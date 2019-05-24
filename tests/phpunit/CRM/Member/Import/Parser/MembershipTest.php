@@ -33,13 +33,15 @@
 class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   /**
    * Membership type name used in test function.
-   * @var String
+   *
+   * @var string
    */
   protected $_membershipTypeName = NULL;
 
   /**
    * Membership type id used in test function.
-   * @var String
+   *
+   * @var string
    */
   protected $_membershipTypeID = NULL;
 

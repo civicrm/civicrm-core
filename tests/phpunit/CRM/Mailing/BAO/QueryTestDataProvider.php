@@ -8,7 +8,7 @@
 class CRM_Mailing_BAO_QueryTestDataProvider implements Iterator {
 
   /**
-   * @var integer
+   * @var int
    */
   private $i = 0;
 
