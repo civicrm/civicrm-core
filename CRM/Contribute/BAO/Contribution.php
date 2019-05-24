@@ -897,14 +897,24 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
-   * @param $contributionId
-   * @param $participantId
-   * @param array $financialTrxn
+   * Record an activity when a payment is received.
    *
-   * @param $financialTrxn
+   * @todo this is intended to be moved to payment BAO class as a protected function
+   * on that class. Currently being cleaned up. The addActivityForPayment doesn't really
+   * merit it's own function as it makes the code less rather than more readable.
+   *
+   * @param int $contributionId
+   * @param int $participantId
+   * @param string $totalAmount
+   * @param string $currency
+   * @param string $trxnDate
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  protected static function recordPaymentActivity($contributionId, $participantId, $financialTrxn) {
-    $activityType = ($financialTrxn->total_amount < 0) ? 'Refund' : 'Payment';
+  protected static function recordPaymentActivity($contributionId, $participantId, $totalAmount, $currency, $trxnDate) {
+    $activityType = ($totalAmount < 0) ? 'Refund' : 'Payment';
+
     if ($participantId) {
       $inputParams['id'] = $participantId;
       $values = [];
@@ -919,8 +929,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       $entityObj->find(TRUE);
       $title = ts('Contribution');
     }
-
-    self::addActivityForPayment($entityObj->contact_id, $financialTrxn, $activityType, $title, $contributionId);
+    // @todo per block above this is not a logical splitting off of functionality.
+    self::addActivityForPayment($entityObj->contact_id, $activityType, $title, $contributionId, $totalAmount, $currency, $trxnDate);
   }
 
   /**
@@ -3988,7 +3998,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     if (!empty($financialTrxn)) {
-      self::recordPaymentActivity($contributionId, $participantId, $financialTrxn);
+      self::recordPaymentActivity($contributionId, $participantId, $financialTrxn->total_amount, $financialTrxn->currency, $financialTrxn->trxn_date);
       return $financialTrxn;
     }
 
@@ -3996,17 +4006,20 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
 
   /**
    * @param int $targetCid
-   * @param $trxnObj
    * @param $activityType
    * @param string $title
    * @param int $contributionId
+   * @param string $totalAmount
+   * @param string $currency
+   * @param string $trxn_date
    *
-   * @throws CRM_Core_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function addActivityForPayment($targetCid, $trxnObj, $activityType, $title, $contributionId) {
-    $paymentAmount = CRM_Utils_Money::format($trxnObj->total_amount, $trxnObj->currency);
+  public static function addActivityForPayment($targetCid, $activityType, $title, $contributionId, $totalAmount, $currency, $trxn_date) {
+    $paymentAmount = CRM_Utils_Money::format($totalAmount, $currency);
     $subject = "{$paymentAmount} - Offline {$activityType} for {$title}";
-    $date = CRM_Utils_Date::isoToMysql($trxnObj->trxn_date);
+    $date = CRM_Utils_Date::isoToMysql($trxn_date);
     // source record id would be the contribution id
     $srcRecId = $contributionId;
 
@@ -4028,8 +4041,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $activityParams['source_contact_id'] = $id;
       $activityParams['target_contact_id'][] = $targetCid;
     }
-    // @todo use api.
-    CRM_Activity_BAO_Activity::create($activityParams);
+    civicrm_api3('Activity', 'create', $activityParams);
   }
 
   /**
