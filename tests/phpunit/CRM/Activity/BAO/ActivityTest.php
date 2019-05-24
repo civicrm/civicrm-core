@@ -1284,12 +1284,7 @@ $text
   }
 
   protected function createTestActivities() {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/activities_for_dashboard_count.xml'
-      )
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/activities_for_dashboard_count.xml');
     // Make changes to improve variation in php since the xml method is brittle & relies on option values being unchanged.
     $this->callAPISuccess('Activity', 'create', ['id' => 12, 'activity_type_id' => 'Bulk Email']);
   }

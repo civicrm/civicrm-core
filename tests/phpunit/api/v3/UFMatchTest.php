@@ -40,12 +40,10 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
   protected $_ufGroupId = 11;
   protected $_ufFieldId;
   protected $_contactId;
-  protected $_apiversion;
   protected $_params = array();
 
   protected function setUp() {
     parent::setUp();
-    $this->_apiversion = 3;
     $this->quickCleanup(
       array(
         'civicrm_group',
@@ -56,11 +54,7 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
       )
     );
     $this->_contactId = $this->individualCreate();
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute(
-      $this->_dbconn,
-      $this->createFlatXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml')
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml');
 
     $this->_params = array(
       'contact_id' => $this->_contactId,
