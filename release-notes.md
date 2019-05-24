@@ -1,10 +1,11 @@
 # Release Notes
 
-These release notes are manually compiled from pull requests and Jira issues
+These release notes are manually compiled from pull requests, GitLab and Jira issues
 starting with CiviCRM 4.7.14.
 
 Other resources for identifying changes are:
 
+* The CiviCRM GitLab project management system at https://lab.civicrm.org/groups/dev/-/issues
 * The Jira project management system at https://issues.civicrm.org
 * The following GitHub projects:
     * https://github.com/civicrm/civicrm-core
