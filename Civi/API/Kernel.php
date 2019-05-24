@@ -157,7 +157,7 @@ class Kernel {
   /**
    * Bootstrap - Load basic dependencies and sanity-check inputs.
    *
-   * @param \Civi\API\V4\Action|array $apiRequest
+   * @param \Civi\Api4\Generic\AbstractAction|array $apiRequest
    * @throws \API_Exception
    */
   public function boot($apiRequest) {
