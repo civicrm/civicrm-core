@@ -362,10 +362,12 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       'id' => $this->_contributionId,
     ]);
     $contributionStatusId = CRM_Utils_Array::value('contribution_status_id', $contribution);
-    $result = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $this->_params, $this->_paymentType, $participantId);
+    $paymentID = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $this->_params, $this->_paymentType, $participantId);
     // Fetch the contribution & do proportional line item assignment
     $params = ['id' => $this->_contributionId];
     $contribution = CRM_Contribute_BAO_Contribution::retrieve($params, $defaults, $params);
+    // @todo - this line needs to be moved to the Payment.create api - it's not form layer appropriate.
+    // testing required.
     CRM_Contribute_BAO_Contribution::addPayments([$contribution], $contributionStatusId);
     if ($this->_contributionId && CRM_Core_Permission::access('CiviMember')) {
       $membershipPaymentCount = civicrm_api3('MembershipPayment', 'getCount', ['contribution_id' => $this->_contributionId]);
@@ -382,8 +384,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
     $statusMsg = ts('The payment record has been processed.');
     // send email
-    if (!empty($result) && !empty($this->_params['is_email_receipt'])) {
-      $sendResult = civicrm_api3('Payment', 'sendconfirmation', ['id' => $result->id])['values'][$result->id];
+    if (!empty($paymentID) && !empty($this->_params['is_email_receipt'])) {
+      $sendResult = civicrm_api3('Payment', 'sendconfirmation', ['id' => $paymentID])['values'][$paymentID];
       if ($sendResult['is_sent']) {
         $statusMsg .= ' ' . ts('A receipt has been emailed to the contributor.');
       }

@@ -912,7 +912,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  protected static function recordPaymentActivity($contributionId, $participantId, $totalAmount, $currency, $trxnDate) {
+  public static function recordPaymentActivity($contributionId, $participantId, $totalAmount, $currency, $trxnDate) {
     $activityType = ($totalAmount < 0) ? 'Refund' : 'Payment';
 
     if ($participantId) {
@@ -3974,34 +3974,25 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @param int $participantId
    * @param bool $updateStatus
    *
-   * @return null|object
+   * @return int
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function recordAdditionalPayment($contributionId, $trxnsData, $paymentType = 'owed', $participantId = NULL, $updateStatus = TRUE) {
 
     if ($paymentType == 'owed') {
       $financialTrxn = CRM_Financial_BAO_Payment::recordPayment($contributionId, $trxnsData, $participantId);
+      if (!empty($financialTrxn)) {
+        self::recordPaymentActivity($contributionId, $participantId, $financialTrxn->total_amount, $financialTrxn->currency, $financialTrxn->trxn_date);
+        return $financialTrxn->id;
+      }
     }
     elseif ($paymentType == 'refund') {
       $trxnsData['total_amount'] = -$trxnsData['total_amount'];
-      $financialTrxn = CRM_Financial_BAO_Payment::recordRefundPayment($contributionId, $trxnsData, $updateStatus);
-      if ($participantId) {
-        // update participant status
-        // @todo this doesn't make sense...
-        $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
-        $ids = CRM_Event_BAO_Participant::getParticipantIds($contributionId);
-        foreach ($ids as $val) {
-          $participantUpdate['id'] = $val;
-          $participantUpdate['status_id'] = array_search('Registered', $participantStatuses);
-          CRM_Event_BAO_Participant::add($participantUpdate);
-        }
-      }
+      $trxnsData['participant_id'] = $participantId;
+      return civicrm_api3('Payment', 'create', $trxnsData)['id'];
     }
-
-    if (!empty($financialTrxn)) {
-      self::recordPaymentActivity($contributionId, $participantId, $financialTrxn->total_amount, $financialTrxn->currency, $financialTrxn->trxn_date);
-      return $financialTrxn;
-    }
-
   }
 
   /**
