@@ -3,14 +3,13 @@ civicrm_contact:
     id: 3
     contact_type: Individual
     contact_sub_type:
-    do_not_email:
-    do_not_phone:
-    do_not_mail:
-    do_not_sms:
-    do_not_trade:
+    do_not_email: 0
+    do_not_phone: 0
+    do_not_mail: 0
+    do_not_sms: 0
+    do_not_trade: 0
     is_opt_out: 0
     legal_identifier:
-    external_identifier:
     sort_name: Site Administrator
     display_name: Site Administrator
     nick_name:
@@ -24,38 +23,18 @@ civicrm_contact:
     first_name: Site
     middle_name:
     last_name: Administrator
-    prefix_id:
-    suffix_id:
-    email_greeting_id:
-    email_greeting_custom:
-    postal_greeting_id:
-    postal_greeting_custom:
-    addressee_id:
-    addressee_custom:
-    job_title:
-    gender_id:
-    birth_date:
-    is_deceased:
-    deceased_date:
-    household_name:
-    primary_contact_id:
-    organization_name:
-    sic_code:
-    user_unique_id:
-    employer_id:
 
   -
     id: 17
     contact_type: Individual
     contact_sub_type:
-    do_not_email:
-    do_not_phone:
-    do_not_mail:
-    do_not_sms:
-    do_not_trade:
+    do_not_email: 0
+    do_not_phone: 0
+    do_not_mail: 0
+    do_not_sms: 0
+    do_not_trade: 0
     is_opt_out: 0
     legal_identifier:
-    external_identifier:
     sort_name:
     display_name: Test Contact
     nick_name:
@@ -69,22 +48,3 @@ civicrm_contact:
     first_name: Test
     middle_name:
     last_name: Contact
-    prefix_id:
-    suffix_id:
-    email_greeting_id:
-    email_greeting_custom:
-    postal_greeting_id:
-    postal_greeting_custom:
-    addressee_id:
-    addressee_custom:
-    job_title:
-    gender_id:
-    birth_date:
-    is_deceased: 0
-    deceased_date:
-    household_name:
-    primary_contact_id:
-    organization_name:
-    sic_code:
-    user_unique_id:
-    employer_id:
