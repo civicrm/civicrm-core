@@ -385,6 +385,44 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
   }
 
   /**
+   * Load the data that used to be handled by the discontinued dbunit class.
+   *
+   * This could do with further tidy up - the initial priority is simply to get rid of
+   * the dbunity package which is no longer supported.
+   *
+   * @param string $fileName
+   */
+  protected function loadXMLDataSet($fileName) {
+    CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 0');
+    $xml = json_decode(json_encode(simplexml_load_file($fileName)), TRUE);
+    foreach ($xml as $tableName => $element) {
+      if (!empty($element)) {
+        foreach ($element as $row) {
+          $keys = $values = [];
+          if (isset($row['@attributes'])) {
+            foreach ($row['@attributes'] as $key => $value) {
+              $keys[] = $key;
+              $values[] = is_numeric($value) ? $value : "'{$value}'";
+            }
+          }
+          else {
+            // cos we copied it & it is inconsistent....
+            foreach ($row as $key => $value) {
+              $keys[] = $key;
+              $values[] = is_numeric($value) ? $value : "'{$value}'";
+            }
+          }
+
+          CRM_Core_DAO::executeQuery("
+            INSERT INTO $tableName (" . implode(',', $keys) . ') VALUES(' . implode(',', $values) . ')'
+          );
+        }
+      }
+    }
+    CRM_Core_DAO::executeQuery('SET FOREIGN_KEY_CHECKS = 1');
+  }
+
+  /**
    * Create default domain contacts for the two domains added during test class.
    * database population.
    */

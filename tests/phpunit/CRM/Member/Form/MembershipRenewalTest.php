@@ -36,10 +36,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
-  protected $_apiversion;
   protected $_entity = 'Membership';
   protected $_params;
-  protected $_ids = array();
   protected $_paymentProcessorID;
 
   /**
@@ -54,7 +52,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    *
    * @var array
    */
-  protected $_processorParams = array();
+  protected $_processorParams = [];
 
   /**
    * ID of created membership.
@@ -68,7 +66,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    *
    * @var array
    */
-  protected $paymentInstruments = array();
+  protected $paymentInstruments = [];
 
 
   /**
@@ -83,18 +81,12 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * and redirect stdin to a temporary file.
    */
   public function setUp() {
-    $this->_apiversion = 3;
     parent::setUp();
 
     $this->_individualId = $this->individualCreate();
     $this->_paymentProcessorID = $this->processorCreate();
-    // Insert test data.
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/dataset/data.xml'
-      )
-    );
+
+    $this->loadXMLDataSet(dirname(__FILE__) . '/dataset/data.xml');
     $membershipTypeAnnualFixed = $this->callAPISuccess('membership_type', 'create', array(
       'domain_id' => 1,
       'name' => "AnnualFixed",
@@ -114,7 +106,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     ));
     $this->_membershipID = $membership['id'];
 
-    $instruments = $this->callAPISuccess('contribution', 'getoptions', array('field' => 'payment_instrument_id'));
+    $instruments = $this->callAPISuccess('contribution', 'getoptions', ['field' => 'payment_instrument_id']);
     $this->paymentInstruments = $instruments['values'];
   }
 
@@ -144,7 +136,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
   public function testSubmit() {
     $form = $this->getForm();
     $this->createLoggedInUser();
-    $params = array(
+    $params = [
       'cid' => $this->_individualId,
       'join_date' => date('m/d/Y', time()),
       'start_date' => '',
@@ -178,7 +170,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'billing_state_province_id-5' => '1003',
       'billing_postal_code-5' => '90210',
       'billing_country_id-5' => '1228',
-    );
+    ];
     $form->_contactID = $this->_individualId;
 
     $form->testSubmit($params);
