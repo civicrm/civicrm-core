@@ -5,7 +5,9 @@
  */
 class CRM_Core_Reference_OptionValue extends CRM_Core_Reference_Basic {
   /**
-   * @var string option-group-name
+   * Option group name.
+   *
+   * @var string
    */
   protected $targetOptionGroupName;
 
