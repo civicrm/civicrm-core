@@ -126,17 +126,12 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
   public static function postProcess(&$form) {
     $formValues = $form->controller->exportValues($form->getName());
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = self::processMessageTemplate($formValues);
-    $buttonName = $form->controller->getButtonName();
     $skipOnHold = isset($form->skipOnHold) ? $form->skipOnHold : FALSE;
     $skipDeceased = isset($form->skipDeceased) ? $form->skipDeceased : TRUE;
     $html = $activityIds = [];
 
-    // CRM-21255 - Hrm, CiviCase 4+5 seem to report buttons differently...
-    $c = $form->controller->container();
-    $isLiveMode = ($buttonName == '_qf_PDF_upload') || isset($c['values']['PDF']['buttons']['_qf_PDF_upload']);
-
     // CRM-16725 Skip creation of activities if user is previewing their PDF letter(s)
-    if ($isLiveMode) {
+    if (self::isLiveMode($form)) {
       $activityIds = self::createActivities($form, $html_message, $form->_contactIds, $formValues['subject'], CRM_Utils_Array::value('campaign_id', $formValues));
     }
 
@@ -346,6 +341,27 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
       Civi::$statics[__CLASS__]['token_categories'] = array_keys($tokens);
     }
     return Civi::$statics[__CLASS__]['token_categories'];
+  }
+
+  /**
+   * Is the form in live mode (as opposed to being run as a preview).
+   *
+   * Returns true if the user has clicked the Download Document button on a
+   * Print/Merge Document (PDF Letter) search task form, or false if the Preview
+   * button was clicked.
+   *
+   * @param CRM_Core_Form $form
+   *
+   * @return bool
+   *   TRUE if the Download Document button was clicked (also defaults to TRUE
+   *     if the form controller does not exist), else FALSE
+   */
+  protected static function isLiveMode($form) {
+    // CRM-21255 - Hrm, CiviCase 4+5 seem to report buttons differently...
+    $buttonName = $form->controller->getButtonName();
+    $c = $form->controller->container();
+    $isLiveMode = ($buttonName == '_qf_PDF_upload') || isset($c['values']['PDF']['buttons']['_qf_PDF_upload']);
+    return $isLiveMode;
   }
 
 }
