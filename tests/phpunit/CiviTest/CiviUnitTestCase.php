@@ -52,7 +52,7 @@ define('API_LATEST_VERSION', 3);
  *  Common functions for unit tests
  * @package CiviCRM
  */
-class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
+class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
   use \Civi\Test\Api3DocTrait;
   use \Civi\Test\GenericAssertionsTrait;
