@@ -95,8 +95,6 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
     $specialDateFields = [
       'event_start_date_low' => 'event_date_low',
       'event_end_date_high' => 'event_date_high',
-      'participant_register_date_low' => 'participant_date_low',
-      'participant_register_date_high' => 'participant_date_high',
       'case_from_start_date_low' => 'case_from_date_low',
       'case_from_start_date_high' => 'case_from_date_high',
       'case_to_end_date_low' => 'case_to_date_low',

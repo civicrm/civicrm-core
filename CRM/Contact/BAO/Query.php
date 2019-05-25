@@ -1553,22 +1553,20 @@ class CRM_Contact_BAO_Query {
     }
 
     self::filterCountryFromValuesIfStateExists($formValues);
-
+    // We shouldn't have to whitelist fields to not hack but here we are, for now.
+    $nonLegacyDateFields = ['participant_register_date_relative'];
     // Handle relative dates first
     foreach (array_keys($formValues) as $id) {
-      if (preg_match('/_date_relative$/', $id) ||
+      if (
+        !in_array($id, $nonLegacyDateFields) && (
+        preg_match('/_date_relative$/', $id) ||
         $id == 'event_relative' ||
         $id == 'case_from_relative' ||
-        $id == 'case_to_relative' ||
-        $id == 'participant_relative'
+        $id == 'case_to_relative')
       ) {
         if ($id == 'event_relative') {
           $fromRange = 'event_start_date_low';
           $toRange = 'event_end_date_high';
-        }
-        elseif ($id == 'participant_relative') {
-          $fromRange = 'participant_register_date_low';
-          $toRange = 'participant_register_date_high';
         }
         elseif ($id == 'case_from_relative') {
           $fromRange = 'case_from_start_date_low';
@@ -1647,11 +1645,12 @@ class CRM_Contact_BAO_Query {
       ) {
         self::convertCustomRelativeFields($formValues, $params, $values, $id);
       }
-      elseif (preg_match('/_date_relative$/', $id) ||
-        $id == 'event_relative' ||
-        $id == 'case_from_relative' ||
-        $id == 'case_to_relative' ||
-        $id == 'participant_relative'
+      elseif (
+        !in_array($id, $nonLegacyDateFields) && (
+          preg_match('/_date_relative$/', $id) ||
+          $id == 'event_relative' ||
+          $id == 'case_from_relative' ||
+          $id == 'case_to_relative')
       ) {
         // Already handled in previous loop
         continue;

@@ -582,6 +582,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
   public static function getSearchFieldMetadata() {
     $fields = [
       'participant_status_id',
+      'participant_register_date',
     ];
     $metadata = civicrm_api3('Participant', 'getfields', [])['values'];
     return array_intersect_key($metadata, array_flip($fields));
@@ -628,10 +629,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
 
     CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
 
-    CRM_Core_Form_Date::buildDateRange($form, 'participant', 1, '_register_date_low', '_register_date_high', ts('From'), FALSE);
-
     $form->addElement('hidden', 'event_date_range_error');
-    $form->addElement('hidden', 'participant_date_range_error');
     $form->addFormRule(['CRM_Event_BAO_Query', 'formRule'], $form);
 
     $form->addElement('checkbox', "event_include_repeating_events", NULL, ts('Include participants from all events in the %1 series', [1 => '<em>%1</em>']));
@@ -686,7 +684,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
   public static function formRule($fields, $files, $form) {
     $errors = [];
 
-    if ((empty($fields['event_start_date_low']) || empty($fields['event_end_date_high'])) && (empty($fields['participant_register_date_low']) || empty($fields['participant_register_date_high']))) {
+    if ((empty($fields['event_start_date_low']) || empty($fields['event_end_date_high']))) {
       return TRUE;
     }
     $lowDate = strtotime($fields['event_start_date_low']);
@@ -696,12 +694,6 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
       $errors['event_date_range_error'] = ts('Please check that your Event Date Range is in correct chronological order.');
     }
 
-    $lowDate1 = strtotime($fields['participant_register_date_low']);
-    $highDate1 = strtotime($fields['participant_register_date_high']);
-
-    if ($lowDate1 > $highDate1) {
-      $errors['participant_date_range_error'] = ts('Please check that your Registration Date Range is in correct chronological order.');
-    }
     return empty($errors) ? TRUE : $errors;
   }
 

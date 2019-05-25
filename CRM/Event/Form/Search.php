@@ -77,8 +77,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    */
   protected $searchFieldMetadata = [];
 
-
   /**
+   * Get the default entity for the form.
+   *
    * @return string
    */
   public function getDefaultEntity() {

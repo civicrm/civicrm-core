@@ -186,7 +186,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     foreach ($form->getSearchFieldMetadata() as $entity => $spec) {
       foreach ($spec as $fieldName => $fieldSpec) {
         if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || $fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
-          if (isset($fields[$fieldName . '_high']) && isset($fields[$fieldName . '_low']) && empty($fields[$fieldName . '_relative'])) {
+          if (!empty($fields[$fieldName . '_high']) && !empty($fields[$fieldName . '_low']) && empty($fields[$fieldName . '_relative'])) {
             if (strtotime($fields[$fieldName . '_low']) > strtotime($fields[$fieldName . '_high'])) {
               $errors[$fieldName . '_low'] = ts('%1: Please check that your date range is in correct chronological order.', [1 => $fieldSpec['title']]);
             }
