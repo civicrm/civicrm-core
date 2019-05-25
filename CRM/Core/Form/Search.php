@@ -125,7 +125,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   /**
    * Common buildForm tasks required by all searches.
    */
-  public function buildQuickform() {
+  public function buildQuickForm() {
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header')
       ->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');

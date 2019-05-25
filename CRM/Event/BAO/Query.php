@@ -575,9 +575,29 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * Get the metadata for fields to be included on the grant search form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = [
+      'participant_status_id',
+    ];
+    $metadata = civicrm_api3('Participant', 'getfields', [])['values'];
+    return array_intersect_key($metadata, array_flip($fields));
+  }
+
+  /**
+   * Build the event search form.
+   *
+   * @param \CRM_Event_Form_Search $form
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function buildSearchForm(&$form) {
+    $form->addSearchFieldMetadata(['Participant' => self::getSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
     $dataURLEventFee = CRM_Utils_System::url('civicrm/ajax/eventFee',
       "reset=1",
       FALSE, NULL, FALSE
@@ -615,16 +635,6 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
     $form->addFormRule(['CRM_Event_BAO_Query', 'formRule'], $form);
 
     $form->addElement('checkbox', "event_include_repeating_events", NULL, ts('Include participants from all events in the %1 series', [1 => '<em>%1</em>']));
-
-    $form->addSelect('participant_status_id',
-      [
-        'entity' => 'participant',
-        'label' => ts('Participant Status'),
-        'multiple' => 'multiple',
-        'option_url' => NULL,
-        'placeholder' => ts('- any -'),
-      ]
-    );
 
     $form->addSelect('participant_role_id',
       [
