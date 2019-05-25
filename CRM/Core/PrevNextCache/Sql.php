@@ -83,7 +83,7 @@ INSERT INTO civicrm_prevnext_cache (cacheKey, entity_id1, data)
    * @param string $cacheKey
    * @param string $action
    *   Ex: 'select', 'unselect'.
-   * @param array|int|NULL $ids
+   * @param array|int|null $ids
    *   A list of contact IDs to (un)select.
    *   To unselect all contact IDs, use NULL.
    */

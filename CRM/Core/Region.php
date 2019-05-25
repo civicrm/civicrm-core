@@ -29,9 +29,11 @@ class CRM_Core_Region {
   public $_name;
 
   /**
-   * List of snippets to inject within region
+   * List of snippets to inject within region.
    *
-   * @var array; e.g. $this->_snippets[3]['type'] = 'template';
+   * e.g. $this->_snippets[3]['type'] = 'template';
+   *
+   * @var array
    */
   public $_snippets;
 

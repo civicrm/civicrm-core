@@ -55,7 +55,7 @@ class PostEvent extends GenericHookEvent {
   public $entity;
 
   /**
-   * @var int|NULL
+   * @var int|null
    */
   public $id;
 
@@ -65,10 +65,12 @@ class PostEvent extends GenericHookEvent {
   public $object;
 
   /**
-   * @param $action
-   * @param $entity
-   * @param $id
-   * @param $object
+   * Class constructor
+   *
+   * @param string $action
+   * @param string $entity
+   * @param int $id
+   * @param object $object
    */
   public function __construct($action, $entity, $id, &$object) {
     $this->action = $action;

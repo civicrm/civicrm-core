@@ -1087,7 +1087,7 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    * @param string $greetingType
    *   Greeting type.
    *
-   * @return int|NULL
+   * @return int|null
    */
   public static function defaultGreeting($contactType, $greetingType) {
     $contactTypeFilters = [

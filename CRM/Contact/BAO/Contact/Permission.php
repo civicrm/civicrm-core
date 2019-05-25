@@ -146,7 +146,7 @@ WHERE contact_id IN ({$contact_id_list})
       return TRUE;
     }
 
-    # FIXME: push this somewhere below, to not give this permission so many rights
+    // FIXME: push this somewhere below, to not give this permission so many rights
     $isDeleted = (bool) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $id, 'is_deleted');
     if (CRM_Core_Permission::check('access deleted contacts') && $isDeleted) {
       return TRUE;

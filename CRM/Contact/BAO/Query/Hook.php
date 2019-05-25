@@ -37,7 +37,9 @@
 class CRM_Contact_BAO_Query_Hook {
 
   /**
-   * @var array of CRM_Contact_BAO_Query_Interface objects
+   * Query objects.
+   *
+   * @var CRM_Contact_BAO_Query_Interface[]
    */
   protected $_queryObjects = NULL;
 

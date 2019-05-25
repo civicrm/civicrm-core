@@ -51,7 +51,7 @@ class CRM_Extension_System {
   /**
    * The URL of the remote extensions repository.
    *
-   * @var string|FALSE
+   * @var string|false
    */
   private $_repoUrl = NULL;
 
@@ -89,6 +89,8 @@ class CRM_Extension_System {
   }
 
   /**
+   * Class constructor.
+   *
    * @param array $parameters
    *   List of configuration values required by the extension system.
    *   Missing values will be guessed based on $config.

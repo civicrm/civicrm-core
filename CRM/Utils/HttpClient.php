@@ -48,7 +48,7 @@ class CRM_Utils_HttpClient {
   protected static $singleton;
 
   /**
-   * @var int|NULL
+   * @var int|null
    *   seconds; or NULL to use system default
    */
   protected $connectionTimeout;

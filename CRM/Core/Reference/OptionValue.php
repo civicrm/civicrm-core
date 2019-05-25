@@ -10,7 +10,9 @@ class CRM_Core_Reference_OptionValue extends CRM_Core_Reference_Basic {
   protected $targetOptionGroupName;
 
   /**
-   * @var int|NULL null if not yet loaded
+   * Target Option Group ID.
+   *
+   * @var int|null
    */
   protected $targetOptionGroupId;
 
@@ -45,6 +47,8 @@ class CRM_Core_Reference_OptionValue extends CRM_Core_Reference_Basic {
   }
 
   /**
+   * Get Reference Count.
+   *
    * @param CRM_Core_DAO $targetDao
    *
    * @return array|null
@@ -63,7 +67,9 @@ class CRM_Core_Reference_OptionValue extends CRM_Core_Reference_Basic {
   }
 
   /**
-   * @return int|NULL
+   * Get target option group ID.
+   *
+   * @return int
    */
   public function getTargetOptionGroupId() {
     if ($this->targetOptionGroupId === NULL) {

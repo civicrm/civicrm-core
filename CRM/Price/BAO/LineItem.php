@@ -619,7 +619,7 @@ WHERE li.contribution_id = %1";
    * @param float|NULL $overrideAmount
    *   Optional override of the amount.
    *
-   * @param int|NULL $financialTypeID
+   * @param int|null $financialTypeID
    *   Financial type ID is the type should be overridden.
    *
    * @return array

@@ -2252,7 +2252,7 @@ AND cc.sort_name LIKE '%$name%'";
    *
    * @param array $params
    * @param int $relationshipId
-   * @param int|NULL $updatedRelTypeID
+   * @param int|null $updatedRelTypeID
    *
    * @return bool
    *   TRUE if current employer needs to be cleared.

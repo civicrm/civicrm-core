@@ -50,7 +50,12 @@ abstract class CRM_Utils_Hook {
   const SUMMARY_REPLACE = 3;
 
   /**
-   * @var ojbect
+   * Object to pass when an object is required to be passed by params.
+   *
+   * This is supposed to be a convenience but note that it is a bad
+   * pattern as it can get contaminated & result in hard-to-diagnose bugs.
+   *
+   * @var null
    */
   public static $_nullObject = NULL;
 
@@ -58,7 +63,7 @@ abstract class CRM_Utils_Hook {
    * We only need one instance of this object. So we use the singleton
    * pattern and cache the instance in this variable
    *
-   * @var object
+   * @var CRM_Utils_Hook
    */
   static private $_singleton = NULL;
 
@@ -82,7 +87,7 @@ abstract class CRM_Utils_Hook {
    *
    * @param bool $fresh
    *
-   * @return self
+   * @return CRM_Utils_Hook
    *   An instance of $config->userHookClass
    */
   public static function singleton($fresh = FALSE) {
@@ -96,6 +101,8 @@ abstract class CRM_Utils_Hook {
 
   /**
    * CRM_Utils_Hook constructor.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct() {
     $this->cache = CRM_Utils_Cache::create([
@@ -239,17 +246,20 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * @param $civiModules
-   * @param $fnSuffix
-   * @param array $numParams
-   * @param $arg1
-   * @param $arg2
-   * @param $arg3
-   * @param $arg4
-   * @param $arg5
-   * @param $arg6
+   * Run hooks.
+   *
+   * @param array $civiModules
+   * @param string $fnSuffix
+   * @param int $numParams
+   * @param mixed $arg1
+   * @param mixed $arg2
+   * @param mixed $arg3
+   * @param mixed $arg4
+   * @param mixed $arg5
+   * @param mixed $arg6
    *
    * @return array|bool
+   * @throws \Exception
    */
   public function runHooks(
     $civiModules, $fnSuffix, $numParams,
@@ -1879,7 +1889,7 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
-   * @param CRM_Core_ExceptionObject $exception
+   * @param CRM_Core_Exception $exception
    * @param mixed $request
    *   Reserved for future use.
    */
@@ -1891,7 +1901,7 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called for declaring managed entities via API.
    *
-   * Note: This is a preboot hook. It will dispatch via the extension/module
+   * Note: This is a pre-boot hook. It will dispatch via the extension/module
    * subsystem but *not* the Symfony EventDispatcher.
    *
    * @param array[] $entityTypes
@@ -2457,7 +2467,7 @@ abstract class CRM_Utils_Hook {
   /**
    * This hook is called before an inbound SMS is processed.
    *
-   * @param \CRM_SMS_MessageObject $message
+   * @param \CRM_SMS_Message $message
    *   An SMS message received
    * @return mixed
    */

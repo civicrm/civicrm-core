@@ -144,7 +144,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   /**
    * The destination if set will override the destination the code wants to send it to.
    *
-   * @var string;
+   * @var string
    */
   public $_destination = NULL;
 
@@ -170,6 +170,8 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
    *   Should we add a unique sequence number to the end of the key.
    * @param bool $ignoreKey
    *   Should we not set a qfKey for this controller (for standalone forms).
+   *
+   * @throws \CRM_Core_Exception
    */
   public function __construct(
     $title = NULL,

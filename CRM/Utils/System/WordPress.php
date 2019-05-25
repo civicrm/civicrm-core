@@ -401,7 +401,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Determine the native ID of the CMS user.
    *
    * @param string $username
-   * @return int|NULL
+   *
+   * @return int|null
    */
   public function getUfId($username) {
     $userdata = get_user_by('login', $username);

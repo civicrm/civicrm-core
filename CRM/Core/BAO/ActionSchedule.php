@@ -458,7 +458,7 @@ FROM civicrm_action_schedule cas
    * @param Civi\ActionSchedule\Mapping $mapping
    * @param int $contactID
    * @param int $entityID
-   * @param int|NULL $caseID
+   * @param int|null $caseID
    * @throws CRM_Core_Exception
    */
   protected static function createMailingActivity($tokenRow, $mapping, $contactID, $entityID, $caseID) {

@@ -2836,9 +2836,10 @@ SELECT contact_id
   /**
    * Transform an array to a serialized string for database storage.
    *
-   * @param array|NULL $value
-   * @param $serializationType
-   * @return string|NULL
+   * @param array|null $value
+   * @param int $serializationType
+   * @return string|null
+   *
    * @throws \Exception
    */
   public static function serializeField($value, $serializationType) {
