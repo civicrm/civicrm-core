@@ -185,7 +185,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
    */
   public function getLoginURL($destination = '') {
     $query = $destination ? ['destination' => $destination] : [];
-    return \Drupal::url('user.page', [], ['query' => $query]);
+    return \Drupal::url('user.login', [], ['query' => $query]);
   }
 
   /**
