@@ -72,6 +72,8 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
 
   /**
    * Process the form submission.
+   *
+   * @throws \Exception
    */
   public function postProcess() {
     // flush caches so we reload details for future requests
@@ -95,16 +97,15 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
       else {
         $session = CRM_Core_Session::singleton();
         $userID = $session->get('userID');
-        list($toDisplayName, $toEmail, $toDoNotEmail) = CRM_Contact_BAO_Contact::getContactDetails($userID);
+        list($toDisplayName, $toEmail) = CRM_Contact_BAO_Contact::getContactDetails($userID);
 
         //get the default domain email address.CRM-4250
         list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
 
         if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
           $fixUrl = CRM_Utils_System::url("civicrm/admin/domain", 'action=update&reset=1');
-          CRM_Core_Error::fatal(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; FROM Email Addresses</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
+          CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid email address in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; Organization Address and Contact Info</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
         }
-
         if (!$toEmail) {
           CRM_Core_Error::statusBounce(ts('Cannot send a test email because your user record does not have a valid email address.'));
         }
@@ -205,7 +206,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
    * @param array $fields
    *   Posted values of the form.
    *
-   * @return array
+   * @return array|bool
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields) {
