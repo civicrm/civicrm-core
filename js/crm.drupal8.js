@@ -5,7 +5,7 @@ localStorage.setItem('Drupal.toolbar.activeTabID', JSON.stringify('toolbar-item-
 
 (function($) {
   function adjustToggle() {
-    if ($(window).width() < 768) {
+    if ($(window).width() < 768 && $('#toolbar-item-civicrm').length) {
       $('#civicrm-menu-nav .crm-menubar-toggle-btn').css({
         left: '' + $('#toolbar-item-civicrm').offset().left + 'px',
         width: '' + $('#toolbar-item-civicrm').innerWidth() + 'px'
