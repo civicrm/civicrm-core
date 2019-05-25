@@ -52,7 +52,7 @@ define('API_LATEST_VERSION', 3);
  *  Common functions for unit tests
  * @package CiviCRM
  */
-class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
+class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
 
   use \Civi\Test\Api3DocTrait;
   use \Civi\Test\GenericAssertionsTrait;
@@ -245,7 +245,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
    * @return PHPUnit_Extensions_Database_DB_IDatabaseConnection connection
    */
   protected function getConnection() {
-    $dbName = self::$_dbName;
     if (!self::$dbInit) {
       $dbName = self::getDBName();
 
@@ -257,7 +256,6 @@ class CiviUnitTestCase extends PHPUnit_Extensions_Database_TestCase {
       self::$dbInit = TRUE;
     }
 
-    return $this->createDefaultDBConnection(Civi\Test::pdo(), $dbName);
   }
 
   /**
