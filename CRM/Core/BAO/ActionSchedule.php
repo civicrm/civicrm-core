@@ -120,13 +120,14 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
    * @param bool $namesOnly
    *   Return simple list of names.
    *
-   * @param \Civi\ActionSchedule\Mapping|NULL $filterMapping
+   * @param \Civi\ActionSchedule\Mapping|null $filterMapping
    *   Filter by the schedule's mapping type.
    * @param int $filterValue
    *   Filter by the schedule's entity_value.
    *
    * @return array
    *   (reference)   reminder list
+   * @throws \CRM_Core_Exception
    */
   public static function &getList($namesOnly = FALSE, $filterMapping = NULL, $filterValue = NULL) {
     $query = "

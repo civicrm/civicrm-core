@@ -39,12 +39,16 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   use CRM_Core_Form_EntityFormTrait;
 
   /**
-   * @var int Contribution ID
+   * Contribution ID.
+   *
+   * @var int
    */
   protected $_coid = NULL;
 
   /**
-   * @var int Contribution Recur ID
+   * Contribution Recur ID.
+   *
+   * @var int
    */
   protected $_crid = NULL;
 
@@ -59,7 +63,9 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   protected $contributionRecurID = NULL;
 
   /**
-   * @var int Membership ID
+   * Membership ID.
+   *
+   * @var int
    */
   protected $_mid = NULL;
 
@@ -71,10 +77,11 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   protected $_paymentProcessorObj = NULL;
 
   /**
-   * @var array
+   * Current payment processor.
    *
-   * Current payment processor including a copy of the object in 'object' key for
-   * legacy reasons.
+   * This includes a copy of the object in 'object' key for legacy reasons.
+   *
+   * @var array
    */
   public $_paymentProcessor = [];
 

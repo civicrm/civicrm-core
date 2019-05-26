@@ -56,7 +56,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   /**
    * Field for all the objects related to this contribution
    *
-   * @var array of objects (e.g membership object, participant object)
+   * @var \CRM_Member_BAO_Membership|\CRM_Event_BAO_Participant[]
    */
   public $_relatedObjects = [];
 
@@ -66,7 +66,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * This is used for composing messages because they have dependency on the
    * contribution_page or event page - although over time we may eliminate that
    *
-   * @var string component or event
+   * @var "contribution"\"event"
    */
   public $_component = NULL;
 
@@ -4363,10 +4363,10 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   /**
    * Check financial type validation on update of a contribution.
    *
-   * @param Integer $financialTypeId
+   * @param int $financialTypeId
    *   Value of latest Financial Type.
    *
-   * @param Integer $contributionId
+   * @param int $contributionId
    *   Contribution Id.
    *
    * @param array $errors
@@ -4956,15 +4956,15 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   }
 
   /**
-   * Function use to store line item proportionaly in
-   * in entity financial trxn table
+   * Function use to store line item proportionally in in entity financial trxn table
    *
    * @param array $trxnParams
    *
-   * @param Integer $trxnId
+   * @param int $trxnId
    *
    * @param float $contributionTotalAmount
    *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function assignProportionalLineItems($trxnParams, $trxnId, $contributionTotalAmount) {
     $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($trxnParams['contribution_id']);
