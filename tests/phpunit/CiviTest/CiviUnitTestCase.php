@@ -242,7 +242,6 @@ class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
    *
    *  Initialize the test database if it hasn't been initialized
    *
-   * @return PHPUnit_Extensions_Database_DB_IDatabaseConnection connection
    */
   protected function getConnection() {
     if (!self::$dbInit) {

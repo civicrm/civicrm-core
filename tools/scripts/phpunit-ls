@@ -12,7 +12,6 @@ if (!class_exists('PHPUnit_Framework_TestCase')) {
   // Note: Use eval() to prevent IDE scanners from tripping up on this.
   eval('
   class PHPUnit_Framework_TestCase {}
-  class PHPUnit_Extensions_Database_TestCase {}
   class PHPUnit_Extensions_SeleniumTestCase {}
   ');
 }
