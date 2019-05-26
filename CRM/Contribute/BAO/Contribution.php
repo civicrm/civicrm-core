@@ -3760,13 +3760,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $currentContributionStatus = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution']->contribution_status_id);
     $previousContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($params['prevContribution']->contribution_status_id, 'name');
 
-    if (($previousContributionStatus == 'Pending'
-        || $previousContributionStatus == 'In Progress')
-      && $currentContributionStatus == 'Completed'
-      && $context == 'changePaymentInstrument'
-    ) {
-      return;
-    }
     if ($context == 'changedStatus') {
       list($continue, $isARefund) = self::updateFinancialAccountsOnContributionStatusChange($params, $context, $previousContributionStatus, $currentContributionStatus);
       // @todo - it may be that this is always false & the parent function is just a confusing wrapper for the child fn.
@@ -3783,68 +3776,68 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $trxn = CRM_Core_BAO_FinancialTrxn::create($params['trxnParams']);
     // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
     $params['entity_id'] = $trxn->id;
-    if ($context != 'changePaymentInstrument') {
-      $itemParams['entity_table'] = 'civicrm_line_item';
-      $trxnIds['id'] = $params['entity_id'];
-      $previousLineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution']->id);
-      foreach ($params['line_item'] as $fieldId => $fields) {
-        foreach ($fields as $fieldValueId => $lineItemDetails) {
-          $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemDetails['id']);
-          $receiveDate = CRM_Utils_Date::isoToMysql($params['prevContribution']->receive_date);
-          if ($params['contribution']->receive_date) {
-            $receiveDate = CRM_Utils_Date::isoToMysql($params['contribution']->receive_date);
+
+    $itemParams['entity_table'] = 'civicrm_line_item';
+    $trxnIds['id'] = $params['entity_id'];
+    $previousLineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution']->id);
+    foreach ($params['line_item'] as $fieldId => $fields) {
+      foreach ($fields as $fieldValueId => $lineItemDetails) {
+        $prevFinancialItem = CRM_Financial_BAO_FinancialItem::getPreviousFinancialItem($lineItemDetails['id']);
+        $receiveDate = CRM_Utils_Date::isoToMysql($params['prevContribution']->receive_date);
+        if ($params['contribution']->receive_date) {
+          $receiveDate = CRM_Utils_Date::isoToMysql($params['contribution']->receive_date);
+        }
+
+        $financialAccount = self::getFinancialAccountForStatusChangeTrxn($params, CRM_Utils_Array::value('financial_account_id', $prevFinancialItem));
+
+        $currency = $params['prevContribution']->currency;
+        // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
+        if ($params['contribution']->currency) {
+          $currency = $params['contribution']->currency;
+        }
+        $previousLineItemTotal = CRM_Utils_Array::value('line_total', CRM_Utils_Array::value($fieldValueId, $previousLineItems), 0);
+        $itemParams = [
+          'transaction_date' => $receiveDate,
+          'contact_id' => $params['prevContribution']->contact_id,
+          'currency' => $currency,
+          'amount' => self::getFinancialItemAmountFromParams($inputParams, $context, $lineItemDetails, $isARefund, $previousLineItemTotal),
+          'description' => CRM_Utils_Array::value('description', $prevFinancialItem),
+          'status_id' => $prevFinancialItem['status_id'],
+          'financial_account_id' => $financialAccount,
+          'entity_table' => 'civicrm_line_item',
+          'entity_id' => $lineItemDetails['id'],
+        ];
+        $financialItem = CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
+        // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
+        $params['line_item'][$fieldId][$fieldValueId]['deferred_line_total'] = $itemParams['amount'];
+        $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
+
+        if (($lineItemDetails['tax_amount'] && $lineItemDetails['tax_amount'] !== 'null') || ($context == 'changeFinancialType')) {
+          $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
+          $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
+          $taxAmount = (float) $lineItemDetails['tax_amount'];
+          if ($context == 'changeFinancialType' && $lineItemDetails['tax_amount'] === 'null') {
+            // reverse the Sale Tax amount if there is no tax rate associated with new Financial Type
+            $taxAmount = CRM_Utils_Array::value('tax_amount', CRM_Utils_Array::value($fieldValueId, $previousLineItems), 0);
           }
-
-          $financialAccount = self::getFinancialAccountForStatusChangeTrxn($params, CRM_Utils_Array::value('financial_account_id', $prevFinancialItem));
-
-          $currency = $params['prevContribution']->currency;
-          // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-          if ($params['contribution']->currency) {
-            $currency = $params['contribution']->currency;
+          elseif ($previousLineItemTotal != $lineItemDetails['line_total']) {
+            $taxAmount -= CRM_Utils_Array::value('tax_amount', CRM_Utils_Array::value($fieldValueId, $previousLineItems), 0);
           }
-          $previousLineItemTotal = CRM_Utils_Array::value('line_total', CRM_Utils_Array::value($fieldValueId, $previousLineItems), 0);
-          $itemParams = [
-            'transaction_date' => $receiveDate,
-            'contact_id' => $params['prevContribution']->contact_id,
-            'currency' => $currency,
-            'amount' => self::getFinancialItemAmountFromParams($inputParams, $context, $lineItemDetails, $isARefund, $previousLineItemTotal),
-            'description' => CRM_Utils_Array::value('description', $prevFinancialItem),
-            'status_id' => $prevFinancialItem['status_id'],
-            'financial_account_id' => $financialAccount,
-            'entity_table' => 'civicrm_line_item',
-            'entity_id' => $lineItemDetails['id'],
-          ];
-          $financialItem = CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
-          // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
-          $params['line_item'][$fieldId][$fieldValueId]['deferred_line_total'] = $itemParams['amount'];
-          $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
-
-          if (($lineItemDetails['tax_amount'] && $lineItemDetails['tax_amount'] !== 'null') || ($context == 'changeFinancialType')) {
-            $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-            $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-            $taxAmount = (float) $lineItemDetails['tax_amount'];
-            if ($context == 'changeFinancialType' && $lineItemDetails['tax_amount'] === 'null') {
-              // reverse the Sale Tax amount if there is no tax rate associated with new Financial Type
-              $taxAmount = CRM_Utils_Array::value('tax_amount', CRM_Utils_Array::value($fieldValueId, $previousLineItems), 0);
+          if ($taxAmount != 0) {
+            $itemParams['amount'] = self::getMultiplier($params['contribution']->contribution_status_id, $context) * $taxAmount;
+            $itemParams['description'] = $taxTerm;
+            if ($lineItemDetails['financial_type_id']) {
+              $itemParams['financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount(
+                $lineItemDetails['financial_type_id'],
+                'Sales Tax Account is'
+              );
             }
-            elseif ($previousLineItemTotal != $lineItemDetails['line_total']) {
-              $taxAmount -= CRM_Utils_Array::value('tax_amount', CRM_Utils_Array::value($fieldValueId, $previousLineItems), 0);
-            }
-            if ($taxAmount != 0) {
-              $itemParams['amount'] = self::getMultiplier($params['contribution']->contribution_status_id, $context) * $taxAmount;
-              $itemParams['description'] = $taxTerm;
-              if ($lineItemDetails['financial_type_id']) {
-                $itemParams['financial_account_id'] = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount(
-                  $lineItemDetails['financial_type_id'],
-                  'Sales Tax Account is'
-                );
-              }
-              CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
-            }
+            CRM_Financial_BAO_FinancialItem::create($itemParams, NULL, $trxnIds);
           }
         }
       }
     }
+
     if ($context == 'changeFinancialType') {
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['skipLineItem'] = FALSE;
