@@ -241,7 +241,7 @@
     <import>true</import>
     <add>1.6</add>
     <pseudoconstant>
-      <optionGroupName>contribution_status</optionGroupName>
+      <optionGroupName>contribution_recur_status</optionGroupName>
     </pseudoconstant>
     <html>
       <type>Select</type>
