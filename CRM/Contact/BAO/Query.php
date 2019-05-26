@@ -4960,6 +4960,7 @@ civicrm_relationship.start_date > {$today}
    * @return CRM_Core_DAO
    */
   public function getCachedContacts($cids, $includeContactIds) {
+    CRM_Core_DAO::disableFullGroupByMode();
     CRM_Utils_Type::validateAll($cids, 'Positive');
     $this->_includeContactIds = $includeContactIds;
     $onlyDeleted = in_array(['deleted_contacts', '=', '1', '0', '0'], $this->_params);
@@ -4971,7 +4972,9 @@ civicrm_relationship.start_date > {$today}
     $limit = '';
     $query = "$select $from $where $groupBy $order $limit";
 
-    return CRM_Core_DAO::executeQuery($query);
+    $result = CRM_Core_DAO::executeQuery($query);
+    CRM_Core_DAO::reenableFullGroupByMode();
+    return $result;
   }
 
   /**
