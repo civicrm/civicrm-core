@@ -642,7 +642,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $prevnext = $spacing = [];
     foreach ($params as $button) {
       if (!empty($button['submitOnce'])) {
-        $button['js']['onclick'] = "return submitOnce(this,'{$this->_name}','" . ts('Processing') . "');";
+        CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'js/crm.submitOnce.js');
       }
 
       $attrs = ['class' => 'crm-form-submit'] + (array) CRM_Utils_Array::value('js', $button);
@@ -1270,7 +1270,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         'isDefault' => TRUE,
       ];
       if ($submitOnce) {
-        $nextButton['js'] = ['onclick' => "return submitOnce(this,'{$this->_name}','" . ts('Processing') . "');"];
+        $nextButton['submitOnce'] = TRUE;
       }
       $buttons[] = $nextButton;
     }

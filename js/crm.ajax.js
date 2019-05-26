@@ -485,6 +485,10 @@
       });
       // For convenience, focus the first field
       $('input[type=text], textarea, select', this).filter(':visible').first().not('.dateplugin').focus();
+      $('.action-link button, .action-link .button, div.ui-dialog-buttonset button, div.ui-dialog-buttonset .button').click(function() {
+        console.log('boo2');
+        $('div.ui-dialog-buttonset').css('visibility', 'hidden');
+      });
     });
     return widget;
   };
