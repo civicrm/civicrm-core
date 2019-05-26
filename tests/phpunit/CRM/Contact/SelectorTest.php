@@ -93,10 +93,17 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
         ]);
         $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
         $this->assertEquals(1, count($rows));
+
+        CRM_Core_DAO::reenableFullGroupByMode();
+        $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
+
         $sortChar = $selector->alphabetQuery()->fetchAll();
         // sort name is stored in '<last_name>, <first_name>' format, as per which the first character would be B of Bond
         $this->assertEquals('B', $sortChar[0]['sort_name']);
         $this->assertEquals($contactID, key($rows));
+
+        CRM_Core_DAO::reenableFullGroupByMode();
+        $selector->getQueryObject()->getCachedContacts([$contactID], FALSE);
       }
     }
   }
