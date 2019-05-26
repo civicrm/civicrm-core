@@ -44,6 +44,13 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   public static $_links = NULL;
 
   /**
+   * The action links that we need to display for the browse screen.
+   *
+   * @var array
+   */
+  private static $_actionLinks;
+
+  /**
    * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array

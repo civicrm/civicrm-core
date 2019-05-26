@@ -2483,6 +2483,21 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
   }
 
   /**
+   * Get the list of view only activities
+   *
+   * @return array
+   */
+  public static function getViewOnlyActivityTypeIDs() {
+    $viewOnlyActivities = [
+      'Email' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email'),
+    ];
+    if (self::checkEditInboundEmailsPermissions()) {
+      $viewOnlyActivities['Inbound Email'] = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email');
+    }
+    return $viewOnlyActivities;
+  }
+
+  /**
    * Wrapper for ajax activity selector.
    *
    * @param array $params
