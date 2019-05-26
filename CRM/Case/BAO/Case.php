@@ -1066,7 +1066,6 @@ SELECT case_status.label AS case_status, status_id, civicrm_case_type.title AS c
       }
 
       // Activity Status Label for Case activities list
-      $caseActivities[$caseActivityId]['status_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_status_id', $dao->status);
       $deleted = '';
       if ($dao->deleted) {
         $deleted = '<br /> ' . ts('(deleted)');
