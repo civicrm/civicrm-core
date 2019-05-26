@@ -107,6 +107,13 @@ function _civicrm_api3_group_contact_create_spec(&$params) {
  *   Information about operation results
  */
 function civicrm_api3_group_contact_create($params) {
+
+  // Check if contact can be modified.
+  _civicrm_api3_check_edit_permissions(
+    _civicrm_api3_get_BAO(__FUNCTION__),
+    $params
+  );
+
   // Nonstandard bao - doesn't accept ID as a param, so convert id to group_id + contact_id
   if (!empty($params['id'])) {
     $getParams = ['id' => $params['id']];

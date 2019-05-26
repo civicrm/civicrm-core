@@ -2527,11 +2527,30 @@ function _civicrm_api3_check_edit_permissions($bao_name, $params) {
     'CRM_Core_BAO_IM',
     'CRM_Core_BAO_Website',
     'CRM_Core_BAO_OpenID',
+    'CRM_Contact_BAO_GroupContact',
+    'CRM_Contact_BAO_Relationship',
   ];
+
   if (!empty($params['check_permissions']) && in_array($bao_name, $contactEntities)) {
-    $cid = !empty($params['contact_id']) ? $params['contact_id'] : CRM_Core_DAO::getFieldValue($bao_name, $params['id'], 'contact_id');
-    if (!CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT)) {
-      throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
+    // Relationship table has 2 contact fieds contact_id_a and contact_id_b
+    // Hence we need to fetch those contact id separately.
+    if ($bao_name == 'CRM_Contact_BAO_Relationship') {
+      $cids = $bao_name::getRelationshipContacts($params);
+    }
+    else {
+      $cids = [];
+      if (!empty($params['contact_id'])) {
+        $cids[] = $params['contact_id'];
+      }
+      if (!empty($params['id'])) {
+        $cids[] = CRM_Core_DAO::getFieldValue($bao_name, $params['id'], 'contact_id');
+      }
+    }
+
+    foreach (array_unique($cids) as $cid) {
+      if (!CRM_Contact_BAO_Contact_Permission::allow($cid, CRM_Core_Permission::EDIT)) {
+        throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify contact record');
+      }
     }
   }
 }

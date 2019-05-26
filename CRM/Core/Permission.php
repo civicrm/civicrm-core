@@ -984,6 +984,8 @@ class CRM_Core_Permission {
     $permissions['website'] = $permissions['address'];
     $permissions['im'] = $permissions['address'];
     $permissions['open_i_d'] = $permissions['address'];
+    $permissions['relationship'] = $permissions['address'];
+    $permissions['group_contact'] = $permissions['address'];
 
     // Also managed by ACLs - CRM-19448
     $permissions['entity_tag'] = ['default' => []];
@@ -995,20 +997,6 @@ class CRM_Core_Permission {
       'get' => ['access CiviCRM'],
       'create' => ['access CiviCRM'],
       'update' => ['access CiviCRM'],
-    ];
-
-    //relationship permissions
-    $permissions['relationship'] = [
-      // get is managed by BAO::addSelectWhereClause
-      'get' => [],
-      'delete' => [
-        'access CiviCRM',
-        'edit all contacts',
-      ],
-      'default' => [
-        'access CiviCRM',
-        'edit all contacts',
-      ],
     ];
 
     // CRM-17741 - Permissions for RelationshipType.
@@ -1214,17 +1202,6 @@ class CRM_Core_Permission {
 
     $permissions['group_nesting'] = $permissions['group'];
     $permissions['group_organization'] = $permissions['group'];
-
-    //Group Contact permission
-    $permissions['group_contact'] = [
-      'get' => [
-        'access CiviCRM',
-      ],
-      'default' => [
-        'access CiviCRM',
-        'edit all contacts',
-      ],
-    ];
 
     // CiviMail Permissions
     $civiMailBasePerms = [

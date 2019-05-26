@@ -63,6 +63,12 @@ function civicrm_api3_relationship_delete($params) {
     return civicrm_api3_create_error('Invalid value for relationship ID');
   }
 
+  // Check if contact can be modified.
+  _civicrm_api3_check_edit_permissions(
+    _civicrm_api3_get_BAO(__FUNCTION__),
+    $params
+  );
+
   $relationBAO = new CRM_Contact_BAO_Relationship();
   $relationBAO->id = $params['id'];
   if (!$relationBAO->find(TRUE)) {

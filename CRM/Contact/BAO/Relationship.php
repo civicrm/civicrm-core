@@ -2437,4 +2437,31 @@ SELECT count(*)
     return $membershipValues;
   }
 
+  /*
+   * Get Relationship Contacts array for checking if contact can be modified.
+   *
+   * @param array $params
+   *
+   * @return array
+   *   list of contact ids.
+   */
+  public static function getRelationshipContacts($params) {
+    $cids = [];
+    $relationshipDetails = NULL;
+    if (!empty($params['id'])) {
+      $relationshipDetails = self::getRelationshipByID($params['id']);
+    }
+
+    foreach (['contact_id_a', 'contact_id_b'] as $field) {
+      if (!empty($params[$field])) {
+        $cids[] = $params[$field];
+      }
+      if ($relationshipDetails && !empty($relationshipDetails->$field)) {
+        $cids[] = $relationshipDetails->$field;
+      }
+    }
+
+    return $cids;
+  }
+
 }
