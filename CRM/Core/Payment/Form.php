@@ -207,7 +207,7 @@ class CRM_Core_Payment_Form {
    * @return string
    */
   public static function getPaymentTypeLabel($paymentProcessor) {
-    return ts('%1 Information', [$paymentProcessor->getPaymentTypeLabel()]);
+    return $paymentProcessor->getPaymentTypeLabel();
   }
 
   /**

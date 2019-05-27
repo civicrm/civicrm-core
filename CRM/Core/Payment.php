@@ -581,7 +581,7 @@ abstract class CRM_Core_Payment {
    * @return string
    */
   public function getPaymentTypeLabel() {
-    return $this->_paymentProcessor['payment_type'] == 1 ? 'Credit Card' : 'Direct Debit';
+    return $this->_paymentProcessor['payment_type'] == 1 ? ts('Credit Card') : ts('Direct Debit');
   }
 
   /**
