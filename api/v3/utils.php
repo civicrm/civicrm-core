@@ -381,6 +381,11 @@ function _civicrm_api3_get_BAO($name) {
     // has enhanced access to other entities.
     $name = 'Contribution';
   }
+  if ($name === 'Dedupe') {
+    // Dedupe is a pseudoentity for PrevNextCache - but accessing dedupe related info
+    // not the other cache info like search results (which could in fact be in Redis or another cache engine)
+    $name = 'PrevNextCache';
+  }
   $dao = _civicrm_api3_get_DAO($name);
   if (!$dao) {
     return NULL;

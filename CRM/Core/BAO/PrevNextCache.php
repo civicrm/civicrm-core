@@ -496,4 +496,26 @@ AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
     ];
   }
 
+  /**
+   * Generate and assign an arbitrary value to a field of a test object.
+   *
+   * This specifically supports testing the dedupe use case.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   *   The globally-unique ID of the test object.
+   */
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName === 'cacheKey') {
+      $this->cacheKey = 'merge_' . rand();
+      return;
+    }
+    if ($fieldName === 'data') {
+      $this->data = serialize([]);
+      return;
+    }
+    parent::assignTestValue($fieldName, $fieldDef, $counter);
+  }
+
 }

@@ -97,6 +97,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'civicrm_group_contact',
       'civicrm_saved_search',
       'civicrm_group_contact_cache',
+      'civicrm_prevnext_cache',
     );
 
     $this->quickCleanup($tablesToTruncate, TRUE);
