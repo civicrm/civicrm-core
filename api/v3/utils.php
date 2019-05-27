@@ -779,7 +779,7 @@ function _civicrm_api3_apply_filters_to_dao($filterField, $filterValue, &$dao) {
  * @return array
  *   options extracted from params
  */
-function _civicrm_api3_get_options_from_params(&$params, $queryObject = FALSE, $entity = '', $action = '') {
+function _civicrm_api3_get_options_from_params($params, $queryObject = FALSE, $entity = '', $action = '') {
   $lowercase_entity = _civicrm_api_get_entity_name_from_camel($entity);
   $is_count = FALSE;
   $sort = CRM_Utils_Array::value('sort', $params, 0);
