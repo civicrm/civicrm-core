@@ -39,7 +39,7 @@ interface CRM_Core_PrevNextCache_Interface {
    * @param string $cacheKey
    * @param string $sql
    *   A SQL query. The query *MUST* be a SELECT statement which yields
-   *   the following columns (in order): cacheKey, entity_id1, data
+   *   the following columns (in order): cachekey, entity_id1, data
    * @param array $sqlParams
    *   An array of parameters to be used with $sql.
    *   Use the same interpolation format as CRM_Core_DAO (composeQuery/executeQuery).
