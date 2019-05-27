@@ -679,6 +679,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'contribution_id' => $contribution['id'],
       'total_amount' => 40,
     );
+    // Rename the 'completed' status label first to check that we are not using the labels!
+    $this->callAPISuccess('OptionValue', 'get', ['name' => 'Completed', 'option_group_id' => 'contribution_status', 'api.OptionValue.create' => ['label' => 'Unicorn']]);
     $payment = $this->callAPISuccess('Payment', 'create', $params);
     $expectedResult = array(
       $payment['id'] => array(
@@ -706,11 +708,13 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->assertEquals($eft['values'][$eft['id']]['amount'], 40);
     // Check contribution for completed status
     $contribution = $this->callAPISuccess('contribution', 'get', array('id' => $contribution['id']));
-    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
+    $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Unicorn');
     $this->assertEquals($contribution['values'][$contribution['id']]['total_amount'], 100.00);
     $this->callAPISuccess('Contribution', 'Delete', array(
       'id' => $contribution['id'],
     ));
+    $this->callAPISuccess('OptionValue', 'get', ['name' => 'Completed', 'option_group_id' => 'contribution_status', 'api.OptionValue.create' => ['label' => 'Completed']]);
+
   }
 
   /**

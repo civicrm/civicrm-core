@@ -1198,7 +1198,6 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         return [FALSE, $isARefund];
       }
     }
-    // @todo - figure out when, if ever this is reached.
     return [TRUE, $isARefund];
   }
 
@@ -3757,7 +3756,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $trxnID = NULL;
     $inputParams = $params;
     $isARefund = FALSE;
-    $currentContributionStatus = CRM_Core_PseudoConstant::getLabel('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution']->contribution_status_id);
+    $currentContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution']->contribution_status_id);
     $previousContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($params['prevContribution']->contribution_status_id, 'name');
 
     if (($previousContributionStatus == 'Pending'
