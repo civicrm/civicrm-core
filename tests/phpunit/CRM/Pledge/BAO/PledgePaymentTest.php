@@ -527,6 +527,8 @@ class CRM_Pledge_BAO_PledgePaymentTest extends CiviUnitTestCase {
       $this->assertEquals(1, $pp['status_id']);
     }
 
+    $this->assertEquals(count($pledgePayments['values']), CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($pledge->id, 2));
+
     // Cleanup
     civicrm_api3('Pledge', 'delete', array(
       'id' => $pledge->id,
