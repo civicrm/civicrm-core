@@ -297,50 +297,55 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
   /**
    * Generate from clause.
-   *
-   * @param bool|FALSE $durationMode
    */
-  public function from($durationMode = FALSE) {
+  public function from() {
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
-    if (!$durationMode) {
-      $this->_from = "
-          FROM civicrm_activity {$this->_aliases['civicrm_activity']}
+    $this->_from = "
+        FROM civicrm_activity {$this->_aliases['civicrm_activity']}
 
-               LEFT JOIN civicrm_activity_contact target_activity
-                      ON {$this->_aliases['civicrm_activity']}.id = target_activity.activity_id AND
-                         target_activity.record_type_id = {$targetID}
-               LEFT JOIN civicrm_activity_contact assignment_activity
-                      ON {$this->_aliases['civicrm_activity']}.id = assignment_activity.activity_id AND
-                         assignment_activity.record_type_id = {$assigneeID}
-               LEFT JOIN civicrm_activity_contact source_activity
-                      ON {$this->_aliases['civicrm_activity']}.id = source_activity.activity_id AND
-                         source_activity.record_type_id = {$sourceID}
-               LEFT JOIN civicrm_contact contact_civireport
-                      ON target_activity.contact_id = contact_civireport.id
-               LEFT JOIN civicrm_contact civicrm_contact_assignee
-                      ON assignment_activity.contact_id = civicrm_contact_assignee.id
-               LEFT JOIN civicrm_contact civicrm_contact_source
-                      ON source_activity.contact_id = civicrm_contact_source.id
-               {$this->_aclFrom}
-               LEFT JOIN civicrm_option_value
-                      ON ( {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value )
-               LEFT JOIN civicrm_option_group
-                      ON civicrm_option_group.id = civicrm_option_value.option_group_id
-               LEFT JOIN civicrm_case_activity
-                      ON civicrm_case_activity.activity_id = {$this->_aliases['civicrm_activity']}.id
-               LEFT JOIN civicrm_case
-                      ON civicrm_case_activity.case_id = civicrm_case.id
-               LEFT JOIN civicrm_case_contact
-                      ON civicrm_case_contact.case_id = civicrm_case.id ";
+             LEFT JOIN civicrm_activity_contact target_activity
+                    ON {$this->_aliases['civicrm_activity']}.id = target_activity.activity_id AND
+                       target_activity.record_type_id = {$targetID}
+             LEFT JOIN civicrm_activity_contact assignment_activity
+                    ON {$this->_aliases['civicrm_activity']}.id = assignment_activity.activity_id AND
+                       assignment_activity.record_type_id = {$assigneeID}
+             LEFT JOIN civicrm_activity_contact source_activity
+                    ON {$this->_aliases['civicrm_activity']}.id = source_activity.activity_id AND
+                       source_activity.record_type_id = {$sourceID}
+             LEFT JOIN civicrm_contact contact_civireport
+                    ON target_activity.contact_id = contact_civireport.id
+             LEFT JOIN civicrm_contact civicrm_contact_assignee
+                    ON assignment_activity.contact_id = civicrm_contact_assignee.id
+             LEFT JOIN civicrm_contact civicrm_contact_source
+                    ON source_activity.contact_id = civicrm_contact_source.id
+             {$this->_aclFrom}
+             LEFT JOIN civicrm_option_value
+                    ON ( {$this->_aliases['civicrm_activity']}.activity_type_id = civicrm_option_value.value )
+             LEFT JOIN civicrm_option_group
+                    ON civicrm_option_group.id = civicrm_option_value.option_group_id
+             LEFT JOIN civicrm_case_activity
+                    ON civicrm_case_activity.activity_id = {$this->_aliases['civicrm_activity']}.id
+             LEFT JOIN civicrm_case
+                    ON civicrm_case_activity.case_id = civicrm_case.id
+             LEFT JOIN civicrm_case_contact
+                    ON civicrm_case_contact.case_id = civicrm_case.id ";
 
-      $this->joinPhoneFromContact();
-    }
-    else {
-      $this->_from = "
+    $this->joinPhoneFromContact();
+
+    $this->joinEmailFromContact();
+  }
+
+  /**
+   * Generate from clause for when calculating activity durations.
+   */
+  public function activityDurationFrom() {
+    $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
+    $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
+    $this->_from = "
       FROM civicrm_activity {$this->_aliases['civicrm_activity']}
               LEFT JOIN civicrm_activity_contact target_activity
                      ON {$this->_aliases['civicrm_activity']}.id = target_activity.activity_id AND
@@ -348,9 +353,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
               LEFT JOIN civicrm_contact contact_civireport
                      ON target_activity.contact_id = contact_civireport.id
               {$this->_aclFrom}";
-    }
-
-    $this->joinEmailFromContact();
   }
 
   /**
@@ -553,7 +555,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     CRM_Core_DAO::executeQuery($insertQuery);
 
     // now build the query for duration sum
-    $this->from(TRUE);
+    $this->activityDurationFrom();
     $this->where(TRUE);
     $this->groupBy(FALSE);
 
