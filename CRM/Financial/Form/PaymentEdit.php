@@ -131,6 +131,15 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
         'name' => ts('Cancel'),
       ],
     ]);
+
+    $contact = civicrm_api3('Contribution', 'getsingle', ['return' => ["contact_id"], 'id' => "{$this->_contributionID}"]);
+
+    $url = CRM_Utils_System::url(
+      "civicrm/contact/view/contribution",
+      "reset=1&action=update&id={$this->_contributionID}&cid={$contact['contact_id']}&context=contribution"
+    );
+
+    $this->controller->setDestination($url);
   }
 
   /**
