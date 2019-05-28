@@ -255,6 +255,23 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   }
 
   /**
+   * Convert any submitted text fields to use 'like' rather than '=' as the operator.
+   *
+   * This excludes any with options.
+   *
+   * Note this will only pick up fields declared via metadata.
+   */
+  protected function convertTextStringsToUseLikeOperator() {
+    foreach ($this->getSearchFieldMetadata()[$this->getDefaultEntity()] as $fieldName => $field) {
+      if (!empty($this->_formValues[$fieldName]) && empty($field['options']) && empty($field['pseudoconstant'])) {
+        if (in_array($field['type'], [CRM_Utils_Type::T_STRING, CRM_Utils_Type::T_TEXT])) {
+          $this->_formValues[$fieldName] = ['LIKE' => CRM_Contact_BAO_Query::getWildCardedValue(TRUE, 'LIKE', $this->_formValues[$fieldName])];
+        }
+      }
+    }
+  }
+
+  /**
    * Add checkboxes for each row plus a master checkbox.
    *
    * @param array $rows

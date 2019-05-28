@@ -141,6 +141,9 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    *
    * @param array $values
    * @param CRM_Contact_BAO_Query $query
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -915,15 +918,32 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
+   * Get the metadata for fields to be included on the search form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = [
+      'contribution_source',
+      'cancel_reason',
+      'invoice_number',
+    ];
+    $metadata = civicrm_api3('Contribution', 'getfields', [])['values'];
+    return array_intersect_key($metadata, array_flip($fields));
+  }
+
+  /**
    * Add all the elements shared between contribute search and advnaced search.
    *
-   * @param CRM_Core_Form $form
+   * @param \CRM_Contribute_Form_Search $form
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function buildSearchForm(&$form) {
 
-    // Added contribution source
-    $form->addElement('text', 'contribution_source', ts('Contribution Source'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'source'));
-
+    $form->addSearchFieldMetadata(['Contribution' => self::getSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
     CRM_Core_Form_Date::buildDateRange($form, 'contribution_date', 1, '_low', '_high', ts('From:'), FALSE);
     // CRM-17602
     // This hidden element added for displaying Date Range error correctly. Definitely a dirty hack, but... it works.
@@ -936,7 +956,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     $form->add('text', 'contribution_amount_high', ts('To'), ['size' => 8, 'maxlength' => 8]);
     $form->addRule('contribution_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
 
-    $form->addField('cancel_reason', ['entity' => 'Contribution']);
     CRM_Core_Form_Date::buildDateRange($form, 'contribution_cancel_date', 1, '_low', '_high', ts('From:'), FALSE);
     $form->addElement('hidden', 'contribution_cancel_date_range_error');
 
@@ -991,7 +1010,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
     // Add field for transaction ID search
     $form->addElement('text', 'contribution_trxn_id', ts("Transaction ID"));
-    $form->addElement('text', 'invoice_number', ts("Invoice Number"));
     $form->addElement('text', 'contribution_check_number', ts('Check Number'));
 
     // Add field for pcp display in roll search
