@@ -33,13 +33,11 @@
  * @group headless
  */
 class api_v3_PhoneTest extends CiviUnitTestCase {
-  protected $_apiversion;
   protected $_contactID;
   protected $_locationType;
   protected $_params;
 
   public function setUp() {
-    $this->_apiversion = 3;
     parent::setUp();
     $this->useTransaction();
 
@@ -56,7 +54,12 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     );
   }
 
-  public function testCreatePhone() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreatePhone($version) {
+    $this->_apiversion = $version;
 
     $result = $this->callAPIAndDocument('phone', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
@@ -65,7 +68,12 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $this->callAPISuccess('phone', 'delete', array('id' => $result['id']));
   }
 
-  public function testDeletePhone() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDeletePhone($version) {
+    $this->_apiversion = $version;
     //create one
     $create = $this->callAPISuccess('phone', 'create', $this->_params);
 
@@ -80,8 +88,11 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_phone_get with empty params.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetEmptyParams() {
+  public function testGetEmptyParams($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPISuccess('Phone', 'Get', array());
   }
 
@@ -96,8 +107,11 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_phone_get - success expected.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGet() {
+  public function testGet($version) {
+    $this->_apiversion = $version;
     $phone = $this->callAPISuccess('phone', 'create', $this->_params);
     $params = array(
       'contact_id' => $this->_params['contact_id'],
@@ -114,8 +128,11 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
 
   /**
    * Ensure numeric_phone field is correctly populated (this happens via sql trigger)
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testNumericPhone() {
+  public function testNumericPhone($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPISuccess('phone', 'create', $this->_params);
     $id = $result['id'];
     $params = array('id' => $id, 'return.phone_numeric' => 1);
@@ -127,8 +144,11 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
    * If a new phone is set to is_primary the prev should no longer be.
    *
    * If is_primary is not set then it should become is_primary is no others exist
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreatePhonePrimaryHandlingChangeToPrimary() {
+  public function testCreatePhonePrimaryHandlingChangeToPrimary($version) {
+    $this->_apiversion = $version;
     $params = $this->_params;
     unset($params['is_primary']);
     $phone1 = $this->callAPISuccess('phone', 'create', $params);
@@ -140,7 +160,12 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $this->assertEquals(1, $check);
   }
 
-  public function testCreatePhonePrimaryHandlingChangeExisting() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreatePhonePrimaryHandlingChangeExisting($version) {
+    $this->_apiversion = $version;
     $phone1 = $this->callAPISuccess('phone', 'create', $this->_params);
     $phone2 = $this->callAPISuccess('phone', 'create', $this->_params);
     $check = $this->callAPISuccess('phone', 'getcount', array(

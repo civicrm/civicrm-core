@@ -82,21 +82,25 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
 
   /**
    * Check with no name.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipTypeCreateWithoutName() {
+  public function testRelationshipTypeCreateWithoutName($version) {
+    $this->_apiversion = $version;
     $relTypeParams = array(
       'contact_type_a' => 'Individual',
       'contact_type_b' => 'Organization',
     );
-    $result = $this->callAPIFailure('relationship_type', 'create', $relTypeParams,
-      'Mandatory key(s) missing from params array: name_a_b, name_b_a'
-    );
+    $result = $this->callAPIFailure('relationship_type', 'create', $relTypeParams);
   }
 
   /**
    * Create relationship type.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipTypeCreate() {
+  public function testRelationshipTypeCreate($version) {
+    $this->_apiversion = $version;
     $params = array(
       'name_a_b' => 'Relation 1 for relationship type create',
       'name_b_a' => 'Relation 2 for relationship type create',
@@ -115,8 +119,11 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
 
   /**
    * Test  using example code.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipTypeCreateExample() {
+  public function testRelationshipTypeCreateExample($version) {
+    $this->_apiversion = $version;
     require_once 'api/v3/examples/RelationshipType/Create.php';
     $result = relationship_type_create_example();
     $expectedResult = relationship_type_create_expectedresult();
@@ -125,8 +132,11 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
 
   /**
    * Check if required fields are not passed.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipTypeDeleteWithoutRequired() {
+  public function testRelationshipTypeDeleteWithoutRequired($version) {
+    $this->_apiversion = $version;
     $params = array(
       'name_b_a' => 'Relation 2 delete without required',
       'contact_type_b' => 'Individual',
@@ -135,7 +145,12 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
     );
 
     $result = $this->callAPIFailure('relationship_type', 'delete', $params);
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: id');
+    if ($version == 3) {
+      $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: id');
+    }
+    else {
+      $this->assertEquals($result['error_message'], 'Parameter "where" is required.');
+    }
   }
 
   /**
@@ -158,8 +173,11 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
 
   /**
    * Check relationship type delete.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipTypeDelete() {
+  public function testRelationshipTypeDelete($version) {
+    $this->_apiversion = $version;
     $id = $this->_relationshipTypeCreate();
     // create sample relationship type.
     $params = array(
@@ -173,17 +191,24 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
 
   /**
    * Check with empty array.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipTypeUpdateEmpty() {
+  public function testRelationshipTypeUpdateEmpty($version) {
+    $this->_apiversion = $version;
     $params = array();
     $result = $this->callAPIFailure('relationship_type', 'create', $params);
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: name_a_b, name_b_a');
+    $this->assertContains('name_a_b', $result['error_message']);
+    $this->assertContains('name_b_a', $result['error_message']);
   }
 
   /**
    * Check with no contact type.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipTypeUpdateWithoutContactType() {
+  public function testRelationshipTypeUpdateWithoutContactType($version) {
+    $this->_apiversion = $version;
     // create sample relationship type.
     $this->_relTypeID = $this->_relationshipTypeCreate();
 
@@ -204,8 +229,11 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
 
   /**
    * Check with all parameters.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipTypeUpdate() {
+  public function testRelationshipTypeUpdate($version) {
+    $this->_apiversion = $version;
     // create sample relationship type.
     $this->_relTypeID = $this->_relationshipTypeCreate();
 
@@ -231,8 +259,11 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
 
   /**
    * Check with empty array.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipTypesGetEmptyParams() {
+  public function testRelationshipTypesGetEmptyParams($version) {
+    $this->_apiversion = $version;
     $firstRelTypeParams = array(
       'name_a_b' => 'Relation 27 for create',
       'name_b_a' => 'Relation 28 for create',
@@ -262,16 +293,22 @@ class api_v3_RelationshipTypeTest extends CiviUnitTestCase {
 
   /**
    * Check with params Not Array.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipTypesGetParamsNotArray() {
+  public function testRelationshipTypesGetParamsNotArray($version) {
+    $this->_apiversion = $version;
 
     $results = $this->callAPIFailure('relationship_type', 'get', 'string');
   }
 
   /**
    * Check with valid params array.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testRelationshipTypesGet() {
+  public function testRelationshipTypesGet($version) {
+    $this->_apiversion = $version;
     $firstRelTypeParams = array(
       'name_a_b' => 'Relation 30 for create',
       'name_b_a' => 'Relation 31 for create',

@@ -79,8 +79,11 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
 
   /**
    * Fetch contact id by uf id.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetUFMatchID() {
+  public function testGetUFMatchID($version) {
+    $this->_apiversion = $version;
     $params = array(
       'uf_id' => 42,
     );
@@ -88,15 +91,23 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$result['id']]['contact_id'], 69);
   }
 
-  public function testGetUFMatchIDWrongParam() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testGetUFMatchIDWrongParam($version) {
+    $this->_apiversion = $version;
     $params = 'a string';
     $result = $this->callAPIFailure('uf_match', 'get', $params);
   }
 
   /**
    * Fetch uf id by contact id.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetUFID() {
+  public function testGetUFID($version) {
+    $this->_apiversion = $version;
     $params = array(
       'contact_id' => 69,
     );
@@ -104,30 +115,46 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][$result['id']]['uf_id'], 42);
   }
 
-  public function testGetUFIDWrongParam() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testGetUFIDWrongParam($version) {
+    $this->_apiversion = $version;
     $params = 'a string';
     $result = $this->callAPIFailure('uf_match', 'get', $params);
   }
 
   /**
    * Test civicrm_activity_create() using example code
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testUFMatchGetExample() {
+  public function testUFMatchGetExample($version) {
+    $this->_apiversion = $version;
     require_once 'api/v3/examples/UFMatch/Get.php';
     $result = UF_match_get_example();
     $expectedResult = UF_match_get_expectedresult();
     $this->assertEquals($result, $expectedResult);
   }
 
-  public function testCreate() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreate($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPISuccess('uf_match', 'create', $this->_params);
     $this->getAndCheck($this->_params, $result['id'], 'uf_match');
   }
 
   /**
    * Test Civi to CMS email sync optional
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testUFNameMatchSync() {
+  public function testUFNameMatchSync($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess('uf_match', 'create', $this->_params);
     $email1 = substr(sha1(rand()), 0, 7) . '@test.com';
     $email2 = substr(sha1(rand()), 0, 7) . '@test.com';
@@ -160,7 +187,12 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
     $this->assertEquals($email1, $ufName);
   }
 
-  public function testDelete() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDelete($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPISuccess('uf_match', 'create', $this->_params);
     $this->assertEquals(1, $this->callAPISuccess('uf_match', 'getcount', array(
       'id' => $result['id'],

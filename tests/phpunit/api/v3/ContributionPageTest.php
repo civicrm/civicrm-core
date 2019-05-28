@@ -33,7 +33,6 @@
  * @group headless
  */
 class api_v3_ContributionPageTest extends CiviUnitTestCase {
-  protected $_apiversion = 3;
   protected $testAmount = 34567;
   protected $params;
   protected $id = 0;
@@ -90,14 +89,24 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->quickCleanUpFinancialEntities();
   }
 
-  public function testCreateContributionPage() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateContributionPage($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
   }
 
-  public function testGetBasicContributionPage() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testGetBasicContributionPage($version) {
+    $this->_apiversion = $version;
     $createResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $this->id = $createResult['id'];
     $getParams = array(
@@ -121,7 +130,12 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals(1, $getResult['count']);
   }
 
-  public function testDeleteContributionPage() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDeleteContributionPage($version) {
+    $this->_apiversion = $version;
     $createResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = array('id' => $createResult['id']);
     $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);

@@ -40,7 +40,6 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
   protected $_params;
 
   public function setUp() {
-    $this->_apiversion = 3;
     parent::setUp();
     $this->useTransaction(TRUE);
 
@@ -55,7 +54,12 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
     );
   }
 
-  public function testCreateActivityContact() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateActivityContact($version) {
+    $this->_apiversion = $version;
 
     $result = $this->callAPIAndDocument('activity_contact', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
@@ -64,7 +68,12 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('activity_contact', 'delete', array('id' => $result['id']));
   }
 
-  public function testDeleteActivityContact() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDeleteActivityContact($version) {
+    $this->_apiversion = $version;
     //create one
     $create = $this->callAPISuccess('activity_contact', 'create', $this->_params);
 
@@ -77,25 +86,36 @@ class api_v3_ActivityContactTest extends CiviUnitTestCase {
   }
 
   /**
-   *
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetActivitiesByContact() {
+  public function testGetActivitiesByContact($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess('ActivityContact', 'Get', array('contact_id' => $this->_contactID));
   }
 
-  public function testGetActivitiesByActivity() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testGetActivitiesByActivity($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess('ActivityContact', 'Get', array('activity_id' => $this->_activityID));
   }
 
   /**
    * Test civicrm_activity_contact_get with empty params.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetEmptyParams() {
+  public function testGetEmptyParams($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess('ActivityContact', 'Get', array());
   }
 
   /**
    * Test civicrm_activity_contact_get with wrong params.
+   * FIXME: Api4
    */
   public function testGetWrongParams() {
     $this->callAPIFailure('ActivityContact', 'Get', array('contact_id' => 'abc'));

@@ -54,14 +54,24 @@ class api_v3_OpenIDTest extends CiviUnitTestCase {
     );
   }
 
-  public function testCreateOpenID() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateOpenID($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
     $this->assertNotNull($result['values'][$result['id']]['id'], 'In line ' . __LINE__);
   }
 
-  public function testGetOpenID() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testGetOpenID($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $result = $this->callAPIAndDocument($this->_entity, 'get', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count'], 'In line ' . __LINE__);
@@ -69,7 +79,12 @@ class api_v3_OpenIDTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result['id']));
   }
 
-  public function testDeleteOpenID() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDeleteOpenID($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = array('id' => $result['id']);
     $result = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
@@ -77,7 +92,12 @@ class api_v3_OpenIDTest extends CiviUnitTestCase {
     $this->assertEquals(0, $checkDeleted['count'], 'In line ' . __LINE__);
   }
 
-  public function testDeleteOpenIDInvalid() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDeleteOpenIDInvalid($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = array('id' => 600);
     $result = $this->callAPIFailure($this->_entity, 'delete', $deleteParams);

@@ -44,7 +44,6 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
   protected $_params;
   protected $_params2;
   protected $_entity = 'activity';
-  protected $_apiversion = 3;
   protected $test_activity_type_value;
   protected $_contactID;
   /**
@@ -121,15 +120,21 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Check fails with empty array.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testActivityCreateEmpty() {
+  public function testActivityCreateEmpty($version) {
+    $this->_apiversion = $version;
     $this->callAPIFailure('activity', 'create', array());
   }
 
   /**
    * Check if required fields are not passed.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testActivityCreateWithoutRequired() {
+  public function testActivityCreateWithoutRequired($version) {
+    $this->_apiversion = $version;
     $params = array(
       'subject' => 'this case should fail',
       'scheduled_date_time' => date('Ymd'),
@@ -197,8 +202,11 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_activity_id() with non-numeric source_contact_id.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testActivityCreateWithNonNumericContactId() {
+  public function testActivityCreateWithNonNumericContactId($version) {
+    $this->_apiversion = $version;
     $params = array(
       'source_contact_id' => 'fubar',
       'subject' => 'Make-it-Happen Meeting',
@@ -326,8 +334,11 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_activity_create() with valid parameters - use type_id.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testActivityCreateCampaignTypeID() {
+  public function testActivityCreateCampaignTypeID($version) {
+    $this->_apiversion = $version;
     $this->enableCiviCampaign();
 
     $params = array(

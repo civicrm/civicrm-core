@@ -14,8 +14,6 @@ namespace Civi\Test;
  */
 trait ContactTestTrait {
 
-  abstract public function callAPISuccess($entity, $action, $params, $checkAgainst = NULL);
-
   /**
    * Emulate a logged in user since certain functions use that.
    * value to store a record in the DB (like activity)

@@ -37,7 +37,6 @@
  * @group headless
  */
 class api_v3_AddressTest extends CiviUnitTestCase {
-  protected $_apiversion = 3;
   protected $_contactID;
   protected $_locationType;
   protected $_params;
@@ -71,14 +70,24 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->quickCleanup(array('civicrm_address', 'civicrm_relationship'));
   }
 
-  public function testCreateAddress() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateAddress($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPIAndDocument('address', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->_params, $result['id'], 'address');
   }
 
-  public function testCreateAddressParsing() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateAddressParsing($version) {
+    $this->_apiversion = $version;
     $params = array(
       'street_parsing' => 1,
       'street_address' => '54A Excelsior Ave. Apt 1C',
@@ -98,8 +107,11 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * Is_primary should be set as a default.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressTestDefaults() {
+  public function testCreateAddressTestDefaults($version) {
+    $this->_apiversion = $version;
     $params = $this->_params;
     unset($params['is_primary']);
     $result = $this->callAPISuccess('address', 'create', $params);
@@ -108,6 +120,9 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->getAndCheck($this->_params, $result['id'], 'address');
   }
 
+  /**
+   * FIXME: Api4
+   */
   public function testCreateAddressTooLongSuffix() {
     $params = $this->_params;
     $params['street_number_suffix'] = 'really long string';
@@ -116,8 +131,11 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * Create an address with a master ID and ensure that a relationship is created.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressWithMasterRelationshipHousehold() {
+  public function testCreateAddressWithMasterRelationshipHousehold($version) {
+    $this->_apiversion = $version;
     $householdID = $this->householdCreate();
     $address = $this->callAPISuccess('address', 'create', array_merge($this->_params, $this->_params, array('contact_id' => $householdID)));
     $individualID = $this->individualCreate();
@@ -134,8 +152,11 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * Create an address with a master ID and ensure that a relationship is created.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressWithMasterRelationshipOrganization() {
+  public function testCreateAddressWithMasterRelationshipOrganization($version) {
+    $this->_apiversion = $version;
     $address = $this->callAPISuccess('address', 'create', $this->_params);
     $individualID = $this->individualCreate();
     $individualParams = array(
@@ -151,8 +172,11 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * Create an address with a master ID and relationship creation disabled.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressWithoutMasterRelationshipOrganization() {
+  public function testCreateAddressWithoutMasterRelationshipOrganization($version) {
+    $this->_apiversion = $version;
     $address = $this->callAPISuccess('address', 'create', $this->_params);
     $individualID = $this->individualCreate();
     $individualParams = array(
@@ -169,8 +193,11 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * Create an address with a master ID and ensure that a relationship is created.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressWithMasterRelationshipChangingOrganization() {
+  public function testCreateAddressWithMasterRelationshipChangingOrganization($version) {
+    $this->_apiversion = $version;
     $address = $this->callAPISuccess('address', 'create', $this->_params);
     $organisation2ID = $this->organizationCreate();
     $address2 = $this->callAPISuccess('address', 'create', array_merge($this->_params, array('contact_id' => $organisation2ID)));
@@ -200,15 +227,18 @@ class api_v3_AddressTest extends CiviUnitTestCase {
    * ie. create the address, unset the params & recreate.
    * is_primary should be 0 before & after the update. ie - having no other address
    * is_primary is invalid.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressTestDefaultWithID() {
+  public function testCreateAddressTestDefaultWithID($version) {
+    $this->_apiversion = $version;
     $params = $this->_params;
     $params['is_primary'] = 0;
     $result = $this->callAPISuccess('address', 'create', $params);
     unset($params['is_primary']);
     $params['id'] = $result['id'];
-    $result = $this->callAPISuccess('address', 'create', $params);
-    $this->callAPISuccess('address', 'get', array('contact_id' => $params['contact_id']));
+    $this->callAPISuccess('address', 'create', $params);
+    $result = $this->callAPISuccess('address', 'get', array('contact_id' => $params['contact_id']));
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(1, $result['values'][$result['id']]['is_primary']);
     $this->getAndCheck($params, $result['id'], 'address', __FUNCTION__);
@@ -216,8 +246,11 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * test address deletion.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testDeleteAddress() {
+  public function testDeleteAddress($version) {
+    $this->_apiversion = $version;
     //check there are no address to start with
     $get = $this->callAPISuccess('address', 'get', array(
       'location_type_id' => $this->_locationType->id,
@@ -237,8 +270,11 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_address_get - success expected.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetAddress() {
+  public function testGetAddress($version) {
+    $this->_apiversion = $version;
     $address = $this->callAPISuccess('address', 'create', $this->_params);
 
     $params = array(
@@ -254,8 +290,11 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_address_get - success expected.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetSingleAddress() {
+  public function testGetSingleAddress($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess('address', 'create', $this->_params);
     $params = array(
       'contact_id' => $this->_contactID,
@@ -267,8 +306,11 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_address_get with sort option- success expected.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetAddressSort() {
+  public function testGetAddressSort($version) {
+    $this->_apiversion = $version;
     $create = $this->callAPISuccess('address', 'create', $this->_params);
     $this->callAPISuccess('address', 'create', array_merge($this->_params, array('street_address' => 'yzy')));
     $subfile = "AddressSort";
@@ -288,8 +330,11 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_address_get with sort option- success expected.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetAddressLikeSuccess() {
+  public function testGetAddressLikeSuccess($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess('address', 'create', $this->_params);
     $subfile = "AddressLike";
     $description = "Demonstrates Use of Like.";
@@ -305,8 +350,11 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_address_get with sort option- success expected.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetAddressLikeFail() {
+  public function testGetAddressLikeFail($version) {
+    $this->_apiversion = $version;
     $create = $this->callAPISuccess('address', 'create', $this->_params);
     $params = array(
       'street_address' => array('LIKE' => "'%xy%'"),
@@ -318,6 +366,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   }
 
   /**
+   * FIXME: Api4 custom address fields broken?
    */
   public function testGetWithCustom() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
@@ -338,8 +387,11 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   }
 
   /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressPrimaryHandlingChangeToPrimary() {
+  public function testCreateAddressPrimaryHandlingChangeToPrimary($version) {
+    $this->_apiversion = $version;
     $params = $this->_params;
     unset($params['is_primary']);
     $address1 = $this->callAPISuccess('address', 'create', $params);
@@ -354,8 +406,11 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   }
 
   /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressPrimaryHandlingChangeExisting() {
+  public function testCreateAddressPrimaryHandlingChangeExisting($version) {
+    $this->_apiversion = $version;
     $address1 = $this->callAPISuccess('address', 'create', $this->_params);
     $this->callAPISuccess('address', 'create', $this->_params);
     $check = $this->callAPISuccess('address', 'getcount', array(
@@ -371,7 +426,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
    * This is legacy API v3 behaviour and not correct behaviour
    * however we are too far down the path wiwth v3 to fix this
    * @link https://chat.civicrm.org/civicrm/pl/zcq3jkg69jdt5g4aqze6bbe9pc
-   * @todo vis this in v4 api
+   * FIXME: Api4
    */
   public function testCreateDuplicateLocationTypes() {
     $address1 = $this->callAPISuccess('address', 'create', $this->_params);
@@ -479,31 +534,41 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($expectState, $created['state_province_id']);
   }
 
-  public function testBuildStateProvinceOptionsWithDodgyProvinceLimit() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testBuildStateProvinceOptionsWithDodgyProvinceLimit($version) {
+    $this->_apiversion = $version;
     $provinceLimit = [1228, "abcd;ef"];
     $this->callAPISuccess('setting', 'create', [
-     'provinceLimit' => $provinceLimit,
+      'provinceLimit' => $provinceLimit,
     ]);
     $result = $this->callAPIFailure('address', 'getoptions', ['field' => 'state_province_id']);
     // confirm that we hit our error not a SQLI.
     $this->assertEquals('Province limit or default country setting is incorrect', $result['error_message']);
     $this->callAPISuccess('setting', 'create', [
-     'provinceLimit' => [1228],
+      'provinceLimit' => [1228],
     ]);
     // Now confirm with a correct province setting it works fine
     $this->callAPISuccess('address', 'getoptions', ['field' => 'state_province_id']);
   }
 
-  public function testBuildCountryWithDodgyCountryLimitSetting() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testBuildCountryWithDodgyCountryLimitSetting($version) {
+    $this->_apiversion = $version;
     $countryLimit = [1228, "abcd;ef"];
     $this->callAPISuccess('setting', 'create', [
-     'countryLimit' => $countryLimit,
+      'countryLimit' => $countryLimit,
     ]);
     $result = $this->callAPIFailure('address', 'getoptions', ['field' => 'country_id']);
     // confirm that we hit our error not a SQLI.
     $this->assertEquals('Available Country setting is incorrect', $result['error_message']);
     $this->callAPISuccess('setting', 'create', [
-     'countryLimit' => [1228],
+      'countryLimit' => [1228],
     ]);
     // Now confirm with a correct province setting it works fine
     $this->callAPISuccess('address', 'getoptions', ['field' => 'country_id']);

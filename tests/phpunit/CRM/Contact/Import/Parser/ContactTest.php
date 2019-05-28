@@ -257,6 +257,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test that address custom fields can be imported
+   * FIXME: Api4
    */
   public function testAddressWithCustomData() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate('Address', 'AddressTest.php');

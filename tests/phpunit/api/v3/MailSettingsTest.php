@@ -40,7 +40,7 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
       'domain_id' => 1,
       'name' => "my mail setting",
       'domain' => 'setting.com',
-      'local_part' => 'civicrm+',
+      'localpart' => 'civicrm+',
       'server' => "localhost",
       'username' => 'sue',
       'password' => 'pass',
@@ -52,8 +52,11 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
 
   /**
    * Test creation.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateMailSettings() {
+  public function testCreateMailSettings($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccessGetCount('mail_settings', array(), 1);
     $result = $this->callAPIAndDocument('MailSettings', 'create', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
@@ -64,8 +67,11 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
 
   /**
    * Test caches cleared adequately.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateUpdateMailSettings() {
+  public function testCreateUpdateMailSettings($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPISuccess('MailSettings', 'create', $this->params);
     $this->assertEquals('setting.com', CRM_Core_BAO_MailSettings::defaultDomain());
     $this->callAPISuccess('mail_settings', 'create', array('id' => $result['id'], 'domain' => 'updated.com'));
@@ -76,8 +82,11 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
 
   /**
    * Test get method.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetMailSettings() {
+  public function testGetMailSettings($version) {
+    $this->_apiversion = $version;
     $this->callAPIAndDocument('MailSettings', 'create', $this->params, __FUNCTION__, __FILE__);
     $result = $this->callAPIAndDocument('MailSettings', 'get', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
@@ -86,7 +95,12 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('mail_settings', array(), 1);
   }
 
-  public function testDeleteMailSettings() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDeleteMailSettings($version) {
+    $this->_apiversion = $version;
     $this->callAPIAndDocument('MailSettings', 'create', $this->params, __FUNCTION__, __FILE__);
     $entity = $this->callAPISuccess('MailSettings', 'get', $this->params);
     $this->assertEquals('setting.com', $entity['values'][$entity['id']]['domain']);
@@ -97,17 +111,20 @@ class api_v3_MailSettingsTest extends CiviUnitTestCase {
 
   /**
    * Test chained delete.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetMailSettingsChainDelete() {
+  public function testGetMailSettingsChainDelete($version) {
+    $this->_apiversion = $version;
     $description = "Demonstrates get + delete in the same call.";
     $subFile = 'ChainedGetDelete';
     $params = array(
-      'title' => "MailSettings title",
+      'name' => "delete this setting",
       'api.MailSettings.delete' => 1,
     );
-    $this->callAPISuccess('MailSettings', 'create', $this->params);
-    $this->callAPIAndDocument('MailSettings', 'get', $params, __FUNCTION__, __FILE__, $description, $subFile);
-    $this->assertEquals(0, $this->callAPISuccess('MailSettings', 'getcount', array()));
+    $this->callAPISuccess('MailSettings', 'create', ['name' => "delete this setting"] + $this->params);
+    $result = $this->callAPIAndDocument('MailSettings', 'get', $params, __FUNCTION__, __FILE__, $description, $subFile);
+    $this->assertEquals(0, $this->callAPISuccess('MailSettings', 'getcount', ['name' => "delete this setting"]));
   }
 
 }

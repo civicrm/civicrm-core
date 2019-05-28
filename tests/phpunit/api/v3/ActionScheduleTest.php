@@ -35,7 +35,6 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
   protected $_params;
   protected $_params2;
   protected $_entity = 'action_schedule';
-  protected $_apiversion = 3;
 
   /**
    * Test setup for every test.
@@ -47,8 +46,11 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
 
   /**
    * Test simple create action schedule.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSimpleActionScheduleCreate() {
+  public function testSimpleActionScheduleCreate($version) {
+    $this->_apiversion = $version;
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
@@ -73,8 +75,11 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
 
   /**
    * Check if required fields are not passed.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testActionScheduleCreateWithoutRequired() {
+  public function testActionScheduleCreateWithoutRequired($version) {
+    $this->_apiversion = $version;
     $params = array(
       'subject' => 'this case should fail',
       'scheduled_date_time' => date('Ymd'),
@@ -84,8 +89,11 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
 
   /**
    * Test create with scheduled dates.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testActionScheduleWithScheduledDatesCreate() {
+  public function testActionScheduleWithScheduledDatesCreate($version) {
+    $this->_apiversion = $version;
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
@@ -116,7 +124,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
     $actionSchedule = $this->callAPISuccess('action_schedule', 'create', $params);
     $this->assertTrue(is_numeric($actionSchedule['id']));
     $this->assertTrue($actionSchedule['id'] > 0);
-    $this->assertEquals($actionSchedule['values'][$actionSchedule['id']]['start_action_offset'][0], $params['start_action_offset']);
+    $this->assertEquals($actionSchedule['values'][$actionSchedule['id']]['start_action_offset'], $params['start_action_offset']);
     $newCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_action_schedule');
     $this->assertEquals($oldCount + 1, $newCount);
 

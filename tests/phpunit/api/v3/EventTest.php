@@ -157,7 +157,12 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][0]['id'], $this->_eventIds[0]);
   }
 
-  public function testGetEventByWrongTitle() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testGetEventByWrongTitle($version) {
+    $this->_apiversion = $version;
     $params = array(
       'title' => 'No event with that title',
     );
@@ -165,6 +170,9 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals(0, $result['count']);
   }
 
+  /**
+   * Skip api4 - this api uses deprecated query syntax
+   */
   public function testGetEventByIdSort() {
     $params = array(
       'return.sort' => 'id ASC',
@@ -210,6 +218,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   /**
    * Test 'is.Current' option. Existing event is 'old' so only current should be returned
+   * FIXME: Api4
    */
   public function testGetIsCurrent() {
     $params = array(
@@ -233,6 +242,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   /**
    * There has been a schema change & the api needs to buffer developers from it
+   * FIXME: Api4
    */
   public function testGetPaymentProcessorId() {
     $params = $this->_params[0];
@@ -244,7 +254,12 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][0]['payment_processor_id'], 1, "handing get payment processor compatibility");
   }
 
-  public function testInvalidData() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testInvalidData($version) {
+    $this->_apiversion = $version;
     $params = $this->_params[0];
     $params['sequential'] = 1;
     $params['loc_block_id'] = 100;
@@ -253,7 +268,8 @@ class api_v3_EventTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test 'is.Current' option. Existing event is 'old' so only current should be returned
+   * Test 'is_full' option.
+   * FIXME: Api4
    */
   public function testGetSingleReturnIsFull() {
     $contactID = $this->individualCreate();
@@ -306,8 +322,11 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   /**
    * Chaining get event and loc block.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testChainingGetLocBlock() {
+  public function testChainingGetLocBlock($version) {
+    $this->_apiversion = $version;
     // create a loc block and an event for that loc block.
     $eventParams = $this->_params[0];
     $eventParams['loc_bloc_id'] = '$value.id';
@@ -368,8 +387,11 @@ class api_v3_EventTest extends CiviUnitTestCase {
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateWithCustom() {
+  public function testCreateWithCustom($version) {
+    $this->_apiversion = $version;
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
 
     $params = $this->_params[0];
@@ -392,8 +414,11 @@ class api_v3_EventTest extends CiviUnitTestCase {
    * Check searching on custom fields.
    *
    * https://issues.civicrm.org/jira/browse/CRM-16036
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSearchCustomField() {
+  public function testSearchCustomField($version) {
+    $this->_apiversion = $version;
     // create custom group with custom field on event
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
 
@@ -413,8 +438,11 @@ class api_v3_EventTest extends CiviUnitTestCase {
    * Check searching on custom fields with IS NULL.
    *
    * https://issues.civicrm.org/jira/browse/CRM-20740
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSearchCustomFieldIsNull() {
+  public function testSearchCustomFieldIsNull($version) {
+    $this->_apiversion = $version;
     // create custom group with custom field on event
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
 
@@ -434,6 +462,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
    * Test searching on custom fields returning a contact reference.
    *
    * https://issues.civicrm.org/jira/browse/CRM-16036
+   * FIXME: Api4
    */
   public function testEventGetCustomContactRefFieldCRM16036() {
     // Create some contact.
@@ -497,8 +526,11 @@ class api_v3_EventTest extends CiviUnitTestCase {
    * Test searching on custom fields with less than or equal.
    *
    * See CRM-17101.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testEventGetCustomFieldLte() {
+  public function testEventGetCustomFieldLte($version) {
+    $this->_apiversion = $version;
     // create custom group with custom field on event
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
 
@@ -567,6 +599,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   /**
    * Test that an event with a price set can be created.
+   * FIXME: Api4
    */
   public function testCreatePaidEvent() {
     //@todo alter API so that an integer is converted to an array
@@ -576,33 +609,53 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertArrayKeyExists('price_set_id', $event);
   }
 
-  public function testCreateEventParamsNotArray() {
-    $params = NULL;
-    $result = $this->callAPIFailure('event', 'create', $params);
-  }
-
-  public function testCreateEventEmptyParams() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateEventEmptyParams($version) {
+    $this->_apiversion = $version;
     $params = array();
     $result = $this->callAPIFailure('event', 'create', $params);
   }
 
-  public function testCreateEventParamsWithoutTitle() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateEventParamsWithoutTitle($version) {
+    $this->_apiversion = $version;
     unset($this->_params['title']);
     $result = $this->callAPIFailure('event', 'create', $this->_params);
     $this->assertAPIFailure($result);
   }
 
-  public function testCreateEventParamsWithoutEventTypeId() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateEventParamsWithoutEventTypeId($version) {
+    $this->_apiversion = $version;
     unset($this->_params['event_type_id']);
     $result = $this->callAPIFailure('event', 'create', $this->_params);
   }
 
-  public function testCreateEventParamsWithoutStartDate() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateEventParamsWithoutStartDate($version) {
+    $this->_apiversion = $version;
     unset($this->_params['start_date']);
-    $result = $this->callAPIFailure('event', 'create', $this->_params);
+    $result = $this->callAPIFailure('event', 'create', $this->_params, 'start_date');
   }
 
-  public function testCreateEventSuccess() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateEventSuccess($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPIAndDocument('Event', 'Create', $this->_params[0], __FUNCTION__, __FILE__);
     $this->assertArrayHasKey('id', $result['values'][$result['id']]);
     $result = $this->callAPISuccess($this->_entity, 'Get', array('id' => $result['id']));
@@ -615,6 +668,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   /**
    * Test that passing in Unique field names works.
+   * Skip api4 which doesn't use unique names
    */
   public function testCreateEventSuccessUniqueFieldNames() {
     $this->_params[0]['event_start_date'] = $this->_params[0]['start_date'];
@@ -634,7 +688,12 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals($this->_params[0]['event_title'], $result['values'][$result['id']]['title'], 'end date is not set in line ' . __LINE__);
   }
 
-  public function testUpdateEvent() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testUpdateEvent($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPISuccess('event', 'create', $this->_params[1]);
 
     $params = array(
@@ -648,11 +707,21 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'Delete', array('id' => $result['id']));
   }
 
-  public function testDeleteEmptyParams() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDeleteEmptyParams($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPIFailure('Event', 'Delete', array());
   }
 
-  public function testDelete() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDelete($version) {
+    $this->_apiversion = $version;
     $params = array(
       'id' => $this->_eventIds[0],
     );
@@ -661,8 +730,11 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   /**
    * Check event_id still supported for delete.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testDeleteWithEventId() {
+  public function testDeleteWithEventId($version) {
+    $this->_apiversion = $version;
     $params = array(
       'event_id' => $this->_eventIds[0],
     );
@@ -672,8 +744,11 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   /**
    * Trying to delete an event with participants should return error.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testDeleteWithExistingParticipant() {
+  public function testDeleteWithExistingParticipant($version) {
+    $this->_apiversion = $version;
     $contactID = $this->individualCreate();
     $this->participantCreate(
       array(
@@ -684,7 +759,12 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->callAPISuccess('Event', 'Delete', array('id' => $this->_eventIds[0]));
   }
 
-  public function testDeleteWithWrongEventId() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDeleteWithWrongEventId($version) {
+    $this->_apiversion = $version;
     $params = array('event_id' => $this->_eventIds[0]);
     $result = $this->callAPISuccess('Event', 'Delete', $params);
     // try to delete again - there's no such event anymore
@@ -694,16 +774,22 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_event_search with wrong params type.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSearchWrongParamsType() {
+  public function testSearchWrongParamsType($version) {
+    $this->_apiversion = $version;
     $params = 'a string';
     $result = $this->callAPIFailure('event', 'get', $params);
   }
 
   /**
    * Test civicrm_event_search with empty params.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSearchEmptyParams() {
+  public function testSearchEmptyParams($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess('event', 'create', $this->_params[1]);
 
     $getParams = array(
@@ -718,8 +804,11 @@ class api_v3_EventTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_event_search. Success expected.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSearch() {
+  public function testSearch($version) {
+    $this->_apiversion = $version;
     $params = array(
       'event_type_id' => 1,
       'return.title' => 1,
@@ -764,7 +853,12 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals(2, $result['count'], ' 2 results returned In line ' . __LINE__);
   }
 
-  public function testEventCreationPermissions() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testEventCreationPermissions($version) {
+    $this->_apiversion = $version;
     $params = array(
       'event_type_id' => 1,
       'start_date' => '2010-10-03',
@@ -773,8 +867,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     );
     $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array('access CiviCRM');
-    $result = $this->callAPIFailure('event', 'create', $params);
-    $this->assertEquals('API permission check failed for Event/create call; insufficient permission: require access CiviCRM and access CiviEvent and edit all events', $result['error_message'], 'lacking permissions should not be enough to create an event');
+    $result = $this->callAPIFailure('event', 'create', $params, 'failed');
 
     $config->userPermissionClass->permissions = array(
       'access CiviEvent',
@@ -784,11 +877,16 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('event', 'create', $params);
   }
 
-  public function testgetfields() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testgetfields($version) {
+    $this->_apiversion = $version;
     $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('action' => 'create');
     $result = $this->callAPISuccess('event', 'getfields', $params);
-    $this->assertEquals(1, $result['values']['is_active']['api.default']);
+    $this->assertEquals('is_active', $result['values']['is_active']['name']);
   }
 
   /**
@@ -801,6 +899,9 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['values']['is_active']['api.default']);
   }
 
+  /**
+   * Skip api4 - output is different
+   */
   public function testgetfieldsGet() {
     $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('action' => 'get');
@@ -808,6 +909,9 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals('title', $result['values']['event_title']['name']);
   }
 
+  /**
+   * Skip api4 - output is different
+   */
   public function testgetfieldsDelete() {
     $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('action' => 'delete');
@@ -815,7 +919,12 @@ class api_v3_EventTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['values']['id']['api.required']);
   }
 
-  public function testCreateFromTemplate() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateFromTemplate($version) {
+    $this->_apiversion = $version;
     $templateParams = array(
       'summary' => 'Sign up now to learn the results of this unit test',
       'description' => 'This event is created from a template, so all the values should be the same as the original ones.',
