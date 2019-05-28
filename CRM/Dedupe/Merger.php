@@ -873,15 +873,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           // return error
           return FALSE;
         }
-        // Generate var $migrationInfo. The variable structure is exactly same as
-        // $formValues submitted during a UI merge for a pair of contacts.
-        $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($mainId, $otherId, $checkPermissions);
-        // add additional details that we might need to resolve conflicts
-        $rowsElementsAndInfo['migration_info']['main_details'] = &$rowsElementsAndInfo['main_details'];
-        $rowsElementsAndInfo['migration_info']['other_details'] = &$rowsElementsAndInfo['other_details'];
-        $rowsElementsAndInfo['migration_info']['rows'] = &$rowsElementsAndInfo['rows'];
 
-        self::dedupePair($rowsElementsAndInfo['migration_info'], $resultStats, $deletedContacts, $mode, $checkPermissions, $mainId, $otherId, $cacheKeyString);
+        self::dedupePair($resultStats, $deletedContacts, $mode, $checkPermissions, $mainId, $otherId, $cacheKeyString);
       }
 
       if ($cacheKeyString && !$redirectForPerformance) {
@@ -2086,7 +2079,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Dedupe a pair of contacts.
    *
-   * @param array $migrationInfo
    * @param array $resultStats
    * @param array $deletedContacts
    * @param string $mode
@@ -2094,9 +2086,20 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $mainId
    * @param int $otherId
    * @param string $cacheKeyString
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  protected static function dedupePair(&$migrationInfo, &$resultStats, &$deletedContacts, $mode, $checkPermissions, $mainId, $otherId, $cacheKeyString) {
+  protected static function dedupePair(&$resultStats, &$deletedContacts, $mode, $checkPermissions, $mainId, $otherId, $cacheKeyString) {
 
+    // Generate var $migrationInfo. The variable structure is exactly same as
+    // $formValues submitted during a UI merge for a pair of contacts.
+    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($mainId, $otherId, $checkPermissions);
+    // add additional details that we might need to resolve conflicts
+    $rowsElementsAndInfo['migration_info']['main_details'] = &$rowsElementsAndInfo['main_details'];
+    $rowsElementsAndInfo['migration_info']['other_details'] = &$rowsElementsAndInfo['other_details'];
+    $rowsElementsAndInfo['migration_info']['rows'] = &$rowsElementsAndInfo['rows'];
+    $migrationInfo = $rowsElementsAndInfo['migration_info'];
     // go ahead with merge if there is no conflict
     $conflicts = [];
     if (!CRM_Dedupe_Merger::skipMerge($mainId, $otherId, $migrationInfo, $mode, $conflicts)) {
