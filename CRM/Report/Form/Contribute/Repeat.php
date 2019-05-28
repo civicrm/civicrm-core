@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
   protected $_amountClauseWithAND = NULL;
@@ -78,7 +78,7 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
   /**
    * The column in the contribution table that joins to the temp tables.
    *
-   * @var
+   * @var string
    */
   protected $contributionJoinTableColumn;
 
@@ -99,41 +99,27 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
         'grouping' => 'contact-fields',
-        'fields' => array(
-          'sort_name' => array(
-            'title' => ts('Contact Name'),
-            'no_repeat' => TRUE,
-            'default' => TRUE,
-          ),
-          'display_name' => array(
-            'title' => ts('Display Name'),
-            'no_repeat' => TRUE,
-          ),
-          'addressee_display' => array(
-            'title' => ts('Addressee Name'),
-            'no_repeat' => TRUE,
-          ),
-          'id' => array(
-            'no_display' => TRUE,
-            'required' => TRUE,
-          ),
-          'contact_type' => array(
-            'title' => ts('Contact Type'),
-            'no_repeat' => TRUE,
-          ),
-          'contact_sub_type' => array(
-            'title' => ts('Contact Subtype'),
-            'no_repeat' => TRUE,
-          ),
+        'fields' => array_merge(
+          $this->getBasicContactFields(),
+          array(
+            'sort_name' => array(
+              'title' => ts('Contact Name'),
+              'no_repeat' => TRUE,
+              'default' => TRUE,
+            ),
+          )
         ),
-        'filters' => array(
-          'percentage_change' => array(
-            'title' => ts('Percentage Change'),
-            'type' => CRM_Utils_Type::T_INT,
-            'operatorType' => CRM_Report_Form::OP_INT,
-            'name' => 'percentage_change',
-            'dbAlias' => '( ( contribution_civireport2.total_amount_sum - contribution_civireport1.total_amount_sum ) * 100 / contribution_civireport1.total_amount_sum )',
-          ),
+        'filters' => array_merge(
+          $this->getBasicContactFilters(array('deceased' => NULL)),
+          array(
+            'percentage_change' => array(
+              'title' => ts('Percentage Change'),
+              'type' => CRM_Utils_Type::T_INT,
+              'operatorType' => CRM_Report_Form::OP_INT,
+              'name' => 'percentage_change',
+              'dbAlias' => '( ( contribution_civireport2.total_amount_sum - contribution_civireport1.total_amount_sum ) * 100 / contribution_civireport1.total_amount_sum )',
+            ),
+          )
         ),
         'group_bys' => array(
           'id' => array(
@@ -186,24 +172,6 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
           ),
         ),
         'grouping' => 'contact-fields',
-      ),
-      'civicrm_address' => array(
-        'dao' => 'CRM_Core_DAO_Address',
-        'grouping' => 'contact-fields',
-        'fields' => array(
-          'street_address' => array('title' => ts('Street Address')),
-          'supplemental_address_1' => array('title' => ts('Supplemental Address 1')),
-          'city' => array('title' => ts('City')),
-          'country_id' => array('title' => ts('Country')),
-          'state_province_id' => array('title' => ts('State/Province')),
-          'postal_code' => array('title' => ts('Postal Code')),
-        ),
-        'group_bys' => array(
-          'country_id' => array('title' => ts('Country')),
-          'state_province_id' => array(
-            'title' => ts('State/Province'),
-          ),
-        ),
       ),
       'civicrm_financial_type' => array(
         'dao' => 'CRM_Financial_DAO_FinancialType',
@@ -280,7 +248,7 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
         ),
         'group_bys' => array('contribution_source' => NULL),
       ),
-    );
+    ) + $this->addAddressFields(TRUE, FALSE, TRUE, array('country_id' => FALSE));
 
     $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
@@ -531,6 +499,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
     $rules = array(
       'id' => array(
         'sort_name',
+        'exposed_id',
         'display_name',
         'addressee_display',
         'contact_type',
@@ -540,9 +509,38 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
         'state_province_id',
         'country_id',
         'city',
+        'county_id',
         'street_address',
         'supplemental_address_1',
+        'supplemental_address_2',
+        'supplemental_address_3',
+        'street_number',
+        'street_name',
+        'street_unit',
         'postal_code',
+        'postal_code_suffix',
+        'prefix_id',
+        'first_name',
+        'nick_name',
+        'middle_name',
+        'last_name',
+        'suffix_id',
+        'postal_greeting_display',
+        'email_greeting_display',
+        'addressee_display',
+        'gender_id',
+        'birth_date',
+        'age',
+        'job_title',
+        'organization_name',
+        'external_identifier',
+        'do_not_email',
+        'do_not_phone',
+        'do_not_mail',
+        'do_not_sms',
+        'is_opt_out',
+        'is_deceased',
+        'preferred_language',
       ),
       'country_id' => array('country_id'),
       'state_province_id' => array('country_id', 'state_province_id'),
@@ -574,7 +572,7 @@ LEFT JOIN $this->tempTableRepeat2 {$this->_aliases['civicrm_contribution']}2
     }
     else {
       foreach ($fields['fields'] as $fld_id => $value) {
-        if (!($fld_id == 'total_amount1') && !($fld_id == 'total_amount2')) {
+        if (!($fld_id == 'total_amount1') && !($fld_id == 'total_amount2') && !(substr($fld_id, 0, 7) === "custom_")) {
           $found = FALSE;
           $invlidGroups = array();
           foreach ($fields['group_bys'] as $grp_id => $val) {
@@ -833,6 +831,7 @@ GROUP BY    currency
     $this->buildGroupTempTable();
     $this->select();
     $this->from();
+    $this->customDataFrom();
     $this->where();
     $this->groupBy();
     $this->orderBy();
@@ -1031,31 +1030,25 @@ SELECT {$subSelect2} contribution2.{$this->contributionJoinTableColumn},
 {$from}
 {$subWhere}
 GROUP BY contribution2.{$this->contributionJoinTableColumn}, currency";
-    $this->tempTableRepeat1 = 'civicrm_temp_civireport_repeat1' . uniqid();
-    $sql = "
-CREATE TEMPORARY TABLE $this->tempTableRepeat1 (
+    $this->tempTableRepeat1 = $this->createTemporaryTable('tempTableRepeat1', "
 {$create}
 {$this->contributionJoinTableColumn} int unsigned,
-total_amount_sum int,
+total_amount_sum decimal(20,2),
 total_amount_count int
-) ENGINE=HEAP {$this->_databaseAttributes}";
-    $this->executeReportQuery($sql);
+", TRUE, TRUE);
     $this->executeReportQuery("INSERT INTO $this->tempTableRepeat1 {$subContributionQuery1}");
 
     $this->executeReportQuery("
       ALTER TABLE $this->tempTableRepeat1 ADD INDEX ({$this->contributionJoinTableColumn})
     ");
 
-    $this->tempTableRepeat2 = 'civicrm_temp_civireport_repeat2' . uniqid();
-    $sql = "
-CREATE TEMPORARY TABLE  $this->tempTableRepeat2 (
+    $this->tempTableRepeat2 = $this->createTemporaryTable('tempTableRepeat2', "
 {$create}
 {$this->contributionJoinTableColumn} int unsigned,
-total_amount_sum int,
+total_amount_sum decimal(20,2),
 total_amount_count int,
 currency varchar(3)
-) ENGINE=HEAP {$this->_databaseAttributes}";
-    $this->executeReportQuery($sql);
+", TRUE, TRUE);
     $sql = "INSERT INTO $this->tempTableRepeat2 {$subContributionQuery2}";
     $this->executeReportQuery($sql);
 

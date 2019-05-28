@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
 
@@ -60,14 +60,14 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
     $mode = CRM_Utils_Request::retrieveValue('mode', 'String', 'safe');
     $criteria = CRM_Utils_Request::retrieve('criteria', 'Json', $null, FALSE, '{}');
 
-    $urlQry = array(
+    $urlQry = [
       'reset' => 1,
       'action' => 'update',
       'rgid' => $rgid,
       'gid' => $gid,
       'limit' => $limit,
       'criteria' => $criteria,
-    );
+    ];
 
     $criteria = json_decode($criteria, TRUE);
     $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria);
@@ -77,16 +77,16 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry));
     }
     // Setup the Queue
-    $queue = CRM_Queue_Service::singleton()->create(array(
+    $queue = CRM_Queue_Service::singleton()->create([
       'name'  => $cacheKeyString,
       'type'  => 'Sql',
       'reset' => TRUE,
-    ));
+    ]);
 
     $where = NULL;
     $onlyProcessSelected = ($action == CRM_Core_Action::MAP) ? 1 : 0;
 
-    $total  = CRM_Core_BAO_PrevNextCache::getCount($cacheKeyString, NULL, ($onlyProcessSelected ? "pn.is_selected = 1" : NULL));
+    $total = CRM_Core_BAO_PrevNextCache::getCount($cacheKeyString, NULL, ($onlyProcessSelected ? "pn.is_selected = 1" : NULL));
     if ($total <= 0) {
       // Nothing to do.
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry));
@@ -96,9 +96,9 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
     CRM_Dedupe_Merger::resetMergeStats($cacheKeyString);
 
     for ($i = 1; $i <= ceil($total / self::BATCHLIMIT); $i++) {
-      $task  = new CRM_Queue_Task(
-        array('CRM_Contact_Page_DedupeMerge', 'callBatchMerge'),
-        array($rgid, $gid, $mode, self::BATCHLIMIT, $onlyProcessSelected, $criteria),
+      $task = new CRM_Queue_Task(
+        ['CRM_Contact_Page_DedupeMerge', 'callBatchMerge'],
+        [$rgid, $gid, $mode, self::BATCHLIMIT, $onlyProcessSelected, $criteria],
         "Processed " . $i * self::BATCHLIMIT . " pair of duplicates out of " . $total
       );
 
@@ -111,12 +111,12 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
     if ($onlyProcessSelected) {
       $urlQry['selected'] = 1;
     }
-    $runner = new CRM_Queue_Runner(array(
+    $runner = new CRM_Queue_Runner([
       'title'     => ts('Merging Duplicates..'),
       'queue'     => $queue,
       'errorMode' => CRM_Queue_Runner::ERROR_ABORT,
       'onEndUrl'  => CRM_Utils_System::url('civicrm/contact/dedupefind', $urlQry, TRUE, NULL, FALSE),
-    ));
+    ]);
 
     return $runner;
   }

@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -99,10 +99,10 @@
 
             <tr>
               <td>{$form.start_date.label}<br/>
-                {include file="CRM/common/jcalendar.tpl" elementName=start_date}
+                {$form.start_date.html}
               </td>
               <td>{$form.end_date.label}<br/>
-                {include file="CRM/common/jcalendar.tpl" elementName=end_date}
+                {$form.end_date.html}
               </td>
             </tr>
 

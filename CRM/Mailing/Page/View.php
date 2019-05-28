@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,21 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
  * A page for mailing preview.
  */
 class CRM_Mailing_Page_View extends CRM_Core_Page {
+
+  /**
+   * Signal to Flexmailer that this version of the class is usable.
+   *
+   * @var bool
+   */
+  const USES_MAILING_PREVIEW_API = 1;
+
   protected $_mailingID;
   protected $_mailing;
   protected $_contactID;
@@ -132,59 +140,27 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       return NULL;
     }
 
-    CRM_Mailing_BAO_Mailing::tokenReplace($this->_mailing);
+    $contactId = isset($this->_contactID) ? $this->_contactID : 0;
 
-    // get and format attachments
-    $attachments = CRM_Core_BAO_File::getEntityFile('civicrm_mailing',
-      $this->_mailing->id
-    );
-
-    // get contact detail and compose if contact id exists
-    $returnProperties = $this->_mailing->getReturnProperties();
-    if (isset($this->_contactID)) {
-      // get details of contact with token value including Custom Field Token Values.CRM-3734
-      $params = array('contact_id' => $this->_contactID);
-      $details = CRM_Utils_Token::getTokenDetails($params,
-        $returnProperties,
-        FALSE, TRUE, NULL,
-        $this->_mailing->getFlattenedTokens(),
-        get_class($this)
-      );
-      $details = $details[0][$this->_contactID];
-      $contactId = $this->_contactID;
-    }
-    else {
-      // get tokens that are not contact specific resolved
-      $params = array('contact_id' => 0);
-      $details = CRM_Utils_Token::getAnonymousTokenDetails($params,
-        $returnProperties,
-        TRUE, TRUE, NULL,
-        $this->_mailing->getFlattenedTokens(),
-        get_class($this)
-      );
-
-      $details = CRM_Utils_Array::value(0, $details[0]);
-      $contactId = 0;
-    }
-    $mime = $this->_mailing->compose(NULL, NULL, NULL, $contactId,
-      $this->_mailing->from_email,
-      $this->_mailing->from_email,
-      TRUE, $details, $attachments
-    );
+    $result = civicrm_api3('Mailing', 'preview', [
+      'id' => $this->_mailingID,
+      'contact_id' => $contactId,
+    ]);
+    $mailing = \CRM_Utils_Array::value('values', $result);
 
     $title = NULL;
-    if (isset($this->_mailing->body_html) && empty($_GET['text'])) {
+    if (isset($mailing['body_html']) && empty($_GET['text'])) {
       $header = 'text/html; charset=utf-8';
-      $content = $mime->getHTMLBody();
+      $content = $mailing['body_html'];
       if (strpos($content, '<head>') === FALSE && strpos($content, '<title>') === FALSE) {
-        $title = '<head><title>' . $this->_mailing->subject . '</title></head>';
+        $title = '<head><title>' . $mailing['subject'] . '</title></head>';
       }
     }
     else {
       $header = 'text/plain; charset=utf-8';
-      $content = $mime->getTXTBody();
+      $content = $mailing['body_text'];
     }
-    CRM_Utils_System::setTitle($this->_mailing->subject);
+    CRM_Utils_System::setTitle($mailing['subject']);
 
     if (CRM_Utils_Array::value('snippet', $_GET) === 'json') {
       CRM_Core_Page_AJAX::returnJsonResponse($content);

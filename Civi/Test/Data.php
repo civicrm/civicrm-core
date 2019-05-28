@@ -15,6 +15,9 @@ class Data {
     \Civi\Test::schema()->truncateAll();
 
     \Civi\Test::schema()->setStrict(FALSE);
+
+    // Ensure that when we populate the database it is done in utf8 mode
+    \Civi\Test::execute('SET NAMES utf8');
     $sqlDir = dirname(dirname(__DIR__)) . "/sql";
 
     $query2 = file_get_contents("$sqlDir/civicrm_data.mysql");
@@ -35,16 +38,16 @@ class Data {
     \Civi\Test::schema()->setStrict(TRUE);
 
     // Rebuild triggers
-    civicrm_api('system', 'flush', array('version' => 3, 'triggers' => 1));
+    civicrm_api('system', 'flush', ['version' => 3, 'triggers' => 1]);
 
-    \CRM_Core_BAO_ConfigSetting::setEnabledComponents(array(
+    \CRM_Core_BAO_ConfigSetting::setEnabledComponents([
       'CiviEvent',
       'CiviContribute',
       'CiviMember',
       'CiviMail',
       'CiviReport',
       'CiviPledge',
-    ));
+    ]);
 
     return TRUE;
   }

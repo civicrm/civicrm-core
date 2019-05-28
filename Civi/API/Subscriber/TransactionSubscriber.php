@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -44,21 +44,22 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * @package Civi\API\Subscriber
  */
 class TransactionSubscriber implements EventSubscriberInterface {
+
   /**
    * @return array
    */
   public static function getSubscribedEvents() {
-    return array(
-      Events::PREPARE => array('onApiPrepare', Events::W_EARLY),
-      Events::RESPOND => array('onApiRespond', Events::W_MIDDLE),
-      Events::EXCEPTION => array('onApiException', Events::W_EARLY),
-    );
+    return [
+      Events::PREPARE => ['onApiPrepare', Events::W_EARLY],
+      Events::RESPOND => ['onApiRespond', Events::W_MIDDLE],
+      Events::EXCEPTION => ['onApiException', Events::W_EARLY],
+    ];
   }
 
   /**
    * @var array (scalar $apiRequestId => CRM_Core_Transaction $tx)
    */
-  private $transactions = array();
+  private $transactions = [];
 
   /**
    * @var array (scalar $apiRequestId => bool)
@@ -66,7 +67,7 @@ class TransactionSubscriber implements EventSubscriberInterface {
    * A list of requests which should be forcibly rolled back to
    * their save points.
    */
-  private $forceRollback = array();
+  private $forceRollback = [];
 
   /**
    * Determine if an API request should be treated as transactional.
@@ -78,6 +79,9 @@ class TransactionSubscriber implements EventSubscriberInterface {
    * @return bool
    */
   public function isTransactional($apiProvider, $apiRequest) {
+    if ($apiRequest['version'] == 4) {
+      return FALSE;
+    }
     if ($this->isForceRollback($apiProvider, $apiRequest)) {
       return TRUE;
     }
@@ -97,6 +101,9 @@ class TransactionSubscriber implements EventSubscriberInterface {
    * @return bool
    */
   public function isForceRollback($apiProvider, $apiRequest) {
+    if ($apiRequest['version'] == 4) {
+      return FALSE;
+    }
     // FIXME: When APIv3 uses better parsing, only one check will be needed.
     if (isset($apiRequest['params']['options']['force_rollback'])) {
       return \CRM_Utils_String::strtobool($apiRequest['params']['options']['force_rollback']);

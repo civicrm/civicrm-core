@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,9 +34,6 @@
  */
 class api_v3_OrderTest extends CiviUnitTestCase {
 
-  /**
-   * Assume empty database with just civicrm_data.
-   */
   protected $_individualId;
   protected $_financialTypeId = 1;
   protected $_apiversion;
@@ -211,7 +208,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
       'total_amount' => 200,
-      'financial_type_id' => $this->_financialTypeId,
+      'financial_type_id' => 'Event Fee',
       'contribution_status_id' => 1,
     );
     $priceFields = $this->createPriceSet();
@@ -557,7 +554,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
               'financial_type_id' => 1,
               'entity_table' => 'civicrm_contribution',
             ],
-          ]
+          ],
         ],
       ],
     ];
@@ -592,7 +589,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
               'entity_table' => 'civicrm_contribution',
               'tax_amount' => 15,
             ],
-          ]
+          ],
         ],
       ],
     ];
@@ -623,7 +620,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
               'entity_table' => 'civicrm_contribution',
               'tax_amount' => 15,
             ],
-          ]
+          ],
         ],
       ],
     ];

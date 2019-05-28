@@ -179,6 +179,26 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->customGroupDelete($customGroup['id']);
   }
 
+  public function testGetDisplayedValuesContactRef() {
+    $customGroup = $this->customGroupCreate(['extends' => 'Individual']);
+    $params = [
+      'data_type' => 'ContactReference',
+      'html_type' => 'Autocomplete-Select',
+      'label' => 'test ref',
+      'custom_group_id' => $customGroup['id'],
+    ];
+    $createdField = $this->callAPISuccess('customField', 'create', $params);
+    $contact1 = $this->individualCreate();
+    $contact2 = $this->individualCreate(['custom_' . $createdField['id'] => $contact1['id']]);
+
+    $this->assertEquals($contact1['display_name'], CRM_Core_BAO_CustomField::displayValue($contact2['id'], $createdField['id']));
+    $this->assertEquals("Bob", CRM_Core_BAO_CustomField::displayValue("Bob", $createdField['id']));
+
+    $this->contactDelete($contact2['id']);
+    $this->contactDelete($contact1['id']);
+    $this->customGroupDelete($customGroup['id']);
+  }
+
   public function testDeleteCustomField() {
     $customGroup = $this->customGroupCreate(array('extends' => 'Individual'));
     $fields = array(
@@ -341,13 +361,29 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
 
     $fieldID = CRM_Core_BAO_CustomField::getCustomFieldID('testFld', 'new custom group');
     $this->assertEquals($this->customFieldID, $fieldID);
+
+    $fieldID = CRM_Core_BAO_CustomField::getCustomFieldID('testFld', 'new custom group', TRUE);
+    $this->assertEquals('custom_' . $this->customFieldID, $fieldID);
+
+    // create field with same name in a different group
+    $this->createCustomField('other custom group');
+    $otherFieldID = CRM_Core_BAO_CustomField::getCustomFieldID('testFld', 'other custom group');
+    // make sure it does not return the field ID of the first field
+    $this->assertNotEquals($fieldID, $otherFieldID);
   }
 
   /**
+   * Create a custom field
+   *
+   * @param string $groupTitle
+   *
    * @return array
    */
-  protected function createCustomField() {
-    $customGroup = $this->customGroupCreate(array('extends' => 'Individual'));
+  protected function createCustomField($groupTitle = 'new custom group') {
+    $customGroup = $this->customGroupCreate([
+      'extends' => 'Individual',
+      'title'   => $groupTitle,
+    ]);
     $fields = array(
       'label' => 'testFld',
       'data_type' => 'String',

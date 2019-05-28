@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Financial_Form_Payment extends CRM_Core_Form {
 
@@ -38,7 +38,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   protected $_paymentProcessorID;
   protected $currency;
 
-  public $_values = array();
+  public $_values = [];
 
   /**
    * @var array
@@ -51,7 +51,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   public $isBackOffice = FALSE;
 
   /**
-   * @var String
+   * @var string
    */
   public $_formName = '';
 
@@ -79,11 +79,6 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
 
     CRM_Core_Payment_ProcessorForm::preProcess($this);
 
-    self::addCreditCardJs($this->_paymentProcessorID);
-
-    $this->assign('paymentProcessorID', $this->_paymentProcessorID);
-    $this->assign('currency', $this->currency);
-
     $this->assign('suppressForm', TRUE);
     $this->controller->_generateQFKey = FALSE;
   }
@@ -96,7 +91,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
    *
    * @return string
    */
-  public function getCurrency($submittedValues = array()) {
+  public function getCurrency($submittedValues = []) {
     return $this->currency;
   }
 

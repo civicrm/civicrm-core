@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * process
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  */
 class CRM_Core_Controller_Simple extends CRM_Core_Controller {
@@ -67,7 +67,7 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
 
     $this->_stateMachine = new CRM_Core_StateMachine($this);
 
-    $params = array($path => NULL);
+    $params = [$path => NULL];
 
     $savedAction = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, NULL);
     if (!empty($savedAction) &&
@@ -98,7 +98,7 @@ class CRM_Core_Controller_Simple extends CRM_Core_Controller {
         );
       }
       elseif ($imageUpload) {
-        $this->addActions($config->imageUploadDir, array('uploadFile'));
+        $this->addActions($config->imageUploadDir, ['uploadFile']);
       }
       else {
         $this->addActions();

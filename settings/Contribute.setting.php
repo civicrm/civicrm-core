@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  *
  * Settings metadata file
  */
 
-return array(
-  'cvv_backoffice_required' => array(
+return [
+  'cvv_backoffice_required' => [
     'group_name' => 'Contribute Preferences',
     'group' => 'contribute',
     'name' => 'cvv_backoffice_required',
@@ -48,15 +48,15 @@ return array(
     'is_contact' => 0,
     'description' => 'Is the CVV code required for back office credit card transactions',
     'help_text' => 'If set it back-office credit card transactions will required a cvv code. Leave as required unless you have a very strong reason to change',
-  ),
-  'contribution_invoice_settings' => array(
+  ],
+  'contribution_invoice_settings' => [
     // @todo our standard is to have a setting per item not to hide settings in an array with
     // no useful metadata. Undo this setting.
     'group_name' => 'Contribute Preferences',
     'group' => 'contribute',
     'name' => 'contribution_invoice_settings',
     'type' => 'Array',
-    'default' => array(
+    'default' => [
       'invoice_prefix' => 'INV_',
       'credit_notes_prefix' => 'CN_',
       'due_date' => '10',
@@ -64,15 +64,15 @@ return array(
       'notes' => '',
       'tax_term' => 'Sales Tax',
       'tax_display_settings' => 'Inclusive',
-    ),
+    ],
     'add' => '4.7',
     'title' => 'Contribution Invoice Settings',
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => NULL,
     'help_text' => NULL,
-  ),
-  'invoicing' => array(
+  ],
+  'invoicing' => [
     'group_name' => 'Contribute Preferences',
     'group' => 'contribute',
     'name' => 'invoicing',
@@ -84,11 +84,11 @@ return array(
     'title' => 'Enable Tax and Invoicing',
     'is_domain' => 1,
     'is_contact' => 0,
-    'on_change' => array(
+    'on_change' => [
       'CRM_Invoicing_Utils::onToggle',
-    ),
-  ),
-  'acl_financial_type' => array(
+    ],
+  ],
+  'acl_financial_type' => [
     'group_name' => 'Contribute Preferences',
     'group' => 'contribute',
     'name' => 'acl_financial_type',
@@ -103,8 +103,8 @@ return array(
     'description' => NULL,
     'help_text' => NULL,
     'help' => ['id' => 'acl_financial_type'],
-  ),
-  'deferred_revenue_enabled' => array(
+  ],
+  'deferred_revenue_enabled' => [
     'group_name' => 'Contribute Preferences',
     'group' => 'contribute',
     'name' => 'deferred_revenue_enabled',
@@ -118,18 +118,18 @@ return array(
     'is_contact' => 0,
     'description' => NULL,
     'help_text' => NULL,
-  ),
-  'default_invoice_page' => array(
+  ],
+  'default_invoice_page' => [
     'group_name' => 'Contribute Preferences',
     'group' => 'contribute',
     'name' => 'default_invoice_page',
     'type' => 'Integer',
     'quick_form_type' => 'Select',
     'default' => NULL,
-    'pseudoconstant' => array(
+    'pseudoconstant' => [
       // @todo - handle table style pseudoconstants for settings & avoid deprecated function.
       'callback' => 'CRM_Contribute_PseudoConstant::contributionPage',
-    ),
+    ],
     'html_type' => 'select',
     'add' => '4.7',
     'title' => 'Default invoice payment page',
@@ -137,8 +137,8 @@ return array(
     'is_contact' => 0,
     'description' => NULL,
     'help_text' => NULL,
-  ),
-  'always_post_to_accounts_receivable' => array(
+  ],
+  'always_post_to_accounts_receivable' => [
     'group_name' => 'Contribute Preferences',
     'group' => 'contribute',
     'name' => 'always_post_to_accounts_receivable',
@@ -152,8 +152,8 @@ return array(
     'is_contact' => 0,
     'description' => NULL,
     'help_text' => NULL,
-  ),
-  'update_contribution_on_membership_type_change' => array(
+  ],
+  'update_contribution_on_membership_type_change' => [
     'group_name' => 'Contribute Preferences',
     'group' => 'contribute',
     'name' => 'update_contribution_on_membership_type_change',
@@ -167,5 +167,5 @@ return array(
     'is_contact' => 0,
     'description' => 'Enabling this setting will update related contribution of membership(s) except if the membership is paid for with a recurring contribution.',
     'help_text' => NULL,
-  ),
-);
+  ],
+];

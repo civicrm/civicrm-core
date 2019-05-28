@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -36,7 +36,7 @@
  */
 class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
 
-  protected $_settings = array();
+  protected $_settings = [];
 
   protected $_uf = NULL;
 
@@ -53,7 +53,7 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
     }
 
     CRM_Utils_System::setTitle(
-      ts('Settings - %1 Integration', array(1 => $this->_uf))
+      ts('Settings - %1 Integration', [1 => $this->_uf])
     );
 
     if ($config->userSystem->is_drupal) {
@@ -82,7 +82,11 @@ class CRM_Admin_Form_Setting_UF extends CRM_Admin_Form_Setting {
       $dsnArray = DB::parseDSN($config->dsn);
       $tableNames = CRM_Core_DAO::getTableNames();
       $tablePrefixes = '$databases[\'default\'][\'default\'][\'prefix\']= array(';
-      $tablePrefixes .= "\n  'default' => '$drupal_prefix',"; // add default prefix: the drupal database prefix
+      if ($config->userFramework === 'Backdrop') {
+        $tablePrefixes = '$database_prefix = array(';
+      }
+      // add default prefix: the drupal database prefix
+      $tablePrefixes .= "\n  'default' => '$drupal_prefix',";
       $prefix = "";
       if ($config->dsn != $config->userFrameworkDSN) {
         $prefix = "`{$dsnArray['database']}`.";

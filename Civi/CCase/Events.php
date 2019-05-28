@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,7 +37,7 @@ class Events {
    *
    * We do not want to fire case-change events recursively.
    */
-  static $isActive = array();
+  public static $isActive = [];
 
   /**
    * Following a change to an activity or case, fire the case-change event.
@@ -73,8 +73,8 @@ class Events {
           $tx = new \CRM_Core_Transaction();
           \CRM_Core_Transaction::addCallback(
             \CRM_Core_Transaction::PHASE_POST_COMMIT,
-            array(__CLASS__, 'fireCaseChangeForRealz'),
-            array($caseId),
+            [__CLASS__, 'fireCaseChangeForRealz'],
+            [$caseId],
             "Civi_CCase_Events::fire::{$caseId}"
           );
         }

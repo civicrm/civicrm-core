@@ -75,11 +75,17 @@
   </field>
   <field>
     <name>region_id</name>
-    <title>Region</title>
+    <title>World Region ID</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Foreign key to civicrm_worldregion.id.</comment>
     <add>1.8</add>
+    <localize_context>country</localize_context>
+    <pseudoconstant>
+      <table>civicrm_worldregion</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
   </field>
   <foreignKey>
     <name>region_id</name>

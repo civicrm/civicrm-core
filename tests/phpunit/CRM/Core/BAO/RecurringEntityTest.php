@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -187,7 +187,8 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     //Create tell a friend for event
     $daoTellAFriend = new CRM_Friend_DAO_Friend();
     $daoTellAFriend->entity_table = 'civicrm_event';
-    $daoTellAFriend->entity_id = $daoEvent->id; // join with event
+    // join with event
+    $daoTellAFriend->entity_id = $daoEvent->id;
     $daoTellAFriend->title = 'Testing tell a friend';
     $daoTellAFriend->is_active = 1;
     $daoTellAFriend->save();
@@ -297,7 +298,6 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $daoRecurEvent->id = $generatedEntities['civicrm_event'][$key];
     if ($daoRecurEvent->find(TRUE)) {
       $daoRecurEvent->delete();
-      $daoRecurEvent->free();
     }
 
     //Check if this event_id was deleted
@@ -316,6 +316,86 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     );
     $compareActParams = array();
     $this->assertDBCompareValues('CRM_Friend_DAO_Friend', $searchActParams, $compareActParams);
+  }
+
+  /**
+   * Testing Activity Generation through Entity Recursion with Custom Data and Tags.
+   */
+  public function testRecurringEntityGenerationWithCustomDataAndTags() {
+
+    // Create custom group and field
+    $customGroup = $this->customGroupCreate([
+      'extends' => 'Activity',
+    ]);
+    $customField = $this->customFieldCreate([
+        'custom_group_id' => $customGroup['id'],
+        'default_value' => '',
+      ]
+    );
+
+    // Create activity Tag
+    $tag = $this->tagCreate([
+      'used_for' => 'Activities',
+    ]);
+
+    // Create original activity
+    $customFieldValue = 'Custom Value';
+    $activityDateTime = date('YmdHis');
+    $activityId = $this->activityCreate([
+      'activity_date_time' => $activityDateTime,
+      'custom_' . $customField['id'] => $customFieldValue,
+    ]);
+
+    $activityId = $activityId['id'];
+
+    // Assign tag to a activity.
+    $this->callAPISuccess('EntityTag', 'create', [
+      'entity_table' => 'civicrm_activity',
+      'entity_id' => $activityId,
+      'tag_id' => $tag['id'],
+    ]);
+
+    // Create recurring activities.
+    $recursion = new CRM_Core_BAO_RecurringEntity();
+    $recursion->entity_id = $activityId;
+    $recursion->entity_table = 'civicrm_activity';
+    $recursion->dateColumns = ['activity_date_time'];
+    $recursion->schedule = [
+      'entity_value' => $activityId,
+      'start_action_date' => $activityDateTime,
+      'entity_status' => 'fourth saturday',
+      'repetition_frequency_unit' => 'month',
+      'repetition_frequency_interval' => 3,
+      'start_action_offset' => 3,
+      'used_for' => 'activity',
+    ];
+
+    $generatedEntities = $recursion->generate();
+    $generatedActivities = $generatedEntities['civicrm_activity'];
+
+    $this->assertEquals(3, count($generatedActivities), "Check if number of iterations are 3");
+
+    foreach ($generatedActivities as $generatedActivityId) {
+
+      /* Validate tag in recurring activity
+      // @todo - refer https://github.com/civicrm/civicrm-core/pull/13470
+      $this->callAPISuccess('EntityTag', 'getsingle', [
+      'entity_table' => 'civicrm_activity',
+      'entity_id' => $generatedActivityId,
+      ]);
+       */
+
+      // Validate custom data in recurring activity
+      $activity = $this->callAPISuccess('activity', 'getsingle', [
+        'return' => [
+          'custom_' . $customField['id'],
+        ],
+        'id' => $generatedActivityId,
+      ]);
+
+      $this->assertEquals($customFieldValue, $activity['custom_' . $customField['id']], 'Custom field value should be ' . $customFieldValue);
+
+    }
   }
 
 }

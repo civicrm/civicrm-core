@@ -3,7 +3,7 @@
 +--------------------------------------------------------------------+
 | CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2018                                |
+| Copyright CiviCRM LLC (c) 2004-2019                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -29,9 +29,10 @@
  * Parse Javascript content and extract translatable strings.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_JS {
+
   /**
    * Parse a javascript file for translatable strings.
    *
@@ -41,7 +42,7 @@ class CRM_Utils_JS {
    *   Array of translatable strings
    */
   public static function parseStrings($jsCode) {
-    $strings = array();
+    $strings = [];
     // Match all calls to ts() in an array.
     // Note: \s also matches newlines with the 's' modifier.
     preg_match_all('~

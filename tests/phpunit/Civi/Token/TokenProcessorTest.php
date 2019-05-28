@@ -8,7 +8,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 class TokenProcessorTest extends \CiviUnitTestCase {
 
   /**
-   * @var EventDispatcher
+   * @var \Symfony\Component\EventDispatcher\EventDispatcher
    */
   protected $dispatcher;
 
@@ -59,6 +59,22 @@ class TokenProcessorTest extends \CiviUnitTestCase {
   }
 
   /**
+   * Check that getContextValues() returns the correct data
+   */
+  public function testGetContextValues() {
+    $p = new TokenProcessor($this->dispatcher, array(
+      'controller' => __CLASS__,
+      'omega' => '99',
+    ));
+    $p->addRow()->context('id', 10)->context('omega', '98');
+    $p->addRow()->context('id', 10)->context('contact', (object) ['cid' => 10]);
+    $p->addRow()->context('id', 11)->context('contact', (object) ['cid' => 11]);
+    $this->assertArrayValuesEqual([10, 11], $p->getContextValues('id'));
+    $this->assertArrayValuesEqual(['99', '98'], $p->getContextValues('omega'));
+    $this->assertArrayValuesEqual([10, 11], $p->getContextValues('contact', 'cid'));
+  }
+
+  /**
    * Check that the TokenRow helper can correctly read/update token
    * values.
    */
@@ -97,6 +113,14 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     $this->assertEquals($expected, $p->getMessageTokens());
   }
 
+  public function testListTokens() {
+    $p = new TokenProcessor($this->dispatcher, array(
+      'controller' => __CLASS__,
+    ));
+    $p->addToken(array('entity' => 'MyEntity', 'field' => 'myField', 'label' => 'My Label'));
+    $this->assertEquals(array('{MyEntity.myField}' => 'My Label'), $p->listTokens());
+  }
+
   /**
    * Perform a full mail-merge, substituting multiple tokens for multiple
    * contacts in multiple messages.
@@ -130,7 +154,7 @@ class TokenProcessorTest extends \CiviUnitTestCase {
     );
 
     $expectText = array(
-      0 => 'Good morning, What. #0123 is a good number. Trickster {contact.display_name}. Bye!' ,
+      0 => 'Good morning, What. #0123 is a good number. Trickster {contact.display_name}. Bye!',
       1 => 'Good morning, Who. #0004 is a good number. Trickster {contact.display_name}. Bye!',
       2 => 'Good morning, Darth Vader. #0010 is a good number. Trickster {contact.display_name}. Bye!',
     );
@@ -144,7 +168,8 @@ class TokenProcessorTest extends \CiviUnitTestCase {
       $rowCount++;
     }
     $this->assertEquals(3, $rowCount);
-    $this->assertEquals(0, $this->counts['onListTokens']); // This may change in the future.
+    // This may change in the future.
+    $this->assertEquals(0, $this->counts['onListTokens']);
     $this->assertEquals(1, $this->counts['onEvalTokens']);
   }
 

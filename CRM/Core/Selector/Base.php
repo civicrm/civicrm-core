@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * and display names
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -121,7 +121,7 @@ class CRM_Core_Selector_Base {
     $columnHeaders = &$this->getColumnHeaders(NULL);
 
     if (!isset($this->_order)) {
-      $this->_order = array();
+      $this->_order = [];
       $start = 2;
       $firstElementNotFound = TRUE;
       if (!empty($columnHeaders)) {

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,24 +28,24 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
 /*
  * Settings metadata file
  */
-return array(
-  'ext_repo_url' => array(
+return [
+  'ext_repo_url' => [
     'group_name' => 'Extension Preferences',
     'group' => 'ext',
     'name' => 'ext_repo_url',
     'type' => 'String',
     'quick_form_type' => 'Element',
-    'html_attributes' => array(
+    'html_attributes' => [
       'size' => 64,
       'maxlength' => 128,
-    ),
+    ],
     'html_type' => 'text',
     'default' => 'https://civicrm.org/extdir/ver={ver}|cms={uf}',
     'add' => '4.3',
@@ -54,5 +54,5 @@ return array(
     'is_contact' => 0,
     'description' => '',
     'help_text' => '',
-  ),
-);
+  ],
+];

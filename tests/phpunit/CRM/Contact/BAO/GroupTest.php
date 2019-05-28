@@ -3,7 +3,7 @@
   +--------------------------------------------------------------------+
   | CiviCRM version 5                                                  |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2018                                |
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -94,7 +94,8 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'name' => uniqid(),
       'title' => 'Parent Group B',
       'description' => 'Parent Group Two',
-      'is_active' => 0, // disable
+      // disable
+      'is_active' => 0,
     ));
     $group2 = CRM_Contact_BAO_Group::create($params);
 

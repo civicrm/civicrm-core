@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
   }
@@ -76,17 +77,22 @@ class CRM_Utils_Cache_SqlGroupTest extends CiviUnitTestCase {
       'group' => 'testPrefetch',
       'prefetch' => TRUE,
     ));
-    $this->assertEquals($fooValue, $b->getFromFrontCache('foo')); // should work b/c value was prefetched
-    $this->assertEquals($fooValue, $b->get('foo')); // should work b/c value was prefetched
+    // should work b/c value was prefetched
+    $this->assertEquals($fooValue, $b->getFromFrontCache('foo'));
+    // should work b/c value was prefetched
+    $this->assertEquals($fooValue, $b->get('foo'));
 
     // 3. see what happens when prefetch is FALSE
     $c = new CRM_Utils_Cache_SqlGroup(array(
       'group' => 'testPrefetch',
       'prefetch' => FALSE,
     ));
-    $this->assertEquals(NULL, $c->getFromFrontCache('foo')); // should be NULL b/c value was NOT prefetched
-    $this->assertEquals($fooValue, $c->get('foo')); // should work b/c value is fetched on demand
-    $this->assertEquals($fooValue, $c->getFromFrontCache('foo')); // should work b/c value was fetched on demand
+    // should be NULL b/c value was NOT prefetched
+    $this->assertEquals(NULL, $c->getFromFrontCache('foo'));
+    // should work b/c value is fetched on demand
+    $this->assertEquals($fooValue, $c->get('foo'));
+    // should work b/c value was fetched on demand
+    $this->assertEquals($fooValue, $c->getFromFrontCache('foo'));
   }
 
 }

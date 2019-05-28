@@ -6,11 +6,11 @@
 // ODDITY: Only loads if you have CiviMail permissions.
 // ODDITY: Extra resources loaded via CRM_Mailing_Info::getAngularModules.
 
-return array(
+return [
   'ext' => 'civicrm',
-  'js' => array(
+  'js' => [
     'ang/crmD3.js',
     'bower_components/d3/d3.min.js',
-  ),
-  'requires' => array(),
-);
+  ],
+  'requires' => [],
+];

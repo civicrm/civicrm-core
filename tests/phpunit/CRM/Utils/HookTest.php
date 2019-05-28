@@ -6,11 +6,11 @@
  */
 class CRM_Utils_HookTest extends CiviUnitTestCase {
 
-  static $activeTest = NULL;
+  public static $activeTest = NULL;
 
-  var $fakeModules;
+  public $fakeModules;
 
-  var $log;
+  public $log;
 
   public function setUp() {
     parent::setUp();

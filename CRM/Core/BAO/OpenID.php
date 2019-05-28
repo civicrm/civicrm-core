@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -116,20 +116,20 @@ WHERE
   civicrm_contact.id = %1
 ORDER BY
   civicrm_openid.is_primary DESC,  openid_id ASC ";
-    $params = array(1 => array($id, 'Integer'));
+    $params = [1 => [$id, 'Integer']];
 
-    $openids = $values = array();
+    $openids = $values = [];
     $dao = CRM_Core_DAO::executeQuery($query, $params);
     $count = 1;
     while ($dao->fetch()) {
-      $values = array(
+      $values = [
         'locationType' => $dao->locationType,
         'is_primary' => $dao->is_primary,
         'id' => $dao->openid_id,
         'openid' => $dao->openid,
         'locationTypeId' => $dao->locationTypeId,
         'allowed_to_login' => $dao->allowed_to_login,
-      );
+      ];
 
       if ($updateBlankLocInfo) {
         $openids[$count++] = $values;

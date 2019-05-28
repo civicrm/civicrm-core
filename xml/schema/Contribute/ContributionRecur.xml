@@ -7,6 +7,7 @@
   <log>true</log>
   <field>
     <name>id</name>
+    <uniqueName>contribution_recur_id</uniqueName>
     <title>Recurring Contribution ID</title>
     <type>int unsigned</type>
     <required>true</required>
@@ -19,11 +20,14 @@
   </primaryKey>
   <field>
     <name>contact_id</name>
-    <title>Contact ID</title>
+    <title>Contact</title>
     <type>int unsigned</type>
     <required>true</required>
-    <comment>Foreign key to civicrm_contact.id .</comment>
+    <comment>Foreign key to civicrm_contact.id.</comment>
     <add>1.6</add>
+    <html>
+      <type>EntityRef</type>
+    </html>
   </field>
   <foreignKey>
     <name>contact_id</name>
@@ -100,42 +104,42 @@
   </field>
   <field>
     <name>start_date</name>
-    <title>Recurring Contribution Started Date</title>
+    <title>Start Date</title>
     <type>datetime</type>
     <required>true</required>
     <comment>The date the first scheduled recurring contribution occurs.</comment>
     <add>1.6</add>
     <html>
       <type>Select Date</type>
-      <formatType>activityDate</formatType>
+      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>
     <name>create_date</name>
-    <title>Recurring Contribution Created Date</title>
+    <title>Created Date</title>
     <type>datetime</type>
     <required>true</required>
     <comment>When this recurring contribution record was created.</comment>
     <add>1.6</add>
     <html>
       <type>Select Date</type>
-      <formatType>activityDate</formatType>
+      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>
     <name>modified_date</name>
-    <title>Recurring Contribution Modified Date</title>
+    <title>Modified Date</title>
     <type>datetime</type>
     <comment>Last updated date for this record. mostly the last time a payment was received</comment>
     <add>1.6</add>
     <html>
       <type>Select Date</type>
-      <formatType>activityDate</formatType>
+      <formatType>activityDateTime</formatType>
     </html>
   </field>
   <field>
     <name>cancel_date</name>
-    <title>Recurring Contribution Cancel Date</title>
+    <title>Cancel Date</title>
     <type>datetime</type>
     <comment>Date this recurring contribution was cancelled by contributor- if we can get access to it</comment>
     <add>1.6</add>
@@ -143,6 +147,18 @@
       <type>Select Date</type>
       <formatType>activityDate</formatType>
     </html>
+  </field>
+  <field>
+    <name>cancel_reason</name>
+    <type>text</type>
+    <title>Cancellation Reason</title>
+    <uniqueName>contribution_recur_cancel_reason</uniqueName>
+    <comment>Free text field for a reason for cancelling</comment>
+    <html>
+      <type>Text</type>
+      <size>40</size>
+    </html>
+    <add>5.13</add>
   </field>
   <field>
     <name>end_date</name>
@@ -157,11 +173,15 @@
   </field>
   <field>
     <name>processor_id</name>
+    <uniqueName>contribution_recur_processor_id</uniqueName>
     <title>Processor ID</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Possibly needed to store a unique identifier for this recurring payment order - if this is available from the processor??</comment>
     <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>payment_token_id</name>
@@ -179,11 +199,15 @@
   </foreignKey>
   <field>
     <name>trxn_id</name>
+    <uniqueName>contribution_recur_trxn_id</uniqueName>
     <title>Transaction ID</title>
     <type>varchar</type>
     <length>255</length>
     <comment>unique transaction id. may be processor id, bank id + trans id, or account number + check number... depending on payment_method</comment>
     <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <field>
     <name>invoice_id</name>
@@ -192,6 +216,9 @@
     <length>255</length>
     <comment>unique invoice id, system generated or passed in</comment>
     <add>1.6</add>
+    <html>
+      <type>Text</type>
+    </html>
   </field>
   <index>
     <name>UI_contrib_trxn_id</name>
@@ -207,7 +234,8 @@
   </index>
   <field>
     <name>contribution_status_id</name>
-    <title>Recurring Contribution Status</title>
+    <uniqueName>contribution_recur_contribution_status_id</uniqueName>
+    <title>Status</title>
     <type>int unsigned</type>
     <default>1</default>
     <import>true</import>
@@ -215,6 +243,9 @@
     <pseudoconstant>
       <optionGroupName>contribution_status</optionGroupName>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <index>
     <name>index_contribution_status</name>
@@ -233,7 +264,7 @@
   </field>
   <field>
     <name>cycle_day</name>
-    <title>Number of Cycle Day</title>
+    <title>Cycle Day</title>
     <type>int unsigned</type>
     <default>1</default>
     <required>true</required>
@@ -298,9 +329,18 @@
   <field>
     <name>payment_processor_id</name>
     <title>Payment Processor</title>
+    <uniqueName>contribution_recur_payment_processor_id</uniqueName>
     <type>int unsigned</type>
     <comment>Foreign key to civicrm_payment_processor.id</comment>
     <add>3.3</add>
+    <pseudoconstant>
+      <table>civicrm_payment_processor</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <foreignKey>
     <name>payment_processor_id</name>
@@ -338,6 +378,9 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
     </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <foreignKey>
     <name>financial_type_id</name>
@@ -377,6 +420,9 @@
       <labelColumn>title</labelColumn>
     </pseudoconstant>
     <add>4.1</add>
+    <html>
+      <type>Select</type>
+    </html>
   </field>
   <foreignKey>
     <name>campaign_id</name>

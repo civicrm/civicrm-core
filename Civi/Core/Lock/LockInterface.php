@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,7 +34,7 @@ interface LockInterface {
   /**
    * Acquire lock.
    *
-   * @param int|NULL $timeout
+   * @param int|null $timeout
    *   The number of seconds to wait to get the lock.
    *   For a default value, use NULL.
    * @return bool

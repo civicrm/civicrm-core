@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Activity_Import_Field {
 
@@ -40,6 +40,7 @@ class CRM_Activity_Import_Field {
 
   /**
    * Title of the field to be used in display
+   * @var string
    */
   public $_title;
 
@@ -51,7 +52,7 @@ class CRM_Activity_Import_Field {
 
   /**
    * Is this field required
-   * @var boolean
+   * @var bool
    */
   public $_required;
 

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,15 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
-class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
+class CRM_Report_Form_Event_Income extends CRM_Report_Form {
   const ROW_COUNT_LIMIT = 2;
 
   protected $_summary = NULL;
   protected $_noFields = TRUE;
+  protected $eventIDs = [];
 
   protected $_add2groupSupported = FALSE;
 
@@ -45,19 +46,19 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
    */
   public function __construct() {
 
-    $this->_columns = array(
-      'civicrm_event' => array(
+    $this->_columns = [
+      'civicrm_event' => [
         'dao' => 'CRM_Event_DAO_Event',
-        'filters' => array(
-          'id' => array(
+        'filters' => [
+          'id' => [
             'title' => ts('Event'),
             'operatorType' => CRM_Report_Form::OP_ENTITYREF,
             'type' => CRM_Utils_Type::T_INT,
-            'attributes' => array('select' => array('minimumInputLength' => 0)),
-          ),
-        ),
-      ),
-    );
+            'attributes' => ['select' => ['minimumInputLength' => 0]],
+          ],
+        ],
+      ],
+    ];
 
     parent::__construct();
   }
@@ -75,57 +76,15 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
   public function buildEventReport($eventIDs) {
 
     $this->assign('events', $eventIDs);
-
-    $eventID = implode(',', $eventIDs);
-
-    $participantStatus = CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1", "label");
+    $this->eventIDs = $eventIDs;
+    $eventID = implode(',', $this->eventIDs);
     $participantRole = CRM_Event_PseudoConstant::participantRole();
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
 
-    $rows = $eventSummary = $roleRows = $statusRows = $instrumentRows = $count = array();
-
-    $optionGroupDAO = new CRM_Core_DAO_OptionGroup();
-    $optionGroupDAO->name = 'event_type';
-    $optionGroupId = NULL;
-    if ($optionGroupDAO->find(TRUE)) {
-      $optionGroupId = $optionGroupDAO->id;
-    }
-    //show the income of active participant status (Counted = filter = 1)
-    $activeParticipantStatusIDArray = $activeParticipantStatusLabelArray = array();
-    foreach ($participantStatus as $id => $label) {
-      $activeParticipantStatusIDArray[] = $id;
-      $activeParticipantStatusLabelArray[] = $label;
-    }
-    $activeParticipantStatus = implode(',', $activeParticipantStatusIDArray);
-    $activeparticipnatStutusLabel = implode(', ', $activeParticipantStatusLabelArray);
-    $activeParticipantClause = " AND civicrm_participant.status_id IN ( $activeParticipantStatus ) ";
-    $select = array(
-      "civicrm_event.id as event_id",
-      "civicrm_event.title as event_title",
-      "civicrm_event.max_participants as max_participants",
-      "civicrm_event.start_date as start_date",
-      "civicrm_event.end_date as end_date",
-      "civicrm_option_value.label as event_type",
-      "civicrm_participant.fee_currency as currency",
-    );
-
-    $groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($select, 'civicrm_event.id');
-    $sql = "
-            SELECT  " . implode(', ', $select) . ",
-                    SUM(civicrm_participant.fee_amount) as total,
-                    COUNT(civicrm_participant.id)       as participant
-
-            FROM       civicrm_event
-            LEFT JOIN  civicrm_option_value
-                   ON  ( civicrm_event.event_type_id = civicrm_option_value.value AND
-                         civicrm_option_value.option_group_id = {$optionGroupId} )
-            LEFT JOIN  civicrm_participant ON ( civicrm_event.id = civicrm_participant.event_id
-                       {$activeParticipantClause} AND civicrm_participant.is_test  = 0 )
-
-            WHERE      civicrm_event.id IN( {$eventID}) {$groupBy}";
-
+    $rows = $eventSummary = $roleRows = $statusRows = $instrumentRows = $count = [];
+    $sql = $this->buildQuery();
     $eventDAO = $this->executeReportQuery($sql);
-    $currency = array();
+    $currency = [];
     while ($eventDAO->fetch()) {
       $eventSummary[$eventDAO->event_id][ts('Title')] = $eventDAO->event_title;
       $eventSummary[$eventDAO->event_id][ts('Max Participants')] = $eventDAO->max_participants;
@@ -133,11 +92,12 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
       $eventSummary[$eventDAO->event_id][ts('End Date')] = CRM_Utils_Date::customFormat($eventDAO->end_date);
       $eventSummary[$eventDAO->event_id][ts('Event Type')] = $eventDAO->event_type;
       $eventSummary[$eventDAO->event_id][ts('Event Income')] = CRM_Utils_Money::format($eventDAO->total, $eventDAO->currency);
-      $eventSummary[$eventDAO->event_id][ts('Registered Participant')] = "{$eventDAO->participant} ({$activeparticipnatStutusLabel})";
+      $eventSummary[$eventDAO->event_id][ts('Registered Participant')] = "{$eventDAO->participant} ({" . implode(', ', $this->getActiveParticipantStatuses()) . ")";
       $currency[$eventDAO->event_id] = $eventDAO->currency;
     }
     $this->assign_by_ref('summary', $eventSummary);
 
+    $activeParticipantClause = " AND civicrm_participant.status_id IN ( " . implode(',', array_keys($this->getActiveParticipantStatuses())) . " ) ";
     //Total Participant Registerd for the Event
     $pariticipantCount = "
             SELECT COUNT(civicrm_participant.id ) as count, civicrm_participant.event_id as event_id
@@ -216,6 +176,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
     $statusDAO = $this->executeReportQuery($status);
 
+    $participantStatus = $this->getActiveParticipantStatuses();
     while ($statusDAO->fetch()) {
       $statusRows[$statusDAO->event_id][$participantStatus[$statusDAO->STATUSID]]['total'] = $statusDAO->participant;
       $statusRows[$statusDAO->event_id][$participantStatus[$statusDAO->STATUSID]]['round'] = round(($statusDAO->participant / $count[$statusDAO->event_id]) * 100, 2);
@@ -269,7 +230,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
    * @return array
    */
   public function statistics(&$eventIDs) {
-    $statistics = array();
+    $statistics = [];
     $count = count($eventIDs);
     $this->countStat($statistics, $count);
     if ($this->_setVariable) {
@@ -300,14 +261,14 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
    * @param int $rowCount
    */
   public function setPager($rowCount = self::ROW_COUNT_LIMIT) {
-    $params = array(
+    $params = [
       'total' => $this->_rowsFound,
       'rowCount' => self::ROW_COUNT_LIMIT,
       'status' => ts('Records %%StatusMessage%%'),
       'buttonBottom' => 'PagerBottomButton',
       'buttonTop' => 'PagerTopButton',
       'pageID' => $this->get(CRM_Utils_Pager::PAGE_ID),
-    );
+    ];
 
     $pager = new CRM_Utils_Pager($params);
     $this->assign_by_ref('pager', $pager);
@@ -324,7 +285,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
 
     $noSelection = FALSE;
     if (empty($this->_params['id_value'])) {
-      $this->_params['id_value'] = array();
+      $this->_params['id_value'] = [];
       $this->_setVariable = FALSE;
 
       $events = CRM_Event_PseudoConstant::event(NULL, NULL,
@@ -349,7 +310,7 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
       $this->limit();
       $this->setPager();
 
-      $showEvents = array();
+      $showEvents = [];
       $count = 0;
       $numRows = $this->_limit;
 
@@ -380,6 +341,61 @@ class CRM_Report_Form_Event_Income extends CRM_Report_Form_Event {
     }
 
     parent::endPostProcess();
+  }
+
+  /**
+   * Get statuses with the counted filter set to TRUE.
+   *
+   * @return array
+   */
+  protected function getActiveParticipantStatuses() {
+    return CRM_Event_PseudoConstant::participantStatus(NULL, "is_counted = 1", "label");
+  }
+
+  /**
+   * Build main report sql query.
+   *
+   * @param bool $applyLimit
+   *
+   * @return string
+   */
+  public function buildQuery($applyLimit = FALSE) {
+    $eventID = implode(',', $this->eventIDs);
+
+    $optionGroupDAO = new CRM_Core_DAO_OptionGroup();
+    $optionGroupDAO->name = 'event_type';
+    $optionGroupId = NULL;
+    if ($optionGroupDAO->find(TRUE)) {
+      $optionGroupId = $optionGroupDAO->id;
+    }
+
+    $activeParticipantClause = " AND civicrm_participant.status_id IN ( " . implode(',', array_keys($this->getActiveParticipantStatuses())) . " ) ";
+    $select = [
+      "civicrm_event.id as event_id",
+      "civicrm_event.title as event_title",
+      "civicrm_event.max_participants as max_participants",
+      "civicrm_event.start_date as start_date",
+      "civicrm_event.end_date as end_date",
+      "civicrm_option_value.label as event_type",
+      "civicrm_participant.fee_currency as currency",
+    ];
+
+    $groupBy = CRM_Contact_BAO_Query::getGroupByFromSelectColumns($select, 'civicrm_event.id');
+    $sql = "
+            SELECT  " . implode(', ', $select) . ",
+                    SUM(civicrm_participant.fee_amount) as total,
+                    COUNT(civicrm_participant.id)       as participant
+
+            FROM       civicrm_event
+            LEFT JOIN  civicrm_option_value
+                   ON  ( civicrm_event.event_type_id = civicrm_option_value.value AND
+                         civicrm_option_value.option_group_id = {$optionGroupId} )
+            LEFT JOIN  civicrm_participant ON ( civicrm_event.id = civicrm_participant.event_id
+                       {$activeParticipantClause} AND civicrm_participant.is_test  = 0 )
+
+            WHERE      civicrm_event.id IN( {$eventID}) {$groupBy}";
+
+    return $sql;
   }
 
 }

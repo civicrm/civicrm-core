@@ -6,9 +6,9 @@
  *   API result array
  */
 function grant_get_example() {
-  $params = array(
+  $params = [
     'rationale' => 'Just Because',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Grant', 'get', $params);
@@ -18,12 +18,12 @@ function grant_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,13 +37,13 @@ function grant_get_example() {
  */
 function grant_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'contact_id' => '5',
         'application_received_date' => '20130728084957',
@@ -53,9 +53,9 @@ function grant_get_expectedresult() {
         'currency' => 'USD',
         'rationale' => 'Just Because',
         'status_id' => '1',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

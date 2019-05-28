@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -115,7 +115,7 @@ function civicrm_api3_custom_group_get($params) {
  */
 function civicrm_api3_custom_group_setvalue($params) {
   require_once 'api/v3/Generic/Setvalue.php';
-  $result = civicrm_api3_generic_setValue(array("entity" => 'CustomGroup', 'params' => $params));
+  $result = civicrm_api3_generic_setValue(["entity" => 'CustomGroup', 'params' => $params]);
   if (empty($result['is_error'])) {
     CRM_Utils_System::flushCache();
   }

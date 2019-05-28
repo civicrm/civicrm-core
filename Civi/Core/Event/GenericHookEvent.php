@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -108,7 +108,7 @@ class GenericHookEvent extends \Symfony\Component\EventDispatcher\Event {
    * @var mixed
    * @deprecated
    */
-  private $returnValues = array();
+  private $returnValues = [];
 
   /**
    * List of field names that are prohibited due to conflicts
@@ -116,7 +116,7 @@ class GenericHookEvent extends \Symfony\Component\EventDispatcher\Event {
    *
    * @var array
    */
-  private static $BLACKLIST = array(
+  private static $BLACKLIST = [
     'name',
     'dispatcher',
     'propagationStopped',
@@ -124,7 +124,7 @@ class GenericHookEvent extends \Symfony\Component\EventDispatcher\Event {
     'hookValues',
     'hookFields',
     'hookFieldsFlip',
-  );
+  ];
 
   /**
    * Create a GenericHookEvent using key-value pairs.

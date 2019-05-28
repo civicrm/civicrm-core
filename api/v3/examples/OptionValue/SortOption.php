@@ -8,13 +8,13 @@
  *   API result array
  */
 function option_value_getsingle_example() {
-  $params = array(
+  $params = [
     'option_group_id' => 1,
-    'options' => array(
+    'options' => [
       'sort' => 'label DESC',
       'limit' => 1,
-    ),
-  );
+    ],
+  ];
 
   try{
     $result = civicrm_api3('OptionValue', 'getsingle', $params);
@@ -24,12 +24,12 @@ function option_value_getsingle_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -43,7 +43,7 @@ function option_value_getsingle_example() {
  */
 function option_value_getsingle_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'id' => '4',
     'option_group_id' => '1',
     'label' => 'SMS',
@@ -54,7 +54,7 @@ function option_value_getsingle_expectedresult() {
     'is_optgroup' => 0,
     'is_reserved' => 0,
     'is_active' => '1',
-  );
+  ];
 
   return $expectedResult;
 }

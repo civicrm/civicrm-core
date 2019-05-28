@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -37,6 +37,7 @@
  * WordPress specific stuff goes here
  */
 class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
+
   /**
    */
   public function __construct() {
@@ -82,10 +83,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $filesPath = CRM_Utils_File::baseFilePath();
     $filesRelPath = CRM_Utils_File::relativize($filesPath, $cmsPath);
     $filesURL = rtrim($cmsUrl, '/') . '/' . ltrim($filesRelPath, ' /');
-    return array(
+    return [
       'url' => CRM_Utils_File::addTrailingSlash($filesURL, '/'),
       'path' => CRM_Utils_File::addTrailingSlash($filesPath),
-    );
+    ];
   }
 
   /**
@@ -114,10 +115,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     }
     $civiRelPath = CRM_Utils_File::relativize(realpath($civicrm_root), realpath($cmsPath));
     $civiUrl = rtrim($cmsUrl, '/') . '/' . ltrim($civiRelPath, ' /');
-    return array(
+    return [
       'url' => CRM_Utils_File::addTrailingSlash($civiUrl, '/'),
       'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
-    );
+    ];
   }
 
   /**
@@ -129,7 +130,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if (is_array($breadCrumbs)) {
       foreach ($breadCrumbs as $crumbs) {
         if (stripos($crumbs['url'], 'id%%')) {
-          $args = array('cid', 'mid');
+          $args = ['cid', 'mid'];
           foreach ($args as $a) {
             $val = CRM_Utils_Request::retrieve($a, 'Positive', CRM_Core_DAO::$_nullObject,
               FALSE, NULL, $_GET
@@ -152,7 +153,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function resetBreadCrumb() {
-    $bc = array();
+    $bc = [];
     wp_set_breadcrumb($bc);
   }
 
@@ -163,13 +164,13 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     static $registered = FALSE;
     if (!$registered) {
       // front-end view
-      add_action('wp_head', array(__CLASS__, '_showHTMLHead'));
+      add_action('wp_head', [__CLASS__, '_showHTMLHead']);
       // back-end views
-      add_action('admin_head', array(__CLASS__, '_showHTMLHead'));
+      add_action('admin_head', [__CLASS__, '_showHTMLHead']);
     }
-    CRM_Core_Region::instance('wp_head')->add(array(
+    CRM_Core_Region::instance('wp_head')->add([
       'markup' => $head,
-    ));
+    ]);
   }
 
   /**
@@ -255,12 +256,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       $base = $script;
     }
 
-    $queryParts = array();
-
-    // CRM_Core_Payment::getReturnSuccessUrl() passes $query as an array
-    if (isset($query) && is_array($query)) {
-      $query = implode($separator, $query);
-    }
+    $queryParts = [];
 
     if (
       // not using clean URLs
@@ -283,7 +279,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       if ($wpPageParam) {
         $queryParts[] = $wpPageParam;
       }
-      if (isset($query)) {
+      if (!empty($query)) {
         $queryParts[] = $query;
       }
 
@@ -343,7 +339,10 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     $config = CRM_Core_Config::singleton();
 
     if ($loadCMSBootstrap) {
-      $config->userSystem->loadBootStrap($name, $password);
+      $config->userSystem->loadBootStrap([
+        'name' => $name,
+        'pass' => $password,
+      ]);
     }
 
     $user = wp_authenticate($name, $password);
@@ -358,7 +357,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     if (!$contactID) {
       return FALSE;
     }
-    return array($contactID, $user->data->ID, mt_rand());
+    return [$contactID, $user->data->ID, mt_rand()];
   }
 
   /**
@@ -402,7 +401,8 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * Determine the native ID of the CMS user.
    *
    * @param string $username
-   * @return int|NULL
+   *
+   * @return int|null
    */
   public function getUfId($username) {
     $userdata = get_user_by('login', $username);
@@ -458,15 +458,21 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Load wordpress bootstrap.
    *
-   * @param string $name
-   *   optional username for login.
-   * @param string $pass
-   *   optional password for login.
+   * @param array $params
+   *   Optional credentials
+   *   - name: string, cms username
+   *   - pass: string, cms password
+   * @param bool $loadUser
+   * @param bool $throwError
+   * @param mixed $realPath
    *
    * @return bool
    */
-  public function loadBootStrap($name = NULL, $pass = NULL) {
+  public function loadBootStrap($params = [], $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     global $wp, $wp_rewrite, $wp_the_query, $wp_query, $wpdb, $current_site, $current_blog, $current_user;
+
+    $name = CRM_Utils_Array::value('name', $params);
+    $pass = CRM_Utils_Array::value('pass', $params);
 
     if (!defined('WP_USE_THEMES')) {
       define('WP_USE_THEMES', FALSE);
@@ -492,7 +498,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       CRM_Core_Config::singleton()->userSystem->setMySQLTimeZone();
     }
     require_once $cmsRootPath . DIRECTORY_SEPARATOR . 'wp-includes/pluggable.php';
-    $uid = CRM_Utils_Array::value('uid', $name);
+    $uid = CRM_Utils_Array::value('uid', $params);
     if (!$uid) {
       $name = $name ? $name : trim(CRM_Utils_Array::value('name', $_REQUEST));
       $pass = $pass ? $pass : trim(CRM_Utils_Array::value('pass', $_REQUEST));
@@ -582,14 +588,14 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
    * @inheritDoc
    */
   public function createUser(&$params, $mail) {
-    $user_data = array(
+    $user_data = [
       'ID' => '',
       'user_pass' => $params['cms_pass'],
       'user_login' => $params['cms_name'],
       'user_email' => $params[$mail],
       'nickname' => $params['cms_name'],
       'role' => get_option('default_role'),
-    );
+    ];
     if (isset($params['contactID'])) {
       $contactType = CRM_Contact_BAO_Contact::getContactType($params['contactID']);
       if ($contactType == 'Individual') {
@@ -604,7 +610,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
 
     $uid = wp_insert_user($user_data);
 
-    $creds = array();
+    $creds = [];
     $creds['user_login'] = $params['cms_name'];
     $creds['user_password'] = $params['cms_pass'];
     $creds['remember'] = TRUE;
@@ -623,7 +629,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       $ufID = CRM_Utils_Type::escape($ufID, 'Integer');
       $ufName = CRM_Utils_Type::escape($ufName, 'String');
 
-      $values = array('ID' => $ufID, 'user_email' => $ufName);
+      $values = ['ID' => $ufID, 'user_email' => $ufName];
       if ($ufID) {
         wp_update_user($values);
       }
@@ -647,7 +653,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
         $errors['cms_name'] = ts("Your username contains invalid characters");
       }
       elseif (username_exists(sanitize_user($params['name']))) {
-        $errors['cms_name'] = ts('The username %1 is already taken. Please select another username.', array(1 => $params['name']));
+        $errors['cms_name'] = ts('The username %1 is already taken. Please select another username.', [1 => $params['name']]);
       }
     }
 
@@ -657,7 +663,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       }
       elseif (email_exists($params['mail'])) {
         $errors[$emailName] = ts('The email address %1 already has an account associated with it. <a href="%2">Have you forgotten your password?</a>',
-          array(1 => $params['mail'], 2 => wp_lostpassword_url())
+          [1 => $params['mail'], 2 => wp_lostpassword_url()]
         );
       }
     }
@@ -784,7 +790,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   public function getUserRecordUrl($contactID) {
     $uid = CRM_Core_BAO_UFMatch::getUFId($contactID);
     if (CRM_Core_Session::singleton()
-        ->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(array('cms:administer users'))
+      ->get('userID') == $contactID || CRM_Core_Permission::checkAnyPerm(['cms:administer users'])
     ) {
       return CRM_Core_Config::singleton()->userFrameworkBaseURL . "wp-admin/user-edit.php?user_id=" . $uid;
     }
@@ -793,10 +799,20 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   /**
    * Append WP js to coreResourcesList.
    *
-   * @param array $list
+   * @param \Civi\Core\Event\GenericHookEvent $e
    */
-  public function appendCoreResources(&$list) {
-    $list[] = 'js/crm.wordpress.js';
+  public function appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) {
+    $e->list[] = 'js/crm.wordpress.js';
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) {
+    // Set menubar breakpoint to match WP admin theme
+    if ($e->asset == 'crm-menubar.css') {
+      $e->params['breakpoint'] = 783;
+    }
   }
 
   /**
@@ -840,11 +856,11 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       }
     }
 
-    return array(
+    return [
       'contactCount' => $contactCount,
       'contactMatching' => $contactMatching,
       'contactCreated' => $contactCreated,
-    );
+    ];
   }
 
 }

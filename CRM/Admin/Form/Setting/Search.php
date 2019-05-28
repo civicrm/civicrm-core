@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -37,9 +37,9 @@
  */
 class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
 
-  protected $_settings = array(
-    'contact_reference_options' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
-    'contact_autocomplete_options' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+  protected $_settings = [
+    'contact_reference_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+    'contact_autocomplete_options' => CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
     'search_autocomplete_count' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'enable_innodb_fts' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'includeWildCardInName' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
@@ -51,7 +51,7 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
     'defaultSearchProfileID' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'searchPrimaryDetailsOnly' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
     'quicksearch_options' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
-  );
+  ];
 
   /**
    * Build the form object.
@@ -80,34 +80,26 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
    * @return array
    */
   public static function getContactAutocompleteOptions() {
-    return array(
-      ts('Contact Name') => 1,
-    ) + array_flip(CRM_Core_OptionGroup::values('contact_autocomplete_options',
-      FALSE, FALSE, TRUE
-    ));
+    return [1 => ts('Contact Name')] + CRM_Core_OptionGroup::values('contact_autocomplete_options', FALSE, FALSE, TRUE);
   }
 
   /**
    * @return array
    */
   public static function getAvailableProfiles() {
-    return array('' => ts('- none -')) + CRM_Core_BAO_UFGroup::getProfiles(array(
+    return ['' => ts('- none -')] + CRM_Core_BAO_UFGroup::getProfiles([
       'Contact',
       'Individual',
       'Organization',
       'Household',
-    ));
+    ]);
   }
 
   /**
    * @return array
    */
   public static function getContactReferenceOptions() {
-    return array(
-      ts('Contact Name') => 1,
-    ) + array_flip(CRM_Core_OptionGroup::values('contact_reference_options',
-      FALSE, FALSE, TRUE
-    ));
+    return [1 => ts('Contact Name')] + CRM_Core_OptionGroup::values('contact_reference_options', FALSE, FALSE, TRUE);
   }
 
 }

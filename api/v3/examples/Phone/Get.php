@@ -6,10 +6,10 @@
  *   API result array
  */
 function phone_get_example() {
-  $params = array(
+  $params = [
     'contact_id' => 7,
     'phone' => '(123) 456-7890',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Phone', 'get', $params);
@@ -19,12 +19,12 @@ function phone_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -38,13 +38,13 @@ function phone_get_example() {
  */
 function phone_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 4,
-    'values' => array(
-      '4' => array(
+    'values' => [
+      '4' => [
         'id' => '4',
         'contact_id' => '7',
         'location_type_id' => '10',
@@ -53,9 +53,9 @@ function phone_get_expectedresult() {
         'phone' => '(123) 456-7890',
         'phone_numeric' => '1234567890',
         'phone_type_id' => '1',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

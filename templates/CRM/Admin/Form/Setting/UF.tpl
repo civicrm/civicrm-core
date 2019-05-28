@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -52,7 +52,7 @@
 <div class="form-item">
 <fieldset>
     <legend>{ts}Views integration settings{/ts}</legend>
-    <div>{ts}To enable CiviCRM Views integration, add the following to the site <code>settings.php</code> file:{/ts}</div>
+    <div>{ts}To enable CiviCRM Views integration, add or update the following item in the <code>settings.php</code> file:{/ts}</div>
     <pre>{$tablePrefixes}</pre>
 </fieldset>
 </div>

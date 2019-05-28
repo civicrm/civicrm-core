@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Mailing_Config {
 
@@ -36,7 +36,8 @@ class CRM_Mailing_Config {
   const OUTBOUND_OPTION_SENDMAIL = 1;
   const OUTBOUND_OPTION_DISABLED = 2;
   const OUTBOUND_OPTION_MAIL = 3;
-  const OUTBOUND_OPTION_MOCK = 4; // seems to be the same as 2, but also calls Mail's pre/post hooks? - see packages/Mail
+  // seems to be the same as 2, but also calls Mail's pre/post hooks? - see packages/Mail
+  const OUTBOUND_OPTION_MOCK = 4;
   const OUTBOUND_OPTION_REDIRECT_TO_DB = 5;
 
   // special value for mail bulk inserts to avoid

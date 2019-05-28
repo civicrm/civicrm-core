@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,8 +32,6 @@
     {/if}
     <div class="crm-block crm-form-block crm-activity-form-block">
   {/if}
-  {* added onload javascript for source contact*}
-  {include file="CRM/Activity/Form/ActivityJs.tpl" tokenContext="activity"}
   {if !$action or ( $action eq 1 ) or ( $action eq 2 ) }
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   {/if}
@@ -114,7 +112,7 @@
   {/if}
 
   <tr class="crm-activity-form-block-subject">
-    <td class="label">{$form.subject.label}</td><td class="view-value">{$form.subject.html|crmAddClass:huge}</td>
+    <td class="label">{$form.subject.label}</td><td class="view-value">{$form.subject.html}</td>
   </tr>
 
   {* CRM-7362 --add campaign to activities *}
@@ -135,7 +133,7 @@
   <tr class="crm-activity-form-block-activity_date_time">
     <td class="label">{$form.activity_date_time.label}</td>
     {if $action neq 4}
-      <td class="view-value">{include file="CRM/common/jcalendar.tpl" elementName=activity_date_time}</td>
+      <td class="view-value">{$form.activity_date_time.html}</td>
       {else}
       <td class="view-value">{$form.activity_date_time.value|crmDate}</td>
     {/if}
@@ -280,31 +278,23 @@
 
 
   {if $action eq 1 or $action eq 2 or $context eq 'search' or $context eq 'smog'}
-    {*include custom data js file*}
-    {include file="CRM/common/customData.tpl"}
     {literal}
     <script type="text/javascript">
-    CRM.$(function($) {
-      var doNotNotifyAssigneeFor = {/literal}{$doNotNotifyAssigneeFor|@json_encode}{literal};
-      $('#activity_type_id').change(function() {
-        if ($.inArray($(this).val(), doNotNotifyAssigneeFor) != -1) {
-          $('#notify_assignee_msg').hide();
-        }
-        else {
-          $('#notify_assignee_msg').show();
-        }
+      CRM.$(function($) {
+        var doNotNotifyAssigneeFor = {/literal}{$doNotNotifyAssigneeFor|@json_encode}{literal};
+        $('#activity_type_id').change(function() {
+          if ($.inArray($(this).val(), doNotNotifyAssigneeFor) != -1) {
+            $('#notify_assignee_msg').hide();
+          }
+          else {
+            $('#notify_assignee_msg').show();
+          }
+        });
       });
-
-      {/literal}
-      {if $customDataSubType}
-        CRM.buildCustomData( '{$customDataType}', {$customDataSubType} );
-        {else}
-        CRM.buildCustomData( '{$customDataType}' );
-      {/if}
-      {literal}
-    });
     </script>
     {/literal}
+
+    {include file="CRM/common/customDataBlock.tpl"}
   {/if}
   </div>{* end of form block*}
 

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -100,8 +100,8 @@ function civicrm_api3_relationship_type_delete($params) {
  * @return array
  */
 function _civicrm_api3_relationship_type_getlist_defaults($request) {
-  return array(
+  return [
     'label_field' => 'label_a_b',
     'search_field' => 'label_a_b',
-  );
+  ];
 }

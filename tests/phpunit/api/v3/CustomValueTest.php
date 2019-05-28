@@ -3,7 +3,7 @@
  * +--------------------------------------------------------------------+
  * | CiviCRM version 5                                                  |
  * +--------------------------------------------------------------------+
- * | Copyright CiviCRM LLC (c) 2004-2018                                |
+ * | Copyright CiviCRM LLC (c) 2004-2019                                |
  * +--------------------------------------------------------------------+
  * | This file is a part of CiviCRM.                                    |
  * |                                                                    |
@@ -31,7 +31,7 @@
  */
 class api_v3_CustomValueTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
-  protected $ids;
+
   protected $optionGroup;
 
   public $DBResetRequired = FALSE;

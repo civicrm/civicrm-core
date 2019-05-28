@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,12 +35,14 @@
 class api_v3_TagTest extends CiviUnitTestCase {
   protected $_apiversion = 3;
   /**
+   * @var array
    * @ids array of values to be cleaned up in the tear down
    */
   protected $ids = array();
   /**
    * Tag id.
-   * @var integer
+   *
+   * @var int
    */
   protected $tag = array();
 
@@ -54,6 +56,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
   }
 
   ///////////////// civicrm_tag_get methods
+
   /**
    * Test civicrm_tag_get with wrong params.
    */
@@ -149,6 +152,7 @@ class api_v3_TagTest extends CiviUnitTestCase {
     $params['used_for'] = 'civicrm_activity';
     $this->getAndCheck($params, $result['id'], 'tag', 1, __FUNCTION__ . ' tag updated in line ' . __LINE__);
   }
+
   ///////////////// civicrm_tag_delete methods
 
   /**

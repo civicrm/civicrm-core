@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -284,15 +284,15 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    *
    * @return CRM_Contact_BAO_Relationship
    */
-  public static function add(&$params, $ids = array(), $contactId = NULL) {
-    $relationshipId = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
+  public static function add($params, $ids = array(), $contactId = NULL) {
+    $params['id'] = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
 
     $hook = 'create';
-    if ($relationshipId) {
+    if ($params['id']) {
       $hook = 'edit';
     }
     //@todo hook are called from create and add - remove one
-    CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
+    CRM_Utils_Hook::pre($hook, 'Relationship', $params['id'], $params);
 
     $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
 
@@ -306,7 +306,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     if ($type == 6) {
       CRM_Contact_BAO_Household::updatePrimaryContact($params['contact_id_b'], $params['contact_id_a']);
     }
-    if (!empty($relationshipId) && self::isCurrentEmployerNeedingToBeCleared($params, $relationshipId, $type)) {
+    if (!empty($params['id']) && self::isCurrentEmployerNeedingToBeCleared($params, $params['id'], $type)) {
       CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($params['contact_id_a']);
     }
     $relationship = new CRM_Contact_BAO_Relationship();
@@ -316,7 +316,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $relationship->contact_id_b = $params['contact_id_b'];
     $relationship->contact_id_a = $params['contact_id_a'];
     $relationship->relationship_type_id = $type;
-    $relationship->id = $relationshipId;
+    $relationship->id = $params['id'];
 
     $dateFields = array('end_date', 'start_date');
 
@@ -332,7 +332,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
           $relationship->$defaultField = $params[$defaultField];
         }
       }
-      elseif (!$relationshipId) {
+      elseif (empty($params['id'])) {
         $relationship->$defaultField = $defaultValue;
       }
     }
@@ -343,8 +343,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     if (!empty($params['custom'])) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_relationship', $relationship->id);
     }
-
-    $relationship->free();
 
     CRM_Utils_Hook::post($hook, 'Relationship', $relationship->id, $relationship);
 
@@ -475,7 +473,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    */
   public static function getdefaults() {
     return array(
-      'is_active' => 0,
+      'is_active' => 1,
       'is_permission_a_b' => self::NONE,
       'is_permission_b_a' => self::NONE,
       'description' => '',
@@ -484,7 +482,6 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       'end_date' => 'NULL',
     );
   }
-
 
   /**
    * Check if there is data to create the object.
@@ -960,11 +957,9 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
       // Check whether the custom field values are identical.
       $result = self::checkDuplicateCustomFields($params, $relationship->id);
       if ($result) {
-        $relationship->free();
         return TRUE;
       }
     }
-    $relationship->free();
     return FALSE;
   }
 
@@ -1434,6 +1429,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
               if ($values[$rid]['rtype'] == 'b_a') {
                 $replace['clientid'] = $values[$rid]['cid'];
               }
+              $values[$rid]['case'] = '<a href="' . CRM_Utils_System::url('civicrm/case/ajax/details', sprintf('caseId=%d&cid=%d&snippet=4', $values[$rid]['case_id'], $values[$rid]['cid'])) . '" class="action-item crm-hover-button crm-summary-link"><i class="crm-i fa-folder-open-o"></i></a>';
             }
           }
 
@@ -1450,7 +1446,6 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         }
       }
 
-      $relationship->free();
       return $values;
     }
   }
@@ -1464,7 +1459,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * @return array
    *   array reference of all relationship types with context to current contact type .
    */
-  static public function getRelationType($targetContactType) {
+  public static function getRelationType($targetContactType) {
     $relationshipType = array();
     $allRelationshipType = CRM_Core_PseudoConstant::relationshipType();
 
@@ -2037,7 +2032,6 @@ AND cc.sort_name LIKE '%$name%'";
     }
   }
 
-
   /**
    * Wrapper for contact relationship selector.
    *
@@ -2120,7 +2114,7 @@ AND cc.sort_name LIKE '%$name%'";
             'civicrm/contact/view',
             "reset=1&cid={$values['cid']}");
 
-        $relationship['relation'] = CRM_Utils_System::href(
+        $relationship['relation'] = CRM_Utils_Array::value('case', $values, '') . CRM_Utils_System::href(
           $values['relation'],
           'civicrm/contact/view/rel',
           "action=view&reset=1&cid={$values['cid']}&id={$values['id']}&rtype={$values['rtype']}");
@@ -2258,7 +2252,7 @@ AND cc.sort_name LIKE '%$name%'";
    *
    * @param array $params
    * @param int $relationshipId
-   * @param int|NULL $updatedRelTypeID
+   * @param int|null $updatedRelTypeID
    *
    * @return bool
    *   TRUE if current employer needs to be cleared.

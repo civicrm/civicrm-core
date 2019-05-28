@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -45,14 +45,14 @@
  *   API result array.
  */
 function civicrm_api3_price_field_value_create($params) {
-  $ids = array();
+  $ids = [];
   if (!empty($params['id'])) {
     $ids['id'] = $params['id'];
   }
 
   $bao = CRM_Price_BAO_PriceFieldValue::create($params, $ids);
 
-  $values = array();
+  $values = [];
   _civicrm_api3_object_to_array($bao, $values[$bao->id]);
   return civicrm_api3_create_success($values, $params, 'PriceFieldValue', 'create', $bao);
 

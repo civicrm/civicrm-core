@@ -4,7 +4,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,7 +41,7 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    * @return array
    */
   protected function getPassthruTokens() {
-    return array(
+    return [
       'contribution_page_id',
       'receive_date',
       'total_amount',
@@ -54,7 +54,7 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       'receipt_date',
       'thankyou_date',
       'tax_amount',
-    );
+    ];
   }
 
   /**
@@ -63,13 +63,13 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    * @return array
    */
   protected function getAliasTokens() {
-    return array(
+    return [
       'id' => 'contribution_id',
       'payment_instrument' => 'payment_instrument_id',
       'source' => 'contribution_source',
       'status' => 'contribution_status_id',
       'type' => 'financial_type_id',
-    );
+    ];
   }
 
   /**
@@ -97,8 +97,7 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    * @return bool
    */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
-    return
-      !empty($processor->context['actionMapping'])
+    return !empty($processor->context['actionMapping'])
       && $processor->context['actionMapping']->getEntity() === 'civicrm_contribution';
   }
 
@@ -129,7 +128,7 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     $fieldValue = isset($actionSearchResult->{"contrib_$field"}) ? $actionSearchResult->{"contrib_$field"} : NULL;
 
     $aliasTokens = $this->getAliasTokens();
-    if (in_array($field, array('total_amount', 'fee_amount', 'net_amount'))) {
+    if (in_array($field, ['total_amount', 'fee_amount', 'net_amount'])) {
       return $row->format('text/plain')->tokens($entity, $field,
         \CRM_Utils_Money::format($fieldValue, $actionSearchResult->contrib_currency));
     }

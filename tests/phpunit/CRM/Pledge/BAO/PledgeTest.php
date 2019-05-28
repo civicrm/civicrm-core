@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -91,6 +91,8 @@ class CRM_Pledge_BAO_PledgeTest extends CiviUnitTestCase {
 
     $this->assertEquals(count($pledgePayment), 1);
     $payment = array_pop($pledgePayment);
+    // Assert that we actually have no pledge Payments
+    $this->assertEquals(0, CRM_Pledge_BAO_Pledge::pledgeHasFinancialTransactions($pledge->id, array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'))));
     $this->assertEquals($payment['status'], 'Pending');
     $this->assertEquals($payment['scheduled_date'], date('Y-m-d 00:00:00', strtotime($scheduledDate)));
   }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,16 +33,11 @@
  */
 class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
-  /**
-   * Assume empty database with just civicrm_data.
-   */
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
-  protected $_apiversion;
   protected $_entity = 'Membership';
   protected $_params;
-  protected $_ids = array();
   protected $_paymentProcessorID;
 
   /**
@@ -57,7 +52,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    *
    * @var array
    */
-  protected $_processorParams = array();
+  protected $_processorParams = [];
 
   /**
    * ID of created membership.
@@ -71,7 +66,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    *
    * @var array
    */
-  protected $paymentInstruments = array();
+  protected $paymentInstruments = [];
 
 
   /**
@@ -86,18 +81,12 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
    * and redirect stdin to a temporary file.
    */
   public function setUp() {
-    $this->_apiversion = 3;
     parent::setUp();
 
     $this->_individualId = $this->individualCreate();
     $this->_paymentProcessorID = $this->processorCreate();
-    // Insert test data.
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/dataset/data.xml'
-      )
-    );
+
+    $this->loadXMLDataSet(dirname(__FILE__) . '/dataset/data.xml');
     $membershipTypeAnnualFixed = $this->callAPISuccess('membership_type', 'create', array(
       'domain_id' => 1,
       'name' => "AnnualFixed",
@@ -117,7 +106,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     ));
     $this->_membershipID = $membership['id'];
 
-    $instruments = $this->callAPISuccess('contribution', 'getoptions', array('field' => 'payment_instrument_id'));
+    $instruments = $this->callAPISuccess('contribution', 'getoptions', ['field' => 'payment_instrument_id']);
     $this->paymentInstruments = $instruments['values'];
   }
 
@@ -147,7 +136,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
   public function testSubmit() {
     $form = $this->getForm();
     $this->createLoggedInUser();
-    $params = array(
+    $params = [
       'cid' => $this->_individualId,
       'join_date' => date('m/d/Y', time()),
       'start_date' => '',
@@ -170,7 +159,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'cvv2' => '123',
       'credit_card_exp_date' => array(
         'M' => '9',
-        'Y' => '2024', // TODO: Future proof
+        // TODO: Future proof
+        'Y' => '2024',
       ),
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
@@ -180,10 +170,11 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'billing_state_province_id-5' => '1003',
       'billing_postal_code-5' => '90210',
       'billing_country_id-5' => '1228',
-    );
+    ];
     $form->_contactID = $this->_individualId;
 
     $form->testSubmit($params);
+    $form->setRenewalMessage();
     $membership = $this->callAPISuccessGetSingle('Membership', array('contact_id' => $this->_individualId));
     $this->callAPISuccessGetCount('ContributionRecur', array('contact_id' => $this->_individualId), 0);
     $contribution = $this->callAPISuccess('Contribution', 'get', array(
@@ -204,7 +195,15 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
         'id' => $this->_paymentProcessorID,
         'return' => 'payment_instrument_id',
       )),
-      ), 'online');
+    ), 'online');
+    $this->assertEquals([
+      [
+        'text' => 'AnnualFixed membership for Mr. Anthony Anderson II has been renewed.',
+        'title' => 'Complete',
+        'type' => 'success',
+        'options' => NULL,
+      ],
+    ], CRM_Core_Session::singleton()->getStatus());
   }
 
   /**
@@ -247,7 +246,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'cvv2' => '123',
       'credit_card_exp_date' => array(
         'M' => '9',
-        'Y' => '2019', // TODO: Future proof
+        // TODO: Future proof
+        'Y' => '2019',
       ),
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',
@@ -296,7 +296,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('address', array(
       'contact_id' => $this->_individualId,
       'street_address' => '10 Test St',
-       'postal_code' => 90210,
+      'postal_code' => 90210,
     ));
   }
 
@@ -400,7 +400,7 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
     $contributionRecur = $this->callAPISuccessGetSingle('ContributionRecur', array('contact_id' => $this->_individualId));
     $this->assertEquals(1, $contributionRecur['is_email_receipt']);
     $this->mut->checkMailLog([
-      '$ ' . $this->formatMoneyInput(7800.90)
+      '$ ' . $this->formatMoneyInput(7800.90),
     ]);
     $this->mut->stop();
     $this->setCurrencySeparators(',');
@@ -611,7 +611,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'num_terms' => '1',
       'source' => '',
       'total_amount' => $this->formatMoneyInput('7800.90'),
-      'financial_type_id' => '2', //Member dues, see data.xml
+      //Member dues, see data.xml
+      'financial_type_id' => '2',
       'soft_credit_type_id' => 11,
       'soft_credit_contact_id' => '',
       'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
@@ -621,7 +622,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
       'cvv2' => '123',
       'credit_card_exp_date' => array(
         'M' => '9',
-        'Y' => '2019', // TODO: Future proof
+        // TODO: Future proof
+        'Y' => '2019',
       ),
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Test',

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
@@ -42,12 +42,12 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
    * @param array $formValues
    */
   public function __construct(&$formValues) {
-    $this->_formValues = $formValues;
+    $this->_formValues = self::formatSavedSearchFields($formValues);
 
     /**
      * Define the columns for search result rows
      */
-    $this->_columns = array(
+    $this->_columns = [
       ts('Name') => 'sort_name',
       ts('Status') => 'activity_status',
       ts('Activity Type') => 'activity_type',
@@ -61,7 +61,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
       ts('Duration') => 'duration',
       ts('Details') => 'details',
       ts('Assignee') => 'assignee',
-    );
+    ];
 
     $this->_groupId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_OptionGroup',
       'activity_status',
@@ -107,7 +107,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
     );
 
     // Select box for Activity Type
-    $activityType = array('' => ' - select activity - ') + CRM_Core_PseudoConstant::activityType();
+    $activityType = ['' => ' - select activity - '] + CRM_Core_PseudoConstant::activityType();
 
     $form->add('select', 'activity_type_id', ts('Activity Type'),
       $activityType,
@@ -115,7 +115,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
     );
 
     // textbox for Activity Status
-    $activityStatus = array('' => ' - select status - ') + CRM_Core_PseudoConstant::activityStatus();
+    $activityStatus = ['' => ' - select status - '] + CRM_Core_PseudoConstant::activityStatus();
 
     $form->add('select', 'activity_status_id', ts('Activity Status'),
       $activityStatus,
@@ -123,8 +123,8 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
     );
 
     // Activity Date range
-    $form->addDate('start_date', ts('Activity Date From'), FALSE, array('formatType' => 'custom'));
-    $form->addDate('end_date', ts('...through'), FALSE, array('formatType' => 'custom'));
+    $form->add('datepicker', 'start_date', ts('Activity Date From'), [], FALSE, ['time' => FALSE]);
+    $form->add('datepicker', 'end_date', ts('...through'), [], FALSE, ['time' => FALSE]);
 
     // Contact Name field
     $form->add('text', 'sort_name', ts('Contact Name'));
@@ -133,7 +133,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
      * If you are using the sample template, this array tells the template fields to render
      * for the search form.
      */
-    $form->assign('elements', array(
+    $form->assign('elements', [
       'contact_type',
       'activity_subject',
       'activity_type_id',
@@ -141,7 +141,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Sea
       'start_date',
       'end_date',
       'sort_name',
-    ));
+    ]);
   }
 
   /**
@@ -296,7 +296,7 @@ ORDER BY contact_a.sort_name';
    * @return string
    */
   public function where($includeContactIDs = FALSE) {
-    $clauses = array();
+    $clauses = [];
 
     // add contact name search; search on primary name, source contact, assignee
     $contactname = $this->_formValues['sort_name'];
@@ -328,26 +328,16 @@ ORDER BY contact_a.sort_name';
       $clauses[] = "activity.activity_type_id = {$this->_formValues['activity_type_id']}";
     }
 
-    $startDate = $this->_formValues['start_date'];
-    if (!empty($startDate)) {
-      $startDate .= '00:00:00';
-      $startDateFormatted = CRM_Utils_Date::processDate($startDate);
-      if ($startDateFormatted) {
-        $clauses[] = "activity.activity_date_time >= $startDateFormatted";
-      }
+    if (!empty($this->_formValues['start_date'])) {
+      $clauses[] = "activity.activity_date_time >= '{$this->_formValues['start_date']} 00:00:00'";
     }
 
-    $endDate = $this->_formValues['end_date'];
-    if (!empty($endDate)) {
-      $endDate .= '23:59:59';
-      $endDateFormatted = CRM_Utils_Date::processDate($endDate);
-      if ($endDateFormatted) {
-        $clauses[] = "activity.activity_date_time <= $endDateFormatted";
-      }
+    if (!empty($this->_formValues['end_date'])) {
+      $clauses[] = "activity.activity_date_time <= '{$this->_formValues['end_date']} 23:59:59'";
     }
 
     if ($includeContactIDs) {
-      $contactIDs = array();
+      $contactIDs = [];
       foreach ($this->_formValues as $id => $value) {
         if ($value &&
           substr($id, 0, CRM_Core_Form::CB_PREFIX_LEN) == CRM_Core_Form::CB_PREFIX
@@ -427,6 +417,30 @@ ORDER BY contact_a.sort_name';
    */
   public function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+  /**
+   * Format saved search fields for this custom group.
+   *
+   * Note this is a function to facilitate the transition to jcalendar for
+   * saved search groups. In time it can be stripped out again.
+   *
+   * @param array $formValues
+   *
+   * @return array
+   */
+  public static function formatSavedSearchFields($formValues) {
+    $dateFields = [
+      'start_date',
+      'end_date',
+    ];
+    foreach ($formValues as $element => $value) {
+      if (in_array($element, $dateFields) && !empty($value)) {
+        $formValues[$element] = date('Y-m-d', strtotime($value));
+      }
+    }
+
+    return $formValues;
   }
 
 }

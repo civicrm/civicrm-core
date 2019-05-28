@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -91,14 +91,12 @@ class CRM_Core_OptionGroupTest extends CiviUnitTestCase {
     }
   }
 
-
   public function emailAddressTests() {
     $tests[] = array('"Name"<email@example.com>', '"Name" <email@example.com>');
     $tests[] = array('"Name" <email@example.com>', '"Name" <email@example.com>');
     $tests[] = array('"Name"  <email@example.com>', '"Name" <email@example.com>');
     return $tests;
   }
-
 
   /**
    * @dataProvider emailAddressTests

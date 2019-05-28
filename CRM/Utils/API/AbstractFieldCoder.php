@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * of all fields (except for some black-listed skip-fields).
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 require_once 'api/Wrapper.php';
@@ -79,7 +79,7 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
     }
     // Field can take multiple entries, eg. fieldName[1], fieldName[2], etc.
     // We remove the index and check again if the fieldName in the list of skipped fields.
-    $matches = array();
+    $matches = [];
     if (preg_match('/^(.*)\[\d+\]/', $fldName, $matches) && in_array($matches[1], $skipFields)) {
       return TRUE;
     }
@@ -92,7 +92,7 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
    *
    * @param array|string $values the field value from the API
    */
-  public abstract function encodeInput(&$values);
+  abstract public function encodeInput(&$values);
 
   /**
    * Decode output.
@@ -101,14 +101,14 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
    *
    * @return mixed
    */
-  public abstract function decodeOutput(&$values);
+  abstract public function decodeOutput(&$values);
 
   /**
    * @inheritDoc
    */
   public function fromApiInput($apiRequest) {
     $lowerAction = strtolower($apiRequest['action']);
-    if ($apiRequest['version'] == 3 && in_array($lowerAction, array('get', 'create'))) {
+    if ($apiRequest['version'] == 3 && in_array($lowerAction, ['get', 'create'])) {
       // note: 'getsingle', 'replace', 'update', and chaining all build on top of 'get'/'create'
       foreach ($apiRequest['params'] as $key => $value) {
         // Don't apply escaping to API control parameters (e.g. 'api.foo' or 'options.foo')
@@ -133,7 +133,7 @@ abstract class CRM_Utils_API_AbstractFieldCoder implements API_Wrapper {
    */
   public function toApiOutput($apiRequest, $result) {
     $lowerAction = strtolower($apiRequest['action']);
-    if ($apiRequest['version'] == 3 && in_array($lowerAction, array('get', 'create', 'setvalue', 'getquick'))) {
+    if ($apiRequest['version'] == 3 && in_array($lowerAction, ['get', 'create', 'setvalue', 'getquick'])) {
       foreach ($result as $key => $value) {
         // Don't apply escaping to API control parameters (e.g. 'api.foo' or 'options.foo')
         // and don't apply to other skippable fields

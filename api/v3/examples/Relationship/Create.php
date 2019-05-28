@@ -6,7 +6,7 @@
  *   API result array
  */
 function relationship_create_example() {
-  $params = array(
+  $params = [
     'contact_id_a' => 31,
     'contact_id_b' => 33,
     'relationship_type_id' => 18,
@@ -14,7 +14,7 @@ function relationship_create_example() {
     'end_date' => '2010-12-30',
     'is_active' => 1,
     'note' => 'note',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Relationship', 'create', $params);
@@ -24,12 +24,12 @@ function relationship_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -43,13 +43,13 @@ function relationship_create_example() {
  */
 function relationship_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'contact_id_a' => '31',
         'contact_id_b' => '33',
@@ -61,9 +61,9 @@ function relationship_create_expectedresult() {
         'is_permission_a_b' => 0,
         'is_permission_b_a' => 0,
         'case_id' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

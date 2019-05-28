@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -76,12 +76,12 @@ class CRM_Campaign_Form_Search_Petition extends CRM_Core_Form {
 
     //campaigns
     $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(NULL, NULL, FALSE, FALSE, FALSE, TRUE);
-    $this->add('select', 'petition_campaign_id', ts('Campaign'), array('' => ts('- select -')) + $campaigns);
+    $this->add('select', 'petition_campaign_id', ts('Campaign'), ['' => ts('- select -')] + $campaigns);
     $this->set('petitionCampaigns', $campaigns);
     $this->assign('petitionCampaigns', json_encode($campaigns));
 
     //build the array of all search params.
-    $this->_searchParams = array();
+    $this->_searchParams = [];
     foreach ($this->_elements as $element) {
       $name = $element->_attributes['name'];
       $label = $element->_label;

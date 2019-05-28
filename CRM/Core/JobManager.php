@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,24 +30,27 @@
  * by every scheduled job (cron task) in CiviCRM.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_JobManager {
 
   /**
-   * @var array ($id => CRM_Core_ScheduledJob)
+   * Jobs.
+   *
+   * Format is ($id => CRM_Core_ScheduledJob).
+   *
+   * @var array
    */
-  var $jobs = NULL;
+  public $jobs = NULL;
 
   /**
    * @var CRM_Core_ScheduledJob
    */
-  var $currentJob = NULL;
+  public $currentJob = NULL;
 
-  var $singleRunParams = array();
+  public $singleRunParams = [];
 
-  var $_source = NULL;
-
+  public $_source = NULL;
 
   /**
    * Class constructor.
@@ -83,10 +86,10 @@ class CRM_Core_JobManager {
     $this->logEntry('Finishing scheduled jobs execution.');
 
     // Set last cron date for the status check
-    $statusPref = array(
+    $statusPref = [
       'name' => 'checkLastCron',
       'check_info' => gmdate('U'),
-    );
+    ];
     CRM_Core_BAO_StatusPreference::create($statusPref);
   }
 
@@ -156,7 +159,7 @@ class CRM_Core_JobManager {
     //Disable outBound option after executing the job.
     $environment = CRM_Core_Config::environment(NULL, TRUE);
     if ($environment != 'Production' && !empty($job->apiParams['runInNonProductionEnvironment'])) {
-      Civi::settings()->set('mailing_backend', array('outBound_option' => CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED));
+      Civi::settings()->set('mailing_backend', ['outBound_option' => CRM_Mailing_Config::OUTBOUND_OPTION_DISABLED]);
     }
   }
 
@@ -168,13 +171,13 @@ class CRM_Core_JobManager {
    *   ($id => CRM_Core_ScheduledJob)
    */
   private function _getJobs() {
-    $jobs = array();
+    $jobs = [];
     $dao = new CRM_Core_DAO_Job();
     $dao->orderBy('name');
     $dao->domain_id = CRM_Core_Config::domainID();
     $dao->find();
     while ($dao->fetch()) {
-      $temp = array();
+      $temp = [];
       CRM_Core_DAO::storeValues($dao, $temp);
       $jobs[$dao->id] = new CRM_Core_ScheduledJob($temp);
     }

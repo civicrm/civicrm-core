@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,11 +35,12 @@
  * @package CiviCRM
  * @group headless
  */
-class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
+class CRM_Contact_SelectorTest extends CiviUnitTestCase {
 
   public function tearDown() {
 
   }
+
   /**
    * Test the query from the selector class is consistent with the dataset expectation.
    *
@@ -92,10 +93,17 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
         ]);
         $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
         $this->assertEquals(1, count($rows));
+
+        CRM_Core_DAO::reenableFullGroupByMode();
+        $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 50, '');
+
         $sortChar = $selector->alphabetQuery()->fetchAll();
         // sort name is stored in '<last_name>, <first_name>' format, as per which the first character would be B of Bond
         $this->assertEquals('B', $sortChar[0]['sort_name']);
         $this->assertEquals($contactID, key($rows));
+
+        CRM_Core_DAO::reenableFullGroupByMode();
+        $selector->getQueryObject()->getCachedContacts([$contactID], FALSE);
       }
     }
   }
@@ -140,24 +148,23 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
     $selector->setKey($key);
 
     // fetch row and check the result
-    $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, TRUE, NULL);
+    $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
     $this->assertEquals(1, count($rows));
     $this->assertEquals($contactID, key($rows));
 
     // build cache key and use to it to fetch prev-next cache record
     $cacheKey = 'civicrm search ' . $key;
     $contacts = CRM_Utils_SQL_Select::from('civicrm_prevnext_cache')
-                  ->select(['entity_table', 'entity_id1', 'cacheKey'])
-                  ->where("cacheKey = '!key'")
-                  ->param('!key', $cacheKey)
-                  ->execute()
-                  ->fetchAll();
+      ->select(['entity_id1', 'cachekey'])
+      ->where("cachekey = @key")
+      ->param('key', $cacheKey)
+      ->execute()
+      ->fetchAll();
     $this->assertEquals(1, count($contacts));
     // check the prevNext record matches
     $expectedEntry = [
-      'entity_table' => 'civicrm_contact',
       'entity_id1' => $contactID,
-      'cacheKey' => $cacheKey,
+      'cachekey' => $cacheKey,
     ];
     $this->checkArrayEquals($contacts[0], $expectedEntry);
   }
@@ -201,7 +208,7 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
           'expected_query' => array(
             0 => 'default',
             1 => 'default',
-            2 => "WHERE  ( civicrm_email.email LIKE '%mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE '%mouse%' ) OR ( civicrm_email.email LIKE '%mouse%' ) ) ) ) AND (contact_a.is_deleted = 0)",
+            2 => "WHERE  ( civicrm_email.email LIKE '%mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE '%Mouse%' ) OR ( civicrm_email.email LIKE '%Mouse%' ) ) ) ) AND (contact_a.is_deleted = 0)",
           ),
         ),
       ),
@@ -220,7 +227,7 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
           'expected_query' => array(
             0 => 'default',
             1 => 'default',
-            2 => "WHERE  ( civicrm_email.email LIKE 'mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE 'mouse%' ) OR ( civicrm_email.email LIKE 'mouse%' ) ) ) ) AND (contact_a.is_deleted = 0)",
+            2 => "WHERE  ( civicrm_email.email LIKE 'mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND (contact_a.is_deleted = 0)",
           ),
         ),
       ),
@@ -240,7 +247,7 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
           'expected_query' => array(
             0 => 'default',
             1 => 'default',
-            2 => "WHERE  ( civicrm_email.email = 'mickey@mouseville.com'  AND ( ( ( contact_a.sort_name LIKE 'mouse%' ) OR ( civicrm_email.email LIKE 'mouse%' ) ) ) ) AND (contact_a.is_deleted = 0)",
+            2 => "WHERE  ( civicrm_email.email = 'mickey@mouseville.com'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND (contact_a.is_deleted = 0)",
           ),
         ),
       ),
@@ -294,13 +301,15 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
    * Test the contact ID query does not fail on country search.
    */
   public function testContactIDQuery() {
-    $params = [[
-      0 => 'country-1',
-      1 => '=',
-      2 => '1228',
-      3 => 1,
-      4 => 0,
-    ]];
+    $params = [
+      [
+        0 => 'country-1',
+        1 => '=',
+        2 => '1228',
+        3 => 1,
+        4 => 0,
+      ],
+    ];
 
     $searchOBJ = new CRM_Contact_Selector(NULL);
     $searchOBJ->contactIDQuery($params, '1_u');
@@ -326,13 +335,15 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
     $selector = new CRM_Contact_Selector(
       'CRM_Contact_Selector',
       ['email' => ['IS NOT NULL' => 1]],
-      [[
-        0 => 'email-' . $locationType->id,
-        1 => 'IS NOT NULL',
-        2 => NULL,
-        3 => 1,
-        4 => 0,
-      ]],
+      [
+        [
+          0 => 'email-' . $locationType->id,
+          1 => 'IS NOT NULL',
+          2 => NULL,
+          3  => 1,
+          4 => 0,
+        ],
+      ],
       [
         'contact_type' => 1,
         'contact_sub_type' => 1,
@@ -355,13 +366,13 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
     $expectedQuery = [
       0 => "SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, `Non_ASCII_Location_Type-location_type`.id as `Non_ASCII_Location_Type-location_type_id`, `Non_ASCII_Location_Type-location_type`.name as `Non_ASCII_Location_Type-location_type`, `Non_ASCII_Location_Type-email`.id as `Non_ASCII_Location_Type-email_id`, `Non_ASCII_Location_Type-email`.email as `Non_ASCII_Location_Type-email`",
       // @TODO these FROM clause doesn't matches due to extra spaces or special character
-      2 => "WHERE  (  ( LOWER(`Non_ASCII_Location_Type-email`.email) IS NOT NULL )  )  AND (contact_a.is_deleted = 0)",
+      2 => "WHERE  (  ( `Non_ASCII_Location_Type-email`.email IS NOT NULL )  )  AND (contact_a.is_deleted = 0)",
     ];
     foreach ($expectedQuery as $index => $queryString) {
       $this->assertEquals($this->strWrangle($queryString), $this->strWrangle($sql[$index]));
     }
 
-    $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, TRUE, NULL);
+    $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
     $this->assertEquals(1, count($rows));
     $this->assertEquals($contactID, key($rows));
     $this->assertEquals('test@test.com', $rows[$contactID]['Non_ASCII_Location_Type-email']);
@@ -381,23 +392,30 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
       'IN' => ['IN' => ['Adam']],
     ];
     $filtersByWhereClause = [
-      'IS NOT NULL' => '( contact_a.first_name IS NOT NULL )', // doesn't matter
-      '=' => "( contact_a.first_name = 'Adam' )", // case sensitive check
-      'LIKE' => "( contact_a.first_name LIKE '%ad%' )", // case insensitive check
-      'RLIKE' => "(  contact_a.first_name RLIKE BINARY '^A[a-z]{3}$'  )", // case sensitive check
-      'IN' => '( contact_a.first_name IN ("Adam") )', // case sensitive check
+      // doesn't matter
+      'IS NOT NULL' => '( contact_a.first_name IS NOT NULL )',
+      // case sensitive check
+      '=' => "( contact_a.first_name = 'Adam' )",
+      // case insensitive check
+      'LIKE' => "( contact_a.first_name LIKE '%Ad%' )",
+      // case sensitive check
+      'RLIKE' => "(  contact_a.first_name RLIKE BINARY '^A[a-z]{3}$'  )",
+      // case sensitive check
+      'IN' => '( contact_a.first_name IN ("Adam") )',
     ];
     foreach ($filters as $op => $filter) {
       $selector = new CRM_Contact_Selector(
         'CRM_Contact_Selector',
         ['first_name' => [$op => $filter]],
-        [[
-          0 => 'first_name',
-          1 => $op,
-          2 => $filter,
-          3 => 1,
-          4 => 0,
-        ]],
+        [
+          [
+            0 => 'first_name',
+            1 => $op,
+            2 => $filter,
+            3 => 1,
+            4 => 0,
+          ],
+        ],
         [],
         CRM_Core_Action::NONE,
         NULL,
@@ -408,7 +426,7 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
       $sql = $selector->getQueryObject()->query();
       $this->assertEquals(TRUE, strpos($sql[2], $filtersByWhereClause[$op]));
 
-      $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, TRUE, NULL);
+      $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
       $this->assertEquals(1, count($rows));
       $this->assertEquals($contactID, key($rows));
     }
@@ -420,13 +438,15 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
    */
   public function testSelectorQueryOrderByCustomField() {
     //Search for any params.
-    $params = [[
-      0 => 'country-1',
-      1 => '=',
-      2 => '1228',
-      3 => 1,
-      4 => 0,
-    ]];
+    $params = [
+      [
+        0 => 'country-1',
+        1 => '=',
+        2 => '1228',
+        3 => 1,
+        4 => 0,
+      ],
+    ];
 
     //Create a test custom group and field.
     $customGroup = $this->callAPISuccess('CustomGroup', 'create', array(
@@ -465,6 +485,8 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
     $this->assertTrue(in_array($cgTableName, array_keys($query->_tables)));
     //Assert if from clause joins the custom table.
     $this->assertTrue(strpos($query->_fromClause, $cgTableName) !== FALSE);
+    $this->callAPISuccess('CustomField', 'delete', ['id' => $customField['id']]);
+    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $customGroup['id']]);
   }
 
   /**
@@ -477,7 +499,7 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
       'title' => "test custom group",
       'extends' => "Individual",
     ));
-    $customTableName = $this->callAPISuccess('CustomGroup', 'getValue', ['id' => $customGroup, 'return' => 'table_name']);
+    $customTableName = $this->callAPISuccess('CustomGroup', 'getValue', ['id' => $customGroup['id'], 'return' => 'table_name']);
     $customGroupTableName = $customGroup['values'][$customGroup['id']]['table_name'];
 
     $createdField = $this->callAPISuccess('customField', 'create', [
@@ -498,13 +520,15 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
     $selector = new CRM_Contact_Selector(
       'CRM_Contact_Selector',
       ['custom_' . $createdField['id'] => ['IS NOT EMPTY' => 1]],
-      [[
-        0 => 'custom_' . $createdField['id'],
-        1 => 'IS NOT NULL',
-        2 => 1,
-        3 => 1,
-        4 => 0,
-      ]],
+      [
+        [
+          0 => 'custom_' . $createdField['id'],
+          1 => 'IS NOT NULL',
+          2 => 1,
+          3 => 1,
+          4 => 0,
+        ],
+      ],
       [],
       CRM_Core_Action::NONE,
       NULL,
@@ -517,7 +541,7 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
     // test the presence of expected date clause
     $this->assertEquals(TRUE, strpos($whereClause, $expectedClause));
 
-    $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, TRUE, NULL);
+    $rows = $selector->getRows(CRM_Core_Action::VIEW, 0, 1, NULL);
     $this->assertEquals(1, count($rows));
   }
 
@@ -549,10 +573,11 @@ class CRM_Contact_Form_SelectorTest extends CiviUnitTestCase {
    */
   public function getDefaultFromString() {
     return ' FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 )'
+    . ' LEFT JOIN civicrm_country ON ( civicrm_address.country_id = civicrm_country.id ) '
     . ' LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1)'
     . ' LEFT JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id AND civicrm_phone.is_primary = 1)'
     . ' LEFT JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id AND civicrm_im.is_primary = 1) '
-    . 'LEFT JOIN civicrm_country ON civicrm_address.country_id = civicrm_country.id LEFT JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id ';
+    . 'LEFT JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id ';
   }
 
   /**

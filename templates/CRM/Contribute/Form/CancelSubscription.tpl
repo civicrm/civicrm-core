@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -42,17 +42,5 @@
     </div>
   {/if}
 </div>
-{if !$self_service}
-<table class="form-layout">
-   <tr>
-      <td class="label">{$form.send_cancel_request.label}</td>
-      <td class="html-adjust">{$form.send_cancel_request.html}</td>
-   </tr>
-   <tr>
-      <td class="label">{$form.is_notify.label}</td>
-      <td class="html-adjust">{$form.is_notify.html}</td>
-   </tr>
-</table>
-{/if}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
+  {include file="CRM/Core/Form/EntityForm.tpl"}
 </div>

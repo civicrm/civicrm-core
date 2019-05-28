@@ -6,9 +6,9 @@
  *   API result array
  */
 function domain_get_example() {
-  $params = array(
+  $params = [
     'sequential' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Domain', 'get', $params);
@@ -18,12 +18,12 @@ function domain_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -37,23 +37,23 @@ function domain_get_example() {
  */
 function domain_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 2,
-    'values' => array(
-      '0' => array(
+    'values' => [
+      '0' => [
         'id' => '1',
         'name' => 'Default Domain Name',
         'version' => '4.6.alpha1',
         'contact_id' => '3',
         'locale_custom_strings' => 'a:1:{s:5:\"en_US\";a:0:{}}',
         'domain_email' => 'my@email.com',
-        'domain_phone' => array(
+        'domain_phone' => [
           'phone_type' => 'Phone',
           'phone' => '456-456',
-        ),
-        'domain_address' => array(
+        ],
+        'domain_address' => [
           'street_address' => '45 Penny Lane',
           'supplemental_address_1' => '',
           'supplemental_address_2' => '',
@@ -64,22 +64,22 @@ function domain_get_expectedresult() {
           'country_id' => '',
           'geo_code_1' => '',
           'geo_code_2' => '',
-        ),
+        ],
         'from_email' => 'info@EXAMPLE.ORG',
         'from_name' => 'FIXME',
         'domain_version' => '4.6.alpha1',
-      ),
-      '1' => array(
+      ],
+      '1' => [
         'id' => '2',
         'name' => 'Second Domain',
         'version' => '4.6.alpha1',
         'contact_id' => '2',
         'domain_email' => '\"Domain Email\" <domainemail2@example.org>',
-        'domain_phone' => array(
+        'domain_phone' => [
           'phone_type' => 'Phone',
           'phone' => '204 555-1001',
-        ),
-        'domain_address' => array(
+        ],
+        'domain_address' => [
           'street_address' => '15 Main St',
           'supplemental_address_1' => '',
           'supplemental_address_2' => '',
@@ -90,13 +90,13 @@ function domain_get_expectedresult() {
           'country_id' => '1228',
           'geo_code_1' => '41.8328',
           'geo_code_2' => '-72.9253',
-        ),
+        ],
         'from_email' => 'info@EXAMPLE.ORG',
         'from_name' => 'FIXME',
         'domain_version' => '4.6.alpha1',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

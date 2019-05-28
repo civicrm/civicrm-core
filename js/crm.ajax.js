@@ -572,8 +572,11 @@
           var currentHeight = $wrapper.outerHeight(),
             padding = currentHeight - $dialog.height(),
             newHeight = $dialog.prop('scrollHeight') + padding,
-            menuHeight = $('#civicrm-menu').outerHeight(),
-            maxHeight = $(window).height() - menuHeight;
+            menuHeight = $('#civicrm-menu').outerHeight();
+          if ($('body').hasClass('crm-menubar-below-cms-menu')) {
+            menuHeight += $('#civicrm-menu').offset().top;
+          }
+          var maxHeight = $(window).height() - menuHeight;
           newHeight = newHeight > maxHeight ? maxHeight : newHeight;
           if (newHeight > (currentHeight + 15)) {
             $dialog.dialog('option', {

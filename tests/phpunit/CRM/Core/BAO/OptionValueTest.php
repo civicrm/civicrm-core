@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -63,7 +63,6 @@ class CRM_Core_BAO_OptionValueTest extends CiviUnitTestCase {
     }
     $this->fail('Should not have gotten this far');
   }
-
 
   /**
    * Ensure only one option value copes with disabled.

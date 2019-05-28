@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  * Utilities for rendering numbers as English.
@@ -38,7 +38,7 @@
  */
 class CRM_Utils_EnglishNumber {
 
-  protected static $lowNumbers = array(
+  protected static $lowNumbers = [
     'Zero',
     'One',
     'Two',
@@ -59,9 +59,9 @@ class CRM_Utils_EnglishNumber {
     'Seventeen',
     'Eighteen',
     'Nineteen',
-  );
+  ];
 
-  protected static $intervalsOfTen = array(
+  protected static $intervalsOfTen = [
     9 => 'Ninety',
     8 => 'Eighty',
     7 => 'Seventy',
@@ -70,7 +70,7 @@ class CRM_Utils_EnglishNumber {
     4 => 'Forty',
     3 => 'Thirty',
     2 => 'Twenty',
-  );
+  ];
 
   /**
    * @param int $num

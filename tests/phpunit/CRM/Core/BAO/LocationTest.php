@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -38,17 +38,18 @@
  * @group headless
  */
 class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
 
     $this->quickCleanup(array(
-        'civicrm_contact',
-        'civicrm_address',
-        'civicrm_loc_block',
-        'civicrm_email',
-        'civicrm_phone',
-        'civicrm_im',
-      ));
+      'civicrm_contact',
+      'civicrm_address',
+      'civicrm_loc_block',
+      'civicrm_email',
+      'civicrm_phone',
+      'civicrm_im',
+    ));
   }
 
   /**

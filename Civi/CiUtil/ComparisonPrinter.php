@@ -7,8 +7,8 @@ namespace Civi\CiUtil;
  * @package Civi\CiUtil
  */
 class ComparisonPrinter {
-  var $headers;
-  var $hasHeader = FALSE;
+  public $headers;
+  public $hasHeader = FALSE;
 
   /**
    * @param $headers

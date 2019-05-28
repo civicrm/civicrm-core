@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  *
  * Table naming rules:
  *   - MySQL imposes a 64 char limit.
@@ -54,7 +54,7 @@
  *
  * Example 3: Create an empty temp table with list of columns.
  *
- * $tmpTbl = CRM_Utils_SQL_TempTable::build()->setDurable()->setUtf8()->createWithColumns('id int(10, name varchar(64)');
+ * $tmpTbl = CRM_Utils_SQL_TempTable::build()->setDurable()->createWithColumns('id int(10, name varchar(64)');
  *
  * Example 4: Drop a table that you previously created.
  *
@@ -70,19 +70,31 @@ class CRM_Utils_SQL_TempTable {
   const UTF8 = 'DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci';
   const CATEGORY_LENGTH = 12;
   const CATEGORY_REGEXP = ';^[a-zA-Z0-9]+$;';
-  const ID_LENGTH = 37; // MAX{64} - CATEGORY_LENGTH{12} - CONST_LENGHTH{15} = 37
+  // MAX{64} - CATEGORY_LENGTH{12} - CONST_LENGHTH{15} = 37
+  const ID_LENGTH = 37;
   const ID_REGEXP = ';^[a-zA-Z0-9_]+$;';
+  const INNODB = 'ENGINE=InnoDB';
+  const MEMORY = 'ENGINE=MEMORY';
 
   /**
    * @var bool
    */
-  protected $durable, $utf8;
+  protected $durable;
+
+  /**
+   * @var bool
+   */
+  protected $utf8;
 
   protected $category;
 
   protected $id;
 
   protected $autodrop;
+
+  protected $memory;
+
+  protected $createSql;
 
   /**
    * @return CRM_Utils_SQL_TempTable
@@ -93,9 +105,9 @@ class CRM_Utils_SQL_TempTable {
     $t->id = md5(uniqid('', TRUE));
     // The constant CIVICRM_TEMP_FORCE_DURABLE is for local debugging.
     $t->durable = CRM_Utils_Constant::value('CIVICRM_TEMP_FORCE_DURABLE', FALSE);
-    // I suspect it would be better to just say utf8=true, but a lot of existing queries don't do the utf8 bit.
-    $t->utf8 = CRM_Utils_Constant::value('CIVICRM_TEMP_FORCE_UTF8', FALSE);
+    $t->utf8 = TRUE;
     $t->autodrop = FALSE;
+    $t->memory = FALSE;
     return $t;
   }
 
@@ -126,12 +138,14 @@ class CRM_Utils_SQL_TempTable {
    * @return CRM_Utils_SQL_TempTable
    */
   public function createWithQuery($selectQuery) {
-    $sql = sprintf('%s %s AS %s',
+    $sql = sprintf('%s %s %s AS %s',
       $this->toSQL('CREATE'),
+      $this->memory ? self::MEMORY : self::INNODB,
       $this->utf8 ? self::UTF8 : '',
       ($selectQuery instanceof CRM_Utils_SQL_Select ? $selectQuery->toSQL() : $selectQuery)
     );
-    CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, TRUE, FALSE);
+    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
+    $this->createSql = $sql;
     return $this;
   }
 
@@ -144,12 +158,14 @@ class CRM_Utils_SQL_TempTable {
    * @return CRM_Utils_SQL_TempTable
    */
   public function createWithColumns($columns) {
-    $sql = sprintf('%s (%s) %s',
+    $sql = sprintf('%s (%s) %s %s',
       $this->toSQL('CREATE'),
       $columns,
+      $this->memory ? self::MEMORY : self::INNODB,
       $this->utf8 ? self::UTF8 : ''
     );
-    CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, TRUE, FALSE);
+    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
+    $this->createSql = $sql;
     return $this;
   }
 
@@ -160,7 +176,7 @@ class CRM_Utils_SQL_TempTable {
    */
   public function drop() {
     $sql = $this->toSQL('DROP', 'IF EXISTS');
-    CRM_Core_DAO::executeQuery($sql, array(), TRUE, NULL, TRUE, FALSE);
+    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, TRUE, FALSE);
     return $this;
   }
 
@@ -202,6 +218,13 @@ class CRM_Utils_SQL_TempTable {
   }
 
   /**
+   * @return string|NULL
+   */
+  public function getCreateSql() {
+    return $this->createSql;
+  }
+
+  /**
    * @return bool
    */
   public function isAutodrop() {
@@ -213,6 +236,13 @@ class CRM_Utils_SQL_TempTable {
    */
   public function isDurable() {
     return $this->durable;
+  }
+
+  /**
+   * @return bool
+   */
+  public function isMemory() {
+    return $this->memory;
   }
 
   /**
@@ -274,9 +304,23 @@ class CRM_Utils_SQL_TempTable {
   }
 
   /**
+   * Set table engine to MEMORY.
+   *
+   * @param bool $value
+   *
+   * @return $this
+   */
+  public function setMemory($value = TRUE) {
+    $this->memory = $value;
+    return $this;
+  }
+
+  /**
    * Set table collation to UTF8.
    *
-   * This would make sense as a default but cautiousness during phasing in has made it opt-in.
+   * @deprecated This method is deprecated as tables should be assumed to have
+   * UTF-8 as the default character set and collation; some other character set
+   * or collation may be specified in the column definition.
    *
    * @param bool $value
    *

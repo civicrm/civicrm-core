@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -59,7 +59,7 @@
     {assign var="element_name" value="trxn_id_"|cat:$row.contribution_id}
     <td>{$form.$element_name.html|crmAddClass:eight}</td>
     {assign var="element_name" value="trxn_date_"|cat:$row.contribution_id}
-    <td>{include file="CRM/common/jcalendar.tpl" elementName=$element_name}</td>
+    <td>{$form.$element_name.html}</td>
 </tr>
 {/foreach}
 </table>

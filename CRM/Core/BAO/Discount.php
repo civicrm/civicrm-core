@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -92,7 +92,7 @@ class CRM_Core_BAO_Discount extends CRM_Core_DAO_Discount {
    *   option group Ids associated with discount
    */
   public static function getOptionGroup($entityId, $entityTable) {
-    $optionGroupIDs = array();
+    $optionGroupIDs = [];
     $dao = new CRM_Core_DAO_Discount();
     $dao->entity_id = $entityId;
     $dao->entity_table = $entityTable;

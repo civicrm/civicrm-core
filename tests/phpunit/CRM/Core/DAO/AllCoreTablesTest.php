@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
+
   public function testGetTableForClass() {
     $this->assertEquals('civicrm_email', CRM_Core_DAO_AllCoreTables::getTableForClass('CRM_Core_DAO_Email'));
     $this->assertEquals('civicrm_email', CRM_Core_DAO_AllCoreTables::getTableForClass('CRM_Core_BAO_Email'));
@@ -38,7 +39,7 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
   /**
    * Implements hook_civicrm_entityTypes().
    *
-   * @param array $entityTypes
+   * @see CRM_Utils_Hook::entityTypes()
    */
   public function _hook_civicrm_entityTypes(&$entityTypes) {
     $entityTypes['CRM_Core_DAO_Email']['fields_callback'][] = function ($class, &$fields) {
@@ -202,6 +203,14 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
     // needs a real DAO so use Group
     $newIndices = CRM_Core_DAO_AllCoreTables::multilingualize('CRM_Contact_DAO_Group', $originalIndices);
     $this->assertEquals($newIndices, $expectedIndices);
+  }
+
+  /**
+   * Test CRM_Core_DAO_AllCoreTables::isCoreTable
+   */
+  public function testIsCoreTable() {
+    $this->assertTrue(CRM_Core_DAO_AllCoreTables::isCoreTable('civicrm_contact'), 'civicrm_contact should be a core table');
+    $this->assertFalse(CRM_Core_DAO_AllCoreTables::isCoreTable('civicrm_invalid_table'), 'civicrm_invalid_table should NOT be a core table');
   }
 
 }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -42,7 +42,7 @@ class CRM_Contact_Form_Task_Merge extends CRM_Contact_Form_Task {
   public function preProcess() {
     parent::preProcess();
     $statusMsg = NULL;
-    $contactIds = array();
+    $contactIds = [];
     if (is_array($this->_contactIds)) {
       $contactIds = array_unique($this->_contactIds);
     }
@@ -51,7 +51,7 @@ class CRM_Contact_Form_Task_Merge extends CRM_Contact_Form_Task {
     }
 
     // do check for same contact type.
-    $contactTypes = array();
+    $contactTypes = [];
     if (!$statusMsg) {
       $sql = "SELECT contact_type FROM civicrm_contact WHERE id IN (" . implode(',', $contactIds) . ")";
       $contact = CRM_Core_DAO::executeQuery($sql);

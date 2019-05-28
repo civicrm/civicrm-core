@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -45,7 +45,7 @@ class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
     // Build contact type specific fields
     $class = 'CRM_Contact_Form_Edit_' . $this->_contactType;
     $class::buildQuickForm($this, 1);
-    $this->addFormRule(array('CRM_Contact_Form_Inline_ContactName', 'formRule'), $this);
+    $this->addFormRule(['CRM_Contact_Form_Inline_ContactName', 'formRule'], $this);
   }
 
   /**
@@ -63,7 +63,7 @@ class CRM_Contact_Form_Inline_ContactName extends CRM_Contact_Form_Inline {
     if (empty($fields['first_name']) && empty($fields['last_name'])
       && empty($fields['organization_name'])
       && empty($fields['household_name'])) {
-      $emails = civicrm_api3('Email', 'getcount', array('contact_id' => $form->_contactId));
+      $emails = civicrm_api3('Email', 'getcount', ['contact_id' => $form->_contactId]);
       if (!$emails) {
         $errorField = $form->_contactType == 'Individual' ? 'last' : strtolower($form->_contactType);
         $errors[$errorField . '_name'] = ts('Contact with no email must have a name.');

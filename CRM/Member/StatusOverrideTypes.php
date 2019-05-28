@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Membership status override types.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  *
  */
 class CRM_Member_StatusOverrideTypes {
@@ -64,11 +64,11 @@ class CRM_Member_StatusOverrideTypes {
    *   In ['Type 1 Value' => 'Type 1 Label'] format
    */
   public static function getSelectOptions() {
-    return array(
+    return [
       self::NO => ts('No'),
       self::PERMANENT => ts('Override Permanently'),
       self::UNTIL_DATE => ts('Override Until Selected Date'),
-    );
+    ];
   }
 
   /**

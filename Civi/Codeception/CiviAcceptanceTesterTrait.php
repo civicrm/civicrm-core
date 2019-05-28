@@ -33,7 +33,7 @@ trait CiviAcceptanceTesterTrait {
    */
   public function login($username, $password) {
     $config = \CRM_Core_Config::singleton();
-    $handler = array($this, 'loginTo' . $config->userFramework);
+    $handler = [$this, 'loginTo' . $config->userFramework];
     if (is_callable($handler)) {
       call_user_func($handler, $username, $password);
     }

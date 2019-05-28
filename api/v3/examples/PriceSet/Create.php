@@ -6,13 +6,13 @@
  *   API result array
  */
 function price_set_create_example() {
-  $params = array(
+  $params = [
     'entity_table' => 'civicrm_event',
     'entity_id' => 1,
     'name' => 'event price',
     'title' => 'event price',
     'extends' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('PriceSet', 'create', $params);
@@ -22,12 +22,12 @@ function price_set_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -41,13 +41,13 @@ function price_set_create_example() {
  */
 function price_set_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 18,
-    'values' => array(
-      '18' => array(
+    'values' => [
+      '18' => [
         'id' => '18',
         'domain_id' => '',
         'name' => 'event price',
@@ -61,9 +61,9 @@ function price_set_create_expectedresult() {
         'is_quick_config' => '',
         'is_reserved' => '',
         'min_amount' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

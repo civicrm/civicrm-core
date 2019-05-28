@@ -4,7 +4,7 @@
  * +--------------------------------------------------------------------+
  * | CiviCRM version 5                                                  |
  * +--------------------------------------------------------------------+
- * | Copyright CiviCRM LLC (c) 2004-2018                                |
+ * | Copyright CiviCRM LLC (c) 2004-2019                                |
  * +--------------------------------------------------------------------+
  * | This file is a part of CiviCRM.                                    |
  * |                                                                    |
@@ -55,7 +55,8 @@ class api_v3_PcpTest extends CiviUnitTestCase {
       'title' => "Pcp title",
       'contact_id' => 1,
       'page_id' => 1,
-      'pcp_block_id' => 1);
+      'pcp_block_id' => 1,
+    );
     parent::setUp();
   }
 

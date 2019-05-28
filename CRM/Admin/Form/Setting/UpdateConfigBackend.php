@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -44,12 +44,12 @@ class CRM_Admin_Form_Setting_UpdateConfigBackend extends CRM_Admin_Form_Setting 
 
     $this->addElement(
       'submit', $this->getButtonName('next', 'cleanup'), 'Cleanup Caches',
-      array('class' => 'crm-form-submit', 'id' => 'cleanup-cache')
+      ['class' => 'crm-form-submit', 'id' => 'cleanup-cache']
     );
 
     $this->addElement(
       'submit', $this->getButtonName('next', 'resetpaths'), 'Reset Paths',
-      array('class' => 'crm-form-submit', 'id' => 'resetpaths')
+      ['class' => 'crm-form-submit', 'id' => 'resetpaths']
     );
 
     //parent::buildQuickForm();

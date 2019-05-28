@@ -54,11 +54,11 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
    * @return array
    */
   private function getRecurContributions($membershipID) {
-    $result = civicrm_api3('MembershipPayment', 'get', array(
+    $result = civicrm_api3('MembershipPayment', 'get', [
       'sequential' => 1,
       'contribution_id.contribution_recur_id.id' => ['IS NOT NULL' => TRUE],
       'options' => ['limit' => 0],
-      'return' => array(
+      'return' => [
         'contribution_id.contribution_recur_id.id',
         'contribution_id.contribution_recur_id.contact_id',
         'contribution_id.contribution_recur_id.start_date',
@@ -72,10 +72,10 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
         'contribution_id.contribution_recur_id.contribution_status_id',
         'contribution_id.contribution_recur_id.is_test',
         'contribution_id.contribution_recur_id.payment_processor_id',
-      ),
+      ],
       'membership_id' => $membershipID,
-    ));
-    $recurringContributions = array();
+    ]);
+    $recurringContributions = [];
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus();
 
     foreach ($result['values'] as $payment) {
@@ -87,7 +87,7 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
       }
 
       foreach ($payment as $field => $value) {
-        $key = strtr($field, array('contribution_id.contribution_recur_id.' => ''));
+        $key = strtr($field, ['contribution_id.contribution_recur_id.' => '']);
         $recurringContributions[$recurringContributionID][$key] = $value;
       }
 
@@ -111,7 +111,7 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
    * @param array $recurringContribution
    */
   private function setActionsForRecurringContribution($recurID, &$recurringContribution) {
-    $action = array_sum(array_keys($this->recurLinks($recurID)));
+    $action = array_sum(array_keys(CRM_Contribute_Page_Tab::recurLinks($recurID, 'contribution')));
 
     // no action allowed if it's not active
     $recurringContribution['is_active'] = ($recurringContribution['contribution_status_id'] != 3);
@@ -125,13 +125,13 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
       }
 
       $recurringContribution['action'] = CRM_Core_Action::formLink(
-        $this->recurLinks($recurID),
+        CRM_Contribute_Page_Tab::recurLinks($recurID, 'contribution'),
         $action,
-        array(
+        [
           'cid' => $this->contactID,
           'crid' => $recurID,
           'cxt' => 'contribution',
-        ),
+        ],
         ts('more'),
         FALSE,
         'contribution.selector.recurring',
@@ -139,21 +139,6 @@ class CRM_Member_Page_RecurringContributions extends CRM_Core_Page {
         $recurID
       );
     }
-  }
-
-  /**
-   * This method returns the links that are given for recur search row.
-   * currently the links added for each row are:
-   * - View
-   * - Edit
-   * - Cancel
-   *
-   * @param bool $id
-   *
-   * @return array
-   */
-  private function recurLinks($id) {
-    return CRM_Contribute_Page_Tab::recurLinks($id, 'contribution');
   }
 
 }

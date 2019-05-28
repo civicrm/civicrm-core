@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -191,7 +191,6 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'delete', array('id' => $childContact));
     $this->callAPISuccess('Contact', 'delete', array('id' => $childSmartGroupContact));
   }
-
 
   /**
    *  CRM-19698: Test case for combine contact search in regular and smart group

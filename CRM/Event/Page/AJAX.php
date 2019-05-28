@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -60,9 +60,9 @@ LEFT JOIN civicrm_price_set_entity ce ON ce.price_set_id = cf.price_set_id
 WHERE ce.entity_table = 'civicrm_event' AND {$whereClause}";
 
     $dao = CRM_Core_DAO::executeQuery($query);
-    $results = array();
+    $results = [];
     while ($dao->fetch()) {
-      $results[] = array('id' => $dao->id, 'text' => $dao->label);
+      $results[] = ['id' => $dao->id, 'text' => $dao->label];
     }
     CRM_Utils_JSON::output($results);
   }

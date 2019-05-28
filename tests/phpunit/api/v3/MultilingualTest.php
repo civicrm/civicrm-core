@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -121,9 +121,12 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
       'Location',
       'Pcp',
       'Survey',
-      'UFField', // throw error for help_post column
-      'UFGroup', //throw error for title
-      'User', // need loggedIn user id
+      // throw error for help_post column
+      'UFField',
+      //throw error for title
+      'UFGroup',
+      // need loggedIn user id
+      'User',
     );
     // fetch all entities
     $entities = $this->callAPISuccess('Entity', 'get', array());

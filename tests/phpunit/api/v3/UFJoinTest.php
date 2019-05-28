@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,11 +33,13 @@
  * @group headless
  */
 class api_v3_UFJoinTest extends CiviUnitTestCase {
-  // ids from the uf_group_test.xml fixture
+  /**
+   * ids from the uf_group_test.xml fixture
+   * @var int
+   */
   protected $_ufGroupId = 11;
   protected $_ufFieldId;
   protected $_contactId = 69;
-  protected $_apiversion;
 
   protected function setUp() {
     parent::setUp();
@@ -51,12 +53,7 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
         'civicrm_uf_match',
       )
     );
-    $this->_apiversion = 3;
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute(
-      $this->_dbconn,
-      $this->createFlatXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml')
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml');
   }
 
   public function tearDown() {
@@ -96,7 +93,6 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
       $this->assertEquals($value['uf_group_id'], $this->_ufGroupId);
     }
   }
-
 
   public function testUFJoinEditWrongParamsType() {
     $params = 'a string';

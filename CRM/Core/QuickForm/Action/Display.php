@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * Redefine the display action.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
 
@@ -37,13 +37,13 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
    * The template to display the required "red" asterick.
    * @var string
    */
-  static $_requiredTemplate = NULL;
+  public static $_requiredTemplate = NULL;
 
   /**
    * The template to display error messages inline with the form element.
    * @var string
    */
-  static $_errorTemplate = NULL;
+  public static $_errorTemplate = NULL;
 
   /**
    * Class constructor.
@@ -152,7 +152,7 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
     }
 
     if ($controller->_QFResponseType == 'json') {
-      $response = array('content' => $html);
+      $response = ['content' => $html];
       if (!empty($page->ajaxResponse)) {
         $response += $page->ajaxResponse;
       }
@@ -169,7 +169,7 @@ class CRM_Core_QuickForm_Action_Display extends CRM_Core_QuickForm_Action {
           $content,
           "{$page->_name}.pdf",
           FALSE,
-          array('paper_size' => 'a3', 'orientation' => 'landscape')
+          ['paper_size' => 'a3', 'orientation' => 'landscape']
         );
       }
       else {

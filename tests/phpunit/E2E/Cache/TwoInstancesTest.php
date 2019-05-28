@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,7 +34,12 @@ class E2E_Cache_TwoInstancesTest extends CiviEndToEndTestCase {
   /**
    * @var Psr\SimpleCache\CacheInterface;
    */
-  protected $a, $b;
+  protected $a;
+
+  /**
+   * @var Psr\SimpleCache\CacheInterface;
+   */
+  protected $b;
 
   protected function setUp() {
     parent::setUp();

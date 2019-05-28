@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
 | CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2018                                |
+| Copyright CiviCRM LLC (c) 2004-2019                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -328,7 +328,6 @@ class api_v3_OptionValueTest extends CiviUnitTestCase {
     $fields = $this->callAPISuccess('contribution', 'getoptions', array('field' => 'payment_instrument_id'));
     $this->assertFalse(in_array($newOption, $fields['values']));
   }
-
 
   /**
    * Update option value with 'id' parameter and the value to update

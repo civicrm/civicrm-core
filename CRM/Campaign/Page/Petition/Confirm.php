@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,9 +28,10 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
+
   /**
    * @return string
    * @throws Exception
@@ -71,7 +72,7 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
     $this->assign('survey_id', $petition_id);
 
     $pparams['id'] = $petition_id;
-    $this->petition = array();
+    $this->petition = [];
     CRM_Campaign_BAO_Survey::retrieve($pparams, $this->petition);
     $this->assign('is_share', CRM_Utils_Array::value('is_share', $this->petition));
     $this->assign('thankyou_title', CRM_Utils_Array::value('thankyou_title', $this->petition));
@@ -119,7 +120,7 @@ class CRM_Campaign_Page_Petition_Confirm extends CRM_Core_Page {
     $ce->save();
 
     CRM_Contact_BAO_GroupContact::addContactsToGroup(
-      array($contact_id),
+      [$contact_id],
       $se->group_id,
       'Email',
       'Added',

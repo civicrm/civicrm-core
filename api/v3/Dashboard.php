@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,6 @@
  * @package CiviCRM_APIv3
  */
 
-
 /**
  * Creates or updates an Dashlet.
  *
@@ -41,13 +40,12 @@
  *   Array containing 'is_error' to denote success or failure and details of the created activity
  */
 function civicrm_api3_dashboard_create($params) {
-  civicrm_api3_verify_one_mandatory($params, NULL, array(
-      'name',
-      'label',
-      'url',
-      'fullscreen_url',
-    )
-  );
+  civicrm_api3_verify_one_mandatory($params, NULL, [
+    'name',
+    'label',
+    'url',
+    'fullscreen_url',
+  ]);
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Dashboard');
 }
 

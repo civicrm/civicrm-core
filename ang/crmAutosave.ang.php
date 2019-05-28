@@ -3,8 +3,8 @@
 // in CiviCRM. See also:
 // http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_angularModules
 
-return array(
+return [
   'ext' => 'civicrm',
-  'js' => array('ang/crmAutosave.js'),
-  'requires' => array('crmUtil'),
-);
+  'js' => ['ang/crmAutosave.js'],
+  'requires' => ['crmUtil'],
+];

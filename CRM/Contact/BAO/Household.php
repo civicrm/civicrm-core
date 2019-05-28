@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Contact_BAO_Household extends CRM_Contact_DAO_Contact {
 
@@ -54,17 +54,17 @@ class CRM_Contact_BAO_Household extends CRM_Contact_DAO_Contact {
     $queryString = "UPDATE civicrm_contact
                            SET primary_contact_id = ";
 
-    $params = array();
+    $params = [];
     if ($primaryContactId) {
       $queryString .= '%1';
-      $params[1] = array($primaryContactId, 'Integer');
+      $params[1] = [$primaryContactId, 'Integer'];
     }
     else {
       $queryString .= "null";
     }
 
     $queryString .= " WHERE id = %2";
-    $params[2] = array($contactId, 'Integer');
+    $params[2] = [$contactId, 'Integer'];
 
     return CRM_Core_DAO::executeQuery($queryString, $params);
   }

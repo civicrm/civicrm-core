@@ -31,6 +31,21 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
   protected $priceSetFieldID;
 
   /**
+   * @var int
+   */
+  private $_contactId;
+
+  /**
+   * @var int
+   */
+  private $_eventId;
+
+  /**
+   * @var array
+   */
+  private $_feeBlock;
+
+  /**
    * Set up for test.
    */
   public function setUp() {
@@ -64,8 +79,8 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
   protected function priceSetCreate($type = 'Radio') {
     $feeTotal = 55;
     $minAmt = 0;
-    $paramsSet['title'] = 'Two Options'  . substr(sha1(rand()), 0, 4);
-    $paramsSet['name'] = CRM_Utils_String::titleToVar('Two Options')  . substr(sha1(rand()), 0, 4);
+    $paramsSet['title'] = 'Two Options' . substr(sha1(rand()), 0, 4);
+    $paramsSet['name'] = CRM_Utils_String::titleToVar('Two Options') . substr(sha1(rand()), 0, 4);
     $paramsSet['is_active'] = FALSE;
     $paramsSet['extends'] = 1;
 
@@ -114,7 +129,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $field = CRM_Price_BAO_PriceField::create($paramsField);
     $values = $this->callAPISuccess('PriceFieldValue', 'get', [
       'price_field_id' => $field->id,
-      'return' => ['id', 'label']
+      'return' => ['id', 'label'],
     ]);
     foreach ($values['values'] as $value) {
       switch ($value['label']) {
@@ -234,6 +249,8 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $lineItemVal[$this->_priceSetID] = $lineItems;
     CRM_Price_BAO_LineItem::processPriceSet($participant['id'], $lineItemVal, $this->getContributionObject($contribution['id']), 'civicrm_participant');
     $this->balanceCheck($this->_expensiveFee);
+    $this->assertEquals(($this->_expensiveFee - $actualPaidAmt), CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId));
+
   }
 
   public function testCRM19273() {
@@ -276,22 +293,29 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
    */
   public function testCRM20611() {
     $this->registerParticipantAndPay();
+    $actualPaidAmount = 100;
     $priceSetParams['price_' . $this->priceSetFieldID] = $this->expensiveFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
     $this->balanceCheck($this->_expensiveFee);
+    $contributionBalance = ($this->_expensiveFee - $actualPaidAmount);
+    $this->assertEquals($contributionBalance, CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId));
 
     $priceSetParams['price_' . $this->priceSetFieldID] = $this->cheapFeeValueID;
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
     $this->balanceCheck($this->_cheapFee);
+    $contributionBalance = ($this->_cheapFee - $actualPaidAmount);
+    $this->assertEquals($contributionBalance, CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId));
 
-    //Complete the refund payment.
-    $submittedValues = array(
-      'total_amount' => 120,
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $this->_contributionId,
+      'total_amount' => -120,
       'payment_instrument_id' => 3,
-    );
-    CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $submittedValues, 'refund', $this->_participantId);
+      'participant_id' => $this->_participantId,
+    ]);
+    $contributionBalance += 120;
+    $this->assertEquals($contributionBalance, CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId));
 
     // retrieve the cancelled line-item information
     $cancelledLineItem = $this->callAPISuccessGetSingle('LineItem', array(
@@ -386,19 +410,22 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $unpaidStatus = CRM_Core_PseudoConstant::getKey('CRM_Financial_DAO_FinancialItem', 'status_id', 'Unpaid');
     $expectedResults = array(
       array(
-        'amount' => 10.00, // when qty 1 is used
+        // when qty 1 is used
+        'amount' => 10.00,
         'status_id' => $unpaidStatus,
         'entity_table' => 'civicrm_line_item',
         'entity_id' => 1,
       ),
       array(
-        'amount' => 20.00, // when qty 3 is used, add the surplus amount i.e. $30 - $10 = $20
+        // when qty 3 is used, add the surplus amount i.e. $30 - $10 = $20
+        'amount' => 20.00,
         'status_id' => $unpaidStatus,
         'entity_table' => 'civicrm_line_item',
         'entity_id' => 1,
       ),
       array(
-        'amount' => -10.00, // when qty 2 is used, add the surplus amount i.e. $20 - $30 = -$10
+        // when qty 2 is used, add the surplus amount i.e. $20 - $30 = -$10
+        'amount' => -10.00,
         'status_id' => $unpaidStatus,
         'entity_table' => 'civicrm_line_item',
         'entity_id' => 1,

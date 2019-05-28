@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,7 +37,7 @@
  * @param array $params
  *
  * @return array
- *    API Success Array
+ *   API Success Array
  * @throws \API_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
@@ -59,27 +59,27 @@ function civicrm_api3_logging_revert($params) {
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function _civicrm_api3_logging_revert_spec(&$params) {
-  $params['log_conn_id'] = array(
+  $params['log_conn_id'] = [
     'title' => 'Logging Connection ID',
     'type' => CRM_Utils_Type::T_STRING,
     'api.required' => TRUE,
-  );
-  $params['log_date'] = array(
+  ];
+  $params['log_date'] = [
     'title' => 'Logging Timestamp',
     'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-  );
-  $params['interval'] = array(
+  ];
+  $params['interval'] = [
     'title' => ts('Interval (required if date is included)'),
     'type' => CRM_Utils_Type::T_STRING,
     'api.default' => '10 SECOND',
     'description' => ts('Used when log_date is passed in'),
-  );
+  ];
 
-  $params['tables'] = array(
+  $params['tables'] = [
     'title' => ts('Tables to revert'),
     'type' => CRM_Utils_Type::T_STRING,
     'description' => ts('Tables to revert, if not set all contact-referring entities will be reverted'),
-  );
+  ];
 }
 
 /**
@@ -88,7 +88,7 @@ function _civicrm_api3_logging_revert_spec(&$params) {
  * @param array $params
  *
  * @return array
- *    API Success Array
+ *   API Success Array
  * @throws \API_Exception
  * @throws \Civi\API\Exception\UnauthorizedException
  */
@@ -109,24 +109,24 @@ function civicrm_api3_logging_get($params) {
  * @throws \Civi\API\Exception\UnauthorizedException
  */
 function _civicrm_api3_logging_get_spec(&$params) {
-  $params['log_conn_id'] = array(
+  $params['log_conn_id'] = [
     'title' => 'Logging Connection ID',
     'type' => CRM_Utils_Type::T_STRING,
     'api.required' => TRUE,
-  );
-  $params['log_date'] = array(
+  ];
+  $params['log_date'] = [
     'title' => 'Logging Timestamp',
     'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
-  );
-  $params['interval'] = array(
+  ];
+  $params['interval'] = [
     'title' => ts('Interval (required if date is included)'),
     'type' => CRM_Utils_Type::T_STRING,
     'api.default' => '10 SECOND',
     'description' => ts('Used when log_date is passed in'),
-  );
-  $params['tables'] = array(
+  ];
+  $params['tables'] = [
     'title' => ts('Tables to query'),
     'type' => CRM_Utils_Type::T_STRING,
     'description' => ts('Tables to query, if not set all contact-referring entities will be queried'),
-  );
+  ];
 }

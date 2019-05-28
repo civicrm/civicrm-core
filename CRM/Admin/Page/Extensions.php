@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * This is a part of CiviCRM extension management functionality.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -42,7 +42,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * Obtains the group name from url and sets the title.
@@ -76,39 +76,39 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    */
   public function &links() {
     if (!(self::$_links)) {
-      self::$_links = array(
-        CRM_Core_Action::ADD => array(
+      self::$_links = [
+        CRM_Core_Action::ADD => [
           'name' => ts('Install'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=add&id=%%id%%&key=%%key%%',
           'title' => ts('Install'),
-        ),
-        CRM_Core_Action::ENABLE => array(
+        ],
+        CRM_Core_Action::ENABLE => [
           'name' => ts('Enable'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=enable&id=%%id%%&key=%%key%%',
           'ref' => 'enable-action',
           'title' => ts('Enable'),
-        ),
-        CRM_Core_Action::DISABLE => array(
+        ],
+        CRM_Core_Action::DISABLE => [
           'name' => ts('Disable'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=disable&id=%%id%%&key=%%key%%',
           'title' => ts('Disable'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Uninstall'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=delete&id=%%id%%&key=%%key%%',
           'title' => ts('Uninstall Extension'),
-        ),
-        CRM_Core_Action::UPDATE => array(
+        ],
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Download'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=update&id=%%id%%&key=%%key%%',
           'title' => ts('Download Extension'),
-        ),
-      );
+        ],
+      ];
     }
     return self::$_links;
   }
@@ -160,7 +160,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
     $mapper = CRM_Extension_System::singleton()->getMapper();
     $manager = CRM_Extension_System::singleton()->getManager();
 
-    $localExtensionRows = array(); // array($pseudo_id => extended_CRM_Extension_Info)
+    // array($pseudo_id => extended_CRM_Extension_Info)
+    $localExtensionRows = [];
     $keys = array_keys($manager->getStatuses());
     sort($keys);
     foreach ($keys as $key) {
@@ -168,7 +169,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
         $obj = $mapper->keyToInfo($key);
       }
       catch (CRM_Extension_Exception $ex) {
-        CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', array(1 => $key)));
+        CRM_Core_Session::setStatus(ts('Failed to read extension (%1). Please refresh the extension list.', [1 => $key]));
         continue;
       }
 
@@ -202,10 +203,10 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       // then $action += CRM_Core_Action::UPDATE
       $row['action'] = CRM_Core_Action::formLink(self::links(),
         $action,
-        array(
+        [
           'id' => $row['id'],
           'key' => $obj->key,
-        ),
+        ],
         ts('more'),
         FALSE,
         'extension.local.action',
@@ -221,7 +222,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
   }
 
   /**
-   * Get the list of local extensions and format them as a table with
+   * Get the list of remote extensions and format them as a table with
    * status and action data.
    *
    * @param array $localExtensionRows
@@ -232,22 +233,27 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       $remoteExtensions = CRM_Extension_System::singleton()->getBrowser()->getExtensions();
     }
     catch (CRM_Extension_Exception $e) {
-      $remoteExtensions = array();
+      $remoteExtensions = [];
       CRM_Core_Session::setStatus($e->getMessage(), ts('Extension download error'), 'error');
     }
 
     // build list of available downloads
-    $remoteExtensionRows = array();
+    $remoteExtensionRows = [];
+    $compat = CRM_Extension_System::getCompatibilityInfo();
+
     foreach ($remoteExtensions as $info) {
+      if (!empty($compat[$info->key]['obsolete'])) {
+        continue;
+      }
       $row = (array) $info;
       $row['id'] = $info->key;
       $action = CRM_Core_Action::UPDATE;
       $row['action'] = CRM_Core_Action::formLink(self::links(),
         $action,
-        array(
+        [
           'id' => $row['id'],
           'key' => $row['key'],
-        ),
+        ],
         ts('more'),
         FALSE,
         'extension.remote.action',

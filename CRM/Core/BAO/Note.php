@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -133,7 +133,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    *   (reference) an assoc array of name/value pairs.
    * @param array $ids
    *   (deprecated) associated array with note id - preferably set $params['id'].
-   * @return null|object $note
+   * @return null|object
    *   $note CRM_Core_BAO_Note object
    * @throws \CRM_Exception
    */
@@ -293,7 +293,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param bool $showStatus
    *   Do we need to set status or not.
    *
-   * @return int|NULL
+   * @return int|null
    *   no of deleted notes on success, null otherwise
    */
   public static function del($id, $showStatus = TRUE) {
@@ -315,12 +315,10 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
       $childNote = new CRM_Core_DAO_Note();
       $childNote->id = $childId;
       $childNote->delete();
-      $childNote->free();
       $recent[] = $childId;
     }
 
     $return = $note->delete();
-    $note->free();
     if ($showStatus) {
       CRM_Core_Session::setStatus($status, ts('Deleted'), 'success');
     }

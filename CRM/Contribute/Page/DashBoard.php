@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -44,18 +44,18 @@ class CRM_Contribute_Page_DashBoard extends CRM_Core_Page {
   public function preProcess() {
     CRM_Utils_System::setTitle(ts('CiviContribute'));
 
-    $status = array('Valid', 'Cancelled');
-    $prefixes = array('start', 'month', 'year');
+    $status = ['Valid', 'Cancelled'];
+    $prefixes = ['start', 'month', 'year'];
     $startDate = NULL;
-    $startToDate = $monthToDate = $yearToDate = array();
+    $startToDate = $monthToDate = $yearToDate = [];
 
     //get contribution dates.
     $dates = CRM_Contribute_BAO_Contribution::getContributionDates();
-    foreach (array(
-               'now',
-               'yearDate',
-               'monthDate',
-             ) as $date) {
+    foreach ([
+      'now',
+      'yearDate',
+      'monthDate',
+    ] as $date) {
       $$date = $dates[$date];
     }
     // fiscal years end date

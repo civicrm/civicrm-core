@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -73,7 +73,7 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
     );
 
     $this->assign('cid', $this->_id);
-    $this->addFormRule(array('CRM_Admin_Form_ContactType', 'formRule'), $this);
+    $this->addFormRule(['CRM_Admin_Form_ContactType', 'formRule'], $this);
   }
 
   /**
@@ -90,7 +90,7 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
    */
   public static function formRule($fields, $files, $self) {
 
-    $errors = array();
+    $errors = [];
 
     if ($self->_id) {
       $contactName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_ContactType', $self->_id, 'name');
@@ -142,7 +142,7 @@ class CRM_Admin_Form_ContactType extends CRM_Admin_Form {
     }
     $contactType = CRM_Contact_BAO_ContactType::add($params);
     CRM_Core_Session::setStatus(ts("The Contact Type '%1' has been saved.",
-      array(1 => $contactType->label)
+      [1 => $contactType->label]
     ), ts('Saved'), 'success');
   }
 

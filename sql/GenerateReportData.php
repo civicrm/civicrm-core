@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,12 +28,12 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
 
-/*******************************************************
+/**
  * This class generates data for the schema located in Contact.sql
  *
  * each public method generates data for the concerned table.
@@ -74,9 +74,9 @@
  * Contact Location = 15% for Households, 10% for Organizations, (75-(15*4))% for Individuals.
  *                     (Assumption is that each household contains 4 individuals)
  *
- *******************************************************/
+ */
 
-/*******************************************************
+/**
  *
  * Note: implication of using of mt_srand(1) in constructor
  * The data generated will be done in a consistent manner
@@ -86,7 +86,7 @@
  * to get consistent random numbers then the mt_srand(1) shld
  * be in each function that adds data to each table.
  *
- *******************************************************/
+ */
 
 
 require_once '../civicrm.config.php';
@@ -117,9 +117,9 @@ require_once 'CRM/Member/DAO/MembershipPayment.php';
  */
 class CRM_GCD {
 
-  /*******************************************************
+  /**
    * constants
-   *******************************************************/
+   */
   const DATA_FILENAME = "sample_data.xml";
   const NUM_DOMAIN = 1;
   const NUM_CONTACT = 5000;
@@ -149,32 +149,47 @@ class CRM_GCD {
   //const ADD_TO_DB=FALSE;
   const DEBUG_LEVEL = 1;
 
-  /*********************************
+  /***
    * private members
-   *********************************/
+   */
 
-  // enum's from database
+  /**
+   * enum's from database
+   * @var array
+   */
   private $preferredCommunicationMethod = array('1', '2', '3', '4', '5');
   private $contactType = array('Individual', 'Household', 'Organization');
   private $phoneType = array('1', '2', '3', '4');
 
-  // customizable enums (foreign keys)
+  /**
+   * customizable enums (foreign keys)
+   * @var array
+   */
   private $prefix = array(1 => 'Mrs', 2 => 'Ms', 3 => 'Mr', 4 => 'Dr');
   private $suffix = array(1 => 'Jr', 2 => 'Sr');
   private $gender = array(1 => 'Female', 2 => 'Male');
   private $greetingType = array(1 => 'Dear [first]', 2 => 'Dear [prefix] [first] [last]', 3 => 'Dear [prefix] [last]');
 
-  // store domain id's
+  /**
+   * store domain id's
+   * @var array
+   */
   private $domain = array();
 
-  // store contact id's
+  /**
+   * store contact id's
+   * @var array
+   */
   private $contact = array();
   private $individual = array();
   private $household = array();
   private $organization = array();
 
 
-  // store names, firstnames, street 1, street2
+  /**
+   * store names, firstnames, street 1, street2
+   * @var array
+   */
   private $firstName = array();
   private $lastName = array();
   private $streetName = array();
@@ -198,14 +213,23 @@ class CRM_GCD {
   private $degree = array();
   private $school = array();
 
-  // stores the strict individual id and household id to individual id mapping
+  /**
+   * stores the strict individual id and household id to individual id mapping
+   * @var array
+   */
   private $strictIndividual = array();
   private $householdIndividual = array();
 
-  // sample data in xml format
+  /**
+   * sample data in xml format
+   * @var int
+   */
   private $sampleData = NULL;
 
-  // private vars
+  /**
+   * private vars
+   * @var int
+   */
   private $numIndividual = 0;
   private $numHousehold = 0;
   private $numOrganization = 0;
@@ -234,13 +258,15 @@ class CRM_GCD {
       1116 => array('Gdańsk', 'Gdynia'),
     ),
   );
-
+  /**
+   * @var array
+   */
   private $groupMembershipStatus = array('Added', 'Removed', 'Pending');
   private $subscriptionHistoryMethod = array('Admin', 'Email');
 
-  /*********************************
+  /**
    * private methods
-   ********************************
+   *
    * @param int $size
    * @return string
    */
@@ -298,8 +324,8 @@ class CRM_GCD {
     return mt_rand(1, count($array1));
   }
 
-
   // country state city combo
+
   /**
    * @return array
    */
@@ -375,8 +401,8 @@ class CRM_GCD {
     return date($dateFormat, mt_rand($today - $numSecond, $today));
   }
 
-
   // insert data into db's
+
   /**
    * @param $dao
    */
@@ -391,6 +417,7 @@ class CRM_GCD {
   }
 
   // update data into db's
+
   /**
    * @param $dao
    */
@@ -570,7 +597,6 @@ class CRM_GCD {
       return 'Organization';
     }
   }
-
 
   public function initDB() {
     $config = CRM_Core_Config::singleton();
@@ -1213,7 +1239,8 @@ class CRM_GCD {
         $this->_insert($activityContactDAO);
 
         if (in_array($activityTypeID, array(
-          6, 9))) {
+          6, 9,
+        ))) {
           $activityTargetDAO = new CRM_Activity_DAO_ActivityContact();
           $activityTargetDAO->activity_id = $activityDAO->id;
           $activityTargetDAO->contact_id = mt_rand(1, 101);
@@ -1702,7 +1729,6 @@ function user_access($str = NULL) {
 function module_list() {
   return array();
 }
-
 
 echo ("Starting data generation on " . date("F dS h:i:s A") . "\n");
 $obj1 = new CRM_GCD();

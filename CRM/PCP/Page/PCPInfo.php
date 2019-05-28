@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -61,7 +61,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
 
     $action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE);
 
-    $prms = array('id' => $this->_id);
+    $prms = ['id' => $this->_id];
 
     CRM_Core_DAO::commonRetrieve('CRM_PCP_DAO_PCP', $prms, $pcpInfo);
     $this->_component = $pcpInfo['page_type'];
@@ -83,7 +83,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     $anonymousPCP = CRM_Utils_Request::retrieve('ap', 'Boolean', $this);
     if ($anonymousPCP) {
       $loginURL = $config->userSystem->getLoginURL();
-      $anonMessage = ts('Once you\'ve received your new account welcome email, you can <a href=%1>click here</a> to login and promote your campaign page.', array(1 => $loginURL));
+      $anonMessage = ts('Once you\'ve received your new account welcome email, you can <a href=%1>click here</a> to login and promote your campaign page.', [1 => $loginURL]);
       CRM_Core_Session::setStatus($anonMessage, ts('Success'), 'success');
     }
     else {
@@ -122,7 +122,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
       }
     }
 
-    $default = array();
+    $default = [];
 
     if ($pcpBlock->target_entity_type == 'contribute') {
       $urlBase = 'civicrm/contribute/transact';
@@ -135,19 +135,19 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
       $page_class = 'CRM_Event_DAO_Event';
       $this->assign('pageName', CRM_Event_PseudoConstant::event($pcpInfo['page_id']));
       CRM_Core_DAO::commonRetrieveAll($page_class, 'id',
-        $pcpInfo['page_id'], $default, array(
+        $pcpInfo['page_id'], $default, [
           'start_date',
           'end_date',
           'registration_start_date',
           'registration_end_date',
-        )
+        ]
       );
     }
     elseif ($pcpBlock->entity_table == 'civicrm_contribution_page') {
       $page_class = 'CRM_Contribute_DAO_ContributionPage';
       $this->assign('pageName', CRM_Contribute_PseudoConstant::contributionPage($pcpInfo['page_id'], TRUE));
       CRM_Core_DAO::commonRetrieveAll($page_class, 'id',
-        $pcpInfo['page_id'], $default, array('start_date', 'end_date')
+        $pcpInfo['page_id'], $default, ['start_date', 'end_date']
       );
     }
 
@@ -161,7 +161,7 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
 
       $link = CRM_PCP_BAO_PCP::pcpLinks();
 
-      $hints = array(
+      $hints = [
         CRM_Core_Action::UPDATE => ts('Change the content and appearance of your page'),
         CRM_Core_Action::DETACH => ts('Send emails inviting your friends to support your campaign!'),
         CRM_Core_Action::VIEW => ts('Copy this link to share directly with your network!'),
@@ -169,13 +169,13 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
         CRM_Core_Action::DISABLE => ts('De-activate the page (you can re-activate it later)'),
         CRM_Core_Action::ENABLE => ts('Activate the page (you can de-activate it later)'),
         CRM_Core_Action::DELETE => ts('Remove the page (this cannot be undone!)'),
-      );
+      ];
 
-      $replace = array(
+      $replace = [
         'id' => $this->_id,
         'block' => $pcpBlock->id,
         'pageComponent' => $this->_component,
-      );
+      ];
 
       if (!$pcpBlock->is_tellfriend_enabled || CRM_Utils_Array::value('status_id', $pcpInfo) != $approvedId) {
         unset($link['all'][CRM_Core_Action::DETACH]);
@@ -202,8 +202,9 @@ class CRM_PCP_Page_PCPInfo extends CRM_Core_Page {
     if (!empty($entityFile)) {
       $fileInfo = reset($entityFile);
       $fileId = $fileInfo['fileID'];
+      $fileHash = CRM_Core_BAO_File::generateFileHash($this->_id, $fileId);
       $image = '<img src="' . CRM_Utils_System::url('civicrm/file',
-          "reset=1&id=$fileId&eid={$this->_id}"
+          "reset=1&id=$fileId&eid={$this->_id}&fcs={$fileHash}"
         ) . '" />';
       $this->assign('image', $image);
     }

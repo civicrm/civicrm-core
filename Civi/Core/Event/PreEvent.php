@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -55,7 +55,7 @@ class PreEvent extends GenericHookEvent {
   public $entity;
 
   /**
-   * @var int|NULL
+   * @var int|null
    */
   public $id;
 
@@ -65,10 +65,12 @@ class PreEvent extends GenericHookEvent {
   public $params;
 
   /**
-   * @param $action
-   * @param $entity
-   * @param $id
-   * @param $params
+   * Class constructor.
+   *
+   * @param string $action
+   * @param string $entity
+   * @param int $id
+   * @param array $params
    */
   public function __construct($action, $entity, $id, &$params) {
     $this->action = $action;
@@ -81,7 +83,7 @@ class PreEvent extends GenericHookEvent {
    * @inheritDoc
    */
   public function getHookValues() {
-    return array($this->action, $this->entity, $this->id, &$this->params);
+    return [$this->action, $this->entity, $this->id, &$this->params];
   }
 
 }

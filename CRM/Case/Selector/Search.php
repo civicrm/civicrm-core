@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -41,20 +41,20 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @var array
    */
-  static $_links = NULL;
+  public static $_links = NULL;
 
   /**
    * We use desc to remind us what that column is, name is used in the tpl
    *
    * @var array
    */
-  static $_columnHeaders;
+  public static $_columnHeaders;
 
   /**
    * Properties of contact we're interested in displaying
    * @var array
    */
-  static $_properties = array(
+  public static $_properties = [
     'contact_id',
     'contact_type',
     'sort_name',
@@ -67,19 +67,19 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
     'case_type',
     'case_role',
     'phone',
-  );
+  ];
 
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @var boolean
+   * @var bool
    */
   protected $_limit = NULL;
 
@@ -180,49 +180,49 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    *
    * @return array
    */
-  static public function &links($isDeleted = FALSE, $key = NULL) {
+  public static function &links($isDeleted = FALSE, $key = NULL) {
     $extraParams = ($key) ? "&key={$key}" : NULL;
 
     if ($isDeleted) {
-      self::$_links = array(
-        CRM_Core_Action::RENEW => array(
+      self::$_links = [
+        CRM_Core_Action::RENEW => [
           'name' => ts('Restore'),
           'url' => 'civicrm/contact/view/case',
           'qs' => 'reset=1&action=renew&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'ref' => 'restore-case',
           'title' => ts('Restore Case'),
-        ),
-      );
+        ],
+      ];
     }
     else {
-      self::$_links = array(
-        CRM_Core_Action::VIEW => array(
+      self::$_links = [
+        CRM_Core_Action::VIEW => [
           'name' => ts('Manage'),
           'url' => 'civicrm/contact/view/case',
           'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=view&context=%%cxt%%&selectedChild=case' . $extraParams,
           'ref' => 'manage-case',
           'class' => 'no-popup',
           'title' => ts('Manage Case'),
-        ),
-        CRM_Core_Action::DELETE => array(
+        ],
+        CRM_Core_Action::DELETE => [
           'name' => ts('Delete'),
           'url' => 'civicrm/contact/view/case',
           'qs' => 'reset=1&action=delete&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'ref' => 'delete-case',
           'title' => ts('Delete Case'),
-        ),
-        CRM_Core_Action::UPDATE => array(
+        ],
+        CRM_Core_Action::UPDATE => [
           'name' => ts('Assign to Another Client'),
           'url' => 'civicrm/contact/view/case/editClient',
           'qs' => 'reset=1&action=update&id=%%id%%&cid=%%cid%%&context=%%cxt%%' . $extraParams,
           'ref' => 'reassign',
           'class' => 'medium-popup',
           'title' => ts('Assign to Another Client'),
-        ),
-      );
+        ],
+      ];
     }
 
-    $actionLinks = array();
+    $actionLinks = [];
     foreach (self::$_links as $key => $value) {
       $actionLinks['primaryActions'][$key] = $value;
     }
@@ -292,10 +292,10 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
       $this->_additionalClause
     );
     // process the result of the query
-    $rows = array();
+    $rows = [];
 
     //CRM-4418 check for view, edit, delete
-    $permissions = array(CRM_Core_Permission::VIEW);
+    $permissions = [CRM_Core_Permission::VIEW];
     if (CRM_Core_Permission::check('access all cases and activities')
       || CRM_Core_Permission::check('access my cases and activities')
     ) {
@@ -308,10 +308,10 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
 
     $caseStatus = CRM_Core_OptionGroup::values('case_status', FALSE, FALSE, FALSE, " AND v.name = 'Urgent' ");
 
-    $scheduledInfo = array();
+    $scheduledInfo = [];
 
     while ($result->fetch()) {
-      $row = array();
+      $row = [];
       // the columns we are interested in
       foreach (self::$_properties as $property) {
         if (isset($result->$property)) {
@@ -322,7 +322,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
       $isDeleted = FALSE;
       if ($result->case_deleted) {
         $isDeleted = TRUE;
-        $row['case_status_id'] = empty($row['case_status_id']) ? "" : $row['case_status_id'] . '<br />(deleted)';
+        $row['case_status_id'] = empty($row['case_status_id']) ? "" : $row['case_status_id'] . '<br />' . ts('(deleted)');
       }
 
       $scheduledInfo['case_id'][] = $result->case_id;
@@ -332,11 +332,11 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
 
       $links = self::links($isDeleted, $this->_key);
       $row['action'] = CRM_Core_Action::formLink($links['primaryActions'],
-        $mask, array(
+        $mask, [
           'id' => $result->case_id,
           'cid' => $result->contact_id,
           'cxt' => $this->_context,
-        ),
+        ],
         ts('more'),
         FALSE,
         'case.selector.actions',
@@ -400,51 +400,51 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    */
   public function &getColumnHeaders($action = NULL, $output = NULL) {
     if (!isset(self::$_columnHeaders)) {
-      self::$_columnHeaders = array(
-        array(
+      self::$_columnHeaders = [
+        [
           'name' => ts('Subject'),
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Status'),
           'sort' => 'case_status',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Case Type'),
           'sort' => 'case_type',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('My Role'),
           'sort' => 'case_role',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Case Manager'),
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Most Recent'),
           'sort' => 'case_recent_activity_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array(
+        ],
+        [
           'name' => ts('Next Sched.'),
           'sort' => 'case_scheduled_activity_date',
           'direction' => CRM_Utils_Sort::DONTCARE,
-        ),
-        array('name' => ts('Actions')),
-      );
+        ],
+        ['name' => ts('Actions')],
+      ];
 
       if (!$this->_single) {
-        $pre = array(
-          array(
+        $pre = [
+          [
             'name' => ts('Client'),
             'sort' => 'sort_name',
             'direction' => CRM_Utils_Sort::ASCENDING,
-          ),
-        );
+          ],
+        ];
 
         self::$_columnHeaders = array_merge($pre, self::$_columnHeaders);
       }
@@ -456,7 +456,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
    * @return mixed
    */
   public function alphabetQuery() {
-    return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
+    return $this->_query->alphabetQuery();
   }
 
   /**

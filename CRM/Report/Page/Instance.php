@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
  * Page for invoking report instances
  */
 class CRM_Report_Page_Instance extends CRM_Core_Page {
+
   /**
    * Run this page (figure out the action needed and perform it).
    */
@@ -73,8 +74,8 @@ class CRM_Report_Page_Instance extends CRM_Core_Page {
     }
 
     if (strstr($templateInfo['name'], '_Form') || !is_null($reportClass)) {
-      $instanceInfo = array();
-      CRM_Report_BAO_ReportInstance::retrieve(array('id' => $instanceId), $instanceInfo);
+      $instanceInfo = [];
+      CRM_Report_BAO_ReportInstance::retrieve(['id' => $instanceId], $instanceInfo);
 
       if (!empty($instanceInfo['title'])) {
         CRM_Utils_System::setTitle($instanceInfo['title']);

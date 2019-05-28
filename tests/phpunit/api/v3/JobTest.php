@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Job
  *
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -49,7 +49,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * Must be created outside the transaction due to it breaking the transaction.
    *
-   * @var
+   * @var int
    */
   public $membershipTypeID;
 
@@ -77,6 +77,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     // The membershipType create breaks transactions so this extra cleanup is needed.
     $this->membershipTypeDelete(array('id' => $this->membershipTypeID));
     $this->cleanUpSetUpIDs();
+    $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_website', 'civicrm_phone'], TRUE);
   }
 
   /**
@@ -244,13 +245,19 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * We create 3 contacts - 1 is in our group, 1 has our membership & the chosen one has both
    * & check that only the chosen one got the reminder
    */
-  public function testCallSendReminderLimitTo() {
+  public function testCallSendReminderLimitToSMS() {
     $membershipTypeID = $this->membershipTypeCreate();
     $this->membershipStatusCreate();
     $createTotal = 3;
     $groupID = $this->groupCreate(array('name' => 'Texan drawlers', 'title' => 'a...'));
     for ($i = 1; $i <= $createTotal; $i++) {
       $contactID = $this->individualCreate();
+      $this->callAPISuccess('Phone', 'create', [
+        'contact_id' => $contactID,
+        'phone' => '555 123 1234',
+        'phone_type_id' => 'Mobile',
+        'location_type_id' => 'Billing',
+      ]);
       if ($i == 2) {
         $theChosenOneID = $contactID;
       }
@@ -263,14 +270,26 @@ class api_v3_JobTest extends CiviUnitTestCase {
       }
       if ($i > 1) {
         $this->callAPISuccess('membership', 'create', array(
-            'contact_id' => $contactID,
-            'membership_type_id' => $membershipTypeID,
-            'join_date' => 'now',
-            'start_date' => '+ 1 day',
-          )
-        );
+          'contact_id' => $contactID,
+          'membership_type_id' => $membershipTypeID,
+          'join_date' => 'now',
+          'start_date' => '+ 1 day',
+        ));
       }
     }
+    $this->setupForSmsTests();
+    $provider = civicrm_api3('SmsProvider', 'create', array(
+      'name' => "CiviTestSMSProvider",
+      'api_type' => "1",
+      "username" => "1",
+      "password" => "1",
+      "api_type" => "1",
+      "api_url" => "1",
+      "api_params" => "a=1",
+      "is_default" => "1",
+      "is_active" => "1",
+      "domain_id" => "1",
+    ));
     $this->callAPISuccess('action_schedule', 'create', array(
       'title' => " remind all Texans",
       'subject' => "drawling renewal",
@@ -282,12 +301,16 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'start_action_unit' => 'day',
       'group_id' => $groupID,
       'limit_to' => TRUE,
+      'sms_provider_id' => $provider['id'],
+      'mode' => 'User_Preference',
     ));
     $this->callAPISuccess('job', 'send_reminder', array());
     $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
     $this->assertEquals($successfulCronCount, 1);
     $sentToID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_action_log");
     $this->assertEquals($sentToID, $theChosenOneID);
+    $this->assertEquals(0, CRM_Core_DAO::singleValueQuery("SELECT is_error FROM civicrm_action_log"));
+    $this->setupForSmsTests(TRUE);
   }
 
   public function testCallDisableExpiredRelationships() {
@@ -312,6 +335,85 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->assertEquals('Go Go you good thing', $result['values'][$relationshipID]['description']);
     $this->contactDelete($individualID);
     $this->contactDelete($orgID);
+  }
+
+  /**
+   * Test scheduled reminders respect limit to (since above identified addition_to handling issue).
+   *
+   * We create 3 contacts - 1 is in our group, 1 has our membership & the chosen one has both
+   * & check that only the chosen one got the reminder
+   *
+   * Also check no hard fail on cron job with running a reminder that has a deleted SMS provider
+   */
+  public function testCallSendReminderLimitToSMSWithDeletedProviderr() {
+    $membershipTypeID = $this->membershipTypeCreate();
+    $this->membershipStatusCreate();
+    $createTotal = 3;
+    $groupID = $this->groupCreate(array('name' => 'Texan drawlers', 'title' => 'a...'));
+    for ($i = 1; $i <= $createTotal; $i++) {
+      $contactID = $this->individualCreate();
+      $this->callAPISuccess('Phone', 'create', [
+        'contact_id' => $contactID,
+        'phone' => '555 123 1234',
+        'phone_type_id' => 'Mobile',
+        'location_type_id' => 'Billing',
+      ]);
+      if ($i == 2) {
+        $theChosenOneID = $contactID;
+      }
+      if ($i < 3) {
+        $this->callAPISuccess('group_contact', 'create', array(
+          'contact_id' => $contactID,
+          'status' => 'Added',
+          'group_id' => $groupID,
+        ));
+      }
+      if ($i > 1) {
+        $this->callAPISuccess('membership', 'create', array(
+          'contact_id' => $contactID,
+          'membership_type_id' => $membershipTypeID,
+          'join_date' => 'now',
+          'start_date' => '+ 1 day',
+        ));
+      }
+    }
+    $this->setupForSmsTests();
+    $provider = civicrm_api3('SmsProvider', 'create', array(
+      'name' => "CiviTestSMSProvider",
+      'api_type' => "1",
+      "username" => "1",
+      "password" => "1",
+      "api_type" => "1",
+      "api_url" => "1",
+      "api_params" => "a=1",
+      "is_default" => "1",
+      "is_active" => "1",
+      "domain_id" => "1",
+    ));
+    $this->callAPISuccess('action_schedule', 'create', array(
+      'title' => " remind all Texans",
+      'subject' => "drawling renewal",
+      'entity_value' => $membershipTypeID,
+      'mapping_id' => 4,
+      'start_action_date' => 'membership_start_date',
+      'start_action_offset' => 1,
+      'start_action_condition' => 'before',
+      'start_action_unit' => 'day',
+      'group_id' => $groupID,
+      'limit_to' => TRUE,
+      'sms_provider_id' => $provider['id'],
+      'mode' => 'SMS',
+    ));
+    $this->callAPISuccess('SmsProvider', 'delete', ['id' => $provider['id']]);
+    $this->callAPISuccess('job', 'send_reminder', array());
+    $cronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
+    $this->assertEquals($cronCount, 1);
+    $sentToID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_action_log");
+    $this->assertEquals($sentToID, $theChosenOneID);
+    $cronlog = CRM_Core_DAO::executeQuery("SELECT * FROM civicrm_action_log")->fetchAll()[0];
+    $this->assertEquals(1, $cronlog['is_error']);
+    $this->assertEquals('SMS reminder cannot be sent because the SMS provider has been deleted.', $cronlog['message']);
+    $this->setupForSmsTests(TRUE);
   }
 
   /**
@@ -696,10 +798,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $data = $this->getMergeLocations($address1, $address2, 'Address');
     $data = array_merge($data, $this->getMergeLocations(array('phone' => '12345', 'phone_type_id' => 1), array('phone' => '678910', 'phone_type_id' => 1), 'Phone'));
     $data = array_merge($data, $this->getMergeLocations(array('phone' => '12345'), array('phone' => '678910'), 'Phone'));
-    $data = array_merge($data, $this->getMergeLocations(array('email' => 'mini@me.com'), array('email' => 'mini@me.org'), 'Email', array(array(
-      'email' => 'anthony_anderson@civicrm.org',
-      'location_type_id' => 'Home',
-    ))));
+    $data = array_merge($data, $this->getMergeLocations(array('email' => 'mini@me.com'), array('email' => 'mini@me.org'), 'Email', array(
+      array(
+        'email' => 'anthony_anderson@civicrm.org',
+        'location_type_id' => 'Home',
+      ),
+    )));
     return $data;
 
   }
@@ -779,6 +883,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @param string $contactType
    * @param string $used
+   * @param string $name
    * @param bool $isReserved
    * @param int $threshold
    */
@@ -916,7 +1021,62 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
     $this->assertEquals('blah', $mouse['custom_' . $customField['id']]);
 
-    $this->customFieldDelete($customGroup['id']);
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
+  }
+
+  /**
+   * Test the batch merge retains 0 as a valid custom field value.
+   *
+   * Note that we set 0 on 2 fields with one on each contact to ensure that
+   * both merged & mergee fields are respected.
+   */
+  public function testBatchMergeCustomDataZeroValueField() {
+    $customGroup = $this->CustomGroupCreate();
+    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'default_value' => NULL));
+
+    $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email' => 'tha_mouse@mouse.com'];
+    $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => '']));
+    $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 0]));
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
+    $this->assertEquals(1, count($result['values']['merged']));
+    $mouseParams['return'] = 'custom_' . $customField['id'];
+    $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
+    $this->assertEquals(0, $mouse['custom_' . $customField['id']]);
+
+    $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => NULL]));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
+    $this->assertEquals(1, count($result['values']['merged']));
+    $mouseParams['return'] = 'custom_' . $customField['id'];
+    $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
+    $this->assertEquals(0, $mouse['custom_' . $customField['id']]);
+
+    $this->customFieldDelete($customField['id']);
+    $this->customGroupDelete($customGroup['id']);
+  }
+
+  /**
+   * Test the batch merge treats 0 vs 1 as a conflict.
+   */
+  public function testBatchMergeCustomDataZeroValueFieldWithConflict() {
+    $customGroup = $this->CustomGroupCreate();
+    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'default_value' => NULL));
+
+    $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email' => 'tha_mouse@mouse.com'];
+    $mouse1 = $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 0]));
+    $mouse2 = $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 1]));
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
+    $this->assertEquals(0, count($result['values']['merged']));
+
+    // Reverse which mouse has the zero to test we still get a conflict.
+    $this->individualCreate(array_merge($mouseParams, ['id' => $mouse1, 'custom_' . $customField['id'] => 1]));
+    $this->individualCreate(array_merge($mouseParams, ['id' => $mouse2, 'custom_' . $customField['id'] => 0]));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
+    $this->assertEquals(0, count($result['values']['merged']));
+
+    $this->customFieldDelete($customField['id']);
     $this->customGroupDelete($customGroup['id']);
   }
 
@@ -1325,7 +1485,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param array $locationParams1
    * @param array $locationParams2
    * @param string $entity
-   *
+   * @param array $additionalExpected
    * @return array
    */
   public function getMergeLocations($locationParams1, $locationParams2, $entity, $additionalExpected = array()) {
@@ -1763,7 +1923,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     // Default params, which we'll expand on below.
     $params = [
       'membership_type_id' => $membershipTypeId,
-      'skipStatusCal' => 1, // Don't calculate status.
+      // Don't calculate status.
+      'skipStatusCal' => 1,
       'source' => 'Test',
       'sequential' => 1,
     ];
@@ -1779,7 +1940,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $params['join_date'] = date('Y-m-d');
     $params['start_date'] = date('Y-m-d');
     $params['end_date'] = date('Y-m-d', strtotime('now + 1 year'));
-    $params['status_id'] = 'Current'; // Intentionally incorrect status.
+    // Intentionally incorrect status.
+    $params['status_id'] = 'Current';
     $resultNew = $this->callAPISuccess('Membership', 'create', $params);
     $this->assertEquals(array_search('Current', $memStatus), $resultNew['values'][0]['status_id']);
 
@@ -1788,7 +1950,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $params['join_date'] = date('Y-m-d', strtotime('now - 6 month'));
     $params['start_date'] = date('Y-m-d', strtotime('now - 6 month'));
     $params['end_date'] = date('Y-m-d', strtotime('now + 6 month'));
-    $params['status_id'] = 'New'; // Intentionally incorrect status.
+    // Intentionally incorrect status.
+    $params['status_id'] = 'New';
     $resultCurrent = $this->callAPISuccess('Membership', 'create', $params);
     $this->assertEquals(array_search('New', $memStatus), $resultCurrent['values'][0]['status_id']);
 
@@ -1797,7 +1960,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $params['join_date'] = date('Y-m-d', strtotime('now - 53 week'));
     $params['start_date'] = date('Y-m-d', strtotime('now - 53 week'));
     $params['end_date'] = date('Y-m-d', strtotime('now - 1 week'));
-    $params['status_id'] = 'Current'; // Intentionally incorrect status.
+    // Intentionally incorrect status.
+    $params['status_id'] = 'Current';
     $resultGrace = $this->callAPISuccess('Membership', 'create', $params);
     $this->assertEquals(array_search('Current', $memStatus), $resultGrace['values'][0]['status_id']);
 
@@ -1806,7 +1970,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $params['join_date'] = date('Y-m-d', strtotime('now - 16 month'));
     $params['start_date'] = date('Y-m-d', strtotime('now - 16 month'));
     $params['end_date'] = date('Y-m-d', strtotime('now - 4 month'));
-    $params['status_id'] = 'Grace'; // Intentionally incorrect status.
+    // Intentionally incorrect status.
+    $params['status_id'] = 'Grace';
     $resultExpired = $this->callAPISuccess('Membership', 'create', $params);
     $this->assertEquals(array_search('Grace', $memStatus), $resultExpired['values'][0]['status_id']);
 
@@ -1884,8 +2049,10 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'join_date' => date('Y-m-d', strtotime('now - 16 month')),
       'start_date' => date('Y-m-d', strtotime('now - 16 month')),
       'end_date' => date('Y-m-d', strtotime('now - 4 month')),
-      'status_id' => 'Grace', // Intentionally incorrect status.
-      'skipStatusCal' => 1, // Don't calculate status.
+      // Intentionally incorrect status.
+      'status_id' => 'Grace',
+      // Don't calculate status.
+      'skipStatusCal' => 1,
     ];
     $organizationMembershipID = $this->contactMembershipCreate($params);
 
@@ -1943,6 +2110,42 @@ class api_v3_JobTest extends CiviUnitTestCase {
     // Inherit Expired - should get updated.
     $membership = $this->callAPISuccess('membership', 'getsingle', ['id' => $resultInheritExpired['values'][0]['id']]);
     $this->assertEquals(array_search('Expired', $memStatus), $membership['status_id']);
+  }
+
+  /**
+   * Test procesing membership where is_override is set to 0 rather than NULL
+   */
+  public function testProcessMembershipIsOverrideNotNullNot1either() {
+    $membershipTypeId = $this->membershipTypeCreate();
+
+    // Create admin-only membership status and get all statuses.
+    $result = $this->callAPISuccess('membership_status', 'create', ['name' => 'Admin', 'is_admin' => 1, 'sequential' => 1]);
+    $membershipStatusIdAdmin = $result['values'][0]['id'];
+    $memStatus = CRM_Member_PseudoConstant::membershipStatus();
+
+    // Default params, which we'll expand on below.
+    $params = [
+      'membership_type_id' => $membershipTypeId,
+      // Don't calculate status.
+      'skipStatusCal' => 1,
+      'source' => 'Test',
+      'sequential' => 1,
+    ];
+
+    // Create membership with incorrect status but dates implying status Current.
+    $params['contact_id'] = $this->individualCreate();
+    $params['join_date'] = date('Y-m-d', strtotime('now - 6 month'));
+    $params['start_date'] = date('Y-m-d', strtotime('now - 6 month'));
+    $params['end_date'] = date('Y-m-d', strtotime('now + 6 month'));
+    // Intentionally incorrect status.
+    $params['status_id'] = 'New';
+    $resultCurrent = $this->callAPISuccess('Membership', 'create', $params);
+    // Ensure that is_override is set to 0 by doing through DB given API not seem to accept id
+    CRM_Core_DAO::executeQuery("Update civicrm_membership SET is_override = 0 WHERE id = %1", [1 => [$resultCurrent['id'], 'Positive']]);
+    $this->assertEquals(array_search('New', $memStatus), $resultCurrent['values'][0]['status_id']);
+    $jobResult = $this->callAPISuccess('Job', 'process_membership', []);
+    $this->assertEquals('Processed 1 membership records. Updated 1 records.', $jobResult['values']);
+    $this->assertEquals(array_search('Current', $memStatus), $this->callAPISuccess('Membership', 'get', ['id' => $resultCurrent['id']])['values'][$resultCurrent['id']]['status_id']);
   }
 
 }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -54,7 +54,7 @@ function civicrm_api3_option_group_get($params) {
  */
 function civicrm_api3_option_group_create($params) {
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'OptionGroup');
-  civicrm_api('option_value', 'getfields', array('version' => 3, 'cache_clear' => 1));
+  civicrm_api('option_value', 'getfields', ['version' => 3, 'cache_clear' => 1]);
   return $result;
 }
 

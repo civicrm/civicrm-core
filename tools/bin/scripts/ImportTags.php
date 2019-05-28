@@ -24,8 +24,7 @@
 */
 
 
-
-require_once ('bin/cli.php');
+require_once('bin/cli.php');
 require_once 'CRM/Core/BAO/Tag.php';
 
 /**
@@ -41,7 +40,7 @@ class tagsImporter extends civicrm_cli {
       die("you need to profide a csv file (1st column parent name, 2nd tag name");
     }
     $this->file = $this->args[0];
-    $this->tags = array_flip(CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE)));
+    $this->tags = array_flip(CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]));
   }
 
   //format expected: parent name, tag
@@ -70,12 +69,17 @@ class tagsImporter extends civicrm_cli {
       echo "\n- exists already: " . $param['name'];
       return;
     }
-    $key = array('tag' => '');
+    $key = ['tag' => ''];
     if ($param['parent']) {
       if (array_key_exists($param['parent'], $this->tags)) {
         $param['parent_id'] = $this->tags[$param['parent']];
       }
-      else $param['parent_id'] = $this->addTag(array(parent => '', name => $param['parent']));
+      else {
+        $param['parent_id'] = $this->addTag([
+          parent => '',
+          name => $param['parent'],
+        ]);
+      }
       $tag = CRM_Core_BAO_Tag::add($param, $key);
       echo "\n" . $tag->id . ": create " . $param['name'] . " below " . $param['parent'];
     }

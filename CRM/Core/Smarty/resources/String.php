@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  * @param $tpl_name
@@ -74,11 +74,10 @@ function civicrm_smarty_resource_string_get_trusted($tpl_name, &$smarty_obj) {
 
 function civicrm_smarty_register_string_resource() {
   $template = CRM_Core_Smarty::singleton();
-  $template->register_resource('string', array(
-      'civicrm_smarty_resource_string_get_template',
-      'civicrm_smarty_resource_string_get_timestamp',
-      'civicrm_smarty_resource_string_get_secure',
-      'civicrm_smarty_resource_string_get_trusted',
-    )
-  );
+  $template->register_resource('string', [
+    'civicrm_smarty_resource_string_get_template',
+    'civicrm_smarty_resource_string_get_timestamp',
+    'civicrm_smarty_resource_string_get_secure',
+    'civicrm_smarty_resource_string_get_trusted',
+  ]);
 }

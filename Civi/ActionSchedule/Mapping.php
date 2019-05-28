@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -63,7 +63,7 @@ namespace Civi\ActionSchedule;
  */
 abstract class Mapping implements MappingInterface {
 
-  private static $fields = array(
+  private static $fields = [
     'id',
     'entity',
     'entity_label',
@@ -73,7 +73,7 @@ abstract class Mapping implements MappingInterface {
     'entity_status_label',
     'entity_date_start',
     'entity_date_end',
-  );
+  ];
 
   /**
    * Create mapping.
@@ -112,7 +112,7 @@ abstract class Mapping implements MappingInterface {
   /**
    * The basic entity to query (label).
    *
-   * @var
+   * @var string
    *   Ex: 'Activity', 'Event'
    */
   private $entity_label;
@@ -149,14 +149,14 @@ abstract class Mapping implements MappingInterface {
 
   /**
    * Date filter -- the field name.
-   * @var string|NULL
+   * @var string|null
    *   Ex: 'event_start_date'
    */
   private $entity_date_start;
 
   /**
    * Date filter -- the field name.
-   * @var string|NULL
+   * @var string|null
    *   Ex: 'event_end_date'.
    */
   private $entity_date_end;
@@ -229,7 +229,7 @@ abstract class Mapping implements MappingInterface {
         return \CRM_Core_OptionGroup::values('auto_renew_options');
       }
       else {
-        return array();
+        return [];
       }
     }
     return self::getValueLabelMap($this->entity_status);
@@ -242,7 +242,7 @@ abstract class Mapping implements MappingInterface {
    *   Array(string $fieldName => string $fieldLabel).
    */
   public function getDateFields() {
-    $dateFieldLabels = array();
+    $dateFieldLabels = [];
     if (!empty($this->entity_date_start)) {
       $dateFieldLabels[$this->entity_date_start] = ucwords(str_replace('_', ' ', $this->entity_date_start));
     }
@@ -263,7 +263,7 @@ abstract class Mapping implements MappingInterface {
    *   Ex: array('assignee' => 'Activity Assignee').
    */
   public function getRecipientTypes() {
-    return array();
+    return [];
   }
 
   /**
@@ -280,7 +280,7 @@ abstract class Mapping implements MappingInterface {
    * @see getRecipientTypes
    */
   public function getRecipientListing($recipientType) {
-    return array();
+    return [];
   }
 
   protected static function getValueLabelMap($name) {
@@ -300,11 +300,11 @@ abstract class Mapping implements MappingInterface {
       $valueLabelMap['civicrm_membership_type'] = \CRM_Member_PseudoConstant::membershipType();
 
       $allCustomFields = \CRM_Core_BAO_CustomField::getFields('');
-      $dateFields = array(
+      $dateFields = [
         'birth_date' => ts('Birth Date'),
         'created_date' => ts('Created Date'),
         'modified_date' => ts('Modified Date'),
-      );
+      ];
       foreach ($allCustomFields as $fieldID => $field) {
         if ($field['data_type'] == 'Date') {
           $dateFields["custom_$fieldID"] = $field['label'];
@@ -326,7 +326,7 @@ abstract class Mapping implements MappingInterface {
    *   List of error messages.
    */
   public function validateSchedule($schedule) {
-    return array();
+    return [];
   }
 
   /**
@@ -339,6 +339,6 @@ abstract class Mapping implements MappingInterface {
    * @param array $defaultParams
    * @return \CRM_Utils_SQL_Select
    */
-  public abstract function createQuery($schedule, $phase, $defaultParams);
+  abstract public function createQuery($schedule, $phase, $defaultParams);
 
 }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  *
  */
 
@@ -92,15 +92,18 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       ],
       'duration_interval' => [
         'name' => 'duration_interval',
+        'required' => TRUE,
       ],
       'duration_unit' => [
         'name' => 'duration_unit',
         'description' => ts('Duration of this membership (e.g. 30 days, 2 months, 5 years, 1 lifetime)'),
+        'required' => TRUE,
       ],
       'period_type' => [
         'name' => 'period_type',
         'description' => ts("Select 'rolling' if membership periods begin at date of signup. Select 'fixed' if membership periods begin on a set calendar date."),
         'help' => ['id' => 'period-type', 'file' => "CRM/Member/Page/MembershipType.hlp"],
+        'required' => TRUE,
       ],
       'fixed_period_start_day' => [
         'name' => 'fixed_period_start_day',
@@ -129,7 +132,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       ],
     ];
 
-    if (!CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('Recurring'))) {
+    if (!CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(['Recurring'])) {
       $this->entityFields['auto_renew']['not-auto-addable'] = TRUE;
       $this->entityFields['auto_renew']['documentation_link'] = ['page' => 'user/contributions/payment-processors'];
     }
@@ -203,19 +206,19 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       // Set values for relation type select box
       $relTypeIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $defaults['relationship_type_id']);
       $relDirections = explode(CRM_Core_DAO::VALUE_SEPARATOR, $defaults['relationship_direction']);
-      $defaults['relationship_type_id'] = array();
+      $defaults['relationship_type_id'] = [];
       foreach ($relTypeIds as $key => $value) {
         $defaults['relationship_type_id'][] = $value . '_' . $relDirections[$key];
       }
     }
 
     //setting default fixed_period_start_day & fixed_period_rollover_day
-    $periods = array('fixed_period_start_day', 'fixed_period_rollover_day');
+    $periods = ['fixed_period_start_day', 'fixed_period_rollover_day'];
     foreach ($periods as $per) {
       if (isset($defaults[$per])) {
         $date = $defaults[$per];
 
-        $defaults[$per] = array();
+        $defaults[$per] = [];
         if ($date > 31) {
           $date = ($date < 999) ? '0' . $date : $date;
           $defaults[$per]['M'] = substr($date, 0, 2);
@@ -251,11 +254,11 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     $this->assign('tpl_standardised_fields', ['name', 'description', 'member_of_contact_id', 'minimum_fee']);
 
     $this->addRule('name', ts('A membership type with this name already exists. Please select another name.'),
-      'objectExists', array('CRM_Member_DAO_MembershipType', $this->_id)
+      'objectExists', ['CRM_Member_DAO_MembershipType', $this->_id]
     );
     $this->addRule('minimum_fee', ts('Please enter a monetary value for the Minimum Fee.'), 'money');
 
-    $props = array('api' => array('params' => array('contact_type' => 'Organization')));
+    $props = ['api' => ['params' => ['contact_type' => 'Organization']]];
     $this->addEntityRef('member_of_contact_id', ts('Membership Organization'), $props, TRUE);
 
     //start day
@@ -265,8 +268,8 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
     // Add Auto-renew options if we have a payment processor that supports recurring contributions
     $isAuthorize = FALSE;
-    $options = array();
-    if (CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(array('Recurring'))) {
+    $options = [];
+    if (CRM_Financial_BAO_PaymentProcessor::hasPaymentProcessorSupporting(['Recurring'])) {
       $isAuthorize = TRUE;
       $options = CRM_Core_SelectValues::memberAutoRenew();
     }
@@ -282,7 +285,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       CRM_Core_SelectValues::date(NULL, 'd'), FALSE
     );
     $this->add('select', 'financial_type_id', ts('Financial Type'),
-      array('' => ts('- select -')) + CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, $this->_action), TRUE, array('class' => 'crm-select2')
+      ['' => ts('- select -')] + CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, $this->_action), TRUE, ['class' => 'crm-select2']
     );
 
     $relTypeInd = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, NULL, TRUE);
@@ -290,13 +293,13 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       asort($relTypeInd);
     }
     $memberRel = $this->add('select', 'relationship_type_id', ts('Relationship Type'),
-      $relTypeInd, FALSE, array('class' => 'crm-select2 huge', 'multiple' => 1));
+      $relTypeInd, FALSE, ['class' => 'crm-select2 huge', 'multiple' => 1]);
 
-    $this->addField('visibility', array('placeholder' => NULL, 'option_url' => NULL));
+    $this->addField('visibility', ['placeholder' => NULL, 'option_url' => NULL]);
 
     $membershipRecords = FALSE;
     if ($this->_action & CRM_Core_Action::UPDATE) {
-      $result = civicrm_api3("Membership", "get", array("membership_type_id" => $this->_id, "options" => array("limit" => 1)));
+      $result = civicrm_api3("Membership", "get", ["membership_type_id" => $this->_id, "options" => ["limit" => 1]]);
       $membershipRecords = ($result["count"] > 0);
       if ($membershipRecords) {
         $memberRel->freeze();
@@ -305,11 +308,11 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
 
     $this->assign('membershipRecordsExists', $membershipRecords);
 
-    $this->addFormRule(array('CRM_Member_Form_MembershipType', 'formRule'));
+    $this->addFormRule(['CRM_Member_Form_MembershipType', 'formRule']);
 
     $this->assign('membershipTypeId', $this->_id);
 
-    if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+    if (Civi::settings()->get('deferred_revenue_enabled')) {
       $deferredFinancialType = CRM_Financial_BAO_FinancialAccount::getDeferredFinancialType();
       $this->assign('deferredFinancialType', array_keys($deferredFinancialType));
     }
@@ -325,7 +328,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    *   mixed true or array of errors
    */
   public static function formRule($params) {
-    $errors = array();
+    $errors = [];
 
     if (!$params['name']) {
       $errors['name'] = ts('Please enter a membership type name.');
@@ -339,10 +342,10 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       $errors['duration_interval'] = ts('Please enter a duration interval.');
     }
 
-    if (in_array(CRM_Utils_Array::value('auto_renew', $params), array(
+    if (in_array(CRM_Utils_Array::value('auto_renew', $params), [
       1,
       2,
-    ))) {
+    ])) {
       if (($params['duration_interval'] > 1 && $params['duration_unit'] == 'year') ||
         ($params['duration_interval'] > 12 && $params['duration_unit'] == 'month')
       ) {
@@ -359,7 +362,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
     if (($params['period_type'] == 'fixed') &&
       ($params['duration_unit'] == 'year')
     ) {
-      $periods = array('fixed_period_start_day', 'fixed_period_rollover_day');
+      $periods = ['fixed_period_start_day', 'fixed_period_rollover_day'];
       foreach ($periods as $period) {
         $month = $params[$period]['M'];
         $date = $params[$period]['d'];
@@ -420,7 +423,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       if (!CRM_Utils_System::isNull($params['relationship_type_id'])) {
         // To insert relation ids and directions with value separator
         $relTypeDirs = $params['relationship_type_id'];
-        $relIds = $relDirection = array();
+        $relIds = $relDirection = [];
         foreach ($relTypeDirs as $key => $value) {
           $relationId = explode('_', $value);
           if (count($relationId) == 3 &&
@@ -446,7 +449,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
         $params['duration_interval'] = 1;
       }
 
-      $periods = array('fixed_period_start_day', 'fixed_period_rollover_day');
+      $periods = ['fixed_period_start_day', 'fixed_period_rollover_day'];
       foreach ($periods as $period) {
         if (!empty($params[$period]['M']) && !empty($params[$period]['d'])) {
           $mon = $params[$period]['M'];
@@ -482,7 +485,7 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
       $membershipTypeName = $membershipTypeResult['values'][$membershipTypeResult['id']]['name'];
 
       CRM_Core_Session::setStatus(ts("The membership type '%1' has been saved.",
-        array(1 => $membershipTypeName)
+        [1 => $membershipTypeName]
       ), ts('Saved'), 'success');
       $session = CRM_Core_Session::singleton();
       $buttonName = $this->controller->getButtonName();
@@ -502,18 +505,18 @@ class CRM_Member_Form_MembershipType extends CRM_Member_Form_MembershipConfig {
    */
   public static function checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, &$optionsIds) {
     if ($previousID) {
-      $editedFieldParams = array(
+      $editedFieldParams = [
         'price_set_id ' => $priceSetId,
         'name' => $previousID,
-      );
-      $editedResults = array();
+      ];
+      $editedResults = [];
       CRM_Price_BAO_PriceField::retrieve($editedFieldParams, $editedResults);
       if (!empty($editedResults)) {
-        $editedFieldParams = array(
+        $editedFieldParams = [
           'price_field_id' => $editedResults['id'],
           'membership_type_id' => $membershipTypeId,
-        );
-        $editedResults = array();
+        ];
+        $editedResults = [];
         CRM_Price_BAO_PriceFieldValue::retrieve($editedFieldParams, $editedResults);
         $optionsIds['option_id'][1] = CRM_Utils_Array::value('id', $editedResults);
       }

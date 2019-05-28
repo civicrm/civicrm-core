@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
 
@@ -174,7 +174,7 @@ SELECT id, label, parent_id, weight, is_active, name
 FROM civicrm_navigation WHERE domain_id = $domainID";
       $result = CRM_Core_DAO::executeQuery($query);
 
-      $pidGroups = array();
+      $pidGroups = [];
       while ($result->fetch()) {
         $pidGroups[$result->parent_id][$result->label] = $result->id;
       }
@@ -183,7 +183,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
         $pidGroups[''][$label] = self::_getNavigationValue($val, $pidGroups);
       }
 
-      $navigations = array();
+      $navigations = [];
       self::_getNavigationLabel($pidGroups[''], $navigations);
 
       CRM_Core_BAO_Cache::setItem($navigations, 'navigation', $cacheKeyString);
@@ -207,7 +207,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       if ($label == 'navigation_id') {
         continue;
       }
-      $translatedLabel = $i18n->crm_translate($label, array('context' => 'menu'));
+      $translatedLabel = $i18n->crm_translate($label, ['context' => 'menu']);
       $navigations[is_array($val) ? $val['navigation_id'] : $val] = "{$separator}{$translatedLabel}";
       if (is_array($val)) {
         self::_getNavigationLabel($val, $navigations, $separator . '&nbsp;&nbsp;&nbsp;&nbsp;');
@@ -227,7 +227,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
    */
   public static function _getNavigationValue($val, &$pidGroups) {
     if (array_key_exists($val, $pidGroups)) {
-      $list = array('navigation_id' => $val);
+      $list = ['navigation_id' => $val];
       foreach ($pidGroups[$val] as $label => $id) {
         $list[$label] = self::_getNavigationValue($id, $pidGroups);
       }
@@ -247,7 +247,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
    */
   public static function buildNavigationTree() {
     $domainID = CRM_Core_Config::domainID();
-    $navigationTree = array();
+    $navigationTree = [];
 
     $navigationMenu = new self();
     $navigationMenu->domain_id = $domainID;
@@ -255,8 +255,8 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     $navigationMenu->find();
 
     while ($navigationMenu->fetch()) {
-      $navigationTree[$navigationMenu->id] = array(
-        'attributes' => array(
+      $navigationTree[$navigationMenu->id] = [
+        'attributes' => [
           'label' => $navigationMenu->label,
           'name' => $navigationMenu->name,
           'url' => $navigationMenu->url,
@@ -268,8 +268,8 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
           'parentID' => $navigationMenu->parent_id,
           'navID' => $navigationMenu->id,
           'active' => $navigationMenu->is_active,
-        ),
-      );
+        ],
+      ];
     }
 
     return self::buildTree($navigationTree);
@@ -284,7 +284,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
    * @return array
    */
   private static function buildTree($elements, $parentId = NULL) {
-    $branch = array();
+    $branch = [];
 
     foreach ($elements as $id => $element) {
       if ($element['attributes']['parentID'] == $parentId) {
@@ -297,51 +297,6 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     }
 
     return $branch;
-  }
-
-  /**
-   * Build menu.
-   *
-   * @return string
-   */
-  public static function buildNavigation() {
-    $navigations = self::buildNavigationTree();
-    $navigationString = '';
-
-    // run the Navigation  through a hook so users can modify it
-    CRM_Utils_Hook::navigationMenu($navigations);
-    self::fixNavigationMenu($navigations);
-
-    // Hooks have added menu items in an arbitrary order. We need to order by
-    // weight again. I would put this function directly after
-    // CRM_Utils_Hook::navigationMenu but for some reason, fixNavigationMenu is
-    // moving items added by hooks on the end of the menu. Hence I do it
-    // afterwards
-    self::orderByWeight($navigations);
-
-    //skip children menu item if user don't have access to parent menu item
-    $skipMenuItems = array();
-    foreach ($navigations as $key => $value) {
-      // Home is a special case
-      if ($value['attributes']['name'] != 'Home') {
-        $name = self::getMenuName($value, $skipMenuItems);
-        if ($name) {
-          //separator before
-          if (isset($value['attributes']['separator']) && $value['attributes']['separator'] == 2) {
-            $navigationString .= '<li class="menu-separator"></li>';
-          }
-          $removeCharacters = array('/', '!', '&', '*', ' ', '(', ')', '.');
-          $navigationString .= '<li class="menumain crm-' . str_replace($removeCharacters, '_', $value['attributes']['label']) . '">' . $name;
-        }
-      }
-      self::recurseNavigation($value, $navigationString, $skipMenuItems);
-    }
-
-    // clean up - Need to remove empty <ul>'s, this happens when user don't have
-    // permission to access parent
-    $navigationString = str_replace('<ul></ul></li>', '', $navigationString);
-
-    return $navigationString;
   }
 
   /**
@@ -399,7 +354,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
           if (isset($val['attributes']['separator']) && $val['attributes']['separator'] == 2) {
             $navigationString .= '<li class="menu-separator"></li>';
           }
-          $removeCharacters = array('/', '!', '&', '*', ' ', '(', ')', '.');
+          $removeCharacters = ['/', '!', '&', '*', ' ', '(', ')', '.'];
           $navigationString .= '<li class="crm-' . str_replace($removeCharacters, '_', $val['attributes']['label']) . '">' . $name;
           self::recurseNavigation($val, $navigationString, $skipMenuItems);
         }
@@ -475,7 +430,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     // want to use ts() as it would throw the ts-extractor off
     $i18n = CRM_Core_I18n::singleton();
 
-    $name = $i18n->crm_translate($value['attributes']['label'], array('context' => 'menu'));
+    $name = $i18n->crm_translate($value['attributes']['label'], ['context' => 'menu']);
     $url = CRM_Utils_Array::value('url', $value['attributes']);
     $parentID = CRM_Utils_Array::value('parentID', $value['attributes']);
     $navID = CRM_Utils_Array::value('navID', $value['attributes']);
@@ -558,52 +513,6 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       }
     }
     return TRUE;
-  }
-
-  /**
-   * Create navigation for CiviCRM Admin Menu.
-   *
-   * @return string
-   *   returns navigation html
-   */
-  public static function createNavigation() {
-    $navigation = self::buildNavigation();
-
-    if ($navigation) {
-
-      //add additional navigation items
-      $logoutURL = CRM_Utils_System::url('civicrm/logout', 'reset=1');
-
-      // get home menu from db
-      $homeParams = array('name' => 'Home');
-      $homeNav = array();
-      $homeIcon = '<span class="crm-logo-sm" ></span>';
-      self::retrieve($homeParams, $homeNav);
-      if ($homeNav) {
-        $homeURL = self::makeFullyFormedUrl($homeNav['url']);
-        $homeLabel = $homeNav['label'];
-        // CRM-6804 (we need to special-case this as we don’t ts()-tag variables)
-        if ($homeLabel == 'Home') {
-          $homeLabel = ts('CiviCRM Home');
-        }
-      }
-      else {
-        $homeURL = CRM_Utils_System::url('civicrm/dashboard', 'reset=1');
-        $homeLabel = ts('CiviCRM Home');
-      }
-      // Link to hide the menubar
-      $hideLabel = ts('Hide Menu');
-
-      $prepandString = "
-        <li class='menumain crm-link-home'>$homeIcon
-          <ul id='civicrm-home'>
-            <li><a href='$homeURL'>$homeLabel</a></li>
-            <li><a href='#' class='crm-hidemenu'>$hideLabel</a></li>
-            <li><a href='$logoutURL' class='crm-logout-link'>" . ts('Log out') . "</a></li>
-          </ul>";
-      // <li> tag doesn't need to be closed
-    }
-    return $prepandString . $navigation;
   }
 
   /**
@@ -741,7 +650,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
 
     $incrementOtherNodes = TRUE;
     $sql = "SELECT weight from civicrm_navigation WHERE {$parentClause} ORDER BY weight LIMIT %1, 1";
-    $params = array(1 => array($position, 'Positive'));
+    $params = [1 => [$position, 'Positive']];
     $newWeight = CRM_Core_DAO::singleValueQuery($sql, $params);
 
     // this means node is moved to last position, so you need to get the weight of last element + 1
@@ -750,7 +659,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       if ($position) {
         $lastPosition = $position - 1;
         $sql = "SELECT weight from civicrm_navigation WHERE {$parentClause} ORDER BY weight LIMIT %1, 1";
-        $params = array(1 => array($lastPosition, 'Positive'));
+        $params = [1 => [$lastPosition, 'Positive']];
         $newWeight = CRM_Core_DAO::singleValueQuery($sql, $params);
 
         // since last node increment + 1
@@ -825,7 +734,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
    * @param int $domain_id
    */
   public static function rebuildReportsNavigation($domain_id) {
-    $component_to_nav_name = array(
+    $component_to_nav_name = [
       'CiviContact' => 'Contact Reports',
       'CiviContribute' => 'Contribution Reports',
       'CiviMember' => 'Membership Reports',
@@ -834,7 +743,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       'CiviGrant' => 'Grant Reports',
       'CiviMail' => 'Mailing Reports',
       'CiviCampaign' => 'Campaign Reports',
-    );
+    ];
 
     // Create or update the top level Reports link.
     $reports_nav = self::createOrUpdateTopLevelReportsNavItem($domain_id);
@@ -861,10 +770,10 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
         $report_nav = self::createOrUpdateReportNavItem($report['title'], $report['url'], 'reset=1', $component_nav->id, $report['permission'], $domain_id, FALSE, TRUE);
         // Update the report instance to include the navigation id.
         $query = "UPDATE civicrm_report_instance SET navigation_id = %1 WHERE id = %2";
-        $params = array(
-          1 => array($report_nav->id, 'Integer'),
-          2 => array($report_id, 'Integer'),
-        );
+        $params = [
+          1 => [$report_nav->id, 'Integer'],
+          2 => [$report_id, 'Integer'],
+        ];
         CRM_Core_DAO::executeQuery($query, $params);
       }
     }
@@ -883,7 +792,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
    *
    * @return bool|\CRM_Core_DAO
    */
-  static public function createOrUpdateTopLevelReportsNavItem($domain_id) {
+  public static function createOrUpdateTopLevelReportsNavItem($domain_id) {
     $id = NULL;
 
     $dao = new CRM_Core_BAO_Navigation();
@@ -950,19 +859,19 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
         civicrm_report_instance.domain_id = %1
       ORDER BY civicrm_option_value.weight";
 
-    $dao = CRM_Core_DAO::executeQuery($sql, array(
-      1 => array($domain_id, 'Integer'),
-    ));
-    $rows = array();
+    $dao = CRM_Core_DAO::executeQuery($sql, [
+      1 => [$domain_id, 'Integer'],
+    ]);
+    $rows = [];
     while ($dao->fetch()) {
       $component_name = is_null($dao->name) ? 'CiviContact' : $dao->name;
       $component_id = is_null($dao->component_id) ? 99 : $dao->component_id;
       $rows[$component_id]['name'] = $component_name;
-      $rows[$component_id]['reports'][$dao->id] = array(
+      $rows[$component_id]['reports'][$dao->id] = [
         'title' => $dao->title,
         'url' => "civicrm/report/instance/{$dao->id}",
         'permission' => $dao->permission,
-      );
+      ];
     }
     return $rows;
   }
@@ -983,7 +892,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
    *   If True then do not match with a url that has a different parent
    *   (This is because for top level items there is a risk of 'stealing' rows that normally
    *   live under 'Contact' and intentionally duplicate the report examples.)
-   *
+   * @param bool $useWildcard
    * @return \CRM_Core_DAO_Navigation
    */
   protected static function createOrUpdateReportNavItem($name, $url, $url_params, $parent_id, $permission,
@@ -1017,17 +926,17 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
     if ($url !== NULL) {
       $url = "{$url}?{$url_params}";
     }
-    $params = array(
+    $params = [
       'name' => $name,
       'label' => ts($name),
       'url' => $url,
       'parent_id' => $parent_id,
       'is_active' => TRUE,
-      'permission' => array(
+      'permission' => [
         $permission,
-      ),
+      ],
       'domain_id' => $domain_id,
-    );
+    ];
     if ($id) {
       $params['id'] = $id;
     }
@@ -1049,6 +958,66 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       $key = self::resetNavigation($cid);
     }
     return $key;
+  }
+
+  /**
+   * Unset menu items for disabled components and non-permissioned users
+   *
+   * @param $menu
+   */
+  public static function filterByPermission(&$menu) {
+    foreach ($menu as $key => $item) {
+      if (
+        (array_key_exists('active', $item['attributes']) && !$item['attributes']['active']) ||
+        !CRM_Core_BAO_Navigation::checkPermission($item['attributes'])
+      ) {
+        unset($menu[$key]);
+        continue;
+      }
+      if (!empty($item['child'])) {
+        self::filterByPermission($menu[$key]['child']);
+      }
+    }
+  }
+
+  /**
+   * @param array $menu
+   */
+  public static function buildHomeMenu(&$menu) {
+    foreach ($menu as &$item) {
+      if (CRM_Utils_Array::value('name', $item['attributes']) === 'Home') {
+        unset($item['attributes']['label'], $item['attributes']['url']);
+        $item['attributes']['icon'] = 'crm-logo-sm';
+        $item['attributes']['attr']['accesskey'] = 'm';
+        $item['child'] = [
+          [
+            'attributes' => [
+              'label' => 'CiviCRM Home',
+              'name' => 'CiviCRM Home',
+              'url' => 'civicrm/dashboard?reset=1',
+              'weight' => 1,
+            ],
+          ],
+          [
+            'attributes' => [
+              'label' => 'Hide Menu',
+              'name' => 'Hide Menu',
+              'url' => '#hidemenu',
+              'weight' => 2,
+            ],
+          ],
+          [
+            'attributes' => [
+              'label' => 'Log out',
+              'name' => 'Log out',
+              'url' => 'civicrm/logout?reset=1',
+              'weight' => 3,
+            ],
+          ],
+        ];
+        return;
+      }
+    }
   }
 
 }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,9 @@
 class CRM_Contact_Form_Search_Custom_SampleTestDataProvider implements Iterator {
 
   /**
-   * @var integer
+   * Current count.
+   *
+   * @var int
    */
   private $i = 0;
 

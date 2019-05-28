@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,6 +29,7 @@
  * Class CiviReportTestCase
  */
 class CiviReportTestCase extends CiviUnitTestCase {
+
   public function setUp() {
     parent::setUp();
     $this->_sethtmlGlobals();

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -54,7 +54,7 @@ class CRM_Activity_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoar
     $controller->set('context', 'user');
     $controller->set('cid', $this->_contactId);
     // Limit to status "Scheduled" and "Available"
-    $controller->set('status', array('IN' => array(1, 7)));
+    $controller->set('status', ['IN' => [1, 7]]);
     $controller->set('activity_role', 2);
     $controller->set('force', 1);
     $controller->process();

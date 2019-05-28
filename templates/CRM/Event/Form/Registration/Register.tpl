@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -145,7 +145,7 @@
       {include file='CRM/Core/BillingBlockWrapper.tpl'}
     {/if}
 
-    <div class="crm-public-form-item crm-section custom_pre-section">
+    <div class="crm-public-form-item crm-section custom_post-section">
       {include file="CRM/UF/Form/Block.tpl" fields=$customPost}
     </div>
 

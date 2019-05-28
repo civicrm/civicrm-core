@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -93,23 +93,22 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
       $this->get('exportMode')
     );
 
-    $this->addButtons(array(
-        array(
-          'type' => 'back',
-          'name' => ts('Previous'),
-        ),
-        array(
-          'type' => 'next',
-          'name' => ts('Export'),
-          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
-        ),
-        array(
-          'type' => 'done',
-          'icon' => 'fa-times',
-          'name' => ts('Done'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'back',
+        'name' => ts('Previous'),
+      ],
+      [
+        'type' => 'next',
+        'name' => ts('Export'),
+        'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+      ],
+      [
+        'type' => 'done',
+        'icon' => 'fa-times',
+        'name' => ts('Done'),
+      ],
+    ]);
   }
 
   /**
@@ -125,7 +124,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
    *   list of errors to be posted back to the form
    */
   public static function formRule($fields, $values, $mappingTypeId) {
-    $errors = array();
+    $errors = [];
 
     if (!empty($fields['saveMapping']) && !empty($fields['_qf_Map_next'])) {
       $nameField = CRM_Utils_Array::value('saveMappingName', $fields);
@@ -221,11 +220,11 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
       }
 
       if (!empty($params['saveMapping'])) {
-        $mappingParams = array(
+        $mappingParams = [
           'name' => $params['saveMappingName'],
           'description' => $params['saveMappingDesc'],
           'mapping_type_id' => $this->get('mappingTypeId'),
-        );
+        ];
 
         $saveMapping = CRM_Core_BAO_Mapping::add($mappingParams);
 

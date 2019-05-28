@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -47,18 +47,18 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
   public function __construct($dir) {
     $this->_dir = $dir;
 
-    $this->_ignored = $this->maildir(implode(DIRECTORY_SEPARATOR, array(
-          'CiviMail.ignored',
-          date('Y'),
-          date('m'),
-          date('d'),
-        )));
-    $this->_processed = $this->maildir(implode(DIRECTORY_SEPARATOR, array(
-          'CiviMail.processed',
-          date('Y'),
-          date('m'),
-          date('d'),
-        )));
+    $this->_ignored = $this->maildir(implode(DIRECTORY_SEPARATOR, [
+      'CiviMail.ignored',
+      date('Y'),
+      date('m'),
+      date('d'),
+    ]));
+    $this->_processed = $this->maildir(implode(DIRECTORY_SEPARATOR, [
+      'CiviMail.processed',
+      date('Y'),
+      date('m'),
+      date('d'),
+    ]));
   }
 
   /**
@@ -72,15 +72,15 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
    *   array of ezcMail objects
    */
   public function fetchNext($count = 0) {
-    $mails = array();
+    $mails = [];
     $parser = new ezcMailParser();
     // set property text attachment as file CRM-5408
     $parser->options->parseTextAttachmentsAsFiles = TRUE;
 
-    foreach (array(
-               'cur',
-               'new',
-             ) as $subdir) {
+    foreach ([
+      'cur',
+      'new',
+    ] as $subdir) {
       $dir = $this->_dir . DIRECTORY_SEPARATOR . $subdir;
       foreach (scandir($dir) as $file) {
         if ($file == '.' or $file == '..') {
@@ -94,7 +94,7 @@ class CRM_Mailing_MailStore_Maildir extends CRM_Mailing_MailStore {
 
         }
 
-        $set = new ezcMailFileSet(array($path));
+        $set = new ezcMailFileSet([$path]);
         $single = $parser->parseMail($set);
         $mails[$path] = $single[0];
       }

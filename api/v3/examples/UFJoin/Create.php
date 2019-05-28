@@ -6,7 +6,7 @@
  *   API result array
  */
 function uf_join_create_example() {
-  $params = array(
+  $params = [
     'module' => 'CiviCampaign',
     'entity_table' => 'civicrm_survey',
     'entity_id' => 1,
@@ -14,7 +14,7 @@ function uf_join_create_example() {
     'uf_group_id' => 11,
     'is_active' => 1,
     'sequential' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('UFJoin', 'create', $params);
@@ -24,12 +24,12 @@ function uf_join_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -43,13 +43,13 @@ function uf_join_create_example() {
  */
 function uf_join_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 0,
-    'values' => array(
-      '0' => array(
+    'values' => [
+      '0' => [
         'id' => '1',
         'is_active' => '1',
         'module' => 'CiviCampaign',
@@ -58,9 +58,9 @@ function uf_join_create_expectedresult() {
         'weight' => '1',
         'uf_group_id' => '11',
         'module_data' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

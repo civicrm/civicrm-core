@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -37,14 +37,18 @@
 class CRM_Extension_Container_Collection implements CRM_Extension_Container_Interface {
 
   /**
-   * @var array ($name => CRM_Extension_Container_Interface)
+   * Containers.
+   *
+   * Format is [$name => CRM_Extension_Container_Interface]
+   *
+   * @var [string => CRM_Extension_Container_Interface]
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $containers;
 
   /**
-   * @var CRM_Utils_Cache_Interface|NULL
+   * @var CRM_Utils_Cache_Interface|null
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
@@ -58,13 +62,19 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   public $cacheKey;
 
   /**
-   * @var array ($key => $containerName)
+   * K2C ....
+   *
+   * Format is ($key => $containerName).
+   *
+   * @var array
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $k2c;
 
   /**
+   * Class constructor.
+   *
    * @param array $containers
    *   Array($name => CRM_Extension_Container_Interface) in order from highest
    *   priority (winners) to lowest priority (losers).
@@ -85,7 +95,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
    * @return array
    */
   public function checkRequirements() {
-    $errors = array();
+    $errors = [];
     foreach ($this->containers as $container) {
       $errors = array_merge($errors, $container->checkRequirements());
     }
@@ -95,7 +105,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   /**
    * @inheritDoc
    *
-   * @return array_keys
+   * @return array
    */
   public function getKeys() {
     $k2c = $this->getKeysToContainer();
@@ -106,6 +116,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
    * @inheritDoc
    *
    * @param string $key
+   *
+   * @throws \CRM_Extension_Exception_MissingException
    */
   public function getPath($key) {
     return $this->getContainer($key)->getPath($key);
@@ -115,6 +127,8 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
    * @inheritDoc
    *
    * @param string $key
+   *
+   * @throws \CRM_Extension_Exception_MissingException
    */
   public function getResUrl($key) {
     return $this->getContainer($key)->getResUrl($key);
@@ -163,7 +177,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
       $k2c = $this->cache->get($this->cacheKey);
     }
     if (!isset($k2c) || !is_array($k2c)) {
-      $k2c = array();
+      $k2c = [];
       $containerNames = array_reverse(array_keys($this->containers));
       foreach ($containerNames as $name) {
         $keys = $this->containers[$name]->getKeys();

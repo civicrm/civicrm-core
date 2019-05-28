@@ -6,13 +6,13 @@
  *   API result array
  */
 function status_preference_create_example() {
-  $params = array(
+  $params = [
     'name' => 'test_check',
     'domain_id' => 1,
     'hush_until' => '20151212',
     'ignore_severity' => 'cRItical',
     'check_info' => '',
-  );
+  ];
 
   try{
     $result = civicrm_api3('StatusPreference', 'create', $params);
@@ -22,12 +22,12 @@ function status_preference_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -41,13 +41,13 @@ function status_preference_create_example() {
  */
 function status_preference_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 4,
-    'values' => array(
-      '4' => array(
+    'values' => [
+      '4' => [
         'id' => '4',
         'domain_id' => '1',
         'name' => 'test_check',
@@ -55,9 +55,9 @@ function status_preference_create_expectedresult() {
         'ignore_severity' => '5',
         'prefs' => '',
         'check_info' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

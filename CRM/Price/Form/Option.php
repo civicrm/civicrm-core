@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -51,6 +51,13 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @var int
    */
   protected $_oid;
+
+  /**
+   * Array of Money fields
+   *
+   * @var array
+   */
+  protected $_moneyFields = ['amount', 'non_deductible_amount'];
 
   /**
    * Set variables up before form is built.
@@ -77,15 +84,17 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
     if ($this->_action == CRM_Core_Action::DELETE) {
       return NULL;
     }
-    $defaults = array();
+    $defaults = [];
 
     if (isset($this->_oid)) {
-      $params = array('id' => $this->_oid);
+      $params = ['id' => $this->_oid];
 
       CRM_Price_BAO_PriceFieldValue::retrieve($params, $defaults);
 
       // fix the display of the monetary value, CRM-4038
-      $defaults['value'] = CRM_Utils_Money::format(CRM_Utils_Array::value('value', $defaults), NULL, '%a');
+      foreach ($this->_moneyFields as $field) {
+        $defaults[$field] = CRM_Utils_Money::format(CRM_Utils_Array::value($field, $defaults), NULL, '%a');
+      }
     }
 
     $memberComponentId = CRM_Core_Component::getComponentID('CiviMember');
@@ -99,7 +108,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       $defaults['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_sid, 'financial_type_id', 'id');;
     }
     if (!isset($defaults['weight']) || !$defaults['weight']) {
-      $fieldValues = array('price_field_id' => $this->_fid);
+      $fieldValues = ['price_field_id' => $this->_fid];
       $defaults['weight'] = CRM_Utils_Weight::getDefaultWeight('CRM_Price_DAO_PriceFieldValue', $fieldValues);
       $defaults['is_active'] = 1;
     }
@@ -120,16 +129,16 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       }
     }
     if ($this->_action == CRM_Core_Action::DELETE) {
-      $this->addButtons(array(
-        array(
+      $this->addButtons([
+        [
           'type' => 'next',
           'name' => ts('Delete'),
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      ));
+        ],
+      ]);
       return NULL;
     }
     else {
@@ -163,11 +172,11 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       if ($memberComponentId == $extendComponentId) {
         $this->assign('showMember', TRUE);
         $membershipTypes = CRM_Member_PseudoConstant::membershipType();
-        $this->add('select', 'membership_type_id', ts('Membership Type'), array(
+        $this->add('select', 'membership_type_id', ts('Membership Type'), [
           '' => ' ',
-        ) + $membershipTypes, FALSE,
-        array('onClick' => "calculateRowValues( );"));
-        $this->add('text', 'membership_num_terms', ts('Number of Terms'), $attributes['membership_num_terms']);
+        ] + $membershipTypes, FALSE,
+        ['onClick' => "calculateRowValues( );"]);
+        $this->add('number', 'membership_num_terms', ts('Number of Terms'), $attributes['membership_num_terms']);
       }
       else {
         $allComponents = explode(CRM_Core_DAO::VALUE_SEPARATOR, $extendComponentId);
@@ -175,10 +184,10 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         if (in_array($eventComponentId, $allComponents)) {
           $this->isEvent = TRUE;
           // count
-          $this->add('text', 'count', ts('Participant Count'));
+          $this->add('number', 'count', ts('Participant Count'));
           $this->addRule('count', ts('Please enter a valid Max Participants.'), 'positiveInteger');
 
-          $this->add('text', 'max_value', ts('Max Participants'));
+          $this->add('number', 'max_value', ts('Max Participants'));
           $this->addRule('max_value', ts('Please enter a valid Max Participants.'), 'positiveInteger');
         }
 
@@ -193,7 +202,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         'select',
         'financial_type_id',
         ts('Financial Type'),
-        array('' => ts('- select -')) + $financialType,
+        ['' => ts('- select -')] + $financialType,
         TRUE
       );
 
@@ -223,7 +232,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       $this->add('textarea', 'help_post', ts('Post Option Help'));
 
       // weight
-      $this->add('text', 'weight', ts('Order'), NULL, TRUE);
+      $this->add('number', 'weight', ts('Order'), NULL, TRUE);
       $this->addRule('weight', ts('is a numeric field'), 'numeric');
 
       // is active ?
@@ -244,31 +253,31 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
         }
       }
       // add buttons
-      $this->addButtons(array(
-        array(
+      $this->addButtons([
+        [
           'type' => 'next',
           'name' => ts('Save'),
-        ),
-        array(
+        ],
+        [
           'type' => 'cancel',
           'name' => ts('Cancel'),
-        ),
-      ));
+        ],
+      ]);
 
       // if view mode pls freeze it with the done button.
       if ($this->_action & CRM_Core_Action::VIEW) {
         $this->freeze();
-        $this->addButtons(array(
-          array(
+        $this->addButtons([
+          [
             'type' => 'cancel',
             'name' => ts('Done'),
             'isDefault' => TRUE,
-          ),
-        ));
+          ],
+        ]);
       }
     }
 
-    $this->addFormRule(array('CRM_Price_Form_Option', 'formRule'), $this);
+    $this->addFormRule(['CRM_Price_Form_Option', 'formRule'], $this);
   }
 
   /**
@@ -285,7 +294,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    *                  true otherwise
    */
   public static function formRule($fields, $files, $form) {
-    $errors = array();
+    $errors = [];
     if (!empty($fields['count']) && !empty($fields['max_value']) &&
       $fields['count'] > $fields['max_value']
     ) {
@@ -293,7 +302,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
     }
 
     $priceField = CRM_Price_BAO_PriceField::findById($fields['fieldId']);
-    $visibilityOptions = CRM_Price_BAO_PriceFieldValue::buildOptions('visibility_id', NULL, array('labelColumn' => 'name'));
+    $visibilityOptions = CRM_Price_BAO_PriceFieldValue::buildOptions('visibility_id', NULL, ['labelColumn' => 'name']);
 
     $publicCount = 0;
     $options = CRM_Price_BAO_PriceField::getOptions($priceField->id);
@@ -322,7 +331,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    */
   public function postProcess() {
     if ($this->_action == CRM_Core_Action::DELETE) {
-      $fieldValues = array('price_field_id' => $this->_fid);
+      $fieldValues = ['price_field_id' => $this->_fid];
       $wt = CRM_Utils_Weight::delWeight('CRM_Price_DAO_PriceFieldValue', $this->_oid, $fieldValues);
       $label = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue',
         $this->_oid,
@@ -330,27 +339,29 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       );
 
       if (CRM_Price_BAO_PriceFieldValue::del($this->_oid)) {
-        CRM_Core_Session::setStatus(ts('%1 option has been deleted.', array(1 => $label)), ts('Record Deleted'), 'success');
+        CRM_Core_Session::setStatus(ts('%1 option has been deleted.', [1 => $label]), ts('Record Deleted'), 'success');
       }
       return NULL;
     }
     else {
-      $params = $ids = array();
+      $params = $ids = [];
       $params = $this->controller->exportValues('Option');
       $fieldLabel = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceField', $this->_fid, 'label');
 
-      $params['amount'] = CRM_Utils_Rule::cleanMoney(trim($params['amount']));
+      foreach ($this->_moneyFields as $field) {
+        $params[$field] = CRM_Utils_Rule::cleanMoney(trim($params[$field]));
+      }
       $params['price_field_id'] = $this->_fid;
       $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
       $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
       $params['visibility_id'] = CRM_Utils_Array::value('visibility_id', $params, FALSE);
-      $ids = array();
+      $ids = [];
       if ($this->_oid) {
         $ids['id'] = $this->_oid;
       }
       $optionValue = CRM_Price_BAO_PriceFieldValue::create($params, $ids);
 
-      CRM_Core_Session::setStatus(ts("The option '%1' has been saved.", array(1 => $params['label'])), ts('Value Saved'), 'success');
+      CRM_Core_Session::setStatus(ts("The option '%1' has been saved.", [1 => $params['label']]), ts('Value Saved'), 'success');
     }
   }
 

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -165,7 +165,6 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       if ($dao->fetch()) {
         $msg = $dao->headers . "\n\n" . $dao->body;
       }
-      $dao->free();
     }
 
     switch ($type) {
@@ -198,7 +197,6 @@ class CiviMailUtils extends PHPUnit_Framework_TestCase {
       while ($dao->fetch()) {
         $msgs[] = $dao->headers . "\n\n" . $dao->body;
       }
-      $dao->free();
     }
 
     switch ($type) {

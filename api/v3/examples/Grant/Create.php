@@ -6,7 +6,7 @@
  *   API result array
  */
 function grant_create_example() {
-  $params = array(
+  $params = [
     'contact_id' => 3,
     'application_received_date' => 'now',
     'decision_date' => 'next Monday',
@@ -15,7 +15,7 @@ function grant_create_example() {
     'rationale' => 'Just Because',
     'currency' => 'USD',
     'grant_type_id' => 1,
-  );
+  ];
 
   try{
     $result = civicrm_api3('Grant', 'create', $params);
@@ -25,12 +25,12 @@ function grant_create_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -44,13 +44,13 @@ function grant_create_example() {
  */
 function grant_create_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 1,
-    'values' => array(
-      '1' => array(
+    'values' => [
+      '1' => [
         'id' => '1',
         'contact_id' => '3',
         'application_received_date' => '20130728084957',
@@ -66,9 +66,9 @@ function grant_create_expectedresult() {
         'rationale' => 'Just Because',
         'status_id' => '1',
         'financial_type_id' => '',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

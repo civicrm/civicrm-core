@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -115,30 +115,13 @@
 
 <tr class="crm-case-form-block-custom_data">
     <td colspan="2">
-        <div id="customData"></div>
+      {include file="CRM/common/customDataBlock.tpl"}
     </td>
 </tr>
 
 <tr class="crm-case-form-block-tag_set"><td colspan="2">{include file="CRM/common/Tagset.tpl" tagsetType='case'}</td></tr>
 
 </table>
-{/if}
-
-{if $action eq 1}
-    {*include custom data js file*}
-    {include file="CRM/common/customData.tpl"}
-    {literal}
-      <script type="text/javascript">
-      CRM.$(function($) {
-           var customDataSubType = $('#case_type_id').val();
-           if ( customDataSubType ) {
-              CRM.buildCustomData( {/literal}'{$customDataType}'{literal}, customDataSubType );
-           } else {
-              CRM.buildCustomData( {/literal}'{$customDataType}'{literal} );
-           }
-       });
-       </script>
-     {/literal}
 {/if}
 
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
 
@@ -308,15 +308,15 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
           foreach ($date as $field => $value) {
             switch ($field) {
               case 'contribution_date':
-                $form->addDate('start_date', ts('First installment payment'));
-                $paymentDate = $value = date('m/d/Y');
-                list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults(NULL);
+                $form->add('datepicker', 'start_date', ts('First installment payment'), [], FALSE, ['time' => FALSE]);
+                $paymentDate = $value = date('Y-m-d');
+                $defaults['start_date'] = $value;
                 $form->assign('is_date', TRUE);
                 break;
 
               case 'calendar_date':
-                $form->addDate('start_date', ts('First installment payment'));
-                list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults($value);
+                $form->add('datepicker', 'start_date', ts('First installment payment'), [], FALSE, ['time' => FALSE]);
+                $defaults['start_date'] = $value;
                 $form->assign('is_date', TRUE);
                 $paymentDate = $value;
                 break;
@@ -325,7 +325,7 @@ class CRM_Pledge_BAO_PledgeBlock extends CRM_Pledge_DAO_PledgeBlock {
                 $month = CRM_Utils_Date::getCalendarDayOfMonth();
                 $form->add('select', 'start_date', ts('Day of month installments paid'), $month);
                 $paymentDate = CRM_Pledge_BAO_Pledge::getPaymentDate($value);
-                list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults($paymentDate);
+                $defaults['start_date'] = $paymentDate;
                 break;
 
               default:

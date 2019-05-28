@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,8 +27,31 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2017
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
+ *
+ * This script processes "Instant Payment Notifications" (IPNs).  Modern
+ * Payment Processors use the /civicrm/payment/ipn/123 endpoint instead (where
+ * 123 is the payment processor ID), however a quirk in the way PayPal works
+ * means that we need to maintain this script.
+ *
+ * Note on PayPal.
+ *
+ * Using PayPal Website Standard (which uses the old PayPal button API) the IPN
+ * endpoint is passed to PayPal with every transaction, and it is then stored
+ * by PayPal who unhelpfully do not give you any way to retrieve or change
+ * this.
+ *
+ * This means that if you provide URL1 when setting up a recurring
+ * contribution, then you will always need to maintain URL1 because all
+ * recurring payments against that will be sent to URL1.
+ *
+ * Note that this also affects you if you were to move your CiviCRM instance to
+ * another domain (if you do, get the webserver at the original domain to emit
+ * a 307 redirect to the new one, PayPal will re-send).
+ *
+ * Therefore, for the sake of these old recurring contributions, CiviCRM should
+ * maintain this script as part of core.
  */
 
 if (defined('PANTHEON_ENVIRONMENT')) {
@@ -52,9 +75,18 @@ else {
   // @todo upgrade standard per Pro
 }
 try {
-  //CRM-18245
-  if ($config->userFramework == 'Joomla') {
-    CRM_Utils_System::loadBootStrap();
+  switch ($config->userFramework) {
+    case 'Joomla':
+      // CRM-18245
+      CRM_Utils_System::loadBootStrap();
+      break;
+
+    case 'Drupal':
+    case 'Backdrop':
+      // Gitlab issue: #973
+      CRM_Utils_System::loadBootStrap([], FALSE);
+      break;
+
   }
   $paypalIPN->main();
 }

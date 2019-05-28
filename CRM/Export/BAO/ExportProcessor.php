@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -80,11 +80,20 @@ class CRM_Export_BAO_ExportProcessor {
   protected $isMergeSameHousehold;
 
   /**
+   * Only export contacts that can receive postal mail.
+   *
+   * Includes being alive, having an address & not having do_not_mail.
+   *
+   * @var bool
+   */
+  protected $isPostalableOnly;
+
+  /**
    * Key representing the head of household in the relationship array.
    *
    * e.g. ['8_b_a' => 'Household Member Is', '8_a_b = 'Household Member Of'.....]
    *
-   * @var
+   * @var array
    */
   protected $relationshipTypes = [];
 
@@ -94,6 +103,13 @@ class CRM_Export_BAO_ExportProcessor {
    * @var array
    */
   protected $relationshipReturnProperties = [];
+
+  /**
+   * IDs of households that have already been exported.
+   *
+   * @var array
+   */
+  protected $exportedHouseholds = [];
 
   /**
    * Get return properties by relationship.
@@ -127,14 +143,30 @@ class CRM_Export_BAO_ExportProcessor {
    * @param array|NULL $requestedFields
    * @param string $queryOperator
    * @param bool $isMergeSameHousehold
+   * @param bool $isPostalableOnly
    */
-  public function __construct($exportMode, $requestedFields, $queryOperator, $isMergeSameHousehold = FALSE) {
+  public function __construct($exportMode, $requestedFields, $queryOperator, $isMergeSameHousehold = FALSE, $isPostalableOnly = FALSE) {
     $this->setExportMode($exportMode);
     $this->setQueryMode();
     $this->setQueryOperator($queryOperator);
     $this->setRequestedFields($requestedFields);
     $this->setRelationshipTypes();
     $this->setIsMergeSameHousehold($isMergeSameHousehold);
+    $this->setisPostalableOnly($isPostalableOnly);
+  }
+
+  /**
+   * @return bool
+   */
+  public function isPostalableOnly() {
+    return $this->isPostalableOnly;
+  }
+
+  /**
+   * @param bool $isPostalableOnly
+   */
+  public function setIsPostalableOnly($isPostalableOnly) {
+    $this->isPostalableOnly = $isPostalableOnly;
   }
 
   /**
@@ -222,6 +254,30 @@ class CRM_Export_BAO_ExportProcessor {
   }
 
   /**
+   * Get the id of the related household.
+   *
+   * @param int $contactID
+   * @param string $relationshipType
+   *
+   * @return int
+   */
+  public function getRelatedHouseholdID($contactID, $relationshipType) {
+    return $this->relatedContactValues[$relationshipType][$contactID]['id'];
+  }
+
+  /**
+   * Has the household already been exported.
+   *
+   * @param int $housholdContactID
+   *
+   * @return bool
+   */
+  public function isHouseholdExported($housholdContactID) {
+    return isset($this->exportedHouseholds[$housholdContactID]);
+
+  }
+
+  /**
    * @return bool
    */
   public function isMergeSameHousehold() {
@@ -258,7 +314,6 @@ class CRM_Export_BAO_ExportProcessor {
     return array_key_exists($fieldName, $this->relationshipTypes);
   }
 
-
   /**
    * @param $fieldName
    * @return bool
@@ -292,6 +347,12 @@ class CRM_Export_BAO_ExportProcessor {
    * @param array $queryFields
    */
   public function setQueryFields($queryFields) {
+    // legacy hacks - we add these to queryFields because this
+    // pseudometadata is currently required.
+    $queryFields['im_provider']['pseudoconstant']['var'] = 'imProviders';
+    $queryFields['country']['context'] = 'country';
+    $queryFields['world_region']['context'] = 'country';
+    $queryFields['state_province']['context'] = 'province';
     $this->queryFields = $queryFields;
   }
 
@@ -428,6 +489,23 @@ class CRM_Export_BAO_ExportProcessor {
    * @return array
    */
   public function runQuery($params, $order, $returnProperties) {
+    $addressWhere = '';
+    $params = array_merge($params, $this->getWhereParams());
+    if ($this->isPostalableOnly) {
+      if (array_key_exists('street_address', $returnProperties)) {
+        $addressWhere = " civicrm_address.street_address <> ''";
+        if (array_key_exists('supplemental_address_1', $returnProperties)) {
+          // We need this to be an OR rather than AND on the street_address so, hack it in.
+          $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+            'address_options', TRUE, NULL, TRUE
+          );
+          if (!empty($addressOptions['supplemental_address_1'])) {
+            $addressWhere .= " OR civicrm_address.supplemental_address_1 <> ''";
+          }
+        }
+        $addressWhere = ' AND (' . $addressWhere . ')';
+      }
+    }
     $query = new CRM_Contact_BAO_Query($params, $returnProperties, NULL,
       FALSE, FALSE, $this->getQueryMode(),
       FALSE, TRUE, TRUE, NULL, $this->getQueryOperator()
@@ -438,7 +516,7 @@ class CRM_Export_BAO_ExportProcessor {
     $query->_sort = $order;
     list($select, $from, $where, $having) = $query->query();
     $this->setQueryFields($query->_fields);
-    return array($query, $select, $from, $where, $having);
+    return [$query, $select, $from, $where . $addressWhere, $having];
   }
 
   /**
@@ -450,26 +528,54 @@ class CRM_Export_BAO_ExportProcessor {
    * @param int $entityTypeID phone_type_id or provider_id for phone or im fields.
    */
   public function addOutputSpecification($key, $relationshipType = NULL, $locationType = NULL, $entityTypeID = NULL) {
-    $label = $this->getHeaderForRow($key);
-    $labelPrefix = $fieldPrefix = [];
-    if ($relationshipType) {
-      $labelPrefix[] = $this->getRelationshipTypes()[$relationshipType];
-      $fieldPrefix[] = $relationshipType;
-    }
-    if ($locationType) {
-      $labelPrefix[] = $fieldPrefix[] = $locationType;
-    }
+    $entityLabel = '';
     if ($entityTypeID) {
       if ($key === 'phone') {
-        $labelPrefix[] = $fieldPrefix[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id', $entityTypeID);
+        $entityLabel = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id', $entityTypeID);
       }
       if ($key === 'im') {
-        $labelPrefix[] = $fieldPrefix[] = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $entityTypeID);
+        $entityLabel = CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_IM', 'provider_id', $entityTypeID);
       }
     }
-    $index = ($fieldPrefix ? (implode('-', $fieldPrefix)  . '-') : '') . $key;
-    $this->outputSpecification[$index]['header'] = ($labelPrefix ? (implode('-', $labelPrefix) . '-') : '') . $label;
 
+    // These oddly constructed keys are for legacy reasons. Altering them will affect test success
+    // but in time it may be good to rationalise them.
+    $label = $this->getOutputSpecificationLabel($key, $relationshipType, $locationType, $entityLabel);
+    $index = $this->getOutputSpecificationIndex($key, $relationshipType, $locationType, $entityLabel);
+    $fieldKey = $this->getOutputSpecificationFieldKey($key, $relationshipType, $locationType, $entityLabel);
+
+    $this->outputSpecification[$index]['header'] = $label;
+    $this->outputSpecification[$index]['sql_columns'] = $this->getSqlColumnDefinition($fieldKey, $key);
+
+    if ($relationshipType && $this->isHouseholdMergeRelationshipTypeKey($relationshipType)) {
+      $this->setColumnAsCalculationOnly($index);
+    }
+    $this->outputSpecification[$index]['metadata'] = $this->getMetaDataForField($key);
+  }
+
+  /**
+   * Get the metadata for the given field.
+   *
+   * @param $key
+   *
+   * @return array
+   */
+  public function getMetaDataForField($key) {
+    $mappings = ['contact_id' => 'id'];
+    if (isset($this->getQueryFields()[$key])) {
+      return $this->getQueryFields()[$key];
+    }
+    if (isset($mappings[$key])) {
+      return $this->getQueryFields()[$mappings[$key]];
+    }
+    return [];
+  }
+
+  /**
+   * @param $key
+   */
+  public function setSqlColumnDefn($key) {
+    $this->outputSpecification[$this->getMungedFieldName($key)]['sql_columns'] = $this->getSqlColumnDefinition($key, $this->getMungedFieldName($key));
   }
 
   /**
@@ -497,6 +603,30 @@ class CRM_Export_BAO_ExportProcessor {
   }
 
   /**
+   * @return array
+   */
+  public function getSQLColumns() {
+    $sqlColumns = [];
+    foreach ($this->outputSpecification as $key => $spec) {
+      if (empty($spec['do_not_output_to_sql'])) {
+        $sqlColumns[$key] = $spec['sql_columns'];
+      }
+    }
+    return $sqlColumns;
+  }
+
+  /**
+   * @return array
+   */
+  public function getMetadata() {
+    $metadata = [];
+    foreach ($this->outputSpecification as $key => $spec) {
+      $metadata[$key] = $spec['metadata'];
+    }
+    return $metadata;
+  }
+
+  /**
    * Build the row for output.
    *
    * @param \CRM_Contact_BAO_Query $query
@@ -507,18 +637,30 @@ class CRM_Export_BAO_ExportProcessor {
    * @param $addPaymentHeader
    * @param $paymentTableId
    *
-   * @return array
+   * @return array|bool
    */
   public function buildRow($query, $iterationDAO, $outputColumns, $metadata, $paymentDetails, $addPaymentHeader, $paymentTableId) {
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
 
     $row = [];
+    $householdMergeRelationshipType = $this->getHouseholdMergeTypeForRow($iterationDAO->contact_id);
+    if ($householdMergeRelationshipType) {
+      $householdID = $this->getRelatedHouseholdID($iterationDAO->contact_id, $householdMergeRelationshipType);
+      if ($this->isHouseholdExported($householdID)) {
+        return FALSE;
+      }
+      foreach (array_keys($outputColumns) as $column) {
+        $row[$column] = $this->getRelationshipValue($householdMergeRelationshipType, $iterationDAO->contact_id, $column);
+      }
+      $this->markHouseholdExported($householdID);
+      return $row;
+    }
+
     $query->convertToPseudoNames($iterationDAO);
 
     //first loop through output columns so that we return what is required, and in same order.
     foreach ($outputColumns as $field => $value) {
-
       // add im_provider to $dao object
       if ($field == 'im_provider' && property_exists($iterationDAO, 'provider_id')) {
         $iterationDAO->im_provider = $iterationDAO->provider_id;
@@ -546,20 +688,7 @@ class CRM_Export_BAO_ExportProcessor {
       }
 
       if ($this->isRelationshipTypeKey($field)) {
-        foreach (array_keys($value) as $property) {
-          if ($property === 'location') {
-            // @todo just undo all this nasty location wrangling!
-            foreach ($value['location'] as $locationKey => $locationFields) {
-              foreach (array_keys($locationFields) as $locationField) {
-                $fieldKey = str_replace(' ', '_', $locationKey . '-' . $locationField);
-                $row[$field . '_' . $fieldKey] = $this->getRelationshipValue($field, $iterationDAO->contact_id, $fieldKey);
-              }
-            }
-          }
-          else {
-            $row[$field . '_' . $property] = $this->getRelationshipValue($field, $iterationDAO->contact_id, $property);
-          }
-        }
+        $this->buildRelationshipFieldsForRow($row, $iterationDAO->contact_id, $value, $field);
       }
       else {
         $row[$field] = $this->getTransformedFieldValue($field, $iterationDAO, $fieldValue, $metadata, $paymentDetails);
@@ -591,6 +720,33 @@ class CRM_Export_BAO_ExportProcessor {
       $row['organization_name'] = '';
     }
     return $row;
+  }
+
+  /**
+   * If this row has a household whose details we should use get the relationship type key.
+   *
+   * @param $contactID
+   *
+   * @return bool
+   */
+  public function getHouseholdMergeTypeForRow($contactID) {
+    if (!$this->isMergeSameHousehold()) {
+      return FALSE;
+    }
+    foreach ($this->getHouseholdRelationshipTypes() as $relationshipType) {
+      if (isset($this->relatedContactValues[$relationshipType][$contactID])) {
+        return $relationshipType;
+      }
+    }
+  }
+
+  /**
+   * Mark the given household as already exported.
+   *
+   * @param $householdID
+   */
+  public function markHouseholdExported($householdID) {
+    $this->exportedHouseholds[$householdID] = $householdID;
   }
 
   /**
@@ -627,11 +783,11 @@ class CRM_Export_BAO_ExportProcessor {
         return CRM_Core_BAO_CustomField::displayValue($fieldValue, $cfID);
       }
 
-      elseif (in_array($field, array(
+      elseif (in_array($field, [
         'email_greeting',
         'postal_greeting',
         'addressee',
-      ))) {
+      ])) {
         //special case for greeting replacement
         $fldValue = "{$field}_display";
         return $iterationDAO->$fldValue;
@@ -641,10 +797,10 @@ class CRM_Export_BAO_ExportProcessor {
         switch ($field) {
           case 'country':
           case 'world_region':
-            return $i18n->crm_translate($fieldValue, array('context' => 'country'));
+            return $i18n->crm_translate($fieldValue, ['context' => 'country']);
 
           case 'state_province':
-            return $i18n->crm_translate($fieldValue, array('context' => 'province'));
+            return $i18n->crm_translate($fieldValue, ['context' => 'province']);
 
           case 'gender':
           case 'preferred_communication_method':
@@ -660,6 +816,9 @@ class CRM_Export_BAO_ExportProcessor {
                 return $i18n->crm_translate($fieldValue, $metadata[$field]);
               }
               if (!empty($metadata[$field]['pseudoconstant'])) {
+                if (!empty($metadata[$field]['bao'])) {
+                  return CRM_Core_PseudoConstant::getLabel($metadata[$field]['bao'], $metadata[$field]['name'], $fieldValue);
+                }
                 // This is not our normal syntax for pseudoconstants but I am a bit loath to
                 // call an external function until sure it is not increasing php processing given this
                 // may be iterated 100,000 times & we already have the $imProvider var loaded.
@@ -683,13 +842,13 @@ class CRM_Export_BAO_ExportProcessor {
     elseif ($this->isExportSpecifiedPaymentFields() && array_key_exists($field, $this->getcomponentPaymentFields())) {
       $paymentTableId = $this->getPaymentTableID();
       $paymentData = CRM_Utils_Array::value($iterationDAO->$paymentTableId, $paymentDetails);
-      $payFieldMapper = array(
+      $payFieldMapper = [
         'componentPaymentField_total_amount' => 'total_amount',
         'componentPaymentField_contribution_status' => 'contribution_status',
         'componentPaymentField_payment_instrument' => 'pay_instru',
         'componentPaymentField_transaction_id' => 'trxn_id',
         'componentPaymentField_received_date' => 'receive_date',
-      );
+      ];
       return CRM_Utils_Array::value($payFieldMapper[$field], $paymentData, '');
     }
     else {
@@ -843,7 +1002,7 @@ class CRM_Export_BAO_ExportProcessor {
     $skippedFields = ($this->getQueryMode() === CRM_Contact_BAO_Query::MODE_CONTACTS) ? [] : [
       'groups',
       'tags',
-      'notes'
+      'notes',
     ];
 
     foreach ($fields as $key => $var) {
@@ -953,17 +1112,17 @@ class CRM_Export_BAO_ExportProcessor {
   /**
    * Get the sql column definition for the given field.
    *
-   * @param $field
+   * @param string $fieldName
+   * @param string $columnName
    *
    * @return mixed
    */
-  public function getSqlColumnDefinition($field) {
-    $fieldName = $this->getMungedFieldName($field);
+  public function getSqlColumnDefinition($fieldName, $columnName) {
 
     // early exit for master_id, CRM-12100
     // in the DB it is an ID, but in the export, we retrive the display_name of the master record
     // also for current_employer, CRM-16939
-    if ($fieldName == 'master_id' || $fieldName == 'current_employer') {
+    if ($columnName == 'master_id' || $columnName == 'current_employer') {
       return "$fieldName varchar(128)";
     }
 
@@ -975,11 +1134,11 @@ class CRM_Export_BAO_ExportProcessor {
     $queryFields = $this->getQueryFields();
     $lookUp = ['prefix_id', 'suffix_id'];
     // set the sql columns
-    if (isset($queryFields[$field]['type'])) {
-      switch ($queryFields[$field]['type']) {
+    if (isset($queryFields[$columnName]['type'])) {
+      switch ($queryFields[$columnName]['type']) {
         case CRM_Utils_Type::T_INT:
         case CRM_Utils_Type::T_BOOLEAN:
-          if (in_array($field, $lookUp)) {
+          if (in_array($columnName, $lookUp)) {
             return "$fieldName varchar(255)";
           }
           else {
@@ -987,8 +1146,8 @@ class CRM_Export_BAO_ExportProcessor {
           }
 
         case CRM_Utils_Type::T_STRING:
-          if (isset($queryFields[$field]['maxlength'])) {
-            return "$fieldName varchar({$queryFields[$field]['maxlength']})";
+          if (isset($queryFields[$columnName]['maxlength'])) {
+            return "$fieldName varchar({$queryFields[$columnName]['maxlength']})";
           }
           else {
             return "$fieldName varchar(255)";
@@ -1032,12 +1191,12 @@ class CRM_Export_BAO_ExportProcessor {
         }
         else {
           // set the sql columns for custom data
-          if (isset($queryFields[$field]['data_type'])) {
+          if (isset($queryFields[$columnName]['data_type'])) {
 
-            switch ($queryFields[$field]['data_type']) {
+            switch ($queryFields[$columnName]['data_type']) {
               case 'String':
                 // May be option labels, which could be up to 512 characters
-                $length = max(512, CRM_Utils_Array::value('text_length', $queryFields[$field]));
+                $length = max(512, CRM_Utils_Array::value('text_length', $queryFields[$columnName]));
                 return "$fieldName varchar($length)";
 
               case 'Country':
@@ -1072,6 +1231,129 @@ class CRM_Export_BAO_ExportProcessor {
       $fieldName = 'civicrm_primary_id';
     }
     return $fieldName;
+  }
+
+  /**
+   * In order to respect the history of this class we need to index kinda illogically.
+   *
+   * On the bright side - this stuff is tested within a nano-byte of it's life.
+   *
+   * e.g '2-a-b_Home-City'
+   *
+   * @param string $key
+   * @param string $relationshipType
+   * @param string $locationType
+   * @param $entityLabel
+   *
+   * @return string
+   */
+  protected function getOutputSpecificationIndex($key, $relationshipType, $locationType, $entityLabel) {
+    if ($entityLabel || $key === 'im') {
+      // Just cos that's the history...
+      if ($key !== 'master_id') {
+        $key = $this->getHeaderForRow($key);
+      }
+    }
+    if (!$relationshipType || $key !== 'id') {
+      $key = $this->getMungedFieldName($key);
+    }
+    return $this->getMungedFieldName(
+      ($relationshipType ? ($relationshipType . '_') : '')
+      . ($locationType ? ($locationType . '_') : '')
+      . $key
+      . ($entityLabel ? ('_' . $entityLabel) : '')
+    );
+  }
+
+  /**
+   * Get the compiled label for the column.
+   *
+   * e.g 'Gender', 'Employee Of-Home-city'
+   *
+   * @param string $key
+   * @param string $relationshipType
+   * @param string $locationType
+   * @param string $entityLabel
+   *
+   * @return string
+   */
+  protected function getOutputSpecificationLabel($key, $relationshipType, $locationType, $entityLabel) {
+    return ($relationshipType ? $this->getRelationshipTypes()[$relationshipType] . '-' : '')
+      . ($locationType ? $locationType . '-' : '')
+      . $this->getHeaderForRow($key)
+      . ($entityLabel ? '-' . $entityLabel : '');
+  }
+
+  /**
+   * Get the mysql field name key.
+   *
+   * This key is locked in by tests but the reasons for the specific conventions -
+   * ie. headings are used for keying fields in some cases, are likely
+   * accidental rather than deliberate.
+   *
+   * This key is used for the output sql array.
+   *
+   * @param string $key
+   * @param $relationshipType
+   * @param $locationType
+   * @param $entityLabel
+   *
+   * @return string
+   */
+  protected function getOutputSpecificationFieldKey($key, $relationshipType, $locationType, $entityLabel) {
+    if ($entityLabel || $key === 'im') {
+      if ($key !== 'state_province' && $key !== 'id') {
+        // @todo - test removing this - indexing by $key should be fine...
+        $key = $this->getHeaderForRow($key);
+      }
+    }
+    if (!$relationshipType || $key !== 'id') {
+      $key = $this->getMungedFieldName($key);
+    }
+    $fieldKey = $this->getMungedFieldName(
+      ($relationshipType ? ($relationshipType . '_') : '')
+      . ($locationType ? ($locationType . '_') : '')
+      . $key
+      . ($entityLabel ? ('_' . $entityLabel) : '')
+    );
+    return $fieldKey;
+  }
+
+  /**
+   * Get params for the where criteria.
+   *
+   * @return mixed
+   */
+  public function getWhereParams() {
+    if (!$this->isPostalableOnly()) {
+      return [];
+    }
+    $params['is_deceased'] = ['is_deceased', '=', 0, CRM_Contact_BAO_Query::MODE_CONTACTS];
+    $params['do_not_mail'] = ['do_not_mail', '=', 0, CRM_Contact_BAO_Query::MODE_CONTACTS];
+    return $params;
+  }
+
+  /**
+   * @param $row
+   * @param $contactID
+   * @param $value
+   * @param $field
+   */
+  protected function buildRelationshipFieldsForRow(&$row, $contactID, $value, $field) {
+    foreach (array_keys($value) as $property) {
+      if ($property === 'location') {
+        // @todo just undo all this nasty location wrangling!
+        foreach ($value['location'] as $locationKey => $locationFields) {
+          foreach (array_keys($locationFields) as $locationField) {
+            $fieldKey = str_replace(' ', '_', $locationKey . '-' . $locationField);
+            $row[$field . '_' . $fieldKey] = $this->getRelationshipValue($field, $contactID, $fieldKey);
+          }
+        }
+      }
+      else {
+        $row[$field . '_' . $property] = $this->getRelationshipValue($field, $contactID, $property);
+      }
+    }
   }
 
 }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -174,7 +174,8 @@ class api_v3_PaymentProcessorTypeTest extends CiviUnitTestCase {
 
     $params = array(
       'id' => $this->_ppTypeID,
-      'name' => 'API_Test_PP', // keep the same
+      // keep the same
+      'name' => 'API_Test_PP',
       'title' => 'API Test Payment Processor 2',
       'class_name' => 'CRM_Core_Payment_APITest 2',
       'billing_mode' => 2,

@@ -6,6 +6,7 @@
  */
 class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   use CRMTraits_Financial_FinancialACLTrait;
+  use CRMTraits_Financial_PriceSetTrait;
 
   /**
    * @return CRM_Contact_BAO_QueryTestDataProvider
@@ -18,8 +19,14 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
+  /**
+   * Clean up after test.
+   *
+   * @throws \Exception
+   */
   public function tearDown() {
-    $tablesToTruncate = array(
+    $this->quickCleanUpFinancialEntities();
+    $tablesToTruncate = [
       'civicrm_group_contact',
       'civicrm_group',
       'civicrm_saved_search',
@@ -27,7 +34,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       'civicrm_tag',
       'civicrm_contact',
       'civicrm_address',
-    );
+    ];
     $this->quickCleanup($tablesToTruncate);
   }
 
@@ -42,12 +49,89 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    * @param $full
    */
   public function testSearch($fv, $count, $ids, $full) {
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/queryDataset.xml'
-      )
-    );
+    $this->callAPISuccess('SavedSearch', 'create', ['form_values' => 'a:9:{s:5:"qfKey";s:32:"0123456789abcdef0123456789abcdef";s:13:"includeGroups";a:1:{i:0;s:1:"3";}s:13:"excludeGroups";a:0:{}s:11:"includeTags";a:0:{}s:11:"excludeTags";a:0:{}s:4:"task";s:2:"14";s:8:"radio_ts";s:6:"ts_all";s:14:"customSearchID";s:1:"4";s:17:"customSearchClass";s:36:"CRM_Contact_Form_Search_Custom_Group";}']);
+    $this->callAPISuccess('SavedSearch', 'create', ['form_values' => 'a:9:{s:5:"qfKey";s:32:"0123456789abcdef0123456789abcdef";s:13:"includeGroups";a:1:{i:0;s:1:"3";}s:13:"excludeGroups";a:0:{}s:11:"includeTags";a:0:{}s:11:"excludeTags";a:0:{}s:4:"task";s:2:"14";s:8:"radio_ts";s:6:"ts_all";s:14:"customSearchID";s:1:"4";s:17:"customSearchClass";s:36:"CRM_Contact_Form_Search_Custom_Group";}']);
+
+    $tag7 = $this->ids['Tag'][7] = $this->tagCreate(['name' => 'Test Tag 7', 'description' => 'Test Tag 7'])['id'];
+    $tag9 = $this->ids['Tag'][9] = $this->tagCreate(['name' => 'Test Tag 9', 'description' => 'Test Tag 9'])['id'];
+    $this->tagCreate(['name' => 'Test Tag 10']);
+    $groups = [
+      3 => ['name' => 'Test Group 3'],
+      4 => ['name' => 'Test Smart Group 4', 'saved_search_id' => 1],
+      5 => ['name' => 'Test Group 5'],
+      6 => ['name' => 'Test Smart Group 6', 'saved_search_id' => 2],
+    ];
+
+    foreach ($groups as $id => $group) {
+      $this->ids['Group'][$id] = $this->groupCreate(array_merge($group, ['title' => $group['name']]));
+    }
+    $individuals = [
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 9', 'gender_id' => 1, 'prefix_id' => 1, 'suffix_id' => 1],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 10', 'gender_id' => 2, 'prefix_id' => 2, 'suffix_id' => 2, 'api.entity_tag.create' => ['tag_id' => $tag9]],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 11', 'gender_id' => 3, 'prefix_id' => 3, 'suffix_id' => 3, 'api.entity_tag.create' => ['tag_id' => $tag7]],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 12', 'gender_id' => 3, 'prefix_id' => 4, 'suffix_id' => 4, 'api.entity_tag.create' => ['tag_id' => $tag9], 'api.entity_tag.create.2' => ['tag_id' => $tag7]],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 13', 'gender_id' => 2, 'prefix_id' => 2, 'suffix_id' => 2],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 14', 'gender_id' => 3, 'prefix_id' => 4, 'suffix_id' => 4, 'api.entity_tag.create' => ['tag_id' => $tag9]],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 15', 'gender_id' => 3, 'prefix_id' => 4, 'suffix_id' => 5, 'api.entity_tag.create' => ['tag_id' => $tag7]],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 16', 'gender_id' => 3, 'prefix_id' => 4, 'suffix_id' => 6, 'api.entity_tag.create' => ['tag_id' => $tag9], 'api.entity_tag.create.2' => ['tag_id' => $tag7]],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 17', 'gender_id' => 2, 'prefix_id' => 4, 'suffix_id' => 7],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 18', 'gender_id' => 2, 'prefix_id' => 4, 'suffix_id' => 4, 'api.entity_tag.create' => ['tag_id' => $tag9]],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 19', 'gender_id' => 2, 'prefix_id' => 4, 'suffix_id' => 6, 'api.entity_tag.create.2' => ['tag_id' => $tag7]],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 20', 'gender_id' => 1, 'prefix_id' => 4, 'suffix_id' => 6, 'api.entity_tag.create' => ['tag_id' => $tag9], 'api.entity_tag.create.2' => ['tag_id' => $tag7]],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 21', 'gender_id' => 3, 'prefix_id' => 1, 'suffix_id' => 6],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 22', 'gender_id' => 1, 'prefix_id' => 1, 'suffix_id' => 1, 'api.entity_tag.create' => ['tag_id' => $tag9]],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 23', 'gender_id' => 3, 'prefix_id' => 1, 'suffix_id' => 1, 'api.entity_tag.create' => ['tag_id' => $tag7]],
+      ['first_name' => 'Test', 'last_name' => 'Test Contact 24', 'gender_id' => 3, 'prefix_id' => 3, 'suffix_id' => 2, 'api.entity_tag.create' => ['tag_id' => $tag9], 'api.entity_tag.create.2' => ['tag_id' => $tag7]],
+    ];
+    foreach ($individuals as $individual) {
+      $this->ids['Contact'][$individual['last_name']] = $this->individualCreate($individual);
+    }
+    $groupContacts = [
+      [5 => 13],
+      [5 => 14],
+      [5 => 15],
+      [5 => 16],
+      [5 => 21],
+      [5 => 22],
+      [5 => 23],
+      [5 => 24],
+      [3 => 17],
+      [3 => 18],
+      [3 => 19],
+      [3 => 20],
+      [3 => 21],
+      [3 => 22],
+      [3 => 23],
+      [3 => 24],
+    ];
+    foreach ($groupContacts as $group) {
+      $groupID = $this->ids['Group'][key($group)];
+      $contactID = $this->ids['Contact']['Test Contact ' . reset($group)];
+      $this->callAPISuccess('GroupContact', 'create', ['group_id' => $groupID, 'contact_id' => $contactID, 'status' => 'Added']);
+    }
+
+    // We have migrated from a hard-coded dataset to a dynamic one but are still working with the same
+    // dataprovider at this stage -> wrangle.
+    foreach ($fv as $key => $value) {
+      $entity = ucfirst($key);
+      if (!array_key_exists($entity, $this->ids)) {
+        continue;
+      }
+      if (is_numeric($value)) {
+        $fv[$key] = $this->ids[$entity][$value];
+      }
+      elseif (!empty($value[0])) {
+        foreach ($value as $index => $oldGroup) {
+          $fv[$key][$index] = $this->ids[$entity][$oldGroup];
+        }
+      }
+      else {
+        foreach (array_keys($value) as $index) {
+          unset($fv[$key][$index]);
+          $fv[$key][$this->ids[$entity][$index]] = 1;
+        }
+      }
+    }
 
     $params = CRM_Contact_BAO_Query::convertFormValues($fv);
     $obj = new CRM_Contact_BAO_Query($params);
@@ -58,14 +142,18 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $dao = $obj->searchQuery();
 
-    $contacts = array();
+    $contacts = [];
     while ($dao->fetch()) {
       $contacts[] = $dao->contact_id;
     }
 
     sort($contacts, SORT_NUMERIC);
 
-    $this->assertEquals($ids, $contacts);
+    $expectedIDs = [];
+    foreach ($ids as $id) {
+      $expectedIDs[] = $this->ids['Contact']['Test Contact ' . $id];
+    }
+    $this->assertEquals($expectedIDs, $contacts);
   }
 
   /**
@@ -76,10 +164,10 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     CRM_Core_Config::singleton()->defaultSearchProfileID = 1;
     $this->callAPISuccess('address', 'create', array(
-        'contact_id' => $contactID,
-        'city' => 'Cool City',
-        'location_type_id' => 1,
-      ));
+      'contact_id' => $contactID,
+      'city' => 'Cool City',
+      'location_type_id' => 1,
+    ));
     $params = array(
       0 => array(
         0 => 'city-1',
@@ -97,10 +185,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
     try {
-      $resultDAO = $queryObj->searchQuery(0, 0, NULL,
-        FALSE, FALSE,
-        FALSE, FALSE,
-        FALSE);
+      $resultDAO = $queryObj->searchQuery();
       $this->assertTrue($resultDAO->fetch());
     }
     catch (PEAR_Exception $e) {
@@ -118,10 +203,10 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $contactID = $this->individualCreate();
     CRM_Core_Config::singleton()->defaultSearchProfileID = 1;
     $this->callAPISuccess('address', 'create', array(
-        'contact_id' => $contactID,
-        'city' => 'Cool City',
-        'location_type_id' => 1,
-      ));
+      'contact_id' => $contactID,
+      'city' => 'Cool City',
+      'location_type_id' => 1,
+    ));
     $params = array(
       0 => array(
         0 => 'city-1',
@@ -139,10 +224,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
     $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
     try {
-      $resultDAO = $queryObj->searchQuery(0, 0, NULL,
-        FALSE, FALSE,
-        FALSE, FALSE,
-        FALSE);
+      $resultDAO = $queryObj->searchQuery();
       $this->assertFalse($resultDAO->fetch());
     }
     catch (PEAR_Exception $e) {
@@ -187,10 +269,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
       );
 
       $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
-      $resultDAO = $queryObj->searchQuery(0, 0, NULL,
-        FALSE, FALSE,
-        FALSE, FALSE,
-        FALSE);
+      $resultDAO = $queryObj->searchQuery();
 
       if ($searchPrimary) {
         $this->assertEquals($resultDAO->N, 0);
@@ -209,6 +288,47 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
   }
 
   /**
+   *  Test created to prove failure of search on state when location
+   *  display name is different form location name (issue 607)
+   */
+  public function testSearchOtherLocationUpperLower() {
+
+    $params = [
+      0 => [
+        0 => 'state_province-4',
+        1 => 'IS NOT EMPTY',
+        2 => '',
+        3 => 1,
+        4 => 0,
+      ],
+    ];
+    $returnProperties = [
+      'contact_type' => 1,
+      'contact_sub_type' => 1,
+      'sort_name' => 1,
+      'location' => [
+        'other' => [
+          'location_type' => 4,
+          'state_province' => 1,
+        ],
+      ],
+    ];
+
+    // update with the api does not work because it updates both the name and the
+    // the display_name. Plain SQL however does the job
+    CRM_Core_DAO::executeQuery('update civicrm_location_type set name=%2 where id=%1',
+      [
+        1 => [4, 'Integer'],
+        2 => ['other', 'String'],
+      ]);
+
+    $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
+
+    $resultDAO = $queryObj->searchQuery();
+    $resultDAO->fetch();
+  }
+
+  /**
    * CRM-14263 search builder failure with search profile & address in criteria.
    *
    * We are retrieving primary here - checking the actual sql seems super prescriptive - but since the massive query object has
@@ -217,16 +337,18 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
    * @dataProvider getSearchProfileData
    *
    * @param array $params
+   * @param string $selectClause
+   * @param string $whereClause
    */
   public function testSearchProfilePrimaryCityCRM14263($params, $selectClause, $whereClause) {
     $contactID = $this->individualCreate();
     CRM_Core_Config::singleton()->defaultSearchProfileID = 1;
     $this->callAPISuccess('address', 'create', array(
-        'contact_id' => $contactID,
-        'city' => 'Cool CITY',
-        'street_address' => 'Long STREET',
-        'location_type_id' => 1,
-      ));
+      'contact_id' => $contactID,
+      'city' => 'Cool CITY',
+      'street_address' => 'Long STREET',
+      'location_type_id' => 1,
+    ));
     $returnProperties = array(
       'contact_type' => 1,
       'contact_sub_type' => 1,
@@ -235,10 +357,7 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
     $expectedSQL = "SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, civicrm_address.id as address_id, " . $selectClause . "  FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 ) WHERE  (  ( " . $whereClause . " )  )  AND (contact_a.is_deleted = 0)    ORDER BY `contact_a`.`sort_name` ASC, `contact_a`.`id` ";
     $queryObj = new CRM_Contact_BAO_Query($params, $returnProperties);
     try {
-      $this->assertEquals($expectedSQL, $queryObj->searchQuery(0, 0, NULL,
-        FALSE, FALSE,
-        FALSE, FALSE,
-        TRUE));
+      $this->assertEquals($expectedSQL, $queryObj->getSearchSQL());
       list($select, $from, $where, $having) = $queryObj->query();
       $dao = CRM_Core_DAO::executeQuery("$select $from $where $having");
       $dao->fetch();
@@ -592,6 +711,27 @@ civicrm_relationship.is_active = 1 AND
   }
 
   /**
+   * Test we can narrow a group get by status.
+   */
+  public function testGetByGroupWithStatus() {
+    $groupID = $this->groupCreate();
+    $this->groupContactCreate($groupID, 3);
+    $groupContactID = $this->callAPISuccessGetSingle('GroupContact', ['group_id' => $groupID, 'options' => ['limit' => 1]])['id'];
+    $this->callAPISuccess('GroupContact', 'create', ['id' => $groupContactID, 'status' => 'Removed']);
+    $queryObj = new CRM_Contact_BAO_Query([['group', '=', $groupID, 0, 0], ['group_contact_status', 'IN', ['Removed' => 1], 0, 0]]);
+    $resultDAO = $queryObj->searchQuery();
+    $this->assertEquals(1, $resultDAO->N);
+
+    $queryObj = new CRM_Contact_BAO_Query([['group', '=', $groupID, 0, 0], ['group_contact_status', 'IN', ['Added' => 1], 0, 0]]);
+    $resultDAO = $queryObj->searchQuery();
+    $this->assertEquals(2, $resultDAO->N);
+
+    $queryObj = new CRM_Contact_BAO_Query([['group', '=', $groupID, 0, 0]]);
+    $resultDAO = $queryObj->searchQuery();
+    $this->assertEquals(2, $resultDAO->N);
+  }
+
+  /**
    * Test the group contact clause does not contain an OR.
    *
    * The search should return 3 contacts - 2 households in the smart group of
@@ -664,17 +804,87 @@ civicrm_relationship.is_active = 1 AND
     $this->fail('Test failed for some reason which is not good');
   }
 
+  /**
+   * Test the sorting on the contact ID query works.
+   *
+   * Checking for lack of fatal.
+   *
+   * @param string $sortOrder
+   *   Param reflecting how sort is passed in.
+   *   - 1_d is column 1 descending.
+   *
+   * @dataProvider getSortOptions
+   */
+  public function testContactIDQuery($sortOrder) {
+    $selector = new CRM_Contact_Selector(NULL, ['radio_ts' => 'ts_all'], NULL, ['sort_name' => 1]);
+    $selector->contactIDQuery([], $sortOrder);
+  }
+
+  /**
+   * Test the sorting on the contact ID query works with a profile search.
+   *
+   * Checking for lack of fatal.
+   */
+  public function testContactIDQueryProfileSearchResults() {
+    $profile = $this->callAPISuccess('UFGroup', 'create', ['group_type' => 'Contact', 'name' => 'search', 'title' => 'search']);
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $profile['id'],
+      'field_name' => 'postal_code',
+      'field_type' => 'Contact',
+      'in_selector' => TRUE,
+      'is_searchable' => TRUE,
+      'label' => 'postal code',
+      'visibility' => 'Public Pages and Listings',
+    ]);
+    $selector = new CRM_Contact_Selector(NULL, ['radio_ts' => 'ts_all', 'uf_group_id' => $profile['id']], NULL, ['sort_name' => 1]);
+    $selector->contactIDQuery([], '2_d');
+  }
+
+  /**
+   * Get search options to reflect how a UI search would look.
+   *
+   * @return array
+   */
+  public function getSortOptions() {
+    return [
+      ['1_d'],
+      ['2_d'],
+      ['3_d'],
+      ['4_d'],
+      ['5_d'],
+      ['6_d'],
+    ];
+  }
 
   /**
    * Test the summary query does not add an acl clause when acls not enabled..
    */
   public function testGetSummaryQueryWithFinancialACLDisabled() {
+    $this->createContributionsForSummaryQueryTests();
+
+    // Test the function directly
     $where = $from = NULL;
     $queryObject = new CRM_Contact_BAO_Query();
-    $query = $queryObject->appendFinancialTypeWhereAndFromToQueryStrings($where,
+    $queryObject->appendFinancialTypeWhereAndFromToQueryStrings($where,
       $from);
-    $this->assertEquals($where, $query[0]);
-    $this->assertEquals($from, $query[1]);
+    $this->assertEquals(NULL, $where);
+    $this->assertEquals(NULL, $from);
+
+    // Test the function in action
+    $queryObject = new CRM_Contact_BAO_Query([['contribution_source', '=', 'SSF', '', '']]);
+    $summary = $queryObject->summaryContribution();
+    $this->assertEquals([
+      'total' => [
+        'avg' => '$ 233.33',
+        'amount' => '$ 1,400.00',
+        'count' => 6,
+      ],
+      'cancel' => [
+        'count' => 2,
+        'amount' => '$ 100.00',
+        'avg' => '$ 50.00',
+      ],
+    ], $summary);
   }
 
   /**
@@ -682,16 +892,35 @@ civicrm_relationship.is_active = 1 AND
    */
   public function testGetSummaryQueryWithFinancialACLEnabled() {
     $where = $from = NULL;
+    $this->createContributionsForSummaryQueryTests();
     $this->enableFinancialACLs();
     $this->createLoggedInUserWithFinancialACL();
+
+    // Test the function directly
     $queryObject = new CRM_Contact_BAO_Query();
-    $query = $queryObject->appendFinancialTypeWhereAndFromToQueryStrings($where,
+    $queryObject->appendFinancialTypeWhereAndFromToQueryStrings($where,
       $from);
     $donationTypeID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation');
     $this->assertEquals(
       " LEFT JOIN civicrm_line_item li
                   ON civicrm_contribution.id = li.contribution_id AND
                      li.entity_table = 'civicrm_contribution' AND li.financial_type_id NOT IN ({$donationTypeID}) ", $from);
+
+    // Test the function in action
+    $queryObject = new CRM_Contact_BAO_Query([['contribution_source', '=', 'SSF', '', '']]);
+    $summary = $queryObject->summaryContribution();
+    $this->assertEquals([
+      'total' => [
+        'avg' => '$ 200.00',
+        'amount' => '$ 400.00',
+        'count' => 2,
+      ],
+      'cancel' => [
+        'count' => 1,
+        'amount' => '$ 50.00',
+        'avg' => '$ 50.00',
+      ],
+    ], $summary);
     $this->disableFinancialACLs();
   }
 
@@ -701,13 +930,15 @@ civicrm_relationship.is_active = 1 AND
    */
   public function testConvertFormValuesCRM21816() {
     $fv = array(
-      "member_end_date_relative" => "starting_2.month", // next 60 days
+    // next 60 days
+      "member_end_date_relative" => "starting_2.month",
       "member_end_date_low" => "20180101000000",
       "member_end_date_high" => "20180331235959",
       "membership_is_current_member" => "1",
       "member_is_primary" => "1",
     );
-    $fv_orig = $fv;  // $fv is modified by convertFormValues()
+    // $fv is modified by convertFormValues()
+    $fv_orig = $fv;
     $params = CRM_Contact_BAO_Query::convertFormValues($fv);
 
     // restructure for easier testing
@@ -731,6 +962,55 @@ civicrm_relationship.is_active = 1 AND
     // Check other fv values are in params
     $this->assertEquals($modparams['membership_is_current_member'][2], $fv_orig['membership_is_current_member']);
     $this->assertEquals($modparams['member_is_primary'][2], $fv_orig['member_is_primary']);
+  }
+
+  /**
+   * Create contributions to test summary calculations.
+   *
+   * financial type     | cancel_date        |total_amount| source    | line_item_financial_types  |number_line_items| line_amounts
+   * Donation           |NULL                | 100.00     |SSF         | Donation                  | 1                | 100.00
+   * Member Dues        |NULL                | 100.00     |SSF         | Member Dues               | 1                | 100.00
+   * Donation           |NULL                | 300.00     |SSF         | Event Fee,Event Fee       | 2                | 200.00,100.00
+   * Donation           |NULL                | 300.00     |SSF         | Event Fee,Donation        | 2                | 200.00,100.00
+   * Donation           |NULL                | 300.00     |SSF         | Donation,Donation         | 2                | 200.00,100.00
+   * Donation           |2019-02-13 00:00:00 | 50.00      |SSF         | Donation                  | 1                | 50.00
+   * Member Dues        |2019-02-13 00:00:00 | 50.00      |SSF         | Member Dues               | 1                | 50.00
+   */
+  protected function createContributionsForSummaryQueryTests() {
+    $contactID = $this->individualCreate();
+    $this->contributionCreate(['contact_id' => $contactID]);
+    $this->contributionCreate([
+      'contact_id' => $contactID,
+      'total_amount' => 100,
+      'financial_type_id' => 'Member Dues',
+    ]);
+    $eventFeeType = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Event Fee');
+    $this->createContributionWithTwoLineItemsAgainstPriceSet(['contact_id' => $contactID, 'source' => 'SSF']);
+    $this->createContributionWithTwoLineItemsAgainstPriceSet(['contact_id' => $contactID, 'source' => 'SSF'], [
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      $eventFeeType,
+    ]);
+    $this->createContributionWithTwoLineItemsAgainstPriceSet(['contact_id' => $contactID, 'source' => 'SSF'], [
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+    ]);
+    $this->createContributionWithTwoLineItemsAgainstPriceSet(['contact_id' => $contactID, 'source' => 'SSF', 'financial_type_id' => $eventFeeType], [
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+      CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Donation'),
+    ]);
+    $this->contributionCreate([
+      'contact_id' => $contactID,
+      'total_amount' => 50,
+      'contribution_status_id' => 'Cancelled',
+      'cancel_date' => 'yesterday',
+    ]);
+    $this->contributionCreate([
+      'contact_id' => $contactID,
+      'total_amount' => 50,
+      'contribution_status_id' => 'Cancelled',
+      'cancel_date' => 'yesterday',
+      'financial_type_id' => 'Member Dues',
+    ]);
   }
 
 }

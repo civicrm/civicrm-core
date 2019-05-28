@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -46,19 +46,20 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_limit = NULL;
 
   /**
    * Prefix for the controller.
+   * @var string
    */
   protected $_prefix = "activity_";
 
@@ -68,6 +69,13 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    * @var int
    */
   protected $_ssID;
+
+  /**
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'Activity';
+  }
 
   /**
    * Processing needed for buildForm and later.
@@ -80,16 +88,8 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
-    $this->defaults = array();
 
-    // we allow the controller to set force/reset externally, useful when we are being
-    // driven by the wizard framework
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
-    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
-    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'search');
-
-    $this->assign("context", $this->_context);
+    $this->loadStandardSearchOptionsFromUrl();
 
     // get user submitted values
     // get it from controller only if form has been submitted, else preProcess has set this
@@ -102,6 +102,8 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       if ($this->_force) {
         // If we force the search then merge form values with url values
         // and set submit values to form values.
+        // @todo this is not good security practice. Instead define the fields in metadata & use
+        // getEntityDefaults.
         $this->_formValues = array_merge((array) $this->_formValues, CRM_Utils_Request::exportValues());
         $this->_submitValues = $this->_formValues;
       }
@@ -197,20 +199,19 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
 
     if (!empty($_POST)) {
       $this->_formValues = $this->controller->exportValues($this->_name);
-      $specialParams = array(
+      $specialParams = [
         'activity_type_id',
         'status_id',
         'priority_id',
         'activity_text',
-      );
-      $changeNames = array(
+      ];
+      $changeNames = [
         'status_id' => 'activity_status_id',
         'priority_id' => 'activity_priority_id',
-      );
+      ];
 
       CRM_Contact_BAO_Query::processSpecialFormValue($this->_formValues, $specialParams, $changeNames);
     }
-
     $this->fixFormValues();
 
     if (isset($this->_ssID) && empty($_POST)) {
@@ -322,60 +323,9 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
       }
     }
 
-    // Added for membership search
-
-    $signupType = CRM_Utils_Request::retrieve('signupType', 'Positive');
-
-    if ($signupType) {
-      $this->_formValues['activity_role'] = 1;
-      $this->_defaults['activity_role'] = 1;
-      $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, FALSE, FALSE, 'name');
-
-      $renew = CRM_Utils_Array::key('Membership Renewal', $activityTypes);
-      $signup = CRM_Utils_Array::key('Membership Signup', $activityTypes);
-
-      switch ($signupType) {
-        case 3: // signups and renewals
-          $this->_formValues['activity_type_id'][$renew] = 1;
-          $this->_defaults['activity_type_id'][$renew] = 1;
-        case 1: // signups only
-          $this->_formValues['activity_type_id'][$signup] = 1;
-          $this->_defaults['activity_type_id'][$signup] = 1;
-          break;
-
-        case 2: // renewals only
-          $this->_formValues['activity_type_id'][$renew] = 1;
-          $this->_defaults['activity_type_id'][$renew] = 1;
-          break;
-      }
-    }
-
-    $dateLow = CRM_Utils_Request::retrieve('dateLow', 'String');
-
-    if ($dateLow) {
-      $dateLow = date('m/d/Y', strtotime($dateLow));
-      $this->_formValues['activity_date_relative'] = 0;
-      $this->_defaults['activity_date_relative'] = 0;
-      $this->_formValues['activity_date_low'] = $dateLow;
-      $this->_defaults['activity_date_low'] = $dateLow;
-    }
-
-    $dateHigh = CRM_Utils_Request::retrieve('dateHigh', 'String');
-
-    if ($dateHigh) {
-      // Activity date time assumes midnight at the beginning of the date
-      // This sets it to almost midnight at the end of the date
-      /*   if ($dateHigh <= 99999999) {
-      $dateHigh = 1000000 * $dateHigh + 235959;
-      } */
-      $dateHigh = date('m/d/Y', strtotime($dateHigh));
-      $this->_formValues['activity_date_relative'] = 0;
-      $this->_defaults['activity_date_relative'] = 0;
-      $this->_formValues['activity_date_high'] = $dateHigh;
-      $this->_defaults['activity_date_high'] = $dateHigh;
-    }
-
     // Enable search activity by custom value
+    // @todo this is not good security practice. Instead define entity fields in metadata &
+    // use getEntity Defaults
     $requestParams = CRM_Utils_Request::exportValues();
     foreach (array_keys($requestParams) as $key) {
       if (substr($key, 0, 7) != 'custom_') {
@@ -404,12 +354,26 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
+   * This virtual function is used to set the default values of various form elements.
+   *
+   * @return array|NULL
+   *   reference to the array of default values
+   */
+  public function setDefaultValues() {
+    return array_merge($this->getEntityDefaults($this->getDefaultEntity()), (array) $this->_formValues);
+  }
+
+  /**
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string
    */
   public function getTitle() {
     return ts('Find Activities');
+  }
+
+  protected function getEntityMetadata() {
+    return CRM_Activity_BAO_Query::getSearchFieldMetadata();
   }
 
 }

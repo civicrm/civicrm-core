@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
+
   public function testGetDefault() {
     $select = CRM_Utils_SQL_Select::from('foo bar');
     $this->assertLike('SELECT * FROM foo bar', $select->toSQL());

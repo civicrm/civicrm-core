@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,6 +32,7 @@
 class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
 
   use CRMTraits_Financial_FinancialACLTrait;
+  use CRMTraits_Financial_PriceSetTrait;
 
   /**
    * Clean up after tests.
@@ -325,6 +326,24 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the annual query returns a correct result when multiple line items are present.
+   */
+  public function testAnnualWithMultipleLineItems() {
+    $contactID = $this->createLoggedInUserWithFinancialACL();
+    $this->createContributionWithTwoLineItemsAgainstPriceSet([
+      'contact_id' => $contactID,
+    ]
+    );
+    $this->enableFinancialACLs();
+    $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([$contactID]);
+    $result = CRM_Core_DAO::executeQuery($sql);
+    $result->fetch();
+    $this->assertEquals(300, $result->amount);
+    $this->assertEquals(1, $result->count);
+    $this->disableFinancialACLs();
+  }
+
+  /**
    * Test that financial type data is not added to the annual query if acls not enabled.
    */
   public function testAnnualQueryWithFinancialACLsDisabled() {
@@ -335,6 +354,32 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     //$this->assertNotContains('line_item', $sql);
     // Run it to make sure it's not bad sql.
     CRM_Core_DAO::executeQuery($sql);
+  }
+
+  /**
+   * Test that financial type data is not added to the annual query if acls not enabled.
+   */
+  public function testAnnualQueryWithFinancialHook() {
+    $this->hookClass->setHook('civicrm_selectWhereClause', array($this, 'aclIdNoZero'));
+    $sql = CRM_Contribute_BAO_Contribution::getAnnualQuery([1, 2, 3]);
+    $this->assertContains('SUM(total_amount) as amount,', $sql);
+    $this->assertContains('WHERE b.contact_id IN (1,2,3)', $sql);
+    $this->assertContains('b.id NOT IN (0)', $sql);
+    $this->assertNotContains('b.financial_type_id', $sql);
+    CRM_Core_DAO::executeQuery($sql);
+  }
+
+  /**
+   * Add ACL denying values LIKE '0'.
+   *
+   * @param string $entity
+   * @param string $clauses
+   */
+  public function aclIdNoZero($entity, &$clauses) {
+    if ($entity != 'Contribution') {
+      return;
+    }
+    $clauses['id'] = "NOT IN (0)";
   }
 
   /**
@@ -955,22 +1000,6 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
-   * Test checkContributeSettings.
-   */
-  public function testCheckContributeSettings() {
-    $settings = CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled');
-    $this->assertNull($settings);
-    $params = array(
-      'contribution_invoice_settings' => array(
-        'deferred_revenue_enabled' => '1',
-      ),
-    );
-    $this->callAPISuccess('Setting', 'create', $params);
-    $settings = CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled');
-    $this->assertEquals($settings, 1, 'Check for settings has failed');
-  }
-
-  /**
    * Test allowUpdateRevenueRecognitionDate.
    */
   public function testAllowUpdateRevenueRecognitionDate() {
@@ -1338,14 +1367,12 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $form = new CRM_Contribute_Form_Contribution();
 
     $form->testSubmit(array(
-       'total_amount' => $params['total_amount'],
-        'financial_type_id' => $financialType['id'],
-        'contact_id' => $contactId,
-        'contribution_status_id' => 1,
-        'price_set_id' => 0,
-      ),
-      CRM_Core_Action::ADD
-    );
+      'total_amount' => $params['total_amount'],
+      'financial_type_id' => $financialType['id'],
+      'contact_id' => $contactId,
+      'contribution_status_id' => 1,
+      'price_set_id' => 0,
+    ), CRM_Core_Action::ADD);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
       array(
         'contact_id' => $contactId,
@@ -1544,6 +1571,104 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'id' => $result['entity_id'],
       'return' => array("financial_account_id.name"),
     ), $checkAgainst);
+  }
+
+  /**
+   *  https://lab.civicrm.org/dev/financial/issues/56
+   * Changing financial type on a contribution records correct financial items
+   */
+  public function testChangingFinancialTypeWithoutTax() {
+    $ids = $values = [];
+    $contactId = $this->individualCreate();
+    $params = array(
+      'contact_id' => $contactId,
+      'receive_date' => date('YmdHis'),
+      'total_amount' => 100.00,
+      'financial_type_id' => 'Donation',
+      'contribution_status_id' => 'Completed',
+    );
+    /* first test the scenario when sending an email */
+    $contributionId = $this->callAPISuccess(
+      'contribution',
+      'create',
+      $params
+    )['id'];
+
+    // Update Financial Type.
+    $this->callAPISuccess('contribution', 'create', [
+      'id' => $contributionId,
+      'financial_type_id' => 'Event Fee',
+    ]);
+
+    // Get line item
+    $lineItem = $this->callAPISuccessGetSingle('LineItem', [
+      'contribution_id' => $contributionId,
+      'return' => ["financial_type_id.name", "line_total"],
+    ]);
+
+    $this->assertEquals(
+      $lineItem['line_total'],
+      100.00,
+      'Invalid line amount.'
+    );
+
+    $this->assertEquals(
+      $lineItem['financial_type_id.name'],
+      'Event Fee',
+      'Invalid Financial Type stored.'
+    );
+
+    // Get Financial Items.
+    $financialItems = $this->callAPISuccess('FinancialItem', 'get', [
+      'entity_id' => $lineItem['id'],
+      'sequential' => 1,
+      'entity_table' => 'civicrm_line_item',
+      'options' => ['sort' => "id"],
+      'return' => ["financial_account_id.name", "amount", "description"],
+    ]);
+
+    $this->assertEquals($financialItems['count'], 3, 'Count mismatch.');
+
+    $toCheck = [
+      ['Donation', 100.00],
+      ['Donation', -100.00],
+      ['Event Fee', 100.00],
+    ];
+
+    foreach ($financialItems['values'] as $key => $values) {
+      $this->assertEquals(
+        $values['financial_account_id.name'],
+        $toCheck[$key][0],
+        'Invalid Financial Account stored.'
+      );
+      $this->assertEquals(
+        $values['amount'],
+        $toCheck[$key][1],
+        'Amount mismatch.'
+      );
+      $this->assertEquals(
+        $values['description'],
+        'Contribution Amount',
+        'Description mismatch.'
+      );
+    }
+
+    // Check transactions.
+    $financialTransactions = $this->callAPISuccess('EntityFinancialTrxn', 'get', [
+      'return' => ["financial_trxn_id"],
+      'entity_table' => "civicrm_contribution",
+      'entity_id' => $contributionId,
+      'sequential' => 1,
+    ]);
+    $this->assertEquals($financialTransactions['count'], 3, 'Count mismatch.');
+
+    foreach ($financialTransactions['values'] as $key => $values) {
+      $this->callAPISuccessGetCount('EntityFinancialTrxn', [
+        'financial_trxn_id' => $values['financial_trxn_id'],
+        'amount' => $toCheck[$key][1],
+        'financial_trxn_id.total_amount' => $toCheck[$key][1],
+      ], 2);
+    }
   }
 
   /**

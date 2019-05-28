@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,12 +30,14 @@
  * headers.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_Verp {
-  /* Mapping of reserved characters to hex codes */
-
-  static $encodeMap = array(
+  /**
+   * Mapping of reserved characters to hex codes
+   * @var array
+   */
+  public static $encodeMap = [
     '+' => '2B',
     '@' => '40',
     ':' => '3A',
@@ -44,11 +46,13 @@ class CRM_Utils_Verp {
     '-' => '2D',
     '[' => '5B',
     ']' => '5D',
-  );
+  ];
 
-  /* Mapping of hex codes to reserved characters */
-
-  static $decodeMap = array(
+  /**
+   * Mapping of hex codes to reserved characters
+   * @var array
+   */
+  public static $decodeMap = [
     '40' => '@',
     '3A' => ':',
     '25' => '%',
@@ -57,7 +61,7 @@ class CRM_Utils_Verp {
     '5B' => '[',
     '5D' => ']',
     '2B' => '+',
-  );
+  ];
 
   /**
    * Encode the sender's address with the VERPed recipient.
@@ -109,7 +113,7 @@ class CRM_Utils_Verp {
       $rdomain = preg_replace("/+$code/i", $char, $rdomain);
     }
 
-    return array("$slocal@$sdomain", "$rlocal@$rdomain");
+    return ["$slocal@$sdomain", "$rlocal@$rdomain"];
   }
 
 }

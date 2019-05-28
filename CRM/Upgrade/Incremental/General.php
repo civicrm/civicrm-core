@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -41,19 +41,19 @@ class CRM_Upgrade_Incremental_General {
   /**
    * The recommended PHP version.
    */
-  const RECOMMENDED_PHP_VER = '7.1';
+  const RECOMMENDED_PHP_VER = '7.2';
 
   /**
    * The previous recommended PHP version.
    */
-  const MIN_RECOMMENDED_PHP_VER = '7.0';
+  const MIN_RECOMMENDED_PHP_VER = '7.1';
 
   /**
    * The minimum PHP version required to install Civi.
    *
    * @see install/index.php
    */
-  const MIN_INSTALL_PHP_VER = '5.5';
+  const MIN_INSTALL_PHP_VER = '5.6';
 
   /**
    * Compute any messages which should be displayed before upgrade.
@@ -67,11 +67,11 @@ class CRM_Upgrade_Incremental_General {
     $dateFormat = Civi::Settings()->get('dateformatshortdate');
     if (version_compare(phpversion(), self::MIN_RECOMMENDED_PHP_VER) < 0) {
       $preUpgradeMessage .= '<p>';
-      $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but future releases will require PHP %2 or above. We recommend PHP version %3.', array(
-         1 => $latestVer,
-         2 => self::MIN_RECOMMENDED_PHP_VER,
-         3 => self::RECOMMENDED_PHP_VER,
-      ));
+      $preUpgradeMessage .= ts('You may proceed with the upgrade and CiviCRM %1 will continue working normally, but future releases will require PHP %2 or above. We recommend PHP version %3.', [
+        1 => $latestVer,
+        2 => self::MIN_RECOMMENDED_PHP_VER,
+        3 => self::RECOMMENDED_PHP_VER,
+      ]);
       $preUpgradeMessage .= '</p>';
     }
 
@@ -83,14 +83,14 @@ class CRM_Upgrade_Incremental_General {
     $ofcFile = "$civicrm_root/packages/OpenFlashChart/php-ofc-library/ofc_upload_image.php";
     if (file_exists($ofcFile)) {
       if (@unlink($ofcFile)) {
-        $preUpgradeMessage .= '<br />' . ts('This system included an outdated, insecure script (%1). The file was automatically deleted.', array(
-            1 => $ofcFile,
-          ));
+        $preUpgradeMessage .= '<br />' . ts('This system included an outdated, insecure script (%1). The file was automatically deleted.', [
+          1 => $ofcFile,
+        ]);
       }
       else {
-        $preUpgradeMessage .= '<br />' . ts('This system includes an outdated, insecure script (%1). Please delete it.', array(
-            1 => $ofcFile,
-          ));
+        $preUpgradeMessage .= '<br />' . ts('This system includes an outdated, insecure script (%1). Please delete it.', [
+          1 => $ofcFile,
+        ]);
       }
     }
 
@@ -104,16 +104,16 @@ class CRM_Upgrade_Incremental_General {
       // ignore the matter and simply run CRM_Core_InnoDBIndexer::fixSchemaDifferences
       // after the upgrade.  But that's speculative.  For now, we'll leave this
       // advanced feature in the hands of the sysadmin.
-      $preUpgradeMessage .= '<br />' . ts('This database uses InnoDB Full Text Search for optimized searching. The upgrade procedure has not been tested with this feature. You should disable (and later re-enable) the feature by navigating to "Administer => System Settings => Miscellaneous".');
+      $preUpgradeMessage .= '<br />' . ts('This database uses InnoDB Full Text Search for optimized searching. The upgrade procedure has not been tested with this feature. You should disable (and later re-enable) the feature by navigating to "Administer => Customize Data and Screens => Search Preferences".');
     }
 
     $ftAclSetting = Civi::settings()->get('acl_financial_type');
-    $financialAclExtension = civicrm_api3('extension', 'get', array('key' => 'biz.jmaconsulting.financialaclreport'));
+    $financialAclExtension = civicrm_api3('extension', 'get', ['key' => 'biz.jmaconsulting.financialaclreport']);
     if ($ftAclSetting && (($financialAclExtension['count'] == 1 && $financialAclExtension['status'] != 'Installed') || $financialAclExtension['count'] !== 1)) {
-      $preUpgradeMessage .= '<br />' . ts('CiviCRM will in the future require the extension %1 for CiviCRM Reports to work correctly with the Financial Type ACLs. The extension can be downloaded <a href="%2">here</a>', array(
+      $preUpgradeMessage .= '<br />' . ts('CiviCRM will in the future require the extension %1 for CiviCRM Reports to work correctly with the Financial Type ACLs. The extension can be downloaded <a href="%2">here</a>', [
         1 => 'biz.jmaconsulting.financialaclreport',
         2 => 'https://github.com/JMAConsulting/biz.jmaconsulting.financialaclreport',
-      ));
+      ]);
     }
   }
 
@@ -135,10 +135,10 @@ class CRM_Upgrade_Incremental_General {
       return sprintf("<li><em>%s</em> - %s</li>", htmlentities($k), htmlentities($v));
     }, array_keys($messages), $messages);
 
-    $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a href='%1' style='color:white; text-decoration:underline; font-weight:bold;' target='_blank'>Click here</a> for detailed instructions. %2", array(
-        1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Message+Templates#MessageTemplates-UpgradesandCustomizedSystemWorkflowTemplates',
-        2 => '<ul>' . implode('', $messagesHtml) . '</ul>',
-      ));
+    $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a href='%1' style='color:white; text-decoration:underline; font-weight:bold;' target='_blank'>Click here</a> for detailed instructions. %2", [
+      1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Message+Templates#MessageTemplates-UpgradesandCustomizedSystemWorkflowTemplates',
+      2 => '<ul>' . implode('', $messagesHtml) . '</ul>',
+    ]);
 
     $messageObj->updateTemplates();
   }
@@ -184,21 +184,21 @@ class CRM_Upgrade_Incremental_General {
 
       // check if file exists locally
       $textFileName = implode(DIRECTORY_SEPARATOR,
-        array(
+        [
           $pathName,
           "{$latestVer}.msg_template",
           'message_templates',
           "{$name}_text.tpl",
-        )
+        ]
       );
 
       $htmlFileName = implode(DIRECTORY_SEPARATOR,
-        array(
+        [
           $pathName,
           "{$latestVer}.msg_template",
           'message_templates',
           "{$name}_html.tpl",
-        )
+        ]
       );
 
       if (file_exists($textFileName) ||
@@ -212,10 +212,10 @@ class CRM_Upgrade_Incremental_General {
     if ($flag == TRUE) {
       $html = "<ul>" . $html . "<ul>";
 
-      $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a href='%1' style='color:white; text-decoration:underline; font-weight:bold;' target='_blank'>Click here</a> for detailed instructions. %2", array(
-            1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Message+Templates#MessageTemplates-UpgradesandCustomizedSystemWorkflowTemplates',
-            2 => $html,
-          ));
+      $message .= '<br />' . ts("The default copies of the message templates listed below will be updated to handle new features or correct a problem. Your installation has customized versions of these message templates, and you will need to apply the updates manually after running this upgrade. <a href='%1' style='color:white; text-decoration:underline; font-weight:bold;' target='_blank'>Click here</a> for detailed instructions. %2", [
+        1 => 'http://wiki.civicrm.org/confluence/display/CRMDOC/Message+Templates#MessageTemplates-UpgradesandCustomizedSystemWorkflowTemplates',
+        2 => $html,
+      ]);
     }
   }
 

@@ -37,6 +37,8 @@
  * @group headless
  */
 class api_v3_ContactTest extends CiviUnitTestCase {
+  use CRMTraits_Custom_CustomDataTrait;
+
   public $DBResetRequired = FALSE;
   protected $_apiversion;
   protected $_entity;
@@ -44,6 +46,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   protected $_contactID;
   protected $_financialTypeId = 1;
+
+
+  /**
+   * Entity to be extended.
+   *
+   * @var string
+   */
+  protected $entity = 'Contact';
 
   /**
    * Test setup for every test.
@@ -87,6 +97,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'civicrm_group_contact',
       'civicrm_saved_search',
       'civicrm_group_contact_cache',
+      'civicrm_prevnext_cache',
     );
 
     $this->quickCleanup($tablesToTruncate, TRUE);
@@ -611,8 +622,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'create', array(
       'first_name' => 'Snoop',
       'last_name' => 'Dog',
-      'contact_type' => 'Individual')
-    );
+      'contact_type' => 'Individual',
+    ));
     $result = $this->callAPISuccessGetSingle('Contact', array('last_name' => 'Dog'));
     $this->assertEquals('en_US', $result['preferred_language']);
   }
@@ -637,11 +648,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testCreatePreferredLanguageNull() {
     $this->callAPISuccess('Setting', 'create', array('contact_default_language' => 'null'));
     $this->callAPISuccess('Contact', 'create', array(
-        'first_name' => 'Snoop',
-        'last_name' => 'Dog',
-        'contact_type' => 'Individual',
-        )
-    );
+      'first_name' => 'Snoop',
+      'last_name' => 'Dog',
+      'contact_type' => 'Individual',
+    ));
     $result = $this->callAPISuccessGetSingle('Contact', array('last_name' => 'Dog'));
     $this->assertEquals(NULL, $result['preferred_language']);
   }
@@ -731,7 +741,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'create', $params);
   }
 
-
   /**
    * Test creating a current employer through API.
    */
@@ -743,21 +752,18 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ));
     $this->assertEquals(0, $count);
     $employerResult = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
-        'current_employer' => 'new employer org',
-      )
-    ));
+      'current_employer' => 'new employer org',
+    )));
     // do it again as an update to check it doesn't cause an error
     $employerResult = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
-        'current_employer' => 'new employer org',
-        'id' => $employerResult['id'],
-      )
-    ));
+      'current_employer' => 'new employer org',
+      'id' => $employerResult['id'],
+    )));
     $expectedCount = 1;
     $this->callAPISuccess('contact', 'getcount', array(
-        'organization_name' => 'new employer org',
-        'contact_type' => 'Organization',
-      ),
-      $expectedCount);
+      'organization_name' => 'new employer org',
+      'contact_type' => 'Organization',
+    ), $expectedCount);
 
     $result = $this->callAPISuccess('contact', 'getsingle', array(
       'id' => $employerResult['id'],
@@ -775,8 +781,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function testContactCreateDuplicateCurrentEmployerEnables() {
     // Set up  - create employer relationship.
     $employerResult = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
-        'current_employer' => 'new employer org',
-      )
+      'current_employer' => 'new employer org',
+    )
     ));
     $relationship = $this->callAPISuccess('relationship', 'get', array(
       'contact_id_a' => $employerResult['id'],
@@ -791,9 +797,9 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
     // Re-set the current employer - thus enabling the relationship.
     $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
-        'current_employer' => 'new employer org',
-        'id' => $employerResult['id'],
-      )
+      'current_employer' => 'new employer org',
+      'id' => $employerResult['id'],
+    )
     ));
     //check is_active is now 1
     $relationship = $this->callAPISuccess('relationship', 'getsingle', array(
@@ -993,7 +999,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
         'options' => array(
           'limit' => '1',
           'sort' => 'start_date DESC',
-        )),
+        ),
+      ),
     );
     $get_result = $this->callAPISuccess('contact', 'getsingle', $get_params);
 
@@ -1017,7 +1024,26 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'last_name' => "O'Connor",
       'sequential' => 1,
     ));
-    $this->assertEquals("O'Connor", $result['last_name'], 'in line' . __LINE__);
+    $this->assertEquals("O'Connor", $result['last_name']);
+  }
+
+  /**
+   * Test between accepts zero.
+   *
+   * In the past it incorrectly required !empty.
+   */
+  public function testGetBetweenZeroWorks() {
+    $this->callAPISuccess($this->_entity, 'get', [
+      'contact_id' => ['BETWEEN' => [0, 9]],
+    ]);
+    $this->callAPISuccess($this->_entity, 'get', [
+      'contact_id' => [
+        'BETWEEN' => [
+          (0 - 9),
+          0,
+        ],
+      ],
+    ]);
   }
 
   /**
@@ -1028,7 +1054,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'skip_greeting_processing' => 1,
       'addressee_id' => 'null',
       'email_greeting_id' => 'null',
-      'postal_greeting_id' => 'null'
+      'postal_greeting_id' => 'null',
     ]);
     $individual2ID = $this->individualCreate();
 
@@ -1331,10 +1357,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     // Clean up first.
     $this->callAPISuccess('contact', 'delete', array(
       'id' => $create_result_1['id'],
-      ));
+    ));
     $this->callAPISuccess('contact', 'delete', array(
       'id' => $create_result_2['id'],
-      ));
+    ));
     $this->callAPISuccess('contact', 'delete', array(
       'id' => $create_result_2['id'],
     ));
@@ -1464,16 +1490,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Verify successful update of individual contact.
    */
   public function testUpdateIndividualWithAll() {
-    // Insert a row in civicrm_contact creating individual contact.
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_ind.xml'
-      )
-    );
+    $contactID = $this->individualCreate();
 
-    $params = array(
-      'id' => 23,
+    $params = [
+      'id' => $contactID,
       'first_name' => 'abcd',
       'contact_type' => 'Individual',
       'nick_name' => 'This is nickname first',
@@ -1485,8 +1505,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'external_identifier' => '1928837465',
       'image_URL' => 'http://some.url.com/image.jpg',
       'home_url' => 'http://www.example.org',
-
-    );
+    ];
 
     $this->callAPISuccess('Contact', 'Update', $params);
     $getResult = $this->callAPISuccess('Contact', 'Get', $params);
@@ -1495,50 +1514,28 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     //reducing this test partially back to api v2 level to get it through
     unset($params['home_url']);
     foreach ($params as $key => $value) {
-      $this->assertEquals($value, $getResult['values'][23][$key]);
+      $this->assertEquals($value, $getResult['values'][$contactID][$key]);
     }
-    // Check updated civicrm_contact against expected.
-    $expected = $this->createXMLDataSet(
-      dirname(__FILE__) . '/dataset/contact_ind_upd.xml'
-    );
-    $actual = new PHPUnit_Extensions_Database_DataSet_QueryDataSet(
-      $this->_dbconn
-    );
-    $actual->addTable('civicrm_contact');
-    $expected->matches($actual);
   }
 
   /**
    * Verify successful update of organization contact.
+   *
+   * @throws \Exception
    */
   public function testUpdateOrganizationWithAll() {
-    // Insert a row in civicrm_contact creating organization contact
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_org.xml'
-      )
-    );
+    $contactID = $this->organizationCreate();
 
-    $params = array(
-      'id' => 24,
+    $params = [
+      'id' => $contactID,
       'organization_name' => 'WebAccess India Pvt Ltd',
       'legal_name' => 'WebAccess',
       'sic_code' => 'ABC12DEF',
       'contact_type' => 'Organization',
-    );
+    ];
 
     $this->callAPISuccess('Contact', 'Update', $params);
-
-    // Check updated civicrm_contact against expected.
-    $expected = $this->createXMLDataSet(
-      dirname(__FILE__) . '/dataset/contact_org_upd.xml'
-    );
-    $actual = new PHPUnit_Extensions_Database_DataSet_QueryDataSet(
-      $this->_dbconn
-    );
-    $actual->addTable('civicrm_contact');
-    $expected->matches($actual);
+    $this->getAndCheck($params, $contactID, 'Contact');
   }
 
   /**
@@ -1550,9 +1547,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $organizationID1 = $this->organizationCreate(array(), 0);
     $organizationID2 = $this->organizationCreate(array(), 1);
     $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
-        'employer_id' => $organizationID1,
-      )
-    ));
+      'employer_id' => $organizationID1,
+    )));
     $contact = $contact["values"][$contact["id"]];
 
     $membershipType = $this->createEmployerOfMembership();
@@ -1615,30 +1611,24 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Verify successful update of household contact.
    */
   public function testUpdateHouseholdWithAll() {
-    // Insert a row in civicrm_contact creating household contact
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_hld.xml'
-      )
-    );
+    $contactID = $this->householdCreate();
 
-    $params = array(
-      'id' => 25,
+    $params = [
+      'id' => $contactID ,
       'household_name' => 'ABC household',
       'nick_name' => 'ABC House',
       'contact_type' => 'Household',
-    );
+    ];
 
     $result = $this->callAPISuccess('Contact', 'Update', $params);
 
-    $expected = array(
+    $expected = [
       'contact_type' => 'Household',
       'is_opt_out' => 0,
       'sort_name' => 'ABC household',
       'display_name' => 'ABC household',
       'nick_name' => 'ABC House',
-    );
+    ];
     $this->getAndCheck($expected, $result['id'], 'contact');
   }
 
@@ -1650,20 +1640,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * CRM-7645.
    */
   public function testUpdateCreateWithID() {
-    // Insert a row in civicrm_contact creating individual contact.
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_ind.xml'
-      )
-    );
-
-    $params = array(
-      'id' => 23,
+    $contactID = $this->individualCreate();
+    $this->callAPISuccess('Contact', 'Update', [
+      'id' => $contactID,
       'first_name' => 'abcd',
       'last_name' => 'wxyz',
-    );
-    $this->callAPISuccess('Contact', 'Update', $params);
+    ]);
   }
 
   /**
@@ -1774,49 +1756,31 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test civicrm_contact_getquick() with empty name param.
    */
   public function testContactGetQuick() {
-    // Insert a row in civicrm_contact creating individual contact.
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_17.xml'
-      )
-    );
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/email_contact_17.xml'
-      )
-    );
-    $params = array(
-      'name' => "T",
-    );
+    $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact', 'email' => 'TestContact@example.com']);
 
+    $result = $this->callAPISuccess('contact', 'getquick', ['name' => 'T']);
+    $this->assertEquals($contactID, $result['values'][0]['id']);
+    $params = [
+      'name' => "TestContact@example.com",
+      'field_name' => 'sort_name',
+    ];
     $result = $this->callAPISuccess('contact', 'getquick', $params);
-    $this->assertEquals(17, $result['values'][0]['id']);
+    $this->assertEquals($contactID, $result['values'][0]['id']);
   }
 
   /**
    * Test civicrm_contact_get) with empty params.
    */
   public function testContactGetEmptyParams() {
-    $this->callAPISuccess('contact', 'get', array());
+    $this->callAPISuccess('contact', 'get', []);
   }
 
   /**
    * Test civicrm_contact_get(,true) with no matches.
    */
   public function testContactGetOldParamsNoMatches() {
-    // Insert a row in civicrm_contact creating contact 17.
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_17.xml'
-      )
-    );
-
-    $params = array(
-      'first_name' => 'Fred',
-    );
-    $result = $this->callAPISuccess('contact', 'get', $params);
+    $this->individualCreate();
+    $result = $this->callAPISuccess('contact', 'get', ['first_name' => 'Fred']);
     $this->assertEquals(0, $result['count']);
   }
 
@@ -1824,19 +1788,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test civicrm_contact_get(,true) with one match.
    */
   public function testContactGetOldParamsOneMatch() {
-    // Insert a row in civicrm_contact creating contact 17
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(dirname(__FILE__) . '/dataset/contact_17.xml'
-      )
-    );
+    $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
 
-    $params = array(
-      'first_name' => 'Test',
-    );
-    $result = $this->callAPISuccess('contact', 'get', $params);
-    $this->assertEquals(17, $result['values'][17]['contact_id']);
-    $this->assertEquals(17, $result['id']);
+    $result = $this->callAPISuccess('contact', 'get', ['first_name' => 'Test']);
+    $this->assertEquals($contactID, $result['values'][$contactID]['contact_id']);
+    $this->assertEquals($contactID, $result['id']);
   }
 
   /**
@@ -1915,7 +1871,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       CRM_Core_PseudoConstant::getKey("CRM_Contact_BAO_Contact", 'preferred_communication_method', 'SMS'),
     ), $result['preferred_communication_method']);
   }
-
 
   /**
    * Test birth date parameters.
@@ -2061,6 +2016,13 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'id' => '@user:exampleUser',
     ));
     $this->assertEquals('testGetByUsername', $result['values'][$cid]['first_name']);
+
+    // Check search of contacts with & without uf records
+    $result = $this->callAPISuccess('Contact', 'get', ['uf_user' => 1]);
+    $this->assertArrayHasKey($cid, $result['values']);
+
+    $result = $this->callAPISuccess('Contact', 'get', ['uf_user' => 0]);
+    $this->assertArrayNotHasKey($cid, $result['values']);
   }
 
   /**
@@ -2462,11 +2424,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test TrueFalse format - I couldn't come up with an easy way to get an error on Get.
    */
   public function testContactGetFormatIsSuccessTrue() {
-    $this->createContactFromXML();
+    $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $description = "This demonstrates use of the 'format.is_success' param.
     This param causes only the success or otherwise of the function to be returned as BOOLEAN";
     $subfile = "FormatIsSuccess_True";
-    $params = array('id' => 17, 'format.is_success' => 1);
+    $params = ['id' => $contactID, 'format.is_success' => 1];
     $result = $this->callAPIAndDocument('Contact', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals(1, $result);
     $this->callAPISuccess('Contact', 'Delete', $params);
@@ -2501,28 +2463,59 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that we can set the sort name via the api or alter it via a hook.
+   *
+   * As of writing this is being fixed for Organization & Household but it makes sense to do for individuals too.
+   */
+  public function testCreateAlterSortName() {
+    $organizationID = $this->organizationCreate(['organization_name' => 'The Justice League', 'sort_name' => 'Justice League, The']);
+    $organization = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name'], 'id' => $organizationID]);
+    $this->assertEquals('Justice League, The', $organization['sort_name']);
+    $this->assertEquals('The Justice League', $organization['display_name']);
+    $this->hookClass->setHook('civicrm_pre', array($this, 'killTheJusticeLeague'));
+    $this->organizationCreate(['id' => $organizationID, 'sort_name' => 'Justice League, The']);
+    $organization = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name', 'is_deceased'], 'id' => $organizationID]);
+    $this->assertEquals('Steppenwolf wuz here', $organization['display_name']);
+    $this->assertEquals('Steppenwolf wuz here', $organization['sort_name']);
+    $this->assertEquals(1, $organization['is_deceased']);
+
+    $householdID = $this->householdCreate();
+    $household = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name'], 'id' => $householdID]);
+    $this->assertEquals('Steppenwolf wuz here', $household['display_name']);
+    $this->assertEquals('Steppenwolf wuz here', $household['sort_name']);
+  }
+
+  /**
+   * Implements hook_pre().
+   */
+  public function killTheJusticeLeague($op, $entity, $id, &$params) {
+    $params['sort_name'] = 'Steppenwolf wuz here';
+    $params['display_name'] = 'Steppenwolf wuz here';
+    $params['is_deceased'] = 1;
+  }
+
+  /**
    * Test Single Entity format.
    */
   public function testContactGetSingleEntityArray() {
-    $this->createContactFromXML();
+    $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $description = "This demonstrates use of the 'format.single_entity_array' param.
       This param causes the only contact to be returned as an array without the other levels.
       It will be ignored if there is not exactly 1 result";
     $subfile = "GetSingleContact";
-    $params = array('id' => 17);
-    $result = $this->callAPIAndDocument('Contact', 'GetSingle', $params, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertEquals('Test Contact', $result['display_name']);
-    $this->callAPISuccess('Contact', 'Delete', $params);
+    $result = $this->callAPIAndDocument('Contact', 'GetSingle', ['id' => $contactID], __FUNCTION__, __FILE__, $description, $subfile);
+    $this->assertEquals('Mr. Test Contact II', $result['display_name']);
+    $this->callAPISuccess('Contact', 'Delete', ['id' => $contactID]);
   }
 
   /**
    * Test Single Entity format.
    */
   public function testContactGetFormatCountOnly() {
-    $this->createContactFromXML();
+    $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $description = "This demonstrates use of the 'getCount' action.
       This param causes the count of the only function to be returned as an integer.";
-    $params = array('id' => 17);
+    $params = ['id' => $contactID];
     $result = $this->callAPIAndDocument('Contact', 'GetCount', $params, __FUNCTION__, __FILE__, $description,
       'GetCountContact');
     $this->assertEquals('1', $result);
@@ -2533,14 +2526,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test id only format.
    */
   public function testContactGetFormatIDOnly() {
-    $this->createContactFromXML();
+    $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $description = "This demonstrates use of the 'format.id_only' param.
       This param causes the id of the only entity to be returned as an integer.
       It will be ignored if there is not exactly 1 result";
     $subfile = "FormatOnlyID";
-    $params = array('id' => 17, 'format.only_id' => 1);
+    $params = ['id' => $contactID, 'format.only_id' => 1];
     $result = $this->callAPIAndDocument('Contact', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
-    $this->assertEquals('17', $result);
+    $this->assertEquals($contactID, $result);
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
 
@@ -2548,14 +2541,14 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test id only format.
    */
   public function testContactGetFormatSingleValue() {
-    $this->createContactFromXML();
+    $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $description = "This demonstrates use of the 'format.single_value' param.
       This param causes only a single value of the only entity to be returned as an string.
       It will be ignored if there is not exactly 1 result";
     $subFile = "FormatSingleValue";
-    $params = array('id' => 17, 'return' => 'display_name');
+    $params = ['id' => $contactID, 'return' => 'display_name'];
     $result = $this->callAPIAndDocument('Contact', 'getvalue', $params, __FUNCTION__, __FILE__, $description, $subFile);
-    $this->assertEquals('Test Contact', $result);
+    $this->assertEquals('Mr. Test Contact II', $result);
     $this->callAPISuccess('Contact', 'Delete', $params);
   }
 
@@ -2627,19 +2620,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'import contacts',
     );
     $this->callAPISuccess('contact', 'update', $params);
-  }
-
-  /**
-   * Set up helper to create a contact.
-   */
-  public function createContactFromXML() {
-    // Insert a row in civicrm_contact creating contact 17.
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createXMLDataSet(
-        dirname(__FILE__) . '/dataset/contact_17.xml'
-      )
-    );
   }
 
   /**
@@ -3401,6 +3381,57 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test merging 2 contacts with custom fields.
+   *
+   * @throws \Exception
+   */
+  public function testMergeCustomFields() {
+    $contact1 = $this->individualCreate();
+    /* Not sure this is quite right but it does get it into the file table
+    $file = $this->callAPISuccess('Attachment', 'create', [
+    'name' => 'header.txt',
+    'mime_type' => 'text/plain',
+    'description' => 'My test description',
+    'content' => 'My test content',
+    'entity_table' => 'civicrm_contact',
+    'entity_id' => $contact1,
+    ]);
+     */
+
+    $this->createCustomGroupWithFieldsOfAllTypes();
+    $fileField = $this->getCustomFieldName('file');
+    $linkField = $this->getCustomFieldName('link');
+    $dateField = $this->getCustomFieldName('select_date');
+    $selectField = $this->getCustomFieldName('select_string');
+    $countryField = $this->getCustomFieldName('country');
+
+    $countriesByName = array_flip(CRM_Core_PseudoConstant::country(FALSE, FALSE));
+    $customFieldValues = [
+      // @todo fix the fatal bug on this & uncomment - see dev/core#723
+      // $fileField => $file['id'],
+      $linkField => 'http://example.org',
+      $dateField => '2018-01-01 17:10:56',
+      $selectField => 'G',
+      // Currently broken.
+      //$countryField => $countriesByName['New Zealand'],
+    ];
+    $this->callAPISuccess('Contact', 'create', array_merge([
+      'id' => $contact1,
+    ], $customFieldValues));
+
+    $contact2 = $this->individualCreate();
+    $this->callAPISuccess('contact', 'merge', [
+      'to_keep_id' => $contact2,
+      'to_remove_id' => $contact1,
+      'auto_flip' => FALSE,
+    ]);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $contact2, 'return' => array_keys($customFieldValues)]);
+    foreach ($customFieldValues as $key => $value) {
+      $this->assertEquals($value, $contact[$key]);
+    }
+  }
+
+  /**
    * Test retrieving merged contacts.
    *
    * The goal here is to start with a contact deleted by merged and find out the contact that is the current version of them.
@@ -3743,7 +3774,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contact', 'create', array(
       'first_name' => 'John',
       'last_name' => 'Doe',
-      'contact_type' => 'Individual')
+      'contact_type' => 'Individual',
+    )
     );
     $result = $this->callAPISuccessGetSingle('Contact', array('last_name' => 'Doe'));
     $this->assertEquals(1, $result['communication_style_id']);
@@ -3829,6 +3861,31 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals(array('external_identifier'), $result['values']['UI_external_identifier']);
   }
 
+  /**
+   * API test to retrieve contact from group having different group title and name.
+   */
+  public function testContactGetFromGroup() {
+    $groupId = $this->groupCreate([
+      'name' => 'Test_Group',
+      'domain_id' => 1,
+      'title' => 'New Test Group Created',
+      'description' => 'New Test Group Created',
+      'is_active' => 1,
+      'visibility' => 'User and User Admin Only',
+    ]);
+    $contact = $this->callAPISuccess('contact', 'create', $this->_params);
+    $groupContactCreateParams = array(
+      'contact_id' => $contact['id'],
+      'group_id' => $groupId,
+      'status' => 'Pending',
+    );
+    $groupContact = $this->callAPISuccess('groupContact', 'create', $groupContactCreateParams);
+    $groupGetContact = $this->CallAPISuccess('groupContact', 'get', $groupContactCreateParams);
+    $this->CallAPISuccess('Contact', 'getcount', [
+      'group' => "Test_Group",
+    ]);
+  }
+
   public function testSmartGroupsForRelatedContacts() {
     $rtype1 = $this->callAPISuccess('relationship_type', 'create', array(
       "name_a_b" => uniqid() . " Child of",
@@ -3845,37 +3902,43 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'contact_id_a' => $c1,
       'contact_id_b' => $c2,
       'is_active' => 1,
-      'relationship_type_id' => $rtype1['id'], // Child of
+      // Child of
+      'relationship_type_id' => $rtype1['id'],
     ));
     $this->callAPISuccess('relationship', 'create', array(
       'contact_id_a' => $c1,
       'contact_id_b' => $h1,
       'is_active' => 1,
-      'relationship_type_id' => $rtype2['id'], // Household Member of
+      // Household Member of
+      'relationship_type_id' => $rtype2['id'],
     ));
     $this->callAPISuccess('relationship', 'create', array(
       'contact_id_a' => $c2,
       'contact_id_b' => $h1,
       'is_active' => 1,
-      'relationship_type_id' => $rtype2['id'], // Household Member of
+      // Household Member of
+      'relationship_type_id' => $rtype2['id'],
     ));
 
     $ssParams = array(
       'formValues' => array(
-        'display_relationship_type' => $rtype1['id'] . '_a_b', // Child of
+        // Child of
+        'display_relationship_type' => $rtype1['id'] . '_a_b',
         'sort_name' => 'Adams',
       ),
     );
     $g1ID = $this->smartGroupCreate($ssParams, array('name' => uniqid(), 'title' => uniqid()));
     $ssParams = array(
       'formValues' => array(
-        'display_relationship_type' => $rtype2['id'] . '_a_b', // Household Member of
+        // Household Member of
+        'display_relationship_type' => $rtype2['id'] . '_a_b',
       ),
     );
     $g2ID = $this->smartGroupCreate($ssParams, array('name' => uniqid(), 'title' => uniqid()));
     $ssParams = array(
       'formValues' => array(
-        'display_relationship_type' => $rtype2['id'] . '_b_a', // Household Member is
+        // Household Member is
+        'display_relationship_type' => $rtype2['id'] . '_b_a',
       ),
     );
     // the reverse of g2 which adds another layer for overlap at related contact filter
@@ -3887,6 +3950,98 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertTrue($g1Contacts['count'] == 1);
     $this->assertTrue($g2Contacts['count'] == 2);
     $this->assertTrue($g3Contacts['count'] == 1);
+  }
+
+  /**
+   * Test creating a note from the contact.create API call when only passing the note as a string.
+   */
+  public function testCreateNoteinCreate() {
+    $loggedInContactID = $this->createLoggedInUser();
+    $this->_params['note'] = "Test note created by API Call as a String";
+    $contact = $this->callAPISuccess('Contact', 'create', $this->_params);
+    $note = $this->callAPISuccess('Note', 'get', ['contact_id' => $loggedInContactID]);
+    $this->assertEquals($note['values'][$note['id']]['note'], "Test note created by API Call as a String");
+    $note = $this->callAPISuccess('Note', 'get', ['entity_id' => $contact['id']]);
+    $this->assertEquals($note['values'][$note['id']]['note'], "Test note created by API Call as a String");
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contact['id'], 'skip_undelete' => TRUE]);
+  }
+
+  /**
+   * Test Creating a note from the contact.create api call when passing the note params as an array.
+   */
+  public function testCreateNoteinCreateArrayFormat() {
+    $contact1 = $this->callAPISuccess('Contact', 'create', array('first_name' => 'Alan', 'last_name' => 'MouseMouse', 'contact_type' => 'Individual'));
+    $this->_params['note'] = [['note' => "Test note created by API Call as array", 'contact_id' => $contact1['id']]];
+    $contact2 = $this->callAPISuccess('Contact', 'create', $this->_params);
+    $note = $this->callAPISuccess('Note', 'get', ['contact_id' => $contact1['id']]);
+    $this->assertEquals($note['values'][$note['id']]['note'], "Test note created by API Call as array");
+    $note = $this->callAPISuccess('Note', 'get', ['entity_id' => $contact2['id']]);
+    $this->assertEquals($note['values'][$note['id']]['note'], "Test note created by API Call as array");
+  }
+
+  /**
+   * Verify that passing tag IDs to Contact.get works
+   *
+   * Tests the following formats
+   * - Contact.get tag='id1'
+   * - Contact.get tag='id1,id2'
+   * - Contact.get tag='id1, id2'
+   */
+  public function testContactGetWithTag() {
+    $contact = $this->callApiSuccess('Contact', 'create', [
+      'contact_type' => 'Individual',
+      'first_name' => 'Test',
+      'last_name' => 'Tagged',
+      'email' => 'test@example.org',
+    ]);
+    $tags = [];
+    foreach (['Tag A', 'Tag B'] as $name) {
+      $tags[] = $this->callApiSuccess('Tag', 'create', [
+        'name' => $name,
+      ]);
+    }
+
+    // assign contact to "Tag B"
+    $this->callApiSuccess('EntityTag', 'create', [
+      'entity_table' => 'civicrm_contact',
+      'entity_id' => $contact['id'],
+      'tag_id' => $tags[1]['id'],
+    ]);
+
+    // test format Contact.get tag='id1'
+    $contact_get = $this->callAPISuccess('Contact', 'get', [
+      'tag' => $tags[1]['id'],
+      'return' => 'tag',
+    ]);
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($contact['id'], $contact_get['id']);
+    $this->assertEquals('Tag B', $contact_get['values'][$contact['id']]['tags']);
+
+    // test format Contact.get tag='id1,id2'
+    $contact_get = $this->callAPISuccess('Contact', 'get', [
+      'tag' => $tags[0]['id'] . ',' . $tags[1]['id'],
+      'return' => 'tag',
+    ]);
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($contact['id'], $contact_get['id']);
+    $this->assertEquals('Tag B', $contact_get['values'][$contact['id']]['tags']);
+
+    // test format Contact.get tag='id1, id2'
+    $contact_get = $this->callAPISuccess('Contact', 'get', [
+      'tag' => $tags[0]['id'] . ', ' . $tags[1]['id'],
+      'return' => 'tag',
+    ]);
+    $this->assertEquals(1, $contact_get['count']);
+    $this->assertEquals($contact['id'], $contact_get['id']);
+    $this->assertEquals('Tag B', $contact_get['values'][$contact['id']]['tags']);
+
+    foreach ($tags as $tag) {
+      $this->callAPISuccess('Tag', 'delete', ['id' => $tag['id']]);
+    }
+    $this->callAPISuccess('Contact', 'delete', [
+      'id' => $contact['id'],
+      'skip_undelete' => TRUE,
+    ]);
   }
 
 }

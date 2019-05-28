@@ -6,11 +6,11 @@
  *   API result array
  */
 function campaign_get_example() {
-  $params = array(
+  $params = [
     'title' => 'campaign title',
     'description' => 'Call people, ask for money',
     'created_date' => 'first sat of July 2008',
-  );
+  ];
 
   try{
     $result = civicrm_api3('Campaign', 'get', $params);
@@ -20,12 +20,12 @@ function campaign_get_example() {
     $errorMessage = $e->getMessage();
     $errorCode = $e->getErrorCode();
     $errorData = $e->getExtraParams();
-    return array(
+    return [
       'is_error' => 1,
       'error_message' => $errorMessage,
       'error_code' => $errorCode,
       'error_data' => $errorData,
-    );
+    ];
   }
 
   return $result;
@@ -39,22 +39,22 @@ function campaign_get_example() {
  */
 function campaign_get_expectedresult() {
 
-  $expectedResult = array(
+  $expectedResult = [
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
     'id' => 2,
-    'values' => array(
-      '2' => array(
+    'values' => [
+      '2' => [
         'id' => '2',
         'name' => 'campaign_title',
         'title' => 'campaign title',
         'description' => 'Call people, ask for money',
         'is_active' => '1',
         'created_date' => '2013-07-28 08:49:19',
-      ),
-    ),
-  );
+      ],
+    ],
+  ];
 
   return $expectedResult;
 }

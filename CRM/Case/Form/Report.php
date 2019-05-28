@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -38,16 +38,19 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
 
   /**
    * Case Id
+   * @var int
    */
   public $_caseID = NULL;
 
   /**
    * Client Id
+   * @var int
    */
   public $_clientID = NULL;
 
   /**
    * Activity set name
+   * @var string
    */
   public $_activitySetName = NULL;
 
@@ -79,10 +82,10 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
       return;
     }
 
-    $includeActivites = array(
+    $includeActivites = [
       1 => ts('All Activities'),
       2 => ts('Exclude Completed Activities'),
-    );
+    ];
     $includeActivitesGroup = $this->addRadio('include_activities',
       NULL,
       $includeActivites,
@@ -97,18 +100,17 @@ class CRM_Case_Form_Report extends CRM_Core_Form {
       ts('Redact (hide) Client and Service Provider Data')
     );
 
-    $this->addButtons(array(
-        array(
-          'type' => 'refresh',
-          'name' => ts('Generate Report'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'refresh',
+        'name' => ts('Generate Report'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
     // We want this form to redirect to a full page
     $this->preventAjaxSubmit();
   }

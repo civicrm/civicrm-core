@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -86,19 +86,11 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
   public function testCount($fv, $count, $ids, $full) {
     $this->quickCleanup($this->_tablesToTruncate);
 
-    // echo "testCount\n";
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/datasets/sample-dataset.xml'
-      )
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/sample-dataset.xml');
 
     $obj = new CRM_Contact_Form_Search_Custom_Sample($fv);
 
-    $this->assertEquals($count, $obj->count(),
-      'In line ' . __LINE__
-    );
+    $this->assertEquals($count, $obj->count());
   }
 
   /**
@@ -114,13 +106,8 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
     // Truncate affected tables
     $this->quickCleanup($this->_tablesToTruncate);
 
-    // echo "testAll\n";
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/datasets/sample-dataset.xml'
-      )
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/sample-dataset.xml');
+
     $obj = new CRM_Contact_Form_Search_Custom_Sample($fv);
     $sql = $obj->all(0, 0, 'contact_id');
     $this->assertTrue(is_string($sql));
@@ -150,13 +137,7 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
     // Truncate affected tables
     $this->quickCleanup($this->_tablesToTruncate);
 
-    // echo "testContactIDs\n";
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/datasets/sample-dataset.xml'
-      )
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/sample-dataset.xml');
     $obj = new CRM_Contact_Form_Search_Custom_Sample($fv);
     $sql = $obj->contactIDs();
     $this->assertTrue(is_string($sql));
@@ -222,12 +203,7 @@ class CRM_Contact_Form_Search_Custom_SampleTest extends CiviUnitTestCase {
   public function testSavedSearch() {
     $this->quickCleanup($this->_tablesToTruncate);
 
-    $op = new PHPUnit_Extensions_Database_Operation_Insert();
-    $op->execute($this->_dbconn,
-      $this->createFlatXMLDataSet(
-        dirname(__FILE__) . '/datasets/sample-dataset.xml'
-      )
-    );
+    $this->loadXMLDataSet(dirname(__FILE__) . '/datasets/sample-dataset.xml');
 
     $dataset[1] = array('id' => array(12));
     $dataset[2] = array('id' => array(10, 11));

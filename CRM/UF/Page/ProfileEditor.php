@@ -7,6 +7,7 @@ require_once 'CRM/Core/Page.php';
  * widgets
  */
 class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
+
   /**
    * Run page.
    *
@@ -28,11 +29,11 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
 
     CRM_Core_Resources::singleton()
       ->addSettingsFactory(function () {
-        $ufGroups = civicrm_api3('UFGroup', 'get', array(
+        $ufGroups = civicrm_api3('UFGroup', 'get', [
           'sequential' => 1,
           'is_active' => 1,
-          'options' => array('limit' => 0),
-        ));
+          'options' => ['limit' => 0],
+        ]);
         //CRM-16915 - insert 'module' param for the profile used by CiviEvent.
         if (CRM_Core_Permission::check('manage event profiles') && !CRM_Core_Permission::check('administer CiviCRM')) {
           foreach ($ufGroups['values'] as $key => $value) {
@@ -42,16 +43,16 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
             }
           }
         }
-        return array(
-          'PseudoConstant' => array(
+        return [
+          'PseudoConstant' => [
             'locationType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'),
             'websiteType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id'),
             'phoneType' => CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id'),
-          ),
+          ],
           'initialProfileList' => $ufGroups,
           'contactSubTypes' => CRM_Contact_BAO_ContactType::subTypes(),
           'profilePreviewKey' => CRM_Core_Key::get('CRM_UF_Form_Inline_Preview', TRUE),
-        );
+        ];
       })
       ->addScriptFile('civicrm', 'packages/backbone/json2.js', 100, 'html-header', FALSE)
       ->addScriptFile('civicrm', 'packages/backbone/backbone.js', 120, 'html-header')
@@ -75,9 +76,9 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
       ->addScriptFile('civicrm', 'js/jquery/jquery.crmProfileSelector.js', 250)
       ->addScriptFile('civicrm', 'js/crm.designerapp.js', 250);
 
-    CRM_Core_Region::instance('page-header')->add(array(
+    CRM_Core_Region::instance('page-header')->add([
       'template' => 'CRM/UF/Page/ProfileTemplates.tpl',
-    ));
+    ]);
   }
 
   /**
@@ -89,9 +90,9 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
   public static function registerSchemas($entityTypes) {
     // TODO in cases where registerSchemas is called multiple times for same entity, be more efficient
     CRM_Core_Resources::singleton()->addSettingsFactory(function () use ($entityTypes) {
-      return array(
+      return [
         'civiSchema' => CRM_UF_Page_ProfileEditor::getSchema($entityTypes),
-      );
+      ];
     });
   }
 
@@ -120,7 +121,7 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
 
     $entityTypes = array_unique($entityTypes);
     $availableFields = NULL;
-    $civiSchema = array();
+    $civiSchema = [];
     foreach ($entityTypes as $entityType) {
       if (!$availableFields) {
         $availableFields = CRM_Core_BAO_UFField::getAvailableFieldsFlat();
@@ -196,22 +197,22 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
     }
 
     // Adding the oddball "formatting" field here because there's no other place to put it
-    foreach (array('Individual', 'Organization', 'Household') as $type) {
+    foreach (['Individual', 'Organization', 'Household'] as $type) {
       if (isset($civiSchema[$type . 'Model'])) {
-        $civiSchema[$type . 'Model']['schema'] += array(
-          'formatting' => array(
+        $civiSchema[$type . 'Model']['schema'] += [
+          'formatting' => [
             'type' => 'Markup',
             'title' => ts('Free HTML'),
             'civiFieldType' => 'Formatting',
             'section' => 'formatting',
-          ),
-        );
-        $civiSchema[$type . 'Model']['sections'] += array(
-          'formatting' => array(
+          ],
+        ];
+        $civiSchema[$type . 'Model']['sections'] += [
+          'formatting' => [
             'title' => ts('Formatting'),
             'is_addable' => FALSE,
-          ),
-        );
+          ],
+        ];
       }
     }
 
@@ -238,10 +239,10 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
 
     // schema in format array($fieldName => $fieldSchema)
     // sections in format array($sectionName => $section)
-    $result = array(
-      'schema' => array(),
-      'sections' => array(),
-    );
+    $result = [
+      'schema' => [],
+      'sections' => [],
+    ];
 
     // build field list
     foreach ($availableFields as $fieldName => $field) {
@@ -263,28 +264,28 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
           }
       }
       // FIXME: type set to "Text"
-      $result['schema'][$fieldName] = array(
+      $result['schema'][$fieldName] = [
         'type' => 'Text',
         'title' => $field['title'],
         'civiFieldType' => $field['field_type'],
-      );
+      ];
       if (in_array($fieldName, $locationFields)) {
         $result['schema'][$fieldName]['civiIsLocation'] = TRUE;
       }
       if ($fieldName == 'url') {
         $result['schema'][$fieldName]['civiIsWebsite'] = TRUE;
       }
-      if (in_array($fieldName, array('phone', 'phone_and_ext'))) {
+      if (in_array($fieldName, ['phone', 'phone_and_ext'])) {
         // FIXME what about phone_ext?
         $result['schema'][$fieldName]['civiIsPhone'] = TRUE;
       }
     }
 
     // build section list
-    $result['sections']['default'] = array(
+    $result['sections']['default'] = [
       'title' => $title,
       'is_addable' => FALSE,
-    );
+    ];
 
     $customGroup = CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity($extends);
     $customGroup->orderBy('weight');
@@ -292,14 +293,14 @@ class CRM_UF_Page_ProfileEditor extends CRM_Core_Page {
     $customGroup->find();
     while ($customGroup->fetch()) {
       $sectionName = 'cg_' . $customGroup->id;
-      $section = array(
-        'title' => ts('%1: %2', array(1 => $title, 2 => $customGroup->title)),
+      $section = [
+        'title' => ts('%1: %2', [1 => $title, 2 => $customGroup->title]),
         'is_addable' => $customGroup->is_reserved ? FALSE : TRUE,
         'custom_group_id' => $customGroup->id,
         'extends_entity_column_id' => $customGroup->extends_entity_column_id,
         'extends_entity_column_value' => CRM_Utils_Array::explodePadded($customGroup->extends_entity_column_value),
         'is_reserved' => $customGroup->is_reserved ? TRUE : FALSE,
-      );
+      ];
       $result['sections'][$sectionName] = $section;
     }
 

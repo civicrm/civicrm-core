@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -63,28 +63,28 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
           'location_type_id' => 1,
           'is_primary' => 1,
           'street_number' => 3,
-        ]
+        ],
       ]),
       'odd_street_number_2' => $this->individualCreate([
         'api.Address.create' => [
           'location_type_id' => 1,
           'is_primary' => 1,
           'street_number' => 5,
-        ]
+        ],
       ]),
       'even_street_number_1' => $this->individualCreate([
         'api.Address.create' => [
           'location_type_id' => 1,
           'is_primary' => 1,
           'street_number' => 2,
-        ]
+        ],
       ]),
       'even_street_number_2' => $this->individualCreate([
         'api.Address.create' => [
           'location_type_id' => 1,
           'is_primary' => 1,
           'street_number' => 4,
-        ]
+        ],
       ]),
       'no_street_number' => $this->individualCreate(),
     ];

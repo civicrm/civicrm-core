@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,7 @@
     {/capture}{help id=$help.id file=$help.file}{/if}
     {if $action == 2 && $fieldSpec.is_add_translate_dialog}{include file='CRM/Core/I18n/Dialog.tpl' table=$entityTable field=$fieldName id=$entityID}{/if}
   </td>
-  <td>{$fieldSpec.pre_html_text}{if $form.$fieldName.html}{if $fieldSpec.formatter === 'crmMoney'}{$form.$fieldName.html|crmMoney}{else}{$form.$fieldName.html}{/if}{else}{$fieldSpec.place_holder}{/if}{$fieldSpec.post_html_text}<br />
+  <td>{$fieldSpec.pre_html_text}{if $form.$fieldName.html}{if $fieldSpec.formatter === 'crmMoney'}{$form.$fieldName.html|crmMoney:$fieldSpec.formatterParam}{else}{$form.$fieldName.html}{/if}{else}{$fieldSpec.place_holder}{/if}{$fieldSpec.post_html_text}<br />
     {if $fieldSpec.description}<span class="description">{$fieldSpec.description}</span>{/if}
     {if $fieldSpec.documentation_link}{docURL page=$fieldSpec.documentation_link.page resource=$fieldSpec.documentation_link.resource}{/if}
   </td>

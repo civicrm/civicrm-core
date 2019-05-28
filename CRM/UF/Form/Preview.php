@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -74,7 +74,7 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
       }
 
       // preview for field
-      $specialFields = array(
+      $specialFields = [
         'address_name',
         'street_address',
         'supplemental_address_1',
@@ -91,7 +91,7 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
         'phone',
         'email',
         'im',
-      );
+      ];
 
       if ($fieldDAO->location_type_id) {
         $name .= '-' . $fieldDAO->location_type_id;
@@ -131,13 +131,13 @@ class CRM_UF_Form_Preview extends CRM_UF_Form_AbstractPreview {
   public function buildQuickForm() {
     parent::buildQuickForm();
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'cancel',
         'name' => ts('Done with Preview'),
         'isDefault' => TRUE,
-      ),
-    ));
+      ],
+    ]);
   }
 
 }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -33,7 +33,9 @@
  * @group headless
  */
 class api_v3_ReportTemplateTest extends CiviUnitTestCase {
-  protected $_apiversion = 3;
+
+  use CRMTraits_ACL_PermissionTrait;
+  use CRMTraits_PCP_PCPTestTrait;
 
   protected $contactIDs = [];
 
@@ -192,7 +194,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public function testReportTemplateGetRowsContactSummary() {
     $description = "Retrieve rows from a report template (optionally providing the instance_id).";
-    $result = $this->callAPIAndDocument('report_template', 'getrows', array(
+    $result = $this->callAPISuccess('report_template', 'getrows', array(
       'report_id' => 'contact/summary',
       'options' => array('metadata' => array('labels', 'title')),
     ), __FUNCTION__, __FILE__, $description, 'Getrows');
@@ -209,6 +211,39 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $this->assertEquals('Second Domain', $result[1]['civicrm_contact_sort_name']);
     $this->assertEquals('15 Main St', $result[1]['civicrm_address_street_address']);
      */
+  }
+
+  /**
+   * Test getrows on Mailing Opened report.
+   */
+  public function testReportTemplateGetRowsMailingUniqueOpened() {
+    $description = "Retrieve rows from a mailing opened report template.";
+    $this->loadXMLDataSet(dirname(__FILE__) . '/../../CRM/Mailing/BAO/queryDataset.xml');
+
+    // Check total rows without distinct
+    global $_REQUEST;
+    $_REQUEST['distinct'] = 0;
+    $result = $this->callAPIAndDocument('report_template', 'getrows', array(
+      'report_id' => 'Mailing/opened',
+      'options' => array('metadata' => array('labels', 'title')),
+    ), __FUNCTION__, __FILE__, $description, 'Getrows');
+    $this->assertEquals(14, $result['count']);
+
+    // Check total rows with distinct
+    $_REQUEST['distinct'] = 1;
+    $result = $this->callAPIAndDocument('report_template', 'getrows', array(
+      'report_id' => 'Mailing/opened',
+      'options' => array('metadata' => array('labels', 'title')),
+    ), __FUNCTION__, __FILE__, $description, 'Getrows');
+    $this->assertEquals(5, $result['count']);
+
+    // Check total rows with distinct by passing NULL value to distinct parameter
+    $_REQUEST['distinct'] = NULL;
+    $result = $this->callAPIAndDocument('report_template', 'getrows', array(
+      'report_id' => 'Mailing/opened',
+      'options' => array('metadata' => array('labels', 'title')),
+    ), __FUNCTION__, __FILE__, $description, 'Getrows');
+    $this->assertEquals(5, $result['count']);
   }
 
   /**
@@ -354,6 +389,11 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     return array(array('member/detail'));
   }
 
+  /**
+   * Get the membership and contribution reports to test.
+   *
+   * @return array
+   */
   public static function getMembershipAndContributionReportTemplatesForGroupTests() {
     $templates = array_merge(self::getContributionReportTemplates(), self::getMembershipReportTemplates());
     foreach ($templates as $key => $value) {
@@ -431,15 +471,19 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
     $this->assertEquals(2, $rows['count'], "Report failed - the sql used to generate the results was " . print_r($rows['metadata']['sql'], TRUE));
 
-    $expected = 'DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci
+    $expected = preg_replace('/\s+/', ' ', 'DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci AS
       SELECT SQL_CALC_FOUND_ROWS contact_civireport.id as cid  FROM civicrm_contact contact_civireport    INNER JOIN civicrm_contribution contribution_civireport USE index (received_date) ON contribution_civireport.contact_id = contact_civireport.id
          AND contribution_civireport.is_test = 0
          AND contribution_civireport.receive_date BETWEEN \'20140701000000\' AND \'20150630235959\'
-
-       LEFT JOIN civicrm_contribution cont_exclude ON cont_exclude.contact_id = contact_civireport.id
-         AND cont_exclude.receive_date BETWEEN \'2015-7-1\' AND \'20160630235959\' WHERE cont_exclude.id IS NULL AND 1 AND ( contribution_civireport.contribution_status_id IN (1) )
-      GROUP BY contact_civireport.id';
-    $this->assertContains(preg_replace('/\s+/', ' ', $expected), preg_replace('/\s+/', ' ', $rows['metadata']['sql'][0]));
+         WHERE contact_civireport.id NOT IN (
+      SELECT cont_exclude.contact_id
+          FROM civicrm_contribution cont_exclude
+          WHERE cont_exclude.receive_date BETWEEN \'2015-7-1\' AND \'20160630235959\')
+          AND ( contribution_civireport.contribution_status_id IN (1) )
+      GROUP BY contact_civireport.id');
+    // Exclude whitespace in comparison as we don't care if it changes & this allows us to make the above readable.
+    $whitespacelessSql = preg_replace('/\s+/', ' ', $rows['metadata']['sql'][0]);
+    $this->assertContains($expected, $whitespacelessSql);
   }
 
   /**
@@ -504,6 +548,23 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
       'options' => array('metadata' => array('sql')),
     ));
     $this->assertEquals(2, $rows['values'][0]['civicrm_contribution_total_amount_count']);
+  }
+
+  /**
+   * Test no fatal on order by per https://lab.civicrm.org/dev/core/issues/739
+   */
+  public function testCaseDetailsCaseTypeHeader() {
+    $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'case/detail',
+      'fields' => ['subject' => 1, 'client_sort_name' => 1],
+      'order_bys' => [
+        1 => [
+          'column' => 'case_type_title',
+          'order' => 'ASC',
+          'section' => '1',
+        ],
+      ],
+    ]);
   }
 
   /**
@@ -781,11 +842,11 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     ));
 
     foreach (array(
-               $addedToBothIndividualID,
-               $removedFromBothIndividualID,
-               $addedToSmartGroupRemovedFromOtherIndividualID,
-               $removedFromSmartGroupAddedToOtherIndividualID,
-             ) as $contactID) {
+      $addedToBothIndividualID,
+      $removedFromBothIndividualID,
+      $addedToSmartGroupRemovedFromOtherIndividualID,
+      $removedFromSmartGroupAddedToOtherIndividualID,
+    ) as $contactID) {
       $this->contributionCreate(array(
         'contact_id' => $contactID,
         'invoice_id' => '',
@@ -1020,10 +1081,161 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
         'financial_type_id' => '1',
         'receive_date' => '1',
         'total_amount' => '1',
-       ],
+      ],
       'order_bys' => [['column' => 'sort_name', 'order' => 'ASC', 'section' => '1']],
       'options' => array('metadata' => array('sql')),
     ));
+  }
+
+  /**
+   * Test contact subtype filter on grant report.
+   */
+  public function testGrantReportSeparatedFilter() {
+    $contactID = $this->individualCreate(['contact_sub_type' => ['Student', 'Parent']]);
+    $contactID2 = $this->individualCreate();
+    $this->callAPISuccess('Grant', 'create', ['contact_id' => $contactID, 'status_id' => 1, 'grant_type_id' => 1, 'amount_total' => 1]);
+    $this->callAPISuccess('Grant', 'create', ['contact_id' => $contactID2, 'status_id' => 1, 'grant_type_id' => 1, 'amount_total' => 1]);
+    $rows = $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => 'grant/detail',
+      'contact_sub_type_op' => 'in',
+      'contact_sub_type_value' => ['Student'],
+    ]);
+    $this->assertEquals(1, $rows['count']);
+  }
+
+  /**
+   * Test PCP report to ensure total donors and total committed is accurate.
+   */
+  public function testPcpReportTotals() {
+    $donor1ContactId = $this->individualCreate();
+    $donor2ContactId = $this->individualCreate();
+    $donor3ContactId = $this->individualCreate();
+
+    // We are going to create two PCP pages. We will create two contributions
+    // on the first PCP page and one contribution on the second PCP page.
+    //
+    // Then, we will ensure that the first PCP page reports a total of both
+    // contributions (but not the contribution made on the second PCP page).
+
+    // A PCP page requires three components:
+    // 1. A contribution page
+    // 2. A PCP Block
+    // 3. A PCP page
+
+    // pcpBLockParams creates a contribution page and returns the parameters
+    // necessary to create a PBP Block.
+    $blockParams = $this->pcpBlockParams();
+    $pcpBlock = CRM_PCP_BAO_PCPBlock::create($blockParams);
+
+    // Keep track of the contribution page id created. We will use this
+    // contribution page id for all the PCP pages.
+    $contribution_page_id = $pcpBlock->entity_id;
+
+    // pcpParams returns the parameters needed to create a PCP page.
+    $pcpParams = $this->pcpParams();
+    // Keep track of the owner of the page so we can properly apply the
+    // soft credit.
+    $pcpOwnerContact1Id = $pcpParams['contact_id'];
+    $pcpParams['pcp_block_id'] = $pcpBlock->id;
+    $pcpParams['page_id'] = $contribution_page_id;
+    $pcpParams['page_type'] = 'contribute';
+    $pcp1 = CRM_PCP_BAO_PCP::create($pcpParams);
+
+    // Nice work. Now, let's create a second PCP page.
+    $pcpParams = $this->pcpParams();
+    // Keep track of the owner of the page.
+    $pcpOwnerContact2Id = $pcpParams['contact_id'];
+    // We're using the same pcpBlock id and contribution page that we created above.
+    $pcpParams['pcp_block_id'] = $pcpBlock->id;
+    $pcpParams['page_id'] = $contribution_page_id;
+    $pcpParams['page_type'] = 'contribute';
+    $pcp2 = CRM_PCP_BAO_PCP::create($pcpParams);
+
+    // Get soft credit types, with the name column as the key.
+    $soft_credit_types = CRM_Contribute_BAO_ContributionSoft::buildOptions("soft_credit_type_id", NULL, array("flip" => TRUE, 'labelColumn' => 'name'));
+    $pcp_soft_credit_type_id = $soft_credit_types['pcp'];
+
+    // Create two contributions assigned to this contribution page and
+    // assign soft credits appropriately.
+    // FIRST...
+    $contribution1params = array(
+      'contact_id' => $donor1ContactId,
+      'contribution_page_id' => $contribution_page_id,
+      'total_amount' => '75.00',
+    );
+    $c1 = $this->contributionCreate($contribution1params);
+    // Now the soft contribution.
+    $p = array(
+      'contribution_id' => $c1,
+      'pcp_id' => $pcp1->id,
+      'contact_id' => $pcpOwnerContact1Id,
+      'amount' => 75.00,
+      'currency' => 'USD',
+      'soft_credit_type_id' => $pcp_soft_credit_type_id,
+    );
+    $this->callAPISuccess('contribution_soft', 'create', $p);
+    // SECOND...
+    $contribution2params = array(
+      'contact_id' => $donor2ContactId,
+      'contribution_page_id' => $contribution_page_id,
+      'total_amount' => '25.00',
+    );
+    $c2 = $this->contributionCreate($contribution2params);
+    // Now the soft contribution.
+    $p = array(
+      'contribution_id' => $c2,
+      'pcp_id' => $pcp1->id,
+      'contact_id' => $pcpOwnerContact1Id,
+      'amount' => 25.00,
+      'currency' => 'USD',
+      'soft_credit_type_id' => $pcp_soft_credit_type_id,
+    );
+    $this->callAPISuccess('contribution_soft', 'create', $p);
+
+    // Create one contributions assigned to the second PCP page
+    $contribution3params = array(
+      'contact_id' => $donor3ContactId,
+      'contribution_page_id' => $contribution_page_id,
+      'total_amount' => '200.00',
+    );
+    $c3 = $this->contributionCreate($contribution3params);
+    // Now the soft contribution.
+    $p = [
+      'contribution_id' => $c3,
+      'pcp_id' => $pcp2->id,
+      'contact_id' => $pcpOwnerContact2Id,
+      'amount' => 200.00,
+      'currency' => 'USD',
+      'soft_credit_type_id' => $pcp_soft_credit_type_id,
+    ];
+    $this->callAPISuccess('contribution_soft', 'create', $p);
+
+    $template = 'contribute/pcp';
+    $rows = $this->callAPISuccess('report_template', 'getrows', array(
+      'report_id' => $template,
+      'title' => 'My PCP',
+      'fields' => [
+        'amount_1' => '1',
+        'soft_id' => '1',
+      ],
+    ));
+    $values = $rows['values'][0];
+    $this->assertEquals(100.00, $values['civicrm_contribution_soft_amount_1_sum'], "Total commited should be $100");
+    $this->assertEquals(2, $values['civicrm_contribution_soft_soft_id_count'], "Total donors should be 2");
+  }
+
+  /**
+   * Test a report that uses getAddressColumns();
+   */
+  public function testGetAddressColumns() {
+    $template = 'event/participantlisting';
+    $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => $template,
+      'fields' => [
+        'sort_name' => '1',
+        'street_address' => '1',
+      ],
+    ]);
   }
 
 }

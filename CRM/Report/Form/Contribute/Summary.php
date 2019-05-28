@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
 
@@ -69,16 +69,6 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
    * Class constructor.
    */
   public function __construct() {
-
-    // Check if CiviCampaign is a) enabled and b) has active campaigns
-    $config = CRM_Core_Config::singleton();
-    $campaignEnabled = in_array("CiviCampaign", $config->enableComponents);
-    if ($campaignEnabled) {
-      $getCampaigns = CRM_Campaign_BAO_Campaign::getPermissionedCampaigns(NULL, NULL, FALSE, FALSE, TRUE);
-      $this->activeCampaigns = $getCampaigns['campaigns'];
-      asort($this->activeCampaigns);
-    }
-
     $this->_columns = array(
       'civicrm_contact' => array(
         'dao' => 'CRM_Contact_DAO_Contact',
@@ -91,6 +81,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             ),
           )
         ),
+        'filters' => $this->getBasicContactFilters(array('deceased' => NULL)),
         'grouping' => 'contact-fields',
         'group_bys' => array(
           'id' => array('title' => ts('Contact ID')),
@@ -142,6 +133,9 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'required' => TRUE,
             'no_display' => TRUE,
           ),
+          'contribution_page_id' => array(
+            'title' => ts('Contribution Page'),
+          ),
           'total_amount' => array(
             'title' => ts('Contribution Amount Stats'),
             'default' => TRUE,
@@ -158,11 +152,18 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
         'grouping' => 'contri-fields',
         'filters' => array(
           'receive_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
+          'thankyou_date' => array('operatorType' => CRM_Report_Form::OP_DATE),
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(1),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+          'contribution_page_id' => array(
+            'title' => ts('Contribution Page'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contribute_PseudoConstant::contributionPage(),
             'type' => CRM_Utils_Type::T_INT,
           ),
           'currency' => array(
@@ -221,6 +222,12 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
             'default' => array(1),
+            'type' => CRM_Utils_Type::T_INT,
+          ),
+          'contribution_page_id' => array(
+            'title' => ts('Contribution Page'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => CRM_Contribute_PseudoConstant::contributionPage(),
             'type' => CRM_Utils_Type::T_INT,
           ),
         ),
@@ -313,20 +320,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
       ),
     ) + $this->addAddressFields();
 
-    // If we have a campaign, build out the relevant elements
-    if ($campaignEnabled && !empty($this->activeCampaigns)) {
-      $this->_columns['civicrm_contribution']['fields']['campaign_id'] = array(
-        'title' => ts('Campaign'),
-        'default' => 'false',
-      );
-      $this->_columns['civicrm_contribution']['filters']['campaign_id'] = array(
-        'title' => ts('Campaign'),
-        'type' => CRM_Utils_Type::T_INT,
-        'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-        'options' => $this->activeCampaigns,
-      );
-      $this->_columns['civicrm_contribution']['group_bys']['campaign_id'] = array('title' => ts('Campaign'));
-    }
+    $this->addCampaignFields('civicrm_contribution', TRUE);
 
     $this->_tagFilter = TRUE;
     $this->_groupFilter = TRUE;
@@ -463,10 +457,10 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
 
     if (empty($fields['fields']['total_amount'])) {
       foreach (array(
-                 'total_count_value',
-                 'total_sum_value',
-                 'total_avg_value',
-               ) as $val) {
+        'total_count_value',
+        'total_sum_value',
+        'total_avg_value',
+      ) as $val) {
         if (!empty($fields[$val])) {
           $errors[$val] = ts("Please select the Amount Statistics");
         }
@@ -652,7 +646,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
 
     $contriSQL = "SELECT {$contriQuery} {$group} {$this->_having}";
     $contriDAO = CRM_Core_DAO::executeQuery($contriSQL);
-
+    $this->addToDeveloperTab($contriSQL);
     $totalAmount = $average = $mode = $median = $softTotalAmount = $softAverage = array();
     $count = $softCount = 0;
     while ($contriDAO->fetch()) {
@@ -671,13 +665,12 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
       FROM (SELECT {$this->_aliases['civicrm_contribution']}.total_amount as amount,
     {$contriQuery} {$groupBy} {$orderBy}) as mode GROUP BY currency";
 
-    $mode = CRM_Contribute_BAO_Contribution::computeStats('mode', $modeSQL);
-
-    $medianSQL = "{$this->_from} {$this->_where}";
-    $median = CRM_Contribute_BAO_Contribution::computeStats('median', $medianSQL, $this->_aliases['civicrm_contribution']);
+    $mode = $this->calculateMode($modeSQL);
+    $median = $this->calculateMedian();
 
     if ($softCredit) {
       $softDAO = CRM_Core_DAO::executeQuery($softSQL);
+      $this->addToDeveloperTab($softSQL);
       while ($softDAO->fetch()) {
         $softTotalAmount[]
           = CRM_Utils_Money::format($softDAO->civicrm_contribution_soft_soft_amount_sum, $softDAO->currency) .
@@ -748,6 +741,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
    */
   public function buildRows($sql, &$rows) {
     $dao = CRM_Core_DAO::executeQuery($sql);
+    $this->addToDeveloperTab($sql);
     if (!is_array($rows)) {
       $rows = array();
     }
@@ -765,10 +759,12 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
       $this->customDataFrom();
       $contriSQL = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
       $contriDAO = CRM_Core_DAO::executeQuery($contriSQL);
+      $this->addToDeveloperTab($contriSQL);
       $contriFields = array(
         'civicrm_contribution_total_amount_sum',
         'civicrm_contribution_total_amount_avg',
-        'civicrm_contribution_total_amount_count');
+        'civicrm_contribution_total_amount_count',
+      );
       $contriRows = array();
       while ($contriDAO->fetch()) {
         $contriRow = array();
@@ -869,6 +865,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
   public function alterDisplay(&$rows) {
     $entryFound = FALSE;
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $contributionPages = CRM_Contribute_PseudoConstant::contributionPage();
 
     foreach ($rows as $rowNum => $row) {
       // make count columns point to detail report
@@ -958,10 +955,15 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
         $entryFound = TRUE;
       }
 
+      if ($value = CRM_Utils_Array::value('civicrm_contribution_contribution_page_id', $row)) {
+        $rows[$rowNum]['civicrm_contribution_contribution_page_id'] = $contributionPages[$value];
+        $entryFound = TRUE;
+      }
+
       // If using campaigns, convert campaign_id to campaign title
       if (array_key_exists('civicrm_contribution_campaign_id', $row)) {
         if ($value = $row['civicrm_contribution_campaign_id']) {
-          $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->activeCampaigns[$value];
+          $rows[$rowNum]['civicrm_contribution_campaign_id'] = $this->campaigns[$value];
         }
         $entryFound = TRUE;
       }
@@ -981,6 +983,73 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
         break;
       }
     }
+  }
+
+  /**
+   * Calculate mode.
+   *
+   * Note this is a slow query. Alternative is extended reports.
+   *
+   * @param string $sql
+   * @return array|null
+   */
+  protected function calculateMode($sql) {
+    $mode = [];
+    $modeDAO = CRM_Core_DAO::executeQuery($sql);
+    while ($modeDAO->fetch()) {
+      if ($modeDAO->civicrm_contribution_total_amount_count > 1) {
+        $mode[] = CRM_Utils_Money::format($modeDAO->amount, $modeDAO->currency);
+      }
+      else {
+        $mode[] = 'N/A';
+      }
+    }
+    return $mode;
+  }
+
+  /**
+   * Calculate mode.
+   *
+   * Note this is a slow query. Alternative is extended reports.
+   *
+   * @return array|null
+   */
+  protected function calculateMedian() {
+    $sql = "{$this->_from} {$this->_where}";
+    $currencies = CRM_Core_OptionGroup::values('currencies_enabled');
+    $median = [];
+    foreach ($currencies as $currency => $val) {
+      $midValue = 0;
+      $where = "AND {$this->_aliases['civicrm_contribution']}.currency = '{$currency}'";
+      $rowCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) as count {$sql} {$where}");
+
+      $even = FALSE;
+      $offset = 1;
+      $medianRow = floor($rowCount / 2);
+      if ($rowCount % 2 == 0 && !empty($medianRow)) {
+        $even = TRUE;
+        $offset++;
+        $medianRow--;
+      }
+
+      $medianValue = "SELECT {$this->_aliases['civicrm_contribution']}.total_amount as median
+             {$sql} {$where}
+             ORDER BY median LIMIT {$medianRow},{$offset}";
+      $medianValDAO = CRM_Core_DAO::executeQuery($medianValue);
+      while ($medianValDAO->fetch()) {
+        if ($even) {
+          $midValue = $midValue + $medianValDAO->median;
+        }
+        else {
+          $median[] = CRM_Utils_Money::format($medianValDAO->median, $currency);
+        }
+      }
+      if ($even) {
+        $midValue = $midValue / 2;
+        $median[] = CRM_Utils_Money::format($midValue, $currency);
+      }
+    }
+    return $median;
   }
 
 }

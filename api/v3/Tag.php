@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2017                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -62,7 +62,7 @@ function civicrm_api3_tag_create($params) {
 function _civicrm_api3_tag_create_spec(&$params) {
   $params['used_for']['api.default'] = 'civicrm_contact';
   $params['name']['api.required'] = 1;
-  $params['id']['api.aliases'] = array('tag');
+  $params['id']['api.aliases'] = ['tag'];
 }
 
 /**

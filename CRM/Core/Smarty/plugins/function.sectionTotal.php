@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  *
  * @package CRM
  * @author Allen Shaw <allen@nswebsolutions.com>
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  */
 
@@ -62,7 +62,7 @@ function smarty_function_sectionTotal($params, &$smarty) {
    * Note: This array is created and assigned to the template in CRM_Report_Form::sectionTotals()
    */
 
-  static $sectionValues = array();
+  static $sectionValues = [];
 
   // move back in the stack, if necessary
   if (count($sectionValues) > $params['depth']) {

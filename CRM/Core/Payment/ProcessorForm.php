@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -26,10 +26,11 @@
  */
 
 use Civi\Payment\System;
+
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 
@@ -72,8 +73,10 @@ class CRM_Core_Payment_ProcessorForm {
 
     $form->assign('suppressSubmitButton', $form->_paymentObject->isSuppressSubmitButtons());
 
-    $currency = $form->getCurrency();
-    $form->assign('currency', $currency);
+    CRM_Financial_Form_Payment::addCreditCardJs($form->getPaymentProcessorID());
+    $form->assign('paymentProcessorID', $form->getPaymentProcessorID());
+
+    $form->assign('currency', $form->getCurrency());
 
     // also set cancel subscription url
     if (!empty($form->_paymentProcessor['is_recur']) && !empty($form->_values['is_recur'])) {
@@ -81,12 +84,12 @@ class CRM_Core_Payment_ProcessorForm {
     }
 
     if (!empty($form->_values['custom_pre_id'])) {
-      $profileAddressFields = array();
+      $profileAddressFields = [];
       $fields = CRM_Core_BAO_UFGroup::getFields($form->_values['custom_pre_id'], FALSE, CRM_Core_Action::ADD, NULL, NULL, FALSE,
         NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL);
 
       foreach ((array) $fields as $key => $value) {
-        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields, array('uf_group_id' => $form->_values['custom_pre_id']));
+        CRM_Core_BAO_UFField::assignAddressField($key, $profileAddressFields, ['uf_group_id' => $form->_values['custom_pre_id']]);
       }
       if (count($profileAddressFields)) {
         $form->set('profileAddressFields', $profileAddressFields);
@@ -129,7 +132,7 @@ class CRM_Core_Payment_ProcessorForm {
     ) {
 
       CRM_Core_Error::fatal(ts('This contribution page is configured to support separate contribution and membership payments. This %1 plugin does not currently support multiple simultaneous payments, or the option to "Execute real-time monetary transactions" is disabled. Please contact the site administrator and notify them of this error',
-          array(1 => $form->_paymentProcessor['payment_processor_type'])
+          [1 => $form->_paymentProcessor['payment_processor_type']]
         )
       );
     }

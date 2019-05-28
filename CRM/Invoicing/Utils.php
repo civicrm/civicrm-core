@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Invoicing_Utils {
 
@@ -92,6 +92,17 @@ class CRM_Invoicing_Utils {
     }
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
     return CRM_Utils_Array::value('default_invoice_page', $invoiceSettings);
+  }
+
+  /**
+   * Function to get the tax term.
+   *
+   * The value is nested in the contribution_invoice_settings setting - which
+   * is unsupported. Here we have a wrapper function to make later cleanup easier.
+   */
+  public static function getTaxTerm() {
+    $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
+    return CRM_Utils_Array::value('tax_term', $invoiceSettings);
   }
 
 }

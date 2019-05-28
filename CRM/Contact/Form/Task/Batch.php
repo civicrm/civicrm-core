@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -45,21 +45,25 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
   /**
    * Maximum contacts that should be allowed to update.
+   * @var int
    */
   protected $_maxContacts = 100;
 
   /**
    * Maximum profile fields that will be displayed.
+   * @var int
    */
   protected $_maxFields = 9;
 
   /**
    * Variable to store redirect path.
+   * @var string
    */
   protected $_userContext;
 
   /**
    * When not to reset sort_name.
+   * @var bool
    */
   protected $_preserveDefault = TRUE;
 
@@ -88,7 +92,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
     // remove file type field and then limit fields
     $suppressFields = FALSE;
-    $removehtmlTypes = array('File');
+    $removehtmlTypes = ['File'];
     foreach ($this->_fields as $name => $field) {
       if ($cfID = CRM_Core_BAO_CustomField::getKeyID($name) &&
         in_array($this->_fields[$name]['html_type'], $removehtmlTypes)
@@ -101,25 +105,24 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     //FIX ME: phone ext field is added at the end and it gets removed because of below code
     //$this->_fields = array_slice($this->_fields, 0, $this->_maxFields);
 
-    $this->addButtons(array(
-        array(
-          'type' => 'submit',
-          'name' => ts('Update Contact(s)'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'submit',
+        'name' => ts('Update Contact(s)'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
     $this->assign('profileTitle', $this->_title);
     $this->assign('componentIds', $this->_contactIds);
 
     // if below fields are missing we should not reset sort name / display name
     // CRM-6794
-    $preserveDefaultsArray = array(
+    $preserveDefaultsArray = [
       'first_name',
       'last_name',
       'middle_name',
@@ -127,7 +130,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       'prefix_id',
       'suffix_id',
       'household_name',
-    );
+    ];
 
     foreach ($this->_contactIds as $contactId) {
       $profileFields = $this->_fields;
@@ -151,7 +154,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
     }
 
     $this->addDefaultButtons(ts('Update Contacts'));
-    $this->addFormRule(array('CRM_Contact_Form_Task_Batch', 'formRule'));
+    $this->addFormRule(['CRM_Contact_Form_Task_Batch', 'formRule']);
   }
 
   /**
@@ -165,9 +168,9 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       return NULL;
     }
 
-    $defaults = $sortName = array();
+    $defaults = $sortName = [];
     foreach ($this->_contactIds as $contactId) {
-      $details[$contactId] = array();
+      $details[$contactId] = [];
 
       //build sortname
       $sortName[$contactId] = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact',
@@ -193,8 +196,8 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
    *   true if no errors, else array of errors
    */
   public static function formRule($fields) {
-    $errors = array();
-    $externalIdentifiers = array();
+    $errors = [];
+    $externalIdentifiers = [];
     foreach ($fields['field'] as $componentId => $field) {
       foreach ($field as $fieldName => $fieldValue) {
         if ($fieldName == 'external_identifier') {
@@ -248,10 +251,10 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
 
     CRM_Core_Session::setStatus('', ts("Updates Saved"), 'success');
     if ($inValidSubtypeCnt) {
-      CRM_Core_Session::setStatus(ts('Contact Subtype field of 1 contact has not been updated.', array(
-            'plural' => 'Contact Subtype field of %count contacts has not been updated.',
-            'count' => $inValidSubtypeCnt,
-          )), ts('Invalid Subtype'));
+      CRM_Core_Session::setStatus(ts('Contact Subtype field of 1 contact has not been updated.', [
+        'plural' => 'Contact Subtype field of %count contacts has not been updated.',
+        'count' => $inValidSubtypeCnt,
+      ]), ts('Invalid Subtype'));
     }
   }
 
@@ -289,7 +292,7 @@ class CRM_Contact_Form_Task_Batch extends CRM_Contact_Form_Task {
       return;
     }
 
-    $allParseValues = array();
+    $allParseValues = [];
     foreach ($contactValues as $key => $value) {
       if (strpos($key, $addressFldKey) !== FALSE) {
         $locTypeId = substr($key, strlen($addressFldKey) + 1);

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
 | CiviCRM version 5                                                  |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2018                                |
+| Copyright CiviCRM LLC (c) 2004-2019                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -383,7 +383,8 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals('120.00', $trxnAmount);
     $newParams = array(
       'id' => $contribution['id'],
-      'financial_type_id' => 1, // without tax rate i.e Donation
+      // without tax rate i.e Donation
+      'financial_type_id' => 1,
       'total_amount' => '300',
     );
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);

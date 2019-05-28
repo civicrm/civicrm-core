@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Utils_ReCAPTCHA {
 
@@ -61,7 +61,6 @@ class CRM_Utils_ReCAPTCHA {
     }
     return self::$_singleton;
   }
-
 
   /**
    * Check if reCaptcha settings is avilable to add on form.
@@ -98,11 +97,10 @@ class CRM_Utils_ReCAPTCHA {
       require_once 'packages/recaptcha/recaptchalib.php';
     }
 
-    // See if we are using SSL
-    if (CRM_Utils_System::isSSL()) {
-      $useSSL = TRUE;
-    }
-    $html = recaptcha_get_html($config->recaptchaPublicKey, $error, $useSSL);
+    // Load the Recaptcha api.js over HTTPS
+    $useHTTPS = TRUE;
+
+    $html = recaptcha_get_html($config->recaptchaPublicKey, $error, $useHTTPS);
 
     $form->assign('recaptchaHTML', $html);
     $form->assign('recaptchaOptions', $config->recaptchaOptions);

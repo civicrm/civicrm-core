@@ -2,7 +2,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -52,18 +52,7 @@
     {/if}
   </table>
 
-  <div id="customData"></div>
-  {*include custom data js file*}
-  {include file="CRM/common/customData.tpl"}
-  {literal}
-    <script type="text/javascript">
-      CRM.$(function($) {
-        {/literal}
-        CRM.buildCustomData( '{$customDataType}' );
-        {literal}
-      });
-    </script>
-  {/literal}
+  {include file="CRM/common/customDataBlock.tpl"}
 
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

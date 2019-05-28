@@ -4,7 +4,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -95,7 +95,6 @@ class CRM_SMS_ProviderTest extends CiviUnitTestCase {
     $activity = $this->callAPISuccess('activity', 'getsingle', array('id' => $result->id, 'return' => array('source_contact_id', 'target_contact_id', 'assignee_contact_id')));
     $this->assertEquals($contact['id'], $activity['source_contact_id']);
   }
-
 
   public function smsHookTest(&$message) {
     $testSourceContact = $this->individualCreate(array('phone' => array(1 => array('phone' => '+61487654321'))));

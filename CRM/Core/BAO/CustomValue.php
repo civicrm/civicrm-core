@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -157,7 +157,6 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
     }
   }
 
-
   /**
    * @param array $formValues
    * @return null
@@ -183,14 +182,14 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
 
       if (is_array($formValues[$key])) {
         if (!in_array(key($formValues[$key]), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
-          $formValues[$key] = array('IN' => $formValues[$key]);
+          $formValues[$key] = ['IN' => $formValues[$key]];
         }
       }
       elseif (($htmlType == 'TextArea' ||
           ($htmlType == 'Text' && $dataType == 'String')
         ) && strstr($formValues[$key], '%')
       ) {
-        $formValues[$key] = array('LIKE' => $formValues[$key]);
+        $formValues[$key] = ['LIKE' => $formValues[$key]];
       }
     }
   }
@@ -208,9 +207,9 @@ class CRM_Core_BAO_CustomValue extends CRM_Core_DAO {
     $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $customGroupID, 'table_name');
 
     // Retrieve the $entityId so we can pass that to the hook.
-    $entityID = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM {$tableName} WHERE id = %1", array(
-      1 => array($customValueID, 'Integer'),
-    ));
+    $entityID = CRM_Core_DAO::singleValueQuery("SELECT entity_id FROM {$tableName} WHERE id = %1", [
+      1 => [$customValueID, 'Integer'],
+    ]);
 
     // delete custom value from corresponding custom value table
     $sql = "DELETE FROM {$tableName} WHERE id = {$customValueID}";

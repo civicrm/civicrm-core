@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -53,7 +53,7 @@ class CRM_Contact_Import_Page_AJAX {
     }
     else {
       $status = "<div class='description'>&nbsp; " . ts('No processing status reported yet.') . "</div>";
-      echo json_encode(array(0, $status));
+      echo json_encode([0, $status]);
     }
     CRM_Utils_System::civiExit();
   }

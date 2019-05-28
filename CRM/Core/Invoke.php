@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * Serves as a wrapper between the UserFrameWork and Core CRM
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Core_Invoke {
 
@@ -77,7 +77,8 @@ class CRM_Core_Invoke {
 
     if (!defined('CIVICRM_SYMFONY_PATH')) {
       // Traditional Civi invocation path
-      self::hackMenuRebuild($args); // may exit
+      // may exit
+      self::hackMenuRebuild($args);
       self::init($args);
       self::hackStandalone($args);
       $item = self::getItem($args);
@@ -108,13 +109,14 @@ class CRM_Core_Invoke {
    *   List of path parts.
    * @void
    */
-  static public function hackMenuRebuild($args) {
-    if (array('civicrm', 'menu', 'rebuild') == $args || array('civicrm', 'clearcache') == $args) {
+  public static function hackMenuRebuild($args) {
+    if (['civicrm', 'menu', 'rebuild'] == $args || ['civicrm', 'clearcache'] == $args) {
       // ensure that the user has a good privilege level
       if (CRM_Core_Permission::check('administer CiviCRM')) {
         self::rebuildMenuAndCaches();
         CRM_Core_Session::setStatus(ts('Cleared all CiviCRM caches (database, menu, templates)'), ts('Complete'), 'success');
-        return CRM_Utils_System::redirect(); // exits
+        // exits
+        return CRM_Utils_System::redirect();
       }
       else {
         CRM_Core_Error::fatal('You do not have permission to execute this url');
@@ -129,7 +131,7 @@ class CRM_Core_Invoke {
    *   List of path parts.
    * @void
    */
-  static public function init($args) {
+  public static function init($args) {
     // first fire up IDS and check for bad stuff
     $config = CRM_Core_Config::singleton();
 
@@ -145,7 +147,7 @@ class CRM_Core_Invoke {
    *   List of path parts.
    * @void
    */
-  static public function hackStandalone($args) {
+  public static function hackStandalone($args) {
     $config = CRM_Core_Config::singleton();
     if ($config->userFramework == 'Standalone') {
       $session = CRM_Core_Session::singleton();
@@ -165,7 +167,7 @@ class CRM_Core_Invoke {
    *   List of path parts.
    * @return array; see CRM_Core_Menu
    */
-  static public function getItem($args) {
+  public static function getItem($args) {
     if (is_array($args)) {
       // get the menu items
       $path = implode('/', $args);
@@ -192,7 +194,7 @@ class CRM_Core_Invoke {
    *   See CRM_Core_Menu.
    * @return string, HTML
    */
-  static public function runItem($item) {
+  public static function runItem($item) {
     $ids = new CRM_Core_IDS();
     $ids->check($item);
 
@@ -328,12 +330,12 @@ class CRM_Core_Invoke {
    *
    */
   public static function form($action, $contact_type, $contact_sub_type) {
-    CRM_Utils_System::setUserContext(array('civicrm/contact/search/basic', 'civicrm/contact/view'));
+    CRM_Utils_System::setUserContext(['civicrm/contact/search/basic', 'civicrm/contact/view']);
     $wrapper = new CRM_Utils_Wrapper();
 
     $properties = CRM_Core_Component::contactSubTypeProperties($contact_sub_type, 'Edit');
     if ($properties) {
-      $wrapper->run($properties['class'], ts('New %1', array(1 => $contact_sub_type)), $action, TRUE);
+      $wrapper->run($properties['class'], ts('New %1', [1 => $contact_sub_type]), $action, TRUE);
     }
     else {
       $wrapper->run('CRM_Contact_Form_Contact', ts('New Contact'), $action, TRUE);

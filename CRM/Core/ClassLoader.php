@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  * $Id$
  *
  */
@@ -63,15 +63,18 @@ class CRM_Core_ClassLoader {
   }
 
   /**
-   * @var bool TRUE if previously registered
+   * Has this been registered already.
+   *
+   * @var bool
    */
   protected $_registered;
 
   /**
+   * Class constructor.
    */
   protected function __construct() {
     $this->_registered = FALSE;
-    $this->civiTestClasses = array(
+    $this->civiTestClasses = [
       'CiviCaseTestCase',
       'CiviDBAssert',
       'CiviMailUtils',
@@ -87,7 +90,7 @@ class CRM_Core_ClassLoader {
       'Membership',
       'Participant',
       'PaypalPro',
-    );
+    ];
   }
 
   /**
@@ -133,16 +136,16 @@ class CRM_Core_ClassLoader {
     // CRM-11304
     // TODO Remove this autoloader. For civicrm-core and civicrm-packages, the composer autoloader works fine.
     // Extensions rely on include_path-based autoloading
-    spl_autoload_register(array($this, 'loadClass'), TRUE, $prepend);
+    spl_autoload_register([$this, 'loadClass'], TRUE, $prepend);
     $this->initHtmlPurifier($prepend);
 
     $this->_registered = TRUE;
-    $packages_path = implode(DIRECTORY_SEPARATOR, array($civicrm_base_path, 'packages'));
-    $include_paths = array(
+    $packages_path = implode(DIRECTORY_SEPARATOR, [$civicrm_base_path, 'packages']);
+    $include_paths = [
       '.',
       $civicrm_base_path,
       $packages_path,
-    );
+    ];
     $include_paths = implode(PATH_SEPARATOR, $include_paths);
     set_include_path($include_paths . PATH_SEPARATOR . get_include_path());
     // @todo Why do we need to load this again?
@@ -167,7 +170,7 @@ class CRM_Core_ClassLoader {
       return;
     }
     require_once $htmlPurifierPath;
-    spl_autoload_register(array('HTMLPurifier_Bootstrap', 'autoload'), TRUE, $prepend);
+    spl_autoload_register(['HTMLPurifier_Bootstrap', 'autoload'], TRUE, $prepend);
   }
 
   /**
@@ -190,7 +193,7 @@ class CRM_Core_ClassLoader {
     // we do this to prevent a autoloader errors with joomla / 3rd party packages
     // Use absolute path, since we don't know the content of include_path yet.
     // CRM-11304
-    $file = dirname(__FILE__) . '/../../packages/IDS/vendors/htmlpurifier/HTMLPurifier/Bootstrap.php';
+    $file = dirname(__FILE__) . '/../../packages/IDS/vendors/htmlpurifer/HTMLPurifier/Bootstrap.php';
     if (file_exists($file)) {
       return $file;
     }

@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -38,7 +38,7 @@
  */
 class CRM_Mailing_Task extends CRM_Core_Task {
 
-  static $objectType = 'mailing';
+  public static $objectType = 'mailing';
 
   /**
    * These tasks are the core set of tasks that the user can perform
@@ -49,13 +49,13 @@ class CRM_Mailing_Task extends CRM_Core_Task {
    */
   public static function tasks() {
     if (!(self::$_tasks)) {
-      self::$_tasks = array(
-        self::TASK_PRINT => array(
+      self::$_tasks = [
+        self::TASK_PRINT => [
           'title' => ts('Print Mailing Recipients'),
           'class' => 'CRM_Mailing_Form_Task_Print',
           'result' => FALSE,
-        ),
-      );
+        ],
+      ];
 
       parent::tasks();
     }
@@ -73,8 +73,8 @@ class CRM_Mailing_Task extends CRM_Core_Task {
    * @return array
    *   set of tasks that are valid for the user
    */
-  public static function permissionedTaskTitles($permission, $params = array()) {
-    $tasks = array();
+  public static function permissionedTaskTitles($permission, $params = []) {
+    $tasks = [];
 
     $tasks = parent::corePermissionedTaskTitles($tasks, $permission, $params);
     return $tasks;
@@ -96,10 +96,10 @@ class CRM_Mailing_Task extends CRM_Core_Task {
       $value = self::TASK_PRINT;
     }
 
-    return array(
+    return [
       self::$_tasks[$value]['class'],
       self::$_tasks[$value]['result'],
-    );
+    ];
   }
 
 }

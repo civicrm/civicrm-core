@@ -279,7 +279,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
         [NULL, ['wrong' => NULL, 'right' => ['foo' => 1, 'bar' => 2]]], [1, 'wrong'], 'nada', 'nada',
       ],
       [
-        [NULL, ['wrong' => NULL, 'right' => ['foo' => 1, 'bar' => 2]]], [1, 'right'], NULL, ['foo' => 1, 'bar' => 2]
+        [NULL, ['wrong' => NULL, 'right' => ['foo' => 1, 'bar' => 2]]], [1, 'right'], NULL, ['foo' => 1, 'bar' => 2],
       ],
       [
         [NULL, ['wrong' => NULL, 'right' => ['foo' => 1, 'bar' => 2]]], [1, 'right', 'foo'], NULL, 1,
@@ -290,6 +290,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
   /**
    * @param $array
    * @param $path
+   * @param $default
    * @param $expected
    * @dataProvider getRecursiveValueExamples
    */
@@ -318,6 +319,7 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
   /**
    * Test the build recursive function.
    *
+   * @param $source
    * @param $path
    * @param $expected
    *
@@ -326,6 +328,45 @@ class CRM_Utils_ArrayTest extends CiviUnitTestCase {
   public function testBuildRecursiveValue($source, $path, $expected) {
     CRM_Utils_Array::pathSet($source, $path, 'llama');
     $this->assertEquals($expected, $source);
+  }
+
+  /**
+   * Test the flatten function
+   */
+  public function testFlatten() {
+    $data = [
+      'my_array' => [
+        '0' => 'bar',
+        '1' => 'baz',
+        '2' => 'boz',
+      ],
+      'my_complex' => [
+        'dog' => 'woof',
+        'asdf' => [
+          'my_zero' => 0,
+          'my_int' => 1,
+          'my_null' => NULL,
+          'my_empty' => '',
+        ],
+      ],
+      'my_simple' => 999,
+    ];
+
+    $expected = [
+      'my_array.0' => 'bar',
+      'my_array.1' => 'baz',
+      'my_array.2' => 'boz',
+      'my_complex.dog' => 'woof',
+      'my_complex.asdf.my_zero' => 0,
+      'my_complex.asdf.my_int' => 1,
+      'my_complex.asdf.my_null' => NULL,
+      'my_complex.asdf.my_empty' => '',
+      'my_simple' => 999,
+    ];
+
+    $flat = [];
+    CRM_Utils_Array::flatten($data, $flat);
+    $this->assertEquals($flat, $expected);
   }
 
 }

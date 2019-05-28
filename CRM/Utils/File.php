@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -139,7 +139,7 @@ class CRM_Utils_File {
    * @throws Exception
    */
   public static function cleanDir($target, $rmdir = TRUE, $verbose = TRUE) {
-    static $exceptions = array('.', '..');
+    static $exceptions = ['.', '..'];
     if ($target == '' || $target == '/' || !$target) {
       throw new Exception("Overly broad deletion");
     }
@@ -154,7 +154,7 @@ class CRM_Utils_File {
           }
           elseif (is_file($object)) {
             if (!unlink($object)) {
-              CRM_Core_Session::setStatus(ts('Unable to remove file %1', array(1 => $object)), ts('Warning'), 'error');
+              CRM_Core_Session::setStatus(ts('Unable to remove file %1', [1 => $object]), ts('Warning'), 'error');
             }
           }
         }
@@ -164,12 +164,12 @@ class CRM_Utils_File {
       if ($rmdir) {
         if (rmdir($target)) {
           if ($verbose) {
-            CRM_Core_Session::setStatus(ts('Removed directory %1', array(1 => $target)), '', 'success');
+            CRM_Core_Session::setStatus(ts('Removed directory %1', [1 => $target]), '', 'success');
           }
           return TRUE;
         }
         else {
-          CRM_Core_Session::setStatus(ts('Unable to remove directory %1', array(1 => $target)), ts('Warning'), 'error');
+          CRM_Core_Session::setStatus(ts('Unable to remove directory %1', [1 => $target]), ts('Warning'), 'error');
         }
       }
     }
@@ -280,7 +280,7 @@ class CRM_Utils_File {
       // I think this fn should default to forward-slash instead.
       $slash = DIRECTORY_SEPARATOR;
     }
-    if (!in_array(substr($path, -1, 1), array('/', '\\'))) {
+    if (!in_array(substr($path, -1, 1), ['/', '\\'])) {
       $path .= $slash;
     }
     return $path;
@@ -500,7 +500,7 @@ class CRM_Utils_File {
    */
   public static function getFilesByExtension($path, $ext) {
     $path = self::addTrailingSlash($path);
-    $files = array();
+    $files = [];
     if ($dh = opendir($path)) {
       while (FALSE !== ($elem = readdir($dh))) {
         if (substr($elem, -(strlen($ext) + 1)) == '.' . $ext) {
@@ -526,8 +526,16 @@ class CRM_Utils_File {
     if (!empty($dir) && is_dir($dir)) {
       $htaccess = <<<HTACCESS
 <Files "*">
-  Order allow,deny
-  Deny from all
+# Apache 2.2
+  <IfModule !authz_core_module>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+
+# Apache 2.4+
+  <IfModule authz_core_module>
+    Require all denied
+  </IfModule>
 </Files>
 
 HTACCESS;
@@ -743,11 +751,11 @@ HTACCESS;
    */
   public static function findFiles($dir, $pattern, $relative = FALSE) {
     if (!is_dir($dir)) {
-      return array();
+      return [];
     }
     $dir = rtrim($dir, '/');
-    $todos = array($dir);
-    $result = array();
+    $todos = [$dir];
+    $result = [];
     while (!empty($todos)) {
       $subdir = array_shift($todos);
       $matches = glob("$subdir/$pattern");
@@ -797,7 +805,8 @@ HTACCESS;
       }
     }
     if (empty($childParts)) {
-      return FALSE; // same directory
+      // same directory
+      return FALSE;
     }
     else {
       return TRUE;
@@ -828,7 +837,7 @@ HTACCESS;
 
     CRM_Utils_File::copyDir($fromDir, $toDir);
     if (!CRM_Utils_File::cleanDir($fromDir, TRUE, FALSE)) {
-      CRM_Core_Session::setStatus(ts('Failed to clean temp dir: %1', array(1 => $fromDir)), '', 'alert');
+      CRM_Core_Session::setStatus(ts('Failed to clean temp dir: %1', [1 => $fromDir]), '', 'alert');
       return FALSE;
     }
     return TRUE;
@@ -841,17 +850,17 @@ HTACCESS;
    * @param string $fileName
    * @param array $extraParams
    */
-  public static function formatFile(&$param, $fileName, $extraParams = array()) {
+  public static function formatFile(&$param, $fileName, $extraParams = []) {
     if (empty($param[$fileName])) {
       return;
     }
 
-    $fileParams = array(
+    $fileParams = [
       'uri' => $param[$fileName]['name'],
       'type' => $param[$fileName]['type'],
       'location' => $param[$fileName]['name'],
       'upload_date' => date('YmdHis'),
-    ) + $extraParams;
+    ] + $extraParams;
 
     $param[$fileName] = $fileParams;
   }
@@ -917,7 +926,19 @@ HTACCESS;
     else {
       $path = $url = $imageURL;
     }
-    $mimeType = 'image/' . strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    $fileExtension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    //According to (https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Complete_list_of_MIME_types),
+    // there are some extensions that would need translating.:
+    $translateMimeTypes = [
+      'tif' => 'tiff',
+      'jpg' => 'jpeg',
+      'svg' => 'svg+xml',
+    ];
+    $mimeType = 'image/' . CRM_Utils_Array::value(
+      $fileExtension,
+      $translateMimeTypes,
+      $fileExtension
+    );
 
     return self::getFileURL($path, $mimeType, $url);
   }
@@ -1032,6 +1053,50 @@ HTACCESS;
       }
     }
     return $iconClasses['*'];
+  }
+
+  /**
+   * Is the filename a safe and valid filename passed in from URL
+   *
+   * @param string $fileName
+   * @return bool
+   */
+  public static function isValidFileName($fileName = NULL) {
+    if ($fileName) {
+      $check = $fileName !== basename($fileName) ? FALSE : TRUE;
+      if ($check) {
+        if (substr($fileName, 0, 1) == '/' || substr($fileName, 0, 1) == '.' || substr($fileName, 0, 1) == DIRECTORY_SEPARATOR) {
+          $check = FALSE;
+        }
+      }
+      return $check;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Get the extensions that this MimeTpe is for
+   * @param string $mimeType the mime-type we want extensions for
+   * @return array
+   */
+  public static function getAcceptableExtensionsForMimeType($mimeType = NULL) {
+    $mapping = \MimeType\Mapping::$types;
+    $extensions = [];
+    foreach ($mapping as $extension => $type) {
+      if ($mimeType == $type) {
+        $extensions[] = $extension;
+      }
+    }
+    return $extensions;
+  }
+
+  /**
+   * Get the extension of a file based on its path
+   * @param string $path path of the file to query
+   * @return string
+   */
+  public static function getExtensionFromPath($path) {
+    return pathinfo($path, PATHINFO_EXTENSION);
   }
 
 }

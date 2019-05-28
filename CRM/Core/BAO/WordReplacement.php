@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -79,7 +79,6 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
     }
     return $wordReplacement;
   }
-
 
   /**
    * Save the values of a WordReplacement.
@@ -153,11 +152,11 @@ SELECT find_word,replace_word,is_active,match_type
 FROM   civicrm_word_replacement
 WHERE  domain_id = %1
 ";
-    $params = array(1 => array($id, 'Integer'));
+    $params = [1 => [$id, 'Integer']];
 
     $dao = CRM_Core_DAO::executeQuery($query, $params);
 
-    $overrides = array();
+    $overrides = [];
 
     while ($dao->fetch()) {
       if ($dao->is_active == 1) {
@@ -223,26 +222,26 @@ WHERE  domain_id = %1
    * @see CRM_Core_BAO_WordReplacement::convertConfigArraysToAPIParams
    */
   public static function getConfigArraysAsAPIParams($rebuildEach) {
-    $settingsResult = civicrm_api3('Setting', 'get', array(
+    $settingsResult = civicrm_api3('Setting', 'get', [
       'return' => 'lcMessages',
-    ));
+    ]);
     $returnValues = CRM_Utils_Array::first($settingsResult['values']);
     $lang = $returnValues['lcMessages'];
 
-    $wordReplacementCreateParams = array();
+    $wordReplacementCreateParams = [];
     // get all domains
-    $result = civicrm_api3('domain', 'get', array(
-      'return' => array('locale_custom_strings'),
-    ));
+    $result = civicrm_api3('domain', 'get', [
+      'return' => ['locale_custom_strings'],
+    ]);
     if (!empty($result["values"])) {
       foreach ($result["values"] as $value) {
-        $params = array();
+        $params = [];
         $params["domain_id"] = $value["id"];
-        $params["options"] = array('wp-rebuild' => $rebuildEach);
+        $params["options"] = ['wp-rebuild' => $rebuildEach];
         // Unserialize word match string.
         $localeCustomArray = unserialize($value["locale_custom_strings"]);
         if (!empty($localeCustomArray)) {
-          $wordMatchArray = array();
+          $wordMatchArray = [];
           // Only return the replacement strings of the current language,
           // otherwise some replacements will be duplicated, which will
           // lead to undesired results, like CRM-19683.
@@ -279,10 +278,10 @@ WHERE  domain_id = %1
    * bug-fix in both places.
    */
   public static function rebuildWordReplacementTable() {
-    civicrm_api3('word_replacement', 'replace', array(
-      'options' => array('match' => array('domain_id', 'find_word')),
+    civicrm_api3('word_replacement', 'replace', [
+      'options' => ['match' => ['domain_id', 'find_word']],
       'values' => self::getConfigArraysAsAPIParams(FALSE),
-    ));
+    ]);
     CRM_Core_BAO_WordReplacement::rebuild();
   }
 
@@ -312,11 +311,11 @@ WHERE  domain_id = %1
    */
   private static function _getLocaleCustomStrings($domainId) {
     // TODO: Would it be worthwhile using memcache here?
-    $domain = CRM_Core_DAO::executeQuery('SELECT locale_custom_strings FROM civicrm_domain WHERE id = %1', array(
-      1 => array($domainId, 'Integer'),
-    ));
+    $domain = CRM_Core_DAO::executeQuery('SELECT locale_custom_strings FROM civicrm_domain WHERE id = %1', [
+      1 => [$domainId, 'Integer'],
+    ]);
     while ($domain->fetch()) {
-      return empty($domain->locale_custom_strings) ? array() : unserialize($domain->locale_custom_strings);
+      return empty($domain->locale_custom_strings) ? [] : unserialize($domain->locale_custom_strings);
     }
   }
 
@@ -345,10 +344,10 @@ WHERE  domain_id = %1
    * @param string $lcs
    */
   private static function _setLocaleCustomStrings($domainId, $lcs) {
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_domain SET locale_custom_strings = %1 WHERE id = %2", array(
-      1 => array(serialize($lcs), 'String'),
-      2 => array($domainId, 'Integer'),
-    ));
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_domain SET locale_custom_strings = %1 WHERE id = %2", [
+      1 => [serialize($lcs), 'String'],
+      2 => [$domainId, 'Integer'],
+    ]);
   }
 
 }

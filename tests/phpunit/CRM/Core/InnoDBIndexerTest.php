@@ -5,6 +5,7 @@
  * @group headless
  */
 class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
+
   public function tearDown() {
     // May or may not cleanup well if there's a bug in the indexer.
     // This is better than nothing -- and better than duplicating the
@@ -28,8 +29,10 @@ class CRM_Core_InnoDBIndexerTest extends CiviUnitTestCase {
 
     $this->assertTrue($idx->hasDeclaredIndex('civicrm_contact', array('first_name', 'last_name')));
     $this->assertTrue($idx->hasDeclaredIndex('civicrm_contact', array('last_name', 'first_name')));
-    $this->assertTrue($idx->hasDeclaredIndex('civicrm_contact', array('first_name'))); // not sure if this is right behavior
-    $this->assertTrue($idx->hasDeclaredIndex('civicrm_contact', array('last_name'))); // not sure if this is right behavior
+    // not sure if this is right behavior
+    $this->assertTrue($idx->hasDeclaredIndex('civicrm_contact', array('first_name')));
+    // not sure if this is right behavior
+    $this->assertTrue($idx->hasDeclaredIndex('civicrm_contact', array('last_name')));
     $this->assertTrue($idx->hasDeclaredIndex('civicrm_contact', array('foo')));
     $this->assertFalse($idx->hasDeclaredIndex('civicrm_contact', array('whiz')));
 

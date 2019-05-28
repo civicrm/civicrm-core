@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -46,19 +46,20 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
   /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_limit = NULL;
 
   /**
    * Prefix for the controller.
+   * @var string
    */
   protected $_prefix = "pledge_";
 
@@ -71,17 +72,8 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
     $this->_actionButtonName = $this->getButtonName('next', 'action');
 
     $this->_done = FALSE;
-    $this->defaults = array();
 
-    // we allow the controller to set force/reset externally, useful when we are being
-    // driven by the wizard framework
-
-    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
-    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean', $this, FALSE);
-    $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive', $this);
-    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'search');
-
-    $this->assign("context", $this->_context);
+    $this->loadStandardSearchOptionsFromUrl();
 
     // get user submitted values
     // get it from controller only if form has been submitted, else preProcess has set this
@@ -240,7 +232,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
       $this->_formValues["pledge_test"] = 0;
     }
 
-    foreach (array('pledge_amount_low', 'pledge_amount_high') as $f) {
+    foreach (['pledge_amount_low', 'pledge_amount_high'] as $f) {
       if (isset($this->_formValues[$f])) {
         $this->_formValues[$f] = CRM_Utils_Rule::cleanMoney($this->_formValues[$f]);
       }
@@ -319,25 +311,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    * @see valid_date
    */
   public function addRules() {
-    $this->addFormRule(array('CRM_Pledge_Form_Search', 'formRule'));
-  }
-
-  /**
-   * Global validation rules for the form.
-   *
-   * @param array $fields
-   *   Posted values of the form.
-   *
-   * @return array|bool
-   */
-  public static function formRule($fields) {
-    $errors = array();
-
-    if (!empty($errors)) {
-      return $errors;
-    }
-
-    return TRUE;
+    $this->addFormRule(['CRM_Pledge_Form_Search', 'formRule']);
   }
 
   /**
@@ -348,7 +322,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
    *   the default array reference
    */
   public function setDefaultValues() {
-    $defaults = array();
+    $defaults = [];
     $defaults = $this->_formValues;
     return $defaults;
   }
@@ -361,8 +335,8 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
     // set pledge payment related fields
     $status = CRM_Utils_Request::retrieve('status', 'String');
     if ($status) {
-      $this->_formValues['pledge_payment_status_id'] = array($status => 1);
-      $this->_defaults['pledge_payment_status_id'] = array($status => 1);
+      $this->_formValues['pledge_payment_status_id'] = [$status => 1];
+      $this->_defaults['pledge_payment_status_id'] = [$status => 1];
     }
 
     $fromDate = CRM_Utils_Request::retrieve('start', 'Date');
@@ -388,7 +362,7 @@ class CRM_Pledge_Form_Search extends CRM_Core_Form_Search {
       // we need set all statuses except Cancelled
       unset($statusValues[$pledgeStatus]);
 
-      $statuses = array();
+      $statuses = [];
       foreach ($statusValues as $statusId => $value) {
         $statuses[$statusId] = 1;
       }

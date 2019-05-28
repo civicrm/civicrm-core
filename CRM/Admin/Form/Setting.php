@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2018
+ * @copyright CiviCRM LLC (c) 2004-2019
  */
 
 /**
@@ -38,7 +38,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
   use CRM_Admin_Form_SettingTrait;
 
-  protected $_settings = array();
+  protected $_settings = [];
 
   protected $includesReadOnlyFields;
 
@@ -49,8 +49,8 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    */
   public function setDefaultValues() {
     if (!$this->_defaults) {
-      $this->_defaults = array();
-      $formArray = array('Component', 'Localization');
+      $this->_defaults = [];
+      $formArray = ['Component', 'Localization'];
       $formMode = FALSE;
       if (in_array($this->_name, $formArray)) {
         $formMode = TRUE;
@@ -58,9 +58,7 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
 
       $this->setDefaultsForMetadataDefinedFields();
 
-      // @todo thise should be retrievable from the above function.
-      $this->_defaults['contact_autocomplete_options'] = self::getAutocompleteContactSearch();
-      $this->_defaults['contact_reference_options'] = self::getAutocompleteContactReference();
+      // @todo these should be retrievable from the above function.
       $this->_defaults['enableSSL'] = Civi::settings()->get('enableSSL');
       $this->_defaults['verifySSL'] = Civi::settings()->get('verifySSL');
       $this->_defaults['environment'] = CRM_Core_Config::environment();
@@ -75,23 +73,22 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
-    $this->addButtons(array(
-        array(
-          'type' => 'next',
-          'name' => ts('Save'),
-          'isDefault' => TRUE,
-        ),
-        array(
-          'type' => 'cancel',
-          'name' => ts('Cancel'),
-        ),
-      )
-    );
+    $this->addButtons([
+      [
+        'type' => 'next',
+        'name' => ts('Save'),
+        'isDefault' => TRUE,
+      ],
+      [
+        'type' => 'cancel',
+        'name' => ts('Cancel'),
+      ],
+    ]);
 
     $this->addFieldsDefinedInSettingsMetadata();
 
     if ($this->includesReadOnlyFields) {
-      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', array('expires' => 0));
+      CRM_Core_Session::setStatus(ts("Some fields are loaded as 'readonly' as they have been set (overridden) in civicrm.settings.php."), '', 'info', ['expires' => 0]);
     }
   }
 
@@ -115,29 +112,15 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    */
   public function commonProcess(&$params) {
 
-    // save autocomplete search options
-    if (!empty($params['contact_autocomplete_options'])) {
-      Civi::settings()->set('contact_autocomplete_options',
-        CRM_Utils_Array::implodePadded(array_keys($params['contact_autocomplete_options'])));
-      unset($params['contact_autocomplete_options']);
-    }
-
-    // save autocomplete contact reference options
-    if (!empty($params['contact_reference_options'])) {
-      Civi::settings()->set('contact_reference_options',
-        CRM_Utils_Array::implodePadded(array_keys($params['contact_reference_options'])));
-      unset($params['contact_reference_options']);
-    }
-
     // save components to be enabled
     if (array_key_exists('enableComponents', $params)) {
-      civicrm_api3('setting', 'create', array(
+      civicrm_api3('setting', 'create', [
         'enable_components' => $params['enableComponents'],
-      ));
+      ]);
       unset($params['enableComponents']);
     }
 
-    foreach (array('verifySSL', 'enableSSL') as $name) {
+    foreach (['verifySSL', 'enableSSL'] as $name) {
       if (isset($params[$name])) {
         Civi::settings()->set($name, $params[$name]);
         unset($params[$name]);
@@ -159,7 +142,8 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     }
 
     CRM_Core_Config::clearDBCache();
-    Civi::cache('session')->clear(); // This doesn't make a lot of sense to me, but it maintains pre-existing behavior.
+    // This doesn't make a lot of sense to me, but it maintains pre-existing behavior.
+    Civi::cache('session')->clear();
     CRM_Utils_System::flushCache();
     CRM_Core_Resources::singleton()->resetCacheCode();
 
@@ -176,53 +160,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
     // also delete the IDS file so we can write a new correct one on next load
     $configFile = $config->uploadDir . 'Config.IDS.ini';
     @unlink($configFile);
-  }
-
-  /**
-   * Ugh, this shouldn't exist.
-   *
-   * Get the selected values of "contact_reference_options" formatted for checkboxes.
-   *
-   * @return array
-   */
-  public static function getAutocompleteContactReference() {
-    $cRlist = array_flip(CRM_Core_OptionGroup::values('contact_reference_options',
-      FALSE, FALSE, TRUE, NULL, 'name'
-    ));
-    $cRlistEnabled = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'contact_reference_options'
-    );
-    $cRSearchFields = array();
-    if (!empty($cRlist) && !empty($cRlistEnabled)) {
-      $cRSearchFields = array_combine($cRlist, $cRlistEnabled);
-    }
-    return array(
-      '1' => 1,
-    ) + $cRSearchFields;
-  }
-
-  /**
-   * Ugh, this shouldn't exist.
-   *
-   * Get the selected values of "contact_autocomplete_options" formatted for checkboxes.
-   *
-   * @return array
-   */
-  public static function getAutocompleteContactSearch() {
-    $list = array_flip(CRM_Core_OptionGroup::values('contact_autocomplete_options',
-      FALSE, FALSE, TRUE, NULL, 'name'
-    ));
-    $listEnabled = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-      'contact_autocomplete_options'
-    );
-    $autoSearchFields = array();
-    if (!empty($list) && !empty($listEnabled)) {
-      $autoSearchFields = array_combine($list, $listEnabled);
-    }
-    //Set defaults for autocomplete and contact reference options
-    return array(
-      '1' => 1,
-    ) + $autoSearchFields;
   }
 
 }

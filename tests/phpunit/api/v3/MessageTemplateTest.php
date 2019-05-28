@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 5                                                  |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2018                                |
+ | Copyright CiviCRM LLC (c) 2004-2019                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,12 +32,9 @@
  * @group headless
  */
 class api_v3_MessageTemplateTest extends CiviUnitTestCase {
-  /**
-   * Assume empty database with just civicrm_data.
-   */
+
   protected $entity = 'MessageTemplate';
   protected $params;
-
 
   public function setUp() {
     $this->_apiversion = 3;
