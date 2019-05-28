@@ -155,8 +155,8 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
     // build cache key and use to it to fetch prev-next cache record
     $cacheKey = 'civicrm search ' . $key;
     $contacts = CRM_Utils_SQL_Select::from('civicrm_prevnext_cache')
-      ->select(['entity_id1', 'cacheKey'])
-      ->where("cacheKey = @key")
+      ->select(['entity_id1', 'cachekey'])
+      ->where("cachekey = @key")
       ->param('key', $cacheKey)
       ->execute()
       ->fetchAll();
@@ -164,7 +164,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
     // check the prevNext record matches
     $expectedEntry = [
       'entity_id1' => $contactID,
-      'cacheKey' => $cacheKey,
+      'cachekey' => $cacheKey,
     ];
     $this->checkArrayEquals($contacts[0], $expectedEntry);
   }

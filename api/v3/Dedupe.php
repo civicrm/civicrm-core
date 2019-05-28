@@ -43,13 +43,6 @@ function civicrm_api3_dedupe_get($params) {
   $sql = CRM_Utils_SQL_Select::fragment();
   $sql->where(['merge_data_restriction' => "cachekey LIKE 'merge_%'"]);
 
-  if (isset($params['cachekey'])) {
-    // This is so bad. We actually have a camel case field name in the DB. Don't do that.
-    // Intercept the pain here.
-    $params['cacheKey'] = $params['cachekey'];
-    unset($params['cachekey']);
-  }
-
   $options = _civicrm_api3_get_options_from_params($params, TRUE, 'PrevNextCache', 'get');
   $result = _civicrm_api3_basic_get('CRM_Core_BAO_PrevNextCache', $params, FALSE, 'PrevNextCache', $sql);
 
@@ -59,10 +52,6 @@ function civicrm_api3_dedupe_get($params) {
   foreach ($result as $index => $values) {
     if (isset($values['data']) && !empty($values['data'])) {
       $result[$index]['data'] = unserialize($values['data']);
-    }
-    if (isset($values['cacheKey'])) {
-      $result[$index]['cachekey'] = $result[$index]['cacheKey'];
-      unset($result[$index]['cacheKey']);
     }
   }
   return civicrm_api3_create_success($result, $params, 'PrevNextCache');

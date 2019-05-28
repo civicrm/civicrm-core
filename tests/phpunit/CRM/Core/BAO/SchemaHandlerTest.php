@@ -256,7 +256,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     );
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_prevnext_cache', 'index_all');
     //Missing Column `is_selected`.
-    CRM_Core_DAO::executeQuery('CREATE INDEX index_all ON civicrm_prevnext_cache (cacheKey, entity_id1, entity_id2, entity_table)');
+    CRM_Core_DAO::executeQuery('CREATE INDEX index_all ON civicrm_prevnext_cache (cachekey, entity_id1, entity_id2, entity_table)');
     $missingIndices = CRM_Core_BAO_SchemaHandler::getMissingIndices();
     $this->assertNotEmpty($missingIndices);
 

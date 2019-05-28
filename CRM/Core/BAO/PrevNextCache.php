@@ -58,7 +58,7 @@ class CRM_Core_BAO_PrevNextCache extends CRM_Core_DAO_PrevNextCache {
       $query = "
 SELECT id
 FROM   civicrm_prevnext_cache
-WHERE  cacheKey     = %3 AND
+WHERE  cachekey     = %3 AND
        entity_id1 = %1 AND
        entity_id2 = %2 AND
        entity_table = 'civicrm_contact'
@@ -87,7 +87,7 @@ WHERE  cacheKey     = %3 AND
         2 => [$cacheKey, 'String'],
       ];
       $sql = "SELECT pn.id, pn.entity_id1, pn.entity_id2, pn.data FROM civicrm_prevnext_cache pn {$join} ";
-      $wherePrev = " WHERE pn.id < %1 AND pn.cacheKey = %2 {$where} ORDER BY ID DESC LIMIT 1";
+      $wherePrev = " WHERE pn.id < %1 AND pn.cachekey = %2 {$where} ORDER BY ID DESC LIMIT 1";
       $sqlPrev = $sql . $wherePrev;
 
       $dao = CRM_Core_DAO::executeQuery($sqlPrev, $p);
@@ -98,7 +98,7 @@ WHERE  cacheKey     = %3 AND
         $pos['prev']['data'] = $dao->data;
       }
 
-      $whereNext = " WHERE pn.id > %1 AND pn.cacheKey = %2 {$where} ORDER BY ID ASC LIMIT 1";
+      $whereNext = " WHERE pn.id > %1 AND pn.cachekey = %2 {$where} ORDER BY ID ASC LIMIT 1";
       $sqlNext = $sql . $whereNext;
 
       $dao = CRM_Core_DAO::executeQuery($sqlNext, $p);
@@ -131,7 +131,7 @@ WHERE  cacheKey     = %3 AND
     }
 
     if (isset($cacheKey)) {
-      $sql .= " AND cacheKey LIKE %3";
+      $sql .= " AND cachekey LIKE %3";
       $params[3] = ["{$cacheKey}%", 'String'];
     }
     CRM_Core_DAO::executeQuery($sql, $params);
@@ -155,7 +155,7 @@ WHERE  cacheKey     = %3 AND
     $params[3] = [$id2, 'Integer'];
 
     if (isset($cacheKey)) {
-      $sql .= " AND cacheKey LIKE %4";
+      $sql .= " AND cachekey LIKE %4";
       // used % to address any row with conflict-cacheKey e.g "merge Individual_8_0_conflicts"
       $params[4] = ["{$cacheKey}%", 'String'];
     }
@@ -182,7 +182,7 @@ WHERE  cacheKey     = %3 AND
       FROM  civicrm_prevnext_cache pn
       WHERE
       ((pn.entity_id1 = %1 AND pn.entity_id2 = %2) OR (pn.entity_id1 = %2 AND pn.entity_id2 = %1)) AND
-      (cacheKey = %3 OR cacheKey = %4)";
+      (cachekey = %3 OR cachekey = %4)";
     $params = [
       1 => [$id1, 'Integer'],
       2 => [$id2, 'Integer'],
@@ -201,7 +201,7 @@ WHERE  cacheKey     = %3 AND
         $pncUp->id = $pncFind->id;
         if ($pncUp->find(TRUE)) {
           $pncUp->data     = serialize($data);
-          $pncUp->cacheKey = "{$cacheKey}_conflicts";
+          $pncUp->cachekey = "{$cacheKey}_conflicts";
           $pncUp->save();
         }
       }
@@ -251,11 +251,11 @@ WHERE  cacheKey     = %3 AND
       $whereClause = " AND " . $whereClause;
     }
     if ($includeConflicts) {
-      $where = ' WHERE (pn.cacheKey = %1 OR pn.cacheKey = %2)' . $whereClause;
+      $where = ' WHERE (pn.cachekey = %1 OR pn.cachekey = %2)' . $whereClause;
       $params[2] = ["{$cacheKey}_conflicts", 'String'];
     }
     else {
-      $where = ' WHERE (pn.cacheKey = %1)' . $whereClause;
+      $where = ' WHERE (pn.cachekey = %1)' . $whereClause;
     }
 
     $query = "
@@ -318,7 +318,7 @@ FROM   civicrm_prevnext_cache pn
    * @param $values
    */
   public static function setItem($values) {
-    $insert = "INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cacheKey, data ) VALUES \n";
+    $insert = "INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cachekey, data ) VALUES \n";
     $query = $insert . implode(",\n ", $values);
 
     //dump the dedupe matches in the prevnext_cache table
@@ -341,7 +341,7 @@ FROM   civicrm_prevnext_cache pn
     $query = "
 SELECT COUNT(*) FROM civicrm_prevnext_cache pn
        {$join}
-WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
+WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
 ";
     if ($where) {
       $query .= " AND {$where}";
@@ -385,7 +385,7 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
     }
 
     // 1. Clear cache if any
-    $sql = "DELETE FROM civicrm_prevnext_cache WHERE  cacheKey LIKE %1";
+    $sql = "DELETE FROM civicrm_prevnext_cache WHERE  cachekey LIKE %1";
     CRM_Core_DAO::executeQuery($sql, [1 => ["{$cacheKeyString}%", 'String']]);
 
     // FIXME: we need to start using temp tables / queries here instead of arrays.
@@ -427,7 +427,7 @@ WHERE (pn.cacheKey $op %1 OR pn.cacheKey $op %2)
     $sql = "
 DELETE     pn, c
 FROM       civicrm_cache c
-INNER JOIN civicrm_prevnext_cache pn ON c.path = pn.cacheKey
+INNER JOIN civicrm_prevnext_cache pn ON c.path = pn.cachekey
 WHERE      c.group_name = %1
 AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
 ";
@@ -507,8 +507,8 @@ AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
    *   The globally-unique ID of the test object.
    */
   protected function assignTestValue($fieldName, &$fieldDef, $counter) {
-    if ($fieldName === 'cacheKey') {
-      $this->cacheKey = 'merge_' . rand();
+    if ($fieldName === 'cachekey') {
+      $this->cachekey = 'merge_' . rand();
       return;
     }
     if ($fieldName === 'data') {

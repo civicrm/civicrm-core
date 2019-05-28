@@ -1047,7 +1047,7 @@ LIMIT {$offset}, {$rowCount}
       $params[2]   = [$pnid, 'Integer'];
     }
 
-    $sql = "UPDATE civicrm_prevnext_cache SET is_selected = %1 WHERE {$whereClause} AND cacheKey LIKE %3";
+    $sql = "UPDATE civicrm_prevnext_cache SET is_selected = %1 WHERE {$whereClause} AND cachekey LIKE %3";
     CRM_Core_DAO::executeQuery($sql, $params);
 
     CRM_Utils_System::civiExit();

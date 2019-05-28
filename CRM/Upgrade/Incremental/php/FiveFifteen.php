@@ -75,6 +75,14 @@ class CRM_Upgrade_Incremental_php_FiveFifteen extends CRM_Upgrade_Incremental_Ba
   public function upgrade_5_15_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Fix errant deferred revenue settings', 'updateContributeSettings');
+    $this->addTask('Fix cache key column name in prev next cache', 'fixCacheKeyColumnNamePrevNext');
+  }
+
+  public static function fixCacheKeyColumnNamePrevNext() {
+    CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_prevnext_cache', 'index_all');
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_prevnext_cache CHANGE COLUMN  cacheKey cachekey VARCHAR(255) COMMENT 'Unique path name for cache element of the searched item'");
+    CRM_Core_DAO::executeQuery("CREATE INDEX index_all ON civicrm_prevnext_cache (cachekey, entity_id1, entity_id2, entity_table, is_selected)");
+    return TRUE;
   }
 
 }
