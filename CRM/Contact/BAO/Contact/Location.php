@@ -69,7 +69,7 @@ class CRM_Contact_BAO_Contact_Location {
       (isset($contact['display_name'])) ? $contact['display_name'] : NULL,
       (isset($email['email'])) ? $email['email'] : NULL,
       (isset($email['location_type_id'])) ? $email['location_type_id'] : NULL,
-      (isset($email['id'])) ? $email['id'] : NULL
+      (isset($email['id'])) ? $email['id'] : NULL,
     );
 
     return $returnParams;
