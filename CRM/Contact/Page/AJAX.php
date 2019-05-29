@@ -624,22 +624,7 @@ LIMIT {$offset}, {$rowCount}
       return;
     }
 
-    $exception = new CRM_Dedupe_DAO_Exception();
-    $exception->contact_id1 = $cid;
-    $exception->contact_id2 = $oid;
-    //make sure contact2 > contact1.
-    if ($cid > $oid) {
-      $exception->contact_id1 = $oid;
-      $exception->contact_id2 = $cid;
-    }
-    $exception->find(TRUE);
-    $status = NULL;
-    if ($oper == 'dupe-nondupe') {
-      $status = $exception->save();
-    }
-    if ($oper == 'nondupe-dupe') {
-      $status = $exception->delete();
-    }
+    $status = self::markNonDuplicates($cid, $oid, $oper);
 
     CRM_Utils_JSON::output(['status' => ($status) ? $oper : $status]);
   }
@@ -906,6 +891,40 @@ LIMIT {$offset}, {$rowCount}
   public static function isOrQuery() {
     $searchData = CRM_Utils_Array::value('search', $_REQUEST);
     return !empty($searchData['value']);
+  }
+
+  /**
+   * Mark not duplicates.
+   *
+   * Note this function would sensibly be replaced by an api-call but extracting here to add a test first.
+   *
+   * I would have like to make it private but test class accesses it & it doesn't warrant being a BAO class
+   * as it should feel very endangered.
+   *
+   * @param int $cid
+   * @param int $oid
+   * @param 'dupe-nondupe'|'nondupe-dupe' $oper
+   *
+   * @return \CRM_Core_DAO|mixed|null
+   */
+  public static function markNonDuplicates($cid, $oid, $oper) {
+    $exception = new CRM_Dedupe_DAO_Exception();
+    $exception->contact_id1 = $cid;
+    $exception->contact_id2 = $oid;
+    //make sure contact2 > contact1.
+    if ($cid > $oid) {
+      $exception->contact_id1 = $oid;
+      $exception->contact_id2 = $cid;
+    }
+    $exception->find(TRUE);
+    $status = NULL;
+    if ($oper == 'dupe-nondupe') {
+      $status = $exception->save();
+    }
+    if ($oper == 'nondupe-dupe') {
+      $status = $exception->delete();
+    }
+    return $status;
   }
 
   /**
