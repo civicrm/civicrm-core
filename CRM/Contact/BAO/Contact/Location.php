@@ -45,21 +45,34 @@ class CRM_Contact_BAO_Contact_Location {
    *   Array of display_name, email, location type and location id if found, or (null,null,null, null)
    */
   public static function getEmailDetails($id, $isPrimary = TRUE, $locationTypeID = NULL) {
-    $params = [
-      'location_type_id' => $locationTypeID,
+    $params = array(
       'contact_id' => $id,
-      'return' => ['contact_id.display_name', 'email', 'location_type_id', 'id'],
-    ];
+      'return' => array('display_name', 'email.email'),
+      'api.Email.get' => array(
+        'location_type_id' => $locationTypeID,
+        'sequential' => 0,
+        'return' => array('email', 'location_type_id', 'id'),
+      ),
+    );
     if ($isPrimary) {
-      $params['is_primary'] = 1;
+      $params['api.Email.get']['is_primary'] = 1;
     }
-    $emails = civicrm_api3('Email', 'get', $params);
 
-    if ($emails['count'] > 0) {
-      $email = reset($emails['values']);
-      return [$email['contact_id.display_name'], $email['email'], $email['location_type_id'], $email['id']];
+    $contacts = civicrm_api3('Contact', 'get', $params);
+    if ($contacts['count'] > 0) {
+      $contact = reset($contacts['values']);
+      if ($contact['api.Email.get']['count'] > 0) {
+        $email = reset($contact['api.Email.get']['values']);
+      }
     }
-    return [NULL, NULL, NULL, NULL];
+    $returnParams = array(
+      (isset($contact['display_name'])) ? $contact['display_name'] : NULL,
+      (isset($email['email'])) ? $email['email'] : NULL,
+      (isset($email['location_type_id'])) ? $email['location_type_id'] : NULL,
+      (isset($email['id'])) ? $email['id'] : NULL
+    );
+
+    return $returnParams;
   }
 
   /**
