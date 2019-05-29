@@ -1,28 +1,28 @@
 <?php
 /*
- +--------------------------------------------------------------------+
- | CiviCRM version 5                                                  |
- +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2019                                |
- +--------------------------------------------------------------------+
- | This file is a part of CiviCRM.                                    |
- |                                                                    |
- | CiviCRM is free software; you can copy, modify, and distribute it  |
- | under the terms of the GNU Affero General Public License           |
- | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
- |                                                                    |
- | CiviCRM is distributed in the hope that it will be useful, but     |
- | WITHOUT ANY WARRANTY; without even the implied warranty of         |
- | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
- | See the GNU Affero General Public License for more details.        |
- |                                                                    |
- | You should have received a copy of the GNU Affero General Public   |
- | License and the CiviCRM Licensing Exception along                  |
- | with this program; if not, contact CiviCRM LLC                     |
- | at info[AT]civicrm[DOT]org. If you have questions about the        |
- | GNU Affero General Public License or the licensing of CiviCRM,     |
- | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
- +--------------------------------------------------------------------+
+  +--------------------------------------------------------------------+
+  | CiviCRM version 5                                                  |
+  +--------------------------------------------------------------------+
+  | Copyright CiviCRM LLC (c) 2004-2019                                |
+  +--------------------------------------------------------------------+
+  | This file is a part of CiviCRM.                                    |
+  |                                                                    |
+  | CiviCRM is free software; you can copy, modify, and distribute it  |
+  | under the terms of the GNU Affero General Public License           |
+  | Version 3, 19 November 2007 and the CiviCRM Licensing Exception.   |
+  |                                                                    |
+  | CiviCRM is distributed in the hope that it will be useful, but     |
+  | WITHOUT ANY WARRANTY; without even the implied warranty of         |
+  | MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.               |
+  | See the GNU Affero General Public License for more details.        |
+  |                                                                    |
+  | You should have received a copy of the GNU Affero General Public   |
+  | License and the CiviCRM Licensing Exception along                  |
+  | with this program; if not, contact CiviCRM LLC                     |
+  | at info[AT]civicrm[DOT]org. If you have questions about the        |
+  | GNU Affero General Public License or the licensing of CiviCRM,     |
+  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
+  +--------------------------------------------------------------------+
  */
 
 /**
@@ -45,21 +45,34 @@ class CRM_Contact_BAO_Contact_Location {
    *   Array of display_name, email, location type and location id if found, or (null,null,null, null)
    */
   public static function getEmailDetails($id, $isPrimary = TRUE, $locationTypeID = NULL) {
-    $params = [
-      'location_type_id' => $locationTypeID,
+    $params = array(
       'contact_id' => $id,
-      'return' => ['contact_id.display_name', 'email', 'location_type_id', 'id'],
-    ];
+      'return' => array('display_name', 'email.email'),
+      'api.Email.get' => array(
+        'location_type_id' => $locationTypeID,
+        'sequential' => 0,
+        'return' => array('email', 'location_type_id', 'id'),
+      ),
+    );
     if ($isPrimary) {
-      $params['is_primary'] = 1;
+      $params['api.Email.get']['is_primary'] = 1;
     }
-    $emails = civicrm_api3('Email', 'get', $params);
 
-    if ($emails['count'] > 0) {
-      $email = reset($emails['values']);
-      return [$email['contact_id.display_name'], $email['email'], $email['location_type_id'], $email['id']];
+    $contacts = civicrm_api3('Contact', 'get', $params);
+    if ($contacts['count'] > 0) {
+      $contact = reset($contacts['values']);
+      if ($contact['api.Email.get']['count'] > 0) {
+        $email = reset($contact['api.Email.get']['values']);
+      }
     }
-    return [NULL, NULL, NULL, NULL];
+    $returnParams = array(
+      (isset($contact['display_name'])) ? $contact['display_name'] : NULL,
+      (isset($email['email'])) ? $email['email'] : NULL,
+      (isset($email['location_type_id'])) ? $email['location_type_id'] : NULL,
+      (isset($email['id'])) ? $email['id'] : NULL
+    );
+
+    return $returnParams;
   }
 
   /**
@@ -170,11 +183,11 @@ AND civicrm_contact.id IN $idString ";
 
       CRM_Utils_String::append($address, '<br />',
         [
-          $dao->street_address,
-          $dao->supplemental_address_1,
-          $dao->supplemental_address_2,
-          $dao->supplemental_address_3,
-          $dao->city,
+        $dao->street_address,
+        $dao->supplemental_address_1,
+        $dao->supplemental_address_2,
+        $dao->supplemental_address_3,
+        $dao->city,
         ]
       );
       CRM_Utils_String::append($address, ', ',
