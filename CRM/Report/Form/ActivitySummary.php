@@ -415,6 +415,95 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
   }
 
   /**
+   * Build the report query.
+   *
+   * @param bool $applyLimit
+   *
+   * @return string
+   */
+  public function buildQuery($applyLimit = TRUE) {
+    $this->buildGroupTempTable();
+    $this->select();
+    $this->from();
+    $this->customDataFrom();
+    $this->buildPermissionClause();
+    $this->where();
+    $this->groupBy();
+    $this->orderBy();
+
+    foreach ($this->unselectedOrderByColumns() as $alias => $field) {
+      $clause = $this->getSelectClauseWithGroupConcatIfNotGroupedBy($field['table_name'], $field['name'], $field);
+      if (!$clause) {
+        $clause = "{$field['dbAlias']} as {$alias}";
+      }
+      $this->_select .= ", $clause ";
+    }
+
+    if ($applyLimit && empty($this->_params['charts'])) {
+      $this->limit();
+    }
+    CRM_Utils_Hook::alterReportVar('sql', $this, $this);
+
+    // order_by columns not selected for display need to be included in SELECT
+    $unselectedSectionColumns = $this->unselectedSectionColumns();
+    foreach ($unselectedSectionColumns as $alias => $section) {
+      $this->_select .= ", {$section['dbAlias']} as {$alias}";
+    }
+
+    // build temporary table column names base on column headers of result
+    $dbColumns = [];
+    foreach ($this->_columnHeaders as $fieldName => $dontCare) {
+      $dbColumns[] = $fieldName . ' VARCHAR(128)';
+    }
+
+    // create temp table to store main result
+    $this->_tempTableName = $this->createTemporaryTable('tempTable', "
+      id int unsigned NOT NULL AUTO_INCREMENT, " . implode(', ', $dbColumns) . ' , PRIMARY KEY (id)',
+    TRUE);
+
+    // build main report query
+    $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
+    $this->addToDeveloperTab($sql);
+
+    // store the result in temporary table
+    $insertCols = '';
+    $insertQuery = "INSERT INTO {$this->_tempTableName} ( " . implode(',', array_keys($this->_columnHeaders)) . " )
+{$sql}";
+    CRM_Core_DAO::executeQuery($insertQuery);
+
+    // now build the query for duration sum
+    $this->activityDurationFrom();
+    $this->where(TRUE);
+    $this->groupBy(FALSE);
+
+    // build the query to calulate duration sum
+    $sql = "SELECT SUM(activity_civireport.duration) as civicrm_activity_duration_total {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
+
+    // create temp table to store duration
+    $this->_tempDurationSumTableName = $this->createTemporaryTable('tempDurationSumTable', "
+      id int unsigned NOT NULL AUTO_INCREMENT, civicrm_activity_duration_total VARCHAR(128), PRIMARY KEY (id)",
+    TRUE);
+
+    // store the result in temporary table
+    $insertQuery = "INSERT INTO {$this->_tempDurationSumTableName} (civicrm_activity_duration_total)
+    {$sql}";
+    CRM_Core_DAO::executeQuery($insertQuery);
+
+    $sql = "SELECT {$this->_tempTableName}.*,  {$this->_tempDurationSumTableName}.civicrm_activity_duration_total
+    FROM {$this->_tempTableName} INNER JOIN {$this->_tempDurationSumTableName}
+      ON ({$this->_tempTableName}.id = {$this->_tempDurationSumTableName}.id)";
+
+    // finally add duration total to column headers
+    $this->_columnHeaders['civicrm_activity_duration_total'] = ['no_display' => 1];
+
+    // reset the sql building to default, which is used / called during other actions like "add to group"
+    $this->from();
+    $this->where();
+
+    return $sql;
+  }
+
+  /**
    * Group the fields.
    *
    * @param bool $includeSelectCol
@@ -503,100 +592,6 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
       }
     }
     return $errors;
-  }
-
-  public function postProcess() {
-    // get the acl clauses built before we assemble the query
-    $this->buildACLClause($this->_aliases['civicrm_contact']);
-
-    // get ready with post process params
-    $this->beginPostProcess();
-
-    // build query
-    $sql = $this->buildQuery();
-
-    // main sql statement
-    $this->select();
-    $this->from();
-    $this->customDataFrom();
-    $this->where();
-    $this->groupBy();
-    $this->orderBy();
-
-    // order_by columns not selected for display need to be included in SELECT
-    $unselectedSectionColumns = $this->unselectedSectionColumns();
-    foreach ($unselectedSectionColumns as $alias => $section) {
-      $this->_select .= ", {$section['dbAlias']} as {$alias}";
-    }
-
-    if (!empty($applyLimit) && empty($this->_params['charts'])) {
-      $this->limit();
-    }
-    CRM_Utils_Hook::alterReportVar('sql', $this, $this);
-
-    // build temporary table column names base on column headers of result
-    $dbColumns = [];
-    foreach ($this->_columnHeaders as $fieldName => $dontCare) {
-      $dbColumns[] = $fieldName . ' VARCHAR(128)';
-    }
-
-    // create temp table to store main result
-    $this->_tempTableName = $this->createTemporaryTable('tempTable', "
-      id int unsigned NOT NULL AUTO_INCREMENT, " . implode(', ', $dbColumns) . ' , PRIMARY KEY (id)',
-    TRUE);
-
-    // build main report query
-    $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
-
-    // store the result in temporary table
-    $insertCols = '';
-    $insertQuery = "INSERT INTO {$this->_tempTableName} ( " . implode(',', array_keys($this->_columnHeaders)) . " )
-{$sql}";
-    CRM_Core_DAO::executeQuery($insertQuery);
-
-    // now build the query for duration sum
-    $this->activityDurationFrom();
-    $this->where(TRUE);
-    $this->groupBy(FALSE);
-
-    // build the query to calulate duration sum
-    $sql = "SELECT SUM(activity_civireport.duration) as civicrm_activity_duration_total {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
-
-    // create temp table to store duration
-    $this->_tempDurationSumTableName = $this->createTemporaryTable('tempDurationSumTable', "
-      id int unsigned NOT NULL AUTO_INCREMENT, civicrm_activity_duration_total VARCHAR(128), PRIMARY KEY (id)",
-    TRUE);
-
-    // store the result in temporary table
-    $insertQuery = "INSERT INTO {$this->_tempDurationSumTableName} (civicrm_activity_duration_total)
-    {$sql}";
-    CRM_Core_DAO::executeQuery($insertQuery);
-
-    // build array of result based on column headers. This method also allows
-    // modifying column headers before using it to build result set i.e $rows.
-    $rows = [];
-    $query = "SELECT {$this->_tempTableName}.*,  {$this->_tempDurationSumTableName}.civicrm_activity_duration_total
-    FROM {$this->_tempTableName} INNER JOIN {$this->_tempDurationSumTableName}
-      ON ({$this->_tempTableName}.id = {$this->_tempDurationSumTableName}.id)";
-
-    // finally add duration total to column headers
-    $this->_columnHeaders['civicrm_activity_duration_total'] = ['no_display' => 1];
-
-    $this->buildRows($query, $rows);
-
-    // format result set.
-    $this->formatDisplay($rows);
-
-    // assign variables to templates
-    $this->doTemplateAssignment($rows);
-
-    //reset the sql building to default, which is used / called during other actions like "add to group"
-    // now build the query for duration sum
-    $this->from();
-    $this->where();
-
-    // do print / pdf / instance stuff if needed
-    $this->endPostProcess($rows);
   }
 
   /**
