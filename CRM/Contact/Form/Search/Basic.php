@@ -102,8 +102,10 @@ class CRM_Contact_Form_Search_Basic extends CRM_Contact_Form_Search {
     $defaults['sort_name'] = CRM_Utils_Array::value('sort_name', $this->_formValues);
     foreach (self::$csv as $v) {
       if (!empty($this->_formValues[$v]) && is_array($this->_formValues[$v])) {
-        $tmpArray = array_keys($this->_formValues[$v]);
-        $defaults[$v] = array_pop($tmpArray);
+        $defaults[$v] = key($this->_formValues[$v]);
+        if ($v == 'contact_type' && !empty($this->_formValues['contact_sub_type'])) {
+          $defaults[$v] .= '__' . key($this->_formValues['contact_sub_type']);
+        }
       }
       else {
         $defaults[$v] = '';
