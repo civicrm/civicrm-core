@@ -355,7 +355,6 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     $reportsToSkip = array(
       'event/income' => 'I do no understand why but error is Call to undefined method CRM_Report_Form_Event_Income::from() in CRM/Report/Form.php on line 2120',
       'contribute/history' => 'Declaration of CRM_Report_Form_Contribute_History::buildRows() should be compatible with CRM_Report_Form::buildRows($sql, &$rows)',
-      'activitySummary' => 'We use temp tables for the main query generation and name are dynamic. These names are not available in stats() when called directly.',
     );
 
     $reports = civicrm_api3('report_template', 'get', array('return' => 'value', 'options' => array('limit' => 500)));
@@ -934,9 +933,9 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test activity summary report - requiring all current fields to be output.
+   * Test activity details report - requiring all current fields to be output.
    */
-  public function testActivitySummary() {
+  public function testActivityDetails() {
     $this->createContactsWithActivities();
     $fields = [
       'contact_source' => '1',
