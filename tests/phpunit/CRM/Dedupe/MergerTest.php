@@ -675,6 +675,34 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
+   * Creatd Date merge cases
+   * @return array
+   */
+  public function createdDateMergeCases() {
+    $cases = [];
+    // Normal pattern merge into the lower id
+    $cases[] = [0, 1];
+    // Check if we flipped the contacts that it still does right thing
+    $cases[] = [1, 0];
+    return $cases;
+  }
+
+  /**
+   * dev/core#996 Ensure that the oldest created date is retained even if duplicates have been flipped
+   * @dataProvider createdDateMergeCases
+   */
+  public function testCreatedDatePostMerge($keepContactKey, $duplicateContactKey) {
+    $this->setupMatchData();
+    $lowerContactCreatedDate = $this->callAPISuccess('Contact', 'getsingle', [
+      'id' => $this->contacts[0]['id'],
+      'return' => ['created_date'],
+    ])['created_date'];
+    // Assume contats have been flipped in the UL so merging into the higher id
+    $this->mergeContacts($this->contacts[$keepContactKey]['id'], $this->contacts[$duplicateContactKey]['id'], []);
+    $this->assertEquals($lowerContactCreatedDate, $this->callAPISuccess('Contact', 'getsingle', ['id' => $this->contacts[$keepContactKey]['id'], 'return' => ['created_date']])['created_date']);
+  }
+
+  /**
    * Verifies that when a contact with a custom field value is merged into a
    * contact without a record int its corresponding custom group table, and none
    * of the custom fields of that custom table are selected, the value is not
@@ -894,6 +922,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     foreach ($fixtures as $fixture) {
       $contactID = $this->individualCreate($fixture);
       $this->contacts[] = array_merge($fixture, ['id' => $contactID]);
+      sleep(5);
     }
     $organizationFixtures = [
       [
