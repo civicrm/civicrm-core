@@ -94,6 +94,13 @@ class CRM_Core_BAO_CustomQuery {
   public $_fields;
 
   /**
+   * @return array
+   */
+  public function getFields() {
+    return $this->_fields;
+  }
+
+  /**
    * Searching for contacts?
    *
    * @var bool

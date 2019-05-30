@@ -50,6 +50,18 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       $queryObj->_where[0][0]
     );
     $this->assertEquals($queryObj->_qill[0][0], "date field BETWEEN 'January 1st, " . date('Y') . " 12:00 AM AND December 31st, " . date('Y') . " 11:59 PM'");
+    $this->assertEquals([
+      'id' => $dateCustomField['id'],
+      'label' => 'date field',
+      'extends' => 'civicrm_contact',
+      'data_type' => 'Date',
+      'html_type' => 'Select Date',
+      'is_search_range' => '0',
+      'column_name' => 'date_field_' . $dateCustomField['id'],
+      'table_name' => 'civicrm_value_testsearchcus_' . $ids['custom_group_id'],
+      'option_group_id' => NULL,
+    ], $queryObj->getFields()[$dateCustomField['id']]);
+
   }
 
   /**
