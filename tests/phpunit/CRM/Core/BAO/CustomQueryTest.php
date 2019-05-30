@@ -53,13 +53,27 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
     $this->assertEquals([
       'id' => $dateCustomField['id'],
       'label' => 'date field',
-      'extends' => 'civicrm_contact',
+      'extends' => 'Contact',
       'data_type' => 'Date',
       'html_type' => 'Select Date',
       'is_search_range' => '0',
       'column_name' => 'date_field_' . $dateCustomField['id'],
       'table_name' => 'civicrm_value_testsearchcus_' . $ids['custom_group_id'],
       'option_group_id' => NULL,
+      'groupTitle' => 'testSearchCustomDataDateRelative',
+      'default_value' => NULL,
+      'text_length' => NULL,
+      'options_per_line' => NULL,
+      'custom_group_id' => '1',
+      'extends_entity_column_value' => NULL,
+      'extends_entity_column_id' => NULL,
+      'is_view' => '0',
+      'is_multiple' => '0',
+      'date_format' => 'mm/dd/yy',
+      'time_format' => NULL,
+      'is_required' => '0',
+      'extends_table' => 'civicrm_contact',
+      'search_table' => 'contact_a',
     ], $queryObj->getFields()[$dateCustomField['id']]);
 
   }
