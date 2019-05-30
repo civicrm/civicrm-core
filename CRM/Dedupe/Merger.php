@@ -1507,12 +1507,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $otherId
    *   Duplicate contact which would be deleted after merge operation.
    *
-   * @param $migrationInfo
+   * @param array $migrationInfo
    *
    * @param bool $checkPermissions
    *   Respect logged in user permissions.
    *
    * @return bool
+   * @throws \CiviCRM_API3_Exception
    */
   public static function moveAllBelongings($mainId, $otherId, $migrationInfo, $checkPermissions = TRUE) {
     if (empty($migrationInfo)) {
@@ -1553,6 +1554,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // **** Do contact related migrations
     $customTablesToCopyValues = self::getAffectedCustomTables($submittedCustomFields);
+    // @todo - move all custom field processing to the move class & eventually have an
+    // overridable DAO class for it.
+    $customFieldBAO = new CRM_Core_BAO_CustomField();
+    $customFieldBAO->move($otherId, $mainId, $submittedCustomFields);
     CRM_Dedupe_Merger::moveContactBelongings($mainId, $otherId, $moveTables, $tableOperations, $customTablesToCopyValues);
     unset($moveTables, $tableOperations);
 
@@ -1596,12 +1601,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     if (!isset($submitted)) {
       $submitted = [];
     }
-    $customFiles = [];
     foreach ($submitted as $key => $value) {
-      list($cFields, $customFiles, $submitted) = self::processCustomFields($mainId, $key, $cFields, $customFiles, $submitted, $value);
+      list($cFields, $submitted) = self::processCustomFields($mainId, $key, $cFields, $submitted, $value);
     }
-
-    self::processCustomFieldFiles($mainId, $otherId, $customFiles);
 
     // move view only custom fields CRM-5362
     $viewOnlyCustomFields = [];
@@ -2167,29 +2169,37 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Honestly - what DOES this do - hopefully some refactoring will reveal it's purpose.
    *
+   * Update this function formats fields in preparation for them to be submitted to the
+   * 'ProfileContactCreate action. This is a lot of code to do this & for
+   * - for some fields it fails - e.g Country - per testMergeCustomFields.
+   *
+   * Goal is to move all custom field handling into 'move' functions on the various BAO
+   * with an underlying DAO function. For custom fields it has been started on the BAO.
+   *
    * @param $mainId
    * @param $key
    * @param $cFields
-   * @param $customFiles
    * @param $submitted
    * @param $value
    *
    * @return array
+   * @throws \Exception
    */
-  protected static function processCustomFields($mainId, $key, $cFields, $customFiles, $submitted, $value) {
+  protected static function processCustomFields($mainId, $key, $cFields, $submitted, $value) {
     if (substr($key, 0, 7) == 'custom_') {
       $fid = (int) substr($key, 7);
       if (empty($cFields[$fid])) {
-        return [$cFields, $customFiles, $submitted];
+        return [$cFields, $submitted];
       }
       $htmlType = $cFields[$fid]['attributes']['html_type'];
       switch ($htmlType) {
         case 'File':
-          $customFiles[] = $fid;
+          // Handled in CustomField->move(). Tested in testMergeCustomFields.
           unset($submitted["custom_$fid"]);
           break;
 
         case 'Select Country':
+          // @todo Test in testMergeCustomFields disabled as this does not work, Handle in CustomField->move().
         case 'Select State/Province':
           $submitted[$key] = CRM_Core_BAO_CustomField::displayValue($value, $fid);
           break;
@@ -2268,7 +2278,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           break;
       }
     }
-    return [$cFields, $customFiles, $submitted];
+    return [$cFields, $submitted];
   }
 
   /**
@@ -2409,64 +2419,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $migrationInfo = $migrationData['migration_info'];
     $migrationInfo['skip_merge'] = CRM_Utils_Array::value('skip_merge', $migrationData);
     return $conflicts;
-  }
-
-  /**
-   * Do file custom fields related migrations.
-   * FIXME: move this someplace else (one of the BAOs) after discussing
-   * where to, and whether CRM_Core_BAO_File::deleteFileReferences() shouldn't actually,
-   * like, delete a file...
-   *
-   * Note outstanding bug https://lab.civicrm.org/dev/core/issues/723
-   * relates to this code....
-   *
-   * @param $mainId
-   * @param $otherId
-   * @param $customFiles
-   */
-  protected static function processCustomFieldFiles($mainId, $otherId, $customFiles) {
-    foreach ($customFiles as $customId) {
-      list($tableName, $columnName, $groupID) = CRM_Core_BAO_CustomField::getTableColumnGroup($customId);
-
-      // get the contact_id -> file_id mapping
-      $fileIds = [];
-      $sql = "SELECT entity_id, {$columnName} AS file_id FROM {$tableName} WHERE entity_id IN ({$mainId}, {$otherId})";
-      $dao = CRM_Core_DAO::executeQuery($sql);
-      while ($dao->fetch()) {
-        // @todo - this is actually broken - fix & or remove - see testMergeCustomFields
-        $fileIds[$dao->entity_id] = $dao->file_id;
-        if ($dao->entity_id == $mainId) {
-          CRM_Core_BAO_File::deleteFileReferences($fileIds[$mainId], $mainId, $customId);
-        }
-      }
-
-      // move the other contact's file to main contact
-      //NYSS need to INSERT or UPDATE depending on whether main contact has an existing record
-      if (CRM_Core_DAO::singleValueQuery("SELECT id FROM {$tableName} WHERE entity_id = {$mainId}")) {
-        $sql = "UPDATE {$tableName} SET {$columnName} = {$fileIds[$otherId]} WHERE entity_id = {$mainId}";
-      }
-      else {
-        $sql = "INSERT INTO {$tableName} ( entity_id, {$columnName} ) VALUES ( {$mainId}, {$fileIds[$otherId]} )";
-      }
-      CRM_Core_DAO::executeQuery($sql);
-
-      if (CRM_Core_DAO::singleValueQuery("
-        SELECT id
-        FROM civicrm_entity_file
-        WHERE entity_table = '{$tableName}' AND file_id = {$fileIds[$otherId]}")
-      ) {
-        $sql = "
-          UPDATE civicrm_entity_file
-          SET entity_id = {$mainId}
-          WHERE entity_table = '{$tableName}' AND file_id = {$fileIds[$otherId]}";
-      }
-      else {
-        $sql = "
-          INSERT INTO civicrm_entity_file ( entity_table, entity_id, file_id )
-          VALUES ( '{$tableName}', {$mainId}, {$fileIds[$otherId]} )";
-      }
-      CRM_Core_DAO::executeQuery($sql);
-    }
   }
 
   /**
