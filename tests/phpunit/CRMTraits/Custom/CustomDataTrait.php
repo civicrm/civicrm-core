@@ -176,7 +176,23 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @return string
    */
   protected function getCustomFieldName($key) {
-    $linkField = 'custom_' . $this->ids['CustomField'][$key];
+    $linkField = 'custom_' . $this->getCustomFieldID($key);
+    return $linkField;
+  }
+
+  /**
+   * Get the custom field name for the relevant key.
+   *
+   * e.g returns 'custom_5' where 5 is the id of the field using the key.
+   *
+   * Generally keys map to data types.
+   *
+   * @param string $key
+   *
+   * @return string
+   */
+  protected function getCustomFieldID($key) {
+    $linkField = $this->ids['CustomField'][$key];
     return $linkField;
   }
 
