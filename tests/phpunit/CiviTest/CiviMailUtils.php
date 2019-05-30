@@ -43,7 +43,7 @@
 /**
  * Class CiviMailUtils
  */
-class CiviMailUtils extends PHPUnit_Framework_TestCase {
+class CiviMailUtils extends PHPUnit\Framework\TestCase {
 
   /**
    * @var mixed current outbound email option

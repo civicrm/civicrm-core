@@ -9,7 +9,7 @@
  * Note: If you need to work as a different user, try using `cv()` or
  * a web-service.
  */
-class CiviEndToEndTestCase extends PHPUnit_Framework_TestCase implements \Civi\Test\EndToEndInterface {
+class CiviEndToEndTestCase extends PHPUnit\Framework\TestCase implements \Civi\Test\EndToEndInterface {
 
   public static function setUpBeforeClass() {
     CRM_Core_Config::singleton(1, 1);

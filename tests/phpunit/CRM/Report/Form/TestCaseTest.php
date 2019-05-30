@@ -154,7 +154,6 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
   }
 
   /**
-   * @expectedException PHPUnit_Framework_AssertionFailedError
    * @dataProvider badDataProvider
    * @param $reportClass
    * @param $inputParams
@@ -170,7 +169,15 @@ class CRM_Report_Form_TestCaseTest extends CiviReportTestCase {
     $reportCsvArray = $this->getArrayFromCsv($reportCsvFile);
 
     $expectedOutputCsvArray = $this->getArrayFromCsv(dirname(__FILE__) . "/{$expectedOutputCsvFile}");
-    $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
+    try {
+      $this->assertCsvArraysEqual($expectedOutputCsvArray, $reportCsvArray);
+    }
+    catch (PHPUnit\Framework\AssertionFailedError $e) {
+      /* OK */
+    }
+    catch (PHPUnit_Framework_AssertionFailedError $e) {
+      /* OK */
+    }
   }
 
   /**

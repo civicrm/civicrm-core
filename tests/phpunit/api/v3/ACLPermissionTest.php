@@ -471,7 +471,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @dataProvider entities
    * confirm that with check permissions we don't get entities
    * @param $entity
-   * @throws \PHPUnit_Framework_IncompleteTestError
+   * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testEntitiesGetCoreACLLimitingCheck($entity) {
     $this->setupCoreACL();
@@ -487,7 +487,7 @@ class api_v3_ACLPermissionTest extends CiviUnitTestCase {
    * @dataProvider entities
    * Function tests that an empty where hook returns no results
    * @param string $entity
-   * @throws \PHPUnit_Framework_IncompleteTestError
+   * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testEntityGetNoResultsHook($entity) {
     $this->markTestIncomplete('hook acls only work with contacts so far');

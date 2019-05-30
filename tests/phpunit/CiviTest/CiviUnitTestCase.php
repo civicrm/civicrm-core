@@ -195,7 +195,10 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       // FIXME: loosen coupling
       _civix_phpunit_setUp();
     }
-    if (version_compare(PHPUnit_Runner_Version::id(), '5', '>=')) {
+    if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Version::id(), '5', '>=')) {
+      $this->mockMethod = 'createMock';
+    }
+    elseif (class_exists('PHPUnit\Runner\Version') && version_compare(PHPUnit\Runner\Version::id(), '6', '>=')) {
       $this->mockMethod = 'createMock';
     }
   }

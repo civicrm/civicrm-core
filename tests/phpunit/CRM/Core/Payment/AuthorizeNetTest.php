@@ -323,7 +323,7 @@ class CRM_Core_Payment_AuthorizeNetTest extends CiviUnitTestCase {
    *
    * @param array $params
    *
-   * @throws PHPUnit_Framework_SkippedTestError
+   * @throws PHPUnit\Framework\SkippedTestError
    */
   public function doPayment($params) {
     try {

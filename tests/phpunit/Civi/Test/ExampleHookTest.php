@@ -8,7 +8,7 @@ use Civi\Angular\Page\Main;
  *
  * @group headless
  */
-class ExampleHookTest extends \PHPUnit_Framework_TestCase implements HeadlessInterface, HookInterface {
+class ExampleHookTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, HookInterface {
 
   /**
    * @var \CRM_Contact_DAO_Contact

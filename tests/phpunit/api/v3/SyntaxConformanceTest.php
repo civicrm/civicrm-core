@@ -796,6 +796,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     catch (ArgumentCountError $e) {
       /* ok */
     }
+    catch (PHPUnit\Framework\Error $e) {
+      /* ok */
+    }
     catch (PHPUnit_Framework_Error $e) {
       /* ok */
     }
@@ -1181,7 +1184,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
    * Currency - only seems to support US
    * @param $entityName
-   * @throws \PHPUnit_Framework_IncompleteTestError
+   * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testByIDAlias_get($entityName) {
     if (in_array($entityName, self::toBeSkipped_automock(TRUE))) {
@@ -1285,7 +1288,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *
    * Check that create doesn't work with an invalid
    * @param $Entity
-   * @throws \PHPUnit_Framework_IncompleteTestError
+   * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testInvalidSort_get($Entity) {
     $invalidEntitys = array('ActivityType', 'Setting', 'System');
@@ -1300,7 +1303,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *
    * Check that create doesn't work with an invalid
    * @param $Entity
-   * @throws \PHPUnit_Framework_IncompleteTestError
+   * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testValidSortSingleArrayById_get($Entity) {
     $invalidEntitys = array('ActivityType', 'Setting', 'System');
@@ -1327,7 +1330,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    *
    * Check that create doesn't work with an invalid
    * @param $Entity
-   * @throws \PHPUnit_Framework_IncompleteTestError
+   * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testInvalidID_create($Entity) {
     // turn test off for noew
@@ -1605,6 +1608,9 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     catch (ArgumentCountError $e) {
       /* ok */
     }
+    catch (PHPUnit\Framework\Error $e) {
+      /* ok */
+    }
     catch (PHPUnit_Framework_Error $e) {
       /* ok */
     }
@@ -1627,7 +1633,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
   /**
    * @dataProvider entities_delete
    * @param $Entity
-   * @throws \PHPUnit_Framework_IncompleteTestError
+   * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testInvalidID_delete($Entity) {
     $result = $this->callAPIFailure($Entity, 'Delete', array('id' => 999999));
@@ -1651,7 +1657,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * hence FKs only set by createTestObject when required. e.g parent_id on campaign is not being followed through
    * Currency - only seems to support US
    * @param $entityName
-   * @throws \PHPUnit_Framework_IncompleteTestError
+   * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testByID_delete($entityName) {
     // turn test off for noew

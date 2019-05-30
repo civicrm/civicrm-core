@@ -381,7 +381,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
   /**
    * Generate a mock HTTP client with the expectation that it is never called.
    *
-   * @return CRM_Utils_HttpClient|PHPUnit_Framework_MockObject_MockObject
+   * @return CRM_Utils_HttpClient|PHPUnit\Framework\MockObject\MockObject
    */
   protected function expectNoHttpRequest() {
     $mockFunction = $this->mockMethod;
@@ -396,7 +396,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
    *
    * @param $response
    *
-   * @return CRM_Utils_HttpClient|PHPUnit_Framework_MockObject_MockObject
+   * @return CRM_Utils_HttpClient|PHPUnit\Framework\MockObject\MockObject
    */
   protected function expectOneHttpRequest($response) {
     $mockFunction = $this->mockMethod;
