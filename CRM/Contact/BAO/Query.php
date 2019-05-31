@@ -607,7 +607,7 @@ class CRM_Contact_BAO_Query {
       if (empty($value[0])) {
         continue;
       }
-      $cfID = CRM_Core_BAO_CustomField::getKeyID($value[0]);
+      $cfID = CRM_Core_BAO_CustomField::getKeyID(str_replace('_relative', '', $value[0]));
       if ($cfID) {
         if (!array_key_exists($cfID, $this->_cfIDs)) {
           $this->_cfIDs[$cfID] = [];
@@ -1638,8 +1638,7 @@ class CRM_Contact_BAO_Query {
       }
       elseif (substr($id, 0, 7) == 'custom_'
         &&  (
-          substr($id, -9, 9) == '_relative'
-          || substr($id, -5, 5) == '_from'
+          substr($id, -5, 5) == '_from'
           || substr($id, -3, 3) == '_to'
         )
       ) {
@@ -6932,7 +6931,9 @@ AND   displayRelType.is_active = 1
     $tableName = $fieldSpec['table_name'];
     $filters = CRM_Core_OptionGroup::values('relative_date_filters');
     $grouping = CRM_Utils_Array::value(3, $values);
-    $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
+    // If the table value is already set for a custom field it will be more nuanced than just '1'.
+    $this->_tables[$tableName] = $this->_tables[$tableName] ?? 1;
+    $this->_whereTables[$tableName] = $this->_whereTables[$tableName] ?? 1;
 
     $dates = CRM_Utils_Date::getFromTo($value, NULL, NULL);
     if (empty($dates[0])) {

@@ -205,9 +205,11 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
   /**
    * Test relative dates
    *
-   * The function saveRelativeDates should detect whether a field is using
-   * a relative date range and include in the fromValues a relative_date
-   * index so it is properly detects when executed.
+   * This is a slightly odd test because it was originally created to test that we DO create a
+   * special 'relative_dates' key but the new favoured format is not to do that and to
+   * save (eg) custom_1_relative = this.day.
+   *
+   * It still presumably provides useful 'this does not fatal or give enotice' coverage.
    */
   public function testCustomFieldRelativeDates() {
     // Create a custom field.
@@ -246,8 +248,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
     CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
     // Since custom_13 doesn't have the word 'date' in it, the key is
     // set to 0, rather than the field name.
-    $err = 'Relative date in custom field smart group creation failed.';
-    $this->assertArrayHasKey('relative_dates', $queryParams, $err);
+    $this->assertArrayNotHasKey('relative_dates', $queryParams, 'Relative date in custom field smart group creation failed.');
     $dropCustomValueTables = TRUE;
     $this->quickCleanup(array('civicrm_saved_search'), $dropCustomValueTables);
   }
