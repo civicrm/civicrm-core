@@ -354,6 +354,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
     }
     $this->selfService = FALSE;
     if (!CRM_Core_Permission::check('edit contributions')) {
+      $this->set('cid', $this->_subscriptionDetails->contact_id);
       if ($this->_subscriptionDetails->contact_id != $this->getContactID()) {
         CRM_Core_Error::statusBounce(ts('You do not have permission to cancel this recurring contribution.'));
       }
