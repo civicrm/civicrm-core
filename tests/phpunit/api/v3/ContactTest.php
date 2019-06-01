@@ -1607,7 +1607,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * CRM-20421: This test make sure that inherited memberships are deleted upon merging organization.
    */
   public function testMergeOrganizations() {
-    $organizationID1 = $this->organizationCreate(array(), 0);
+    $organizationID1 = $this->organizationCreate([], 0);
     $organizationID2 = $this->organizationCreate(array(), 1);
     $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
       'employer_id' => $organizationID1,
@@ -1648,6 +1648,16 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ));
 
     $this->assertEquals(0, $contactmembership["count"], "Contact membership must be deleted after merging organization without memberships.");
+  }
+
+  /**
+   * Test the function that determines if 2 contacts have conflicts.
+   */
+  public function testMergeGetConflicts() {
+    $contact1 = $this->individualCreate();
+    $contact2 = $this->individualCreate(['first_name' => 'different']);
+    $conflicts = $this->callAPISuccess('Contact', 'get_merge_conflicts', ['to_keep_id' => $contact1, 'to_remove_id' => $contact2])['values'];
+    $this->assertEquals(['first_name' => [$contact1 => 'Anthony', $contact2 => 'different']], $conflicts);
   }
 
   private function createEmployerOfMembership() {

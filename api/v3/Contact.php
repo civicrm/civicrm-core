@@ -1213,22 +1213,87 @@ function civicrm_api3_contact_merge($params) {
  */
 function _civicrm_api3_contact_merge_spec(&$params) {
   $params['to_remove_id'] = [
-    'title' => 'ID of the contact to merge & remove',
-    'description' => ts('Wow - these 2 params are the logical reverse of what I expect - but what to do?'),
+    'title' => ts('ID of the contact to merge & remove'),
+    'description' => ts('Wow - these 2 aliased params are the logical reverse of what I expect - but what to do?'),
     'api.required' => 1,
     'type' => CRM_Utils_Type::T_INT,
     'api.aliases' => ['main_id'],
   ];
   $params['to_keep_id'] = [
-    'title' => 'ID of the contact to keep',
-    'description' => ts('Wow - these 2 params are the logical reverse of what I expect - but what to do?'),
+    'title' => ts('ID of the contact to keep'),
+    'description' => ts('Wow - these 2 aliased params are the logical reverse of what I expect - but what to do?'),
     'api.required' => 1,
     'type' => CRM_Utils_Type::T_INT,
     'api.aliases' => ['other_id'],
   ];
   $params['mode'] = [
-    // @todo need more detail on what this means.
-    'title' => 'Dedupe mode',
+    'title' => ts('Dedupe mode'),
+    'description' => ts("In 'safe' mode conflicts will result in no merge. In 'aggressive' mode the merge will still proceed (hook dependent)"),
+    'api.default' => 'safe',
+  ];
+}
+
+/**
+ * Determines if given pair of contaacts have conflicts that would affect merging them.
+ *
+ * @param array $params
+ *   Allowed array keys are:
+ *   -int main_id: main contact id with whom merge has to happen
+ *   -int other_id: duplicate contact which would be deleted after merge operation
+ *   -string mode: "safe" skips the merge if there are no conflicts. Does a force merge otherwise.
+ *
+ * @return array
+ *   API Result Array
+ *
+ * @throws \CRM_Core_Exception
+ * @throws \CiviCRM_API3_Exception
+ */
+function civicrm_api3_contact_get_merge_conflicts($params) {
+  $migrationInfo = [];
+  $result = CRM_Dedupe_Merger::getConflicts(
+    $migrationInfo,
+      $params['to_remove_id'], $params['to_keep_id'],
+      $params['mode']
+  );
+  $return = [];
+  foreach (array_keys($result) as $index) {
+    $return[str_replace('move_', '', $index)] = [];
+  }
+  $contacts = civicrm_api3('Contact', 'get', [
+    'id' => [
+      'IN' => [
+        $params['to_keep_id'],
+        $params['to_remove_id'],
+      ],
+    ],
+    'return' => array_keys($return),
+  ])['values'];
+  foreach (array_keys($return) as $fieldName) {
+    $return[$fieldName][$params['to_keep_id']] = CRM_Utils_Array::value($fieldName, $contacts[$params['to_keep_id']]);
+    $return[$fieldName][$params['to_remove_id']] = CRM_Utils_Array::value($fieldName, $contacts[$params['to_remove_id']]);
+  }
+  return civicrm_api3_create_success($return, $params);
+}
+
+/**
+ * Adjust metadata for contact_merge api function.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_contact_get_merge_conflicts_spec(&$params) {
+  $params['to_remove_id'] = [
+    'title' => ts('ID of the contact to merge & remove'),
+    'api.required' => 1,
+    'type' => CRM_Utils_Type::T_INT,
+  ];
+  $params['to_keep_id'] = [
+    'title' => ts('ID of the contact to keep'),
+    'api.required' => 1,
+    'type' => CRM_Utils_Type::T_INT,
+  ];
+  $params['mode'] = [
+    'title' => ts('Dedupe mode'),
+    'description' => ts("'safe' or 'aggressive'  - these modes map to the merge actions & may affect resolution done by hooks "),
     'api.default' => 'safe',
   ];
 }

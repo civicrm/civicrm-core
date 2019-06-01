@@ -2109,15 +2109,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   protected static function dedupePair(&$resultStats, &$deletedContacts, $mode, $checkPermissions, $mainId, $otherId, $cacheKeyString) {
 
-    // Generate var $migrationInfo. The variable structure is exactly same as
-    // $formValues submitted during a UI merge for a pair of contacts.
-    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($mainId, $otherId, $checkPermissions);
-    // add additional details that we might need to resolve conflicts
-    $rowsElementsAndInfo['migration_info']['main_details'] = &$rowsElementsAndInfo['main_details'];
-    $rowsElementsAndInfo['migration_info']['other_details'] = &$rowsElementsAndInfo['other_details'];
-    $rowsElementsAndInfo['migration_info']['rows'] = &$rowsElementsAndInfo['rows'];
-    $migrationInfo = $rowsElementsAndInfo['migration_info'];
-    // go ahead with merge if there is no conflict
+    $migrationInfo = [];
     $conflicts = [];
     if (!CRM_Dedupe_Merger::skipMerge($mainId, $otherId, $migrationInfo, $mode, $conflicts)) {
       CRM_Dedupe_Merger::moveAllBelongings($mainId, $otherId, $migrationInfo, $checkPermissions);
@@ -2332,9 +2324,21 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   -  Does a force merge otherwise (aggressive mode).
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getConflicts(&$migrationInfo, $mainId, $otherId, $mode) {
     $conflicts = [];
+    // Generate var $migrationInfo. The variable structure is exactly same as
+    // $formValues submitted during a UI merge for a pair of contacts.
+    $rowsElementsAndInfo = CRM_Dedupe_Merger::getRowsElementsAndInfo($mainId, $otherId, FALSE);
+    // add additional details that we might need to resolve conflicts
+    $migrationInfo = $rowsElementsAndInfo['migration_info'];
+    $migrationInfo['main_details'] = &$rowsElementsAndInfo['main_details'];
+    $migrationInfo['other_details'] = &$rowsElementsAndInfo['other_details'];
+    $migrationInfo['rows'] = &$rowsElementsAndInfo['rows'];
+    // go ahead with merge if there is no conflict
     $originalMigrationInfo = $migrationInfo;
     foreach ($migrationInfo as $key => $val) {
       if ($val === "null") {
