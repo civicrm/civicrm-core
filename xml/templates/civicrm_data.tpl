@@ -1054,6 +1054,8 @@ VALUES
   (@option_group_id_crs, '{ts escape="sql"}Failed{/ts}'     , 4, 'Failed'     , NULL, 0, NULL, 4, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_crs, '{ts escape="sql"}In Progress{/ts}', 5, 'In Progress', NULL, 0, NULL, 5, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_crs, '{ts escape="sql"}Overdue{/ts}'    , 6, 'Overdue'    , NULL, 0, NULL, 6, NULL, 0, 1, 1, NULL, NULL, NULL),
+  (@option_group_id_crs, '{ts escape="sql"}Processing{/ts}' , 7, 'Processing' , NULL, 0, NULL, 7, NULL, 0, 1, 1, NULL, NULL, NULL),
+  (@option_group_id_crs, '{ts escape="sql"}Failing{/ts}'    , 8, 'Failing'    , NULL, 0, NULL, 8, NULL, 0, 1, 1, NULL, NULL, NULL),
 
 -- CiviCase - Activity Assignee Default
 --  (`option_group_id`,             `label`,                                                `value`, `name`,                    `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
