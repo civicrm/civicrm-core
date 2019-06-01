@@ -71,13 +71,17 @@ class CRM_Extension_Manager {
   public $fullContainer;
 
   /**
-   * @var CRM_Extension_Container_Basic|FALSE
+   * Default container.
+   *
+   * @var CRM_Extension_Container_Basic|false
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $defaultContainer;
 
   /**
+   * Mapper.
+   *
    * @var CRM_Extension_Mapper
    *
    * Note: Treat as private. This is only public to facilitate debugging.
@@ -85,24 +89,34 @@ class CRM_Extension_Manager {
   public $mapper;
 
   /**
-   * @var array (typeName => CRM_Extension_Manager_Interface)
+   * Type managers.
+   *
+   * @var array
+   *
+   * Format is (typeName => CRM_Extension_Manager_Interface)
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $typeManagers;
 
   /**
-   * @var array (extensionKey => statusConstant)
+   * Statuses.
+   *
+   * @var array
+   *
+   * Format is (extensionKey => statusConstant)
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
   public $statuses;
 
   /**
+   * Class constructor.
+   *
    * @param CRM_Extension_Container_Interface $fullContainer
    * @param CRM_Extension_Container_Basic|FALSE $defaultContainer
    * @param CRM_Extension_Mapper $mapper
-   * @param $typeManagers
+   * @param array $typeManagers
    */
   public function __construct(CRM_Extension_Container_Interface $fullContainer, $defaultContainer, CRM_Extension_Mapper $mapper, $typeManagers) {
     $this->fullContainer = $fullContainer;

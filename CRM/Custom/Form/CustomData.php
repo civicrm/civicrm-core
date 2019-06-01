@@ -192,7 +192,7 @@ class CRM_Custom_Form_CustomData {
    *
    * @param CRM_Core_Form $form
    * @param string $subType
-   * @param integer $gid
+   * @param int $gid
    * @param bool $onlySubType
    * @param bool $getCachedTree
    *

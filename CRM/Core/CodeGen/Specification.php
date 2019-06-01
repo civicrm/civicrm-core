@@ -32,7 +32,7 @@ class CRM_Core_CodeGen_Specification {
 
     $this->classNames = [];
 
-    # TODO: peel DAO-specific stuff out of getTables, and spec reading into its own class
+    // TODO: peel DAO-specific stuff out of getTables, and spec reading into its own class
     if ($verbose) {
       echo "Extracting table information\n";
     }

@@ -214,7 +214,7 @@ class CRM_Core_BAO_OptionGroup extends CRM_Core_DAO_OptionGroup {
    *
    * @param string $optionGroupName
    *   e.g "languages"
-   * @param array<string> $activeValues
+   * @param string[] $activeValues
    *   e.g. array("en_CA","fr_CA")
    */
   public static function setActiveValues($optionGroupName, $activeValues) {
