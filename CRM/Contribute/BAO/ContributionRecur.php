@@ -33,13 +33,6 @@
 class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_ContributionRecur {
 
   /**
-   * Array with statuses that mark a recurring contribution as inactive.
-   *
-   * @var array
-   */
-  private static $inactiveStatuses = ['Cancelled', 'Chargeback', 'Refunded', 'Completed'];
-
-  /**
    * Create recurring contribution.
    *
    * @param array $params
@@ -276,15 +269,14 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       'details' => CRM_Utils_Array::value('processor_message', $params),
     ];
 
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $canceledId = array_search('Cancelled', $contributionStatus);
+    $cancelledId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_ContributionRecur', 'contribution_status_id', 'Cancelled');
     $recur = new CRM_Contribute_DAO_ContributionRecur();
     $recur->id = $recurId;
-    $recur->whereAdd("contribution_status_id != $canceledId");
+    $recur->whereAdd("contribution_status_id != $cancelledId");
 
     if ($recur->find(TRUE)) {
       $transaction = new CRM_Core_Transaction();
-      $recur->contribution_status_id = $canceledId;
+      $recur->contribution_status_id = $cancelledId;
       $recur->start_date = CRM_Utils_Date::isoToMysql($recur->start_date);
       $recur->create_date = CRM_Utils_Date::isoToMysql($recur->create_date);
       $recur->modified_date = CRM_Utils_Date::isoToMysql($recur->modified_date);
@@ -333,7 +325,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
     else {
       // if already cancelled, return true
       $recur->whereAdd();
-      $recur->whereAdd("contribution_status_id = $canceledId");
+      $recur->whereAdd("contribution_status_id = $cancelledId");
       if ($recur->find(TRUE)) {
         return TRUE;
       }
@@ -933,13 +925,12 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   }
 
   /**
-   * Returns array with statuses that are considered to make a recurring
-   * contribution inactive.
+   * Returns array with statuses that are considered to make a recurring contribution inactive.
    *
    * @return array
    */
   public static function getInactiveStatuses() {
-    return self::$inactiveStatuses;
+    return ['Cancelled', 'Failed', 'Completed'];
   }
 
   /**
