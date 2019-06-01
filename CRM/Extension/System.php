@@ -155,6 +155,12 @@ class CRM_Extension_System {
         }
       }
 
+      if (!defined('CIVICRM_TEST')) {
+        foreach ($containers as $container) {
+          $container->addFilter([__CLASS__, 'isNotTestExtension']);
+        }
+      }
+
       $this->fullContainer = new CRM_Extension_Container_Collection($containers, $this->getCache(), 'full');
     }
     return $this->fullContainer;
@@ -300,6 +306,10 @@ class CRM_Extension_System {
       Civi::$statics[__CLASS__]['compatibility'] = json_decode(file_get_contents(Civi::paths()->getPath('[civicrm.root]/extension-compatibility.json')), TRUE);
     }
     return Civi::$statics[__CLASS__]['compatibility'];
+  }
+
+  public static function isNotTestExtension(CRM_Extension_Info $info) {
+    return (bool) !preg_match('/^test\./', $info->key);
   }
 
   /**
