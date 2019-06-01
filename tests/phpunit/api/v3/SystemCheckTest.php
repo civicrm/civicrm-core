@@ -36,22 +36,22 @@
  * @group headless
  */
 class api_v3_SystemCheckTest extends CiviUnitTestCase {
-  protected $_apiversion;
   protected $_contactID;
   protected $_locationType;
   protected $_params;
 
   public function setUp() {
-    $this->_apiversion = 3;
     parent::setUp();
     $this->useTransaction(TRUE);
   }
 
   /**
-   * Ensure that without any StatusPreference set, checkDefaultMailbox shows
-   * up.
+   * Ensure that without any StatusPreference set, checkDefaultMailbox shows up.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSystemCheckBasic() {
+  public function testSystemCheckBasic($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPISuccess('System', 'check', array());
     foreach ($result['values'] as $check) {
       if ($check['name'] == 'checkDefaultMailbox') {
@@ -64,8 +64,11 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
 
   /**
    * Permanently hushed items should never show up.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSystemCheckHushForever() {
+  public function testSystemCheckHushForever($version) {
+    $this->_apiversion = $version;
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 7,
@@ -86,8 +89,11 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
 
   /**
    * Items hushed through tomorrow shouldn't show up.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSystemCheckHushFuture() {
+  public function testSystemCheckHushFuture($version) {
+    $this->_apiversion = $version;
     $tomorrow = new DateTime('tomorrow');
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
@@ -110,8 +116,11 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
 
   /**
    * Items hushed through today should show up.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSystemCheckHushToday() {
+  public function testSystemCheckHushToday($version) {
+    $this->_apiversion = $version;
     $today = new DateTime('today');
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
@@ -134,8 +143,11 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
 
   /**
    * Items hushed through yesterday should show up.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSystemCheckHushYesterday() {
+  public function testSystemCheckHushYesterday($version) {
+    $this->_apiversion = $version;
     $yesterday = new DateTime('yesterday');
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
@@ -158,8 +170,11 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
 
   /**
    * Items hushed above current severity should be hidden.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSystemCheckHushAboveSeverity() {
+  public function testSystemCheckHushAboveSeverity($version) {
+    $this->_apiversion = $version;
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 4,
@@ -180,14 +195,17 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
 
   /**
    * Items hushed at current severity should be hidden.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSystemCheckHushAtSeverity() {
+  public function testSystemCheckHushAtSeverity($version) {
+    $this->_apiversion = $version;
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 3,
     );
-    $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
-    $result = $this->callAPISuccess('System', 'check', array());
+    $this->callAPISuccess('StatusPreference', 'create', $this->_params);
+    $result = $this->callAPISuccess('System', 'check');
     foreach ($result['values'] as $check) {
       if ($check['name'] == 'checkDefaultMailbox') {
         $testedCheck = $check;
@@ -202,8 +220,11 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
 
   /**
    * Items hushed below current severity should be shown.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSystemCheckHushBelowSeverity() {
+  public function testSystemCheckHushBelowSeverity($version) {
+    $this->_apiversion = $version;
     $this->_params = array(
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 2,

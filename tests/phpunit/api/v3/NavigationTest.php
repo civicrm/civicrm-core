@@ -37,13 +37,17 @@ class api_v3_NavigationTest extends CiviUnitTestCase {
 
   /**
    * Test get function.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGet() {
+  public function testGet($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess($this->_entity, 'getsingle', array('label' => 'Manage Groups', 'domain_id' => 1));
   }
 
   /**
    * Test get specifying parent
+   * FIXME: Api4
    */
   public function testGetByParent() {
     // get by name
@@ -61,8 +65,11 @@ class api_v3_NavigationTest extends CiviUnitTestCase {
 
   /**
    * Test create function.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreate() {
+  public function testCreate($version) {
+    $this->_apiversion = $version;
     $params = array('label' => 'Feed the Goats', 'domain_id' => 1);
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $this->getAndCheck($params, $result['id'], $this->_entity, TRUE);
@@ -70,8 +77,11 @@ class api_v3_NavigationTest extends CiviUnitTestCase {
 
   /**
    * Test create function.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testDefaultDomain() {
+  public function testDefaultDomain($version) {
+    $this->_apiversion = $version;
     $params = array('label' => 'Herd the Cats');
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
     // Check domain_id has been set per default
@@ -81,8 +91,11 @@ class api_v3_NavigationTest extends CiviUnitTestCase {
 
   /**
    * Test delete function.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testDelete() {
+  public function testDelete($version) {
+    $this->_apiversion = $version;
     $getParams = array(
       'return' => 'id',
       'options' => array('limit' => 1),

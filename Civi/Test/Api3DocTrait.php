@@ -68,7 +68,7 @@ trait Api3DocTrait {
    *   Name for this example file (CamelCase) - if omitted the action name will be substituted.
    */
   private function documentMe($entity, $action, $params, $result, $testFunction, $testFile, $description = "", $exampleName = NULL) {
-    if (defined('DONT_DOCUMENT_TEST_CONFIG') && DONT_DOCUMENT_TEST_CONFIG) {
+    if ($params['version'] != 3 || (defined('DONT_DOCUMENT_TEST_CONFIG') && DONT_DOCUMENT_TEST_CONFIG)) {
       return;
     }
     $entity = _civicrm_api_get_camel_name($entity);

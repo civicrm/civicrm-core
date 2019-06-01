@@ -33,7 +33,6 @@
  * @group headless
  */
 class api_v3_ImTest extends CiviUnitTestCase {
-  protected $_apiversion = 3;
   protected $params;
   protected $id;
   protected $_entity;
@@ -54,14 +53,24 @@ class api_v3_ImTest extends CiviUnitTestCase {
     );
   }
 
-  public function testCreateIm() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateIm($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPIAndDocument($this->_entity, 'create', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->getAndCheck($this->params, $result['id'], $this->_entity);
     $this->assertNotNull($result['values'][$result['id']]['id']);
   }
 
-  public function testGetIm() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testGetIm($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $result = $this->callAPIAndDocument($this->_entity, 'get', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
@@ -69,7 +78,12 @@ class api_v3_ImTest extends CiviUnitTestCase {
     $this->callAPISuccess($this->_entity, 'delete', array('id' => $result['id']));
   }
 
-  public function testDeleteIm() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testDeleteIm($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = array('id' => $result['id']);
     $result = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
@@ -77,6 +91,9 @@ class api_v3_ImTest extends CiviUnitTestCase {
     $this->assertEquals(0, $checkDeleted['count']);
   }
 
+  /**
+   * Skip api4 test - delete behaves differently
+   */
   public function testDeleteImInvalid() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
     $deleteParams = array('id' => 600);

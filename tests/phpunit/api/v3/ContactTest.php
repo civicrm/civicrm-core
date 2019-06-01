@@ -64,7 +64,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   public function setUp() {
     // Connect to the database.
     parent::setUp();
-    $this->_apiversion = 3;
     $this->_entity = 'contact';
     $this->_params = array(
       'first_name' => 'abc1',
@@ -79,6 +78,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function tearDown() {
+    $this->_apiversion = 3;
     $this->callAPISuccess('Setting', 'create', array('includeOrderByClause' => TRUE));
     // truncate a few tables
     $tablesToTruncate = array(
@@ -109,8 +109,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * Verify that attempt to create individual contact with only
    * first and last names succeeds
+   *
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testAddCreateIndividual() {
+  public function testAddCreateIndividual($version) {
+    $this->_apiversion = $version;
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_contact');
     $params = array(
       'first_name' => 'abc1',
@@ -201,8 +205,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test civicrm_contact_create.
    *
    * Verify that preferred language can be set.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testAddCreateIndividualWithPreferredLanguage() {
+  public function testAddCreateIndividualWithPreferredLanguage($version) {
+    $this->_apiversion = $version;
     $params = array(
       'first_name' => 'abc1',
       'contact_type' => 'Individual',
@@ -218,6 +225,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test civicrm_contact_create with sub-types.
    *
    * Verify that sub-types are created successfully and not deleted by subsequent updates.
+   *
+   * v3 only - uses nonstandard syntax
    */
   public function testIndividualSubType() {
     $params = array(
@@ -243,8 +252,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Verify that we can retreive contacts of different sub types
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetMultipleContactSubTypes() {
+  public function testGetMultipleContactSubTypes($version) {
+    $this->_apiversion = $version;
 
     // This test presumes that there are no parents or students in the dataset
 
@@ -376,8 +388,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test creating individual by name.
    *
    * Verify create individual contact with only first and last names succeeds.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateNameIndividual() {
+  public function testCreateNameIndividual($version) {
+    $this->_apiversion = $version;
     $params = array(
       'first_name' => 'abc1',
       'contact_type' => 'Individual',
@@ -391,8 +406,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test creating individual by display_name.
    *
    * Display name & sort name should be set.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateDisplayNameIndividual() {
+  public function testCreateDisplayNameIndividual($version) {
+    $this->_apiversion = $version;
     $params = array(
       'display_name' => 'abc1',
       'contact_type' => 'Individual',
@@ -405,8 +423,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test that name searches are case insensitive.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetNameVariantsCaseInsensitive() {
+  public function testGetNameVariantsCaseInsensitive($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess('contact', 'create', [
       'display_name' => 'Abc1',
       'contact_type' => 'Individual',
@@ -414,7 +435,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->callAPISuccessGetSingle('Contact', ['display_name' => 'aBc1']);
     $this->callAPISuccessGetSingle('Contact', ['sort_name' => 'aBc1']);
     Civi::settings()->set('includeNickNameInName', TRUE);
-    $this->callAPISuccessGetSingle('Contact', ['display_name' => 'aBc1']);
+    $result = $this->callAPISuccessGetSingle('Contact', ['display_name' => 'aBc1']);
     $this->callAPISuccessGetSingle('Contact', ['sort_name' => 'aBc1']);
     Civi::settings()->set('includeNickNameInName', FALSE);
   }
@@ -475,8 +496,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * Verify that attempt to create household contact with only
    * household name succeeds
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateNameHousehold() {
+  public function testCreateNameHousehold($version) {
+    $this->_apiversion = $version;
     $params = array(
       'household_name' => 'The abc Household',
       'contact_type' => 'Household',
@@ -489,8 +513,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * Verify that attempt to create organization contact with only
    * organization name succeeds.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateNameOrganization() {
+  public function testCreateNameOrganization($version) {
+    $this->_apiversion = $version;
     $params = array(
       'organization_name' => 'The abc Organization',
       'contact_type' => 'Organization',
@@ -511,8 +538,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Check that permissions on API key are restricted (CRM-18112).
+   *
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateApiKey() {
+  public function testCreateApiKey($version) {
+    $this->_apiversion = $version;
     $config = CRM_Core_Config::singleton();
     $contactId = $this->individualCreate(array(
       'first_name' => 'A',
@@ -584,8 +615,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Note that the test is written on purpose without any
    * variables specific to participant so it can be replicated into other entities
    * and / or moved to the automated test suite
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateWithCustom() {
+  public function testCreateWithCustom($version) {
+    $this->_apiversion = $version;
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
 
     $params = $this->_params;
@@ -617,8 +651,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * CRM-14232 test preferred language set to site default if not passed.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreatePreferredLanguageUnset() {
+  public function testCreatePreferredLanguageUnset($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess('Contact', 'create', array(
       'first_name' => 'Snoop',
       'last_name' => 'Dog',
@@ -630,8 +667,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * CRM-14232 test preferred language returns setting if not passed.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreatePreferredLanguageSet() {
+  public function testCreatePreferredLanguageSet($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess('Setting', 'create', array('contact_default_language' => 'fr_FR'));
     $this->callAPISuccess('Contact', 'create', array(
       'first_name' => 'Snoop',
@@ -644,6 +684,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * CRM-14232 test preferred language returns setting if not passed where setting is NULL.
+   * TODO: Api4
    */
   public function testCreatePreferredLanguageNull() {
     $this->callAPISuccess('Setting', 'create', array('contact_default_language' => 'null'));
@@ -658,8 +699,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * CRM-14232 test preferred language returns setting if not passed where setting is NULL.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreatePreferredLanguagePassed() {
+  public function testCreatePreferredLanguagePassed($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess('Setting', 'create', array('contact_default_language' => 'null'));
     $this->callAPISuccess('Contact', 'create', array(
       'first_name' => 'Snoop',
@@ -812,8 +856,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Check deceased contacts are not retrieved.
    *
    * Note at time of writing the default is to return default. This should possibly be changed & test added.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetDeceasedRetrieved() {
+  public function testGetDeceasedRetrieved($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $c2 = $this->callAPISuccess($this->_entity, 'create', array(
       'first_name' => 'bb',
@@ -860,8 +907,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test that we can retrieve contacts using array syntax.
    *
    * I.e 'id' => array('IN' => array('3,4')).
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetINIDArray() {
+  public function testGetINIDArray($version) {
+    $this->_apiversion = $version;
     $c1 = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $c2 = $this->callAPISuccess($this->_entity, 'create', array(
       'first_name' => 'bb',
@@ -917,8 +967,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test that sort works - new syntax.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetSortNewSyntax() {
+  public function testGetSortNewSyntax($version) {
+    $this->_apiversion = $version;
     $c1 = $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $c2 = $this->callAPISuccess($this->_entity, 'create', array(
       'first_name' => 'bb',
@@ -953,8 +1006,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test sort and limit for chained relationship get.
    *
    * https://issues.civicrm.org/jira/browse/CRM-15983
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSortLimitChainedRelationshipGetCRM15983() {
+  public function testSortLimitChainedRelationshipGetCRM15983($version) {
+    $this->_apiversion = $version;
     // Some contact
     $create_result_1 = $this->callAPISuccess('contact', 'create', array(
       'first_name' => 'Jules',
@@ -1016,8 +1072,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test apostrophe works in get & create.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetApostropheCRM10857() {
+  public function testGetApostropheCRM10857($version) {
+    $this->_apiversion = $version;
     $params = array_merge($this->_params, array('last_name' => "O'Connor"));
     $this->callAPISuccess($this->_entity, 'create', $params);
     $result = $this->callAPISuccess($this->_entity, 'getsingle', array(
@@ -1031,8 +1090,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test between accepts zero.
    *
    * In the past it incorrectly required !empty.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetBetweenZeroWorks() {
+  public function testGetBetweenZeroWorks($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess($this->_entity, 'get', [
       'contact_id' => ['BETWEEN' => [0, 9]],
     ]);
@@ -1048,6 +1110,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test retrieval by addressee id.
+   * V3 only - the "skip_greeting_processing" param is not currently in v4
    */
   public function testGetByAddresseeID() {
     $individual1ID = $this->individualCreate([
@@ -1302,8 +1365,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test for direction when chaining relationships.
    *
    * https://issues.civicrm.org/jira/browse/CRM-16084
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testDirectionChainingRelationshipsCRM16084() {
+  public function testDirectionChainingRelationshipsCRM16084($version) {
+    $this->_apiversion = $version;
     // Some contact, called Jules.
     $create_result_1 = $this->callAPISuccess('contact', 'create', array(
       'first_name' => 'Jules',
@@ -1357,9 +1423,6 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     // Clean up first.
     $this->callAPISuccess('contact', 'delete', array(
       'id' => $create_result_1['id'],
-    ));
-    $this->callAPISuccess('contact', 'delete', array(
-      'id' => $create_result_2['id'],
     ));
     $this->callAPISuccess('contact', 'delete', array(
       'id' => $create_result_2['id'],
@@ -1609,8 +1672,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Verify successful update of household contact.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testUpdateHouseholdWithAll() {
+  public function testUpdateHouseholdWithAll($version) {
+    $this->_apiversion = $version;
     $contactID = $this->householdCreate();
 
     $params = [
@@ -1638,8 +1704,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Deliberately exclude contact_type as it should still cope using civicrm_api.
    *
    * CRM-7645.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testUpdateCreateWithID() {
+  public function testUpdateCreateWithID($version) {
+    $this->_apiversion = $version;
     $contactID = $this->individualCreate();
     $this->callAPISuccess('Contact', 'Update', [
       'id' => $contactID,
@@ -1650,8 +1719,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_contact_delete() with no contact ID.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactDeleteNoID() {
+  public function testContactDeleteNoID($version) {
+    $this->_apiversion = $version;
     $params = array(
       'foo' => 'bar',
     );
@@ -1660,16 +1732,22 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_contact_delete() with error.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactDeleteError() {
+  public function testContactDeleteError($version) {
+    $this->_apiversion = $version;
     $params = array('contact_id' => 999);
     $this->callAPIFailure('contact', 'delete', $params);
   }
 
   /**
    * Test civicrm_contact_delete().
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactDelete() {
+  public function testContactDelete($version) {
+    $this->_apiversion = $version;
     $contactID = $this->individualCreate();
     $params = array(
       'id' => $contactID,
@@ -1679,8 +1757,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_contact_get() return only first name.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactGetRetFirst() {
+  public function testContactGetRetFirst($version) {
+    $this->_apiversion = $version;
     $contact = $this->callAPISuccess('contact', 'create', $this->_params);
     $params = array(
       'contact_id' => $contact['id'],
@@ -1697,8 +1778,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test civicrm_contact_get() return only first name & last name.
    *
    * Use comma separated string return with a space.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactGetReturnFirstLast() {
+  public function testContactGetReturnFirstLast($version) {
+    $this->_apiversion = $version;
     $contact = $this->callAPISuccess('contact', 'create', $this->_params);
     $params = array(
       'contact_id' => $contact['id'],
@@ -1724,8 +1808,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test civicrm_contact_get() return only first name & last name.
    *
    * Use comma separated string return without a space
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactGetReturnFirstLastNoComma() {
+  public function testContactGetReturnFirstLastNoComma($version) {
+    $this->_apiversion = $version;
     $contact = $this->callAPISuccess('contact', 'create', $this->_params);
     $params = array(
       'contact_id' => $contact['id'],
@@ -1770,15 +1857,21 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_contact_get) with empty params.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactGetEmptyParams() {
+  public function testContactGetEmptyParams($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess('contact', 'get', []);
   }
 
   /**
    * Test civicrm_contact_get(,true) with no matches.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactGetOldParamsNoMatches() {
+  public function testContactGetOldParamsNoMatches($version) {
+    $this->_apiversion = $version;
     $this->individualCreate();
     $result = $this->callAPISuccess('contact', 'get', ['first_name' => 'Fred']);
     $this->assertEquals(0, $result['count']);
@@ -1818,8 +1911,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Ensure consistent return format for option group fields.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSetPreferredCommunicationNull() {
+  public function testSetPreferredCommunicationNull($version) {
+    $this->_apiversion = $version;
     $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
       'preferred_communication_method' => array('Phone', 'SMS'),
     )));
@@ -2055,8 +2151,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test creating multiple phones using chaining.
    *
    * @throws \Exception
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCRM13252MultipleChainedPhones() {
+  public function testCRM13252MultipleChainedPhones($version) {
+    $this->_apiversion = $version;
     $contactID = $this->householdCreate();
     $this->callAPISuccessGetCount('phone', array('contact_id' => $contactID), 0);
     $params = array(
@@ -2103,8 +2202,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Verify attempt to create individual with chained arrays and sequential.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetIndividualWithChainedArraysAndSequential() {
+  public function testGetIndividualWithChainedArraysAndSequential($version) {
+    $this->_apiversion = $version;
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
     $params['custom_' . $ids['custom_field_id']] = "custom string";
 
@@ -2206,9 +2308,12 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   /**
    * Verify attempt to create individual with chained arrays and sequential.
    *
-   *  See https://issues.civicrm.org/jira/browse/CRM-15815
+   * @see https://issues.civicrm.org/jira/browse/CRM-15815
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateIndividualWithChainedArrayAndSequential() {
+  public function testCreateIndividualWithChainedArrayAndSequential($version) {
+    $this->_apiversion = $version;
     $params = array(
       'sequential' => 1,
       'first_name' => 'abc5',
@@ -2393,6 +2498,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test checks usage of $values to pick & choose inputs.
+   *
+   * Api3 Only - chaining syntax is too funky for v4 (assuming entityTag "entity_id" field will be filled by magic)
    */
   public function testChainingValuesCreate() {
     $description = "This demonstrates the usage of chained api functions.  Specifically it has one 'parent function' &
@@ -2422,8 +2529,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test TrueFalse format - I couldn't come up with an easy way to get an error on Get.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactGetFormatIsSuccessTrue() {
+  public function testContactGetFormatIsSuccessTrue($version) {
+    $this->_apiversion = $version;
     $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $description = "This demonstrates use of the 'format.is_success' param.
     This param causes only the success or otherwise of the function to be returned as BOOLEAN";
@@ -2436,8 +2546,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test TrueFalse format.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactCreateFormatIsSuccessFalse() {
+  public function testContactCreateFormatIsSuccessFalse($version) {
+    $this->_apiversion = $version;
 
     $description = "This demonstrates use of the 'format.is_success' param.
     This param causes only the success or otherwise of the function to be returned as BOOLEAN";
@@ -2451,8 +2564,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test long display names.
    *
    * CRM-21258
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactCreateLongDisplayName() {
+  public function testContactCreateLongDisplayName($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPISuccess('Contact', 'Create', array(
       'first_name' => str_pad('a', 64, 'a'),
       'last_name' => str_pad('a', 64, 'a'),
@@ -2466,8 +2582,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test that we can set the sort name via the api or alter it via a hook.
    *
    * As of writing this is being fixed for Organization & Household but it makes sense to do for individuals too.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAlterSortName() {
+  public function testCreateAlterSortName($version) {
+    $this->_apiversion = $version;
     $organizationID = $this->organizationCreate(['organization_name' => 'The Justice League', 'sort_name' => 'Justice League, The']);
     $organization = $this->callAPISuccessGetSingle('Contact', ['return' => ['sort_name', 'display_name'], 'id' => $organizationID]);
     $this->assertEquals('Justice League, The', $organization['sort_name']);
@@ -2496,8 +2615,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test Single Entity format.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactGetSingleEntityArray() {
+  public function testContactGetSingleEntityArray($version) {
+    $this->_apiversion = $version;
     $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $description = "This demonstrates use of the 'format.single_entity_array' param.
       This param causes the only contact to be returned as an array without the other levels.
@@ -2510,8 +2632,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test Single Entity format.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactGetFormatCountOnly() {
+  public function testContactGetFormatCountOnly($version) {
+    $this->_apiversion = $version;
     $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $description = "This demonstrates use of the 'getCount' action.
       This param causes the count of the only function to be returned as an integer.";
@@ -2524,8 +2649,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test id only format.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactGetFormatIDOnly() {
+  public function testContactGetFormatIDOnly($version) {
+    $this->_apiversion = $version;
     $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $description = "This demonstrates use of the 'format.id_only' param.
       This param causes the id of the only entity to be returned as an integer.
@@ -2539,8 +2667,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test id only format.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactGetFormatSingleValue() {
+  public function testContactGetFormatSingleValue($version) {
+    $this->_apiversion = $version;
     $contactID = $this->individualCreate(['first_name' => 'Test', 'last_name' => 'Contact']);
     $description = "This demonstrates use of the 'format.single_value' param.
       This param causes only a single value of the only entity to be returned as an string.
@@ -2554,8 +2685,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test that permissions are respected when creating contacts.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactCreationPermissions() {
+  public function testContactCreationPermissions($version) {
+    $this->_apiversion = $version;
     $params = array(
       'contact_type' => 'Individual',
       'first_name' => 'Foo',
@@ -2565,7 +2699,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array('access CiviCRM');
     $result = $this->callAPIFailure('contact', 'create', $params);
-    $this->assertEquals('API permission check failed for Contact/create call; insufficient permission: require access CiviCRM and add contacts', $result['error_message'], 'lacking permissions should not be enough to create a contact');
+    $this->assertContains('failed', $result['error_message'], 'lacking permissions should not be enough to create a contact');
 
     $config->userPermissionClass->permissions = array('access CiviCRM', 'add contacts', 'import contacts');
     $this->callAPISuccess('contact', 'create', $params);
@@ -2573,6 +2707,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test that delete with skip undelete respects permissions.
+   * TODO: Api4
    */
   public function testContactDeletePermissions() {
     $contactID = $this->individualCreate();
@@ -2591,8 +2726,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test update with check permissions set.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactUpdatePermissions() {
+  public function testContactUpdatePermissions($version) {
+    $this->_apiversion = $version;
     $params = array(
       'contact_type' => 'Individual',
       'first_name' => 'Foo',
@@ -3105,8 +3243,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test the use of sql operators.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testSQLOperatorsOnContactAPI() {
+  public function testSQLOperatorsOnContactAPI($version) {
+    $this->_apiversion = $version;
     $this->individualCreate();
     $this->organizationCreate();
     $this->householdCreate();
@@ -3118,8 +3259,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * CRM-14743 - test api respects search operators.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetModifiedDateByOperators() {
+  public function testGetModifiedDateByOperators($version) {
+    $this->_apiversion = $version;
     $preExistingContactCount = CRM_Core_DAO::singleValueQuery('select count(*) FROM civicrm_contact');
     $contact1 = $this->individualCreate();
     $sql = "UPDATE civicrm_contact SET created_date = '2012-01-01', modified_date = '2013-01-01' WHERE id = " . $contact1;
@@ -3138,8 +3282,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * CRM-14743 - test api respects search operators.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetCreatedDateByOperators() {
+  public function testGetCreatedDateByOperators($version) {
+    $this->_apiversion = $version;
     $preExistingContactCount = CRM_Core_DAO::singleValueQuery('select count(*) FROM civicrm_contact');
     $contact1 = $this->individualCreate();
     $sql = "UPDATE civicrm_contact SET created_date = '2012-01-01' WHERE id = " . $contact1;
@@ -3769,8 +3916,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * CRM-21041 Test if 'communication style' is set to site default if not passed.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateCommunicationStyleUnset() {
+  public function testCreateCommunicationStyleUnset($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess('Contact', 'create', array(
       'first_name' => 'John',
       'last_name' => 'Doe',
@@ -3804,6 +3954,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Test that creating a contact with various contact greetings works.
+   * V3 Only.
    */
   public function testContactGreetingsCreate() {
     $contact = $this->callAPISuccess('Contact', 'create', array('first_name' => 'Alan', 'last_name' => 'MouseMouse', 'contact_type' => 'Individual'));

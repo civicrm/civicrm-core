@@ -305,6 +305,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $session = CRM_Core_Session::singleton();
     $session->set('userID', NULL);
 
+    $this->_apiversion = 3;
+
     // REVERT
     $this->errorScope = CRM_Core_TemporaryErrorScope::useException();
     //  Use a temporary file for STDIN
@@ -451,6 +453,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *  Common teardown functions for all unit tests.
    */
   protected function tearDown() {
+    $this->_apiversion = 3;
+
     error_reporting(E_ALL & ~E_NOTICE);
     CRM_Utils_Hook::singleton()->reset();
     if ($this->hookClass) {
@@ -1372,7 +1376,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       $params['assignee_contact_id'] = $params['target_contact_id'];
     }
 
-    $result = $this->callAPISuccess('Activity', 'create', $params);
+    $result = civicrm_api3('Activity', 'create', $params);
 
     $result['target_contact_id'] = $params['target_contact_id'];
     $result['assignee_contact_id'] = $params['assignee_contact_id'];

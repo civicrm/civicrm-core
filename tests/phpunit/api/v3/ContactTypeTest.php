@@ -35,7 +35,6 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
-    $this->_apiversion = 3;
     $params = array(
       'label' => 'sub_individual',
       'name' => 'sub_individual',
@@ -70,8 +69,11 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
   /**
    * Test add methods with valid data.
    * success expected
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactCreate() {
+  public function testContactCreate($version) {
+    $this->_apiversion = $version;
 
     // check for Type:Individual Subtype:sub_individual
     $contactParams = array(
@@ -112,8 +114,11 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
 
   /**
    * Test add with invalid data.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactAddInvalidData() {
+  public function testContactAddInvalidData($version) {
+    $this->_apiversion = $version;
 
     // check for Type:Individual Subtype:sub_household
     $contactParams = array(
@@ -136,8 +141,11 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
   /**
    * Test update with no subtype to valid subtype.
    * success expected
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactUpdateNoSubtypeValid() {
+  public function testContactUpdateNoSubtypeValid($version) {
+    $this->_apiversion = $version;
 
     // check for Type:Individual
     $contactParams = array(
@@ -200,8 +208,11 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
 
   /**
    * Test update with no subtype to invalid subtype.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactUpdateNoSubtypeInvalid() {
+  public function testContactUpdateNoSubtypeInvalid($version) {
+    $this->_apiversion = $version;
 
     // check for Type:Individual
     $contactParams = array(
@@ -248,8 +259,11 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
   /**
    * Test update with no subtype to valid subtype.
    * success expected
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactUpdateSubtypeValid() {
+  public function testContactUpdateSubtypeValid($version) {
+    $this->_apiversion = $version;
 
     $params = array(
       'label' => 'sub2_individual',
@@ -336,8 +350,11 @@ class api_v3_ContactTypeTest extends CiviUnitTestCase {
 
   /**
    * Test update with no subtype to invalid subtype.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactUpdateSubtypeInvalid() {
+  public function testContactUpdateSubtypeInvalid($version) {
+    $this->_apiversion = $version;
 
     // check for Type:Individual subtype:sub_individual
     $contactParams = array(

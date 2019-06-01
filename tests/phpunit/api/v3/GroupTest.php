@@ -32,7 +32,6 @@
  * @group headless
  */
 class api_v3_GroupTest extends CiviUnitTestCase {
-  protected $_apiversion = 3;
   protected $_groupID;
 
   /**
@@ -57,8 +56,11 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
   /**
    * Test missing required title parameter results in an error.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGroupCreateNoTitle() {
+  public function testGroupCreateNoTitle($version) {
+    $this->_apiversion = $version;
     $params = array(
       'name' => 'Test Group No title ',
       'domain_id' => 1,
@@ -71,10 +73,15 @@ class api_v3_GroupTest extends CiviUnitTestCase {
       ),
     );
 
-    $this->callAPIFailure('group', 'create', $params, 'Mandatory key(s) missing from params array: title');
+    $this->callAPIFailure('group', 'create', $params, 'title');
   }
 
-  public function testGetGroupWithEmptyParams() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testGetGroupWithEmptyParams($version) {
+    $this->_apiversion = $version;
     $group = $this->callAPISuccess('group', 'get', array());
 
     $group = $group["values"];
@@ -88,14 +95,22 @@ class api_v3_GroupTest extends CiviUnitTestCase {
    * Test ability to get active, inactive and both.
    *
    * Default is active only.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetGroupActiveAndInactive() {
+  public function testGetGroupActiveAndInactive($version) {
+    $this->_apiversion = $version;
     $this->groupCreate(['is_active' => 0, 'name' => 'group_2', 'title' => 2]);
     $group1 = $this->callAPISuccessGetSingle('Group', ['is_active' => 1]);
     $this->callAPISuccessGetCount('Group', [], 2);
   }
 
-  public function testGetGroupParamsWithGroupId() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testGetGroupParamsWithGroupId($version) {
+    $this->_apiversion = $version;
     $params = array('id' => $this->_groupID);
     $group = $this->callAPISuccess('group', 'get', $params);
 
@@ -108,7 +123,12 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     }
   }
 
-  public function testGetGroupParamsWithGroupName() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testGetGroupParamsWithGroupName($version) {
+    $this->_apiversion = $version;
     $params = array(
       'name' => "Test Group 1",
     );
@@ -124,7 +144,12 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     }
   }
 
-  public function testGetGroupParamsWithReturnName() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testGetGroupParamsWithReturnName($version) {
+    $this->_apiversion = $version;
     $params = array();
     $params['id'] = $this->_groupID;
     $params['return.name'] = 1;
@@ -134,7 +159,12 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     );
   }
 
-  public function testGetGroupParamsWithGroupTitle() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testGetGroupParamsWithGroupTitle($version) {
+    $this->_apiversion = $version;
     $params = array();
     $params['title'] = 'New Test Group Created';
     $group = $this->callAPISuccess('group', 'get', $params);
@@ -150,6 +180,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
   /**
    * Test Group create with Group Type and Parent
+   * FIXME: Api4
    */
   public function testGroupCreateWithTypeAndParent() {
     $params = array(
@@ -214,6 +245,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
   /**
    * Test that an array of valid values works for group_type field.
+   * FIXME: Api4
    */
   public function testGroupTypeWithPseudoconstantArray() {
     $params = [
@@ -228,22 +260,37 @@ class api_v3_GroupTest extends CiviUnitTestCase {
     $this->assertAPIArrayComparison([2, 1], $groupType);
   }
 
-  public function testGetNonExistingGroup() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testGetNonExistingGroup($version) {
+    $this->_apiversion = $version;
     $params = array();
     $params['title'] = 'No such group Exist';
     $group = $this->callAPISuccess('group', 'get', $params);
     $this->assertEquals(0, $group['count']);
   }
 
-  public function testgroupdeleteParamsnoId() {
-    $group = $this->callAPIFailure('group', 'delete', array(), 'Mandatory key(s) missing from params array: id');
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testgroupdeleteParamsnoId($version) {
+    $this->_apiversion = $version;
+    $group = $this->callAPIFailure('group', 'delete', array());
   }
 
-  public function testgetfields() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testgetfields($version) {
+    $this->_apiversion = $version;
     $description = "Demonstrate use of getfields to interrogate api.";
     $params = array('action' => 'create');
     $result = $this->callAPIAndDocument('group', 'getfields', $params, __FUNCTION__, __FILE__, $description);
-    $this->assertEquals(1, $result['values']['is_active']['api.default']);
+    $this->assertEquals('is_active', $result['values']['is_active']['name']);
   }
 
   public function testIllegalParentsParams() {
@@ -273,6 +320,7 @@ class api_v3_GroupTest extends CiviUnitTestCase {
 
   /**
    * Test that ACLs are applied to group.get calls.
+   * FIXME: Api4
    */
   public function testGroupGetACLs() {
     $this->createLoggedInUser();

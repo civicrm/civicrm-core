@@ -37,7 +37,6 @@
  * @group headless
  */
 class api_v3_ConstantTest extends CiviUnitTestCase {
-  protected $_apiversion = 3;
 
   /**
    * Test setup for every test.
@@ -48,7 +47,6 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
   public function setUp() {
     //  Connect to the database
     parent::setUp();
-    $this->_apiversion = 3;
   }
 
   /**
@@ -89,8 +87,11 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_address_getoptions( 'location_type_id' )
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testLocationTypeGet() {
+  public function testLocationTypeGet($version) {
+    $this->_apiversion = $version;
     // needed to get rid of cached values from previous tests
     CRM_Core_PseudoConstant::flush();
 
@@ -107,8 +108,11 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_phone_getoptions( 'phone_type_id' )
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testPhoneType() {
+  public function testPhoneType($version) {
+    $this->_apiversion = $version;
     $params = array(
       'field' => 'phone_type_id',
     );
@@ -124,8 +128,11 @@ class api_v3_ConstantTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_constant_get( 'mailProtocol' )
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testmailProtocol() {
+  public function testmailProtocol($version) {
+    $this->_apiversion = $version;
     $params = array(
       'field' => 'protocol',
     );

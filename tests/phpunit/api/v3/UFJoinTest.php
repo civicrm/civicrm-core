@@ -71,8 +71,11 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
 
   /**
    * Find uf join group id.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testFindUFGroupId() {
+  public function testFindUFGroupId($version) {
+    $this->_apiversion = $version;
     $params = array(
       'module' => 'CiviContribute',
       'entity_table' => 'civicrm_contribution_page',
@@ -94,19 +97,23 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
     }
   }
 
-  public function testUFJoinEditWrongParamsType() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testUFJoinEditWrongParamsType($version) {
+    $this->_apiversion = $version;
     $params = 'a string';
     $result = $this->callAPIFailure('uf_join', 'create', $params);
     $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
   }
 
-  public function testUFJoinEditEmptyParams() {
-    $params = array();
-    $result = $this->callAPIFailure('uf_join', 'create', $params);
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: module, weight, uf_group_id');
-  }
-
-  public function testUFJoinEditWithoutUFGroupId() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testUFJoinEditWithoutUFGroupId($version) {
+    $this->_apiversion = $version;
     $params = array(
       'module' => 'CiviContribute',
       'entity_table' => 'civicrm_contribution_page',
@@ -115,13 +122,18 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
     $result = $this->callAPIFailure('uf_join', 'create', $params);
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: uf_group_id');
+    $this->assertContains('Mandatory', $result['error_message']);
+    $this->assertContains('missing', $result['error_message']);
+    $this->assertContains('uf_group_id', $result['error_message']);
   }
 
   /**
    * Create/update uf join
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateUFJoin() {
+  public function testCreateUFJoin($version) {
+    $this->_apiversion = $version;
     $params = array(
       'module' => 'CiviContribute',
       'entity_table' => 'civicrm_contribution_page',
@@ -155,8 +167,11 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
   /**
    * Ensure we can create a survey join which is less common than event or contribution
    * joins.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateSurveyUFJoin() {
+  public function testCreateSurveyUFJoin($version) {
+    $this->_apiversion = $version;
     $params = array(
       'module' => 'CiviCampaign',
       'entity_table' => 'civicrm_survey',
@@ -172,18 +187,25 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
     $this->assertEquals($ufJoin['values'][0]['is_active'], $params['is_active']);
   }
 
-  public function testFindUFJoinWrongParamsType() {
-    $params = 'a string';
-    $result = $this->callAPIFailure('uf_join', 'create', $params);
-    $this->assertEquals($result['error_message'], 'Input variable `params` is not an array');
-  }
-
-  public function testFindUFJoinEmptyParams() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testFindUFJoinEmptyParams($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPIFailure('uf_join', 'create', array());
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: module, weight, uf_group_id');
+    $this->assertContains('Mandatory', $result['error_message']);
+    $this->assertContains('missing', $result['error_message']);
+    $this->assertContains('module', $result['error_message']);
+    $this->assertContains('uf_group_id', $result['error_message']);
   }
 
-  public function testFindUFJoinWithoutUFGroupId() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateUFJoinWithoutUFGroupId($version) {
+    $this->_apiversion = $version;
     $params = array(
       'module' => 'CiviContribute',
       'entity_table' => 'civicrm_contribution_page',
@@ -192,13 +214,18 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
       'is_active' => 1,
     );
     $result = $this->callAPIFailure('uf_join', 'create', $params);
-    $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: uf_group_id');
+    $this->assertContains('Mandatory', $result['error_message']);
+    $this->assertContains('missing', $result['error_message']);
+    $this->assertContains('uf_group_id', $result['error_message']);
   }
 
   /**
    * Find uf join id.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetUFJoinId() {
+  public function testGetUFJoinId($version) {
+    $this->_apiversion = $version;
     $params = array(
       'module' => 'CiviContribute',
       'entity_table' => 'civicrm_contribution_page',
@@ -223,8 +250,11 @@ class api_v3_UFJoinTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_activity_create() using example code.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testUFJoinCreateExample() {
+  public function testUFJoinCreateExample($version) {
+    $this->_apiversion = $version;
     require_once 'api/v3/examples/UFJoin/Create.php';
     $result = UF_join_create_example();
     $expectedResult = UF_join_create_expectedresult();

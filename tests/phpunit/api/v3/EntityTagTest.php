@@ -69,7 +69,7 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
     $this->_householdID = $this->houseHoldCreate();
     $this->_organizationID = $this->organizationCreate();
     $this->_params = array(
-      'contact_id' => $this->_individualID,
+      'entity_id' => $this->_individualID,
       'tag_id' => $this->_tagID,
     );
   }
@@ -90,10 +90,12 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
 
   /**
    * Test basic create.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testContactEntityTagCreate() {
+  public function testContactEntityTagCreate($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPISuccess('entity_tag', 'create', $this->_params);
-    $this->assertEquals($result['added'], 1);
   }
 
   /**
@@ -128,15 +130,19 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
 
   /**
    * Basic get functionality test.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testIndividualEntityTagGet() {
+  public function testIndividualEntityTagGet($version) {
+    $this->_apiversion = $version;
     $individualEntity = $this->callAPISuccess('entity_tag', 'create', $this->_params);
-    $this->assertEquals($individualEntity['added'], 1);
 
     $paramsEntity = array(
       'contact_id' => $this->_individualID,
     );
-    $this->callAPIAndDocument('entity_tag', 'get', $paramsEntity, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('entity_tag', 'get', $paramsEntity, __FUNCTION__, __FILE__);
+    $this->assertEquals(1, $result['count']);
+    $this->assertEquals($this->_tagID, $result['values'][$result['id']]['tag_id']);
   }
 
   /**
@@ -167,18 +173,22 @@ class api_v3_EntityTagTest extends CiviUnitTestCase {
 
   /**
    * Test tag can be added to an organization.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testOrganizationEntityGet() {
+  public function testOrganizationEntityGet($version) {
+    $this->_apiversion = $version;
 
     $params = array(
-      'contact_id' => $this->_organizationID,
+      'entity_id' => $this->_organizationID,
       'tag_id' => $this->_tagID,
     );
 
-    $organizationEntity = $this->callAPISuccess('entity_tag', 'create', $params);
-    $this->assertEquals($organizationEntity['added'], 1);
+    $this->callAPISuccess('entity_tag', 'create', $params);
 
-    $this->callAPISuccess('entity_tag', 'getsingle', array('contact_id' => $this->_organizationID));
+    $tag = $this->callAPISuccess('entity_tag', 'getsingle', array('contact_id' => $this->_organizationID));
+    $this->assertEquals($this->_organizationID, $tag['entity_id']);
+    $this->assertEquals($this->_tagID, $tag['tag_id']);
   }
 
   /**

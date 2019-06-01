@@ -26,9 +26,7 @@
  */
 
 /**
- * Test class for UFGroup API - civicrm_uf_*
- *
- * @todo Split UFGroup and UFJoin tests
+ * Test class for UFField API
  *
  * @package   CiviCRM
  * @group headless
@@ -105,8 +103,11 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
 
   /**
    * Create / updating field.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateUFField() {
+  public function testCreateUFField($version) {
+    $this->_apiversion = $version;
     $params = $this->_params;
     $ufField = $this->callAPIAndDocument('uf_field', 'create', $params, __FUNCTION__, __FILE__);
     unset($params['uf_group_id']);
@@ -118,8 +119,11 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
 
   /**
    * Failure test for field_name.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateUFFieldWithBadFieldName() {
+  public function testCreateUFFieldWithBadFieldName($version) {
+    $this->_apiversion = $version;
     $params = $this->_params;
     $params['field_name'] = 'custom_98789';
     $this->callAPIFailure('uf_field', 'create', $params);
@@ -127,8 +131,11 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
 
   /**
    * Failure test for bad parameters.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateUFFieldWithWrongParams() {
+  public function testCreateUFFieldWithWrongParams($version) {
+    $this->_apiversion = $version;
     $this->callAPIFailure('uf_field', 'create', ['field_name' => 'test field']);
     $this->callAPIFailure('uf_field', 'create', ['label' => 'name-less field']);
   }
@@ -137,8 +144,11 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
    * Create a field with 'weight=1' and then a second with 'weight=1'.
    *
    * The second field winds up with weight=1, and the first field gets bumped to 'weight=2'.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateUFFieldWithDefaultAutoWeight() {
+  public function testCreateUFFieldWithDefaultAutoWeight($version) {
+    $this->_apiversion = $version;
     $params1 = $this->_params;
     $ufField1 = $this->callAPISuccess('uf_field', 'create', $params1);
     $this->assertEquals(1, $ufField1['values'][$ufField1['id']]['weight']);
@@ -161,8 +171,11 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
 
   /**
    * Deleting field.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testDeleteUFField() {
+  public function testDeleteUFField($version) {
+    $this->_apiversion = $version;
     $ufField = $this->callAPISuccess('uf_field', 'create', $this->_params);
     $params = [
       'field_id' => $ufField['id'],
@@ -172,8 +185,11 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
 
   /**
    * Test getting ufField.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetUFFieldSuccess() {
+  public function testGetUFFieldSuccess($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess($this->_entity, 'create', $this->_params);
     $result = $this->callAPIAndDocument($this->_entity, 'get', [], __FUNCTION__, __FILE__);
     $this->getAndCheck($this->_params, $result['id'], $this->_entity);
@@ -243,8 +259,11 @@ class api_v3_UFFieldTest extends CiviUnitTestCase {
 
   /**
    * Check Profile API permission without ACL.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testProfilesWithoutACL() {
+  public function testProfilesWithoutACL($version) {
+    $this->_apiversion = $version;
     $this->createLoggedInUser();
     $baseFields[] = [
       'field_name' => 'first_name',
