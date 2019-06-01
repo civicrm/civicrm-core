@@ -433,7 +433,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * Store and return an array of all active custom fields.
    *
    * @param string $customDataType
-   *   Type of Custom Data; empty is a synonym for "all contact data types".
+   *   Type of Custom Data; 'ANY' is a synonym for "all contact data types".
    * @param bool $showAll
    *   If true returns all fields (includes disabled fields).
    * @param bool $inline
@@ -464,6 +464,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   ) {
     if (empty($customDataType)) {
       $customDataType = array('Contact', 'Individual', 'Organization', 'Household');
+    }
+    if ($customDataType === 'ANY') {
+      // NULL should have been respected but the line above broke that.
+      // boo for us not having enough unit tests back them.
+      $customDataType = NULL;
     }
     if ($customDataType && !is_array($customDataType)) {
 
@@ -630,6 +635,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
         $fields = array();
         while (($dao->fetch()) != NULL) {
+          $fields[$dao->id]['id'] = $dao->id;
           $fields[$dao->id]['label'] = $dao->label;
           $fields[$dao->id]['groupTitle'] = $dao->title;
           $fields[$dao->id]['data_type'] = $dao->data_type;
@@ -650,7 +656,16 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $fields[$dao->id]['is_required'] = $dao->is_required;
           $fields[$dao->id]['table_name'] = $dao->table_name;
           $fields[$dao->id]['column_name'] = $dao->column_name;
+          // Probably we should use a different fn to get the extends tables but this is a refactor so not changing that now.
+          $fields[$dao->id]['extends_table'] = array_key_exists($dao->extends, CRM_Core_BAO_CustomQuery::$extendsMap) ? CRM_Core_BAO_CustomQuery::$extendsMap[$dao->extends] : '';
+          if (in_array($dao->extends, CRM_Contact_BAO_ContactType::subTypes())) {
+            // if $extends is a subtype, refer contact table
+            $fields[$dao->id]['extends_table'] = 'civicrm_contact';
+          }
+          // Search table is used by query object searches..
+          $fields[$dao->id]['search_table'] = ($fields[$dao->id]['extends_table'] == 'civicrm_contact') ? 'contact_a' : $fields[$dao->id]['extends_table'];
           self::getOptionsForField($fields[$dao->id], $dao->option_group_name);
+
         }
 
         CRM_Core_BAO_Cache::setItem($fields,
