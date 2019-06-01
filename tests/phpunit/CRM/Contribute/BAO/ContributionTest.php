@@ -1115,7 +1115,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
           'previous_line_total' => 100,
           'diff' => -1,
         ),
-        'context' => 'changePaymentInstrument',
+        // Most contexts are ignored. Removing refs to change payment instrument so placeholder.
+        'context' => 'not null',
         'expectedItemAmount' => -100,
       ),
       array(
