@@ -112,14 +112,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
    */
   public function commonProcess(&$params) {
 
-    // save components to be enabled
-    if (array_key_exists('enableComponents', $params)) {
-      civicrm_api3('setting', 'create', [
-        'enable_components' => $params['enableComponents'],
-      ]);
-      unset($params['enableComponents']);
-    }
-
     foreach (['verifySSL', 'enableSSL'] as $name) {
       if (isset($params[$name])) {
         Civi::settings()->set($name, $params[$name]);
@@ -127,7 +119,6 @@ class CRM_Admin_Form_Setting extends CRM_Core_Form {
       }
     }
     try {
-      $settings = $this->getSettingsToSetByMetadata($params);
       $this->saveMetadataDefinedSettings($params);
     }
     catch (CiviCRM_API3_Exception $e) {

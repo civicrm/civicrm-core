@@ -1158,4 +1158,21 @@ class CRM_Core_SelectValues {
     return $options;
   }
 
+  /**
+   * Get components (translated for display.
+   *
+   * @return array
+   *
+   * @throws \Exception
+   */
+  public static function getComponentSelectValues() {
+    $ret = [];
+    $components = CRM_Core_Component::getComponents();
+    foreach ($components as $name => $object) {
+      $ret[$name] = $object->info['translatedName'];
+    }
+
+    return $ret;
+  }
+
 }

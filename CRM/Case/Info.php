@@ -246,10 +246,66 @@ class CRM_Case_Info extends CRM_Core_Component_Info {
       (!$oldValue || !in_array('CiviCase', $oldValue))
     ) {
       $pathToCaseSampleTpl = __DIR__ . '/xml/configuration.sample/';
-      CRM_Admin_Form_Setting_Component::loadCaseSampleData($pathToCaseSampleTpl . 'case_sample.mysql.tpl');
+      self::loadCaseSampleData($pathToCaseSampleTpl . 'case_sample.mysql.tpl');
       if (!CRM_Case_BAO_Case::createCaseViews()) {
         $msg = ts("Could not create the MySQL views for CiviCase. Your mysql user needs to have the 'CREATE VIEW' permission");
         CRM_Core_Error::fatal($msg);
+      }
+    }
+  }
+
+  /**
+   * Load case sample data.
+   *
+   * @param string $fileName
+   * @param bool $lineMode
+   */
+  public static function loadCaseSampleData($fileName, $lineMode = FALSE) {
+    $dao = new CRM_Core_DAO();
+    $db = $dao->getDatabaseConnection();
+
+    $domain = new CRM_Core_DAO_Domain();
+    $domain->find(TRUE);
+    $multiLingual = (bool) $domain->locales;
+    $smarty = CRM_Core_Smarty::singleton();
+    $smarty->assign('multilingual', $multiLingual);
+    $smarty->assign('locales', explode(CRM_Core_DAO::VALUE_SEPARATOR, $domain->locales));
+
+    if (!$lineMode) {
+
+      $string = $smarty->fetch($fileName);
+      // change \r\n to fix windows issues
+      $string = str_replace("\r\n", "\n", $string);
+
+      //get rid of comments starting with # and --
+
+      $string = preg_replace("/^#[^\n]*$/m", "\n", $string);
+      $string = preg_replace("/^(--[^-]).*/m", "\n", $string);
+
+      $queries = preg_split('/;$/m', $string);
+      foreach ($queries as $query) {
+        $query = trim($query);
+        if (!empty($query)) {
+          $res = &$db->query($query);
+          if (PEAR::isError($res)) {
+            die("Cannot execute $query: " . $res->getMessage());
+          }
+        }
+      }
+    }
+    else {
+      $fd = fopen($fileName, "r");
+      while ($string = fgets($fd)) {
+        $string = preg_replace("/^#[^\n]*$/m", "\n", $string);
+        $string = preg_replace("/^(--[^-]).*/m", "\n", $string);
+
+        $string = trim($string);
+        if (!empty($string)) {
+          $res = &$db->query($string);
+          if (PEAR::isError($res)) {
+            die("Cannot execute $string: " . $res->getMessage());
+          }
+        }
       }
     }
   }
