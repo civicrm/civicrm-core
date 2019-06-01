@@ -629,7 +629,7 @@ class CRM_Core_I18n_SchemaStructure {
             'cols' => "60",
           ],
           'description' => [
-            'type' => "TextArea",
+            'type' => "RichTextEditor",
             'rows' => "8",
             'cols' => "60",
           ],
@@ -645,12 +645,12 @@ class CRM_Core_I18n_SchemaStructure {
             'type' => "Text",
           ],
           'intro_text' => [
-            'type' => "TextArea",
+            'type' => "RichTextEditor",
             'rows' => "6",
             'cols' => "50",
           ],
           'footer_text' => [
-            'type' => "TextArea",
+            'type' => "RichTextEditor",
             'rows' => "6",
             'cols' => "50",
           ],
@@ -658,12 +658,12 @@ class CRM_Core_I18n_SchemaStructure {
             'type' => "Text",
           ],
           'confirm_text' => [
-            'type' => "TextArea",
+            'type' => "RichTextEditor",
             'rows' => "6",
             'cols' => "50",
           ],
           'confirm_footer_text' => [
-            'type' => "TextArea",
+            'type' => "RichTextEditor",
             'rows' => "6",
             'cols' => "50",
           ],
@@ -679,17 +679,17 @@ class CRM_Core_I18n_SchemaStructure {
             'type' => "Text",
           ],
           'thankyou_text' => [
-            'type' => "TextArea",
+            'type' => "RichTextEditor",
             'rows' => "6",
             'cols' => "50",
           ],
           'thankyou_footer_text' => [
-            'type' => "TextArea",
+            'type' => "RichTextEditor",
             'rows' => "6",
             'cols' => "50",
           ],
           'pay_later_text' => [
-            'type' => "Text",
+            'type' => "RichTextEditor",
           ],
           'pay_later_receipt' => [
             'type' => "Text",
