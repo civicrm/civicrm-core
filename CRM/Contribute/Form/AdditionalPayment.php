@@ -73,6 +73,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
 
   public $_action = NULL;
 
+  /**
+   * Pre process form.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function preProcess() {
 
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
@@ -118,11 +123,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->_paymentType = 'owed';
     }
     else {
-      CRM_Core_Error::fatal(ts('No payment information found for this record'));
+      throw new CRM_Core_Exception(ts('No payment information found for this record'));
     }
 
     if (!empty($this->_mode) && $this->_paymentType == 'refund') {
-      CRM_Core_Error::fatal(ts('Credit card payment is not for Refund payments use'));
+      throw new CRM_Core_Exception(ts('Credit card payment is not for Refund payments use'));
     }
 
     list($this->_contributorDisplayName, $this->_contributorEmail) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
@@ -139,6 +144,8 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
    * Is this function being called from a datatable selector.
    *
    * If so we don't want to show the buttons.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function isBeingCalledFromSelectorContext() {
     return CRM_Utils_Request::retrieve('selector', 'Positive');
@@ -356,19 +363,16 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->processCreditCard();
     }
 
-    $defaults = [];
-    $contribution = civicrm_api3('Contribution', 'getsingle', [
-      'return' => ["contribution_status_id"],
-      'id' => $this->_contributionId,
-    ]);
-    $contributionStatusId = CRM_Utils_Array::value('contribution_status_id', $contribution);
-    $paymentID = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($this->_contributionId, $this->_params, $this->_paymentType, $participantId);
-    // Fetch the contribution & do proportional line item assignment
-    $params = ['id' => $this->_contributionId];
-    $contribution = CRM_Contribute_BAO_Contribution::retrieve($params, $defaults, $params);
-    // @todo - this line needs to be moved to the Payment.create api - it's not form layer appropriate.
-    // testing required.
-    CRM_Contribute_BAO_Contribution::addPayments([$contribution], $contributionStatusId);
+    $trxnsData = $this->_params;
+    if ($this->_paymentType == 'refund') {
+      $trxnsData['total_amount'] = -$trxnsData['total_amount'];
+    }
+    $trxnsData['participant_id'] = $participantId;
+    $trxnsData['contribution_id'] = $this->_contributionId;
+    // From the
+    $trxnsData['is_send_contribution_notification'] = FALSE;
+    $paymentID = civicrm_api3('Payment', 'create', $trxnsData)['id'];
+
     if ($this->_contributionId && CRM_Core_Permission::access('CiviMember')) {
       $membershipPaymentCount = civicrm_api3('MembershipPayment', 'getCount', ['contribution_id' => $this->_contributionId]);
       if ($membershipPaymentCount) {

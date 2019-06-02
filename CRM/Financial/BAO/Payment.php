@@ -162,6 +162,7 @@ class CRM_Financial_BAO_Payment {
         civicrm_api3('Contribution', 'completetransaction', [
           'id' => $contribution['id'],
           'is_post_payment_create' => TRUE,
+          'is_email_receipt' => $params['is_send_contribution_notification'],
         ]);
         // Get the trxn
         $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
@@ -359,8 +360,6 @@ class CRM_Financial_BAO_Payment {
    * @param $trxnData
    * @param $updateStatus
    *   - deprecate this param
-   *
-   * @todo  - make this protected once recordAdditionalPayment no longer calls it.
    *
    * @return CRM_Financial_DAO_FinancialTrxn
    */
