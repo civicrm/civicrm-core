@@ -140,7 +140,7 @@ class CRM_Export_BAO_ExportProcessor {
    * CRM_Export_BAO_ExportProcessor constructor.
    *
    * @param int $exportMode
-   * @param array|NULL $requestedFields
+   * @param array|null $requestedFields
    * @param string $queryOperator
    * @param bool $isMergeSameHousehold
    * @param bool $isPostalableOnly

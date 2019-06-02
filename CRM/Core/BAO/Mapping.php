@@ -299,7 +299,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @param int $columnNo
    * @param int $blockCount
    *   (no of blocks shown).
-   * @param NULL $exportMode
+   * @param int $exportMode
    */
   public static function buildMappingForm(&$form, $mappingType, $mappingId, $columnNo, $blockCount, $exportMode = NULL) {
 

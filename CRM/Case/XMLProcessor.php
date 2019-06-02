@@ -36,7 +36,9 @@ class CRM_Case_XMLProcessor {
    * FIXME: This does *NOT* belong in a static property, but we're too late in
    * the 4.5-cycle to do the necessary cleanup.
    *
-   * @var array|null array(int $id => string $relTypeCname)
+   * Format is [int $id => string $relTypeCname].
+   *
+   * @var array|null
    */
   public static $activityTypes = NULL;
 
@@ -44,7 +46,9 @@ class CRM_Case_XMLProcessor {
    * FIXME: This does *NOT* belong in a static property, but we're too late in
    * the 4.5-cycle to do the necessary cleanup.
    *
-   * @var array|null array(int $id => string $relTypeCname)
+   * Format is array(int $id => string $relTypeCname).
+   *
+   * @var array|null
    */
   public static $relationshipTypes = NULL;
 

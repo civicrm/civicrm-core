@@ -300,15 +300,17 @@ class CRM_Core_SelectValues {
   /**
    * Compose the parameters for a date select object.
    *
-   * @param string|NULL $type
+   * @param string|null $type
    *   the type of date
-   * @param string|NULL $format
+   * @param string|null $format
    *   date format (QF format)
    * @param null $minOffset
    * @param null $maxOffset
    * @param string $context
+   *
    * @return array
    *   the date array
+   * @throws \Exception
    */
   public static function date($type = NULL, $format = NULL, $minOffset = NULL, $maxOffset = NULL, $context = 'display') {
     // These options are deprecated. Definitely not used in datepicker. Possibly not even in jcalendar+addDateTime.

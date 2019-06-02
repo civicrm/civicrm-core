@@ -903,7 +903,7 @@ LIMIT {$offset}, {$rowCount}
    *
    * @param int $cid
    * @param int $oid
-   * @param 'dupe-nondupe'|'nondupe-dupe' $oper
+   * @param "dupe-nondupe|nondupe-dupe" $oper
    *
    * @return \CRM_Core_DAO|mixed|null
    */

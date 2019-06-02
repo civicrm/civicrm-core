@@ -51,7 +51,7 @@ class CRM_Event_Form_Task_ParticipantStatus extends CRM_Event_Form_Task_Batch {
     );
 
     $this->assign('context', 'statusChange');
-    # CRM-4321: display info on users being notified if any of the below statuses is enabled
+    // CRM-4321: display info on users being notified if any of the below statuses is enabled
     parent::assignToTemplate();
     parent::buildQuickForm();
   }

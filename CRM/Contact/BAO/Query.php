@@ -436,7 +436,7 @@ class CRM_Contact_BAO_Query {
    * @param null $displayRelationshipType
    * @param string $operator
    * @param string $apiEntity
-   * @param bool|NULL $primaryLocationOnly
+   * @param bool|null $primaryLocationOnly
    */
   public function __construct(
     $params = NULL, $returnProperties = NULL, $fields = NULL,
@@ -6489,7 +6489,9 @@ AND   displayRelType.is_active = 1
    * @param string $where
    * @param string $from
    *
+   *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   protected function addBasicStatsToSummary(&$summary, $where, $from) {
     $summary['total']['count'] = 0;
