@@ -94,6 +94,13 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   protected $entityFields = [];
 
   /**
+   * Details of the subscription (recurring contribution) to be altered.
+   *
+   * @var array
+   */
+  protected $subscriptionDetails = [];
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -109,6 +116,8 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     $this->setAction(CRM_Core_Action::UPDATE);
@@ -116,7 +125,11 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
     $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
     $this->contributionRecurID = $this->_crid;
     $this->_coid = CRM_Utils_Request::retrieve('coid', 'Integer', $this, FALSE);
+    $this->setSubscriptionDetails();
     $this->setPaymentProcessor();
+    if ($this->getSubscriptionContactID()) {
+      $this->set('cid', $this->getSubscriptionContactID());
+    }
   }
 
   /**
@@ -133,6 +146,37 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
       }
       $this->_paymentProcessorObj = $this->_paymentProcessor['object'];
     }
+  }
+
+  /**
+   * Set the subscription details on the form.
+   */
+  protected function setSubscriptionDetails() {
+    if ($this->contributionRecurID) {
+      $this->subscriptionDetails = $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_crid);
+    }
+    elseif ($this->_coid) {
+      $this->subscriptionDetails = $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
+    }
+  }
+
+  /**
+   * Get details for the recurring contribution being altered.
+   *
+   * @return array
+   */
+  public function getSubscriptionDetails() {
+    return $this->subscriptionDetails;
+  }
+
+  /**
+   * Get the contact ID for the subscription.
+   *
+   * @return int|false
+   */
+  protected function getSubscriptionContactID() {
+    $sub = $this->getSubscriptionDetails();
+    return isset($sub->contact_id) ? $sub->contact_id : FALSE;
   }
 
 }
