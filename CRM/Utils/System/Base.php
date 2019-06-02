@@ -681,7 +681,7 @@ abstract class CRM_Utils_System_Base {
     }
 
     return [
-      'url' => CRM_Utils_File::addTrailingSlash($userFrameworkResourceURL),
+      'url' => CRM_Utils_File::addTrailingSlash($userFrameworkResourceURL, '/'),
       'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
     ];
   }
