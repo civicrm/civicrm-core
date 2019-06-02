@@ -359,7 +359,6 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
    *
    * @param int $rgid
    * @param int $gid
-   * @param NULL $cacheKeyString
    * @param array $criteria
    *   Additional criteria to filter by.
    *
@@ -371,18 +370,11 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
    *  The search methodology finds all matches for the searchedContacts so this limits
    *  the number of searched contacts, not the matches found.
    *
-   * @return bool
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function refillCache($rgid, $gid, $cacheKeyString, $criteria, $checkPermissions, $searchLimit = 0) {
-    if (!$cacheKeyString && $rgid) {
-      $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions);
-    }
-
-    if (!$cacheKeyString) {
-      return FALSE;
-    }
+  public static function refillCache($rgid, $gid, $criteria, $checkPermissions, $searchLimit = 0) {
+    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions);
 
     // 1. Clear cache if any
     $sql = "DELETE FROM civicrm_prevnext_cache WHERE  cachekey LIKE %1";
