@@ -42,7 +42,7 @@
 /**
  * Class HelloTest
  */
-class HelloTest extends PHPUnit_Framework_TestCase {
+class HelloTest extends PHPUnit\Framework\TestCase {
   /**
    * contains the object handle of the string class
    * @var string

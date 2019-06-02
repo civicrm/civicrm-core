@@ -4,7 +4,7 @@
  * Class CRM_Core_ComposerConfigTest
  * @group headless
  */
-class CRM_Core_ComposerConfigTest extends \PHPUnit_Framework_TestCase {
+class CRM_Core_ComposerConfigTest extends \PHPUnit\Framework\TestCase {
 
   /**
    * Assert that `composer.lock` remains as expected.

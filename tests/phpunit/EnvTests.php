@@ -10,7 +10,7 @@
  * names. Each name may be a class (eg "MyFirstTest") or a method
  * (eg "MyFirstTest::testFoo").
  */
-class EnvTests extends \PHPUnit_Framework_TestSuite {
+class EnvTests extends \PHPUnit\Framework\TestSuite {
 
   /**
    * @return \EnvTests

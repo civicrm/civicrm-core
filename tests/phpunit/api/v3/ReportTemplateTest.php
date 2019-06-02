@@ -126,7 +126,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @param $reportID
    *
-   * @throws \PHPUnit_Framework_IncompleteTestError
+   * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testReportTemplateSelectWhere($reportID) {
     $this->hookClass->setHook('civicrm_selectWhereClause', array($this, 'hookSelectWhere'));
@@ -253,7 +253,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @param $reportID
    *
-   * @throws \PHPUnit_Framework_IncompleteTestError
+   * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testReportTemplateGetRowsAllReports($reportID) {
     //$reportID = 'logging/contact/summary';
@@ -311,7 +311,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @param $reportID
    *
-   * @throws \PHPUnit_Framework_IncompleteTestError
+   * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testReportTemplateGetRowsAllReportsACL($reportID) {
     if (stristr($reportID, 'has existing issues')) {
@@ -330,7 +330,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    *
    * @param $reportID
    *
-   * @throws \PHPUnit_Framework_IncompleteTestError
+   * @throws \PHPUnit\Framework\IncompleteTestError
    */
   public function testReportTemplateGetStatisticsAllReports($reportID) {
     if (stristr($reportID, 'has existing issues')) {

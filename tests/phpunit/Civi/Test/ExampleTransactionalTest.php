@@ -9,7 +9,7 @@ namespace Civi\Test;
  *
  * @group headless
  */
-class ExampleTransactionalTest extends \PHPUnit_Framework_TestCase implements HeadlessInterface, TransactionalInterface {
+class ExampleTransactionalTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, TransactionalInterface {
 
   /**
    * @var array
