@@ -21,5 +21,9 @@ VALUES(
 ),
 (
 @option_group_id_ps, {localize field='label'}'Failing'{/localize}, @maxValue + 2, 'Failing', @maxWeight + 2, 1 , 1 , 0
+),
+(
+@option_group_id_ps, {localize field='label'}'Ended'{/localize}, @maxValue + 3, 'Ended', @maxWeight + 3, 1 , 1 , 0
 )
 ON DUPLICATE KEY UPDATE id=id;
+
