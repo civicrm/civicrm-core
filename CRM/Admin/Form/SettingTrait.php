@@ -213,11 +213,12 @@ trait CRM_Admin_Form_SettingTrait {
           foreach ($options as $key => $val) {
             $newOptions[$key] = $val;
           }
+          $settingMetaData[$setting]['wrapper_element'] = ['<ul class="crm-checkbox-list"><li>', '</li></ul>'];
           $this->addCheckBox($setting,
             $props['title'],
             $newOptions,
             NULL, NULL, NULL, NULL,
-            ['&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>']
+            '</li><li>'
           );
         }
         elseif ($add == 'addChainSelect') {

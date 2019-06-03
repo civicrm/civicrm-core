@@ -3229,6 +3229,43 @@ span.crm-select-item-color {
   width: 93%;
 }
 
+/* Checkbox gropus */
+.crm-container ul.crm-checkbox-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  border: 1px solid #a5a5a5;
+  width: 300px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+.crm-container ul.crm-checkbox-list li {
+  position: relative;
+  margin: 0;
+  padding: 0;
+}
+.crm-container ul.crm-checkbox-list li input {
+  position: absolute;
+  left: 5px;
+  top: 4px;
+}
+.crm-container ul.crm-checkbox-list li label {
+  display: block;
+  padding: 2px 0 2px 22px;
+  margin: 0;
+  word-break: break-all;
+}
+.crm-container ul.crm-checkbox-list li:nth-child(even) label {
+  background-color: #FAFAFA;
+}
+.crm-container ul.crm-checkbox-list li input:checked + label {
+  background-color: #FFFFCC;
+}
+.crm-container ul.crm-checkbox-list li:nth-child(even) input:checked + label {
+  background-color: #fffdb2
+}
+
 /* classes related to batch entry operation */
 .crm-container span.batch-edit,
 .crm-container span.batch-valid,
