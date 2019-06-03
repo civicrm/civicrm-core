@@ -241,11 +241,6 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $this->assertEquals(1, $cases['rows']['Housing Support']['Ongoing']['count']);
   }
 
-  /* FIXME: requires activities
-   * function testGetRelatedCases() {
-   * }
-   */
-
   /**
    * Test various things after a case is closed.
    *
@@ -319,7 +314,8 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'activity_date_time' => $now_date,
       'target_contact_id' => $client_id,
       'source_contact_id' => $loggedInUser,
-      'subject' => 'null', // yeah this is extra weird, but without it you get the wrong subject
+      'subject' => 'null',
+      // yeah this is extra weird, but without it you get the wrong subject
     ];
 
     $form->postProcess($actParams);
