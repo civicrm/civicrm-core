@@ -9,3 +9,17 @@ SELECT @option_group_id_ps as option_group_id, {localize field='label'}`label`{/
 FROM civicrm_option_value ov
 INNER JOIN civicrm_option_group og
 ON og.id = ov.option_group_id AND og.name = 'contribution_status';
+
+SELECT @maxValue := MAX(CAST(value AS UNSIGNED))  FROM `civicrm_option_value` where option_group_id = @option_group_id_ps;
+SELECT @maxWeight := MAX(weight) FROM `civicrm_option_value` where option_group_id = @option_group_id_ps;
+
+INSERT INTO `civicrm_option_value` (
+`option_group_id`, {localize field='label'}`label`{/localize}, `value`, `name`, `weight`, `is_reserved`, `is_active`, `is_default`
+)
+VALUES(
+ @option_group_id_ps, {localize field='label'}'Processing'{/localize}, @maxValue + 1, 'Processing', @maxWeight + 1, 1 , 1 , 0
+),
+(
+@option_group_id_ps, {localize field='label'}'Failing'{/localize}, @maxValue + 2, 'Failing', @maxWeight + 2, 1 , 1 , 0
+)
+ON DUPLICATE KEY UPDATE id=id;
