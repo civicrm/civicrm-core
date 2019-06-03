@@ -319,8 +319,14 @@ trait CRM_Admin_Form_SettingTrait {
   }
 
   /**
-   * @param $params
+   * Save any fields which have been defined via metadata.
    *
+   * (Other fields are hack-handled... sadly.
+   *
+   * @param array $params
+   *   Form input.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   protected function saveMetadataDefinedSettings($params) {
     $settings = $this->getSettingsToSetByMetadata($params);

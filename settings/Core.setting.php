@@ -732,12 +732,11 @@ return [
     'group' => 'core',
     'name' => 'enable_components',
     'type' => 'Array',
-    'quick_form_type' => 'Element',
-    'html_type' => 'advmultiselect',
+    'quick_form_type' => 'Select',
+    'html_type' => 'Select',
     'html_attributes' => [
-      'size' => 5,
-      'style' => 'width:150px',
-      'class' => 'advmultiselect',
+      'multiple' => 1,
+      'class' => 'crm-select2',
     ],
     'default' => NULL,
     'add' => '4.4',
@@ -750,6 +749,9 @@ return [
       'CRM_Case_Info::onToggleComponents',
       'CRM_Core_Component::flushEnabledComponents',
       'call://resources/resetCacheCode',
+    ],
+    'pseudoconstant' => [
+      'callback' => 'CRM_Core_SelectValues::getComponentSelectValues',
     ],
   ],
   'disable_core_css' => [
