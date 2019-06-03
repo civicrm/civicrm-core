@@ -231,7 +231,7 @@ SELECT     civicrm_email.id as email_id
 
     $url = CRM_Utils_System::url('civicrm/mailing/confirm',
       "reset=1&cid={$this->contact_id}&sid={$this->id}&h={$this->hash}",
-      TRUE
+      TRUE, NULL, TRUE, TRUE
     );
 
     $html = $component->body_html;
