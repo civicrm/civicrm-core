@@ -233,7 +233,7 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   }
 
   /* Pseudo-element to ensure vertical alignment */
-  #civicrm-menu > li > a:after {
+  #civicrm-menu > li:not(#crm-qsearch) > a:after {
     content: '';
     display: inline-block;
     height: 100%;
