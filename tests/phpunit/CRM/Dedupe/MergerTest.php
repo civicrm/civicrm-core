@@ -297,14 +297,10 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    */
   public function testGetMatches() {
     $this->setupMatchData();
-    $pairs = CRM_Dedupe_Merger::getDuplicatePairs(
-      1,
-      NULL,
-      TRUE,
-      25,
-      FALSE
-    );
 
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+    ])['values'];
     $this->assertEquals([
       0 => [
         'srcID' => $this->contacts[1]['id'],

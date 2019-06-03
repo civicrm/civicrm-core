@@ -137,3 +137,46 @@ function _civicrm_api3_dedupe_getstatistics_spec(&$params) {
   ];
 
 }
+
+/**
+ * Get the duplicate contacts for the supplied parameters.
+ *
+ * @param array $params
+ *
+ * @return array
+ * @throws \CiviCRM_API3_Exception
+ * @throws \API_Exception
+ * @throws \CRM_Core_Exception
+ */
+function civicrm_api3_dedupe_getduplicates($params) {
+  $options = _civicrm_api3_get_options_from_params($params);
+  $dupePairs = CRM_Dedupe_Merger::getDuplicatePairs($params['rule_group_id'], NULL, TRUE, $options['limit'], FALSE, TRUE, $params['criteria'], CRM_Utils_Array::value('check_permissions', $params), CRM_Utils_Array::value('search_limit', $params, 0));
+  return civicrm_api3_create_success($dupePairs);
+}
+
+/**
+ * Adjust Metadata for getduplicates action..
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_dedupe_getduplicates_spec(&$params) {
+  $params['rule_group_id'] = [
+    'title' => ts('Rule Group ID'),
+    'api.required' => TRUE,
+    'type' => CRM_Utils_Type::T_INT,
+  ];
+  $params['criteria'] = [
+    'title' => ts('Criteria'),
+    'description' => ts("Dedupe search criteria, as parsable by v3 Contact.get api, keyed by Contact. Eg.['Contact' => ['id' => ['BETWEEN' => [1, 2000]], 'group' => 34]"),
+    'api.default' => [],
+  ];
+  $spec['search_limit'] = [
+    'title' => ts('Number of contacts to look for matches for.'),
+    'type' => CRM_Utils_Type::T_INT,
+    'api.default' => (int) Civi::settings()->get('dedupe_default_limit'),
+  ];
+
+}
