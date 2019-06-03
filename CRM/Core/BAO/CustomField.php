@@ -635,10 +635,18 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
         $fields = array();
         while (($dao->fetch()) != NULL) {
+          $regexp = preg_replace('/[.,;:!?]/', '', NULL);
           $fields[$dao->id]['id'] = $dao->id;
           $fields[$dao->id]['label'] = $dao->label;
+          // This seems broken, but not in a new way.
+          $fields[$dao->id]['headerPattern'] = '/' . preg_quote($regexp, '/') . '/';
+          // To support the consolidation of various functions & their expectations.
+          $fields[$dao->id]['title'] = $dao->label;
+          $fields[$dao->id]['custom_field_id']  = $dao->id;
           $fields[$dao->id]['groupTitle'] = $dao->title;
           $fields[$dao->id]['data_type'] = $dao->data_type;
+          $fields[$dao->id]['name'] = 'custom_' . $dao->id;
+          $fields[$dao->id]['type'] = CRM_Utils_Array::value($dao->data_type, self::dataToType());
           $fields[$dao->id]['html_type'] = $dao->html_type;
           $fields[$dao->id]['default_value'] = $dao->default_value;
           $fields[$dao->id]['text_length'] = $dao->text_length;
@@ -656,6 +664,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $fields[$dao->id]['is_required'] = $dao->is_required;
           $fields[$dao->id]['table_name'] = $dao->table_name;
           $fields[$dao->id]['column_name'] = $dao->column_name;
+          $fields[$dao->id]['where'] = $dao->table_name . '.' . $dao->column_name;
           // Probably we should use a different fn to get the extends tables but this is a refactor so not changing that now.
           $fields[$dao->id]['extends_table'] = array_key_exists($dao->extends, CRM_Core_BAO_CustomQuery::$extendsMap) ? CRM_Core_BAO_CustomQuery::$extendsMap[$dao->extends] : '';
           if (in_array($dao->extends, CRM_Contact_BAO_ContactType::subTypes())) {
@@ -716,7 +725,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       $checkPermission
     );
 
-    $importableFields = array();
+    $importableFields = [];
     foreach ($fields as $id => $values) {
       // for now we should not allow multiple fields in profile / export etc, hence unsetting
       if (!$search &&
@@ -728,27 +737,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       /* generate the key for the fields array */
 
       $key = "custom_$id";
-
-      $regexp = preg_replace('/[.,;:!?]/', '', CRM_Utils_Array::value(0, $values));
-      $importableFields[$key] = array(
-        'name' => $key,
-        'type' => CRM_Utils_Array::value(CRM_Utils_Array::value('data_type', $values), self::dataToType()),
-        'title' => CRM_Utils_Array::value('label', $values),
-        'headerPattern' => '/' . preg_quote($regexp, '/') . '/',
-        'import' => 1,
-        'custom_field_id' => $id,
-        'options_per_line' => CRM_Utils_Array::value('options_per_line', $values),
-        'text_length' => CRM_Utils_Array::value('text_length', $values, 255),
-        'data_type' => CRM_Utils_Array::value('data_type', $values),
-        'html_type' => CRM_Utils_Array::value('html_type', $values),
-        'is_search_range' => CRM_Utils_Array::value('is_search_range', $values),
-      );
-
-      // CRM-6681, pass date and time format when html_type = Select Date
-      if (CRM_Utils_Array::value('html_type', $values) == 'Select Date') {
-        $importableFields[$key]['date_format'] = CRM_Utils_Array::value('date_format', $values);
-        $importableFields[$key]['time_format'] = CRM_Utils_Array::value('time_format', $values);
-      }
+      $importableFields[$key] = $values;
+      $importableFields[$key]['import'] = 1;
     }
 
     return $importableFields;
