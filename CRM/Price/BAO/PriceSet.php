@@ -60,7 +60,7 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @return CRM_Price_DAO_PriceSet
    */
   public static function create(&$params) {
-     if (!empty($params['id'])) {
+    if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'PriceSet', $params['id'], $params);
     }
     else {
