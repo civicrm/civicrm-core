@@ -71,6 +71,7 @@ trait ContactTestTrait {
    *
    * @return int
    *   id of Individual created
+   * @throws \Exception
    */
   public function individualCreate($params = array(), $seq = 0, $random = FALSE) {
     $params = array_merge($this->sampleContact('Individual', $seq, $random), $params);
