@@ -4037,6 +4037,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ]);
   }
 
+  /**
+   * Test the related contacts filter.
+   *
+   * @throws \Exception
+   */
   public function testSmartGroupsForRelatedContacts() {
     $rtype1 = $this->callAPISuccess('relationship_type', 'create', array(
       "name_a_b" => uniqid() . " Child of",
