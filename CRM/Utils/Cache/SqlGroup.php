@@ -129,7 +129,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
       return $this->delete($key);
     }
 
-    $dataExists = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM {$this->table} WHERE {$this->where($key)}");
+    $dataExists = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM {$this->table} WHERE {$this->where($key, TRUE)}");
     $expires = round(microtime(1)) + CRM_Utils_Date::convertCacheTtl($ttl, self::DEFAULT_TTL);
 
     $dataSerialized = CRM_Core_BAO_Cache::encode($value);
@@ -137,7 +137,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     // This table has a wonky index, so we cannot use REPLACE or
     // "INSERT ... ON DUPE". Instead, use SELECT+(INSERT|UPDATE).
     if ($dataExists) {
-      $sql = "UPDATE {$this->table} SET data = %1, created_date = FROM_UNIXTIME(%2), expired_date = FROM_UNIXTIME(%3) WHERE {$this->where($key)}";
+      $sql = "UPDATE {$this->table} SET data = %1, created_date = FROM_UNIXTIME(%2), expired_date = FROM_UNIXTIME(%3) WHERE {$this->where($key, TRUE)}";
       $args = [
         1 => [$dataSerialized, 'String'],
         2 => [time(), 'Positive'],
@@ -146,7 +146,6 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
       $dao = CRM_Core_DAO::executeQuery($sql, $args, FALSE, NULL, FALSE, FALSE);
     }
     else {
-      $sql = "INSERT INTO {$this->table} (group_name,path,data,created_date,expired_date) VALUES (%1,%2,%3,FROM_UNIXTIME(%4),FROM_UNIXTIME(%5))";
       $args = [
         1 => [$this->group, 'String'],
         2 => [$key, 'String'],
@@ -154,6 +153,13 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
         4 => [time(), 'Positive'],
         5 => [$expires, 'Positive'],
       ];
+      if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_cache', 'domain_id')) {
+        $sql = "INSERT INTO {$this->table} (group_name,path,data,created_date,expired_date,domain_id) VALUES (%1,%2,%3,FROM_UNIXTIME(%4),FROM_UNIXTIME(%5),%6)";
+        $args[6] = [CRM_Core_Config::domainID(), 'Positive'];
+      }
+      else {
+        $sql = "INSERT INTO {$this->table} (group_name,path,data,created_date,expired_date) VALUES (%1,%2,%3,FROM_UNIXTIME(%4),FROM_UNIXTIME(%5))";
+      }
       $dao = CRM_Core_DAO::executeQuery($sql, $args, FALSE, NULL, FALSE, FALSE);
     }
 
@@ -175,7 +181,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   public function get($key, $default = NULL) {
     CRM_Utils_Cache::assertValidKey($key);
     if (!isset($this->expiresCache[$key]) || time() >= $this->expiresCache[$key]) {
-      $sql = "SELECT path, data, UNIX_TIMESTAMP(expired_date) as expires FROM {$this->table} WHERE " . $this->where($key);
+      $sql = "SELECT path, data, UNIX_TIMESTAMP(expired_date) as expires FROM {$this->table} WHERE " . $this->where($key, TRUE);
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
         $this->expiresCache[$key] = $dao->expires;
@@ -216,7 +222,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    */
   public function delete($key) {
     CRM_Utils_Cache::assertValidKey($key);
-    CRM_Core_DAO::executeQuery("DELETE FROM {$this->table} WHERE {$this->where($key)}");
+    CRM_Core_DAO::executeQuery("DELETE FROM {$this->table} WHERE {$this->where($key, TRUE)}");
     unset($this->valueCache[$key]);
     unset($this->expiresCache[$key]);
     return TRUE;
@@ -234,7 +240,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   }
 
   public function prefetch() {
-    $dao = CRM_Core_DAO::executeQuery("SELECT path, data, UNIX_TIMESTAMP(expired_date) AS expires FROM {$this->table} WHERE " . $this->where(NULL));
+    $dao = CRM_Core_DAO::executeQuery("SELECT path, data, UNIX_TIMESTAMP(expired_date) AS expires FROM {$this->table} WHERE " . $this->where(NULL, TRUE));
     $this->valueCache = [];
     $this->expiresCache = [];
     while ($dao->fetch()) {
@@ -244,9 +250,12 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
     $dao->free();
   }
 
-  protected function where($path = NULL) {
+  protected function where($path = NULL, $domain = FALSE) {
     $clauses = [];
     $clauses[] = ('group_name = "' . CRM_Core_DAO::escapeString($this->group) . '"');
+    if ($domain && CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_cache', 'domain_id')) {
+      $clauses[] = ('domain_id = ' . CRM_Core_Config::domainID() . ' OR domain_id IS NULL');
+    }
     if ($path) {
       $clauses[] = ('path = "' . CRM_Core_DAO::escapeString($path) . '"');
     }

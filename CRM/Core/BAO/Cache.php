@@ -89,7 +89,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       self::$_cache[$argString] = $cache->get($cleanKey);
       if (self::$_cache[$argString] === NULL) {
         $table = self::getTableName();
-        $where = self::whereCache($group, $path, $componentID);
+        $where = self::whereCache($group, $path, $componentID, TRUE);
         $rawData = CRM_Core_DAO::singleValueQuery("SELECT data FROM $table WHERE $where");
         $data = $rawData ? self::decode($rawData) : NULL;
 
@@ -131,7 +131,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       self::$_cache[$argString] = $cache->get($cleanKey);
       if (!self::$_cache[$argString]) {
         $table = self::getTableName();
-        $where = self::whereCache($group, NULL, $componentID);
+        $where = self::whereCache($group, NULL, $componentID, TRUE);
         $dao = CRM_Core_DAO::executeQuery("SELECT path, data FROM $table WHERE $where");
 
         $result = [];
@@ -178,7 +178,7 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     }
 
     $table = self::getTableName();
-    $where = self::whereCache($group, $path, $componentID);
+    $where = self::whereCache($group, $path, $componentID, TRUE);
     $dataExists = CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) FROM $table WHERE {$where}");
     // FIXME - Use SQL NOW() or CRM_Utils_Time?
     $now = date('Y-m-d H:i:s');
@@ -195,14 +195,17 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       $dao = CRM_Core_DAO::executeQuery($sql, $args, TRUE, NULL, FALSE, FALSE);
     }
     else {
-      $insert = CRM_Utils_SQL_Insert::into($table)
-        ->row([
-          'group_name' => $group,
-          'path' => $path,
-          'component_id' => $componentID,
-          'data' => $dataSerialized,
-          'created_date' => $now,
-        ]);
+      $params = [
+        'group_name' => $group,
+        'path' => $path,
+        'component_id' => $componentID,
+        'data' => $dataSerialized,
+        'created_date' => $now,
+      ];
+      if (CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_cache', 'domain_id')) {
+        $params['domain_id'] = CRM_Core_Config::domainID();
+      }
+      $insert = CRM_Utils_SQL_Insert::into($table)->row($params);
       $dao = CRM_Core_DAO::executeQuery($insert->toSQL(), [], TRUE, NULL, FALSE, FALSE);
     }
 
@@ -442,11 +445,16 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    *   Filter by path. If NULL, then return any paths.
    * @param int|null $componentID
    *   Filter by component. If NULL, then look for explicitly NULL records.
+   * @param bool $domain
+   *   Filter by Domain
    * @return string
    */
-  protected static function whereCache($group, $path, $componentID) {
+  protected static function whereCache($group, $path, $componentID, $domain = FALSE) {
     $clauses = [];
     $clauses[] = ('group_name = "' . CRM_Core_DAO::escapeString($group) . '"');
+    if ($domain && CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_cache', 'domain_id')) {
+      $clauses[] = ('domain_id = ' . CRM_Core_Config::domainID() . ' OR domain_id IS NULL');
+    }
     if ($path) {
       $clauses[] = ('path = "' . CRM_Core_DAO::escapeString($path) . '"');
     }

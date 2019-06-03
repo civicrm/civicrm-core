@@ -257,11 +257,6 @@ return [
     'class' => 'CRM_Cxn_DAO_Cxn',
     'table' => 'civicrm_cxn',
   ],
-  'CRM_Core_DAO_Cache' => [
-    'name' => 'Cache',
-    'class' => 'CRM_Core_DAO_Cache',
-    'table' => 'civicrm_cache',
-  ],
   'CRM_Core_DAO_Country' => [
     'name' => 'Country',
     'class' => 'CRM_Core_DAO_Country',
@@ -511,6 +506,11 @@ return [
     'name' => 'PriceSetEntity',
     'class' => 'CRM_Price_DAO_PriceSetEntity',
     'table' => 'civicrm_price_set_entity',
+  ],
+  'CRM_Core_DAO_Cache' => [
+    'name' => 'Cache',
+    'class' => 'CRM_Core_DAO_Cache',
+    'table' => 'civicrm_cache',
   ],
   'CRM_Core_DAO_County' => [
     'name' => 'County',

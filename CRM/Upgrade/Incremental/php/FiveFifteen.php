@@ -81,12 +81,21 @@ class CRM_Upgrade_Incremental_php_FiveFifteen extends CRM_Upgrade_Incremental_Ba
         'participant_register_date',
       ],
     ]);
+    $this->addTask('Drop Index UI_group_path_date from civicrm_cache', 'dropIndex', 'civicrm_cache', 'UI_group_path_date');
+    $this->addTask('Add domain_id column to civicrm_cache', 'addColumn', 'civicrm_cache', 'domain_id', "int unsigned DEFAULT NULL COMMENT 'Domain that this cache item belongs to'");
+    $this->addTask('Add new index incoproating domain_id to civicrm_cache', 'cacheNewDomainIndex');
   }
 
   public static function fixCacheKeyColumnNamePrevNext() {
     CRM_Core_BAO_SchemaHandler::dropIndexIfExists('civicrm_prevnext_cache', 'index_all');
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_prevnext_cache CHANGE COLUMN  cacheKey cachekey VARCHAR(255) COMMENT 'Unique path name for cache element of the searched item'");
     CRM_Core_DAO::executeQuery("CREATE INDEX index_all ON civicrm_prevnext_cache (cachekey, entity_id1, entity_id2, entity_table, is_selected)");
+    return TRUE;
+  }
+
+  public static function cacheNewDomainIndex() {
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_cache ADD FOREIGN KEY `FK_civicrm_cache_domain_id` (`domain_id`) REFERENCES `civicrm_domain`(`id`) ON DELETE CASCADE");
+    CRM_Core_DAO::executeQuery("CREATE INDEX UI_group_path_date_domain ON civicrm_cache (group_name, path, created_date, domain_id)");
     return TRUE;
   }
 
