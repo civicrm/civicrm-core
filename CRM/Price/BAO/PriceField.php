@@ -61,6 +61,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
    * @return CRM_Price_BAO_PriceField
    */
   public static function add(&$params) {
+    if (!empty($params['id'])) {
+      CRM_Utils_Hook::pre('edit', 'PriceField', $params['id'], $params);
+    }
+    else {
+      CRM_Utils_Hook::pre('create', 'PriceField', NULL, $params);
+    }
     $priceFieldBAO = new CRM_Price_BAO_PriceField();
 
     $priceFieldBAO->copyValues($params);
@@ -70,6 +76,12 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
     }
 
     $priceFieldBAO->save();
+    if (!empty($params['id'])) {
+      CRM_Utils_Hook::post('edit', 'PriceField', $params['id'], $event);
+    }
+    else {
+      CRM_Utils_Hook::post('create', 'PriceField', NULL, $event);
+    }
     return $priceFieldBAO;
   }
 

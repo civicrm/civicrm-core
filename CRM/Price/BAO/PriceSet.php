@@ -60,6 +60,12 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
    * @return CRM_Price_DAO_PriceSet
    */
   public static function create(&$params) {
+     if (!empty($params['id'])) {
+      CRM_Utils_Hook::pre('edit', 'PriceSet', $params['id'], $params);
+    }
+    else {
+      CRM_Utils_Hook::pre('create', 'PriceSet', NULL, $params);
+    }
     if (empty($params['id']) && empty($params['name'])) {
       $params['name'] = CRM_Utils_String::munge($params['title'], '_', 242);
     }
@@ -81,7 +87,14 @@ class CRM_Price_BAO_PriceSet extends CRM_Price_DAO_PriceSet {
     if (self::eventPriceSetDomainID()) {
       $priceSetBAO->domain_id = CRM_Core_Config::domainID();
     }
-    return $priceSetBAO->save();
+    $result = $priceSetBAO->save();
+    if (!empty($params['id'])) {
+      CRM_Utils_Hook::post('edit', 'PriceSet', $params['id'], $event);
+    }
+    else {
+      CRM_Utils_Hook::post('create', 'PriceSet', $NULL, $event);
+    }
+    return $result;
   }
 
   /**

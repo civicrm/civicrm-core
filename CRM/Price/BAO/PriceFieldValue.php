@@ -48,7 +48,12 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @return CRM_Price_DAO_PriceFieldValue
    */
   public static function add(&$params, $ids = []) {
-
+    if (!empty($params['id'])) {
+      CRM_Utils_Hook::pre('edit', 'PriceFieldValue', $params['id'], $params);
+    }
+    else {
+      CRM_Utils_Hook::pre('create', 'PriceFieldValue', NULL, $params);
+    }
     $fieldValueBAO = new CRM_Price_BAO_PriceFieldValue();
     $fieldValueBAO->copyValues($params);
 
