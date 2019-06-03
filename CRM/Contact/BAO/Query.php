@@ -4952,7 +4952,7 @@ civicrm_relationship.start_date > {$today}
   public function alphabetQuery() {
     $sqlParts = $this->getSearchSQLParts(NULL, NULL, NULL, FALSE, FALSE, TRUE);
     $query = "SELECT DISTINCT LEFT(contact_a.sort_name, 1) as sort_name
-      {$this->_simpleFromClause}
+      {$sqlParts['from']}
       {$sqlParts['where']}
       {$sqlParts['having']}
       GROUP BY sort_name
@@ -5681,10 +5681,8 @@ civicrm_relationship.start_date > {$today}
     }
     else {
       // create temp table with contact ids
-      $tableName = CRM_Core_DAO::createTempTableName('civicrm_transform', TRUE);
 
-      $sql = "CREATE TEMPORARY TABLE $tableName ( contact_id int primary key) ENGINE=HEAP";
-      CRM_Core_DAO::executeQuery($sql);
+      $tableName = CRM_Utils_SQL_TempTable::build()->createWithColumns('contact_id int primary key')->setMemory(TRUE)->getName();
 
       $sql = "
 REPLACE INTO $tableName ( contact_id )
