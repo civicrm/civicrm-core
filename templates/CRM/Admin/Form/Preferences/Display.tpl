@@ -29,7 +29,7 @@
   <table class="form-layout">
     <tr class="crm-preferences-display-form-block-contact_view_options">
       <td class="label">{$form.contact_view_options.label}</td>
-      <td>{$form.contact_view_options.html}</td>
+      <td><ul class="crm-checkbox-list"><li>{$form.contact_view_options.html}</li></ul></td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
@@ -105,7 +105,7 @@
     </tr>
     <tr class="crm-preferences-display-form-block-advanced_search_options">
       <td class="label">{$form.advanced_search_options.label}</td>
-      <td>{$form.advanced_search_options.html}</td>
+      <td><ul class="crm-checkbox-list"><li>{$form.advanced_search_options.html}</li></ul></td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
@@ -164,7 +164,12 @@
 
     <tr class="crm-preferences-display-form-block-user_dashboard_options">
       <td class="label">{$form.user_dashboard_options.label}</td>
-      <td>{$form.user_dashboard_options.html}<span id="invoice_help">  {help id="id-invoices_id"}</span></td>
+      <td>
+        <ul class="crm-checkbox-list"><li>
+          {$form.user_dashboard_options.html}
+          <span style="position: absolute; right: 5px; bottom: 3px;"> {help id="id-invoices_id"}</span>
+        </li></ul>
+      </td>
     </tr>
     <tr class="crm-preferences-display-form-block-description">
       <td>&nbsp;</td>
@@ -261,7 +266,6 @@
         if (!invoicing) {
           $('#user_dashboard_options_' + invoicesKey).attr("disabled", true);
         }
-        $("#invoice_help").insertAfter("label[for='user_dashboard_options_" + invoicesKey + "']");
 
         $("#contactEditBlocks, #contactEditOptions").sortable({
           placeholder: 'ui-state-highlight',

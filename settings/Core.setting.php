@@ -40,7 +40,6 @@ return [
     'group' => 'core',
     'name' => 'contact_view_options',
     'type' => 'String',
-    'quick_form_type' => 'CheckBoxes',
     'html_type' => 'checkboxes',
     'pseudoconstant' => [
       'optionGroupName' => 'contact_view_options',
@@ -289,7 +288,6 @@ return [
     'group' => 'core',
     'name' => 'contact_autocomplete_options',
     'type' => 'String',
-    'quick_form_type' => 'CheckBoxes',
     'html_type' => 'checkboxes',
     'pseudoconstant' => [
       'callback' => 'CRM_Admin_Form_Setting_Search::getContactAutocompleteOptions',
@@ -308,7 +306,6 @@ return [
     'group' => 'core',
     'name' => 'contact_reference_options',
     'type' => 'String',
-    'quick_form_type' => 'CheckBoxes',
     'html_type' => 'checkboxes',
     'pseudoconstant' => [
       'callback' => 'CRM_Admin_Form_Setting_Search::getContactReferenceOptions',
@@ -732,12 +729,7 @@ return [
     'group' => 'core',
     'name' => 'enable_components',
     'type' => 'Array',
-    'quick_form_type' => 'Select',
-    'html_type' => 'Select',
-    'html_attributes' => [
-      'multiple' => 1,
-      'class' => 'crm-select2',
-    ],
+    'html_type' => 'checkboxes',
     'default' => NULL,
     'add' => '4.4',
     'title' => ts('Enable Components'),

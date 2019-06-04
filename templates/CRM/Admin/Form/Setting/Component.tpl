@@ -24,11 +24,9 @@
  +--------------------------------------------------------------------+
 *}
 <div class="help">
-    {ts}CiviCRM includes several optional components which give you more tools to connect with and engage your constituents.{/ts}{help id="components"}
+  {ts}CiviCRM includes several optional components which give you more tools to connect with and engage your constituents.{/ts}{help id="components"}
 </div>
 <div class="crm-block crm-form-block crm-component-form-block">
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-{$form.enable_components.html}
-<div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
+  {include file='CRM/Admin/Form/Setting/SettingForm.tpl'}
 </div>
 <div class="spacer"></div>
