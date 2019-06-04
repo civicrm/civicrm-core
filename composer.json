@@ -64,6 +64,9 @@
     "pear/log": "1.13.1",
     "katzien/php-mime-type": "2.1.0"
   },
+  "require-dev": {
+    "cache/integration-tests": "dev-master"
+  },
   "scripts": {
     "post-install-cmd": [
       "bash tools/scripts/composer/dompdf-cleanup.sh",

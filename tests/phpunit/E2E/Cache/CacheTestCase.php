@@ -24,14 +24,12 @@
  +--------------------------------------------------------------------+
  */
 
-require_once 'Cache/IntegrationTests/LegacySimpleCacheTest.php';
-
 /**
  * Verify that a cache service complies with PSR-16.
  *
  * @group e2e
  */
-abstract class E2E_Cache_CacheTestCase extends \Cache\IntegrationTests\LegacySimpleCacheTest implements \Civi\Test\EndToEndInterface {
+abstract class E2E_Cache_CacheTestCase extends \Cache\IntegrationTests\SimpleCacheTest implements \Civi\Test\EndToEndInterface {
 
   const MAX_KEY = 255;
 
