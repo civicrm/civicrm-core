@@ -10,11 +10,20 @@
  * This script is an adapter for backwards compatibility.
  */
 
+$argFilters = [];
+
 if (PHP_SAPI !== 'cli') {
   die("phpunit can only be run from command line.");
 }
 if (version_compare(PHP_VERSION, '7.0', '>=')) {
   $phpunit = findCommand('phpunit6');
+  $argFilters[] = function ($argv) {
+    $pos = array_search('--tap', $argv);
+    if ($pos !== FALSE) {
+      array_splice($argv, $pos, 1, ['--printer', '\Civi\Test\TAP']);
+    }
+    return $argv;
+  };
 }
 elseif (version_compare(PHP_VERSION, '5.6', '>=')) {
   $phpunit = findCommand('phpunit5');
@@ -62,6 +71,10 @@ if (is_dir('packages/PHPUnit/')) {
     echo "Failed to move aside stale copy of PHPUnit.\n";
     exit(1);
   }
+}
+
+foreach ($argFilters as $filter) {
+  $argv = $filter($argv);
 }
 
 $cmd =
