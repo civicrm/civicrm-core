@@ -82,7 +82,7 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
    * Test that passing an invalid currency throws an error
    */
   public function testInvalidCurrency() {
-    $this->setExpectedException(CRM_Core_Exception::class, 'Invalid currency "NOT_A_CURRENCY"');
+    $this->expectException(\CRM_Core_Exception::class, 'Invalid currency "NOT_A_CURRENCY"');
     CRM_Utils_Money::format(4.00, 'NOT_A_CURRENCY');
   }
 
