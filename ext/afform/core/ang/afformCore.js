@@ -17,6 +17,7 @@
         $scope.crmApi4 = crmApi4;
         $scope.crmStatus = crmStatus;
         $scope.crmUiAlert = crmUiAlert;
+        $scope.crmUrl = CRM.url;
       };
       return d;
     };
