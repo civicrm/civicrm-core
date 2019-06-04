@@ -66,12 +66,12 @@ class CRM_Admin_Form_Setting_Component extends CRM_Admin_Form_Setting {
     $errors = [];
 
     if (array_key_exists('enable_components', $fields) && is_array($fields['enable_components'])) {
-      if (in_array('CiviPledge', $fields['enable_components']) &&
-        !in_array('CiviContribute', $fields['enable_components'])
+      if (!empty($fields['enable_components']['CiviPledge']) &&
+        empty($fields['enable_components']['CiviContribute'])
       ) {
         $errors['enable_components'] = ts('You need to enable CiviContribute before enabling CiviPledge.');
       }
-      if (in_array('CiviCase', $fields['enable_components']) &&
+      if (!empty($fields['enable_components']['CiviCase']) &&
         !CRM_Core_DAO::checkTriggerViewPermission(TRUE, FALSE)
       ) {
         $errors['enable_components'] = ts('CiviCase requires CREATE VIEW and DROP VIEW permissions for the database.');
