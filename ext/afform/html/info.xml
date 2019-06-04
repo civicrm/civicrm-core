@@ -20,6 +20,9 @@
   <compatibility>
     <ver>5.0</ver>
   </compatibility>
+  <requires>
+    <ext>org.civicrm.afform</ext>
+  </requires>
   <comments>This is a new, undeveloped module</comments>
   <civix>
     <namespace>CRM/AfformHtml</namespace>
