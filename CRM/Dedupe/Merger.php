@@ -1875,6 +1875,23 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       CRM_Core_BAO_CustomValueTable::setValues($viewOnlyCustomFields);
     }
 
+
+    // dev/core#996 Ensure that the earliest created date is stored against the kept contact id
+    $mainCreatedDate = civicrm_api3('Contact', 'getsingle', [
+      'id' => $mainId,
+      'return' => ['created_date'],
+    ])['created_date'];
+    $otherCreatedDate = civicrm_api3('Contact', 'getsingle', [
+      'id' => $otherId,
+      'return' => ['created_date'],
+    ])['created_date'];
+    if ($otherCreatedDate < $mainCreatedDate) {
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_contact SET created_date = %1 WHERE id = %2", [
+        1 => [$otherCreatedDate, 'String'],
+        2 => [$mainId, 'Positive'],
+      ]);
+    }
+
     if (!$checkPermissions || (CRM_Core_Permission::check('merge duplicate contacts') &&
         CRM_Core_Permission::check('delete contacts'))
     ) {
