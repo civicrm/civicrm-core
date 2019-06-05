@@ -131,6 +131,43 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * Basic test to ensure the exportComponents function can export with soft credits enabled.
+   */
+  public function testExportComponentsContributionSoftCredits() {
+    $this->setUpContributionExportData();
+    $params = [
+      ['contribution_date_low', '=', '20190101000000', 0, 0],
+      ['contribution_date_high', '=', '20191231235959', 0, 0],
+      ['contribution_amount_low', '=', '1', 0, 0],
+      ['contribution_amount_high', '=', '10000000', 0, 0],
+      ['contribution_test', '=', '0', 0, 0],
+      ['contribution_or_softcredits', '=', 'both', 0, 0],
+    ];
+
+    list($tableName) = CRM_Export_BAO_Export::exportComponents(
+      FALSE,
+      $this->contributionIDs,
+      $params,
+      'receive_date desc',
+      NULL,
+      NULL,
+      CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
+      'civicrm_contribution.id IN ( ' . implode(',', $this->contributionIDs) . ')',
+      NULL,
+      FALSE,
+      FALSE,
+      [
+        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
+        'suppress_csv_for_testing' => TRUE,
+      ]
+    );
+
+    // delete the export temp table and component table
+    $sql = "DROP TABLE IF EXISTS {$tableName}";
+    CRM_Core_DAO::executeQuery($sql);
+  }
+
+  /**
    * Basic test to ensure the exportComponents function can export selected fields for contribution.
    */
   public function testExportComponentsMembership() {
