@@ -262,7 +262,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * Note this will only pick up fields declared via metadata.
    */
   protected function convertTextStringsToUseLikeOperator() {
-    foreach ($this->getSearchFieldMetadata()[$this->getDefaultEntity()] as $fieldName => $field) {
+    foreach (CRM_Utils_Array::value($this->getDefaultEntity(), $this->getSearchFieldMetadata(), []) as $fieldName => $field) {
       if (!empty($this->_formValues[$fieldName]) && empty($field['options']) && empty($field['pseudoconstant'])) {
         if (in_array($field['type'], [CRM_Utils_Type::T_STRING, CRM_Utils_Type::T_TEXT])) {
           $this->_formValues[$fieldName] = ['LIKE' => CRM_Contact_BAO_Query::getWildCardedValue(TRUE, 'LIKE', $this->_formValues[$fieldName])];
