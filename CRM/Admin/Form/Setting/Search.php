@@ -61,19 +61,13 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
 
     parent::buildQuickForm();
 
-    // @todo remove the following adds in favour of setting via the settings array (above).
-
-    // Autocomplete for Contact Search (quick search etc.)
+    // Option 1 can't be unchecked. @see self::enableOptionOne
     $element = $this->getElement('contact_autocomplete_options');
-    $element->_elements[0]->_flagFrozen = TRUE;
+    $element->_elements[0]->setAttribute('disabled', 'disabled');
 
-    // Autocomplete for Contact Reference (custom fields)
+    // Option 1 can't be unchecked. @see self::enableOptionOne
     $element = $this->getElement('contact_reference_options');
-    $element->_elements[0]->_flagFrozen = TRUE;
-
-    // Freeze first element of quicksearch options
-    $element = $this->getElement('quicksearch_options');
-    $element->_elements[0]->_flagFrozen = TRUE;
+    $element->_elements[0]->setAttribute('disabled', 'disabled');
   }
 
   /**
@@ -100,6 +94,22 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
    */
   public static function getContactReferenceOptions() {
     return [1 => ts('Contact Name')] + CRM_Core_OptionGroup::values('contact_reference_options', FALSE, FALSE, TRUE);
+  }
+
+  /**
+   * Presave callback for contact_reference_options and contact_autocomplete_options.
+   *
+   * Ensures "1" is always contained in the array.
+   *
+   * @param $value
+   * @return bool
+   */
+  public static function enableOptionOne(&$value) {
+    $values = (array) CRM_Utils_Array::explodePadded($value);
+    if (!in_array(1, $values)) {
+      $value = CRM_Utils_Array::implodePadded(array_merge([1], $values));
+    }
+    return TRUE;
   }
 
 }
