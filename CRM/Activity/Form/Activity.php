@@ -277,7 +277,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       if (!CRM_Core_Permission::check('delete activities')) {
-        CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+        CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
       }
     }
 
@@ -306,7 +306,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       ]) &&
       !CRM_Activity_BAO_Activity::checkPermission($this->_activityId, $this->_action)
     ) {
-      CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
+      CRM_Core_Error::statusBounce(ts('You do not have permission to access this page.'));
     }
     if (($this->_action & CRM_Core_Action::VIEW) &&
       CRM_Activity_BAO_Activity::checkPermission($this->_activityId, CRM_Core_Action::UPDATE)
@@ -329,22 +329,21 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $this->_activityTypeName = $activityTName[$this->_activityTypeId];
         $this->assign('activityTName', $activityTName[$this->_activityTypeId]);
       }
-    }
+      // Set title.
+      if (isset($activityTName)) {
+        $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTName);
 
-    // Set title.
-    if (isset($activityTName)) {
-      $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTName);
-
-      if ($this->_currentlyViewedContactId) {
-        $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
-        // Check if this is default domain contact CRM-10482.
-        if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
-          $displayName .= ' (' . ts('default organization') . ')';
+        if ($this->_currentlyViewedContactId) {
+          $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
+          // Check if this is default domain contact CRM-10482.
+          if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
+            $displayName .= ' (' . ts('default organization') . ')';
+          }
+          CRM_Utils_System::setTitle($displayName . ' - ' . $activityName);
         }
-        CRM_Utils_System::setTitle($displayName . ' - ' . $activityName);
-      }
-      else {
-        CRM_Utils_System::setTitle(ts('%1 Activity', [1 => $activityName]));
+        else {
+          CRM_Utils_System::setTitle(ts('%1 Activity', [1 => $activityName]));
+        }
       }
     }
 
