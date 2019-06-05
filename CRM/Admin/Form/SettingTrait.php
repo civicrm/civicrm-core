@@ -208,12 +208,13 @@ trait CRM_Admin_Form_SettingTrait {
           $this->addCheckBox($setting, '', $options, NULL, CRM_Utils_Array::value('html_attributes', $props), NULL, NULL, ['&nbsp;&nbsp;']);
         }
         elseif ($add == 'addCheckBoxes') {
-          $options = array_flip($options);
-          $newOptions = [];
-          foreach ($options as $key => $val) {
-            $newOptions[$key] = $val;
+          $newOptions = array_flip($options);
+          $classes = 'crm-checkbox-list';
+          if (!empty($props['sortable'])) {
+            $classes .= ' crm-sortable-list';
+            $newOptions = array_flip(self::reorderSortableOptions($setting, $options));
           }
-          $settingMetaData[$setting]['wrapper_element'] = ['<ul class="crm-checkbox-list"><li>', '</li></ul>'];
+          $settingMetaData[$setting]['wrapper_element'] = ['<ul class="' . $classes . '"><li>', '</li></ul>'];
           $this->addCheckBox($setting,
             $props['title'],
             $newOptions,
@@ -332,15 +333,45 @@ trait CRM_Admin_Form_SettingTrait {
   protected function saveMetadataDefinedSettings($params) {
     $settings = $this->getSettingsToSetByMetadata($params);
     foreach ($settings as $setting => $settingValue) {
-      if ($this->getQuickFormType($this->getSettingMetadata($setting)) === 'CheckBoxes') {
+      $settingMetaData = $this->getSettingMetadata($setting);
+      if (!empty($settingMetaData['sortable'])) {
+        $settings[$setting] = $this->getReorderedSettingData($setting, $settingValue);
+      }
+      elseif ($this->getQuickFormType($settingMetaData) === 'CheckBoxes') {
         $settings[$setting] = array_keys($settingValue);
       }
-      if ($this->getQuickFormType($this->getSettingMetadata($setting)) === 'CheckBox') {
+      elseif ($this->getQuickFormType($settingMetaData) === 'CheckBox') {
         // This will be an array with one value.
         $settings[$setting] = (int) reset($settings[$setting]);
       }
     }
     civicrm_api3('setting', 'create', $settings);
+  }
+
+  /**
+   * Display options in correct order on the form
+   *
+   * @param $setting
+   * @param $options
+   * @return array
+   */
+  public static function reorderSortableOptions($setting, $options) {
+    return array_merge(array_flip(Civi::settings()->get($setting)), $options);
+  }
+
+  /**
+   * @param string $setting
+   * @param array $settingValue
+   *
+   * @return array
+   */
+  private function getReorderedSettingData($setting, $settingValue) {
+    // Get order from $_POST as $_POST maintains the order the sorted setting
+    // options were sent. You can simply assign data from $_POST directly to
+    // $settings[] but preference has to be given to data from Quickform.
+    $order = array_keys(\CRM_Utils_Request::retrieve($setting, 'String'));
+    $settingValueKeys = array_keys($settingValue);
+    return array_intersect($order, $settingValueKeys);
   }
 
 }
