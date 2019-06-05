@@ -325,15 +325,17 @@ class CRM_Activity_BAO_Query {
         }
 
       case 'activity_tags':
-        $value = array_keys($value);
         $activityTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
 
-        $names = [];
-        if (is_array($value)) {
-          foreach ($value as $k => $v) {
-            $names[] = $activityTags[$v];
-          }
+        if (!is_array($value)) {
+          $value = explode(',', $value);
         }
+
+        $names = [];
+        foreach ($value as $k => $v) {
+          $names[] = $activityTags[$v];
+        }
+
         $query->_where[$grouping][] = "civicrm_activity_tag.tag_id IN (" . implode(",", $value) . ")";
         $query->_qill[$grouping][] = ts('Activity Tag %1', [1 => $op]) . ' ' . implode(' ' . ts('OR') . ' ', $names);
         $query->_tables['civicrm_activity_tag'] = $query->_whereTables['civicrm_activity_tag'] = 1;
@@ -525,13 +527,18 @@ class CRM_Activity_BAO_Query {
     );
 
     $form->addYesNo('activity_test', ts('Activity is a Test?'));
-    $activity_tags = CRM_Core_BAO_Tag::getTags('civicrm_activity');
+    $activity_tags = CRM_Core_BAO_Tag::getColorTags('civicrm_activity');
+
     if ($activity_tags) {
-      foreach ($activity_tags as $tagID => $tagName) {
-        $form->_tagElement = &$form->addElement('checkbox', "activity_tags[$tagID]",
-          NULL, $tagName
-        );
-      }
+      $form->add('select2', 'activity_tags', ts('Activity Tag(s)'),
+        $activity_tags, FALSE, [
+          'id' => 'activity_tags',
+          'multiple' =>
+          'multiple',
+          'class' => 'crm-select2',
+          'placeholder' => ts('- select -'),
+        ]
+      );
     }
 
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_activity');
