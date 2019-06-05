@@ -81,9 +81,8 @@ try {
       CRM_Utils_System::loadBootStrap();
       break;
 
-    case 'Drupal':
-    case 'Backdrop':
-      // Gitlab issue: #973
+    default:
+      // Gitlab issues: #973, #1017
       CRM_Utils_System::loadBootStrap([], FALSE);
       break;
 
