@@ -12,3 +12,5 @@ This file documents all the changes made on top of core 5.13 by Australian Green
 | ad4fab7    | dev/core/#273: Set doNotSms To False When Phone Number Is Given                                                  | Need to check against core pr to determine if still needed       |
 | a7c102e8bf | Port fix for dev/core#369 Fix Fatal error on scheduled reminders when SMS provider has been deleted              | PR merged into 5.15                                              |
 | 0026681cad | Fix legacy IPN endpoint for Drupal (gitlab issue 973)                                                            | Already merged into Civi core                                    |
+| 9faaca2    | Fix error when renewing by credit card it does not set the contribution receive date                             |                                                                  |
+| 3a9d7c0    | dev/core#996 #SYS-152 Ensure that the oldest created date is retained during merge process                       | Already merged into Civi core                                    |
