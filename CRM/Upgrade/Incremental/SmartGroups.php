@@ -54,7 +54,10 @@ class CRM_Upgrade_Incremental_SmartGroups {
       $fieldPossibilities[] = $field . '_high';
       $fieldPossibilities[] = $field . '_low';
     }
-    $relativeDateMappings = ['activity_date_time' => 'activity'];
+    $relativeDateMappings = [
+      'activity_date_time' => 'activity',
+      'participant_register_date' => 'participant',
+    ];
 
     foreach ($fields as $field) {
       foreach ($this->getSearchesWithField($field) as $savedSearch) {
@@ -74,7 +77,10 @@ class CRM_Upgrade_Incremental_SmartGroups {
             // Any actual criteria will have this key set but skip any weird lines
             continue;
           }
-          if (in_array($formValue[0], $fieldPossibilities)) {
+          if ($formValue[0] === $relativeFieldName && empty($formValue[2])) {
+            unset($formValues[$index]);;
+          }
+          elseif (in_array($formValue[0], $fieldPossibilities)) {
             if ($isRelative) {
               unset($formValues[$index]);
             }
