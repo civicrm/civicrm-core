@@ -1298,36 +1298,35 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   }
 
   /**
-   * Test for function createProportionalFinancialEntries().
+   * Test to ensure proportional entries are creating when adding a payment..
+   *
+   * In this test we create a pending contribution for $110 consisting of $100 contribution and $10 tax.
+   *
+   * We pay $50, resulting in it being allocated as $45.45 paymnt & $4.55 tax. This is in equivalent proportions
+   * to the original payment - ie. .0909 of the $110 is 10 & that * 50 is $4.54 (note the rounding seems wrong as it should be
+   * saved un-rounded).
    */
-  public function testcreateProportionalFinancialEntries() {
-    list($contribution, $financialAccount) = $this->createContributionWithTax();
-    $params = array(
+  public function testCreateProportionalFinancialEntriesViaPaymentCreate() {
+    list($contribution, $financialAccount) = $this->createContributionWithTax([], FALSE);
+    $params = [
       'total_amount' => 50,
       'to_financial_account_id' => $financialAccount->financial_account_id,
       'payment_instrument_id' => 1,
       'trxn_date' => date('Ymd'),
       'status_id' => 1,
       'entity_id' => $contribution['id'],
-    );
-    $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'create', $params);
-    $entityParams = array(
-      'contribution_total_amount' => $contribution['total_amount'],
-      'trxn_total_amount' => 55,
-      'trxn_id' => $financialTrxn['id'],
-    );
-    $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($contribution['id']);
-    list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($contribution['id']);
-    CRM_Contribute_BAO_Contribution::createProportionalFinancialEntries($entityParams, $lineItems, $ftIds, $taxItems);
-    $eftParams = array(
+      'contribution_id' => $contribution['id'],
+    ];
+    $financialTrxn = $this->callAPISuccess('Payment', 'create', $params);
+    $eftParams = [
       'entity_table' => 'civicrm_financial_item',
       'financial_trxn_id' => $financialTrxn['id'],
-    );
+    ];
     $entityFinancialTrxn = $this->callAPISuccess('EntityFinancialTrxn', 'Get', $eftParams);
     $this->assertEquals($entityFinancialTrxn['count'], 2, 'Invalid count.');
-    $testAmount = array(5, 50);
+    $testAmount = [4.55, 45.45];
     foreach ($entityFinancialTrxn['values'] as $value) {
-      $this->assertEquals($value['amount'], array_pop($testAmount), 'Invalid amount stored in civicrm_entity_financial_trxn.');
+      $this->assertEquals(array_pop($testAmount), $value['amount'], 'Invalid amount stored in civicrm_entity_financial_trxn.');
     }
   }
 
@@ -1357,7 +1356,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
   /**
    * Function to create contribution with tax.
    */
-  public function createContributionWithTax($params = array()) {
+  public function createContributionWithTax($params = array(), $isCompleted = TRUE) {
     if (!isset($params['total_amount'])) {
       $params['total_amount'] = 100;
     }
@@ -1371,7 +1370,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'total_amount' => $params['total_amount'],
       'financial_type_id' => $financialType['id'],
       'contact_id' => $contactId,
-      'contribution_status_id' => 1,
+      'contribution_status_id' => $isCompleted ? 1 : 2,
       'price_set_id' => 0,
     ), CRM_Core_Action::ADD);
     $contribution = $this->callAPISuccessGetSingle('Contribution',
