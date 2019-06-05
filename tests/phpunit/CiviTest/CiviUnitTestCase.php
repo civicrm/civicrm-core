@@ -2458,6 +2458,16 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
+   * Assert 2 sql strings are the same, ignoring double spaces.
+   *
+   * @param string $expectedSQL
+   * @param string $actualSQL
+   */
+  protected function assertSqlSamey($expectedSQL, $actualSQL) {
+    $this->assertEquals(preg_replace('/\s+/', ' ', $expectedSQL), preg_replace('/\s+/', ' ', $actualSQL));
+  }
+
+  /**
    * Create a price set for an event.
    *
    * @param int $feeTotal
