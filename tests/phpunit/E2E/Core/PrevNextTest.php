@@ -31,7 +31,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
     parent::setUp();
     $this->prevNext = \Civi::service('prevnext');
     $this->cacheKey = 'PrevNextTest_' . \CRM_Utils_String::createRandom(16, \CRM_Utils_String::ALPHANUMERIC);
-    $this->cacheKeyB = 'PrevNextTest_' . \CRM_Utils_String::createRandom(16, \CRM_Utils_String::ALPHANUMERIC);
+    $this->cacheKeyB = 'PrevNextTestb_' . \CRM_Utils_String::createRandom(16, \CRM_Utils_String::ALPHANUMERIC);
     $this->assertTrue(
       \CRM_Core_DAO::singleValueQuery('SELECT count(*) FROM civicrm_contact') > 25,
       'The contact table must have at least 25 records.'
@@ -40,6 +40,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
 
   protected function tearDown() {
     \Civi::service('prevnext')->deleteItem(NULL, $this->cacheKey);
+    \Civi::service('prevnext')->deleteItem(NULL, $this->cacheKeyB);
   }
 
   public function testFillSql() {
@@ -331,7 +332,7 @@ class PrevNextTest extends \CiviEndToEndTestCase {
       $cacheKey = $this->cacheKey;
     }
     $selected = $this->prevNext->getSelection($cacheKey, $action)[$cacheKey];
-    $this->assertEquals($ids, array_keys($selected));
+    $this->assertEquals($ids, array_keys($selected), 'selected cache not correct for ' . $cacheKey . 'defined keys are ' . $this->cacheKey . 'and ' . $this->cacheKeyB);
     $this->assertCount(count($ids), $selected);
   }
 
