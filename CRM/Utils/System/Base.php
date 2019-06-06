@@ -946,4 +946,18 @@ abstract class CRM_Utils_System_Base {
     return [];
   }
 
+  /**
+   * Set the HTTP Status Code for a request
+   * @param string $statusCode
+   */
+  public function setStatusCode($statusCode) {
+    if (function_exists('http_response_code')) {
+      // PHP 5.4+
+      http_response_code($statusCode);
+    }
+    else {
+      header('X-PHP-Response-Code: ' . $statusCode, TRUE, $statusCode);
+    }
+  }
+
 }
