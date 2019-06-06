@@ -62,11 +62,12 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     parent::preProcess();
     if ($this->_crid) {
-      $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_crid);
       $this->assign('frequency_unit', $this->_subscriptionDetails->frequency_unit);
       $this->assign('frequency_interval', $this->_subscriptionDetails->frequency_interval);
       $this->assign('amount', $this->_subscriptionDetails->amount);
@@ -97,7 +98,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         CRM_Core_Error::fatal(ts('The recurring contribution looks to have been cancelled already.'));
       }
       $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
-      $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
 
       $this->assign('frequency_unit', $this->_subscriptionDetails->frequency_unit);
       $this->assign('frequency_interval', $this->_subscriptionDetails->frequency_interval);

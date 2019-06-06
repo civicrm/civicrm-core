@@ -2710,7 +2710,7 @@ class CRM_Contact_BAO_Query {
       case 'civicrm_worldregion':
         // We can be sure from the calling function that country will already be joined in.
         // we really don't need world_region - we could use a pseudoconstant for it.
-        return "$side JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id ";
+        return " $side JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id ";
 
       case 'civicrm_location_type':
         return " $side JOIN civicrm_location_type ON civicrm_address.location_type_id = civicrm_location_type.id ";
