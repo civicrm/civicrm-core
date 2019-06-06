@@ -102,7 +102,6 @@ class CRM_Financial_BAO_Payment {
     }
     elseif ($params['total_amount'] < 0) {
       $trxn = self::recordRefundPayment($params['contribution_id'], $params, FALSE);
-      CRM_Contribute_BAO_Contribution::recordPaymentActivity($params['contribution_id'], CRM_Utils_Array::value('participant_id', $params), $params['total_amount'], $trxn->currency, $trxn->trxn_date);
     }
 
     if ($isPaymentCompletesContribution) {
@@ -133,7 +132,7 @@ class CRM_Financial_BAO_Payment {
         ]
       );
     }
-
+    CRM_Contribute_BAO_Contribution::recordPaymentActivity($params['contribution_id'], CRM_Utils_Array::value('participant_id', $params), $params['total_amount'], $trxn->currency, $trxn->trxn_date);
     return $trxn;
   }
 
