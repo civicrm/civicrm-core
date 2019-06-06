@@ -5632,13 +5632,13 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
 
     $spec = [
       $options['prefix'] . 'name' => [
-        'title' => ts($options['prefix_label'] . 'Address Name'),
+        'title' => $options['prefix_label'] . ts('Address Name'),
         'name' => 'name',
         'is_fields' => TRUE,
       ],
       $options['prefix'] . 'street_number' => [
         'name' => 'street_number',
-        'title' => ts($options['prefix_label'] . 'Street Number'),
+        'title' => $options['prefix_label'] . ts('Street Number'),
         'type' => 1,
         'is_fields' => TRUE,
       ],
@@ -5654,7 +5654,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ],
       $options['prefix'] . 'street_name' => [
         'name' => 'street_name',
-        'title' => ts($options['prefix_label'] . 'Street Name'),
+        'title' => $options['prefix_label'] . ts('Street Name'),
         'type' => 1,
         'is_fields' => TRUE,
         'is_filters' => TRUE,
@@ -5662,30 +5662,30 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_order_bys' => TRUE,
       ],
       $options['prefix'] . 'street_address' => [
-        'title' => ts($options['prefix_label'] . 'Street Address'),
+        'title' => $options['prefix_label'] . ts('Street Address'),
         'name' => 'street_address',
         'is_fields' => TRUE,
         'is_filters' => TRUE,
         'is_group_bys' => TRUE,
       ],
       $options['prefix'] . 'supplemental_address_1' => [
-        'title' => ts($options['prefix_label'] . 'Supplementary Address Field 1'),
+        'title' => $options['prefix_label'] . ts('Supplementary Address Field 1'),
         'name' => 'supplemental_address_1',
         'is_fields' => TRUE,
       ],
       $options['prefix'] . 'supplemental_address_2' => [
-        'title' => ts($options['prefix_label'] . 'Supplementary Address Field 2'),
+        'title' => $options['prefix_label'] . ts('Supplementary Address Field 2'),
         'name' => 'supplemental_address_2',
         'is_fields' => TRUE,
       ],
       $options['prefix'] . 'supplemental_address_3' => [
-        'title' => ts($options['prefix_label'] . 'Supplementary Address Field 3'),
+        'title' => $options['prefix_label'] . ts('Supplementary Address Field 3'),
         'name' => 'supplemental_address_3',
         'is_fields' => TRUE,
       ],
       $options['prefix'] . 'street_number' => [
         'name' => 'street_number',
-        'title' => ts($options['prefix_label'] . 'Street Number'),
+        'title' => $options['prefix_label'] . ts('Street Number'),
         'type' => 1,
         'is_order_bys' => TRUE,
         'is_filters' => TRUE,
@@ -5693,12 +5693,12 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ],
       $options['prefix'] . 'street_unit' => [
         'name' => 'street_unit',
-        'title' => ts($options['prefix_label'] . 'Street Unit'),
+        'title' => $options['prefix_label'] . ts('Street Unit'),
         'type' => 1,
         'is_fields' => TRUE,
       ],
       $options['prefix'] . 'city' => [
-        'title' => ts($options['prefix_label'] . 'City'),
+        'title' => $options['prefix_label'] . ts('City'),
         'name' => 'city',
         'operator' => 'like',
         'is_fields' => TRUE,
@@ -5707,7 +5707,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_order_bys' => TRUE,
       ],
       $options['prefix'] . 'postal_code' => [
-        'title' => ts($options['prefix_label'] . 'Postal Code'),
+        'title' => $options['prefix_label'] . ts('Postal Code'),
         'name' => 'postal_code',
         'type' => 1,
         'is_fields' => TRUE,
@@ -5716,7 +5716,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_order_bys' => TRUE,
       ],
       $options['prefix'] . 'postal_code_suffix' => [
-        'title' => ts($options['prefix_label'] . 'Postal Code Suffix'),
+        'title' => $options['prefix_label'] . ts('Postal Code Suffix'),
         'name' => 'postal_code',
         'type' => 1,
         'is_fields' => TRUE,
@@ -5725,7 +5725,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_order_bys' => TRUE,
       ],
       $options['prefix'] . 'county_id' => [
-        'title' => ts($options['prefix_label'] . 'County'),
+        'title' => $options['prefix_label'] . ts('County'),
         'alter_display' => 'alterCountyID',
         'name' => 'county_id',
         'type' => CRM_Utils_Type::T_INT,
@@ -5736,7 +5736,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_group_bys' => TRUE,
       ],
       $options['prefix'] . 'state_province_id' => [
-        'title' => ts($options['prefix_label'] . 'State/Province'),
+        'title' => $options['prefix_label'] . ts('State/Province'),
         'alter_display' => 'alterStateProvinceID',
         'name' => 'state_province_id',
         'type' => CRM_Utils_Type::T_INT,
@@ -5747,7 +5747,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_group_bys' => TRUE,
       ],
       $options['prefix'] . 'country_id' => [
-        'title' => ts($options['prefix_label'] . 'Country'),
+        'title' => $options['prefix_label'] . ts('Country'),
         'alter_display' => 'alterCountryID',
         'name' => 'country_id',
         'is_fields' => TRUE,
@@ -5759,19 +5759,19 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ],
       $options['prefix'] . 'location_type_id' => [
         'name' => 'is_primary',
-        'title' => ts($options['prefix_label'] . 'Location Type'),
+        'title' => $options['prefix_label'] . ts('Location Type'),
         'type' => CRM_Utils_Type::T_INT,
         'is_fields' => TRUE,
         'alter_display' => 'alterLocationTypeID',
       ],
       $options['prefix'] . 'id' => [
-        'title' => ts($options['prefix_label'] . 'ID'),
+        'title' => $options['prefix_label'] . ts('ID'),
         'name' => 'id',
         'is_fields' => TRUE,
       ],
       $options['prefix'] . 'is_primary' => [
         'name' => 'is_primary',
-        'title' => ts($options['prefix_label'] . 'Primary Address?'),
+        'title' => $options['prefix_label'] . ts('Primary Address?'),
         'type' => CRM_Utils_Type::T_BOOLEAN,
         'is_fields' => TRUE,
       ],

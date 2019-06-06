@@ -89,7 +89,7 @@ class CRM_Contact_Form_Search_Criteria {
         // we will hide searching contact by attachments tags until it will be implemented in core
         if (count($tags) && $key != 'civicrm_file' && $key != 'civicrm_contact') {
           //if tags exists then add type to display in adv search form help text
-          $tagsTypes[] = ts($value);
+          $tagsTypes[] = $value;
           $showAllTagTypes = TRUE;
         }
       }
