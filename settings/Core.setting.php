@@ -300,6 +300,7 @@ return [
     'description' => ts("Selected fields will be displayed in back-office autocomplete dropdown search results (Quick Search, etc.). Contact Name is always included."),
     'help_text' => NULL,
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
+    'validate_callback' => 'CRM_Admin_Form_Setting_Search::enableOptionOne',
   ],
   'contact_reference_options' => [
     'group_name' => 'CiviCRM Preferences',
@@ -318,6 +319,7 @@ return [
     'description' => ts("Selected fields will be displayed in autocomplete dropdown search results for 'Contact Reference' custom fields. Contact Name is always included. NOTE: You must assign 'access contact reference fields' permission to the anonymous role if you want to use custom contact reference fields in profiles on public pages. For most situations, you should use the 'Limit List to Group' setting when configuring a contact reference field which will be used in public forms to prevent exposing your entire contact list."),
     'help_text' => NULL,
     'serialize' => CRM_Core_DAO::SERIALIZE_SEPARATOR_BOOKEND,
+    'validate_callback' => 'CRM_Admin_Form_Setting_Search::enableOptionOne',
   ],
   'contact_smart_group_display' => [
     'group_name' => 'CiviCRM Preferences',
