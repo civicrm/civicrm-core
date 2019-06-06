@@ -128,6 +128,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     // delete the export temp table and component table
     $sql = "DROP TABLE IF EXISTS {$tableName}";
     CRM_Core_DAO::executeQuery($sql);
+    $this->contributionIDs = [];
   }
 
   /**
@@ -163,6 +164,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     // delete the export temp table and component table
     $sql = "DROP TABLE IF EXISTS {$tableName}";
     CRM_Core_DAO::executeQuery($sql);
+    $this->contributionIDs = [];
   }
 
   /**
@@ -327,6 +329,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'membership_id' => $this->membershipIDs[0],
       'api.LineItem.create' => ['contribution_id' => $this->contributionIDs[0]],
     ]);
+    $this->contributionIDs = [];
   }
 
   /**
@@ -483,6 +486,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       )
     );
     $this->assertEquals('Big campaign,', CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(contribution_campaign_title) FROM {$tableName}"));
+    $this->contributionIDs = [];
   }
 
   /**
