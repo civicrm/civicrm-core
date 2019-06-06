@@ -245,7 +245,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         ->readUserContext());
     }
     catch (CRM_Core_Exception $e) {
-      CRM_Core_Error::statusBounce(ts($e->getMessage()));
+      CRM_Core_Error::statusBounce($e->getMessage());
     }
   }
 

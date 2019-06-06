@@ -1774,7 +1774,7 @@ SELECT count(*)
             $membershipValues['status_id'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipStatus', 'Expired', 'id', 'label');
             $type = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipValues['membership_type_id'], 'name', 'id');
             CRM_Member_BAO_Membership::add($membershipValues);
-            CRM_Core_Session::setStatus(ts("Inherited membership {$type} status was changed to Expired due to the change in relationship type."), ts('Record Updated'), 'alert');
+            CRM_Core_Session::setStatus(ts("Inherited membership %1 status was changed to Expired due to the change in relationship type.", [1 => $type]), ts('Record Updated'), 'alert');
           }
         }
       }
