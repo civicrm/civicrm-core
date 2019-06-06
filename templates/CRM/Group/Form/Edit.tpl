@@ -102,11 +102,11 @@
       {if $group.saved_search_id}
         <br />
         {if $group.mapping_id}
-          <a class="no-popup" href="{crmURL p="civicrm/contact/search/builder" q="reset=1&force=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
+          <a class="no-popup" href="{crmURL p="civicrm/contact/search/builder" q="reset=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
         {elseif $group.search_custom_id}
-          <a class="no-popup" href="{crmURL p="civicrm/contact/search/custom" q="reset=1&force=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
+          <a class="no-popup" href="{crmURL p="civicrm/contact/search/custom" q="reset=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
         {else}
-          <a class="no-popup" href="{crmURL p="civicrm/contact/search/advanced" q="reset=1&force=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
+          <a class="no-popup" href="{crmURL p="civicrm/contact/search/advanced" q="reset=1&ssID=`$group.saved_search_id`"}">&raquo; {ts}Edit Smart Group Criteria{/ts}</a>
         {/if}
 
       {/if}
