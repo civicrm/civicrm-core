@@ -60,35 +60,30 @@
           <tr>
             <td style="width:30%">
               <span class="label"><strong>{ts}Individual Name Fields{/ts}</strong></span>
-              <ul id="contactEditNameFields">
+              <ul id="contactEditNameFields" class="crm-checkbox-list">
                 {foreach from=$nameFields item="title" key="opId"}
-                  <li id="preference-{$opId}-contactedit" class="ui-state-default ui-corner-all"
-                      style="padding-left:1px;">
-                    <span>{$form.contact_edit_options.$opId.html}</span>
+                  <li id="preference-{$opId}-contactedit">
+                    {$form.contact_edit_options.$opId.html}
                   </li>
                 {/foreach}
               </ul>
             </td>
             <td style="width:30%">
               <span class="label"><strong>{ts}Contact Details{/ts}</strong></span>
-              <ul id="contactEditBlocks">
+              <ul id="contactEditBlocks" class="crm-checkbox-list crm-sortable-list">
                 {foreach from=$contactBlocks item="title" key="opId"}
-                  <li id="preference-{$opId}-contactedit" class="ui-state-default ui-corner-all"
-                      style="padding-left:1px;">
-                    <i class='crm-i fa-arrows crm-grip' style="float:left;"></i>
-                    <span>{$form.contact_edit_options.$opId.html}</span>
+                  <li id="preference-{$opId}-contactedit">
+                    {$form.contact_edit_options.$opId.html}
                   </li>
                 {/foreach}
               </ul>
             </td>
-            <td>
+            <td style="width:30%">
               <span class="label"><strong>{ts}Other Panes{/ts}</strong></span>
-              <ul id="contactEditOptions">
+              <ul id="contactEditOptions"  class="crm-checkbox-list crm-sortable-list">
                 {foreach from=$editOptions item="title" key="opId"}
-                  <li id="preference-{$opId}-contactedit" class="ui-state-default ui-corner-all"
-                      style="padding-left:1px;">
-                    <i class='crm-i fa-arrows crm-grip' style="float:left;"></i>
-                    <span>{$form.contact_edit_options.$opId.html}</span>
+                  <li id="preference-{$opId}-contactedit">
+                    {$form.contact_edit_options.$opId.html}
                   </li>
                 {/foreach}
               </ul>
@@ -267,10 +262,7 @@
           $('#user_dashboard_options_' + invoicesKey).attr("disabled", true);
         }
 
-        $("#contactEditBlocks, #contactEditOptions").sortable({
-          placeholder: 'ui-state-highlight',
-          update: getSorting
-        });
+        $("#contactEditBlocks, #contactEditOptions").on('sortupdate', getSorting);
 
         function showCKEditorConfig() {
           $('.crm-preferences-display-form-block-editor_id .crm-button').toggle($(this).val() == 'CKEditor');
