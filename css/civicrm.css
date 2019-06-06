@@ -3237,6 +3237,7 @@ span.crm-select-item-color {
   background-color: white;
   border: 1px solid #a5a5a5;
   width: 300px;
+  max-width: 100%;
   max-height: 300px;
   overflow-y: auto;
 }
