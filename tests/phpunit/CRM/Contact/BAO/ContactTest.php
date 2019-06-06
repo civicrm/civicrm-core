@@ -1623,4 +1623,18 @@ class CRM_Contact_BAO_ContactTest extends CiviUnitTestCase {
     $this->contactDelete($contactId);
   }
 
+  /**
+   * Test that contact details are still displayed if no email is present.
+   *
+   * @throws \Exception
+   */
+  public function testContactEmailDetailsWithNoPrimaryEmail() {
+    $params = $this->contactParams();
+    unset($params['email']);
+    $contact = CRM_Contact_BAO_Contact::create($params);
+    $contactId = $contact->id;
+    $result = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactId);
+    $this->assertEquals([$contact->display_name, NULL, NULL, NULL], $result);
+  }
+
 }
