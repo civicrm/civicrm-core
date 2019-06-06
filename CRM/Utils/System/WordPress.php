@@ -863,4 +863,19 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
     ];
   }
 
+  /**
+   * Set the HTTP Status Code for a request
+   * @param string $statusCode
+   */
+  public function setStatusCode($statusCode) {
+    status_header($statusCode);
+    if (function_exists('http_response_code')) {
+      // PHP 5.4+
+      http_response_code($statusCode);
+    }
+    else {
+      header('X-PHP-Response-Code: ' . $statusCode, TRUE, $statusCode);
+    }
+  }
+
 }
