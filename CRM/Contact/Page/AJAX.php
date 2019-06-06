@@ -908,6 +908,16 @@ LIMIT {$offset}, {$rowCount}
    * @return \CRM_Core_DAO|mixed|null
    */
   public static function markNonDuplicates($cid, $oid, $oper) {
+    if ($oper == 'dupe-nondupe') {
+      try {
+        civicrm_api3('Exception', 'create', ['contact_id1' => $cid, 'contact_id2' => $oid]);
+        return TRUE;
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        return FALSE;
+      }
+    }
+
     $exception = new CRM_Dedupe_DAO_Exception();
     $exception->contact_id1 = $cid;
     $exception->contact_id2 = $oid;
@@ -918,9 +928,7 @@ LIMIT {$offset}, {$rowCount}
     }
     $exception->find(TRUE);
     $status = NULL;
-    if ($oper == 'dupe-nondupe') {
-      $status = $exception->save();
-    }
+
     if ($oper == 'nondupe-dupe') {
       $status = $exception->delete();
     }
