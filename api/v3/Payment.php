@@ -156,26 +156,26 @@ function _civicrm_api3_payment_create_spec(&$params) {
   $params = [
     'contribution_id' => [
       'api.required' => 1,
-      'title' => 'Contribution ID',
+      'title' => ts('Contribution ID'),
       'type' => CRM_Utils_Type::T_INT,
     ],
     'total_amount' => [
       'api.required' => 1,
-      'title' => 'Total Payment Amount',
+      'title' => ts('Total Payment Amount'),
       'type' => CRM_Utils_Type::T_FLOAT,
     ],
     'payment_processor_id' => [
-      'title' => 'Payment Processor ID',
+      'title' => ts('Payment Processor ID'),
       'type' => CRM_Utils_Type::T_INT,
       'description' => ts('Payment processor ID - required for payment processor payments'),
     ],
     'id' => [
-      'title' => 'Payment ID',
+      'title' => ts('Payment ID'),
       'type' => CRM_Utils_Type::T_INT,
       'api.aliases' => ['payment_id'],
     ],
     'trxn_date' => [
-      'title' => 'Cancel Date',
+      'title' => ts('Cancel Date'),
       'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
     ],
   ];
