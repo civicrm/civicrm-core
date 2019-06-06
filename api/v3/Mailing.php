@@ -594,7 +594,7 @@ function civicrm_api3_mailing_preview($params) {
   return civicrm_api3_create_success([
     'id' => $mailingID,
     'contact_id' => $contactID,
-    'subject' => $mime->headers()['Subject'],
+    'subject' => CRM_Utils_Array::value('Subject', $mime->headers(), ''),
     'body_html' => $mime->getHTMLBody(),
     'body_text' => $mime->getTXTBody(),
   ]);
