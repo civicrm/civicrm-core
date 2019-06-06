@@ -1607,7 +1607,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * CRM-20421: This test make sure that inherited memberships are deleted upon merging organization.
    */
   public function testMergeOrganizations() {
-    $organizationID1 = $this->organizationCreate(array(), 0);
+    $organizationID1 = $this->organizationCreate([], 0);
     $organizationID2 = $this->organizationCreate(array(), 1);
     $contact = $this->callAPISuccess('contact', 'create', array_merge($this->_params, array(
       'employer_id' => $organizationID1,
@@ -1648,6 +1648,68 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     ));
 
     $this->assertEquals(0, $contactmembership["count"], "Contact membership must be deleted after merging organization without memberships.");
+  }
+
+  /**
+   * Test the function that determines if 2 contacts have conflicts.
+   *
+   * @throws \Exception
+   */
+  public function testMergeGetConflicts() {
+    $this->createCustomGroupWithFieldOfType();
+    $contact1 = $this->individualCreate([
+      'email' => 'bob@example.com',
+      'api.address.create' => ['location_type_id' => 'work', 'street_address' => 'big office', 'city' => 'small city'],
+      'api.address.create.2' => ['location_type_id' => 'home', 'street_address' => 'big house', 'city' => 'small city'],
+      'external_identifier' => 'unique and special',
+      $this->getCustomFieldName('text') => 'mummy loves me',
+    ]);
+    $contact2 = $this->individualCreate([
+      'first_name' => 'different',
+      'api.address.create.1' => ['location_type_id' => 'home', 'street_address' => 'medium house', 'city' => 'small city'],
+      'api.address.create.2' => ['location_type_id' => 'work', 'street_address' => 'medium office', 'city' => 'small city'],
+      'external_identifier' => 'uniquer and specialler',
+      $this->getCustomFieldName('text') => 'mummy loves me more',
+    ]);
+    $conflicts = $this->callAPISuccess('Contact', 'get_merge_conflicts', ['to_keep_id' => $contact1, 'to_remove_id' => $contact2])['values'];
+    $this->assertEquals([
+      'safe' => [
+        'conflicts' => [
+          'contact' => [
+            [
+              'first_name' => [$contact1 => 'Anthony', $contact2 => 'different'],
+              'external_identifier' => [$contact1 => 'unique and special', $contact2 => 'uniquer and specialler'],
+              $this->getCustomFieldName('text') => [$contact1 => 'mummy loves me', $contact2 => 'mummy loves me more'],
+            ],
+          ],
+          'address' => [
+            [
+              'location_type_id' => '1',
+              'street_address' => [
+                $contact1 => 'big house',
+                $contact2 => 'medium house',
+              ],
+            ],
+            [
+              'location_type_id' => '2',
+              'street_address' => [
+                $contact1 => 'big office',
+                $contact2 => 'medium office',
+              ],
+            ],
+          ],
+          'email' => [
+            [
+              'location_type_id' => '1',
+              'email' => [
+                $contact1 => 'bob@example.com',
+                $contact2 => 'anthony_anderson@civicrm.org',
+              ],
+            ],
+          ],
+        ],
+      ],
+    ], $conflicts);
   }
 
   private function createEmployerOfMembership() {

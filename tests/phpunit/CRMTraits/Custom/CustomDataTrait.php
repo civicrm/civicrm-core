@@ -62,22 +62,30 @@ trait CRMTraits_Custom_CustomDataTrait {
   }
 
   /**
+   * Create a custom group with a single field.
+   *
+   * @param array $groupParams
+   * @param string $customFieldType
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function createCustomGroupWithFieldOfType($groupParams = [], $customFieldType = 'text') {
+    if ($customFieldType !== 'text') {
+      throw new CRM_Core_Exception('we have not yet extracted other custom field types from createCustomFieldsOfAllTypes, Use consistent syntax when you do');
+    }
+    $groupParams['title'] = empty($groupParams['title']) ? 'Group with field ' . $customFieldType : $groupParams['title'];
+    $this->createCustomGroup($groupParams);
+    $customField = $this->createTextCustomField(['custom_group_id' => $this->ids['CustomGroup'][$groupParams['title']]]);
+    $this->ids['CustomField'][$customFieldType] = $customField['id'];
+  }
+
+  /**
    * @return array
    */
   public function createCustomFieldsOfAllTypes() {
     $customGroupID = $this->ids['CustomGroup']['Custom Group'];
     $ids = [];
-    $params = [
-      'custom_group_id' => $customGroupID,
-      'label' => 'Enter text here',
-      'html_type' => 'Text',
-      'data_type' => 'String',
-      'default_value' => 'xyz',
-      'weight' => 1,
-      'is_required' => 1,
-    ];
-
-    $customField = $this->callAPISuccess('CustomField', 'create', $params);
+    $customField = $this->createTextCustomField(['custom_group_id' => $customGroupID]);
     $ids['text'] = $customField['id'];
 
     $optionValue[] = [
@@ -194,6 +202,28 @@ trait CRMTraits_Custom_CustomDataTrait {
   protected function getCustomFieldID($key) {
     $linkField = $this->ids['CustomField'][$key];
     return $linkField;
+  }
+
+  /**
+   * Create a custom text fields.
+   *
+   * @param array $params
+   *   Parameter overrides, must include custom_group_id.
+   *
+   * @return array
+   */
+  protected function createTextCustomField($params = []) {
+    $params = array_merge([
+      'label' => 'Enter text here',
+      'html_type' => 'Text',
+      'data_type' => 'String',
+      'default_value' => 'xyz',
+      'weight' => 1,
+      'is_required' => 1,
+      'sequential' => 1,
+    ], $params);
+
+    return $this->callAPISuccess('CustomField', 'create', $params)['values'][0];
   }
 
 }
