@@ -113,7 +113,7 @@ class CRM_Upgrade_Incremental_MessageTemplates {
         ],
       ],
       [
-        'version' => '5.14',
+        'version' => '5.15.alpha1',
         'upgrade_descriptor' => ts('Use email greeting and fix capitalization'),
         'label' => ts('Pledge acknowledgement'),
         'templates' => [
