@@ -1,4 +1,4 @@
-{ts 1=$contact.display_name}Dear %1{/ts},
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
 
 {ts}Thank you for your generous pledge. Please print this acknowledgment for your records.{/ts}
 
