@@ -623,7 +623,7 @@ class InstallRequirements {
 
     $this->requirePHPVersion(array(
       ts("PHP Configuration"),
-      ts("PHP5 installed"),
+      ts("PHP7 installed"),
     ));
 
     // Check that we can identify the root folder successfully
