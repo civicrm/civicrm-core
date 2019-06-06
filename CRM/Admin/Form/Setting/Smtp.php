@@ -36,6 +36,9 @@
  */
 class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   protected $_testButtonName;
+  protected $_settings = [
+    'allow_mail_from_logged_in_contact' => CRM_Core_BAO_Setting::DIRECTORY_PREFERENCES_NAME,
+  ];
 
   /**
    * Build the form object.
@@ -52,7 +55,6 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     $this->addRadio('outBound_option', ts('Select Mailer'), $outBoundOption);
 
     CRM_Utils_System::setTitle(ts('Settings - Outbound Mail'));
-    $this->add('checkbox', 'allow_mail_from_logged_in_contact', ts('Allow Mail to be sent from logged in contact\'s email address'));
     $this->add('text', 'sendmail_path', ts('Sendmail Path'));
     $this->add('text', 'sendmail_args', ts('Sendmail Argument'));
     $this->add('text', 'smtpServer', ts('SMTP Server'));
