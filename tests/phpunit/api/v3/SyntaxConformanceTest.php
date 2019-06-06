@@ -786,28 +786,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
    * @dataProvider entities
    * @param $Entity
    */
-  public function testWithoutParam_get($Entity) {
-    // should get php complaining that a param is missing
-    try {
-      $result = civicrm_api($Entity, 'Get');
-      $this->fail('Expected an exception. No exception was thrown.');
-    }
-    // As of php7.1 a new Exception is thrown by PHP ArgumentCountError when not enough params are passed.
-    catch (ArgumentCountError $e) {
-      /* ok */
-    }
-    catch (PHPUnit\Framework\Error $e) {
-      /* ok */
-    }
-    catch (PHPUnit_Framework_Error $e) {
-      /* ok */
-    }
-  }
-
-  /**
-   * @dataProvider entities
-   * @param $Entity
-   */
   public function testGetFields($Entity) {
     if (in_array($Entity, $this->deprecatedAPI) || $Entity == 'Entity' || $Entity == 'CustomValue') {
       return;
@@ -1592,28 +1570,6 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
     $result = civicrm_api($Entity, 'Delete', array('version' => 3, 'id' => $nonExistantID));
     $this->assertEquals(1, $result['is_error']);
     $this->assertContains(strtolower("API ($Entity, Delete) does not exist"), strtolower($result['error_message']));
-  }
-
-  /**
-   * @dataProvider entities
-   * @param $Entity
-   */
-  public function testWithoutParam_delete($Entity) {
-    // should delete php complaining that a param is missing
-    try {
-      $result = civicrm_api($Entity, 'Delete');
-      $this->fail('Expected an exception. No exception was thrown.');
-    }
-    // As of php7.1 a new Exception is thrown by PHP ArgumentCountError when not enough params are passed.
-    catch (ArgumentCountError $e) {
-      /* ok */
-    }
-    catch (PHPUnit\Framework\Error $e) {
-      /* ok */
-    }
-    catch (PHPUnit_Framework_Error $e) {
-      /* ok */
-    }
   }
 
   /**
