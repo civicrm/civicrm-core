@@ -342,7 +342,7 @@ class AssetBuilder {
   public static function pageRun() {
     // Beg your pardon, sir. Please may I have an HTTP response class instead?
     $asset = self::pageRender($_GET);
-    \CRM_Utils_System::sendResponse($asset);
+    \CRM_Utils_System::sendResponse(new \GuzzleHttp\Psr7\Response($asset['statusCode'], ['Content-Type' => $asset['mimeType']], $asset['content']));
   }
 
   /**
