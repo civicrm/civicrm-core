@@ -71,7 +71,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
     $sql = $queryObject->query();
     $this->wrangleDefaultClauses($dataSet['expected_query']);
     foreach ($dataSet['expected_query'] as $index => $queryString) {
-      $this->assertEquals($this->strWrangle($queryString), $this->strWrangle($sql[$index]));
+      $this->assertLike($this->strWrangle($queryString), $this->strWrangle($sql[$index]));
     }
     // Ensure that search builder return individual contact as per criteria
     if ($dataSet['context'] == 'builder') {

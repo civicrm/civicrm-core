@@ -36,15 +36,4 @@ class CRM_Utils_SQL_InsertTest extends CiviUnitTestCase {
     $this->assertLike($expected, $insert->toSQL());
   }
 
-  /**
-   * @param $expected
-   * @param $actual
-   * @param string $message
-   */
-  public function assertLike($expected, $actual, $message = '') {
-    $expected = trim((preg_replace('/[ \r\n\t]+/', ' ', $expected)));
-    $actual = trim((preg_replace('/[ \r\n\t]+/', ' ', $actual)));
-    $this->assertEquals($expected, $actual, $message);
-  }
-
 }
