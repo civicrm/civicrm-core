@@ -213,7 +213,8 @@ SELECT f.id, f.label, f.data_type,
       return;
     }
 
-    foreach ($this->_fields as $id => $field) {
+    foreach (array_keys($this->_ids) as $id) {
+      $field = $this->_fields[$id];
       $name = $field['table_name'];
       $fieldName = 'custom_' . $field['id'];
       $this->_select["{$name}_id"] = "{$name}.id as {$name}_id";
@@ -227,10 +228,7 @@ SELECT f.id, f.label, f.data_type,
       }
 
       $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = $joinTable.id";
-
-      if (!empty($this->_ids[$id])) {
-        $this->_whereTables[$name] = $this->_tables[$name];
-      }
+      $this->_whereTables[$name] = $this->_tables[$name];
 
       if ($joinTable) {
         $joinClause = 1;

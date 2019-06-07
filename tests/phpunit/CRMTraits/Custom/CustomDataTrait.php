@@ -67,16 +67,18 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @param array $groupParams
    * @param string $customFieldType
    *
+   * @param string $identifier
+   *
    * @throws \CRM_Core_Exception
    */
-  public function createCustomGroupWithFieldOfType($groupParams = [], $customFieldType = 'text') {
+  public function createCustomGroupWithFieldOfType($groupParams = [], $customFieldType = 'text', $identifier = '') {
     if ($customFieldType !== 'text') {
       throw new CRM_Core_Exception('we have not yet extracted other custom field types from createCustomFieldsOfAllTypes, Use consistent syntax when you do');
     }
-    $groupParams['title'] = empty($groupParams['title']) ? 'Group with field ' . $customFieldType : $groupParams['title'];
+    $groupParams['title'] = empty($groupParams['title']) ? $identifier . 'Group with field ' . $customFieldType : $groupParams['title'];
     $this->createCustomGroup($groupParams);
     $customField = $this->createTextCustomField(['custom_group_id' => $this->ids['CustomGroup'][$groupParams['title']]]);
-    $this->ids['CustomField'][$customFieldType] = $customField['id'];
+    $this->ids['CustomField'][$identifier . $customFieldType] = $customField['id'];
   }
 
   /**
