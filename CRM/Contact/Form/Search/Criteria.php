@@ -260,9 +260,16 @@ class CRM_Contact_Form_Search_Criteria {
    * @param CRM_Core_Form $form
    */
   protected static function setBasicSearchFields($form) {
-    $userFramework = CRM_Core_Config::singleton()->userFramework;
+    $form->assign('basicSearchFields', self::getBasicSearchFields());
+  }
 
-    $form->assign('basicSearchFields', [
+  /**
+   * Return list of basic contact fields that can be displayed for the basic search section.
+   *
+   */
+  public static function getBasicSearchFields() {
+    $userFramework = CRM_Core_Config::singleton()->userFramework;
+    return [
       'sort_name' => ['name' => 'sort_name'],
       'email' => ['name' => 'email'],
       'contact_type' => ['name' => 'contact_type'],
@@ -319,7 +326,7 @@ class CRM_Contact_Form_Search_Criteria {
         'name' => 'uf_user',
         'description' => ts('Does the contact have a %1 Account?', [$userFramework]),
       ],
-    ]);
+    ];
   }
 
   /**
