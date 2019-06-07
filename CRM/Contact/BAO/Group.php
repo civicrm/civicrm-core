@@ -699,8 +699,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     if ($params['search_context'] == 'builder') {
       $savedSearch->form_values = serialize(($params['form_values']));
     }
-    else
-    {
+    else {
       $savedSearch->form_values = serialize(CRM_Contact_BAO_Query::convertFormValues($params['form_values']));
     }
     CRM_Core_Error::debug_var('test-testin333', CRM_Contact_BAO_Query::convertFormValues($params['form_values']));
