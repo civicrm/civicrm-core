@@ -354,16 +354,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   }
 
   /**
-   * This virtual function is used to set the default values of various form elements.
-   *
-   * @return array|NULL
-   *   reference to the array of default values
-   */
-  public function setDefaultValues() {
-    return array_merge($this->getEntityDefaults($this->getDefaultEntity()), (array) $this->_formValues);
-  }
-
-  /**
    * Return a descriptive name for the page, used in wizard header
    *
    * @return string

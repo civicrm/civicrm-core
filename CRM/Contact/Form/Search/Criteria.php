@@ -33,9 +33,13 @@
 class CRM_Contact_Form_Search_Criteria {
 
   /**
-   * @param CRM_Core_Form $form
+   * @param CRM_Contact_Form_Search_Advanced $form
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function basic(&$form) {
+    $form->addSearchFieldMetadata(['Contact' => self::getSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
     self::setBasicSearchFields($form);
     $form->addElement('hidden', 'hidden_basic', 1);
 
@@ -99,9 +103,6 @@ class CRM_Contact_Form_Search_Criteria {
         $form->add('hidden', 'tag_types_text', $tagTypesText);
       }
     }
-
-    // add text box for last name, first name, street name, city
-    $form->addElement('text', 'sort_name', ts('Complete OR Partial Name'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
 
     // add text box for last name, first name, street name, city
     $form->add('text', 'email', ts('Complete OR Partial Email'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
@@ -252,6 +253,20 @@ class CRM_Contact_Form_Search_Criteria {
     $phoneType = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $form->add('select', 'phone_location_type_id', ts('Phone Location'), ['' => ts('- any -')] + $locationType, FALSE, ['class' => 'crm-select2']);
     $form->add('select', 'phone_phone_type_id', ts('Phone Type'), ['' => ts('- any -')] + $phoneType, FALSE, ['class' => 'crm-select2']);
+  }
+
+  /**
+   * Get the metadata for fields to be included on the contact search form.
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = [
+      'sort_name' => ['title' => ts('Complete OR Partial Name'), 'template_grouping' => 'basic'],
+    ];
+    $metadata = civicrm_api3('Contact', 'getfields', [])['values'];
+    foreach ($fields as $fieldName => $field) {
+      $fields[$fieldName] = array_merge(CRM_Utils_Array::value($fieldName, $metadata, []), $field);
+    }
+    return $fields;
   }
 
   /**
