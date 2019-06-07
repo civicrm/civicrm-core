@@ -946,17 +946,23 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
-   * Set the HTTP Status Code for a request
-   * @param string $statusCode
+   * Send an HTTP Response base on PSR HTTP RespnseInterface response.
+   *
+   * @param \Psr\Http\Message\ResponseInterface $response
    */
-  public function setStatusCode($statusCode) {
+  public function sendResponse(\Psr\Http\Message\ResponseInterface $response) {
     if (function_exists('http_response_code')) {
       // PHP 5.4+
-      http_response_code($statusCode);
+      http_response_code($response->getStatusCode());
     }
     else {
-      header('X-PHP-Response-Code: ' . $statusCode, TRUE, $statusCode);
+      // @todo should we remove this given we are no longer supporting < PHP 5.6 however keeping
+      // in for the moment for compatability with the original AssetBuilder code.
+      header('X-PHP-Response-Code: ' . $response->getStatusCode(), TRUE, $reponse->getStatusCode());
     }
+    CRM_Utils_System::setHttpHeader('Content-Type', $response->getHeaderLine('Content-Type'));
+    echo $response->getBody();
+    CRM_Utils_System::civiExit();
   }
 
 }

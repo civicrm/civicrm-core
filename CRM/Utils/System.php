@@ -53,7 +53,7 @@
  * @method static array synchronizeUsers() Create CRM contacts for all existing CMS users.
  * @method static appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_coreResourceList.
  * @method static alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_getAssetUrl.
- * @method static sendResponse(array $responseData) function to set HTTP status response and return specific response to client initially for assetBuilder content.
+ * @method static sendResponse(\Psr\Http\Message\ResponseInterface $response) function to handle RepsoseInterface for delivering HTTP Responses.
  */
 class CRM_Utils_System {
 
@@ -1864,18 +1864,11 @@ class CRM_Utils_System {
 
   /**
    * Return an HTTP Response with appropriate content and status code set.
-   * @param array $responseData
+   * @param \Psr\Http\Message\ResponseInterface $response
    */
-  public static function sendResponse($responseData) {
+  public static function sendResponse(\Psr\Http\Message\ResponseInterface $response) {
     $config = CRM_Core_Config::singleton();
-    if (!empty($responseData['statusCode'])) {
-      $config->userSystem->setStatusCode($responseData['statusCode']);
-    }
-    if (!empty($responseData['mimeType'])) {
-      self::setHttpHeader('Content-Type', $responseData['mimeType']);
-    }
-    echo $responseData['content'];
-    self::civiExit();
+    $config->userSystem->sendResponse($response);
   }
 
 }
