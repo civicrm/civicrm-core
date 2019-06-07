@@ -317,14 +317,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       \Drupal::logger('civicrm')->error($e->getMessage());
     }
 
-    // Special case: CiviCRM passes us "*path*?*query*" as a skeleton, but asterisks
-    // are invalid and Drupal will attempt to escape them. We unescape them here:
-    if ($path == '*path*') {
-      // First remove trailing equals sign that has been added since the key '?*query*' has no value.
-      $url = rtrim($url, '=');
-      $url = urldecode($url);
-    }
-
     return $url;
   }
 

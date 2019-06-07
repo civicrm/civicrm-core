@@ -23,13 +23,13 @@
     }
     query = query || '';
     var frag = path.split('?');
-    var url = tplURL[mode].replace("*path*", frag[0]);
+    var url = tplURL[mode].replace("civicrm-placeholder-url-path", frag[0]);
 
     if (!query) {
-      url = url.replace(/[?&]\*query\*/, '');
+      url = url.replace(/[?&]civicrm-placeholder-url-query=1/, '');
     }
     else {
-      url = url.replace("*query*", typeof query === 'string' ? query : $.param(query));
+      url = url.replace("civicrm-placeholder-url-query=1", typeof query === 'string' ? query : $.param(query));
     }
     if (frag[1]) {
       url += (url.indexOf('?') < 0 ? '?' : '&') + frag[1];
