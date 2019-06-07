@@ -695,7 +695,15 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     //create/update saved search record.
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $savedSearch->id = $ssId;
-    $savedSearch->form_values = serialize(($params['form_values']));
+    // Search Builder's form values have already been converted.
+    if ($params['search_context'] == 'builder') {
+      $savedSearch->form_values = serialize(($params['form_values']));
+    }
+    else
+    {
+      $savedSearch->form_values = serialize(CRM_Contact_BAO_Query::convertFormValues($params['form_values']));
+    }
+    CRM_Core_Error::debug_var('test-testin333', CRM_Contact_BAO_Query::convertFormValues($params['form_values']));
     $savedSearch->mapping_id = $mappingId;
     $savedSearch->search_custom_id = CRM_Utils_Array::value('search_custom_id', $params);
     $savedSearch->save();

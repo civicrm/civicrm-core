@@ -241,7 +241,7 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
   /**
    * Ensure that when hidden smart group is created, wildcard string value is not ignored
    */
-  public function testHiddenSmartGroup() {
+  public function testHiddenSmartGroupAdvancedSearch() {
     $customGroup = $this->customGroupCreate();
     $fields = array(
       'label' => 'testFld',
@@ -259,6 +259,43 @@ class CRM_Contact_BAO_GroupTest extends CiviUnitTestCase {
       'saved_search_id' => NULL,
       'search_custom_id' => NULL,
       'search_context' => 'advanced',
+    ];
+    list($smartGroupID, $savedSearchID) = CRM_Contact_BAO_Group::createHiddenSmartGroup($hiddenSmartParams);
+
+    $mailingID = $this->callAPISuccess('Mailing', 'create', [])['id'];
+    $this->callAPISuccess('MailingGroup', 'create', array(
+      'mailing_id' => $mailingID,
+      'group_type' => 'Include',
+      'entity_table' => 'civicrm_group',
+      'entity_id' => $smartGroupID,
+    ));
+
+    CRM_Mailing_BAO_Mailing::getRecipients($mailingID);
+    $recipients = $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailingID]);
+    $this->assertEquals(1, $recipients['count'], 'Check recipient count');
+  }
+
+  /**
+   * Ensure that when hidden smart group is created, wildcard string value is not ignored
+   */
+  public function testHiddenSmartGroupSearchBuilder() {
+    $customGroup = $this->customGroupCreate(['title' => 'search builder custom group']);
+    $fields = array(
+      'label' => 'testFld2',
+      'data_type' => 'String',
+      'html_type' => 'Text',
+      'custom_group_id' => $customGroup['id'],
+    );
+    $customFieldID = CRM_Core_BAO_CustomField::create($fields)->id;
+
+    $contactID = $this->individualCreate(['custom_' . $customFieldID => 'abc']);
+
+    $hiddenSmartParams = [
+      'group_type' => ['2' => 1],
+      'form_values' => ['custom_' . $customFieldID => ['LIKE' => '%a%']],
+      'saved_search_id' => NULL,
+      'search_custom_id' => NULL,
+      'search_context' => 'builder',
     ];
     list($smartGroupID, $savedSearchID) = CRM_Contact_BAO_Group::createHiddenSmartGroup($hiddenSmartParams);
 
