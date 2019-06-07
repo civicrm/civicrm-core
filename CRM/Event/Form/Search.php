@@ -419,19 +419,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   public function addRules() {
   }
 
-  /**
-   * Set the default form values.
-   *
-   *
-   * @return array
-   *   the default array reference
-   */
-  public function setDefaultValues() {
-    $defaults = [];
-    $defaults = $this->_formValues;
-    return $defaults;
-  }
-
   public function fixFormValues() {
     // if this search has been forced
     // then see if there are any get values, and if so over-ride the post values
