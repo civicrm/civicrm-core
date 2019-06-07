@@ -543,7 +543,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
         'group_type' => ['2' => 1],
         // queryParams have been preprocessed esp WRT any entity reference fields - see +
         // https://github.com/civicrm/civicrm-core/pull/13250
-        'form_values' => $this->get('queryParams'),
+        'form_values' => $searchParams,
         'saved_search_id' => $ssId,
         'search_custom_id' => $this->get('customSearchID'),
         'search_context' => $this->get('context'),
