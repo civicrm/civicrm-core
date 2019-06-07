@@ -67,4 +67,16 @@ class api_v3_ExceptionTest extends CiviUnitTestCase {
     $this->assertEquals(0, $dupes['count']);
   }
 
+  /**
+   * Per the ajax code there is an expectation the lower id will be contact 1 - ensure api handles this.
+   *
+   * @throws \Exception
+   */
+  public function testExceptionSavesLowerIDFirst() {
+    $contact1 = $this->individualCreate();
+    $contact2 = $this->individualCreate();
+    $this->callAPISuccess('Exception', 'create', ['contact_id1' => $contact2, 'contact_id2' => $contact1]);
+    $this->callAPISuccessGetSingle('Exception', ['contact_id1' => $contact1, 'contact_id2' => $contact2]);
+  }
+
 }
