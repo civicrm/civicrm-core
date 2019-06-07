@@ -104,9 +104,11 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   /**
    * Metadata for fields on the search form.
    *
+   * Instantiate with empty array for contact to prevent e-notices.
+   *
    * @var array
    */
-  protected $searchFieldMetadata = [];
+  protected $searchFieldMetadata = ['Contact' => []];
 
   /**
    * @return array
@@ -120,6 +122,17 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    */
   public function addSearchFieldMetadata($searchFieldMetadata) {
     $this->searchFieldMetadata = array_merge($this->searchFieldMetadata, $searchFieldMetadata);
+  }
+
+  /**
+   * This virtual function is used to set the default values of various form elements.
+   *
+   * @return array|NULL
+   *   reference to the array of default values
+   * @throws \Exception
+   */
+  public function setDefaultValues() {
+    return array_merge($this->getEntityDefaults($this->getDefaultEntity()), (array) $this->_formValues);
   }
 
   /**
@@ -159,7 +172,11 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
           $this->addDatePickerRange($fieldName, $fieldSpec['title'], ($fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)));
         }
         else {
-          $this->addField($fieldName, ['entity' => $entity]);
+          $props = ['entity' => $entity];
+          if (isset($fields[$fieldName]['title'])) {
+            $props['label'] = $fields[$fieldName]['title'];
+          }
+          $this->addField($fieldName, $props);
         }
       }
     }
