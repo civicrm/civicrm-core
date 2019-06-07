@@ -1165,6 +1165,20 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Tests that using 'return' with a custom field not of type contact does not inappropriately filter.
+   *
+   * https://lab.civicrm.org/dev/core/issues/1025
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetWithCustomOfActivityType() {
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Activity']);
+    $this->createCustomGroupWithFieldOfType(['extends' => 'Contact'], 'text', 'contact_');
+    $contactID = $this->individualCreate();
+    $this->callAPISuccessGetSingle('Contact', ['id' => $contactID, 'return' => ['external_identifier', $this->getCustomFieldName('contact_text')]]);
+  }
+
+  /**
    * Check with complete array + custom field.
    *
    * Note that the test is written on purpose without any
