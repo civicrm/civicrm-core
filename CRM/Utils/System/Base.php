@@ -956,12 +956,9 @@ abstract class CRM_Utils_System_Base {
       // PHP 5.4+
       http_response_code($response->getStatusCode());
     }
-    else {
-      // @todo should we remove this given we are no longer supporting < PHP 5.6 however keeping
-      // in for the moment for compatability with the original AssetBuilder code.
-      header('X-PHP-Response-Code: ' . $response->getStatusCode(), TRUE, $reponse->getStatusCode());
+    foreach ($response->getHeaders() as $name => $values) {
+      CRM_Utils_System::setHttpHeader($name, implode(', ', (array) $values));
     }
-    CRM_Utils_System::setHttpHeader('Content-Type', $response->getHeaderLine('Content-Type'));
     echo $response->getBody();
     CRM_Utils_System::civiExit();
   }

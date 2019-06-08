@@ -1869,8 +1869,7 @@ class CRM_Utils_System {
    * @param \Psr\Http\Message\ResponseInterface $response
    */
   public static function sendResponse(\Psr\Http\Message\ResponseInterface $response) {
-    $config = CRM_Core_Config::singleton();
-    $config->userSystem->sendResponse($response);
+    $config = CRM_Core_Config::singleton()->userSystem->sendResponse($response);
   }
 
 }
