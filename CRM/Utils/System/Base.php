@@ -951,10 +951,7 @@ abstract class CRM_Utils_System_Base {
    * @param \Psr\Http\Message\ResponseInterface $response
    */
   public function sendResponse(\Psr\Http\Message\ResponseInterface $response) {
-    if (function_exists('http_response_code')) {
-      // PHP 5.4+
-      http_response_code($response->getStatusCode());
-    }
+    http_response_code($response->getStatusCode());
     foreach ($response->getHeaders() as $name => $values) {
       CRM_Utils_System::setHttpHeader($name, implode(', ', (array) $values));
     }
