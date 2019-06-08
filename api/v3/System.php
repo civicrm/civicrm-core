@@ -414,6 +414,11 @@ function _civicrm_api3_system_updatelogtables_spec(&$params) {
     'description' => 'By default, we only update if the ENGINE has changed, set this to TRUE to update if the ENGINE_CONFIG has changed.',
     'type' => CRM_Utils_Type::T_BOOLEAN,
   ];
+  $params['forceEngineMigration'] = [
+    'title' => 'Force storage engine to upgrade to InnoDB?',
+    'description' => 'Older versions of CiviCRM used the ARCHIVE engine by default. Set this to TRUE to migrate the engine to the new default.',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  ];
 }
 
 /**
