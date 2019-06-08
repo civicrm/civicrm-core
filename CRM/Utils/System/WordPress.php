@@ -871,16 +871,9 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
   public function sendResponse(\Psr\Http\Message\ResponseInterface $response) {
     // use WordPress function status_header to ensure 404 response is sent
     status_header($response->getStatusCode());
-    if (function_exists('http_response_code')) {
-      // PHP 5.4+
-      http_response_code($response->getStatusCode());
+    foreach ($response->getHeaders() as $name => $values) {
+      CRM_Utils_System::setHttpHeader($name, implode(', ', (array) $values));
     }
-    else {
-      // @todo should we remove this given we are no longer supporting < PHP 5.6 however keeping
-      // in for the moment for compatability with the original AssetBuilder code.
-      header('X-PHP-Response-Code: ' . $response->getStatusCode(), TRUE, $response->getStatusCode());
-    }
-    CRM_Utils_System::setHttpHeader('Content-Type', $response->getHeaderLine('Content-Type'));
     echo $response->getBody();
     CRM_Utils_System::civiExit();
   }
