@@ -1,4 +1,25 @@
 <div class="crm-container">
   <div crm-ui-debug="afforms"></div>
 
+  <h1 crm-page-title>{{ ts('All Forms') }}</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Name</th>
+        <th>Route</th>
+        <th>Public</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="afform in afforms">
+        <td>{{ afform.title }}</td>
+        <td>{{ afform.name }}</td>
+        <td>{{ afform.server_route }}</td>
+        <td>{{ afform.is_public }}</td>
+      </tr>
+    </tbody>
+  </table>
+
 </div>
