@@ -83,7 +83,6 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
           'financial_type' => 1,
           'total_amount' => 70,
           'receive_date' => '2013-07-24',
-          'receive_date_time' => NULL,
           'payment_instrument' => 1,
           'check_number' => NULL,
           'contribution_status_id' => 1,
@@ -92,7 +91,6 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
           'financial_type' => 1,
           'total_amount' => 30,
           'receive_date' => '2014-07-24',
-          'receive_date_time' => NULL,
           'payment_instrument' => 1,
           'check_number' => NULL,
           'contribution_status_id' => 1,
@@ -106,7 +104,6 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'total_amount' => 123,
       'receive_date' => '2014-07-24',
-      'receive_date_time' => NULL,
       'payment_instrument' => 1,
       'check_number' => NULL,
       'contribution_status_id' => 1,
@@ -182,7 +179,6 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'total_amount' => 100,
       'receive_date' => date('Ymd'),
-      'receive_date_time' => NULL,
       'payment_instrument' => 1,
       'contribution_status_id' => 1,
       'contact_id' => $contactID1,
@@ -200,7 +196,6 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'total_amount' => 150,
       'receive_date' => date('Ymd'),
-      'receive_date_time' => NULL,
       'payment_instrument' => 1,
       'contribution_status_id' => 1,
       'contact_id' => $contactID1,
@@ -209,7 +204,6 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'total_amount' => 200,
       'receive_date' => date('Ymd'),
-      'receive_date_time' => NULL,
       'payment_instrument' => 1,
       'contribution_status_id' => 1,
       'contact_id' => $contactID2,
@@ -287,7 +281,6 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'total_amount' => 100,
       'receive_date' => date('Ymd'),
-      'receive_date_time' => NULL,
       'payment_instrument' => 1,
       'contribution_status_id' => 1,
       'contact_id' => $contactID1,
@@ -306,7 +299,6 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'total_amount' => 150,
       'receive_date' => date('Ymd'),
-      'receive_date_time' => NULL,
       'payment_instrument' => 1,
       'contribution_status_id' => 1,
       'contact_id' => $contactID1,
@@ -315,7 +307,6 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'total_amount' => 200,
       'receive_date' => date('Ymd'),
-      'receive_date_time' => NULL,
       'payment_instrument' => 1,
       'contribution_status_id' => 1,
       'contact_id' => $contactID2,
@@ -437,8 +428,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $Contribution1 = $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 1,
       'total_amount' => 100,
-      'receive_date' => date('Ymd'),
-      'receive_date_time' => NULL,
+      'receive_date' => date('Y-m-d'),
       'payment_instrument' => 1,
       'contribution_status_id' => 3,
       'cancel_date' => date('Ymd'),
@@ -448,11 +438,10 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 1,
       'total_amount' => 150,
-      'receive_date' => date('Ymd', strtotime(date('Y-m-d') . ' - 1 days')),
-      'receive_date_time' => NULL,
+      'receive_date' => date('Y-m-d', strtotime(date('Y-m-d') . ' - 1 days')),
       'payment_instrument' => 1,
       'contribution_status_id' => 3,
-      'cancel_date' => date('Ymd', strtotime(date('Y-m-d') . ' - 1 days')),
+      'cancel_date' => date('Y-m-d', strtotime(date('Y-m-d') . ' - 1 days')),
       'cancel_reason' => 'Insufficient funds',
       'contact_id' => $contactID2,
     ]);
@@ -460,7 +449,6 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'total_amount' => 200,
       'receive_date' => date('Ymd'),
-      'receive_date_time' => NULL,
       'payment_instrument' => 1,
       'contribution_status_id' => 3,
       'cancel_date' => date('Ymd'),
@@ -471,10 +459,10 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $useCases = [
       // Case 1: Search for Cancelled Date
       [
-        'form_value' => ['cancel_date' => date('Y-m-d')],
+        'form_value' => ['contribution_cancel_date' => date('Y-m-d')],
         'expected_count' => 2,
         'expected_contribution' => [$Contribution1['id'], $Contribution3['id']],
-        'expected_qill' => "Cancel Date Like '%" . date('Y-m-d') . "%'",
+        'expected_qill' => "Cancelled / Refunded Date = " . date('F dS, Y') . " 12:00 AM",
       ],
       // Case 2: Search for Cancelled Reason
       [
@@ -485,16 +473,16 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       ],
       // Case 3: Search for Cancelled Date and Cancelled Reason
       [
-        'form_value' => ['cancel_date' => date('Y-m-d'), 'cancel_reason' => 'Insufficient funds'],
+        'form_value' => ['contribution_cancel_date' => date('Y-m-d'), 'cancel_reason' => 'Insufficient funds'],
         'expected_count' => 1,
         'expected_contribution' => [$Contribution1['id']],
-        'expected_qill' => "Cancel Date Like '%" . date('Y-m-d') . "%'ANDCancellation / Refund Reason Like '%Insufficient funds%'",
+        'expected_qill' => "Cancellation / Refund Reason Like '%Insufficient funds%'ANDCancelled / Refunded Date = " . date('F dS, Y') . " 12:00 AM",
       ],
     ];
 
     foreach ($useCases as $case) {
       $fv = $case['form_value'];
-      CRM_Contact_BAO_Query::processSpecialFormValue($fv, ['cancel_date', 'cancel_reason']);
+      CRM_Contact_BAO_Query::processSpecialFormValue($fv, ['cancel_reason']);
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
       list($select, $from, $where) = $query->query();
 

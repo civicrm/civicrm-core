@@ -294,7 +294,7 @@ function civicrm_api3_contribution_get($params) {
 function _civicrm_api3_contribution_get_support_nonunique_returns($params) {
   $additionalOptions = [];
   $options = _civicrm_api3_get_options_from_params($params, TRUE);
-  foreach (['check_number', 'address_id'] as $changedVariable) {
+  foreach (['check_number', 'address_id', 'cancel_date'] as $changedVariable) {
     if (isset($options['return']) && !empty($options['return'][$changedVariable])) {
       $additionalOptions['return']['contribution_' . $changedVariable] = 1;
     }
@@ -316,6 +316,7 @@ function _civicrm_api3_contribution_add_supported_fields(&$contribution) {
     'contribution_check_number' => 'check_number',
     'contribution_address_id' => 'address_id',
     'payment_instrument_id' => 'instrument_id',
+    'contribution_cancel_date' => 'cancel_date',
   ];
   foreach ($outputAliases as $returnName => $copyTo) {
     if (array_key_exists($returnName, $contribution)) {
