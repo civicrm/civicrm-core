@@ -50,6 +50,7 @@ return [
     'description' => ts('Make CiviCRM aware of multiple domains. You should configure a domain group if enabled'),
     'documentation_link' => ['page' => 'Multi Site Installation', 'resource' => 'wiki'],
     'help_text' => NULL,
+    'settings_pages' => ['multisite' => ['weight' => 10]],
   ],
   'domain_group_id' => [
     'group_name' => 'Multi Site Preferences',
@@ -65,6 +66,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Contacts created on this site are added to this group'),
     'help_text' => NULL,
+    'settings_pages' => ['multisite' => ['weight' => 20]],
   ],
   'event_price_set_domain_id' => [
     'group_name' => 'Multi Site Preferences',
