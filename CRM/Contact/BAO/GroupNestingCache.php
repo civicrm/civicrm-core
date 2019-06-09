@@ -100,7 +100,8 @@ WHERE  id = $id
     }
 
     // this tree stuff is quite useful, so lets store it in the cache
-    CRM_Core_BAO_Cache::setItem($tree, 'contact groups', 'nestable tree hierarchy');
+    $cache = Civi::cache('groups');
+    $cache->set('nestable tree hierarchy', $tree);
   }
 
   /**
@@ -153,11 +154,12 @@ WHERE  id = $id
    * @return array
    */
   public static function getPotentialCandidates($id, &$groups) {
-    $tree = CRM_Core_BAO_Cache::getItem('contact groups', 'nestable tree hierarchy');
+    $cache = Civi::cache('groups');
+    $tree = $cache->get('nestable tree hierarchy');
 
     if ($tree === NULL) {
       self::update();
-      $tree = CRM_Core_BAO_Cache::getItem('contact groups', 'nestable tree hierarchy');
+      $tree = $cache->get('nestable tree hierarchy');
     }
 
     $potential = $groups;
@@ -219,11 +221,12 @@ WHERE  id = $id
    * @return string
    */
   public static function json() {
-    $tree = CRM_Core_BAO_Cache::getItem('contact groups', 'nestable tree hierarchy');
+    $cache = Civi::cache('groups');
+    $tree = $cache->get('nestable tree hierarchy');
 
     if ($tree === NULL) {
       self::update();
-      $tree = CRM_Core_BAO_Cache::getItem('contact groups', 'nestable tree hierarchy');
+      $tree = $cache->get('nestable tree hierarchy');
     }
 
     // get all the groups

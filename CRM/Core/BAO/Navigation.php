@@ -165,7 +165,8 @@ class CRM_Core_BAO_Navigation extends CRM_Core_DAO_Navigation {
     $config = CRM_Core_Config::singleton();
 
     // check if we can retrieve from database cache
-    $navigations = CRM_Core_BAO_Cache::getItem('navigation', $cacheKeyString);
+    $cache = Civi::cache('navigation');
+    $navigations = $cache->get($cacheKeyString);
 
     if (!$navigations) {
       $domainID = CRM_Core_Config::domainID();
@@ -186,7 +187,7 @@ FROM civicrm_navigation WHERE domain_id = $domainID";
       $navigations = [];
       self::_getNavigationLabel($pidGroups[''], $navigations);
 
-      CRM_Core_BAO_Cache::setItem($navigations, 'navigation', $cacheKeyString);
+      $cache->set($cacheKeyString, $navigations);
     }
     return $navigations;
   }

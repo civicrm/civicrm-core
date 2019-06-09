@@ -254,7 +254,8 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
    */
   public function postProcess() {
     // note this also resets any ACL cache
-    CRM_Core_BAO_Cache::deleteGroup('contact fields');
+    $cache = Civi::cache('fields');
+    $cache->flush();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       CRM_ACL_BAO_ACL::del($this->_id);

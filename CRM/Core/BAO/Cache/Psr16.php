@@ -183,9 +183,6 @@ class CRM_Core_BAO_Cache_Psr16 {
     $groups = [
       // Core
       'CiviCRM Search PrevNextCache',
-      'contact fields',
-      'navigation',
-      'contact groups',
       'custom data',
 
       // Universe

@@ -1446,7 +1446,7 @@ class CRM_Utils_System {
     // also reset the various static memory caches
 
     // reset the memory or array cache
-    CRM_Core_BAO_Cache::deleteGroup('contact fields', NULL, FALSE);
+    Civi::cache('fields')->flush();
 
     // reset ACL cache
     CRM_ACL_BAO_Cache::resetCache();
