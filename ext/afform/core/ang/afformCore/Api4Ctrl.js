@@ -18,13 +18,14 @@
         ctrl.entity = parts[0];
         ctrl.action = parts[1];
         ctrl.params = parts[2];
+        ctrl.index = parts[3];
         ctrl.result = {};
         ctrl.loading = ctrl.firstLoad = true;
 
         ctrl.refresh = function refresh() {
           ctrl.loading = true;
           crmThrottle(function () {
-            return crmApi4(ctrl.entity, ctrl.action, ctrl.params)
+            return crmApi4(ctrl.entity, ctrl.action, ctrl.params, ctrl.index)
               .then(function (response) {
                 ctrl.result = response;
                 ctrl.loading = ctrl.firstLoad = false;
@@ -39,7 +40,7 @@
 
         var mode = $scope.affApi4Refresh ? $scope.affApi4Refresh : 'auto';
         switch (mode) {
-          case 'auto': $scope.$watchCollection('affApi4Ctrl.params', ctrl.refresh); break;
+          case 'auto': $scope.$watch('affApi4Ctrl', ctrl.refresh, true); break;
           case 'init': ctrl.refresh(); break;
           case 'manual': break;
           default: throw 'Unrecognized refresh mode: '+ mode;
