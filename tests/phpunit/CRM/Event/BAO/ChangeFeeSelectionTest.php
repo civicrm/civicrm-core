@@ -9,9 +9,11 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
   protected $_cheapFee = 80;
   protected $_expensiveFee = 100;
   protected $_veryExpensive = 120;
+  protected $_noFee = 0;
   protected $expensiveFeeValueID;
   protected $cheapFeeValueID;
   protected $veryExpensiveFeeValueID;
+  protected $noFeeID;
 
   /**
    * @var int
@@ -111,12 +113,12 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
         'name' => CRM_Utils_String::titleToVar('Two Options'),
         'html_type' => 'Radio',
         //'price' => $feeTotal,
-        'option_label' => array('1' => 'Expensive Room', '2' => "Cheap Room", '3' => 'Very Expensive'),
-        'option_value' => array('1' => 'E', '2' => 'C', '3' => 'V'),
-        'option_name' => array('1' => 'Expensive', '2' => "Cheap", "3" => "Very Expensive"),
-        'option_weight' => array('1' => 1, '2' => 2, '3' => 3),
-        'option_amount' => array('1' => $this->_expensiveFee, '2' => $this->_cheapFee, '3' => $this->_veryExpensive),
-        'option_count' => array(1 => 1, 2 => 1, 3 => 1),
+        'option_label' => array('1' => 'Expensive Room', '2' => "Cheap Room", '3' => 'Very Expensive', '4' => 'No Fee'),
+        'option_value' => array('1' => 'E', '2' => 'C', '3' => 'V', '4' => 'N'),
+        'option_name' => array('1' => 'Expensive', '2' => "Cheap", "3" => "Very Expensive", '3' => 'No Fee'),
+        'option_weight' => array('1' => 1, '2' => 2, '3' => 3, '4' => 4),
+        'option_amount' => array('1' => $this->_expensiveFee, '2' => $this->_cheapFee, '3' => $this->_veryExpensive, '4' => $this->_noFee),
+        'option_count' => array(1 => 1, 2 => 1, 3 => 1, 4 => 1),
         'is_display_amounts' => 1,
         'weight' => 1,
         'options_per_line' => 1,
@@ -144,6 +146,11 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
         case 'Very Expensive':
           $this->veryExpensiveFeeValueID = $value['id'];
           break;
+
+        case 'No Fee':
+          $this->noFeeID = $value['id'];
+          break;
+
       }
     }
 
@@ -465,6 +472,59 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->_participantId, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
     $this->assertDBCompareValue('CRM_Contribute_BAO_Contribution', $this->_contributionId, 'contribution_status_id', 'id', $partiallyPaidStatusId, 'Partial Paid');
+  }
+
+  /**
+   * Test that recording a refund when fee selection is 0 works
+   */
+  public function testRefundWithFeeAmount0() {
+    $this->registerParticipantAndPay();
+    $actualPaidAmount = 100;
+    $priceSetParams['price_' . $this->priceSetFieldID] = $this->expensiveFeeValueID;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
+    $this->balanceCheck($this->_expensiveFee);
+    $contributionBalance = ($this->_expensiveFee - $actualPaidAmount);
+    $this->assertEquals($contributionBalance, CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId));
+
+    $priceSetParams['price_' . $this->priceSetFieldID] = $this->noFeeID;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
+    $this->balanceCheck($this->_noFee);
+    $contributionBalance = ($this->_noFee - $actualPaidAmount);
+    $this->assertEquals($contributionBalance, CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId));
+
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $this->_contributionId,
+      'total_amount' => -100,
+      'payment_instrument_id' => 3,
+      'participant_id' => $this->_participantId,
+    ]);
+    $contributionBalance += 100;
+    $this->assertEquals($contributionBalance, CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId));
+
+    // retrieve the cancelled line-item information
+    $cancelledLineItem = $this->callAPISuccessGetSingle('LineItem', array(
+      'entity_table' => 'civicrm_participant',
+      'entity_id' => $this->_participantId,
+      'qty' => 0,
+    ));
+    // retrieve the related financial lin-items
+    $financialItems = $this->callAPISuccess('FinancialItem', 'Get', array(
+      'entity_id' => $cancelledLineItem['id'],
+      'entity_table' => 'civicrm_line_item',
+    ));
+    $this->assertEquals($financialItems['count'], 2, 'Financial Items for Cancelled fee is not proper');
+
+    $contributionCompletedStatusID = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    $expectedAmount = 100.00;
+    foreach ($financialItems['values'] as $id => $financialItem) {
+      $this->assertEquals($expectedAmount, $financialItem['amount']);
+      $this->assertNotEmpty($financialItem['financial_account_id']);
+      $this->assertNotEmpty($financialItem['financial_account_id']);
+      $this->assertEquals($contributionCompletedStatusID, $financialItem['status_id']);
+      $expectedAmount = -$expectedAmount;
+    }
   }
 
 }
