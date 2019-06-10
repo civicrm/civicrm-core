@@ -184,12 +184,10 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
 
     //cache contact fields retaining localized titles
     //though we changed localization, so reseting cache.
-    $contactCache = Civi::cache('fields');
-    $contactCache->flush();
+    Civi::cache('fields')->flush();
 
     //CRM-8559, cache navigation do not respect locale if it is changed, so reseting cache.
-    $navigationCache = Civi::cache('navigation');
-    $navigationCache->flush();
+    Civi::cache('navigation')->flush();
 
     // we do this only to initialize monetary decimal point and thousand separator
     $config = CRM_Core_Config::singleton();

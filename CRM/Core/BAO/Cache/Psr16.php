@@ -181,9 +181,6 @@ class CRM_Core_BAO_Cache_Psr16 {
    */
   public static function getLegacyGroups() {
     $groups = [
-      // Core
-      'CiviCRM Search PrevNextCache',
-      'custom data',
 
       // Universe
 

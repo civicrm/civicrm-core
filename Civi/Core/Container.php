@@ -159,6 +159,7 @@ class Container {
       'fields' => 'contact fields',
       'navigation' => 'navigation',
       'groups' => 'contact groups',
+      'customData' => 'custom data',
     ];
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $container->setDefinition("cache.{$cacheSvc}", new Definition(
@@ -171,6 +172,16 @@ class Container {
         ]
       ))->setFactory('CRM_Utils_Cache::create');
     }
+
+    $container->setDefinition("cache.prevNextCache", new Definition(
+      'CRM_Utils_Cache_Interface',
+      [
+        [
+          'name' => 'CiviCRM Search PrevNextCache',
+          'type' => ['SqlGroup'],
+        ],
+      ]
+    ))->setFactory('CRM_Utils_Cache::create');
 
     $container->setDefinition('sql_triggers', new Definition(
       'Civi\Core\SqlTriggers',

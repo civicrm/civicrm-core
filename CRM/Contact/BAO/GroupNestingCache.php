@@ -100,8 +100,7 @@ WHERE  id = $id
     }
 
     // this tree stuff is quite useful, so lets store it in the cache
-    $cache = Civi::cache('groups');
-    $cache->set('nestable tree hierarchy', $tree);
+    Civi::cache('groups')->set('nestable tree hierarchy', $tree);
   }
 
   /**
@@ -154,12 +153,11 @@ WHERE  id = $id
    * @return array
    */
   public static function getPotentialCandidates($id, &$groups) {
-    $cache = Civi::cache('groups');
-    $tree = $cache->get('nestable tree hierarchy');
+    $tree = Civi::cache('groups')->get('nestable tree hierarchy');
 
     if ($tree === NULL) {
       self::update();
-      $tree = $cache->get('nestable tree hierarchy');
+      $tree = Civi::cache('groups')->get('nestable tree hierarchy');
     }
 
     $potential = $groups;
@@ -221,12 +219,11 @@ WHERE  id = $id
    * @return string
    */
   public static function json() {
-    $cache = Civi::cache('groups');
-    $tree = $cache->get('nestable tree hierarchy');
+    $tree = Civi::cache('groups')->get('nestable tree hierarchy');
 
     if ($tree === NULL) {
       self::update();
-      $tree = $cache->get('nestable tree hierarchy');
+      $tree = Civi::cache('groups')->get('nestable tree hierarchy');
     }
 
     // get all the groups

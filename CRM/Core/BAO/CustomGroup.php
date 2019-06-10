@@ -259,8 +259,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
    */
   public static function setIsActive($id, $is_active) {
     // reset the cache
-    $cache = Civi::cache('fields');
-    $cache->flush();
+    Civi::cache('fields')->flush();
 
     if (!$is_active) {
       CRM_Core_BAO_UFField::setUFFieldStatus($id, $is_active);
@@ -1819,7 +1818,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
 
     // fetch submitted custom field values later use to set as a default values
     if ($qfKey) {
-      $submittedValues = CRM_Core_BAO_Cache::getItem('custom data', $qfKey);
+      $submittedValues = Civi::cache('customData')->get($qfKey);
     }
 
     foreach ($groupTree as $key => $value) {
@@ -1878,7 +1877,7 @@ SELECT IF( EXISTS(SELECT name FROM civicrm_contact_type WHERE name like %1), 1, 
       if (count($formValues)) {
         $qf = $form->get('qfKey');
         $form->assign('qfKey', $qf);
-        CRM_Core_BAO_Cache::setItem($formValues, 'custom data', $qf);
+        Civi::cache('customData')->set($qf, $formValues);
       }
 
       // hack for field type File
