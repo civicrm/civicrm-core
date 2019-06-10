@@ -751,8 +751,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       GROUP BY activity_id', [
         1 => [
           CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets'),
-          'Integer'
-        ]
+          'Integer',
+        ],
       ])->fetchAll();
     }
     foreach ($targetCount as $activityTarget) {
