@@ -6,7 +6,7 @@ starting with CiviCRM 4.7.14.
 Other resources for identifying changes are:
 
 * The CiviCRM GitLab project management system at https://lab.civicrm.org/groups/dev/-/issues
-* The Jira project management system at https://issues.civicrm.org
+* The former Jira project management system archived at https://issues.civicrm.org
 * The following GitHub projects:
     * https://github.com/civicrm/civicrm-core
     * https://github.com/civicrm/civicrm-packages
@@ -14,6 +14,17 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-drupal
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
+
+## CiviCRM 5.15.0
+
+Released July 3, 2019
+
+- **[Synopsis](release-notes/5.15.0.md#synopsis)**
+- **[Features](release-notes/5.15.0.md#features)**
+- **[Bugs resolved](release-notes/5.15.0.md#bugs)**
+- **[Miscellany](release-notes/5.15.0.md#misc)**
+- **[Credits](release-notes/5.15.0.md#credits)**
+- **[Feedback](release-notes/5.15.0.md#feedback)**
 
 ## CiviCRM 5.14.1
 
