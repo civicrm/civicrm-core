@@ -329,7 +329,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     // CRM-9137
     if (!empty($params['id'])) {
-      CRM_Utils_Hook::pre('edit', 'Activity', $activity->id, $params);
+      CRM_Utils_Hook::pre('edit', 'Activity', $params['id'], $params);
     }
     else {
       CRM_Utils_Hook::pre('create', 'Activity', NULL, $params);
