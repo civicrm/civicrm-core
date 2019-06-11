@@ -863,14 +863,12 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $this->header = new CRM_Mailing_BAO_MailingComponent();
       $this->header->id = $this->header_id;
       $this->header->find(TRUE);
-      $this->header->free();
     }
 
     if (!$this->footer and $this->footer_id) {
       $this->footer = new CRM_Mailing_BAO_MailingComponent();
       $this->footer->id = $this->footer_id;
       $this->footer->find(TRUE);
-      $this->footer->free();
     }
   }
 
@@ -1451,7 +1449,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     while ($mg->fetch()) {
       $groups[] = $mg->name;
     }
-    $mg->free();
     return $groups;
   }
 

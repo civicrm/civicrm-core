@@ -323,7 +323,6 @@ AND    domain_id    = %4
 
       if (!$conflict) {
         $ufmatch = CRM_Core_BAO_UFMatch::create((array) $ufmatch);
-        $ufmatch->free();
         $newContact = TRUE;
         $transaction->commit();
       }

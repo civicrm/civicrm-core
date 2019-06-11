@@ -332,7 +332,6 @@ FROM civicrm_action_schedule cas
         CRM_Core_BAO_ActionLog::create($logParams);
       }
 
-      $dao->free();
     }
   }
 

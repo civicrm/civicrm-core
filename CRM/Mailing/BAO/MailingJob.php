@@ -501,7 +501,6 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $mailing = new CRM_Mailing_BAO_Mailing();
     $mailing->id = $this->mailing_id;
     $mailing->find(TRUE);
-    $mailing->free();
 
     $config = NULL;
 
@@ -542,7 +541,6 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         if (!empty($fields)) {
           $this->deliverGroup($fields, $mailing, $mailer, $job_date, $attachments);
         }
-        $eq->free();
         return FALSE;
       }
       self::$mailsProcessed++;
@@ -557,14 +555,11 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       if (count($fields) == self::MAX_CONTACTS_TO_PROCESS) {
         $isDelivered = $this->deliverGroup($fields, $mailing, $mailer, $job_date, $attachments);
         if (!$isDelivered) {
-          $eq->free();
           return $isDelivered;
         }
         $fields = [];
       }
     }
-
-    $eq->free();
 
     if (!empty($fields)) {
       $isDelivered = $this->deliverGroup($fields, $mailing, $mailer, $job_date, $attachments);
