@@ -1310,7 +1310,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
             // In other contexts show a paperclip icon
             if (CRM_Utils_Rule::integer($value)) {
               $icons = CRM_Core_BAO_File::paperIconAttachment('*', $value);
-              $display = $icons[$value];
+              $display = $icons[$value] . civicrm_api3('File', 'getvalue', ['return' => "description", 'id' => $value]);
             }
             else {
               //CRM-18396, if filename is passed instead
