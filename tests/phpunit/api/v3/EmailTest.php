@@ -82,9 +82,11 @@ class api_v3_EmailTest extends CiviUnitTestCase {
    * If no location is specified when creating a new email, it should default to
    * the LocationType default
    *
-   * Only API v3
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateEmailDefaultLocation() {
+  public function testCreateEmailDefaultLocation($version) {
+    $this->_apiversion = $version;
     $params = $this->_params;
     unset($params['location_type_id']);
     $result = $this->callAPIAndDocument('email', 'create', $params, __FUNCTION__, __FILE__);
