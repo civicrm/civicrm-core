@@ -226,9 +226,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    *
    * Verify that sub-types are created successfully and not deleted by subsequent updates.
    *
-   * v3 only - uses nonstandard syntax
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testIndividualSubType() {
+  public function testIndividualSubType($version) {
+    $this->_apiversion = $version;
     $params = array(
       'first_name' => 'test abc',
       'contact_type' => 'Individual',

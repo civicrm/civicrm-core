@@ -140,11 +140,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
         $params['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type']);
       }
     }
-    else {
-      // Reset the value.
-      // CRM-101XX.
-      $params['contact_sub_type'] = 'null';
-    }
 
     if (isset($params['preferred_communication_method']) && is_array($params['preferred_communication_method'])) {
       CRM_Utils_Array::formatArrayKeys($params['preferred_communication_method']);
