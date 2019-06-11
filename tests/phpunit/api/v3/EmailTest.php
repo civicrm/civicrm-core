@@ -79,6 +79,22 @@ class api_v3_EmailTest extends CiviUnitTestCase {
   }
 
   /**
+   * If no location is specified when creating a new email, it should default to
+   * the LocationType default
+   *
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateEmailDefaultLocation($version) {
+    $this->_apiversion = $version;
+    $params = $this->_params;
+    unset($params['location_type_id']);
+    $result = $this->callAPIAndDocument('email', 'create', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals(CRM_Core_BAO_LocationType::getDefault()->id, $result['values'][$result['id']]['location_type_id']);
+    $delresult = $this->callAPISuccess('email', 'delete', array('id' => $result['id']));
+  }
+
+  /**
    * If a new email is set to is_primary the prev should no longer be.
    *
    * If is_primary is not set then it should become is_primary is no others exist
