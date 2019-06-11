@@ -128,7 +128,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       if (empty($params['contact_sub_type'])) {
         $params['contact_sub_type'] = 'null';
       }
-      else {
+      elseif ($params['contact_sub_type'] !== 'null') {
         if (!CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'],
           $params['contact_type'], TRUE
         )

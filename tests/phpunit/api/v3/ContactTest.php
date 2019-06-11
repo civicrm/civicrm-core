@@ -245,11 +245,18 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'middle_name' => 'foo',
     );
     $this->callAPISuccess('contact', 'create', $params);
-    unset($params['middle_name']);
 
-    $contact = $this->callAPISuccess('contact', 'get', $params);
+    $contact = $this->callAPISuccess('contact', 'get', ['id' => $cid]);
 
     $this->assertEquals(array('Student', 'Staff'), $contact['values'][$cid]['contact_sub_type']);
+
+    $this->callAPISuccess('Contact', 'create', [
+      'id' => $cid,
+      'contact_sub_type' => [],
+    ]);
+
+    $contact = $this->callAPISuccess('contact', 'get', ['id' => $cid]);
+    $this->assertTrue(empty($contact['values'][$cid]['contact_sub_type']));
   }
 
   /**
