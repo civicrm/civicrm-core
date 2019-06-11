@@ -58,6 +58,10 @@ class Update extends BasicUpdateAction {
     // We may have changed list of files covered by the cache.
     $scanner->clear();
 
+    if (isset($updates['server_route']) && $updates['server_route'] !== $orig[0]['server_route']) {
+      \CRM_Core_Menu::store();
+      \CRM_Core_BAO_Navigation::resetNavigation();
+    }
     // FIXME if `server_route` changes, then flush the menu cache.
     // FIXME if asset-caching is enabled, then flush the asset cache.
 
