@@ -329,7 +329,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
 
     // CRM-9137
     if (!empty($params['id'])) {
-      CRM_Utils_Hook::pre('edit', 'Activity', $activity->id, $params);
+      CRM_Utils_Hook::pre('edit', 'Activity', $params['id'], $params);
     }
     else {
       CRM_Utils_Hook::pre('create', 'Activity', NULL, $params);
@@ -751,8 +751,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       GROUP BY activity_id', [
         1 => [
           CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets'),
-          'Integer'
-        ]
+          'Integer',
+        ],
       ])->fetchAll();
     }
     foreach ($targetCount as $activityTarget) {
