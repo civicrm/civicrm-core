@@ -837,6 +837,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $this->_params = array_merge($this->_params, $addressParams);
     }
 
+    // @fixme it would be really nice to have a comment here so I had a clue why we are setting $fields[$name] = 1
+    // Also how does relate to similar code in CRM_Contact_BAO_Contact::addBillingNameFieldsIfOtherwiseNotSet()
     $nameFields = ['first_name', 'middle_name', 'last_name'];
     foreach ($nameFields as $name) {
       $fields[$name] = 1;

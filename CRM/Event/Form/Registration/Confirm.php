@@ -180,6 +180,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       CRM_Utils_System::setTitle($this->_values['event']['confirm_title']);
     }
 
+    // Personal campaign page
     if ($this->_pcpId) {
       $params = CRM_Contribute_Form_Contribution_Confirm::processPcp($this, $this->_params[0]);
       $this->_params[0] = $params;
