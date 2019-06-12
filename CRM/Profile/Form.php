@@ -372,7 +372,6 @@ class CRM_Profile_Form extends CRM_Core_Form {
         $this->_isAddCaptcha = $dao->add_captcha;
         $this->_ufGroup = (array) $dao;
       }
-      $dao->free();
 
       if (!CRM_Utils_Array::value('is_active', $this->_ufGroup)) {
         CRM_Core_Error::fatal(ts('The requested profile (gid=%1) is inactive or does not exist.', [

@@ -159,8 +159,6 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
 
     $lock->release();
 
-    $dao->free();
-
     $this->valueCache[$key] = CRM_Core_BAO_Cache::decode($dataSerialized);
     $this->expiresCache[$key] = $expires;
     return TRUE;
@@ -181,7 +179,6 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
         $this->expiresCache[$key] = $dao->expires;
         $this->valueCache[$key] = CRM_Core_BAO_Cache::decode($dao->data);
       }
-      $dao->free();
     }
     return (isset($this->expiresCache[$key]) && time() < $this->expiresCache[$key]) ? $this->reobjectify($this->valueCache[$key]) : $default;
   }
@@ -241,7 +238,6 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
       $this->valueCache[$dao->path] = CRM_Core_BAO_Cache::decode($dao->data);
       $this->expiresCache[$dao->path] = $dao->expires;
     }
-    $dao->free();
   }
 
   protected function where($path = NULL) {

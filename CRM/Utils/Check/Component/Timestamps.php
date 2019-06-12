@@ -104,7 +104,6 @@ class CRM_Utils_Check_Component_Timestamps extends CRM_Utils_Check_Component {
         $result = TRUE;
       }
     }
-    $dao->free();
     return $result;
   }
 

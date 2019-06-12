@@ -1274,7 +1274,6 @@ class CRM_GCD {
         $this->stateMap[$dao->abbreviation] = $dao->id;
         $this->states[$dao->id] = $dao->name;
       }
-      $dao->free();
     }
 
     $offset = mt_rand(1, 43000);
