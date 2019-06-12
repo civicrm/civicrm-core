@@ -2943,13 +2943,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           if (!isset($this->_relatedObjects['contributionPage'])) {
             $this->loadRelatedEntitiesByID(['contributionPage' => $this->contribution_page_id]);
           }
-          // CRM-8254 - override default currency if applicable
-          $config = CRM_Core_Config::singleton();
-          $config->defaultCurrency = CRM_Utils_Array::value(
-            'currency',
-            $values,
-            $config->defaultCurrency
-          );
+          CRM_Contribute_BAO_Contribution_Utils::overrideDefaultCurrency($values);
         }
       }
       // no contribution page -probably back office

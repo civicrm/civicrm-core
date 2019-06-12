@@ -479,14 +479,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // This can, for example, by used by payment processors using client side encryption
     $this->assign('currency', $this->getCurrency());
 
-    //CRM-6907
-    // these lines exist to support a non-default currenty on the form but are probably
-    // obsolete & meddling wth the defaultCurrency is not the right approach....
-    $config = CRM_Core_Config::singleton();
-    $config->defaultCurrency = CRM_Utils_Array::value('currency',
-      $this->_values,
-      $config->defaultCurrency
-    );
+    CRM_Contribute_BAO_Contribution_Utils::overrideDefaultCurrency($this->_values);
 
     //lets allow user to override campaign.
     $campID = CRM_Utils_Request::retrieve('campID', 'Positive', $this);
