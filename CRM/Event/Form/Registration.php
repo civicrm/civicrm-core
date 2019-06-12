@@ -519,9 +519,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     // also assign all participantIDs to the template
     // useful in generating confirmation numbers if needed
-    $this->assign('participantIDs',
-      $this->_participantIDS
-    );
+    $this->assign('participantIDs', $this->_participantIDS);
   }
 
   /**

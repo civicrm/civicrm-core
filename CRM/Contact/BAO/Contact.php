@@ -549,13 +549,15 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * Add billing fields to the params if appropriate.
    *
    * If we have ANY name fields then we want to ignore all the billing name fields. However, if we
-   * don't then we should set the name fields to the filling fields AND add the preserveDBName
+   * don't then we should set the name fields to the billing fields AND add the preserveDBName
    * parameter (which will tell the BAO only to set those fields if none already exist.
    *
    * We specifically don't want to set first name from billing and last name form an on-page field. Mixing &
    * matching is best done by hipsters.
    *
    * @param array $params
+   *
+   * @fixme How does this relate to almost the same thing being done in CRM_Core_Form::formatParamsForPaymentProcessor()
    */
   public static function addBillingNameFieldsIfOtherwiseNotSet(&$params) {
     $nameFields = array('first_name', 'middle_name', 'last_name', 'nick_name', 'prefix_id', 'suffix_id');
