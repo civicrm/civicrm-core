@@ -349,32 +349,26 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       );
     }
 
+    $whereClauses = ['trash_clause' => "contact_a.is_deleted != 1"];
     if (!$selectAll && $componentTable) {
       $from .= " INNER JOIN $componentTable ctTable ON ctTable.contact_id = contact_a.id ";
     }
     elseif ($componentClause) {
-      if (empty($where)) {
-        $where = "WHERE $componentClause";
-      }
-      else {
-        $where .= " AND $componentClause";
-      }
+      $whereClauses[] = $componentClause;
     }
 
     // CRM-13982 - check if is deleted
-    $excludeTrashed = TRUE;
     foreach ($params as $value) {
       if ($value[0] == 'contact_is_deleted') {
-        $excludeTrashed = FALSE;
+        unset($whereClauses['trash_clause']);
       }
     }
-    $trashClause = $excludeTrashed ? "contact_a.is_deleted != 1" : "( 1 )";
 
     if (empty($where)) {
-      $where = "WHERE $trashClause";
+      $where = "WHERE " . implode(' AND ', $whereClauses);
     }
     else {
-      $where .= " AND $trashClause";
+      $where .= " AND " . implode(' AND ', $whereClauses);
     }
 
     $queryString = "$select $from $where $having";
