@@ -281,17 +281,17 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Set variables up before form is built.
    */
   public function preProcess() {
-    $config = CRM_Core_Config::singleton();
+    $this->_params = $this->controller->exportValues('Main');
     parent::preProcess();
 
     // lineItem isn't set until Register postProcess
     $this->_lineItem = $this->get('lineItem');
     $this->_ccid = $this->get('ccid');
 
-    $this->_params = $this->controller->exportValues('Main');
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->get('amount');
-    if (isset($this->_params['amount'])) {
+
+    if (!$this->getFixedAmountSubmitted($this->_params) && isset($this->_params['amount'])) {
       $this->setFormAmountFields($this->_params['priceSetId']);
     }
 
@@ -303,7 +303,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
     }
 
-    $this->_params['currencyID'] = $config->defaultCurrency;
+    $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
     if (!empty($this->_membershipBlock)) {
       $this->_params['selectMembership'] = $this->get('selectMembership');
@@ -538,8 +538,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->set('productID', $productID);
       $this->set('option', $option);
     }
-    $config = CRM_Core_Config::singleton();
-    if (in_array('CiviMember', $config->enableComponents) && empty($this->_ccid)) {
+    if (in_array('CiviMember', CRM_Core_Config::singleton()->enableComponents) && empty($this->_ccid)) {
       if (isset($params['selectMembership']) &&
         $params['selectMembership'] != 'no_thanks'
       ) {

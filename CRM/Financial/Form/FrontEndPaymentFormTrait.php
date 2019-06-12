@@ -79,4 +79,24 @@ trait CRM_Financial_Form_FrontEndPaymentFormTrait {
     $this->assign('lineItem', $tplLineItems);
   }
 
+  /**
+   * Once the form has been submitted return the
+   * @param array $params Form params
+   *
+   * @return bool|float
+   */
+  protected function getFixedAmountSubmitted($params) {
+    return empty($params['fixed_amount']) ? FALSE : (float) $params['fixed_amount'];
+  }
+
+  /**
+   * Get the configured fixed amount value for a contribution page, or NULL if not configured
+   *
+   * @return NULL|float
+   * @throws \CRM_Core_Exception
+   */
+  protected function getFixedAmount() {
+    return CRM_Utils_Request::retrieve('fixed_amount', 'Float');
+  }
+
 }

@@ -35,6 +35,7 @@
  * This class generates form components for processing a contribution.
  */
 class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
+  use CRM_Financial_Form_FrontEndPaymentFormTrait;
 
   /**
    * The id of the contribution page that we are processing.
@@ -238,8 +239,8 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // this was used prior to the cleverer this_>getContactID - unsure now
     $this->_userID = CRM_Core_Session::singleton()->getLoggedInContactID();
-
     $this->_contactID = $this->_membershipContactID = $this->getContactID();
+
     $this->_mid = NULL;
     if ($this->_contactID) {
       $this->_mid = CRM_Utils_Request::retrieve('mid', 'Positive', $this);
@@ -446,13 +447,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // check if one of the (amount , membership)  blocks is active or not.
     $this->_membershipBlock = $this->get('membershipBlock');
-
-    if (!$this->_values['amount_block_is_active'] &&
-      !$this->_membershipBlock['is_active'] &&
-      !$this->_priceSetId
-    ) {
-      CRM_Core_Error::fatal(ts('The requested online contribution page is missing a required Contribution Amount section or Membership section or Price Set. Please check with the site administrator for assistance.'));
-    }
 
     if ($this->_values['amount_block_is_active']) {
       $this->set('amount_block_is_active', $this->_values['amount_block_is_active']);

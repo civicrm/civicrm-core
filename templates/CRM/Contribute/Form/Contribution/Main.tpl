@@ -107,9 +107,15 @@
         <td><span>{$form.total_amount.html|crmMoney}&nbsp;&nbsp;{if $taxAmount}{ts 1=$taxTerm 2=$taxAmount|crmMoney}(includes %1 of %2){/ts}{/if}</span></td>
       </div>
     {/if}
-  {else}
+  {elseif $priceSetID}
     <div id="priceset-div">
     {include file="CRM/Price/Form/PriceSet.tpl" extends="Contribution"}
+    </div>
+  {else}
+    <div id="fixedamount-div" class="crm-public-form-item crm-section {$form.fixed_amount.name}-section">
+      <div class="label">{$form.fixed_amount.label}</div>
+      <div class="content">{$form.fixed_amount.html|crmMoney}&nbsp;&nbsp;{if $taxAmount}{ts 1=$taxTerm 2=$taxAmount|crmMoney}(includes %1 of %2){/ts}{/if}</div>
+      <div class="clear"></div>
     </div>
   {/if}
 
