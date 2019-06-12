@@ -6,11 +6,14 @@ use Civi\Test\TransactionalInterface;
 /**
  * @group headless
  */
-class CRM_Afform_UtilTest extends \PHPUnit_Framework_TestCase implements HeadlessInterface, TransactionalInterface {
+class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, TransactionalInterface {
 
   /**
    * Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
+   *
    * See: https://github.com/civicrm/org.civicrm.testapalooza/blob/master/civi-test.md
+   *
+   * @throws \CRM_Extension_Exception_ParseException
    */
   public function setUpHeadless() {
     return \Civi\Test::headless()
@@ -42,7 +45,9 @@ class CRM_Afform_UtilTest extends \PHPUnit_Framework_TestCase implements Headles
    * @param $inputFileName
    * @param $toFormat
    * @param $expected
+   *
    * @dataProvider getNameExamples
+   * @throws \Exception
    */
   public function testNameConversion($inputFileName, $toFormat, $expected) {
     $actual = _afform_angular_module_name($inputFileName, $toFormat);

@@ -6,7 +6,7 @@ use Civi\Test\TransactionalInterface;
 /**
  * Base class for Afform API tests.
  */
-abstract class api_v4_AfformTestCase extends \PHPUnit_Framework_TestCase implements HeadlessInterface, TransactionalInterface {
+abstract class api_v4_AfformTestCase extends \PHPUnit\Framework\TestCase implements HeadlessInterface, TransactionalInterface {
 
   /**
    * Civi\Test has many helpers, like install(), uninstall(), sql(), and sqlFile().
