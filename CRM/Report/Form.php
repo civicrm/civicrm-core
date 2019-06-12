@@ -1768,7 +1768,6 @@ class CRM_Report_Form extends CRM_Core_Form {
     switch ($type) {
       case CRM_Report_Form::OP_INT:
       case CRM_Report_Form::OP_FLOAT:
-
         $result = [
           'lte' => ts('Is less than or equal to'),
           'gte' => ts('Is greater than or equal to'),
@@ -1781,6 +1780,12 @@ class CRM_Report_Form extends CRM_Core_Form {
           'nll' => ts('Is empty (Null)'),
           'nnll' => ts('Is not empty (Null)'),
         ];
+
+        if ($fieldName == 'owner_membership_id') {
+          $result['nll'] = ts('Primary members only');
+          $result['nnll'] = ts('Non-primary members only');
+        }
+
         return $result;
 
       case CRM_Report_Form::OP_SELECT:
