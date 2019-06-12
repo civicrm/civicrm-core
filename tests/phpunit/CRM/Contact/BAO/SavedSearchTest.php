@@ -224,7 +224,7 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
       'weight' => 4,
       'is_required' => 1,
       'is_searchable' => 1,
-      'date_format' => 'mm/dd/yyyy',
+      'date_format' => 'mm/dd/yy',
       'is_active' => 1,
     );
     $customField = $this->callAPIAndDocument('custom_field', 'create', $params, __FUNCTION__, __FILE__);
