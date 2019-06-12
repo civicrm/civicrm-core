@@ -891,10 +891,8 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
     //finally add captcha to form.
     if ($this->_isAddCaptcha) {
-      $captcha = CRM_Utils_ReCAPTCHA::singleton();
-      $captcha->add($this);
+      CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
     }
-    $this->assign("isCaptcha", $this->_isAddCaptcha);
 
     if ($this->_mode != self::MODE_SEARCH) {
       if (isset($addToGroupId)) {
