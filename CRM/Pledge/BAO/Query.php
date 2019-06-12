@@ -524,10 +524,30 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * Get the metadata for fields to be included on the grant search form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = [
+      'pledge_status_id',
+    ];
+    $metadata = civicrm_api3('Pledge', 'getfields', [])['values'];
+    return array_intersect_key($metadata, array_flip($fields));
+  }
+
+  /**
+   * Build the search for for pledges.
+   *
+   * @param CRM_Pledge_Form_Search|\CRM_Contact_Form_Search_Advanced $form
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function buildSearchForm(&$form) {
     // pledge related dates
+    $form->addSearchFieldMetadata(['Pledge' => self::getSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
     CRM_Core_Form_Date::buildDateRange($form, 'pledge_start_date', 1, '_low', '_high', ts('From'), FALSE);
     CRM_Core_Form_Date::buildDateRange($form, 'pledge_end_date', 1, '_low', '_high', ts('From'), FALSE);
     CRM_Core_Form_Date::buildDateRange($form, 'pledge_create_date', 1, '_low', '_high', ts('From'), FALSE);
@@ -541,11 +561,6 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
 
     $form->add('text', 'pledge_amount_high', ts('To'), ['size' => 8, 'maxlength' => 8]);
     $form->addRule('pledge_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
-
-    $form->add('select', 'pledge_status_id',
-      ts('Pledge Status'), CRM_Pledge_BAO_Pledge::buildOptions('status_id'),
-      FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple']
-    );
 
     $form->addYesNo('pledge_acknowledge_date_is_not_null', ts('Acknowledgement sent?'), TRUE);
 

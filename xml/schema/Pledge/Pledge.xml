@@ -291,6 +291,9 @@
     <import>true</import>
     <export>false</export>
     <type>int unsigned</type>
+    <html>
+      <type>Select</type>
+    </html>
     <pseudoconstant>
       <optionGroupName>pledge_status</optionGroupName>
     </pseudoconstant>
