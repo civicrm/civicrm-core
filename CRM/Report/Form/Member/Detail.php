@@ -284,6 +284,18 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     }
   }
 
+  public function getOperationPair($type = "string", $fieldName = NULL) {
+    $result = parent::getOperationPair($type, $fieldName);
+
+    //re-name IS NULL/IS NOT NULL for clarity
+    if ($fieldName == 'owner_membership_id') {
+      $result['nll'] = ts('Primary members only');
+      $result['nnll'] = ts('Non-primary members only');
+    }
+
+    return $result;
+  }
+
   /**
    * Alter display of rows.
    *
