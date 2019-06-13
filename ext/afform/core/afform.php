@@ -189,6 +189,8 @@ function afform_civicrm_alterAngular($angular) {
         $entityType = $entities[$entityName]['type'];
         $getFields = civicrm_api4($entityType, 'getFields', [
           'where' => [['name', '=', $fieldName]],
+          'select' => ['name', 'html_type', 'html_attrs', 'options'],
+          'loadOptions' => TRUE,
         ]);
         foreach ($getFields as $field) {
           pq($afField)->attr('field-defn', json_encode($field, JSON_UNESCAPED_SLASHES));
