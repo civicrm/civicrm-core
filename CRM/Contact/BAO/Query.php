@@ -2656,7 +2656,7 @@ class CRM_Contact_BAO_Query {
         continue;
       }
 
-      $from .= self::getEntitySpecificJoins($name, $mode, $side, $primaryLocation);
+      $from .= ' ' . trim(self::getEntitySpecificJoins($name, $mode, $side, $primaryLocation)) . ' ';
     }
     return $from;
   }
