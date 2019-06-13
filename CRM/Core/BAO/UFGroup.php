@@ -1189,7 +1189,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
                 // Core image; .htaccess blocks direct URL access, so find it by directory instead.
                 $imagename = substr($details->$name, $iscoreimage + strlen($coreimagepattern));
                 list($width, $height) = getimagesize(CRM_Utils_String::unstupifyUrl($config->customFileUploadDir . $imagename));
-              } else {
+              }
+              else {
                 // Could be a webform uploaded image so try by URL.
                 list($width, $height) = getimagesize(CRM_Utils_String::unstupifyUrl($details->$name));
               }
