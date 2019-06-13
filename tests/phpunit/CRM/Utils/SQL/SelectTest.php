@@ -72,6 +72,15 @@ class CRM_Utils_SQL_SelectTest extends CiviUnitTestCase {
     $this->assertLike('SELECT * FROM foo WHERE (foo = "not\\"valid") AND (whiz > "in\\"valid") AND (frob != "in\\"valid")', $select->toSQL());
   }
 
+  public function testWhereNullArg() {
+    $select = CRM_Utils_SQL_Select::from('foo')
+      ->where('foo IS @value', array('@value' => NULL))
+      ->where('nonexistent IS @nonexistent', [])
+      ->where('morenonexistent IS @nonexistent', NULL)
+      ->where('bar IS @value', array('@value' => 'null'));
+    $this->assertLike('SELECT * FROM foo WHERE (foo IS NULL) AND (nonexistent IS @nonexistent) AND (morenonexistent IS @nonexistent) AND (bar IS "null")', $select->toSQL());
+  }
+
   public function testGroupByPlain() {
     $select = CRM_Utils_SQL_Select::from('foo')
       ->groupBy("bar_id")
