@@ -40,10 +40,9 @@ class CRM_Upgrade_Incremental_php_FiveSixteen extends CRM_Upgrade_Incremental_Ba
    * @param null $currentVer
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
-    // Example: Generate a pre-upgrade message.
-    // if ($rev == '5.12.34') {
-    //   $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the Manage Tags screen.', array(1 => ts('manage tags'))) . '</p>';
-    // }
+    if ($rev == '5.16.alpha1') {
+      $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the CiviCRM Status Checks notices.', array(1 => ts('View CiviCRM Status Checks'))) . '</p>';
+    }
   }
 
   /**

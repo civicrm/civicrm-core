@@ -348,7 +348,7 @@ class CRM_Core_Invoke {
    * @param CRM_Core_Smarty $template
    */
   public static function statusCheck($template) {
-    if (CRM_Core_Config::isUpgradeMode() || !CRM_Core_Permission::check('administer CiviCRM')) {
+    if (CRM_Core_Config::isUpgradeMode() || !CRM_Core_Permission::check('view status checks')) {
       return;
     }
     // always use cached results - they will be refreshed by the session timer

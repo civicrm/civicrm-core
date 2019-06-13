@@ -914,6 +914,10 @@ class CRM_Core_Permission {
         $prefix . ts('send SMS'),
         ts('Send an SMS'),
       ],
+      'view status checks' => [
+        $prefix . ts('View CiviCRM Status Checks'),
+        ts('View CiviCRM Status Checks'),
+      ],
     ];
 
     return $permissions;
