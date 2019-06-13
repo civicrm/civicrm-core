@@ -3160,12 +3160,19 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @param string $class
    *   Name of form class.
    *
+   * @param array $formValues
+   *
+   * @param string $pageName
+   *
    * @return \CRM_Core_Form
+   * @throws \CRM_Core_Exception
    */
-  public function getFormObject($class) {
+  public function getFormObject($class, $formValues = [], $pageName = '') {
     $form = new $class();
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Core_Controller();
+    $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
+    $_SESSION['_' . $form->controller->_name . '_container']['values'][$pageName] = $formValues;
     return $form;
   }
 
