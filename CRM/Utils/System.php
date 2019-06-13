@@ -1395,9 +1395,14 @@ class CRM_Utils_System {
    *
    * @param int $status
    *   (optional) Code with which to exit.
+   *
+   * @throws \CRM_Core_PrematureExit_Exception
    */
   public static function civiExit($status = 0) {
 
+    if (CIVICRM_UF === 'UnitTests') {
+      throw new CRM_Core_Exception_PrematureExitException('civiExit called');
+    }
     if ($status > 0) {
       http_response_code(500);
     }
