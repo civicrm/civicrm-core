@@ -3067,7 +3067,7 @@ ORDER BY civicrm_mailing.name";
 
       // if hash setting is on then we change the public url into a hash
       $hash = CRM_Mailing_BAO_Mailing::getMailingHash($id);
-      if(!empty($hash)){
+      if (!empty($hash)) {
         $id = $hash;
       }
 
