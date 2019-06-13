@@ -3064,6 +3064,11 @@ ORDER BY civicrm_mailing.name";
       'id' => $id,
       'return' => 'visibility',
     ])) === 'Public Pages') {
+
+      if ($hash = CRM_Mailing_BAO_Mailing::getMailingHash($id)) {
+        $id = $hash;
+      }
+
       return CRM_Utils_System::url('civicrm/mailing/view', ['id' => $id], $absolute, NULL, TRUE, TRUE);
     }
   }
