@@ -116,7 +116,7 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
 
         //lets get the id from the hash
         $result_id = civicrm_api3('Mailing', 'get', [
-          'return' => ["id"],
+          'return' => ['id'],
           'hash' => $this->_mailingID,
         ]);
         $this->_mailing->hash = $this->_mailingID;
