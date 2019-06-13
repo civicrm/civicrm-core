@@ -1093,7 +1093,7 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
         $caseActivity['no_attachments'] = count($attachmentIDs);
       }
 
-      $caseActivities[$caseActivityId]['links'] = self::addCaseActivityLinks($caseID, $contactID, $userID, $context, $dao);
+      $caseActivities[$caseActivityId]['links'] = CRM_Case_Selector_Search::addCaseActivityLinks($caseID, $contactID, $userID, $context, $dao);
     }
 
     $caseActivitiesDT = array();
@@ -1102,80 +1102,6 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
     $caseActivitiesDT['recordsFiltered'] = $caseCount;
 
     return $caseActivitiesDT;
-  }
-
-  /**
-   * FIXME: This is a transitional function to facilitate a refactor of this to use CRM_Core_Action and actionLinks
-   * Add the set of "actionLinks" to the case activity
-   *
-   * @param int $caseID
-   * @param int $contactID
-   * @param int $userID
-   * @param string $context
-   * @param \CRM_Core_DAO $dao
-   *
-   * @return string
-   *   HTML formatted Link
-   */
-  private static function addCaseActivityLinks($caseID, $contactID, $userID, $context, $dao) {
-    // FIXME: Why are we not using CRM_Core_Action for these links? This is too much manual work and likely to get out-of-sync with core markup.
-    $caseActivityId = $dao->id;
-    $allowView = self::checkPermission($caseActivityId, 'view', $dao->activity_type_id, $userID);
-    $allowEdit = self::checkPermission($caseActivityId, 'edit', $dao->activity_type_id, $userID);
-    $allowDelete = self::checkPermission($caseActivityId, 'delete', $dao->activity_type_id, $userID);
-    $emailActivityTypeIDs = [
-      'Email' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email'),
-      'Inbound Email' => CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email'),
-    ];
-    $url = CRM_Utils_System::url("civicrm/case/activity",
-      "reset=1&cid={$contactID}&caseid={$caseID}", FALSE, NULL, FALSE
-    );
-    $contextUrl = '';
-    if ($context == 'fulltext') {
-      $contextUrl = "&context={$context}";
-    }
-    $editUrl = "{$url}&action=update{$contextUrl}";
-    $deleteUrl = "{$url}&action=delete{$contextUrl}";
-    $restoreUrl = "{$url}&action=renew{$contextUrl}";
-    $viewTitle = ts('View activity');
-    $caseDeleted = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_Case', $caseID, 'is_deleted');
-
-    $url = "";
-    $css = 'class="action-item crm-hover-button"';
-    if ($allowView) {
-      $viewUrl = CRM_Utils_System::url('civicrm/case/activity/view', array('cid' => $contactID, 'aid' => $caseActivityId));
-      $url = '<a ' . str_replace('action-item', 'action-item medium-pop-up', $css) . 'href="' . $viewUrl . '" title="' . $viewTitle . '">' . ts('View') . '</a>';
-    }
-    $additionalUrl = "&id={$caseActivityId}";
-    if (!$dao->deleted) {
-      //hide edit link of activity type email.CRM-4530.
-      if (!in_array($dao->type, $emailActivityTypeIDs)) {
-        //hide Edit link if activity type is NOT editable (special case activities).CRM-5871
-        if ($allowEdit) {
-          $url .= '<a ' . $css . ' href="' . $editUrl . $additionalUrl . '">' . ts('Edit') . '</a> ';
-        }
-      }
-      if ($allowDelete) {
-        $url .= ' <a ' . str_replace('action-item', 'action-item small-popup', $css) . ' href="' . $deleteUrl . $additionalUrl . '">' . ts('Delete') . '</a>';
-      }
-    }
-    elseif (!$caseDeleted) {
-      $url = ' <a ' . $css . ' href="' . $restoreUrl . $additionalUrl . '">' . ts('Restore') . '</a>';
-    }
-
-    //check for operations.
-    if (self::checkPermission($caseActivityId, 'Move To Case', $dao->activity_type_id)) {
-      $url .= ' <a ' . $css . ' href="#" onClick="Javascript:fileOnCase( \'move\',' . $caseActivityId . ', ' . $caseID . ', this ); return false;">' . ts('Move To Case') . '</a> ';
-    }
-    if (self::checkPermission($caseActivityId, 'Copy To Case', $dao->activity_type_id)) {
-      $url .= ' <a ' . $css . ' href="#" onClick="Javascript:fileOnCase( \'copy\',' . $caseActivityId . ',' . $caseID . ', this ); return false;">' . ts('Copy To Case') . '</a> ';
-    }
-    // if there are file attachments we will return how many and, if only one, add a link to it
-    if (!empty($dao->attachment_ids)) {
-      $url .= implode(' ', CRM_Core_BAO_File::paperIconAttachment('civicrm_activity', $caseActivityId));
-    }
-
-    return $url;
   }
 
   /**
