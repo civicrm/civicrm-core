@@ -128,7 +128,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       if (empty($params['contact_sub_type'])) {
         $params['contact_sub_type'] = 'null';
       }
-      else {
+      elseif ($params['contact_sub_type'] !== 'null') {
         if (!CRM_Contact_BAO_ContactType::isExtendsContactType($params['contact_sub_type'],
           $params['contact_type'], TRUE
         )
@@ -139,11 +139,6 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
         }
         $params['contact_sub_type'] = CRM_Utils_Array::implodePadded($params['contact_sub_type']);
       }
-    }
-    else {
-      // Reset the value.
-      // CRM-101XX.
-      $params['contact_sub_type'] = 'null';
     }
 
     if (isset($params['preferred_communication_method']) && is_array($params['preferred_communication_method'])) {
