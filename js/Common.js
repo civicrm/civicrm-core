@@ -144,17 +144,11 @@ function showHideByValue(trigger_field_id, trigger_value, target_element_id, tar
   }
 }
 
-/**
- * Function to change button text and disable one it is clicked
- * @deprecated
- * @param obj object - the button clicked
- * @param formID string - the id of the form being submitted
- * @param string procText - button text after user clicks it
- * @return bool
- */
 var submitcount = 0;
-/* Changes button label on submit, and disables button after submit for newer browsers.
- Puts up alert for older browsers. */
+/**
+ * Old submit-once function. Will be removed soon.
+ * @deprecated
+ */
 function submitOnce(obj, formId, procText) {
   // if named button clicked, change text
   if (obj.value != null) {
@@ -860,6 +854,30 @@ if (!CRM.vars) CRM.vars = {};
     });
   };
 
+  // Submit-once
+  var submitted = [],
+    submitButton;
+  function submitOnceForm(e) {
+    if (e.isDefaultPrevented()) {
+      return;
+    }
+    if (_.contains(submitted, e.target)) {
+      return false;
+    }
+    submitted.push(e.target);
+    // Spin submit button icon
+    if (submitButton && $(submitButton, e.target).length) {
+      // Dialog button
+      if ($(e.target).closest('.ui-dialog .crm-ajax-container')) {
+        var identifier = $(submitButton).attr('name') || $(submitButton).attr('href');
+        if (identifier) {
+          submitButton = $(e.target).closest('.ui-dialog').find('button[data-identifier="' + identifier + '"]')[0] || submitButton;
+        }
+      }
+      $(submitButton).siblings('.crm-i').add('.crm-i, .ui-icon', submitButton).removeClass().addClass('crm-i fa-spinner fa-pulse');
+    }
+  }
+
   // Initialize widgets
   $(document)
     .on('crmLoad', function(e) {
@@ -924,6 +942,10 @@ if (!CRM.vars) CRM.vars = {};
         } else {
           CRM.wysiwyg.create(this);
         }
+      });
+      $('form[data-submit-once]', e.target).submit(submitOnceForm);
+      $('form[data-submit-once] input[type=submit]', e.target).click(function(e) {
+        submitButton = e.target;
       });
     })
     .on('dialogopen', function(e) {

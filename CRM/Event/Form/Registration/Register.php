@@ -463,10 +463,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     ) {
 
       //freeze button to avoid multiple calls.
-      $js = NULL;
-
       if (empty($this->_values['event']['is_monetary'])) {
-        $js = ['onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"];
+        $this->submitOnce = TRUE;
       }
 
       // CRM-11182 - Optional confirmation screen
@@ -488,7 +486,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           'name' => $buttonLabel,
           'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
           'isDefault' => TRUE,
-          'js' => $js,
         ],
       ]);
     }

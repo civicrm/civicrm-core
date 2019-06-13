@@ -136,8 +136,9 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    * @var bool
    *
    */
-
   protected $supportsActivitySeparation = TRUE;
+
+  public $submitOnce = TRUE;
 
   /**
    * Explicitly declare the entity api name.

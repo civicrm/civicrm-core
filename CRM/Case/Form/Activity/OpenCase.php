@@ -198,7 +198,6 @@ class CRM_Case_Form_Activity_OpenCase {
         'type' => 'upload',
         'name' => ts('Save'),
         'isDefault' => TRUE,
-        'submitOnce' => TRUE,
       ],
       [
         'type' => 'upload',

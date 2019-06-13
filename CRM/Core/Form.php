@@ -190,6 +190,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $context;
 
   /**
+   * @var bool
+   */
+  public $submitOnce = FALSE;
+
+  /**
    * @return string
    */
   public function getContext() {
@@ -627,6 +632,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     ) {
       $this->setAttribute('data-warn-changes', 'true');
     }
+
+    if ($this->submitOnce) {
+      $this->setAttribute('data-submit-once', 'true');
+    }
   }
 
   /**
@@ -642,7 +651,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $prevnext = $spacing = [];
     foreach ($params as $button) {
       if (!empty($button['submitOnce'])) {
-        $button['js']['onclick'] = "return submitOnce(this,'{$this->_name}','" . ts('Processing') . "');";
+        $this->submitOnce = TRUE;
       }
 
       $attrs = ['class' => 'crm-form-submit'] + (array) CRM_Utils_Array::value('js', $button);
@@ -1255,7 +1264,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $nextType
    *   Button type for the form after processing.
    * @param string $backType
-   * @param bool|string $submitOnce If true, add javascript to next button submit which prevents it from being clicked more than once
+   * @param bool|string $submitOnce
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $buttons = [];
@@ -1272,7 +1281,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         'isDefault' => TRUE,
       ];
       if ($submitOnce) {
-        $nextButton['js'] = ['onclick' => "return submitOnce(this,'{$this->_name}','" . ts('Processing') . "');"];
+        $this->submitOnce = TRUE;
       }
       $buttons[] = $nextButton;
     }

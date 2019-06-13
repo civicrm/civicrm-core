@@ -525,7 +525,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       ];
       // Add submit-once behavior when confirm page disabled
       if (empty($this->_values['is_confirm_enabled'])) {
-        $submitButton['js'] = ['onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"];
+        $this->submitOnce = TRUE;
       }
       //change button name for updating contribution
       if (!empty($this->_ccid)) {
