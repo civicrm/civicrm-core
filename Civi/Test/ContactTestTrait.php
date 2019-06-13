@@ -71,7 +71,8 @@ trait ContactTestTrait {
    *
    * @return int
    *   id of Individual created
-   * @throws \Exception
+   *
+   * @throws \CRM_Core_Exception
    */
   public function individualCreate($params = array(), $seq = 0, $random = FALSE) {
     $params = array_merge($this->sampleContact('Individual', $seq, $random), $params);
@@ -151,7 +152,7 @@ trait ContactTestTrait {
    * @param array $params
    *   For civicrm_contact_add api function call.
    *
-   * @throws \Exception
+   * @throws CRM_Core_Exception
    *
    * @return int
    *   id of Household created
@@ -159,7 +160,7 @@ trait ContactTestTrait {
   private function _contactCreate($params) {
     $result = $this->callAPISuccess('contact', 'create', $params);
     if (!empty($result['is_error']) || empty($result['id'])) {
-      throw new \Exception('Could not create test contact, with message: ' . \CRM_Utils_Array::value('error_message', $result) . "\nBacktrace:" . \CRM_Utils_Array::value('trace', $result));
+      throw new \CRM_Core_Exception('Could not create test contact, with message: ' . \CRM_Utils_Array::value('error_message', $result) . "\nBacktrace:" . \CRM_Utils_Array::value('trace', $result));
     }
     return $result['id'];
   }
