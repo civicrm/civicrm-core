@@ -3065,7 +3065,9 @@ ORDER BY civicrm_mailing.name";
       'return' => 'visibility',
     ])) === 'Public Pages') {
 
-      if ($hash = CRM_Mailing_BAO_Mailing::getMailingHash($id)) {
+      // if hash setting is on then we change the public url into a hash
+      $hash = CRM_Mailing_BAO_Mailing::getMailingHash($id);
+      if(!empty($hash)){
         $id = $hash;
       }
 
