@@ -992,6 +992,17 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $activity = $this->processActivity($params);
     }
 
+    // Redirect to contact page or activity view in standalone mode
+    if ($this->_context == 'standalone') {
+      if (count($params['target_contact_id']) == 1) {
+        $url = CRM_Utils_System::url('civicrm/contact/view', ['cid' => CRM_Utils_Array::first($params['target_contact_id']), 'selectedChild' => 'activity']);
+      }
+      else {
+        $url = CRM_Utils_System::url('civicrm/activity', ['action' => 'view', 'reset' => 1, 'id' => $this->_activityId]);
+      }
+      CRM_Core_Session::singleton()->pushUserContext($url);
+    }
+
     $activityIds = empty($this->_activityIds) ? [$this->_activityId] : $this->_activityIds;
     foreach ($activityIds as $activityId) {
       // set params for repeat configuration in create mode
