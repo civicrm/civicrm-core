@@ -50,3 +50,7 @@ Within this extension, there are things which need updating/addressing:
   support batching (i.e. all API calls issued within a 5ms window are sent as a batch).
 * Default CSS: There's no mechanism for defining adhoc CSS. This is arguably a feature, though, because the CSS classes
   should be validated (to ensure theme interoperability).
+* `Civi/Angular/ChangeSet.php` previously had an integrity check that activated in developer mode
+  (`\CRM_Core_Config::singleton()->debug && $coder->checkConsistentHtml($html)`). This has been removed because it was a bit brittle
+  about self-closing HTML tags. However, the general concept of HTML validation should be reinstated as part of the `afform_auditor`.
+* `hook_alterAngular` is used to inject APIv4 metadata for certain tags. This behavior needs a unit-test.

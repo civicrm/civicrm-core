@@ -171,6 +171,44 @@ function afform_civicrm_angularModules(&$angularModules) {
 }
 
 /**
+ * @param \Civi\Angular\Manager $angular
+ * @see CRM_Utils_Hook::alterAngular()
+ */
+function afform_civicrm_alterAngular($angular) {
+  $fieldMetadata = \Civi\Angular\ChangeSet::create('fieldMetadata')
+    ->alterHtml(';^~afform/;', function($doc, $path){
+      $entities =  _afform_getMetadata($doc);
+
+      foreach (pq('af-field', $doc) as $afField) {
+        /** @var DOMElement $afField */
+        $fieldName = $afField->getAttribute('field-name');
+        $entityName = pq($afField)->parent('[af-name]')->attr('af-name');
+        if (!preg_match(';^[a-zA-Z0-9\_\-\. ]+$;', $entityName)) {
+          throw new \CRM_Core_Exception("Cannot process $path: malformed entity name ($entityName)");
+        }
+        $entityType = $entities[$entityName]['type'];
+        $getFields = civicrm_api4($entityType, 'getFields', [
+          'where' => [['name', '=', $fieldName]],
+        ]);
+        foreach ($getFields as $field) {
+          pq($afField)->attr('field-defn', json_encode($field, JSON_UNESCAPED_SLASHES));
+        }
+      }
+    });
+  $angular->add($fieldMetadata);
+}
+
+function _afform_getMetadata(phpQueryObject $doc) {
+  $entities = [];
+  foreach ($doc->find('af-model-prop') as $afmModelProp) {
+    $entities[$afmModelProp->getAttribute('af-name')] = [
+      'type' => $afmModelProp->getAttribute('af-type'),
+    ];
+  }
+  return $entities;
+}
+
+/**
  * Implements hook_civicrm_alterSettingsFolders().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_alterSettingsFolders
