@@ -1183,7 +1183,16 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
               }
             }
             elseif ($name == 'image_URL') {
-              list($width, $height) = getimagesize(CRM_Utils_String::unstupifyUrl($details->$name));
+              $coreimagepattern = 'imagefile?photo=';
+              $iscoreimage = strpos($details->$name, $coreimagepattern);
+              if ($iscoreimage) {
+                // Core image; .htaccess blocks direct URL access, so find it by directory instead.
+                $imagename = substr($details->$name, $iscoreimage + strlen($coreimagepattern));
+                list($width, $height) = getimagesize(CRM_Utils_String::unstupifyUrl($config->customFileUploadDir . $imagename));
+              } else {
+                // Could be a webform uploaded image so try by URL.
+                list($width, $height) = getimagesize(CRM_Utils_String::unstupifyUrl($details->$name));
+              }
               list($thumbWidth, $thumbHeight) = CRM_Contact_BAO_Contact::getThumbSize($width, $height);
 
               $image_URL = '<img src="' . $details->$name . '" height= ' . $thumbHeight . ' width= ' . $thumbWidth . '  />';
