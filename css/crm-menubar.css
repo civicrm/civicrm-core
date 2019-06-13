@@ -143,16 +143,16 @@ a.highlighted #crm-qsearch-input,
   width: 130px;
 }
 input#crm-qsearch-input:-ms-input-placeholder {
-  font-family: 'FontAwesome';
+  font-family: 'FontAwesome', sans-serif;
 }
 input#crm-qsearch-input::-webkit-input-placeholder {
-  font-family: 'FontAwesome';
+  font-family: 'FontAwesome', sans-serif;
 }
 input#crm-qsearch-input::-moz-placeholder {
-  font-family: 'FontAwesome';
+  font-family: 'FontAwesome', sans-serif;
 }
 input#crm-qsearch-input::placeholder {
-  font-family: 'FontAwesome';
+  font-family: 'FontAwesome', sans-serif;
 }
 
 ul.crm-quickSearch-results {
