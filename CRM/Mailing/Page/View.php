@@ -113,7 +113,14 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       $this->_mailing = new CRM_Mailing_BAO_Mailing();
 
       if (!is_numeric($this->_mailingID)) {
+
+        //lets get the id from the hash
+        $result_id = civicrm_api3('Mailing', 'get', [
+          'return' => ["id"],
+          'hash' => $this->_mailingID,
+        ]);
         $this->_mailing->hash = $this->_mailingID;
+        $this->_mailingID     = $result_id['id'];
       }
       elseif (is_numeric($this->_mailingID)) {
         $this->_mailing->id = $this->_mailingID;
