@@ -165,7 +165,7 @@ function afform_civicrm_angularModules(&$angularModules) {
 
     // FIXME: The HTML layout template is embedded in the JS asset.
     // This works at runtime for basic usage, but it bypasses
-    // the hook_alterAngular infrastructure, and I'm not sure translation works.
+    // the normal workflow for templates (e.g. translation).
     // We should update core so that 'partials' can be specified more dynamically.
   }
 }
@@ -211,12 +211,18 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
   $meta = $scanner->getMeta($name);
   // Hmm?? $scanner = new CRM_Afform_AfformScanner();
 
+  $fileName = '~afform/' . _afform_angular_module_name($name, 'camel');
+  $htmls = [
+    $fileName => file_get_contents($scanner->findFilePath($name, 'aff.html'))
+  ];
+  $htmls = \Civi\Angular\ChangeSet::applyResourceFilters(Civi::service('angular')->getChangeSets(), 'partials', $htmls);
+
   $smarty = CRM_Core_Smarty::singleton();
   $smarty->assign('afform', [
     'camel' => _afform_angular_module_name($name, 'camel'),
     'meta' => $meta,
     'metaJson' => json_encode($meta),
-    'layout' => file_get_contents($scanner->findFilePath($name, 'aff.html'))
+    'layout' => $htmls[$fileName],
   ]);
   $mimeType = 'text/javascript';
   $content = $smarty->fetch('afform/AfformAngularModule.tpl');
