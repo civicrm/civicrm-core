@@ -180,7 +180,7 @@ class CRM_Core_BAO_Cache_Psr16 {
    * @return array
    */
   public static function getLegacyGroups() {
-    return [
+    $groups = [
       // Core
       'CiviCRM Search PrevNextCache',
       'contact fields',
@@ -202,9 +202,17 @@ class CRM_Core_BAO_Cache_Psr16 {
       // nz.co.fuzion.entitysetting
       'CiviCRM setting Spec',
 
-      // org.civicrm.multisite
-      'descendant groups for an org',
     ];
+    // Handle Legacy Multisite caching group.
+    $extensions = CRM_Extension_System::singleton()->getManager();
+    $multisiteExtensionStatus = $extensions->getStatus('org.civicrm.multisite');
+    if ($multisiteExtensionStatus == $extensions::STATUS_INSTALLED) {
+      $extension_version = civicrm_api3('Extension', 'get', ['key' => 'org.civicrm.multisite'])['values'][0]['version'];
+      if (version_compare($extension_version, '2.7', '<')) {
+        $groups[] = 'descendant groups for an org';
+      }
+    }
+    return $groups;
   }
 
 }
