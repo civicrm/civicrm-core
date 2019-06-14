@@ -1312,6 +1312,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
     $cacheKeyString .= $showAll ? '_1' : '_0';
     $cacheKeyString .= $isProfile ? '_1' : '_0';
     $cacheKeyString .= $checkPermission ? '_1' : '_0';
+    $cacheKeyString .= '_' . CRM_Core_Config::domainID() . '_';
 
     $fields = CRM_Utils_Array::value($cacheKeyString, self::$_importableFields);
 

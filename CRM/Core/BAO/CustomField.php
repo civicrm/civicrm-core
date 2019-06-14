@@ -498,6 +498,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $cacheKey .= $onlyParent ? '_1_' : '_0_';
     $cacheKey .= $onlySubType ? '_1_' : '_0_';
     $cacheKey .= $checkPermission ? '_1_' : '_0_';
+    $cacheKey .= '_' . CRM_Core_Config::domainID() . '_';
 
     $cgTable = CRM_Core_DAO_CustomGroup::getTableName();
 
