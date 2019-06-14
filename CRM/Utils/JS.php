@@ -126,4 +126,22 @@ class CRM_Utils_JS {
     return preg_replace(":^\\s*//[^\n]+$:m", "", $script);
   }
 
+  /**
+   * Decodes a js object (not necessarily strict json but valid js) into an array or primitive type
+   *
+   * ex. {a: 'Apple', 'b': "Banana", c: [1, 2, 3]}
+   *
+   * @param string $js
+   * @return mixed
+   */
+  public static function decode($js) {
+    if (!class_exists('Services_JSON')) {
+      require_once 'packages/OpenFlashChart/php-ofc-library/JSON.php';
+    }
+    $codec = new Services_JSON();
+    $result = $codec->decode($js);
+    // Converts stdClass to array
+    return json_decode(json_encode($result), TRUE);
+  }
+
 }

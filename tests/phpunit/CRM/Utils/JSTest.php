@@ -199,4 +199,26 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     $this->assertEquals($expectedOutput, CRM_Utils_JS::stripComments($input));
   }
 
+  public static function decodeExamples() {
+    return [
+      ['{a: \'Apple\', \'b\': "Banana", c: [1, 2, 3]}', ['a' => 'Apple', 'b' => 'Banana', 'c' => [1, 2, 3]]],
+      ['true', TRUE],
+      ['false', FALSE],
+      ['null', NULL],
+      ['0.5', 0.5],
+      ["{}", []],
+      ["[]", []],
+      ['{a: ["foo", "bar"], b: {a: ["foo", "bar"], b: {a: ["foo", "bar"], b: {}}}}', ['a' => ['foo', 'bar'], 'b' => ['a' => ['foo', 'bar'], 'b' => ['a' => ['foo', 'bar'], 'b' => []]]]],
+    ];
+  }
+
+  /**
+   * @param string $input
+   * @param string $expectedOutput
+   * @dataProvider decodeExamples
+   */
+  public function testDecode($input, $expectedOutput) {
+    $this->assertEquals($expectedOutput, CRM_Utils_JS::decode($input));
+  }
+
 }
