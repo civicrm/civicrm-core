@@ -612,6 +612,18 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
     return $statistics;
   }
 
+  public function getOperationPair($type = "string", $fieldName = NULL) {
+    $result = parent::getOperationPair($type, $fieldName);
+
+    //re-name IS NULL/IS NOT NULL for clarity
+    if ($fieldName == 'owner_membership_id') {
+      $result['nll'] = ts('Primary members only');
+      $result['nnll'] = ts('Non-primary members only');
+    }
+
+    return $result;
+  }
+
   public function postProcess() {
     // get the acl clauses built before we assemble the query
     $this->buildACLClause($this->_aliases['civicrm_contact']);
