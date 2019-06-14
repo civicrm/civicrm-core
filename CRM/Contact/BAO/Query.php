@@ -1554,7 +1554,7 @@ class CRM_Contact_BAO_Query {
 
     self::filterCountryFromValuesIfStateExists($formValues);
     // We shouldn't have to whitelist fields to not hack but here we are, for now.
-    $nonLegacyDateFields = ['participant_register_date_relative'];
+    $nonLegacyDateFields = ['participant_register_date_relative', 'receive_date_relative'];
     // Handle relative dates first
     foreach (array_keys($formValues) as $id) {
       if (
