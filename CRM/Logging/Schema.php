@@ -315,18 +315,13 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    * defaults.
    *
    * @param array $params
-   *     'updateChangedEngineConfig' - update if the engine config changes,
-   *                                   default FALSE
-   *     'forceEngineMigration' - force engine upgrade from ARCHIVE to InnoDB,
-   *                              default FALSE
+   *     'updateChangedEngineConfig' - update if the engine config changes?
+   *     'forceEngineMigration' - force engine upgrade from ARCHIVE to InnoDB?
    *
    * @return int $updateTablesCount
    * @throws \CiviCRM_API3_Exception
    */
-  public function updateLogTableSchema($params = []) {
-    isset($params['updateChangedEngineConfig']) ? NULL : $params['updateChangedEngineConfig'] = FALSE;
-    isset($params['forceEngineMigration']) ? NULL : $params['forceEngineMigration'] = FALSE;
-
+  public function updateLogTableSchema($params) {
     $updateLogConn = FALSE;
     $updatedTablesCount = 0;
     foreach ($this->logs as $mainTable => $logTable) {

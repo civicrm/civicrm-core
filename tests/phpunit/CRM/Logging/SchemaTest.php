@@ -77,13 +77,13 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
       $this->assertRegexp('/ENGINE=ARCHIVE/', $log_table->Create_Table);
     }
     // engine should not change by default
-    $schema->updateLogTableSchema();
+    $schema->updateLogTableSchema(['updateChangedEngineConfig' => FALSE, 'forceEngineMigration' => FALSE]);
     $log_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_acl");
     while ($log_table->fetch()) {
       $this->assertRegexp('/ENGINE=ARCHIVE/', $log_table->Create_Table);
     }
     // update with forceEngineMigration should convert to InnoDB
-    $schema->updateLogTableSchema(['forceEngineMigration' => TRUE]);
+    $schema->updateLogTableSchema(['updateChangedEngineConfig' => FALSE, 'forceEngineMigration' => TRUE]);
     $log_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_acl");
     while ($log_table->fetch()) {
       $this->assertRegexp('/ENGINE=InnoDB/', $log_table->Create_Table);
@@ -189,7 +189,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
     $schema = new CRM_Logging_Schema();
     $schema->enableLogging();
-    $schema->updateLogTableSchema();
+    $schema->updateLogTableSchema(['updateChangedEngineConfig' => FALSE, 'forceEngineMigration' => FALSE]);
     $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs']['civicrm_test_column_info'];
 
     $this->assertEquals('test_id', $ci['test_id']['COLUMN_NAME']);
