@@ -87,12 +87,20 @@ $cmd =
 passthru($cmd);
 
 function findPhp() {
-  if (defined('PHP_BINARY')) {
-    return PHP_BINARY; // php 5.4+
-  } elseif (defined('PHP_BINDIR') && file_exists(PHP_BINDIR . '/php')) {
-    return PHP_BINDIR . '/php'; // php 5.3
-  } else {
-    die("Failed to determine active PHP version.");
+  // The autodetect behavior here is a potential point of contention. These two cases are hard to reconcile:
+  // 1. `php` is actually a wrapper script which delegates to another PHP binary and
+  //    passes options (such as INI's and PECL extensions). Subprocesses should use the wrapper script.
+  //    Examples: bitnami, bknix
+  // 2. There are multiple PHP binaries (eg `php55`, `php70`). Subprocesses should use
+  //    the final executable (regardless of its name).
+  //    Example: using MAMP and adding 'ln -s /Application/MAMP/.../php7.1.2/bin/php ~/bin/php71`
+  // Since the test infra uses a wrapper script like (1), we use autodetect logic that works there.
+  // If you're in situation (2), then set an env-var or just skip on using `tools/scripts/phpunit`.
+  if (getenv('PHP')) {
+    return getenv('PHP');
+  }
+  else {
+    return 'php';
   }
 }
 
