@@ -193,6 +193,24 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         );
         return;
 
+      case 'contribution_receive_date_relative':
+      case 'contribution_receive_date_low':
+      case 'contribution_receive_date_high':
+        // process to / from date
+        $query->dateQueryBuilder($values,
+          'civicrm_contribution', 'contribution_receive_date', 'receive_date', ts('Contribution Date')
+        );
+        return;
+
+      case 'receive_date_relative':
+      case 'receive_date_low':
+      case 'receive_date_high':
+        // process to / from date
+        $query->dateQueryBuilder($values,
+          'civicrm_contribution', 'receive_date', 'receive_date', ts('Contribution Date')
+        );
+        return;
+
       case 'contribution_amount':
       case 'contribution_amount_low':
       case 'contribution_amount_high':

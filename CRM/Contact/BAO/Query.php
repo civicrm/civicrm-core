@@ -2017,6 +2017,13 @@ class CRM_Contact_BAO_Query {
         // handled by the proximity_distance clause
         return;
 
+      case 'receive_date_relative':
+      case 'receive_date_high':
+      case 'receive_date_low':
+        // Handled by Contribution not properly name spaced for reasons.
+        CRM_Contribute_BAO_Query::whereClauseSingle($values, $this);
+        return;
+
       default:
         $this->restWhere($values);
         return;

@@ -427,14 +427,14 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     if ($lowDate) {
       $lowDate = CRM_Utils_Type::escape($lowDate, 'Timestamp');
       $date = CRM_Utils_Date::setDateDefaults($lowDate);
-      $this->_formValues['contribution_date_low'] = $this->_defaults['contribution_date_low'] = $date[0];
+      $this->_formValues['receive_date_low'] = $this->_defaults['receive_date_low'] = $date[0];
     }
 
     $highDate = CRM_Utils_Request::retrieve('end', 'Timestamp');
     if ($highDate) {
       $highDate = CRM_Utils_Type::escape($highDate, 'Timestamp');
       $date = CRM_Utils_Date::setDateDefaults($highDate);
-      $this->_formValues['contribution_date_high'] = $this->_defaults['contribution_date_high'] = $date[0];
+      $this->_formValues['receive_date_high'] = $this->_defaults['receive_date_high'] = $date[0];
     }
 
     if ($highDate || $lowDate) {
