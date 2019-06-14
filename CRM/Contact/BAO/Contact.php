@@ -1960,7 +1960,7 @@ ORDER BY civicrm_email.is_primary DESC";
    */
   public static function createProfileContact(
     &$params,
-    &$fields,
+    &$fields = [],
     $contactID = NULL,
     $addToGroupID = NULL,
     $ufGroupId = NULL,
