@@ -80,7 +80,7 @@ class CRM_Core_Page_File extends CRM_Core_Page {
       }
       $extension = CRM_Utils_File::getExtensionFromPath($path);
       $candidateExtensions = CRM_Utils_File::getAcceptableExtensionsForMimeType($passedInMimeType);
-      if (!in_array($extension, $candidateExtensions)) {
+      if (!in_array(strtolower($extension), array_map('strtolower', $candidateExtensions))) {
         throw new CRM_Core_Exception("Supplied mime-type does not match file extension");
       }
       // Now that we have validated mime-type supplied as much as possible lets now set the MimeType variable/
