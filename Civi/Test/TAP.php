@@ -97,10 +97,21 @@ class TAP extends \PHPUnit\Util\Printer implements \PHPUnit\Framework\TestListen
         );
       }
     }
-    $yaml = new \Symfony\Component\Yaml\Dumper();
-    $this
-      ->write(sprintf("  ---\n%s  ...\n", $yaml
-        ->dump($diagnostic, 2, 2)));
+
+    if (function_exists('yaml_emit')) {
+      $content = \yaml_emit($diagnostic, YAML_UTF8_ENCODING);
+      $content = '  ' . strtr($content, ["\n" => "\n  "]);
+    }
+    else {
+      // Any valid JSON document is a valid YAML document.
+      $content = json_encode($diagnostic, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+      // For closest match, drop outermost {}'s. Realign indentation.
+      $content = substr($content, 0, strrpos($content, "}")) . '  }';
+      $content = '  ' . ltrim($content);
+      $content = sprintf("  ---\n%s\n  ...\n", $content);
+    }
+
+    $this->write($content);
   }
 
   /**
