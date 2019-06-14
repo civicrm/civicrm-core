@@ -466,6 +466,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Build the form object.
    */
   public function buildQuickForm() {
+    if ($this->_id) {
+      $this->add('hidden', 'id', $this->_id);
+    }
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons([
         [
@@ -824,7 +828,6 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
 
     // if contribution is related to membership or participant freeze Financial Type, Amount
     if ($this->_id) {
-      $this->add('hidden', 'id', $this->_id);
       $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
       $isCancelledStatus = ($this->_values['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'));
 
