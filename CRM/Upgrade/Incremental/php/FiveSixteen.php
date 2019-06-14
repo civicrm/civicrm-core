@@ -80,6 +80,29 @@ class CRM_Upgrade_Incremental_php_FiveSixteen extends CRM_Upgrade_Incremental_Ba
   //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
   //  }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_16_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Update smart groups to rename filters on contribution_date to receive_date', 'updateSmartGroups', [
+      'renameField' => [
+        ['old' => 'contribution_date', 'new' => 'receive_date'],
+        ['old' => 'contribution_date_low', 'new' => 'receive_date_low'],
+        ['old' => 'contribution_date_high', 'new' => 'receive_date_high'],
+        ['old' => 'contribution_date_relative', 'new' => 'receive_date_relative'],
+      ],
+    ]);
+    $this->addTask('Update smart groups where jcalendar fields have been converted to datepicker', 'updateSmartGroups', [
+      'datepickerConversion' => [
+        'receive_date',
+        'contribution_cancel_date',
+      ],
+    ]);
+  }
+
   // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
   //   return TRUE;
   // }

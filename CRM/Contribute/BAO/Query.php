@@ -835,7 +835,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         // site
         'thankyou_date' => 1,
         // performance
-        'cancel_date' => 1,
+        'contribution_cancel_date' => 1,
         // and
         'total_amount' => 1,
         // torture
@@ -927,6 +927,8 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       'contribution_source',
       'cancel_reason',
       'invoice_number',
+      'receive_date',
+      'contribution_cancel_date',
     ];
     $metadata = civicrm_api3('Contribution', 'getfields', [])['values'];
     return array_intersect_key($metadata, array_flip($fields));
@@ -944,20 +946,12 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
     $form->addSearchFieldMetadata(['Contribution' => self::getSearchFieldMetadata()]);
     $form->addFormFieldsFromMetadata();
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_date', 1, '_low', '_high', ts('From:'), FALSE);
-    // CRM-17602
-    // This hidden element added for displaying Date Range error correctly. Definitely a dirty hack, but... it works.
-    $form->addElement('hidden', 'contribution_date_range_error');
-    $form->addFormRule(['CRM_Contribute_BAO_Query', 'formRule'], $form);
 
     $form->add('text', 'contribution_amount_low', ts('From'), ['size' => 8, 'maxlength' => 8]);
     $form->addRule('contribution_amount_low', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('9.99', ' ')]), 'money');
 
     $form->add('text', 'contribution_amount_high', ts('To'), ['size' => 8, 'maxlength' => 8]);
     $form->addRule('contribution_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
-
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_cancel_date', 1, '_low', '_high', ts('From:'), FALSE);
-    $form->addElement('hidden', 'contribution_cancel_date_range_error');
 
     // Adding select option for curreny type -- CRM-4711
     $form->add('select', 'contribution_currency_type',
@@ -1125,28 +1119,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       'civicrm_' . $table, $field, $fieldName[1], $title
     );
     return TRUE;
-  }
-
-  /**
-   * Custom form rules.
-   *
-   * @param array $fields
-   * @param array $files
-   * @param CRM_Core_Form $form
-   *
-   * @return bool|array
-   */
-  public static function formRule($fields, $files, $form) {
-    $errors = [];
-
-    if (!empty($fields['contribution_date_high']) && !empty($fields['contribution_date_low'])) {
-      CRM_Utils_Rule::validDateRange($fields, 'contribution_date', $errors, ts('Date Received'));
-    }
-    if (!empty($fields['contribution_cancel_date_high']) && !empty($fields['contribution_cancel_date_low'])) {
-      CRM_Utils_Rule::validDateRange($fields, 'contribution_cancel_date', $errors, ts('Cancel Date'));
-    }
-
-    return empty($errors) ? TRUE : $errors;
   }
 
   /**

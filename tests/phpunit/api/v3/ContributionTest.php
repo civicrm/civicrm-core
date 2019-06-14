@@ -282,7 +282,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $fieldsLockedIn = array(
       'contribution_id', 'contribution_contact_id', 'financial_type_id', 'contribution_page_id',
       'payment_instrument_id', 'receive_date', 'non_deductible_amount', 'total_amount',
-      'fee_amount', 'net_amount', 'trxn_id', 'invoice_id', 'currency', 'cancel_date', 'cancel_reason',
+      'fee_amount', 'net_amount', 'trxn_id', 'invoice_id', 'currency', 'contribution_cancel_date', 'cancel_reason',
       'receipt_date', 'thankyou_date', 'contribution_source', 'amount_level', 'contribution_recur_id',
       'is_test', 'is_pay_later', 'contribution_status_id', 'address_id', 'check_number', 'contribution_campaign_id',
       'creditnote_id', 'tax_amount', 'revenue_recognition_date', 'decoy',

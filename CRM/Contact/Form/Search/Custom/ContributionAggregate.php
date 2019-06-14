@@ -63,6 +63,8 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
    * @param CRM_Core_Form $form
    */
   public function buildForm(&$form) {
+    $form->addSearchFieldMetadata(['Contribution' => self::getSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
 
     /**
      * You can define a custom title for the search form
@@ -83,7 +85,6 @@ class CRM_Contact_Form_Search_Custom_ContributionAggregate extends CRM_Contact_F
       ts('...and $')
     );
     $form->addRule('max_amount', ts('Please enter a valid amount (numbers and decimal point only).'), 'money');
-    CRM_Core_Form_Date::buildDateRange($form, 'contribution_date', 1, '_low', '_high', ts('From:'), FALSE, FALSE);
 
     $form->addSelect('financial_type_id',
       ['entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search']
@@ -188,6 +189,20 @@ civicrm_contact AS contact_a {$this->_aclFrom}
   }
 
   /**
+   * Get the metadata for fields to be included on the contact search form.
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = [
+      'receive_date' => ['title' => ''],
+    ];
+    $metadata = civicrm_api3('Contribution', 'getfields', [])['values'];
+    foreach ($fields as $fieldName => $field) {
+      $fields[$fieldName] = array_merge(CRM_Utils_Array::value($fieldName, $metadata, []), $field);
+    }
+    return $fields;
+  }
+
+  /**
    * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values.
    *
    * @param bool $includeContactIDs
@@ -201,9 +216,9 @@ civicrm_contact AS contact_a {$this->_aclFrom}
     ];
 
     foreach ([
-      'contribution_date_relative',
-      'contribution_date_low',
-      'contribution_date_high',
+      'receive_date_relative',
+      'receive_date_low',
+      'receive_date_high',
     ] as $dateFieldName) {
       $dateParams[$dateFieldName] = CRM_Utils_Array::value(
         $dateFieldName,
@@ -214,10 +229,16 @@ civicrm_contact AS contact_a {$this->_aclFrom}
     foreach (CRM_Contact_BAO_Query::convertFormValues($dateParams) as $values) {
       list($name, $op, $value) = $values;
       if (strstr($name, '_low')) {
-        $clauses[] = "contrib.receive_date >= " . CRM_Utils_Date::processDate($value);
+        if (strlen($value) == 10) {
+          $value .= ' 00:00:00';
+        }
+        $clauses[] = "contrib.receive_date >= '{$value}'";
       }
       else {
-        $clauses[] = "contrib.receive_date <= " . CRM_Utils_Date::processDate($value);
+        if (strlen($value) == 10) {
+          $value .= ' 23:59:59';
+        }
+        $clauses[] = "contrib.receive_date <= '{$value}'";
       }
     }
 
