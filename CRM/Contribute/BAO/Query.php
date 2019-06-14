@@ -186,6 +186,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       case 'contribution_date_low_time':
       case 'contribution_date_high':
       case 'contribution_date_high_time':
+        CRM_Core_Error::deprecatedFunctionWarning('search by receive_date');
         // process to / from date
         $query->dateQueryBuilder($values,
           'civicrm_contribution', 'contribution_date', 'receive_date', ts('Contribution Date')
