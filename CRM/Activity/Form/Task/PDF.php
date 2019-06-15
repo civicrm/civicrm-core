@@ -35,6 +35,7 @@
  * This class provides the functionality to create PDF/Word letters for activities.
  */
 class CRM_Activity_Form_Task_PDF extends CRM_Activity_Form_Task {
+
   /**
    * Build all the data structures needed to build the form.
    */

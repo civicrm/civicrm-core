@@ -51,8 +51,12 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
   private $customFieldTokens;
   private $specialTokens;
 
-  // Mapping from tokenName to api return field
-  // Use lists since we might need multiple fields
+  /**
+   * Mapping from tokenName to api return field
+   * Use lists since we might need multiple fields
+   *
+   * @var array
+   */
   private static $fieldMapping = [
     'activity_id' => ['id'],
     'activity_type' => ['activity_type_id'],
@@ -75,8 +79,7 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    * @inheritDoc
    */
   public function checkActive(\Civi\Token\TokenProcessor $processor) {
-    return
-      in_array('activityId', $processor->context['schema']) ||
+    return in_array('activityId', $processor->context['schema']) ||
       (!empty($processor->context['actionMapping'])
       && $processor->context['actionMapping']->getEntity() === 'civicrm_activity');
   }
@@ -126,7 +129,8 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
    * @return array         list of fields needed to generate those tokens
    */
   public function getReturnFields($tokens) {
-    $fields = ['id']; // Make sure we always return something
+    // Make sure we always return something
+    $fields = ['id'];
 
     foreach (array_intersect($tokens,
       array_merge(array_keys(self::getBasicTokens()), array_keys(self::getCustomFieldTokens()))
@@ -249,7 +253,7 @@ class CRM_Activity_Tokens extends \Civi\Token\AbstractTokenSubscriber {
     if (in_array($field, ['activity_date_time', 'created_date'])) {
       $row->tokens($entity, $field, \CRM_Utils_Date::customFormat($activity->$field));
     }
-    elseif (isset($mapping[$field]) AND (isset($activity->{$mapping[$field]}))) {
+    elseif (isset($mapping[$field]) and (isset($activity->{$mapping[$field]}))) {
       $row->tokens($entity, $field, $activity->{$mapping[$field]});
     }
     elseif (in_array($field, ['activity_type'])) {

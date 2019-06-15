@@ -344,8 +344,9 @@ class CRM_Core_Form_Task_PDFLetterCommon {
    * Render html from rows
    * @param  array $rows   Array of \Civi\Token\TokenRow
    * @param  string $msgPart The name registered with the TokenProcessor
-   * @return string $html  if formValues['is_unit_test'] is true,
-   *                       otherwise outputs document to browser
+   * @param  string $formValues The values submitted through the form
+   * @return string
+   *   $html if formValues['is_unit_test'] is true, otherwise outputs document to browser
    *
    */
   public static function renderFromRows($rows, $msgPart, $formValues) {
