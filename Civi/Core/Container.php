@@ -179,6 +179,11 @@ class Container {
       []
     ));
 
+    $container->setDefinition('themes', new Definition(
+      'Civi\Core\Themes',
+      []
+    ));
+
     $container->setDefinition('pear_mail', new Definition('Mail'))
       ->setFactory('CRM_Utils_Mail::createMailer');
 

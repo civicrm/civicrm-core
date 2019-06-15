@@ -211,8 +211,8 @@ class CRM_Core_Resources {
       $domain = ($translate === TRUE) ? $ext : $translate;
       $this->addString($this->strings->get($domain, $this->getPath($ext, $file), 'text/javascript'), $domain);
     }
-    $this->resolveFileName($file, $ext);
-    return $this->addScriptUrl($this->getUrl($ext, $file, TRUE), $weight, $region);
+    $url = $this->getUrl($ext, $this->filterMinify($ext, $file), TRUE);
+    return $this->addScriptUrl($url, $weight, $region);
   }
 
   /**
@@ -427,8 +427,12 @@ class CRM_Core_Resources {
    * @return CRM_Core_Resources
    */
   public function addStyleFile($ext, $file, $weight = self::DEFAULT_WEIGHT, $region = self::DEFAULT_REGION) {
-    $this->resolveFileName($file, $ext);
-    return $this->addStyleUrl($this->getUrl($ext, $file, TRUE), $weight, $region);
+    /** @var Civi\Core\Themes $theme */
+    $theme = Civi::service('themes');
+    foreach ($theme->resolveUrls($theme->getActiveThemeKey(), $ext, $file) as $url) {
+      $this->addStyleUrl($url, $weight, $region);
+    }
+    return $this;
   }
 
   /**
@@ -937,18 +941,22 @@ class CRM_Core_Resources {
   }
 
   /**
-   * In debug mode, look for a non-minified version of this file
+   * Determine the minified file name.
    *
-   * @param string $fileName
-   * @param string $extName
+   * @param string $ext
+   * @param string $file
+   * @return string
+   *   An updated $fileName. If a minified version exists and is supported by
+   *   system policy, the minified version will be returned. Otherwise, the original.
    */
-  private function resolveFileName(&$fileName, $extName) {
-    if (CRM_Core_Config::singleton()->debug && strpos($fileName, '.min.') !== FALSE) {
-      $nonMiniFile = str_replace('.min.', '.', $fileName);
-      if ($this->getPath($extName, $nonMiniFile)) {
-        $fileName = $nonMiniFile;
+  public function filterMinify($ext, $file) {
+    if (CRM_Core_Config::singleton()->debug && strpos($file, '.min.') !== FALSE) {
+      $nonMiniFile = str_replace('.min.', '.', $file);
+      if ($this->getPath($ext, $nonMiniFile)) {
+        $file = $nonMiniFile;
       }
     }
+    return $file;
   }
 
   /**
