@@ -89,19 +89,10 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function tearDown() {
-    $this->quickCleanup(array(
-      'civicrm_membership',
-      'civicrm_membership_payment',
-      'civicrm_membership_log',
-      'civicrm_uf_match',
-    ),
-      TRUE
-    );
-    $this->membershipStatusDelete($this->_membershipStatusID);
-    $this->membershipTypeDelete(array('id' => $this->_membershipTypeID2));
-    $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
+    $this->quickCleanUpFinancialEntities();
+    $this->quickCleanup(['civicrm_uf_match'], TRUE);
     $this->contactDelete($this->_contactID);
-
+    parent::tearDown();
   }
 
   /**
@@ -457,6 +448,8 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
   /**
    * Test civicrm_membership_get with relationship.
    * get Memberships.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetWithRelationship() {
     $membershipOrgId = $this->organizationCreate(NULL);

@@ -87,6 +87,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       $this->callAPISuccess('contact', 'delete', array('id' => $id));
     }
     $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   /**
@@ -1641,6 +1642,9 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     // put stuff here that should happen before all tests in this unit
   }
 
+  /**
+   * @throws \Exception
+   */
   public static function tearDownAfterClass() {
     $tablesToTruncate = array(
       'civicrm_contact',
