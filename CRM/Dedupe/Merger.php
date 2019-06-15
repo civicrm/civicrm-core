@@ -1679,8 +1679,8 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       if (!isset($submitted['suffix_id']) && !empty($migrationInfo['main_details']['suffix_id'])) {
         $submitted['suffix_id'] = $migrationInfo['main_details']['suffix_id'];
       }
-
-      CRM_Contact_BAO_Contact::createProfileContact($submitted, CRM_Core_DAO::$_nullArray, $mainId);
+      $null = [];
+      CRM_Contact_BAO_Contact::createProfileContact($submitted, $null, $mainId);
     }
     $transaction->commit();
     CRM_Utils_Hook::post('merge', 'Contact', $mainId);
