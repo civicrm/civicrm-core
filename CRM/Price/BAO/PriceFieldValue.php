@@ -85,6 +85,8 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
    * @param $ids
    *
    * @return CRM_Price_DAO_PriceFieldValue
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function create(&$params, $ids = []) {
     $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));

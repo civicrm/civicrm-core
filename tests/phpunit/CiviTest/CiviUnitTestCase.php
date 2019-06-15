@@ -2544,6 +2544,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *
    * @return int
    *   Price Set ID.
+   * @throws \CRM_Core_Exception
    */
   protected function eventPriceSetCreate($feeTotal, $minAmt = 0, $type = 'Text') {
     // creating price set, price field
@@ -2579,7 +2580,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       $paramsField['option_value'][2] = $paramsField['option_weight'][2] = $paramsField['option_amount'][2] = 100;
       $paramsField['option_label'][2] = $paramsField['option_name'][2] = 'hundy';
     }
-    CRM_Price_BAO_PriceField::create($paramsField);
+    $this->callAPISuccess('PriceField', 'create', $paramsField);
     $fields = $this->callAPISuccess('PriceField', 'get', array('price_set_id' => $this->_ids['price_set']));
     $this->_ids['price_field'] = array_keys($fields['values']);
     $fieldValues = $this->callAPISuccess('PriceFieldValue', 'get', array('price_field_id' => $this->_ids['price_field'][0]));
