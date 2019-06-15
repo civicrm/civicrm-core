@@ -3187,6 +3187,15 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
+   * Get the boolean options as a provider.
+   *
+   * @return array
+   */
+  public function getBooleanDataProvider() {
+    return [[TRUE], [FALSE]];
+  }
+
+  /**
    * Set the separators for thousands and decimal points.
    *
    * @param string $thousandSeparator

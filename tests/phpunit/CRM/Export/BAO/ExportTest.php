@@ -365,7 +365,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @param int $isPrimaryOnly
    *
-   * @dataProvider getPrimarySearchOptions
+   * @dataProvider getBooleanDataProvider
+   * @throws \CRM_Core_Exception
    */
   public function testExportPrimaryAddress($isPrimaryOnly) {
     \Civi::settings()->set('searchPrimaryDetailsOnly', $isPrimaryOnly);
@@ -397,14 +398,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->assertEquals('home@example.com', $dao->home_email);
     $this->assertEquals(2, $dao->N);
     \Civi::settings()->set('searchPrimaryDetailsOnly', FALSE);
-  }
-
-  /**
-   * Get the options for the primary search setting field.
-   * @return array
-   */
-  public function getPrimarySearchOptions() {
-    return [[TRUE], [FALSE]];
   }
 
   /**
@@ -506,10 +499,19 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Test exporting relationships.
    *
    * This is to ensure that CRM-13995 remains fixed.
+   *
+   * @dataProvider getBooleanDataProvider
+   *
+   * @param bool $includeHouseHold
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testExportRelationshipsMergeToHousehold() {
+  public function testExportRelationshipsMergeToHousehold($includeHouseHold) {
     list($householdID, $houseHoldTypeID) = $this->setUpHousehold();
 
+    if ($includeHouseHold) {
+      $this->contactIDs[] = $householdID;
+    }
     $selectedFields = [
       ['Individual', $houseHoldTypeID . '_a_b', 'state_province', ''],
       ['Individual', $houseHoldTypeID . '_a_b', 'city', ''],
@@ -536,6 +538,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     );
     $dao = CRM_Core_DAO::executeQuery("SELECT * FROM {$tableName}");
     while ($dao->fetch()) {
+      $this->assertEquals(1, $dao->N);
       $this->assertEquals('Portland', $dao->city);
       $this->assertEquals('ME', $dao->state_province);
       $this->assertEquals($householdID, $dao->civicrm_primary_id);

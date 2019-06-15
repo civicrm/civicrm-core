@@ -334,6 +334,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       $processor->setHouseholdMergeReturnProperties(array_diff_key($returnProperties, array_fill_keys(['location_type', 'im_provider'], 1)));
     }
 
+    // This perhaps only needs calling when $mergeSameHousehold == 1
     self::buildRelatedContactArray($selectAll, $ids, $processor, $componentTable);
 
     // make sure the groups stuff is included only if specifically specified
