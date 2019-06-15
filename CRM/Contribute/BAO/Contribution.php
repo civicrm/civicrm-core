@@ -5237,7 +5237,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    * @return \CRM_Contribute_BAO_Contribution|null
    */
   private static function getOriginalContribution($contributionID) {
-    return self::getValues(['id' => $contributionID], CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
+    return self::getValues(['id' => $contributionID]);
   }
 
   /**
