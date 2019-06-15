@@ -129,9 +129,12 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * Instantiate form object
    *
    * @param string $class
+   * @param array $formValues
+   * @param string $pageName
    * @return \CRM_Core_Form
+   * @throws \CRM_Core_Exception
    */
-  public function getFormObject($class) {
+  public function getFormObject($class, $formValues = [], $pageName = '') {
     $form = parent::getFormObject($class);
     $contactFields = CRM_Contact_BAO_Contact::importableFields();
     $fields = array();
