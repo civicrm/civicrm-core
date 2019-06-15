@@ -3028,28 +3028,20 @@ class CRM_Contact_BAO_Query {
 
       // if $regularGroupIDs is populated with regular child group IDs
       //   then change the mysql operator to desired
-      if (count($regularGroupIDs) > 1) {
+      if (!empty($regularGroupIDs)) {
         $op = strpos($op, 'IN') ? $op : ($op == '!=') ? 'NOT IN' : 'IN';
       }
-      $groupIds = '';
-      if (!empty($regularGroupIDs)) {
-        $groupIds = CRM_Utils_Type::validate(
-          implode(',', (array) $regularGroupIDs),
-          'CommaSeparatedIntegers'
-        );
-      }
+
       $gcTable = "`civicrm_group_contact-" . uniqid() . "`";
       $joinClause = ["contact_a.id = {$gcTable}.contact_id"];
 
-      if (strpos($op, 'IN') !== FALSE) {
-        $clause = "{$gcTable}.group_id $op ( $groupIds ) ";
-      }
-      elseif ($op == '!=') {
-        $clause = "{$gcTable}.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact cgc WHERE cgc.group_id = $groupIds )";
+      if ($op == '!=') {
+        $clause = "{$gcTable}.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact cgc WHERE cgc.group_id = $regularGroupIDs )";
       }
       else {
-        $clause = "{$gcTable}.group_id $op $groupIds ";
+        $clause = self::buildClause("{$gcTable}.group_id", $op, $regularGroupIDs);
       }
+
       $groupClause[] = "( {$clause} )";
 
       if ($statusJoinClause) {
@@ -6581,7 +6573,7 @@ AND   displayRelType.is_active = 1
         FROM (
       SELECT civicrm_contribution.total_amount, civicrm_contribution.currency
       $from
-      $where  AND civicrm_contribution.cancel_date IS NOT NULL 
+      $where AND civicrm_contribution.cancel_date IS NOT NULL
       GROUP BY civicrm_contribution.id
     ) as conts
     GROUP BY currency";
