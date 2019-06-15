@@ -317,7 +317,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @return CRM_Contribute_BAO_Contribution|null
    *   The found object or null
    */
-  public static function getValues($params, &$values, &$ids) {
+  public static function getValues($params, &$values = [], &$ids = []) {
     if (empty($params)) {
       return NULL;
     }
@@ -4493,8 +4493,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $primaryContributionID = isset($contribution->id) ? $contribution->id : $objects['first_contribution']->id;
     // The previous details are used when calculating line items so keep it before any code that 'does something'
     if (!empty($contribution->id)) {
-      $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues(['id' => $contribution->id],
-        CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
+      $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues(['id' => $contribution->id]);
     }
     $inputContributionWhiteList = [
       'fee_amount',
