@@ -3028,7 +3028,7 @@ class CRM_Contact_BAO_Query {
 
       // if $regularGroupIDs is populated with regular child group IDs
       //   then change the mysql operator to desired
-      if (!empty($regularGroupIDs)) {
+      if (!empty($regularGroupIDs) && strpos($op, 'NULL') === FALSE) {
         $op = strpos($op, 'IN') ? $op : ($op == '!=') ? 'NOT IN' : 'IN';
       }
 
