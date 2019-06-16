@@ -78,6 +78,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $this->membershipTypeDelete(array('id' => $this->membershipTypeID));
     $this->cleanUpSetUpIDs();
     $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_website', 'civicrm_phone'], TRUE);
+    parent::tearDown();
   }
 
   /**

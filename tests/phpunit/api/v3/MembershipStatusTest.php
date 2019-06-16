@@ -50,8 +50,9 @@ class api_v3_MembershipStatusTest extends CiviUnitTestCase {
 
   public function tearDown() {
     $this->membershipStatusDelete($this->_membershipStatusID);
-    $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
+    $this->membershipTypeDelete(['id' => $this->_membershipTypeID]);
     $this->contactDelete($this->_contactID);
+    parent::tearDown();
   }
 
   ///////////////// civicrm_membership_status_get methods

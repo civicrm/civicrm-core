@@ -58,6 +58,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     );
 
     $this->quickCleanup($tablesToTruncate);
+    parent::tearDown();
   }
 
   public function testGetPledgePayment() {

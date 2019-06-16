@@ -56,9 +56,6 @@ class api_v3_PriceSetTest extends CiviUnitTestCase {
     );
   }
 
-  public function tearDown() {
-  }
-
   /**
    * Test create price set.
    */
