@@ -121,7 +121,7 @@ class CRM_Financial_BAO_Payment {
         // Get the trxn
         $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
         $ftParams = ['id' => $trxnId['financialTrxnId']];
-        $trxn = CRM_Core_BAO_FinancialTrxn::retrieve($ftParams, CRM_Core_DAO::$_nullArray);
+        $trxn = CRM_Core_BAO_FinancialTrxn::retrieve($ftParams);
       }
     }
     elseif ($contributionStatus === 'Pending') {
