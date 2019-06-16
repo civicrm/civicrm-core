@@ -119,7 +119,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *
    * @return \CRM_Financial_DAO_FinancialTrxn
    */
-  public static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults = []) {
     $financialItem = new CRM_Financial_DAO_FinancialTrxn();
     $financialItem->copyValues($params);
     if ($financialItem->find(TRUE)) {
