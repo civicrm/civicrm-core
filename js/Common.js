@@ -874,8 +874,19 @@ if (!CRM.vars) CRM.vars = {};
           submitButton = $(e.target).closest('.ui-dialog').find('button[data-identifier="' + identifier + '"]')[0] || submitButton;
         }
       }
-      $(submitButton).siblings('.crm-i').add('.crm-i, .ui-icon', submitButton).removeClass().addClass('crm-i fa-spinner fa-pulse');
+      var $icon = $(submitButton).siblings('.crm-i').add('.crm-i, .ui-icon', submitButton);
+      $icon.data('origClass', $icon.attr('class')).removeClass().addClass('crm-i crm-submit-icon fa-spinner fa-pulse');
     }
+  }
+
+  // If form fails validation, restore button icon and reset the submitted array
+  function submitFormInvalid(form) {
+    submitted = [];
+    $('.crm-i.crm-submit-icon').each(function() {
+      if ($(this).data('origClass')) {
+        $(this).removeClass().addClass($(this).data('origClass'));
+      }
+    });
   }
 
   // Initialize widgets
@@ -943,7 +954,10 @@ if (!CRM.vars) CRM.vars = {};
           CRM.wysiwyg.create(this);
         }
       });
-      $('form[data-submit-once]', e.target).submit(submitOnceForm);
+      // Submit once handlers
+      $('form[data-submit-once]', e.target)
+        .submit(submitOnceForm)
+        .on('invalid-form', submitFormInvalid);
       $('form[data-submit-once] input[type=submit]', e.target).click(function(e) {
         submitButton = e.target;
       });
