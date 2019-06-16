@@ -153,6 +153,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Test email receipt for partial payment.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPaymentEmailReceiptFullyPaid() {
     $mut = new CiviMailUtils($this);
