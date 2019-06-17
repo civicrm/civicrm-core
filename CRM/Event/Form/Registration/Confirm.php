@@ -34,6 +34,7 @@
  * This class generates form components for processing Event.
  */
 class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
+  use CRM_Financial_Form_FrontEndPaymentFormTrait;
 
   /**
    * The values for the contribution db object.
@@ -287,25 +288,16 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
     if ($this->_priceSetId && !CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $this->_priceSetId, 'is_quick_config')) {
       $lineItemForTemplate = [];
-      $getTaxDetails = FALSE;
       if (!empty($this->_lineItem) && is_array($this->_lineItem)) {
         foreach ($this->_lineItem as $key => $value) {
           if (!empty($value)) {
             $lineItemForTemplate[$key] = $value;
           }
-          if ($invoicing) {
-            foreach ($value as $v) {
-              if (isset($v['tax_rate'])) {
-                $getTaxDetails = TRUE;
-              }
-            }
-          }
         }
       }
       if (!empty($lineItemForTemplate)) {
-        $this->assign('lineItem', $lineItemForTemplate);
+        $this->assignLineItemsToTemplate($lineItemForTemplate);
       }
-      $this->assign('getTaxDetails', $getTaxDetails);
     }
 
     //display additional participants profile.
