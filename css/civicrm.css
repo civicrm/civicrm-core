@@ -1437,6 +1437,7 @@ input.crm-form-entityref {
   padding: 4px;
   margin: 0;
   line-height: 15px;
+  white-space: initial;
 }
 
 .crm-container .action-item-wrap {
