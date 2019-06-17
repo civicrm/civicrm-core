@@ -83,10 +83,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
       $this->_mode = 'auto_renew';
       // CRM-18468: crid is more accurate than mid for getting
       // subscriptionDetails, so don't get them again.
-      if (!$this->_crid) {
-        $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_mid, 'membership', 'obj');
-        $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_mid, 'membership');
-      }
 
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();
       $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_mid, 'membership_type_id');
@@ -136,7 +132,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
       'cancel_reason' => ['name' => 'cancel_reason'],
     ];
     $this->entityFields['send_cancel_request'] = [
-      'title' => ts('Send cancellation request to %1 ?', [1 => $this->_paymentProcessorObj->_processorName]),
+      'title' => ts('Send cancellation request?'),
       'name' => 'send_cancel_request',
       'not-auto-addable' => TRUE,
     ];
