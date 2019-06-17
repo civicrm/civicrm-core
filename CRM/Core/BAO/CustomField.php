@@ -1945,9 +1945,7 @@ SELECT count(*)
 FROM   $tableName
 WHERE  $columnName is not null
 ";
-    $count = CRM_Core_DAO::singleValueQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    $count = CRM_Core_DAO::singleValueQuery($query);
     if ($count > 0) {
       $query = "
 SELECT extends

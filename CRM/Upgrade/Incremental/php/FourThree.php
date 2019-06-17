@@ -834,7 +834,7 @@ FROM   civicrm_financial_item fi";
     $query = "
 ALTER TABLE civicrm_domain ADD contact_id INT( 10 ) UNSIGNED NULL DEFAULT NULL COMMENT 'FK to Contact ID. This is specifically not an FK to avoid circular constraints',
  ADD CONSTRAINT FK_civicrm_domain_contact_id FOREIGN KEY (contact_id) REFERENCES civicrm_contact(id);";
-    CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
+    CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
 
     $query = '
 SELECT cd.id, cd.name, ce.email FROM civicrm_domain cd

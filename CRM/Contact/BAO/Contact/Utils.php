@@ -132,9 +132,7 @@ SELECT count( DISTINCT contact_type )
 FROM   civicrm_contact
 WHERE  id IN ( $idString )
 ";
-    $count = CRM_Core_DAO::singleValueQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    $count = CRM_Core_DAO::singleValueQuery($query);
     return $count > 1 ? TRUE : FALSE;
   }
 

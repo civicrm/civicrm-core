@@ -734,7 +734,7 @@ FROM civicrm_premiums
 WHERE entity_table = 'civicrm_contribution_page'
       AND entity_id ={$id}";
 
-    $premiumDao = CRM_Core_DAO::executeQuery($premiumQuery, CRM_Core_DAO::$_nullArray);
+    $premiumDao = CRM_Core_DAO::executeQuery($premiumQuery);
     while ($premiumDao->fetch()) {
       if ($premiumDao->id) {
         CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_PremiumsProduct', [

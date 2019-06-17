@@ -1249,9 +1249,7 @@ SELECT c.contribution_page_id as pageID
    AND mp.membership_id = " . CRM_Utils_Type::escape($membershipID, 'Integer')
       . " ORDER BY mp.id DESC";
 
-    return CRM_Core_DAO::singleValueQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    return CRM_Core_DAO::singleValueQuery($query);
   }
 
   /**

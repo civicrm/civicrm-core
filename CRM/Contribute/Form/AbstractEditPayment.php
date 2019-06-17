@@ -338,9 +338,7 @@ SELECT *
 FROM   civicrm_contribution_product
 WHERE  contribution_id = {$id}
 ";
-    $dao = CRM_Core_DAO::executeQuery($sql,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($sql);
     if ($dao->fetch()) {
       $this->_premiumID = $dao->id;
       $this->_productDAO = $dao;

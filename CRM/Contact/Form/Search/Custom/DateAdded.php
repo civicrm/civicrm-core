@@ -211,7 +211,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
               date_added >= '$startDate 00:00:00'
               $endDateFix";
 
-    CRM_Core_DAO::executeQuery($dateRange, CRM_Core_DAO::$_nullArray);
+    CRM_Core_DAO::executeQuery($dateRange);
 
     // Only include groups in the search query of one or more Include OR Exclude groups has been selected.
     // CRM-6356
@@ -256,7 +256,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
                      civicrm_group_contact.status = 'Added' AND
                      civicrm_group_contact.group_id IN( {$xGroups})";
 
-        CRM_Core_DAO::executeQuery($excludeGroup, CRM_Core_DAO::$_nullArray);
+        CRM_Core_DAO::executeQuery($excludeGroup);
 
         //search for smart group contacts
         foreach ($this->_excludeGroups as $keys => $values) {
@@ -271,7 +271,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
 
             $smartGroupQuery = " INSERT IGNORE INTO {$this->_xgTable}(contact_id) $smartSql";
 
-            CRM_Core_DAO::executeQuery($smartGroupQuery, CRM_Core_DAO::$_nullArray);
+            CRM_Core_DAO::executeQuery($smartGroupQuery);
           }
         }
       }
@@ -303,7 +303,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
         $includeGroup .= " AND  {$this->_xgTable}.contact_id IS null";
       }
 
-      CRM_Core_DAO::executeQuery($includeGroup, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($includeGroup);
 
       //search for smart group contacts
       foreach ($this->_includeGroups as $keys => $values) {
@@ -330,13 +330,13 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
                         {$this->_igTable}(contact_id)
                         $smartSql";
 
-          CRM_Core_DAO::executeQuery($smartGroupQuery, CRM_Core_DAO::$_nullArray);
+          CRM_Core_DAO::executeQuery($smartGroupQuery);
           $insertGroupNameQuery = "UPDATE IGNORE {$this->_igTable}
                         SET group_names = (SELECT title FROM civicrm_group
                             WHERE civicrm_group.id = $values)
                         WHERE {$this->_igTable}.contact_id IS NOT NULL
                             AND {$this->_igTable}.group_names IS NULL";
-          CRM_Core_DAO::executeQuery($insertGroupNameQuery, CRM_Core_DAO::$_nullArray);
+          CRM_Core_DAO::executeQuery($insertGroupNameQuery);
         }
       }
     }
@@ -395,9 +395,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
   public function count() {
     $sql = $this->all();
 
-    $dao = CRM_Core_DAO::executeQuery($sql,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($sql);
     return $dao->N;
   }
 
@@ -405,12 +403,12 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     //drop the temp. tables if they exist
     if ($this->_igTable && !empty($this->_includeGroups)) {
       $sql = "DROP TEMPORARY TABLE IF EXISTS {$this->_igTable}";
-      CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($sql);
     }
 
     if ($this->_xgTable && !empty($this->_excludeGroups)) {
       $sql = "DROP TEMPORARY TABLE IF EXISTS {$this->_xgTable}";
-      CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
+      CRM_Core_DAO::executeQuery($sql);
     }
   }
 

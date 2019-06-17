@@ -95,7 +95,7 @@ class CRM_Contact_Form_Search_Custom_Base {
       return $sql;
     }
 
-    return CRM_Core_DAO::composeQuery($sql, CRM_Core_DAO::$_nullArray);
+    return CRM_Core_DAO::composeQuery($sql);
   }
 
   /**
