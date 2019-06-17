@@ -891,9 +891,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
   /**
    * Process the form submission.
    *
-   *
    * @param array $params
-
+   *
    * @return array|null
    * @throws \CiviCRM_API3_Exception
    */
