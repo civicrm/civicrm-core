@@ -581,7 +581,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
     if ($force || !isset(\Civi::$statics[__CLASS__]['columnsOf'][$table])) {
       $from = (substr($table, 0, 4) == 'log_') ? "`{$this->db}`.$table" : $table;
       CRM_Core_TemporaryErrorScope::ignoreException();
-      $dao = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $from", CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
+      $dao = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $from", [], TRUE, NULL, FALSE, FALSE);
       if (is_a($dao, 'DB_Error')) {
         return [];
       }
@@ -737,7 +737,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
    * @param string $table
    */
   private function createLogTableFor($table) {
-    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE $table", CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
+    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE $table", [], TRUE, NULL, FALSE, FALSE);
     $dao->fetch();
     $query = $dao->Create_Table;
 
@@ -785,10 +785,10 @@ COLS;
     $query = self::fixTimeStampAndNotNullSQL($query);
     $query = preg_replace("/(,*\n*\) )ENGINE/m", "$cols\n) ENGINE", $query);
 
-    CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
+    CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
 
     $columns = implode(', ', $this->columnsOf($table));
-    CRM_Core_DAO::executeQuery("INSERT INTO `{$this->db}`.log_$table ($columns, log_conn_id, log_user_id, log_action) SELECT $columns, @uniqueID, @civicrm_user_id, 'Initialization' FROM {$table}", CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
+    CRM_Core_DAO::executeQuery("INSERT INTO `{$this->db}`.log_$table ($columns, log_conn_id, log_user_id, log_action) SELECT $columns, @uniqueID, @civicrm_user_id, 'Initialization' FROM {$table}", [], TRUE, NULL, FALSE, FALSE);
 
     $this->tables[] = $table;
     if (empty($this->logs)) {

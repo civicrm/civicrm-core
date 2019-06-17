@@ -55,9 +55,7 @@ class CRM_Contribute_Form_Task_SearchTaskHookSample extends CRM_Contribute_Form_
 INNER JOIN civicrm_contact ct ON ( co.contact_id = ct.id )
      WHERE co.id IN ( $contribIDs )";
 
-    $dao = CRM_Core_DAO::executeQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     while ($dao->fetch()) {
       $rows[] = [
