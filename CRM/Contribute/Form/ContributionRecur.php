@@ -155,6 +155,10 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
       }
       $this->_paymentProcessorObj = $this->_paymentProcessor['object'];
     }
+    elseif ($this->_mid) {
+      $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_mid, 'membership', 'obj');
+      $this->_paymentProcessor = $this->_paymentProcessorObj->getPaymentProcessor();
+    }
   }
 
   /**
@@ -167,6 +171,11 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
     elseif ($this->_coid) {
       $this->subscriptionDetails = $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
     }
+    elseif ($this->_mid) {
+      $this->subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_mid, 'membership');
+    }
+    // This is being set temporarily - we should eventually just use the getter fn.
+    $this->_subscriptionDetails = $this->subscriptionDetails;
   }
 
   /**
