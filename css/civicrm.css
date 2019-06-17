@@ -887,6 +887,12 @@ input.crm-form-entityref {
   font-weight: bold;
 }
 
+/* dev/core#1039 Make contact details in popup on merge screen non bold */
+#crm-container tr.columnheader td [class*="crm-summary-col-"] {
+  font-size: 13px;
+  font-weight: normal;
+}
+
 #crm-container tr.columnheader-dark th span.extra {
   font-size: .95em;
   font-weight: normal;
