@@ -1751,7 +1751,7 @@ SELECT count(*)
     AND is_current_member = 1";
             $result = CRM_Core_DAO::singleValueQuery($query);
             if ($result < CRM_Utils_Array::value('max_related', $membershipValues, PHP_INT_MAX)) {
-              CRM_Member_BAO_Membership::create($membershipValues, CRM_Core_DAO::$_nullArray);
+              CRM_Member_BAO_Membership::create($membershipValues);
             }
           }
         }

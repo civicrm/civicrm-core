@@ -497,9 +497,7 @@ class CRM_Utils_Mail_Incoming {
 
     CRM_Utils_String::extractName($name, $params);
 
-    return CRM_Contact_BAO_Contact::createProfileContact($params,
-      CRM_Core_DAO::$_nullArray
-    );
+    return CRM_Contact_BAO_Contact::createProfileContact($params);
   }
 
 }

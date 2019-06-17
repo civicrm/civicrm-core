@@ -168,8 +168,9 @@ class CRM_Contribute_BAO_ContributionSoft extends CRM_Contribute_DAO_Contributio
         $honorId = CRM_Utils_Array::value(0, $ids);
       }
 
+      $null = [];
       $honorId = CRM_Contact_BAO_Contact::createProfileContact(
-        $params['honor'], CRM_Core_DAO::$_nullArray,
+        $params['honor'], $null,
         $honorId, NULL,
         $form->_values['honoree_profile_id']
       );

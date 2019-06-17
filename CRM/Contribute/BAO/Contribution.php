@@ -705,7 +705,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *
    * @return CRM_Contribute_BAO_Contribution
    */
-  public static function retrieve(&$params, &$defaults, &$ids) {
+  public static function retrieve(&$params, &$defaults = [], &$ids = []) {
     $contribution = CRM_Contribute_BAO_Contribution::getValues($params, $defaults, $ids);
     return $contribution;
   }

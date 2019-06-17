@@ -492,7 +492,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
   protected static function getContributionAndParamsInFormatForRecordFinancialTransaction($contributionId) {
     $getInfoOf['id'] = $contributionId;
     $defaults = [];
-    $contributionDAO = CRM_Contribute_BAO_Contribution::retrieve($getInfoOf, $defaults, CRM_Core_DAO::$_nullArray);
+    $contributionDAO = CRM_Contribute_BAO_Contribution::retrieve($getInfoOf, $defaults);
 
     // build params for recording financial trxn entry
     $params['contribution'] = $contributionDAO;

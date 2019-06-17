@@ -244,7 +244,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     // email sending
     if (!empty($params['send_receipt'])) {
       $fetchParticipantVals = ['id' => $this->_participantId];
-      CRM_Event_BAO_Participant::getValues($fetchParticipantVals, $participantDetails, CRM_Core_DAO::$_nullArray);
+      CRM_Event_BAO_Participant::getValues($fetchParticipantVals, $participantDetails);
       $participantParams = array_merge($params, $participantDetails[$this->_participantId]);
       $mailSent = $this->emailReceipt($participantParams);
     }

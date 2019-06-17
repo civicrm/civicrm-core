@@ -3764,7 +3764,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'account_relationship' => $relationTypeId,
       'financial_account_id' => 7,
     );
-    CRM_Financial_BAO_FinancialTypeAccount::add($financialParams, CRM_Core_DAO::$_nullArray);
+    CRM_Financial_BAO_FinancialTypeAccount::add($financialParams);
     $this->assertNotEmpty($optionValue['values'][$optionValue['id']]['value']);
     return $optionValue['values'][$optionValue['id']]['value'];
   }
