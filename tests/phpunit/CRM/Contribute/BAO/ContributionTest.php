@@ -245,7 +245,8 @@ class CRM_Contribute_BAO_ContributionTest extends CiviUnitTestCase {
     );
     $softParam = array('soft_credit_type_id' => 1);
 
-    $honoreeContactId = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray,
+    $null = [];
+    $honoreeContactId = CRM_Contact_BAO_Contact::createProfileContact($params, $null,
       NULL, NULL, $honoreeProfileId
     );
 

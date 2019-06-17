@@ -296,7 +296,7 @@ AND    domain_id = %2
           }
         }
 
-        $contactId = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray);
+        $contactId = CRM_Contact_BAO_Contact::createProfileContact($params);
         $ufmatch->contact_id = $contactId;
         $ufmatch->uf_name = $uniqId;
       }
