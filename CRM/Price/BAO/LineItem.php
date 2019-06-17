@@ -1212,9 +1212,7 @@ WHERE li.contribution_id = %1";
       $updatedContributionDAO->save();
       // adjusted amount financial_trxn creation
       $updatedContribution = CRM_Contribute_BAO_Contribution::getValues(
-        ['id' => $contributionId],
-        CRM_Core_DAO::$_nullArray,
-        CRM_Core_DAO::$_nullArray
+        ['id' => $contributionId]
       );
       $toFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($updatedContribution->financial_type_id, 'Accounts Receivable Account is');
       $adjustedTrxnValues = [
