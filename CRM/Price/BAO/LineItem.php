@@ -119,7 +119,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    *
    * @return CRM_Price_BAO_LineItem
    */
-  public static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params = [], &$defaults = []) {
     $lineItem = new CRM_Price_BAO_LineItem();
     $lineItem->copyValues($params);
     if ($lineItem->find(TRUE)) {
@@ -1277,7 +1277,7 @@ WHERE li.contribution_id = %1";
         $tempFinancialTrxnID = ['id' => $adjustedTrxn->id];
       }
     }
-    $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams, CRM_Core_DAO::$_nullArray);
+    $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
     // insert financial items
     // ensure entity_financial_trxn table has a linking of it.
     CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, NULL, $tempFinancialTrxnID);

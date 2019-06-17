@@ -369,7 +369,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
             'subject' => CRM_Utils_Array::value('subject', $note),
             'contact_id' => $contactId,
           );
-          CRM_Core_BAO_Note::add($noteParams, CRM_Core_DAO::$_nullArray);
+          CRM_Core_BAO_Note::add($noteParams);
         }
       }
       else {
@@ -386,7 +386,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
           'subject' => CRM_Utils_Array::value('subject', $params),
           'contact_id' => $contactId,
         );
-        CRM_Core_BAO_Note::add($noteParams, CRM_Core_DAO::$_nullArray);
+        CRM_Core_BAO_Note::add($noteParams);
       }
     }
 

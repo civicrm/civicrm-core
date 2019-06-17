@@ -121,7 +121,8 @@ class CRM_Financial_Page_FinancialType extends CRM_Core_Page_Basic {
 
       $params['entity_id'] = $dao->id;
       $params['entity_table'] = 'civicrm_financial_type';
-      CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, CRM_Core_DAO::$_nullArray, $financialAccountIds);
+      $null = [];
+      CRM_Financial_BAO_FinancialTypeAccount::retrieve($params, $null, $financialAccountIds);
 
       foreach ($financialAccountIds as $key => $values) {
         if (!empty($financialAccounts[$values['financial_account_id']])) {
