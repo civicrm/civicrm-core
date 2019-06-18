@@ -77,7 +77,7 @@ class CRM_Core_BAO_SchemaHandler {
     }
 
     // always do a trigger rebuild for this table
-    CRM_Core_DAO::triggerRebuild($params['name']);
+    Civi::service('sql_triggers')->rebuild($params['name'], TRUE);
 
     return TRUE;
   }
@@ -347,7 +347,7 @@ ALTER TABLE {$tableName}
     }
 
     if ($triggerRebuild) {
-      CRM_Core_DAO::triggerRebuild($params['table_name']);
+      Civi::service('sql_triggers')->rebuild($params['table_name'], TRUE);
     }
 
     return TRUE;

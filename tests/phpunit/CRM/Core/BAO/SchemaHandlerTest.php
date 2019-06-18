@@ -297,4 +297,43 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     $this->assertEquals($indices['two']['sig'], 'my_table::0::title');
   }
 
+  /**
+   * Test that columns are dropped
+   */
+  public function testDropColumn() {
+    CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS `civicrm_test_drop_column`');
+    CRM_Core_DAO::executeQuery('CREATE TABLE `civicrm_test_drop_column` (`id` int(10), `col1` varchar(255), `col2` varchar(255))');
+
+    // test with logging enabled to ensure log triggers don't break anything
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+
+    $alterParams = [
+      'table_name' => 'civicrm_test_drop_column',
+      'operation'  => 'delete',
+      'name'       => 'col1',
+      'type'       => 'varchar(255)',
+      'required'   => FALSE,
+      'searchable' => FALSE,
+    ];
+
+    // drop col1
+    CRM_Core_BAO_SchemaHandler::alterFieldSQL($alterParams, FALSE, TRUE);
+
+    $create_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE civicrm_test_drop_column");
+    while ($create_table->fetch()) {
+      $this->assertNotContains('col1', $create_table->Create_Table);
+      $this->assertContains('col2', $create_table->Create_Table);
+    }
+
+    // drop col2
+    $alterParams['name'] = 'col2';
+    CRM_Core_BAO_SchemaHandler::alterFieldSQL($alterParams, FALSE, TRUE);
+
+    $create_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE civicrm_test_drop_column");
+    while ($create_table->fetch()) {
+      $this->assertNotContains('col2', $create_table->Create_Table);
+    }
+  }
+
 }
