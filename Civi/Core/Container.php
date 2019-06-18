@@ -157,6 +157,7 @@ class Container {
       'session' => 'CiviCRM Session',
       'long' => 'long',
       'groups' => 'contact groups',
+      'navigation' => 'navigation',
     ];
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $definitionParams = [

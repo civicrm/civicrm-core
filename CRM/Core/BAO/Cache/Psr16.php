@@ -183,7 +183,6 @@ class CRM_Core_BAO_Cache_Psr16 {
     $groups = [
       // Core
       'contact fields',
-      'navigation',
       'custom data',
 
       // Universe
