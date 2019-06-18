@@ -6,6 +6,8 @@
  */
 class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
+  private $allowedContactsACL = [];
+
   public function setUp() {
     parent::setUp();
     $this->prepareForACLs();
@@ -151,6 +153,45 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
 
     $this->contactDelete($contactId);
     $this->contactDelete($targetContactId);
+  }
+
+  /**
+   * Test Assigning a target contact but then the logged in user cannot see the contact
+   */
+  public function testTargetContactNotavaliable() {
+    $contactId = $this->individualCreate();
+    $params = array(
+      'first_name' => 'liz',
+      'last_name' => 'hurleey',
+    );
+    $targetContactId = $this->individualCreate($params);
+
+    $params = array(
+      'source_contact_id' => $contactId,
+      'subject' => 'Scheduling Meeting',
+      'activity_type_id' => 2,
+      'target_contact_id' => array($targetContactId),
+      'activity_date_time' => date('Ymd'),
+    );
+
+    CRM_Activity_BAO_Activity::create($params);
+
+    // set custom hook
+    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'hook_civicrm_aclWhereClause'));
+
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM');
+
+    $this->allowedContactsACL = array($contactId);
+
+    // get logged in user
+    $user_id = $this->createLoggedInUser();
+    $activityGetParams = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
+    $activityGetParams += ['contact_id' => $contactId];
+    $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($activityGetParams);
+    $this->assertEquals(1, $activites[1]['target_contact_count']);
+    $this->assertEquals([], $activites[1]['target_contact_name']);
+    $config = CRM_Core_Config::singleton();
+    $config->userPermissionClass->permissions = array();
   }
 
   /**
@@ -1287,6 +1328,16 @@ $text
     $this->loadXMLDataSet(dirname(__FILE__) . '/activities_for_dashboard_count.xml');
     // Make changes to improve variation in php since the xml method is brittle & relies on option values being unchanged.
     $this->callAPISuccess('Activity', 'create', ['id' => 12, 'activity_type_id' => 'Bulk Email']);
+  }
+
+  /**
+   * ACL HOOK implementation for various tests
+   */
+  public function hook_civicrm_aclWhereClause($type, &$tables, &$whereTables, &$contactID, &$where) {
+    if (!empty($this->allowedContactsACL)) {
+      $contact_id_list = implode(',', $this->allowedContactsACL);
+      $where = " contact_a.id IN ($contact_id_list)";
+    }
   }
 
 }
