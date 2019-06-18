@@ -221,8 +221,12 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $activityGetParams = CRM_Core_Page_AJAX::defaultSortAndPagerParams();
     $activityGetParams += ['contact_id' => $contactId];
     $activities = CRM_Activity_BAO_Activity::getContactActivitySelector($activityGetParams);
-    $this->assertEquals(1, $activites[1]['target_contact_count']);
-    $this->assertEquals([], $activites[1]['target_contact_name']);
+    // Aseert that we have sensible data to display in the contact tab
+    $this->assertEquals('Anderson, Anthony', $activities['data'][0]['source_contact_name']);
+    // Note that becasue there is a target contact but it is not accessable the output is an empty string not n/a
+    $this->assertEquals('', $activities['data'][0]['target_contact_name']);
+    // verify that doing the underlying query shows we get a target contact_id
+    $this->assertEquals(1, CRM_Activity_BAO_Activity::getActivities(['contact_id' => $contactId])[1]['target_contact_count']);
     $config = CRM_Core_Config::singleton();
     $config->userPermissionClass->permissions = array();
   }
