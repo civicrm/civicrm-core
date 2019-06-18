@@ -1066,4 +1066,23 @@ return [
     'description' => ts('Acceptable Mime Types that can be used as part of file urls'),
     'help_text' => NULL,
   ],
+  'http_timeout' => [
+    'group_name' => 'CiviCRM Preferences',
+    'group' => 'core',
+    'name' => 'http_timeout',
+    'type' => 'Integer',
+    'quick_form_type' => 'Element',
+    'html_type' => 'text',
+    'html_attributes' => [
+      'size' => 2,
+      'maxlength' => 3,
+    ],
+    'default' => 5,
+    'add' => '5.14',
+    'title' => ts('HTTP request timeout'),
+    'is_domain' => 1,
+    'is_contact' => 0,
+    'description' => ts('How long should HTTP requests through Guzzle application run for in seconds'),
+    'help_text' => ts('Set the number of seconds http requests should run for before terminating'),
+  ],
 ];
