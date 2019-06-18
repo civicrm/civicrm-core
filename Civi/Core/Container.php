@@ -159,6 +159,7 @@ class Container {
       'groups' => 'contact groups',
       'navigation' => 'navigation',
       'customData' => 'custom data',
+      'fields' => 'contact fields',
     ];
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $definitionParams = [
