@@ -122,6 +122,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
       ->addSetting(['setting' => ['monetaryThousandSeparator' => CRM_Core_Config::singleton()->monetaryThousandSeparator]])
       ->addSetting(['setting' => ['monetaryDecimalPoint' => CRM_Core_Config::singleton()->monetaryDecimalPoint]]);
 
+    $this->assign('defaultCurrencySymbol', CRM_Core_BAO_Country::defaultCurrencySymbol());
   }
 
   /**

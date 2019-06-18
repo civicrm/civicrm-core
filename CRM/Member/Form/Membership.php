@@ -418,7 +418,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   public function buildQuickForm() {
 
     $this->buildQuickEntityForm();
-    $this->assign('currency', CRM_Core_Config::singleton()->defaultCurrencySymbol);
+    $this->assign('currency', CRM_Core_BAO_Country::defaultCurrencySymbol());
     $isUpdateToExistingRecurringMembership = $this->isUpdateToExistingRecurringMembership();
     // build price set form.
     $buildPriceSet = FALSE;

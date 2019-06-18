@@ -159,8 +159,7 @@ class CRM_Event_Form_ParticipantFeeSelection extends CRM_Core_Form {
     $this->assign('pendingRefund', array_search('Pending refund', $statuses));
     $this->assign('participantStatus', $this->_participantStatus);
 
-    $config = CRM_Core_Config::singleton();
-    $this->assign('currencySymbol', $config->defaultCurrencySymbol);
+    $this->assign('currencySymbol', CRM_Core_BAO_Country::defaultCurrencySymbol());
 
     // line items block
     $lineItem = $event = [];

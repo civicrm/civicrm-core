@@ -49,7 +49,7 @@ class CRM_Contribute_BAO_Widget extends CRM_Contribute_DAO_Widget {
     $config = CRM_Core_Config::singleton();
 
     $data = [];
-    $data['currencySymbol'] = $config->defaultCurrencySymbol;
+    $data['currencySymbol'] = CRM_Core_BAO_Country::defaultCurrencySymbol();
 
     if (empty($contributionPageID) ||
       CRM_Utils_Type::validate($contributionPageID, 'Integer') == NULL
