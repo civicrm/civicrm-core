@@ -33,8 +33,6 @@ namespace Civi\Core;
  */
 class SettingsMetadata {
 
-  const ALL = 'all';
-
   /**
    * WARNING: This interface may change.
    *
@@ -72,25 +70,14 @@ class SettingsMetadata {
 
     $cache = \Civi::cache('settings');
     $cacheString = 'settingsMetadata_' . $domainID . '_';
-    // the caching into 'All' seems to be a duplicate of caching to
-    // settingsMetadata__ - I think the reason was to cache all settings as defined & then those altered by a hook
     $settingsMetadata = $cache->get($cacheString);
-    $cached = is_array($settingsMetadata);
 
-    if (!$cached) {
-      $settingsMetadata = $cache->get(self::ALL);
-      if (empty($settingsMetadata)) {
-        global $civicrm_root;
-        $metaDataFolders = [$civicrm_root . '/settings'];
-        \CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
-        $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
-        $cache->set(self::ALL, $settingsMetadata);
-      }
-    }
-
-    \CRM_Utils_Hook::alterSettingsMetaData($settingsMetadata, $domainID, NULL);
-
-    if (!$cached) {
+    if (!is_array($settingsMetadata)) {
+      global $civicrm_root;
+      $metaDataFolders = [$civicrm_root . '/settings'];
+      \CRM_Utils_Hook::alterSettingsFolders($metaDataFolders);
+      $settingsMetadata = self::loadSettingsMetaDataFolders($metaDataFolders);
+      \CRM_Utils_Hook::alterSettingsMetaData($settingsMetadata, $domainID, NULL);
       $cache->set($cacheString, $settingsMetadata);
     }
 
