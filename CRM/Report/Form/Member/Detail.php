@@ -119,7 +119,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           'membership_start_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'membership_end_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'owner_membership_id' => [
-            'title' => ts('Membership Owner ID'),
+            'title' => ts('Primary Membership'),
             'operatorType' => CRM_Report_Form::OP_INT,
           ],
           'tid' => [
@@ -285,14 +285,21 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
   }
 
   public function getOperationPair($type = "string", $fieldName = NULL) {
-    $result = parent::getOperationPair($type, $fieldName);
-
     //re-name IS NULL/IS NOT NULL for clarity
     if ($fieldName == 'owner_membership_id') {
+      $result = [];
       $result['nll'] = ts('Primary members only');
       $result['nnll'] = ts('Non-primary members only');
+      $options = parent::getOperationPair($type, $fieldName);
+      foreach ($options as $key => $label) {
+        if (!array_key_exists($key, $result)) {
+          $result[$key] = $label;
+        }
+      }
     }
-
+    else {
+      $result = parent::getOperationPair($type, $fieldName);
+    }
     return $result;
   }
 

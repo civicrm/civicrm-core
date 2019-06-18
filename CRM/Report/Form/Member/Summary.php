@@ -91,7 +91,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_DATE,
           ],
           'owner_membership_id' => [
-            'title' => ts('Membership Owner ID'),
+            'title' => ts('Primary Membership'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_INT,
           ],
@@ -437,14 +437,21 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
   }
 
   public function getOperationPair($type = "string", $fieldName = NULL) {
-    $result = parent::getOperationPair($type, $fieldName);
-
     //re-name IS NULL/IS NOT NULL for clarity
     if ($fieldName == 'owner_membership_id') {
+      $result = [];
       $result['nll'] = ts('Primary members only');
       $result['nnll'] = ts('Non-primary members only');
+      $options = parent::getOperationPair($type, $fieldName);
+      foreach ($options as $key => $label) {
+        if (!array_key_exists($key, $result)) {
+          $result[$key] = $label;
+        }
+      }
     }
-
+    else {
+      $result = parent::getOperationPair($type, $fieldName);
+    }
     return $result;
   }
 
