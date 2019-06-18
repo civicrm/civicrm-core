@@ -156,6 +156,7 @@ class Container {
       'checks' => 'checks',
       'session' => 'CiviCRM Session',
       'long' => 'long',
+      'groups' => 'contact groups',
     ];
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $container->setDefinition("cache.{$cacheSvc}", new Definition(
