@@ -2568,7 +2568,7 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
           $firstTargetContactID = key($values['target_contact_name']);
 
           $targetLink = CRM_Utils_System::href($firstTargetName, 'civicrm/contact/view', "reset=1&cid={$firstTargetContactID}");
-          if ($showContactOverlay) {
+          if ($showContactOverlay && $firstTargetContactID) {
             $targetTypeImage = CRM_Contact_BAO_Contact_Utils::getImage(
               CRM_Contact_BAO_Contact::getContactType($firstTargetContactID),
               FALSE,
