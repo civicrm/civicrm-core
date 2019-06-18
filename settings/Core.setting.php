@@ -1074,7 +1074,7 @@ return [
       'maxlength' => 3,
     ],
     'default' => 5,
-    'add' => '5.15',
+    'add' => '5.14',
     'title' => ts('HTTP request timeout'),
     'is_domain' => 1,
     'is_contact' => 0,
