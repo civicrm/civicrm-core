@@ -221,4 +221,38 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     $this->assertEquals($expectedOutput, CRM_Utils_JS::decode($input));
   }
 
+  public static function objectExamples() {
+    return [
+      [
+        '{a: \'Apple\', \'b\': "Banana", "c ": [1,2,3]}',
+        ['a' => "'Apple'", 'b' => '"Banana"', 'c ' => '[1,2,3]'],
+      ],
+      [
+        "{}",
+        [],
+      ],
+      [
+        "  {'fn' : function (foo, bar, baz) { return \"One, two, three\"; }, number: 55 }   ",
+        ['fn' => "function (foo, bar, baz) { return \"One, two, three\"; }", 'number' => '55 '],
+      ],
+      [
+        "{ string : 'this, has(some : weird, \\'stuff [{}!' , expr: callMeAl(1, 2, 3), ' notes ' : [Do, re mi]  }",
+        ['string' => "'this, has(some : weird, \\'stuff [{}!' ", 'expr' => 'callMeAl(1, 2, 3)', ' notes ' => "[Do, re mi]  "],
+      ],
+      [
+        '{foo: getFoo("Some \"quoted\" thing"), bar: function() {return "bar"}}',
+        ['foo' => 'getFoo("Some \"quoted\" thing")', 'bar' => 'function() {return "bar"}'],
+      ],
+    ];
+  }
+
+  /**
+   * @param string $input
+   * @param string $expectedOutput
+   * @dataProvider objectExamples
+   */
+  public function testgetObjectProps($input, $expectedOutput) {
+    $this->assertEquals($expectedOutput, CRM_Utils_JS::getObjectProps($input));
+  }
+
 }

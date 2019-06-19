@@ -144,4 +144,87 @@ class CRM_Utils_JS {
     return json_decode(json_encode($result), TRUE);
   }
 
+  /**
+   * Gets the properties of a javascript object WITHOUT decoding them.
+   *
+   * Useful when the object might contain js functions, expressions, etc. which cannot be decoded.
+   * Returns an array with keys as property names and values as raw strings of js.
+   *
+   * Ex: {foo: getFoo(arg), bar: function() {return "bar"}}
+   * Returns [
+   *   'foo' => 'getFoo(arg)',
+   *   'bar' => 'function() {return "bar"}',
+   * ]
+   *
+   * @param $js
+   * @return array
+   * @throws \Exception
+   */
+  public static function getObjectProps($js) {
+    $js = trim($js);
+    if (!is_string($js) || !($js[0] === '{')) {
+      throw new Exception("Invalid js object string passed to CRM_Utils_JS::getObjectProps");
+    }
+    $chars = str_split(substr($js, 1));
+    $prev = NULL;
+    $key = NULL;
+    $quote = NULL;
+    $item = '';
+    $length = strlen($js) - 2;
+    $quotes = ['"', "'"];
+    $enclosures = [
+      '{' => 0,
+      '(' => 0,
+      '[' => 0,
+    ];
+    $closers = [
+      '}' => '{',
+      ')' => '(',
+      ']' => '[',
+    ];
+    $result = [];
+    foreach ($chars as $index => $char) {
+      // Open quotes - we'll ignore everything inside
+      if (in_array($char, $quotes) && $prev != '\\' && !$quote) {
+        $quote = $char;
+      }
+      // Close quotes
+      elseif (in_array($char, $quotes) && $prev != '\\' && $char === $quote) {
+        $quote = NULL;
+      }
+      if (!$quote) {
+        // Skip opening whitespace between properties
+        if ($char === ' ' && !strlen($item)) {
+          $prev = $char;
+          continue;
+        }
+        // Delineates property key
+        if ($char == ':' && !array_filter($enclosures)) {
+          $key = $item;
+          $item = '';
+          $prev = $char;
+          continue;
+        }
+        // Delineates property value
+        if (($char == ',' || ($char == '}' && $index == $length)) && !array_filter($enclosures) && isset($key)) {
+          $result[trim(trim($key), '"\'')] = $item;
+          $item = '';
+          $prev = $char;
+          continue;
+        }
+        // Open brackets - we'll ignore delineators inside
+        if (isset($enclosures[$char])) {
+          $enclosures[$char]++;
+        }
+        // Close brackets
+        if (isset($closers[$char]) && $enclosures[$closers[$char]]) {
+          $enclosures[$closers[$char]]--;
+        }
+      }
+      $item .= $char;
+      $prev = $char;
+    }
+    return $result;
+  }
+
 }
