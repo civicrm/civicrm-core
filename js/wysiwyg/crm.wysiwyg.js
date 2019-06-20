@@ -54,6 +54,9 @@
           CRM.wysiwyg.destroy(item);
           $(item).hide().next('.replace-plain').show().html($(item).val());
         })
+        .on('change', function() {
+          $(this).next('.replace-plain').html($(this).val());
+        })
         .after('<div class="replace-plain" tabindex="0"></div>');
       $(item).next('.replace-plain')
         .attr('title', ts('Click to edit'))
