@@ -176,8 +176,8 @@ function afform_civicrm_angularModules(&$angularModules) {
  */
 function afform_civicrm_alterAngular($angular) {
   $fieldMetadata = \Civi\Angular\ChangeSet::create('fieldMetadata')
-    ->alterHtml(';^~afform/;', function($doc, $path){
-      $entities =  _afform_getMetadata($doc);
+    ->alterHtml(';^~afform/;', function($doc, $path) {
+      $entities = _afform_getMetadata($doc);
 
       foreach (pq('af-field', $doc) as $afField) {
         /** @var DOMElement $afField */
@@ -253,7 +253,7 @@ function afform_civicrm_buildAsset($asset, $params, &$mimeType, &$content) {
 
   $fileName = '~afform/' . _afform_angular_module_name($name, 'camel');
   $htmls = [
-    $fileName => file_get_contents($scanner->findFilePath($name, 'aff.html'))
+    $fileName => file_get_contents($scanner->findFilePath($name, 'aff.html')),
   ];
   $htmls = \Civi\Angular\ChangeSet::applyResourceFilters(Civi::service('angular')->getChangeSets(), 'partials', $htmls);
 
@@ -299,6 +299,7 @@ function afform_civicrm_alterMenu(&$items) {
  *   'camel' or 'dash'.
  * @return string
  *   Ex: 'FooBar' or 'foo-bar'.
+ * @throws \Exception
  */
 function _afform_angular_module_name($fileBaseName, $format = 'camel') {
   switch ($format) {
@@ -316,29 +317,3 @@ function _afform_angular_module_name($fileBaseName, $format = 'camel') {
       throw new \Exception("Unrecognized format");
   }
 }
-
-/**
- * Implements hook_civicrm_preProcess().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_preProcess
- *
-function afform_civicrm_preProcess($formName, &$form) {
-
-} // */
-
-/**
- * Implements hook_civicrm_navigationMenu().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
- *
-function afform_civicrm_navigationMenu(&$menu) {
-  _afform_civix_insert_navigation_menu($menu, 'Mailings', array(
-    'label' => E::ts('New subliminal message'),
-    'name' => 'mailing_subliminal_message',
-    'url' => 'civicrm/mailing/subliminal',
-    'permission' => 'access CiviMail',
-    'operator' => 'OR',
-    'separator' => 0,
-  ));
-  _afform_civix_navigationMenu($menu);
-} // */
