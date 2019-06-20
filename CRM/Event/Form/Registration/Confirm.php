@@ -50,6 +50,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    */
   public $_totalAmount;
 
+  public $submitOnce = TRUE;
+
   /**
    * Monetary fields that may be submitted.
    *
@@ -326,7 +328,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         'type' => 'next',
         'name' => $contribButton,
         'isDefault' => TRUE,
-        'js' => ['onclick' => "return submitOnce(this,'" . $this->_name . "','" . ts('Processing') . "');"],
       ],
     ]);
 
