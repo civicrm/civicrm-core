@@ -306,8 +306,12 @@ trait Api3TestTrait {
     $indexBy = in_array($v3Action, ['get', 'create', 'replace']) && !$sequential ? 'id' : NULL;
     $onlyId = !empty($v3Params['format.only_id']);
     $onlySuccess = !empty($v3Params['format.is_success']);
-    if (!empty($v3Params['filters']['is_current']) || !empty($params['isCurrent'])) {
+    if (!empty($v3Params['filters']['is_current']) || !empty($v3Params['isCurrent'])) {
       $v4Params['current'] = TRUE;
+    }
+    $language = !empty($v3Params['options']['language']) ? $v3Params['options']['language'] : \CRM_Utils_Array::value('option.language', $v3Params);
+    if ($language) {
+      $v4Params['language'] = $language;
     }
     $toRemove = ['option.', 'return', 'api.', 'format.'];
     $chains = [];
