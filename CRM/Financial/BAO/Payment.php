@@ -65,8 +65,29 @@ class CRM_Financial_BAO_Payment {
     $isSkipRecordingPaymentHereForLegacyHandlingReasons = ($contributionStatus == 'Pending' && $isPaymentCompletesContribution);
 
     if (!$isSkipRecordingPaymentHereForLegacyHandlingReasons && $params['total_amount'] > 0) {
-      $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
+      $balanceTrxnParams['to_financial_account_id'] = CRM_Contribute_BAO_Contribution::getToFinancialAccount($contribution, $params);
+      $balanceTrxnParams['from_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($contribution['financial_type_id'], 'Accounts Receivable Account is');
+      $balanceTrxnParams['total_amount'] = $params['total_amount'];
+      $balanceTrxnParams['contribution_id'] = $params['contribution_id'];
+      $balanceTrxnParams['trxn_date'] = CRM_Utils_Array::value('trxn_date', $params, CRM_Utils_Array::value('contribution_receive_date', $params, date('YmdHis')));
+      $balanceTrxnParams['fee_amount'] = CRM_Utils_Array::value('fee_amount', $params);
+      $balanceTrxnParams['net_amount'] = CRM_Utils_Array::value('total_amount', $params);
+      $balanceTrxnParams['currency'] = $contribution['currency'];
+      $balanceTrxnParams['trxn_id'] = CRM_Utils_Array::value('contribution_trxn_id', $params, NULL);
+      $balanceTrxnParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'status_id', 'Completed');
+      $balanceTrxnParams['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $params, $contribution['payment_instrument_id']);
+      $balanceTrxnParams['check_number'] = CRM_Utils_Array::value('check_number', $params);
+      $balanceTrxnParams['is_payment'] = 1;
 
+      if (!empty($params['payment_processor'])) {
+        // I can't find evidence this is passed in - I was gonna just remove it but decided to deprecate  as I see getToFinancialAccount
+        // also anticipates it.
+        CRM_Core_Error::deprecatedFunctionWarning('passing payment_processor is deprecated - use payment_processor_id');
+        $balanceTrxnParams['payment_processor_id'] = $params['payment_processor'];
+      }
+      $trxn = CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
+
+      // @todo - this is just weird & historical & inconsistent - why 2 tracks?
       if (CRM_Utils_Array::value('line_item', $params) && !empty($trxn)) {
         foreach ($params['line_item'] as $values) {
           foreach ($values as $id => $amount) {

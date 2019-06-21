@@ -942,7 +942,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *
    * @return int
    */
-  protected static function getToFinancialAccount($contribution, $params) {
+  public static function getToFinancialAccount($contribution, $params) {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $pendingStatus = [
@@ -4839,7 +4839,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @return CRM_Financial_DAO_FinancialTrxn
    */
   public static function recordPartialPayment($contribution, $params) {
-
+    CRM_Core_Error::deprecatedFunctionWarning('use payment create api');
     $balanceTrxnParams['to_financial_account_id'] = self::getToFinancialAccount($contribution, $params);
     $balanceTrxnParams['from_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($contribution['financial_type_id'], 'Accounts Receivable Account is');
     $balanceTrxnParams['total_amount'] = $params['total_amount'];
