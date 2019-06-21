@@ -493,6 +493,7 @@ class CRM_Core_SelectValues {
       '{domain.address}' => ts('Domain (organization) address'),
       '{domain.phone}' => ts('Domain (organization) phone'),
       '{domain.email}' => ts('Domain (organization) email'),
+      '{mailing.key}' => ts('Mailing key'),
       '{mailing.name}' => ts('Mailing name'),
       '{mailing.group}' => ts('Mailing group'),
       '{mailing.viewUrl}' => ts('Mailing permalink'),

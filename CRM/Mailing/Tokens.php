@@ -42,6 +42,7 @@ class CRM_Mailing_Tokens extends \Civi\Token\AbstractTokenSubscriber {
   public function __construct() {
     parent::__construct('mailing', [
       'id' => ts('Mailing ID'),
+      'key' => ts('Mailing Key'),
       'name' => ts('Mailing Name'),
       'group' => ts('Mailing Group(s)'),
       'subject' => ts('Mailing Subject'),
