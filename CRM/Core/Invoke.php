@@ -348,7 +348,17 @@ class CRM_Core_Invoke {
    * @param CRM_Core_Smarty $template
    */
   public static function statusCheck($template) {
-    if (CRM_Core_Config::isUpgradeMode() || !CRM_Core_Permission::check('view status checks')) {
+    $permissions = [];
+    // Transitional arrangement until end of 2019, we have added a new permission
+    // view status checks and if CIVICRM_DISABLE_TRANSITION_STATUS_CHECKS is not defined
+    // or defined as false fall back to standard administer CiviCRM permission
+    if (!CRM_Utils_Constant::value('CIVICRM_DISABLE_TRANSITION_STATUS_CHECKS')) {
+      $permissions[] = ['view status checks', 'administer CiviCRM'];
+    }
+    else {
+      $permissions[0] = 'view status checks';
+    }
+    if (CRM_Core_Config::isUpgradeMode() || !CRM_Core_Permission::check($permissions)) {
       return;
     }
     // always use cached results - they will be refreshed by the session timer

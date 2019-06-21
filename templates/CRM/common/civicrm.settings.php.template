@@ -477,6 +477,15 @@ define('CIVICRM_DEADLOCK_RETRIES', 3);
  */
 // define('CIVICRM_BAO_CACHE_ADAPTER', 'CRM_Core_BAO_Cache_Psr16');
 
+/**
+ * Specify if CiviCRM should not translate administer CiviCRM Permission
+ * to include view status checks permission.
+ *
+ * This is a transitional arrangement and if left undefined administer civicrm
+ * will be treated like view status checks permission
+ */
+// define('CIVICRM_DISABLE_TRANSITION_STATUS_CHECKS', TRUE);
+
 if (CIVICRM_UF === 'UnitTests') {
   if (!defined('CIVICRM_CONTAINER_CACHE')) define('CIVICRM_CONTAINER_CACHE', 'auto');
   if (!defined('CIVICRM_MYSQL_STRICT')) define('CIVICRM_MYSQL_STRICT', true);

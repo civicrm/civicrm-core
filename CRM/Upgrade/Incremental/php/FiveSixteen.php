@@ -41,7 +41,10 @@ class CRM_Upgrade_Incremental_php_FiveSixteen extends CRM_Upgrade_Incremental_Ba
    */
   public function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
     if ($rev == '5.16.alpha1') {
-      $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. This permission is now used to control access to the CiviCRM Status Checks notices.', array(1 => ts('View CiviCRM Status Checks'))) . '</p>';
+      $preUpgradeMessage .= '<p>' . ts('A new permission, "%1", has been added. For the moment this new permission or %2 permission will be enough to see the status checks. This will change at the end of 2019 when the permissions %1 will be required to access the status checks. We recommend at least one user has that permission granted to them. If System Administrators want to switch to just using the new permission check to control access to the status checks. They can add a define in civicrm.settings.php setting CIVICRM_DISABLE_TRANSITION_STATUS_CHECKS to be TRUE to disable the transitional arrangement .', [
+        1 => 'View CiviCRM Status Checks',
+        2 => 'Administer CiviCRM',
+      ]) . '</p>';
     }
   }
 
