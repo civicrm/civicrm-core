@@ -213,6 +213,11 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
    */
   public function delete($key) {
     CRM_Utils_Cache::assertValidKey($key);
+    // If we are triggering a deletion of a prevNextCache key in the civicrm_cache tabl
+    // Alssure that the relevant prev_next_cache values are also removed.
+    if ($this->group == CRM_Core_BAO_Cache::cleanKey('CiviCRM Search PrevNextCache')) {
+      Civi::service('prevnext')->deleteItem(NULL, $key);
+    }
     CRM_Core_DAO::executeQuery("DELETE FROM {$this->table} WHERE {$this->where($key)}");
     unset($this->valueCache[$key]);
     unset($this->expiresCache[$key]);
@@ -220,7 +225,14 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   }
 
   public function flush() {
-    CRM_Core_DAO::executeQuery("DELETE FROM {$this->table} WHERE {$this->where()}");
+    if ($this->group == CRM_Core_BAO_Cache::cleanKey('CiviCRM Search PrevNextCache') &&
+      Civi::service('prevnext') instanceof CRM_Core_PrevNextCache_Sql) {
+      // Use the standard PrevNextCache cleanup function here not just delete from civicrm_cache
+      CRM_Core_BAO_PrevNextCache::cleanupCache();
+    }
+    else {
+      CRM_Core_DAO::executeQuery("DELETE FROM {$this->table} WHERE {$this->where()}");
+    }
     $this->valueCache = [];
     $this->expiresCache = [];
     return TRUE;
