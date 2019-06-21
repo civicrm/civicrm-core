@@ -82,6 +82,9 @@ class APIv3SchemaAdapter implements EventSubscriberInterface {
    */
   public function onApiPrepare_validate(\Civi\API\Event\Event $event) {
     $apiRequest = $event->getApiRequest();
+    if ($apiRequest['version'] > 3) {
+      return;
+    }
     // Not sure why this is omitted for generic actions. It would make sense
     // to omit 'getfields', but that's only one generic action.
 
