@@ -1599,11 +1599,14 @@ FROM   civicrm_domain
    * @param string $blockCopyOfDependencies
    *   Fields that you want to block from.
    *   getting copied
+   * @param bool $blockCopyofCustomValues
+   *   Case when you don't want to copy the custom values set in a
+   *   template as it will override/ignore the submitted custom values
    *
    * @return CRM_Core_DAO|bool
    *   the newly created copy of the object. False if none created.
    */
-  public static function copyGeneric($daoName, $criteria, $newData = NULL, $fieldsFix = NULL, $blockCopyOfDependencies = NULL) {
+  public static function copyGeneric($daoName, $criteria, $newData = NULL, $fieldsFix = NULL, $blockCopyOfDependencies = NULL, $blockCopyofCustomValues = FALSE) {
     $object = new $daoName();
     $newObject = FALSE;
     if (!$newData) {
@@ -1671,7 +1674,9 @@ FROM   civicrm_domain
         }
       }
       $newObject->save();
-      $newObject->copyCustomFields($object->id, $newObject->id);
+      if (!$blockCopyofCustomValues) {
+        $newObject->copyCustomFields($object->id, $newObject->id);
+      }
       CRM_Utils_Hook::post('create', CRM_Core_DAO_AllCoreTables::getBriefName($daoName), $newObject->id, $newObject);
     }
 
