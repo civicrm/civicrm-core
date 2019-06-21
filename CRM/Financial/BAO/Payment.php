@@ -118,7 +118,17 @@ class CRM_Financial_BAO_Payment {
         }
       }
       elseif (!empty($trxn)) {
-        CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn->id, $contribution['total_amount']);
+        $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
+        if (!empty($lineItems)) {
+          // get financial item
+          list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($params['contribution_id']);
+          $entityParams = [
+            'contribution_total_amount' => $contribution['total_amount'],
+            'trxn_total_amount' => $params['total_amount'],
+            'trxn_id' => $trxn->id,
+          ];
+          CRM_Contribute_BAO_Contribution::createProportionalFinancialEntries($entityParams, $lineItems, $ftIds, $taxItems);
+        }
       }
     }
     elseif ($params['total_amount'] < 0) {
