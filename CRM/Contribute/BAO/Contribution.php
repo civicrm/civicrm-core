@@ -301,6 +301,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         FALSE, FALSE, FALSE, 'AND is_default = 1')
       ),
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'receive_date' => date('Y-m-d H:i:s'),
     ];
   }
 
