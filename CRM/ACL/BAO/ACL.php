@@ -687,8 +687,11 @@ SELECT $acl.*
    *   true if we found and updated the object, else false
    */
   public static function setIsActive($id, $is_active) {
-    // note this also resets any ACL cache
     Civi::cache('fields')->flush();
+    // also reset ACL Cache
+    CRM_ACL_BAO_Cache::resetCache();
+    // also reset memory cache if any
+    CRM_Utils_System::flushCache();
 
     return CRM_Core_DAO::setFieldValue('CRM_ACL_DAO_ACL', $id, 'is_active', $is_active);
   }
