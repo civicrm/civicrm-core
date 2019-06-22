@@ -1063,7 +1063,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
 
     if (Civi::service('prevnext') instanceof CRM_Core_PrevNextCache_Sql) {
       // SQL-backed prevnext cache uses an extra record for pruning the cache.
-      CRM_Core_BAO_Cache::setItem($cacheKey, 'CiviCRM Search PrevNextCache', $cacheKey);
+      Civi::cache('prevNextCache')->set($cacheKey, $cacheKey);
     }
   }
 
