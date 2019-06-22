@@ -921,15 +921,15 @@ WHERE civicrm_event.is_active = 1
    *
    * @param int $id
    *   The event id to copy.
-   *        boolean $afterCreate call to copy after the create function
    * @param array $params
+   *
    * @return CRM_Event_DAO_Event
    * @throws \CRM_Core_Exception
    */
   public static function copy($id, $params = []) {
     $eventValues = [];
 
-    //get the require event values.
+    //get the required event values.
     $eventParams = ['id' => $id];
     $returnProperties = [
       'loc_block_id',
