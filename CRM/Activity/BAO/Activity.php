@@ -751,8 +751,8 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
       GROUP BY activity_id', [
         1 => [
           CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_ActivityContact', 'record_type_id', 'Activity Targets'),
-          'Integer'
-        ]
+          'Integer',
+        ],
       ])->fetchAll();
     }
     foreach ($targetCount as $activityTarget) {
@@ -2566,23 +2566,26 @@ INNER JOIN  civicrm_option_group grp ON (grp.id = option_group_id AND grp.name =
           $firstTargetName = reset($values['target_contact_name']);
           $firstTargetContactID = key($values['target_contact_name']);
 
-          $targetLink = CRM_Utils_System::href($firstTargetName, 'civicrm/contact/view', "reset=1&cid={$firstTargetContactID}");
-          if ($showContactOverlay) {
-            $targetTypeImage = CRM_Contact_BAO_Contact_Utils::getImage(
-              CRM_Contact_BAO_Contact::getContactType($firstTargetContactID),
-              FALSE,
-              $firstTargetContactID);
-            $activity['target_contact_name'] .= "<div>$targetTypeImage  $targetLink";
-          }
-          else {
-            $activity['target_contact_name'] .= $targetLink;
-          }
+          // The first target may not be accessable to the logged in user dev/core#1052
+          if ($firstTargetName) {
+            $targetLink = CRM_Utils_System::href($firstTargetName, 'civicrm/contact/view', "reset=1&cid={$firstTargetContactID}");
+            if ($showContactOverlay) {
+              $targetTypeImage = CRM_Contact_BAO_Contact_Utils::getImage(
+                CRM_Contact_BAO_Contact::getContactType($firstTargetContactID),
+                FALSE,
+                $firstTargetContactID);
+              $activity['target_contact_name'] .= "<div>$targetTypeImage  $targetLink";
+            }
+            else {
+              $activity['target_contact_name'] .= $targetLink;
+            }
 
-          if ($extraCount = $values['target_contact_count'] - 1) {
-            $activity['target_contact_name'] .= ";<br />" . "(" . ts('%1 more', [1 => $extraCount]) . ")";
-          }
-          if ($showContactOverlay) {
-            $activity['target_contact_name'] .= "</div> ";
+            if ($extraCount = $values['target_contact_count'] - 1) {
+              $activity['target_contact_name'] .= ";<br />" . "(" . ts('%1 more', [1 => $extraCount]) . ")";
+            }
+            if ($showContactOverlay) {
+              $activity['target_contact_name'] .= "</div> ";
+            }
           }
         }
         elseif (!$values['target_contact_name']) {
