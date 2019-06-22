@@ -434,7 +434,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $headerRows = $processor->getHeaderRows();
     $sqlColumns = $processor->getSQLColumns();
-    $exportTempTable = self::createTempTable($sqlColumns);
+    $processor->setTemporaryTable(self::createTempTable($sqlColumns));
     $limitReached = FALSE;
 
     while (!$limitReached) {
@@ -460,7 +460,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
         // output every $tempRowCount rows
         if ($count % $tempRowCount == 0) {
-          self::writeDetailsToTable($exportTempTable, $componentDetails, $sqlColumns);
+          self::writeDetailsToTable($processor, $componentDetails, $sqlColumns);
           $componentDetails = [];
         }
       }
@@ -470,32 +470,37 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       $offset += $rowCount;
     }
 
-    if ($exportTempTable) {
-      self::writeDetailsToTable($exportTempTable, $componentDetails, $sqlColumns);
+    if ($processor->getTemporaryTable()) {
+      self::writeDetailsToTable($processor, $componentDetails, $sqlColumns);
 
       // do merge same address and merge same household processing
       if ($mergeSameAddress) {
-        self::mergeSameAddress($exportTempTable, $sqlColumns, $exportParams);
+        self::mergeSameAddress($processor, $sqlColumns, $exportParams);
       }
 
       // call export hook
-      CRM_Utils_Hook::export($exportTempTable, $headerRows, $sqlColumns, $exportMode, $componentTable, $ids);
+      $table = $processor->getTemporaryTable();
+      CRM_Utils_Hook::export($table, $headerRows, $sqlColumns, $exportMode, $componentTable, $ids);
+      if ($table !== $processor->getTemporaryTable()) {
+        CRM_Core_Error::deprecatedFunctionWarning('altering the export table in the hook is deprecated (in some flows the table itself will be)');
+        $processor->setTemporaryTable($table);
+      }
 
       // In order to be able to write a unit test against this function we need to suppress
       // the csv writing. In future hopefully the csv writing & the main processing will be in separate functions.
       if (empty($exportParams['suppress_csv_for_testing'])) {
-        self::writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $processor);
+        self::writeCSVFromTable($headerRows, $sqlColumns, $processor);
       }
       else {
         // return tableName sqlColumns headerRows in test context
-        return [$exportTempTable, $sqlColumns, $headerRows, $processor];
+        return [$processor->getTemporaryTable(), $sqlColumns, $headerRows, $processor];
       }
 
       // delete the export temp table and component table
-      $sql = "DROP TABLE IF EXISTS {$exportTempTable}";
+      $sql = "DROP TABLE IF EXISTS " . $processor->getTemporaryTable();
       CRM_Core_DAO::executeQuery($sql);
       CRM_Core_DAO::reenableFullGroupByMode();
-      CRM_Utils_System::civiExit();
+      CRM_Utils_System::civiExit(0, ['processor' => $processor]);
     }
     else {
       CRM_Core_DAO::reenableFullGroupByMode();
@@ -594,11 +599,12 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
   }
 
   /**
-   * @param string $tableName
+   * @param \CRM_Export_BAO_ExportProcessor $processor
    * @param $details
    * @param $sqlColumns
    */
-  public static function writeDetailsToTable($tableName, $details, $sqlColumns) {
+  public static function writeDetailsToTable($processor, $details, $sqlColumns) {
+    $tableName = $processor->getTemporaryTable();
     if (empty($details)) {
       return;
     }
@@ -679,11 +685,12 @@ VALUES $sqlValueString
   }
 
   /**
-   * @param string $tableName
+   * @param \CRM_Export_BAO_ExportProcessor $processor
    * @param $sqlColumns
    * @param array $exportParams
    */
-  public static function mergeSameAddress($tableName, &$sqlColumns, $exportParams) {
+  public static function mergeSameAddress($processor, &$sqlColumns, $exportParams) {
+    $tableName = $processor->getTemporaryTable();
     // check if any records are present based on if they have used shared address feature,
     // and not based on if city / state .. matches.
     $sql = "
@@ -961,12 +968,12 @@ WHERE  id IN ( $deleteIDString )
   }
 
   /**
-   * @param $exportTempTable
    * @param $headerRows
    * @param $sqlColumns
    * @param \CRM_Export_BAO_ExportProcessor $processor
    */
-  public static function writeCSVFromTable($exportTempTable, $headerRows, $sqlColumns, $processor) {
+  public static function writeCSVFromTable($headerRows, $sqlColumns, $processor) {
+    $exportTempTable = $processor->getTemporaryTable();
     $exportMode = $processor->getExportMode();
     $writeHeader = TRUE;
     $offset = 0;

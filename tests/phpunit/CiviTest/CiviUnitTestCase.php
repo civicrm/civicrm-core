@@ -27,6 +27,7 @@
  */
 
 use Civi\Payment\System;
+use League\Csv\Reader;
 
 /**
  *  Include class definitions
@@ -3283,6 +3284,38 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     // Create an SMS provider "CiviTestSMSProvider". Civi handles "CiviTestSMSProvider" as a special case and allows it to be instantiated
     //  in CRM/Sms/Provider.php even though it is not an extension.
     return civicrm_api3('option_value', 'create', $params);
+  }
+
+  /**
+   * Start capturing browser output.
+   *
+   * The starts the process of browser output being captured, setting any variables needed for e-notice prevention.
+   */
+  protected function startCapturingOutput() {
+    ob_start();
+    $_SERVER['HTTP_USER_AGENT'] = 'unittest';
+  }
+
+  /**
+   * Stop capturing browser output and return as a csv.
+   *
+   * @param bool $isFirstRowHeaders
+   *
+   * @return \League\Csv\Reader
+   *
+   * @throws \League\Csv\Exception
+   */
+  protected function captureOutputToCSV($isFirstRowHeaders = TRUE) {
+    $output = ob_get_flush();
+    $stream = fopen('php://memory', 'r+');
+    fwrite($stream, $output);
+    rewind($stream);
+    $csv = Reader::createFromString($output);
+    if ($isFirstRowHeaders) {
+      $csv->setHeaderOffset(0);
+    }
+    ob_clean();
+    return $csv;
   }
 
 }

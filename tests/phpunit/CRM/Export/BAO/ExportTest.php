@@ -28,7 +28,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected $activityIDs = [];
 
-
   /**
    * Contribution IDs created for testing.
    *
@@ -45,7 +44,20 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   protected $locationTypes = [];
 
+  /**
+   * Processor generated in test.
+   *
+   * @var \CRM_Export_BAO_ExportProcessor
+   */
+  protected $processor;
+
+  /**
+   * Cleanup data.
+   *
+   * @throws \Exception
+   */
   public function tearDown() {
+    $this->quickCleanUpFinancialEntities();
     $this->quickCleanup([
       'civicrm_contact',
       'civicrm_email',
@@ -56,10 +68,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'civicrm_case_contact',
       'civicrm_case_activity',
     ]);
-    $this->quickCleanUpFinancialEntities();
+
     if (!empty($this->locationTypes)) {
       $this->callAPISuccess('LocationType', 'delete', ['id' => $this->locationTypes['Whare Kai']['id']]);
       $this->callAPISuccess('LocationType', 'create', ['id' => $this->locationTypes['Main']['id'], 'name' => 'Main']);
+    }
+    if ($this->processor && $this->processor->getTemporaryTable()) {
+      // delete the export temp table
+      CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS " . $this->processor->getTemporaryTable());
     }
     parent::tearDown();
   }
@@ -68,29 +84,32 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Basic test to ensure the exportComponents function completes without error.
    *
    * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportComponentsNull() {
-    list($tableName) = CRM_Export_BAO_Export::exportComponents(
-      TRUE,
-      [],
-      [],
-      NULL,
-      NULL,
-      NULL,
-      CRM_Export_Form_Select::CONTACT_EXPORT,
-      NULL,
-      NULL,
-      FALSE,
-      FALSE,
-      [
-        'exportOption' => 1,
-        'suppress_csv_for_testing' => TRUE,
-      ]
-    );
-
-    // delete the export temp table and component table
-    $sql = "DROP TABLE IF EXISTS {$tableName}";
-    CRM_Core_DAO::executeQuery($sql);
+    $this->startCapturingOutput();
+    try {
+      list($tableName) = CRM_Export_BAO_Export::exportComponents(
+        TRUE,
+        [],
+        [],
+        NULL,
+        NULL,
+        NULL,
+        CRM_Export_Form_Select::CONTACT_EXPORT,
+        NULL,
+        NULL,
+        FALSE,
+        FALSE,
+        [
+          'exportOption' => 1,
+        ]
+      );
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+    }
+    $this->processor = $e->errorData['processor'];
+    ob_end_clean();
   }
 
   /**
