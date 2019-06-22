@@ -1439,6 +1439,7 @@ class CRM_Utils_System {
       Civi::cache('settings')->flush();
       Civi::cache('js_strings')->flush();
       Civi::cache('community_messages')->flush();
+      Civi::cache('groups')->flush();
       CRM_Extension_System::singleton()->getCache()->flush();
       CRM_Cxn_CiviCxnHttp::singleton()->getCache()->flush();
     }
