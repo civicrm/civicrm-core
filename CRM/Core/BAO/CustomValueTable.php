@@ -39,7 +39,7 @@ class CRM_Core_BAO_CustomValueTable {
    *
    * @throws Exception
    */
-  public static function create(&$customParams) {
+  public static function create($customParams) {
     if (empty($customParams) ||
       !is_array($customParams)
     ) {
@@ -338,7 +338,7 @@ class CRM_Core_BAO_CustomValueTable {
    * @param $entityTable
    * @param int $entityID
    */
-  public static function store(&$params, $entityTable, $entityID) {
+  public static function store($params, $entityTable, $entityID) {
     $cvParams = [];
     foreach ($params as $fieldID => $param) {
       foreach ($param as $index => $customValue) {
