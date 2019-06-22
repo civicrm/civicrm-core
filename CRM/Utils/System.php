@@ -829,7 +829,7 @@ class CRM_Utils_System {
     self::setHttpHeader('Expires', $now);
 
     // lem9 & loic1: IE needs specific headers
-    $isIE = strstr($_SERVER['HTTP_USER_AGENT'], 'MSIE');
+    $isIE = empty($_SERVER['HTTP_USER_AGENT']) ? FALSE : strstr($_SERVER['HTTP_USER_AGENT'], 'MSIE');
     if ($ext) {
       $fileString = "filename=\"{$name}.{$ext}\"";
     }
