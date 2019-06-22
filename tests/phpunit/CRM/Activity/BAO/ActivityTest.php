@@ -227,8 +227,7 @@ class CRM_Activity_BAO_ActivityTest extends CiviUnitTestCase {
     $this->assertEquals('', $activities['data'][0]['target_contact_name']);
     // verify that doing the underlying query shows we get a target contact_id
     $this->assertEquals(1, CRM_Activity_BAO_Activity::getActivities(['contact_id' => $contactId])[1]['target_contact_count']);
-    $config = CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array();
+    $this->cleanUpAfterACLs();
   }
 
   /**
