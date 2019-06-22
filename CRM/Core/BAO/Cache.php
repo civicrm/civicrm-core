@@ -242,12 +242,20 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     }
 
     if ($clearAll) {
-      // also reset ACL Cache
-      CRM_ACL_BAO_Cache::resetCache();
-
-      // also reset memory cache if any
-      CRM_Utils_System::flushCache();
+      self::resetCaches();
     }
+  }
+
+  /**
+   * Cleanup ACL and System Level caches
+   */
+  public static function resetCaches() {
+    // also reset ACL Cache
+    // @todo why is this called when CRM_Utils_System::flushCache() does it as well.
+    CRM_ACL_BAO_Cache::resetCache();
+
+    // also reset memory cache if any
+    CRM_Utils_System::flushCache();
   }
 
   /**
