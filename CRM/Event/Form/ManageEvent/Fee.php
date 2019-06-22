@@ -62,7 +62,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
    */
   public function preProcess() {
     parent::preProcess();
-    $this->assign('selectedChild', 'fee');
+    $this->setSelectedChild('fee');
   }
 
   /**

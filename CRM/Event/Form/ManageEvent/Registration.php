@@ -55,7 +55,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
     $this->_profileBottomNumAdd = CRM_Utils_Array::value('addProfileNumAdd', $_GET, 0);
 
     parent::preProcess();
-    $this->assign('selectedChild', 'registration');
+    $this->setSelectedChild('registration');
 
     $this->assign('addProfileBottom', $this->_addProfileBottom);
     $this->assign('profileBottomNum', $this->_profileBottomNum);

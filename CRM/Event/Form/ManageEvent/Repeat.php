@@ -26,7 +26,7 @@ class CRM_Event_Form_ManageEvent_Repeat extends CRM_Event_Form_ManageEvent {
 
   public function preProcess() {
     parent::preProcess();
-    $this->assign('selectedChild', 'repeat');
+    $this->setSelectedChild('repeat');
     $this->assign('currentEventId', $this->_id);
 
     $checkParentExistsForThisId = CRM_Core_BAO_RecurringEntity::getParentFor($this->_id, 'civicrm_event');
