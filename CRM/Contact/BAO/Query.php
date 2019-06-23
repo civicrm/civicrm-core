@@ -2972,9 +2972,18 @@ class CRM_Contact_BAO_Query {
       $op = key($value);
       $value = $value[$op];
     }
-
-    // Replace pseudo operators from search builder
-    $op = str_replace('EMPTY', 'NULL', $op);
+    // Translate EMPTY to NULL as EMPTY is cannot be used in it's intended meaning here
+    // so has to be 'squashed into' NULL. (ie. group membership cannot be '').
+    // even one group might equate to multiple when looking at children so IN is simpler.
+    // @todo - also look at != casting but there are rows below to review.
+    $opReplacements = [
+      'EMPTY' => 'NULL',
+      'NOT EMPTY' => 'NOT NULL',
+      '=' => 'IN',
+    ];
+    if (isset($opReplacements[$op])) {
+      $op = $opReplacements[$op];
+    }
 
     if (strpos($op, 'NULL')) {
       $value = NULL;
@@ -3050,7 +3059,7 @@ class CRM_Contact_BAO_Query {
         $clause = "{$gcTable}.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact cgc WHERE cgc.group_id = $groupIds )";
       }
       else {
-        $clause = self::buildClause("{$gcTable}.group_id", $op, ($op === '=' ? $regularGroupIDs[0] : $regularGroupIDs));
+        $clause = self::buildClause("{$gcTable}.group_id", $op, $regularGroupIDs);
       }
       $groupClause[] = "( {$clause} )";
 
