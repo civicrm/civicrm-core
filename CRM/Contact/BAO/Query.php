@@ -2998,10 +2998,10 @@ class CRM_Contact_BAO_Query {
     $regularGroupIDs = $smartGroupIDs = [];
     foreach ((array) $value as $id) {
       if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'saved_search_id')) {
-        $smartGroupIDs[] = $id;
+        $smartGroupIDs[] = (int) $id;
       }
       else {
-        $regularGroupIDs[] = trim($id);
+        $regularGroupIDs[] = (int) trim($id);
       }
     }
     $hasNonSmartGroups = count($regularGroupIDs);
@@ -3035,29 +3035,22 @@ class CRM_Contact_BAO_Query {
         }
       }
 
-      // if $regularGroupIDs is populated with regular child group IDs
-      //   then change the mysql operator to desired
-      if (count($regularGroupIDs) > 1) {
-        $op = strpos($op, 'IN') ? $op : ($op == '!=') ? 'NOT IN' : 'IN';
-      }
-      $groupIds = '';
-      if (!empty($regularGroupIDs)) {
-        $groupIds = CRM_Utils_Type::validate(
-          implode(',', (array) $regularGroupIDs),
-          'CommaSeparatedIntegers'
-        );
-      }
       $gcTable = "`civicrm_group_contact-" . uniqid() . "`";
       $joinClause = ["contact_a.id = {$gcTable}.contact_id"];
 
-      if (strpos($op, 'IN') !== FALSE) {
-        $clause = "{$gcTable}.group_id $op ( $groupIds ) ";
-      }
-      elseif ($op == '!=') {
+      // @todo consider just casting != to NOT IN & handling both together.
+      if ($op == '!=') {
+        $groupIds = '';
+        if (!empty($regularGroupIDs)) {
+          $groupIds = CRM_Utils_Type::validate(
+            implode(',', (array) $regularGroupIDs),
+            'CommaSeparatedIntegers'
+          );
+        }
         $clause = "{$gcTable}.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact cgc WHERE cgc.group_id = $groupIds )";
       }
       else {
-        $clause = "{$gcTable}.group_id $op $groupIds ";
+        $clause = self::buildClause("{$gcTable}.group_id", $op, ($op === '=' ? $regularGroupIDs[0] : $regularGroupIDs));
       }
       $groupClause[] = "( {$clause} )";
 
