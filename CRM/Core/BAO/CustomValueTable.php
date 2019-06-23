@@ -36,10 +36,15 @@ class CRM_Core_BAO_CustomValueTable {
 
   /**
    * @param array $customParams
+   * @param string $parentOperation Operation being taken on the parent entity.
+   *   If we know the parent entity is doing an insert we can skip the
+   *   ON DUPLICATE UPDATE - which improves performance and reduces deadlocks.
+   *   - edit
+   *   - create
    *
    * @throws Exception
    */
-  public static function create($customParams) {
+  public static function create($customParams, $parentOperation = NULL) {
     if (empty($customParams) ||
       !is_array($customParams)
     ) {
@@ -256,7 +261,7 @@ class CRM_Core_BAO_CustomValueTable {
             $fieldValues = implode(',', array_values($set));
             $query = "$sqlOP ( $fieldNames ) VALUES ( $fieldValues )";
             // for multiple values we dont do on duplicate key update
-            if (!$isMultiple) {
+            if (!$isMultiple && $parentOperation !== 'create') {
               $query .= " ON DUPLICATE KEY UPDATE $setClause";
             }
           }
@@ -337,8 +342,13 @@ class CRM_Core_BAO_CustomValueTable {
    * @param array $params
    * @param $entityTable
    * @param int $entityID
+   * @param string $parentOperation Operation being taken on the parent entity.
+   *   If we know the parent entity is doing an insert we can skip the
+   *   ON DUPLICATE UPDATE - which improves performance and reduces deadlocks.
+   *   - edit
+   *   - create
    */
-  public static function store($params, $entityTable, $entityID) {
+  public static function store($params, $entityTable, $entityID, $parentOperation = NULL) {
     $cvParams = [];
     foreach ($params as $fieldID => $param) {
       foreach ($param as $index => $customValue) {
@@ -375,7 +385,7 @@ class CRM_Core_BAO_CustomValueTable {
       }
     }
     if (!empty($cvParams)) {
-      self::create($cvParams);
+      self::create($cvParams, $parentOperation);
     }
   }
 
