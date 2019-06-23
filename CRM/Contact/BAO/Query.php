@@ -2140,6 +2140,12 @@ class CRM_Contact_BAO_Query {
       $field = CRM_Utils_Array::value($locType[0], $this->_fields);
 
       if (!$field) {
+        // Strip any trailing _high & _low that might be appended.
+        $realFieldName = str_replace(['_high', '_low'], '', $name);
+        if (isset($this->_fields[$realFieldName])) {
+          $field = $this->_fields[str_replace(['_high', '_low'], '', $realFieldName)];
+          $this->dateQueryBuilder($values, $field['table_name'], $realFieldName, $realFieldName, $field['title']);
+        }
         return;
       }
     }
@@ -5214,6 +5220,7 @@ civicrm_relationship.start_date > {$today}
     $appendTimeStamp = TRUE,
     $dateFormat = 'YmdHis'
   ) {
+    // @todo - remove dateFormat - pretty sure it's never passed in...
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     if ($name == "{$fieldName}_low" ||
