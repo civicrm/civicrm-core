@@ -78,11 +78,10 @@ class CRM_Event_Form_ManageEvent_TabHeader {
       'valid' => TRUE,
       'active' => TRUE,
       'current' => FALSE,
-      'class' => 'ajaxForm',
     ];
 
     $tabs = [];
-    $tabs['settings'] = ['title' => ts('Info and Settings'), 'class' => 'ajaxForm livePage'] + $default;
+    $tabs['settings'] = ['title' => ts('Info and Settings')] + $default;
     $tabs['location'] = ['title' => ts('Event Location')] + $default;
     $tabs['fee'] = ['title' => ts('Fees')] + $default;
     $tabs['registration'] = ['title' => ts('Online Registration')] + $default;
@@ -155,11 +154,8 @@ WHERE      e.id = %1
       }
     }
 
-    // see if any other modules want to add any tabs
-    // note: status of 'valid' flag of any injected tab, needs to be taken care in the hook implementation.
-    CRM_Utils_Hook::tabset('civicrm/event/manage', $tabs,
-      ['event_id' => $eventID]);
-
+    // Call tabset hook to add/remove custom tabs
+    CRM_Utils_Hook::tabset('civicrm/event/manage', $tabs, ['event_id' => $eventID]);
     $fullName = $form->getVar('_name');
     $className = CRM_Utils_String::getClassName($fullName);
     $new = '';

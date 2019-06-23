@@ -313,7 +313,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
     if ($this->_single) {
       $buttons = [
         [
-          'type' => 'upload',
+          'type' => 'next',
           'name' => ts('Save'),
           'isDefault' => TRUE,
         ],
@@ -395,19 +395,18 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
         }
       }
       $this->postProcessHook();
-      if ($this->controller->getButtonName('submit') == "_qf_{$className}_upload_done") {
-        if ($this->_isTemplate) {
-          CRM_Core_Session::singleton()
-            ->pushUserContext(CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1'));
-        }
-        else {
-          CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url('civicrm/event/manage', 'reset=1'));
-        }
-      }
-      else {
+      if ($this->controller->getButtonName('submit') == "_qf_{$className}_next") {
         CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url("civicrm/event/manage/{$subPage}",
           "action=update&reset=1&id={$this->_id}"
         ));
+      }
+      else {
+        if ($this->_isTemplate) {
+          CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/admin/eventTemplate', 'reset=1'));
+        }
+        else {
+          CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/event/manage', 'reset=1'));
+        }
       }
     }
   }
