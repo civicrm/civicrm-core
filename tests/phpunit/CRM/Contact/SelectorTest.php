@@ -37,10 +37,6 @@
  */
 class CRM_Contact_SelectorTest extends CiviUnitTestCase {
 
-  public function tearDown() {
-
-  }
-
   /**
    * Test the query from the selector class is consistent with the dataset expectation.
    *
@@ -189,6 +185,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'action' => CRM_Core_Action::NONE,
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
+          'expected_query' => [],
         ),
       ),
       array(
