@@ -163,8 +163,12 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       CRM_Core_Error::deprecatedFunctionWarning('pass receive_date_high not end');
     }
     $this->_defaults = parent::setDefaultValues();
-    if (empty($this->_defaults['contribution_status'])) {
-      $this->_defaults['contribution_status'][1] = 1;
+    if (empty($this->_defaults['contribution_status_id'])) {
+      $this->_defaults['contribution_status_id'][1] = CRM_Core_PseudoConstant::getKey(
+        'CRM_Contribute_BAO_Contribution',
+        'contribution_status_id',
+        'Completed'
+      );
     }
     return $this->_defaults;
   }
