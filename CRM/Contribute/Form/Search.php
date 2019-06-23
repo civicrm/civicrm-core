@@ -149,8 +149,10 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * Set defaults.
    *
    * @return array
+   * @throws \Exception
    */
   public function setDefaultValues() {
+    $this->_defaults = parent::setDefaultValues();
     if (empty($this->_defaults['contribution_status'])) {
       $this->_defaults['contribution_status'][1] = 1;
     }

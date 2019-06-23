@@ -251,19 +251,19 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    */
   protected function getEntityDefaults($entity) {
     $defaults = [];
-    foreach ($this->getSearchFieldMetadata()[$entity] as $fieldSpec) {
+    foreach ($this->getSearchFieldMetadata()[$entity] as $fieldName => $fieldSpec) {
       if (empty($_POST[$fieldSpec['name']])) {
-        $value = CRM_Utils_Request::retrieveValue($fieldSpec['name'], $this->getValidationTypeForField($entity, $fieldSpec['name']), FALSE, NULL, 'GET');
-        if ($value !== FALSE) {
-          $defaults[$fieldSpec['name']] = $value;
+        $value = CRM_Utils_Request::retrieveValue($fieldName, $this->getValidationTypeForField($entity, $fieldName), FALSE, NULL, 'GET');
+        if ($value !== NULL) {
+          $defaults[$fieldName] = $value;
         }
         if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || ($fieldSpec['type'] === CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
-          $low = CRM_Utils_Request::retrieveValue($fieldSpec['name'] . '_low', 'Timestamp', FALSE, NULL, 'GET');
-          $high = CRM_Utils_Request::retrieveValue($fieldSpec['name'] . '_high', 'Timestamp', FALSE, NULL, 'GET');
+          $low = CRM_Utils_Request::retrieveValue($fieldName . '_low', 'Timestamp', FALSE, NULL, 'GET');
+          $high = CRM_Utils_Request::retrieveValue($fieldName . '_high', 'Timestamp', FALSE, NULL, 'GET');
           if ($low !== FALSE || $high !== FALSE) {
-            $defaults[$fieldSpec['name'] . '_relative'] = 0;
-            $defaults[$fieldSpec['name'] . '_low'] = $low ? date('Y-m-d H:i:s', strtotime($low)) : NULL;
-            $defaults[$fieldSpec['name'] . '_high'] = $high ? date('Y-m-d H:i:s', strtotime($high)) : NULL;
+            $defaults[$fieldName . '_relative'] = 0;
+            $defaults[$fieldName . '_low'] = $low ? date('Y-m-d H:i:s', strtotime($low)) : NULL;
+            $defaults[$fieldName . '_high'] = $high ? date('Y-m-d H:i:s', strtotime($high)) : NULL;
           }
         }
       }
