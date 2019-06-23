@@ -152,6 +152,16 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    * @throws \Exception
    */
   public function setDefaultValues() {
+    $lowReceiveDate = CRM_Utils_Request::retrieve('start', 'Timestamp');
+    if (!empty($lowReceiveDate)) {
+      $this->_formValues['receive_date_low'] = date('Y-m-d H:i:s', strtotime($lowReceiveDate));
+      CRM_Core_Error::deprecatedFunctionWarning('pass receive_date_low not start');
+    }
+    $highReceiveDate = CRM_Utils_Request::retrieve('end', 'Timestamp');
+    if (!empty($highReceiveDate)) {
+      $this->_formValues['receive_date_high'] = date('Y-m-d H:i:s', strtotime($highReceiveDate));
+      CRM_Core_Error::deprecatedFunctionWarning('pass receive_date_high not end');
+    }
     $this->_defaults = parent::setDefaultValues();
     if (empty($this->_defaults['contribution_status'])) {
       $this->_defaults['contribution_status'][1] = 1;
@@ -423,25 +433,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         // also assign individual mode to the template
         $this->_single = TRUE;
       }
-    }
-
-    $lowDate = CRM_Utils_Request::retrieve('start', 'Timestamp');
-    if ($lowDate) {
-      $lowDate = CRM_Utils_Type::escape($lowDate, 'Timestamp');
-      $date = CRM_Utils_Date::setDateDefaults($lowDate);
-      $this->_formValues['contribution_date_low'] = $this->_defaults['contribution_date_low'] = $date[0];
-    }
-
-    $highDate = CRM_Utils_Request::retrieve('end', 'Timestamp');
-    if ($highDate) {
-      $highDate = CRM_Utils_Type::escape($highDate, 'Timestamp');
-      $date = CRM_Utils_Date::setDateDefaults($highDate);
-      $this->_formValues['contribution_date_high'] = $this->_defaults['contribution_date_high'] = $date[0];
-    }
-
-    if ($highDate || $lowDate) {
-      //set the Choose Date Range value
-      $this->_formValues['contribution_date_relative'] = 0;
     }
 
     $this->_limit = CRM_Utils_Request::retrieve('limit', 'Positive',
