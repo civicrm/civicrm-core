@@ -49,6 +49,7 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
    *   clause will need changing.
    *
    * @dataProvider querySets
+   * @throws \Exception
    */
   public function testSelectorQuery($dataSet) {
     $params = CRM_Contact_BAO_Query::convertFormValues($dataSet['form_values'], 0, FALSE, NULL, array());
@@ -176,6 +177,20 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
    */
   public function querySets() {
     return array(
+      array(
+        array(
+          'description' => 'Empty group test',
+          'class' => 'CRM_Contact_Selector',
+          'settings' => [],
+          'form_values' => [['contact_type', '=', 'Individual', 1, 0], ['group', 'IS NULL', '', 1, 0]],
+          'params' => [],
+          'return_properties' => NULL,
+          'context' => 'builder',
+          'action' => CRM_Core_Action::NONE,
+          'includeContactIds' => NULL,
+          'searchDescendentGroups' => FALSE,
+        ),
+      ),
       array(
         array(
           'description' => 'Normal default behaviour',
