@@ -171,33 +171,21 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
     $this->assign('isTemplate', $this->_isTemplate);
 
+    // Set "Manage Event" Title
+    $title = NULL;
     if ($this->_id) {
       if ($this->_isTemplate) {
-        $title = CRM_Utils_Array::value('template_title', $eventInfo);
-        CRM_Utils_System::setTitle(ts('Edit Event Template') . " - $title");
+        $title = ts('Edit Event Template') . ' - ' . CRM_Utils_Array::value('template_title', $eventInfo);
       }
       else {
-        $configureText = ts('Configure Event');
-        $title = CRM_Utils_Array::value('title', $eventInfo);
-        //If it is a repeating event change title
-        if ($this->_isRepeatingEvent) {
-          $configureText = 'Configure Repeating Event';
-        }
-        CRM_Utils_System::setTitle($configureText . " - $title");
+        $configureText = $this->_isRepeatingEvent ? ts('Configure Repeating Event') : ts('Configure Event');
+        $title = $configureText . ' - ' . CRM_Utils_Array::value('title', $eventInfo);
       }
-      $this->assign('title', $title);
     }
     elseif ($this->_action & CRM_Core_Action::ADD) {
-      if ($this->_isTemplate) {
-        $title = ts('New Event Template');
-        CRM_Utils_System::setTitle($title);
-      }
-      else {
-        $title = ts('New Event');
-        CRM_Utils_System::setTitle($title);
-      }
-      $this->assign('title', $title);
+      $title = $this->_isTemplate ? ts('New Event Template') : ts('New Event');
     }
+    $this->setTitle($title);
 
     if (CRM_Core_Permission::check('view event participants') &&
       CRM_Core_Permission::check('view all contacts')
@@ -393,7 +381,7 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
 
       CRM_Core_Session::setStatus(ts("'%1' information has been saved.",
         [1 => CRM_Utils_Array::value('title', CRM_Utils_Array::value($subPage, $this->get('tabHeader')), $className)]
-      ), ts('Saved'), 'success');
+      ), $this->getTitle(), 'success');
 
       $config = CRM_Core_Config::singleton();
       if (in_array('CiviCampaign', $config->enableComponents)) {
