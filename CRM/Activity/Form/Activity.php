@@ -865,13 +865,17 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $errors['activity_type_id'] = ts('Activity Type is a required field');
     }
 
-    if (CRM_Utils_Array::value('activity_type_id', $fields) == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email')
-      && CRM_Utils_Array::value('status_id', $fields) == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled')) {
-      $errors['status_id'] = ts('You cannot record scheduled email activity.');
-    }
-    elseif (CRM_Utils_Array::value('activity_type_id', $fields) == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'SMS')
-      && CRM_Utils_Array::value('status_id', $fields) == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled')) {
-      $errors['status_id'] = ts('You cannot record scheduled SMS activity.');
+    $activity_type_id = CRM_Utils_Array::value('activity_type_id', $fields);
+    $activity_status_id = CRM_Utils_Array::value('status_id', $fields);
+    $scheduled_status_id = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Scheduled');
+
+    if ($activity_type_id && $activity_status_id == $scheduled_status_id) {
+      if ($activity_type_id == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Email')) {
+        $errors['status_id'] = ts('You cannot record scheduled email activity.');
+      }
+      elseif ($activity_type_id == CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'SMS')) {
+        $errors['status_id'] = ts('You cannot record scheduled SMS activity');
+      }
     }
 
     if (!empty($fields['followup_activity_type_id']) && empty($fields['followup_date'])) {
