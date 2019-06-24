@@ -1899,7 +1899,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   public function checkArrayEquals(&$actual, &$expected) {
     self::unsetId($actual);
     self::unsetId($expected);
-    $this->assertEquals($actual, $expected);
+    $this->assertEquals($expected, $actual);
   }
 
   /**
