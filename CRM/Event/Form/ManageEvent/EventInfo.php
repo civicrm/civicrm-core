@@ -46,7 +46,7 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
    */
   public function preProcess() {
     parent::preProcess();
-    $this->assign('selectedChild', 'settings');
+    $this->setSelectedChild('settings');
 
     $entityID = $this->_id ?: $this->_templateId;
     if ($entityID) {

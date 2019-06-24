@@ -45,8 +45,6 @@ class CRM_Event_Form_ManageEvent_TabHeader {
    * @throws \CRM_Core_Exception
    */
   public static function build(&$form) {
-    $form->assign('selectedChild', CRM_Utils_Request::retrieve('selectedChild', 'Alphanumeric', $form));
-
     $tabs = $form->get('tabHeader');
     if (!$tabs || empty($_GET['reset'])) {
       $tabs = self::process($form);
