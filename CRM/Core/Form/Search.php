@@ -132,7 +132,11 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * @throws \Exception
    */
   public function setDefaultValues() {
-    return array_merge($this->getEntityDefaults($this->getDefaultEntity()), (array) $this->_formValues);
+    $defaults = (array) $this->_formValues;
+    foreach (['Contact', $this->getDefaultEntity()] as $entity) {
+      $defaults = array_merge($this->getEntityDefaults($entity), $defaults);
+    }
+    return $defaults;
   }
 
   /**
@@ -251,16 +255,16 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    */
   protected function getEntityDefaults($entity) {
     $defaults = [];
-    foreach ($this->getSearchFieldMetadata()[$entity] as $fieldName => $fieldSpec) {
-      if (empty($_POST[$fieldSpec['name']])) {
-        $value = CRM_Utils_Request::retrieveValue($fieldName, $this->getValidationTypeForField($entity, $fieldName), FALSE, NULL, 'GET');
+    foreach (CRM_Utils_Array::value($entity, $this->getSearchFieldMetadata(), []) as $fieldName => $fieldSpec) {
+      if (empty($_POST[$fieldName])) {
+        $value = CRM_Utils_Request::retrieveValue($fieldName, $this->getValidationTypeForField($entity, $fieldName), NULL, NULL, 'GET');
         if ($value !== NULL) {
           $defaults[$fieldName] = $value;
         }
         if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || ($fieldSpec['type'] === CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
-          $low = CRM_Utils_Request::retrieveValue($fieldName . '_low', 'Timestamp', FALSE, NULL, 'GET');
-          $high = CRM_Utils_Request::retrieveValue($fieldName . '_high', 'Timestamp', FALSE, NULL, 'GET');
-          if ($low !== FALSE || $high !== FALSE) {
+          $low = CRM_Utils_Request::retrieveValue($fieldName . '_low', 'Timestamp', NULL, NULL, 'GET');
+          $high = CRM_Utils_Request::retrieveValue($fieldName . '_high', 'Timestamp', NULL, NULL, 'GET');
+          if ($low !== NULL || $high !== NULL) {
             $defaults[$fieldName . '_relative'] = 0;
             $defaults[$fieldName . '_low'] = $low ? date('Y-m-d H:i:s', strtotime($low)) : NULL;
             $defaults[$fieldName . '_high'] = $high ? date('Y-m-d H:i:s', strtotime($high)) : NULL;
@@ -327,12 +331,14 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * to define the string.
    */
   protected function addSortNameField() {
+    $title = civicrm_api3('setting', 'getvalue', ['name' => 'includeEmailInName', 'group' => 'Search Preferences']) ? $this->getSortNameLabelWithEmail() : $this->getSortNameLabelWithOutEmail();
     $this->addElement(
       'text',
       'sort_name',
-      civicrm_api3('setting', 'getvalue', ['name' => 'includeEmailInName', 'group' => 'Search Preferences']) ? $this->getSortNameLabelWithEmail() : $this->getSortNameLabelWithOutEmail(),
+      $title,
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name')
     );
+    $this->searchFieldMetadata['Contact']['sort_name'] = ['name' => 'sort_name', 'title' => $title, 'type' => CRM_Utils_Type::T_STRING];
   }
 
   /**
