@@ -33,7 +33,8 @@
     "smartmenus": "~1.1",
     "phantomjs-polyfill": "^0.0.2",
     "es6-promise": "^4.2.4",
-    "angular-xeditable": "^0.9.0"
+    "angular-xeditable": "^0.9.0",
+    "checklist-model": "~1"
   },
   "resolutions": {
     "angular": "~1.5.11",
