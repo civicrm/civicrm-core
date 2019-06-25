@@ -730,38 +730,24 @@ class CRM_Core_SelectValues {
    * @return array
    */
   public static function getDatePluginInputFormats() {
-    $dateInputFormats = [
-      "mm/dd/yy" => ts('mm/dd/yyyy (12/31/2009)'),
-      "dd/mm/yy" => ts('dd/mm/yyyy (31/12/2009)'),
-      "yy-mm-dd" => ts('yyyy-mm-dd (2009-12-31)'),
-      "dd-mm-yy" => ts('dd-mm-yyyy (31-12-2009)'),
-      'dd.mm.yy' => ts('dd.mm.yyyy (31.12.2009)'),
-      "M d, yy" => ts('M d, yyyy (Dec 31, 2009)'),
-      'd M yy' => ts('d M yyyy (31 Dec 2009)'),
-      "MM d, yy" => ts('MM d, yyyy (December 31, 2009)'),
-      'd MM yy' => ts('d MM yyyy (31 December 2009)'),
-      "DD, d MM yy" => ts('DD, d MM yyyy (Thursday, 31 December 2009)'),
-      "mm/dd" => ts('mm/dd (12/31)'),
-      "dd-mm" => ts('dd-mm (31-12)'),
-      "yy-mm" => ts('yyyy-mm (2009-12)'),
-      'M yy' => ts('M yyyy (Dec 2009)'),
-      "yy" => ts('yyyy (2009)'),
+    $yy = date('Y');
+    return [
+      "mm/dd/yy" => ts("mm/dd/yyyy (12/31/$yy)"),
+      "dd/mm/yy" => ts("dd/mm/yyyy (31/12/$yy)"),
+      "yy-mm-dd" => ts("yyyy-mm-dd ($yy-12-31)"),
+      "dd-mm-yy" => ts("dd-mm-yyyy (31-12-$yy)"),
+      "dd.mm.yy" => ts("dd.mm.yyyy (31.12.$yy)"),
+      "M d, yy" => ts("M d, yyyy (Dec 31, $yy)"),
+      "d M yy" => ts("d M yyyy (31 Dec $yy)"),
+      "MM d, yy" => ts("MM d, yyyy (December 31, $yy)"),
+      "d MM yy" => ts("d MM yyyy (31 December $yy)"),
+      "DD, d MM yy" => ts("DD, d MM yyyy (Thursday, 31 December $yy)"),
+      "mm/dd" => ts("mm/dd (12/31)"),
+      "dd-mm" => ts("dd-mm (31-12)"),
+      "yy-mm" => ts("yyyy-mm ($yy-12)"),
+      "M yy" => ts("M yyyy (Dec $yy)"),
+      "yy" => ts("yyyy ($yy)"),
     ];
-
-    /*
-    Year greater than 2000 get wrong result for following format
-    echo date( 'Y-m-d', strtotime( '7 Nov, 2001') );
-    echo date( 'Y-m-d', strtotime( '7 November, 2001') );
-    Return current year
-    expected :: 2001-11-07
-    output   :: 2009-11-07
-    However
-    echo date( 'Y-m-d', strtotime( 'Nov 7, 2001') );
-    echo date( 'Y-m-d', strtotime( 'November 7, 2001') );
-    gives proper result
-     */
-
-    return $dateInputFormats;
   }
 
   /**
