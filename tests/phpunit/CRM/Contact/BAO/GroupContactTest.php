@@ -91,6 +91,8 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
 
   /**
    *  Test case for contact search: CRM-6706, CRM-6586 Parent Group search should return contacts from child groups too.
+   *
+   * @throws \Exception
    */
   public function testContactSearchByParentGroup() {
     // create a parent group
@@ -146,7 +148,7 @@ class CRM_Contact_BAO_GroupContactTest extends CiviUnitTestCase {
     $childContactParams = array(
       'first_name' => 'Child1 Fname',
       'last_name' => 'Child2 Lname',
-      'group' => array($childGroup['id'] => 1),
+      'group' => [$childGroup['id'] => 1],
     );
     $childContact = $this->individualCreate($childContactParams);
 

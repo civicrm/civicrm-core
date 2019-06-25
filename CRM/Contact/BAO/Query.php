@@ -2968,6 +2968,8 @@ class CRM_Contact_BAO_Query {
    * Where / qill clause for groups.
    *
    * @param $values
+   *
+   * @throws \CRM_Core_Exception
    */
   public function group($values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -2977,9 +2979,18 @@ class CRM_Contact_BAO_Query {
       $op = key($value);
       $value = $value[$op];
     }
-
-    // Replace pseudo operators from search builder
-    $op = str_replace('EMPTY', 'NULL', $op);
+    // Translate EMPTY to NULL as EMPTY is cannot be used in it's intended meaning here
+    // so has to be 'squashed into' NULL. (ie. group membership cannot be '').
+    // even one group might equate to multiple when looking at children so IN is simpler.
+    // @todo - also look at != casting but there are rows below to review.
+    $opReplacements = [
+      'EMPTY' => 'NULL',
+      'NOT EMPTY' => 'NOT NULL',
+      '=' => 'IN',
+    ];
+    if (isset($opReplacements[$op])) {
+      $op = $opReplacements[$op];
+    }
 
     if (strpos($op, 'NULL')) {
       $value = NULL;
@@ -3003,10 +3014,10 @@ class CRM_Contact_BAO_Query {
     $regularGroupIDs = $smartGroupIDs = [];
     foreach ((array) $value as $id) {
       if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'saved_search_id')) {
-        $smartGroupIDs[] = $id;
+        $smartGroupIDs[] = (int) $id;
       }
       else {
-        $regularGroupIDs[] = trim($id);
+        $regularGroupIDs[] = (int) trim($id);
       }
     }
     $hasNonSmartGroups = count($regularGroupIDs);
@@ -3014,8 +3025,10 @@ class CRM_Contact_BAO_Query {
     $isNotOp = ($op == 'NOT IN' || $op == '!=');
 
     $statusJoinClause = $this->getGroupStatusClause($grouping);
+    // If we are searching for 'Removed' contacts then despite it being a smart group we only care about the group_contact table.
+    $isGroupStatusSearch = (!empty($this->getSelectedGroupStatuses($grouping)) && $this->getSelectedGroupStatuses($grouping) !== ["'Added'"]);
     $groupClause = [];
-    if ($hasNonSmartGroups || empty($value)) {
+    if ($hasNonSmartGroups || empty($value) || $isGroupStatusSearch) {
       // include child groups IDs if any
       $childGroupIds = (array) CRM_Contact_BAO_Group::getChildGroupIds($regularGroupIDs);
       foreach ($childGroupIds as $key => $id) {
@@ -3029,32 +3042,31 @@ class CRM_Contact_BAO_Query {
       }
 
       if (empty($regularGroupIDs)) {
-        $regularGroupIDs = [0];
+        if ($isGroupStatusSearch) {
+          $regularGroupIDs = $smartGroupIDs;
+        }
+        // If it is still empty we want a filter that blocks all results.
+        if (empty($regularGroupIDs)) {
+          $regularGroupIDs = [0];
+        }
       }
 
-      // if $regularGroupIDs is populated with regular child group IDs
-      //   then change the mysql operator to desired
-      if (count($regularGroupIDs) > 1) {
-        $op = strpos($op, 'IN') ? $op : ($op == '!=') ? 'NOT IN' : 'IN';
-      }
-      $groupIds = '';
-      if (!empty($regularGroupIDs)) {
-        $groupIds = CRM_Utils_Type::validate(
-          implode(',', (array) $regularGroupIDs),
-          'CommaSeparatedIntegers'
-        );
-      }
       $gcTable = "`civicrm_group_contact-" . uniqid() . "`";
       $joinClause = ["contact_a.id = {$gcTable}.contact_id"];
 
-      if (strpos($op, 'IN') !== FALSE) {
-        $clause = "{$gcTable}.group_id $op ( $groupIds ) ";
-      }
-      elseif ($op == '!=') {
+      // @todo consider just casting != to NOT IN & handling both together.
+      if ($op == '!=') {
+        $groupIds = '';
+        if (!empty($regularGroupIDs)) {
+          $groupIds = CRM_Utils_Type::validate(
+            implode(',', (array) $regularGroupIDs),
+            'CommaSeparatedIntegers'
+          );
+        }
         $clause = "{$gcTable}.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact cgc WHERE cgc.group_id = $groupIds )";
       }
       else {
-        $clause = "{$gcTable}.group_id $op $groupIds ";
+        $clause = self::buildClause("{$gcTable}.group_id", $op, $regularGroupIDs);
       }
       $groupClause[] = "( {$clause} )";
 
@@ -3065,8 +3077,9 @@ class CRM_Contact_BAO_Query {
     }
 
     //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
-    $groupContactCacheClause = '';
-    if (count($smartGroupIDs) || empty($value)) {
+    // If we are only searching for Removed or Pending contacts we don't need to resolve the smart group
+    // as that info is in the group_contact table.
+    if ((count($smartGroupIDs) || empty($value)) && !$isGroupStatusSearch) {
       $this->_groupUniqueKey = uniqid();
       $this->_groupKeys[] = $this->_groupUniqueKey;
       $gccTableAlias = "civicrm_group_contact_cache_{$this->_groupUniqueKey}";
