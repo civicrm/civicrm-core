@@ -37,11 +37,19 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class I18nSubscriber implements EventSubscriberInterface {
 
   /**
+   * Used for rolling back language to its original setting after the api call.
+   *
+   * @var array
+   */
+  public $originalLang = [];
+
+  /**
    * @return array
    */
   public static function getSubscribedEvents() {
     return [
       Events::PREPARE => ['onApiPrepare', Events::W_MIDDLE],
+      Events::RESPOND => ['onApiRespond', Events::W_LATE],
     ];
   }
 
@@ -64,7 +72,25 @@ class I18nSubscriber implements EventSubscriberInterface {
       $language = \CRM_Utils_Array::value('language', $params);
     }
     if ($language) {
-      $this->setLocale($language);
+      $this->setLocale($language, $apiRequest['id']);
+    }
+  }
+
+  /**
+   * Reset language to the default.
+   *
+   * @param \Civi\API\Event\Event $event
+   *
+   * @throws \API_Exception
+   */
+  public function onApiRespond(\Civi\API\Event\Event $event) {
+    $apiRequest = $event->getApiRequest();
+
+    if (!empty($this->originalLang[$apiRequest['id']])) {
+      global $tsLocale;
+      global $dbLocale;
+      $tsLocale = $this->originalLang[$apiRequest['id']]['tsLocale'];
+      $dbLocale = $this->originalLang[$apiRequest['id']]['dbLocale'];
     }
   }
 
@@ -73,9 +99,10 @@ class I18nSubscriber implements EventSubscriberInterface {
    * Some code duplication from CRM/Core/BAO/ConfigSetting.php retrieve()
    * to avoid regressions from refactoring.
    * @param $lcMessagesRequest
+   * @param int $requestId
    * @throws \API_Exception
    */
-  public function setLocale($lcMessagesRequest) {
+  public function setLocale($lcMessagesRequest, $requestId) {
     // We must validate whether the locale is valid, otherwise setting a bad
     // dbLocale could probably lead to sql-injection.
     $domain = new \CRM_Core_DAO_Domain();
@@ -102,14 +129,20 @@ class I18nSubscriber implements EventSubscriberInterface {
       }
     }
 
-    global $dbLocale;
-
-    // set suffix for table names - use views if more than one language
     if ($lcMessages) {
-      $dbLocale = $multiLang && $lcMessages ? "_{$lcMessages}" : '';
-
-      // FIXME: an ugly hack to fix CRM-4041
+      global $dbLocale;
       global $tsLocale;
+
+      // Store original value to be restored in $this->onApiRespond
+      $this->originalLang[$requestId] = [
+        'tsLocale' => $tsLocale,
+        'dbLocale' => $dbLocale,
+      ];
+
+      // Set suffix for table names - use views if more than one language
+      $dbLocale = "_{$lcMessages}";
+
+      // Also set tsLocale - CRM-4041
       $tsLocale = $lcMessages;
     }
   }
