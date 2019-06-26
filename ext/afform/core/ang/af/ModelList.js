@@ -8,8 +8,15 @@
         // afModelList: '=',
         ctrl: '@'
       },
-      link: function($scope, $el, $attr) {},
-      controller: ['$scope', function($scope) {
+      link: {
+        pre: function($scope, $el, $attr) {
+
+        },
+        post: function($scope, $el, $attr) {
+          $scope.myCtrl.loadData();
+        }
+      },
+      controller: function($scope, $routeParams, crmApi4) {
         var schema = {}, data = {};
 
         $scope.$parent[$scope.ctrl] = this;
@@ -31,6 +38,20 @@
         };
         this.getSchema = function getSchema(name) {
           return schema[name];
+        };
+        this.loadData = function() {
+          var apiCalls = {};
+          _.each(schema, function(entity, entityName) {
+            if ($routeParams[entityName]) {
+              var id = $routeParams[entityName];
+              apiCalls[entityName] = [entity.type, 'get', {select: entity.fields, where: [['id', '=', id]]}, 0];
+            }
+          });
+          if (!_.isEmpty(apiCalls)) {
+            crmApi4(apiCalls).then(function(resp) {
+              data = resp;
+            });
+          }
         };
 
         this.submit = function submit() {
