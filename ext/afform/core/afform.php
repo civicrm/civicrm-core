@@ -189,11 +189,23 @@ function afform_civicrm_alterAngular($angular) {
         $entityType = $entities[$entityName]['type'];
         $getFields = civicrm_api4($entityType, 'getFields', [
           'where' => [['name', '=', $fieldName]],
-          'select' => ['name', 'html_type', 'html_attrs', 'options'],
+          'select' => ['title', 'input_type', 'input_attrs', 'options'],
           'loadOptions' => TRUE,
         ]);
+        // Merge field definition data with whatever's already in the markup
         foreach ($getFields as $field) {
-          pq($afField)->attr('field-defn', json_encode($field, JSON_UNESCAPED_SLASHES));
+          $existingFieldDefn = trim(pq($afField)->attr('field-defn') ?: '');
+          if ($existingFieldDefn && $existingFieldDefn[0] != '{') {
+            // If it's not an object, don't mess with it.
+            continue;
+          }
+          foreach ($field as &$prop) {
+            $prop = json_encode($prop, JSON_UNESCAPED_SLASHES);
+          }
+          if ($existingFieldDefn) {
+            $field = array_merge($field, CRM_Utils_JS::getRawProps($existingFieldDefn));
+          }
+          pq($afField)->attr('field-defn', CRM_Utils_JS::writeObject($field));
         }
       }
     });
