@@ -12,7 +12,9 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
     $loader = new \Civi\Angular\AngularLoader();
     $loader->setModules([$module, 'afformStandalone']);
     $loader->setPageName(implode('/', $pagePath));
-    $loader->useApp();
+    $loader->useApp([
+      'file' => 'CRM/Afform/Page/AfformBase.tpl',
+    ]);
     $loader->getRes()->addSetting([
       'afform' => [
         'open' => _afform_angular_module_name($pageArgs['afform'], 'dash'),

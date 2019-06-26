@@ -10,16 +10,21 @@
       },
       link: function($scope, $el, $attr, afModelListCtrl) {
         $scope.afModelListCtrl = afModelListCtrl;
-        // $scope.$watch('afName', function(newValue){
-        //   // $scope.myOptions = newValue;
-        //   $scope.modelDefn = afModelListCtrl.getEntity(newValue);
-        //   console.log('Lookup entity', newValue, $scope.modelDefn);
-        // });
+        // This is faster than waiting for each field directive to register itself
+        $('af-field', $el).each(function() {
+          afModelListCtrl.registerField($scope.afName, $(this).attr('field-name'))
+        });
       },
       controller: function($scope){
         this.getDefn = function getDefn() {
           return $scope.afModelListCtrl.getEntity($scope.afName);
           // return $scope.modelDefn;
+        };
+        this.getData = function getData() {
+          return $scope.afModelListCtrl.getData($scope.afName);
+        };
+        this.getName = function() {
+          return $scope.afName;
         }
       }
     };

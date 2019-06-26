@@ -3,16 +3,16 @@
 // in CiviCRM. See also:
 // http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_angularModules
 
-return array(
-  'js' => array(
+return [
+  'js' => [
     'ang/afformStandalone.js',
     'ang/afformStandalone/*.js',
     'ang/afformStandalone/*/*.js',
-  ),
-  'css' => array(),
-  'partials' => array(
+  ],
+  'css' => [],
+  'partials' => [
     'ang/afformStandalone',
-  ),
-  'settings' => array(),
+  ],
+  'settings' => [],
   'requires' => ['ngRoute'],
-);
+];

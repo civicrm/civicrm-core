@@ -10,25 +10,33 @@
       },
       link: function($scope, $el, $attr) {},
       controller: ['$scope', function($scope) {
-        var entities = {};
+        var schema = {}, data = {};
 
         $scope.$parent[$scope.ctrl] = this;
+        // Maybe there's a better way to export this controller to scope?
+        $scope.myCtrl = this;
 
         this.registerEntity = function registerEntity(entity) {
-          // console.log('register', entity.name);
-          entities[entity.name] = entity;
+          schema[entity.name] = entity;
+          data[entity.name] = data[entity.name] || {};
+        };
+        this.registerField = function(entityName, fieldName) {
+          schema[entityName].fields.push(fieldName);
         };
         this.getEntity = function getEntity(name) {
-          // console.log('get', name);
-          return entities[name];
+          return schema[name];
         };
-
-        // TODO: Support for tapping into load+save API calls
+        this.getData = function getData(name) {
+          return data[name];
+        };
+        this.getSchema = function getSchema(name) {
+          return schema[name];
+        };
 
         this.submit = function submit() {
           CRM.alert('TODO: Submit');
         };
-      }]
+      }
     };
   });
 })(angular, CRM.$, CRM._);

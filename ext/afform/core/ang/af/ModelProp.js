@@ -13,9 +13,11 @@
       link: function($scope, $el, $attr, afModelListCtrl) {
         var ts = $scope.ts = CRM.ts('afform');
         afModelListCtrl.registerEntity({
+          id: null,
           type: $scope.afType,
           name: $scope.afName,
-          label: $scope.afLabel
+          label: $scope.afLabel,
+          fields: [],
         });
         // $scope.$watch('afModelProp', function(newValue){$scope.myOptions = newValue;});
       }

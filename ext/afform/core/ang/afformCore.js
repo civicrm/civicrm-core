@@ -1,8 +1,6 @@
 (function(angular, $, _) {
   // Declare a list of dependencies.
-  angular.module('afformCore', [
-    'crmUi', 'crmUtil', 'ngRoute', 'api4'
-  ]);
+  angular.module('afformCore', CRM.angRequires('afformCore'));
 
   // Use `afformCoreDirective(string name)` to generate an AngularJS directive.
   angular.module('afformCore').service('afformCoreDirective', function($routeParams, crmApi4, crmStatus, crmUiAlert){
