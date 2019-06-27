@@ -173,7 +173,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         'column_name'
       );
     }
-    $columnName = $params['column_name'];
 
     $indexExist = FALSE;
     //as during create if field is_searchable we had created index.
@@ -227,7 +226,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       if ($params['option_type'] == 1 && (empty($params['option_group_id']) || !empty($params['option_value']))) {
         // first create an option group for this custom group
         $optionGroup = new CRM_Core_DAO_OptionGroup();
-        $optionGroup->name = "{$columnName}_" . date('YmdHis');
+        $optionGroup->name = "{$params['column_name']}_" . date('YmdHis');
         $optionGroup->title = $params['label'];
         $optionGroup->is_active = 1;
         // Don't set reserved as it's not a built-in option group and may be useful for other custom fields.
@@ -319,10 +318,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     }
     else {
       if (!isset($origParams['column_name'])) {
-        $columnName .= "_{$customField->id}";
-        $params['column_name'] = $columnName;
+        $params['column_name'] .= "_{$customField->id}";
       }
-      $customField->column_name = $columnName;
+      $customField->column_name = $params['column_name'];
       $customField->save();
       // make sure all values are present in the object
       $customField->find(TRUE);
