@@ -546,7 +546,7 @@ class CRM_Contact_Form_Task extends CRM_Core_Form_Task {
         // Advanced search sets queryParams, for builder you need formValues.
         // This is kinda fragile but ....  see CRM_Mailing_Form_Task_AdhocMailingTest for test effort.
         // Moral never touch anything ever again and the house of cards will stand tall, unless there is a breeze
-        'form_values' => $this->get('isSearchBuilder') ?  $this->get('formValues') : $this->get('queryParams'),
+        'form_values' => $this->get('isSearchBuilder') ? $this->get('formValues') : $this->get('queryParams'),
         'saved_search_id' => $ssId,
         'search_custom_id' => $this->get('customSearchID'),
         'search_context' => $this->get('context'),
