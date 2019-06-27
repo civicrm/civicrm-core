@@ -124,7 +124,7 @@ class CRM_Core_BAO_SchemaHandler {
    *
    * @return string
    */
-  public static function buildFieldSQL(&$params, $separator, $prefix) {
+  public static function buildFieldSQL($params, $separator, $prefix) {
     $sql = '';
     $sql .= $separator;
     $sql .= str_repeat(' ', 8);
@@ -159,7 +159,7 @@ class CRM_Core_BAO_SchemaHandler {
    *
    * @return NULL|string
    */
-  public static function buildPrimaryKeySQL(&$params, $separator, $prefix) {
+  public static function buildPrimaryKeySQL($params, $separator, $prefix) {
     $sql = NULL;
     if (!empty($params['primary'])) {
       $sql .= $separator;
@@ -178,7 +178,7 @@ class CRM_Core_BAO_SchemaHandler {
    *
    * @return NULL|string
    */
-  public static function buildSearchIndexSQL(&$params, $separator, $prefix, $indexExist = FALSE) {
+  public static function buildSearchIndexSQL($params, $separator, $prefix, $indexExist = FALSE) {
     $sql = NULL;
 
     // dont index blob
@@ -271,7 +271,7 @@ ALTER TABLE {$tableName}
    *
    * @return NULL|string
    */
-  public static function buildForeignKeySQL(&$params, $separator, $prefix, $tableName) {
+  public static function buildForeignKeySQL($params, $separator, $prefix, $tableName) {
     $sql = NULL;
     if (!empty($params['fk_table_name']) && !empty($params['fk_field_name'])) {
       $sql .= $separator;
