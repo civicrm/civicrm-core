@@ -239,6 +239,8 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
         CRM_Contact_BAO_SubscriptionHistory::create($historyParams);
         $groupContact->status = $status;
         $groupContact->save();
+        // Remove any rows from the group contact cache so it disappears straight away from smart groups.
+        CRM_Contact_BAO_GroupContactCache::removeContact($contactId, $groupId);
       }
     }
 
