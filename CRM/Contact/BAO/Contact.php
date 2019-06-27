@@ -267,18 +267,25 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       return $contact;
     }
 
-    if (!empty($params['contact_id']) && empty($params['contact_type'])) {
+    $isEdit = !empty($params['contact_id']);
+
+    if ($isEdit && empty($params['contact_type'])) {
       $params['contact_type'] = self::getContactType($params['contact_id']);
     }
 
-    $isEdit = TRUE;
+    if (!empty($params['check_permissions']) && isset($params['api_key'])
+      && !CRM_Core_Permission::check([['edit api keys', 'administer CiviCRM']])
+      && !($isEdit && CRM_Core_Permission::check('edit own api keys') && $params['contact_id'] == CRM_Core_Session::getLoggedInContactID())
+    ) {
+      throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify api key');
+    }
+
     if ($invokeHooks) {
       if (!empty($params['contact_id'])) {
         CRM_Utils_Hook::pre('edit', $params['contact_type'], $params['contact_id'], $params);
       }
       else {
         CRM_Utils_Hook::pre('create', $params['contact_type'], NULL, $params);
-        $isEdit = FALSE;
       }
     }
 
