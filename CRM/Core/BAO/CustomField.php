@@ -237,32 +237,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $params['option_group_id'] = $optionGroup->id;
         if (!empty($params['option_value']) && is_array($params['option_value'])) {
           foreach ($params['option_value'] as $k => $v) {
-            if (strlen(trim($v))) {
-              $optionValue = new CRM_Core_DAO_OptionValue();
-              $optionValue->option_group_id = $optionGroup->id;
-              $optionValue->label = $params['option_label'][$k];
-              $optionValue->name = CRM_Utils_String::titleToVar($params['option_label'][$k]);
-              switch ($dataType) {
-                case 'Money':
-                  $optionValue->value = CRM_Utils_Rule::cleanMoney($v);
-                  break;
-
-                case 'Int':
-                  $optionValue->value = intval($v);
-                  break;
-
-                case 'Float':
-                  $optionValue->value = floatval($v);
-                  break;
-
-                default:
-                  $optionValue->value = trim($v);
-              }
-
-              $optionValue->weight = $params['option_weight'][$k];
-              $optionValue->is_active = CRM_Utils_Array::value($k, $params['option_status'], FALSE);
-              $optionValue->save();
-            }
+            self::createOptionValue($params, $v, $optionGroup, $k, $dataType);
           }
         }
       }
@@ -2012,6 +1987,44 @@ WHERE  id IN ( %1, %2 )
     $add->save();
 
     CRM_Utils_System::flushCache();
+  }
+
+  /**
+   * Create an option value for a custom field option group ID.
+   *
+   * @param array $params
+   * @param string $value
+   * @param \CRM_Core_DAO_OptionGroup $optionGroup
+   * @param string $optionName
+   * @param string $dataType
+   */
+  protected static function createOptionValue(&$params, $value, CRM_Core_DAO_OptionGroup $optionGroup, $optionName, $dataType) {
+    if (strlen(trim($value))) {
+      $optionValue = new CRM_Core_DAO_OptionValue();
+      $optionValue->option_group_id = $optionGroup->id;
+      $optionValue->label = $params['option_label'][$optionName];
+      $optionValue->name = CRM_Utils_String::titleToVar($params['option_label'][$optionName]);
+      switch ($dataType) {
+        case 'Money':
+          $optionValue->value = CRM_Utils_Rule::cleanMoney($value);
+          break;
+
+        case 'Int':
+          $optionValue->value = intval($value);
+          break;
+
+        case 'Float':
+          $optionValue->value = floatval($value);
+          break;
+
+        default:
+          $optionValue->value = trim($value);
+      }
+
+      $optionValue->weight = $params['option_weight'][$optionName];
+      $optionValue->is_active = CRM_Utils_Array::value($optionName, $params['option_status'], FALSE);
+      $optionValue->save();
+    }
   }
 
   /**
