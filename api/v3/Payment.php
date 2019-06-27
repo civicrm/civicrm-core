@@ -84,7 +84,7 @@ function civicrm_api3_payment_get($params) {
  * @return array
  *   Api result array
  */
-function civicrm_api3_payment_delete(&$params) {
+function civicrm_api3_payment_delete($params) {
   return civicrm_api3('FinancialTrxn', 'delete', $params);
 }
 
@@ -98,7 +98,7 @@ function civicrm_api3_payment_delete(&$params) {
  * @return array
  *   Api result array
  */
-function civicrm_api3_payment_cancel(&$params) {
+function civicrm_api3_payment_cancel($params) {
   $eftParams = [
     'entity_table' => 'civicrm_contribution',
     'financial_trxn_id' => $params['id'],
@@ -130,7 +130,7 @@ function civicrm_api3_payment_cancel(&$params) {
  * @return array
  *   Api result array
  */
-function civicrm_api3_payment_create(&$params) {
+function civicrm_api3_payment_create($params) {
   // Check if it is an update
   if (CRM_Utils_Array::value('id', $params)) {
     $amount = $params['total_amount'];

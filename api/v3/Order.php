@@ -84,7 +84,7 @@ function _civicrm_api3_order_get_spec(&$params) {
  * @return array
  *   Api result array
  */
-function civicrm_api3_order_create(&$params) {
+function civicrm_api3_order_create($params) {
 
   $entity = NULL;
   $entityIds = [];
