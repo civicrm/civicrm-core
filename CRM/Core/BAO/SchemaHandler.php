@@ -296,41 +296,11 @@ ALTER TABLE {$tableName}
    * @return bool
    */
   public static function alterFieldSQL(&$params, $indexExist = FALSE, $triggerRebuild = TRUE) {
-    $sql = str_repeat(' ', 8);
-    $sql .= "ALTER TABLE {$params['table_name']}";
 
     // lets suppress the required flag, since that can cause sql issue
     $params['required'] = FALSE;
 
-    switch ($params['operation']) {
-      case 'add':
-        $separator = "\n";
-        $prefix = "ADD ";
-        $sql .= self::buildFieldSQL($params, $separator, "ADD COLUMN ");
-        $separator = ",\n";
-        $sql .= self::buildPrimaryKeySQL($params, $separator, "ADD PRIMARY KEY ");
-        $sql .= self::buildSearchIndexSQL($params, $separator, "ADD INDEX ");
-        $sql .= self::buildForeignKeySQL($params, $separator, "ADD ", $params['table_name']);
-        break;
-
-      case 'modify':
-        $separator = "\n";
-        $prefix = "MODIFY ";
-        $sql .= self::buildFieldSQL($params, $separator, $prefix);
-        $separator = ",\n";
-        $sql .= self::buildSearchIndexSQL($params, $separator, "ADD INDEX ", $indexExist);
-        break;
-
-      case 'delete':
-        $sql .= " DROP COLUMN `{$params['name']}`";
-        if (!empty($params['primary'])) {
-          $sql .= ", DROP PRIMARY KEY";
-        }
-        if (!empty($params['fk_table_name'])) {
-          $sql .= ", DROP FOREIGN KEY FK_{$params['fkName']}";
-        }
-        break;
-    }
+    $sql = self::buildFieldChangeSql($params, $indexExist);
 
     // CRM-7007: do not i18n-rewrite this query
     CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
@@ -342,7 +312,7 @@ ALTER TABLE {$tableName}
       // Are there any modifies we DON'T was to call this function for (& shouldn't it be clever enough to cope?)
       if ($params['operation'] == 'add' || $params['operation'] == 'modify') {
         $logging = new CRM_Logging_Schema();
-        $logging->fixSchemaDifferencesFor($params['table_name'], [trim($prefix) => [$params['name']]], FALSE);
+        $logging->fixSchemaDifferencesFor($params['table_name'], [trim(strtoupper($params['operation'])) => [$params['name']]], FALSE);
       }
     }
 
@@ -777,6 +747,47 @@ MODIFY      {$columnName} varchar( $length )
     foreach ($queries as $query) {
       $dao->query($query, FALSE);
     }
+  }
+
+  /**
+   * Build the sql to alter the field.
+   *
+   * @param array $params
+   * @param bool $indexExist
+   *
+   * @return string
+   */
+  public static function buildFieldChangeSql($params, $indexExist) {
+    $sql = str_repeat(' ', 8);
+    $sql .= "ALTER TABLE {$params['table_name']}";
+    switch ($params['operation']) {
+      case 'add':
+        $separator = "\n";
+        $sql .= self::buildFieldSQL($params, $separator, "ADD COLUMN ");
+        $separator = ",\n";
+        $sql .= self::buildPrimaryKeySQL($params, $separator, "ADD PRIMARY KEY ");
+        $sql .= self::buildSearchIndexSQL($params, $separator, "ADD INDEX ");
+        $sql .= self::buildForeignKeySQL($params, $separator, "ADD ", $params['table_name']);
+        break;
+
+      case 'modify':
+        $separator = "\n";
+        $sql .= self::buildFieldSQL($params, $separator, "MODIFY ");
+        $separator = ",\n";
+        $sql .= self::buildSearchIndexSQL($params, $separator, "ADD INDEX ", $indexExist);
+        break;
+
+      case 'delete':
+        $sql .= " DROP COLUMN `{$params['name']}`";
+        if (!empty($params['primary'])) {
+          $sql .= ", DROP PRIMARY KEY";
+        }
+        if (!empty($params['fk_table_name'])) {
+          $sql .= ", DROP FOREIGN KEY FK_{$params['fkName']}";
+        }
+        break;
+    }
+    return $sql;
   }
 
 }
