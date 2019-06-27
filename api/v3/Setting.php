@@ -109,7 +109,7 @@ function _civicrm_api3_setting_getfields_spec(&$params) {
  * @throws \CiviCRM_API3_Exception
  * @throws \Exception
  */
-function civicrm_api3_setting_getdefaults(&$params) {
+function civicrm_api3_setting_getdefaults($params) {
   $settings = civicrm_api3('Setting', 'getfields', $params);
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $defaults = [];
@@ -166,7 +166,7 @@ function civicrm_api3_setting_getoptions($params) {
  * @return array
  * @throws \Exception
  */
-function civicrm_api3_setting_revert(&$params) {
+function civicrm_api3_setting_revert($params) {
   $defaults = civicrm_api('Setting', 'getdefaults', $params);
   $fields = civicrm_api('Setting', 'getfields', $params);
   $fields = $fields['values'];
@@ -216,7 +216,7 @@ function _civicrm_api3_setting_revert_spec(&$params) {
  * @throws \CiviCRM_API3_Exception
  * @throws \Exception
  */
-function civicrm_api3_setting_fill(&$params) {
+function civicrm_api3_setting_fill($params) {
   $defaults = civicrm_api3('Setting', 'getdefaults', $params);
   $domains = _civicrm_api3_setting_getDomainArray($params);
   $result = [];
