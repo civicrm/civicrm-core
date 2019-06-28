@@ -59,12 +59,7 @@ class CRM_Financial_BAO_Payment {
 
     $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount']);
 
-    // For legacy reasons Pending payments are completed through completetransaction.
-    // @todo completetransaction should transition components but financial transactions
-    // should be handled through Payment.create.
-    $isSkipRecordingPaymentHereForLegacyHandlingReasons = ($contributionStatus == 'Pending' && $isPaymentCompletesContribution);
-
-    if (!$isSkipRecordingPaymentHereForLegacyHandlingReasons && $params['total_amount'] > 0) {
+    if ($params['total_amount'] > 0) {
       $balanceTrxnParams['to_financial_account_id'] = CRM_Contribute_BAO_Contribution::getToFinancialAccount($contribution, $params);
       $balanceTrxnParams['from_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($contribution['financial_type_id'], 'Accounts Receivable Account is');
       $balanceTrxnParams['total_amount'] = $params['total_amount'];
@@ -148,7 +143,10 @@ class CRM_Financial_BAO_Payment {
         );
       }
       else {
-        civicrm_api3('Contribution', 'completetransaction', ['id' => $contribution['id']]);
+        civicrm_api3('Contribution', 'completetransaction', [
+          'id' => $contribution['id'],
+          'is_post_payment_create' => TRUE,
+        ]);
         // Get the trxn
         $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
         $ftParams = ['id' => $trxnId['financialTrxnId']];
