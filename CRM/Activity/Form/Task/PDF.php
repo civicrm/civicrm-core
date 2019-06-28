@@ -58,6 +58,11 @@ class CRM_Activity_Form_Task_PDF extends CRM_Activity_Form_Task {
    */
   public function buildQuickForm() {
     CRM_Activity_Form_Task_PDFLetterCommon::buildQuickForm($this);
+    // Remove types other than pdf as they are not working (have never worked) and don't want fix
+    // for them to block pdf.
+    // @todo debug & fix....
+    $this->add('select', 'document_type', ts('Document Type'), ['pdf' => ts('Portable Document Format (.pdf)')]);
+
   }
 
   /**
