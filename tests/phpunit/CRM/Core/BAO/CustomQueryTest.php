@@ -42,14 +42,15 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
     // Assigning the relevant form value to be within a custom key is normally done in
     // build field params. It would be better if it were all done in convertFormValues
     // but for now we just imitate it.
-    $params[$dateCustomField['id']] = CRM_Contact_BAO_Query::convertFormValues($formValues);
-    $queryObj = new CRM_Core_BAO_CustomQuery($params);
-    $queryObj->Query();
+
+    $params = CRM_Contact_BAO_Query::convertFormValues($formValues);
+    $queryObj = new CRM_Contact_BAO_Query($params);
     $this->assertEquals(
-      'civicrm_value_testsearchcus_1.date_field_2 BETWEEN "' . date('Y') . '0101000000" AND "' . date('Y') . '1231235959"',
+      "civicrm_value_testsearchcus_1.date_field_2 BETWEEN '" . date('Y') . "0101000000' AND '" . date('Y') . "1231235959'",
       $queryObj->_where[0][0]
     );
-    $this->assertEquals($queryObj->_qill[0][0], "date field BETWEEN 'January 1st, " . date('Y') . " 12:00 AM AND December 31st, " . date('Y') . " 11:59 PM'");
+    $this->assertEquals("date field is This calendar year (between January 1st, " . date('Y') . " 12:00 AM and December 31st, " . date('Y') . " 11:59 PM)", $queryObj->_qill[0][0]);
+    $queryObj = new CRM_Core_BAO_CustomQuery($params);
     $this->assertEquals([
       'id' => $dateCustomField['id'],
       'label' => 'date field',
