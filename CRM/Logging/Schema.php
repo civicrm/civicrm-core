@@ -31,6 +31,14 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Logging_Schema {
+
+  /**
+   * Default storage engine for log tables
+   *
+   * @var string
+   */
+  const ENGINE = 'InnoDB';
+
   private $logs = [];
   private $tables = [];
 
@@ -58,7 +66,7 @@ class CRM_Logging_Schema {
 
   /**
    * Specifications of all log table including
-   *  - engine (default is archive, if not set.)
+   *  - engine (default is InnoDB, if not set.)
    *  - engine_config, a string appended to the engine type.
    *    For INNODB  space can be saved with 'ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4'
    *  - indexes (default is none and they cannot be added unless engine is innodb. If they are added and
@@ -302,23 +310,31 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    * and also implements the engine change defined by the hook (i.e. INNODB).
    *
    * Note changing engine & adding hook-defined indexes, but not changing back
-   * to ARCHIVE if engine has not been deliberately set (by hook) and not dropping
-   * indexes. Sysadmin will need to manually intervene to revert to defaults.
+   * to INNODB if engine has not been deliberately set (by hook) and not
+   * dropping indexes. Sysadmin will need to manually intervene to revert to
+   * defaults.
    *
    * @param array $params
-   *     'updateChangedEngineConfig' - update if the engine config changes, default FALSE
+   *     'updateChangedEngineConfig' - update if the engine config changes?
+   *     'forceEngineMigration' - force engine upgrade from ARCHIVE to InnoDB?
    *
    * @return int $updateTablesCount
+   * @throws \CiviCRM_API3_Exception
    */
-  public function updateLogTableSchema($params = []) {
-    isset($params['updateChangedEngineConfig']) ? NULL : $params['updateChangedEngineConfig'] = FALSE;
-
+  public function updateLogTableSchema($params) {
     $updateLogConn = FALSE;
     $updatedTablesCount = 0;
     foreach ($this->logs as $mainTable => $logTable) {
       $alterSql = [];
       $tableSpec = $this->logTableSpec[$mainTable];
-      $engineChanged = isset($tableSpec['engine']) && (strtoupper($tableSpec['engine']) != $this->getEngineForLogTable($logTable));
+      $currentEngine = strtoupper($this->getEngineForLogTable($logTable));
+      if (!isset($tableSpec['engine']) && $currentEngine == 'ARCHIVE' && $params['forceEngineMigration']) {
+        // table uses ARCHIVE engine (the previous default) and no one set an
+        // alternative engine via hook_civicrm_alterLogTables => force change to
+        // new default
+        $tableSpec['engine'] = self::ENGINE;
+      }
+      $engineChanged = isset($tableSpec['engine']) && (strtoupper($tableSpec['engine']) != $currentEngine);
       $engineConfigChanged = isset($tableSpec['engine_config']) && (strtoupper($tableSpec['engine_config']) != $this->getEngineConfigForLogTable($logTable));
       if ($engineChanged || ($engineConfigChanged && $params['updateChangedEngineConfig'])) {
         $alterSql[] = "ENGINE=" . $tableSpec['engine'] . " " . CRM_Utils_Array::value('engine_config', $tableSpec);
@@ -762,7 +778,7 @@ COLS;
     // - prepend the name with log_
     // - drop AUTO_INCREMENT columns
     // - drop non-column rows of the query (keys, constraints, etc.)
-    // - set the ENGINE to the specified engine (default is archive or if archive is disabled or nor installed INNODB)
+    // - set the ENGINE to the specified engine (default is INNODB)
     // - add log-specific columns (at the end of the table)
     $mysqlEngines = [];
     $engines = CRM_Core_DAO::executeQuery("SHOW ENGINES");
@@ -771,11 +787,10 @@ COLS;
         $mysqlEngines[] = $engines->Engine;
       }
     }
-    $logEngine = in_array('ARCHIVE', $mysqlEngines) ? 'ARCHIVE' : 'INNODB';
     $query = preg_replace("/^CREATE TABLE `$table`/i", "CREATE TABLE `{$this->db}`.log_$table", $query);
     $query = preg_replace("/ AUTO_INCREMENT/i", '', $query);
     $query = preg_replace("/^  [^`].*$/m", '', $query);
-    $engine = strtoupper(CRM_Utils_Array::value('engine', $this->logTableSpec[$table], $logEngine));
+    $engine = strtoupper(CRM_Utils_Array::value('engine', $this->logTableSpec[$table], self::ENGINE));
     $engine .= " " . CRM_Utils_Array::value('engine_config', $this->logTableSpec[$table]);
     $query = preg_replace("/^\) ENGINE=[^ ]+ /im", ') ENGINE=' . $engine . ' ', $query);
 
