@@ -83,6 +83,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   /**
    * Basic test to ensure the exportComponents function completes without error.
    *
+   * To avoid failing on previous headers sent...
+   * https://stackoverflow.com/questions/13875761/phpunit-output-with-header-exceptions-stderr-no-result
+   *
+   * @runInSeparateProcess
+   *
    * @throws \CRM_Core_Exception
    * @throws \League\Csv\Exception
    */
