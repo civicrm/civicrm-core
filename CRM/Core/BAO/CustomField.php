@@ -174,12 +174,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       );
     }
 
-    $indexExist = FALSE;
-    //as during create if field is_searchable we had created index.
-    if (!empty($params['id'])) {
-      $indexExist = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'is_searchable');
-    }
-
     switch (CRM_Utils_Array::value('html_type', $params)) {
       case 'Select Date':
         if (empty($params['date_format'])) {
@@ -289,6 +283,11 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $triggerRebuild = CRM_Utils_Array::value('triggerRebuild', $params, TRUE);
     //create/drop the index when we toggle the is_searchable flag
     if ($op == 'edit') {
+      $indexExist = FALSE;
+      //as during create if field is_searchable we had created index.
+      if (!empty($params['id'])) {
+        $indexExist = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'is_searchable');
+      }
       self::createField($customField, 'modify', $indexExist, $triggerRebuild);
     }
     else {
@@ -300,8 +299,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       // make sure all values are present in the object
       $customField->find(TRUE);
 
-      $indexExist = FALSE;
-      self::createField($customField, 'add', $indexExist, $triggerRebuild);
+      self::createField($customField, 'add', FALSE, $triggerRebuild);
     }
 
     // complete transaction
