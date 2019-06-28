@@ -572,6 +572,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * @param int $version
    *
    * @dataProvider versionThreeAndFour
+   * @throws \CRM_Core_Exception
    */
   public function testCreateApiKey($version) {
     $this->_apiversion = $version;
@@ -606,6 +607,10 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'api_key' => 'defg4321',
     ]);
     $this->assertRegExp(';Permission denied to modify api key;', $result['error_message']);
+
+    // Specifically check get action.
+    $check = $this->callAPISuccessGetSingle('Contact', ['id' => $contactId, 'return' => ['api_key', 'display_name']]);
+    $this->assertTrue(!isset($check['api_key']));
 
     // Return everything -- because permissions are not being checked
     $config->userPermissionClass->permissions = [];
