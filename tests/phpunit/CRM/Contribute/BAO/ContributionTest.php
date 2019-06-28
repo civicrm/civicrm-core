@@ -1466,7 +1466,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    *   This function tests whether the contribution tokens are replaced with values from contribution.
    */
   public function testReplaceContributionTokens() {
-    $customGroup = $this->customGroupCreate(['extends' => 'Contribution']);
+    $customGroup = $this->customGroupCreate(['extends' => 'Contribution', 'title' => 'contribution stuff']);
     $customField = $this->customFieldOptionValueCreate($customGroup, 'myCustomField');
     $contactId1 = $this->individualCreate();
     $params = array(
