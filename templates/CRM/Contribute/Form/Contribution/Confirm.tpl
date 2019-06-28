@@ -296,13 +296,9 @@
     <div class="messages status continue_instructions-section">
       <p>
         {if $is_pay_later OR $amount LE 0.0}
-          {ts 1=$button}Your transaction will not be completed until you click the
-            <strong>%1</strong>
-            button. Please click the button one time only.{/ts}
+          {ts 1=$button}Your transaction will not be completed until you click the <strong>%1</strong> button. Please click the button one time only.{/ts}
         {else}
-          {ts 1=$button}Your contribution will not be completed until you click the
-            <strong>%1</strong>
-            button. Please click the button one time only.{/ts}
+          {ts 1=$button}Your contribution will not be completed until you click the <strong>%1</strong> button. Please click the button one time only.{/ts}
         {/if}
       </p>
     </div>
