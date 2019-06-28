@@ -147,7 +147,7 @@ class CRM_Core_Form_Task_PDFLetterCommon {
 
     $form->assign('useThisPageFormat', ts('Always use this Page Format with the new template?'));
     $form->assign('useSelectedPageFormat', ts('Should the new template always use the selected Page Format?'));
-    $form->assign('totalSelectedContacts', count($form->_contactIds));
+    $form->assign('totalSelectedContacts', !is_null($form->_contactIds) ? count($form->_contactIds) : 0);
 
     $form->add('select', 'document_type', ts('Document Type'), CRM_Core_SelectValues::documentFormat());
 
@@ -235,6 +235,10 @@ class CRM_Core_Form_Task_PDFLetterCommon {
 
   /**
    * Handle the template processing part of the form
+   *
+   * @param array $formValues
+   *
+   * @return string $html_message
    */
   public static function processTemplate(&$formValues) {
     $html_message = CRM_Utils_Array::value('html_message', $formValues);
@@ -334,6 +338,48 @@ class CRM_Core_Form_Task_PDFLetterCommon {
       $m = implode($newLineOperators['br']['oper'], $messages);
     }
     $message = implode($newLineOperators['p']['oper'], $htmlMsg);
+  }
+
+  /**
+   * Render html from rows
+   * @param  array $rows   Array of \Civi\Token\TokenRow
+   * @param  string $msgPart The name registered with the TokenProcessor
+   * @param  string $formValues The values submitted through the form
+   * @return string
+   *   $html if formValues['is_unit_test'] is true, otherwise outputs document to browser
+   *
+   */
+  public static function renderFromRows($rows, $msgPart, $formValues) {
+    $html = array();
+    foreach ($rows as $row) {
+      $html[] = $row->render($msgPart);
+    }
+
+    if (!empty($formValues['is_unit_test'])) {
+      return $html;
+    }
+
+    if (!empty($html)) {
+      $type = $formValues['document_type'];
+
+      if ($type == 'pdf') {
+        CRM_Utils_PDF_Utils::html2pdf($html, "CiviLetter.pdf", FALSE, $formValues);
+      }
+      else {
+        CRM_Utils_PDF_Document::html2doc($html, "CiviLetter.$type", $formValues);
+      }
+    }
+  }
+
+  /**
+   * List the available tokens
+   * @return array of token name => label
+   */
+  public static function listTokens() {
+    $class = get_called_class();
+    if (method_exists($class, 'createTokenProcessor')) {
+      return $class::createTokenProcessor()->listTokens();
+    }
   }
 
 }

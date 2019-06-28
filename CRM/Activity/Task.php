@@ -84,6 +84,11 @@ class CRM_Activity_Task extends CRM_Core_Task {
           ],
           'result' => FALSE,
         ],
+        self::PDF_LETTER => [
+          'title' => ts('Print/merge Document'),
+          'class' => 'CRM_Activity_Form_Task_PDF',
+          'result' => FALSE,
+        ],
         self::TASK_SMS => [
           'title' => ts('SMS - send reply'),
           'class' => 'CRM_Activity_Form_Task_SMS',
