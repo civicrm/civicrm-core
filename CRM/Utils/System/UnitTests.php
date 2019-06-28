@@ -78,6 +78,13 @@ class CRM_Utils_System_UnitTests extends CRM_Utils_System_Base {
   /**
    * @inheritDoc
    */
+  public function setHttpHeader($name, $value) {
+    return NULL;
+  }
+
+  /**
+   * @inheritDoc
+   */
   public function url(
     $path = NULL,
     $query = NULL,
