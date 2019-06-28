@@ -152,13 +152,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @return CRM_Core_DAO_CustomField
    */
   public static function create($params) {
-    $origParams = array_merge(array(), $params);
+    $transaction = new CRM_Core_Transaction();
+    $origParams = array_merge([], $params);
 
     $op = empty($params['id']) ? 'create' : 'edit';
 
     CRM_Utils_Hook::pre($op, 'CustomField', CRM_Utils_Array::value('id', $params), $params);
-
-    if ($op == 'create') {
+    if ($op === 'create') {
+      CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
       if (!isset($params['column_name'])) {
         // if add mode & column_name not present, calculate it.
         $params['column_name'] = strtolower(CRM_Utils_String::munge($params['label'], '_', 32));
@@ -206,8 +207,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         }
         break;
     }
-
-    $transaction = new CRM_Core_Transaction();
 
     $htmlType = CRM_Utils_Array::value('html_type', $params);
     $dataType = CRM_Utils_Array::value('data_type', $params);
@@ -266,15 +265,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     $customField = new CRM_Core_DAO_CustomField();
     $customField->copyValues($params);
-    if ($op == 'create') {
-      $customField->is_required = CRM_Utils_Array::value('is_required', $params, FALSE);
-      $customField->is_searchable = CRM_Utils_Array::value('is_searchable', $params, FALSE);
-      $customField->in_selector = CRM_Utils_Array::value('in_selector', $params, FALSE);
-      $customField->is_search_range = CRM_Utils_Array::value('is_search_range', $params, FALSE);
-      //CRM-15792 - Custom field gets disabled if is_active not set
-      $customField->is_active = CRM_Utils_Array::value('is_active', $params, TRUE);
-      $customField->is_view = CRM_Utils_Array::value('is_view', $params, FALSE);
-    }
     $customField->save();
 
     // make sure all values are present in the object for further processing
@@ -2165,6 +2155,24 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
     }
 
     return $customOptionGroup[$cacheKey];
+  }
+
+  /**
+   * Get defaults for new entity.
+   *
+   * @return array
+   */
+  public static function getDefaults() {
+    return [
+      'is_required' => FALSE,
+      'is_searchable' => FALSE,
+      'in_selector' => FALSE,
+      'is_search_range' => FALSE,
+      //CRM-15792 - Custom field gets disabled if is_active not set
+      // this would ideally be a mysql default.
+      'is_active' => TRUE,
+      'is_view' => FALSE,
+    ];
   }
 
   /**
