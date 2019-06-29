@@ -777,14 +777,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     //for prev/next pagination
     $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer');
 
-    if (array_key_exists($this->_searchButtonName, $_POST) ||
-      ($this->_force && !$crmPID)
-    ) {
-      //reset the cache table for new search
-      $cacheKey = "civicrm search {$this->controller->_key}";
-      Civi::service('prevnext')->deleteItem(NULL, $cacheKey);
-    }
-
     //get the button name
     $buttonName = $this->controller->getButtonName();
 
@@ -822,6 +814,13 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       return;
     }
     else {
+      if (array_key_exists($this->_searchButtonName, $_POST) ||
+        ($this->_force && !$crmPID)
+      ) {
+        //reset the cache table for new search
+        $cacheKey = "civicrm search {$this->controller->_key}";
+        Civi::service('prevnext')->deleteItem(NULL, $cacheKey);
+      }
       $output = CRM_Core_Selector_Controller::SESSION;
 
       // create the selector, controller and run - store results in session

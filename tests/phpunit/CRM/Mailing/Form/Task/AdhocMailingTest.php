@@ -28,15 +28,18 @@
  * Test class for CRM_Contact_Form_Task_EmailCommon.
  * @group headless
  */
-class CRM_Mailing_Form_Task_AdHocMailingTest extends CiviUnitTestCase {
+class CRM_Mailing_Form_Task_AdhocMailingTest extends CiviUnitTestCase {
 
+  /**
+   * @throws \Exception
+   */
   protected function setUp() {
     parent::setUp();
     $this->_contactIds = [
       $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']),
       $this->individualCreate(['first_name' => 'Anthony', 'last_name' => 'Collins']),
     ];
-    $this->_optionValue = $this->callApiSuccess('optionValue', 'create', [
+    $this->_optionValue = $this->callAPISuccess('optionValue', 'create', [
       'label' => '"Seamus Lee" <seamus@example.com>',
       'option_group_id' => 'from_email_address',
     ]);
@@ -64,6 +67,9 @@ class CRM_Mailing_Form_Task_AdHocMailingTest extends CiviUnitTestCase {
     ];
     $form = $this->getFormObject('CRM_Mailing_Form_Task_AdhocMailing', $formValues, 'Builder');
     $form->setAction(CRM_Core_Action::PROFILE);
+    $form->set('formValues', $formValues);
+    $form->set('isSearchBuilder', 1);
+    $form->set('context', 'builder');
     try {
       $form->preProcess();
     }
@@ -71,7 +77,7 @@ class CRM_Mailing_Form_Task_AdHocMailingTest extends CiviUnitTestCase {
       // Nothing to see here.
     }
     $savedSearch = $this->callAPISuccessGetSingle('SavedSearch', []);
-    $this->assertEquals(['bla'], $savedSearch);
+    $this->assertEquals($formValues, $savedSearch['form_values']);
   }
 
 }
