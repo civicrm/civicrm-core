@@ -33,6 +33,12 @@
 class CRM_Core_PrevNextCache_Sql implements CRM_Core_PrevNextCache_Interface {
 
   /**
+   * Default TTL
+   * @var int
+   */
+  const DEFAULT_TTL = 21600;
+
+  /**
    * Store the results of a SQL query in the cache.
    * @param string $cacheKey
    * @param string $sql
@@ -54,6 +60,13 @@ INSERT INTO civicrm_prevnext_cache (cachekey, entity_id1, data)
     if (is_a($result, 'DB_Error')) {
       throw new CRM_Core_Exception($result->message);
     }
+    $expiry = (float) round(microtime(1)) + (float) self::DEFAULT_TTL;
+    $date = new DateTime();
+    $date->setTimeStamp($expiry);
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_prevnext_cache SET expiry_date = %1 WHERE cacheKey = %2", [
+      1 => [CRM_Utils_Date::convertDateToLocalTime($date, 'Y-m-d H:i:s'), 'String'],
+      2 => [$cacheKey, 'String'],
+    ]);
     return TRUE;
   }
 
@@ -67,12 +80,18 @@ INSERT INTO civicrm_prevnext_cache (cachekey, entity_id1, data)
         'entity_id1',
         'cachekey',
         'data',
+        'expiry_date',
       ]);
 
     foreach ($rows as &$row) {
-      $insert->row($row + ['cachekey' => $cacheKey]);
+      $expiry = (float) round(microtime(1)) + (float) self::DEFAULT_TTL;
+      $date = new DateTime();
+      $date->setTimeStamp($expiry);
+      $insert->row($row + [
+        'cachekey' => $cacheKey,
+        'expiry_date' => CRM_Utils_Date::convertDateToLocalTime($date, 'Y-m-d H:i:s'),
+      ]);
     }
-
     CRM_Core_DAO::executeQuery($insert->toSQL());
     return TRUE;
   }
@@ -97,25 +116,25 @@ INSERT INTO civicrm_prevnext_cache (cachekey, entity_id1, data)
       if (is_array($ids)) {
         $cIdFilter = "(" . implode(',', $ids) . ")";
         $whereClause = "
-WHERE cachekey = %1
+WHERE cachekey = %1 AND expiry_date >= FROM_UNIXTIME(%3)
 AND (entity_id1 IN {$cIdFilter} OR entity_id2 IN {$cIdFilter})
 ";
       }
       else {
         $whereClause = "
-WHERE cachekey = %1
+WHERE cachekey = %1 AND expiry_date >= FROM_UNIXTIME(%3)
 AND (entity_id1 = %2 OR entity_id2 = %2)
 ";
         $params[2] = ["{$ids}", 'Integer'];
       }
       if ($action == 'select') {
         $whereClause .= "AND is_selected = 0";
-        $sql = "UPDATE civicrm_prevnext_cache SET is_selected = 1 {$whereClause}";
+        $sql = "UPDATE civicrm_prevnext_cache SET is_selected = 1, expiry_date = FROM_UNIXTIME(%3) {$whereClause}";
         $params[1] = [$cacheKey, 'String'];
       }
       elseif ($action == 'unselect') {
         $whereClause .= "AND is_selected = 1";
-        $sql = "UPDATE civicrm_prevnext_cache SET is_selected = 0 {$whereClause}";
+        $sql = "UPDATE civicrm_prevnext_cache SET is_selected = 0, expiry_date = FROM_UNIXTIME(%3) {$whereClause}";
         $params[1] = [$cacheKey, 'String'];
       }
       // default action is reseting
@@ -123,11 +142,13 @@ AND (entity_id1 = %2 OR entity_id2 = %2)
     elseif (!$ids && $cacheKey && $action == 'unselect') {
       $sql = "
 UPDATE civicrm_prevnext_cache
-SET    is_selected = 0
+SET    is_selected = 0, expiry_date = FROM_UNIXTIME(%3)
 WHERE  cachekey = %1 AND is_selected = 1
 ";
       $params[1] = [$cacheKey, 'String'];
     }
+    $expires = (float) round(microtime(1)) + (float) self::DEFAULT_TTL;
+    $params[3] = [$expires, 'Integer'];
     CRM_Core_DAO::executeQuery($sql, $params);
   }
 
@@ -270,6 +291,12 @@ ORDER BY id
       $cids[] = $dao->cid;
     }
     return $cids;
+  }
+
+  public function flush() {
+    // first find all the cacheKeys that match this
+    $sql = "DELETE FROM civicrm_prenext_cache WHERE expiry_date < NOW()";
+    CRM_Core_DAO::executeQuery($sql);
   }
 
 }

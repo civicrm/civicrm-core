@@ -101,6 +101,8 @@ class CRM_Upgrade_Incremental_php_FiveSixteen extends CRM_Upgrade_Incremental_Ba
         'contribution_cancel_date',
       ],
     ]);
+    $this->addTask('add Expiry date column to prevnext_cache table', 'addColumn', 'civicrm_prevnext_cache', 'expiry_date',
+      "timestamp NOT NULL  DEFAULT current_timestamp() COMMENT 'The Time this prev_next_cache data set expires'");
   }
 
   // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {

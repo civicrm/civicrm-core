@@ -2204,4 +2204,17 @@ class CRM_Utils_Date {
     }
   }
 
+  /**
+   * Print out a date object in specified format in local timezone
+   *
+   * @param DateTimeObject $dateObject
+   * @param string $format
+   * @return string
+   */
+  public static function convertDateToLocalTime($dateObject, $format = 'YmdHis') {
+    $systemTimeZone = new DateTimeZone(CRM_Core_Config::singleton()->userSystem->getTimeZoneString());
+    $dateObject->setTimezone($systemTimeZone);
+    return $dateObject->format($format);
+  }
+
 }

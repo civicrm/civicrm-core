@@ -252,4 +252,9 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     return [$allKey, $dataKey, $selKey, $maxScore];
   }
 
+  public function flush() {
+    // In Redis caches are automatically culled by redis
+    return;
+  }
+
 }

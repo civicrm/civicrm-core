@@ -72,4 +72,17 @@
     <fieldName>entity_table</fieldName>
     <fieldName>is_selected</fieldName>
   </index>
+  <field>
+    <name>expiry_date</name>
+    <title>Prev Next Expiry Date</title>
+    <type>timestamp</type>
+    <default>current_timestamp()</default>
+    <comment>The Time this prev_next_cache data set expires</comment>
+    <add>5.16</add>
+    <required>true</required>
+  </field>
+  <index>
+    <name>index_expiry_date</name>
+    <fieldName>expiry_date</fieldName>
+  </index>
 </table>

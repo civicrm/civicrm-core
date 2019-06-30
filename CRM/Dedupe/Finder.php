@@ -376,9 +376,8 @@ class CRM_Dedupe_Finder {
       ];
 
       $data = CRM_Core_DAO::escapeString(serialize($row));
-      $values[] = " ( 'civicrm_contact', $dstID, $srcID, '$cacheKeyString', '$data' ) ";
+      CRM_Core_BAO_PrevNextCache::setItem([], 'civicrm_contact', $dstID, $srcID, $cacheKeyString, $data);
     }
-    CRM_Core_BAO_PrevNextCache::setItem($values);
     return $mainContacts;
   }
 

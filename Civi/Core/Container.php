@@ -170,18 +170,6 @@ class Container {
       ))->setFactory('CRM_Utils_Cache::create');
     }
 
-    // PrevNextCache cannot use memory or array cache at the moment because the
-    // Code in CRM_Core_BAO_PrevNextCache assumes that this cache is sql backed.
-    $container->setDefinition("cache.prevNextCache", new Definition(
-      'CRM_Utils_Cache_Interface',
-      [
-        [
-          'name' => 'CiviCRM Search PrevNextCache',
-          'type' => ['SqlGroup'],
-        ],
-      ]
-    ))->setFactory('CRM_Utils_Cache::create');
-
     $container->setDefinition('sql_triggers', new Definition(
       'Civi\Core\SqlTriggers',
       []
