@@ -351,7 +351,9 @@
     <length>32</length>
     <comment>API Key for validating requests related to this contact.</comment>
     <add>2.2</add>
-    <protected>true</protected>
+    <permission>
+      <or>administer CiviCRM, edit api keys</or>
+    </permission>
   </field>
   <index>
     <name>index_api_key</name>

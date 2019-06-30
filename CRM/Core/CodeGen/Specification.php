@@ -370,7 +370,13 @@ class CRM_Core_CodeGen_Specification {
     $field['uniqueName'] = $this->value('uniqueName', $fieldXML);
     $field['serialize'] = $this->value('serialize', $fieldXML);
     $field['html'] = $this->value('html', $fieldXML);
-    $field['protected'] = $this->value('protected', $fieldXML);
+    if (isset($fieldXML->permission)) {
+      $field['permission'] = trim($this->value('permission', $fieldXML));
+      $field['permission'] = $field['permission'] ? array_filter(array_map('trim', explode(',', $field['permission']))) : [];
+      if (isset($fieldXML->permission->or)) {
+        $field['permission'][] = array_filter(array_map('trim', explode(',', $fieldXML->permission->or)));
+      }
+    }
     if (!empty($field['html'])) {
       $validOptions = [
         'type',
