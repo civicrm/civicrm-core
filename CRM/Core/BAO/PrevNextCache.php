@@ -194,7 +194,7 @@ WHERE  cachekey     = %3 AND
     while ($pncFind->fetch()) {
       $data = $pncFind->data;
       if (!empty($data)) {
-        $data = unserialize($data);
+        $data = unserialize($data, ['allowed_classes' => FALSE]);
         $data['conflicts'] = implode(",", array_values($conflicts));
 
         $pncUp = new CRM_Core_DAO_PrevNextCache();
