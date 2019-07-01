@@ -346,7 +346,7 @@ class api_v3_LoggingTest extends CiviUnitTestCase {
   public function testRevertRestrictedTables() {
 
     CRM_Core_DAO::executeQuery("SET @uniqueID = 'temp name'");
-    $this->callAPISuccessGetValue('Setting', array('name' => 'logging_all_tables_uniquid'), TRUE);
+    $this->assertEquals(TRUE, $this->callAPISuccessGetValue('Setting', ['name' => 'logging_all_tables_uniquid']));
     $this->callAPISuccess('Setting', 'create', array('logging' => TRUE));
 
     $contactId = $this->individualCreate(array('address' => array(array('street_address' => '27 Cool way', 'location_type_id' => 1))));
