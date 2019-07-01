@@ -172,6 +172,7 @@ WHERE  cachekey     = %3 AND
    * @param array $conflicts
    *
    * @return bool
+   * @throws CRM_Core_Exception
    */
   public static function markConflict($id1, $id2, $cacheKey, $conflicts) {
     if (empty($cacheKey) || empty($conflicts)) {
@@ -194,7 +195,7 @@ WHERE  cachekey     = %3 AND
     while ($pncFind->fetch()) {
       $data = $pncFind->data;
       if (!empty($data)) {
-        $data = unserialize($data);
+        $data = CRM_Core_DAO::unSerializeField($data, CRM_Core_DAO::SERIALIZE_PHP);
         $data['conflicts'] = implode(",", array_values($conflicts));
 
         $pncUp = new CRM_Core_DAO_PrevNextCache();
