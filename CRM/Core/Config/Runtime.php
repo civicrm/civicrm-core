@@ -106,7 +106,7 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
       CRM_Utils_File::restrictAccess($this->templateCompileDir);
     }
 
-    $civicrm_private = $GLOBALS['civicrm_paths']['civicrm.private'];
+    $civicrm_private = $GLOBALS['civicrm_paths']['civicrm.private']['path'];
     if (!empty($civicrm_private)) {
       $this->configAndLogDir = rtrim($civicrm_private, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'ConfigAndLog' . DIRECTORY_SEPARATOR;
     }
