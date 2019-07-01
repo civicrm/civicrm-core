@@ -64,13 +64,12 @@ class CRM_Core_BAO_SchemaHandler {
    *   TRUE if successfully created, FALSE otherwise
    *
    */
-  public static function createTable(&$params) {
+  public static function createTable($params) {
     $sql = self::buildTableSQL($params);
     // do not i18n-rewrite
     CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
 
-    $config = CRM_Core_Config::singleton();
-    if ($config->logging) {
+    if (CRM_Core_Config::singleton()->logging) {
       // logging support
       $logging = new CRM_Logging_Schema();
       $logging->fixSchemaDifferencesFor($params['name'], NULL, FALSE);
@@ -87,7 +86,7 @@ class CRM_Core_BAO_SchemaHandler {
    *
    * @return string
    */
-  public static function buildTableSQL(&$params) {
+  public static function buildTableSQL($params) {
     $sql = "CREATE TABLE {$params['name']} (";
     if (isset($params['fields']) &&
       is_array($params['fields'])
@@ -295,7 +294,7 @@ ALTER TABLE {$tableName}
    *
    * @return bool
    */
-  public static function alterFieldSQL(&$params, $indexExist = FALSE, $triggerRebuild = TRUE) {
+  public static function alterFieldSQL($params, $indexExist = FALSE, $triggerRebuild = TRUE) {
 
     // lets suppress the required flag, since that can cause sql issue
     $params['required'] = FALSE;
