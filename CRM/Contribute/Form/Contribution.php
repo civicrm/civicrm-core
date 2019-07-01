@@ -250,7 +250,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $this->assign('action', $this->_action);
 
     // Get the contribution id if update
-    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_id = CRM_Utils_Request::retrieve('id', 'Positive');
     if (!empty($this->_id)) {
       $this->assignPaymentInfoBlock();
       $this->assign('contribID', $this->_id);
@@ -466,6 +466,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Build the form object.
    */
   public function buildQuickForm() {
+    if ($this->_id) {
+      $this->add('hidden', 'id', $this->_id);
+    }
+
     if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons([
         [
