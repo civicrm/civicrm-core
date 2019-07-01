@@ -192,11 +192,16 @@ WHERE  cachekey     = %3 AND
     ];
     $pncFind = CRM_Core_DAO::executeQuery($sql, $params);
 
+    $conflictTexts = [];
+    foreach ($conflicts as $conflict) {
+      $conflictTexts[] = "{$conflict['title']}: '{$conflict[$id1]}' vs. '{$conflict[$id2]}'";
+    }
+    $conflictString = implode(', ', $conflictTexts);
     while ($pncFind->fetch()) {
       $data = $pncFind->data;
       if (!empty($data)) {
         $data = CRM_Core_DAO::unSerializeField($data, CRM_Core_DAO::SERIALIZE_PHP);
-        $data['conflicts'] = implode(",", array_values($conflicts));
+        $data['conflicts'] = $conflictString;
 
         $pncUp = new CRM_Core_DAO_PrevNextCache();
         $pncUp->id = $pncFind->id;

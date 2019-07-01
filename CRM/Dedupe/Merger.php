@@ -2129,7 +2129,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // store any conflicts
     if (!empty($conflicts)) {
       foreach ($conflicts as $key => $dnc) {
-        $conflicts[$key] = "{$migrationInfo['rows'][$key]['title']}: '{$migrationInfo['rows'][$key]['main']}' vs. '{$migrationInfo['rows'][$key]['other']}'";
+        unset($conflicts[$key]);
+        $conflicts[substr($key, 5)] = [
+          'title' => $migrationInfo['rows'][$key]['title'],
+          $mainId => $migrationInfo['rows'][$key]['main'],
+          $otherId => $migrationInfo['rows'][$key]['other'],
+          'key' => $key,
+        ];
       }
       CRM_Core_BAO_PrevNextCache::markConflict($mainId, $otherId, $cacheKeyString, $conflicts);
     }
