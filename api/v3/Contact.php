@@ -1211,89 +1211,15 @@ function _civicrm_api3_contact_merge_spec(&$params) {
  */
 function civicrm_api3_contact_get_merge_conflicts($params) {
   $migrationInfo = [];
-  $contactFieldsToCompare = [];
-  $entitiesToCompare = [];
-  $return = [];
+  $result = [];
   foreach ((array) $params['mode'] as $mode) {
-    $result[$mode] = CRM_Dedupe_Merger::getConflicts(
+    $result[$mode]['conflicts'] = CRM_Dedupe_Merger::getConflicts(
       $migrationInfo,
       $params['to_remove_id'], $params['to_keep_id'],
-      $params['mode']
+      $mode
     );
-    $return = [];
-    foreach (array_keys($result[$mode]) as $index) {
-      if (substr($index, 0, 14) === 'move_location_') {
-        $parts = explode('_', $index);
-        $entity = $parts[2];
-        $locationTypeID = $migrationInfo['location_blocks'][$entity][$parts[3]]['locTypeId'];
-        $return[$mode]['conflicts'][$entity][] = ['location_type_id' => $locationTypeID];
-        $entitiesToCompare[$entity][] = $locationTypeID;
-      }
-      elseif (substr($index, 0, 5) === 'move_') {
-        $contactFieldsToCompare[] = str_replace('move_', '', $index);
-        $return[$mode]['conflicts']['contact'][0][str_replace('move_', '', $index)] = [];
-      }
-      else {
-        // Can't think of why this would be the case but perhaps it's ensuring it isn't as we
-        // refactor this.
-        throw new API_Exception(ts('Unknown parameter') . $index);
-      }
-    }
   }
-  // We get the contact & location details once, now we know what we need for both modes (if both being fetched).
-  $contacts = civicrm_api3('Contact', 'get', [
-    'id' => [
-      'IN' => [
-        $params['to_keep_id'],
-        $params['to_remove_id'],
-      ],
-    ],
-    'return' => $contactFieldsToCompare,
-  ])['values'];
-  foreach ($contactFieldsToCompare as $fieldName) {
-    foreach ((array) $params['mode'] as $mode) {
-      if (isset($return[$mode]['conflicts']['contact'][0][$fieldName])) {
-        $return[$mode]['conflicts']['contact'][0][$fieldName][$params['to_keep_id']] = CRM_Utils_Array::value($fieldName, $contacts[$params['to_keep_id']]);
-        $return[$mode]['conflicts']['contact'][0][$fieldName][$params['to_remove_id']] = CRM_Utils_Array::value($fieldName, $contacts[$params['to_remove_id']]);
-      }
-    }
-  }
-  foreach ($entitiesToCompare as $entity => $locations) {
-    $contactLocationDetails = civicrm_api3($entity, 'get', [
-      'contact_id' => ['IN' => [$params['to_keep_id'], $params['to_remove_id']]],
-      'location_type_id' => ['IN' => $locations],
-    ])['values'];
-    $detailsByLocation = [];
-    foreach ($contactLocationDetails as $locationDetail) {
-      if ((int) $locationDetail['contact_id'] === $params['to_keep_id']) {
-        $detailsByLocation[$locationDetail['location_type_id']]['to_keep'] = $locationDetail;
-      }
-      elseif ((int) $locationDetail['contact_id'] === $params['to_remove_id']) {
-        $detailsByLocation[$locationDetail['location_type_id']]['to_remove'] = $locationDetail;
-      }
-      else {
-        // Can't think of why this would be the case but perhaps it's ensuring it isn't as we
-        // refactor this.
-        throw new API_Exception(ts('Unknown parameter') . $index);
-      }
-    }
-    foreach ((array) $params['mode'] as $mode) {
-      foreach ($return[$mode]['conflicts'][$entity] as $index => $entityData) {
-        $locationTypeID = $entityData['location_type_id'];
-        foreach ($detailsByLocation[$locationTypeID]['to_keep'] as $fieldName => $keepContactValue) {
-          $fieldsToIgnore = ['id', 'contact_id', 'is_primary', 'is_billing', 'manual_geo_code', 'contact_id', 'reset_date', 'hold_date'];
-          if (in_array($fieldName, $fieldsToIgnore)) {
-            continue;
-          }
-          $otherContactValue = $detailsByLocation[$locationTypeID]['to_remove'][$fieldName];
-          if (!empty($keepContactValue) && !empty($otherContactValue) && $keepContactValue !== $otherContactValue) {
-            $return[$mode]['conflicts'][$entity][$index][$fieldName] = [$params['to_keep_id'] => $keepContactValue, $params['to_remove_id'] => $otherContactValue];
-          }
-        }
-      }
-    }
-  }
-  return civicrm_api3_create_success($return, $params);
+  return civicrm_api3_create_success($result, $params);
 }
 
 /**
@@ -1315,7 +1241,7 @@ function _civicrm_api3_contact_get_merge_conflicts_spec(&$params) {
   $params['mode'] = [
     'title' => ts('Dedupe mode'),
     'description' => ts("'safe' or 'aggressive'  - these modes map to the merge actions & may affect resolution done by hooks "),
-    'api.default' => ['safe'],
+    'api.default' => 'safe',
   ];
 }
 

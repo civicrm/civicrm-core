@@ -1050,9 +1050,11 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * Note that we set 0 on 2 fields with one on each contact to ensure that
    * both merged & mergee fields are respected.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeCustomDataZeroValueField() {
-    $customGroup = $this->CustomGroupCreate();
+    $customGroup = $this->customGroupCreate();
     $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id'], 'default_value' => NULL]);
 
     $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email' => 'tha_mouse@mouse.com'];
