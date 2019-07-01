@@ -160,34 +160,24 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     $customField->copyValues($params);
     $customField->save();
 
-    // make sure all values are present in the object for further processing
-    $customField->find(TRUE);
+    $indexExist = empty($params['id']) ? FALSE : CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'is_searchable');
 
-    $triggerRebuild = CRM_Utils_Array::value('triggerRebuild', $params, TRUE);
     //create/drop the index when we toggle the is_searchable flag
     $op = empty($params['id']) ? 'add' : 'modify';
-    if ($op == 'modify') {
-      $indexExist = FALSE;
-      //as during create if field is_searchable we had created index.
-      if (!empty($params['id'])) {
-        $indexExist = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'is_searchable');
-      }
-      self::createField($customField, $op, $indexExist, $triggerRebuild);
-    }
-    else {
+    if ($op !== 'modify') {
       if (!isset($origParams['column_name'])) {
         $params['column_name'] .= "_{$customField->id}";
       }
       $customField->column_name = $params['column_name'];
       $customField->save();
-      // make sure all values are present in the object
-      $customField->find(TRUE);
-
-      self::createField($customField, $op, FALSE, $triggerRebuild);
     }
 
-    // complete transaction
+    // complete transaction - note that any table alterations include an implicit commit so this is largely meaningless.
     $transaction->commit();
+
+    // make sure all values are present in the object for further processing
+    $customField->find(TRUE);
+    self::createField($customField, $op, $indexExist, CRM_Utils_Array::value('triggerRebuild', $params, TRUE));
 
     CRM_Utils_Hook::post(($op === 'add' ? 'create' : 'edit'), 'CustomField', $customField->id, $customField);
 
