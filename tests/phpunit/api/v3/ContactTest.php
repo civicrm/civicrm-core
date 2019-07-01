@@ -3757,6 +3757,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
    * Test retrieving merged contacts.
    *
    * The goal here is to start with a contact deleted by merged and find out the contact that is the current version of them.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testMergedGet() {
     $this->contactIDs[] = $this->individualCreate();
