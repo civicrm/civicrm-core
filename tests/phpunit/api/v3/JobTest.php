@@ -889,10 +889,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     // Each row specifies: contact 1 on_hold, contact 2 on_hold, merge? (0 or 1),
     $sets = [
       [0, 0, 1, NULL],
-      [0, 1, 0, "Email 2 (Work): 'batman@gotham.met' vs. 'batman@gotham.met
-(On Hold)'"],
-      [1, 0, 0, "Email 2 (Work): 'batman@gotham.met
-(On Hold)' vs. 'batman@gotham.met'"],
+      [0, 1, 0, "Email 2 (Work): 'batman@gotham.met' vs. 'batman@gotham.met\n(On Hold)'"],
+      [1, 0, 0, "Email 2 (Work): 'batman@gotham.met\n(On Hold)' vs. 'batman@gotham.met'"],
       [1, 1, 1, NULL],
     ];
     return $sets;

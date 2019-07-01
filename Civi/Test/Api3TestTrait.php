@@ -249,6 +249,7 @@ trait Api3TestTrait {
    *   - object
    *
    * @return array|int
+   * @throws \CRM_Core_Exception
    */
   public function callAPISuccessGetValue($entity, $params, $type = NULL) {
     $params += [
@@ -257,10 +258,10 @@ trait Api3TestTrait {
     ];
     $result = $this->civicrm_api($entity, 'getvalue', $params);
     if (is_array($result) && (!empty($result['is_error']) || isset($result['values']))) {
-      throw new \Exception('Invalid getvalue result' . print_r($result, TRUE));
+      throw new \CRM_Core_Exception('Invalid getvalue result' . print_r($result, TRUE));
     }
     if ($type) {
-      if ($type == 'integer') {
+      if ($type === 'integer') {
         // api seems to return integers as strings
         $this->assertTrue(is_numeric($result), "expected a numeric value but got " . print_r($result, 1));
       }
