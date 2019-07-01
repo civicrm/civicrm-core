@@ -805,7 +805,7 @@ function _civicrm_api3_activity_getlist_output($result, $request) {
         'id' => $row[$request['id_field']],
         'label' => $row[$request['label_field']] ? $row[$request['label_field']] : ts('(no subject)'),
         'description' => [
-          CRM_Core_Pseudoconstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $row['activity_type_id']),
+          CRM_Core_PseudoConstant::getLabel('CRM_Activity_BAO_Activity', 'activity_type_id', $row['activity_type_id']),
         ],
       ];
       if (!empty($row['activity_date_time'])) {
