@@ -160,7 +160,7 @@ trait ContactTestTrait {
    *
    */
   private function _contactCreate($params) {
-    $result = $this->callAPISuccess('contact', 'create', $params);
+    $result = civicrm_api3('contact', 'create', $params);
     if (!empty($result['is_error']) || empty($result['id'])) {
       throw new \CRM_Core_Exception('Could not create test contact, with message: ' . \CRM_Utils_Array::value('error_message', $result) . "\nBacktrace:" . \CRM_Utils_Array::value('trace', $result));
     }

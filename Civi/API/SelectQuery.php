@@ -233,6 +233,12 @@ abstract class SelectQuery {
         // Join doesn't exist - might be another param with a dot in it for some reason, we'll just ignore it.
         return NULL;
       }
+
+      // Skip if we don't have permission to access this field
+      if ($this->checkPermissions && !empty($fieldInfo['permission']) && !\CRM_Core_Permission::check($fieldInfo['permission'])) {
+        return NULL;
+      }
+
       $fkTable = \CRM_Core_DAO_AllCoreTables::getTableForClass($fkField['FKClassName']);
       $tableAlias = implode('_to_', $subStack) . "_to_$fkTable";
 
