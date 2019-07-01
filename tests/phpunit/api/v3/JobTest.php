@@ -843,12 +843,15 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @dataProvider getOnHoldSets
    *
-   * @param
+   * @param bool $onHold1
+   * @param bool $onHold2
+   * @param bool $merge
+   * @param string $conflictText
    *
    * @throws \CRM_Core_Exception
    */
-  public function testBatchMergeEmailOnHold($onHold1, $onHold2, $merge) {
-    $contactID1 = $this->individualCreate([
+  public function testBatchMergeEmailOnHold($onHold1, $onHold2, $merge, $conflictText) {
+    $this->individualCreate([
       'api.email.create' => [
         'email' => 'batman@gotham.met',
         'location_type_id' => 'Work',
@@ -856,7 +859,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
         'on_hold' => $onHold1,
       ],
     ]);
-    $contactID2 = $this->individualCreate([
+    $this->individualCreate([
       'api.email.create' => [
         'email' => 'batman@gotham.met',
         'location_type_id' => 'Work',
@@ -865,7 +868,18 @@ class api_v3_JobTest extends CiviUnitTestCase {
       ],
     ]);
     $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
-    $this->assertEquals($merge, count($result['values']['merged']));
+    $this->assertCount($merge, $result['values']['merged']);
+    if ($conflictText) {
+      $defaultRuleGroupID = $this->callAPISuccessGetValue('RuleGroup', [
+        'contact_type' => 'Individual',
+        'used' => 'Unsupervised',
+        'return' => 'id',
+        'options' => ['limit' => 1],
+      ]);
+
+      $duplicates = $this->callAPISuccess('Dedupe', 'getduplicates', ['rule_group_id' => $defaultRuleGroupID]);
+      $this->assertEquals($conflictText, $duplicates['values'][0]['conflicts']);
+    }
   }
 
   /**
@@ -874,10 +888,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function getOnHoldSets() {
     // Each row specifies: contact 1 on_hold, contact 2 on_hold, merge? (0 or 1),
     $sets = [
-      [0, 0, 1],
-      [0, 1, 0],
-      [1, 0, 0],
-      [1, 1, 1],
+      [0, 0, 1, NULL],
+      [0, 1, 0, "Email 2 (Work): 'batman@gotham.met' vs. 'batman@gotham.met
+(On Hold)'"],
+      [1, 0, 0, "Email 2 (Work): 'batman@gotham.met
+(On Hold)' vs. 'batman@gotham.met'"],
+      [1, 1, 1, NULL],
     ];
     return $sets;
   }
