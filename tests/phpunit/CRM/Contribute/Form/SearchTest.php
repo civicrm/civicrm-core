@@ -64,7 +64,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $batch = $this->callAPISuccess('Batch', 'create', [
       'created_id' => $this->_individual,
       'created_date' => CRM_Utils_Date::processDate(date("Y-m-d"), date("H:i:s")),
-      'status_id' => CRM_Core_Pseudoconstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Data Entry'),
+      'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Data Entry'),
       'title' => $batchTitle,
       'item_count' => 2,
       'total' => 100,
