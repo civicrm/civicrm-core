@@ -420,6 +420,8 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
 
   /**
    *  CRM-21343: Test CRM_Contribute_Form_Search Cancelled filters
+   *
+   * @throws CRM_Core_Exception
    */
   public function testCancelledFilter() {
     $this->quickCleanup($this->_tablesToTruncate);
@@ -462,7 +464,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
         'form_value' => ['contribution_cancel_date' => date('Y-m-d')],
         'expected_count' => 2,
         'expected_contribution' => [$Contribution1['id'], $Contribution3['id']],
-        'expected_qill' => "Cancelled / Refunded Date = " . date('F dS, Y') . " 12:00 AM",
+        'expected_qill' => "Cancelled / Refunded Date = " . date('F jS, Y') . " 12:00 AM",
       ],
       // Case 2: Search for Cancelled Reason
       [
@@ -476,7 +478,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
         'form_value' => ['contribution_cancel_date' => date('Y-m-d'), 'cancel_reason' => 'Insufficient funds'],
         'expected_count' => 1,
         'expected_contribution' => [$Contribution1['id']],
-        'expected_qill' => "Cancellation / Refund Reason Like '%Insufficient funds%'ANDCancelled / Refunded Date = " . date('F dS, Y') . " 12:00 AM",
+        'expected_qill' => "Cancellation / Refund Reason Like '%Insufficient funds%'ANDCancelled / Refunded Date = " . date('F jS, Y') . " 12:00 AM",
       ],
     ];
 
