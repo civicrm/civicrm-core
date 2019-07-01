@@ -1713,11 +1713,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param array $tablesToTruncate
    * @param bool $dropCustomValueTables
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function quickCleanup($tablesToTruncate, $dropCustomValueTables = FALSE) {
     if ($this->tx) {
-      throw new Exception("CiviUnitTestCase: quickCleanup() is not compatible with useTransaction()");
+      throw new \CRM_Core_Exception("CiviUnitTestCase: quickCleanup() is not compatible with useTransaction()");
     }
     if ($dropCustomValueTables) {
       $optionGroupResult = CRM_Core_DAO::executeQuery('SELECT option_group_id FROM civicrm_custom_field');
