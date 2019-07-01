@@ -1646,6 +1646,10 @@ WHERE  id = $cfID
                   }
                   $skip = TRUE;
                 }
+                // for checkboxes, change array of [key => bool] to array of [idx => key]
+                elseif ($dao->html_type == 'CheckBox') {
+                  $customVal = array_keys(array_filter($params[$name]));
+                }
                 else {
                   $customVal = $params[$name];
                 }
