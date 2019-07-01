@@ -51,7 +51,7 @@ function civicrm_api3_dedupe_get($params) {
   }
   foreach ($result as $index => $values) {
     if (isset($values['data']) && !empty($values['data'])) {
-      $result[$index]['data'] = unserialize($values['data']);
+      $result[$index]['data'] = CRM_Core_DAO::unSerializeField($values['data'], CRM_Core_DAO::SERIALIZE_PHP);
     }
   }
   return civicrm_api3_create_success($result, $params, 'PrevNextCache');

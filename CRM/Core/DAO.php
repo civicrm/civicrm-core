@@ -2877,8 +2877,9 @@ SELECT contact_id
    *
    * @param string|null $value
    * @param $serializationType
+   *
    * @return array|null
-   * @throws \Exception
+   * @throws CRM_Core_Exception
    */
   public static function unSerializeField($value, $serializationType) {
     if ($value === NULL) {
@@ -2898,13 +2899,13 @@ SELECT contact_id
         return strlen($value) ? json_decode($value, TRUE) : [];
 
       case self::SERIALIZE_PHP:
-        return strlen($value) ? unserialize($value) : [];
+        return strlen($value) ? unserialize($value, ['allowed_classes' => FALSE]) : [];
 
       case self::SERIALIZE_COMMA:
         return explode(',', trim(str_replace(', ', '', $value)));
 
       default:
-        throw new Exception('Unknown serialization method for field.');
+        throw new CRM_Core_Exception('Unknown serialization method for field.');
     }
   }
 
