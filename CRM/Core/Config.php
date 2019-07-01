@@ -496,6 +496,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @return string
    */
   public function defaultCurrencySymbol($defaultCurrency = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Core_BAO_Country::defaultCurrencySymbol');
     return CRM_Core_BAO_Country::defaultCurrencySymbol($defaultCurrency);
   }
 

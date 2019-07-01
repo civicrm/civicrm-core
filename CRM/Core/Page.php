@@ -214,6 +214,10 @@ class CRM_Core_Page {
 
     $config = CRM_Core_Config::singleton();
 
+    // @fixme this is probably the wrong place for this.  It is required by jsortable.tpl which is inherited from many page templates.
+    //   So we have to add it here to deprecate $config->defaultCurrencySymbol
+    $this->assign('defaultCurrencySymbol', CRM_Core_BAO_Country::defaultCurrencySymbol());
+
     // Intermittent alert to admins
     CRM_Utils_Check::singleton()->showPeriodicAlerts();
 
