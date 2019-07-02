@@ -224,14 +224,22 @@ ORDER BY target_entity_type, target_entity_id
    *   Total amount
    */
   public static function thermoMeter($pcpId) {
+    $completedStatusId = CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Completed'
+    );
     $query = "
 SELECT SUM(cc.total_amount) as total
 FROM civicrm_pcp pcp
 LEFT JOIN civicrm_contribution_soft cs ON ( pcp.id = cs.pcp_id )
 LEFT JOIN civicrm_contribution cc ON ( cs.contribution_id = cc.id)
-WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
+WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
 
-    $params = [1 => [$pcpId, 'Integer']];
+    $params = [
+      1 => [$pcpId, 'Integer'],
+      2 => [$completedStatusId, 'Integer'],
+    ];
     return CRM_Core_DAO::singleValueQuery($query, $params);
   }
 
