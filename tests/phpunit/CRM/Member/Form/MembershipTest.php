@@ -1339,7 +1339,7 @@ Expires: ',
       'contact_id' => $this->_individualId,
       'id' => $lineItem['contribution_id'],
       'financial_type_id' => 2,
-      'contribution_status_id' => CRM_Core_Pseudoconstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
     ),
     CRM_Core_Action::UPDATE);
 

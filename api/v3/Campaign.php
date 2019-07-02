@@ -126,11 +126,11 @@ function _civicrm_api3_campaign_getlist_output($result, $request) {
         'id' => $row[$request['id_field']],
         'label' => $row[$request['label_field']],
         'description' => [
-          CRM_Core_Pseudoconstant::getLabel('CRM_Campaign_BAO_Campaign', 'campaign_type_id', $row['campaign_type_id']),
+          CRM_Core_PseudoConstant::getLabel('CRM_Campaign_BAO_Campaign', 'campaign_type_id', $row['campaign_type_id']),
         ],
       ];
       if (!empty($row['status_id'])) {
-        $data['description'][0] .= ': ' . CRM_Core_Pseudoconstant::getLabel('CRM_Campaign_BAO_Campaign', 'status_id', $row['status_id']);
+        $data['description'][0] .= ': ' . CRM_Core_PseudoConstant::getLabel('CRM_Campaign_BAO_Campaign', 'status_id', $row['status_id']);
       }
       $dateString = CRM_Utils_Date::customFormat($row['start_date'], $config->dateformatFull) . ' -';
       if (!empty($row['end_date'])) {
