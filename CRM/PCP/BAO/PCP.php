@@ -252,16 +252,25 @@ WHERE pcp.id = %1 AND cc.contribution_status_id = %2 AND cc.is_test = 0";
    * @return array
    */
   public static function honorRoll($pcpId) {
+    $completedStatusId = CRM_Core_PseudoConstant::getKey(
+      'CRM_Contribute_BAO_Contribution',
+      'contribution_status_id',
+      'Completed'
+    );
     $query = "
             SELECT cc.id, cs.pcp_roll_nickname, cs.pcp_personal_note,
                    cc.total_amount, cc.currency
             FROM civicrm_contribution cc
                  LEFT JOIN civicrm_contribution_soft cs ON cc.id = cs.contribution_id
-            WHERE cs.pcp_id = {$pcpId}
+            WHERE cs.pcp_id = %1
                   AND cs.pcp_display_in_roll = 1
-                  AND contribution_status_id = 1
+                  AND contribution_status_id = %2
                   AND is_test = 0";
-    $dao = CRM_Core_DAO::executeQuery($query);
+    $params = [
+      1 => [$pcpId, 'Integer'],
+      2 => [$completedStatusId, 'Integer'],
+    ];
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
     $honor = [];
     while ($dao->fetch()) {
       $honor[$dao->id]['nickname'] = ucwords($dao->pcp_roll_nickname);
