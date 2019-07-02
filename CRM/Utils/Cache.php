@@ -171,7 +171,7 @@ class CRM_Utils_Cache {
    *     Support varies by driver:
    *       - For most memory backed caches, this option is meaningful.
    *       - For SqlGroup, this option is ignored. SqlGroup has equivalent behavior built-in.
-   *       - For Arraycache, this option is ignored. It's redundant.
+   *       - For ArrayCache, this option is ignored. It's redundant.
    *      If this is a short-lived process in which TTL's don't matter, you might
    *      use 'fast' mode. It sacrifices some PSR-16 compliance and cache-coherency
    *      protections to improve performance.

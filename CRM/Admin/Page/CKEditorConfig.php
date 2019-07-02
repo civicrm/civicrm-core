@@ -163,7 +163,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
     foreach (glob($pluginDir . '/*', GLOB_ONLYDIR) as $dir) {
       $dir = rtrim(str_replace('\\', '/', $dir), '/');
       $name = substr($dir, strrpos($dir, '/') + 1);
-      $dir = CRM_Utils_file::addTrailingSlash($dir, '/');
+      $dir = CRM_Utils_File::addTrailingSlash($dir, '/');
       if (is_file($dir . 'plugin.js')) {
         $plugins[$name] = [
           'id' => $name,

@@ -603,7 +603,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       }
       \Civi::$statics[__CLASS__]['columnsOf'][$table] = [];
       while ($dao->fetch()) {
-        \Civi::$statics[__CLASS__]['columnsOf'][$table][] = CRM_Utils_type::escape($dao->Field, 'MysqlColumnNameOrAlias');
+        \Civi::$statics[__CLASS__]['columnsOf'][$table][] = CRM_Utils_Type::escape($dao->Field, 'MysqlColumnNameOrAlias');
       }
     }
     return \Civi::$statics[__CLASS__]['columnsOf'][$table];
