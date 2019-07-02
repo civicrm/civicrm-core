@@ -416,10 +416,10 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       );
     }
     elseif ($this->data_type === 'StateProvince') {
-      $options = CRM_Core_Pseudoconstant::stateProvince();
+      $options = CRM_Core_PseudoConstant::stateProvince();
     }
     elseif ($this->data_type === 'Country') {
-      $options = $context == 'validate' ? CRM_Core_Pseudoconstant::countryIsoCode() : CRM_Core_Pseudoconstant::country();
+      $options = $context == 'validate' ? CRM_Core_PseudoConstant::countryIsoCode() : CRM_Core_PseudoConstant::country();
     }
     elseif ($this->data_type === 'Boolean') {
       $options = $context == 'validate' ? array(0, 1) : CRM_Core_SelectValues::boolean();
