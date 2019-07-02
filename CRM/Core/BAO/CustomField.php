@@ -1090,7 +1090,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @return string
    */
   private static function formatDisplayValue($value, $field, $entityId = NULL) {
-
     if (self::isSerialized($field) && !is_array($value)) {
       $value = CRM_Utils_Array::explodePadded($value);
     }
@@ -1509,6 +1508,16 @@ SELECT id
       else {
         $value = '';
       }
+    }
+
+    if ($customFields[$customFieldId]['html_type'] == 'Autocomplete-Select'
+      && $customFields[$customFieldId]['data_type'] != 'ContactReference'
+      && isset($value)
+    ) {
+      if (!is_array($value)) {
+        $value = explode(',', $value);
+      }
+      $value = CRM_Utils_Array::implodePadded($value);
     }
 
     if (($customFields[$customFieldId]['html_type'] == 'Multi-Select' ||
@@ -2614,7 +2623,10 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
     // Fields retrieved via api are an array, or from the dao are an object. We'll accept either.
     $field = (array) $field;
     // FIXME: Currently the only way to know if data is serialized is by looking at the html_type. It would be cleaner to decouple this.
-    return ($field['html_type'] == 'CheckBox' || strpos($field['html_type'], 'Multi') !== FALSE);
+    return ($field['html_type'] == 'CheckBox'
+      || ($field['html_type'] == 'Autocomplete-Select' && $field['data_type'] != 'ContactReference')
+      || strpos($field['html_type'], 'Multi') !== FALSE
+    );
   }
 
   /**
