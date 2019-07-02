@@ -144,6 +144,31 @@ class CRM_Export_BAO_ExportProcessor {
   protected $outputSpecification = [];
 
   /**
+   * Name of a temporary table created to hold the results.
+   *
+   * Current decision making on when to create a temp table is kinda bad so this might change
+   * a bit as it is reviewed but basically we need a temp table or similar to calculate merging
+   * addresses. Merging households is handled in php. We create a temp table even when we don't need them.
+   *
+   * @var string
+   */
+  protected $temporaryTable;
+
+  /**
+   * @return string
+   */
+  public function getTemporaryTable(): string {
+    return $this->temporaryTable;
+  }
+
+  /**
+   * @param string $temporaryTable
+   */
+  public function setTemporaryTable(string $temporaryTable) {
+    $this->temporaryTable = $temporaryTable;
+  }
+
+  /**
    * CRM_Export_BAO_ExportProcessor constructor.
    *
    * @param int $exportMode
