@@ -1432,7 +1432,7 @@ class CRM_Utils_System {
     // zealous about destroying *all* memory-backed caches during a flush().
     // These flushes simulate that legacy behavior. However, they should probably
     // be removed at some point.
-    $localDrivers = ['CRM_Utils_Cache_Arraycache', 'CRM_Utils_Cache_NoCache'];
+    $localDrivers = ['CRM_Utils_Cache_ArrayCache', 'CRM_Utils_Cache_NoCache'];
     if (Civi\Core\Container::isContainerBooted()
       && !in_array(get_class(CRM_Utils_Cache::singleton()), $localDrivers)) {
       Civi::cache('long')->flush();

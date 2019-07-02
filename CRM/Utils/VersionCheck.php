@@ -160,7 +160,7 @@ class CRM_Utils_VersionCheck {
         'co' => $config->defaultContactCountry,
         'ufv' => $config->userSystem->getVersion(),
         'PHP' => phpversion(),
-        'MySQL' => CRM_CORE_DAO::singleValueQuery('SELECT VERSION()'),
+        'MySQL' => CRM_Core_DAO::singleValueQuery('SELECT VERSION()'),
         'communityMessagesUrl' => Civi::settings()->get('communityMessagesUrl'),
       ];
       $this->getDomainStats();
