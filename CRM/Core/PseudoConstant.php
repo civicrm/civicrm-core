@@ -486,7 +486,7 @@ class CRM_Core_PseudoConstant {
         WHERE page_callback LIKE '%CRM_Admin_Page_$child%' OR page_callback LIKE '%CRM_{$parent}_Page_$child%'
         ORDER BY page_callback
         LIMIT 1";
-      return CRM_Core_Dao::singleValueQuery($sql);
+      return CRM_Core_DAO::singleValueQuery($sql);
     }
     return NULL;
   }
