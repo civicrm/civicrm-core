@@ -465,7 +465,13 @@ class CRM_Activity_BAO_Query {
   public static function getSearchFieldMetadata() {
     $fields = ['activity_type_id', 'activity_date_time', 'priority_id', 'activity_location'];
     $metadata = civicrm_api3('Activity', 'getfields', [])['values'];
-    return array_intersect_key($metadata, array_flip($fields));
+    $metadata = array_intersect_key($metadata, array_flip($fields));
+    $metadata['activity_text'] = [
+      'title' => ts('Activity Text'),
+      'type' => CRM_Utils_Type::T_STRING,
+      'is_pseudofield' => TRUE,
+    ];
+    return $metadata;
   }
 
   /**
