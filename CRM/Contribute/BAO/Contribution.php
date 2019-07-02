@@ -4736,7 +4736,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // Use input value if supplied.
     if (!empty($input['receipt_from_email'])) {
       return [
-        CRM_Utils_array::value('receipt_from_name', $input, ''),
+        CRM_Utils_Array::value('receipt_from_name', $input, ''),
         $input['receipt_from_email'],
       ];
     }

@@ -1236,7 +1236,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @param string $elementName
    * @param array $optionIds
-   * @param CRM_Core_form $form
+   * @param CRM_Core_Form $form
    */
   public static function resetSubmittedValue($elementName, $optionIds = array(), &$form) {
     if (empty($elementName) ||
