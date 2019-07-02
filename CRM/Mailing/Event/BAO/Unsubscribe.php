@@ -532,7 +532,7 @@ WHERE  email = %2
     $org_unsubscribe = NULL
   ) {
 
-    $dao = new CRM_Core_Dao();
+    $dao = new CRM_Core_DAO();
 
     $unsub = self::$_tableName;
     $queueObject = new CRM_Mailing_Event_BAO_Queue();

@@ -72,7 +72,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
 
     $domain = CRM_Core_BAO_Domain::getDomain();
 
-    $dao = new CRM_Core_Dao();
+    $dao = new CRM_Core_DAO();
     $dao->query("
                 SELECT      $contact.id as contact_id,
                             $email.id as email_id,
@@ -298,7 +298,7 @@ class CRM_Mailing_Event_BAO_Forward extends CRM_Mailing_Event_DAO_Forward {
     $is_distinct = FALSE, $offset = NULL, $rowCount = NULL, $sort = NULL
   ) {
 
-    $dao = new CRM_Core_Dao();
+    $dao = new CRM_Core_DAO();
 
     $forward = self::getTableName();
     $queue = CRM_Mailing_Event_BAO_Queue::getTableName();
