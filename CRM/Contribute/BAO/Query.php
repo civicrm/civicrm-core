@@ -115,7 +115,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         continue;
       }
       if (substr($query->_params[$id][0], 0, 13) == 'contribution_' || substr($query->_params[$id][0], 0, 10) == 'financial_'  || substr($query->_params[$id][0], 0, 8) == 'payment_') {
-        if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
+        if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
         // CRM-12065

@@ -175,7 +175,7 @@ class CRM_Activity_BAO_Query {
   public static function where(&$query) {
     foreach (array_keys($query->_params) as $id) {
       if (substr($query->_params[$id][0], 0, 9) == 'activity_') {
-        if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
+        if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
         $query->_params[$id][3];

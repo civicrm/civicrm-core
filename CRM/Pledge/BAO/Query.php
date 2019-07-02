@@ -229,7 +229,7 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
         continue;
       }
       if (substr($query->_params[$id][0], 0, 7) == 'pledge_') {
-        if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
+        if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
         $grouping = $query->_params[$id][3];
