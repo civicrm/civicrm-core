@@ -238,7 +238,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
       if (substr($query->_params[$id][0], 0, 6) == 'event_' ||
         substr($query->_params[$id][0], 0, 12) == 'participant_'
       ) {
-        if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
+        if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
         $grouping = $query->_params[$id][3];

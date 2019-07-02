@@ -146,7 +146,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         continue;
       }
       if (substr($query->_params[$id][0], 0, 7) == 'member_' || substr($query->_params[$id][0], 0, 11) == 'membership_') {
-        if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
+        if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
         self::whereClauseSingle($query->_params[$id], $query);
