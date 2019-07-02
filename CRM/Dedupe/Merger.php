@@ -919,22 +919,16 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *  An empty array to be filed with conflict information.
    *
    * @return bool
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
   public static function skipMerge($mainId, $otherId, &$migrationInfo, $mode = 'safe', &$conflicts = []) {
 
     $conflicts = self::getConflicts($migrationInfo, $mainId, $otherId, $mode);
 
     if (!empty($conflicts)) {
-      foreach ($conflicts as $key => $val) {
-        if ($val === NULL and $mode == 'safe') {
-          // un-resolved conflicts still present. Lets skip this merge after saving the conflict / reason.
-          return TRUE;
-        }
-        else {
-          // copy over the resolved values
-          $migrationInfo[$key] = $val;
-        }
-      }
       // if there are conflicts and mode is aggressive, allow hooks to decide if to skip merges
       return (bool) $migrationInfo['skip_merge'];
     }
@@ -950,15 +944,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @return bool
    */
   public static function locationIsSame($mainAddress, $comparisonAddress) {
-    $keysToIgnore = [
-      'id',
-      'is_primary',
-      'is_billing',
-      'manual_geo_code',
-      'contact_id',
-      'reset_date',
-      'hold_date',
-    ];
+    $keysToIgnore = self::ignoredFields();
     foreach ($comparisonAddress as $field => $value) {
       if (in_array($field, $keysToIgnore)) {
         continue;
@@ -2106,6 +2092,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \API_Exception
    */
   protected static function dedupePair(&$resultStats, &$deletedContacts, $mode, $checkPermissions, $mainId, $otherId, $cacheKeyString) {
 
@@ -2128,10 +2115,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
 
     // store any conflicts
     if (!empty($conflicts)) {
-      foreach ($conflicts as $key => $dnc) {
-        $conflicts[$key] = "{$migrationInfo['rows'][$key]['title']}: '{$migrationInfo['rows'][$key]['main']}' vs. '{$migrationInfo['rows'][$key]['other']}'";
-      }
-      CRM_Core_BAO_PrevNextCache::markConflict($mainId, $otherId, $cacheKeyString, $conflicts);
+      CRM_Core_BAO_PrevNextCache::markConflict($mainId, $otherId, $cacheKeyString, $conflicts, $mode);
     }
     else {
       CRM_Core_BAO_PrevNextCache::deletePair($mainId, $otherId, $cacheKeyString);
@@ -2420,8 +2404,69 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     $conflicts = $migrationData['fields_in_conflict'];
     // allow hook to override / manipulate migrationInfo as well
     $migrationInfo = $migrationData['migration_info'];
-    $migrationInfo['skip_merge'] = CRM_Utils_Array::value('skip_merge', $migrationData);
-    return $conflicts;
+    foreach ($conflicts as $key => $val) {
+      if ($val !== NULL || $mode !== 'safe') {
+        // copy over the resolved values
+        $migrationInfo[$key] = $val;
+        unset($conflicts[$key]);
+      }
+    }
+    $migrationInfo['skip_merge'] = $migrationData['skip_merge'] ?? !empty($conflicts);
+    return self::formatConflictArray($conflicts, $migrationInfo['rows'], $migrationInfo['main_details']['location_blocks'], $migrationInfo['other_details']['location_blocks'], $mainId, $otherId);
+  }
+
+  /**
+   * @param array $conflicts
+   * @param array $migrationInfo
+   * @param $toKeepContactLocationBlocks
+   * @param $toRemoveContactLocationBlocks
+   * @param $toKeepID
+   * @param $toRemoveID
+   *
+   * @return mixed
+   * @throws \CRM_Core_Exception
+   */
+  protected static function formatConflictArray($conflicts, $migrationInfo, $toKeepContactLocationBlocks, $toRemoveContactLocationBlocks, $toKeepID, $toRemoveID) {
+    $return = [];
+    foreach (array_keys($conflicts) as $index) {
+      if (substr($index, 0, 14) === 'move_location_') {
+        $parts = explode('_', $index);
+        $entity = $parts[2];
+        $blockIndex = $parts[3];
+        $locationTypeID = $toKeepContactLocationBlocks[$entity][$blockIndex]['location_type_id'];
+        $entityConflicts = [
+          'location_type_id' => $locationTypeID,
+          'title' => $migrationInfo[$index]['title'],
+        ];
+        foreach ($toKeepContactLocationBlocks[$entity][$blockIndex] as $fieldName => $fieldValue) {
+          if (in_array($fieldName, self::ignoredFields())) {
+            continue;
+          }
+          $toRemoveValue = CRM_Utils_Array::value($fieldName, $toRemoveContactLocationBlocks[$entity][$blockIndex]);
+          if ($fieldValue !== $toRemoveValue) {
+            $entityConflicts[$fieldName] = [
+              $toKeepID => $fieldValue,
+              $toRemoveID => $toRemoveValue,
+            ];
+          }
+        }
+        $return[$entity][] = $entityConflicts;
+      }
+      elseif (substr($index, 0, 5) === 'move_') {
+        $contactFieldsToCompare[] = str_replace('move_', '', $index);
+        $return['contact'][str_replace('move_', '', $index)] = [
+          'title' => $migrationInfo[$index]['title'],
+          $toKeepID => $migrationInfo[$index]['main'],
+          $toRemoveID => $migrationInfo[$index]['other'],
+        ];
+      }
+      else {
+        // Can't think of why this would be the case but perhaps it's ensuring it isn't as we
+        // refactor this.
+        throw new CRM_Core_Exception(ts('Unknown parameter') . $index);
+      }
+    }
+    return $return;
   }
 
   /**
@@ -2446,6 +2491,22 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       [], '',
       $includeConflicts
     );
+  }
+
+  /**
+   * @return array
+   */
+  protected static function ignoredFields(): array {
+    $keysToIgnore = [
+      'id',
+      'is_primary',
+      'is_billing',
+      'manual_geo_code',
+      'contact_id',
+      'reset_date',
+      'hold_date',
+    ];
+    return $keysToIgnore;
   }
 
 }

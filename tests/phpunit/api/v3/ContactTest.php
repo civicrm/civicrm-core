@@ -1728,6 +1728,7 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'api.address.create.1' => ['location_type_id' => 'home', 'street_address' => 'medium house', 'city' => 'small city'],
       'api.address.create.2' => ['location_type_id' => 'work', 'street_address' => 'medium office', 'city' => 'small city'],
       'external_identifier' => 'uniquer and specialler',
+      'api.email.create' => ['location_type_id' => 'Other', 'email' => 'bob@example.com'],
       $this->getCustomFieldName('text') => 'mummy loves me more',
     ]);
     $conflicts = $this->callAPISuccess('Contact', 'get_merge_conflicts', ['to_keep_id' => $contact1, 'to_remove_id' => $contact2])['values'];
@@ -1735,18 +1736,21 @@ class api_v3_ContactTest extends CiviUnitTestCase {
       'safe' => [
         'conflicts' => [
           'contact' => [
-            [
-              'first_name' => [$contact1 => 'Anthony', $contact2 => 'different'],
-              'external_identifier' => [$contact1 => 'unique and special', $contact2 => 'uniquer and specialler'],
-              $this->getCustomFieldName('text') => [$contact1 => 'mummy loves me', $contact2 => 'mummy loves me more'],
-            ],
+            'first_name' => [$contact1 => 'Anthony', $contact2 => 'different', 'title' => 'First Name'],
+            'external_identifier' => [$contact1 => 'unique and special', $contact2 => 'uniquer and specialler', 'title' => 'External Identifier'],
+            $this->getCustomFieldName('text') => [$contact1 => 'mummy loves me', $contact2 => 'mummy loves me more', 'title' => 'Enter text here'],
           ],
           'address' => [
             [
               'location_type_id' => '1',
+              'title' => 'Address 1 (Home)',
               'street_address' => [
                 $contact1 => 'big house',
                 $contact2 => 'medium house',
+              ],
+              'display' => [
+                $contact1 => "big house\nsmall city, \n",
+                $contact2 => "medium house\nsmall city, \n",
               ],
             ],
             [
@@ -1754,6 +1758,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
               'street_address' => [
                 $contact1 => 'big office',
                 $contact2 => 'medium office',
+              ],
+              'title' => 'Address 2 (Work)',
+              'display' => [
+                $contact1 => "big office\nsmall city, \n",
+                $contact2 => "medium office\nsmall city, \n",
               ],
             ],
           ],
@@ -1764,11 +1773,27 @@ class api_v3_ContactTest extends CiviUnitTestCase {
                 $contact1 => 'bob@example.com',
                 $contact2 => 'anthony_anderson@civicrm.org',
               ],
+              'title' => 'Email 1 (Home)',
+              'display' => [
+                $contact1 => 'bob@example.com',
+                $contact2 => 'anthony_anderson@civicrm.org',
+              ],
             ],
           ],
         ],
       ],
     ], $conflicts);
+
+    $result = $this->callAPISuccess('Job', 'process_batch_merge');
+    $defaultRuleGroupID = $this->callAPISuccessGetValue('RuleGroup', [
+      'contact_type' => 'Individual',
+      'used' => 'Unsupervised',
+      'return' => 'id',
+      'options' => ['limit' => 1],
+    ]);
+
+    $duplicates = $this->callAPISuccess('Dedupe', 'getduplicates', ['rule_group_id' => $defaultRuleGroupID]);
+    $this->assertEquals($conflicts['safe'], $duplicates['values'][0]['safe']);
   }
 
   private function createEmployerOfMembership() {
