@@ -94,4 +94,86 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
 
   }
 
+  /**
+   * PR 13477 - Fix incorrect display of Line Items created via API
+   * when printing invoice (for Participants).
+   */
+  public function testInvoiceForLineItems() {
+
+    $this->enableTaxAndInvoicing();
+
+    $event = $this->eventCreatePaid([]);
+
+    $individualOneId = $this->individualCreate();
+    $individualTwoId = $this->individualCreate();
+    $contactIds = [$individualOneId, $individualTwoId];
+
+    $priceSetId = CRM_Price_BAO_PriceSet::getFor('civicrm_event', $event['id']);
+    $priceField = $this->callAPISuccess('PriceField', 'get', ['price_set_id' => $priceSetId]);
+    $priceFieldValues = $this->callAPISuccess('PriceFieldValue', 'get', [
+      'sequential' => 1,
+      'price_field_id' => $priceField['id'],
+    ]);
+
+    $lineItemParams = [];
+    foreach ($priceFieldValues['values'] as $key => $priceFieldValue) {
+      $lineItemParams[] = [
+        'line_item' => [
+          $priceFieldValue['id'] => [
+            'price_field_id' => $priceField['id'],
+            'label' => $priceFieldValue['label'],
+            'financial_type_id' => $priceFieldValue['financial_type_id'],
+            'price_field_value_id' => $priceFieldValue['id'],
+            'qty' => 1,
+            'field_title' => $priceFieldValue['label'],
+            'unit_price' => $priceFieldValue['amount'],
+            'line_total' => $priceFieldValue['amount'],
+            'entity_table' => 'civicrm_participant',
+          ],
+        ],
+        // participant params
+        'params' => [
+          'contact_id' => $contactIds[$key],
+          'event_id' => $event['id'],
+          'status_id' => 1,
+          'price_set_id' => $priceSetId,
+          'participant_fee_amount' => $priceFieldValue['amount'],
+          'participant_fee_level' => $priceFieldValue['label'],
+        ],
+      ];
+    }
+
+    $orderParams = [
+      'contact_id' => $individualOneId,
+      'total_amount' => array_reduce($priceFieldValues['values'], function($total, $priceFieldValue) {
+        $total += $priceFieldValue['amount'];
+        return $total;
+      }),
+      'financial_type_id' => $priceFieldValues['values'][0]['financial_type_id'],
+      'contribution_status_id' => 'Completed',
+      'currency' => 'USD',
+      'line_items' => $lineItemParams,
+    ];
+
+    $order = $this->callAPISuccess('Order', 'create', $orderParams);
+
+    $pdfParams = [
+      'output' => 'pdf_invoice',
+      'forPage' => 1,
+    ];
+
+    $invoiceHTML = CRM_Contribute_Form_Task_Invoice::printPDF([$order['id']], $pdfParams, [$individualOneId]);
+
+    $lineItems = $this->callAPISuccess('LineItem', 'get', ['contribution_id' => $order['id']]);
+
+    foreach ($lineItems['values'] as $lineItem) {
+      $this->assertContains("<font size = \"1\">$ {$lineItem['line_total']}</font>", $invoiceHTML);
+    }
+
+    $totalAmount = $this->formatMoneyInput($order['values'][$order['id']]['total_amount']);
+    $this->assertContains("TOTAL USD</font></b></td>
+                <td style = \"padding-left:34px;text-align:right;\"><font size = \"1\">$ $totalAmount</font>", $invoiceHTML);
+
+  }
+
 }

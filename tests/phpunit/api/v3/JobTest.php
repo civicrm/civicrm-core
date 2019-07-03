@@ -36,14 +36,17 @@
 
 /**
  * Class api_v3_JobTest
+ *
  * @group headless
  */
 class api_v3_JobTest extends CiviUnitTestCase {
-  protected $_apiversion = 3;
 
   public $DBResetRequired = FALSE;
+
   public $_entity = 'Job';
-  public $_params = array();
+
+  public $_params = [];
+
   /**
    * Created membership type.
    *
@@ -58,9 +61,9 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function setUp() {
     parent::setUp();
-    $this->membershipTypeID = $this->membershipTypeCreate(array('name' => 'General'));
+    $this->membershipTypeID = $this->membershipTypeCreate(['name' => 'General']);
     $this->useTransaction(TRUE);
-    $this->_params = array(
+    $this->_params = [
       'sequential' => 1,
       'name' => 'API_Test_Job',
       'description' => 'A long description written by hand in cursive',
@@ -69,24 +72,25 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'api_action' => 'apitestaction',
       'parameters' => 'Semi-formal explanation of runtime job parameters',
       'is_active' => 1,
-    );
+    ];
   }
 
   public function tearDown() {
     parent::tearDown();
     // The membershipType create breaks transactions so this extra cleanup is needed.
-    $this->membershipTypeDelete(array('id' => $this->membershipTypeID));
+    $this->membershipTypeDelete(['id' => $this->membershipTypeID]);
     $this->cleanUpSetUpIDs();
     $this->quickCleanup(['civicrm_contact', 'civicrm_address', 'civicrm_email', 'civicrm_website', 'civicrm_phone'], TRUE);
+    parent::tearDown();
   }
 
   /**
    * Check with no name.
    */
   public function testCreateWithoutName() {
-    $params = array(
+    $params = [
       'is_active' => 1,
-    );
+    ];
     $this->callAPIFailure('job', 'create', $params,
       'Mandatory key(s) missing from params array: run_frequency, name, api_entity, api_action'
     );
@@ -96,7 +100,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Create job with an invalid "run_frequency" value.
    */
   public function testCreateWithInvalidFrequency() {
-    $params = array(
+    $params = [
       'sequential' => 1,
       'name' => 'API_Test_Job',
       'description' => 'A long description written by hand in cursive',
@@ -105,7 +109,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'api_action' => 'apitestaction',
       'parameters' => 'Semi-formal explanation of runtime job parameters',
       'is_active' => 1,
-    );
+    ];
     $this->callAPIFailure('job', 'create', $params);
   }
 
@@ -127,7 +131,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testClone() {
     $createResult = $this->callAPISuccess('job', 'create', $this->_params);
-    $params = array('id' => $createResult['id']);
+    $params = ['id' => $createResult['id']];
     $cloneResult = $this->callAPIAndDocument('job', 'clone', $params, __FUNCTION__, __FILE__);
     $clonedJob = $cloneResult['values'][$cloneResult['id']];
     $this->assertEquals($this->_params['name'] . ' - Copy', $clonedJob['name']);
@@ -142,11 +146,11 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Check if required fields are not passed.
    */
   public function testDeleteWithoutRequired() {
-    $params = array(
+    $params = [
       'name' => 'API_Test_PP',
       'title' => 'API Test Payment Processor',
       'class_name' => 'CRM_Core_Payment_APITest',
-    );
+    ];
 
     $result = $this->callAPIFailure('job', 'delete', $params);
     $this->assertEquals($result['error_message'], 'Mandatory key(s) missing from params array: id');
@@ -156,9 +160,9 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Check with incorrect required fields.
    */
   public function testDeleteWithIncorrectData() {
-    $params = array(
+    $params = [
       'id' => 'abcd',
-    );
+    ];
     $this->callAPIFailure('job', 'delete', $params);
   }
 
@@ -167,7 +171,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testDelete() {
     $createResult = $this->callAPISuccess('job', 'create', $this->_params);
-    $params = array('id' => $createResult['id']);
+    $params = ['id' => $createResult['id']];
     $this->callAPIAndDocument('job', 'delete', $params, __FUNCTION__, __FILE__);
     $this->assertAPIDeleted($this->_entity, $createResult['id']);
   }
@@ -187,16 +191,16 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Note that this test is about tesing the metadata / calling of the function & doesn't test the success of the called function
    */
   public function testCallUpdateGreetingSuccess() {
-    $this->callAPISuccess($this->_entity, 'update_greeting', array(
+    $this->callAPISuccess($this->_entity, 'update_greeting', [
       'gt' => 'postal_greeting',
       'ct' => 'Individual',
-    ));
+    ]);
   }
 
   public function testCallUpdateGreetingCommaSeparatedParamsSuccess() {
     $gt = 'postal_greeting,email_greeting,addressee';
     $ct = 'Individual,Household';
-    $this->callAPISuccess($this->_entity, 'update_greeting', array('gt' => $gt, 'ct' => $ct));
+    $this->callAPISuccess($this->_entity, 'update_greeting', ['gt' => $gt, 'ct' => $ct]);
   }
 
   /**
@@ -215,8 +219,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $createTotal = 30;
     for ($i = 1; $i <= $createTotal; $i++) {
       $contactID = $this->individualCreate();
-      $groupID = $this->groupCreate(array('name' => $i, 'title' => $i));
-      $this->callAPISuccess('action_schedule', 'create', array(
+      $groupID = $this->groupCreate(['name' => $i, 'title' => $i]);
+      $this->callAPISuccess('action_schedule', 'create', [
         'title' => " job $i",
         'subject' => "job $i",
         'entity_value' => $membershipTypeID,
@@ -227,14 +231,14 @@ class api_v3_JobTest extends CiviUnitTestCase {
         'start_action_unit' => 'hour',
         'group_id' => $groupID,
         'limit_to' => FALSE,
-      ));
-      $this->callAPISuccess('group_contact', 'create', array(
+      ]);
+      $this->callAPISuccess('group_contact', 'create', [
         'contact_id' => $contactID,
         'status' => 'Added',
         'group_id' => $groupID,
-      ));
+      ]);
     }
-    $this->callAPISuccess('job', 'send_reminder', array());
+    $this->callAPISuccess('job', 'send_reminder', []);
     $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
     $this->assertEquals($successfulCronCount, $createTotal);
   }
@@ -249,7 +253,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $membershipTypeID = $this->membershipTypeCreate();
     $this->membershipStatusCreate();
     $createTotal = 3;
-    $groupID = $this->groupCreate(array('name' => 'Texan drawlers', 'title' => 'a...'));
+    $groupID = $this->groupCreate(['name' => 'Texan drawlers', 'title' => 'a...']);
     for ($i = 1; $i <= $createTotal; $i++) {
       $contactID = $this->individualCreate();
       $this->callAPISuccess('Phone', 'create', [
@@ -262,23 +266,23 @@ class api_v3_JobTest extends CiviUnitTestCase {
         $theChosenOneID = $contactID;
       }
       if ($i < 3) {
-        $this->callAPISuccess('group_contact', 'create', array(
+        $this->callAPISuccess('group_contact', 'create', [
           'contact_id' => $contactID,
           'status' => 'Added',
           'group_id' => $groupID,
-        ));
+        ]);
       }
       if ($i > 1) {
-        $this->callAPISuccess('membership', 'create', array(
+        $this->callAPISuccess('membership', 'create', [
           'contact_id' => $contactID,
           'membership_type_id' => $membershipTypeID,
           'join_date' => 'now',
           'start_date' => '+ 1 day',
-        ));
+        ]);
       }
     }
     $this->setupForSmsTests();
-    $provider = civicrm_api3('SmsProvider', 'create', array(
+    $provider = civicrm_api3('SmsProvider', 'create', [
       'name' => "CiviTestSMSProvider",
       'api_type' => "1",
       "username" => "1",
@@ -289,8 +293,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
       "is_default" => "1",
       "is_active" => "1",
       "domain_id" => "1",
-    ));
-    $this->callAPISuccess('action_schedule', 'create', array(
+    ]);
+    $this->callAPISuccess('action_schedule', 'create', [
       'title' => " remind all Texans",
       'subject' => "drawling renewal",
       'entity_value' => $membershipTypeID,
@@ -303,8 +307,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'limit_to' => TRUE,
       'sms_provider_id' => $provider['id'],
       'mode' => 'User_Preference',
-    ));
-    $this->callAPISuccess('job', 'send_reminder', array());
+    ]);
+    $this->callAPISuccess('job', 'send_reminder', []);
     $successfulCronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
     $this->assertEquals($successfulCronCount, 1);
     $sentToID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_action_log");
@@ -316,22 +320,22 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testCallDisableExpiredRelationships() {
     $individualID = $this->individualCreate();
     $orgID = $this->organizationCreate();
-    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_pre', array($this, 'hookPreRelationship'));
-    $relationshipTypeID = $this->callAPISuccess('relationship_type', 'getvalue', array(
+    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_pre', [$this, 'hookPreRelationship']);
+    $relationshipTypeID = $this->callAPISuccess('relationship_type', 'getvalue', [
       'return' => 'id',
       'name_a_b' => 'Employee of',
-    ));
-    $result = $this->callAPISuccess('relationship', 'create', array(
+    ]);
+    $result = $this->callAPISuccess('relationship', 'create', [
       'relationship_type_id' => $relationshipTypeID,
       'contact_id_a' => $individualID,
       'contact_id_b' => $orgID,
       'is_active' => 1,
       'end_date' => 'yesterday',
-    ));
+    ]);
     $relationshipID = $result['id'];
     $this->assertEquals('Hooked', $result['values'][$relationshipID]['description']);
-    $this->callAPISuccess($this->_entity, 'disable_expired_relationships', array());
-    $result = $this->callAPISuccess('relationship', 'get', array());
+    $this->callAPISuccess($this->_entity, 'disable_expired_relationships', []);
+    $result = $this->callAPISuccess('relationship', 'get', []);
     $this->assertEquals('Go Go you good thing', $result['values'][$relationshipID]['description']);
     $this->contactDelete($individualID);
     $this->contactDelete($orgID);
@@ -349,7 +353,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $membershipTypeID = $this->membershipTypeCreate();
     $this->membershipStatusCreate();
     $createTotal = 3;
-    $groupID = $this->groupCreate(array('name' => 'Texan drawlers', 'title' => 'a...'));
+    $groupID = $this->groupCreate(['name' => 'Texan drawlers', 'title' => 'a...']);
     for ($i = 1; $i <= $createTotal; $i++) {
       $contactID = $this->individualCreate();
       $this->callAPISuccess('Phone', 'create', [
@@ -362,23 +366,23 @@ class api_v3_JobTest extends CiviUnitTestCase {
         $theChosenOneID = $contactID;
       }
       if ($i < 3) {
-        $this->callAPISuccess('group_contact', 'create', array(
+        $this->callAPISuccess('group_contact', 'create', [
           'contact_id' => $contactID,
           'status' => 'Added',
           'group_id' => $groupID,
-        ));
+        ]);
       }
       if ($i > 1) {
-        $this->callAPISuccess('membership', 'create', array(
+        $this->callAPISuccess('membership', 'create', [
           'contact_id' => $contactID,
           'membership_type_id' => $membershipTypeID,
           'join_date' => 'now',
           'start_date' => '+ 1 day',
-        ));
+        ]);
       }
     }
     $this->setupForSmsTests();
-    $provider = civicrm_api3('SmsProvider', 'create', array(
+    $provider = civicrm_api3('SmsProvider', 'create', [
       'name' => "CiviTestSMSProvider",
       'api_type' => "1",
       "username" => "1",
@@ -389,8 +393,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
       "is_default" => "1",
       "is_active" => "1",
       "domain_id" => "1",
-    ));
-    $this->callAPISuccess('action_schedule', 'create', array(
+    ]);
+    $this->callAPISuccess('action_schedule', 'create', [
       'title' => " remind all Texans",
       'subject' => "drawling renewal",
       'entity_value' => $membershipTypeID,
@@ -403,9 +407,9 @@ class api_v3_JobTest extends CiviUnitTestCase {
       'limit_to' => TRUE,
       'sms_provider_id' => $provider['id'],
       'mode' => 'SMS',
-    ));
+    ]);
     $this->callAPISuccess('SmsProvider', 'delete', ['id' => $provider['id']]);
-    $this->callAPISuccess('job', 'send_reminder', array());
+    $this->callAPISuccess('job', 'send_reminder', []);
     $cronCount = CRM_Core_DAO::singleValueQuery("SELECT count(*) FROM civicrm_action_log");
     $this->assertEquals($cronCount, 1);
     $sentToID = CRM_Core_DAO::singleValueQuery("SELECT contact_id FROM civicrm_action_log");
@@ -422,7 +426,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * We are just checking it returns without error here.
    */
   public function testBatchMerge() {
-    $this->callAPISuccess('Job', 'process_batch_merge', array());
+    $this->callAPISuccess('Job', 'process_batch_merge', []);
   }
 
   /**
@@ -437,15 +441,15 @@ class api_v3_JobTest extends CiviUnitTestCase {
       $this->callAPISuccess('Contact', 'create', $params);
     }
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => $dataSet['mode']));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => $dataSet['mode']]);
     $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']), 'Failed to skip the right number:' . $dataSet['skipped']);
     $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
-    $result = $this->callAPISuccess('Contact', 'get', array(
+    $result = $this->callAPISuccess('Contact', 'get', [
       'contact_sub_type' => 'Student',
       'sequential' => 1,
-      'is_deceased' => array('IN' => array(0, 1)),
-      'options' => array('sort' => 'id ASC'),
-    ));
+      'is_deceased' => ['IN' => [0, 1]],
+      'options' => ['sort' => 'id ASC'],
+    ]);
     $this->assertEquals(count($dataSet['expected']), $result['count']);
     foreach ($dataSet['expected'] as $index => $contact) {
       foreach ($contact as $key => $value) {
@@ -465,34 +469,34 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testBatchMergeWithAssets() {
     $contactID = $this->individualCreate();
     $contact2ID = $this->individualCreate();
-    $this->contributionCreate(array('contact_id' => $contactID));
-    $this->contributionCreate(array('contact_id' => $contact2ID, 'invoice_id' => '2', 'trxn_id' => 2));
-    $this->contactMembershipCreate(array('contact_id' => $contactID));
-    $this->contactMembershipCreate(array('contact_id' => $contact2ID));
-    $this->activityCreate(array('source_contact_id' => $contactID, 'target_contact_id' => $contactID, 'assignee_contact_id' => $contactID));
-    $this->activityCreate(array('source_contact_id' => $contact2ID, 'target_contact_id' => $contact2ID, 'assignee_contact_id' => $contact2ID));
-    $this->tagCreate(array('name' => 'Tall'));
-    $this->tagCreate(array('name' => 'Short'));
-    $this->entityTagAdd(array('contact_id' => $contactID, 'tag_id' => 'Tall'));
-    $this->entityTagAdd(array('contact_id' => $contact2ID, 'tag_id' => 'Short'));
-    $this->entityTagAdd(array('contact_id' => $contact2ID, 'tag_id' => 'Tall'));
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'safe'));
+    $this->contributionCreate(['contact_id' => $contactID]);
+    $this->contributionCreate(['contact_id' => $contact2ID, 'invoice_id' => '2', 'trxn_id' => 2]);
+    $this->contactMembershipCreate(['contact_id' => $contactID]);
+    $this->contactMembershipCreate(['contact_id' => $contact2ID]);
+    $this->activityCreate(['source_contact_id' => $contactID, 'target_contact_id' => $contactID, 'assignee_contact_id' => $contactID]);
+    $this->activityCreate(['source_contact_id' => $contact2ID, 'target_contact_id' => $contact2ID, 'assignee_contact_id' => $contact2ID]);
+    $this->tagCreate(['name' => 'Tall']);
+    $this->tagCreate(['name' => 'Short']);
+    $this->entityTagAdd(['contact_id' => $contactID, 'tag_id' => 'Tall']);
+    $this->entityTagAdd(['contact_id' => $contact2ID, 'tag_id' => 'Short']);
+    $this->entityTagAdd(['contact_id' => $contact2ID, 'tag_id' => 'Tall']);
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
     $this->assertEquals(0, count($result['values']['skipped']));
     $this->assertEquals(1, count($result['values']['merged']));
-    $this->callAPISuccessGetCount('Contribution', array('contact_id' => $contactID), 2);
-    $this->callAPISuccessGetCount('Contribution', array('contact_id' => $contact2ID), 0);
-    $this->callAPISuccessGetCount('FinancialItem', array('contact_id' => $contactID), 2);
-    $this->callAPISuccessGetCount('FinancialItem', array('contact_id' => $contact2ID), 0);
-    $this->callAPISuccessGetCount('Membership', array('contact_id' => $contactID), 2);
-    $this->callAPISuccessGetCount('Membership', array('contact_id' => $contact2ID), 0);
-    $this->callAPISuccessGetCount('EntityTag', array('contact_id' => $contactID), 2);
-    $this->callAPISuccessGetCount('EntityTag', array('contact_id' => $contact2ID), 0);
+    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID], 2);
+    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contact2ID], 0);
+    $this->callAPISuccessGetCount('FinancialItem', ['contact_id' => $contactID], 2);
+    $this->callAPISuccessGetCount('FinancialItem', ['contact_id' => $contact2ID], 0);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $contactID], 2);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $contact2ID], 0);
+    $this->callAPISuccessGetCount('EntityTag', ['contact_id' => $contactID], 2);
+    $this->callAPISuccessGetCount('EntityTag', ['contact_id' => $contact2ID], 0);
     // 14 activities is one for each contribution (2), two (source + target) for each membership (+(2x2) = 6)
     // 3 for each of the added activities as there are 3 roles (+6 = 12
     // 2 for the (source & target) contact merged activity (+2 = 14)
-    $this->callAPISuccessGetCount('ActivityContact', array('contact_id' => $contactID), 14);
+    $this->callAPISuccessGetCount('ActivityContact', ['contact_id' => $contactID], 14);
     // 2 for the connection to the deleted by merge activity (source & target)
-    $this->callAPISuccessGetCount('ActivityContact', array('contact_id' => $contact2ID), 2);
+    $this->callAPISuccessGetCount('ActivityContact', ['contact_id' => $contact2ID], 2);
   }
 
   /**
@@ -514,80 +518,80 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testBatchMergeMergesGroups() {
     $contactID = $this->individualCreate();
     $contact2ID = $this->individualCreate();
-    $groups = array();
+    $groups = [];
     for ($i = 0; $i < 8; $i++) {
-      $groups[] = $this->groupCreate(array(
+      $groups[] = $this->groupCreate([
         'name' => 'mergeGroup' . $i,
         'title' => 'merge group' . $i,
-      ));
+      ]);
     }
 
-    $this->callAPISuccess('GroupContact', 'create', array(
+    $this->callAPISuccess('GroupContact', 'create', [
       'contact_id' => $contactID,
       'group_id' => $groups[0],
-    ));
-    $this->callAPISuccess('GroupContact', 'create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'create', [
       'contact_id' => $contactID,
       'group_id' => $groups[1],
-    ));
-    $this->callAPISuccess('GroupContact', 'create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'create', [
       'contact_id' => $contactID,
       'group_id' => $groups[2],
-    ));
-    $this->callAPISuccess('GroupContact', 'create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'create', [
       'contact_id' => $contactID,
       'group_id' => $groups[3],
       'status' => 'Removed',
-    ));
-    $this->callAPISuccess('GroupContact', 'create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'create', [
       'contact_id' => $contactID,
       'group_id' => $groups[4],
       'status' => 'Removed',
-    ));
-    $this->callAPISuccess('GroupContact', 'create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'create', [
       'contact_id' => $contactID,
       'group_id' => $groups[5],
       'status' => 'Removed',
-    ));
-    $this->callAPISuccess('GroupContact', 'create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'create', [
       'contact_id' => $contact2ID,
       'group_id' => $groups[1],
-    ));
-    $this->callAPISuccess('GroupContact', 'create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'create', [
       'contact_id' => $contact2ID,
       'group_id' => $groups[2],
       'status' => 'Removed',
-    ));
-    $this->callAPISuccess('GroupContact', 'create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'create', [
       'contact_id' => $contact2ID,
       'group_id' => $groups[4],
-    ));
-    $this->callAPISuccess('GroupContact', 'create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'create', [
       'contact_id' => $contact2ID,
       'group_id' => $groups[5],
       'status' => 'Removed',
-    ));
-    $this->callAPISuccess('GroupContact', 'create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'create', [
       'contact_id' => $contact2ID,
       'group_id' => $groups[6],
-    ));
-    $this->callAPISuccess('GroupContact', 'create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'create', [
       'contact_id' => $contact2ID,
       'group_id' => $groups[7],
       'status' => 'Removed',
-    ));
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'safe'));
+    ]);
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
     $this->assertEquals(0, count($result['values']['skipped']));
     $this->assertEquals(1, count($result['values']['merged']));
-    $groupResult = $this->callAPISuccess('GroupContact', 'get', array());
+    $groupResult = $this->callAPISuccess('GroupContact', 'get', []);
     $this->assertEquals(5, $groupResult['count']);
-    $expectedGroups = array(
+    $expectedGroups = [
       $groups[0],
       $groups[1],
       $groups[2],
       $groups[4],
       $groups[6],
-    );
+    ];
     foreach ($groupResult['values'] as $groupValues) {
       $this->assertEquals($contactID, $groupValues['contact_id']);
       $this->assertEquals('Added', $groupValues['status']);
@@ -630,17 +634,17 @@ class api_v3_JobTest extends CiviUnitTestCase {
     $contactID1 = $this->individualCreate();
     $contactID2 = $this->individualCreate();
     foreach ($dataSet['contact_1'] as $address) {
-      $this->callAPISuccess($dataSet['entity'], 'create', array_merge(array('contact_id' => $contactID1), $address));
+      $this->callAPISuccess($dataSet['entity'], 'create', array_merge(['contact_id' => $contactID1], $address));
     }
     foreach ($dataSet['contact_2'] as $address) {
-      $this->callAPISuccess($dataSet['entity'], 'create', array_merge(array('contact_id' => $contactID2), $address));
+      $this->callAPISuccess($dataSet['entity'], 'create', array_merge(['contact_id' => $contactID2], $address));
     }
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'safe'));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
     $this->assertEquals(1, count($result['values']['merged']));
-    $addresses = $this->callAPISuccess($dataSet['entity'], 'get', array('contact_id' => $contactID1, 'sequential' => 1));
+    $addresses = $this->callAPISuccess($dataSet['entity'], 'get', ['contact_id' => $contactID1, 'sequential' => 1]);
     $this->assertEquals(count($dataSet['expected']), $addresses['count'], "Did not get the expected result for " . $dataSet['entity'] . (!empty($dataSet['description']) ? " on dataset {$dataSet['description']}" : ''));
-    $locationTypes = $this->callAPISuccess($dataSet['entity'], 'getoptions', array('field' => 'location_type_id'));
+    $locationTypes = $this->callAPISuccess($dataSet['entity'], 'getoptions', ['field' => 'location_type_id']);
     foreach ($dataSet['expected'] as $index => $expectedAddress) {
       foreach ($expectedAddress as $key => $value) {
         if ($key == 'location_type_id') {
@@ -663,21 +667,21 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testBatchMergesAddressesHook($dataSet) {
     $contactID1 = $this->individualCreate();
     $contactID2 = $this->individualCreate();
-    $this->contributionCreate(array('contact_id' => $contactID1, 'receive_date' => '2010-01-01', 'invoice_id' => 1, 'trxn_id' => 1));
-    $this->contributionCreate(array('contact_id' => $contactID2, 'receive_date' => '2012-01-01', 'invoice_id' => 2, 'trxn_id' => 2));
+    $this->contributionCreate(['contact_id' => $contactID1, 'receive_date' => '2010-01-01', 'invoice_id' => 1, 'trxn_id' => 1]);
+    $this->contributionCreate(['contact_id' => $contactID2, 'receive_date' => '2012-01-01', 'invoice_id' => 2, 'trxn_id' => 2]);
     foreach ($dataSet['contact_1'] as $address) {
-      $this->callAPISuccess($dataSet['entity'], 'create', array_merge(array('contact_id' => $contactID1), $address));
+      $this->callAPISuccess($dataSet['entity'], 'create', array_merge(['contact_id' => $contactID1], $address));
     }
     foreach ($dataSet['contact_2'] as $address) {
-      $this->callAPISuccess($dataSet['entity'], 'create', array_merge(array('contact_id' => $contactID2), $address));
+      $this->callAPISuccess($dataSet['entity'], 'create', array_merge(['contact_id' => $contactID2], $address));
     }
-    $this->hookClass->setHook('civicrm_alterLocationMergeData', array($this, 'hookMostRecentDonor'));
+    $this->hookClass->setHook('civicrm_alterLocationMergeData', [$this, 'hookMostRecentDonor']);
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'safe'));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'safe']);
     $this->assertEquals(1, count($result['values']['merged']));
-    $addresses = $this->callAPISuccess($dataSet['entity'], 'get', array('contact_id' => $contactID1, 'sequential' => 1));
+    $addresses = $this->callAPISuccess($dataSet['entity'], 'get', ['contact_id' => $contactID1, 'sequential' => 1]);
     $this->assertEquals(count($dataSet['expected_hook']), $addresses['count']);
-    $locationTypes = $this->callAPISuccess($dataSet['entity'], 'getoptions', array('field' => 'location_type_id'));
+    $locationTypes = $this->callAPISuccess($dataSet['entity'], 'getoptions', ['field' => 'location_type_id']);
     foreach ($dataSet['expected_hook'] as $index => $expectedAddress) {
       foreach ($expectedAddress as $key => $value) {
         if ($key == 'location_type_id') {
@@ -694,21 +698,21 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test the organization will not be matched to an individual.
    */
   public function testBatchMergeWillNotMergeOrganizationToIndividual() {
-    $individual = $this->callAPISuccess('Contact', 'create', array(
+    $individual = $this->callAPISuccess('Contact', 'create', [
       'contact_type' => 'Individual',
       'organization_name' => 'Anon',
       'email' => 'anonymous@hacker.com',
-    ));
-    $organization = $this->callAPISuccess('Contact', 'create', array(
+    ]);
+    $organization = $this->callAPISuccess('Contact', 'create', [
       'contact_type' => 'Organization',
       'organization_name' => 'Anon',
       'email' => 'anonymous@hacker.com',
-    ));
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('mode' => 'aggressive'));
+    ]);
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['mode' => 'aggressive']);
     $this->assertEquals(0, count($result['values']['skipped']));
     $this->assertEquals(0, count($result['values']['merged']));
-    $this->callAPISuccessGetSingle('Contact', array('id' => $individual['id']));
-    $this->callAPISuccessGetSingle('Contact', array('id' => $organization['id']));
+    $this->callAPISuccessGetSingle('Contact', ['id' => $individual['id']]);
+    $this->callAPISuccessGetSingle('Contact', ['id' => $organization['id']]);
 
   }
 
@@ -737,11 +741,11 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function hookMostRecentDonor(&$blocksDAO, $mainId, $otherId, $migrationInfo) {
 
-    $lastDonorID = $this->callAPISuccessGetValue('Contribution', array(
+    $lastDonorID = $this->callAPISuccessGetValue('Contribution', [
       'return' => 'contact_id',
-      'contact_id' => array('IN' => array($mainId, $otherId)),
-      'options' => array('sort' => 'receive_date DESC', 'limit' => 1),
-    ));
+      'contact_id' => ['IN' => [$mainId, $otherId]],
+      'options' => ['sort' => 'receive_date DESC', 'limit' => 1],
+    ]);
     // Since the last donor is not the main ID we are prioritising info from the last donor.
     // In the test this should always be true - but keep the check in case
     // something changes that we need to detect.
@@ -793,17 +797,17 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @return array
    */
   public function getMergeLocationData() {
-    $address1 = array('street_address' => 'Buckingham Palace', 'city' => 'London');
-    $address2 = array('street_address' => 'The Doghouse', 'supplemental_address_1' => 'under the blanket');
+    $address1 = ['street_address' => 'Buckingham Palace', 'city' => 'London'];
+    $address2 = ['street_address' => 'The Doghouse', 'supplemental_address_1' => 'under the blanket'];
     $data = $this->getMergeLocations($address1, $address2, 'Address');
-    $data = array_merge($data, $this->getMergeLocations(array('phone' => '12345', 'phone_type_id' => 1), array('phone' => '678910', 'phone_type_id' => 1), 'Phone'));
-    $data = array_merge($data, $this->getMergeLocations(array('phone' => '12345'), array('phone' => '678910'), 'Phone'));
-    $data = array_merge($data, $this->getMergeLocations(array('email' => 'mini@me.com'), array('email' => 'mini@me.org'), 'Email', array(
-      array(
+    $data = array_merge($data, $this->getMergeLocations(['phone' => '12345', 'phone_type_id' => 1], ['phone' => '678910', 'phone_type_id' => 1], 'Phone'));
+    $data = array_merge($data, $this->getMergeLocations(['phone' => '12345'], ['phone' => '678910'], 'Phone'));
+    $data = array_merge($data, $this->getMergeLocations(['email' => 'mini@me.com'], ['email' => 'mini@me.org'], 'Email', [
+      [
         'email' => 'anthony_anderson@civicrm.org',
         'location_type_id' => 'Home',
-      ),
-    )));
+      ],
+    ]));
     return $data;
 
   }
@@ -815,21 +819,21 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testBatchMergeEmailHandling() {
     for ($x = 0; $x <= 4; $x++) {
-      $id = $this->individualCreate(array('email' => 'batman@gotham.met'));
+      $id = $this->individualCreate(['email' => 'batman@gotham.met']);
     }
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array());
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
     $this->assertEquals(4, count($result['values']['merged']));
-    $this->callAPISuccessGetCount('Contact', array('email' => 'batman@gotham.met'), 1);
-    $contacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 0));
-    $deletedContacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 1));
-    $this->callAPISuccessGetCount('Email', array(
+    $this->callAPISuccessGetCount('Contact', ['email' => 'batman@gotham.met'], 1);
+    $contacts = $this->callAPISuccess('Contact', 'get', ['is_deleted' => 0]);
+    $deletedContacts = $this->callAPISuccess('Contact', 'get', ['is_deleted' => 1]);
+    $this->callAPISuccessGetCount('Email', [
       'email' => 'batman@gotham.met',
-      'contact_id' => array('IN' => array_keys($contacts['values'])),
-    ), 1);
-    $this->callAPISuccessGetCount('Email', array(
+      'contact_id' => ['IN' => array_keys($contacts['values'])],
+    ], 1);
+    $this->callAPISuccessGetCount('Email', [
       'email' => 'batman@gotham.met',
-      'contact_id' => array('IN' => array_keys($deletedContacts['values'])),
-    ), 4);
+      'contact_id' => ['IN' => array_keys($deletedContacts['values'])],
+    ], 4);
   }
 
   /**
@@ -839,27 +843,43 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * @dataProvider getOnHoldSets
    *
-   * @param
+   * @param bool $onHold1
+   * @param bool $onHold2
+   * @param bool $merge
+   * @param string $conflictText
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testBatchMergeEmailOnHold($onHold1, $onHold2, $merge) {
-    $contactID1 = $this->individualCreate(array(
-      'api.email.create' => array(
+  public function testBatchMergeEmailOnHold($onHold1, $onHold2, $merge, $conflictText) {
+    $this->individualCreate([
+      'api.email.create' => [
         'email' => 'batman@gotham.met',
         'location_type_id' => 'Work',
         'is_primary' => 1,
         'on_hold' => $onHold1,
-      ),
-    ));
-    $contactID2 = $this->individualCreate(array(
-      'api.email.create' => array(
+      ],
+    ]);
+    $this->individualCreate([
+      'api.email.create' => [
         'email' => 'batman@gotham.met',
         'location_type_id' => 'Work',
         'is_primary' => 1,
         'on_hold' => $onHold2,
-      ),
-    ));
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array());
-    $this->assertEquals($merge, count($result['values']['merged']));
+      ],
+    ]);
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
+    $this->assertCount($merge, $result['values']['merged']);
+    if ($conflictText) {
+      $defaultRuleGroupID = $this->callAPISuccessGetValue('RuleGroup', [
+        'contact_type' => 'Individual',
+        'used' => 'Unsupervised',
+        'return' => 'id',
+        'options' => ['limit' => 1],
+      ]);
+
+      $duplicates = $this->callAPISuccess('Dedupe', 'getduplicates', ['rule_group_id' => $defaultRuleGroupID]);
+      $this->assertEquals($conflictText, $duplicates['values'][0]['conflicts']);
+    }
   }
 
   /**
@@ -867,12 +887,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function getOnHoldSets() {
     // Each row specifies: contact 1 on_hold, contact 2 on_hold, merge? (0 or 1),
-    $sets = array(
-      array(0, 0, 1),
-      array(0, 1, 0),
-      array(1, 0, 0),
-      array(1, 1, 1),
-    );
+    $sets = [
+      [0, 0, 1, NULL],
+      [0, 1, 0, "Email 2 (Work): 'batman@gotham.met' vs. 'batman@gotham.met\n(On Hold)'"],
+      [1, 0, 0, "Email 2 (Work): 'batman@gotham.met\n(On Hold)' vs. 'batman@gotham.met'"],
+      [1, 1, 1, NULL],
+    ];
     return $sets;
   }
 
@@ -888,31 +908,31 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param int $threshold
    */
   public function testBatchMergeEmptyRule($contactType, $used, $name, $isReserved, $threshold) {
-    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', array(
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
       'contact_type' => $contactType,
       'threshold' => $threshold,
       'used' => $used,
       'name' => $name,
       'is_reserved' => $isReserved,
-    ));
-    $this->callAPISuccess('Job', 'process_batch_merge', array('rule_group_id' => $ruleGroup['id']));
-    $this->callAPISuccess('RuleGroup', 'delete', array('id' => $ruleGroup['id']));
+    ]);
+    $this->callAPISuccess('Job', 'process_batch_merge', ['rule_group_id' => $ruleGroup['id']]);
+    $this->callAPISuccess('RuleGroup', 'delete', ['id' => $ruleGroup['id']]);
   }
 
   /**
    * Get the various rule combinations.
    */
   public function getRuleSets() {
-    $contactTypes = array('Individual', 'Organization', 'Household');
-    $useds = array('Unsupervised', 'General', 'Supervised');
-    $ruleGroups = array();
+    $contactTypes = ['Individual', 'Organization', 'Household'];
+    $useds = ['Unsupervised', 'General', 'Supervised'];
+    $ruleGroups = [];
     foreach ($contactTypes as $contactType) {
       foreach ($useds as $used) {
-        $ruleGroups[] = array($contactType, $used, 'Bob', FALSE, 0);
-        $ruleGroups[] = array($contactType, $used, 'Bob', FALSE, 10);
-        $ruleGroups[] = array($contactType, $used, 'Bob', TRUE, 10);
-        $ruleGroups[] = array($contactType, $used, $contactType . $used, FALSE, 10);
-        $ruleGroups[] = array($contactType, $used, $contactType . $used, TRUE, 10);
+        $ruleGroups[] = [$contactType, $used, 'Bob', FALSE, 0];
+        $ruleGroups[] = [$contactType, $used, 'Bob', FALSE, 10];
+        $ruleGroups[] = [$contactType, $used, 'Bob', TRUE, 10];
+        $ruleGroups[] = [$contactType, $used, $contactType . $used, FALSE, 10];
+        $ruleGroups[] = [$contactType, $used, $contactType . $used, TRUE, 10];
       }
     }
     return $ruleGroups;
@@ -925,49 +945,49 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testBatchMergeMatchingAddress() {
     for ($x = 0; $x <= 2; $x++) {
-      $this->individualCreate(array(
-        'api.address.create' => array(
+      $this->individualCreate([
+        'api.address.create' => [
           'location_type_id' => 'Home',
           'street_address' => 'Appt 115, The Batcave',
           'city' => 'Gotham',
           'postal_code' => 'Nananananana',
-        ),
-      ));
+        ],
+      ]);
     }
     // Different location type, still merge, identical.
-    $this->individualCreate(array(
-      'api.address.create' => array(
+    $this->individualCreate([
+      'api.address.create' => [
         'location_type_id' => 'Main',
         'street_address' => 'Appt 115, The Batcave',
         'city' => 'Gotham',
         'postal_code' => 'Nananananana',
-      ),
-    ));
+      ],
+    ]);
 
-    $this->individualCreate(array(
-      'api.address.create' => array(
+    $this->individualCreate([
+      'api.address.create' => [
         'location_type_id' => 'Home',
         'street_address' => 'Appt 115, The Batcave',
         'city' => 'Gotham',
         'postal_code' => 'Batman',
-      ),
-    ));
+      ],
+    ]);
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array());
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', []);
     $this->assertEquals(3, count($result['values']['merged']));
     $this->assertEquals(1, count($result['values']['skipped']));
-    $this->callAPISuccessGetCount('Contact', array('street_address' => 'Appt 115, The Batcave'), 2);
-    $contacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 0));
-    $deletedContacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 1));
-    $this->callAPISuccessGetCount('Address', array(
+    $this->callAPISuccessGetCount('Contact', ['street_address' => 'Appt 115, The Batcave'], 2);
+    $contacts = $this->callAPISuccess('Contact', 'get', ['is_deleted' => 0]);
+    $deletedContacts = $this->callAPISuccess('Contact', 'get', ['is_deleted' => 1]);
+    $this->callAPISuccessGetCount('Address', [
       'street_address' => 'Appt 115, The Batcave',
-      'contact_id' => array('IN' => array_keys($contacts['values'])),
-    ), 3);
+      'contact_id' => ['IN' => array_keys($contacts['values'])],
+    ], 3);
 
-    $this->callAPISuccessGetCount('Address', array(
+    $this->callAPISuccessGetCount('Address', [
       'street_address' => 'Appt 115, The Batcave',
-      'contact_id' => array('IN' => array_keys($deletedContacts['values'])),
-    ), 2);
+      'contact_id' => ['IN' => array_keys($deletedContacts['values'])],
+    ], 2);
   }
 
   /**
@@ -977,29 +997,29 @@ class api_v3_JobTest extends CiviUnitTestCase {
    */
   public function testBatchMergeIDRange() {
     for ($x = 0; $x <= 4; $x++) {
-      $id = $this->individualCreate(array('email' => 'batman@gotham.met'));
+      $id = $this->individualCreate(['email' => 'batman@gotham.met']);
     }
     for ($x = 0; $x <= 4; $x++) {
-      $this->individualCreate(array('email' => 'robin@gotham.met'));
+      $this->individualCreate(['email' => 'robin@gotham.met']);
     }
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('criteria' => array('contact' => array('id' => array('<' => $id)))));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['criteria' => ['contact' => ['id' => ['<' => $id]]]]);
     $this->assertEquals(4, count($result['values']['merged']));
-    $this->callAPISuccessGetCount('Contact', array('email' => 'batman@gotham.met'), 1);
-    $this->callAPISuccessGetCount('Contact', array('email' => 'robin@gotham.met'), 5);
-    $contacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 0));
-    $deletedContacts = $this->callAPISuccess('Contact', 'get', array('is_deleted' => 0));
-    $this->callAPISuccessGetCount('Email', array(
+    $this->callAPISuccessGetCount('Contact', ['email' => 'batman@gotham.met'], 1);
+    $this->callAPISuccessGetCount('Contact', ['email' => 'robin@gotham.met'], 5);
+    $contacts = $this->callAPISuccess('Contact', 'get', ['is_deleted' => 0]);
+    $deletedContacts = $this->callAPISuccess('Contact', 'get', ['is_deleted' => 0]);
+    $this->callAPISuccessGetCount('Email', [
       'email' => 'batman@gotham.met',
-      'contact_id' => array('IN' => array_keys($contacts['values'])),
-    ), 1);
-    $this->callAPISuccessGetCount('Email', array(
+      'contact_id' => ['IN' => array_keys($contacts['values'])],
+    ], 1);
+    $this->callAPISuccessGetCount('Email', [
       'email' => 'batman@gotham.met',
-      'contact_id' => array('IN' => array_keys($deletedContacts['values'])),
-    ), 1);
-    $this->callAPISuccessGetCount('Email', array(
+      'contact_id' => ['IN' => array_keys($deletedContacts['values'])],
+    ], 1);
+    $this->callAPISuccessGetCount('Email', [
       'email' => 'robin@gotham.met',
-      'contact_id' => array('IN' => array_keys($contacts['values'])),
-    ), 5);
+      'contact_id' => ['IN' => array_keys($contacts['values'])],
+    ], 5);
 
   }
 
@@ -1007,15 +1027,15 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Test the batch merge copes with view only custom data field.
    */
   public function testBatchMergeCustomDataViewOnlyField() {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'edit my contact');
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit my contact'];
     $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email' => 'tha_mouse@mouse.com'];
     $this->individualCreate($mouseParams);
 
     $customGroup = $this->CustomGroupCreate();
-    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'is_view' => 1));
+    $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id'], 'is_view' => 1]);
     $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 'blah']));
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertEquals(1, count($result['values']['merged']));
     $mouseParams['return'] = 'custom_' . $customField['id'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
@@ -1030,23 +1050,25 @@ class api_v3_JobTest extends CiviUnitTestCase {
    *
    * Note that we set 0 on 2 fields with one on each contact to ensure that
    * both merged & mergee fields are respected.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeCustomDataZeroValueField() {
-    $customGroup = $this->CustomGroupCreate();
-    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'default_value' => NULL));
+    $customGroup = $this->customGroupCreate();
+    $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id'], 'default_value' => NULL]);
 
     $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email' => 'tha_mouse@mouse.com'];
     $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => '']));
     $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 0]));
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertEquals(1, count($result['values']['merged']));
     $mouseParams['return'] = 'custom_' . $customField['id'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
     $this->assertEquals(0, $mouse['custom_' . $customField['id']]);
 
     $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => NULL]));
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertEquals(1, count($result['values']['merged']));
     $mouseParams['return'] = 'custom_' . $customField['id'];
     $mouse = $this->callAPISuccess('Contact', 'getsingle', $mouseParams);
@@ -1058,22 +1080,24 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Test the batch merge treats 0 vs 1 as a conflict.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testBatchMergeCustomDataZeroValueFieldWithConflict() {
-    $customGroup = $this->CustomGroupCreate();
-    $customField = $this->customFieldCreate(array('custom_group_id' => $customGroup['id'], 'default_value' => NULL));
+    $customGroup = $this->customGroupCreate();
+    $customField = $this->customFieldCreate(['custom_group_id' => $customGroup['id'], 'default_value' => NULL]);
 
     $mouseParams = ['first_name' => 'Mickey', 'last_name' => 'Mouse', 'email' => 'tha_mouse@mouse.com'];
     $mouse1 = $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 0]));
     $mouse2 = $this->individualCreate(array_merge($mouseParams, ['custom_' . $customField['id'] => 1]));
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertEquals(0, count($result['values']['merged']));
 
     // Reverse which mouse has the zero to test we still get a conflict.
     $this->individualCreate(array_merge($mouseParams, ['id' => $mouse1, 'custom_' . $customField['id'] => 1]));
     $this->individualCreate(array_merge($mouseParams, ['id' => $mouse2, 'custom_' . $customField['id'] => 0]));
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => 'safe'));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => 'safe']);
     $this->assertEquals(0, count($result['values']['merged']));
 
     $this->customFieldDelete($customField['id']);
@@ -1088,12 +1112,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param $dataSet
    */
   public function testBatchMergeWorksCheckPermissionsTrue($dataSet) {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'administer CiviCRM');
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'administer CiviCRM'];
     foreach ($dataSet['contacts'] as $params) {
       $this->callAPISuccess('Contact', 'create', $params);
     }
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 1, 'mode' => $dataSet['mode']));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 1, 'mode' => $dataSet['mode']]);
     $this->assertEquals(0, count($result['values']['merged']), 'User does not have permission to any contacts, so no merging');
     $this->assertEquals(0, count($result['values']['skipped']), 'User does not have permission to any contacts, so no skip visibility');
   }
@@ -1106,12 +1130,12 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param $dataSet
    */
   public function testBatchMergeWorksCheckPermissionsFalse($dataSet) {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'edit my contact');
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit my contact'];
     foreach ($dataSet['contacts'] as $params) {
       $this->callAPISuccess('Contact', 'create', $params);
     }
 
-    $result = $this->callAPISuccess('Job', 'process_batch_merge', array('check_permissions' => 0, 'mode' => $dataSet['mode']));
+    $result = $this->callAPISuccess('Job', 'process_batch_merge', ['check_permissions' => 0, 'mode' => $dataSet['mode']]);
     $this->assertEquals($dataSet['skipped'], count($result['values']['skipped']), 'Failed to skip the right number:' . $dataSet['skipped']);
     $this->assertEquals($dataSet['merged'], count($result['values']['merged']));
   }
@@ -1120,342 +1144,342 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * Get data for batch merge.
    */
   public function getMergeSets() {
-    $data = array(
-      array(
-        array(
+    $data = [
+      [
+        [
           'mode' => 'safe',
-          'contacts' => array(
-            array(
+          'contacts' => [
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Address.create' => array(
+              'api.Address.create' => [
                 'street_address' => 'big house',
                 'location_type_id' => 'Home',
-              ),
-            ),
-            array(
+              ],
+            ],
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-            ),
-          ),
+            ],
+          ],
           'skipped' => 0,
           'merged' => 1,
-          'expected' => array(
-            array(
+          'expected' => [
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
-            ),
-          ),
-        ),
-      ),
-      array(
-        array(
+            ],
+          ],
+        ],
+      ],
+      [
+        [
           'mode' => 'safe',
-          'contacts' => array(
-            array(
+          'contacts' => [
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Address.create' => array(
+              'api.Address.create' => [
                 'street_address' => 'big house',
                 'location_type_id' => 'Home',
-              ),
-            ),
-            array(
+              ],
+            ],
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Address.create' => array(
+              'api.Address.create' => [
                 'street_address' => 'bigger house',
                 'location_type_id' => 'Home',
-              ),
-            ),
-          ),
+              ],
+            ],
+          ],
           'skipped' => 1,
           'merged' => 0,
-          'expected' => array(
-            array(
+          'expected' => [
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'street_address' => 'big house',
-            ),
-            array(
+            ],
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'street_address' => 'bigger house',
-            ),
-          ),
-        ),
-      ),
-      array(
-        array(
+            ],
+          ],
+        ],
+      ],
+      [
+        [
           'mode' => 'safe',
-          'contacts' => array(
-            array(
+          'contacts' => [
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Email.create' => array(
+              'api.Email.create' => [
                 'email' => 'big.slog@work.co.nz',
                 'location_type_id' => 'Work',
-              ),
-            ),
-            array(
+              ],
+            ],
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Email.create' => array(
+              'api.Email.create' => [
                 'email' => 'big.slog@work.com',
                 'location_type_id' => 'Work',
-              ),
-            ),
-          ),
+              ],
+            ],
+          ],
           'skipped' => 1,
           'merged' => 0,
-          'expected' => array(
-            array(
+          'expected' => [
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
-            ),
-            array(
+            ],
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
-            ),
-          ),
-        ),
-      ),
-      array(
-        array(
+            ],
+          ],
+        ],
+      ],
+      [
+        [
           'mode' => 'safe',
-          'contacts' => array(
-            array(
+          'contacts' => [
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Phone.create' => array(
+              'api.Phone.create' => [
                 'phone' => '123456',
                 'location_type_id' => 'Work',
-              ),
-            ),
-            array(
+              ],
+            ],
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Phone.create' => array(
+              'api.Phone.create' => [
                 'phone' => '23456',
                 'location_type_id' => 'Work',
-              ),
-            ),
-          ),
+              ],
+            ],
+          ],
           'skipped' => 1,
           'merged' => 0,
-          'expected' => array(
-            array(
+          'expected' => [
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
-            ),
-            array(
+            ],
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
-            ),
-          ),
-        ),
-      ),
-      array(
-        array(
+            ],
+          ],
+        ],
+      ],
+      [
+        [
           'mode' => 'aggressive',
-          'contacts' => array(
-            array(
+          'contacts' => [
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Address.create' => array(
+              'api.Address.create' => [
                 'street_address' => 'big house',
                 'location_type_id' => 'Home',
-              ),
-            ),
-            array(
+              ],
+            ],
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Address.create' => array(
+              'api.Address.create' => [
                 'street_address' => 'bigger house',
                 'location_type_id' => 'Home',
-              ),
-            ),
-          ),
+              ],
+            ],
+          ],
           'skipped' => 0,
           'merged' => 1,
-          'expected' => array(
-            array(
+          'expected' => [
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'street_address' => 'big house',
-            ),
-          ),
-        ),
-      ),
-      array(
-        array(
+            ],
+          ],
+        ],
+      ],
+      [
+        [
           'mode' => 'safe',
-          'contacts' => array(
-            array(
+          'contacts' => [
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Address.create' => array(
+              'api.Address.create' => [
                 'street_address' => 'big house',
                 'location_type_id' => 'Home',
-              ),
-            ),
-            array(
+              ],
+            ],
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
               'is_deceased' => 1,
-            ),
-          ),
+            ],
+          ],
           'skipped' => 1,
           'merged' => 0,
-          'expected' => array(
-            array(
+          'expected' => [
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'is_deceased' => 0,
-            ),
-            array(
+            ],
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'is_deceased' => 1,
-            ),
-          ),
-        ),
-      ),
-      array(
-        array(
+            ],
+          ],
+        ],
+      ],
+      [
+        [
           'mode' => 'safe',
-          'contacts' => array(
-            array(
+          'contacts' => [
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-              'api.Address.create' => array(
+              'api.Address.create' => [
                 'street_address' => 'big house',
                 'location_type_id' => 'Home',
-              ),
+              ],
               'is_deceased' => 1,
-            ),
-            array(
+            ],
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'contact_sub_type' => 'Student',
-            ),
-          ),
+            ],
+          ],
           'skipped' => 1,
           'merged' => 0,
-          'expected' => array(
-            array(
+          'expected' => [
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'is_deceased' => 1,
-            ),
-            array(
+            ],
+            [
               'first_name' => 'Michael',
               'last_name' => 'Jackson',
               'email' => 'michael@neverland.com',
               'contact_type' => 'Individual',
               'is_deceased' => 0,
-            ),
-          ),
-        ),
-      ),
-    );
+            ],
+          ],
+        ],
+      ],
+    ];
 
-    $conflictPairs = array(
+    $conflictPairs = [
       'first_name' => 'Dianna',
       'last_name' => 'McAndrew',
       'middle_name' => 'Prancer',
       'birth_date' => '2015-12-25',
       'gender_id' => 'Female',
       'job_title' => 'Thriller',
-    );
+    ];
 
     foreach ($conflictPairs as $key => $value) {
-      $contactParams = array(
+      $contactParams = [
         'first_name' => 'Michael',
         'middle_name' => 'Dancer',
         'last_name' => 'Jackson',
         'birth_date' => '2015-02-25',
         'email' => 'michael@neverland.com',
         'contact_type' => 'Individual',
-        'contact_sub_type' => array('Student'),
+        'contact_sub_type' => ['Student'],
         'gender_id' => 'Male',
         'job_title' => 'Entertainer',
-      );
+      ];
       $contact2 = $contactParams;
 
       $contact2[$key] = $value;
-      $data[$key . '_conflict'] = array(
-        array(
+      $data[$key . '_conflict'] = [
+        [
           'mode' => 'safe',
-          'contacts' => array($contactParams, $contact2),
+          'contacts' => [$contactParams, $contact2],
           'skipped' => 1,
           'merged' => 0,
-          'expected' => array($contactParams, $contact2),
-        ),
-      );
+          'expected' => [$contactParams, $contact2],
+        ],
+      ];
     }
 
     return $data;
@@ -1468,7 +1492,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param array $params
    */
   public function hookPreRelationship($op, $objectName, $id, &$params) {
-    if ($op == 'delete') {
+    if ($op === 'delete') {
       return;
     }
     if ($params['is_active']) {
@@ -1486,395 +1510,396 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param array $locationParams2
    * @param string $entity
    * @param array $additionalExpected
+   *
    * @return array
    */
-  public function getMergeLocations($locationParams1, $locationParams2, $entity, $additionalExpected = array()) {
-    $data = array(
-      array(
-        'matching_primary' => array(
+  public function getMergeLocations($locationParams1, $locationParams2, $entity, $additionalExpected = []) {
+    $data = [
+      [
+        'matching_primary' => [
           'entity' => $entity,
-          'contact_1' => array(
-            array_merge(array(
+          'contact_1' => [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          ),
-          'contact_2' => array(
-            array_merge(array(
+            ], $locationParams2),
+          ],
+          'contact_2' => [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-          ),
-          'expected' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams1),
+          ],
+          'expected' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          )),
-          'expected_hook' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams2),
+          ]),
+          'expected_hook' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          )),
-        ),
-      ),
-      array(
-        'matching_primary_reverse' => array(
+            ], $locationParams2),
+          ]),
+        ],
+      ],
+      [
+        'matching_primary_reverse' => [
           'entity' => $entity,
-          'contact_1' => array(
-            array_merge(array(
+          'contact_1' => [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-          ),
-          'contact_2' => array(
-            array_merge(array(
+            ], $locationParams1),
+          ],
+          'contact_2' => [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          ),
-          'expected' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams2),
+          ],
+          'expected' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          )),
-          'expected_hook' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams2),
+          ]),
+          'expected_hook' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          )),
-        ),
-      ),
-      array(
-        'only_one_has_address' => array(
+            ], $locationParams2),
+          ]),
+        ],
+      ],
+      [
+        'only_one_has_address' => [
           'entity' => $entity,
-          'contact_1' => array(
-            array_merge(array(
+          'contact_1' => [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          ),
-          'contact_2' => array(),
-          'expected' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams2),
+          ],
+          'contact_2' => [],
+          'expected' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          )),
-          'expected_hook' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams2),
+          ]),
+          'expected_hook' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Main',
               // When dealing with email we don't have a clean slate - the existing
               // primary will be primary.
               'is_primary' => ($entity == 'Email' ? 0 : 1),
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          )),
-        ),
-      ),
-      array(
-        'only_one_has_address_reverse' => array(
+            ], $locationParams2),
+          ]),
+        ],
+      ],
+      [
+        'only_one_has_address_reverse' => [
           'description' => 'The destination contact does not have an address. secondary contact should be merged in.',
           'entity' => $entity,
-          'contact_1' => array(),
-          'contact_2' => array(
-            array_merge(array(
+          'contact_1' => [],
+          'contact_2' => [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          ),
-          'expected' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams2),
+          ],
+          'expected' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Main',
               // When dealing with email we don't have a clean slate - the existing
               // primary will be primary.
               'is_primary' => ($entity == 'Email' ? 0 : 1),
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          )),
-          'expected_hook' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams2),
+          ]),
+          'expected_hook' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          )),
-        ),
-      ),
-      array(
-        'different_primaries_with_different_location_type' => array(
+            ], $locationParams2),
+          ]),
+        ],
+      ],
+      [
+        'different_primaries_with_different_location_type' => [
           'description' => 'Primaries are different with different location. Keep both addresses. Set primary to be that of lower id',
           'entity' => $entity,
-          'contact_1' => array(
-            array_merge(array(
+          'contact_1' => [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-          ),
-          'contact_2' => array(
-            array_merge(array(
+            ], $locationParams1),
+          ],
+          'contact_2' => [
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 1,
-            ), $locationParams2),
-          ),
-          'expected' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams2),
+          ],
+          'expected' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          )),
-          'expected_hook' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams2),
+          ]),
+          'expected_hook' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 0,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 1,
-            ), $locationParams2),
-          )),
-        ),
-      ),
-      array(
-        'different_primaries_with_different_location_type_reverse' => array(
+            ], $locationParams2),
+          ]),
+        ],
+      ],
+      [
+        'different_primaries_with_different_location_type_reverse' => [
           'entity' => $entity,
-          'contact_1' => array(
-            array_merge(array(
+          'contact_1' => [
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 1,
-            ), $locationParams2),
-          ),
-          'contact_2' => array(
-            array_merge(array(
+            ], $locationParams2),
+          ],
+          'contact_2' => [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-          ),
-          'expected' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams1),
+          ],
+          'expected' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 1,
-            ), $locationParams2),
-            array_merge(array(
+            ], $locationParams2),
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 0,
-            ), $locationParams1),
-          )),
-          'expected_hook' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams1),
+          ]),
+          'expected_hook' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-            array_merge(array(
+            ], $locationParams2),
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-          )),
-        ),
-      ),
-      array(
-        'different_primaries_location_match_only_one_address' => array(
+            ], $locationParams1),
+          ]),
+        ],
+      ],
+      [
+        'different_primaries_location_match_only_one_address' => [
           'entity' => $entity,
-          'contact_1' => array(
-            array_merge(array(
+          'contact_1' => [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          ),
-          'contact_2' => array(
-            array_merge(array(
+            ], $locationParams2),
+          ],
+          'contact_2' => [
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 1,
-            ), $locationParams2),
+            ], $locationParams2),
 
-          ),
-          'expected' => array_merge($additionalExpected, array(
-            array_merge(array(
+          ],
+          'expected' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          )),
-          'expected_hook' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams2),
+          ]),
+          'expected_hook' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 0,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 1,
-            ), $locationParams2),
-          )),
-        ),
-      ),
-      array(
-        'different_primaries_location_match_only_one_address_reverse' => array(
+            ], $locationParams2),
+          ]),
+        ],
+      ],
+      [
+        'different_primaries_location_match_only_one_address_reverse' => [
           'entity' => $entity,
-          'contact_1' => array(
-            array_merge(array(
+          'contact_1' => [
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 1,
-            ), $locationParams2),
-          ),
-          'contact_2' => array(
-            array_merge(array(
+            ], $locationParams2),
+          ],
+          'contact_2' => [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-          ),
-          'expected' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams2),
+          ],
+          'expected' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 1,
-            ), $locationParams2),
-            array_merge(array(
+            ], $locationParams2),
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 0,
-            ), $locationParams1),
-          )),
-          'expected_hook' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams1),
+          ]),
+          'expected_hook' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams2),
-            array_merge(array(
+            ], $locationParams2),
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-          )),
-        ),
-      ),
-      array(
-        'same_primaries_different_location' => array(
+            ], $locationParams1),
+          ]),
+        ],
+      ],
+      [
+        'same_primaries_different_location' => [
           'entity' => $entity,
-          'contact_1' => array(
-            array_merge(array(
+          'contact_1' => [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-          ),
-          'contact_2' => array(
-            array_merge(array(
+            ], $locationParams1),
+          ],
+          'contact_2' => [
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 1,
-            ), $locationParams1),
+            ], $locationParams1),
 
-          ),
-          'expected' => array_merge($additionalExpected, array(
-            array_merge(array(
+          ],
+          'expected' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 0,
-            ), $locationParams1),
-          )),
-          'expected_hook' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams1),
+          ]),
+          'expected_hook' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 1,
-            ), $locationParams1),
-          )),
-        ),
-      ),
-      array(
-        'same_primaries_different_location_reverse' => array(
+            ], $locationParams1),
+          ]),
+        ],
+      ],
+      [
+        'same_primaries_different_location_reverse' => [
           'entity' => $entity,
-          'contact_1' => array(
-            array_merge(array(
+          'contact_1' => [
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 1,
-            ), $locationParams1),
-          ),
-          'contact_2' => array(
-            array_merge(array(
+            ], $locationParams1),
+          ],
+          'contact_2' => [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-          ),
-          'expected' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams1),
+          ],
+          'expected' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Work',
               'is_primary' => 1,
-            ), $locationParams1),
-            array_merge(array(
+            ], $locationParams1),
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 0,
-            ), $locationParams1),
-          )),
-          'expected_hook' => array_merge($additionalExpected, array(
-            array_merge(array(
+            ], $locationParams1),
+          ]),
+          'expected_hook' => array_merge($additionalExpected, [
+            array_merge([
               'location_type_id' => 'Main',
               'is_primary' => 1,
-            ), $locationParams1),
-          )),
-        ),
-      ),
-    );
+            ], $locationParams1),
+          ]),
+        ],
+      ],
+    ];
     return $data;
   }
 
@@ -1884,7 +1909,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
   public function testProcessMembershipDeceased() {
     $this->callAPISuccess('Job', 'process_membership', []);
     $deadManWalkingID = $this->individualCreate();
-    $membershipID = $this->contactMembershipCreate(array('contact_id' => $deadManWalkingID));
+    $membershipID = $this->contactMembershipCreate(['contact_id' => $deadManWalkingID]);
     $this->callAPISuccess('Contact', 'create', ['id' => $deadManWalkingID, 'is_deceased' => 1]);
     $this->callAPISuccess('Job', 'process_membership', []);
     $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $membershipID]);
@@ -1901,7 +1926,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
     CRM_Core_PseudoConstant::flush();
 
     $deadManWalkingID = $this->individualCreate();
-    $this->contactMembershipCreate(array('contact_id' => $deadManWalkingID));
+    $this->contactMembershipCreate(['contact_id' => $deadManWalkingID]);
     $this->callAPISuccess('Contact', 'create', ['id' => $deadManWalkingID, 'is_deceased' => 1]);
     $this->callAPIFailure('Job', 'process_membership', []);
 
@@ -2114,6 +2139,8 @@ class api_v3_JobTest extends CiviUnitTestCase {
 
   /**
    * Test procesing membership where is_override is set to 0 rather than NULL
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testProcessMembershipIsOverrideNotNullNot1either() {
     $membershipTypeId = $this->membershipTypeCreate();

@@ -68,6 +68,9 @@
   name        : Amal Sharma
   organization: Abhikalak Consultants
 
+- github      : mecachisenros
+  name        : Andrei Mondoc
+
 - github      : andrew-cormick-dockery
   name        : Andrew Cormick-Dockery
   jira        : andrew_dockery
@@ -177,6 +180,9 @@
 
 - name        : Brian McFee
   jira        : brian
+
+  github      : brianPHM
+  name        : Brian Matemachani
 
 - github      : brucew2013
   name        : Bruce Wolfe

@@ -119,7 +119,7 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
    *
    * @return CRM_Price_BAO_LineItem
    */
-  public static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params = [], &$defaults = []) {
     $lineItem = new CRM_Price_BAO_LineItem();
     $lineItem->copyValues($params);
     if ($lineItem->find(TRUE)) {
@@ -427,7 +427,7 @@ WHERE li.contribution_id = %1";
    */
   public static function processPriceSet($entityId, $lineItem, $contributionDetails = NULL, $entityTable = 'civicrm_contribution', $update = FALSE) {
     if (!$entityId || !is_array($lineItem)
-      || CRM_Utils_system::isNull($lineItem)
+      || CRM_Utils_System::isNull($lineItem)
     ) {
       return;
     }
@@ -1212,9 +1212,7 @@ WHERE li.contribution_id = %1";
       $updatedContributionDAO->save();
       // adjusted amount financial_trxn creation
       $updatedContribution = CRM_Contribute_BAO_Contribution::getValues(
-        ['id' => $contributionId],
-        CRM_Core_DAO::$_nullArray,
-        CRM_Core_DAO::$_nullArray
+        ['id' => $contributionId]
       );
       $toFinancialAccount = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($updatedContribution->financial_type_id, 'Accounts Receivable Account is');
       $adjustedTrxnValues = [
@@ -1279,7 +1277,7 @@ WHERE li.contribution_id = %1";
         $tempFinancialTrxnID = ['id' => $adjustedTrxn->id];
       }
     }
-    $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams, CRM_Core_DAO::$_nullArray);
+    $lineObj = CRM_Price_BAO_LineItem::retrieve($lineParams);
     // insert financial items
     // ensure entity_financial_trxn table has a linking of it.
     CRM_Financial_BAO_FinancialItem::add($lineObj, $updatedContribution, NULL, $tempFinancialTrxnID);

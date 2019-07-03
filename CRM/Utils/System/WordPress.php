@@ -270,11 +270,7 @@ class CRM_Utils_System_WordPress extends CRM_Utils_System_Base {
       // pre-existing logic
       if (isset($path)) {
         $queryParts[] = 'page=CiviCRM';
-        // Encode all but the *path* placeholder
-        if ($path !== '*path*') {
-          $path = rawurlencode($path);
-        }
-        $queryParts[] = "q={$path}";
+        $queryParts[] = 'q=' . rawurlencode($path);
       }
       if ($wpPageParam) {
         $queryParts[] = $wpPageParam;

@@ -222,6 +222,22 @@
         {$form.menubar_color.html}
       </td>
     </tr>
+
+    {if $config->userSystem->is_drupal EQ '1'}
+      <tr class="crm-preferences-display-form-block-theme">
+        <td class="label">{ts}Theme{/ts} {help id="theme"}</td>
+        <td>{$form.theme_backend.html}</td>
+      </tr>
+    {else}
+      <tr class="crm-preferences-display-form-block-theme_backend">
+        <td class="label">{$form.theme_backend.label} {help id="theme_backend"}</td>
+        <td>{$form.theme_backend.html}</td>
+      </tr>
+      <tr class="crm-preferences-display-form-block-theme_frontend">
+        <td class="label">{$form.theme_frontend.label} {help id="theme_frontend"}</td>
+        <td>{$form.theme_frontend.html}</td>
+      </tr>
+      {/if}
   </table>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>

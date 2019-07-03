@@ -118,20 +118,24 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * Initial test of submit function.
    *
    * @param string $thousandSeparator
+   * @param array $fromEmails From Emails array to overwrite the default.
    *
    * @dataProvider getThousandSeparators
    *
    * @throws \Exception
    */
-  public function testSubmitWithPayment($thousandSeparator) {
+  public function testSubmitWithPayment($thousandSeparator, $fromEmails = []) {
     $this->setCurrencySeparators($thousandSeparator);
     $form = $this->getForm(array('is_monetary' => 1, 'financial_type_id' => 1));
     $form->_mode = 'Live';
     $form->_quickConfig = TRUE;
     $paymentProcessorID = $this->processorCreate(array('is_test' => 0));
-    $form->_fromEmails = array(
-      'from_email_id' => array('abc@gmail.com' => 1),
-    );
+    if (empty($fromEmails)) {
+      $fromEmails = [
+        'from_email_id' => ['abc@gmail.com' => 1],
+      ];
+    }
+    $form->_fromEmails = $fromEmails;
     $form->submit(array(
       'register_date' => date('Ymd'),
       'status_id' => 1,
@@ -160,7 +164,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'amount_level' => 'Too much',
       'fee_amount' => $this->formatMoneyInput(1550.55),
       'total_amount' => $this->formatMoneyInput(1550.55),
-      'from_email_address' => 'abc@gmail.com',
+      'from_email_address' => array_keys($form->_fromEmails['from_email_id'])[0],
       'send_receipt' => 1,
       'receipt_text' => '',
     ));
@@ -181,6 +185,14 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   public function testParticipantOfflineReceipt($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
     $mut = new CiviMailUtils($this, TRUE);
+    // Create an email associated with the logged in contact
+    $loggedInContactID = $this->createLoggedInUser();
+    $email = $this->callAPISuccess('Email', 'create', [
+      'contact_id' => $loggedInContactID,
+      'is_primary' => 1,
+      'email' => 'testLoggedInReceiptEmail@civicrm.org',
+      'location_type_id' => 1,
+    ]);
 
     //Get workflow id of event_offline receipt.
     $workflowId = $this->callAPISuccess('OptionValue', 'get', array(
@@ -204,12 +216,16 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'msg_html' => $newMsg,
     ));
 
-    $this->testSubmitWithPayment($thousandSeparator);
+    // Use the email created as the from email ensuring we are passing a numeric from to test dev/core#1069
+    $this->testSubmitWithPayment($thousandSeparator, ['from_email_id' => [$email['id'] => 1]]);
     //Check if type is correctly populated in mails.
+    //Also check the string email is present not numeric from.
     $mail = $mut->checkMailLog([
       '<p>Test event type - 1</p>',
+      'testloggedinreceiptemail@civicrm.org',
       $this->formatMoneyInput(1550.55),
     ]);
+    $this->callAPISuccess('Email', 'delete', ['id' => $email['id']]);
   }
 
   /**

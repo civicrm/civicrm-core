@@ -921,15 +921,15 @@ WHERE civicrm_event.is_active = 1
    *
    * @param int $id
    *   The event id to copy.
-   *        boolean $afterCreate call to copy after the create function
    * @param array $params
+   *
    * @return CRM_Event_DAO_Event
    * @throws \CRM_Core_Exception
    */
   public static function copy($id, $params = []) {
     $eventValues = [];
 
-    //get the require event values.
+    //get the required event values.
     $eventParams = ['id' => $id];
     $returnProperties = [
       'loc_block_id',
@@ -946,11 +946,15 @@ WHERE civicrm_event.is_active = 1
       $fieldsFix['prefix']['is_show_location'] = 0;
     }
 
+    $blockCopyOfCustomValue = (!empty($params['custom']));
+
     $copyEvent = CRM_Core_DAO::copyGeneric('CRM_Event_DAO_Event',
       ['id' => $id],
       // since the location is sharable, lets use the same loc_block_id.
       ['loc_block_id' => CRM_Utils_Array::value('loc_block_id', $eventValues)] + $params,
-      $fieldsFix
+      $fieldsFix,
+      NULL,
+      $blockCopyOfCustomValue
     );
     CRM_Price_BAO_PriceSet::copyPriceSet('civicrm_event', $id, $copyEvent->id);
     CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin',
@@ -990,6 +994,10 @@ WHERE civicrm_event.is_active = 1
     );
 
     $copyEvent->save();
+
+    if ($blockCopyOfCustomValue) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_event', $copyEvent->id);
+    }
 
     CRM_Utils_System::flushCache();
     CRM_Utils_Hook::copy('Event', $copyEvent);
@@ -1637,6 +1645,10 @@ WHERE  id = $cfID
                       $config->dateformatDatetime);
                   }
                   $skip = TRUE;
+                }
+                // for checkboxes, change array of [key => bool] to array of [idx => key]
+                elseif ($dao->html_type == 'CheckBox') {
+                  $customVal = array_keys(array_filter($params[$name]));
                 }
                 else {
                   $customVal = $params[$name];

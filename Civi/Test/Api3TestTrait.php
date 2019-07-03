@@ -169,10 +169,13 @@ trait Api3TestTrait {
    * This function exists to wrap api getValue function & check the result
    * so we can ensure they succeed & throw exceptions without litterering the test with checks
    * There is a type check in this
+   *
    * @param string $entity
    * @param array $params
-   * @param null $count
-   * @throws \Exception
+   * @param int $count
+   *
+   * @throws \CRM_Core_Exception
+   *
    * @return array|int
    */
   public function callAPISuccessGetCount($entity, $params, $count = NULL) {
@@ -182,7 +185,7 @@ trait Api3TestTrait {
     ];
     $result = $this->civicrm_api($entity, 'getcount', $params);
     if (!is_int($result) || !empty($result['is_error']) || isset($result['values'])) {
-      throw new \Exception('Invalid getcount result : ' . print_r($result, TRUE) . " type :" . gettype($result));
+      throw new \CRM_Core_Exception('Invalid getcount result : ' . print_r($result, TRUE) . " type :" . gettype($result));
     }
     if (is_int($count)) {
       $this->assertEquals($count, $result, "incorrect count returned from $entity getcount");
@@ -205,7 +208,8 @@ trait Api3TestTrait {
    *   - array
    *   - object
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
+   *
    * @return array|int
    */
   public function callAPISuccessGetSingle($entity, $params, $checkAgainst = NULL) {
@@ -214,8 +218,8 @@ trait Api3TestTrait {
     ];
     $result = $this->civicrm_api($entity, 'getsingle', $params);
     if (!is_array($result) || !empty($result['is_error']) || isset($result['values'])) {
-      $unfilteredResult = $this->civicrm_api($entity, 'get', $params);
-      throw new \Exception(
+      $unfilteredResult = $this->civicrm_api($entity, 'get', ['version' => $this->_apiversion]);
+      throw new \CRM_Core_Exception(
         'Invalid getsingle result' . print_r($result, TRUE)
         . "\n entity: $entity . \n params \n " . print_r($params, TRUE)
         . "\n entities retrieved with blank params \n" . print_r($unfilteredResult, TRUE)
@@ -245,6 +249,7 @@ trait Api3TestTrait {
    *   - object
    *
    * @return array|int
+   * @throws \CRM_Core_Exception
    */
   public function callAPISuccessGetValue($entity, $params, $type = NULL) {
     $params += [
@@ -253,10 +258,10 @@ trait Api3TestTrait {
     ];
     $result = $this->civicrm_api($entity, 'getvalue', $params);
     if (is_array($result) && (!empty($result['is_error']) || isset($result['values']))) {
-      throw new \Exception('Invalid getvalue result' . print_r($result, TRUE));
+      throw new \CRM_Core_Exception('Invalid getvalue result' . print_r($result, TRUE));
     }
     if ($type) {
-      if ($type == 'integer') {
+      if ($type === 'integer') {
         // api seems to return integers as strings
         $this->assertTrue(is_numeric($result), "expected a numeric value but got " . print_r($result, 1));
       }
@@ -302,8 +307,12 @@ trait Api3TestTrait {
     $indexBy = in_array($v3Action, ['get', 'create', 'replace']) && !$sequential ? 'id' : NULL;
     $onlyId = !empty($v3Params['format.only_id']);
     $onlySuccess = !empty($v3Params['format.is_success']);
-    if (!empty($v3Params['filters']['is_current']) || !empty($params['isCurrent'])) {
+    if (!empty($v3Params['filters']['is_current']) || !empty($v3Params['isCurrent'])) {
       $v4Params['current'] = TRUE;
+    }
+    $language = !empty($v3Params['options']['language']) ? $v3Params['options']['language'] : \CRM_Utils_Array::value('option.language', $v3Params);
+    if ($language) {
+      $v4Params['language'] = $language;
     }
     $toRemove = ['option.', 'return', 'api.', 'format.'];
     $chains = [];

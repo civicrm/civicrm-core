@@ -112,6 +112,13 @@ class CRM_Export_BAO_ExportProcessor {
   protected $exportedHouseholds = [];
 
   /**
+   * Households to skip during export as they will be exported via their relationships anyway.
+   *
+   * @var array
+   */
+  protected $householdsToSkip = [];
+
+  /**
    * Get return properties by relationship.
    * @return array
    */
@@ -135,6 +142,31 @@ class CRM_Export_BAO_ExportProcessor {
    * @var array
    */
   protected $outputSpecification = [];
+
+  /**
+   * Name of a temporary table created to hold the results.
+   *
+   * Current decision making on when to create a temp table is kinda bad so this might change
+   * a bit as it is reviewed but basically we need a temp table or similar to calculate merging
+   * addresses. Merging households is handled in php. We create a temp table even when we don't need them.
+   *
+   * @var string
+   */
+  protected $temporaryTable;
+
+  /**
+   * @return string
+   */
+  public function getTemporaryTable(): string {
+    return $this->temporaryTable;
+  }
+
+  /**
+   * @param string $temporaryTable
+   */
+  public function setTemporaryTable(string $temporaryTable) {
+    $this->temporaryTable = $temporaryTable;
+  }
 
   /**
    * CRM_Export_BAO_ExportProcessor constructor.
@@ -233,6 +265,9 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function setRelationshipValue($relationshipType, $contactID, $field, $value) {
     $this->relatedContactValues[$relationshipType][$contactID][$field] = $value;
+    if ($field === 'id') {
+      $this->householdsToSkip[] = $value;
+    }
   }
 
   /**
@@ -640,6 +675,9 @@ class CRM_Export_BAO_ExportProcessor {
    * @return array|bool
    */
   public function buildRow($query, $iterationDAO, $outputColumns, $metadata, $paymentDetails, $addPaymentHeader, $paymentTableId) {
+    if ($this->isHouseholdToSkip($iterationDAO->contact_id)) {
+      return FALSE;
+    }
     $phoneTypes = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Phone', 'phone_type_id');
     $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
 
@@ -1354,6 +1392,17 @@ class CRM_Export_BAO_ExportProcessor {
         $row[$field . '_' . $property] = $this->getRelationshipValue($field, $contactID, $property);
       }
     }
+  }
+
+  /**
+   * Is this contact a household that is already set to be exported by virtue of it's household members.
+   *
+   * @param int $contactID
+   *
+   * @return bool
+   */
+  protected function isHouseholdToSkip($contactID) {
+    return in_array($contactID, $this->householdsToSkip);
   }
 
 }

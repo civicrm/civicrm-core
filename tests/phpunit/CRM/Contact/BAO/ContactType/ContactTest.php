@@ -270,7 +270,7 @@ DELETE FROM civicrm_contact_type
     }
 
     $updateParams = [
-      'contact_sub_type' => NULL,
+      'contact_sub_type' => 'null',
       'contact_type' => 'Individual',
       'contact_id' => $contact->id,
     ];

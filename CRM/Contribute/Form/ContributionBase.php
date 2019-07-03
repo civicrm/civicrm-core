@@ -479,14 +479,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     // This can, for example, by used by payment processors using client side encryption
     $this->assign('currency', $this->getCurrency());
 
-    //CRM-6907
-    // these lines exist to support a non-default currenty on the form but are probably
-    // obsolete & meddling wth the defaultCurrency is not the right approach....
-    $config = CRM_Core_Config::singleton();
-    $config->defaultCurrency = CRM_Utils_Array::value('currency',
-      $this->_values,
-      $config->defaultCurrency
-    );
+    CRM_Contribute_BAO_Contribution_Utils::overrideDefaultCurrency($this->_values);
 
     //lets allow user to override campaign.
     $campID = CRM_Utils_Request::retrieve('campID', 'Positive', $this);
@@ -749,11 +742,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Enable ReCAPTCHA on Contribution form
    */
   protected function enableCaptchaOnForm() {
-    $captcha = CRM_Utils_ReCAPTCHA::singleton();
-    if ($captcha->hasSettingsAvailable()) {
-      $captcha->add($this);
-      $this->assign('isCaptcha', TRUE);
-    }
+    CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
   }
 
   public function assignPaymentFields() {
@@ -813,8 +802,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    */
   protected function displayCaptchaWarning() {
     if (CRM_Core_Permission::check("administer CiviCRM")) {
-      $captcha = CRM_Utils_ReCAPTCHA::singleton();
-      if (!$captcha->hasSettingsAvailable()) {
+      if (!CRM_Utils_ReCAPTCHA::hasSettingsAvailable()) {
         $this->assign('displayCaptchaWarning', TRUE);
       }
     }
@@ -824,8 +812,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
    * Check if ReCAPTCHA has to be added on Contribution form forcefully.
    */
   protected function hasToAddForcefully() {
-    $captcha = CRM_Utils_ReCAPTCHA::singleton();
-    return $captcha->hasToAddForcefully();
+    return CRM_Utils_ReCAPTCHA::hasToAddForcefully();
   }
 
   /**

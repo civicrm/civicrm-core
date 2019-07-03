@@ -102,6 +102,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     $this->contactDelete($this->_cId_b2);
     $this->quickCleanup(array('civicrm_relationship'), TRUE);
     $this->relationshipTypeDelete($this->_relTypeID);
+    parent::tearDown();
   }
 
   /**

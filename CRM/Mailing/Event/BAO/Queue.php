@@ -186,7 +186,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
     $mailing_id, $job_id = NULL, $offset = NULL,
     $rowCount = NULL, $sort = NULL
   ) {
-    $dao = new CRM_Core_Dao();
+    $dao = new CRM_Core_DAO();
 
     $queue = self::getTableName();
     $mailing = CRM_Mailing_BAO_Mailing::getTableName();

@@ -25,7 +25,7 @@
 *}
 <?xml version="1.0" encoding="UTF-8"?>
 <Case>
-  <Client>{$case.clientName}</Client>
+  <Client>{$case.clientName|escape}</Client>
   <CaseType>{$case.caseType}</CaseType>
   <CaseSubject>{$case.subject|escape}</CaseSubject>
   <CaseStatus>{$case.status}</CaseStatus>
@@ -70,4 +70,3 @@
 {/foreach}
   </ActivitySet>
 </Case>
-

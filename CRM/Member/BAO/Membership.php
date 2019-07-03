@@ -261,7 +261,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *
    * @return CRM_Member_BAO_Membership|CRM_Core_Error
    */
-  public static function create(&$params, &$ids, $skipRedirect = FALSE) {
+  public static function create(&$params, &$ids = [], $skipRedirect = FALSE) {
     // always calculate status if is_override/skipStatusCal is not true.
     // giving respect to is_override during import.  CRM-4012
 
@@ -1249,9 +1249,7 @@ SELECT c.contribution_page_id as pageID
    AND mp.membership_id = " . CRM_Utils_Type::escape($membershipID, 'Integer')
       . " ORDER BY mp.id DESC";
 
-    return CRM_Core_DAO::singleValueQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    return CRM_Core_DAO::singleValueQuery($query);
   }
 
   /**

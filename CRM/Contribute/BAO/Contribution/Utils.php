@@ -640,4 +640,16 @@ LIMIT 1
     return $statuses;
   }
 
+  /**
+   * CRM-8254 / CRM-6907 - override default currency if applicable
+   * these lines exist to support a non-default currency on the form but are probably
+   * obsolete & meddling wth the defaultCurrency is not the right approach....
+   *
+   * @param array $params
+   */
+  public static function overrideDefaultCurrency($params) {
+    $config = CRM_Core_Config::singleton();
+    $config->defaultCurrency = CRM_Utils_Array::value('currency', $params, $config->defaultCurrency);
+  }
+
 }

@@ -55,11 +55,14 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
+   *
+   * @throws \Exception
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_uf_match']);
     unset(CRM_Core_Config::singleton()->userPermissionClass->permissions);
+    parent::tearDown();
   }
 
   /**
@@ -150,6 +153,8 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Test email receipt for partial payment.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testPaymentEmailReceiptFullyPaid() {
     $mut = new CiviMailUtils($this);
@@ -633,7 +638,9 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test create payment api for paylater contribution with partial payment.
+   * Test create payment api for pay later contribution with partial payment.
+   *
+   * @throws \Exception
    */
   public function testCreatePaymentPayLaterPartialPayment() {
     $this->createLoggedInUser();
@@ -717,7 +724,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'id' => $contribution['id'],
     ]);
     $this->callAPISuccess('OptionValue', 'get', ['name' => 'Completed', 'option_group_id' => 'contribution_status', 'api.OptionValue.create' => ['label' => 'Completed']]);
-
+    $this->callAPISuccessGetCount('Activity', ['target_contact_id' => $this->_individualId, 'activity_type_id' => 'Payment'], 2);
   }
 
   /**

@@ -65,8 +65,29 @@ class CRM_Financial_BAO_Payment {
     $isSkipRecordingPaymentHereForLegacyHandlingReasons = ($contributionStatus == 'Pending' && $isPaymentCompletesContribution);
 
     if (!$isSkipRecordingPaymentHereForLegacyHandlingReasons && $params['total_amount'] > 0) {
-      $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
+      $balanceTrxnParams['to_financial_account_id'] = CRM_Contribute_BAO_Contribution::getToFinancialAccount($contribution, $params);
+      $balanceTrxnParams['from_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($contribution['financial_type_id'], 'Accounts Receivable Account is');
+      $balanceTrxnParams['total_amount'] = $params['total_amount'];
+      $balanceTrxnParams['contribution_id'] = $params['contribution_id'];
+      $balanceTrxnParams['trxn_date'] = CRM_Utils_Array::value('trxn_date', $params, CRM_Utils_Array::value('contribution_receive_date', $params, date('YmdHis')));
+      $balanceTrxnParams['fee_amount'] = CRM_Utils_Array::value('fee_amount', $params);
+      $balanceTrxnParams['net_amount'] = CRM_Utils_Array::value('total_amount', $params);
+      $balanceTrxnParams['currency'] = $contribution['currency'];
+      $balanceTrxnParams['trxn_id'] = CRM_Utils_Array::value('contribution_trxn_id', $params, NULL);
+      $balanceTrxnParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'status_id', 'Completed');
+      $balanceTrxnParams['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $params, $contribution['payment_instrument_id']);
+      $balanceTrxnParams['check_number'] = CRM_Utils_Array::value('check_number', $params);
+      $balanceTrxnParams['is_payment'] = 1;
 
+      if (!empty($params['payment_processor'])) {
+        // I can't find evidence this is passed in - I was gonna just remove it but decided to deprecate  as I see getToFinancialAccount
+        // also anticipates it.
+        CRM_Core_Error::deprecatedFunctionWarning('passing payment_processor is deprecated - use payment_processor_id');
+        $balanceTrxnParams['payment_processor_id'] = $params['payment_processor'];
+      }
+      $trxn = CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
+
+      // @todo - this is just weird & historical & inconsistent - why 2 tracks?
       if (CRM_Utils_Array::value('line_item', $params) && !empty($trxn)) {
         foreach ($params['line_item'] as $values) {
           foreach ($values as $id => $amount) {
@@ -97,12 +118,21 @@ class CRM_Financial_BAO_Payment {
         }
       }
       elseif (!empty($trxn)) {
-        CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn->id, $contribution['total_amount']);
+        $lineItems = CRM_Price_BAO_LineItem::getLineItemsByContributionID($params['contribution_id']);
+        if (!empty($lineItems)) {
+          // get financial item
+          list($ftIds, $taxItems) = CRM_Contribute_BAO_Contribution::getLastFinancialItemIds($params['contribution_id']);
+          $entityParams = [
+            'contribution_total_amount' => $contribution['total_amount'],
+            'trxn_total_amount' => $params['total_amount'],
+            'trxn_id' => $trxn->id,
+          ];
+          CRM_Contribute_BAO_Contribution::createProportionalFinancialEntries($entityParams, $lineItems, $ftIds, $taxItems);
+        }
       }
     }
     elseif ($params['total_amount'] < 0) {
       $trxn = self::recordRefundPayment($params['contribution_id'], $params, FALSE);
-      CRM_Contribute_BAO_Contribution::recordPaymentActivity($params['contribution_id'], CRM_Utils_Array::value('participant_id', $params), $params['total_amount'], $trxn->currency, $trxn->trxn_date);
     }
 
     if ($isPaymentCompletesContribution) {
@@ -122,7 +152,7 @@ class CRM_Financial_BAO_Payment {
         // Get the trxn
         $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
         $ftParams = ['id' => $trxnId['financialTrxnId']];
-        $trxn = CRM_Core_BAO_FinancialTrxn::retrieve($ftParams, CRM_Core_DAO::$_nullArray);
+        $trxn = CRM_Core_BAO_FinancialTrxn::retrieve($ftParams);
       }
     }
     elseif ($contributionStatus === 'Pending') {
@@ -133,7 +163,7 @@ class CRM_Financial_BAO_Payment {
         ]
       );
     }
-
+    CRM_Contribute_BAO_Contribution::recordPaymentActivity($params['contribution_id'], CRM_Utils_Array::value('participant_id', $params), $params['total_amount'], $trxn->currency, $trxn->trxn_date);
     return $trxn;
   }
 
@@ -350,7 +380,10 @@ class CRM_Financial_BAO_Payment {
         if ($lineItemValue['qty'] == 0) {
           continue;
         }
-        $paid = $lineItemValue['line_total'] * ($financialTrxn->total_amount / $contributionDAO->total_amount);
+        $paid = $financialTrxn->total_amount;
+        if (!empty(floatval($contributionDAO->total_amount))) {
+          $paid = $lineItemValue['line_total'] * ($financialTrxn->total_amount / $contributionDAO->total_amount);
+        }
         $addFinancialEntry = [
           'transaction_date' => $financialTrxn->trxn_date,
           'contact_id' => $contributionDAO->contact_id,
@@ -490,7 +523,7 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
   protected static function getContributionAndParamsInFormatForRecordFinancialTransaction($contributionId) {
     $getInfoOf['id'] = $contributionId;
     $defaults = [];
-    $contributionDAO = CRM_Contribute_BAO_Contribution::retrieve($getInfoOf, $defaults, CRM_Core_DAO::$_nullArray);
+    $contributionDAO = CRM_Contribute_BAO_Contribution::retrieve($getInfoOf, $defaults);
 
     // build params for recording financial trxn entry
     $params['contribution'] = $contributionDAO;

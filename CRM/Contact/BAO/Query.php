@@ -607,7 +607,7 @@ class CRM_Contact_BAO_Query {
       if (empty($value[0])) {
         continue;
       }
-      $cfID = CRM_Core_BAO_CustomField::getKeyID($value[0]);
+      $cfID = CRM_Core_BAO_CustomField::getKeyID(str_replace('_relative', '', $value[0]));
       if ($cfID) {
         if (!array_key_exists($cfID, $this->_cfIDs)) {
           $this->_cfIDs[$cfID] = [];
@@ -1554,7 +1554,7 @@ class CRM_Contact_BAO_Query {
 
     self::filterCountryFromValuesIfStateExists($formValues);
     // We shouldn't have to whitelist fields to not hack but here we are, for now.
-    $nonLegacyDateFields = ['participant_register_date_relative'];
+    $nonLegacyDateFields = ['participant_register_date_relative', 'receive_date_relative'];
     // Handle relative dates first
     foreach (array_keys($formValues) as $id) {
       if (
@@ -1638,8 +1638,7 @@ class CRM_Contact_BAO_Query {
       }
       elseif (substr($id, 0, 7) == 'custom_'
         &&  (
-          substr($id, -9, 9) == '_relative'
-          || substr($id, -5, 5) == '_from'
+          substr($id, -5, 5) == '_from'
           || substr($id, -3, 3) == '_to'
         )
       ) {
@@ -2140,6 +2139,12 @@ class CRM_Contact_BAO_Query {
       $field = CRM_Utils_Array::value($locType[0], $this->_fields);
 
       if (!$field) {
+        // Strip any trailing _high & _low that might be appended.
+        $realFieldName = str_replace(['_high', '_low'], '', $name);
+        if (isset($this->_fields[$realFieldName])) {
+          $field = $this->_fields[str_replace(['_high', '_low'], '', $realFieldName)];
+          $this->dateQueryBuilder($values, $field['table_name'], $realFieldName, $realFieldName, $field['title']);
+        }
         return;
       }
     }
@@ -2656,7 +2661,7 @@ class CRM_Contact_BAO_Query {
         continue;
       }
 
-      $from .= self::getEntitySpecificJoins($name, $mode, $side, $primaryLocation);
+      $from .= ' ' . trim(self::getEntitySpecificJoins($name, $mode, $side, $primaryLocation)) . ' ';
     }
     return $from;
   }
@@ -5227,6 +5232,7 @@ civicrm_relationship.start_date > {$today}
     $appendTimeStamp = TRUE,
     $dateFormat = 'YmdHis'
   ) {
+    // @todo - remove dateFormat - pretty sure it's never passed in...
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     if ($name == "{$fieldName}_low" ||
@@ -6925,7 +6931,9 @@ AND   displayRelType.is_active = 1
     $tableName = $fieldSpec['table_name'];
     $filters = CRM_Core_OptionGroup::values('relative_date_filters');
     $grouping = CRM_Utils_Array::value(3, $values);
-    $this->_tables[$tableName] = $this->_whereTables[$tableName] = 1;
+    // If the table value is already set for a custom field it will be more nuanced than just '1'.
+    $this->_tables[$tableName] = $this->_tables[$tableName] ?? 1;
+    $this->_whereTables[$tableName] = $this->_whereTables[$tableName] ?? 1;
 
     $dates = CRM_Utils_Date::getFromTo($value, NULL, NULL);
     if (empty($dates[0])) {

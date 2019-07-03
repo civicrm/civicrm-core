@@ -39,7 +39,14 @@ class CRM_Upgrade_Incremental_SmartGroups {
    */
   public function updateGroups($actions) {
     foreach ($actions as $func => $fields) {
-      $this->{$func}($fields);
+      if ($func == 'renameField') {
+        foreach ($fields as $fieldConversion) {
+          $this->{$func}($fieldConversion['old'], $fieldConversion['new']);
+        }
+      }
+      else {
+        $this->{$func}($fields);
+      }
     }
   }
 
@@ -57,6 +64,8 @@ class CRM_Upgrade_Incremental_SmartGroups {
     $relativeDateMappings = [
       'activity_date_time' => 'activity',
       'participant_register_date' => 'participant',
+      'receive_date' => 'contribution',
+      'contribution_cancel_date' => 'contribution_cancel',
     ];
 
     foreach ($fields as $field) {

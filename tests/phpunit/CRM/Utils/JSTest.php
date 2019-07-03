@@ -199,4 +199,104 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     $this->assertEquals($expectedOutput, CRM_Utils_JS::stripComments($input));
   }
 
+  public static function decodeExamples() {
+    return [
+      ['{a: \'Apple\', \'b\': "Banana", c: [1, 2, 3]}', ['a' => 'Apple', 'b' => 'Banana', 'c' => [1, 2, 3]]],
+      ['true', TRUE],
+      ['false', FALSE],
+      ['null', NULL],
+      ['"true"', 'true'],
+      ['0.5', 0.5],
+      [" {}", []],
+      ["[]", []],
+      ["{  }", []],
+      [" [   ]", []],
+      [" [ 2   ]", [2]],
+      [
+        '{a: ["foo", \'bar\'], "b": {a: [\'foo\', "bar"], b: {\'a\': ["foo", "bar"], b: {}}}}',
+        ['a' => ['foo', 'bar'], 'b' => ['a' => ['foo', 'bar'], 'b' => ['a' => ['foo', 'bar'], 'b' => []]]],
+      ],
+      [
+        ' [{a: {aa: true}, b: [false, null, {x: 1, y: 2, z: 3}] , "c": -1}, ["fee", "fie", \'foe\']]',
+        [['a' => ['aa' => TRUE], 'b' => [FALSE, NULL, ['x' => 1, 'y' => 2, 'z' => 3]], "c" => -1], ["fee", "fie", "foe"]],
+      ],
+    ];
+  }
+
+  /**
+   * @param string $input
+   * @param string $expectedOutput
+   * @dataProvider decodeExamples
+   */
+  public function testDecode($input, $expectedOutput) {
+    $this->assertEquals($expectedOutput, CRM_Utils_JS::decode($input));
+  }
+
+  /**
+   * @return array
+   */
+  public static function objectExamples() {
+    return [
+      [
+        '{a: \'Apple\', \'b\': "Banana", "c ": [1,2,3]}',
+        ['a' => "'Apple'", 'b' => '"Banana"', 'c ' => '[1,2,3]'],
+        '{a: \'Apple\', b: "Banana", \'c \': [1,2,3]}',
+      ],
+      [
+        " {}",
+        [],
+        "{}",
+      ],
+      [
+        " [ ] ",
+        [],
+        "{}",
+      ],
+      [
+        "  {'fn' : function (foo, bar, baz) { return \"One, two, three\"; }, esc: /[1-9]\\\\/.test('5\\\\') , number  :  55.5/2 }   ",
+        ['fn' => 'function (foo, bar, baz) { return "One, two, three"; }', 'esc' => "/[1-9]\\\\/.test('5\\\\')", 'number' => '55.5/2'],
+        "{fn: function (foo, bar, baz) { return \"One, two, three\"; }, esc: /[1-9]\\\\/.test('5\\\\'), number: 55.5/2}",
+      ],
+      [
+        "{ string :
+          'this, has(some : weird, \\'stuff [{}!' ,
+           expr: sum(1, 2, 3) / 2 + 1, ' notes ' : [Do, re mi],
+        }",
+        ['string' => "'this, has(some : weird, \\'stuff [{}!'", 'expr' => 'sum(1, 2, 3) / 2 + 1', ' notes ' => "[Do, re mi]"],
+        "{string: 'this, has(some : weird, \\'stuff [{}!', expr: sum(1, 2, 3) / 2 + 1, ' notes ': [Do, re mi]}",
+      ],
+      [
+        '{status: /^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\' , \'foo\&\': getFoo("Some \"quoted\" thing"), "ba\'[(r": function() {return "bar"}}',
+        ['status' => '/^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\'', 'foo&' => 'getFoo("Some \"quoted\" thing")', "ba'[(r" => 'function() {return "bar"}'],
+        '{status: /^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\', "foo&": getFoo("Some \"quoted\" thing"), "ba\'[(r": function() {return "bar"}}',
+      ],
+      [
+        '{"some\"key": typeof foo === \'number\' ? true : false , "O\'Really?": ",((,", \'A"quote"\': 1 + 1 , "\\\\\\&\\/" : 0}',
+        ['some"key' => 'typeof foo === \'number\' ? true : false', "O'Really?" => '",((,"', 'A"quote"' => '1 + 1', '\\&/' => '0'],
+        '{\'some"key\': typeof foo === \'number\' ? true : false, "O\'Really?": ",((,", \'A"quote"\': 1 + 1, "\\\\&/": 0}',
+      ],
+      [
+        '[foo ? 1 : 2 , 3 ,  function() {return 1 + 1;}, /^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\' , 3.14   ]',
+        ['foo ? 1 : 2', '3', 'function() {return 1 + 1;}', '/^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\'', '3.14'],
+        '[foo ? 1 : 2, 3, function() {return 1 + 1;}, /^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\', 3.14]',
+      ],
+    ];
+  }
+
+  /**
+   * Test converting a js string to a php array and back again.
+   *
+   * @param string $input
+   * @param string $expectedPHP
+   * @param $expectedJS
+   * @dataProvider objectExamples
+   */
+  public function testObjectToAndFromString($input, $expectedPHP, $expectedJS) {
+    $objectProps = CRM_Utils_JS::getRawProps($input);
+    $this->assertEquals($expectedPHP, $objectProps);
+    $reformattedJS = CRM_Utils_JS::writeObject($objectProps);
+    $this->assertEquals($expectedJS, $reformattedJS);
+    $this->assertEquals($expectedPHP, CRM_Utils_JS::getRawProps($reformattedJS));
+  }
+
 }

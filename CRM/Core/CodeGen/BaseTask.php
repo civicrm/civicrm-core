@@ -75,6 +75,7 @@ abstract class CRM_Core_CodeGen_BaseTask implements CRM_Core_CodeGen_ITask {
   protected function isApproxPhpMatch($actual, $expected) {
     foreach (['actual', 'expected'] as $var) {
       $$var = CRM_Core_CodeGen_Util_ArraySyntaxConverter::convert($$var);
+      $$var = preg_replace("#  '\\d+' => #", "  ", $$var);
       $$var = preg_replace(';\(GenCodeChecksum:([a-zA-Z0-9]+)\);', '', $$var);
       $$var = strtolower(preg_replace(';[ \r\n\t];', '', $$var));
     }

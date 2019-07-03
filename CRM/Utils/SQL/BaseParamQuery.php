@@ -95,10 +95,10 @@ class CRM_Utils_SQL_BaseParamQuery implements ArrayAccess {
 
       $select = $this;
       return preg_replace_callback('/([#!@])([a-zA-Z0-9_]+)/', function($m) use ($select, $args) {
-        if (isset($args[$m[2]])) {
+        if (array_key_exists($m[2], $args)) {
           $values = $args[$m[2]];
         }
-        elseif (isset($args[$m[1] . $m[2]])) {
+        elseif (array_key_exists($m[1] . $m[2], $args)) {
           // Backward compat. Keys in $args look like "#myNumber" or "@myString".
           $values = $args[$m[1] . $m[2]];
         }

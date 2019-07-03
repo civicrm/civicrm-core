@@ -41,7 +41,7 @@
  * @return array
  *   Api result array
  */
-function civicrm_api3_contribution_create(&$params) {
+function civicrm_api3_contribution_create($params) {
   $values = [];
   _civicrm_api3_custom_format_params($params, $values, 'Contribution');
   $params = array_merge($params, $values);
@@ -294,7 +294,7 @@ function civicrm_api3_contribution_get($params) {
 function _civicrm_api3_contribution_get_support_nonunique_returns($params) {
   $additionalOptions = [];
   $options = _civicrm_api3_get_options_from_params($params, TRUE);
-  foreach (['check_number', 'address_id'] as $changedVariable) {
+  foreach (['check_number', 'address_id', 'cancel_date'] as $changedVariable) {
     if (isset($options['return']) && !empty($options['return'][$changedVariable])) {
       $additionalOptions['return']['contribution_' . $changedVariable] = 1;
     }
@@ -316,6 +316,7 @@ function _civicrm_api3_contribution_add_supported_fields(&$contribution) {
     'contribution_check_number' => 'check_number',
     'contribution_address_id' => 'address_id',
     'payment_instrument_id' => 'instrument_id',
+    'contribution_cancel_date' => 'cancel_date',
   ];
   foreach ($outputAliases as $returnName => $copyTo) {
     if (array_key_exists($returnName, $contribution)) {
@@ -533,7 +534,7 @@ function _civicrm_api3_contribution_sendconfirmation_spec(&$params) {
  * @throws \CRM_Core_Exception
  * @throws \Exception
  */
-function civicrm_api3_contribution_completetransaction(&$params) {
+function civicrm_api3_contribution_completetransaction($params) {
   $input = $ids = [];
   if (isset($params['payment_processor_id'])) {
     $input['payment_processor_id'] = $params['payment_processor_id'];
@@ -628,7 +629,7 @@ function _civicrm_api3_contribution_completetransaction_spec(&$params) {
  *   Api result array.
  * @throws API_Exception
  */
-function civicrm_api3_contribution_repeattransaction(&$params) {
+function civicrm_api3_contribution_repeattransaction($params) {
   $input = $ids = [];
   civicrm_api3_verify_one_mandatory($params, NULL, ['contribution_recur_id', 'original_contribution_id']);
   if (empty($params['original_contribution_id'])) {

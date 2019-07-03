@@ -82,6 +82,7 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
         'civicrm_uf_match',
       ]
     );
+    parent::tearDown();
   }
 
   /**

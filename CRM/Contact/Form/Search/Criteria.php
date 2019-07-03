@@ -275,7 +275,13 @@ class CRM_Contact_Form_Search_Criteria {
    * @param CRM_Core_Form $form
    */
   protected static function setBasicSearchFields($form) {
-    $form->assign('basicSearchFields', self::getBasicSearchFields());
+    $searchFields = [];
+    foreach (self::getSearchFieldMetadata() as $fieldName => $field) {
+      if ($field['template_grouping'] === 'basic') {
+        $searchFields[$fieldName] = $field;
+      }
+    }
+    $form->assign('basicSearchFields', array_merge(self::getBasicSearchFields(), $searchFields));
   }
 
   /**
@@ -285,7 +291,6 @@ class CRM_Contact_Form_Search_Criteria {
   public static function getBasicSearchFields() {
     $userFramework = CRM_Core_Config::singleton()->userFramework;
     return [
-      'sort_name' => ['name' => 'sort_name'],
       'email' => ['name' => 'email'],
       'contact_type' => ['name' => 'contact_type'],
       'group' => [

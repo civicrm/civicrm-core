@@ -301,6 +301,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         FALSE, FALSE, FALSE, 'AND is_default = 1')
       ),
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'receive_date' => date('Y-m-d H:i:s'),
     ];
   }
 
@@ -317,7 +318,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @return CRM_Contribute_BAO_Contribution|null
    *   The found object or null
    */
-  public static function getValues($params, &$values, &$ids) {
+  public static function getValues($params, &$values = [], &$ids = []) {
     if (empty($params)) {
       return NULL;
     }
@@ -397,8 +398,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
             'id' => $contributionID,
             'return' => ['total_amount', 'net_amount', 'fee_amount'],
           ]);
-          $totalAmount = isset($params['total_amount']) ? $params['total_amount'] : CRM_Utils_Array::value('total_amount', $contribution);
-          $feeAmount = isset($params['fee_amount']) ? $params['fee_amount'] : CRM_Utils_Array::value('fee_amount', $contribution);
+          $totalAmount = (isset($params['total_amount']) ? (float) $params['total_amount'] : (float) CRM_Utils_Array::value('total_amount', $contribution));
+          $feeAmount = (isset($params['fee_amount']) ? (float) $params['fee_amount'] : (float) CRM_Utils_Array::value('fee_amount', $contribution));
           $params['net_amount'] = $totalAmount - $feeAmount;
         }
       }
@@ -495,6 +496,9 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @return CRM_Contribute_BAO_Contribution
    */
   public static function create(&$params, $ids = []) {
+    $contributionID = CRM_Utils_Array::value('contribution', $ids, CRM_Utils_Array::value('id', $params));
+    $action = $contributionID ? 'edit' : 'create';
+
     $dateFields = [
       'receive_date',
       'cancel_date',
@@ -523,7 +527,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     if (!empty($params['custom']) &&
       is_array($params['custom'])
     ) {
-      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contribution', $contribution->id);
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_contribution', $contribution->id, $action);
     }
 
     $session = CRM_Core_Session::singleton();
@@ -705,7 +709,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *
    * @return CRM_Contribute_BAO_Contribution
    */
-  public static function retrieve(&$params, &$defaults, &$ids) {
+  public static function retrieve(&$params, &$defaults = [], &$ids = []) {
     $contribution = CRM_Contribute_BAO_Contribution::getValues($params, $defaults, $ids);
     return $contribution;
   }
@@ -941,7 +945,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *
    * @return int
    */
-  protected static function getToFinancialAccount($contribution, $params) {
+  public static function getToFinancialAccount($contribution, $params) {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $pendingStatus = [
@@ -2943,13 +2947,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           if (!isset($this->_relatedObjects['contributionPage'])) {
             $this->loadRelatedEntitiesByID(['contributionPage' => $this->contribution_page_id]);
           }
-          // CRM-8254 - override default currency if applicable
-          $config = CRM_Core_Config::singleton();
-          $config->defaultCurrency = CRM_Utils_Array::value(
-            'currency',
-            $values,
-            $config->defaultCurrency
-          );
+          CRM_Contribute_BAO_Contribution_Utils::overrideDefaultCurrency($values);
         }
       }
       // no contribution page -probably back office
@@ -4499,8 +4497,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $primaryContributionID = isset($contribution->id) ? $contribution->id : $objects['first_contribution']->id;
     // The previous details are used when calculating line items so keep it before any code that 'does something'
     if (!empty($contribution->id)) {
-      $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues(['id' => $contribution->id],
-        CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
+      $input['prevContribution'] = CRM_Contribute_BAO_Contribution::getValues(['id' => $contribution->id]);
     }
     $inputContributionWhiteList = [
       'fee_amount',
@@ -4739,7 +4736,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // Use input value if supplied.
     if (!empty($input['receipt_from_email'])) {
       return [
-        CRM_Utils_array::value('receipt_from_name', $input, ''),
+        CRM_Utils_Array::value('receipt_from_name', $input, ''),
         $input['receipt_from_email'],
       ];
     }
@@ -4845,7 +4842,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @return CRM_Financial_DAO_FinancialTrxn
    */
   public static function recordPartialPayment($contribution, $params) {
-
+    CRM_Core_Error::deprecatedFunctionWarning('use payment create api');
     $balanceTrxnParams['to_financial_account_id'] = self::getToFinancialAccount($contribution, $params);
     $balanceTrxnParams['from_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($contribution['financial_type_id'], 'Accounts Receivable Account is');
     $balanceTrxnParams['total_amount'] = $params['total_amount'];
@@ -5244,7 +5241,7 @@ LEFT JOIN  civicrm_contribution on (civicrm_contribution.contact_id = civicrm_co
    * @return \CRM_Contribute_BAO_Contribution|null
    */
   private static function getOriginalContribution($contributionID) {
-    return self::getValues(['id' => $contributionID], CRM_Core_DAO::$_nullArray, CRM_Core_DAO::$_nullArray);
+    return self::getValues(['id' => $contributionID]);
   }
 
   /**

@@ -138,6 +138,7 @@ class CRM_Contribute_Page_AjaxTest extends CiviUnitTestCase {
       'financial_type_id' => 2,
       'status_id' => 1,
       'total_amount' => 100,
+      'receive_date' => '2018-06-08',
       'soft_credit' => array(
         'soft_credit_type_id' => 11,
         'contact_id' => $this->_softContactId,

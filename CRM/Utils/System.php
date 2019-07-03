@@ -1396,12 +1396,12 @@ class CRM_Utils_System {
    * @param int $status
    *   (optional) Code with which to exit.
    *
-   * @throws \CRM_Core_PrematureExit_Exception
+   * @param array $testParameters
    */
-  public static function civiExit($status = 0) {
+  public static function civiExit($status = 0, $testParameters = []) {
 
     if (CIVICRM_UF === 'UnitTests') {
-      throw new CRM_Core_Exception_PrematureExitException('civiExit called');
+      throw new CRM_Core_Exception_PrematureExitException('civiExit called', $testParameters);
     }
     if ($status > 0) {
       http_response_code(500);
@@ -1432,13 +1432,14 @@ class CRM_Utils_System {
     // zealous about destroying *all* memory-backed caches during a flush().
     // These flushes simulate that legacy behavior. However, they should probably
     // be removed at some point.
-    $localDrivers = ['CRM_Utils_Cache_Arraycache', 'CRM_Utils_Cache_NoCache'];
+    $localDrivers = ['CRM_Utils_Cache_ArrayCache', 'CRM_Utils_Cache_NoCache'];
     if (Civi\Core\Container::isContainerBooted()
       && !in_array(get_class(CRM_Utils_Cache::singleton()), $localDrivers)) {
       Civi::cache('long')->flush();
       Civi::cache('settings')->flush();
       Civi::cache('js_strings')->flush();
       Civi::cache('community_messages')->flush();
+      Civi::cache('groups')->flush();
       CRM_Extension_System::singleton()->getCache()->flush();
       CRM_Cxn_CiviCxnHttp::singleton()->getCache()->flush();
     }

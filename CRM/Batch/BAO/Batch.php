@@ -709,15 +709,14 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
       'contribution_receipt_date_is_not_null',
       'contribution_pcp_made_through_id',
       'contribution_pcp_display_in_roll',
-      'contribution_date_relative',
       'contribution_amount_low',
       'contribution_amount_high',
       'contribution_in_honor_of',
       'contact_tags',
       'group',
-      'contribution_date_relative',
-      'contribution_date_high',
-      'contribution_date_low',
+      'receive_date_relative',
+      'receive_date_high',
+      'receive_date_low',
       'contribution_check_number',
       'contribution_status_id',
       'financial_trxn_card_type_id',
@@ -740,11 +739,11 @@ LEFT JOIN civicrm_contribution_soft ON civicrm_contribution_soft.contribution_id
         if ($field == 'group') {
           $from .= " LEFT JOIN civicrm_group_contact `civicrm_group_contact-{$params[$field]}` ON contact_a.id = `civicrm_group_contact-{$params[$field]}`.contact_id ";
         }
-        if ($field == 'contribution_date_relative') {
+        if ($field == 'receive_date_relative') {
           $relativeDate = explode('.', $params[$field]);
           $date = CRM_Utils_Date::relativeToAbsolute($relativeDate[0], $relativeDate[1]);
-          $values['contribution_date_low'] = $date['from'];
-          $values['contribution_date_high'] = $date['to'];
+          $values['receive_date_low'] = $date['from'];
+          $values['receive_date_high'] = $date['to'];
         }
       }
     }

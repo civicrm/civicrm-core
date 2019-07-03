@@ -47,6 +47,16 @@ class CRM_Utils_JSON {
   }
 
   /**
+   * Test whether the input string is valid JSON.
+   * @param string $str
+   * @return boolean
+   */
+  public static function isValidJSON($str) {
+    json_decode($str);
+    return json_last_error() == JSON_ERROR_NONE;
+  }
+
+  /**
    * Do not use this function. See CRM-16353.
    * @deprecated
    *

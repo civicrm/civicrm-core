@@ -41,4 +41,19 @@
  */
 class CRM_Core_Exception_PrematureExitException extends RuntimeException {
 
+  /**
+   * Construct the exception. Note: The message is NOT binary safe.
+   *
+   * @link https://php.net/manual/en/exception.construct.php
+   *
+   * @param string $message [optional] The Exception message to throw.
+   * @param array $errorData
+   * @param int $error_code
+   * @param throwable $previous [optional] The previous throwable used for the exception chaining.
+   */
+  public function __construct($message = "", $errorData = [], $error_code = 0, throwable $previous = NULL) {
+    parent::__construct($message, $error_code, $previous);
+    $this->errorData = $errorData + ['error_code' => $error_code];
+  }
+
 }

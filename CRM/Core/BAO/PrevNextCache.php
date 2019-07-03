@@ -170,10 +170,12 @@ WHERE  cachekey     = %3 AND
    * @param int $id2
    * @param string $cacheKey
    * @param array $conflicts
+   * @param string $mode
    *
    * @return bool
+   * @throws CRM_Core_Exception
    */
-  public static function markConflict($id1, $id2, $cacheKey, $conflicts) {
+  public static function markConflict($id1, $id2, $cacheKey, $conflicts, $mode) {
     if (empty($cacheKey) || empty($conflicts)) {
       return FALSE;
     }
@@ -191,11 +193,32 @@ WHERE  cachekey     = %3 AND
     ];
     $pncFind = CRM_Core_DAO::executeQuery($sql, $params);
 
+    $conflictTexts = [];
+
+    foreach ($conflicts as $entity => $entityConflicts) {
+      if ($entity === 'contact') {
+        foreach ($entityConflicts as $conflict) {
+          $conflictTexts[] = "{$conflict['title']}: '{$conflict[$id1]}' vs. '{$conflict[$id2]}'";
+        }
+      }
+      else {
+        foreach ($entityConflicts as $locationConflict) {
+          if (!is_array($locationConflict)) {
+            continue;
+          }
+          $displayField = CRM_Dedupe_Merger::getLocationBlockInfo()[$entity]['displayField'];
+          $conflictTexts[] = "{$locationConflict['title']}: '{$locationConflict[$displayField][$id1]}' vs. '{$locationConflict[$displayField][$id2]}'";
+        }
+      }
+    }
+    $conflictString = implode(', ', $conflictTexts);
+
     while ($pncFind->fetch()) {
       $data = $pncFind->data;
       if (!empty($data)) {
-        $data = unserialize($data);
-        $data['conflicts'] = implode(",", array_values($conflicts));
+        $data = CRM_Core_DAO::unSerializeField($data, CRM_Core_DAO::SERIALIZE_PHP);
+        $data['conflicts'] = $conflictString;
+        $data[$mode]['conflicts'] = $conflicts;
 
         $pncUp = new CRM_Core_DAO_PrevNextCache();
         $pncUp->id = $pncFind->id;
@@ -424,7 +447,7 @@ WHERE      c.group_name = %1
 AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
 ";
     $params = [
-      1 => ['CiviCRM Search PrevNextCache', 'String'],
+      1 => [CRM_Core_BAO_Cache::cleanKey('CiviCRM Search PrevNextCache'), 'String'],
       2 => [$cacheTimeIntervalDays, 'Integer'],
     ];
     CRM_Core_DAO::executeQuery($sql, $params);

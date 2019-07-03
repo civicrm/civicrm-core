@@ -180,6 +180,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           ],
           'cancel_date' => [
             'title' => ts('Cancelled / Refunded Date'),
+            'name' => 'contribution_cancel_date',
           ],
           'cancel_reason' => [
             'title' => ts('Cancellation / Refund Reason'),
@@ -243,6 +244,7 @@ class CRM_Report_Form_Contribute_Detail extends CRM_Report_Form {
           'cancel_date' => [
             'title' => ts('Cancelled / Refunded Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
+            'name' => 'contribution_cancel_date',
           ],
           'cancel_reason' => [
             'title' => ts('Cancellation / Refund Reason'),

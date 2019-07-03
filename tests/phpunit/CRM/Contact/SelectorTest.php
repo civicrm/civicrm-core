@@ -48,9 +48,9 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testSelectorQuery($dataSet) {
-    $params = CRM_Contact_BAO_Query::convertFormValues($dataSet['form_values'], 0, FALSE, NULL, array());
+    $params = CRM_Contact_BAO_Query::convertFormValues($dataSet['form_values'], 0, FALSE, NULL, []);
     foreach ($dataSet['settings'] as $setting) {
-      $this->callAPISuccess('Setting', 'create', array($setting['name'] => $setting['value']));
+      $this->callAPISuccess('Setting', 'create', [$setting['name'] => $setting['value']]);
     }
     $selector = new CRM_Contact_Selector(
       $dataSet['class'],
@@ -112,24 +112,24 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
    */
   public function testPrevNextCache() {
     $contactID = $this->individualCreate(['email' => 'mickey@mouseville.com']);
-    $dataSet = array(
+    $dataSet = [
       'description' => 'Normal default behaviour',
       'class' => 'CRM_Contact_Selector',
-      'settings' => array(),
-      'form_values' => array('email' => 'mickey@mouseville.com'),
-      'params' => array(),
+      'settings' => [],
+      'form_values' => ['email' => 'mickey@mouseville.com'],
+      'params' => [],
       'return_properties' => NULL,
       'context' => 'advanced',
       'action' => CRM_Core_Action::ADVANCED,
       'includeContactIds' => NULL,
       'searchDescendentGroups' => FALSE,
-      'expected_query' => array(
+      'expected_query' => [
         0 => 'default',
         1 => 'default',
         2 => "WHERE  ( civicrm_email.email LIKE '%mickey@mouseville.com%' )  AND (contact_a.is_deleted = 0)",
-      ),
-    );
-    $params = CRM_Contact_BAO_Query::convertFormValues($dataSet['form_values'], 0, FALSE, NULL, array());
+      ],
+    ];
+    $params = CRM_Contact_BAO_Query::convertFormValues($dataSet['form_values'], 0, FALSE, NULL, []);
 
     // create CRM_Contact_Selector instance and set desired query params
     $selector = new CRM_Contact_Selector(
@@ -172,9 +172,9 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
    * Data sets for testing.
    */
   public function querySets() {
-    return array(
-      array(
-        array(
+    return [
+      [
+        [
           'description' => 'Empty group test',
           'class' => 'CRM_Contact_Selector',
           'settings' => [],
@@ -186,130 +186,130 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
           'expected_query' => [],
-        ),
-      ),
-      array(
-        array(
+        ],
+      ],
+      [
+        [
           'description' => 'Normal default behaviour',
           'class' => 'CRM_Contact_Selector',
-          'settings' => array(),
-          'form_values' => array('email' => 'mickey@mouseville.com'),
-          'params' => array(),
+          'settings' => [],
+          'form_values' => ['email' => 'mickey@mouseville.com'],
+          'params' => [],
           'return_properties' => NULL,
           'context' => 'advanced',
           'action' => CRM_Core_Action::ADVANCED,
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
-          'expected_query' => array(
+          'expected_query' => [
             0 => 'default',
             1 => 'default',
             2 => "WHERE  ( civicrm_email.email LIKE '%mickey@mouseville.com%' )  AND (contact_a.is_deleted = 0)",
-          ),
-        ),
-      ),
-      array(
-        array(
+          ],
+        ],
+      ],
+      [
+        [
           'description' => 'Normal default + user added wildcard',
           'class' => 'CRM_Contact_Selector',
-          'settings' => array(),
-          'form_values' => array('email' => '%mickey@mouseville.com', 'sort_name' => 'Mouse'),
-          'params' => array(),
+          'settings' => [],
+          'form_values' => ['email' => '%mickey@mouseville.com', 'sort_name' => 'Mouse'],
+          'params' => [],
           'return_properties' => NULL,
           'context' => 'advanced',
           'action' => CRM_Core_Action::ADVANCED,
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
-          'expected_query' => array(
+          'expected_query' => [
             0 => 'default',
             1 => 'default',
             2 => "WHERE  ( civicrm_email.email LIKE '%mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE '%Mouse%' ) OR ( civicrm_email.email LIKE '%Mouse%' ) ) ) ) AND (contact_a.is_deleted = 0)",
-          ),
-        ),
-      ),
-      array(
-        array(
+          ],
+        ],
+      ],
+      [
+        [
           'description' => 'Site set to not pre-pend wildcard',
           'class' => 'CRM_Contact_Selector',
-          'settings' => array(array('name' => 'includeWildCardInName', 'value' => FALSE)),
-          'form_values' => array('email' => 'mickey@mouseville.com', 'sort_name' => 'Mouse'),
-          'params' => array(),
+          'settings' => [['name' => 'includeWildCardInName', 'value' => FALSE]],
+          'form_values' => ['email' => 'mickey@mouseville.com', 'sort_name' => 'Mouse'],
+          'params' => [],
           'return_properties' => NULL,
           'context' => 'advanced',
           'action' => CRM_Core_Action::ADVANCED,
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
-          'expected_query' => array(
+          'expected_query' => [
             0 => 'default',
             1 => 'default',
             2 => "WHERE  ( civicrm_email.email LIKE 'mickey@mouseville.com%'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND (contact_a.is_deleted = 0)",
-          ),
-        ),
-      ),
-      array(
-        array(
+          ],
+        ],
+      ],
+      [
+        [
           'description' => 'Use of quotes for exact string',
           'use_case_comments' => 'This is something that was in the code but seemingly not working. No UI info on it though!',
           'class' => 'CRM_Contact_Selector',
-          'settings' => array(array('name' => 'includeWildCardInName', 'value' => FALSE)),
-          'form_values' => array('email' => '"mickey@mouseville.com"', 'sort_name' => 'Mouse'),
-          'params' => array(),
+          'settings' => [['name' => 'includeWildCardInName', 'value' => FALSE]],
+          'form_values' => ['email' => '"mickey@mouseville.com"', 'sort_name' => 'Mouse'],
+          'params' => [],
           'return_properties' => NULL,
           'context' => 'advanced',
           'action' => CRM_Core_Action::ADVANCED,
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
-          'expected_query' => array(
+          'expected_query' => [
             0 => 'default',
             1 => 'default',
             2 => "WHERE  ( civicrm_email.email = 'mickey@mouseville.com'  AND ( ( ( contact_a.sort_name LIKE 'Mouse%' ) OR ( civicrm_email.email LIKE 'Mouse%' ) ) ) ) AND (contact_a.is_deleted = 0)",
-          ),
-        ),
-      ),
-      array(
-        array(
+          ],
+        ],
+      ],
+      [
+        [
           'description' => 'Normal search builder behaviour',
           'class' => 'CRM_Contact_Selector',
-          'settings' => array(),
-          'form_values' => array('contact_type' => 'Individual', 'country' => array('IS NOT NULL' => 1)),
-          'params' => array(),
-          'return_properties' => array(
+          'settings' => [],
+          'form_values' => ['contact_type' => 'Individual', 'country' => ['IS NOT NULL' => 1]],
+          'params' => [],
+          'return_properties' => [
             'contact_type' => 1,
             'contact_sub_type' => 1,
             'sort_name' => 1,
-          ),
+          ],
           'context' => 'builder',
           'action' => CRM_Core_Action::NONE,
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
-          'expected_query' => array(
+          'expected_query' => [
             0 => 'SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, civicrm_address.id as address_id, civicrm_address.country_id as country_id',
             1 => ' FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 )',
             2 => 'WHERE ( contact_a.contact_type IN ("Individual") AND civicrm_address.country_id IS NOT NULL ) AND (contact_a.is_deleted = 0)',
-          ),
-        ),
-      ),
-      array(
-        array(
+          ],
+        ],
+      ],
+      [
+        [
           'description' => 'Search builder behaviour for Activity',
           'class' => 'CRM_Contact_Selector',
-          'settings' => array(),
-          'form_values' => array('source_contact_id' => array('IS NOT NULL' => 1)),
-          'params' => array(),
-          'return_properties' => array(
+          'settings' => [],
+          'form_values' => ['source_contact_id' => ['IS NOT NULL' => 1]],
+          'params' => [],
+          'return_properties' => [
             'source_contact_id' => 1,
-          ),
+          ],
           'context' => 'builder',
           'action' => CRM_Core_Action::NONE,
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
-          'expected_query' => array(
+          'expected_query' => [
             0 => 'SELECT contact_a.id as contact_id, source_contact.id as source_contact_id',
             2 => 'WHERE ( source_contact.id IS NOT NULL ) AND (contact_a.is_deleted = 0)',
-          ),
-        ),
-      ),
-      array(
-        array(
+          ],
+        ],
+      ],
+      [
+        [
           'description' => 'Test display relationships',
           'class' => 'CRM_Contact_Selector',
           'settings' => [],
@@ -320,15 +320,15 @@ class CRM_Contact_SelectorTest extends CiviUnitTestCase {
           'action' => CRM_Core_Action::NONE,
           'includeContactIds' => NULL,
           'searchDescendentGroups' => FALSE,
-          'expected_query' => array(
+          'expected_query' => [
             0 => 'SELECT contact_a.id as contact_id, contact_a.contact_type as `contact_type`, contact_a.contact_sub_type as `contact_sub_type`, contact_a.sort_name as `sort_name`, contact_a.display_name as `display_name`, contact_a.do_not_email as `do_not_email`, contact_a.do_not_phone as `do_not_phone`, contact_a.do_not_mail as `do_not_mail`, contact_a.do_not_sms as `do_not_sms`, contact_a.do_not_trade as `do_not_trade`, contact_a.is_opt_out as `is_opt_out`, contact_a.legal_identifier as `legal_identifier`, contact_a.external_identifier as `external_identifier`, contact_a.nick_name as `nick_name`, contact_a.legal_name as `legal_name`, contact_a.image_URL as `image_URL`, contact_a.preferred_communication_method as `preferred_communication_method`, contact_a.preferred_language as `preferred_language`, contact_a.preferred_mail_format as `preferred_mail_format`, contact_a.first_name as `first_name`, contact_a.middle_name as `middle_name`, contact_a.last_name as `last_name`, contact_a.prefix_id as `prefix_id`, contact_a.suffix_id as `suffix_id`, contact_a.formal_title as `formal_title`, contact_a.communication_style_id as `communication_style_id`, contact_a.job_title as `job_title`, contact_a.gender_id as `gender_id`, contact_a.birth_date as `birth_date`, contact_a.is_deceased as `is_deceased`, contact_a.deceased_date as `deceased_date`, contact_a.household_name as `household_name`, IF ( contact_a.contact_type = \'Individual\', NULL, contact_a.organization_name ) as organization_name, contact_a.sic_code as `sic_code`, contact_a.is_deleted as `contact_is_deleted`, IF ( contact_a.contact_type = \'Individual\', contact_a.organization_name, NULL ) as current_employer, civicrm_address.id as address_id, civicrm_address.street_address as `street_address`, civicrm_address.supplemental_address_1 as `supplemental_address_1`, civicrm_address.supplemental_address_2 as `supplemental_address_2`, civicrm_address.supplemental_address_3 as `supplemental_address_3`, civicrm_address.city as `city`, civicrm_address.postal_code_suffix as `postal_code_suffix`, civicrm_address.postal_code as `postal_code`, civicrm_address.geo_code_1 as `geo_code_1`, civicrm_address.geo_code_2 as `geo_code_2`, civicrm_address.state_province_id as state_province_id, civicrm_address.country_id as country_id, civicrm_phone.id as phone_id, civicrm_phone.phone_type_id as phone_type_id, civicrm_phone.phone as `phone`, civicrm_email.id as email_id, civicrm_email.email as `email`, civicrm_email.on_hold as `on_hold`, civicrm_im.id as im_id, civicrm_im.provider_id as provider_id, civicrm_im.name as `im`, civicrm_worldregion.id as worldregion_id, civicrm_worldregion.name as `world_region`',
             2 => 'WHERE displayRelType.relationship_type_id = 1
 AND   displayRelType.is_active = 1
 AND (contact_a.is_deleted = 0)',
-          ),
-        ),
-      ),
-    );
+          ],
+        ],
+      ],
+    ];
   }
 
   /**
@@ -374,7 +374,7 @@ AND (contact_a.is_deleted = 0)',
           0 => 'email-' . $locationType->id,
           1 => 'IS NOT NULL',
           2 => NULL,
-          3  => 1,
+          3 => 1,
           4 => 0,
         ],
       ],
@@ -483,25 +483,25 @@ AND (contact_a.is_deleted = 0)',
     ];
 
     //Create a test custom group and field.
-    $customGroup = $this->callAPISuccess('CustomGroup', 'create', array(
+    $customGroup = $this->callAPISuccess('CustomGroup', 'create', [
       'title' => "test custom group",
       'extends' => "Individual",
-    ));
+    ]);
     $cgTableName = $customGroup['values'][$customGroup['id']]['table_name'];
-    $customField = $this->callAPISuccess('CustomField', 'create', array(
+    $customField = $this->callAPISuccess('CustomField', 'create', [
       'custom_group_id' => $customGroup['id'],
       'label' => "test field",
       'html_type' => "Text",
-    ));
+    ]);
     $customFieldId = $customField['id'];
 
     //Sort by the custom field created above.
-    $sortParams = array(
-      1 => array(
+    $sortParams = [
+      1 => [
         'name' => 'test field',
         'sort' => "custom_{$customFieldId}",
-      ),
-    );
+      ],
+    ];
     $sort = new CRM_Utils_Sort($sortParams, '1_d');
 
     //Form a query to order by a custom field.
@@ -529,10 +529,10 @@ AND (contact_a.is_deleted = 0)',
   public function testCustomDateField() {
     $contactID = $this->individualCreate();
     //Create a test custom group and field.
-    $customGroup = $this->callAPISuccess('CustomGroup', 'create', array(
+    $customGroup = $this->callAPISuccess('CustomGroup', 'create', [
       'title' => "test custom group",
       'extends' => "Individual",
-    ));
+    ]);
     $customTableName = $this->callAPISuccess('CustomGroup', 'getValue', ['id' => $customGroup['id'], 'return' => 'table_name']);
     $customGroupTableName = $customGroup['values'][$customGroup['id']]['table_name'];
 
@@ -584,22 +584,22 @@ AND (contact_a.is_deleted = 0)',
    */
   public function getDefaultSelectString() {
     return 'SELECT contact_a.id as contact_id, contact_a.contact_type  as `contact_type`, contact_a.contact_sub_type  as `contact_sub_type`, contact_a.sort_name  as `sort_name`,'
-    . ' contact_a.display_name  as `display_name`, contact_a.do_not_email  as `do_not_email`, contact_a.do_not_phone as `do_not_phone`, contact_a.do_not_mail  as `do_not_mail`,'
-    . ' contact_a.do_not_sms  as `do_not_sms`, contact_a.do_not_trade as `do_not_trade`, contact_a.is_opt_out  as `is_opt_out`, contact_a.legal_identifier  as `legal_identifier`,'
-    . ' contact_a.external_identifier  as `external_identifier`, contact_a.nick_name  as `nick_name`, contact_a.legal_name  as `legal_name`, contact_a.image_URL  as `image_URL`,'
-    . ' contact_a.preferred_communication_method  as `preferred_communication_method`, contact_a.preferred_language  as `preferred_language`,'
-    . ' contact_a.preferred_mail_format  as `preferred_mail_format`, contact_a.first_name  as `first_name`, contact_a.middle_name  as `middle_name`, contact_a.last_name  as `last_name`,'
-    . ' contact_a.prefix_id  as `prefix_id`, contact_a.suffix_id  as `suffix_id`, contact_a.formal_title  as `formal_title`, contact_a.communication_style_id  as `communication_style_id`,'
-    . ' contact_a.job_title  as `job_title`, contact_a.gender_id  as `gender_id`, contact_a.birth_date  as `birth_date`, contact_a.is_deceased  as `is_deceased`,'
-    . ' contact_a.deceased_date  as `deceased_date`, contact_a.household_name  as `household_name`,'
-    . ' IF ( contact_a.contact_type = \'Individual\', NULL, contact_a.organization_name ) as organization_name, contact_a.sic_code  as `sic_code`, contact_a.is_deleted  as `contact_is_deleted`,'
-    . ' IF ( contact_a.contact_type = \'Individual\', contact_a.organization_name, NULL ) as current_employer, civicrm_address.id as address_id,'
-    . ' civicrm_address.street_address as `street_address`, civicrm_address.supplemental_address_1 as `supplemental_address_1`, '
-    . 'civicrm_address.supplemental_address_2 as `supplemental_address_2`, civicrm_address.supplemental_address_3 as `supplemental_address_3`, civicrm_address.city as `city`, civicrm_address.postal_code_suffix as `postal_code_suffix`, '
-    . 'civicrm_address.postal_code as `postal_code`, civicrm_address.geo_code_1 as `geo_code_1`, civicrm_address.geo_code_2 as `geo_code_2`, '
-    . 'civicrm_address.state_province_id as state_province_id, civicrm_address.country_id as country_id, civicrm_phone.id as phone_id, civicrm_phone.phone_type_id as phone_type_id, '
-    . 'civicrm_phone.phone as `phone`, civicrm_email.id as email_id, civicrm_email.email as `email`, civicrm_email.on_hold as `on_hold`, civicrm_im.id as im_id, '
-    . 'civicrm_im.provider_id as provider_id, civicrm_im.name as `im`, civicrm_worldregion.id as worldregion_id, civicrm_worldregion.name as `world_region`';
+      . ' contact_a.display_name  as `display_name`, contact_a.do_not_email  as `do_not_email`, contact_a.do_not_phone as `do_not_phone`, contact_a.do_not_mail  as `do_not_mail`,'
+      . ' contact_a.do_not_sms  as `do_not_sms`, contact_a.do_not_trade as `do_not_trade`, contact_a.is_opt_out  as `is_opt_out`, contact_a.legal_identifier  as `legal_identifier`,'
+      . ' contact_a.external_identifier  as `external_identifier`, contact_a.nick_name  as `nick_name`, contact_a.legal_name  as `legal_name`, contact_a.image_URL  as `image_URL`,'
+      . ' contact_a.preferred_communication_method  as `preferred_communication_method`, contact_a.preferred_language  as `preferred_language`,'
+      . ' contact_a.preferred_mail_format  as `preferred_mail_format`, contact_a.first_name  as `first_name`, contact_a.middle_name  as `middle_name`, contact_a.last_name  as `last_name`,'
+      . ' contact_a.prefix_id  as `prefix_id`, contact_a.suffix_id  as `suffix_id`, contact_a.formal_title  as `formal_title`, contact_a.communication_style_id  as `communication_style_id`,'
+      . ' contact_a.job_title  as `job_title`, contact_a.gender_id  as `gender_id`, contact_a.birth_date  as `birth_date`, contact_a.is_deceased  as `is_deceased`,'
+      . ' contact_a.deceased_date  as `deceased_date`, contact_a.household_name  as `household_name`,'
+      . ' IF ( contact_a.contact_type = \'Individual\', NULL, contact_a.organization_name ) as organization_name, contact_a.sic_code  as `sic_code`, contact_a.is_deleted  as `contact_is_deleted`,'
+      . ' IF ( contact_a.contact_type = \'Individual\', contact_a.organization_name, NULL ) as current_employer, civicrm_address.id as address_id,'
+      . ' civicrm_address.street_address as `street_address`, civicrm_address.supplemental_address_1 as `supplemental_address_1`, '
+      . 'civicrm_address.supplemental_address_2 as `supplemental_address_2`, civicrm_address.supplemental_address_3 as `supplemental_address_3`, civicrm_address.city as `city`, civicrm_address.postal_code_suffix as `postal_code_suffix`, '
+      . 'civicrm_address.postal_code as `postal_code`, civicrm_address.geo_code_1 as `geo_code_1`, civicrm_address.geo_code_2 as `geo_code_2`, '
+      . 'civicrm_address.state_province_id as state_province_id, civicrm_address.country_id as country_id, civicrm_phone.id as phone_id, civicrm_phone.phone_type_id as phone_type_id, '
+      . 'civicrm_phone.phone as `phone`, civicrm_email.id as email_id, civicrm_email.email as `email`, civicrm_email.on_hold as `on_hold`, civicrm_im.id as im_id, '
+      . 'civicrm_im.provider_id as provider_id, civicrm_im.name as `im`, civicrm_worldregion.id as worldregion_id, civicrm_worldregion.name as `world_region`';
   }
 
   /**
@@ -607,17 +607,18 @@ AND (contact_a.is_deleted = 0)',
    */
   public function getDefaultFromString() {
     return ' FROM civicrm_contact contact_a LEFT JOIN civicrm_address ON ( contact_a.id = civicrm_address.contact_id AND civicrm_address.is_primary = 1 )'
-    . ' LEFT JOIN civicrm_country ON ( civicrm_address.country_id = civicrm_country.id ) '
-    . ' LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1)'
-    . ' LEFT JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id AND civicrm_phone.is_primary = 1)'
-    . ' LEFT JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id AND civicrm_im.is_primary = 1) '
-    . 'LEFT JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id ';
+      . ' LEFT JOIN civicrm_country ON ( civicrm_address.country_id = civicrm_country.id ) '
+      . ' LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_email.is_primary = 1)'
+      . ' LEFT JOIN civicrm_phone ON (contact_a.id = civicrm_phone.contact_id AND civicrm_phone.is_primary = 1)'
+      . ' LEFT JOIN civicrm_im ON (contact_a.id = civicrm_im.contact_id AND civicrm_im.is_primary = 1) '
+      . 'LEFT JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id ';
   }
 
   /**
    * Strangle strings into a more matchable format.
    *
    * @param string $string
+   *
    * @return string
    */
   public function strWrangle($string) {

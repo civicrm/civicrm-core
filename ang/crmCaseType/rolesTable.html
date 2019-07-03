@@ -13,7 +13,8 @@ Required vars: caseType
   </thead>
   <tbody>
 	  <tr ng-repeat="relType in caseType.definition.caseRoles | orderBy:'name'" ng-class-even="'crm-entity even-row even'" ng-class-odd="'crm-entity odd-row odd'">
-	    <td>{{relType.name}}</td>
+      <!-- display label (client-perspective) -->
+	    <td>{{relType.displaylabel}}</td>
 	    <td><input type="checkbox" ng-model="relType.creator" ng-true-value="'1'" ng-false-value="'0'"></td>
 	    <td><input type="radio" ng-model="relType.manager" value="1" ng-change="onManagerChange(relType)"></td>
 	    <td>

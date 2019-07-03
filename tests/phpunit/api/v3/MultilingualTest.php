@@ -50,8 +50,12 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
-  public function testOptionLanguage() {
+  /**
+   * @dataProvider versionThreeAndFour
+   */
+  public function testOptionLanguage($version) {
     $this->enableMultilingual();
+    $this->_apiversion = $version;
 
     CRM_Core_I18n_Schema::addLocale('fr_CA', 'en_US');
 
@@ -83,13 +87,13 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
     $french = $this->callAPISuccess('OptionValue', 'getsingle', array(
       'option_group_id' => $group['id'],
       'name' => 'IM',
-      'option.language' => 'fr_CA',
+      'options' => ['language' => 'fr_CA'],
     ));
 
+    // Ensure that after language is changed in previous call it will go back to the default.
     $default = $this->callAPISuccess('OptionValue', 'getsingle', array(
       'option_group_id' => $group['id'],
       'name' => 'IM',
-      'option.language' => 'en_US',
     ));
 
     $this->assertEquals($french['label'], 'Messagerie instantanée');

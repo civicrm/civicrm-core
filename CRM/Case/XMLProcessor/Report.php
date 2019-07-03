@@ -824,8 +824,8 @@ LIMIT  1
     $xmlProcessor = new CRM_Case_XMLProcessor_Process();
     $caseRoles = $xmlProcessor->get($caseType, 'CaseRoles');
     foreach ($caseRelationships as $key => & $value) {
-      if (!empty($caseRoles[$value['relation_type']])) {
-        unset($caseRoles[$value['relation_type']]);
+      if (!empty($caseRoles[$value['relation_type'] . '_' . $value['relationship_direction']])) {
+        unset($caseRoles[$value['relation_type'] . '_' . $value['relationship_direction']]);
       }
       if ($isRedact) {
         if (!array_key_exists($value['name'], $report->_redactionStringRules)) {

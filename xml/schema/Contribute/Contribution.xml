@@ -272,6 +272,7 @@
   </field>
   <field>
     <name>cancel_date</name>
+    <title>Cancelled / Refunded Date</title>
     <type>datetime</type>
     <import>true</import>
     <headerPattern>/cancel(.?date)?/i</headerPattern>
@@ -282,6 +283,7 @@
       <type>Select Date</type>
       <formatType>activityDateTime</formatType>
     </html>
+    <uniqueName>contribution_cancel_date</uniqueName>
   </field>
   <field>
     <name>cancel_reason</name>

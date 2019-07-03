@@ -64,20 +64,19 @@ class CRM_Core_BAO_SchemaHandler {
    *   TRUE if successfully created, FALSE otherwise
    *
    */
-  public static function createTable(&$params) {
+  public static function createTable($params) {
     $sql = self::buildTableSQL($params);
     // do not i18n-rewrite
     CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
 
-    $config = CRM_Core_Config::singleton();
-    if ($config->logging) {
+    if (CRM_Core_Config::singleton()->logging) {
       // logging support
       $logging = new CRM_Logging_Schema();
       $logging->fixSchemaDifferencesFor($params['name'], NULL, FALSE);
     }
 
     // always do a trigger rebuild for this table
-    CRM_Core_DAO::triggerRebuild($params['name']);
+    Civi::service('sql_triggers')->rebuild($params['name'], TRUE);
 
     return TRUE;
   }
@@ -87,7 +86,7 @@ class CRM_Core_BAO_SchemaHandler {
    *
    * @return string
    */
-  public static function buildTableSQL(&$params) {
+  public static function buildTableSQL($params) {
     $sql = "CREATE TABLE {$params['name']} (";
     if (isset($params['fields']) &&
       is_array($params['fields'])
@@ -124,7 +123,7 @@ class CRM_Core_BAO_SchemaHandler {
    *
    * @return string
    */
-  public static function buildFieldSQL(&$params, $separator, $prefix) {
+  public static function buildFieldSQL($params, $separator, $prefix) {
     $sql = '';
     $sql .= $separator;
     $sql .= str_repeat(' ', 8);
@@ -159,7 +158,7 @@ class CRM_Core_BAO_SchemaHandler {
    *
    * @return NULL|string
    */
-  public static function buildPrimaryKeySQL(&$params, $separator, $prefix) {
+  public static function buildPrimaryKeySQL($params, $separator, $prefix) {
     $sql = NULL;
     if (!empty($params['primary'])) {
       $sql .= $separator;
@@ -178,7 +177,7 @@ class CRM_Core_BAO_SchemaHandler {
    *
    * @return NULL|string
    */
-  public static function buildSearchIndexSQL(&$params, $separator, $prefix, $indexExist = FALSE) {
+  public static function buildSearchIndexSQL($params, $separator, $prefix, $indexExist = FALSE) {
     $sql = NULL;
 
     // dont index blob
@@ -271,7 +270,7 @@ ALTER TABLE {$tableName}
    *
    * @return NULL|string
    */
-  public static function buildForeignKeySQL(&$params, $separator, $prefix, $tableName) {
+  public static function buildForeignKeySQL($params, $separator, $prefix, $tableName) {
     $sql = NULL;
     if (!empty($params['fk_table_name']) && !empty($params['fk_field_name'])) {
       $sql .= $separator;
@@ -295,42 +294,12 @@ ALTER TABLE {$tableName}
    *
    * @return bool
    */
-  public static function alterFieldSQL(&$params, $indexExist = FALSE, $triggerRebuild = TRUE) {
-    $sql = str_repeat(' ', 8);
-    $sql .= "ALTER TABLE {$params['table_name']}";
+  public static function alterFieldSQL($params, $indexExist = FALSE, $triggerRebuild = TRUE) {
 
     // lets suppress the required flag, since that can cause sql issue
     $params['required'] = FALSE;
 
-    switch ($params['operation']) {
-      case 'add':
-        $separator = "\n";
-        $prefix = "ADD ";
-        $sql .= self::buildFieldSQL($params, $separator, "ADD COLUMN ");
-        $separator = ",\n";
-        $sql .= self::buildPrimaryKeySQL($params, $separator, "ADD PRIMARY KEY ");
-        $sql .= self::buildSearchIndexSQL($params, $separator, "ADD INDEX ");
-        $sql .= self::buildForeignKeySQL($params, $separator, "ADD ", $params['table_name']);
-        break;
-
-      case 'modify':
-        $separator = "\n";
-        $prefix = "MODIFY ";
-        $sql .= self::buildFieldSQL($params, $separator, $prefix);
-        $separator = ",\n";
-        $sql .= self::buildSearchIndexSQL($params, $separator, "ADD INDEX ", $indexExist);
-        break;
-
-      case 'delete':
-        $sql .= " DROP COLUMN `{$params['name']}`";
-        if (!empty($params['primary'])) {
-          $sql .= ", DROP PRIMARY KEY";
-        }
-        if (!empty($params['fk_table_name'])) {
-          $sql .= ", DROP FOREIGN KEY FK_{$params['fkName']}";
-        }
-        break;
-    }
+    $sql = self::buildFieldChangeSql($params, $indexExist);
 
     // CRM-7007: do not i18n-rewrite this query
     CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
@@ -342,12 +311,12 @@ ALTER TABLE {$tableName}
       // Are there any modifies we DON'T was to call this function for (& shouldn't it be clever enough to cope?)
       if ($params['operation'] == 'add' || $params['operation'] == 'modify') {
         $logging = new CRM_Logging_Schema();
-        $logging->fixSchemaDifferencesFor($params['table_name'], [trim($prefix) => [$params['name']]], FALSE);
+        $logging->fixSchemaDifferencesFor($params['table_name'], [trim(strtoupper($params['operation'])) => [$params['name']]], FALSE);
       }
     }
 
     if ($triggerRebuild) {
-      CRM_Core_DAO::triggerRebuild($params['table_name']);
+      Civi::service('sql_triggers')->rebuild($params['table_name'], TRUE);
     }
 
     return TRUE;
@@ -777,6 +746,47 @@ MODIFY      {$columnName} varchar( $length )
     foreach ($queries as $query) {
       $dao->query($query, FALSE);
     }
+  }
+
+  /**
+   * Build the sql to alter the field.
+   *
+   * @param array $params
+   * @param bool $indexExist
+   *
+   * @return string
+   */
+  public static function buildFieldChangeSql($params, $indexExist) {
+    $sql = str_repeat(' ', 8);
+    $sql .= "ALTER TABLE {$params['table_name']}";
+    switch ($params['operation']) {
+      case 'add':
+        $separator = "\n";
+        $sql .= self::buildFieldSQL($params, $separator, "ADD COLUMN ");
+        $separator = ",\n";
+        $sql .= self::buildPrimaryKeySQL($params, $separator, "ADD PRIMARY KEY ");
+        $sql .= self::buildSearchIndexSQL($params, $separator, "ADD INDEX ");
+        $sql .= self::buildForeignKeySQL($params, $separator, "ADD ", $params['table_name']);
+        break;
+
+      case 'modify':
+        $separator = "\n";
+        $sql .= self::buildFieldSQL($params, $separator, "MODIFY ");
+        $separator = ",\n";
+        $sql .= self::buildSearchIndexSQL($params, $separator, "ADD INDEX ", $indexExist);
+        break;
+
+      case 'delete':
+        $sql .= " DROP COLUMN `{$params['name']}`";
+        if (!empty($params['primary'])) {
+          $sql .= ", DROP PRIMARY KEY";
+        }
+        if (!empty($params['fk_table_name'])) {
+          $sql .= ", DROP FOREIGN KEY FK_{$params['fkName']}";
+        }
+        break;
+    }
+    return $sql;
   }
 
 }

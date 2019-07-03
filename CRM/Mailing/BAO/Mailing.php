@@ -863,14 +863,12 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $this->header = new CRM_Mailing_BAO_MailingComponent();
       $this->header->id = $this->header_id;
       $this->header->find(TRUE);
-      $this->header->free();
     }
 
     if (!$this->footer and $this->footer_id) {
       $this->footer = new CRM_Mailing_BAO_MailingComponent();
       $this->footer->id = $this->footer_id;
       $this->footer->find(TRUE);
-      $this->footer->free();
     }
   }
 
@@ -1451,7 +1449,6 @@ ORDER BY   civicrm_email.is_bulkmail DESC
     while ($mg->fetch()) {
       $groups[] = $mg->name;
     }
-    $mg->free();
     return $groups;
   }
 
@@ -3067,6 +3064,13 @@ ORDER BY civicrm_mailing.name";
       'id' => $id,
       'return' => 'visibility',
     ])) === 'Public Pages') {
+
+      // if hash setting is on then we change the public url into a hash
+      $hash = CRM_Mailing_BAO_Mailing::getMailingHash($id);
+      if (!empty($hash)) {
+        $id = $hash;
+      }
+
       return CRM_Utils_System::url('civicrm/mailing/view', ['id' => $id], $absolute, NULL, TRUE, TRUE);
     }
   }

@@ -77,13 +77,15 @@ class CRM_Core_CodeGen_Util_Template {
         "\n  }\n}\n" => "\n  }\n\n}\n",
         '=> true,' => '=> TRUE,',
         '=> false,' => '=> FALSE,',
-        'static ::' => 'static::'
+        'static ::' => 'static::',
       ];
       $contents = str_replace(array_keys($replacements), array_values($replacements), $contents);
       $contents = preg_replace('#(\s*)\\/\\*\\*#', "\n\$1/**", $contents);
 
       // Convert old array syntax to new square brackets
       $contents = CRM_Core_CodeGen_Util_ArraySyntaxConverter::convert($contents);
+      // Remove numeric array keys (assuming its non-associative)
+      $contents = preg_replace("#  '\\d+' => #", "  ", $contents);
     }
     // Ensure file ends with a newline
     if (substr($contents, -1) !== "\n") {

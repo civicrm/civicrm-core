@@ -180,12 +180,10 @@ class CRM_Core_BAO_Cache_Psr16 {
    * @return array
    */
   public static function getLegacyGroups() {
-    return [
+    $groups = [
       // Core
-      'CiviCRM Search PrevNextCache',
       'contact fields',
       'navigation',
-      'contact groups',
       'custom data',
 
       // Universe
@@ -199,12 +197,32 @@ class CRM_Core_BAO_Cache_Psr16 {
       // civihr/uk.co.compucorp.civicrm.hrcore
       'HRCore_Info',
 
-      // nz.co.fuzion.entitysetting
-      'CiviCRM setting Spec',
-
-      // org.civicrm.multisite
-      'descendant groups for an org',
     ];
+    // Handle Legacy Multisite caching group.
+    $extensions = CRM_Extension_System::singleton()->getManager();
+    $multisiteExtensionStatus = $extensions->getStatus('org.civicrm.multisite');
+    if ($multisiteExtensionStatus == $extensions::STATUS_INSTALLED) {
+      $extension_version = civicrm_api3('Extension', 'get', ['key' => 'org.civicrm.multisite'])['values'][0]['version'];
+      if (version_compare($extension_version, '2.7', '<')) {
+        Civi::log()->warning(
+          'CRM_Core_BAO_Cache_PSR is deprecated for multisite extension, you should upgrade to the latest version to avoid this warning, this code will be removed at the end of 2019',
+          ['civi.tag' => 'deprecated']
+        );
+        $groups[] = 'descendant groups for an org';
+      }
+    }
+    $entitySettingExtensionStatus = $extensions->getStatus('nz.co.fuzion.entitysetting');
+    if ($multisiteExtensionStatus == $extensions::STATUS_INSTALLED) {
+      $extension_version = civicrm_api3('Extension', 'get', ['key' => 'nz.co.fuzion.entitysetting'])['values'][0]['version'];
+      if (version_compare($extension_version, '1.3', '<')) {
+        Civi::log()->warning(
+          'CRM_Core_BAO_Cache_PSR is deprecated for entity setting extension, you should upgrade to the latest version to avoid this warning, this code will be removed at the end of 2019',
+          ['civi.tag' => 'deprecated']
+        );
+        $groups[] = 'CiviCRM setting Spec';
+      }
+    }
+    return $groups;
   }
 
 }

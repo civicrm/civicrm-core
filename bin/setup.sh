@@ -60,6 +60,7 @@ while getopts "aDgsdef" opt; do
       DO_GENCODE=1
       DO_SCHEMA=1
       DO_DATA=1
+      DEFAULT_DATA=civicrm_generated.mysql
       DO_FLUSH=1
       FOUND_ACTION=1
       ;;

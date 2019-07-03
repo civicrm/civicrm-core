@@ -113,11 +113,11 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     $contributionTest = new CRM_Contribute_BAO_ContributionTest();
     list($lineItems, $contribution) = $contributionTest->addParticipantWithContribution();
     $contribution = (array) $contribution;
-    $params = array(
+    $params = [
       'contribution_id' => $contribution['id'],
       'total_amount' => 100.00,
-    );
-    $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
+    ];
+    $this->callAPISuccess('Payment', 'create', $params);
     $paid = CRM_Core_BAO_FinancialTrxn::getTotalPayments($params['contribution_id']);
     $total = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution_id'], 'total_amount');
     $cmp = bccomp($total, $paid, 5);
@@ -125,8 +125,6 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     if ($cmp == 0 || $cmp == -1) {
       civicrm_api3('Contribution', 'completetransaction', array('id' => $contribution['id']));
     }
-
-    $this->assertEquals('100.00', $trxn->total_amount, 'Amount does not match.');
 
     $totalPaymentAmount = CRM_Core_BAO_FinancialTrxn::getTotalPayments($contribution['id']);
     $this->assertEquals('250.00', $totalPaymentAmount, 'Amount does not match.');

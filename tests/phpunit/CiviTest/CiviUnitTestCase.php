@@ -27,6 +27,7 @@
  */
 
 use Civi\Payment\System;
+use League\Csv\Reader;
 
 /**
  *  Include class definitions
@@ -482,6 +483,8 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
     $this->cleanTempDirs();
     $this->unsetExtensionSystem();
+    $this->assertEquals([], CRM_Core_DAO::$_nullArray);
+    $this->assertEquals(NULL, CRM_Core_DAO::$_nullObject);
   }
 
   /**
@@ -1711,11 +1714,11 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @param array $tablesToTruncate
    * @param bool $dropCustomValueTables
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function quickCleanup($tablesToTruncate, $dropCustomValueTables = FALSE) {
     if ($this->tx) {
-      throw new Exception("CiviUnitTestCase: quickCleanup() is not compatible with useTransaction()");
+      throw new \CRM_Core_Exception("CiviUnitTestCase: quickCleanup() is not compatible with useTransaction()");
     }
     if ($dropCustomValueTables) {
       $optionGroupResult = CRM_Core_DAO::executeQuery('SELECT option_group_id FROM civicrm_custom_field');
@@ -1780,6 +1783,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'civicrm_participant',
       'civicrm_participant_payment',
       'civicrm_pledge',
+      'civicrm_pledge_block',
       'civicrm_pledge_payment',
       'civicrm_price_set_entity',
       'civicrm_price_field_value',
@@ -1898,7 +1902,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   public function checkArrayEquals(&$actual, &$expected) {
     self::unsetId($actual);
     self::unsetId($expected);
-    $this->assertEquals($actual, $expected);
+    $this->assertEquals($expected, $actual);
   }
 
   /**
@@ -3188,6 +3192,15 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
+   * Get the boolean options as a provider.
+   *
+   * @return array
+   */
+  public function getBooleanDataProvider() {
+    return [[TRUE], [FALSE]];
+  }
+
+  /**
    * Set the separators for thousands and decimal points.
    *
    * @param string $thousandSeparator
@@ -3271,6 +3284,38 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     // Create an SMS provider "CiviTestSMSProvider". Civi handles "CiviTestSMSProvider" as a special case and allows it to be instantiated
     //  in CRM/Sms/Provider.php even though it is not an extension.
     return civicrm_api3('option_value', 'create', $params);
+  }
+
+  /**
+   * Start capturing browser output.
+   *
+   * The starts the process of browser output being captured, setting any variables needed for e-notice prevention.
+   */
+  protected function startCapturingOutput() {
+    ob_start();
+    $_SERVER['HTTP_USER_AGENT'] = 'unittest';
+  }
+
+  /**
+   * Stop capturing browser output and return as a csv.
+   *
+   * @param bool $isFirstRowHeaders
+   *
+   * @return \League\Csv\Reader
+   *
+   * @throws \League\Csv\Exception
+   */
+  protected function captureOutputToCSV($isFirstRowHeaders = TRUE) {
+    $output = ob_get_flush();
+    $stream = fopen('php://memory', 'r+');
+    fwrite($stream, $output);
+    rewind($stream);
+    $csv = Reader::createFromString($output);
+    if ($isFirstRowHeaders) {
+      $csv->setHeaderOffset(0);
+    }
+    ob_clean();
+    return $csv;
   }
 
 }

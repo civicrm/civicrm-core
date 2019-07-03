@@ -166,8 +166,12 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     $this->assertAPISuccess($result);
   }
 
+  /**
+   * Cleanup after function.
+   */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   public function setUpContributionPage() {

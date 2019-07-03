@@ -2,12 +2,14 @@
 
 /**
  *  Include dataProvider for tests
+ *
  * @group headless
  */
 class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
 
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   /**
@@ -19,6 +21,8 @@ class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
    *   Does the order by use a key sort. A key sort uses the mysql 'field' function to
    *   order by a passed in list. It makes sense for option groups & small sets
    *   but may not do for long lists like states - performance testing not done on that yet.
+   *
+   * @throws \CRM_Core_Exception
    *
    * @dataProvider getSortFields
    */
@@ -62,6 +66,22 @@ class CRM_Contribute_BAO_QueryTest extends CiviUnitTestCase {
       ['state_province', FALSE],
       ['country', FALSE],
     ];
+  }
+
+  /**
+   * Test receive_date_high, low & relative work.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRelativeContributionDates() {
+    $this->contributionCreate(['receive_date' => '2018-01-02', 'contact_id' => $this->individualCreate()]);
+    $this->contributionCreate(['receive_date' => '2017-01-02', 'contact_id' => $this->individualCreate()]);
+    $queryObj = new CRM_Contact_BAO_Query([['receive_date_low', '=', 20170101, 1, 0]]);
+    $this->assertEquals(2, $queryObj->searchQuery(0, 0, NULL, TRUE));
+    $queryObj = new CRM_Contact_BAO_Query([['receive_date_low', '=', 20180101, 1, 0]]);
+    $this->assertEquals(1, $queryObj->searchQuery(0, 0, NULL, TRUE));
+    $queryObj = new CRM_Contact_BAO_Query([['receive_date_high', '=', 20180101, 1, 0]]);
+    $this->assertEquals(1, $queryObj->searchQuery(0, 0, NULL, TRUE));
   }
 
 }

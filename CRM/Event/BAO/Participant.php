@@ -161,7 +161,7 @@ class CRM_Event_BAO_Participant extends CRM_Event_DAO_Participant {
    *
    * @return CRM_Event_BAO_Participant|null the found object or null
    */
-  public static function getValues(&$params, &$values, &$ids) {
+  public static function getValues(&$params, &$values = [], &$ids = []) {
     if (empty($params)) {
       return NULL;
     }

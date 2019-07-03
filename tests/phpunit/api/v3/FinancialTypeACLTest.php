@@ -104,11 +104,14 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
+   *
+   * @throws \Exception
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(array('civicrm_uf_match'));
     $this->disableFinancialACLs();
+    parent::tearDown();
   }
 
   /**

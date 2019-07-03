@@ -365,7 +365,11 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     }
     $value_to['contact_id'] = $contact_id;
     $value_to['event_id'] = $this->_event_id;
-    $value_to['status_id'] = 1;
+    $value_to['status_id'] = CRM_Core_PseudoConstant::getKey(
+      'CRM_Event_BAO_Participant',
+      'status_id',
+      'Registered'
+    );
     $value_to['register_date'] = date("Y-m-d");
     //first create the new participant row -don't set registered_by yet or email won't be sent
     $participant = CRM_Event_BAO_Participant::create($value_to);
