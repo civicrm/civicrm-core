@@ -106,8 +106,6 @@ class CRM_Core_Config_MagicMerge {
       'userFrameworkURLVar' => ['runtime'],
       'userHookClass' => ['runtime'],
       'cleanURL' => ['runtime'],
-      'configAndLogDir' => ['runtime'],
-      'templateCompileDir' => ['runtime'],
       'templateDir' => ['runtime'],
 
       // "boot-svc" properties are critical services needed during init.
@@ -189,6 +187,12 @@ class CRM_Core_Config_MagicMerge {
       'wkhtmltopdfPath' => ['setting'],
       'wpBasePage' => ['setting'],
       'wpLoadPhp' => ['setting'],
+
+      // "path" properties are managed via Civi::paths and $civicrm_paths
+      // Option: `mkdir` - auto-create dir
+      // Option: `restrict` - auto-restrict remote access
+      'configAndLogDir' => ['path', 'civicrm.log', ['mkdir', 'restrict']],
+      'templateCompileDir' => ['path', 'civicrm.compile', ['mkdir', 'restrict']],
 
       // "setting-path" properties are settings with special filtering
       // to return normalized file paths.
