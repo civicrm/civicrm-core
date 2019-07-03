@@ -1001,7 +1001,7 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
         'source_record_id' => $this->mailing_id,
         'activity_date_time' => $job_date,
         'subject' => $mailing->subject,
-        'status_id' => 2,
+        'status_id' => 'Completed',
         'deleteActivityTarget' => FALSE,
         'campaign_id' => $mailing->campaign_id,
       ];
@@ -1048,7 +1048,10 @@ AND    record_type_id = $targetRecordID
         }
       }
 
-      if (is_a(CRM_Activity_BAO_Activity::create($activity), 'CRM_Core_Error')) {
+      try {
+        civicrm_api3('Activity', 'create', $activity);
+      }
+      catch (Exception $e) {
         $result = FALSE;
       }
 
