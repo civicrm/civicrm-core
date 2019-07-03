@@ -153,9 +153,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    */
   public static function create($params) {
     $transaction = new CRM_Core_Transaction();
-    $op = empty($params['id']) ? 'create' : 'edit';
     $origParams = array_merge([], $params);
-    $params = self::prepareCreate($params, $op);
+    $params = self::prepareCreate($params);
 
     $customField = new CRM_Core_DAO_CustomField();
     $customField->copyValues($params);
@@ -166,13 +165,14 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     $triggerRebuild = CRM_Utils_Array::value('triggerRebuild', $params, TRUE);
     //create/drop the index when we toggle the is_searchable flag
-    if ($op == 'edit') {
+    $op = empty($params['id']) ? 'add' : 'modify';
+    if ($op == 'modify') {
       $indexExist = FALSE;
       //as during create if field is_searchable we had created index.
       if (!empty($params['id'])) {
         $indexExist = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'is_searchable');
       }
-      self::createField($customField, 'modify', $indexExist, $triggerRebuild);
+      self::createField($customField, $op, $indexExist, $triggerRebuild);
     }
     else {
       if (!isset($origParams['column_name'])) {
@@ -183,13 +183,13 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       // make sure all values are present in the object
       $customField->find(TRUE);
 
-      self::createField($customField, 'add', FALSE, $triggerRebuild);
+      self::createField($customField, $op, FALSE, $triggerRebuild);
     }
 
     // complete transaction
     $transaction->commit();
 
-    CRM_Utils_Hook::post($op, 'CustomField', $customField->id, $customField);
+    CRM_Utils_Hook::post(($op === 'add' ? 'create' : 'edit'), 'CustomField', $customField->id, $customField);
 
     CRM_Utils_System::flushCache();
 
@@ -1915,12 +1915,11 @@ WHERE  id IN ( %1, %2 )
    * This could be called by a single create or a batchCreate.
    *
    * @param array $params
-   * @param string $op
    *
    * @return array
    */
-  protected static function prepareCreate($params, $op) {
-
+  protected static function prepareCreate($params) {
+    $op = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($op, 'CustomField', CRM_Utils_Array::value('id', $params), $params);
     if ($op === 'create') {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
