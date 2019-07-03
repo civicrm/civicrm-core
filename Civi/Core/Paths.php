@@ -57,7 +57,20 @@ class Paths {
         return \CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
       })
       ->register('civicrm.private', function () {
-        return \CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
+        return [
+          'path' => \CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage()['path'],
+
+        ];
+      })
+      ->register('civicrm.log', function () {
+        return [
+          'path' => \CRM_Utils_File::baseFilePath() . 'ConfigAndLog',
+        ];
+      })
+      ->register('civicrm.compile', function () {
+        return [
+          'path' => CIVICRM_TEMPLATE_COMPILEDIR,
+        ];
       })
       ->register('wp.frontend.base', function () {
         return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/'];

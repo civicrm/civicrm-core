@@ -74,13 +74,6 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
   public $cleanURL;
 
   /**
-   * @var string
-   */
-  public $configAndLogDir;
-
-  public $templateCompileDir;
-
-  /**
    * The root directory of our template tree.
    * @var string
    */
@@ -98,20 +91,6 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
     if (!defined('CIVICRM_TEMPLATE_COMPILEDIR') && $loadFromDB) {
       $this->fatal('You need to define CIVICRM_TEMPLATE_COMPILEDIR in civicrm.settings.php');
     }
-
-    if (defined('CIVICRM_TEMPLATE_COMPILEDIR')) {
-      $this->configAndLogDir = CRM_Utils_File::baseFilePath() . 'ConfigAndLog' . DIRECTORY_SEPARATOR;
-      $this->templateCompileDir = defined('CIVICRM_TEMPLATE_COMPILEDIR') ? CRM_Utils_File::addTrailingSlash(CIVICRM_TEMPLATE_COMPILEDIR) : NULL;
-      CRM_Utils_File::createDir($this->templateCompileDir);
-      CRM_Utils_File::restrictAccess($this->templateCompileDir);
-    }
-
-    $civicrm_private = $GLOBALS['civicrm_paths']['civicrm.private']['path'];
-    if (!empty($civicrm_private)) {
-      $this->configAndLogDir = rtrim($civicrm_private, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'ConfigAndLog' . DIRECTORY_SEPARATOR;
-    }
-    CRM_Utils_File::createDir($this->configAndLogDir);
-    CRM_Utils_File::restrictAccess($this->configAndLogDir);
 
     if (!defined('CIVICRM_UF')) {
       $this->fatal('You need to define CIVICRM_UF in civicrm.settings.php');
