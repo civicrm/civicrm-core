@@ -152,30 +152,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @return CRM_Core_DAO_CustomField
    */
   public static function create($params) {
-    $transaction = new CRM_Core_Transaction();
-    $params = self::prepareCreate($params);
-
-    $customField = new CRM_Core_DAO_CustomField();
-    $customField->copyValues($params);
-    $customField->save();
-
-    $indexExist = empty($params['id']) ? FALSE : CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'is_searchable');
-
-    //create/drop the index when we toggle the is_searchable flag
+    $customField = self::createCustomFieldRecord($params);
     $op = empty($params['id']) ? 'add' : 'modify';
-    if ($op !== 'modify') {
-      if ($params['is_append_field_id_to_column_name']) {
-        $params['column_name'] .= "_{$customField->id}";
-      }
-      $customField->column_name = $params['column_name'];
-      $customField->save();
-    }
-
-    // complete transaction - note that any table alterations include an implicit commit so this is largely meaningless.
-    $transaction->commit();
-
-    // make sure all values are present in the object for further processing
-    $customField->find(TRUE);
+    $indexExist = empty($params['id']) ? FALSE : CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'is_searchable');
     self::createField($customField, $op, $indexExist, CRM_Utils_Array::value('triggerRebuild', $params, TRUE));
 
     CRM_Utils_Hook::post(($op === 'add' ? 'create' : 'edit'), 'CustomField', $customField->id, $customField);
@@ -1963,6 +1942,39 @@ WHERE  id IN ( %1, %2 )
       $params['attributes'] = 'rows=4, cols=60';
     }
     return $params;
+  }
+
+  /**
+   * Create database entry for custom field and related option groups.
+   *
+   * @param array $params
+   *
+   * @return CRM_Core_DAO_CustomField
+   */
+  protected static function createCustomFieldRecord($params) {
+    $transaction = new CRM_Core_Transaction();
+    $params = self::prepareCreate($params);
+
+    $customField = new CRM_Core_DAO_CustomField();
+    $customField->copyValues($params);
+    $customField->save();
+
+    //create/drop the index when we toggle the is_searchable flag
+    $op = empty($params['id']) ? 'add' : 'modify';
+    if ($op !== 'modify') {
+      if ($params['is_append_field_id_to_column_name']) {
+        $params['column_name'] .= "_{$customField->id}";
+      }
+      $customField->column_name = $params['column_name'];
+      $customField->save();
+    }
+
+    // complete transaction - note that any table alterations include an implicit commit so this is largely meaningless.
+    $transaction->commit();
+
+    // make sure all values are present in the object for further processing
+    $customField->find(TRUE);
+    return $customField;
   }
 
   /**
