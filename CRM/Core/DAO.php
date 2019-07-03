@@ -1672,7 +1672,7 @@ FROM   civicrm_domain
       }
       $newObject->save();
       $newObject->copyCustomFields($object->id, $newObject->id);
-      CRM_Utils_Hook::post('create', CRM_Core_DAO_AllCoreTables::getBriefName($daoName), $newObject->id, $newObject);
+      CRM_Utils_Hook::post('create', CRM_Core_DAO_AllCoreTables::getBriefName(str_replace('_BAO_', '_DAO_', $daoName)), $newObject->id, $newObject);
     }
 
     return $newObject;
