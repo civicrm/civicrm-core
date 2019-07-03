@@ -1798,6 +1798,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->setCurrencySeparators(',');
     CRM_Core_PseudoConstant::flush('taxRates');
     System::singleton()->flushProcessors();
+    // @fixme this parameter is leaking - it should not be defined as a class static
+    // but for now we just handle in tear down.
+    CRM_Contribute_BAO_Query::$_contribOrSoftCredit = 'only contribs';
   }
 
   public function restoreDefaultPriceSetConfig() {
