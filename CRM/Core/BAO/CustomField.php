@@ -153,7 +153,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    */
   public static function create($params) {
     $transaction = new CRM_Core_Transaction();
-    $origParams = array_merge([], $params);
     $params = self::prepareCreate($params);
 
     $customField = new CRM_Core_DAO_CustomField();
@@ -165,7 +164,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     //create/drop the index when we toggle the is_searchable flag
     $op = empty($params['id']) ? 'add' : 'modify';
     if ($op !== 'modify') {
-      if (!isset($origParams['column_name'])) {
+      if ($params['is_append_field_id_to_column_name']) {
         $params['column_name'] .= "_{$customField->id}";
       }
       $customField->column_name = $params['column_name'];
@@ -1858,6 +1857,7 @@ WHERE  id IN ( %1, %2 )
   protected static function prepareCreate($params) {
     $op = empty($params['id']) ? 'create' : 'edit';
     CRM_Utils_Hook::pre($op, 'CustomField', CRM_Utils_Array::value('id', $params), $params);
+    $params['is_append_field_id_to_column_name'] = !isset($params['column_name']);
     if ($op === 'create') {
       CRM_Core_DAO::setCreateDefaults($params, self::getDefaults());
       if (!isset($params['column_name'])) {
