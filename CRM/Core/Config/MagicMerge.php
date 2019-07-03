@@ -241,10 +241,14 @@ class CRM_Core_Config_MagicMerge {
       case 'setting':
         return $this->getSettings()->get($name);
 
+      // The interpretation of 'path' and 'setting-path' is similar, except
+      // that the latter originates in a stored setting.
+      case 'path':
       case 'setting-path':
         // Array(0 => $type, 1 => $setting, 2 => $actions).
-        $value = $this->getSettings()->get($name);
-        $value = Civi::paths()->getPath($value);
+        $value = ($type === 'path')
+          ? Civi::paths()->getVariable($name, 'path')
+          : Civi::paths()->getPath($this->getSettings()->get($name));
         if ($value) {
           $value = CRM_Utils_File::addTrailingSlash($value);
           if (isset($this->map[$k][2]) && in_array('mkdir', $this->map[$k][2])) {
@@ -322,6 +326,7 @@ class CRM_Core_Config_MagicMerge {
       case 'setting':
       case 'setting-path':
       case 'setting-url':
+      case 'path':
       case 'user-system':
       case 'runtime':
       case 'callback':
