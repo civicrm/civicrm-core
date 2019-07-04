@@ -347,7 +347,7 @@ SELECT  id, html_type
         $form->_pId, 'contribution_id', 'participant_id'
       )
       ) {
-        $form->_online = TRUE;
+        $form->_online = !$form->isBackOffice;
       }
     }
 
