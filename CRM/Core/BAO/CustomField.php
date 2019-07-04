@@ -154,7 +154,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   public static function create($params) {
     $customField = self::createCustomFieldRecord($params);
     $op = empty($params['id']) ? 'add' : 'modify';
-    self::createField($customField, $op, CRM_Utils_Array::value('triggerRebuild', $params, TRUE));
+    self::createField($customField, $op);
 
     CRM_Utils_Hook::post(($op === 'add' ? 'create' : 'edit'), 'CustomField', $customField->id, $customField);
 
@@ -1692,9 +1692,8 @@ SELECT $columnName
    *
    * @param CRM_Core_DAO_CustomField $field
    * @param string $operation
-   * @param bool $triggerRebuild
    */
-  public static function createField($field, $operation, $triggerRebuild = TRUE) {
+  public static function createField($field, $operation) {
     $sql = str_repeat(' ', 8);
     $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $field->custom_group_id, 'table_name');
     $sql .= "ALTER TABLE " . $tableName;
@@ -1714,10 +1713,7 @@ SELECT $columnName
       }
     }
 
-    if ($triggerRebuild) {
-      Civi::service('sql_triggers')->rebuild($tableName, TRUE);
-    }
-
+    Civi::service('sql_triggers')->rebuild($tableName, TRUE);
   }
 
   /**

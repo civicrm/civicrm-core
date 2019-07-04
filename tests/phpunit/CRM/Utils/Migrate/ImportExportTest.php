@@ -137,7 +137,7 @@ class CRM_Utils_Migrate_ImportExportTest extends CiviUnitTestCase {
       // CustomGroup params
       array(
         'extends' => 'Activity',
-        'extends_entity_column_value' => array(array_search('Meeting', CRM_Core_PseudoConstant::activityType())),
+        'extends_entity_column_value' => [1],
         'title' => 'example',
       ),
       // CustomField params
