@@ -28,7 +28,9 @@
 {assign var='from' value=$from|default:'_low'}
 {assign var='to' value=$to|default:'_high'}
 
-  {$form.$relativeName.label}<br />
+  {if !$hideRelativeLabel}
+    {$form.$relativeName.label}<br />
+  {/if}
   {$form.$relativeName.html}<br />
   <span class="crm-absolute-date-range">
     <span class="crm-absolute-date-from">

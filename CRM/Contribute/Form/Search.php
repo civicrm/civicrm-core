@@ -109,6 +109,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       // Search field metadata is normally added in buildForm but we are bypassing that in this flow
       // (I've always found the flow kinda confusing & perhaps that is the problem but this mitigates)
       $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
+      $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
       $this->postProcess();
       $this->set('force', 0);
     }
@@ -169,6 +170,9 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
       CRM_Core_Error::deprecatedFunctionWarning('pass receive_date_high not end');
     }
     $this->_defaults = parent::setDefaultValues();
+
+    $this->_defaults = array_merge($this->getEntityDefaults('ContributionRecur'), $this->_defaults);
+
     if (empty($this->_defaults['contribution_status_id']) && !$this->_force) {
       // In force mode only parameters from the url will be used. When visible/ explicit this is a useful default.
       $this->_defaults['contribution_status_id'][1] = CRM_Core_PseudoConstant::getKey(

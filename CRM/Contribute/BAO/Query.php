@@ -160,13 +160,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $quoteValue = "\"$value\"";
     }
 
-    $recurrringFields = CRM_Contribute_BAO_ContributionRecur::getRecurringFields();
-    unset($recurrringFields['contribution_recur_payment_made']);
-    foreach ($recurrringFields as $dateField => $dateFieldTitle) {
-      if (self::buildDateWhere($values, $query, $name, $dateField, $dateFieldTitle)) {
-        return;
-      }
-    }
     // These are legacy names.
     // @todo enotices when these are hit so we can start to elimnate them.
     $fieldAliases = [
@@ -189,9 +182,10 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     $tableName = CRM_Utils_Array::value('table_name', $fieldSpec, 'civicrm_contribution');
     $dataType = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $fieldSpec));
     if ($dataType === 'Timestamp' || $dataType === 'Date') {
+      $title = empty($fieldSpec['unique_title']) ? $fieldSpec['title'] : $fieldSpec['unique_title'];
       $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
       $query->dateQueryBuilder($values,
-        $tableName, $fieldName, $fieldSpec['name'], $fieldSpec['title']
+        $tableName, $fieldName, $fieldSpec['name'], $title
       );
       return;
     }
@@ -949,6 +943,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
   public static function buildSearchForm(&$form) {
 
     $form->addSearchFieldMetadata(['Contribution' => self::getSearchFieldMetadata()]);
+    $form->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
     $form->addFormFieldsFromMetadata();
 
     $form->add('text', 'contribution_amount_low', ts('From'), ['size' => 8, 'maxlength' => 8]);
