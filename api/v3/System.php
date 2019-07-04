@@ -443,7 +443,7 @@ function civicrm_api3_system_createmissinglogtables() {
   $missingLogTables = $schema->getMissingLogTables();
   if (!empty($missingLogTables)) {
     foreach ($missingLogTables as $tableName) {
-      $schema->fixSchemaDifferencesFor($tableName, NULL, FALSE);
+      $schema->fixSchemaDifferencesFor($tableName);
     }
   }
   return civicrm_api3_create_success(1);

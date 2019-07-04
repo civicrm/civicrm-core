@@ -72,7 +72,7 @@ class CRM_Core_BAO_SchemaHandler {
     if (CRM_Core_Config::singleton()->logging) {
       // logging support
       $logging = new CRM_Logging_Schema();
-      $logging->fixSchemaDifferencesFor($params['name'], NULL, FALSE);
+      $logging->fixSchemaDifferencesFor($params['name']);
     }
 
     // always do a trigger rebuild for this table
@@ -311,7 +311,7 @@ ALTER TABLE {$tableName}
       // Are there any modifies we DON'T was to call this function for (& shouldn't it be clever enough to cope?)
       if ($params['operation'] == 'add' || $params['operation'] == 'modify') {
         $logging = new CRM_Logging_Schema();
-        $logging->fixSchemaDifferencesFor($params['table_name'], [trim(strtoupper($params['operation'])) => [$params['name']]], FALSE);
+        $logging->fixSchemaDifferencesFor($params['table_name'], [trim(strtoupper($params['operation'])) => [$params['name']]]);
       }
     }
 

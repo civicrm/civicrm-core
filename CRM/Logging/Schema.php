@@ -430,12 +430,10 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    *   name of the relevant table.
    * @param array $cols
    *   Mixed array of columns to add or null (to check for the missing columns).
-   * @param bool $rebuildTrigger
-   *   should we rebuild the triggers.
    *
    * @return bool
    */
-  public function fixSchemaDifferencesFor($table, $cols = [], $rebuildTrigger = FALSE) {
+  public function fixSchemaDifferencesFor($table, $cols = []) {
     if (empty($table)) {
       return FALSE;
     }
@@ -469,10 +467,6 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       }
     }
 
-    if ($rebuildTrigger) {
-      // invoke the meta trigger creation call
-      CRM_Core_DAO::triggerRebuild($table);
-    }
     return TRUE;
   }
 
@@ -523,7 +517,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
     }
 
     foreach ($diffs as $table => $cols) {
-      $this->fixSchemaDifferencesFor($table, $cols, FALSE);
+      $this->fixSchemaDifferencesFor($table, $cols);
     }
     if ($rebuildTrigger) {
       // invoke the meta trigger creation call
