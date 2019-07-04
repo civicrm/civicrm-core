@@ -542,7 +542,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         $from = " $side JOIN civicrm_contribution ON civicrm_contribution.contact_id = contact_a.id ";
         if (in_array(self::$_contribOrSoftCredit, ["only_scredits", "both_related", "both"])) {
           // switch the from table if its only soft credit search
-          $from = " $side JOIN contribution_search_scredit_combined ON contribution_search_scredit_combined.contact_id = contact_a.id ";
+          $from = " $side JOIN " . \Civi::$statics[__CLASS__]['soft_credit_temp_table_name'] . " as contribution_search_scredit_combined ON contribution_search_scredit_combined.contact_id = contact_a.id ";
           $from .= " $side JOIN civicrm_contribution ON civicrm_contribution.id = contribution_search_scredit_combined.id ";
           $from .= " $side JOIN civicrm_contribution_soft ON civicrm_contribution_soft.id = contribution_search_scredit_combined.scredit_id";
         }
@@ -695,7 +695,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    * @return bool
    */
   public static function isSoftCreditOptionEnabled($queryParams = []) {
-    static $tempTableFilled = FALSE;
     if (!empty($queryParams)) {
       foreach (array_keys($queryParams) as $id) {
         if (empty($queryParams[$id][0])) {
@@ -708,20 +707,20 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     }
     if (in_array(self::$_contribOrSoftCredit,
       ["only_scredits", "both_related", "both"])) {
-      if (!$tempTableFilled) {
+      if (!isset(\Civi::$statics[__CLASS__]['soft_credit_temp_table_name'])) {
         // build a temp table which is union of contributions and soft credits
         // note: group-by in first part ensures uniqueness in counts
-        $tempQuery = "
-            CREATE TEMPORARY TABLE IF NOT EXISTS contribution_search_scredit_combined AS
+        $tempQuery = '
                SELECT con.id as id, con.contact_id, cso.id as filter_id, NULL as scredit_id
                  FROM civicrm_contribution con
             LEFT JOIN civicrm_contribution_soft cso ON con.id = cso.contribution_id
              GROUP BY id, contact_id, scredit_id, cso.id
             UNION ALL
                SELECT scredit.contribution_id as id, scredit.contact_id, scredit.id as filter_id, scredit.id as scredit_id
-                 FROM civicrm_contribution_soft as scredit";
-        CRM_Core_DAO::executeQuery($tempQuery);
-        $tempTableFilled = TRUE;
+                 FROM civicrm_contribution_soft as scredit';
+        \Civi::$statics[__CLASS__]['soft_credit_temp_table_name'] = CRM_Utils_SQL_TempTable::build()->createWithQuery(
+          $tempQuery
+        )->getName();
       }
       return TRUE;
     }
