@@ -2730,7 +2730,7 @@ AND       civicrm_openid.is_primary = 1";
 
       case 'group':
 
-        return CRM_Contact_BAO_GroupContact::getContactGroup($contactId, "Added", NULL, TRUE);
+        return CRM_Contact_BAO_GroupContact::getContactGroup($contactId, "Added", NULL, TRUE, FALSE, FALSE, TRUE, NULL, TRUE);
 
       case 'log':
         if (CRM_Core_BAO_Log::useLoggingReport()) {
