@@ -392,6 +392,10 @@
   organization: JMA Consulting
   jira        : edsel
 
+- github      : edvanleeuwen
+  name        : Ed van Leeuwen
+  organization: Centrale Organisatie van Voetbal Scheidsrechters (COVS)
+
 - github      : eileenmcnaughton
   name        : Eileen McNaughton
   organization: Wikimedia Foundation
@@ -486,6 +490,8 @@
 - github      : galgeek
   name        : Barbara Miller
   jira        : galgeek
+
+- github      : gareth-circle
 
 - github      : garethdylan361
   name        : Gareth Small
@@ -1505,6 +1511,10 @@
 - name        : Milli Aje
   organization: Debre-Genet Holy Trinity Ethiopian Orthodox Tewahedo Church
   jira        : 'website@dght.uk'
+
+- github      : wadelson
+  organization: Webstanz
+  name:       : Adelson
 
 - github      : wdecraene
   organization: Wim De Craene
