@@ -836,6 +836,21 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook allows modification of the admin panels
+   *
+   * @param array $panels
+   *   Associated array of admin panels
+   *
+   * @return mixed
+   */
+  public static function alterAdminPanel(&$panels) {
+    return self::singleton()->invoke(array('panels'), $panels,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_alterAdminPanel'
+    );
+  }
+
+  /**
    * This hook is called when sending an email / printing labels to get the values for all the
    * tokens returned by the 'tokens' hook
    *
