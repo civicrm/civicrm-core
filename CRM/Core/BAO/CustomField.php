@@ -1682,60 +1682,7 @@ SELECT $columnName
    * @param bool $triggerRebuild
    */
   public static function createField($field, $operation, $indexExist = FALSE, $triggerRebuild = TRUE) {
-    $tableName = CRM_Core_DAO::getFieldValue(
-      'CRM_Core_DAO_CustomGroup',
-      $field->custom_group_id,
-      'table_name'
-    );
-
-    $params = array(
-      'table_name' => $tableName,
-      'operation' => $operation,
-      'name' => $field->column_name,
-      'type' => CRM_Core_BAO_CustomValueTable::fieldToSQLType(
-        $field->data_type,
-        $field->text_length
-      ),
-      'required' => $field->is_required,
-      'searchable' => $field->is_searchable,
-    );
-
-    if ($operation == 'delete') {
-      $fkName = "{$tableName}_{$field->column_name}";
-      if (strlen($fkName) >= 48) {
-        $fkName = substr($fkName, 0, 32) . '_' . substr(md5($fkName), 0, 16);
-      }
-      $params['fkName'] = $fkName;
-    }
-    if ($field->data_type == 'Country' && $field->html_type == 'Select Country') {
-      $params['fk_table_name'] = 'civicrm_country';
-      $params['fk_field_name'] = 'id';
-      $params['fk_attributes'] = 'ON DELETE SET NULL';
-    }
-    elseif ($field->data_type == 'Country' && $field->html_type == 'Multi-Select Country') {
-      $params['type'] = 'varchar(255)';
-    }
-    elseif ($field->data_type == 'StateProvince' && $field->html_type == 'Select State/Province') {
-      $params['fk_table_name'] = 'civicrm_state_province';
-      $params['fk_field_name'] = 'id';
-      $params['fk_attributes'] = 'ON DELETE SET NULL';
-    }
-    elseif ($field->data_type == 'StateProvince' && $field->html_type == 'Multi-Select State/Province') {
-      $params['type'] = 'varchar(255)';
-    }
-    elseif ($field->data_type == 'File') {
-      $params['fk_table_name'] = 'civicrm_file';
-      $params['fk_field_name'] = 'id';
-      $params['fk_attributes'] = 'ON DELETE SET NULL';
-    }
-    elseif ($field->data_type == 'ContactReference') {
-      $params['fk_table_name'] = 'civicrm_contact';
-      $params['fk_field_name'] = 'id';
-      $params['fk_attributes'] = 'ON DELETE SET NULL';
-    }
-    if (isset($field->default_value)) {
-      $params['default'] = "'{$field->default_value}'";
-    }
+    $params = self::prepareCreateParams($field, $operation);
 
     CRM_Core_BAO_SchemaHandler::alterFieldSQL($params, $indexExist, $triggerRebuild);
   }
@@ -2623,6 +2570,70 @@ WHERE cf.id = %1 AND cg.is_multiple = 1";
         'labelColumn' => 'name',
       );
     }
+  }
+
+  /**
+   * @param CRM_Core_DAO_CustomField $field
+   * @param 'add|modify' $operation
+   *
+   * @return array
+   */
+  protected static function prepareCreateParams($field, $operation) {
+    $tableName = CRM_Core_DAO::getFieldValue(
+      'CRM_Core_DAO_CustomGroup',
+      $field->custom_group_id,
+      'table_name'
+    );
+
+    $params = [
+      'table_name' => $tableName,
+      'operation' => $operation,
+      'name' => $field->column_name,
+      'type' => CRM_Core_BAO_CustomValueTable::fieldToSQLType(
+        $field->data_type,
+        $field->text_length
+      ),
+      'required' => $field->is_required,
+      'searchable' => $field->is_searchable,
+    ];
+
+    if ($operation == 'delete') {
+      $fkName = "{$tableName}_{$field->column_name}";
+      if (strlen($fkName) >= 48) {
+        $fkName = substr($fkName, 0, 32) . '_' . substr(md5($fkName), 0, 16);
+      }
+      $params['fkName'] = $fkName;
+    }
+    if ($field->data_type == 'Country' && $field->html_type == 'Select Country') {
+      $params['fk_table_name'] = 'civicrm_country';
+      $params['fk_field_name'] = 'id';
+      $params['fk_attributes'] = 'ON DELETE SET NULL';
+    }
+    elseif ($field->data_type == 'Country' && $field->html_type == 'Multi-Select Country') {
+      $params['type'] = 'varchar(255)';
+    }
+    elseif ($field->data_type == 'StateProvince' && $field->html_type == 'Select State/Province') {
+      $params['fk_table_name'] = 'civicrm_state_province';
+      $params['fk_field_name'] = 'id';
+      $params['fk_attributes'] = 'ON DELETE SET NULL';
+    }
+    elseif ($field->data_type == 'StateProvince' && $field->html_type == 'Multi-Select State/Province') {
+      $params['type'] = 'varchar(255)';
+    }
+    elseif ($field->data_type == 'File') {
+      $params['fk_table_name'] = 'civicrm_file';
+      $params['fk_field_name'] = 'id';
+      $params['fk_attributes'] = 'ON DELETE SET NULL';
+    }
+    elseif ($field->data_type == 'ContactReference') {
+      $params['fk_table_name'] = 'civicrm_contact';
+      $params['fk_field_name'] = 'id';
+      $params['fk_attributes'] = 'ON DELETE SET NULL';
+    }
+    if (isset($field->default_value)) {
+      $params['default'] = "'{$field->default_value}'";
+    }
+    return $params;
   }
 
 }
