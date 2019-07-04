@@ -1650,9 +1650,47 @@ SELECT $columnName
    * @param bool $triggerRebuild
    */
   public static function createField($field, $operation, $indexExist = FALSE, $triggerRebuild = TRUE) {
-    $params = self::prepareCreateParams($field, $operation);
+    $params = [
+      'table_name' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $field->custom_group_id, 'table_name'),
+    ];
+    $sql = str_repeat(' ', 8);
+    $sql .= "ALTER TABLE {$params['table_name']}";
+    $sql .= self::getAlterFieldSQL($field, $operation, $params, $indexExist);
 
-    CRM_Core_BAO_SchemaHandler::alterFieldSQL($params, $indexExist, $triggerRebuild);
+    // CRM-7007: do not i18n-rewrite this query
+    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
+
+    $config = CRM_Core_Config::singleton();
+    if ($config->logging) {
+      // CRM-16717 not sure why this was originally limited to add.
+      // For example custom tables can have field length changes - which need to flow through to logging.
+      // Are there any modifies we DON'T was to call this function for (& shouldn't it be clever enough to cope?)
+      if ($operation == 'add' || $operation == 'modify') {
+        $logging = new CRM_Logging_Schema();
+        $logging->fixSchemaDifferencesFor($params['table_name'], [trim(strtoupper($operation)) => [$params['name']]]);
+      }
+    }
+
+    if ($triggerRebuild) {
+      Civi::service('sql_triggers')->rebuild($params['table_name'], TRUE);
+    }
+
+  }
+
+  /**
+   * @param CRM_Core_DAO_CustomField $field
+   * @param string $operation
+   * @param array $params
+   * @param bool $indexExist
+   *
+   * @return bool
+   */
+  public static function getAlterFieldSQL($field, $operation, &$params, $indexExist = FALSE) {
+    $params = self::prepareCreateParams($field, $operation);
+    // lets suppress the required flag, since that can cause sql issue
+    $params['required'] = FALSE;
+
+    return CRM_Core_BAO_SchemaHandler::getFieldAlterSQL($params, $indexExist);
   }
 
   /**
