@@ -3891,6 +3891,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       'In Progress' => ['Cancelled', 'Completed', 'Failed'],
       'Refunded' => ['Cancelled', 'Completed'],
       'Partially paid' => ['Completed'],
+      'Pending refund' => ['Completed', 'Refunded'],
     ];
 
     if (!in_array($contributionStatuses[$fields['contribution_status_id']],
@@ -4013,6 +4014,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     elseif ($paymentType == 'refund') {
       $trxnsData['total_amount'] = -$trxnsData['total_amount'];
       $trxnsData['participant_id'] = $participantId;
+      $trxnsData['contribution_id'] = $contributionId;
       return civicrm_api3('Payment', 'create', $trxnsData)['id'];
     }
   }
