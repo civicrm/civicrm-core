@@ -258,7 +258,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $this->_id = NULL;
     }
     else {
-      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive');
+      $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     }
 
     if ($this->_id) {
@@ -594,9 +594,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
-    if ($this->_id) {
-      $this->add('hidden', 'id', $this->_id);
-    }
 
     $participantStatuses = CRM_Event_PseudoConstant::participantStatus();
     $partiallyPaidStatusId = array_search('Partially paid', $participantStatuses);
