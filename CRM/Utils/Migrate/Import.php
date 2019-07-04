@@ -386,6 +386,7 @@ AND        v.name = %1
 
         // Only rebuild the table's trigger on the last field added to avoid un-necessary
         // and slow rebuilds when adding many fields at the same time.
+        // @todo - call bulkSave instead.
         $triggerRebuild = FALSE;
         if ($count == $total) {
           $triggerRebuild = TRUE;
