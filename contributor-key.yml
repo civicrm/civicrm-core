@@ -88,7 +88,6 @@
   jira        : andrimont
 
 - name        : Andrew Walker
-  organization: Circle Interactive
   jira        : andyw
 
 - github      : aniesshsethh
@@ -229,9 +228,6 @@
 
 - name        : Christophe Golle
   jira        : christophe.golle@gmail.com
-
-- github      : marsh-circle
-  name        : Clare Marsh
 
 - github      : clnlf
   name        : Carlos Loeza
@@ -492,6 +488,8 @@
   jira        : galgeek
 
 - github      : gareth-circle
+  name        : Gareth Hodgkinson
+  organization: Circle Interactive
 
 - github      : garethdylan361
   name        : Gareth Small
@@ -758,9 +756,9 @@
 - github      : kerasai
   name        : Will Long
 
-- github      : kirk-jackson
+- github      : kirk-circle
   name        : Kirk Jackson
-  organization: Campaign Against Arms Trade
+  organization: Circle Interactive
   jira        : kirk
 
 - github      : kngs
@@ -890,8 +888,7 @@
   jira        : manish
 
 - github      : marsh-circle
-
-- name        : Martin Castle
+  name        : Martin Castle
   organization: Circle Interactive
   jira        : marshCircle
 
@@ -1160,6 +1157,7 @@
 - github      : pradpnayak
   name        : Pradeep Nayak
   jira        : pradeep.nayak
+  organization: Circle Interactive
 
 - github      : pratik-joshi
   name        : Pratik Joshi
