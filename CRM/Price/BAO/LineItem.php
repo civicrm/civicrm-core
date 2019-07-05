@@ -832,19 +832,24 @@ WHERE li.contribution_id = %1";
         $financialItemsArray[$updateFinancialItemInfoValues['entity_id']] = $updateFinancialItemInfoValues;
       }
       // INSERT a financial item to record surplus/lesser amount when a text price fee is changed
-      elseif (!empty($lineItemsToUpdate) &&
-      $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['html_type'] == 'Text' &&
-      $updateFinancialItemInfoValues['amount'] > 0
+      elseif (
+        !empty($lineItemsToUpdate)
+        && isset($lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']])
+        && $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['html_type'] == 'Text'
+        && $updateFinancialItemInfoValues['amount'] > 0
       ) {
-        // calculate the amount difference, considered as financial item amount
-        $updateFinancialItemInfoValues['amount'] = $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['line_total'] - $totalFinancialAmount;
-        // add a flag, later used to link financial trxn and this new financial item
-        $updateFinancialItemInfoValues['link-financial-trxn'] = TRUE;
-        if ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']) {
-          $updateFinancialItemInfoValues['tax']['amount'] = $lineItemsToUpdate[$updateFinancialItemInfoValues['entity_id']]['tax_amount'] - $previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount'];
-          $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
+        $amountChangeOnTextLineItem = $lineItemsToUpdate[$updateFinancialItemInfoValues['price_field_value_id']]['line_total'] - $totalFinancialAmount;
+        if ($amountChangeOnTextLineItem !== (float) 0) {
+          // calculate the amount difference, considered as financial item amount
+          $updateFinancialItemInfoValues['amount'] = $amountChangeOnTextLineItem;
+          // add a flag, later used to link financial trxn and this new financial item
+          $updateFinancialItemInfoValues['link-financial-trxn'] = TRUE;
+          if ($previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount']) {
+            $updateFinancialItemInfoValues['tax']['amount'] = $lineItemsToUpdate[$updateFinancialItemInfoValues['entity_id']]['tax_amount'] - $previousLineItems[$updateFinancialItemInfoValues['entity_id']]['tax_amount'];
+            $updateFinancialItemInfoValues['tax']['description'] = $this->getSalesTaxTerm();
+          }
+          $financialItemsArray[$updateFinancialItemInfoValues['entity_id']] = $updateFinancialItemInfoValues;
         }
-        $financialItemsArray[$updateFinancialItemInfoValues['entity_id']] = $updateFinancialItemInfoValues;
       }
     }
 

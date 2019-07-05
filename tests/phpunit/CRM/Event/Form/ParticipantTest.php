@@ -115,6 +115,58 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * (dev/core#310) : Test to ensure payments are correctly allocated, when a event fee is changed for a mult-line item event registration
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testPaymentAllocationOnMultiLineItemEvent() {
+    // USE-CASE :
+    // 1. Create a Price set with two price fields
+    // 2. Register for a Event using both the price field A($55 - qty 1) and B($10 - qty 1)
+    // 3. Now after registration, edit the participant, change the fee of price B from $10 to $50 (i.e. change qty from 1 to 5)
+    // 4. After submission check that related contribution's status is changed to 'Partially Paid'
+    // 5. Record the additional amount which $40 ($50-$10)
+    // Expected : Check the amount of new Financial Item created is $40
+    $this->createParticipantRecordsFromTwoFieldPriceSet();
+    $priceSetBlock = CRM_Price_BAO_PriceSet::getSetDetail($this->_ids['price_set'], TRUE, FALSE)[$this->_ids['price_set']]['fields'];;
+
+    $priceSetParams = [
+      'priceSetId' => $this->_ids['price_set'],
+      // The 1 & 5 refer to qty as they are text fields.
+      'price_' . $this->_ids['price_field']['first_text_field'] => 5,
+      'price_' . $this->_ids['price_field']['second_text_field'] => 1,
+    ];
+    $participant = $this->callAPISuccess('Participant', 'get', []);
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($participant['id'], 'participant');
+    $contribution = $this->callAPISuccessGetSingle('Contribution', []);
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participant['id'], 'participant', $contribution['id'], $priceSetBlock, $lineItem);
+
+    $financialItems = $this->callAPISuccess('FinancialItem', 'get', [])['values'];
+    $sum = 0;
+    foreach ($financialItems as $financialItem) {
+      $sum += $financialItem['amount'];
+    }
+    $this->assertEquals(105, $sum);
+    $this->assertEquals(3, count($financialItems));
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', []);
+    $this->assertEquals('Partially paid', $contribution['contribution_status']);
+
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contribution['id'],
+      'participant_id' => $participant['id'],
+      'total_amount' => 40.00,
+      'currency' => 'USD',
+      'payment_instrument_id' => 'Check',
+      'check_number' => '#123',
+    ]);
+
+    $result = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_table' => 'civicrm_financial_item', 'sequential' => 1, 'return' => ['entity_table', 'amount']])['values'];
+    // @todo check the values assigned to these as part of fixing dev/financial#34
+  }
+
+  /**
    * Initial test of submit function.
    *
    * @param string $thousandSeparator
@@ -234,8 +286,9 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @param array $eventParams
    *
    * @return CRM_Event_Form_Participant
+   * @throws \CRM_Core_Exception
    */
-  protected function getForm($eventParams = array()) {
+  protected function getForm($eventParams = []) {
     if (!empty($eventParams['is_monetary'])) {
       $event = $this->eventCreatePaid($eventParams);
     }
@@ -244,6 +297,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     }
 
     $contactID = $this->individualCreate();
+    /** @var CRM_Event_Form_Participant $form*/
     $form = $this->getFormObject('CRM_Event_Form_Participant');
     $form->_single = TRUE;
     $form->_contactID = $form->_contactId = $contactID;
@@ -251,10 +305,108 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     $form->_eventId = $event['id'];
     if (!empty($eventParams['is_monetary'])) {
       $form->_bltID = 5;
-      $form->_values['fee'] = array();
+      $form->_values['fee'] = [];
       $form->_isPaidEvent = TRUE;
     }
     return $form;
+  }
+
+  /**
+   * Create a Price set with two price field of type Text.
+   *
+   * Financial Type:  'Event Fee' and 'Event Fee 2' respectively.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function createParticipantRecordsFromTwoFieldPriceSet() {
+    // Create financial type - Event Fee 2
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
+
+    $textFieldsToCreate = [['amount' => 10, 'label' => 'First Text field'], ['amount' => 55, 'label' => 'Second Text field']];
+    foreach ($textFieldsToCreate as $fieldToCreate) {
+      $fieldParams = [
+        'option_label' => ['1' => 'Price Field'],
+        'option_value' => ['1' => $fieldToCreate['amount']],
+        'option_name' => ['1' => $fieldToCreate['amount']],
+        'option_amount' => ['1' => $fieldToCreate['amount']],
+        'option_weight' => ['1' => $fieldToCreate['amount']],
+        'is_display_amounts' => 1,
+        'price_set_id' => $this->_ids['price_set'],
+        'is_enter_qty' => 1,
+        'html_type' => 'Text',
+        'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Campaign Contribution'),
+      ];
+      $fieldParams['label'] = $fieldToCreate['label'];
+      $fieldParams['name'] = CRM_Utils_String::titleToVar($fieldToCreate['label']);
+      $fieldParams['price'] = $fieldToCreate['amount'];
+      $this->_ids['price_field'][strtolower(CRM_Utils_String::titleToVar($fieldToCreate['label']))] = $textPriceFieldID = $this->callAPISuccess('PriceField', 'create', $fieldParams)['id'];
+      $this->_ids['price_field_value'][strtolower(CRM_Utils_String::titleToVar($fieldToCreate['label']))]  = (int) $this->callAPISuccess('PriceFieldValue', 'getsingle', ['price_field_id' => $textPriceFieldID])['id'];
+    }
+
+    $form->_lineItem = [
+      0 => [
+        13 => [
+          'price_field_id' => $this->_ids['price_field']['second_text_field'],
+          'price_field_value_id' => $this->_ids['price_field_value']['second_text_field'],
+          'label' => 'Event Fee 1',
+          'field_title' => 'Event Fee 1',
+          'description' => NULL,
+          'qty' => 1,
+          'unit_price' => 55.00,
+          'line_total' => 55.,
+          'participant_count' => 0,
+          'max_value' => NULL,
+          'membership_type_id' => NULL,
+          'membership_num_terms' => NULL,
+          'auto_renew' => NULL,
+          'html_type' => 'Text',
+          'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Campaign Contribution'),
+          'tax_amount' => NULL,
+          'non_deductible_amount' => '0.00',
+        ],
+        14 => [
+          'price_field_id' => $this->_ids['price_field']['first_text_field'],
+          'price_field_value_id' => $this->_ids['price_field_value']['first_text_field'],
+          'label' => 'Event Fee 2',
+          'field_title' => 'Event Fee 2',
+          'description' => NULL,
+          'qty' => 1,
+          'unit_price' => 10.00,
+          'line_total' => 10,
+          'participant_count' => 0,
+          'max_value' => NULL,
+          'membership_type_id' => NULL,
+          'membership_num_terms' => NULL,
+          'auto_renew' => NULL,
+          'html_type' => 'Text',
+          'financial_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'financial_type_id', 'Campaign Contribution'),
+          'tax_amount' => NULL,
+          'non_deductible_amount' => '0.00',
+        ],
+      ],
+    ];
+    $form->setAction(CRM_Core_Action::ADD);
+    $form->_priceSetId = $this->_ids['price_set'];
+
+    $form->submit([
+      'register_date' => date('Ymd'),
+      'receive_date' => '2018-09-01',
+      'status_id' => 5,
+      'role_id' => 1,
+      'event_id' => $form->_eventId,
+      'priceSetId' => $this->_ids['price_set'],
+      'price_' . $this->_ids['price_field']['first_text_field'] => [$this->_ids['price_field_value']['first_text_field'] => 1],
+      'price_' . $this->_ids['price_field']['second_text_field'] => [$this->_ids['price_field_value']['second_text_field'] => 1],
+      'amount_level' => 'Too much',
+      'fee_amount' => 65,
+      'total_amount' => 65,
+      'payment_processor_id' => 0,
+      'record_contribution' => TRUE,
+      'financial_type_id' => 1,
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
+    ]);
   }
 
 }
