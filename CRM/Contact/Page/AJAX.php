@@ -724,7 +724,7 @@ LIMIT {$offset}, {$rowCount}
       foreach ($_REQUEST['order'] as $orderInfo) {
         if (!empty($orderInfo['column'])) {
           $orderColumnNumber = $orderInfo['column'];
-          $dir = $orderInfo['dir'];
+          $dir = CRM_Utils_Type::escape($orderInfo['dir'], 'MysqlOrderByDirection', FALSE);
         }
       }
       $columnDetails = CRM_Utils_Array::value($orderColumnNumber, $_REQUEST['columns']);
