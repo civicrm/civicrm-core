@@ -759,6 +759,22 @@ MODIFY      {$columnName} varchar( $length )
   public static function buildFieldChangeSql($params, $indexExist) {
     $sql = str_repeat(' ', 8);
     $sql .= "ALTER TABLE {$params['table_name']}";
+    return $sql . self::getFieldAlterSQL($params, $indexExist);
+  }
+
+  /**
+   * Get the sql to alter an individual field.
+   *
+   * This will need to have an ALTER TABLE statement appended but by getting
+   * by individual field we can do one or many.
+   *
+   * @param array $params
+   * @param bool $indexExist
+   *
+   * @return string
+   */
+  public static function getFieldAlterSQL($params, $indexExist) {
+    $sql = '';
     switch ($params['operation']) {
       case 'add':
         $separator = "\n";
