@@ -305,7 +305,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     $hasLocationTypes = [];
     $hasRelationTypes = [];
-    $fields = [];
 
     //get the saved mapping details
 
@@ -346,49 +345,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       );
     }
 
-    $contactType = ['Individual', 'Household', 'Organization'];
-    foreach ($contactType as $value) {
-      if ($mappingType == 'Search Builder') {
-        // get multiple custom group fields in this context
-        $contactFields = CRM_Contact_BAO_Contact::exportableFields($value, FALSE, FALSE, FALSE, TRUE);
-      }
-      else {
-        $contactFields = CRM_Contact_BAO_Contact::exportableFields($value, FALSE, TRUE);
-      }
-      $contactFields = array_merge($contactFields, CRM_Contact_BAO_Query_Hook::singleton()->getFields());
-
-      // exclude the address options disabled in the Address Settings
-      $fields[$value] = CRM_Core_BAO_Address::validateAddressOptions($contactFields);
-      ksort($fields[$value]);
-      if ($mappingType == 'Export') {
-        $relationships = [];
-        $relationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $value, TRUE);
-        asort($relationshipTypes);
-
-        foreach ($relationshipTypes as $key => $var) {
-          list($type) = explode('_', $key);
-
-          $relationships[$key]['title'] = $var;
-          $relationships[$key]['headerPattern'] = '/' . preg_quote($var, '/') . '/';
-          $relationships[$key]['export'] = TRUE;
-          $relationships[$key]['relationship_type_id'] = $type;
-          $relationships[$key]['related'] = TRUE;
-          $relationships[$key]['hasRelationType'] = 1;
-        }
-
-        if (!empty($relationships)) {
-          $fields[$value] = array_merge($fields[$value],
-            ['related' => ['title' => ts('- related contact info -')]],
-            $relationships
-          );
-        }
-      }
-    }
-
-    //get the current employer for mapping.
-    if ($mappingType == 'Export') {
-      $fields['Individual']['current_employer_id']['title'] = ts('Current Employer ID');
-    }
+    $fields = self::getBasicFields($mappingType);
 
     // add component fields
     $compArray = [];
@@ -589,7 +546,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       if ($key) {
         // sort everything BUT the contactType which is sorted separately by
         // an initial commit of CRM-13278 (check ksort above)
-        if (!in_array($key, $contactType)) {
+        if (!in_array($key, ['Individual', 'Household', 'Organization'])) {
           asort($mapperFields[$key]);
         }
         $sel2[$key] = ['' => ts('- select field -')] + $mapperFields[$key];
@@ -960,6 +917,59 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     $form->setDefaults($defaults);
 
     $form->setDefaultAction('refresh');
+  }
+
+  /**
+   * @param string $mappingType
+   * @return array
+   */
+  public static function getBasicFields($mappingType) {
+    $contactTypes = ['Individual', 'Household', 'Organization'];
+    $fields = [];
+    foreach ($contactTypes as $contactType) {
+      if ($mappingType == 'Search Builder') {
+        // Get multiple custom group fields in this context
+        $contactFields = CRM_Contact_BAO_Contact::exportableFields($contactType, FALSE, FALSE, FALSE, TRUE);
+      }
+      else {
+        $contactFields = CRM_Contact_BAO_Contact::exportableFields($contactType, FALSE, TRUE);
+      }
+      $contactFields = array_merge($contactFields, CRM_Contact_BAO_Query_Hook::singleton()->getFields());
+
+      // Exclude the address options disabled in the Address Settings
+      $fields[$contactType] = CRM_Core_BAO_Address::validateAddressOptions($contactFields);
+      ksort($fields[$contactType]);
+      if ($mappingType == 'Export') {
+        $relationships = [];
+        $relationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $contactType, TRUE);
+        asort($relationshipTypes);
+
+        foreach ($relationshipTypes as $key => $var) {
+          list($type) = explode('_', $key);
+
+          $relationships[$key]['title'] = $var;
+          $relationships[$key]['headerPattern'] = '/' . preg_quote($var, '/') . '/';
+          $relationships[$key]['export'] = TRUE;
+          $relationships[$key]['relationship_type_id'] = $type;
+          $relationships[$key]['related'] = TRUE;
+          $relationships[$key]['hasRelationType'] = 1;
+        }
+
+        if (!empty($relationships)) {
+          $fields[$contactType] = array_merge($fields[$contactType],
+            ['related' => ['title' => ts('- related contact info -')]],
+            $relationships
+          );
+        }
+      }
+    }
+
+    // Get the current employer for mapping.
+    if ($mappingType == 'Export') {
+      $fields['Individual']['current_employer_id']['title'] = ts('Current Employer ID');
+    }
+
+    return $fields;
   }
 
   /**
