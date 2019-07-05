@@ -347,19 +347,10 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     $fields = self::getBasicFields($mappingType);
 
-    // add component fields
-    $compArray = [];
-
-    //we need to unset groups, tags, notes for component export
+    // Unset groups, tags, notes for component export
     if ($exportMode != CRM_Export_Form_Select::CONTACT_EXPORT) {
-      foreach ([
-        'groups',
-        'tags',
-        'notes',
-      ] as $value) {
-        unset($fields['Individual'][$value]);
-        unset($fields['Household'][$value]);
-        unset($fields['Organization'][$value]);
+      foreach (array_keys($fields) as $type) {
+        CRM_Utils_Array::remove($fields[$type], 'groups', 'tags', 'notes');
       }
     }
 
@@ -384,6 +375,9 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
         ];
       }
     }
+
+    // add component fields
+    $compArray = [];
 
     if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::CONTRIBUTE_EXPORT)) {
       if (CRM_Core_Permission::access('CiviContribute')) {
@@ -451,44 +445,6 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT)) {
       $fields['Activity'] = CRM_Activity_BAO_Activity::exportableFields('Activity');
       $compArray['Activity'] = ts('Activity');
-    }
-
-    //Contact Sub Type For export
-    $contactSubTypes = [];
-    $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo();
-
-    foreach ($subTypes as $subType => $val) {
-      //adding subtype specific relationships CRM-5256
-      $csRelationships = [];
-
-      if ($mappingType == 'Export') {
-        $subTypeRelationshipTypes
-          = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $val['parent'],
-            FALSE, 'label', TRUE, $subType);
-
-        foreach ($subTypeRelationshipTypes as $key => $var) {
-          if (!array_key_exists($key, $fields[$val['parent']])) {
-            list($type) = explode('_', $key);
-
-            $csRelationships[$key]['title'] = $var;
-            $csRelationships[$key]['headerPattern'] = '/' . preg_quote($var, '/') . '/';
-            $csRelationships[$key]['export'] = TRUE;
-            $csRelationships[$key]['relationship_type_id'] = $type;
-            $csRelationships[$key]['related'] = TRUE;
-            $csRelationships[$key]['hasRelationType'] = 1;
-          }
-        }
-      }
-
-      $fields[$subType] = $fields[$val['parent']] + $csRelationships;
-
-      //custom fields for sub type
-      $subTypeFields = CRM_Core_BAO_CustomField::getFieldsForImport($subType);
-      $fields[$subType] += $subTypeFields;
-
-      if (!empty($subTypeFields) || !empty($csRelationships)) {
-        $contactSubTypes[$subType] = $val['label'];
-      }
     }
 
     foreach ($fields as $key => $value) {
@@ -967,6 +923,38 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     // Get the current employer for mapping.
     if ($mappingType == 'Export') {
       $fields['Individual']['current_employer_id']['title'] = ts('Current Employer ID');
+    }
+
+    // Contact Sub Type For export
+    $subTypes = CRM_Contact_BAO_ContactType::subTypeInfo();
+    foreach ($subTypes as $subType => $info) {
+      //adding subtype specific relationships CRM-5256
+      $csRelationships = [];
+
+      if ($mappingType == 'Export') {
+        $subTypeRelationshipTypes
+          = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $info['parent'],
+          FALSE, 'label', TRUE, $subType);
+
+        foreach ($subTypeRelationshipTypes as $key => $var) {
+          if (!array_key_exists($key, $fields[$info['parent']])) {
+            list($type) = explode('_', $key);
+
+            $csRelationships[$key]['title'] = $var;
+            $csRelationships[$key]['headerPattern'] = '/' . preg_quote($var, '/') . '/';
+            $csRelationships[$key]['export'] = TRUE;
+            $csRelationships[$key]['relationship_type_id'] = $type;
+            $csRelationships[$key]['related'] = TRUE;
+            $csRelationships[$key]['hasRelationType'] = 1;
+          }
+        }
+      }
+
+      $fields[$subType] = $fields[$info['parent']] + $csRelationships;
+
+      //custom fields for sub type
+      $subTypeFields = CRM_Core_BAO_CustomField::getFieldsForImport($subType);
+      $fields[$subType] += $subTypeFields;
     }
 
     return $fields;
