@@ -5718,7 +5718,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ],
       $options['prefix'] . 'postal_code_suffix' => [
         'title' => $options['prefix_label'] . ts('Postal Code Suffix'),
-        'name' => 'postal_code',
+        'name' => 'postal_code_suffix',
         'type' => 1,
         'is_fields' => TRUE,
         'is_filters' => TRUE,
