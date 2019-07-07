@@ -39,6 +39,7 @@
  *
  * @return array
  *   Array of financial transactions which are payments, if error an array with an error id and error message
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_payment_get($params) {
   $financialTrxn = [];
@@ -47,27 +48,41 @@ function civicrm_api3_payment_get($params) {
     $limit = CRM_Utils_Array::value('limit', $params['options']);
   }
   $params['options']['limit'] = 0;
-  $eft = civicrm_api3('EntityFinancialTrxn', 'get', $params);
-  if (!empty($eft['values'])) {
-    $eftIds = [];
-    foreach ($eft['values'] as $efts) {
-      if (empty($efts['financial_trxn_id'])) {
-        continue;
+
+  $ftParams['is_payment'] = 1;
+  if ($limit) {
+    $ftParams['options']['limit'] = $limit;
+  }
+
+  if (!empty($params['trxn_id'])) {
+    $ftParams['trxn_id'] = $params['trxn_id'];
+    $financialTrxn = civicrm_api3('FinancialTrxn', 'get', $ftParams);
+    if (!empty($financialTrxn['count'])) {
+      $financialTrxnIDs = CRM_Utils_Array::collect('id', CRM_Utils_Array::value('values', $financialTrxn));
+      $params['financial_trxn_id'] = ['IN' => $financialTrxnIDs];
+      $eft = civicrm_api3('EntityFinancialTrxn', 'get', $params);
+      foreach ($eft['values'] as $eftID => $eftValues) {
+        $financialTrxn['values'][$eftValues['financial_trxn_id']]['contribution_id'] = $eftValues['entity_id'];
       }
-      $eftIds[] = $efts['financial_trxn_id'];
-      $map[$efts['financial_trxn_id']] = $efts['entity_id'];
     }
-    if (!empty($eftIds)) {
-      $ftParams = [
-        'id' => ['IN' => $eftIds],
-        'is_payment' => 1,
-      ];
-      if ($limit) {
-        $ftParams['options']['limit'] = $limit;
+  }
+  else {
+    $eft = civicrm_api3('EntityFinancialTrxn', 'get', $params);
+    if (!empty($eft['values'])) {
+      $eftIds = [];
+      foreach ($eft['values'] as $efts) {
+        if (empty($efts['financial_trxn_id'])) {
+          continue;
+        }
+        $eftIds[] = $efts['financial_trxn_id'];
+        $map[$efts['financial_trxn_id']] = $efts['entity_id'];
       }
-      $financialTrxn = civicrm_api3('FinancialTrxn', 'get', $ftParams);
-      foreach ($financialTrxn['values'] as &$values) {
-        $values['contribution_id'] = $map[$values['id']];
+      if (!empty($eftIds)) {
+        $ftParams['id'] = ['IN' => $eftIds];
+        $financialTrxn = civicrm_api3('FinancialTrxn', 'get', $ftParams);
+        foreach ($financialTrxn['values'] as &$values) {
+          $values['contribution_id'] = $map[$values['id']];
+        }
       }
     }
   }
@@ -209,6 +224,10 @@ function _civicrm_api3_payment_get_spec(&$params) {
       'title' => 'Entity ID',
       'type' => CRM_Utils_Type::T_INT,
       'api.aliases' => ['contribution_id'],
+    ],
+    'trxn_id' => [
+      'title' => 'Transaction ID',
+      'type' => CRM_Utils_Type::T_STRING,
     ],
   ];
 }

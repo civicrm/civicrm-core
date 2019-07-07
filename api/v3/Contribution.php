@@ -267,6 +267,22 @@ function civicrm_api3_contribution_get($params) {
 
   // Get the contributions based on parameters passed in
   $contributions = _civicrm_api3_get_using_query_object('Contribution', $params, $additionalOptions, NULL, $mode, $returnProperties);
+
+  // If we have a trxn_id check payments for that transaction ID and also return any contributions associated with those payments
+  // An additional array property "payment_trxn_id" will be available containing all found trxn_ids (eg. if you did ['LIKE' => 'test124%'])
+  if (!empty($params['trxn_id'])) {
+    $payments = civicrm_api3('Payment', 'get', $params);
+    if (!empty($payments['count'])) {
+      foreach ($payments['values'] as $paymentID => $paymentValues) {
+        if (empty($contributions[$paymentValues['contribution_id']])) {
+          // Get the details of each additional contribution found via a payment
+          $contributions[$paymentValues['contribution_id']] = CRM_Contribute_BAO_Contribution::getValuesWithMappings(['id' => $paymentValues['contribution_id']]);
+        }
+        $contributions[$paymentValues['contribution_id']]['payment_trxn_id'][] = $paymentValues['trxn_id'];
+      }
+    }
+  }
+
   if (!empty($contributions)) {
     $softContributions = CRM_Contribute_BAO_ContributionSoft::getSoftCreditContributionFields(array_keys($contributions), TRUE);
     foreach ($contributions as $id => $contribution) {
