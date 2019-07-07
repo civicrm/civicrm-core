@@ -111,4 +111,23 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
     parent::testHtmlWithOpenAndUrlTracking();
   }
 
+  /**
+   * Test to check Activity being created on mailing Job.
+   *
+   */
+  public function testMailingActivityCreate() {
+    $subject = uniqid('testMailingActivityCreate');
+    $this->runMailingSuccess([
+      'subject' => $subject,
+      'body_html' => 'Test Mailing Activity Create',
+      'scheduled_id' => $this->individualCreate(),
+    ]);
+
+    $this->callAPISuccessGetCount('activity', [
+      'activity_type_id' => 'Bulk Email',
+      'status_id' => 'Completed',
+      'subject' => $subject,
+    ], 1);
+  }
+
 }
