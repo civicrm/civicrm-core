@@ -608,7 +608,7 @@ WHERE  contribution_id = {$id}
    * @return void
    */
   public static function formatCreditCardDetails(&$params) {
-    if (in_array('credit_card_type', array_keys($params))) {
+    if (!empty($params['credit_card_type'])) {
       $params['card_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $params['credit_card_type']);
     }
     if (!empty($params['credit_card_number']) && empty($params['pan_truncation'])) {
