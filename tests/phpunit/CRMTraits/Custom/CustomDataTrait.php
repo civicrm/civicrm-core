@@ -223,6 +223,7 @@ trait CRMTraits_Custom_CustomDataTrait {
       'weight' => 1,
       'is_required' => 1,
       'sequential' => 1,
+      'is_searchable' => 1,
     ], $params);
 
     return $this->callAPISuccess('CustomField', 'create', $params)['values'][0];
