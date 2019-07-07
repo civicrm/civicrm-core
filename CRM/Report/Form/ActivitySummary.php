@@ -353,6 +353,9 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
               LEFT JOIN civicrm_contact contact_civireport
                      ON target_activity.contact_id = contact_civireport.id
               {$this->_aclFrom}";
+
+    // Email table is needed if sorting by Email.
+    $this->joinEmailFromContact();
   }
 
   /**
@@ -431,7 +434,9 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $this->groupBy();
     $this->orderBy();
 
-    foreach ($this->unselectedOrderByColumns() as $alias => $field) {
+    // Order by & Section columns not selected for display need to be included in SELECT.
+    $unselectedColumns = array_merge($this->unselectedOrderByColumns(), $this->unselectedSectionColumns());
+    foreach ($unselectedColumns as $alias => $field) {
       $clause = $this->getSelectClauseWithGroupConcatIfNotGroupedBy($field['table_name'], $field['name'], $field);
       if (!$clause) {
         $clause = "{$field['dbAlias']} as {$alias}";
@@ -444,16 +449,15 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     }
     CRM_Utils_Hook::alterReportVar('sql', $this, $this);
 
-    // order_by columns not selected for display need to be included in SELECT
-    $unselectedSectionColumns = $this->unselectedSectionColumns();
-    foreach ($unselectedSectionColumns as $alias => $section) {
-      $this->_select .= ", {$section['dbAlias']} as {$alias}";
-    }
-
     // build temporary table column names base on column headers of result
     $dbColumns = [];
     foreach ($this->_columnHeaders as $fieldName => $dontCare) {
       $dbColumns[] = $fieldName . ' VARCHAR(128)';
+    }
+
+    // Order by & Section columns not selected for display need to be included in temp table.
+    foreach ($unselectedColumns as $alias => $section) {
+      $dbColumns[] = $alias . ' VARCHAR(128)';
     }
 
     // create temp table to store main result
@@ -467,7 +471,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
 
     // store the result in temporary table
     $insertCols = '';
-    $insertQuery = "INSERT INTO {$this->_tempTableName} ( " . implode(',', array_keys($this->_columnHeaders)) . " )
+    $insertQuery = "INSERT INTO {$this->_tempTableName} ( " . implode(',', array_merge(array_keys($this->_columnHeaders), array_keys($unselectedColumns))) . " )
 {$sql}";
     CRM_Core_DAO::executeQuery($insertQuery);
 
