@@ -751,7 +751,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    * @return array
    */
   public static function getBasicFields($mappingType) {
-    $contactTypes = ['Individual', 'Household', 'Organization'];
+    $contactTypes = CRM_Contact_BAO_ContactType::basicTypes();
     $fields = [];
     foreach ($contactTypes as $contactType) {
       if ($mappingType == 'Search Builder') {
