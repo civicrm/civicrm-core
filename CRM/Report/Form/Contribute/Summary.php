@@ -740,7 +740,9 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
    * @param array $rows
    */
   public function buildRows($sql, &$rows) {
+    CRM_Core_DAO::disableFullGroupByMode();
     $dao = CRM_Core_DAO::executeQuery($sql);
+    CRM_Core_DAO::reenableFullGroupByMode();
     $this->addToDeveloperTab($sql);
     if (!is_array($rows)) {
       $rows = array();

@@ -36,6 +36,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
 
   use CRMTraits_ACL_PermissionTrait;
   use CRMTraits_PCP_PCPTestTrait;
+  use CRMTraits_Custom_CustomDataTrait;
 
   protected $contactIDs = [];
 
@@ -46,7 +47,7 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(array('civicrm_group', 'civicrm_saved_search', 'civicrm_group_contact', 'civicrm_group_contact_cache', 'civicrm_group'));
+    $this->quickCleanup(['civicrm_group', 'civicrm_saved_search', 'civicrm_group_contact', 'civicrm_group_contact_cache', 'civicrm_group'], TRUE);
     parent::tearDown();
   }
 
@@ -911,6 +912,26 @@ class api_v3_ReportTemplateTest extends CiviUnitTestCase {
     foreach ($rows['values'] as $row) {
       $this->assertEquals(array_pop($count), count($row['rows']), "Report failed to get row count");
     }
+  }
+
+  /**
+   * Test the custom data order by works when not in select.
+   *
+   * @dataProvider getMembershipAndContributionReportTemplatesForGroupTests
+   *
+   * @param string $template
+   *   Report template unique identifier.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testReportsCustomDataOrderBy($template) {
+    $this->entity = 'Contact';
+    $this->createCustomGroupWithFieldOfType();
+    $this->callAPISuccess('report_template', 'getrows', [
+      'report_id' => $template,
+      'contribution_or_soft_value' => 'contributions_only',
+      'order_bys' => [['column' => 'custom_' . $this->ids['CustomField']['text'], 'order' => 'ASC']],
+    ]);
   }
 
   /**
