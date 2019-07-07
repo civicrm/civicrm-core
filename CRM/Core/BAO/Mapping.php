@@ -768,7 +768,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       ksort($fields[$contactType]);
       if ($mappingType == 'Export') {
         $relationships = [];
-        $relationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $contactType, TRUE);
+        $relationshipTypes = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $contactType);
         asort($relationshipTypes);
 
         foreach ($relationshipTypes as $key => $var) {
