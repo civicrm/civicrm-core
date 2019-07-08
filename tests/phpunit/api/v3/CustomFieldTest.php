@@ -33,21 +33,18 @@
  */
 class api_v3_CustomFieldTest extends CiviUnitTestCase {
 
-  protected $_apiversion;
-
-  public function setUp() {
-    $this->_apiversion = 3;
-    parent::setUp();
-  }
-
+  /**
+   * Clean up after test.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function tearDown() {
-    $tablesToTruncate = [
+    $this->quickCleanup([
       'civicrm_contact',
       'civicrm_file',
       'civicrm_entity_file',
-    ];
-    // true tells quickCleanup to drop custom_value tables that might have been created in the test
-    $this->quickCleanup($tablesToTruncate, TRUE);
+    ], TRUE);
+    parent::tearDown();
   }
 
   /**
@@ -298,6 +295,30 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     ]);
 
     $this->assertEquals($optionGroupID, 3);
+  }
+
+  /**
+   * Test adding an optionGroup to an existing field doesn't cause a fatal error.
+   *
+   * (this was happening due to a check running despite no existing option_group_id)
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testUpdateCustomFieldAddOptionGroup() {
+    $customGroup = $this->customGroupCreate(['extends' => 'Organization', 'title' => 'test_group']);
+    $params = [
+      'custom_group_id' => $customGroup['id'],
+      'label' => 'Organization Gender',
+      'html_type' => 'Text',
+      'data_type' => 'Int',
+    ];
+
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    $this->callAPISuccess('CustomField', 'create', [
+      'option_group_id' => civicrm_api3('OptionGroup', 'getvalue', ['options' => ['limit' => 1], 'return' => 'id']),
+      'id' => $customField['id'],
+      'html_type' => 'Select',
+    ]);
   }
 
   /**
