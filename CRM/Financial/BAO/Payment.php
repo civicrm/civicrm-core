@@ -127,7 +127,23 @@ class CRM_Financial_BAO_Payment {
             'trxn_total_amount' => $params['total_amount'],
             'trxn_id' => $trxn->id,
           ];
-          CRM_Contribute_BAO_Contribution::createProportionalFinancialEntries($entityParams, $lineItems, $ftIds, $taxItems);
+          $eftParams = [
+            'entity_table' => 'civicrm_financial_item',
+            'financial_trxn_id' => $entityParams['trxn_id'],
+          ];
+          foreach ($lineItems as $key => $value) {
+            if ($value['qty'] == 0) {
+              continue;
+            }
+            $eftParams['entity_id'] = $ftIds[$value['price_field_value_id']];
+            $entityParams['line_item_amount'] = $value['line_total'];
+            CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
+            if (array_key_exists($value['price_field_value_id'], $taxItems)) {
+              $entityParams['line_item_amount'] = $taxItems[$value['price_field_value_id']]['amount'];
+              $eftParams['entity_id'] = $taxItems[$value['price_field_value_id']]['financial_item_id'];
+              CRM_Contribute_BAO_Contribution::createProportionalEntry($entityParams, $eftParams);
+            }
+          }
         }
       }
     }
