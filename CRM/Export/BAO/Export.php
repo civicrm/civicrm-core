@@ -180,51 +180,7 @@ class CRM_Export_BAO_Export {
     );
 
     $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator, $mergeSameHousehold, $isPostalOnly);
-    $returnProperties = [];
-
-    if ($fields) {
-      foreach ($fields as $key => $value) {
-        $fieldName = CRM_Utils_Array::value(1, $value);
-        if (!$fieldName || $processor->isHouseholdMergeRelationshipTypeKey($fieldName)) {
-          continue;
-        }
-
-        if ($processor->isRelationshipTypeKey($fieldName) && (!empty($value[2]) || !empty($value[4]))) {
-          $returnProperties[$fieldName] = $processor->setRelationshipReturnProperties($value, $fieldName);
-        }
-        elseif (is_numeric(CRM_Utils_Array::value(2, $value))) {
-          $locationName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'location_type_id', $value[2]);
-          if ($fieldName == 'phone') {
-            $returnProperties['location'][$locationName]['phone-' . CRM_Utils_Array::value(3, $value)] = 1;
-          }
-          elseif ($fieldName == 'im') {
-            $returnProperties['location'][$locationName]['im-' . CRM_Utils_Array::value(3, $value)] = 1;
-          }
-          else {
-            $returnProperties['location'][$locationName][$fieldName] = 1;
-          }
-        }
-        else {
-          //hack to fix component fields
-          //revert mix of event_id and title
-          if ($fieldName == 'event_id') {
-            $returnProperties['event_id'] = 1;
-          }
-          else {
-            $returnProperties[$fieldName] = 1;
-          }
-        }
-      }
-      $defaultExportMode = $processor->defaultReturnProperty();
-      if ($defaultExportMode) {
-        $returnProperties[$defaultExportMode] = 1;
-      }
-    }
-    else {
-      $returnProperties = $processor->getDefaultReturnProperties();
-    }
-    // @todo - we are working towards this being entirely a property of the processor
-    $processor->setReturnProperties($returnProperties);
+    $returnProperties = $processor->getReturnProperties();
     $paymentTableId = $processor->getPaymentTableID();
 
     if ($mergeSameAddress) {
