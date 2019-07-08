@@ -377,75 +377,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     }
 
     // add component fields
-    $compArray = [];
-
-    if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::CONTRIBUTE_EXPORT)) {
-      if (CRM_Core_Permission::access('CiviContribute')) {
-        $fields['Contribution'] = CRM_Core_DAO::getExportableFieldsWithPseudoConstants('CRM_Contribute_BAO_Contribution');
-        unset($fields['Contribution']['contribution_contact_id']);
-        $compArray['Contribution'] = ts('Contribution');
-      }
-    }
-
-    if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT)) {
-      if (CRM_Core_Permission::access('CiviEvent')) {
-        $fields['Participant'] = CRM_Event_BAO_Participant::exportableFields();
-        //get the component payment fields
-        // @todo - review this - inconsistent with other entities & hacky.
-        if ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT) {
-          $componentPaymentFields = [];
-          foreach (CRM_Export_BAO_Export::componentPaymentFields() as $payField => $payTitle) {
-            $componentPaymentFields[$payField] = ['title' => $payTitle];
-          }
-          $fields['Participant'] = array_merge($fields['Participant'], $componentPaymentFields);
-        }
-
-        $compArray['Participant'] = ts('Participant');
-      }
-    }
-
-    if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::MEMBER_EXPORT)) {
-      if (CRM_Core_Permission::access('CiviMember')) {
-        $fields['Membership'] = CRM_Member_BAO_Membership::getMembershipFields($exportMode);
-        unset($fields['Membership']['membership_contact_id']);
-        $compArray['Membership'] = ts('Membership');
-      }
-    }
-
-    if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::PLEDGE_EXPORT)) {
-      if (CRM_Core_Permission::access('CiviPledge')) {
-        $fields['Pledge'] = CRM_Pledge_BAO_Pledge::exportableFields();
-        unset($fields['Pledge']['pledge_contact_id']);
-        $compArray['Pledge'] = ts('Pledge');
-      }
-    }
-
-    if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::CASE_EXPORT)) {
-      if (CRM_Core_Permission::access('CiviCase')) {
-        $fields['Case'] = CRM_Case_BAO_Case::exportableFields();
-        $compArray['Case'] = ts('Case');
-
-        $fields['Activity'] = CRM_Activity_BAO_Activity::exportableFields('Case');
-        $compArray['Activity'] = ts('Case Activity');
-
-        unset($fields['Case']['case_contact_id']);
-      }
-    }
-    if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::GRANT_EXPORT)) {
-      if (CRM_Core_Permission::access('CiviGrant')) {
-        $fields['Grant'] = CRM_Grant_BAO_Grant::exportableFields();
-        unset($fields['Grant']['grant_contact_id']);
-        if ($mappingType == 'Search Builder') {
-          unset($fields['Grant']['grant_type_id']);
-        }
-        $compArray['Grant'] = ts('Grant');
-      }
-    }
-
-    if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT)) {
-      $fields['Activity'] = CRM_Activity_BAO_Activity::exportableFields('Activity');
-      $compArray['Activity'] = ts('Activity');
-    }
+    $compArray = self::addComponentFields($fields, $mappingType, $exportMode);
 
     foreach ($fields as $key => $value) {
 
@@ -958,6 +890,88 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     }
 
     return $fields;
+  }
+
+  /**
+   * Adds component fields to the export fields array; returns list of components.
+   *
+   * @param array $fields
+   * @param string $mappingType
+   * @param int $exportMode
+   * @return array
+   */
+  public static function addComponentFields(&$fields, $mappingType, $exportMode) {
+    $compArray = [];
+
+    if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::CONTRIBUTE_EXPORT)) {
+      if (CRM_Core_Permission::access('CiviContribute')) {
+        $fields['Contribution'] = CRM_Core_DAO::getExportableFieldsWithPseudoConstants('CRM_Contribute_BAO_Contribution');
+        unset($fields['Contribution']['contribution_contact_id']);
+        $compArray['Contribution'] = ts('Contribution');
+      }
+    }
+
+    if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT)) {
+      if (CRM_Core_Permission::access('CiviEvent')) {
+        $fields['Participant'] = CRM_Event_BAO_Participant::exportableFields();
+        //get the component payment fields
+        // @todo - review this - inconsistent with other entities & hacky.
+        if ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT) {
+          $componentPaymentFields = [];
+          foreach (CRM_Export_BAO_Export::componentPaymentFields() as $payField => $payTitle) {
+            $componentPaymentFields[$payField] = ['title' => $payTitle];
+          }
+          $fields['Participant'] = array_merge($fields['Participant'], $componentPaymentFields);
+        }
+
+        $compArray['Participant'] = ts('Participant');
+      }
+    }
+
+    if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::MEMBER_EXPORT)) {
+      if (CRM_Core_Permission::access('CiviMember')) {
+        $fields['Membership'] = CRM_Member_BAO_Membership::getMembershipFields($exportMode);
+        unset($fields['Membership']['membership_contact_id']);
+        $compArray['Membership'] = ts('Membership');
+      }
+    }
+
+    if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::PLEDGE_EXPORT)) {
+      if (CRM_Core_Permission::access('CiviPledge')) {
+        $fields['Pledge'] = CRM_Pledge_BAO_Pledge::exportableFields();
+        unset($fields['Pledge']['pledge_contact_id']);
+        $compArray['Pledge'] = ts('Pledge');
+      }
+    }
+
+    if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::CASE_EXPORT)) {
+      if (CRM_Core_Permission::access('CiviCase')) {
+        $fields['Case'] = CRM_Case_BAO_Case::exportableFields();
+        $compArray['Case'] = ts('Case');
+
+        $fields['Activity'] = CRM_Activity_BAO_Activity::exportableFields('Case');
+        $compArray['Activity'] = ts('Case Activity');
+
+        unset($fields['Case']['case_contact_id']);
+      }
+    }
+    if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::GRANT_EXPORT)) {
+      if (CRM_Core_Permission::access('CiviGrant')) {
+        $fields['Grant'] = CRM_Grant_BAO_Grant::exportableFields();
+        unset($fields['Grant']['grant_contact_id']);
+        if ($mappingType == 'Search Builder') {
+          unset($fields['Grant']['grant_type_id']);
+        }
+        $compArray['Grant'] = ts('Grant');
+      }
+    }
+
+    if (($mappingType == 'Search Builder') || ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT)) {
+      $fields['Activity'] = CRM_Activity_BAO_Activity::exportableFields('Activity');
+      $compArray['Activity'] = ts('Activity');
+    }
+
+    return $compArray;
   }
 
   /**
