@@ -1405,4 +1405,38 @@ class CRM_Export_BAO_ExportProcessor {
     return in_array($contactID, $this->householdsToSkip);
   }
 
+  /**
+   * Get default return property for export based on mode
+   *
+   * @return string
+   *   Default Return property
+   */
+  public function defaultReturnProperty() {
+    // hack to add default return property based on export mode
+    $property = NULL;
+    $exportMode = $this->getExportMode();
+    if ($exportMode == CRM_Export_Form_Select::CONTRIBUTE_EXPORT) {
+      $property = 'contribution_id';
+    }
+    elseif ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT) {
+      $property = 'participant_id';
+    }
+    elseif ($exportMode == CRM_Export_Form_Select::MEMBER_EXPORT) {
+      $property = 'membership_id';
+    }
+    elseif ($exportMode == CRM_Export_Form_Select::PLEDGE_EXPORT) {
+      $property = 'pledge_id';
+    }
+    elseif ($exportMode == CRM_Export_Form_Select::CASE_EXPORT) {
+      $property = 'case_id';
+    }
+    elseif ($exportMode == CRM_Export_Form_Select::GRANT_EXPORT) {
+      $property = 'grant_id';
+    }
+    elseif ($exportMode == CRM_Export_Form_Select::ACTIVITY_EXPORT) {
+      $property = 'activity_id';
+    }
+    return $property;
+  }
+
 }
