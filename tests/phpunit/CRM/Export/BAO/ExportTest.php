@@ -153,6 +153,69 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * Basic test to ensure the exportComponents function can export with soft credits enabled.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
+   */
+  public function testExportComponentsContributionSoftCredits() {
+    $this->setUpContributionExportData();
+    $this->callAPISuccess('ContributionSoft', 'create', ['contact_id' => $this->contactIDs[1], 'contribution_id' => $this->contributionIDs[0], 'amount' => 5]);
+    $params = [
+      ['receive_date_low', '=', '20190101000000', 0, 0],
+      ['receive_date_high', '=', '20191231235959', 0, 0],
+      ['contribution_amount_low', '=', '1', 0, 0],
+      ['contribution_amount_high', '=', '10000000', 0, 0],
+      ['contribution_test', '=', '0', 0, 0],
+      ['contribution_or_softcredits', '=', 'both', 0, 0],
+    ];
+
+    $this->startCapturingOutput();
+    try {
+      CRM_Export_BAO_Export::exportComponents(
+        FALSE,
+        $this->contributionIDs,
+        $params,
+        'receive_date desc',
+        NULL,
+        NULL,
+        CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
+        'civicrm_contribution.id IN ( ' . implode(',', $this->contributionIDs) . ')',
+        NULL,
+        FALSE,
+        FALSE,
+        [
+          'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
+        ]
+      );
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+    }
+    $csv = $this->captureOutputToCSV();
+    $this->assertEquals(array_merge($this->getBasicHeaderDefinition(FALSE), $this->getContributeHeaderDefinition()), $csv->getHeader());
+    $rowNumber = 1;
+    $rows = $csv->getRecords();
+    foreach ($rows as $row) {
+      if ($rowNumber === 1) {
+        $this->assertEquals(95, $row['Net Amount']);
+        $this->assertEquals('', $row['Soft Credit Amount']);
+      }
+      if ($rowNumber === 2) {
+        $this->assertEquals(95, $row['Net Amount']);
+        $this->assertEquals(5, $row['Soft Credit Amount']);
+        $this->assertEquals('Anderson, Anthony', $row['Soft Credit For']);
+        $this->assertEquals($this->contributionIDs[0], $row['Soft Credit For Contribution ID']);
+      }
+      $rowNumber++;
+    }
+    $this->assertEquals(4, $rowNumber);
+    // Ideally we would use a randomised temp table name & use generic temp cleanup for cleanup - but
+    // for now just make sure we don't leave a mess.
+    CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS contribution_search_scredit_combined');
+
+  }
+
+  /**
    * Basic test to ensure the exportComponents function can export selected fields for contribution.
    */
   public function testExportComponentsMembership() {
