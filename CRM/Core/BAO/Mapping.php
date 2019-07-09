@@ -1222,6 +1222,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     foreach ($params['mapper'] as $key => $value) {
       $colCnt = 0;
       foreach ($value as $k => $v) {
+        $locationTypeid = NULL;
+        $phoneTypeid = NULL;
 
         if (!empty($v['1'])) {
           $saveMappingFields = new CRM_Core_DAO_MappingField();
