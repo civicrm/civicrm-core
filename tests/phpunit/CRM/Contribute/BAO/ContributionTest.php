@@ -1501,7 +1501,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $html = "<p>Contribution Source: {contribution.contribution_source}</p></br>
       <p>Contribution Invoice ID: {contribution.invoice_id}</p></br>
       <p>Contribution Receive Date: {contribution.receive_date}</p></br>
-      <p>Contribution Custom Field 1: {contribution.custom_1}</p></br>";
+      <p>Contribution Custom Field: {contribution.custom_{$customField['id']}}</p></br>";
 
     $subjectToken = CRM_Utils_Token::getTokens($subject);
     $messageToken = CRM_Utils_Token::getTokens($text);
@@ -1521,7 +1521,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertEquals("<p>Contribution Source: ABC</p></br>
       <p>Contribution Invoice ID: 12345</p></br>
       <p>Contribution Receive Date: May 11th, 2015</p></br>
-      <p>Contribution Custom Field 1: Label2</p></br>", $contributionDetails[$contactId2]['html'], "The html does not match");
+      <p>Contribution Custom Field: Label2</p></br>", $contributionDetails[$contactId2]['html'], "The html does not match");
   }
 
   /**
