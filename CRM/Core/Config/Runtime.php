@@ -88,10 +88,6 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
     }
     $this->dsn = defined('CIVICRM_DSN') ? CIVICRM_DSN : NULL;
 
-    if (!defined('CIVICRM_TEMPLATE_COMPILEDIR') && $loadFromDB) {
-      $this->fatal('You need to define CIVICRM_TEMPLATE_COMPILEDIR in civicrm.settings.php');
-    }
-
     if (!defined('CIVICRM_UF')) {
       $this->fatal('You need to define CIVICRM_UF in civicrm.settings.php');
     }
