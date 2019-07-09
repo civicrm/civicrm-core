@@ -92,6 +92,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Basic test to ensure the exportComponents function can export selected fields for contribution.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testExportComponentsContribution() {
     $this->setUpContributionExportData();
@@ -107,27 +109,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ['Contribution', 'trxn_id'],
     ];
 
-    list($tableName) = CRM_Export_BAO_Export::exportComponents(
-      TRUE,
-      $this->contributionIDs,
-      [],
-      'receive_date desc',
-      $selectedFields,
-      NULL,
-      CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
-      'civicrm_contribution.id IN ( ' . implode(',', $this->contributionIDs) . ')',
-      NULL,
-      FALSE,
-      FALSE,
-      [
-        'exportOption' => CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
-        'suppress_csv_for_testing' => TRUE,
-      ]
-    );
-
-    // delete the export temp table and component table
-    $sql = "DROP TABLE IF EXISTS {$tableName}";
-    CRM_Core_DAO::executeQuery($sql);
+    $this->doExportTest([
+      'ids' => $this->contributionIDs,
+      'order' => 'receive_date desc',
+      'fields' => $selectedFields,
+      'exportMode' => CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
+      'componentClause' => 'civicrm_contribution.id IN ( ' . implode(',', $this->contributionIDs) . ')',
+    ]);
   }
 
   /**
