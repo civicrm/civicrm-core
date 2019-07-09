@@ -242,6 +242,22 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
+   * Get un-indexed array of the field values for the given mapping id.
+   *
+   * For example if passing a mapping ID & name the returned array would look like
+   *   ['First field name', 'second field name']
+   *
+   * @param int $mappingID
+   * @param string $fieldName
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getMappingFieldValues($mappingID, $fieldName) {
+    return array_merge(CRM_Utils_Array::collect($fieldName, civicrm_api3('MappingField', 'get', ['mapping_id' => $mappingID, 'return' => $fieldName])['values']));
+  }
+
+  /**
    * Check Duplicate Mapping Name.
    *
    * @param string $nameField
