@@ -491,7 +491,9 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     // store the result in temporary table
     $insertQuery = "INSERT INTO {$this->_tempDurationSumTableName} (civicrm_activity_duration_total)
     {$sql}";
+    CRM_Core_DAO::disableFullGroupByMode();
     CRM_Core_DAO::executeQuery($insertQuery);
+    CRM_Core_DAO::reenableFullGroupByMode();
 
     $sql = "SELECT {$this->_tempTableName}.*,  {$this->_tempDurationSumTableName}.civicrm_activity_duration_total
     FROM {$this->_tempTableName} INNER JOIN {$this->_tempDurationSumTableName}
