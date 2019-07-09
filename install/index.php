@@ -703,16 +703,6 @@ class InstallRequirements {
       $this->requireWriteable($dirName, $testDetails, TRUE);
     }
 
-    //check for Config.IDS.ini, file may exist in re-install
-    $configIDSiniDir = array($cmsPath, 'sites', $siteDir, 'files', 'civicrm', 'upload', 'Config.IDS.ini');
-
-    if (is_array($configIDSiniDir) && !empty($configIDSiniDir)) {
-      $configIDSiniFile = implode(CIVICRM_DIRECTORY_SEPARATOR, $configIDSiniDir);
-      if (file_exists($configIDSiniFile)) {
-        unlink($configIDSiniFile);
-      }
-    }
-
     // Check for rewriting
     if (isset($_SERVER['SERVER_SOFTWARE'])) {
       $webserver = strip_tags(trim($_SERVER['SERVER_SOFTWARE']));
