@@ -2156,7 +2156,7 @@ INNER JOIN  civicrm_custom_field f ON ( g.id = f.option_group_id )
     );
     // get the updated option group
     // if both are same return
-    if ($currentOptionGroupId == $optionGroupId) {
+    if (!$currentOptionGroupId || $currentOptionGroupId == $optionGroupId) {
       return;
     }
 
