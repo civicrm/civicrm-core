@@ -87,29 +87,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @throws \League\Csv\Exception
    */
   public function testExportComponentsNull() {
-    $this->startCapturingOutput();
-    try {
-      list($tableName) = CRM_Export_BAO_Export::exportComponents(
-        TRUE,
-        [],
-        [],
-        NULL,
-        NULL,
-        NULL,
-        CRM_Export_Form_Select::CONTACT_EXPORT,
-        NULL,
-        NULL,
-        FALSE,
-        FALSE,
-        [
-          'exportOption' => 1,
-        ]
-      );
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-    }
-    $this->processor = $e->errorData['processor'];
-    ob_end_clean();
+    $this->doExportTest([]);
   }
 
   /**
@@ -471,7 +449,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       FALSE,
       FALSE,
       [
-        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
         'suppress_csv_for_testing' => TRUE,
       ]
     );
@@ -523,7 +500,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       FALSE,
       FALSE,
       [
-        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
         'suppress_csv_for_testing' => TRUE,
       ]
     );
@@ -558,7 +534,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       FALSE,
       FALSE,
       [
-        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
         'suppress_csv_for_testing' => TRUE,
       ]
     );
@@ -619,7 +594,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       FALSE,
       TRUE,
       [
-        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
         'suppress_csv_for_testing' => TRUE,
       ]
     );
@@ -666,7 +640,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       FALSE,
       TRUE,
       [
-        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
         'suppress_csv_for_testing' => TRUE,
       ]
     );
@@ -1133,7 +1106,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       FALSE,
       FALSE,
       [
-        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
         'suppress_csv_for_testing' => TRUE,
       ]
     );
@@ -1208,7 +1180,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       TRUE,
       FALSE,
       [
-        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
         'mergeOption' => TRUE,
         'suppress_csv_for_testing' => TRUE,
         'postal_mailing_export' => [
@@ -1304,7 +1275,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       FALSE,
       FALSE,
       [
-        'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
         'suppress_csv_for_testing' => TRUE,
       ]
     );
@@ -1781,7 +1751,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       FALSE,
       FALSE,
       [
-        'exportOption' => CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
         'suppress_csv_for_testing' => TRUE,
       ]
     );
@@ -2805,6 +2774,45 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'name' => 'Whare Kai',
       'display_name' => 'Whare Kai',
     ]);
+  }
+
+  /**
+   * Test export components.
+   *
+   * Tests the exportComponents function with the provided parameters.
+   *
+   * This exportComponents will export a csv but it will also throw a prematureExitException
+   * which we catch & grab the processor from.
+   *
+   * $this->processor is set to the export processor.
+   *
+   * @param $params
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function doExportTest($params) {
+    $this->startCapturingOutput();
+    try {
+      CRM_Export_BAO_Export::exportComponents(
+        CRM_Utils_Array::value('selectAll', $params, (empty($params['fields']))),
+        CRM_Utils_Array::value('ids', $params, []),
+        CRM_Utils_Array::value('params', $params, []),
+        CRM_Utils_Array::value('order', $params),
+        CRM_Utils_Array::value('fields', $params),
+        CRM_Utils_Array::value('moreReturnProperties', $params),
+        CRM_Utils_Array::value('exportMode', $params, CRM_Export_Form_Select::CONTACT_EXPORT),
+        CRM_Utils_Array::value('componentClause', $params, FALSE),
+        CRM_Utils_Array::value('componentTable', $params),
+        CRM_Utils_Array::value('mergeSameAddress', $params, FALSE),
+        CRM_Utils_Array::value('mergeSameHousehold', $params, FALSE)
+      );
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      $this->processor = $e->errorData['processor'];
+      ob_end_clean();
+      return;
+    }
+    $this->fail('We expected a premature exit exception');
   }
 
 }
