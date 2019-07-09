@@ -1208,7 +1208,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @return NULL
    */
-  public static function saveMappingFields(&$params, $mappingId) {
+  public static function saveMappingFields($params, $mappingId) {
     //delete mapping fields records for existing mapping
     $mappingFields = new CRM_Core_DAO_MappingField();
     $mappingFields->mapping_id = $mappingId;
