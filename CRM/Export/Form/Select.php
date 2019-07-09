@@ -388,22 +388,6 @@ FROM   {$this->_componentTable}
     // all submitted options or any other argument
     $exportParams = $params;
 
-    if (!empty($this->_greetingOptions)) {
-      foreach ($this->_greetingOptions as $key => $value) {
-        if ($option = CRM_Utils_Array::value($key, $exportParams)) {
-          if ($this->_greetingOptions[$key][$option] == ts('Other')) {
-            $exportParams[$key] = $exportParams["{$key}_other"];
-          }
-          elseif ($this->_greetingOptions[$key][$option] == ts('List of names')) {
-            $exportParams[$key] = '';
-          }
-          else {
-            $exportParams[$key] = $this->_greetingOptions[$key][$option];
-          }
-        }
-      }
-    }
-
     $mappingId = CRM_Utils_Array::value('mapping', $params);
     if ($mappingId) {
       $this->set('mappingId', $mappingId);
