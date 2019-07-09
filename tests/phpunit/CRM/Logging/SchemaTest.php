@@ -10,10 +10,16 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
+  /**
+   * Clean up after test.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function tearDown() {
-    parent::tearDown();
     $schema = new CRM_Logging_Schema();
     $schema->disableLogging();
+    parent::tearDown();
+    $this->quickCleanup(['civicrm_contact'], TRUE);
     $schema->dropAllLogTables();
     CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS civicrm_test_table");
     CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS civicrm_test_column_info");
@@ -21,6 +27,11 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS civicrm_test_enum_change");
   }
 
+  /**
+   * Data provider for testing query re-writing.
+   *
+   * @return array
+   */
   public function queryExamples() {
     $examples = [];
     $examples[] = ["`modified_date` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'When the mailing (or closely related entity) was created or modified or deleted.'", "`modified_date` timestamp NULL  COMMENT 'When the mailing (or closely related entity) was created or modified or deleted.'"];
@@ -63,6 +74,29 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
   }
 
   /**
+   * Tests that choosing to ignore a custom table does not result in e-notices.
+   */
+  public function testIgnoreCustomTableByHook() {
+    $group = $this->customGroupCreate();
+    Civi::settings()->set('logging', TRUE);
+    $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'noCustomTables']);
+    $this->customFieldCreate(['custom_group_id' => $group['id']]);
+  }
+
+  /**
+   * Remove all custom tables from tables to be logged.
+   *
+   * @param array $logTableSpec
+   */
+  public function noCustomTables(&$logTableSpec) {
+    foreach (array_keys($logTableSpec) as $index) {
+      if (substr($index, 0, 14) === 'civicrm_value_') {
+        unset($logTableSpec[$index]);
+      }
+    }
+  }
+
+  /**
    * Test that existing log tables with ARCHIVE engine are converted to InnoDB
    *
    * @throws \Exception
@@ -80,16 +114,21 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $schema->updateLogTableSchema(['updateChangedEngineConfig' => FALSE, 'forceEngineMigration' => FALSE]);
     $log_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_acl");
     while ($log_table->fetch()) {
-      $this->assertRegexp('/ENGINE=ARCHIVE/', $log_table->Create_Table);
+      $this->assertRegExp('/ENGINE=ARCHIVE/', $log_table->Create_Table);
     }
     // update with forceEngineMigration should convert to InnoDB
     $schema->updateLogTableSchema(['updateChangedEngineConfig' => FALSE, 'forceEngineMigration' => TRUE]);
     $log_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_acl");
     while ($log_table->fetch()) {
-      $this->assertRegexp('/ENGINE=InnoDB/', $log_table->Create_Table);
+      $this->assertRegExp('/ENGINE=InnoDB/', $log_table->Create_Table);
     }
   }
 
+  /**
+   * Alter the engine on the log tables.
+   *
+   * @param $logTableSpec
+   */
   public function alterLogTables(&$logTableSpec) {
     foreach (array_keys($logTableSpec) as $tableName) {
       $logTableSpec[$tableName]['engine'] = 'MyISAM';
