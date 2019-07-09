@@ -184,7 +184,8 @@ class CRM_Export_BAO_ExportProcessor {
     $this->setRequestedFields($requestedFields);
     $this->setRelationshipTypes();
     $this->setIsMergeSameHousehold($isMergeSameHousehold);
-    $this->setisPostalableOnly($isPostalableOnly);
+    $this->setIsPostalableOnly($isPostalableOnly);
+    $this->setReturnProperties($this->determineReturnProperties());
   }
 
   /**
@@ -1437,6 +1438,57 @@ class CRM_Export_BAO_ExportProcessor {
       $property = 'activity_id';
     }
     return $property;
+  }
+
+  /**
+   * Determine the required return properties from the input parameters.
+   *
+   * @return array
+   */
+  public function determineReturnProperties() {
+    if ($this->getRequestedFields()) {
+      $returnProperties = [];
+      foreach ($this->getRequestedFields() as $key => $value) {
+        $fieldName = CRM_Utils_Array::value(1, $value);
+        if (!$fieldName || $this->isHouseholdMergeRelationshipTypeKey($fieldName)) {
+          continue;
+        }
+
+        if ($this->isRelationshipTypeKey($fieldName) && (!empty($value[2]) || !empty($value[4]))) {
+          $returnProperties[$fieldName] = $this->setRelationshipReturnProperties($value, $fieldName);
+        }
+        elseif (is_numeric(CRM_Utils_Array::value(2, $value))) {
+          $locationName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'location_type_id', $value[2]);
+          if ($fieldName == 'phone') {
+            $returnProperties['location'][$locationName]['phone-' . CRM_Utils_Array::value(3, $value)] = 1;
+          }
+          elseif ($fieldName == 'im') {
+            $returnProperties['location'][$locationName]['im-' . CRM_Utils_Array::value(3, $value)] = 1;
+          }
+          else {
+            $returnProperties['location'][$locationName][$fieldName] = 1;
+          }
+        }
+        else {
+          //hack to fix component fields
+          //revert mix of event_id and title
+          if ($fieldName == 'event_id') {
+            $returnProperties['event_id'] = 1;
+          }
+          else {
+            $returnProperties[$fieldName] = 1;
+          }
+        }
+      }
+      $defaultExportMode = $this->defaultReturnProperty();
+      if ($defaultExportMode) {
+        $returnProperties[$defaultExportMode] = 1;
+      }
+    }
+    else {
+      $returnProperties = $this->getDefaultReturnProperties();
+    }
+    return $returnProperties;
   }
 
 }
