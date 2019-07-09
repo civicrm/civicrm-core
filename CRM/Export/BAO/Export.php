@@ -224,12 +224,11 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       $returnProperties = array_merge($returnProperties, $moreReturnProperties);
     }
 
-    $exportParams['postal_mailing_export']['temp_columns'] = [];
-    if ($exportParams['exportOption'] == 2 &&
-      isset($exportParams['postal_mailing_export']) &&
-      CRM_Utils_Array::value('postal_mailing_export', $exportParams['postal_mailing_export']) == 1
+    if ($processor->getRequestedFields() &&
+      $processor->isPostalableOnly()
     ) {
       $postalColumns = ['is_deceased', 'do_not_mail', 'street_address', 'supplemental_address_1'];
+      $exportParams['postal_mailing_export']['temp_columns'] = [];
       foreach ($postalColumns as $column) {
         if (!array_key_exists($column, $returnProperties)) {
           $returnProperties[$column] = 1;
