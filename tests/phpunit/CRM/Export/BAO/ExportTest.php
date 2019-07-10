@@ -856,6 +856,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Test phone data export.
    *
    * Less over the top complete than the im test.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportPhoneData() {
     $this->contactIDs[] = $this->individualCreate();
@@ -932,17 +935,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         }
       }
     }
-    list($tableName) = $this->doExport($fields, $this->contactIDs[0]);
-
-    $dao = CRM_Core_DAO::executeQuery('SELECT * FROM ' . $tableName);
-    while ($dao->fetch()) {
-      // note there is some chance these might be random on some mysql co
-      $this->assertEquals('BillingMobile3', $dao->billing_phone_mobile);
-      $this->assertEquals('', $dao->billing_phone_phone);
-      $relField = '2_a_b_phone_type_id';
-      $this->assertEquals('Phone', $dao->$relField);
-      $this->assertEquals('Mobile', $dao->phone_type_id);
-      $this->assertEquals('Mobile', $dao->billing_phone_type_id);
+    $this->doExportTest(['fields' => $fields, 'ids' => [$this->contactIDs[0]]]);
+    foreach ($this->csv->getRecords() as $row) {
+      $this->assertEquals('BillingMobile3', $row['Billing-Phone-Mobile']);
+      $this->assertEquals('', $row['Billing-Phone-Phone']);
+      $this->assertEquals('Phone', $row['Spouse of-Phone Type']);
+      $this->assertEquals('Mobile', $row['Phone Type']);
+      $this->assertEquals('Mobile', $row['Billing-Phone Type']);
     }
   }
 
@@ -2766,6 +2765,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   protected function doExportTest($params) {
     $this->startCapturingOutput();
     try {
+      $defaultClause = (empty($params['ids']) ? NULL : "contact_a.id IN (" . implode(',', $params['ids']) . ")");
       CRM_Export_BAO_Export::exportComponents(
         CRM_Utils_Array::value('selectAll', $params, (empty($params['fields']))),
         CRM_Utils_Array::value('ids', $params, []),
@@ -2774,7 +2774,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         CRM_Utils_Array::value('fields', $params),
         CRM_Utils_Array::value('moreReturnProperties', $params),
         CRM_Utils_Array::value('exportMode', $params, CRM_Export_Form_Select::CONTACT_EXPORT),
-        CRM_Utils_Array::value('componentClause', $params, FALSE),
+        CRM_Utils_Array::value('componentClause', $params, $defaultClause),
         CRM_Utils_Array::value('componentTable', $params),
         CRM_Utils_Array::value('mergeSameAddress', $params, FALSE),
         CRM_Utils_Array::value('mergeSameHousehold', $params, FALSE)
