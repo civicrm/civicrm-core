@@ -250,19 +250,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     // This perhaps only needs calling when $mergeSameHousehold == 1
     self::buildRelatedContactArray($selectAll, $ids, $processor, $componentTable);
 
-    // make sure the groups stuff is included only if specifically specified
-    // by the fields param (CRM-1969), else we limit the contacts outputted to only
-    // ones that are part of a group
-    if (!empty($returnProperties['groups'])) {
-      $oldClause = "( contact_a.id = civicrm_group_contact.contact_id )";
-      $newClause = " ( $oldClause AND ( civicrm_group_contact.status = 'Added' OR civicrm_group_contact.status IS NULL ) )";
-      // total hack for export, CRM-3618
-      $from = str_replace($oldClause,
-        $newClause,
-        $from
-      );
-    }
-
     $whereClauses = ['trash_clause' => "contact_a.is_deleted != 1"];
     if (!$selectAll && $componentTable) {
       $from .= " INNER JOIN $componentTable ctTable ON ctTable.contact_id = contact_a.id ";
