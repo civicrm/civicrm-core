@@ -721,7 +721,7 @@ class CRM_Export_BAO_ExportProcessor {
     list($select, $from, $where, $having) = $query->query();
     $this->setQueryFields($query->_fields);
     $whereClauses = ['trash_clause' => "contact_a.is_deleted != 1"];
-    if ($this->getRequestedFields() && ($this->getComponentTable())){
+    if ($this->getRequestedFields() && ($this->getComponentTable())) {
       $from .= " INNER JOIN " . $this->getComponentTable() . " ctTable ON ctTable.contact_id = contact_a.id ";
     }
     elseif ($this->getComponentClause()) {
@@ -741,7 +741,7 @@ class CRM_Export_BAO_ExportProcessor {
     else {
       $where .= " AND " . implode(' AND ', $whereClauses);
     }
-    return [$query, $select, $from, $where . $addressWhere, $having];
+    return [$query, "$select $from $where $having"];
   }
 
   /**

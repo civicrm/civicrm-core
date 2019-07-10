@@ -201,12 +201,10 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     $processor->setComponentTable($componentTable);
     $processor->setComponentClause($componentClause);
 
-    list($query, $select, $from, $where, $having) = $processor->runQuery($params, $order);
+    list($query, $queryString) = $processor->runQuery($params, $order);
 
     // This perhaps only needs calling when $mergeSameHousehold == 1
     self::buildRelatedContactArray($selectAll, $ids, $processor, $componentTable);
-
-    $queryString = "$select $from $where $having";
 
     $groupBy = self::getGroupBy($processor, $query);
 
