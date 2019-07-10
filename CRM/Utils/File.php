@@ -666,12 +666,12 @@ HTACCESS;
 
   /**
    * @param $directory
-   * @param string|NULL $basePath
+   * @param string $basePath
    *   The base path when evaluating relative paths. Should include trailing slash.
    *
    * @return string
    */
-  public static function absoluteDirectory($directory, $basePath = NULL) {
+  public static function absoluteDirectory($directory, $basePath) {
     // check if directory is already absolute, if so return immediately
     // Note: Windows PHP accepts any mix of "/" or "\", so "C:\htdocs" or "C:/htdocs" would be a valid absolute path
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && preg_match(';^[a-zA-Z]:[/\\\\];', $directory)) {
@@ -683,8 +683,12 @@ HTACCESS;
       return $directory;
     }
 
-    // make everything absolute from the baseFilePath
-    $basePath = ($basePath === NULL) ? self::baseFilePath() : $basePath;
+    if ($basePath === NULL) {
+      // Previous versions interpreted `NULL` to mean "default to `self::baseFilePath()`".
+      // However, no code in the known `universe` relies on this interpretation, and
+      // the `baseFilePath()` function is problematic/deprecated.
+      throw new \RuntimeException("absoluteDirectory() requires specifying a basePath");
+    }
 
     // ensure that $basePath has a trailing slash
     $basePath = self::addTrailingSlash($basePath);
