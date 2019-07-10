@@ -707,7 +707,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
     // Drupal might not be bootstrapped if being called by the REST API.
     if (!class_exists('Drupal') || !\Drupal::hasContainer()) {
-      return NULL;
+      return $url;
     }
 
     $language = $this->getCurrentLanguage();
