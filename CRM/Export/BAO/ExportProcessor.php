@@ -2114,4 +2114,23 @@ WHERE  id IN ( $deleteIDString )
     return $parsedString;
   }
 
+  /**
+   * Preview export output.
+   *
+   * @param int $limit
+   * @return array
+   */
+  public function getPreview($limit) {
+    $rows = [];
+    list($outputColumns, $metadata) = $this->getExportStructureArrays();
+    $query = $this->runQuery([], '');
+    CRM_Core_DAO::disableFullGroupByMode();
+    $result = CRM_Core_DAO::executeQuery($query[1] . ' LIMIT ' . (int) $limit);
+    CRM_Core_DAO::reenableFullGroupByMode();
+    while ($result->fetch()) {
+      $rows[] = $this->buildRow($query[0], $result, $outputColumns, $metadata, [], []);
+    }
+    return $rows;
+  }
+
 }
