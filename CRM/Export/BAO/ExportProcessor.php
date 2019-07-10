@@ -1211,6 +1211,7 @@ class CRM_Export_BAO_ExportProcessor {
    * @param $returnProperties
    */
   public function setHouseholdMergeReturnProperties($returnProperties) {
+    $returnProperties = array_diff_key($returnProperties, array_fill_keys(['location_type', 'im_provider'], 1));
     foreach ($this->getHouseholdRelationshipTypes() as $householdRelationshipType) {
       $this->relationshipReturnProperties[$householdRelationshipType] = $returnProperties;
     }
@@ -1579,6 +1580,9 @@ class CRM_Export_BAO_ExportProcessor {
     }
     else {
       $returnProperties = $this->getDefaultReturnProperties();
+    }
+    if ($this->isMergeSameHousehold()) {
+      $returnProperties['id'] = 1;
     }
     if ($this->isMergeSameAddress()) {
       $returnProperties['addressee'] = 1;
