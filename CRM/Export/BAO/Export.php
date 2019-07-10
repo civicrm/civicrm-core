@@ -609,6 +609,24 @@ VALUES $sqlValueString
    * @param array $exportParams
    */
   public static function mergeSameAddress($processor, &$sqlColumns, $exportParams) {
+    $greetingOptions = CRM_Export_Form_Select::getGreetingOptions();
+
+    if (!empty($greetingOptions)) {
+      // Greeting options is keyed by 'postal_greeting' or 'addressee'.
+      foreach ($greetingOptions as $key => $value) {
+        if ($option = CRM_Utils_Array::value($key, $exportParams)) {
+          if ($greetingOptions[$key][$option] == ts('Other')) {
+            $exportParams[$key] = $exportParams["{$key}_other"];
+          }
+          elseif ($greetingOptions[$key][$option] == ts('List of names')) {
+            $exportParams[$key] = '';
+          }
+          else {
+            $exportParams[$key] = $greetingOptions[$key][$option];
+          }
+        }
+      }
+    }
     $tableName = $processor->getTemporaryTable();
     // check if any records are present based on if they have used shared address feature,
     // and not based on if city / state .. matches.
