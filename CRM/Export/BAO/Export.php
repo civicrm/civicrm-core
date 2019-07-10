@@ -180,6 +180,9 @@ class CRM_Export_BAO_Export {
     );
 
     $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator, $mergeSameHousehold, $isPostalOnly);
+    if ($moreReturnProperties) {
+      $processor->setAdditionalRequestedReturnProperties($moreReturnProperties);
+    }
     $returnProperties = $processor->getReturnProperties();
     $paymentTableId = $processor->getPaymentTableID();
 
@@ -213,15 +216,6 @@ class CRM_Export_BAO_Export {
       $query = "
 INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_contact gc WHERE gc.group_id = {$exportParams['additional_group']} ON DUPLICATE KEY UPDATE {$componentTable}.contact_id = gc.contact_id";
       CRM_Core_DAO::executeQuery($query);
-    }
-
-    if ($moreReturnProperties) {
-      // fix for CRM-7066
-      if (!empty($moreReturnProperties['group'])) {
-        unset($moreReturnProperties['group']);
-        $moreReturnProperties['groups'] = 1;
-      }
-      $returnProperties = array_merge($returnProperties, $moreReturnProperties);
     }
 
     if ($processor->getRequestedFields() &&

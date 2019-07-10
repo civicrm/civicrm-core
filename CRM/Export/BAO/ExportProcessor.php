@@ -119,6 +119,39 @@ class CRM_Export_BAO_ExportProcessor {
   protected $householdsToSkip = [];
 
   /**
+   * Additional fields to return.
+   *
+   * This doesn't make much sense when we have a fields set but search build add it's own onto
+   * the 'Primary fields' (all) option.
+   *
+   * @var array
+   */
+  protected $additionalRequestedReturnProperties = [];
+
+  /**
+   * Get additional return properties.
+   *
+   * @return array
+   */
+  public function getAdditionalRequestedReturnProperties() {
+    return $this->additionalRequestedReturnProperties;
+  }
+
+  /**
+   * Set additional return properties.
+   *
+   * @param array $value
+   */
+  public function setAdditionalRequestedReturnProperties($value) {
+    // fix for CRM-7066
+    if (!empty($value['group'])) {
+      unset($value['group']);
+      $value['groups'] = 1;
+    }
+    $this->additionalRequestedReturnProperties = $value;
+  }
+
+  /**
    * Get return properties by relationship.
    * @return array
    */
@@ -220,7 +253,7 @@ class CRM_Export_BAO_ExportProcessor {
    * @return array
    */
   public function getReturnProperties() {
-    return $this->returnProperties;
+    return array_merge($this->returnProperties, $this->getAdditionalRequestedReturnProperties());
   }
 
   /**
