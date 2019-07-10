@@ -118,7 +118,7 @@ class CRM_Core_IDS {
    */
   public static function createBaseConfig() {
     $config = \CRM_Core_Config::singleton();
-    $tmpDir = empty($config->uploadDir) ? CIVICRM_TEMPLATE_COMPILEDIR : $config->uploadDir;
+    $tmpDir = empty($config->uploadDir) ? Civi::paths()->getVariable('civicrm.compile', 'path') : $config->uploadDir;
     global $civicrm_root;
 
     return [
