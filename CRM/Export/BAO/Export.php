@@ -179,34 +179,22 @@ class CRM_Export_BAO_Export {
       $exportParams['postal_mailing_export']['postal_mailing_export'] == 1
     );
 
-    $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator, $mergeSameHousehold, $isPostalOnly);
+    $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator, $mergeSameHousehold, $isPostalOnly, $mergeSameAddress);
     if ($moreReturnProperties) {
       $processor->setAdditionalRequestedReturnProperties($moreReturnProperties);
     }
     $returnProperties = $processor->getReturnProperties();
     $paymentTableId = $processor->getPaymentTableID();
 
-    if ($mergeSameAddress) {
+    if ($processor->isMergeSameAddress()) {
       //make sure the addressee fields are selected
       //while using merge same address feature
-      $returnProperties['addressee'] = 1;
-      $returnProperties['postal_greeting'] = 1;
-      $returnProperties['email_greeting'] = 1;
-      $returnProperties['street_name'] = 1;
-      $returnProperties['household_name'] = 1;
-      $returnProperties['street_address'] = 1;
-      $returnProperties['city'] = 1;
-      $returnProperties['state_province'] = 1;
-
       // some columns are required for assistance incase they are not already present
-      $exportParams['merge_same_address']['temp_columns'] = [];
-      $tempColumns = ['id', 'master_id', 'state_province_id', 'postal_greeting_id', 'addressee_id'];
-      foreach ($tempColumns as $column) {
-        if (!array_key_exists($column, $returnProperties)) {
-          $returnProperties[$column] = 1;
-          $column = $column == 'id' ? 'civicrm_primary_id' : $column;
-          $exportParams['merge_same_address']['temp_columns'][$column] = 1;
-        }
+      $exportParams['merge_same_address']['temp_columns'] = $processor->getAdditionalFieldsForSameAddressMerge();
+      // This is silly - we should do this at the point when the array is used...
+      if (isset($exportParams['merge_same_address']['temp_columns']['id'])) {
+        unset($exportParams['merge_same_address']['temp_columns']['id']);
+        $exportParams['merge_same_address']['temp_columns']['civicrm_primary_id'] = 1;
       }
     }
 
