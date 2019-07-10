@@ -577,8 +577,19 @@ HTACCESS;
   }
 
   /**
-   * Create the base file path from which all our internal directories are
-   * offset. This is derived from the template compile directory set
+   * (Deprecated) Create the file-path from which all other internal paths are
+   * computed. This implementation determines it as `dirname(CIVICRM_TEMPLATE_COMPILEDIR)`.
+   *
+   * This approach is problematic - e.g. it prevents one from authentically
+   * splitting the CIVICRM_TEMPLATE_COMPILEDIR away from other dirs. The implementation
+   * is preserved for backwards compatibility (and should only be called by
+   * CMS-adapters and by Civi\Core\Paths).
+   *
+   * Do not use it for new path construction logic. Instead, use Civi::paths().
+   *
+   * @deprecated
+   * @see \Civi::paths()
+   * @see \Civi\Core\Paths
    */
   public static function baseFilePath() {
     static $_path = NULL;
