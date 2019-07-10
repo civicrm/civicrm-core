@@ -95,7 +95,7 @@ class CRM_Core_BAO_Cache_Psr16 {
           'path' => $path,
         ]);
     }
-    return self::getGroup($group)->get(CRM_Core_BAO_Cache::cleanKey($path));
+    return self::getGroup($group)->get(CRM_Utils_Cache::cleanKey($path));
   }
 
   /**
@@ -138,7 +138,7 @@ class CRM_Core_BAO_Cache_Psr16 {
         ]);
     }
     self::getGroup($group)
-      ->set(CRM_Core_BAO_Cache::cleanKey($path), $data, self::TTL);
+      ->set(CRM_Utils_Cache::cleanKey($path), $data, self::TTL);
   }
 
   /**
@@ -153,7 +153,7 @@ class CRM_Core_BAO_Cache_Psr16 {
     // FIXME: Generate a general deprecation notice.
 
     if ($path) {
-      self::getGroup($group)->delete(CRM_Core_BAO_Cache::cleanKey($path));
+      self::getGroup($group)->delete(CRM_Utils_Cache::cleanKey($path));
     }
     else {
       self::getGroup($group)->clear();
