@@ -261,6 +261,10 @@
   name        : Chandana Bandara
   organization: CompuCorp
 
+- github      : CsarRamos
+  name        : César Ramos
+  organization: iXiam
+
 - github      : chrisfromredfin
   name        : Chris Wells
   organization: Redfin Solutions
@@ -1514,7 +1518,7 @@
 
 - github      : wadelson
   organization: Webstanz
-  name:       : Adelson
+  name        : Adelson
 
 - github      : wdecraene
   organization: Wim De Craene
