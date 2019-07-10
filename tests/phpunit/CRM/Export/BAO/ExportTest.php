@@ -373,7 +373,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $processor->setQueryFields($query->_fields);
     $processor->setReturnProperties($returnProperties);
 
-    list($outputFields) = CRM_Export_BAO_Export::getExportStructureArrays($processor);
+    list($outputFields) = $processor->getExportStructureArrays();
     foreach (array_keys($outputFields) as $fieldAlias) {
       if ($fieldAlias === 'Home-country') {
         $this->assertTrue(in_array($fieldAlias . '_id', $queryFieldAliases[1]), 'Country is subject to some funky translate so we make sure country id is present');
