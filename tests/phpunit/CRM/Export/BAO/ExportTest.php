@@ -52,6 +52,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   protected $processor;
 
   /**
+   * Csv output from export.
+   *
+   * @var \League\Csv\Reader
+   */
+  protected $csv;
+
+  /**
    * Cleanup data.
    *
    * @throws \Exception
@@ -418,35 +425,28 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @dataProvider getBooleanDataProvider
    * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportPrimaryAddress($isPrimaryOnly) {
     \Civi::settings()->set('searchPrimaryDetailsOnly', $isPrimaryOnly);
     $this->setUpContactExportData();
 
     $selectedFields = [['Individual', 'email', ' '], ['Individual', 'email', '1'], ['Individual', 'email', '2']];
-    list($tableName) = CRM_Export_BAO_Export::exportComponents(
-      TRUE,
-      [],
-      [['email', 'LIKE', 'c', 0, 1]],
-      NULL,
-      $selectedFields,
-      NULL,
-      CRM_Export_Form_Select::CONTACT_EXPORT,
-      "contact_a.id IN ({$this->contactIDs[0]}, {$this->contactIDs[1]})",
-      NULL,
-      FALSE,
-      FALSE,
-      [
-        'suppress_csv_for_testing' => TRUE,
-      ]
-    );
+    $this->doExportTest([
+      'ids' => [],
+      'params' => [['email', 'LIKE', 'c', 0, 1]],
+      'fields' => $selectedFields,
+      'componentClause' => "contact_a.id IN ({$this->contactIDs[0]}, {$this->contactIDs[1]})",
+      'selectAll' => TRUE,
+    ]);
 
-    $dao = CRM_Core_DAO::executeQuery('SELECT * from ' . $tableName);
-    $dao->fetch();
-    $this->assertEquals('home@example.com', $dao->email);
-    $this->assertEquals('work@example.com', $dao->work_email);
-    $this->assertEquals('home@example.com', $dao->home_email);
-    $this->assertEquals(2, $dao->N);
+    $row = $this->csv->fetchOne();
+    $this->assertEquals([
+      'Email' => 'home@example.com',
+      'Home-Email' => 'home@example.com',
+      'Work-Email' => 'work@example.com',
+    ], $row);
+    $this->assertEquals(2, count($this->csv));
     \Civi::settings()->set('searchPrimaryDetailsOnly', FALSE);
   }
 
@@ -2777,6 +2777,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @param $params
    *
    * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   protected function doExportTest($params) {
     $this->startCapturingOutput();
@@ -2797,7 +2798,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
       $this->processor = $e->errorData['processor'];
-      ob_end_clean();
+      $this->csv = $this->captureOutputToCSV();
       return;
     }
     $this->fail('We expected a premature exit exception');
