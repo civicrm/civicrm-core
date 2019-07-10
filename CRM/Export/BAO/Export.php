@@ -182,19 +182,21 @@ class CRM_Export_BAO_Export {
       $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
     }
 
+    if (!$selectAll && $componentTable && !empty($exportParams['additional_group'])) {
+      // If an Additional Group is selected, then all contacts in that group are
+      // added to the export set (filtering out duplicates).
+      // Really - the calling function could do this ... just saying
+      // @todo take a whip to the calling function.
+      CRM_Core_DAO::executeQuery("
+INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_contact gc WHERE gc.group_id = {$exportParams['additional_group']} ON DUPLICATE KEY UPDATE {$componentTable}.contact_id = gc.contact_id"
+      );
+    }
+
     $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $mappedFields, $queryOperator, $mergeSameHousehold, $isPostalOnly, $mergeSameAddress);
     if ($moreReturnProperties) {
       $processor->setAdditionalRequestedReturnProperties($moreReturnProperties);
     }
     $paymentTableId = $processor->getPaymentTableID();
-
-    if (!$selectAll && $componentTable && !empty($exportParams['additional_group'])) {
-      // If an Additional Group is selected, then all contacts in that group are
-      // added to the export set (filtering out duplicates).
-      $query = "
-INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_contact gc WHERE gc.group_id = {$exportParams['additional_group']} ON DUPLICATE KEY UPDATE {$componentTable}.contact_id = gc.contact_id";
-      CRM_Core_DAO::executeQuery($query);
-    }
 
     if ($processor->getRequestedFields() &&
       $processor->isPostalableOnly()
