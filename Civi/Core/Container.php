@@ -159,14 +159,20 @@ class Container {
       'groups' => 'contact groups',
     ];
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
+      $definitionParams = [
+        'name' => $cacheGrp,
+        'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
+      ];
+      // For Caches that we don't really care about the ttl for and/or maybe accessed
+      // fairly often we use the fastArrayDecorator which improves reads and writes, these
+      // caches should also not have concurrency risk.
+      $fastArrayCaches = ['groups'];
+      if (in_array($cacheSvc, $fastArrayCaches)) {
+        $definitionParams['withArray'] = 'fast';
+      }
       $container->setDefinition("cache.{$cacheSvc}", new Definition(
         'CRM_Utils_Cache_Interface',
-        [
-          [
-            'name' => $cacheGrp,
-            'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
-          ],
-        ]
+        [$definitionParams]
       ))->setFactory('CRM_Utils_Cache::create');
     }
 
