@@ -80,6 +80,62 @@ class CRM_Export_BAO_ExportProcessor {
   protected $isMergeSameHousehold;
 
   /**
+   * Should contacts with the same address be merged.
+   *
+   * @var bool
+   */
+  protected $isMergeSameAddress = FALSE;
+
+  /**
+   * Fields that need to be retrieved for address merge purposes but should not be in output.
+   *
+   * @var array
+   */
+  protected $additionalFieldsForSameAddressMerge = [];
+
+  /**
+   * Get additional non-visible fields for address merge purposes.
+   *
+   * @return array
+   */
+  public function getAdditionalFieldsForSameAddressMerge(): array {
+    return $this->additionalFieldsForSameAddressMerge;
+  }
+
+  /**
+   * Set additional non-visible fields for address merge purposes.
+   */
+  public function setAdditionalFieldsForSameAddressMerge() {
+    if ($this->isMergeSameAddress) {
+      $fields = ['id', 'master_id', 'state_province_id', 'postal_greeting_id', 'addressee_id'];
+      foreach ($fields as $index => $field) {
+        if (!empty($this->getReturnProperties()[$field])) {
+          unset($fields[$index]);
+        }
+      }
+      $this->additionalFieldsForSameAddressMerge = array_fill_keys($fields, 1);
+    }
+  }
+
+  /**
+   * Should contacts with the same address be merged.
+   *
+   * @return bool
+   */
+  public function isMergeSameAddress(): bool {
+    return $this->isMergeSameAddress;
+  }
+
+  /**
+   * Set same address is to be merged.
+   *
+   * @param bool $isMergeSameAddress
+   */
+  public function setIsMergeSameAddress(bool $isMergeSameAddress) {
+    $this->isMergeSameAddress = $isMergeSameAddress;
+  }
+
+  /**
    * Only export contacts that can receive postal mail.
    *
    * Includes being alive, having an address & not having do_not_mail.
@@ -209,8 +265,9 @@ class CRM_Export_BAO_ExportProcessor {
    * @param string $queryOperator
    * @param bool $isMergeSameHousehold
    * @param bool $isPostalableOnly
+   * @param bool $isMergeSameAddress
    */
-  public function __construct($exportMode, $requestedFields, $queryOperator, $isMergeSameHousehold = FALSE, $isPostalableOnly = FALSE) {
+  public function __construct($exportMode, $requestedFields, $queryOperator, $isMergeSameHousehold = FALSE, $isPostalableOnly = FALSE, $isMergeSameAddress = FALSE) {
     $this->setExportMode($exportMode);
     $this->setQueryMode();
     $this->setQueryOperator($queryOperator);
@@ -218,7 +275,9 @@ class CRM_Export_BAO_ExportProcessor {
     $this->setRelationshipTypes();
     $this->setIsMergeSameHousehold($isMergeSameHousehold);
     $this->setIsPostalableOnly($isPostalableOnly);
+    $this->setIsMergeSameAddress($isMergeSameAddress);
     $this->setReturnProperties($this->determineReturnProperties());
+    $this->setAdditionalFieldsForSameAddressMerge();
   }
 
   /**
@@ -253,7 +312,7 @@ class CRM_Export_BAO_ExportProcessor {
    * @return array
    */
   public function getReturnProperties() {
-    return array_merge($this->returnProperties, $this->getAdditionalRequestedReturnProperties());
+    return array_merge($this->returnProperties, $this->getAdditionalRequestedReturnProperties(), $this->getAdditionalFieldsForSameAddressMerge());
   }
 
   /**
@@ -1520,6 +1579,17 @@ class CRM_Export_BAO_ExportProcessor {
     }
     else {
       $returnProperties = $this->getDefaultReturnProperties();
+    }
+    if ($this->isMergeSameAddress()) {
+      $returnProperties['addressee'] = 1;
+      $returnProperties['postal_greeting'] = 1;
+      $returnProperties['email_greeting'] = 1;
+      $returnProperties['street_name'] = 1;
+      $returnProperties['household_name'] = 1;
+      $returnProperties['street_address'] = 1;
+      $returnProperties['city'] = 1;
+      $returnProperties['state_province'] = 1;
+
     }
     return $returnProperties;
   }
