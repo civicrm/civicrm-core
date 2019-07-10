@@ -611,84 +611,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
         $jsSet = FALSE;
 
         if (isset($mappingId)) {
-          $locationId = isset($mappingLocation[$x][$i]) ? $mappingLocation[$x][$i] : 0;
-          if (isset($mappingName[$x][$i])) {
-            if (is_array($mapperFields[$mappingContactType[$x][$i]])) {
-
-              if (isset($mappingRelation[$x][$i])) {
-                $relLocationId = isset($mappingLocation[$x][$i]) ? $mappingLocation[$x][$i] : 0;
-                if (!$relLocationId && in_array($mappingName[$x][$i], $specialFields)) {
-                  $relLocationId = " ";
-                }
-
-                $relPhoneType = isset($mappingPhoneType[$x][$i]) ? $mappingPhoneType[$x][$i] : NULL;
-
-                $defaults["mapper[$x][$i]"] = [
-                  $mappingContactType[$x][$i],
-                  $mappingRelation[$x][$i],
-                  $locationId,
-                  $phoneType,
-                  $mappingName[$x][$i],
-                  $relLocationId,
-                  $relPhoneType,
-                ];
-
-                if (!$locationId) {
-                  $noneArray[] = [$x, $i, 2];
-                }
-                if (!$phoneType && !$imProvider) {
-                  $noneArray[] = [$x, $i, 3];
-                }
-                if (!$mappingName[$x][$i]) {
-                  $noneArray[] = [$x, $i, 4];
-                }
-                if (!$relLocationId) {
-                  $noneArray[] = [$x, $i, 5];
-                }
-                if (!$relPhoneType) {
-                  $noneArray[] = [$x, $i, 6];
-                }
-                $noneArray[] = [$x, $i, 2];
-              }
-              else {
-                $phoneType = isset($mappingPhoneType[$x][$i]) ? $mappingPhoneType[$x][$i] : NULL;
-                $imProvider = isset($mappingImProvider[$x][$i]) ? $mappingImProvider[$x][$i] : NULL;
-                if (!$locationId && in_array($mappingName[$x][$i], $specialFields)) {
-                  $locationId = " ";
-                }
-
-                $defaults["mapper[$x][$i]"] = [
-                  $mappingContactType[$x][$i],
-                  $mappingName[$x][$i],
-                  $locationId,
-                  $phoneType,
-                ];
-                if (!$mappingName[$x][$i]) {
-                  $noneArray[] = [$x, $i, 1];
-                }
-                if (!$locationId) {
-                  $noneArray[] = [$x, $i, 2];
-                }
-                if (!$phoneType && !$imProvider) {
-                  $noneArray[] = [$x, $i, 3];
-                }
-
-                $noneArray[] = [$x, $i, 4];
-                $noneArray[] = [$x, $i, 5];
-                $noneArray[] = [$x, $i, 6];
-              }
-
-              $jsSet = TRUE;
-
-              if (CRM_Utils_Array::value($i, CRM_Utils_Array::value($x, $mappingOperator))) {
-                $defaults["operator[$x][$i]"] = CRM_Utils_Array::value($i, $mappingOperator[$x]);
-              }
-
-              if (CRM_Utils_Array::value($i, CRM_Utils_Array::value($x, $mappingValue))) {
-                $defaults["value[$x][$i]"] = CRM_Utils_Array::value($i, $mappingValue[$x]);
-              }
-            }
-          }
+          list($mappingName, $defaults, $noneArray, $jsSet) = self::loadSavedMapping($mappingLocation, $x, $i, $mappingName, $mapperFields, $mappingContactType, $mappingRelation, $specialFields, $mappingPhoneType, $defaults, $noneArray, $mappingImProvider, $mappingOperator, $mappingValue);
         }
         //Fix for Search Builder
         if ($mappingType == 'Export') {
@@ -1049,6 +972,110 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     }
 
     return $saveMappingFields;
+  }
+
+  /**
+   * Load saved mapping.
+   *
+   * @param $mappingLocation
+   * @param int $x
+   * @param int $i
+   * @param $mappingName
+   * @param $mapperFields
+   * @param $mappingContactType
+   * @param $mappingRelation
+   * @param array $specialFields
+   * @param $mappingPhoneType
+   * @param $phoneType
+   * @param array $defaults
+   * @param array $noneArray
+   * @param $imProvider
+   * @param $mappingImProvider
+   * @param $mappingOperator
+   * @param $mappingValue
+   *
+   * @return array
+   */
+  protected static function loadSavedMapping($mappingLocation, int $x, int $i, $mappingName, $mapperFields, $mappingContactType, $mappingRelation, array $specialFields, $mappingPhoneType, array $defaults, array $noneArray, $mappingImProvider, $mappingOperator, $mappingValue) {
+    $locationId = isset($mappingLocation[$x][$i]) ? $mappingLocation[$x][$i] : 0;
+    if (isset($mappingName[$x][$i])) {
+      if (is_array($mapperFields[$mappingContactType[$x][$i]])) {
+
+        if (isset($mappingRelation[$x][$i])) {
+          $relLocationId = isset($mappingLocation[$x][$i]) ? $mappingLocation[$x][$i] : 0;
+          if (!$relLocationId && in_array($mappingName[$x][$i], $specialFields)) {
+            $relLocationId = " ";
+          }
+
+          $relPhoneType = isset($mappingPhoneType[$x][$i]) ? $mappingPhoneType[$x][$i] : NULL;
+
+          $defaults["mapper[$x][$i]"] = [
+            $mappingContactType[$x][$i],
+            $mappingRelation[$x][$i],
+            $locationId,
+            $phoneType,
+            $mappingName[$x][$i],
+            $relLocationId,
+            $relPhoneType,
+          ];
+
+          if (!$locationId) {
+            $noneArray[] = [$x, $i, 2];
+          }
+          if (!$phoneType && !$imProvider) {
+            $noneArray[] = [$x, $i, 3];
+          }
+          if (!$mappingName[$x][$i]) {
+            $noneArray[] = [$x, $i, 4];
+          }
+          if (!$relLocationId) {
+            $noneArray[] = [$x, $i, 5];
+          }
+          if (!$relPhoneType) {
+            $noneArray[] = [$x, $i, 6];
+          }
+          $noneArray[] = [$x, $i, 2];
+        }
+        else {
+          $phoneType = isset($mappingPhoneType[$x][$i]) ? $mappingPhoneType[$x][$i] : NULL;
+          $imProvider = isset($mappingImProvider[$x][$i]) ? $mappingImProvider[$x][$i] : NULL;
+          if (!$locationId && in_array($mappingName[$x][$i], $specialFields)) {
+            $locationId = " ";
+          }
+
+          $defaults["mapper[$x][$i]"] = [
+            $mappingContactType[$x][$i],
+            $mappingName[$x][$i],
+            $locationId,
+            $phoneType,
+          ];
+          if (!$mappingName[$x][$i]) {
+            $noneArray[] = [$x, $i, 1];
+          }
+          if (!$locationId) {
+            $noneArray[] = [$x, $i, 2];
+          }
+          if (!$phoneType && !$imProvider) {
+            $noneArray[] = [$x, $i, 3];
+          }
+
+          $noneArray[] = [$x, $i, 4];
+          $noneArray[] = [$x, $i, 5];
+          $noneArray[] = [$x, $i, 6];
+        }
+
+        $jsSet = TRUE;
+
+        if (CRM_Utils_Array::value($i, CRM_Utils_Array::value($x, $mappingOperator))) {
+          $defaults["operator[$x][$i]"] = CRM_Utils_Array::value($i, $mappingOperator[$x]);
+        }
+
+        if (CRM_Utils_Array::value($i, CRM_Utils_Array::value($x, $mappingValue))) {
+          $defaults["value[$x][$i]"] = CRM_Utils_Array::value($i, $mappingValue[$x]);
+        }
+      }
+    }
+    return [$mappingName, $defaults, $noneArray, $jsSet];
   }
 
   /**
