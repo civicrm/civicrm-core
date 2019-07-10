@@ -743,7 +743,23 @@ class CRM_Export_BAO_ExportProcessor {
     }
 
     $groupBy = $this->getGroupBy($query);
-    return [$query, "$select $from $where $having $groupBy"];
+    $queryString = "$select $from $where $having $groupBy";
+    if ($order) {
+      // always add contact_a.id to the ORDER clause
+      // so the order is deterministic
+      //CRM-15301
+      if (strpos('contact_a.id', $order) === FALSE) {
+        $order .= ", contact_a.id";
+      }
+
+      list($field, $dir) = explode(' ', $order, 2);
+      $field = trim($field);
+      if (!empty($this->getReturnProperties()[$field])) {
+        //CRM-15301
+        $queryString .= " ORDER BY $order";
+      }
+    }
+    return [$query, $queryString];
   }
 
   /**
@@ -1677,6 +1693,7 @@ class CRM_Export_BAO_ExportProcessor {
     }
     return $returnProperties;
   }
+
   /**
    * @param object $query
    *   CRM_Contact_BAO_Query
