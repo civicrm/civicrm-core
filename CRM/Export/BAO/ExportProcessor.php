@@ -264,6 +264,48 @@ class CRM_Export_BAO_ExportProcessor {
   protected $outputSpecification = [];
 
   /**
+   * @var string
+   */
+  protected $componentTable = '';
+
+  /**
+   * @return string
+   */
+  public function getComponentTable() {
+    return $this->componentTable;
+  }
+
+  /**
+   * Set the component table (if any).
+   *
+   * @param string $componentTable
+   */
+  public function setComponentTable($componentTable) {
+    $this->componentTable = $componentTable;
+  }
+
+  /**
+   * Clause from component search.
+   *
+   * @var string
+   */
+  protected $componentClause = '';
+
+  /**
+   * @return string
+   */
+  public function getComponentClause() {
+    return $this->componentClause;
+  }
+
+  /**
+   * @param string $componentClause
+   */
+  public function setComponentClause($componentClause) {
+    $this->componentClause = $componentClause;
+  }
+
+  /**
    * Name of a temporary table created to hold the results.
    *
    * Current decision making on when to create a temp table is kinda bad so this might change
@@ -678,6 +720,27 @@ class CRM_Export_BAO_ExportProcessor {
     $query->_sort = $order;
     list($select, $from, $where, $having) = $query->query();
     $this->setQueryFields($query->_fields);
+    $whereClauses = ['trash_clause' => "contact_a.is_deleted != 1"];
+    if ($this->getRequestedFields() && ($this->getComponentTable())){
+      $from .= " INNER JOIN " . $this->getComponentTable() . " ctTable ON ctTable.contact_id = contact_a.id ";
+    }
+    elseif ($this->getComponentClause()) {
+      $whereClauses[] = $this->getComponentClause();
+    }
+
+    // CRM-13982 - check if is deleted
+    foreach ($params as $value) {
+      if ($value[0] == 'contact_is_deleted') {
+        unset($whereClauses['trash_clause']);
+      }
+    }
+
+    if (empty($where)) {
+      $where = "WHERE " . implode(' AND ', $whereClauses);
+    }
+    else {
+      $where .= " AND " . implode(' AND ', $whereClauses);
+    }
     return [$query, $select, $from, $where . $addressWhere, $having];
   }
 
