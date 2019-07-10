@@ -993,49 +993,38 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   /**
    * Get the parameters for a mapping field in a saveable format from the quickform mapping format.
    *
-   * @param array $params
-   * @param int $mappingId
+   * @param array $defaults
    * @param array $v
-   * @param string $k
-   * @param string $key
-   * @param int $colCnt
    *
    * @return array
    */
-  protected static function getMappingParams($params, $mappingId, $v, $k, $key, $colCnt) {
+  protected static function getMappingParams($defaults, $v) {
     $locationTypeId = NULL;
     $phoneTypeId = NULL;
-    $saveMappingFields = new CRM_Core_DAO_MappingField();
+    $saveMappingFields = $defaults;
 
-    $saveMappingFields->mapping_id = $mappingId;
-    $saveMappingFields->name = CRM_Utils_Array::value('1', $v);
-    $saveMappingFields->contact_type = CRM_Utils_Array::value('0', $v);
+    $saveMappingFields['name'] = CRM_Utils_Array::value('1', $v);
+    $saveMappingFields['contact_type'] = CRM_Utils_Array::value('0', $v);
     $locationId = CRM_Utils_Array::value('2', $v);
-    $saveMappingFields->location_type_id = is_numeric($locationId) ? $locationId : NULL;
+    $saveMappingFields['location_type_id'] = is_numeric($locationId) ? $locationId : NULL;
 
     if ($v[1] == 'phone') {
-      $saveMappingFields->phone_type_id = CRM_Utils_Array::value('3', $v);
+      $saveMappingFields['phone_type_id'] = CRM_Utils_Array::value('3', $v);
     }
     elseif ($v[1] == 'im') {
-      $saveMappingFields->im_provider_id = CRM_Utils_Array::value('3', $v);
+      $saveMappingFields['im_provider_id'] = CRM_Utils_Array::value('3', $v);
     }
 
-    if (!empty($params['operator'])) {
-      $saveMappingFields->operator = CRM_Utils_Array::value($k, $params['operator'][$key]);
-    }
-    if (!empty($params['value'])) {
-      $saveMappingFields->value = CRM_Utils_Array::value($k, $params['value'][$key]);
-    }
     // Handle mapping for 'related contact' fields
     if (count(explode('_', CRM_Utils_Array::value('1', $v))) > 2) {
       list($id, $first, $second) = explode('_', CRM_Utils_Array::value('1', $v));
       if (($first == 'a' && $second == 'b') || ($first == 'b' && $second == 'a')) {
 
         if (!empty($v['2'])) {
-          $saveMappingFields->name = CRM_Utils_Array::value('2', $v);
+          $saveMappingFields['name'] = CRM_Utils_Array::value('2', $v);
         }
         elseif (!empty($v['4'])) {
-          $saveMappingFields->name = CRM_Utils_Array::value('4', $v);
+          $saveMappingFields['name'] = CRM_Utils_Array::value('4', $v);
         }
 
         if (is_numeric(CRM_Utils_Array::value('3', $v))) {
@@ -1052,16 +1041,14 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
           $phoneTypeId = CRM_Utils_Array::value('6', $v);
         }
 
-        $saveMappingFields->location_type_id = is_numeric($locationTypeId) ? $locationTypeId : NULL;
-        $saveMappingFields->phone_type_id = is_numeric($phoneTypeId) ? $phoneTypeId : NULL;
-        $saveMappingFields->relationship_type_id = $id;
-        $saveMappingFields->relationship_direction = "{$first}_{$second}";
+        $saveMappingFields['location_type_id'] = is_numeric($locationTypeId) ? $locationTypeId : NULL;
+        $saveMappingFields['phone_type_id'] = is_numeric($phoneTypeId) ? $phoneTypeId : NULL;
+        $saveMappingFields['relationship_type_id'] = $id;
+        $saveMappingFields['relationship_direction'] = "{$first}_{$second}";
       }
     }
 
-    $saveMappingFields->grouping = $key;
-    $saveMappingFields->column_number = $colCnt;
-    return (array) $saveMappingFields;
+    return $saveMappingFields;
   }
 
   /**
@@ -1298,7 +1285,14 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       foreach ($value as $k => $v) {
 
         if (!empty($v['1'])) {
-          $saveMappingParams = self::getMappingParams($params, $mappingId, $v, $k, $key, $colCnt);
+          $saveMappingParams = self::getMappingParams(
+          [
+            'mapping_id' => $mappingId,
+            'grouping' => $key,
+            'operator' => $params['operator'][$key][$k] ?? NULL,
+            'value' => $params['value'][$key][$k] ?? NULL,
+            'column_number' => $colCnt,
+          ], $v);
           $saveMappingField = new CRM_Core_DAO_MappingField();
           $saveMappingField->copyValues($saveMappingParams, TRUE);
           $saveMappingField->save();
