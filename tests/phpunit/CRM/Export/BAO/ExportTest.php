@@ -496,6 +496,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Test exporting relationships.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportRelationships() {
     $organization1 = $this->organizationCreate(['organization_name' => 'Org 1', 'legal_name' => 'pretty legal', 'contact_source' => 'friend who took a law paper once']);
@@ -509,40 +512,21 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ['Individual', $employerRelationshipTypeID . '_a_b', 'legal_name', ''],
       ['Individual', $employerRelationshipTypeID . '_a_b', 'contact_source', ''],
     ];
-    list($tableName, $sqlColumns, $headerRows) = CRM_Export_BAO_Export::exportComponents(
-      FALSE,
-      [$contact1, $contact2],
-      [],
-      NULL,
-      $selectedFields,
-      NULL,
-      CRM_Export_Form_Select::CONTACT_EXPORT,
-      "contact_a.id IN ( $contact1, $contact2 )",
-      NULL,
-      FALSE,
-      FALSE,
-      [
-        'suppress_csv_for_testing' => TRUE,
-      ]
-    );
+    $this->doExportTest([
+      'ids' => [$contact1, $contact2],
+      'componentClause' => "contact_a.id IN ( $contact1, $contact2 )",
+      'fields' => $selectedFields,
+    ]);
 
-    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM {$tableName}");
-    $dao->fetch();
-    $this->assertEquals('one', $dao->first_name);
-    $this->assertEquals('Org 1', $dao->{$employerRelationshipTypeID . '_a_b_organization_name'});
-    $this->assertEquals('pretty legal', $dao->{$employerRelationshipTypeID . '_a_b_legal_name'});
-    $this->assertEquals('friend who took a law paper once', $dao->{$employerRelationshipTypeID . '_a_b_contact_source'});
+    $row = $this->csv->fetchOne();
+    $this->assertEquals('one', $row['First Name']);
+    $this->assertEquals('Org 1', $row['Employee of-Organization Name']);
+    $this->assertEquals('pretty legal', $row['Employee of-Legal Name']);
+    $this->assertEquals('friend who took a law paper once', $row['Employee of-Contact Source']);
 
-    $dao->fetch();
-    $this->assertEquals('Org 2', $dao->{$employerRelationshipTypeID . '_a_b_organization_name'});
-    $this->assertEquals('well dodgey', $dao->{$employerRelationshipTypeID . '_a_b_legal_name'});
-
-    $this->assertEquals([
-      0 => 'First Name',
-      1 => 'Employee of-Organization Name',
-      2 => 'Employee of-Legal Name',
-      3 => 'Employee of-Contact Source',
-    ], $headerRows);
+    $row = $this->csv->fetchOne(1);
+    $this->assertEquals('Org 2', $row['Employee of-Organization Name']);
+    $this->assertEquals('well dodgey', $row['Employee of-Legal Name']);
   }
 
   /**
