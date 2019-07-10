@@ -178,8 +178,12 @@ class CRM_Export_BAO_Export {
       isset($exportParams['postal_mailing_export']['postal_mailing_export']) &&
       $exportParams['postal_mailing_export']['postal_mailing_export'] == 1
     );
+    $mappedFields = [];
+    foreach ((array) $fields as $field) {
+      $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
+    }
 
-    $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator, $mergeSameHousehold, $isPostalOnly, $mergeSameAddress);
+    $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $mappedFields, $queryOperator, $mergeSameHousehold, $isPostalOnly, $mergeSameAddress);
     if ($moreReturnProperties) {
       $processor->setAdditionalRequestedReturnProperties($moreReturnProperties);
     }
