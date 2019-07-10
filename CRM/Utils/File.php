@@ -640,6 +640,10 @@ HTACCESS;
    * @param $directory
    *
    * @return string
+   * @deprecated
+   *   Computation of a relative path requires some base.
+   *   This implementation is problematic because it relies on an
+   *   implicit base which was constructed problematically.
    */
   public static function relativeDirectory($directory) {
     // Do nothing on windows
