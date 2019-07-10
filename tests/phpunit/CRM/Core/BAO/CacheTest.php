@@ -109,7 +109,7 @@ class CRM_Core_BAO_CacheTest extends CiviUnitTestCase {
    * @dataProvider getCleanKeyExamples
    */
   public function testCleanKeys($inputKey, $expectKey) {
-    $actualKey = CRM_Core_BAO_Cache::cleanKey($inputKey);
+    $actualKey = CRM_Utils_Cache::cleanKey($inputKey);
     $this->assertEquals($expectKey, $actualKey);
   }
 

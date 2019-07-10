@@ -183,7 +183,7 @@ class CRM_Utils_Cache {
     $types = (array) $params['type'];
 
     if (!empty($params['name'])) {
-      $params['name'] = CRM_Core_BAO_Cache::cleanKey($params['name']);
+      $params['name'] = self::cleanKey($params['name']);
     }
 
     foreach ($types as $type) {
@@ -218,6 +218,37 @@ class CRM_Utils_Cache {
     }
 
     throw new CRM_Core_Exception("Failed to instantiate cache. No supported cache type found. " . print_r($params, 1));
+  }
+
+  /**
+   * Normalize a cache key.
+   *
+   * This bridges an impedance mismatch between our traditional caching
+   * and PSR-16 -- PSR-16 accepts a narrower range of cache keys.
+   *
+   * @param string $key
+   *   Ex: 'ab/cd:ef'
+   * @return string
+   *   Ex: '_abcd1234abcd1234' or 'ab_xx/cd_xxef'.
+   *   A similar key, but suitable for use with PSR-16-compliant cache providers.
+   */
+  public static function cleanKey($key) {
+    if (!is_string($key) && !is_int($key)) {
+      throw new \RuntimeException("Malformed cache key");
+    }
+
+    $maxLen = 64;
+    $escape = '-';
+
+    if (strlen($key) >= $maxLen) {
+      return $escape . md5($key);
+    }
+
+    $r = preg_replace_callback(';[^A-Za-z0-9_\.];', function($m) use ($escape) {
+      return $escape . dechex(ord($m[0]));
+    }, $key);
+
+    return strlen($r) >= $maxLen ? $escape . md5($key) : $r;
   }
 
   /**

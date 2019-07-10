@@ -475,24 +475,11 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @return string
    *   Ex: '_abcd1234abcd1234' or 'ab_xx/cd_xxef'.
    *   A similar key, but suitable for use with PSR-16-compliant cache providers.
+   * @deprecated
+   * @see CRM_Utils_Cache::cleanKey()
    */
   public static function cleanKey($key) {
-    if (!is_string($key) && !is_int($key)) {
-      throw new \RuntimeException("Malformed cache key");
-    }
-
-    $maxLen = 64;
-    $escape = '-';
-
-    if (strlen($key) >= $maxLen) {
-      return $escape . md5($key);
-    }
-
-    $r = preg_replace_callback(';[^A-Za-z0-9_\.];', function($m) use ($escape) {
-      return $escape . dechex(ord($m[0]));
-    }, $key);
-
-    return strlen($r) >= $maxLen ? $escape . md5($key) : $r;
+    return CRM_Utils_Cache::cleanKey($key);
   }
 
 }
