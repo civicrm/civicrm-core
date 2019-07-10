@@ -77,7 +77,7 @@ class CRM_Extension_ClassLoader {
    */
   public function register() {
     // In pre-installation environments, don't bother with caching.
-    if (!defined('CIVICRM_TEMPLATE_COMPILEDIR') || !defined('CIVICRM_DSN') || defined('CIVICRM_TEST') || \CRM_Utils_System::isInUpgradeMode()) {
+    if (!defined('CIVICRM_DSN') || defined('CIVICRM_TEST') || \CRM_Utils_System::isInUpgradeMode()) {
       return $this->buildClassLoader()->register();
     }
 
@@ -146,7 +146,7 @@ class CRM_Extension_ClassLoader {
    */
   protected function getCacheFile() {
     $envId = \CRM_Core_Config_Runtime::getId();
-    $file = CIVICRM_TEMPLATE_COMPILEDIR . "/CachedExtLoader.{$envId}.php";
+    $file = \Civi::paths()->getPath("[civicrm.compile]/CachedExtLoader.{$envId}.php");
     return $file;
   }
 
