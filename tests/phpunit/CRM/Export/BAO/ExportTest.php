@@ -496,6 +496,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Test exporting relationships.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportRelationships() {
     $organization1 = $this->organizationCreate(['organization_name' => 'Org 1', 'legal_name' => 'pretty legal', 'contact_source' => 'friend who took a law paper once']);
@@ -509,40 +512,21 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ['Individual', $employerRelationshipTypeID . '_a_b', 'legal_name', ''],
       ['Individual', $employerRelationshipTypeID . '_a_b', 'contact_source', ''],
     ];
-    list($tableName, $sqlColumns, $headerRows) = CRM_Export_BAO_Export::exportComponents(
-      FALSE,
-      [$contact1, $contact2],
-      [],
-      NULL,
-      $selectedFields,
-      NULL,
-      CRM_Export_Form_Select::CONTACT_EXPORT,
-      "contact_a.id IN ( $contact1, $contact2 )",
-      NULL,
-      FALSE,
-      FALSE,
-      [
-        'suppress_csv_for_testing' => TRUE,
-      ]
-    );
+    $this->doExportTest([
+      'ids' => [$contact1, $contact2],
+      'componentClause' => "contact_a.id IN ( $contact1, $contact2 )",
+      'fields' => $selectedFields,
+    ]);
 
-    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM {$tableName}");
-    $dao->fetch();
-    $this->assertEquals('one', $dao->first_name);
-    $this->assertEquals('Org 1', $dao->{$employerRelationshipTypeID . '_a_b_organization_name'});
-    $this->assertEquals('pretty legal', $dao->{$employerRelationshipTypeID . '_a_b_legal_name'});
-    $this->assertEquals('friend who took a law paper once', $dao->{$employerRelationshipTypeID . '_a_b_contact_source'});
+    $row = $this->csv->fetchOne();
+    $this->assertEquals('one', $row['First Name']);
+    $this->assertEquals('Org 1', $row['Employee of-Organization Name']);
+    $this->assertEquals('pretty legal', $row['Employee of-Legal Name']);
+    $this->assertEquals('friend who took a law paper once', $row['Employee of-Contact Source']);
 
-    $dao->fetch();
-    $this->assertEquals('Org 2', $dao->{$employerRelationshipTypeID . '_a_b_organization_name'});
-    $this->assertEquals('well dodgey', $dao->{$employerRelationshipTypeID . '_a_b_legal_name'});
-
-    $this->assertEquals([
-      0 => 'First Name',
-      1 => 'Employee of-Organization Name',
-      2 => 'Employee of-Legal Name',
-      3 => 'Employee of-Contact Source',
-    ], $headerRows);
+    $row = $this->csv->fetchOne(1);
+    $this->assertEquals('Org 2', $row['Employee of-Organization Name']);
+    $this->assertEquals('well dodgey', $row['Employee of-Legal Name']);
   }
 
   /**
@@ -676,6 +660,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Attempt to do a fairly full export of location data.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportIMData() {
     // Use default providers.
@@ -753,125 +740,29 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         }
       }
     }
-    list($tableName, $sqlColumns) = $this->doExport($fields, $this->contactIDs[0]);
+    $this->doExportTest(['fields' => $fields, 'ids' => [$this->contactIDs[0]]]);
 
-    $dao = CRM_Core_DAO::executeQuery('SELECT * FROM ' . $tableName);
-    while ($dao->fetch()) {
-      $id = $dao->contact_id;
-      $this->assertEquals('AIM', $dao->billing_im_provider);
-      $this->assertEquals('BillingJabber' . $id, $dao->billing_im_screen_name_jabber);
-      $this->assertEquals('BillingSkype' . $id, $dao->billing_im_screen_name_skype);
+    foreach ($this->csv->getRecords() as $row) {
+      $id = $row['contact_id'];
+      $this->assertEquals('AIM', $row['Billing-IM Provider']);
+      $this->assertEquals('AIM', $row['Whare Kai-IM Provider']);
+      $this->assertEquals('BillingJabber' . $id, $row['Billing-IM Screen Name-Jabber']);
+      $this->assertEquals('Whare KaiJabber' . $id, $row['Whare Kai-IM Screen Name-Jabber']);
+      $this->assertEquals('BillingSkype' . $id, $row['Billing-IM Screen Name-Skype']);
       foreach ($relationships as $relatedContactID => $relationship) {
-        $relationshipString = $field = $relationship['relationship_type_id'] . '_a_b';
-        $field = $relationshipString . '_billing_im_screen_name_yahoo';
-        $this->assertEquals('BillingYahoo' . $relatedContactID, $dao->$field);
-        // @todo efforts to output 'im_provider' for related contacts seem to be giving a blank field.
+        $this->assertEquals('BillingYahoo' . $relatedContactID, $row[$relationship['label'] . '-Billing-IM Screen Name-Yahoo']);
+        $this->assertEquals('Whare KaiJabber' . $relatedContactID, $row[$relationship['label'] . '-Whare Kai-IM Screen Name-Jabber']);
       }
     }
-
-    $this->assertEquals([
-      'billing_im_provider' => 'billing_im_provider text',
-      'billing_im_screen_name' => 'billing_im_screen_name varchar(64)',
-      'billing_im_screen_name_jabber' => 'billing_im_screen_name_jabber varchar(64)',
-      'billing_im_screen_name_skype' => 'billing_im_screen_name_skype varchar(64)',
-      'billing_im_screen_name_yahoo' => 'billing_im_screen_name_yahoo varchar(64)',
-      'home_im_provider' => 'home_im_provider text',
-      'home_im_screen_name' => 'home_im_screen_name varchar(64)',
-      'home_im_screen_name_jabber' => 'home_im_screen_name_jabber varchar(64)',
-      'home_im_screen_name_skype' => 'home_im_screen_name_skype varchar(64)',
-      'home_im_screen_name_yahoo' => 'home_im_screen_name_yahoo varchar(64)',
-      'main_im_provider' => 'main_im_provider text',
-      'main_im_screen_name' => 'main_im_screen_name varchar(64)',
-      'main_im_screen_name_jabber' => 'main_im_screen_name_jabber varchar(64)',
-      'main_im_screen_name_skype' => 'main_im_screen_name_skype varchar(64)',
-      'main_im_screen_name_yahoo' => 'main_im_screen_name_yahoo varchar(64)',
-      'other_im_provider' => 'other_im_provider text',
-      'other_im_screen_name' => 'other_im_screen_name varchar(64)',
-      'other_im_screen_name_jabber' => 'other_im_screen_name_jabber varchar(64)',
-      'other_im_screen_name_skype' => 'other_im_screen_name_skype varchar(64)',
-      'other_im_screen_name_yahoo' => 'other_im_screen_name_yahoo varchar(64)',
-      'im_provider' => 'im_provider text',
-      'im_screen_name' => 'im_screen_name varchar(64)',
-      'contact_id' => 'contact_id varchar(255)',
-      '2_a_b_im_provider' => '2_a_b_im_provider text',
-      '2_a_b_billing_im_screen_name' => '2_a_b_billing_im_screen_name varchar(64)',
-      '2_a_b_billing_im_screen_name_jabber' => '2_a_b_billing_im_screen_name_jabber varchar(64)',
-      '2_a_b_billing_im_screen_name_skype' => '2_a_b_billing_im_screen_name_skype varchar(64)',
-      '2_a_b_billing_im_screen_name_yahoo' => '2_a_b_billing_im_screen_name_yahoo varchar(64)',
-      '2_a_b_home_im_screen_name' => '2_a_b_home_im_screen_name varchar(64)',
-      '2_a_b_home_im_screen_name_jabber' => '2_a_b_home_im_screen_name_jabber varchar(64)',
-      '2_a_b_home_im_screen_name_skype' => '2_a_b_home_im_screen_name_skype varchar(64)',
-      '2_a_b_home_im_screen_name_yahoo' => '2_a_b_home_im_screen_name_yahoo varchar(64)',
-      '2_a_b_main_im_screen_name' => '2_a_b_main_im_screen_name varchar(64)',
-      '2_a_b_main_im_screen_name_jabber' => '2_a_b_main_im_screen_name_jabber varchar(64)',
-      '2_a_b_main_im_screen_name_skype' => '2_a_b_main_im_screen_name_skype varchar(64)',
-      '2_a_b_main_im_screen_name_yahoo' => '2_a_b_main_im_screen_name_yahoo varchar(64)',
-      '2_a_b_other_im_screen_name' => '2_a_b_other_im_screen_name varchar(64)',
-      '2_a_b_other_im_screen_name_jabber' => '2_a_b_other_im_screen_name_jabber varchar(64)',
-      '2_a_b_other_im_screen_name_skype' => '2_a_b_other_im_screen_name_skype varchar(64)',
-      '2_a_b_other_im_screen_name_yahoo' => '2_a_b_other_im_screen_name_yahoo varchar(64)',
-      '2_a_b_im_screen_name' => '2_a_b_im_screen_name varchar(64)',
-      '8_a_b_im_provider' => '8_a_b_im_provider text',
-      '8_a_b_billing_im_screen_name' => '8_a_b_billing_im_screen_name varchar(64)',
-      '8_a_b_billing_im_screen_name_jabber' => '8_a_b_billing_im_screen_name_jabber varchar(64)',
-      '8_a_b_billing_im_screen_name_skype' => '8_a_b_billing_im_screen_name_skype varchar(64)',
-      '8_a_b_billing_im_screen_name_yahoo' => '8_a_b_billing_im_screen_name_yahoo varchar(64)',
-      '8_a_b_home_im_screen_name' => '8_a_b_home_im_screen_name varchar(64)',
-      '8_a_b_home_im_screen_name_jabber' => '8_a_b_home_im_screen_name_jabber varchar(64)',
-      '8_a_b_home_im_screen_name_skype' => '8_a_b_home_im_screen_name_skype varchar(64)',
-      '8_a_b_home_im_screen_name_yahoo' => '8_a_b_home_im_screen_name_yahoo varchar(64)',
-      '8_a_b_main_im_screen_name' => '8_a_b_main_im_screen_name varchar(64)',
-      '8_a_b_main_im_screen_name_jabber' => '8_a_b_main_im_screen_name_jabber varchar(64)',
-      '8_a_b_main_im_screen_name_skype' => '8_a_b_main_im_screen_name_skype varchar(64)',
-      '8_a_b_main_im_screen_name_yahoo' => '8_a_b_main_im_screen_name_yahoo varchar(64)',
-      '8_a_b_other_im_screen_name' => '8_a_b_other_im_screen_name varchar(64)',
-      '8_a_b_other_im_screen_name_jabber' => '8_a_b_other_im_screen_name_jabber varchar(64)',
-      '8_a_b_other_im_screen_name_skype' => '8_a_b_other_im_screen_name_skype varchar(64)',
-      '8_a_b_other_im_screen_name_yahoo' => '8_a_b_other_im_screen_name_yahoo varchar(64)',
-      '8_a_b_im_screen_name' => '8_a_b_im_screen_name varchar(64)',
-      '5_a_b_im_provider' => '5_a_b_im_provider text',
-      '5_a_b_billing_im_screen_name' => '5_a_b_billing_im_screen_name varchar(64)',
-      '5_a_b_billing_im_screen_name_jabber' => '5_a_b_billing_im_screen_name_jabber varchar(64)',
-      '5_a_b_billing_im_screen_name_skype' => '5_a_b_billing_im_screen_name_skype varchar(64)',
-      '5_a_b_billing_im_screen_name_yahoo' => '5_a_b_billing_im_screen_name_yahoo varchar(64)',
-      '5_a_b_home_im_screen_name' => '5_a_b_home_im_screen_name varchar(64)',
-      '5_a_b_home_im_screen_name_jabber' => '5_a_b_home_im_screen_name_jabber varchar(64)',
-      '5_a_b_home_im_screen_name_skype' => '5_a_b_home_im_screen_name_skype varchar(64)',
-      '5_a_b_home_im_screen_name_yahoo' => '5_a_b_home_im_screen_name_yahoo varchar(64)',
-      '5_a_b_main_im_screen_name' => '5_a_b_main_im_screen_name varchar(64)',
-      '5_a_b_main_im_screen_name_jabber' => '5_a_b_main_im_screen_name_jabber varchar(64)',
-      '5_a_b_main_im_screen_name_skype' => '5_a_b_main_im_screen_name_skype varchar(64)',
-      '5_a_b_main_im_screen_name_yahoo' => '5_a_b_main_im_screen_name_yahoo varchar(64)',
-      '5_a_b_other_im_screen_name' => '5_a_b_other_im_screen_name varchar(64)',
-      '5_a_b_other_im_screen_name_jabber' => '5_a_b_other_im_screen_name_jabber varchar(64)',
-      '5_a_b_other_im_screen_name_skype' => '5_a_b_other_im_screen_name_skype varchar(64)',
-      '5_a_b_other_im_screen_name_yahoo' => '5_a_b_other_im_screen_name_yahoo varchar(64)',
-      '5_a_b_im_screen_name' => '5_a_b_im_screen_name varchar(64)',
-      'whare_kai_im_provider' => 'whare_kai_im_provider text',
-      'whare_kai_im_screen_name' => 'whare_kai_im_screen_name varchar(64)',
-      'whare_kai_im_screen_name_jabber' => 'whare_kai_im_screen_name_jabber varchar(64)',
-      'whare_kai_im_screen_name_skype' => 'whare_kai_im_screen_name_skype varchar(64)',
-      'whare_kai_im_screen_name_yahoo' => 'whare_kai_im_screen_name_yahoo varchar(64)',
-      '2_a_b_whare_kai_im_screen_name' => '2_a_b_whare_kai_im_screen_name varchar(64)',
-      '2_a_b_whare_kai_im_screen_name_jabber' => '2_a_b_whare_kai_im_screen_name_jabber varchar(64)',
-      '2_a_b_whare_kai_im_screen_name_skype' => '2_a_b_whare_kai_im_screen_name_skype varchar(64)',
-      '2_a_b_whare_kai_im_screen_name_yahoo' => '2_a_b_whare_kai_im_screen_name_yahoo varchar(64)',
-      '8_a_b_whare_kai_im_screen_name' => '8_a_b_whare_kai_im_screen_name varchar(64)',
-      '8_a_b_whare_kai_im_screen_name_jabber' => '8_a_b_whare_kai_im_screen_name_jabber varchar(64)',
-      '8_a_b_whare_kai_im_screen_name_skype' => '8_a_b_whare_kai_im_screen_name_skype varchar(64)',
-      '8_a_b_whare_kai_im_screen_name_yahoo' => '8_a_b_whare_kai_im_screen_name_yahoo varchar(64)',
-      '5_a_b_whare_kai_im_screen_name' => '5_a_b_whare_kai_im_screen_name varchar(64)',
-      '5_a_b_whare_kai_im_screen_name_jabber' => '5_a_b_whare_kai_im_screen_name_jabber varchar(64)',
-      '5_a_b_whare_kai_im_screen_name_skype' => '5_a_b_whare_kai_im_screen_name_skype varchar(64)',
-      '5_a_b_whare_kai_im_screen_name_yahoo' => '5_a_b_whare_kai_im_screen_name_yahoo varchar(64)',
-    ], $sqlColumns);
-
   }
 
   /**
    * Test phone data export.
    *
    * Less over the top complete than the im test.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportPhoneData() {
     $this->contactIDs[] = $this->individualCreate();
@@ -948,17 +839,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         }
       }
     }
-    list($tableName) = $this->doExport($fields, $this->contactIDs[0]);
-
-    $dao = CRM_Core_DAO::executeQuery('SELECT * FROM ' . $tableName);
-    while ($dao->fetch()) {
-      // note there is some chance these might be random on some mysql co
-      $this->assertEquals('BillingMobile3', $dao->billing_phone_mobile);
-      $this->assertEquals('', $dao->billing_phone_phone);
-      $relField = '2_a_b_phone_type_id';
-      $this->assertEquals('Phone', $dao->$relField);
-      $this->assertEquals('Mobile', $dao->phone_type_id);
-      $this->assertEquals('Mobile', $dao->billing_phone_type_id);
+    $this->doExportTest(['fields' => $fields, 'ids' => [$this->contactIDs[0]]]);
+    foreach ($this->csv->getRecords() as $row) {
+      $this->assertEquals('BillingMobile3', $row['Billing-Phone-Mobile']);
+      $this->assertEquals('', $row['Billing-Phone-Phone']);
+      $this->assertEquals('Phone', $row['Spouse of-Phone Type']);
+      $this->assertEquals('Mobile', $row['Phone Type']);
+      $this->assertEquals('Mobile', $row['Billing-Phone Type']);
     }
   }
 
@@ -2782,6 +2669,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   protected function doExportTest($params) {
     $this->startCapturingOutput();
     try {
+      $defaultClause = (empty($params['ids']) ? NULL : "contact_a.id IN (" . implode(',', $params['ids']) . ")");
       CRM_Export_BAO_Export::exportComponents(
         CRM_Utils_Array::value('selectAll', $params, (empty($params['fields']))),
         CRM_Utils_Array::value('ids', $params, []),
@@ -2790,7 +2678,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         CRM_Utils_Array::value('fields', $params),
         CRM_Utils_Array::value('moreReturnProperties', $params),
         CRM_Utils_Array::value('exportMode', $params, CRM_Export_Form_Select::CONTACT_EXPORT),
-        CRM_Utils_Array::value('componentClause', $params, FALSE),
+        CRM_Utils_Array::value('componentClause', $params, $defaultClause),
         CRM_Utils_Array::value('componentTable', $params),
         CRM_Utils_Array::value('mergeSameAddress', $params, FALSE),
         CRM_Utils_Array::value('mergeSameHousehold', $params, FALSE)
