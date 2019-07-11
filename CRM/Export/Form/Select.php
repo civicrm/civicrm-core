@@ -466,9 +466,9 @@ FROM   {$this->_componentTable}
 
     $this->set('mappingTypeId', CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Mapping', 'mapping_type_id', $exportType));
 
-    $mappings = CRM_Core_BAO_Mapping::getMappings($exportType);
+    $mappings = CRM_Core_BAO_Mapping::getMappings($exportType, TRUE);
     if (!empty($mappings)) {
-      $this->add('select', 'mapping', ts('Use Saved Field Mapping'), ['' => '-select-'] + $mappings);
+      $this->add('select2', 'mapping', ts('Use Saved Field Mapping'), $mappings, FALSE, ['placeholder' => ts('- select -')]);
     }
   }
 
