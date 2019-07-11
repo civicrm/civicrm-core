@@ -228,11 +228,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     list($query, $select, $from, $where, $having) = $processor->runQuery($params, $order, $returnProperties);
 
     if ($mergeSameHousehold == 1) {
-      if (empty($returnProperties['id'])) {
-        $returnProperties['id'] = 1;
-      }
-
-      $processor->setHouseholdMergeReturnProperties(array_diff_key($returnProperties, array_fill_keys(['location_type', 'im_provider'], 1)));
+      $processor->setHouseholdMergeReturnProperties($returnProperties);
     }
 
     // This perhaps only needs calling when $mergeSameHousehold == 1
