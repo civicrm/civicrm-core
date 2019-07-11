@@ -1027,7 +1027,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
 
     $fieldInfo = array('options' => $field->getOptions()) + (array) $field;
 
-    return self::formatDisplayValue($value, $fieldInfo, $entityId);
+    $displayValue = self::formatDisplayValue($value, $fieldInfo, $entityId);
+
+    // Call hook to alter display value.
+    CRM_Utils_Hook::alterCustomFieldDisplayValue($displayValue, $value, $entityId, $fieldInfo);
+
+    return $displayValue;
   }
 
   /**

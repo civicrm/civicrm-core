@@ -2612,4 +2612,22 @@ abstract class CRM_Utils_Hook {
     );
   }
 
+  /**
+   * This hook is called to alter Custom field value before its displayed.
+   *
+   * @param string $displayValue
+   * @param mixed $value
+   * @param int $entityId
+   * @param array $fieldInfo
+   *
+   * @return mixed
+   */
+  public static function alterCustomFieldDisplayValue(&$displayValue, $value, $entityId, $fieldInfo) {
+    return self::singleton()->invoke(
+      ['displayValue', 'value', 'entityId', 'fieldInfo'],
+      $displayValue, $value, $entityId, $fieldInfo, self::$_nullObject,
+      self::$_nullObject, 'civicrm_alterCustomFieldDisplayValue'
+    );
+  }
+
 }
