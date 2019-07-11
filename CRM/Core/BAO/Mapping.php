@@ -921,9 +921,8 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
    *
    * @return array
    */
-  protected static function getMappingParams($defaults, $v) {
+  public static function getMappingParams($defaults, $v) {
     $locationTypeId = NULL;
-    $phoneTypeId = NULL;
     $saveMappingFields = $defaults;
 
     $saveMappingFields['name'] = CRM_Utils_Array::value('1', $v);
@@ -958,14 +957,18 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
         }
 
         if (is_numeric(CRM_Utils_Array::value('4', $v))) {
-          $phoneTypeId = CRM_Utils_Array::value('4', $v);
+          if ($saveMappingFields['name'] === 'im') {
+            $saveMappingFields['im_provider_id'] = $v[4];
+          }
+          else {
+            $saveMappingFields['phone_type_id'] = CRM_Utils_Array::value('4', $v);
+          }
         }
         elseif (is_numeric(CRM_Utils_Array::value('6', $v))) {
-          $phoneTypeId = CRM_Utils_Array::value('6', $v);
+          $saveMappingFields['phone_type_id'] = CRM_Utils_Array::value('6', $v);
         }
 
         $saveMappingFields['location_type_id'] = is_numeric($locationTypeId) ? $locationTypeId : NULL;
-        $saveMappingFields['phone_type_id'] = is_numeric($phoneTypeId) ? $phoneTypeId : NULL;
         $saveMappingFields['relationship_type_id'] = $id;
         $saveMappingFields['relationship_direction'] = "{$first}_{$second}";
       }
