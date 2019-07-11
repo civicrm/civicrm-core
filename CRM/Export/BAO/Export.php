@@ -79,16 +79,15 @@ class CRM_Export_BAO_Export {
    * Get Query Group By Clause
    * @param \CRM_Export_BAO_ExportProcessor $processor
    *   Export Mode
-   * @param array $returnProperties
-   *   Return Properties
    * @param object $query
    *   CRM_Contact_BAO_Query
    *
    * @return string
    *   Group By Clause
    */
-  public static function getGroupBy($processor, $returnProperties, $query) {
+  public static function getGroupBy($processor, $query) {
     $groupBy = NULL;
+    $returnProperties = $processor->getReturnProperties();
     $exportMode = $processor->getExportMode();
     $queryMode = $processor->getQueryMode();
     if (!empty($returnProperties['tags']) || !empty($returnProperties['groups']) ||
@@ -187,7 +186,6 @@ class CRM_Export_BAO_Export {
     if ($moreReturnProperties) {
       $processor->setAdditionalRequestedReturnProperties($moreReturnProperties);
     }
-    $returnProperties = $processor->getReturnProperties();
     $paymentTableId = $processor->getPaymentTableID();
 
     if (!$selectAll && $componentTable && !empty($exportParams['additional_group'])) {
@@ -210,10 +208,10 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       CRM_Contact_BAO_ProximityQuery::fixInputParams($params);
     }
 
-    list($query, $select, $from, $where, $having) = $processor->runQuery($params, $order, $returnProperties);
+    list($query, $select, $from, $where, $having) = $processor->runQuery($params, $order);
 
     if ($mergeSameHousehold == 1) {
-      $processor->setHouseholdMergeReturnProperties($returnProperties);
+      $processor->setHouseholdMergeReturnProperties();
     }
 
     // This perhaps only needs calling when $mergeSameHousehold == 1
@@ -243,7 +241,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $queryString = "$select $from $where $having";
 
-    $groupBy = self::getGroupBy($processor, $returnProperties, $query);
+    $groupBy = self::getGroupBy($processor, $query);
 
     $queryString .= $groupBy;
 
@@ -257,7 +255,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
       list($field, $dir) = explode(' ', $order, 2);
       $field = trim($field);
-      if (!empty($returnProperties[$field])) {
+      if (!empty($processor->getReturnProperties()[$field])) {
         //CRM-15301
         $queryString .= " ORDER BY $order";
       }
@@ -265,7 +263,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $addPaymentHeader = FALSE;
 
-    list($outputColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor);
+    list($outputColumns, $metadata) = self::getExportStructureArrays($processor);
 
     if ($processor->isMergeSameAddress()) {
       //make sure the addressee fields are selected
@@ -907,7 +905,6 @@ LIMIT $offset, $limit
    * However it still feels a bit like something that I'm too polite to write down and this should be seen
    * as a step on the refactoring path rather than how it should be.
    *
-   * @param array $returnProperties
    * @param \CRM_Export_BAO_ExportProcessor $processor
    *
    * @return array
@@ -926,10 +923,10 @@ LIMIT $offset, $limit
    *    - b) this code is old & outdated. Submit your answers to circular bin or better
    *       yet find a way to comment them for posterity.
    */
-  public static function getExportStructureArrays($returnProperties, $processor) {
+  public static function getExportStructureArrays($processor) {
     $outputColumns = $metadata = [];
     $queryFields = $processor->getQueryFields();
-    foreach ($returnProperties as $key => $value) {
+    foreach ($processor->getReturnProperties() as $key => $value) {
       if (($key != 'location' || !is_array($value)) && !$processor->isRelationshipTypeKey($key)) {
         $outputColumns[$key] = $value;
         $processor->addOutputSpecification($key);

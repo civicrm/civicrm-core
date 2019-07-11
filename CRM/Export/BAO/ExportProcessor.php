@@ -645,10 +645,11 @@ class CRM_Export_BAO_ExportProcessor {
   /**
    * @param $params
    * @param $order
-   * @param $returnProperties
+   *
    * @return array
    */
-  public function runQuery($params, $order, $returnProperties) {
+  public function runQuery($params, $order) {
+    $returnProperties = $this->getReturnProperties();
     $addressWhere = '';
     $params = array_merge($params, $this->getWhereParams());
     if ($this->isPostalableOnly) {
@@ -1217,10 +1218,9 @@ class CRM_Export_BAO_ExportProcessor {
    *
    * If we are using household merge we need to add these to the relationship properties to
    * be retrieved.
-   *
-   * @param $returnProperties
    */
-  public function setHouseholdMergeReturnProperties($returnProperties) {
+  public function setHouseholdMergeReturnProperties() {
+    $returnProperties = $this->getReturnProperties();
     $returnProperties = array_diff_key($returnProperties, array_fill_keys(['location_type', 'im_provider'], 1));
     foreach ($this->getHouseholdRelationshipTypes() as $householdRelationshipType) {
       $this->relationshipReturnProperties[$householdRelationshipType] = $returnProperties;
