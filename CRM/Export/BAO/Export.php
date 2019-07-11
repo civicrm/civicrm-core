@@ -190,18 +190,6 @@ class CRM_Export_BAO_Export {
     $returnProperties = $processor->getReturnProperties();
     $paymentTableId = $processor->getPaymentTableID();
 
-    if ($processor->isMergeSameAddress()) {
-      //make sure the addressee fields are selected
-      //while using merge same address feature
-      // some columns are required for assistance incase they are not already present
-      $exportParams['merge_same_address']['temp_columns'] = $processor->getAdditionalFieldsForSameAddressMerge();
-      // This is silly - we should do this at the point when the array is used...
-      if (isset($exportParams['merge_same_address']['temp_columns']['id'])) {
-        unset($exportParams['merge_same_address']['temp_columns']['id']);
-        $exportParams['merge_same_address']['temp_columns']['civicrm_primary_id'] = 1;
-      }
-    }
-
     if (!$selectAll && $componentTable && !empty($exportParams['additional_group'])) {
       // If an Additional Group is selected, then all contacts in that group are
       // added to the export set (filtering out duplicates).
@@ -279,7 +267,16 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     list($outputColumns, $metadata) = self::getExportStructureArrays($returnProperties, $processor);
 
-    if (!empty($exportParams['merge_same_address']['temp_columns'])) {
+    if ($processor->isMergeSameAddress()) {
+      //make sure the addressee fields are selected
+      //while using merge same address feature
+      // some columns are required for assistance incase they are not already present
+      $exportParams['merge_same_address']['temp_columns'] = $processor->getAdditionalFieldsForSameAddressMerge();
+      // This is silly - we should do this at the point when the array is used...
+      if (isset($exportParams['merge_same_address']['temp_columns']['id'])) {
+        unset($exportParams['merge_same_address']['temp_columns']['id']);
+        $exportParams['merge_same_address']['temp_columns']['civicrm_primary_id'] = 1;
+      }
       // @todo - this is a temp fix  - ideally later we don't set stuff only to unset it.
       // test exists covering this...
       foreach (array_keys($exportParams['merge_same_address']['temp_columns']) as $field) {
