@@ -136,6 +136,37 @@ class CRM_Export_BAO_ExportProcessor {
   }
 
   /**
+   * Additional fields required to export postal fields.
+   *
+   * @var array
+   */
+  protected $additionalFieldsForPostalExport = [];
+
+  /**
+   * Get additional fields required to do a postal export.
+   *
+   * @return array
+   */
+  public function getAdditionalFieldsForPostalExport() {
+    return $this->additionalFieldsForPostalExport;
+  }
+
+  /**
+   * Set additional fields required for a postal export.
+   */
+  public function setAdditionalFieldsForPostalExport() {
+    if ($this->getRequestedFields() && $this->isPostalableOnly()) {
+      $fields = ['is_deceased', 'do_not_mail', 'street_address', 'supplemental_address_1'];
+      foreach ($fields as $index => $field) {
+        if (!empty($this->getReturnProperties()[$field])) {
+          unset($field[$index]);
+        }
+      }
+      $this->additionalFieldsForPostalExport = array_fill_keys($fields, 1);
+    }
+  }
+
+  /**
    * Only export contacts that can receive postal mail.
    *
    * Includes being alive, having an address & not having do_not_mail.
@@ -278,6 +309,7 @@ class CRM_Export_BAO_ExportProcessor {
     $this->setIsMergeSameAddress($isMergeSameAddress);
     $this->setReturnProperties($this->determineReturnProperties());
     $this->setAdditionalFieldsForSameAddressMerge();
+    $this->setAdditionalFieldsForPostalExport();
   }
 
   /**
@@ -312,7 +344,7 @@ class CRM_Export_BAO_ExportProcessor {
    * @return array
    */
   public function getReturnProperties() {
-    return array_merge($this->returnProperties, $this->getAdditionalRequestedReturnProperties(), $this->getAdditionalFieldsForSameAddressMerge());
+    return array_merge($this->returnProperties, $this->getAdditionalRequestedReturnProperties(), $this->getAdditionalFieldsForSameAddressMerge(), $this->getAdditionalFieldsForPostalExport());
   }
 
   /**

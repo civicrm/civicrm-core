@@ -213,14 +213,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     if ($processor->getRequestedFields() &&
       $processor->isPostalableOnly()
     ) {
-      $postalColumns = ['is_deceased', 'do_not_mail', 'street_address', 'supplemental_address_1'];
-      $exportParams['postal_mailing_export']['temp_columns'] = [];
-      foreach ($postalColumns as $column) {
-        if (!array_key_exists($column, $returnProperties)) {
-          $returnProperties[$column] = 1;
-          $exportParams['postal_mailing_export']['temp_columns'][$column] = 1;
-        }
-      }
+      $exportParams['postal_mailing_export']['temp_columns'] = $processor->getAdditionalFieldsForPostalExport();
     }
 
     // rectify params to what proximity search expects if there is a value for prox_distance
