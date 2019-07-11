@@ -310,6 +310,7 @@ class CRM_Export_BAO_ExportProcessor {
     $this->setReturnProperties($this->determineReturnProperties());
     $this->setAdditionalFieldsForSameAddressMerge();
     $this->setAdditionalFieldsForPostalExport();
+    $this->setHouseholdMergeReturnProperties();
   }
 
   /**
@@ -1220,10 +1221,12 @@ class CRM_Export_BAO_ExportProcessor {
    * be retrieved.
    */
   public function setHouseholdMergeReturnProperties() {
-    $returnProperties = $this->getReturnProperties();
-    $returnProperties = array_diff_key($returnProperties, array_fill_keys(['location_type', 'im_provider'], 1));
-    foreach ($this->getHouseholdRelationshipTypes() as $householdRelationshipType) {
-      $this->relationshipReturnProperties[$householdRelationshipType] = $returnProperties;
+    if ($this->isMergeSameHousehold()) {
+      $returnProperties = $this->getReturnProperties();
+      $returnProperties = array_diff_key($returnProperties, array_fill_keys(['location_type', 'im_provider'], 1));
+      foreach ($this->getHouseholdRelationshipTypes() as $householdRelationshipType) {
+        $this->relationshipReturnProperties[$householdRelationshipType] = $returnProperties;
+      }
     }
   }
 

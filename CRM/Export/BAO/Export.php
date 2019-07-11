@@ -212,10 +212,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     list($query, $select, $from, $where, $having) = $processor->runQuery($params, $order);
 
-    if ($mergeSameHousehold == 1) {
-      $processor->setHouseholdMergeReturnProperties();
-    }
-
     // This perhaps only needs calling when $mergeSameHousehold == 1
     self::buildRelatedContactArray($selectAll, $ids, $processor, $componentTable);
 
