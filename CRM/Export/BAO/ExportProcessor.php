@@ -1609,4 +1609,37 @@ class CRM_Export_BAO_ExportProcessor {
     return $returnProperties;
   }
 
+  /**
+   * The function unsets static part of the string, if token is the dynamic part.
+   *
+   * Example: 'Hello {contact.first_name}' => converted to => '{contact.first_name}'
+   * i.e 'Hello Alan' => converted to => 'Alan'
+   *
+   * @param string $parsedString
+   * @param string $defaultGreeting
+   * @param bool $addressMergeGreetings
+   * @param string $greetingType
+   *
+   * @return mixed
+   */
+  public function trimNonTokensFromAddressString(
+    &$parsedString, $defaultGreeting,
+    $addressMergeGreetings, $greetingType = 'postal_greeting'
+  ) {
+    if (!empty($addressMergeGreetings[$greetingType])) {
+      $greetingLabel = $addressMergeGreetings[$greetingType];
+    }
+    $greetingLabel = empty($greetingLabel) ? $defaultGreeting : $greetingLabel;
+
+    $stringsToBeReplaced = preg_replace('/(\{[a-zA-Z._ ]+\})/', ';;', $greetingLabel);
+    $stringsToBeReplaced = explode(';;', $stringsToBeReplaced);
+    foreach ($stringsToBeReplaced as $key => $string) {
+      // to keep one space
+      $stringsToBeReplaced[$key] = ltrim($string);
+    }
+    $parsedString = str_replace($stringsToBeReplaced, "", $parsedString);
+
+    return $parsedString;
+  }
+
 }

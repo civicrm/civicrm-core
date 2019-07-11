@@ -609,7 +609,7 @@ FROM      $tableName r1
 INNER JOIN civicrm_address adr ON r1.master_id   = adr.id
 INNER JOIN $tableName      r2  ON adr.contact_id = r2.civicrm_primary_id
 ORDER BY  r1.id";
-    $linkedMerge = self::_buildMasterCopyArray($sql, $exportParams, TRUE);
+    $linkedMerge = self::_buildMasterCopyArray($processor, $sql, $exportParams, TRUE);
 
     // find all the records that have the same street address BUT not in a household
     // require match on city and state as well
@@ -636,7 +636,7 @@ AND       ( r1.street_address != '' )
 AND       r2.id > r1.id
 ORDER BY  r1.id
 ";
-    $merge = self::_buildMasterCopyArray($sql, $exportParams);
+    $merge = self::_buildMasterCopyArray($processor, $sql, $exportParams);
 
     // unset ids from $merge already present in $linkedMerge
     foreach ($linkedMerge as $masterID => $values) {
@@ -731,46 +731,14 @@ WHERE  id IN ( $deleteIDString )
   }
 
   /**
-   * The function unsets static part of the string, if token is the dynamic part.
-   *
-   * Example: 'Hello {contact.first_name}' => converted to => '{contact.first_name}'
-   * i.e 'Hello Alan' => converted to => 'Alan'
-   *
-   * @param string $parsedString
-   * @param string $defaultGreeting
-   * @param bool $addressMergeGreetings
-   * @param string $greetingType
-   *
-   * @return mixed
-   */
-  public static function _trimNonTokens(
-    &$parsedString, $defaultGreeting,
-    $addressMergeGreetings, $greetingType = 'postal_greeting'
-  ) {
-    if (!empty($addressMergeGreetings[$greetingType])) {
-      $greetingLabel = $addressMergeGreetings[$greetingType];
-    }
-    $greetingLabel = empty($greetingLabel) ? $defaultGreeting : $greetingLabel;
-
-    $stringsToBeReplaced = preg_replace('/(\{[a-zA-Z._ ]+\})/', ';;', $greetingLabel);
-    $stringsToBeReplaced = explode(';;', $stringsToBeReplaced);
-    foreach ($stringsToBeReplaced as $key => $string) {
-      // to keep one space
-      $stringsToBeReplaced[$key] = ltrim($string);
-    }
-    $parsedString = str_replace($stringsToBeReplaced, "", $parsedString);
-
-    return $parsedString;
-  }
-
-  /**
+   * @param \CRM_Export_BAO_ExportProcessor $processor
    * @param $sql
    * @param array $exportParams
    * @param bool $sharedAddress
    *
    * @return array
    */
-  public static function _buildMasterCopyArray($sql, $exportParams, $sharedAddress = FALSE) {
+  public static function _buildMasterCopyArray($processor, $sql, $exportParams, $sharedAddress = FALSE) {
     static $contactGreetingTokens = [];
 
     $addresseeOptions = CRM_Core_OptionGroup::values('addressee');
@@ -837,7 +805,7 @@ WHERE  id IN ( $deleteIDString )
           $merge[$masterID]['postalGreeting'] = $exportParams['postal_greeting_other'];
         }
         elseif ($copyPostalGreeting) {
-          self::_trimNonTokens($copyPostalGreeting,
+          $processor->trimNonTokensFromAddressString($copyPostalGreeting,
             $postalOptions[$dao->copy_postal_greeting_id],
             $exportParams
           );
@@ -853,7 +821,7 @@ WHERE  id IN ( $deleteIDString )
           $merge[$masterID]['addressee'] = $exportParams['addressee_other'];
         }
         elseif ($copyAddressee) {
-          self::_trimNonTokens($copyAddressee,
+          $processor->trimNonTokensFromAddressString($copyAddressee,
             $addresseeOptions[$dao->copy_addressee_id],
             $exportParams, 'addressee'
           );
