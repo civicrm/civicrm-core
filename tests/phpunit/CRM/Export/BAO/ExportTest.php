@@ -68,6 +68,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->quickCleanup([
       'civicrm_contact',
       'civicrm_email',
+      'civicrm_phone',
+      'civicrm_im',
+      'civicrm_website',
       'civicrm_address',
       'civicrm_relationship',
       'civicrm_membership',
@@ -101,6 +104,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Basic test to ensure the exportComponents function can export selected fields for contribution.
    *
    * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportComponentsContribution() {
     $this->setUpContributionExportData();
@@ -135,7 +139,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->setUpContributionExportData();
     $this->callAPISuccess('ContributionSoft', 'create', ['contact_id' => $this->contactIDs[1], 'contribution_id' => $this->contributionIDs[0], 'amount' => 5]);
     $params = [
-      ['receive_date_low', '=', '20190101000000', 0, 0],
+      ['receive_date_low', '=', '20160101000000', 0, 0],
       ['receive_date_high', '=', '20191231235959', 0, 0],
       ['contribution_amount_low', '=', '1', 0, 0],
       ['contribution_amount_high', '=', '10000000', 0, 0],
@@ -143,45 +147,26 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ['contribution_or_softcredits', '=', 'both', 0, 0],
     ];
 
-    $this->startCapturingOutput();
-    try {
-      CRM_Export_BAO_Export::exportComponents(
-        FALSE,
-        $this->contributionIDs,
-        $params,
-        'receive_date desc',
-        NULL,
-        NULL,
-        CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
-        'civicrm_contribution.id IN ( ' . implode(',', $this->contributionIDs) . ')',
-        NULL,
-        FALSE,
-        FALSE,
-        [
-          'exportOption' => CRM_Export_Form_Select::CONTACT_EXPORT,
-        ]
-      );
-    }
-    catch (CRM_Core_Exception_PrematureExitException $e) {
-    }
-    $csv = $this->captureOutputToCSV();
-    $this->assertEquals(array_merge($this->getBasicHeaderDefinition(FALSE), $this->getContributeHeaderDefinition()), $csv->getHeader());
-    $rowNumber = 1;
-    $rows = $csv->getRecords();
-    foreach ($rows as $row) {
-      if ($rowNumber === 1) {
-        $this->assertEquals(95, $row['Net Amount']);
-        $this->assertEquals('', $row['Soft Credit Amount']);
-      }
-      if ($rowNumber === 2) {
-        $this->assertEquals(95, $row['Net Amount']);
-        $this->assertEquals(5, $row['Soft Credit Amount']);
-        $this->assertEquals('Anderson, Anthony', $row['Soft Credit For']);
-        $this->assertEquals($this->contributionIDs[0], $row['Soft Credit For Contribution ID']);
-      }
-      $rowNumber++;
-    }
-    $this->assertEquals(4, $rowNumber);
+    $this->doExportTest([
+      'selectAll' => FALSE,
+      'ids' => $this->contributionIDs,
+      'params' => $params,
+      'order' => 'receive_date desc',
+      'exportMode' => CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
+      'componentClause' => 'civicrm_contribution.id IN ( ' . implode(',', $this->contributionIDs) . ')',
+    ]);
+
+    $this->assertEquals(array_merge($this->getBasicHeaderDefinition(FALSE), $this->getContributeHeaderDefinition()), $this->csv->getHeader());
+    $this->assertCount(3, $this->csv);
+    $row = $this->csv->fetchOne(0);
+    $this->assertEquals(95, $row['Net Amount']);
+    $this->assertEquals('', $row['Soft Credit Amount']);
+    $row = $this->csv->fetchOne(1);
+    $this->assertEquals(95, $row['Net Amount']);
+    $this->assertEquals(5, $row['Soft Credit Amount']);
+    $this->assertEquals('Anderson, Anthony', $row['Soft Credit For']);
+    $this->assertEquals($this->contributionIDs[0], $row['Soft Credit For Contribution ID']);
+
     // Ideally we would use a randomised temp table name & use generic temp cleanup for cleanup - but
     // for now just make sure we don't leave a mess.
     CRM_Core_DAO::executeQuery('DROP TABLE IF EXISTS contribution_search_scredit_combined');
@@ -316,15 +301,19 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Set up some data for us to do testing on.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUpContributionExportData() {
     $this->setUpContactExportData();
-    $this->contributionIDs[] = $this->contributionCreate(['contact_id' => $this->contactIDs[0], 'trxn_id' => 'null', 'invoice_id' => 'null']);
-    $this->contributionIDs[] = $this->contributionCreate(['contact_id' => $this->contactIDs[1], 'trxn_id' => 'null', 'invoice_id' => 'null']);
+    $this->contributionIDs[] = $this->contributionCreate(['contact_id' => $this->contactIDs[0], 'trxn_id' => 'null', 'invoice_id' => 'null', 'receive_date' => '2019-07-25 07:34:23']);
+    $this->contributionIDs[] = $this->contributionCreate(['contact_id' => $this->contactIDs[1], 'trxn_id' => 'null', 'invoice_id' => 'null', 'receive_date' => '2018-12-01 00:00:00']);
   }
 
   /**
    * Set up some data for us to do testing on.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUpMembershipExportData() {
     $this->setUpContactExportData();
@@ -371,6 +360,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Set up some data for us to do testing on.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUpContactExportData() {
     $this->contactIDs[] = $contactA = $this->individualCreate(['gender_id' => 'Female']);
@@ -988,6 +979,117 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     // delete the export temp table and component table
     $sql = "DROP TABLE IF EXISTS {$tableName}";
     CRM_Core_DAO::executeQuery($sql);
+  }
+
+  /**
+   * Test the merge same address option.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
+   */
+  public function testMergeSameAddress() {
+    $this->setUpContactExportData();
+    $this->contactIDs[] = $contact3 = $this->individualCreate(['first_name' => 'Sarah', 'last_name' => 'Smith', 'prefix_id' => 'Dr.']);
+    // Create address for contact A.
+    $params = [
+      'contact_id' => $contact3,
+      'location_type_id' => 'Home',
+      'street_address' => 'Ambachtstraat 23',
+      'postal_code' => '6971 BN',
+      'country_id' => '1152',
+      'city' => 'Brummen',
+      'is_primary' => 1,
+    ];
+    $this->callAPISuccess('address', 'create', $params);
+    $this->doExportTest(['mergeSameAddress' => TRUE, 'ids' => $this->contactIDs]);
+    // ie 2 merged, one extra.
+    $this->assertCount(2, $this->csv);
+    $expected = [
+      'Contact ID' => $this->contactIDs[0],
+      'Contact Type' => 'Individual',
+      'Contact Subtype' => '',
+      'Do Not Email' => '',
+      'Do Not Phone' => '',
+      'Do Not Mail' => '',
+      'Do Not Sms' => '',
+      'Do Not Trade' => '',
+      'No Bulk Emails (User Opt Out)' => '',
+      'Legal Identifier' => '',
+      'External Identifier' => '',
+      'Sort Name' => 'Anderson, Anthony',
+      'Display Name' => 'Mr. Anthony Anderson II',
+      'Nickname' => '',
+      'Legal Name' => '',
+      'Image Url' => '',
+      'Preferred Communication Method' => '',
+      'Preferred Language' => 'en_US',
+      'Preferred Mail Format' => 'Both',
+      'Contact Hash' => 'e9bd0913cc05cc5aeae69ba04ee3be84',
+      'Contact Source' => '',
+      'First Name' => 'Anthony',
+      'Middle Name' => 'J.',
+      'Last Name' => 'Anderson',
+      'Individual Prefix' => 'Mr.',
+      'Individual Suffix' => 'II',
+      'Formal Title' => '',
+      'Communication Style' => 'Formal',
+      'Email Greeting ID' => '1',
+      'Postal Greeting ID' => '1',
+      'Addressee ID' => '1',
+      'Job Title' => '',
+      'Gender' => 'Female',
+      'Birth Date' => '',
+      'Deceased' => '',
+      'Deceased Date' => '',
+      'Household Name' => '',
+      'Organization Name' => '',
+      'Sic Code' => '',
+      'Unique ID (OpenID)' => '',
+      'Current Employer ID' => '',
+      'Contact is in Trash' => '',
+      'Created Date' => '2019-07-11 10:28:15',
+      'Modified Date' => '2019-07-11 10:28:15',
+      'Addressee' => 'Mr. Anthony J. Anderson II, Dr. Sarah J. Smith II',
+      'Email Greeting' => 'Dear Anthony, Sarah',
+      'Postal Greeting' => 'Dear Anthony, Sarah',
+      'Current Employer' => '',
+      'Location Type' => 'Home',
+      'Street Address' => 'Ambachtstraat 23',
+      'Street Number' => '',
+      'Street Number Suffix' => '',
+      'Street Name' => '',
+      'Street Unit' => '',
+      'Supplemental Address 1' => '',
+      'Supplemental Address 2' => '',
+      'Supplemental Address 3' => '',
+      'City' => 'Brummen',
+      'Postal Code Suffix' => '',
+      'Postal Code' => '6971 BN',
+      'Latitude' => '',
+      'Longitude' => '',
+      'Address Name' => '',
+      'Master Address Belongs To' => '',
+      'County' => '',
+      'State' => '',
+      'Country' => 'Netherlands',
+      'Phone' => '',
+      'Phone Extension' => '',
+      'Phone Type' => '',
+      'Email' => 'home@example.com',
+      'On Hold' => '',
+      'Use for Bulk Mail' => '',
+      'Signature Text' => '',
+      'Signature Html' => '',
+      'IM Provider' => '',
+      'IM Screen Name' => '',
+      'OpenID' => '',
+      'World Region' => 'Europe and Central Asia',
+      'Website' => '',
+      'Group(s)' => '',
+      'Tag(s)' => '',
+      'Note(s)' => '',
+    ];
+    $this->assertExpectedOutput($expected, $this->csv->fetchOne());
   }
 
   /**
@@ -2692,6 +2794,24 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       return;
     }
     $this->fail('We expected a premature exit exception');
+  }
+
+  /**
+   * Assert that the received array matches the expected, ignoring time sensitive fields.
+   *
+   * @param array $expected
+   * @param array $row
+   */
+  protected function assertExpectedOutput(array $expected, array $row) {
+    $variableFields = ['Created Date', 'Modified Date', 'Contact Hash'];
+    foreach ($expected as $key => $value) {
+      if (in_array($key, $variableFields)) {
+        $this->assertTrue(!empty($row[$key]));
+      }
+      else {
+        $this->assertEquals($value, $row[$key]);
+      }
+    }
   }
 
 }
