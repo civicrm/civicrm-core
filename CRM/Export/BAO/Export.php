@@ -198,12 +198,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     }
     $paymentTableId = $processor->getPaymentTableID();
 
-    if ($processor->getRequestedFields() &&
-      $processor->isPostalableOnly()
-    ) {
-      $exportParams['postal_mailing_export']['temp_columns'] = $processor->getAdditionalFieldsForPostalExport();
-    }
-
     // rectify params to what proximity search expects if there is a value for prox_distance
     // CRM-7021
     if (!empty($params)) {
