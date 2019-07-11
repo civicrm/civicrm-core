@@ -628,6 +628,9 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('CustomField', 'create', $params);
   }
 
+  /**
+   * Test disabling a searchable contact reference field.
+   */
   public function testDisableSearchableContactReferenceField() {
     $customGroup = $this->customGroupCreate([
       'name' => 'testCustomGroup',
@@ -647,7 +650,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
       'id' => $result['id'],
       'is_active' => 0,
     ];
-    $result = $this->callAPISuccess('CustomField', 'create', $params);
+    $this->callAPISuccess('CustomField', 'create', $params);
   }
 
 }

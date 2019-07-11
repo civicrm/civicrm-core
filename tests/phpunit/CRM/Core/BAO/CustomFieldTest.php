@@ -636,4 +636,37 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertEquals($expected, CRM_Core_BAO_CustomField::getFieldsForImport());
   }
 
+  /**
+   * Test the bulk create function works.
+   */
+  public function testBulkCreate() {
+    $customGroup = $this->customGroupCreate([
+      'extends' => 'Individual',
+      'title' => 'my bulk group',
+    ]);
+    CRM_Core_BAO_CustomField::bulkSave([
+      [
+        'label' => 'Test',
+        'data_type' => 'String',
+        'html_type' => 'Text',
+        'column_name' => 'my_text',
+      ],
+      [
+        'label' => 'test_link',
+        'data_type' => 'Link',
+        'html_type' => 'Link',
+        'is_search_range' => '0',
+      ],
+    ],
+    [
+      'custom_group_id' => $customGroup['id'],
+      'is_active' => 1,
+      'is_searchable' => 1,
+    ]);
+    $dao = CRM_Core_DAO::executeQuery(('SHOW CREATE TABLE ' . $customGroup['values'][$customGroup['id']]['table_name']));
+    $dao->fetch();
+    $this->assertContains('`test_link_2` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL', $dao->Create_Table);
+    $this->assertContains('KEY `INDEX_my_text` (`my_text`)', $dao->Create_Table);
+  }
+
 }

@@ -154,14 +154,60 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
   public static function create($params) {
     $customField = self::createCustomFieldRecord($params);
     $op = empty($params['id']) ? 'add' : 'modify';
-    $indexExist = empty($params['id']) ? FALSE : CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $params['id'], 'is_searchable');
-    self::createField($customField, $op, $indexExist, CRM_Utils_Array::value('triggerRebuild', $params, TRUE));
+    self::createField($customField, $op, CRM_Utils_Array::value('triggerRebuild', $params, TRUE));
 
     CRM_Utils_Hook::post(($op === 'add' ? 'create' : 'edit'), 'CustomField', $customField->id, $customField);
 
     CRM_Utils_System::flushCache();
 
     return $customField;
+  }
+
+  /**
+   * Create/ update several fields at once in a mysql efficient way.
+   *
+   * https://lab.civicrm.org/dev/core/issues/1093
+   *
+   * The intention is that apiv4 would expose any BAO with bulkSave as a new action.
+   *
+   * @param array $bulkParams
+   *   Array of arrays as would be passed into create
+   * @param array $defaults
+   *  Default parameters to be be merged into each of the params.
+   */
+  public static function bulkSave($bulkParams, $defaults) {
+    $sql = [];
+    $tables = [];
+    $customFields = [];
+    foreach ($bulkParams as $fieldParams) {
+      $params = array_merge($defaults, $fieldParams);
+      $operation = empty($params['id']) ? 'add' : 'modify';
+      $customField = self::createCustomFieldRecord($params);
+      $fieldSQL = self::getAlterFieldSQL($customField, $operation);
+      if (!isset($params['custom_group_id'])) {
+        $params['custom_group_id'] = civicrm_api3('CustomField', 'getvalue', ['id' => $customField->id, 'return' => 'custom_group_id']);
+      }
+      if (!isset($params['table_name'])) {
+        if (!isset($tables[$params['custom_group_id']])) {
+          $tables[$params['custom_group_id']] = civicrm_api3('CustomGroup', 'getvalue', [
+            'id' => $params['custom_group_id'],
+            'return' => 'table_name',
+          ]);
+        }
+        $params['table_name'] = $tables[$params['custom_group_id']];
+      }
+      $sql[$params['table_name']][] = $fieldSQL;
+      $customFields[] = $customField;
+    }
+    foreach ($sql as $tableName => $statements) {
+      // CRM-7007: do not i18n-rewrite this query
+      CRM_Core_DAO::executeQuery("ALTER TABLE $tableName " . implode(', ', $statements), [], TRUE, NULL, FALSE, FALSE);
+      Civi::service('sql_triggers')->rebuild($params['table_name'], TRUE);
+    }
+    CRM_Utils_System::flushCache();
+    foreach ($customFields as $customField) {
+      CRM_Utils_Hook::post($operation === 'add' ? 'create' : 'edit', 'CustomField', $customField->id, $customField);
+    }
   }
 
   /**
@@ -1646,13 +1692,47 @@ SELECT $columnName
    *
    * @param CRM_Core_DAO_CustomField $field
    * @param string $operation
-   * @param bool $indexExist
    * @param bool $triggerRebuild
    */
-  public static function createField($field, $operation, $indexExist = FALSE, $triggerRebuild = TRUE) {
-    $params = self::prepareCreateParams($field, $operation);
+  public static function createField($field, $operation, $triggerRebuild = TRUE) {
+    $sql = str_repeat(' ', 8);
+    $tableName = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $field->custom_group_id, 'table_name');
+    $sql .= "ALTER TABLE " . $tableName;
+    $sql .= self::getAlterFieldSQL($field, $operation);
 
-    CRM_Core_BAO_SchemaHandler::alterFieldSQL($params, $indexExist, $triggerRebuild);
+    // CRM-7007: do not i18n-rewrite this query
+    CRM_Core_DAO::executeQuery($sql, [], TRUE, NULL, FALSE, FALSE);
+
+    $config = CRM_Core_Config::singleton();
+    if ($config->logging) {
+      // CRM-16717 not sure why this was originally limited to add.
+      // For example custom tables can have field length changes - which need to flow through to logging.
+      // Are there any modifies we DON'T was to call this function for (& shouldn't it be clever enough to cope?)
+      if ($operation === 'add' || $operation === 'modify') {
+        $logging = new CRM_Logging_Schema();
+        $logging->fixSchemaDifferencesFor($tableName, [trim(strtoupper($operation)) => [$field->column_name]]);
+      }
+    }
+
+    if ($triggerRebuild) {
+      Civi::service('sql_triggers')->rebuild($tableName, TRUE);
+    }
+
+  }
+
+  /**
+   * @param CRM_Core_DAO_CustomField $field
+   * @param string $operation
+   *
+   * @return bool
+   */
+  public static function getAlterFieldSQL($field, $operation) {
+    $indexExist = $operation === 'add' ? FALSE : CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomField', $field->id, 'is_searchable');
+    $params = self::prepareCreateParams($field, $operation);
+    // Let's suppress the required flag, since that can cause an sql issue... for unknown reasons since we are calling
+    // a function only used by Custom Field creation...
+    $params['required'] = FALSE;
+    return CRM_Core_BAO_SchemaHandler::getFieldAlterSQL($params, $indexExist);
   }
 
   /**

@@ -295,7 +295,7 @@ ALTER TABLE {$tableName}
    * @return bool
    */
   public static function alterFieldSQL($params, $indexExist = FALSE, $triggerRebuild = TRUE) {
-
+    CRM_Core_Error::deprecatedFunctionWarning('function no longer in use / supported');
     // lets suppress the required flag, since that can cause sql issue
     $params['required'] = FALSE;
 

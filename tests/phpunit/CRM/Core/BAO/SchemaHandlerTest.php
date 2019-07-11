@@ -318,7 +318,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
     ];
 
     // drop col1
-    CRM_Core_BAO_SchemaHandler::alterFieldSQL($alterParams, FALSE, TRUE);
+    CRM_Core_DAO::executeQuery(CRM_Core_BAO_SchemaHandler::buildFieldChangeSql($alterParams, FALSE));
 
     $create_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE civicrm_test_drop_column");
     while ($create_table->fetch()) {
@@ -328,7 +328,7 @@ class CRM_Core_BAO_SchemaHandlerTest extends CiviUnitTestCase {
 
     // drop col2
     $alterParams['name'] = 'col2';
-    CRM_Core_BAO_SchemaHandler::alterFieldSQL($alterParams, FALSE, TRUE);
+    CRM_Core_DAO::executeQuery(CRM_Core_BAO_SchemaHandler::buildFieldChangeSql($alterParams, FALSE));
 
     $create_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE civicrm_test_drop_column");
     while ($create_table->fetch()) {
