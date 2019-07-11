@@ -1647,6 +1647,111 @@ class CRM_Export_BAO_ExportProcessor {
   }
 
   /**
+   * Build array for merging same addresses.
+   *
+   * @param $sql
+   * @param array $exportParams
+   * @param bool $sharedAddress
+   *
+   * @return array
+   */
+  public function buildMasterCopyArray($sql, $exportParams, $sharedAddress = FALSE) {
+    static $contactGreetingTokens = [];
+
+    $addresseeOptions = CRM_Core_OptionGroup::values('addressee');
+    $postalOptions = CRM_Core_OptionGroup::values('postal_greeting');
+
+    $merge = $parents = [];
+    $dao = CRM_Core_DAO::executeQuery($sql);
+
+    while ($dao->fetch()) {
+      $masterID = $dao->master_id;
+      $copyID = $dao->copy_id;
+      $masterPostalGreeting = $dao->master_postal_greeting;
+      $masterAddressee = $dao->master_addressee;
+      $copyAddressee = $dao->copy_addressee;
+
+      if (!$sharedAddress) {
+        if (!isset($contactGreetingTokens[$dao->master_contact_id])) {
+          $contactGreetingTokens[$dao->master_contact_id] = $this->replaceMergeTokens($dao->master_contact_id, $exportParams);
+        }
+        $masterPostalGreeting = CRM_Utils_Array::value('postal_greeting',
+          $contactGreetingTokens[$dao->master_contact_id], $dao->master_postal_greeting
+        );
+        $masterAddressee = CRM_Utils_Array::value('addressee',
+          $contactGreetingTokens[$dao->master_contact_id], $dao->master_addressee
+        );
+
+        if (!isset($contactGreetingTokens[$dao->copy_contact_id])) {
+          $contactGreetingTokens[$dao->copy_contact_id] = $this->replaceMergeTokens($dao->copy_contact_id, $exportParams);
+        }
+        $copyPostalGreeting = CRM_Utils_Array::value('postal_greeting',
+          $contactGreetingTokens[$dao->copy_contact_id], $dao->copy_postal_greeting
+        );
+        $copyAddressee = CRM_Utils_Array::value('addressee',
+          $contactGreetingTokens[$dao->copy_contact_id], $dao->copy_addressee
+        );
+      }
+
+      if (!isset($merge[$masterID])) {
+        // check if this is an intermediate child
+        // this happens if there are 3 or more matches a,b, c
+        // the above query will return a, b / a, c / b, c
+        // we might be doing a bit more work, but for now its ok, unless someone
+        // knows how to fix the query above
+        if (isset($parents[$masterID])) {
+          $masterID = $parents[$masterID];
+        }
+        else {
+          $merge[$masterID] = [
+            'addressee' => $masterAddressee,
+            'copy' => [],
+            'postalGreeting' => $masterPostalGreeting,
+          ];
+          $merge[$masterID]['emailGreeting'] = &$merge[$masterID]['postalGreeting'];
+        }
+      }
+      $parents[$copyID] = $masterID;
+
+      if (!$sharedAddress && !array_key_exists($copyID, $merge[$masterID]['copy'])) {
+
+        if (!empty($exportParams['postal_greeting_other']) &&
+          count($merge[$masterID]['copy']) >= 1
+        ) {
+          // use static greetings specified if no of contacts > 2
+          $merge[$masterID]['postalGreeting'] = $exportParams['postal_greeting_other'];
+        }
+        elseif ($copyPostalGreeting) {
+          $this->trimNonTokensFromAddressString($copyPostalGreeting,
+            $postalOptions[$dao->copy_postal_greeting_id],
+            $exportParams
+          );
+          $merge[$masterID]['postalGreeting'] = "{$merge[$masterID]['postalGreeting']}, {$copyPostalGreeting}";
+          // if there happens to be a duplicate, remove it
+          $merge[$masterID]['postalGreeting'] = str_replace(" {$copyPostalGreeting},", "", $merge[$masterID]['postalGreeting']);
+        }
+
+        if (!empty($exportParams['addressee_other']) &&
+          count($merge[$masterID]['copy']) >= 1
+        ) {
+          // use static greetings specified if no of contacts > 2
+          $merge[$masterID]['addressee'] = $exportParams['addressee_other'];
+        }
+        elseif ($copyAddressee) {
+          $this->trimNonTokensFromAddressString($copyAddressee,
+            $addresseeOptions[$dao->copy_addressee_id],
+            $exportParams, 'addressee'
+          );
+          $merge[$masterID]['addressee'] = "{$merge[$masterID]['addressee']}, " . trim($copyAddressee);
+        }
+      }
+      $merge[$masterID]['copy'][$copyID] = $copyAddressee;
+    }
+
+    return $merge;
+  }
+
+  /**
    * The function unsets static part of the string, if token is the dynamic part.
    *
    * Example: 'Hello {contact.first_name}' => converted to => '{contact.first_name}'
