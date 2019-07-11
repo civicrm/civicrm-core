@@ -689,43 +689,6 @@ WHERE  id IN ( $deleteIDString )
   }
 
   /**
-   * @param int $contactId
-   * @param array $exportParams
-   *
-   * @return array
-   */
-  public static function _replaceMergeTokens($contactId, $exportParams) {
-    $greetings = [];
-    $contact = NULL;
-
-    $greetingFields = [
-      'postal_greeting',
-      'addressee',
-    ];
-    foreach ($greetingFields as $greeting) {
-      if (!empty($exportParams[$greeting])) {
-        $greetingLabel = $exportParams[$greeting];
-        if (empty($contact)) {
-          $values = [
-            'id' => $contactId,
-            'version' => 3,
-          ];
-          $contact = civicrm_api('contact', 'get', $values);
-
-          if (!empty($contact['is_error'])) {
-            return $greetings;
-          }
-          $contact = $contact['values'][$contact['id']];
-        }
-
-        $tokens = ['contact' => $greetingLabel];
-        $greetings[$greeting] = CRM_Utils_Token::replaceContactTokens($greetingLabel, $contact, NULL, $tokens);
-      }
-    }
-    return $greetings;
-  }
-
-  /**
    * @param \CRM_Export_BAO_ExportProcessor $processor
    * @param $sql
    * @param array $exportParams
@@ -751,7 +714,7 @@ WHERE  id IN ( $deleteIDString )
 
       if (!$sharedAddress) {
         if (!isset($contactGreetingTokens[$dao->master_contact_id])) {
-          $contactGreetingTokens[$dao->master_contact_id] = self::_replaceMergeTokens($dao->master_contact_id, $exportParams);
+          $contactGreetingTokens[$dao->master_contact_id] = $processor->replaceMergeTokens($dao->master_contact_id, $exportParams);
         }
         $masterPostalGreeting = CRM_Utils_Array::value('postal_greeting',
           $contactGreetingTokens[$dao->master_contact_id], $dao->master_postal_greeting
@@ -761,7 +724,7 @@ WHERE  id IN ( $deleteIDString )
         );
 
         if (!isset($contactGreetingTokens[$dao->copy_contact_id])) {
-          $contactGreetingTokens[$dao->copy_contact_id] = self::_replaceMergeTokens($dao->copy_contact_id, $exportParams);
+          $contactGreetingTokens[$dao->copy_contact_id] = $processor->replaceMergeTokens($dao->copy_contact_id, $exportParams);
         }
         $copyPostalGreeting = CRM_Utils_Array::value('postal_greeting',
           $contactGreetingTokens[$dao->copy_contact_id], $dao->copy_postal_greeting

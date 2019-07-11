@@ -1610,6 +1610,43 @@ class CRM_Export_BAO_ExportProcessor {
   }
 
   /**
+   * @param int $contactId
+   * @param array $exportParams
+   *
+   * @return array
+   */
+  public function replaceMergeTokens($contactId, $exportParams) {
+    $greetings = [];
+    $contact = NULL;
+
+    $greetingFields = [
+      'postal_greeting',
+      'addressee',
+    ];
+    foreach ($greetingFields as $greeting) {
+      if (!empty($exportParams[$greeting])) {
+        $greetingLabel = $exportParams[$greeting];
+        if (empty($contact)) {
+          $values = [
+            'id' => $contactId,
+            'version' => 3,
+          ];
+          $contact = civicrm_api('contact', 'get', $values);
+
+          if (!empty($contact['is_error'])) {
+            return $greetings;
+          }
+          $contact = $contact['values'][$contact['id']];
+        }
+
+        $tokens = ['contact' => $greetingLabel];
+        $greetings[$greeting] = CRM_Utils_Token::replaceContactTokens($greetingLabel, $contact, NULL, $tokens);
+      }
+    }
+    return $greetings;
+  }
+
+  /**
    * The function unsets static part of the string, if token is the dynamic part.
    *
    * Example: 'Hello {contact.first_name}' => converted to => '{contact.first_name}'
