@@ -106,17 +106,20 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
   }
 
   /**
-   * Get the list of mappings.
+   * Get the list of mappings for a select or select2 element.
    *
    * @param string $mappingType
    *   Mapping type name.
+   * @param bool $select2
+   *   Format for select2
    *
    * @return array
    *   Array of mapping names, keyed by id.
    */
-  public static function getMappings($mappingType) {
+  public static function getMappings($mappingType, $select2 = FALSE) {
     $result = civicrm_api3('Mapping', 'get', [
       'mapping_type_id' => $mappingType,
+      'return' => ['name', 'description'],
       'options' => [
         'sort' => 'name',
         'limit' => 0,
@@ -124,8 +127,17 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     ]);
     $mapping = [];
 
-    foreach ($result['values'] as $key => $value) {
-      $mapping[$key] = $value['name'];
+    foreach ($result['values'] as $id => $value) {
+      if ($select2) {
+        $item = ['id' => $id, 'text' => $value['name']];
+        if (!empty($value['description'])) {
+          $item['description'] = $value['description'];
+        }
+        $mapping[] = $item;
+      }
+      else {
+        $mapping[$id] = $value['name'];
+      }
     }
     return $mapping;
   }
