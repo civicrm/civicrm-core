@@ -330,6 +330,38 @@ class CRM_Export_BAO_ExportProcessor {
     $this->temporaryTable = $temporaryTable;
   }
 
+  protected $postalGreetingTemplate;
+
+  /**
+   * @return mixed
+   */
+  public function getPostalGreetingTemplate() {
+    return $this->postalGreetingTemplate;
+  }
+
+  /**
+   * @param mixed $postalGreetingTemplate
+   */
+  public function setPostalGreetingTemplate($postalGreetingTemplate) {
+    $this->postalGreetingTemplate = $postalGreetingTemplate;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getAddresseeGreetingTemplate() {
+    return $this->addresseeGreetingTemplate;
+  }
+
+  /**
+   * @param mixed $addresseeGreetingTemplate
+   */
+  public function setAddresseeGreetingTemplate($addresseeGreetingTemplate) {
+    $this->addresseeGreetingTemplate = $addresseeGreetingTemplate;
+  }
+
+  protected $addresseeGreetingTemplate;
+
   /**
    * CRM_Export_BAO_ExportProcessor constructor.
    *
@@ -1821,12 +1853,11 @@ class CRM_Export_BAO_ExportProcessor {
     $contact = NULL;
 
     $greetingFields = [
-      'postal_greeting',
-      'addressee',
+      'postal_greeting' => $this->getPostalGreetingTemplate(),
+      'addressee' => $this->getAddresseeGreetingTemplate(),
     ];
-    foreach ($greetingFields as $greeting) {
+    foreach ($greetingFields as $greeting => $greetingLabel) {
       if (!empty($exportParams[$greeting])) {
-        $greetingLabel = $exportParams[$greeting];
         if (empty($contact)) {
           $values = [
             'id' => $contactId,
@@ -1977,6 +2008,13 @@ class CRM_Export_BAO_ExportProcessor {
         }
       }
     }
+    if (!empty($exportParams['postal_greeting'])) {
+      $this->setPostalGreetingTemplate($exportParams['postal_greeting']);
+    }
+    if (!empty($exportParams['addressee'])) {
+      $this->setAddresseeGreetingTemplate($exportParams['addressee']);
+    }
+
     $tableName = $this->getTemporaryTable();
     // check if any records are present based on if they have used shared address feature,
     // and not based on if city / state .. matches.
