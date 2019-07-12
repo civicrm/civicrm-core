@@ -1378,14 +1378,14 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     }
   }
 
-  /*
+  /**
    * Update $values populated by CRM_Core_BAO_UFGroup::getValues() with latest multi record values.
    * CRM_Core_BAO_UFGroup::getValues() uses search query with left joins with multi custom set tables,
-   * which won't fetch the latest record for multi custom set fields. And changing core search query 
+   * which won't fetch the latest record for multi custom set fields. And changing core search query
    * to use sub queries for multi set records is quite a big change and effort.
    *
-   * Use Cases: 
-   * 1. Use a profile with multi custom set fields for notification. Notifications would include oldest 
+   * Use Cases:
+   * 1. Use a profile with multi custom set fields for notification. Notifications would include oldest
    *    values.
    * 2. Use onbehalf of profile with multi custom set fields, for a contribution or membership page.
    *    The receipt include oldest values than the submitted latest values.
@@ -1419,14 +1419,14 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
         $DTparams = array(
           'rowCount' => 1,
           'offset'   => 0,
-          'sort'     => 'id desc'
+          'sort'     => 'id desc',
         );
         $result = CRM_Core_BAO_CustomValueTable::getEntityValues($cid, NULL, $fieldIDs, TRUE, $DTparams);
         $ctIds  = array_keys($result['sortedResult']);
         $latestId = max($ctIds);
         if (!empty($result[$latestId])) {
           foreach ($fieldIDs as $fid) {
-            if (CRM_Core_BAO_CustomField::isMultiRecordField($fid) && 
+            if (CRM_Core_BAO_CustomField::isMultiRecordField($fid) &&
               CRM_Utils_Array::value($fid, $result[$latestId])
             ) {
               $display = CRM_Core_BAO_CustomField::displayValue($result[$latestId][$fid], $fid);

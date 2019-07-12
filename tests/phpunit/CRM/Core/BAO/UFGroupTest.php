@@ -25,16 +25,16 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
       'group_type' => 'Contact',
       'name'       => 'test_profile_with_multi_records_cs',
       'title'      => 'Profile With Multi Record CS',
-      'api.uf_field.create' => array( 
+      'api.uf_field.create' => array(
         array(
           'field_name'  => "custom_{$customField['id']}",
           'is_required' => 1,
-          'visibility'  => 'Public Pages and Listings', 
-          'field_type'  => 'Contact',   
+          'visibility'  => 'Public Pages and Listings',
+          'field_type'  => 'Contact',
           'label'       => 'row text',
           'is_multi_summary' => 1,
         ),
-      )
+      ),
     );
     $profile = $this->callAPISuccess('uf_group', 'create', $ufGroupParams);
 
@@ -72,7 +72,7 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
     // getValues uses core search and fetches oldest value
     $this->assertEquals($values['row text'], 'First Row', 'Check for getValues() fetching oldest record.');
 
-    // test updateMultiRecordValuesWithLatest() which should update entries in $values with 
+    // test updateMultiRecordValuesWithLatest() which should update entries in $values with
     // that of latest record.
     CRM_Core_BAO_UFGroup::updateMultiRecordValuesWithLatest($profile['id'], $contactID, $fields, $values);
     $this->assertNotEmpty($values['row text']);
@@ -87,4 +87,5 @@ class CRM_Core_BAO_UFGroupTest extends CiviUnitTestCase {
     $this->customGroupDelete($customGroup['id']);
     $this->contactDelete($contactID);
   }
+
 }
