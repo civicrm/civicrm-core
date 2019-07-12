@@ -318,10 +318,6 @@ class CRM_Core_Config_MagicMerge {
     unset($this->cache[$k]);
     $type = $this->map[$k][0];
 
-    // If foreign name is set, use that name (except with callback types because
-    // their second parameter is the object, not the foreign name).
-    $name = isset($this->map[$k][1]) && $type != 'callback' ? $this->map[$k][1] : $k;
-
     switch ($type) {
       case 'setting':
       case 'setting-path':
@@ -331,12 +327,12 @@ class CRM_Core_Config_MagicMerge {
       case 'callback':
       case 'boot-svc':
         // In the past, changes to $config were not persisted automatically.
-        $this->cache[$name] = $v;
+        $this->cache[$k] = $v;
         return;
 
       case 'local':
         $this->initLocals();
-        $this->locals[$name] = $v;
+        $this->locals[$k] = $v;
         return;
 
       default:
