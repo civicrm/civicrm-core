@@ -187,17 +187,16 @@ class CRM_Export_BAO_Export {
 INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_contact gc WHERE gc.group_id = {$exportParams['additional_group']} ON DUPLICATE KEY UPDATE {$componentTable}.contact_id = gc.contact_id"
       );
     }
-
+    // rectify params to what proximity search expects if there is a value for prox_distance
+    // CRM-7021
+    // @todo - move this back to the calling functions
+    if (!empty($params)) {
+      CRM_Contact_BAO_ProximityQuery::fixInputParams($params);
+    }
+    // @todo everything from this line up should go back to the calling functions.
     $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator, $mergeSameHousehold, $isPostalOnly, $mergeSameAddress);
     if ($moreReturnProperties) {
       $processor->setAdditionalRequestedReturnProperties($moreReturnProperties);
-    }
-    $paymentTableId = $processor->getPaymentTableID();
-
-    // rectify params to what proximity search expects if there is a value for prox_distance
-    // CRM-7021
-    if (!empty($params)) {
-      CRM_Contact_BAO_ProximityQuery::fixInputParams($params);
     }
 
     list($query, $select, $from, $where, $having) = $processor->runQuery($params, $order);
@@ -313,7 +312,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       while ($iterationDAO->fetch()) {
         $count++;
         $rowsThisIteration++;
-        $row = $processor->buildRow($query, $iterationDAO, $outputColumns, $metadata, $paymentDetails, $addPaymentHeader, $paymentTableId);
+        $row = $processor->buildRow($query, $iterationDAO, $outputColumns, $metadata, $paymentDetails, $addPaymentHeader, $processor);
         if ($row === FALSE) {
           continue;
         }
