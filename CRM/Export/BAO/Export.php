@@ -198,35 +198,13 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     if ($moreReturnProperties) {
       $processor->setAdditionalRequestedReturnProperties($moreReturnProperties);
     }
+    $processor->setComponentTable($componentTable);
+    $processor->setComponentClause($componentClause);
 
-    list($query, $select, $from, $where, $having) = $processor->runQuery($params, $order);
+    list($query, $queryString) = $processor->runQuery($params, $order);
 
     // This perhaps only needs calling when $mergeSameHousehold == 1
     self::buildRelatedContactArray($selectAll, $ids, $processor, $componentTable);
-
-    $whereClauses = ['trash_clause' => "contact_a.is_deleted != 1"];
-    if (!$selectAll && $componentTable) {
-      $from .= " INNER JOIN $componentTable ctTable ON ctTable.contact_id = contact_a.id ";
-    }
-    elseif ($componentClause) {
-      $whereClauses[] = $componentClause;
-    }
-
-    // CRM-13982 - check if is deleted
-    foreach ($params as $value) {
-      if ($value[0] == 'contact_is_deleted') {
-        unset($whereClauses['trash_clause']);
-      }
-    }
-
-    if (empty($where)) {
-      $where = "WHERE " . implode(' AND ', $whereClauses);
-    }
-    else {
-      $where .= " AND " . implode(' AND ', $whereClauses);
-    }
-
-    $queryString = "$select $from $where $having";
 
     $groupBy = self::getGroupBy($processor, $query);
 
