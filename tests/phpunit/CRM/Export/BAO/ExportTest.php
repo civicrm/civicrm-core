@@ -2912,4 +2912,47 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * Test get preview function on export processor.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testExportGetPreview() {
+    $this->setUpContactExportData();
+    $fields = [
+      ['Individual', 'first_name'],
+      ['Individual', 'last_name'],
+      ['Individual', 'street_address', 1],
+      ['Individual', 'city', 1],
+      ['Individual', 'country', 1],
+      ['Individual', 'email', 1],
+    ];
+    $mappedFields = [];
+    foreach ($fields as $field) {
+      $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
+    }
+    $processor = new CRM_Export_BAO_ExportProcessor(FALSE, $mappedFields,
+    'AND');
+    $processor->setComponentClause('contact_a.id IN (' . implode(',', $this->contactIDs) . ')');
+    $result = $processor->getPreview(2);
+    $this->assertEquals([
+      [
+        'first_name' => 'Anthony',
+        'last_name' => 'Anderson',
+        'Home-street_address' => 'Ambachtstraat 23',
+        'Home-city' => 'Brummen',
+        'Home-country' => 'Netherlands',
+        'Home-email' => 'home@example.com',
+      ],
+      [
+        'first_name' => 'Anthony',
+        'last_name' => 'Anderson',
+        'Home-street_address' => '',
+        'Home-city' => '',
+        'Home-country' => '',
+        'Home-email' => 'anthony_anderson@civicrm.org',
+      ],
+    ], $result);
+  }
+
 }
