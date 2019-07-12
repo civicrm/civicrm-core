@@ -109,15 +109,15 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   public function testExportComponentsContribution() {
     $this->setUpContributionExportData();
     $selectedFields = [
-      ['Individual', 'first_name'],
-      ['Individual', 'last_name'],
-      ['Contribution', 'receive_date'],
-      ['Contribution', 'contribution_source'],
-      ['Individual', 'street_address', 1],
-      ['Individual', 'city', 1],
-      ['Individual', 'country', 1],
-      ['Individual', 'email', 1],
-      ['Contribution', 'trxn_id'],
+      ['contact_type' => 'Individual', 'name' => 'first_name'],
+      ['contact_type' => 'Individual', 'name' => 'last_name'],
+      ['name' => 'receive_date'],
+      ['name' => 'contribution_source'],
+      ['contact_type' => 'Individual', 'name' => 'street_address', 1],
+      ['contact_type' => 'Individual', 'name' => 'city', 1],
+      ['contact_type' => 'Individual', 'name' => 'country', 1],
+      ['contact_type' => 'Individual', 'name' => 'email', 1],
+      ['name' => 'trxn_id'],
     ];
 
     $this->doExportTest([
@@ -499,7 +499,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     \Civi::settings()->set('searchPrimaryDetailsOnly', $isPrimaryOnly);
     $this->setUpContactExportData();
 
-    $selectedFields = [['Individual', 'email', ' '], ['Individual', 'email', '1'], ['Individual', 'email', '2']];
+    $selectedFields = [
+      ['contact_type' => 'Individual', 'name' => 'email'],
+      ['contact_type' => 'Individual', 'name' => 'email', 'location_type_id' => '1'],
+      ['contact_type' => 'Individual', 'name' => 'email', 'location_type_id' => '2'],
+    ];
     $this->doExportTest([
       'ids' => [],
       'params' => [['email', 'LIKE', 'c', 0, 1]],
@@ -578,10 +582,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $contact2 = $this->individualCreate(['employer_id' => $organization2, 'first_name' => 'one']);
     $employerRelationshipTypeID = $this->callAPISuccessGetValue('RelationshipType', ['return' => 'id', 'label_a_b' => 'Employee of']);
     $selectedFields = [
-      ['Individual', 'first_name', ''],
-      ['Individual', $employerRelationshipTypeID . '_a_b', 'organization_name', ''],
-      ['Individual', $employerRelationshipTypeID . '_a_b', 'legal_name', ''],
-      ['Individual', $employerRelationshipTypeID . '_a_b', 'contact_source', ''],
+      ['contact_type' => 'Individual', 'name' => 'first_name'],
+      ['contact_type' => 'Individual', 'relationship_type_id' => $employerRelationshipTypeID, 'relationship_direction' => 'a_b', 'name' => 'organization_name'],
+      ['contact_type' => 'Individual', 'relationship_type_id' => $employerRelationshipTypeID, 'relationship_direction' => 'a_b', 'name' => 'legal_name'],
+      ['contact_type' => 'Individual', 'relationship_type_id' => $employerRelationshipTypeID, 'relationship_direction' => 'a_b', 'name' => 'contact_source'],
     ];
     $this->doExportTest([
       'ids' => [$contact1, $contact2],
@@ -811,7 +815,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         }
       }
     }
-    $this->doExportTest(['fields' => $fields, 'ids' => [$this->contactIDs[0]]]);
+
+    // @todo switch to just declaring the new format....
+    $mappedFields = [];
+    foreach ($fields as $field) {
+      $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
+    }
+    $this->doExportTest(['fields' => $mappedFields, 'ids' => [$this->contactIDs[0]]]);
 
     foreach ($this->csv->getRecords() as $row) {
       $id = $row['contact_id'];
@@ -910,7 +920,12 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         }
       }
     }
-    $this->doExportTest(['fields' => $fields, 'ids' => [$this->contactIDs[0]]]);
+    // @todo switch to just declaring the new format....
+    $mappedFields = [];
+    foreach ($fields as $field) {
+      $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
+    }
+    $this->doExportTest(['fields' => $mappedFields, 'ids' => [$this->contactIDs[0]]]);
     foreach ($this->csv->getRecords() as $row) {
       $this->assertEquals('BillingMobile3', $row['Billing-Phone-Mobile']);
       $this->assertEquals('', $row['Billing-Phone-Phone']);
@@ -2856,16 +2871,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->startCapturingOutput();
     try {
       $defaultClause = (empty($params['ids']) ? NULL : "contact_a.id IN (" . implode(',', $params['ids']) . ")");
-      $mappedFields = [];
-      foreach (CRM_Utils_Array::value('fields', $params, []) as $field) {
-        $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
-      }
+
       CRM_Export_BAO_Export::exportComponents(
         CRM_Utils_Array::value('selectAll', $params, (empty($params['fields']))),
         CRM_Utils_Array::value('ids', $params, []),
         CRM_Utils_Array::value('params', $params, []),
         CRM_Utils_Array::value('order', $params),
-        $mappedFields,
+        CRM_Utils_Array::value('fields', $params, []),
         CRM_Utils_Array::value('moreReturnProperties', $params),
         CRM_Utils_Array::value('exportMode', $params, CRM_Export_Form_Select::CONTACT_EXPORT),
         CRM_Utils_Array::value('componentClause', $params, $defaultClause),
