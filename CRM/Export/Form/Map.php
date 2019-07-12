@@ -183,14 +183,14 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
 
     $mapperKeys = $params['mapper'][1];
 
-    $checkEmpty = 0;
-    foreach ($mapperKeys as $value) {
-      if ($value[0]) {
-        $checkEmpty++;
+    $mappedFields = [];
+    foreach ((array) $mapperKeys as $field) {
+      if (!empty($field[1])) {
+        $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
       }
     }
 
-    if (!$checkEmpty) {
+    if (!$mappedFields) {
       $this->set('mappingId', NULL);
       CRM_Utils_System::redirect(CRM_Utils_System::url($currentPath, '_qf_Map_display=true' . $urlParams));
     }
@@ -220,7 +220,7 @@ class CRM_Export_Form_Map extends CRM_Core_Form {
       $this->get('componentIds'),
       (array) $this->get('queryParams'),
       $this->get(CRM_Utils_Sort::SORT_ORDER),
-      $mapperKeys,
+      $mappedFields,
       $this->get('returnProperties'),
       $this->get('exportMode'),
       $this->get('componentClause'),

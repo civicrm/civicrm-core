@@ -1556,7 +1556,7 @@ class CRM_Export_BAO_ExportProcessor {
       $returnProperties = [];
       foreach ($this->getRequestedFields() as $key => $value) {
         $fieldName = $value['name'];
-        $locationName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'location_type_id', $value['location_type_id']);
+        $locationName = !empty($value['location_type_id']) ? CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'location_type_id', $value['location_type_id']) : NULL;
         $relationshipTypeKey = !empty($value['relationship_type_id']) ? $value['relationship_type_id'] . '_' . $value['relationship_direction'] : NULL;
         if (!$fieldName || $this->isHouseholdMergeRelationshipTypeKey($relationshipTypeKey)) {
           continue;

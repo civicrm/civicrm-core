@@ -229,8 +229,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   public function testExportComponentsActivity() {
     $this->setUpActivityExportData();
     $selectedFields = [
-      ['Individual', 'display_name'],
-      ['Individual', '5_a_b', 'display_name'],
+      ['contact_type' => 'Individual', 'name' => 'display_name'],
+      ['contact_type' => 'Individual', 'relationship_type_id' => '5', 'relationship_direction' => 'a_b', 'name' => 'display_name'],
     ];
 
     list($tableName) = CRM_Export_BAO_Export::exportComponents(
@@ -465,7 +465,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->setUpContributionExportData();
     $campaign = $this->callAPISuccess('Campaign', 'create', ['title' => 'Big campaign']);
     $this->callAPISuccess('Contribution', 'create', ['campaign_id' => 'Big_campaign', 'id' => $this->contributionIDs[0]]);
-    $selectedFields = [['Individual', 'gender_id'], ['Contribution', 'contribution_campaign_title']];
+    $selectedFields = [
+      ['contact_type' => 'Individual', 'name' => 'gender_id'],
+      ['contact_type' => 'Contribution', 'name' => 'contribution_campaign_title'],
+    ];
     list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
       TRUE,
       $this->contactIDs[1],
@@ -538,11 +541,11 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       $this->contactIDs[] = $householdID;
     }
     $selectedFields = [
-      ['Individual', $houseHoldTypeID . '_a_b', 'state_province', ''],
-      ['Individual', $houseHoldTypeID . '_a_b', 'city', ''],
-      ['Individual', 'city', ''],
-      ['Individual', 'state_province', ''],
-      ['Individual', 'contact_source', ''],
+      ['contact_type' => 'Individual', 'relationship_type_id' => $houseHoldTypeID, 'relationship_direction' => 'a_b', 'name' => 'state_province', 'location_type_id' => ''],
+      ['contact_type' => 'Individual', 'relationship_type_id' => $houseHoldTypeID, 'relationship_direction' => 'a_b', 'name' => 'city', 'location_type_id' => ''],
+      ['contact_type' => 'Individual', 'name' => 'city', 'location_type_id' => ''],
+      ['contact_type' => 'Individual', 'name' => 'state_province', 'location_type_id' => ''],
+      ['contact_type' => 'Individual', 'name' => 'contact_source', 'location_type_id' => ''],
     ];
     list($tableName, $sqlColumns, $headerRows) = CRM_Export_BAO_Export::exportComponents(
       FALSE,
@@ -957,7 +960,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     //export the master address for contact B
     $selectedFields = [
-      ['Individual', 'master_id', 1],
+      ['contact_type' => 'Individual', 'name' => 'master_id', 'location_type_id' => 1],
     ];
     list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
       TRUE,
@@ -1128,12 +1131,16 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function doExport($selectedFields, $id, $exportMode = CRM_Export_Form_Select::CONTACT_EXPORT) {
     $ids = (array) $id;
+    $mappedFields = [];
+    foreach ((array) $selectedFields as $field) {
+      $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
+    }
     list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
       TRUE,
       $ids,
       [],
       NULL,
-      $selectedFields,
+      $mappedFields,
       NULL,
       $exportMode,
       "contact_a.id IN (" . implode(',', $ids) . ")",
@@ -2661,12 +2668,16 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->startCapturingOutput();
     try {
       $defaultClause = (empty($params['ids']) ? NULL : "contact_a.id IN (" . implode(',', $params['ids']) . ")");
+      $mappedFields = [];
+      foreach (CRM_Utils_Array::value('fields', $params, []) as $field) {
+        $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
+      }
       CRM_Export_BAO_Export::exportComponents(
         CRM_Utils_Array::value('selectAll', $params, (empty($params['fields']))),
         CRM_Utils_Array::value('ids', $params, []),
         CRM_Utils_Array::value('params', $params, []),
         CRM_Utils_Array::value('order', $params),
-        CRM_Utils_Array::value('fields', $params),
+        $mappedFields,
         CRM_Utils_Array::value('moreReturnProperties', $params),
         CRM_Utils_Array::value('exportMode', $params, CRM_Export_Form_Select::CONTACT_EXPORT),
         CRM_Utils_Array::value('componentClause', $params, $defaultClause),
