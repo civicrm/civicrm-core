@@ -338,7 +338,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
       // do merge same address and merge same household processing
       if ($mergeSameAddress) {
-        self::mergeSameAddress($processor, $sqlColumns, $exportParams);
+        $processor->mergeSameAddress($sqlColumns, $exportParams);
       }
 
       // call export hook
@@ -545,134 +545,6 @@ VALUES $sqlValueString
 
     $exportTempTable->createWithColumns($sql);
     return $exportTempTable->getName();
-  }
-
-  /**
-   * @param \CRM_Export_BAO_ExportProcessor $processor
-   * @param $sqlColumns
-   * @param array $exportParams
-   */
-  public static function mergeSameAddress($processor, &$sqlColumns, $exportParams) {
-    $greetingOptions = CRM_Export_Form_Select::getGreetingOptions();
-
-    if (!empty($greetingOptions)) {
-      // Greeting options is keyed by 'postal_greeting' or 'addressee'.
-      foreach ($greetingOptions as $key => $value) {
-        if ($option = CRM_Utils_Array::value($key, $exportParams)) {
-          if ($greetingOptions[$key][$option] == ts('Other')) {
-            $exportParams[$key] = $exportParams["{$key}_other"];
-          }
-          elseif ($greetingOptions[$key][$option] == ts('List of names')) {
-            $exportParams[$key] = '';
-          }
-          else {
-            $exportParams[$key] = $greetingOptions[$key][$option];
-          }
-        }
-      }
-    }
-    $tableName = $processor->getTemporaryTable();
-    // check if any records are present based on if they have used shared address feature,
-    // and not based on if city / state .. matches.
-    $sql = "
-SELECT    r1.id                 as copy_id,
-          r1.civicrm_primary_id as copy_contact_id,
-          r1.addressee          as copy_addressee,
-          r1.addressee_id       as copy_addressee_id,
-          r1.postal_greeting    as copy_postal_greeting,
-          r1.postal_greeting_id as copy_postal_greeting_id,
-          r2.id                 as master_id,
-          r2.civicrm_primary_id as master_contact_id,
-          r2.postal_greeting    as master_postal_greeting,
-          r2.postal_greeting_id as master_postal_greeting_id,
-          r2.addressee          as master_addressee,
-          r2.addressee_id       as master_addressee_id
-FROM      $tableName r1
-INNER JOIN civicrm_address adr ON r1.master_id   = adr.id
-INNER JOIN $tableName      r2  ON adr.contact_id = r2.civicrm_primary_id
-ORDER BY  r1.id";
-    $linkedMerge = $processor->buildMasterCopyArray($sql, $exportParams, TRUE);
-
-    // find all the records that have the same street address BUT not in a household
-    // require match on city and state as well
-    $sql = "
-SELECT    r1.id                 as master_id,
-          r1.civicrm_primary_id as master_contact_id,
-          r1.postal_greeting    as master_postal_greeting,
-          r1.postal_greeting_id as master_postal_greeting_id,
-          r1.addressee          as master_addressee,
-          r1.addressee_id       as master_addressee_id,
-          r2.id                 as copy_id,
-          r2.civicrm_primary_id as copy_contact_id,
-          r2.postal_greeting    as copy_postal_greeting,
-          r2.postal_greeting_id as copy_postal_greeting_id,
-          r2.addressee          as copy_addressee,
-          r2.addressee_id       as copy_addressee_id
-FROM      $tableName r1
-LEFT JOIN $tableName r2 ON ( r1.street_address = r2.street_address AND
-               r1.city = r2.city AND
-               r1.state_province_id = r2.state_province_id )
-WHERE     ( r1.household_name IS NULL OR r1.household_name = '' )
-AND       ( r2.household_name IS NULL OR r2.household_name = '' )
-AND       ( r1.street_address != '' )
-AND       r2.id > r1.id
-ORDER BY  r1.id
-";
-    $merge = $processor->buildMasterCopyArray($sql, $exportParams);
-
-    // unset ids from $merge already present in $linkedMerge
-    foreach ($linkedMerge as $masterID => $values) {
-      $keys = [$masterID];
-      $keys = array_merge($keys, array_keys($values['copy']));
-      foreach ($merge as $mid => $vals) {
-        if (in_array($mid, $keys)) {
-          unset($merge[$mid]);
-        }
-        else {
-          foreach ($values['copy'] as $copyId) {
-            if (in_array($copyId, $keys)) {
-              unset($merge[$mid]['copy'][$copyId]);
-            }
-          }
-        }
-      }
-    }
-    $merge = $merge + $linkedMerge;
-
-    foreach ($merge as $masterID => $values) {
-      $sql = "
-UPDATE $tableName
-SET    addressee = %1, postal_greeting = %2, email_greeting = %3
-WHERE  id = %4
-";
-      $params = [
-        1 => [$values['addressee'], 'String'],
-        2 => [$values['postalGreeting'], 'String'],
-        3 => [$values['emailGreeting'], 'String'],
-        4 => [$masterID, 'Integer'],
-      ];
-      CRM_Core_DAO::executeQuery($sql, $params);
-
-      // delete all copies
-      $deleteIDs = array_keys($values['copy']);
-      $deleteIDString = implode(',', $deleteIDs);
-      $sql = "
-DELETE FROM $tableName
-WHERE  id IN ( $deleteIDString )
-";
-      CRM_Core_DAO::executeQuery($sql);
-    }
-
-    // unset temporary columns that were added for postal mailing format
-    // @todo - this part is pretty close to ready to be removed....
-    if (!empty($exportParams['merge_same_address']['temp_columns'])) {
-      $unsetKeys = array_keys($sqlColumns);
-      foreach ($unsetKeys as $headerKey => $sqlColKey) {
-        if (array_key_exists($sqlColKey, $exportParams['merge_same_address']['temp_columns'])) {
-          unset($sqlColumns[$sqlColKey]);
-        }
-      }
-    }
   }
 
   /**
