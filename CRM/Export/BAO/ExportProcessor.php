@@ -860,12 +860,11 @@ class CRM_Export_BAO_ExportProcessor {
    * @param $metadata
    * @param $paymentDetails
    * @param $addPaymentHeader
-   * @param \CRM_Export_BAO_ExportProcessor $processor
    *
    * @return array|bool
    */
-  public function buildRow($query, $iterationDAO, $outputColumns, $metadata, $paymentDetails, $addPaymentHeader, $processor) {
-    $paymentTableId = $processor->getPaymentTableID();
+  public function buildRow($query, $iterationDAO, $outputColumns, $metadata, $paymentDetails, $addPaymentHeader) {
+    $paymentTableId = $this->getPaymentTableID();
     if ($this->isHouseholdToSkip($iterationDAO->contact_id)) {
       return FALSE;
     }
