@@ -76,54 +76,6 @@ class CRM_Export_BAO_Export {
   }
 
   /**
-   * Get Query Group By Clause
-   * @param \CRM_Export_BAO_ExportProcessor $processor
-   *   Export Mode
-   * @param object $query
-   *   CRM_Contact_BAO_Query
-   *
-   * @return string
-   *   Group By Clause
-   */
-  public static function getGroupBy($processor, $query) {
-    $groupBy = NULL;
-    $returnProperties = $processor->getReturnProperties();
-    $exportMode = $processor->getExportMode();
-    $queryMode = $processor->getQueryMode();
-    if (!empty($returnProperties['tags']) || !empty($returnProperties['groups']) ||
-      CRM_Utils_Array::value('notes', $returnProperties) ||
-      // CRM-9552
-      ($queryMode & CRM_Contact_BAO_Query::MODE_CONTACTS && $query->_useGroupBy)
-    ) {
-      $groupBy = "contact_a.id";
-    }
-
-    switch ($exportMode) {
-      case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
-        $groupBy = 'civicrm_contribution.id';
-        if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
-          // especial group by  when soft credit columns are included
-          $groupBy = ['contribution_search_scredit_combined.id', 'contribution_search_scredit_combined.scredit_id'];
-        }
-        break;
-
-      case CRM_Export_Form_Select::EVENT_EXPORT:
-        $groupBy = 'civicrm_participant.id';
-        break;
-
-      case CRM_Export_Form_Select::MEMBER_EXPORT:
-        $groupBy = "civicrm_membership.id";
-        break;
-    }
-
-    if ($queryMode & CRM_Contact_BAO_Query::MODE_ACTIVITY) {
-      $groupBy = "civicrm_activity.id ";
-    }
-
-    return $groupBy ? ' GROUP BY ' . implode(', ', (array) $groupBy) : '';
-  }
-
-  /**
    * Get the list the export fields.
    *
    * @param int $selectAll
@@ -205,26 +157,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     // This perhaps only needs calling when $mergeSameHousehold == 1
     self::buildRelatedContactArray($selectAll, $ids, $processor, $componentTable);
-
-    $groupBy = self::getGroupBy($processor, $query);
-
-    $queryString .= $groupBy;
-
-    if ($order) {
-      // always add contact_a.id to the ORDER clause
-      // so the order is deterministic
-      //CRM-15301
-      if (strpos('contact_a.id', $order) === FALSE) {
-        $order .= ", contact_a.id";
-      }
-
-      list($field, $dir) = explode(' ', $order, 2);
-      $field = trim($field);
-      if (!empty($processor->getReturnProperties()[$field])) {
-        //CRM-15301
-        $queryString .= " ORDER BY $order";
-      }
-    }
 
     $addPaymentHeader = FALSE;
 

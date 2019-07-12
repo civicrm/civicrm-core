@@ -741,7 +741,25 @@ class CRM_Export_BAO_ExportProcessor {
     else {
       $where .= " AND " . implode(' AND ', $whereClauses);
     }
-    return [$query, "$select $from $where $having"];
+
+    $groupBy = $this->getGroupBy($query);
+    $queryString = "$select $from $where $having $groupBy";
+    if ($order) {
+      // always add contact_a.id to the ORDER clause
+      // so the order is deterministic
+      //CRM-15301
+      if (strpos('contact_a.id', $order) === FALSE) {
+        $order .= ", contact_a.id";
+      }
+
+      list($field, $dir) = explode(' ', $order, 2);
+      $field = trim($field);
+      if (!empty($this->getReturnProperties()[$field])) {
+        //CRM-15301
+        $queryString .= " ORDER BY $order";
+      }
+    }
+    return [$query, $queryString];
   }
 
   /**
@@ -1745,6 +1763,51 @@ class CRM_Export_BAO_ExportProcessor {
 
     }
     return $returnProperties;
+  }
+
+  /**
+   * @param object $query
+   *   CRM_Contact_BAO_Query
+   *
+   * @return string
+   *   Group By Clause
+   */
+  public function getGroupBy($query) {
+    $groupBy = NULL;
+    $returnProperties = $this->getReturnProperties();
+    $exportMode = $this->getExportMode();
+    $queryMode = $this->getQueryMode();
+    if (!empty($returnProperties['tags']) || !empty($returnProperties['groups']) ||
+      CRM_Utils_Array::value('notes', $returnProperties) ||
+      // CRM-9552
+      ($queryMode & CRM_Contact_BAO_Query::MODE_CONTACTS && $query->_useGroupBy)
+    ) {
+      $groupBy = "contact_a.id";
+    }
+
+    switch ($exportMode) {
+      case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
+        $groupBy = 'civicrm_contribution.id';
+        if (CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled()) {
+          // especial group by  when soft credit columns are included
+          $groupBy = ['contribution_search_scredit_combined.id', 'contribution_search_scredit_combined.scredit_id'];
+        }
+        break;
+
+      case CRM_Export_Form_Select::EVENT_EXPORT:
+        $groupBy = 'civicrm_participant.id';
+        break;
+
+      case CRM_Export_Form_Select::MEMBER_EXPORT:
+        $groupBy = "civicrm_membership.id";
+        break;
+    }
+
+    if ($queryMode & CRM_Contact_BAO_Query::MODE_ACTIVITY) {
+      $groupBy = "civicrm_activity.id ";
+    }
+
+    return $groupBy ? ' GROUP BY ' . implode(', ', (array) $groupBy) : '';
   }
 
   /**
