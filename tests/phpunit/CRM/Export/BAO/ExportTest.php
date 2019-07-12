@@ -1089,20 +1089,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @throws \League\Csv\Exception
    */
   public function testMergeSameAddress() {
-    $this->setUpContactExportData();
-    $this->contactIDs[] = $contact3 = $this->individualCreate(['first_name' => 'Sarah', 'last_name' => 'Smith', 'prefix_id' => 'Dr.']);
-    // Create address for contact A.
-    $params = [
-      'contact_id' => $contact3,
-      'location_type_id' => 'Home',
-      'street_address' => 'Ambachtstraat 23',
-      'postal_code' => '6971 BN',
-      'country_id' => '1152',
-      'city' => 'Brummen',
-      'is_primary' => 1,
-    ];
-    $this->callAPISuccess('address', 'create', $params);
-    $this->doExportTest(['mergeSameAddress' => TRUE, 'ids' => $this->contactIDs]);
+    $this->setUpContactSameAddressExportData();
+    $this->doExportTest(['mergeSameAddress' => TRUE]);
     // ie 2 merged, one extra.
     $this->assertCount(2, $this->csv);
     $expected = [
@@ -1191,6 +1179,41 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Note(s)' => '',
     ];
     $this->assertExpectedOutput($expected, $this->csv->fetchOne());
+  }
+
+  /**
+   * Tests the options for greeting templates when choosing to merge same address.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
+   */
+  public function testMergeSameAddressGreetingOptions() {
+    $this->setUpContactSameAddressExportData();
+    $this->callAPISuccess('OptionValue', 'create', [
+      'option_group_id' => 'postal_greeting',
+      'label' => '{contact.individual_suffix} {contact.last_name} and first is {contact.first_name} ',
+      // This hard coded number makes it available for export use.
+      'filter' => 4,
+    ]);
+    $this->doExportTest([
+      'mergeSameAddress' => TRUE,
+      'exportParams' => [
+        'postal_greeting' => '2',
+        'postal_greeting_other' => '',
+        'addressee' => '2',
+        'addressee_other' => 'random string {contact.display_name}',
+        'mergeOption' => '1',
+        'additional_group' => '',
+        'mapping' => '',
+      ],
+    ]);
+    $this->assertExpectedOutput([
+      'Addressee' => 'random string Mr. Anthony Anderson II, Dr. Sarah Smith II',
+      'Email Greeting' => 'II Anderson and first is Anthony , II Smith Sarah ',
+      'Postal Greeting' => 'II Anderson and first is Anthony , II Smith Sarah ',
+    ], $this->csv->fetchOne());
+    // 3 contacts merged to 2.
+    $this->assertCount(2, $this->csv);
   }
 
   /**
@@ -2870,20 +2893,22 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   protected function doExportTest($params) {
     $this->startCapturingOutput();
     try {
-      $defaultClause = (empty($params['ids']) ? NULL : "contact_a.id IN (" . implode(',', $params['ids']) . ")");
-
+      $exportMode = CRM_Utils_Array::value('exportMode', $params, CRM_Export_Form_Select::CONTACT_EXPORT);
+      $ids = CRM_Utils_Array::value('ids', $params, ($exportMode === CRM_Export_Form_Select::CONTACT_EXPORT ? $this->contactIDs : []));
+      $defaultClause = (empty($ids) ? NULL : "contact_a.id IN (" . implode(',', $ids) . ")");
       CRM_Export_BAO_Export::exportComponents(
         CRM_Utils_Array::value('selectAll', $params, (empty($params['fields']))),
-        CRM_Utils_Array::value('ids', $params, []),
+        $ids,
         CRM_Utils_Array::value('params', $params, []),
         CRM_Utils_Array::value('order', $params),
         CRM_Utils_Array::value('fields', $params, []),
         CRM_Utils_Array::value('moreReturnProperties', $params),
-        CRM_Utils_Array::value('exportMode', $params, CRM_Export_Form_Select::CONTACT_EXPORT),
+        $exportMode,
         CRM_Utils_Array::value('componentClause', $params, $defaultClause),
         CRM_Utils_Array::value('componentTable', $params),
         CRM_Utils_Array::value('mergeSameAddress', $params, FALSE),
-        CRM_Utils_Array::value('mergeSameHousehold', $params, FALSE)
+        CRM_Utils_Array::value('mergeSameHousehold', $params, FALSE),
+        CRM_Utils_Array::value('exportParams', $params, [])
       );
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {
@@ -2953,6 +2978,27 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         'Home-email' => 'anthony_anderson@civicrm.org',
       ],
     ], $result);
+  }
+
+  /**
+   * Set up contacts which will be merged with the same address option.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function setUpContactSameAddressExportData() {
+    $this->setUpContactExportData();
+    $this->contactIDs[] = $contact3 = $this->individualCreate(['first_name' => 'Sarah', 'last_name' => 'Smith', 'prefix_id' => 'Dr.']);
+    // Create address for contact A.
+    $params = [
+      'contact_id' => $contact3,
+      'location_type_id' => 'Home',
+      'street_address' => 'Ambachtstraat 23',
+      'postal_code' => '6971 BN',
+      'country_id' => '1152',
+      'city' => 'Brummen',
+      'is_primary' => 1,
+    ];
+    $this->callAPISuccess('address', 'create', $params);
   }
 
 }
