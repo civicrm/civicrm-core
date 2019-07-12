@@ -89,7 +89,7 @@ trait ContactTestTrait {
    *
    * @return int
    *   id of Household created
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function householdCreate($params = array(), $seq = 0) {
     $params = array_merge($this->sampleContact('Household', $seq), $params);
