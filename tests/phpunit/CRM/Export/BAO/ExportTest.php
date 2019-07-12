@@ -175,37 +175,123 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Basic test to ensure the exportComponents function can export selected fields for contribution.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportComponentsMembership() {
     $this->setUpMembershipExportData();
-    list($tableName) = CRM_Export_BAO_Export::exportComponents(
-      TRUE,
-      $this->membershipIDs,
-      [],
-      NULL,
-      NULL,
-      NULL,
-      CRM_Export_Form_Select::MEMBER_EXPORT,
-      'civicrm_membership.id IN ( ' . implode(',', $this->membershipIDs) . ')',
-      NULL,
-      FALSE,
-      FALSE,
-      [
-        'exportOption' => CRM_Export_Form_Select::MEMBER_EXPORT,
-        'suppress_csv_for_testing' => TRUE,
-      ]
-    );
+    $this->doExportTest([
+      'selectAll' => TRUE,
+      'ids'  => $this->membershipIDs,
+      'exportMode' => CRM_Export_Form_Select::MEMBER_EXPORT,
+      'componentClause' => 'civicrm_membership.id IN ( ' . implode(',', $this->membershipIDs) . ')',
+    ]);
 
-    $dao = CRM_Core_DAO::executeQuery('SELECT * from ' . $tableName);
-    $dao->fetch();
-    $this->assertEquals('100.00', $dao->componentpaymentfield_total_amount);
-    $this->assertEquals('Completed', $dao->componentpaymentfield_contribution_status);
-    $this->assertEquals('Credit Card', $dao->componentpaymentfield_payment_instrument);
-    $this->assertEquals(1, $dao->N);
-
-    // delete the export temp table and component table
-    $sql = "DROP TABLE IF EXISTS {$tableName}";
-    CRM_Core_DAO::executeQuery($sql);
+    $row = $this->csv->fetchOne();
+    $expected = [
+      'Contact ID' => $this->contactIDs[0],
+      'Contact Type' => 'Individual',
+      'Contact Subtype' => '',
+      'Do Not Email' => '',
+      'Do Not Phone' => '',
+      'Do Not Mail' => '',
+      'Do Not Sms' => '',
+      'Do Not Trade' => '',
+      'No Bulk Emails (User Opt Out)' => '',
+      'Legal Identifier' => '',
+      'External Identifier' => '',
+      'Sort Name' => 'Anderson, Anthony',
+      'Display Name' => 'Mr. Anthony Anderson II',
+      'Nickname' => '',
+      'Legal Name' => '',
+      'Image Url' => '',
+      'Preferred Communication Method' => '',
+      'Preferred Language' => 'en_US',
+      'Preferred Mail Format' => 'Both',
+      'Contact Hash' => '059023a02d27d4e7f285a40ee0e30be8',
+      'Contact Source' => '',
+      'First Name' => 'Anthony',
+      'Middle Name' => 'J.',
+      'Last Name' => 'Anderson',
+      'Individual Prefix' => 'Mr.',
+      'Individual Suffix' => 'II',
+      'Formal Title' => '',
+      'Communication Style' => 'Formal',
+      'Email Greeting ID' => '1',
+      'Postal Greeting ID' => '1',
+      'Addressee ID' => '1',
+      'Job Title' => '',
+      'Gender' => 'Female',
+      'Birth Date' => '',
+      'Deceased' => '',
+      'Deceased Date' => '',
+      'Household Name' => '',
+      'Organization Name' => '',
+      'Sic Code' => '',
+      'Unique ID (OpenID)' => '',
+      'Current Employer ID' => '',
+      'Contact is in Trash' => '',
+      'Created Date' => '2019-07-11 09:56:18',
+      'Modified Date' => '2019-07-11 09:56:19',
+      'Addressee' => 'Mr. Anthony J. Anderson II',
+      'Email Greeting' => 'Dear Anthony',
+      'Postal Greeting' => 'Dear Anthony',
+      'Current Employer' => '',
+      'Location Type' => 'Home',
+      'Street Address' => 'Ambachtstraat 23',
+      'Street Number' => '',
+      'Street Number Suffix' => '',
+      'Street Name' => '',
+      'Street Unit' => '',
+      'Supplemental Address 1' => '',
+      'Supplemental Address 2' => '',
+      'Supplemental Address 3' => '',
+      'City' => 'Brummen',
+      'Postal Code Suffix' => '',
+      'Postal Code' => '6971 BN',
+      'Latitude' => '',
+      'Longitude' => '',
+      'Address Name' => '',
+      'Master Address Belongs To' => '',
+      'County' => '',
+      'State' => '',
+      'Country' => 'Netherlands',
+      'Phone' => '',
+      'Phone Extension' => '',
+      'Phone Type' => '',
+      'Email' => 'home@example.com',
+      'On Hold' => '',
+      'Use for Bulk Mail' => '',
+      'Signature Text' => '',
+      'Signature Html' => '',
+      'IM Provider' => '',
+      'IM Screen Name' => '',
+      'OpenID' => '',
+      'World Region' => 'Europe and Central Asia',
+      'Website' => '',
+      'Membership Type' => 'General',
+      'Test' => '',
+      'Is Pay Later' => '',
+      'Member Since' => '2007-01-21',
+      'Membership Start Date' => '2007-01-21',
+      'Membership Expiration Date' => '2007-12-21',
+      'Source' => 'Payment',
+      'Membership Status' => 'Expired',
+      'Membership ID' => '2',
+      'Primary Member ID' => '',
+      'max_related' => '',
+      'membership_recur_id' => '',
+      'Campaign ID' => '',
+      'member_is_override' => '',
+      'member_auto_renew' => '',
+      'Total Amount' => '100.00',
+      'Contribution Status' => 'Completed',
+      'Date Received' => '2019-07-25 07:34:23',
+      'Payment Method' => 'Credit Card',
+      'Transaction ID' => '',
+    ];
+    $this->assertExpectedOutput($expected, $row);
   }
 
   /**
