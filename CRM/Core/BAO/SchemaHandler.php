@@ -288,6 +288,8 @@ ALTER TABLE {$tableName}
   }
 
   /**
+   * @deprecated
+   *
    * @param array $params
    * @param bool $indexExist
    * @param bool $triggerRebuild
