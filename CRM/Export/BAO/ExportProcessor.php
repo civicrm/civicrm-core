@@ -94,6 +94,13 @@ class CRM_Export_BAO_ExportProcessor {
   protected $additionalFieldsForSameAddressMerge = [];
 
   /**
+   * Fields used for merging same contacts.
+   *
+   * @var array
+   */
+  protected $contactGreetingFields = [];
+
+  /**
    * Get additional non-visible fields for address merge purposes.
    *
    * @return array
@@ -329,6 +336,38 @@ class CRM_Export_BAO_ExportProcessor {
   public function setTemporaryTable(string $temporaryTable) {
     $this->temporaryTable = $temporaryTable;
   }
+
+  protected $postalGreetingTemplate;
+
+  /**
+   * @return mixed
+   */
+  public function getPostalGreetingTemplate() {
+    return $this->postalGreetingTemplate;
+  }
+
+  /**
+   * @param mixed $postalGreetingTemplate
+   */
+  public function setPostalGreetingTemplate($postalGreetingTemplate) {
+    $this->postalGreetingTemplate = $postalGreetingTemplate;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getAddresseeGreetingTemplate() {
+    return $this->addresseeGreetingTemplate;
+  }
+
+  /**
+   * @param mixed $addresseeGreetingTemplate
+   */
+  public function setAddresseeGreetingTemplate($addresseeGreetingTemplate) {
+    $this->addresseeGreetingTemplate = $addresseeGreetingTemplate;
+  }
+
+  protected $addresseeGreetingTemplate;
 
   /**
    * CRM_Export_BAO_ExportProcessor constructor.
@@ -1821,12 +1860,11 @@ class CRM_Export_BAO_ExportProcessor {
     $contact = NULL;
 
     $greetingFields = [
-      'postal_greeting',
-      'addressee',
+      'postal_greeting' => $this->getPostalGreetingTemplate(),
+      'addressee' => $this->getAddresseeGreetingTemplate(),
     ];
-    foreach ($greetingFields as $greeting) {
+    foreach ($greetingFields as $greeting => $greetingLabel) {
       if (!empty($exportParams[$greeting])) {
-        $greetingLabel = $exportParams[$greeting];
         if (empty($contact)) {
           $values = [
             'id' => $contactId,
@@ -1857,7 +1895,6 @@ class CRM_Export_BAO_ExportProcessor {
    * @return array
    */
   public function buildMasterCopyArray($sql, $exportParams, $sharedAddress = FALSE) {
-    static $contactGreetingTokens = [];
 
     $addresseeOptions = CRM_Core_OptionGroup::values('addressee');
     $postalOptions = CRM_Core_OptionGroup::values('postal_greeting');
@@ -1873,24 +1910,24 @@ class CRM_Export_BAO_ExportProcessor {
       $copyAddressee = $dao->copy_addressee;
 
       if (!$sharedAddress) {
-        if (!isset($contactGreetingTokens[$dao->master_contact_id])) {
-          $contactGreetingTokens[$dao->master_contact_id] = $this->replaceMergeTokens($dao->master_contact_id, $exportParams);
+        if (!isset($this->contactGreetingFields[$dao->master_contact_id])) {
+          $this->contactGreetingFields[$dao->master_contact_id] = $this->replaceMergeTokens($dao->master_contact_id, $exportParams);
         }
         $masterPostalGreeting = CRM_Utils_Array::value('postal_greeting',
-          $contactGreetingTokens[$dao->master_contact_id], $dao->master_postal_greeting
+          $this->contactGreetingFields[$dao->master_contact_id], $dao->master_postal_greeting
         );
         $masterAddressee = CRM_Utils_Array::value('addressee',
-          $contactGreetingTokens[$dao->master_contact_id], $dao->master_addressee
+          $this->contactGreetingFields[$dao->master_contact_id], $dao->master_addressee
         );
 
         if (!isset($contactGreetingTokens[$dao->copy_contact_id])) {
-          $contactGreetingTokens[$dao->copy_contact_id] = $this->replaceMergeTokens($dao->copy_contact_id, $exportParams);
+          $this->contactGreetingFields[$dao->copy_contact_id] = $this->replaceMergeTokens($dao->copy_contact_id, $exportParams);
         }
         $copyPostalGreeting = CRM_Utils_Array::value('postal_greeting',
-          $contactGreetingTokens[$dao->copy_contact_id], $dao->copy_postal_greeting
+          $this->contactGreetingFields[$dao->copy_contact_id], $dao->copy_postal_greeting
         );
         $copyAddressee = CRM_Utils_Array::value('addressee',
-          $contactGreetingTokens[$dao->copy_contact_id], $dao->copy_addressee
+          $this->contactGreetingFields[$dao->copy_contact_id], $dao->copy_addressee
         );
       }
 
@@ -1977,6 +2014,13 @@ class CRM_Export_BAO_ExportProcessor {
         }
       }
     }
+    if (!empty($exportParams['postal_greeting'])) {
+      $this->setPostalGreetingTemplate($exportParams['postal_greeting']);
+    }
+    if (!empty($exportParams['addressee'])) {
+      $this->setAddresseeGreetingTemplate($exportParams['addressee']);
+    }
+
     $tableName = $this->getTemporaryTable();
     // check if any records are present based on if they have used shared address feature,
     // and not based on if city / state .. matches.
