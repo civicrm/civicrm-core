@@ -62,4 +62,22 @@ class CRM_Core_BAO_PrevNextCacheTest extends CiviUnitTestCase {
     $this->quickCleanup(array('civicrm_prevnext_cache'));
   }
 
+  public function testSetItem() {
+    $cacheKeyString = 'TestCacheKeyString';
+    $data = '1234afgbghh';
+    $values = [];
+    $values[] = " ( 'civicrm_contact', 0, 0, '{$cacheKeyString}_stats', '$data' ) ";
+    $valueArray = CRM_Core_BAO_PrevNextCache::convertSetItemValues($values[0]);
+    // verify as SetItem would do that it converts the original values style into a sensible array format
+    $this->assertEquals(['civicrm_contact', 0, 0, 'TestCacheKeyString_stats', '1234afgbghh'], $valueArray);
+    CRM_Core_BAO_PrevNextCache::setItem($valueArray[0], $valueArray[1], $valueArray[2], $valueArray[3], $valueArray[4]);
+    $dao = new CRM_Core_BAO_PrevNextCache();
+    $dao->cacheKey = 'TestCacheKeyString_stats';
+    $dao->find(TRUE);
+    $this->assertEquals('1234afgbghh', $dao->data);
+    $this->assertEquals(0, $dao->entity_id1);
+    $this->assertEquals(0, $dao->entity_id2);
+    $this->assertEquals('civicrm_contact', $dao->entity_table);
+  }
+
 }

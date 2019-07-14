@@ -772,9 +772,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     ];
     $data = CRM_Core_DAO::escapeString(serialize($data));
 
-    $values = [];
-    $values[] = " ( 'civicrm_contact', 0, 0, '{$cacheKeyString}_stats', '$data' ) ";
-    CRM_Core_BAO_PrevNextCache::setItem($values);
+    CRM_Core_BAO_PrevNextCache::setItem('civicrm_contact', 0, 0, $cacheKeyString . '_stats', $data);
   }
 
   /**
