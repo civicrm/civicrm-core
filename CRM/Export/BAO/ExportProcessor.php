@@ -1962,7 +1962,7 @@ class CRM_Export_BAO_ExportProcessor {
         elseif ($copyPostalGreeting) {
           $this->trimNonTokensFromAddressString($copyPostalGreeting,
             $postalOptions[$dao->copy_postal_greeting_id],
-            $exportParams
+            $this->getPostalGreetingTemplate()
           );
           $merge[$masterID]['postalGreeting'] = "{$merge[$masterID]['postalGreeting']}, {$copyPostalGreeting}";
           // if there happens to be a duplicate, remove it
@@ -1978,7 +1978,7 @@ class CRM_Export_BAO_ExportProcessor {
         elseif ($copyAddressee) {
           $this->trimNonTokensFromAddressString($copyAddressee,
             $addresseeOptions[$dao->copy_addressee_id],
-            $exportParams, 'addressee'
+            $this->getAddresseeGreetingTemplate()
           );
           $merge[$masterID]['addressee'] = "{$merge[$masterID]['addressee']}, " . trim($copyAddressee);
         }
@@ -2133,18 +2133,14 @@ WHERE  id IN ( $deleteIDString )
    *
    * @param string $parsedString
    * @param string $defaultGreeting
-   * @param bool $addressMergeGreetings
-   * @param string $greetingType
+   * @param string $greetingLabel
    *
    * @return mixed
    */
   public function trimNonTokensFromAddressString(
     &$parsedString, $defaultGreeting,
-    $addressMergeGreetings, $greetingType = 'postal_greeting'
+    $greetingLabel
   ) {
-    if (!empty($addressMergeGreetings[$greetingType])) {
-      $greetingLabel = $addressMergeGreetings[$greetingType];
-    }
     $greetingLabel = empty($greetingLabel) ? $defaultGreeting : $greetingLabel;
 
     $stringsToBeReplaced = preg_replace('/(\{[a-zA-Z._ ]+\})/', ';;', $greetingLabel);
