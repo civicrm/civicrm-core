@@ -444,17 +444,21 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           $validLinks[CRM_Core_Action::BROWSE] = [
             'name' => ts('Public View'),
             'url' => 'civicrm/mailing/view',
-            'qs' => 'id=%%mid%%&reset=1',
+            'qs' => 'id=%%hashOrMid%%&reset=1',
             'title' => ts('Public View'),
             'fe' => TRUE,
           ];
           $actionMask |= CRM_Core_Action::BROWSE;
         }
 
+        $hash = CRM_Mailing_BAO_Mailing::getMailingHash($row['id']);
         $rows[$key]['action'] = CRM_Core_Action::formLink(
           $validLinks,
           $actionMask,
-          ['mid' => $row['id']],
+          [
+            'mid' => $row['id'],
+            'hashOrMid' => $hash ? $hash : $row['id'],
+          ],
           "more",
           FALSE,
           $opString,
