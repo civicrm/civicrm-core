@@ -1851,11 +1851,10 @@ class CRM_Export_BAO_ExportProcessor {
 
   /**
    * @param int $contactId
-   * @param array $exportParams
    *
    * @return array
    */
-  public function replaceMergeTokens($contactId, $exportParams) {
+  public function replaceMergeTokens($contactId) {
     $greetings = [];
     $contact = NULL;
 
@@ -1864,7 +1863,8 @@ class CRM_Export_BAO_ExportProcessor {
       'addressee' => $this->getAddresseeGreetingTemplate(),
     ];
     foreach ($greetingFields as $greeting => $greetingLabel) {
-      if (!empty($exportParams[$greeting])) {
+      $tokens = CRM_Utils_Token::getTokens($greetingLabel);
+      if (!empty($tokens)) {
         if (empty($contact)) {
           $values = [
             'id' => $contactId,
@@ -1911,7 +1911,7 @@ class CRM_Export_BAO_ExportProcessor {
 
       if (!$sharedAddress) {
         if (!isset($this->contactGreetingFields[$dao->master_contact_id])) {
-          $this->contactGreetingFields[$dao->master_contact_id] = $this->replaceMergeTokens($dao->master_contact_id, $exportParams);
+          $this->contactGreetingFields[$dao->master_contact_id] = $this->replaceMergeTokens($dao->master_contact_id);
         }
         $masterPostalGreeting = CRM_Utils_Array::value('postal_greeting',
           $this->contactGreetingFields[$dao->master_contact_id], $dao->master_postal_greeting
@@ -1921,7 +1921,7 @@ class CRM_Export_BAO_ExportProcessor {
         );
 
         if (!isset($contactGreetingTokens[$dao->copy_contact_id])) {
-          $this->contactGreetingFields[$dao->copy_contact_id] = $this->replaceMergeTokens($dao->copy_contact_id, $exportParams);
+          $this->contactGreetingFields[$dao->copy_contact_id] = $this->replaceMergeTokens($dao->copy_contact_id);
         }
         $copyPostalGreeting = CRM_Utils_Array::value('postal_greeting',
           $this->contactGreetingFields[$dao->copy_contact_id], $dao->copy_postal_greeting
