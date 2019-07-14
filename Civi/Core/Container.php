@@ -158,6 +158,7 @@ class Container {
       'long' => 'long',
       'groups' => 'contact groups',
       'navigation' => 'navigation',
+      'customData' => 'custom data',
     ];
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
       $definitionParams = [
@@ -167,7 +168,7 @@ class Container {
       // For Caches that we don't really care about the ttl for and/or maybe accessed
       // fairly often we use the fastArrayDecorator which improves reads and writes, these
       // caches should also not have concurrency risk.
-      $fastArrayCaches = ['groups', 'navigation'];
+      $fastArrayCaches = ['groups', 'navigation', 'customData'];
       if (in_array($cacheSvc, $fastArrayCaches)) {
         $definitionParams['withArray'] = 'fast';
       }
