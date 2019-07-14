@@ -146,6 +146,9 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {if $field.serialize}
   'serialize' => self::SERIALIZE_{$field.serialize|strtoupper},
 {/if}
+{if $field.uniqueTitle}
+  'unique_title' => {$tsFunctionName}('{$field.uniqueTitle}'),
+{/if}
 {if $field.html}
   'html' => array(
   {foreach from=$field.html item=val key=key}

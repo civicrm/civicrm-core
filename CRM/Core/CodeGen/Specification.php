@@ -368,6 +368,7 @@ class CRM_Core_CodeGen_Specification {
     $field['headerPattern'] = $this->value('headerPattern', $fieldXML);
     $field['dataPattern'] = $this->value('dataPattern', $fieldXML);
     $field['uniqueName'] = $this->value('uniqueName', $fieldXML);
+    $field['uniqueTitle'] = $this->value('uniqueTitle', $fieldXML);
     $field['serialize'] = $this->value('serialize', $fieldXML);
     $field['html'] = $this->value('html', $fieldXML);
     if (isset($fieldXML->permission)) {
