@@ -181,9 +181,6 @@ class CRM_Core_BAO_Cache_Psr16 {
    */
   public static function getLegacyGroups() {
     $groups = [
-      // Core
-      'contact fields',
-
       // Universe
 
       // be.chiro.civi.atomfeeds

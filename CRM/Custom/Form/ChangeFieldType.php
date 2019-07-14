@@ -187,7 +187,9 @@ class CRM_Custom_Form_ChangeFieldType extends CRM_Core_Form {
     $customField->save();
 
     // Reset cache for custom fields
-    CRM_Core_BAO_Cache::deleteGroup('contact fields');
+    Civi::cache('fields')->flush();
+    // reset ACL and system caches.
+    CRM_Core_BAO_Cache::resetCaches();
 
     CRM_Core_Session::setStatus(ts('Input type of custom field \'%1\' has been successfully changed to \'%2\'.',
       [1 => $this->_values['label'], 2 => $dstHtmlType]
