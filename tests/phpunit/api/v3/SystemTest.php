@@ -54,17 +54,17 @@ class api_v3_SystemTest extends CiviUnitTestCase {
     // check all of them -- just enough to make sure that the API is doing
     // something
 
-    $this->assertTrue(NULL === CRM_Core_BAO_Cache::getItem(self::TEST_CACHE_GROUP, self::TEST_CACHE_PATH));
+    $this->assertTrue(NULL === Civi::cache()->get(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH)));
 
     $data = 'abc';
-    CRM_Core_BAO_Cache::setItem($data, self::TEST_CACHE_GROUP, self::TEST_CACHE_PATH);
+    Civi::cache()->set(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH), $data);
 
-    $this->assertEquals('abc', CRM_Core_BAO_Cache::getItem(self::TEST_CACHE_GROUP, self::TEST_CACHE_PATH));
+    $this->assertEquals('abc', Civi::cache()->get(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH)));
 
     $params = array();
     $result = $this->callAPIAndDocument('system', 'flush', $params, __FUNCTION__, __FILE__, "Flush all system caches", 'Flush');
 
-    $this->assertTrue(NULL === CRM_Core_BAO_Cache::getItem(self::TEST_CACHE_GROUP, self::TEST_CACHE_PATH));
+    $this->assertTrue(NULL === Civi::cache()->get(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH)));
   }
 
   /**
