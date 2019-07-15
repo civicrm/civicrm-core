@@ -88,29 +88,19 @@
  *
  */
 
+/*
+ * Note as of 2019-07-15 this file does not appear to be called
+ * from anywhere and seems to have issues running on more recent
+ * php versions.
+ * @todo look to remove this file completely.
+ */
+
 
 require_once '../civicrm.config.php';
 
-require_once 'CRM/Core/Config.php';
-require_once 'CRM/Core/Error.php';
-require_once 'CRM/Core/I18n.php';
-
-require_once 'CRM/Core/DAO/Address.php';
-require_once 'CRM/Core/DAO.php';
-require_once 'CRM/Core/DAO/Phone.php';
-require_once 'CRM/Core/DAO/Email.php';
-require_once 'CRM/Core/DAO/EntityTag.php';
-require_once 'CRM/Core/DAO/Note.php';
-require_once 'CRM/Core/DAO/Domain.php';
-
-require_once 'CRM/Contact/DAO/Group.php';
-require_once 'CRM/Contact/DAO/GroupContact.php';
-require_once 'CRM/Contact/DAO/SubscriptionHistory.php';
-require_once 'CRM/Contact/DAO/Contact.php';
-require_once 'CRM/Contact/DAO/Relationship.php';
-require_once 'CRM/Event/DAO/Participant.php';
-require_once 'CRM/Contribute/DAO/ContributionSoft.php';
-require_once 'CRM/Member/DAO/MembershipPayment.php';
+// autoload
+require_once 'CRM/Core/ClassLoader.php';
+CRM_Core_ClassLoader::singleton()->register();
 
 /**
  * Class CRM_GCD
@@ -1173,8 +1163,8 @@ class CRM_GCD {
     //In this function when we add groups that time we are cache the contact fields
     //But at the end of setup we are appending sample custom data, so for consistency
     //reset the cache.
-    require_once 'CRM/Core/BAO/Cache.php';
-    CRM_Core_BAO_Cache::deleteGroup('contact fields');
+    Civi::cache('fields')->flush();
+    CRM_Core_BAO_Cache::resetCaches();
   }
 
   /**
