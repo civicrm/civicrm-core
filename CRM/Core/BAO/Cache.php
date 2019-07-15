@@ -73,6 +73,9 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @deprecated
    */
   public static function &getItem($group, $path, $componentID = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning(
+      'CRM_Core_BAO_Cache::getItem is deprecated and will be removed from core soon, use Civi::cache() facade or define cache group using hook_civicrm_container'
+    );
     if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
       $value = $adapter::getItem($group, $path, $componentID);
       return $value;
@@ -116,6 +119,9 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @deprecated
    */
   public static function &getItems($group, $componentID = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning(
+      'CRM_Core_BAO_Cache::getItems is deprecated and will be removed from core soon, use Civi::cache() facade or define cache group using hook_civicrm_container'
+    );
     if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
       return $adapter::getItems($group, $componentID);
     }
@@ -161,6 +167,9 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @deprecated
    */
   public static function setItem(&$data, $group, $path, $componentID = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning(
+      'CRM_Core_BAO_Cache::setItem is deprecated and will be removed from core soon, use Civi::cache() facade or define cache group using hook_civicrm_container'
+    );
     if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
       return $adapter::setItem($data, $group, $path, $componentID);
     }
@@ -232,6 +241,9 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @deprecated
    */
   public static function deleteGroup($group = NULL, $path = NULL, $clearAll = TRUE) {
+    CRM_Core_Error::deprecatedFunctionWarning(
+      'CRM_Core_BAO_Cache::deleteGroup is deprecated and will be removed from core soon, use Civi::cache() facade or define cache group using hook_civicrm_container'
+    );
     if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
       return $adapter::deleteGroup($group, $path);
     }

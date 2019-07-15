@@ -31,6 +31,20 @@
  */
 class CRM_Core_BAO_CacheTest extends CiviUnitTestCase {
 
+  /**
+   * @var CRM_Utils_Cache_Interface
+   */
+  protected $a;
+
+  public function createSimpleCache() {
+    return new CRM_Utils_Cache_FastArrayDecorator(
+      $this->a = CRM_Utils_Cache::create([
+        'name' => 'CRM_Core_BAO_CacheTest',
+        'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
+      ])
+    );
+  }
+
   public function testMultiVersionDecode() {
     $encoders = ['serialize', ['CRM_Core_BAO_Cache', 'encode']];
     $values = [NULL, 0, 1, TRUE, FALSE, [], ['abcd'], 'ab;cd', new stdClass()];
@@ -68,9 +82,10 @@ class CRM_Core_BAO_CacheTest extends CiviUnitTestCase {
    * @dataProvider exampleValues
    */
   public function testSetGetItem($originalValue) {
-    CRM_Core_BAO_Cache::setItem($originalValue, __CLASS__, 'testSetGetItem');
+    $this->createSimpleCache();
+    $this->a->set('testSetGetItem', $originalValue);
 
-    $return_1 = CRM_Core_BAO_Cache::getItem(__CLASS__, 'testSetGetItem');
+    $return_1 = $this->a->get('testSetGetItem');
     $this->assertEquals($originalValue, $return_1);
 
     // Wipe out any in-memory copies of the cache. Check to see if the SQL
@@ -78,7 +93,8 @@ class CRM_Core_BAO_CacheTest extends CiviUnitTestCase {
 
     CRM_Core_BAO_Cache::$_cache = NULL;
     CRM_Utils_Cache::$_singleton = NULL;
-    $return_2 = CRM_Core_BAO_Cache::getItem(__CLASS__, 'testSetGetItem');
+    $this->a->values = [];
+    $return_2 = $this->a->get('testSetGetItem');
     $this->assertEquals($originalValue, $return_2);
   }
 
