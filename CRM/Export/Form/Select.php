@@ -291,7 +291,7 @@ FROM   {$this->_componentTable}
       $this->_greetingOptions = self::getGreetingOptions();
 
       foreach ($this->_greetingOptions as $key => $value) {
-        $fieldLabel = ts('%1 (merging > 2 contacts)', [1 => ucwords(str_replace('_', ' ', $key))]);
+        $fieldLabel = ts('%1 (when merging contacts)', [1 => ucwords(str_replace('_', ' ', $key))]);
         $this->addElement('select', $key, $fieldLabel,
           $value, ['onchange' => "showOther(this);"]
         );
@@ -361,7 +361,7 @@ FROM   {$this->_componentTable}
         if ((CRM_Utils_Array::value($otherOption, $self->_greetingOptions[$key]) == ts('Other')) && empty($params[$value])) {
 
           $label = ucwords(str_replace('_', ' ', $key));
-          $errors[$value] = ts('Please enter a value for %1 (merging > 2 contacts), or select a pre-configured option from the list.', [1 => $label]);
+          $errors[$value] = ts('Please enter a value for %1 (when merging contacts), or select a pre-configured option from the list.', [1 => $label]);
         }
       }
     }
