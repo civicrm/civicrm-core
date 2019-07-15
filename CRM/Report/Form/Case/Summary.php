@@ -309,66 +309,11 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
     }
   }
 
-  public function where() {
-    $clauses = [];
+  public function storeWhereHavingClauseArray() {
     if (!empty($this->_params['fields']['label_b_a']) && $this->_params['fields']['label_b_a'] == 1) {
-      $clauses[] = 'contact_civireport.sort_name !=  c2_civireport.sort_name';
+      $this->_whereClauses[] = '(contact_civireport.sort_name != c2_civireport.sort_name)';
     }
-    $this->_having = '';
-    foreach ($this->_columns as $tableName => $table) {
-      if (array_key_exists('filters', $table)) {
-        foreach ($table['filters'] as $fieldName => $field) {
-          $clause = NULL;
-          if (CRM_Utils_Array::value("operatorType", $field) & CRM_Report_Form::OP_DATE
-          ) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
-
-            $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to,
-              CRM_Utils_Array::value('type', $field)
-            );
-          }
-          else {
-
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
-            if ($fieldName == 'case_type_id') {
-              $value = CRM_Utils_Array::value("{$fieldName}_value", $this->_params);
-              if (!empty($value)) {
-                $operator = '';
-                if ($op == 'notin') {
-                  $operator = 'NOT';
-                }
-
-                $regexp = "[[:cntrl:]]*" . implode('[[:>:]]*|[[:<:]]*', $value) . "[[:cntrl:]]*";
-                $clause = "{$field['dbAlias']} {$operator} REGEXP '{$regexp}'";
-              }
-              $op = NULL;
-            }
-
-            if ($op) {
-              $clause = $this->whereClause($field,
-                $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-              );
-            }
-          }
-
-          if (!empty($clause)) {
-            $clauses[] = $clause;
-          }
-        }
-      }
-    }
-
-    if (empty($clauses)) {
-      $this->_where = "WHERE ( 1 ) ";
-    }
-    else {
-      $this->_where = "WHERE " . implode(' AND ', $clauses);
-    }
+    parent::storeWhereHavingClauseArray();
   }
 
   public function groupBy() {
