@@ -37,12 +37,6 @@
 class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
-   * Activity type
-   * @var array
-   */
-  public static $activityTypeList = [];
-
-  /**
    * Get all the case statues.
    *
    *
@@ -155,8 +149,8 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
   public static function &caseActivityType($indexName = TRUE, $all = FALSE) {
     $cache = (int) $indexName . '_' . (int) $all;
 
-    if (!array_key_exists($cache, self::$activityTypeList)) {
-      self::$activityTypeList[$cache] = [];
+    if (!isset(Civi::$statics[__CLASS__]['activityTypeList'][$cache])) {
+      Civi::$statics[__CLASS__]['activityTypeList'][$cache] = [];
 
       $query = "
               SELECT  v.label as label ,v.value as value, v.name as name, v.description as description, v.icon
@@ -194,9 +188,9 @@ class CRM_Case_PseudoConstant extends CRM_Core_PseudoConstant {
         $activityTypes[$index]['icon'] = $dao->icon;
         $activityTypes[$index]['description'] = $dao->description;
       }
-      self::$activityTypeList[$cache] = $activityTypes;
+      Civi::$statics[__CLASS__]['activityTypeList'][$cache] = $activityTypes;
     }
-    return self::$activityTypeList[$cache];
+    return Civi::$statics[__CLASS__]['activityTypeList'][$cache];
   }
 
   /**
