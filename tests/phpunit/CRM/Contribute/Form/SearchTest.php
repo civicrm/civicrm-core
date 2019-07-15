@@ -400,7 +400,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
    *
    * @dataProvider getSearchData
    */
-  public function testContributionRecurSearchFilters($formValues, $expectedCount, $expectedContact, $expectedQill) {
+  public function testContributionRecurSearchFilters($formValues, $expectedCount, $expectedContact, $expectedQill, $expectedWhere = NULL) {
     $this->setUpRecurringContributions();
 
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($formValues));
@@ -408,14 +408,22 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
 
     // get and assert contribution count
     $contacts = CRM_Core_DAO::executeQuery(sprintf('SELECT DISTINCT contact_a.id, contact_a.display_name %s %s AND contact_a.id IS NOT NULL', $from, $where))->fetchAll();
-    foreach ($contacts as $key => $value) {
-      $this->assertEquals($expectedContact[$key], $value['display_name']);
+    if ($expectedCount) {
+      foreach ($contacts as $key => $value) {
+        $this->assertEquals($expectedContact[$key], $value['display_name']);
+      }
     }
     // assert the contribution count
     $this->assertEquals($expectedCount, count($contacts));
     // get and assert qill string
-    $qill = trim(implode($query->getOperator(), CRM_Utils_Array::value(0, $query->qill())));
+    $qill = $query->qill();
+    $qillString = !empty($qill[1]) ? $qill[1] : CRM_Utils_Array::value(0, $qill);
+    $qill = trim(implode($query->getOperator(), $qillString));
     $this->assertEquals($expectedQill, $qill);
+
+    if ($expectedWhere) {
+      $this->assertEquals($expectedWhere, $query->_where[1][0]);
+    }
   }
 
   /**
@@ -551,11 +559,12 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'financial_type_id' => 'Donation',
       'trxn_id' => 'a transaction',
       'processor_id' => 'a processor',
+      'start_date' => '20180101',
     ]);
     $Contribution2 = $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 'Donation',
       'total_amount' => 22,
-      'receive_date' => date('Ymd'),
+      'receive_date' => '20180101',
       'receive_date_time' => NULL,
       'payment_instrument' => 1,
       'contribution_status_id' => 1,
@@ -611,6 +620,91 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
         'expected_contact' => ['Mr. Terrence Smith II'],
         'expected_qill' => "Recurring Contribution Processor ID = 'a processor'",
       ],
+      'receive_date_search' => [
+        'form_value' => [['receive_date_high', '=', 20180101, 1, 0]],
+        'expectedResult' => 1,
+        'expected_contact' => ['Mr. Terrence Smith II'],
+        'expected_qill' => 'Date Received - less than or equal to "January 1st, 2018 12:00 AM"',
+        'expected_where' => "civicrm_contribution.receive_date <= '20180101000000'",
+      ],
+      'thankyou_date_search' => [
+        'form_value' => [['thankyou_date_high', '=', 20180101, 1, 0]],
+        'expectedResult' => 0,
+        'expected_contact' => [],
+        'expected_qill' => 'Thank-you Date - less than or equal to "January 1st, 2018 12:00 AM"',
+        'expected_where' => "civicrm_contribution.thankyou_date <= '20180101000000'",
+      ],
+      'cancel_date_search_low' => [
+        'form_value' => [['contribution_cancel_date_low', '=', 20180101, 1, 0]],
+        'expectedResult' => 0,
+        'expected_contact' => [],
+        'expected_qill' => 'Cancelled / Refunded Date - greater than or equal to "January 1st, 2018 12:00 AM"',
+        'expected_where' => "civicrm_contribution.cancel_date >= '20180101000000'",
+      ],
+      'cancel_date_search' => [
+        'form_value' => [['contribution_cancel_date', '=', 20180101, 1, 0]],
+        'expectedResult' => 0,
+        'expected_contact' => [],
+        'expected_qill' => 'Cancelled / Refunded Date = January 1st, 2018 12:00 AM',
+        'expected_where' => "civicrm_contribution.cancel_date = '20180101000000'",
+      ],
+      'cancel_date_relative' => [
+        'form_value' => [['contribution_cancel_date_relative', '=', 'this.year', 1, 0]],
+        'expectedResult' => 0,
+        'expected_contact' => [],
+        'expected_qill' => 'Cancelled / Refunded Date is This calendar year (between January 1st, ' . date('Y') . ' 12:00 AM and December 31st, ' . date('Y') . ' 11:59 PM)',
+        'expected_where' => "civicrm_contribution.cancel_date BETWEEN '" . date('Y') . "0101000000' AND '" . date('Y') . "1231235959'",
+      ],
+      'receipt_date_search_low' => [
+        'form_value' => [['receipt_date_low', '=', 20180101, 1, 0]],
+        'expectedResult' => 0,
+        'expected_contact' => [],
+        'expected_qill' => 'Receipt Date - greater than or equal to "January 1st, 2018 12:00 AM"',
+        'expected_where' => "civicrm_contribution.receipt_date >= '20180101000000'",
+      ],
+      'receipt_date_search' => [
+        'form_value' => [['receipt_date', '=', 20180101, 1, 0]],
+        'expectedResult' => 0,
+        'expected_contact' => [],
+        'expected_qill' => 'Receipt Date = \'20180101\'',
+        'expected_where' => "civicrm_contribution.receipt_date = 20180101",
+      ],
+      'revenue_recognition_search_high' => [
+        'form_value' => [['revenue_recognition_date_high', '=', 20180101, 1, 0]],
+        'expectedResult' => 0,
+        'expected_contact' => [],
+        'expected_qill' => 'Revenue Recognition Date - less than or equal to "January 1st, 2018 12:00 AM"',
+        'expected_where' => "civicrm_contribution.revenue_recognition_date <= '20180101000000'",
+      ],
+      'revenue_recognition_search' => [
+        'form_value' => [['revenue_recognition_date', '=', 20180101, 1, 0]],
+        'expectedResult' => 0,
+        'expected_contact' => [],
+        'expected_qill' => 'Revenue Recognition Date = \'20180101\'',
+        'expected_where' => "civicrm_contribution.revenue_recognition_date = 20180101",
+      ],
+      'start_date_search' => [
+        'form_value' => [['contribution_recur_start_date', '=', 20180101, 1, 0]],
+        'expectedResult' => 1,
+        'expected_contact' => ['Mr. Terrence Smith II'],
+        'expected_qill' => 'Recurring Contribution Start Date = January 1st, 2018 12:00 AM',
+        'expected_where' => "civicrm_contribution_recur.start_date = '20180101000000'",
+      ],
+      'start_date_search_high' => [
+        'form_value' => [['contribution_recur_start_date_high', '<=', 20180101, 1, 0]],
+        'expectedResult' => 1,
+        'expected_contact' => ['Mr. Terrence Smith II'],
+        'expected_qill' => 'Recurring Contribution Start Date - less than or equal to "January 1st, 2018 12:00 AM"',
+        'expected_where' => "civicrm_contribution_recur.start_date <= '20180101000000'",
+      ],
+      'start_date_search_relative' => [
+        'form_value' => [['contribution_recur_start_date_relative', '=', 'this.year', 1, 0]],
+        'expectedResult' => 1,
+        'expected_contact' => ['Mr. Joe Miller II'],
+        'expected_qill' => 'Start Date is This calendar year (between January 1st, ' . date('Y') . ' 12:00 AM and December 31st, ' . date('Y') . ' 11:59 PM)',
+        'expected_where' => "civicrm_contribution_recur.start_date BETWEEN '" . date('Y') . "0101000000' AND '" . date('Y') . "1231235959'",
+      ],
+
     ];
     return $useCases;
   }
