@@ -1094,7 +1094,8 @@ SELECT civicrm_case.id, case_status.label AS case_status, status_id, civicrm_cas
         $caseActivity['no_attachments'] = count($attachmentIDs);
       }
 
-      $caseActivities[$caseActivityId]['links'] = CRM_Case_Selector_Search::addCaseActivityLinks($caseID, $contactID, $userID, $context, $dao);
+      $caseActivities[$caseActivityId]['links']
+        = CRM_Case_Selector_Search::addCaseActivityLinks($caseID, $contactID, $userID, $context, $dao);
     }
 
     $caseActivitiesDT = [];
