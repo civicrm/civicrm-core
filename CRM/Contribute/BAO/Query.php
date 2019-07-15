@@ -48,10 +48,15 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    */
   public static function getFields($checkPermission = TRUE) {
     if (!isset(\Civi::$statics[__CLASS__]) || !isset(\Civi::$statics[__CLASS__]['fields']) || !isset(\Civi::$statics[__CLASS__]['fields']['contribution'])) {
-      // Adding fields with some care as those without unique names could clobber others.
-      // Refer to CRM_Contribute_Form_SearchTest for existing tests ... and to add more!
-      $testedRecurFields = array_fill_keys(['contribution_recur_trxn_id', 'contribution_recur_processor_id', 'contribution_recur_payment_processor_id'], 1);
-      $recurFields = array_intersect_key(CRM_Contribute_DAO_ContributionRecur::fields(), $testedRecurFields);
+      $recurFields = CRM_Contribute_DAO_ContributionRecur::fields();
+      foreach ($recurFields as $fieldKey => $field) {
+        // We can only safely add in those with unique names as those without could clobber others.
+        // The array is keyed by unique names so if it doesn't match the key there is no unique name & we unset
+        // Refer to CRM_Contribute_Form_SearchTest for existing tests ... and to add more!
+        if ($field['name'] === $fieldKey) {
+          unset($recurFields[$fieldKey]);
+        }
+      }
       $fields = array_merge($recurFields, CRM_Contribute_BAO_Contribution::exportableFields($checkPermission));
       CRM_Contribute_BAO_Contribution::appendPseudoConstantsToFields($fields);
       unset($fields['contribution_contact_id']);
@@ -179,6 +184,17 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $qillName = array_search($name, $fieldAliases);
     }
     $pseudoExtraParam = [];
+    $fieldName = str_replace(['_high', '_low'], '', $name);
+    $fieldSpec = CRM_Utils_Array::value($fieldName, $fields, []);
+    $tableName = CRM_Utils_Array::value('table_name', $fieldSpec, 'civicrm_contribution');
+    $dataType = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $fieldSpec));
+    if ($dataType === 'Timestamp' || $dataType === 'Date') {
+      $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
+      $query->dateQueryBuilder($values,
+        $tableName, $fieldName, $fieldSpec['name'], $fieldSpec['title']
+      );
+      return;
+    }
 
     switch ($name) {
       case 'contribution_date':
@@ -230,17 +246,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         return;
 
-      case 'contribution_cancel_date':
-      case 'contribution_cancel_date_low':
-      case 'contribution_cancel_date_low_time':
-      case 'contribution_cancel_date_high':
-      case 'contribution_cancel_date_high_time':
-        // process to / from date
-        $query->dateQueryBuilder($values,
-          'civicrm_contribution', 'contribution_cancel_date', 'cancel_date', ts('Cancelled / Refunded Date')
-        );
-        return;
-
       case 'financial_type_id':
       case 'invoice_id':
       case 'invoice_number':
@@ -256,7 +261,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       case 'contribution_check_number':
       case 'contribution_contact_id':
       case (strpos($name, '_amount') !== FALSE):
-      case (strpos($name, '_date') !== FALSE && $name != 'contribution_fulfilled_date'):
       case 'contribution_campaign_id':
 
         $fieldNamesNotToStripContributionFrom = [
@@ -516,7 +520,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
         $query->_qill[$grouping][] = "$whereTable[title] $op $quoteValue";
         list($tableName) = explode('.', $whereTable['where'], 2);
         $query->_tables[$tableName] = $query->_whereTables[$tableName] = 1;
-        if ($tableName == 'civicrm_contribution_product') {
+        if ($tableName === 'civicrm_contribution_product') {
           $query->_tables['civicrm_product'] = $query->_whereTables['civicrm_product'] = 1;
           $query->_tables['civicrm_contribution'] = $query->_whereTables['civicrm_contribution'] = 1;
         }
