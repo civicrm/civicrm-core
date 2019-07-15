@@ -173,11 +173,15 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     foreach ($this->getSearchFieldMetadata() as $entity => $fields) {
       foreach ($fields as $fieldName => $fieldSpec) {
         if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || $fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
-          $this->addDatePickerRange($fieldName, $fieldSpec['title'], ($fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)));
+          $title = empty($fieldSpec['unique_title']) ? $fieldSpec['title'] : $fieldSpec['unique_title'];
+          $this->addDatePickerRange($fieldName, $title, ($fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)));
         }
         else {
           $props = ['entity' => $entity];
-          if (isset($fields[$fieldName]['title'])) {
+          if (isset($fields[$fieldName]['unique_title'])) {
+            $props['label'] = $fields[$fieldName]['unique_title'];
+          }
+          elseif (isset($fields[$fieldName]['title'])) {
             $props['label'] = $fields[$fieldName]['title'];
           }
           $this->addField($fieldName, $props);

@@ -25,5 +25,6 @@
 *}
 {* Wrapper around DatePickerRange TPL file *}
 <td {if $colspan} colspan="{$colspan}" {else} colspan="2" {/if} {if $class} class="{$class}" {/if}>
-    {include file="CRM/Core/DatePickerRange.tpl" fieldName=$fieldName}
+  {assign var='hideRelativeLabel' value=$hideRelativeLabel|default:0}
+  {include file="CRM/Core/DatePickerRange.tpl" fieldName=$fieldName hideRelativeLabel=$hideRelativeLabel}
 </td>

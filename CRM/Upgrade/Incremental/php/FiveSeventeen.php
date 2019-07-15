@@ -84,4 +84,24 @@ class CRM_Upgrade_Incremental_php_FiveSeventeen extends CRM_Upgrade_Incremental_
   //   return TRUE;
   // }
 
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_17_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask('Update smart groups where jcalendar fields have been converted to datepicker', 'updateSmartGroups', [
+      'datepickerConversion' => [
+        'contribution_recur_start_date',
+        'contribution_recur_next_sched_contribution_date',
+        'contribution_recur_cancel_date',
+        'contribution_recur_end_date',
+        'contribution_recur_create_date',
+        'contribution_recur_modified_date',
+        'contribution_recur_failure_retry_date',
+      ],
+    ]);
+  }
+
 }

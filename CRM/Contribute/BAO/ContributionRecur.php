@@ -725,14 +725,13 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    */
   public static function recurringContribution(&$form) {
     // Recurring contribution fields
-    foreach (self::getRecurringFields() as $key => $label) {
+    foreach (self::getRecurringFields() as $key) {
       if ($key == 'contribution_recur_payment_made' && !empty($form->_formValues) &&
         !CRM_Utils_System::isNull(CRM_Utils_Array::value($key, $form->_formValues))
       ) {
         $form->assign('contribution_recur_pane_open', TRUE);
         break;
       }
-      CRM_Core_Form_Date::buildDateRange($form, $key, 1, '_low', '_high');
       // If data has been entered for a recurring field, tell the tpl layer to open the pane
       if (!empty($form->_formValues) && !empty($form->_formValues[$key . '_relative']) || !empty($form->_formValues[$key . '_low']) || !empty($form->_formValues[$key . '_high'])) {
         $form->assign('contribution_recur_pane_open', TRUE);
@@ -771,20 +770,39 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
   }
 
   /**
+   * Get the metadata for fields to be included on the search form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getContributionRecurSearchFieldMetadata() {
+    $fields = [
+      'contribution_recur_start_date',
+      'contribution_recur_next_sched_contribution_date',
+      'contribution_recur_cancel_date',
+      'contribution_recur_end_date',
+      'contribution_recur_create_date',
+      'contribution_recur_modified_date',
+      'contribution_recur_failure_retry_date',
+    ];
+    $metadata = civicrm_api3('ContributionRecur', 'getfields', [])['values'];
+    return array_intersect_key($metadata, array_flip($fields));
+  }
+
+  /**
    * Get fields for recurring contributions.
    *
    * @return array
    */
   public static function getRecurringFields() {
     return [
-      'contribution_recur_payment_made' => ts(''),
-      'contribution_recur_start_date' => ts('Recurring Contribution Start Date'),
-      'contribution_recur_next_sched_contribution_date' => ts('Next Scheduled Recurring Contribution'),
-      'contribution_recur_cancel_date' => ts('Recurring Contribution Cancel Date'),
-      'contribution_recur_end_date' => ts('Recurring Contribution End Date'),
-      'contribution_recur_create_date' => ('Recurring Contribution Create Date'),
-      'contribution_recur_modified_date' => ('Recurring Contribution Modified Date'),
-      'contribution_recur_failure_retry_date' => ts('Failed Recurring Contribution Retry Date'),
+      'contribution_recur_payment_made',
+      'contribution_recur_start_date',
+      'contribution_recur_next_sched_contribution_date',
+      'contribution_recur_cancel_date',
+      'contribution_recur_end_date',
+      'contribution_recur_create_date',
+      'contribution_recur_modified_date',
+      'contribution_recur_failure_retry_date',
     ];
   }
 
