@@ -261,7 +261,8 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'activity_date_time' => $now_date,
       'target_contact_id' => $client_id,
       'source_contact_id' => $loggedInUser,
-      'subject' => 'null', // yeah this is extra weird, but without it you get the wrong subject
+      // yeah this is extra weird, but without it you get the wrong subject
+      'subject' => 'null',
     ];
 
     $form->postProcess($actParams);
@@ -301,6 +302,150 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     }
     $_GET = $oldGET;
     $_REQUEST = $oldREQUEST;
+  }
+
+  /**
+   * Test max_instances
+   */
+  public function testMaxInstances() {
+    $loggedInUser = $this->createLoggedInUser();
+    $client_id = $this->individualCreate();
+    $caseObj = $this->createCase($client_id, $loggedInUser);
+    $case_id = $caseObj->id;
+
+    // Sanity check to make sure we'll be testing what we think we're testing.
+    $this->assertEquals($caseObj->case_type_id, 1);
+
+    // Get the case type
+    $result = $this->callAPISuccess('CaseType', 'get', [
+      'sequential' => 1,
+      'id' => 1,
+    ]);
+    $caseType = array_shift($result['values']);
+    $activityTypeName = $caseType['definition']['activityTypes'][1]['name'];
+    // Sanity check to make sure we'll be testing what we think we're testing.
+    $this->assertEquals($activityTypeName, "Medical evaluation");
+
+    // Look up the activity type label - we need it later
+    $result = $this->callAPISuccess('OptionValue', 'get', [
+      'sequential' => 1,
+      'option_group_id' => 'activity_type',
+      'name' => $activityTypeName,
+    ]);
+    $optionValue = array_shift($result['values']);
+    $activityTypeLabel = $optionValue['label'];
+    $this->assertNotEmpty($activityTypeLabel);
+
+    // Locate the existing activity independently so we can check it
+    $result = $this->callAPISuccess('Activity', 'get', [
+      'sequential' => 1,
+      // this sometimes confuses me - pass in the name for the id
+      'activity_type_id' => $activityTypeName,
+    ]);
+    // There should be only one in the database at this point so this should be the id.
+    $activity_id = $result['id'];
+    $this->assertNotEmpty($activity_id);
+    $this->assertGreaterThan(0, $activity_id);
+    $activityArr = array_shift($result['values']);
+
+    // At the moment everything should be happy, although there's nothing to test because if max_instances has no value then nothing gets called, which is correct since it means unlimited. But we don't have a way to test that right now. For fun we could test max_instances=0 but that isn't the same as "not set". 0 would actually mean 0 are allowed, which is pointless, since then why would you even add the activity type to the config.
+
+    // Update max instances for the activity type
+    // We're not really checking that the tested code has retrieved the new case type definition, just that given some numbers as input it returns the right thing as output, so these lines are mostly symbolic at the moment.
+    $caseType['definition']['activityTypes'][1]['max_instances'] = 1;
+    $this->callAPISuccess('CaseType', 'create', $caseType);
+
+    // Now we should get a link back
+    $editUrl = CRM_Case_Form_Activity::checkMaxInstances(
+      $case_id,
+      $activityArr['activity_type_id'],
+      // max instances
+      1,
+      $loggedInUser,
+      $client_id,
+      // existing activity count
+      1
+    );
+    $this->assertNotNull($editUrl);
+
+    $expectedUrl = CRM_Utils_System::url(
+      'civicrm/case/activity',
+      "reset=1&cid={$client_id}&caseid={$case_id}&action=update&id={$activity_id}"
+    );
+    $this->assertEquals($editUrl, $expectedUrl);
+
+    // And also a bounce message is expected
+    $bounceMessage = CRM_Case_Form_Activity::getMaxInstancesBounceMessage(
+      $editUrl,
+      $activityTypeLabel,
+      // max instances,
+      1,
+      // existing activity count
+      1
+    );
+    $this->assertNotEmpty($bounceMessage);
+
+    // Now check with max_instances = 2
+    $caseType['definition']['activityTypes'][1]['max_instances'] = 2;
+    $this->callAPISuccess('CaseType', 'create', $caseType);
+
+    // So it should now be back to being happy
+    $editUrl = CRM_Case_Form_Activity::checkMaxInstances(
+      $case_id,
+      $activityArr['activity_type_id'],
+      // max instances
+      2,
+      $loggedInUser,
+      $client_id,
+      // existing activity count
+      1
+    );
+    $this->assertNull($editUrl);
+    $bounceMessage = CRM_Case_Form_Activity::getMaxInstancesBounceMessage(
+      $editUrl,
+      $activityTypeLabel,
+      // max instances,
+      2,
+      // existing activity count
+      1
+    );
+    $this->assertEmpty($bounceMessage);
+
+    // Add new activity check again
+    $newActivity = [
+      'case_id' => $case_id,
+      'activity_type_id' => $activityArr['activity_type_id'],
+      'status_id' => $activityArr['status_id'],
+      'subject' => "A different subject",
+      'activity_date_time' => date('Y-m-d H:i:s'),
+      'source_contact_id' => $loggedInUser,
+      'target_id' => $client_id,
+    ];
+    $this->callAPISuccess('Activity', 'create', $newActivity);
+
+    $editUrl = CRM_Case_Form_Activity::checkMaxInstances(
+      $case_id,
+      $activityArr['activity_type_id'],
+      // max instances
+      2,
+      $loggedInUser,
+      $client_id,
+      // existing activity count
+      2
+    );
+    // There should be no url here.
+    $this->assertNull($editUrl);
+
+    // But there should be a warning message still.
+    $bounceMessage = CRM_Case_Form_Activity::getMaxInstancesBounceMessage(
+      $editUrl,
+      $activityTypeLabel,
+      // max instances,
+      2,
+      // existing activity count
+      2
+    );
+    $this->assertNotEmpty($bounceMessage);
   }
 
 }
