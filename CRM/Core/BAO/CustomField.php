@@ -175,15 +175,12 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
    * @param array $defaults
    *  Default parameters to be be merged into each of the params.
    */
-  public static function bulkSave($bulkParams, $defaults) {
-    $sql = [];
-    $tables = [];
-    $customFields = [];
-    foreach ($bulkParams as $fieldParams) {
+  public static function bulkSave($bulkParams, $defaults = []) {
+    $sql = $tables = $customFields = [];
+    foreach ($bulkParams as $index => $fieldParams) {
       $params = array_merge($defaults, $fieldParams);
-      $operation = empty($params['id']) ? 'add' : 'modify';
       $customField = self::createCustomFieldRecord($params);
-      $fieldSQL = self::getAlterFieldSQL($customField, $operation);
+      $fieldSQL = self::getAlterFieldSQL($customField, empty($params['id']) ? 'add' : 'modify');
       if (!isset($params['custom_group_id'])) {
         $params['custom_group_id'] = civicrm_api3('CustomField', 'getvalue', ['id' => $customField->id, 'return' => 'custom_group_id']);
       }
@@ -197,7 +194,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         $params['table_name'] = $tables[$params['custom_group_id']];
       }
       $sql[$params['table_name']][] = $fieldSQL;
-      $customFields[] = $customField;
+      $customFields[$index] = $customField;
     }
     foreach ($sql as $tableName => $statements) {
       // CRM-7007: do not i18n-rewrite this query
@@ -205,8 +202,8 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       Civi::service('sql_triggers')->rebuild($params['table_name'], TRUE);
     }
     CRM_Utils_System::flushCache();
-    foreach ($customFields as $customField) {
-      CRM_Utils_Hook::post($operation === 'add' ? 'create' : 'edit', 'CustomField', $customField->id, $customField);
+    foreach ($customFields as $index => $customField) {
+      CRM_Utils_Hook::post(empty($bulkParams[$index]['id']) ? 'create' : 'edit', 'CustomField', $customField->id, $customField);
     }
   }
 
