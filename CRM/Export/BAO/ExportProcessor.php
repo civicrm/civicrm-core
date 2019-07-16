@@ -1985,11 +1985,8 @@ class CRM_Export_BAO_ExportProcessor {
 
   /**
    * Merge contacts with the same address.
-   *
-   * @param $sqlColumns
-   * @param array $exportParams
    */
-  public function mergeSameAddress(&$sqlColumns, $exportParams) {
+  public function mergeSameAddress() {
 
     $tableName = $this->getTemporaryTable();
     // check if any records are present based on if they have used shared address feature,
@@ -2081,17 +2078,6 @@ DELETE FROM $tableName
 WHERE  id IN ( $deleteIDString )
 ";
       CRM_Core_DAO::executeQuery($sql);
-    }
-
-    // unset temporary columns that were added for postal mailing format
-    // @todo - this part is pretty close to ready to be removed....
-    if (!empty($exportParams['merge_same_address']['temp_columns'])) {
-      $unsetKeys = array_keys($sqlColumns);
-      foreach ($unsetKeys as $headerKey => $sqlColKey) {
-        if (array_key_exists($sqlColKey, $exportParams['merge_same_address']['temp_columns'])) {
-          unset($sqlColumns[$sqlColKey]);
-        }
-      }
     }
   }
 
