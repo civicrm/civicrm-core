@@ -59,6 +59,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
   /**
    * The name of activity type.
+   * !!! NOTE: This is actually LABEL !!!
    *
    * @var string
    */
@@ -325,14 +326,18 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // Assigning Activity type name.
     if ($this->_activityTypeId) {
-      $activityTName = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $this->_activityTypeId, 'label');
-      if ($activityTName[$this->_activityTypeId]) {
-        $this->_activityTypeName = $activityTName[$this->_activityTypeId];
-        $this->assign('activityTName', $activityTName[$this->_activityTypeId]);
+      $activityTypeLabels = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $this->_activityTypeId, 'label');
+      if ($activityTypeLabels[$this->_activityTypeId]) {
+        // yes it says Name but it's actually label
+        $this->_activityTypeName = $activityTypeLabels[$this->_activityTypeId];
+      }
+      $activityTypeNames = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $this->_activityTypeId, 'name');
+      if ($activityTypeNames[$this->_activityTypeId]) {
+        $this->assign('activityTypeInternalLookupName', $activityTypeNames[$this->_activityTypeId]);
       }
       // Set title.
-      if (isset($activityTName)) {
-        $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTName);
+      if (isset($activityTypeLabels)) {
+        $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTypeLabels);
 
         if ($this->_currentlyViewedContactId) {
           $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
