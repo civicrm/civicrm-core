@@ -200,7 +200,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
     }
     else {
       // for edit mode we need to allow our own record to be a dupe match!
-      $exceptions = [$form->_session->get('userID')];
+      $exceptions = [CRM_Core_Session::singleton()->get('userID')];
     }
     $contactType = CRM_Core_BAO_UFGroup::getContactType($form->_gid);
     // If all profile fields is of Contact Type then consider
@@ -308,8 +308,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
       }
     }
 
-    $this->_session = CRM_Core_Session::singleton();
-    $this->_currentUserID = $this->_session->get('userID');
+    $this->_currentUserID = CRM_Core_Session::singleton()->get('userID');
 
     if ($this->_mode == self::MODE_EDIT) {
       //specifies the action being done on a multi record field
@@ -497,7 +496,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
 
         if (!$emailField) {
           $status = ts("Email field should be included in profile if you want to use Group(s) when Profile double-opt in process is enabled.");
-          $this->_session->setStatus($status);
+          CRM_Core_Session::singleton()->setStatus($status);
         }
       }
 
