@@ -1889,12 +1889,11 @@ class CRM_Export_BAO_ExportProcessor {
    * Build array for merging same addresses.
    *
    * @param $sql
-   * @param array $exportParams
    * @param bool $sharedAddress
    *
    * @return array
    */
-  public function buildMasterCopyArray($sql, $exportParams, $sharedAddress = FALSE) {
+  public function buildMasterCopyArray($sql, $sharedAddress = FALSE) {
 
     $addresseeOptions = CRM_Core_OptionGroup::values('addressee');
     $postalOptions = CRM_Core_OptionGroup::values('postal_greeting');
@@ -1953,13 +1952,7 @@ class CRM_Export_BAO_ExportProcessor {
 
       if (!$sharedAddress && !array_key_exists($copyID, $merge[$masterID]['copy'])) {
 
-        if (!empty($exportParams['postal_greeting_other']) &&
-          count($merge[$masterID]['copy']) >= 1
-        ) {
-          // use static greetings specified if no of contacts > 2
-          $merge[$masterID]['postalGreeting'] = $exportParams['postal_greeting_other'];
-        }
-        elseif ($copyPostalGreeting) {
+        if ($copyPostalGreeting) {
           $this->trimNonTokensFromAddressString($copyPostalGreeting,
             $postalOptions[$dao->copy_postal_greeting_id],
             $this->getPostalGreetingTemplate()
@@ -1969,13 +1962,7 @@ class CRM_Export_BAO_ExportProcessor {
           $merge[$masterID]['postalGreeting'] = str_replace(" {$copyPostalGreeting},", "", $merge[$masterID]['postalGreeting']);
         }
 
-        if (!empty($exportParams['addressee_other']) &&
-          count($merge[$masterID]['copy']) >= 1
-        ) {
-          // use static greetings specified if no of contacts > 2
-          $merge[$masterID]['addressee'] = $exportParams['addressee_other'];
-        }
-        elseif ($copyAddressee) {
+        if ($copyAddressee) {
           $this->trimNonTokensFromAddressString($copyAddressee,
             $addresseeOptions[$dao->copy_addressee_id],
             $this->getAddresseeGreetingTemplate()
@@ -2041,7 +2028,7 @@ FROM      $tableName r1
 INNER JOIN civicrm_address adr ON r1.master_id   = adr.id
 INNER JOIN $tableName      r2  ON adr.contact_id = r2.civicrm_primary_id
 ORDER BY  r1.id";
-    $linkedMerge = $this->buildMasterCopyArray($sql, $exportParams, TRUE);
+    $linkedMerge = $this->buildMasterCopyArray($sql, TRUE);
 
     // find all the records that have the same street address BUT not in a household
     // require match on city and state as well
@@ -2068,7 +2055,7 @@ AND       ( r1.street_address != '' )
 AND       r2.id > r1.id
 ORDER BY  r1.id
 ";
-    $merge = $this->buildMasterCopyArray($sql, $exportParams);
+    $merge = $this->buildMasterCopyArray($sql);
 
     // unset ids from $merge already present in $linkedMerge
     foreach ($linkedMerge as $masterID => $values) {
