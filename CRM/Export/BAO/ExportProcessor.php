@@ -378,8 +378,14 @@ class CRM_Export_BAO_ExportProcessor {
    * @param bool $isMergeSameHousehold
    * @param bool $isPostalableOnly
    * @param bool $isMergeSameAddress
+   * @param array $formValues
+   *   Values from the export options form on contact export. We currently support these keys
+   *   - postal_greeting
+   *   - postal_other
+   *   - addresee_greeting
+   *   - addressee_other
    */
-  public function __construct($exportMode, $requestedFields, $queryOperator, $isMergeSameHousehold = FALSE, $isPostalableOnly = FALSE, $isMergeSameAddress = FALSE) {
+  public function __construct($exportMode, $requestedFields, $queryOperator, $isMergeSameHousehold = FALSE, $isPostalableOnly = FALSE, $isMergeSameAddress = FALSE, $formValues = []) {
     $this->setExportMode($exportMode);
     $this->setQueryMode();
     $this->setQueryOperator($queryOperator);
@@ -392,6 +398,7 @@ class CRM_Export_BAO_ExportProcessor {
     $this->setAdditionalFieldsForSameAddressMerge();
     $this->setAdditionalFieldsForPostalExport();
     $this->setHouseholdMergeReturnProperties();
+    $this->setGreetingStringsForSameAddressMerge($formValues);
   }
 
   /**
@@ -1983,30 +1990,6 @@ class CRM_Export_BAO_ExportProcessor {
    * @param array $exportParams
    */
   public function mergeSameAddress(&$sqlColumns, $exportParams) {
-    $greetingOptions = CRM_Export_Form_Select::getGreetingOptions();
-
-    if (!empty($greetingOptions)) {
-      // Greeting options is keyed by 'postal_greeting' or 'addressee'.
-      foreach ($greetingOptions as $key => $value) {
-        if ($option = CRM_Utils_Array::value($key, $exportParams)) {
-          if ($greetingOptions[$key][$option] == ts('Other')) {
-            $exportParams[$key] = $exportParams["{$key}_other"];
-          }
-          elseif ($greetingOptions[$key][$option] == ts('List of names')) {
-            $exportParams[$key] = '';
-          }
-          else {
-            $exportParams[$key] = $greetingOptions[$key][$option];
-          }
-        }
-      }
-    }
-    if (!empty($exportParams['postal_greeting'])) {
-      $this->setPostalGreetingTemplate($exportParams['postal_greeting']);
-    }
-    if (!empty($exportParams['addressee'])) {
-      $this->setAddresseeGreetingTemplate($exportParams['addressee']);
-    }
 
     $tableName = $this->getTemporaryTable();
     // check if any records are present based on if they have used shared address feature,
@@ -2158,6 +2141,46 @@ WHERE  id IN ( $deleteIDString )
       $rows[] = $this->buildRow($query[0], $result, $outputColumns, $metadata, [], []);
     }
     return $rows;
+  }
+
+  /**
+   * Set the template strings to be used when merging two contacts with the same address.
+   *
+   * @param array $formValues
+   *   Values from first form. In this case we care about the keys
+   *   - postal_greeting
+   *   - postal_other
+   *   - address_greeting
+   *   - addressee_other
+   *
+   * @return mixed
+   */
+  protected function setGreetingStringsForSameAddressMerge($formValues) {
+    $greetingOptions = CRM_Export_Form_Select::getGreetingOptions();
+
+    if (!empty($greetingOptions)) {
+      // Greeting options is keyed by 'postal_greeting' or 'addressee'.
+      foreach ($greetingOptions as $key => $value) {
+        $option = CRM_Utils_Array::value($key, $formValues);
+        if ($option) {
+          if ($greetingOptions[$key][$option] == ts('Other')) {
+            $formValues[$key] = $formValues["{$key}_other"];
+          }
+          elseif ($greetingOptions[$key][$option] == ts('List of names')) {
+            $formValues[$key] = '';
+          }
+          else {
+            $formValues[$key] = $greetingOptions[$key][$option];
+          }
+        }
+      }
+    }
+    if (!empty($formValues['postal_greeting'])) {
+      $this->setPostalGreetingTemplate($formValues['postal_greeting']);
+    }
+    if (!empty($formValues['addressee'])) {
+      $this->setAddresseeGreetingTemplate($formValues['addressee']);
+    }
   }
 
 }
