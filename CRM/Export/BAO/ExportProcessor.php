@@ -2167,4 +2167,40 @@ WHERE  id IN ( $deleteIDString )
     }
   }
 
+  /**
+   * Create the temporary table for output.
+   */
+  public function createTempTable() {
+    //creating a temporary table for the search result that need be exported
+    $exportTempTable = CRM_Utils_SQL_TempTable::build()->setDurable()->setCategory('export');
+    $sqlColumns = $this->getSQLColumns();
+    // also create the sql table
+    $exportTempTable->drop();
+
+    $sql = " id int unsigned NOT NULL AUTO_INCREMENT, ";
+    if (!empty($sqlColumns)) {
+      $sql .= implode(",\n", array_values($sqlColumns)) . ',';
+    }
+
+    $sql .= "\n PRIMARY KEY ( id )";
+
+    // add indexes for street_address and household_name if present
+    $addIndices = [
+      'street_address',
+      'household_name',
+      'civicrm_primary_id',
+    ];
+
+    foreach ($addIndices as $index) {
+      if (isset($sqlColumns[$index])) {
+        $sql .= ",
+  INDEX index_{$index}( $index )
+";
+      }
+    }
+
+    $exportTempTable->createWithColumns($sql);
+    $this->setTemporaryTable($exportTempTable->getName());
+  }
+
 }

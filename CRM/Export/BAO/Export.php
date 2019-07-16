@@ -196,7 +196,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $headerRows = $processor->getHeaderRows();
     $sqlColumns = $processor->getSQLColumns();
-    $processor->setTemporaryTable(self::createTempTable($sqlColumns));
+    $processor->createTempTable();
     $limitReached = FALSE;
 
     while (!$limitReached) {
@@ -406,44 +406,6 @@ INSERT INTO $tableName $sqlColumnString
 VALUES $sqlValueString
 ";
     CRM_Core_DAO::executeQuery($sql);
-  }
-
-  /**
-   * @param $sqlColumns
-   *
-   * @return string
-   */
-  public static function createTempTable($sqlColumns) {
-    //creating a temporary table for the search result that need be exported
-    $exportTempTable = CRM_Utils_SQL_TempTable::build()->setDurable()->setCategory('export');
-
-    // also create the sql table
-    $exportTempTable->drop();
-
-    $sql = " id int unsigned NOT NULL AUTO_INCREMENT, ";
-    if (!empty($sqlColumns)) {
-      $sql .= implode(",\n", array_values($sqlColumns)) . ',';
-    }
-
-    $sql .= "\n PRIMARY KEY ( id )";
-
-    // add indexes for street_address and household_name if present
-    $addIndices = [
-      'street_address',
-      'household_name',
-      'civicrm_primary_id',
-    ];
-
-    foreach ($addIndices as $index) {
-      if (isset($sqlColumns[$index])) {
-        $sql .= ",
-  INDEX index_{$index}( $index )
-";
-      }
-    }
-
-    $exportTempTable->createWithColumns($sql);
-    return $exportTempTable->getName();
   }
 
   /**
