@@ -33,8 +33,11 @@
  * @group headless
  */
 class api_v3_ImTest extends CiviUnitTestCase {
+
   protected $params;
+
   protected $id;
+
   protected $_entity;
 
   public $DBResetRequired = FALSE;
@@ -45,17 +48,20 @@ class api_v3_ImTest extends CiviUnitTestCase {
 
     $this->_entity = 'im';
     $this->_contactID = $this->organizationCreate();
-    $this->params = array(
+    $this->params = [
       'contact_id' => $this->_contactID,
       'name' => 'My Yahoo IM Handle',
       'location_type_id' => 1,
       'provider_id' => 1,
-    );
+    ];
   }
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   *
+   * @throws \Exception
    */
   public function testCreateIm($version) {
     $this->_apiversion = $version;
@@ -67,27 +73,29 @@ class api_v3_ImTest extends CiviUnitTestCase {
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
    */
   public function testGetIm($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $this->callAPISuccess($this->_entity, 'create', $this->params);
     $result = $this->callAPIAndDocument($this->_entity, 'get', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
-    $this->callAPISuccess($this->_entity, 'delete', array('id' => $result['id']));
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
   }
 
   /**
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
    */
   public function testDeleteIm($version) {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $deleteParams = array('id' => $result['id']);
-    $result = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
+    $deleteParams = ['id' => $result['id']];
+    $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
     $this->assertEquals(0, $checkDeleted['count']);
   }
 
@@ -95,10 +103,10 @@ class api_v3_ImTest extends CiviUnitTestCase {
    * Skip api4 test - delete behaves differently
    */
   public function testDeleteImInvalid() {
-    $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $deleteParams = array('id' => 600);
-    $result = $this->callAPIFailure($this->_entity, 'delete', $deleteParams);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
+    $this->callAPISuccess($this->_entity, 'create', $this->params);
+    $deleteParams = ['id' => 600];
+    $this->callAPIFailure($this->_entity, 'delete', $deleteParams);
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
     $this->assertEquals(1, $checkDeleted['count']);
   }
 
