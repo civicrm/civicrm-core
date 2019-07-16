@@ -20,13 +20,13 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    */
   public function testSubmit() {
     $form = $this->getForm();
-    $form->submit(array(
+    $form->submit([
       'register_date' => date('Ymd'),
       'status_id' => 1,
       'role_id' => 1,
       'event_id' => $form->_eventId,
-    ));
-    $participants = $this->callAPISuccess('Participant', 'get', array());
+    ]);
+    $participants = $this->callAPISuccess('Participant', 'get', []);
     $this->assertEquals(1, $participants['count']);
   }
 
@@ -36,12 +36,12 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testSubmitUnpaidPriceChangeWhileStillPending() {
-    $form = $this->getForm(array('is_monetary' => 1, 'financial_type_id' => 1));
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
     $form->_quickConfig = TRUE;
 
-    $form->_lineItem = array(
-      0 => array(
-        13 => array(
+    $form->_lineItem = [
+      0 => [
+        13 => [
           'price_field_id' => $this->_ids['price_field'][0],
           'price_field_value_id' => $this->_ids['price_field_value'][0],
           'label' => 'Tiny-tots (ages 5-8)',
@@ -59,20 +59,20 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
           'financial_type_id' => '4',
           'tax_amount' => NULL,
           'non_deductible_amount' => '0.00',
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
     $form->setAction(CRM_Core_Action::ADD);
     $form->_priceSetId = $this->_ids['price_set'];
-    $form->submit(array(
+    $form->submit([
       'register_date' => date('Ymd'),
       'status_id' => 5,
       'role_id' => 1,
       'event_id' => $form->_eventId,
       'priceSetId' => $this->_ids['price_set'],
-      'price_' . $this->_ids['price_field'][0]  => array(
+      'price_' . $this->_ids['price_field'][0] => [
         $this->_ids['price_field_value'][0] => 1,
-      ),
+      ],
       'is_pay_later' => 1,
       'amount_level' => 'Too much',
       'fee_amount' => 55,
@@ -82,18 +82,18 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'contribution_status_id' => 2,
       'payment_instrument_id' => 1,
-    ));
-    $participants = $this->callAPISuccess('Participant', 'get', array());
+    ]);
+    $participants = $this->callAPISuccess('Participant', 'get', []);
     $this->assertEquals(1, $participants['count']);
-    $contribution = $this->callAPISuccessGetSingle('Contribution', array());
+    $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertEquals(2, $contribution['contribution_status_id']);
-    $items = $this->callAPISuccess('FinancialItem', 'get', array());
+    $items = $this->callAPISuccess('FinancialItem', 'get', []);
     $this->assertEquals(1, $items['count']);
 
     $priceSetParams['price_' . $this->_ids['price_field'][0]] = $this->_ids['price_field_value'][1];
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($participants['id'], 'participant');
     $this->assertEquals(55, $lineItem[1]['subTotal']);
-    $financialItems = $this->callAPISuccess('FinancialItem', 'get', array());
+    $financialItems = $this->callAPISuccess('FinancialItem', 'get', []);
     $sum = 0;
     foreach ($financialItems['values'] as $financialItem) {
       $sum += $financialItem['amount'];
@@ -105,7 +105,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     // Participants is updated to 0 but line remains.
     $this->assertEquals(0, $lineItem[1]['subTotal']);
     $this->assertEquals(100, $lineItem[2]['subTotal']);
-    $financialItems = $this->callAPISuccess('FinancialItem', 'get', array());
+    $financialItems = $this->callAPISuccess('FinancialItem', 'get', []);
 
     $sum = 0;
     foreach ($financialItems['values'] as $financialItem) {
@@ -178,27 +178,27 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    */
   public function testSubmitWithPayment($thousandSeparator, $fromEmails = []) {
     $this->setCurrencySeparators($thousandSeparator);
-    $form = $this->getForm(array('is_monetary' => 1, 'financial_type_id' => 1));
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
     $form->_mode = 'Live';
     $form->_quickConfig = TRUE;
-    $paymentProcessorID = $this->processorCreate(array('is_test' => 0));
+    $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
     if (empty($fromEmails)) {
       $fromEmails = [
         'from_email_id' => ['abc@gmail.com' => 1],
       ];
     }
     $form->_fromEmails = $fromEmails;
-    $form->submit(array(
+    $form->submit([
       'register_date' => date('Ymd'),
       'status_id' => 1,
       'role_id' => 1,
       'event_id' => $form->_eventId,
       'credit_card_number' => 4444333322221111,
       'cvv2' => 123,
-      'credit_card_exp_date' => array(
+      'credit_card_exp_date' => [
         'M' => 9,
         'Y' => 2025,
-      ),
+      ],
       'credit_card_type' => 'Visa',
       'billing_first_name' => 'Junko',
       'billing_middle_name' => '',
@@ -210,19 +210,19 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'billing_country_id-5' => 1228,
       'payment_processor_id' => $paymentProcessorID,
       'priceSetId' => '6',
-      'price_7' => array(
+      'price_7' => [
         13 => 1,
-      ),
+      ],
       'amount_level' => 'Too much',
       'fee_amount' => $this->formatMoneyInput(1550.55),
       'total_amount' => $this->formatMoneyInput(1550.55),
       'from_email_address' => array_keys($form->_fromEmails['from_email_id'])[0],
       'send_receipt' => 1,
       'receipt_text' => '',
-    ));
-    $participants = $this->callAPISuccess('Participant', 'get', array());
+    ]);
+    $participants = $this->callAPISuccess('Participant', 'get', []);
     $this->assertEquals(1, $participants['count']);
-    $contribution = $this->callAPISuccessGetSingle('Contribution', array());
+    $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertEquals(1550.55, $contribution['total_amount']);
     $this->assertEquals('Debit Card', $contribution['payment_instrument']);
   }
@@ -247,26 +247,26 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     ]);
 
     //Get workflow id of event_offline receipt.
-    $workflowId = $this->callAPISuccess('OptionValue', 'get', array(
-      'return' => array("id"),
+    $workflowId = $this->callAPISuccess('OptionValue', 'get', [
+      'return' => ["id"],
       'option_group_id' => "msg_tpl_workflow_event",
       'name' => "event_offline_receipt",
-    ));
+    ]);
 
     //Modify html to contain event_type_id token.
-    $result = $this->callAPISuccess('MessageTemplate', 'get', array(
+    $result = $this->callAPISuccess('MessageTemplate', 'get', [
       'sequential' => 1,
-      'return' => array("id", "msg_html"),
+      'return' => ["id", "msg_html"],
       'workflow_id' => $workflowId['id'],
       'is_default' => 1,
-    ));
+    ]);
     $oldMsg = $result['values'][0]['msg_html'];
     $pos = strpos($oldMsg, 'Please print this confirmation');
     $newMsg = substr_replace($oldMsg, '<p>Test event type - {$event.event_type_id}</p>', $pos, 0);
-    $this->callAPISuccess('MessageTemplate', 'create', array(
+    $this->callAPISuccess('MessageTemplate', 'create', [
       'id' => $result['id'],
       'msg_html' => $newMsg,
-    ));
+    ]);
 
     // Use the email created as the from email ensuring we are passing a numeric from to test dev/core#1069
     $this->testSubmitWithPayment($thousandSeparator, ['from_email_id' => [$email['id'] => 1]]);
@@ -297,7 +297,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     }
 
     $contactID = $this->individualCreate();
-    /** @var CRM_Event_Form_Participant $form*/
+    /** @var CRM_Event_Form_Participant $form */
     $form = $this->getFormObject('CRM_Event_Form_Participant');
     $form->_single = TRUE;
     $form->_contactID = $form->_contactId = $contactID;
@@ -341,7 +341,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       $fieldParams['name'] = CRM_Utils_String::titleToVar($fieldToCreate['label']);
       $fieldParams['price'] = $fieldToCreate['amount'];
       $this->_ids['price_field'][strtolower(CRM_Utils_String::titleToVar($fieldToCreate['label']))] = $textPriceFieldID = $this->callAPISuccess('PriceField', 'create', $fieldParams)['id'];
-      $this->_ids['price_field_value'][strtolower(CRM_Utils_String::titleToVar($fieldToCreate['label']))]  = (int) $this->callAPISuccess('PriceFieldValue', 'getsingle', ['price_field_id' => $textPriceFieldID])['id'];
+      $this->_ids['price_field_value'][strtolower(CRM_Utils_String::titleToVar($fieldToCreate['label']))] = (int) $this->callAPISuccess('PriceFieldValue', 'getsingle', ['price_field_id' => $textPriceFieldID])['id'];
     }
 
     $form->_lineItem = [

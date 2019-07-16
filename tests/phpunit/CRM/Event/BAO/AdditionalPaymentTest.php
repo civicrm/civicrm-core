@@ -27,6 +27,7 @@
 
 /**
  * Class CRM_Event_BAO_AdditionalPaymentTest
+ *
  * @group headless
  */
 class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
@@ -77,7 +78,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
       $participantParams
     );
     $participant = $this->callAPISuccess('participant', 'create', $participantParams);
-    $this->callAPISuccessGetSingle('participant', array('id' => $participant['id']));
+    $this->callAPISuccessGetSingle('participant', ['id' => $participant['id']]);
     // create participant contribution with partial payment
     $contributionParams = array_merge(
       [
@@ -99,16 +100,16 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
     $contributionId = $contribution['id'];
-    $participant = $this->callAPISuccessGetSingle('participant', array('id' => $participant['id']));
+    $participant = $this->callAPISuccessGetSingle('participant', ['id' => $participant['id']]);
 
     // add participant payment entry
-    $this->callAPISuccess('participant_payment', 'create', array(
+    $this->callAPISuccess('participant_payment', 'create', [
       'participant_id' => $participant['id'],
       'contribution_id' => $contributionId,
-    ));
+    ]);
 
     // -- processing priceSet using the BAO
-    $lineItem = array();
+    $lineItem = [];
     $priceSet = CRM_Price_BAO_PriceSet::getSetDetail($priceSetId, TRUE, FALSE);
     $priceSet = CRM_Utils_Array::value($priceSetId, $priceSet);
     $feeBlock = CRM_Utils_Array::value('fields', $priceSet);
@@ -121,14 +122,14 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $lineItemVal[$priceSetId] = $lineItem;
     CRM_Price_BAO_LineItem::processPriceSet($participant['id'], $lineItemVal, $this->getContributionObject($contributionId), 'civicrm_participant');
 
-    return array(
+    return [
       'participant' => $participant,
       'contribution' => $contribution['values'][$contribution['id']],
       'lineItem' => $templineItems,
       'params' => $tempParams,
       'feeBlock' => $feeBlock,
       'priceSetId' => $priceSetId,
-    );
+    ];
   }
 
   /**
@@ -162,7 +163,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
     // make additional payment via 'Record Payment' form
     $form = new CRM_Contribute_Form_AdditionalPayment();
-    $submitParams = array(
+    $submitParams = [
       'contact_id' => $result['contribution']['contact_id'],
       'contribution_id' => $contributionID,
       'total_amount' => 100,
@@ -171,7 +172,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
       'payment_processor_id' => 0,
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
       'check_number' => '#123',
-    );
+    ];
     $form->cid = $result['contribution']['contact_id'];
     $form->testSubmit($submitParams);
 
