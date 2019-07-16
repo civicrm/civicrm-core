@@ -233,7 +233,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     }
 
     if ($processor->getTemporaryTable()) {
-      self::writeDetailsToTable($processor, $componentDetails, $sqlColumns);
+      self::writeDetailsToTable($processor, $componentDetails);
 
       // do merge same address and merge same household processing
       if ($mergeSameAddress) {
@@ -363,9 +363,8 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
   /**
    * @param \CRM_Export_BAO_ExportProcessor $processor
    * @param $details
-   * @param $sqlColumns
    */
-  public static function writeDetailsToTable($processor, $details, $sqlColumns) {
+  public static function writeDetailsToTable($processor, $details) {
     $tableName = $processor->getTemporaryTable();
     if (empty($details)) {
       return;
@@ -396,7 +395,7 @@ FROM   $tableName
       }
       $sqlClause[] = '(' . implode(',', $valueString) . ')';
     }
-    $sqlColumns = array_merge(['id' => 1], $sqlColumns);
+    $sqlColumns = array_merge(['id' => 1], $processor->getSQLColumns());
     $sqlColumnString = '(' . implode(',', array_keys($sqlColumns)) . ')';
 
     $sqlValueString = implode(",\n", $sqlClause);
