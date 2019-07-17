@@ -146,7 +146,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       CRM_Contact_BAO_ProximityQuery::fixInputParams($params);
     }
     // @todo everything from this line up should go back to the calling functions.
-    $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator, $mergeSameHousehold, $isPostalOnly, $mergeSameAddress);
+    $processor = new CRM_Export_BAO_ExportProcessor($exportMode, $fields, $queryOperator, $mergeSameHousehold, $isPostalOnly, $mergeSameAddress, $exportParams);
     if ($moreReturnProperties) {
       $processor->setAdditionalRequestedReturnProperties($moreReturnProperties);
     }
