@@ -27,13 +27,13 @@
 
       // Wait for crm-container present on the page as it's faster than document.ready
       function insert(markup) {
-        if ($('#crm-container').length) {
+        if ($('.crm-container').length) {
           render(markup);
         } else {
           new MutationObserver(function(mutations, observer) {
             _.each(mutations, function(mutant) {
               _.each(mutant.addedNodes, function(node) {
-                if ($(node).is('#crm-container')) {
+                if ($(node).is('.crm-container')) {
                   render(markup);
                   observer.disconnect();
                 }
