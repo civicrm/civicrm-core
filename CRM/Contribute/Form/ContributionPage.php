@@ -88,6 +88,13 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   }
 
   /**
+   * Explicitly declare the form context.
+   */
+  public function getDefaultContext() {
+    return 'create';
+  }
+
+  /**
    * Set variables up before form is built.
    */
   public function preProcess() {

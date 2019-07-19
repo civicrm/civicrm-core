@@ -152,12 +152,13 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     else {
       $this->assign('price', TRUE);
     }
-    $this->add('select', 'price_set_id', ts('Price Set'),
-      [
-        '' => ts('- none -'),
-      ] + $price,
-      NULL, ['onchange' => "showHideAmountBlock( this.value, 'price_set_id' );"]
-    );
+
+    $this->addField('price_set_id', [
+      'entity' => 'PriceSet',
+      'options' => $price,
+      'onchange' => "showHideAmountBlock( this.value, 'price_set_id' );",
+    ]);
+
     //CiviPledge fields.
     $config = CRM_Core_Config::singleton();
     if (in_array('CiviPledge', $config->enableComponents)) {
