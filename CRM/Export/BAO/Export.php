@@ -163,18 +163,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     list($outputColumns, $metadata) = $processor->getExportStructureArrays();
 
     if ($processor->isMergeSameAddress()) {
-      //make sure the addressee fields are selected
-      //while using merge same address feature
-      // some columns are required for assistance incase they are not already present
-      $exportParams['merge_same_address']['temp_columns'] = $processor->getAdditionalFieldsForSameAddressMerge();
-      // This is silly - we should do this at the point when the array is used...
-      if (isset($exportParams['merge_same_address']['temp_columns']['id'])) {
-        unset($exportParams['merge_same_address']['temp_columns']['id']);
-        $exportParams['merge_same_address']['temp_columns']['civicrm_primary_id'] = 1;
-      }
-      // @todo - this is a temp fix  - ideally later we don't set stuff only to unset it.
-      // test exists covering this...
-      foreach (array_keys($exportParams['merge_same_address']['temp_columns']) as $field) {
+      foreach (array_keys($processor->getAdditionalFieldsForSameAddressMerge()) as $field) {
         $processor->setColumnAsCalculationOnly($field);
       }
     }
@@ -248,7 +237,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
       // do merge same address and merge same household processing
       if ($mergeSameAddress) {
-        $processor->mergeSameAddress($sqlColumns, $exportParams);
+        $processor->mergeSameAddress();
       }
 
       // call export hook
@@ -464,7 +453,6 @@ VALUES $sqlValueString
    */
   public static function writeCSVFromTable($headerRows, $sqlColumns, $processor) {
     $exportTempTable = $processor->getTemporaryTable();
-    $exportMode = $processor->getExportMode();
     $writeHeader = TRUE;
     $offset = 0;
     $limit = self::EXPORT_ROW_COUNT;
@@ -485,7 +473,7 @@ LIMIT $offset, $limit
       while ($dao->fetch()) {
         $row = [];
 
-        foreach ($sqlColumns as $column => $dontCare) {
+        foreach (array_keys($processor->getSQLColumns()) as $column) {
           $row[$column] = $dao->$column;
         }
         $componentDetails[] = $row;
