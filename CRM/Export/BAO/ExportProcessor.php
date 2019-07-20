@@ -970,10 +970,8 @@ class CRM_Export_BAO_ExportProcessor {
           $fieldValue = CRM_Utils_Array::value($fieldValue, $imProviders);
         }
         elseif (strstr($field, 'master_id')) {
-          $masterAddressId = NULL;
-          if (isset($iterationDAO->$field)) {
-            $masterAddressId = $iterationDAO->$field;
-          }
+          // @todo - why not just $field === 'master_id'  - what else would it be?
+          $masterAddressId = $iterationDAO->$field ?? NULL;
           // get display name of contact that address is shared.
           $fieldValue = CRM_Contact_BAO_Contact::getMasterDisplayName($masterAddressId);
         }

@@ -1045,7 +1045,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test master_address_id field.
+   * Test master_address_id field when no merge is in play.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportMasterAddress() {
     $this->setUpContactExportData();
@@ -1054,32 +1057,12 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $selectedFields = [
       ['contact_type' => 'Individual', 'name' => 'master_id', 'location_type_id' => 1],
     ];
-    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
-      TRUE,
-      [$this->contactIDs[1]],
-      [],
-      NULL,
-      $selectedFields,
-      NULL,
-      CRM_Export_Form_Select::CONTACT_EXPORT,
-      "contact_a.id IN ({$this->contactIDs[1]})",
-      NULL,
-      FALSE,
-      FALSE,
-      [
-        'suppress_csv_for_testing' => TRUE,
-      ]
-    );
-    $field = key($sqlColumns);
-
-    //assert the exported result
-    $masterName = CRM_Core_DAO::singleValueQuery("SELECT {$field} FROM {$tableName}");
-    $displayName = CRM_Contact_BAO_Contact::getMasterDisplayName($this->masterAddressID);
-    $this->assertEquals($displayName, $masterName);
-
-    // delete the export temp table and component table
-    $sql = "DROP TABLE IF EXISTS {$tableName}";
-    CRM_Core_DAO::executeQuery($sql);
+    $this->doExportTest([
+      'fields' => $selectedFields,
+      'ids' => [$this->contactIDs[1]],
+    ]);
+    $row = $this->csv->fetchOne();
+    $this->assertEquals(CRM_Contact_BAO_Contact::getMasterDisplayName($this->masterAddressID), $row['Home-Master Address Belongs To']);
   }
 
   /**
