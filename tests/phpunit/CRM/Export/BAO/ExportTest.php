@@ -295,7 +295,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
-   * Basic test to ensure the exportComponents function can export selected fields for contribution.
+   * Basic test to ensure the exportComponents function can export selected fields for activity
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportComponentsActivity() {
     $this->setUpActivityExportData();
@@ -304,27 +307,15 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ['contact_type' => 'Individual', 'relationship_type_id' => '5', 'relationship_direction' => 'a_b', 'name' => 'display_name'],
     ];
 
-    list($tableName) = CRM_Export_BAO_Export::exportComponents(
-      FALSE,
-      $this->activityIDs,
-      [],
-      '`activity_date_time` desc',
-      $selectedFields,
-      NULL,
-      CRM_Export_Form_Select::ACTIVITY_EXPORT,
-      'civicrm_activity.id IN ( ' . implode(',', $this->activityIDs) . ')',
-      NULL,
-      FALSE,
-      FALSE,
-      [
-        'exportOption' => CRM_Export_Form_Select::ACTIVITY_EXPORT,
-        'suppress_csv_for_testing' => TRUE,
-      ]
-    );
-
-    // delete the export temp table and component table
-    $sql = "DROP TABLE IF EXISTS {$tableName}";
-    CRM_Core_DAO::executeQuery($sql);
+    $this->doExportTest([
+      'ids' => $this->activityIDs,
+      'order' => '`activity_date_time` desc',
+      'fields' => $selectedFields,
+      'exportMode' => CRM_Export_Form_Select::ACTIVITY_EXPORT,
+      'componentClause' => 'civicrm_activity.id IN ( ' . implode(',', $this->activityIDs) . ')',
+    ]);
+    $row = $this->csv->fetchOne();
+    $this->assertEquals($this->activityIDs[0], $row['Activity ID']);
   }
 
   /**
@@ -438,6 +429,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Set up some data for us to do testing on.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUpActivityExportData() {
     $this->setUpContactExportData();
