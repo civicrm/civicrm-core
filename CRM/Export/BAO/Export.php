@@ -217,7 +217,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       // In order to be able to write a unit test against this function we need to suppress
       // the csv writing. In future hopefully the csv writing & the main processing will be in separate functions.
       if (empty($exportParams['suppress_csv_for_testing'])) {
-        self::writeCSVFromTable($headerRows, $sqlColumns, $processor);
+        self::writeCSVFromTable($headerRows, $processor);
       }
       else {
         // return tableName sqlColumns headerRows in test context
@@ -375,10 +375,9 @@ VALUES $sqlValueString
 
   /**
    * @param $headerRows
-   * @param $sqlColumns
    * @param \CRM_Export_BAO_ExportProcessor $processor
    */
-  public static function writeCSVFromTable($headerRows, $sqlColumns, $processor) {
+  public static function writeCSVFromTable($headerRows, $processor) {
     $exportTempTable = $processor->getTemporaryTable();
     $writeHeader = TRUE;
     $offset = 0;
