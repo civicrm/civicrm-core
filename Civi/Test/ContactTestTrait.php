@@ -4,6 +4,7 @@ namespace Civi\Test;
 
 /**
  * Class ContactTestTrait
+ *
  * @package Civi\Test
  *
  * This trait defines a number of helper functions for managing
@@ -23,18 +24,18 @@ trait ContactTestTrait {
    *   Contact ID of the created user.
    */
   public function createLoggedInUser() {
-    $params = array(
+    $params = [
       'first_name' => 'Logged In',
       'last_name' => 'User ' . rand(),
       'contact_type' => 'Individual',
       'domain_id' => \CRM_Core_Config::domainID(),
-    );
+    ];
     $contactID = $this->individualCreate($params);
-    $this->callAPISuccess('UFMatch', 'create', array(
+    $this->callAPISuccess('UFMatch', 'create', [
       'contact_id' => $contactID,
       'uf_name' => 'superman',
       'uf_id' => 6,
-    ));
+    ]);
 
     $session = \CRM_Core_Session::singleton();
     $session->set('userID', $contactID);
@@ -52,9 +53,9 @@ trait ContactTestTrait {
    * @return int
    *   id of Organisation created
    */
-  public function organizationCreate($params = array(), $seq = 0) {
+  public function organizationCreate($params = [], $seq = 0) {
     if (!$params) {
-      $params = array();
+      $params = [];
     }
     $params = array_merge($this->sampleContact('Organization', $seq), $params);
     return $this->_contactCreate($params);
@@ -74,7 +75,7 @@ trait ContactTestTrait {
    *
    * @throws \CRM_Core_Exception
    */
-  public function individualCreate($params = array(), $seq = 0, $random = FALSE) {
+  public function individualCreate($params = [], $seq = 0, $random = FALSE) {
     $params = array_merge($this->sampleContact('Individual', $seq, $random), $params);
     return $this->_contactCreate($params);
   }
@@ -89,9 +90,10 @@ trait ContactTestTrait {
    *
    * @return int
    *   id of Household created
+   *
    * @throws \CRM_Core_Exception
    */
-  public function householdCreate($params = array(), $seq = 0) {
+  public function householdCreate($params = [], $seq = 0) {
     $params = array_merge($this->sampleContact('Household', $seq), $params);
     return $this->_contactCreate($params);
   }
@@ -109,27 +111,27 @@ trait ContactTestTrait {
    *   properties of sample contact (ie. $params for API call)
    */
   public function sampleContact($contact_type, $seq = 0, $random = FALSE) {
-    $samples = array(
-      'Individual' => array(
+    $samples = [
+      'Individual' => [
         // The number of values in each list need to be coprime numbers to not have duplicates
-        'first_name' => array('Anthony', 'Joe', 'Terrence', 'Lucie', 'Albert', 'Bill', 'Kim'),
-        'middle_name' => array('J.', 'M.', 'P', 'L.', 'K.', 'A.', 'B.', 'C.', 'D', 'E.', 'Z.'),
-        'last_name' => array('Anderson', 'Miller', 'Smith', 'Collins', 'Peterson'),
-      ),
-      'Organization' => array(
-        'organization_name' => array(
+        'first_name' => ['Anthony', 'Joe', 'Terrence', 'Lucie', 'Albert', 'Bill', 'Kim'],
+        'middle_name' => ['J.', 'M.', 'P', 'L.', 'K.', 'A.', 'B.', 'C.', 'D', 'E.', 'Z.'],
+        'last_name' => ['Anderson', 'Miller', 'Smith', 'Collins', 'Peterson'],
+      ],
+      'Organization' => [
+        'organization_name' => [
           'Unit Test Organization',
           'Acme',
           'Roberts and Sons',
           'Cryo Space Labs',
           'Sharper Pens',
-        ),
-      ),
-      'Household' => array(
-        'household_name' => array('Unit Test household'),
-      ),
-    );
-    $params = array('contact_type' => $contact_type);
+        ],
+      ],
+      'Household' => [
+        'household_name' => ['Unit Test household'],
+      ],
+    ];
+    $params = ['contact_type' => $contact_type];
     foreach ($samples[$contact_type] as $key => $values) {
       $params[$key] = $values[$seq % count($values)];
       if ($random) {
@@ -152,10 +154,10 @@ trait ContactTestTrait {
    * @param array $params
    *   For civicrm_contact_add api function call.
    *
-   * @throws CRM_Core_Exception
-   *
    * @return int
    *   id of Household created
+   * @throws \CRM_Core_Exception
+   *
    */
   private function _contactCreate($params) {
     $result = $this->callAPISuccess('contact', 'create', $params);
@@ -175,10 +177,10 @@ trait ContactTestTrait {
     $domain = new \CRM_Core_BAO_Domain();
     $domain->contact_id = $contactID;
     if (!$domain->find(TRUE)) {
-      $this->callAPISuccess('contact', 'delete', array(
+      $this->callAPISuccess('contact', 'delete', [
         'id' => $contactID,
         'skip_undelete' => 1,
-      ));
+      ]);
     }
   }
 
@@ -186,22 +188,23 @@ trait ContactTestTrait {
    * Add a Group.
    *
    * @param array $params
+   *
    * @return int
    *   groupId of created group
    */
-  public function groupCreate($params = array()) {
-    $params = array_merge(array(
+  public function groupCreate($params = []) {
+    $params = array_merge([
       'name' => 'Test Group 1',
       'domain_id' => 1,
       'title' => 'New Test Group Created',
       'description' => 'New Test Group Created',
       'is_active' => 1,
       'visibility' => 'Public Pages',
-      'group_type' => array(
+      'group_type' => [
         '1' => 1,
         '2' => 1,
-      ),
-    ), $params);
+      ],
+    ], $params);
 
     $result = $this->callAPISuccess('Group', 'create', $params);
     return $result['id'];
@@ -213,9 +216,9 @@ trait ContactTestTrait {
    * @param int $gid
    */
   public function groupDelete($gid) {
-    $params = array(
+    $params = [
       'id' => $gid,
-    );
+    ];
 
     $this->callAPISuccess('Group', 'delete', $params);
   }
@@ -228,18 +231,19 @@ trait ContactTestTrait {
    * @param int $groupID
    * @param int $totalCount
    * @param bool $random
+   *
    * @return int
    *   groupId of created group
    */
   public function groupContactCreate($groupID, $totalCount = 10, $random = FALSE) {
-    $params = array('group_id' => $groupID);
+    $params = ['group_id' => $groupID];
     for ($i = 1; $i <= $totalCount; $i++) {
-      $contactID = $this->individualCreate(array(), 0, $random);
+      $contactID = $this->individualCreate([], 0, $random);
       if ($i == 1) {
-        $params += array('contact_id' => $contactID);
+        $params += ['contact_id' => $contactID];
       }
       else {
-        $params += array("contact_id.$i" => $contactID);
+        $params += ["contact_id.$i" => $contactID];
       }
     }
     $result = $this->callAPISuccess('GroupContact', 'create', $params);

@@ -613,7 +613,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    *
    * @param bool $includeHouseHold
    *
-   * @throws \CRM_Core_Exception
+   * @throws CRM_Core_Exception
    */
   public function testExportRelationshipsMergeToHousehold($includeHouseHold) {
     list($householdID, $houseHoldTypeID) = $this->setUpHousehold();
@@ -1311,7 +1311,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Set up household for tests.
    *
    * @return array
-   * @throws \Exception
+   *
+   * @throws CRM_Core_Exception
    */
   protected function setUpHousehold() {
     $this->setUpContactExportData();
