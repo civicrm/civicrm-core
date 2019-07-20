@@ -131,6 +131,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
             'title' => ts('Case Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Case_BAO_Case::buildOptions('case_type_id', 'search'),
+            'type' => CRM_Utils_Type::T_INT,
           ],
           'status_id' => [
             'title' => ts('Status'),
