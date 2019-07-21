@@ -130,10 +130,10 @@ return [
     'html_type' => 'checkbox',
     'default' => '0',
     'add' => '4.1',
-    'title' => ts('Enable Double Opt-in for Profile Group(s) field'),
+    'title' => ts('Enable Double Opt-in for Profiles which use the "Add to Group" setting'),
     'is_domain' => 1,
     'is_contact' => 0,
-    'description' => ts('When CiviMail is enabled, users who "subscribe" to a group from a profile Group(s) checkbox will receive a confirmation email. They must respond (opt-in) before they are added to the group.'),
+    'description' => ts('When CiviMail is enabled and a profile uses the "Add to Group" setting, users who complete the profile form will receive a confirmation email. They must respond (opt-in) before they are added to the group.'),
     'help_text' => NULL,
   ],
   'disable_mandatory_tokens_check' => [
