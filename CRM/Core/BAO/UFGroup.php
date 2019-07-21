@@ -2014,31 +2014,21 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       $form->add('select', $name, $title, $subtypeList, $required, array('class' => 'crm-select2', 'multiple' => TRUE));
     }
     elseif (in_array($fieldName, CRM_Contact_BAO_Contact::$_greetingTypes)) {
-      //add email greeting, postal greeting, addressee, CRM-4575
-      $gId = $form->get('gid') ? $form->get('gid') : CRM_Utils_Array::value('group_id', $field);
+      // Get contact type for greeting selector
+      $gId = $form->get('gid') ?: CRM_Utils_Array::value('group_id', $field);
       $profileType = CRM_Core_BAO_UFField::getProfileType($gId, TRUE, FALSE, TRUE);
 
-      if (empty($profileType) || in_array($profileType, array(
-        'Contact',
-        'Contribution',
-        'Participant',
-        'Membership',
-      ))
-      ) {
-        $profileType = 'Individual';
+      if (!$profileType || in_array($profileType, ['Contact', 'Contribution', 'Participant', 'Membership'])) {
+        $profileType = ($profileType == 'Contact' && $form->get('id')) ? CRM_Contact_BAO_Contact::getContactType($form->get('id')) : 'Individual';
       }
       if (CRM_Contact_BAO_ContactType::isaSubType($profileType)) {
         $profileType = CRM_Contact_BAO_ContactType::getBasicType($profileType);
       }
-      $greeting = array(
+      $greeting = [
         'contact_type' => $profileType,
         'greeting_type' => $fieldName,
-      );
-      $form->add('select', $name, $title,
-        array(
-          '' => ts('- select -'),
-        ) + CRM_Core_PseudoConstant::greeting($greeting), $required
-      );
+      ];
+      $form->add('select', $name, $title, ['' => ts('- select -')] + CRM_Core_PseudoConstant::greeting($greeting), $required);
       // add custom greeting element
       $form->add('text', $fieldName . '_custom', ts('Custom %1', array(1 => ucwords(str_replace('_', ' ', $fieldName)))),
         NULL, FALSE
