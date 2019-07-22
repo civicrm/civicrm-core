@@ -228,10 +228,10 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   public function postProcess() {
     $this->set('isAdvanced', '1');
 
+    $this->setFormValues();
     // get user submitted values
     // get it from controller only if form has been submitted, else preProcess has set this
     if (!empty($_POST)) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
       $this->normalizeFormValues();
       // FIXME: couldn't figure out a good place to do this,
       // FIXME: so leaving this as a dependency for now
@@ -349,8 +349,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'activity_type_id',
       'status_id',
       'priority_id',
-      'activity_subject',
-      'activity_details',
       'contribution_page_id',
       'contribution_product_id',
       'payment_instrument_id',

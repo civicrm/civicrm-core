@@ -3452,7 +3452,7 @@ WHERE  $smartGroupClause
       return;
     }
 
-    $input = $value = trim($value);
+    $input = $value = is_array($value) ? trim($value['LIKE']) : trim($value);
 
     if (!strlen($value)) {
       return;

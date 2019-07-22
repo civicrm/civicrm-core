@@ -140,6 +140,16 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   }
 
   /**
+   * Set the form values based on input and preliminary processing.
+   */
+  protected function setFormValues() {
+    if (!empty($_POST) && !$this->_force) {
+      $this->_formValues = $this->controller->exportValues($this->_name);
+    }
+    $this->convertTextStringsToUseLikeOperator();
+  }
+
+  /**
    * Common buildForm tasks required by all searches.
    */
   public function buildQuickForm() {
@@ -184,7 +194,9 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
           elseif (isset($fields[$fieldName]['title'])) {
             $props['label'] = $fields[$fieldName]['title'];
           }
-          $this->addField($fieldName, $props);
+          if (empty($fieldSpec['is_pseudofield'])) {
+            $this->addField($fieldName, $props);
+          }
         }
       }
     }
@@ -287,10 +299,12 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * Note this will only pick up fields declared via metadata.
    */
   protected function convertTextStringsToUseLikeOperator() {
-    foreach (CRM_Utils_Array::value($this->getDefaultEntity(), $this->getSearchFieldMetadata(), []) as $fieldName => $field) {
-      if (!empty($this->_formValues[$fieldName]) && empty($field['options']) && empty($field['pseudoconstant'])) {
-        if (in_array($field['type'], [CRM_Utils_Type::T_STRING, CRM_Utils_Type::T_TEXT])) {
-          $this->_formValues[$fieldName] = ['LIKE' => CRM_Contact_BAO_Query::getWildCardedValue(TRUE, 'LIKE', $this->_formValues[$fieldName])];
+    foreach ($this->getSearchFieldMetadata() as $entity => $fields) {
+      foreach ($fields as $fieldName => $field) {
+        if (!empty($this->_formValues[$fieldName]) && empty($field['options']) && empty($field['pseudoconstant'])) {
+          if (in_array($field['type'], [CRM_Utils_Type::T_STRING, CRM_Utils_Type::T_TEXT])) {
+            $this->_formValues[$fieldName] = ['LIKE' => CRM_Contact_BAO_Query::getWildCardedValue(TRUE, 'LIKE', $this->_formValues[$fieldName])];
+          }
         }
       }
     }
