@@ -615,7 +615,7 @@ class CRM_Profile_Form extends CRM_Core_Form {
                 "reset=1&id={$fileId}&eid=$entityId&fid={$key}&action=delete&fcs={$fileHash}"
               );
               $text = ts("Delete Attached File");
-              $customFiles[$field['name']]['deleteURL'] = "<a href=\"{$deleteURL}\" onclick = \"if (confirm( ' $deleteExtra ' )) this.href+='&amp;confirmed=1'; else return false;\">$text</a>";
+              $customFiles[$name]['deleteURL'] = "<a href=\"{$deleteURL}\" onclick = \"if (confirm( ' $deleteExtra ' )) this.href+='&amp;confirmed=1'; else return false;\">$text</a>";
 
               // also delete the required rule that we've set on the form element
               $this->removeFileRequiredRules($name);
