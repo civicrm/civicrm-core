@@ -59,12 +59,12 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
 
     CRM_Core_I18n_Schema::addLocale('fr_CA', 'en_US');
 
-    $this->callAPISuccess('Setting', 'create', array(
-      'languageLimit' => array(
-        'en_US',
-        'fr_CA',
-      ),
-    ));
+    $this->callAPISuccess('Setting', 'create', [
+      'languageLimit' => [
+        'en_US' => 1,
+        'fr_CA' => 1,
+      ],
+    ]);
 
     // Take a semi-random OptionGroup and test manually changing its label
     // in one language, while making sure it stays the same in English.

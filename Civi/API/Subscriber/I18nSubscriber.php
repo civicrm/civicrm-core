@@ -98,38 +98,22 @@ class I18nSubscriber implements EventSubscriberInterface {
    * Sets the tsLocale and dbLocale for multi-lingual sites.
    * Some code duplication from CRM/Core/BAO/ConfigSetting.php retrieve()
    * to avoid regressions from refactoring.
-   * @param $lcMessagesRequest
+   * @param string $lcMessages
    * @param int $requestId
    * @throws \API_Exception
    */
-  public function setLocale($lcMessagesRequest, $requestId) {
-    // We must validate whether the locale is valid, otherwise setting a bad
-    // dbLocale could probably lead to sql-injection.
+  public function setLocale($lcMessages, $requestId) {
     $domain = new \CRM_Core_DAO_Domain();
     $domain->id = \CRM_Core_Config::domainID();
     $domain->find(TRUE);
 
-    // are we in a multi-language setup?
-    $multiLang = $domain->locales ? TRUE : FALSE;
-    $lcMessages = NULL;
-
-    // on multi-lang sites based on request and civicrm_uf_match
-    if ($multiLang) {
-      $config = \CRM_Core_Config::singleton();
-      $languageLimit = [];
-      if (isset($config->languageLimit) and $config->languageLimit) {
-        $languageLimit = $config->languageLimit;
+    // Check if the site is multi-lingual
+    if ($domain->locales && $lcMessages) {
+      // Validate language, otherwise a bad dbLocale could probably lead to sql-injection.
+      if (!array_key_exists($lcMessages, \Civi::settings()->get('languageLimit'))) {
+        throw new \API_Exception(ts('Language not enabled: %1', [1 => $lcMessages]));
       }
 
-      if (in_array($lcMessagesRequest, array_keys($languageLimit))) {
-        $lcMessages = $lcMessagesRequest;
-      }
-      else {
-        throw new \API_Exception(ts('Language not enabled: %1', [1 => $lcMessagesRequest]));
-      }
-    }
-
-    if ($lcMessages) {
       global $dbLocale;
       global $tsLocale;
 
