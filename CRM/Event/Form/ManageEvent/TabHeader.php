@@ -86,7 +86,9 @@ class CRM_Event_Form_ManageEvent_TabHeader {
     $tabs['location'] = ['title' => ts('Event Location')] + $default;
     $tabs['fee'] = ['title' => ts('Fees')] + $default;
     $tabs['registration'] = ['title' => ts('Online Registration')] + $default;
-    if (CRM_Core_Permission::check('administer CiviCRM') || CRM_Event_BAO_Event::checkPermission(NULL, CRM_Core_Permission::EDIT)) {
+    // @fixme I don't understand the event permissions check here - can we just get rid of it?
+    $permissions = CRM_Event_BAO_Event::getAllPermissions();
+    if (CRM_Core_Permission::check('administer CiviCRM') || !empty($permissions[CRM_Core_Permission::EDIT])) {
       $tabs['reminder'] = ['title' => ts('Schedule Reminders'), 'class' => 'livePage'] + $default;
     }
     $tabs['conference'] = ['title' => ts('Conference Slots')] + $default;
