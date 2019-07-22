@@ -19,13 +19,13 @@ Installation
 The download URLs and installation instructions are available on our website:
 https://civicrm.org/download
 
-Detailed installation instructions are [on the wiki](https://wiki.civicrm.org/confluence/display/CRMDOC/Installation+and+Upgrades).
+Detailed installation instructions can be found [in our sysadmin guide](https://docs.civicrm.org/sysadmin/en/latest/).
 
 
 Documentation
 -------------
 
-Documentation can be found at https://civicrm.org/documentation
+Documentation can be found at https://docs.civicrm.org
 
 
 Support
@@ -44,7 +44,7 @@ Development and Bugs
 Developers are highly encouraged to join [chat.civicrm.org](https://chat.civicrm.org) and post
 questions and ideas in the [Developer Discussion room](https://chat.civicrm.org/civicrm/channels/dev).
 
-Installing the latest developmental code requires some [special steps](http://wiki.civicrm.org/confluence/display/CRMDOC/Contributing+to+CiviCRM+using+GitHub). 
+Installing the latest developmental code requires some [special steps](https://docs.civicrm.org/dev/en/latest/tools/git/). 
 
 Report all issues to CiviCRM via GitLab:
-https://lab.civicrm.org
+https://lab.civicrm.org/
