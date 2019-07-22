@@ -475,4 +475,46 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
     $this->assertEquals(2, $i);
   }
 
+  /**
+   * Test modifying a query in a hook.
+   *
+   * Test that adding a sensible string does not cause failure.
+   *
+   * @throws \Exception
+   */
+  public function testModifyQuery() {
+    $listener = function(\Civi\Core\Event\GenericHookEvent $e) {
+      $e->query = '/* User :  hooked */' . $e->query;
+    };
+    Civi::dispatcher()->addListener('civi.db.query', $listener);
+    CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_domain');
+
+    Civi::dispatcher()->removeListener('civi.db.query', $listener);
+  }
+
+  /**
+   * Test modifying a query in a hook.
+   *
+   * Demonstrate it is modified showing the query now breaks.
+   */
+  public function testModifyAndBreakQuery() {
+    $listener = function(\Civi\Core\Event\GenericHookEvent $e) {
+      $e->query = '/* Forgot trailing comment marker' . $e->query;
+    };
+    Civi::dispatcher()->addListener('civi.db.query', $listener);
+    try {
+      CRM_Core_DAO::executeQuery('SELECT * FROM civicrm_domain');
+    }
+    catch (PEAR_Exception $e) {
+      $this->assertEquals(
+        "SELECT * FROM civicrm_domain [nativecode=1064 ** You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '/* Forgot trailing comment markerSELECT * FROM civicrm_domain' at line 1]",
+        $e->getCause()->getUserInfo()
+      );
+      Civi::dispatcher()->removeListener('civi.db.query', $listener);
+      return;
+    }
+    Civi::dispatcher()->removeListener('civi.db.query', $listener);
+    $this->fail('String not altered');
+  }
+
 }
