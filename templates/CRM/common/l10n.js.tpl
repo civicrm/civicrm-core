@@ -114,12 +114,12 @@
 
   // use civicrm notifications when there are errors
   params.invalidHandler = function(form, validator) {
+    // If there is no container for display then red text will still show next to the invalid fields
+    // but there will be no overall message. Currently the container is only available on backoffice pages.
     if ($('#crm-notification-container').length) {
       $.each(validator.errorList, function(k, error) {
         $(error.element).crmError(error.message);
       });
-    } else {
-      alert({/literal}"{ts escape='js'}Please review and correct the highlighted fields before continuing.{/ts}"{literal});
     }
   };
 
