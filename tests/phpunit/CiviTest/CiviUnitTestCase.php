@@ -1684,7 +1684,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'option_value' => array('value1', 'value2'),
       'option_name' => array($name . '_1', $name . '_2'),
       'option_weight' => array(1, 2),
-      'option_status' => 1,
+      'option_status' => array(1, 1),
     );
 
     $params = array_merge($fieldParams, $optionGroup, $optionValue, $extraParams);

@@ -5907,12 +5907,36 @@ LIMIT 1;";
     }
     $contributionDetails = [];
     foreach ($contributionIds as $id) {
-      $result = civicrm_api3('Contribution', 'get', ['id' => $id]);
+      $result = self::getContributionTokenValues($id, $messageToken);
       $contributionDetails[$result['values'][$result['id']]['contact_id']]['subject'] = CRM_Utils_Token::replaceContributionTokens($subject, $result, FALSE, $subjectToken, FALSE, $escapeSmarty);
       $contributionDetails[$result['values'][$result['id']]['contact_id']]['text'] = CRM_Utils_Token::replaceContributionTokens($text, $result, FALSE, $messageToken, FALSE, $escapeSmarty);
       $contributionDetails[$result['values'][$result['id']]['contact_id']]['html'] = CRM_Utils_Token::replaceContributionTokens($html, $result, FALSE, $messageToken, FALSE, $escapeSmarty);
     }
     return $contributionDetails;
+  }
+
+  /**
+   * Get the contribution fields for $id and display labels where
+   * appropriate (if the token is present).
+   *
+   * @param int $id
+   * @param array $messageToken
+   * @return array
+   */
+  public static function getContributionTokenValues($id, $messageToken) {
+    if (empty($id)) {
+      return [];
+    }
+    $result = civicrm_api3('Contribution', 'get', ['id' => $id]);
+    // lab.c.o mail#46 - show labels, not values, for custom fields with option values.
+    if (!empty($messageToken)) {
+      foreach ($result['values'][$id] as $fieldName => $fieldValue) {
+        if (strpos($fieldName, 'custom_') === 0 && array_search($fieldName, $messageToken['contribution']) !== FALSE) {
+          $result['values'][$id][$fieldName] = CRM_Core_BAO_CustomField::displayValue($result['values'][$id][$fieldName], $fieldName);
+        }
+      }
+    }
+    return $result;
   }
 
   /**

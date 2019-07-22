@@ -1466,6 +1466,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
    *   This function tests whether the contribution tokens are replaced with values from contribution.
    */
   public function testReplaceContributionTokens() {
+    $customGroup = $this->customGroupCreate(['extends' => 'Contribution', 'title' => 'contribution stuff']);
+    $customField = $this->customFieldOptionValueCreate($customGroup, 'myCustomField');
     $contactId1 = $this->individualCreate();
     $params = array(
       'contact_id' => $contactId1,
@@ -1476,6 +1478,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'invoice_id' => 67890,
       'source' => 'SSF',
       'contribution_status_id' => 2,
+      "custom_{$customField['id']}" => 'value1',
     );
     $contribution1 = $this->contributionCreate($params);
     $contactId2 = $this->individualCreate();
@@ -1488,6 +1491,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'invoice_id' => 12345,
       'source' => 'ABC',
       'contribution_status_id' => 1,
+      "custom_{$customField['id']}" => 'value2',
     );
     $contribution2 = $this->contributionCreate($params);
     $ids = array($contribution1, $contribution2);
@@ -1496,7 +1500,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $text = "Contribution Amount: {contribution.total_amount}";
     $html = "<p>Contribution Source: {contribution.contribution_source}</p></br>
       <p>Contribution Invoice ID: {contribution.invoice_id}</p></br>
-      <p>Contribution Receive Date: {contribution.receive_date}</p></br>";
+      <p>Contribution Receive Date: {contribution.receive_date}</p></br>
+      <p>Contribution Custom Field: {contribution.custom_{$customField['id']}}</p></br>";
 
     $subjectToken = CRM_Utils_Token::getTokens($subject);
     $messageToken = CRM_Utils_Token::getTokens($text);
@@ -1515,7 +1520,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
     $this->assertEquals("Contribution Amount: $ 100.00", $contributionDetails[$contactId1]['text'], "The text does not match");
     $this->assertEquals("<p>Contribution Source: ABC</p></br>
       <p>Contribution Invoice ID: 12345</p></br>
-      <p>Contribution Receive Date: May 11th, 2015</p></br>", $contributionDetails[$contactId2]['html'], "The html does not match");
+      <p>Contribution Receive Date: May 11th, 2015</p></br>
+      <p>Contribution Custom Field: Label2</p></br>", $contributionDetails[$contactId2]['html'], "The html does not match");
   }
 
   /**

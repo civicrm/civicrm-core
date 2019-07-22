@@ -257,16 +257,7 @@ class CRM_Contribute_Form_Task_PDFLetterCommon extends CRM_Contact_Form_Task_PDF
   public static function buildContributionArray($groupBy, $contributionIDs, $returnProperties, $skipOnHold, $skipDeceased, $messageToken, $task, $separator, $isIncludeSoftCredits) {
     $contributions = $contacts = [];
     foreach ($contributionIDs as $item => $contributionId) {
-      // Basic return attributes available to the template.
-      $returnValues = ['contact_id', 'total_amount', 'financial_type', 'receive_date', 'contribution_campaign_title'];
-      if (!empty($messageToken['contribution'])) {
-        $returnValues = array_merge($messageToken['contribution'], $returnValues);
-      }
-      // retrieve contribution tokens listed in $returnProperties using Contribution.Get API
-      $contribution = civicrm_api3('Contribution', 'getsingle', [
-        'id' => $contributionId,
-        'return' => $returnValues,
-      ]);
+      $contribution = CRM_Contribute_BAO_Contribution::getContributionTokenValues($contributionId, $messageToken)['values'][$contributionId];
       $contribution['campaign'] = CRM_Utils_Array::value('contribution_campaign_title', $contribution);
       $contributions[$contributionId] = $contribution;
 
