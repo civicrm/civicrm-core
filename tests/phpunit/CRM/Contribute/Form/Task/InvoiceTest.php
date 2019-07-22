@@ -49,18 +49,18 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
    * invoice pdf for pending and completed contributions
    */
   public function testInvoiceForDueDate() {
-    $contactIds = array();
-    $params = array(
+    $contactIds = [];
+    $params = [
       'output' => 'pdf_invoice',
       'forPage' => 1,
-    );
+    ];
 
     $this->_individualId = $this->individualCreate();
-    $contributionParams = array(
+    $contributionParams = [
       'contact_id' => $this->_individualId,
       'total_amount' => 100,
       'financial_type_id' => 'Donation',
-    );
+    ];
     $result = $this->callAPISuccess('Contribution', 'create', $contributionParams);
 
     $contributionParams['contribution_status_id'] = 2;
@@ -68,15 +68,15 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
 
     $contribution3 = $this->callAPISuccess('Contribution', 'create', $contributionParams);
-    $this->callAPISuccess('Payment', 'create', array('total_amount' => 8, 'contribution_id' => $contribution3['id']));
+    $this->callAPISuccess('Payment', 'create', ['total_amount' => 8, 'contribution_id' => $contribution3['id']]);
 
-    $this->callAPISuccess('Contribution', 'create', array('id' => $contribution3['id'], 'is_pay_later' => 0));
+    $this->callAPISuccess('Contribution', 'create', ['id' => $contribution3['id'], 'is_pay_later' => 0]);
 
-    $contributionIDs = array(
-      array($result['id']),
-      array($contribution['id']),
-      array($contribution3['id']),
-    );
+    $contributionIDs = [
+      [$result['id']],
+      [$contribution['id']],
+      [$contribution3['id']],
+    ];
 
     $contactIds[] = $this->_individualId;
     foreach ($contributionIDs as $contributionID) {

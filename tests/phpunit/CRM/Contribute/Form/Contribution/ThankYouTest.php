@@ -45,7 +45,7 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
    * Test that correct contribution status is fetched for both live and test contributions.
    */
   public function testLiveAndTestContributionStatus() {
-    $paymentProcessorID = $this->paymentProcessorCreate(array('payment_processor_type_id' => 'Dummy'));
+    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy']);
 
     $form = $this->getThankYouFormWithContribution($paymentProcessorID, FALSE, FALSE);
     $form->buildQuickForm();
@@ -83,7 +83,7 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
   private function getThankYouFormWithContribution($paymentProcessorID, $withPendingContribution = FALSE, $isTestContribution = FALSE) {
     $pageContribution = $this->getPageContribution((($withPendingContribution) ? 2 : 1), $isTestContribution);
     $form = $this->getThankYouForm();
-    $form->_lineItem = array();
+    $form->_lineItem = [];
 
     $form->_params['contributionID'] = $pageContribution['contribution_id'];
     $form->_params['invoiceID'] = $pageContribution['invoice_id'];
@@ -106,17 +106,17 @@ class CRM_Contribute_Form_Contribution_ThankYouTest extends CiviUnitTestCase {
     $individualId = $this->individualCreate();
     $invoiceId = rand(100000, 999999);
 
-    $contributionId = $this->contributionCreate(array(
+    $contributionId = $this->contributionCreate([
       'contact_id'             => $individualId,
       'invoice_id'             => $invoiceId,
       'contribution_status_id' => $contributionStatus,
       'is_test'                => ($isTest) ? 1 : 0,
-    ));
+    ]);
 
-    return array(
+    return [
       'contribution_id' => $contributionId,
       'invoice_id'      => $invoiceId,
-    );
+    ];
   }
 
   /**

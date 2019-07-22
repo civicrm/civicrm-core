@@ -41,14 +41,14 @@ class api_v3_EntityJoinTest extends CiviUnitTestCase {
   public function testJoinEmailToContact() {
     $first = 'firstthisisatest';
     $last = 'lastthisisatest';
-    $org = $this->organizationCreate(array('organization_name' => 'Employer of one'));
-    $person1 = $this->individualCreate(array('employer_id' => $org, 'first_name' => $first, 'last_name' => $last, 'gender_id' => 1));
-    $person2 = $this->individualCreate(array(), 1);
-    $result = $this->callAPISuccessGetSingle('Email', array(
+    $org = $this->organizationCreate(['organization_name' => 'Employer of one']);
+    $person1 = $this->individualCreate(['employer_id' => $org, 'first_name' => $first, 'last_name' => $last, 'gender_id' => 1]);
+    $person2 = $this->individualCreate([], 1);
+    $result = $this->callAPISuccessGetSingle('Email', [
       'return' => 'contact_id.employer_id.display_name,contact_id.gender_id.label',
       'contact_id.last_name' => $last,
       'contact_id.first_name' => $first,
-    ));
+    ]);
     $this->assertEquals('Employer of one', $result['contact_id.employer_id.display_name']);
     $this->assertEquals('Female', $result['contact_id.gender_id.label']);
   }

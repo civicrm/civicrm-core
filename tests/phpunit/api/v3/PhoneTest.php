@@ -45,13 +45,13 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $loc = $this->locationTypeCreate();
     $this->_locationType = $loc->id;
     CRM_Core_PseudoConstant::flush();
-    $this->_params = array(
+    $this->_params = [
       'contact_id' => $this->_contactID,
       'location_type_id' => $this->_locationType,
       'phone' => '(123) 456-7890',
       'is_primary' => 1,
       'phone_type_id' => 1,
-    );
+    ];
   }
 
   /**
@@ -65,7 +65,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
 
-    $this->callAPISuccess('phone', 'delete', array('id' => $result['id']));
+    $this->callAPISuccess('phone', 'delete', ['id' => $result['id']]);
   }
 
   /**
@@ -77,12 +77,12 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     //create one
     $create = $this->callAPISuccess('phone', 'create', $this->_params);
 
-    $result = $this->callAPIAndDocument('phone', 'delete', array('id' => $create['id']), __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('phone', 'delete', ['id' => $create['id']], __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
-    $get = $this->callAPISuccess('phone', 'get', array(
+    $get = $this->callAPISuccess('phone', 'get', [
       'id' => $create['id'],
       'location_type_id' => $this->_locationType,
-    ));
+    ]);
     $this->assertEquals(0, $get['count'], 'Phone not successfully deleted In line ' . __LINE__);
   }
 
@@ -93,16 +93,16 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
    */
   public function testGetEmptyParams($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPISuccess('Phone', 'Get', array());
+    $result = $this->callAPISuccess('Phone', 'Get', []);
   }
 
   /**
    * Test civicrm_phone_get with wrong params.
    */
   public function testGetWrongParams() {
-    $this->callAPIFailure('Phone', 'Get', array('contact_id' => 'abc'));
-    $this->callAPIFailure('Phone', 'Get', array('location_type_id' => 'abc'));
-    $this->callAPIFailure('Phone', 'Get', array('phone_type_id' => 'abc'));
+    $this->callAPIFailure('Phone', 'Get', ['contact_id' => 'abc']);
+    $this->callAPIFailure('Phone', 'Get', ['location_type_id' => 'abc']);
+    $this->callAPIFailure('Phone', 'Get', ['phone_type_id' => 'abc']);
   }
 
   /**
@@ -113,10 +113,10 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
   public function testGet($version) {
     $this->_apiversion = $version;
     $phone = $this->callAPISuccess('phone', 'create', $this->_params);
-    $params = array(
+    $params = [
       'contact_id' => $this->_params['contact_id'],
       'phone' => $phone['values'][$phone['id']]['phone'],
-    );
+    ];
     $result = $this->callAPIAndDocument('Phone', 'Get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($phone['values'][$phone['id']]['location_type_id'], $result['values'][$phone['id']]['location_type_id']);
     $this->assertEquals($phone['values'][$phone['id']]['phone_type_id'], $result['values'][$phone['id']]['phone_type_id']);
@@ -135,7 +135,7 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess('phone', 'create', $this->_params);
     $id = $result['id'];
-    $params = array('id' => $id, 'return.phone_numeric' => 1);
+    $params = ['id' => $id, 'return.phone_numeric' => 1];
     $result = $this->callAPISuccess('phone', 'get', $params);
     $this->assertEquals('1234567890', $result['values'][$id]['phone_numeric']);
   }
@@ -153,10 +153,10 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     unset($params['is_primary']);
     $phone1 = $this->callAPISuccess('phone', 'create', $params);
     //now we check & make sure it has been set to primary
-    $check = $this->callAPISuccess('phone', 'getcount', array(
+    $check = $this->callAPISuccess('phone', 'getcount', [
       'is_primary' => 1,
       'id' => $phone1['id'],
-    ));
+    ]);
     $this->assertEquals(1, $check);
   }
 
@@ -168,10 +168,10 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $phone1 = $this->callAPISuccess('phone', 'create', $this->_params);
     $phone2 = $this->callAPISuccess('phone', 'create', $this->_params);
-    $check = $this->callAPISuccess('phone', 'getcount', array(
+    $check = $this->callAPISuccess('phone', 'getcount', [
       'is_primary' => 1,
       'contact_id' => $this->_contactID,
-    ));
+    ]);
     $this->assertEquals(1, $check);
   }
 

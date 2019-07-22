@@ -54,36 +54,36 @@ class PartialSyntaxTest extends \CiviUnitTestCase {
   }
 
   public function basicConsistencyExamples() {
-    $cases = array();
+    $cases = [];
 
-    $cases[0] = array(
+    $cases[0] = [
       '<div foo="bar"></div>',
       '<div foo="bar"></div>',
-    );
-    $cases[1] = array(
+    ];
+    $cases[1] = [
       '<div foo="bar"/>',
       '<div foo="bar"></div>',
-    );
-    $cases[2] = array(
+    ];
+    $cases[2] = [
       '<div foo=\'bar\'></div>',
       '<div foo="bar"></div>',
-    );
-    $cases[3] = array(
+    ];
+    $cases[3] = [
       '<div foo=\'ts("Hello world")\'></div>',
       '<div foo=\'ts("Hello world")\'></div>',
-    );
-    $cases[4] = array(
+    ];
+    $cases[4] = [
       '<div foo="ts(\'Hello world\')\"></div>',
       '<div foo="ts(\'Hello world\')\"></div>',
-    );
-    $cases[5] = array(
+    ];
+    $cases[5] = [
       '<a href="{{foo}}" title="{{bar}}"></a>',
       '<a href="{{foo}}" title="{{bar}}"></a>',
-    );
-    $cases[6] = array(
+    ];
+    $cases[6] = [
       '<div ng-if="a && b"></div>',
       '<div ng-if="a && b"></div>',
-    );
+    ];
 
     return $cases;
   }
@@ -102,7 +102,7 @@ class PartialSyntaxTest extends \CiviUnitTestCase {
    */
   public function testAllPartials() {
     $coder = new \Civi\Angular\Coder();
-    $errors = array();
+    $errors = [];
     $count = 0;
     foreach ($this->angular->getModules() as $module => $moduleDefn) {
       $partials = $this->angular->getPartials($module);

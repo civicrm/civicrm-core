@@ -49,11 +49,11 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @param array $mapper
    * @param array $expecteds
    */
-  public function testSubmit($params, $mapper, $expecteds = array()) {
+  public function testSubmit($params, $mapper, $expecteds = []) {
     CRM_Core_DAO::executeQuery("CREATE TABLE IF NOT EXISTS civicrm_import_job_xxx (`nada` text, `first_name` text, `last_name` text, `address` text) ENGINE=InnoDB DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci");
     $form = $this->getFormObject('CRM_Contact_Import_Form_MapField');
     $form->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
-    $form->_columnNames = array('nada', 'first_name', 'last_name', 'address');
+    $form->_columnNames = ['nada', 'first_name', 'last_name', 'address'];
     $form->set('importTableName', 'civicrm_import_job_xxx');
     $form->preProcess();
     $form->submit($params, $mapper);
@@ -61,7 +61,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery("DROP TABLE civicrm_import_job_xxx");
     if (!empty($expecteds)) {
       foreach ($expecteds as $expected) {
-        $result = $this->callAPISuccess($expected['entity'], 'get', array_merge($expected['values'], array('sequential' => 1)));
+        $result = $this->callAPISuccess($expected['entity'], 'get', array_merge($expected['values'], ['sequential' => 1]));
         $this->assertEquals($expected['count'], $result['count']);
         if (isset($expected['result'])) {
           foreach ($expected['result'] as $key => $expectedValues) {
@@ -72,7 +72,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
         }
       }
     }
-    $this->quickCleanup(array('civicrm_mapping', 'civicrm_mapping_field'));
+    $this->quickCleanup(['civicrm_mapping', 'civicrm_mapping_field']);
   }
 
   /**
@@ -81,48 +81,48 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @return array
    */
   public function getSubmitData() {
-    return array(
-      'basic_data' => array(
-        array(
+    return [
+      'basic_data' => [
+        [
           'saveMappingName' => '',
           'saveMappingDesc' => '',
-        ),
-        array(
-          0 => array(0 => 'do_not_import'),
-          1 => array(0 => 'first_name'),
-          2 => array(0 => 'last_name'),
-          3 => array(0 => 'street_address', 1 => 2),
-        ),
-      ),
-      'save_mapping' => array(
-        array(
+        ],
+        [
+          0 => [0 => 'do_not_import'],
+          1 => [0 => 'first_name'],
+          2 => [0 => 'last_name'],
+          3 => [0 => 'street_address', 1 => 2],
+        ],
+      ],
+      'save_mapping' => [
+        [
           'saveMappingName' => 'new mapping',
           'saveMappingDesc' => 'save it',
           'saveMapping' => 1,
-        ),
-        array(
-          0 => array(0 => 'do_not_import'),
-          1 => array(0 => 'first_name'),
-          2 => array(0 => 'last_name'),
-          3 => array(0 => 'street_address', 1 => 2),
-        ),
-        array(
-          array('entity' => 'mapping', 'count' => 1, 'values' => array('name' => 'new mapping')),
-          array(
+        ],
+        [
+          0 => [0 => 'do_not_import'],
+          1 => [0 => 'first_name'],
+          2 => [0 => 'last_name'],
+          3 => [0 => 'street_address', 1 => 2],
+        ],
+        [
+          ['entity' => 'mapping', 'count' => 1, 'values' => ['name' => 'new mapping']],
+          [
             'entity' =>
             'mapping_field',
             'count' => 4,
-            'values' => array(),
-            'result' => array(
-              0 => array('name' => '- do not import -'),
-              1 => array('name' => 'First Name'),
-              2 => array('name' => 'Last Name'),
-              3 => array('name' => 'Street Address', 'location_type_id' => 2),
-            ),
-          ),
-        ),
-      ),
-    );
+            'values' => [],
+            'result' => [
+              0 => ['name' => '- do not import -'],
+              1 => ['name' => 'First Name'],
+              2 => ['name' => 'Last Name'],
+              3 => ['name' => 'Street Address', 'location_type_id' => 2],
+            ],
+          ],
+        ],
+      ],
+    ];
   }
 
   /**
@@ -137,7 +137,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
   public function getFormObject($class, $formValues = [], $pageName = '') {
     $form = parent::getFormObject($class);
     $contactFields = CRM_Contact_BAO_Contact::importableFields();
-    $fields = array();
+    $fields = [];
     foreach ($contactFields as $name => $field) {
       $fields[$name] = $field['title'];
     }

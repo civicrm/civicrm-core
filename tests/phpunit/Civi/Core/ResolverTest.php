@@ -53,7 +53,7 @@ namespace Civi\Core {
      */
     public function testStatic() {
       $cb = $this->resolver->get('Civi\Core\ResolverTest::dummy');
-      $this->assertEquals(array('Civi\Core\ResolverTest', 'dummy'), $cb);
+      $this->assertEquals(['Civi\Core\ResolverTest', 'dummy'], $cb);
 
       $expected = 'static dummy received foo';
       $actual = call_user_func($cb, 'foo');

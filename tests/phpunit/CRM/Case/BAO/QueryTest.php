@@ -33,37 +33,37 @@ class CRM_Case_BAO_QueryTest extends CiviUnitTestCase {
    *  - case_activity_medium_id
    */
   public function testWhereClauseSingle() {
-    $params = array(
-      0 => array(
+    $params = [
+      0 => [
         0 => 'case_recent_activity_type',
         1 => '=',
         2 => 6,
         3 => 1,
         4 => 0,
-      ),
-      1 => array(
+      ],
+      1 => [
         0 => 'case_activity_status_id',
         1 => '=',
         2 => 1,
         3 => 1,
         4 => 0,
-      ),
-      2 => array(
+      ],
+      2 => [
         0 => 'case_activity_medium_id',
         1 => '=',
         2 => 1,
         3 => 1,
         4 => 0,
-      ),
-    );
+      ],
+    ];
 
     $queryObj = new CRM_Contact_BAO_Query($params, NULL, NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CASE);
     $this->assertEquals(
-      array(
+      [
         0 => 'Activity Type = Contribution',
         1 => 'Activity Type = Scheduled',
         2 => 'Activity Medium = In Person',
-      ),
+      ],
       $queryObj->_qill[1]
     );
   }

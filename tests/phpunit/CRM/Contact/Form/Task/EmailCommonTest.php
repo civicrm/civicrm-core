@@ -32,14 +32,14 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
 
   protected function setUp() {
     parent::setUp();
-    $this->_contactIds = array(
-      $this->individualCreate(array('first_name' => 'Antonia', 'last_name' => 'D`souza')),
-      $this->individualCreate(array('first_name' => 'Anthony', 'last_name' => 'Collins')),
-    );
-    $this->_optionValue = $this->callApiSuccess('optionValue', 'create', array(
+    $this->_contactIds = [
+      $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']),
+      $this->individualCreate(['first_name' => 'Anthony', 'last_name' => 'Collins']),
+    ];
+    $this->_optionValue = $this->callApiSuccess('optionValue', 'create', [
       'label' => '"Seamus Lee" <seamus@example.com>',
       'option_group_id' => 'from_email_address',
-    ));
+    ]);
   }
 
   /**
@@ -48,9 +48,9 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
   public function testDomainEmailGeneration() {
     $emails = CRM_Core_BAO_Email::domainEmails();
     $this->assertNotEmpty($emails);
-    $optionValue = $this->callAPISuccess('OptionValue', 'Get', array(
+    $optionValue = $this->callAPISuccess('OptionValue', 'Get', [
       'id' => $this->_optionValue['id'],
-    ));
+    ]);
     $this->assertTrue(array_key_exists('"Seamus Lee" <seamus@example.com>', $emails));
     $this->assertEquals('"Seamus Lee" <seamus@example.com>', $optionValue['values'][$this->_optionValue['id']]['label']);
   }
@@ -64,9 +64,9 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
     $form->controller = new CRM_Core_Controller();
     for ($i = 0; $i < 27; $i++) {
       $email = 'spy' . $i . '@secretsquirrels.com';
-      $contactID = $this->individualCreate(array('email' => $email));
+      $contactID = $this->individualCreate(['email' => $email]);
       $form->_contactIds[$contactID] = $contactID;
-      $form->_toContactEmails[$this->callAPISuccessGetValue('Email', array('return' => 'id', 'email' => $email))] = $email;
+      $form->_toContactEmails[$this->callAPISuccessGetValue('Email', ['return' => 'id', 'email' => $email])] = $email;
     }
     $loggedInEmail = $this->callAPISuccess('Email', 'create', [
       'email' => 'mickey@mouse.com',
@@ -77,17 +77,17 @@ class CRM_Contact_Form_Task_EmailCommonTest extends CiviUnitTestCase {
       'signature_html' => '<p>This is a test Signature</p>',
     ]);
     $form->_allContactIds = $form->_toContactIds = $form->_contactIds;
-    $form->_emails = array($loggedInEmail['id'] => 'mickey@mouse.com');
-    $form->_fromEmails = array($loggedInEmail['id'] => 'mickey@mouse.com');
+    $form->_emails = [$loggedInEmail['id'] => 'mickey@mouse.com'];
+    $form->_fromEmails = [$loggedInEmail['id'] => 'mickey@mouse.com'];
     CRM_Contact_Form_Task_EmailCommon::preProcessFromAddress($form);
     CRM_Contact_Form_Task_EmailCommon::buildQuickForm($form);
     CRM_Contact_Form_Task_EmailCommon::submit($form, array_merge($form->_defaultValues, [
       'from_email_address' => $loggedInEmail['id'],
       'subject' => 'Really interesting stuff',
     ]));
-    $mut->checkMailLog(array(
+    $mut->checkMailLog([
       'This is a test Signature',
-    ));
+    ]);
     $mut->stop();
     Civi::settings()->set('allow_mail_from_logged_in_contact', 0);
   }

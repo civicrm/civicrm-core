@@ -52,7 +52,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
    */
   public function testSystemCheckBasic($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPISuccess('System', 'check', array());
+    $result = $this->callAPISuccess('System', 'check', []);
     foreach ($result['values'] as $check) {
       if ($check['name'] == 'checkDefaultMailbox') {
         $testedCheck = $check;
@@ -69,19 +69,19 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
    */
   public function testSystemCheckHushForever($version) {
     $this->_apiversion = $version;
-    $this->_params = array(
+    $this->_params = [
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 7,
-    );
+    ];
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
-    $result = $this->callAPISuccess('System', 'check', array());
+    $result = $this->callAPISuccess('System', 'check', []);
     foreach ($result['values'] as $check) {
       if ($check['name'] == 'checkDefaultMailbox') {
         $testedCheck = $check;
         break;
       }
       else {
-        $testedCheck = array();
+        $testedCheck = [];
       }
     }
     $this->assertEquals($testedCheck['is_visible'], '0', 'in line ' . __LINE__);
@@ -95,20 +95,20 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
   public function testSystemCheckHushFuture($version) {
     $this->_apiversion = $version;
     $tomorrow = new DateTime('tomorrow');
-    $this->_params = array(
+    $this->_params = [
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 7,
       'hush_until' => $tomorrow->format('Y-m-d'),
-    );
+    ];
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
-    $result = $this->callAPISuccess('System', 'check', array());
+    $result = $this->callAPISuccess('System', 'check', []);
     foreach ($result['values'] as $check) {
       if ($check['name'] == 'checkDefaultMailbox') {
         $testedCheck = $check;
         break;
       }
       else {
-        $testedCheck = array();
+        $testedCheck = [];
       }
     }
     $this->assertEquals($testedCheck['is_visible'], '0', 'in line ' . __LINE__);;
@@ -122,20 +122,20 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
   public function testSystemCheckHushToday($version) {
     $this->_apiversion = $version;
     $today = new DateTime('today');
-    $this->_params = array(
+    $this->_params = [
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 7,
       'hush_until' => $today->format('Y-m-d'),
-    );
+    ];
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
-    $result = $this->callAPISuccess('System', 'check', array());
+    $result = $this->callAPISuccess('System', 'check', []);
     foreach ($result['values'] as $check) {
       if ($check['name'] == 'checkDefaultMailbox') {
         $testedCheck = $check;
         break;
       }
       else {
-        $testedCheck = array();
+        $testedCheck = [];
       }
     }
     $this->assertEquals($testedCheck['is_visible'], '1', 'in line ' . __LINE__);
@@ -149,20 +149,20 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
   public function testSystemCheckHushYesterday($version) {
     $this->_apiversion = $version;
     $yesterday = new DateTime('yesterday');
-    $this->_params = array(
+    $this->_params = [
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 7,
       'hush_until' => $yesterday->format('Y-m-d'),
-    );
+    ];
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
-    $result = $this->callAPISuccess('System', 'check', array());
+    $result = $this->callAPISuccess('System', 'check', []);
     foreach ($result['values'] as $check) {
       if ($check['name'] == 'checkDefaultMailbox') {
         $testedCheck = $check;
         break;
       }
       else {
-        $testedCheck = array();
+        $testedCheck = [];
       }
     }
     $this->assertEquals($testedCheck['is_visible'], '1', 'in line ' . __LINE__);
@@ -175,19 +175,19 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
    */
   public function testSystemCheckHushAboveSeverity($version) {
     $this->_apiversion = $version;
-    $this->_params = array(
+    $this->_params = [
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 4,
-    );
+    ];
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
-    $result = $this->callAPISuccess('System', 'check', array());
+    $result = $this->callAPISuccess('System', 'check', []);
     foreach ($result['values'] as $check) {
       if ($check['name'] == 'checkDefaultMailbox') {
         $testedCheck = $check;
         break;
       }
       else {
-        $testedCheck = array();
+        $testedCheck = [];
       }
     }
     $this->assertEquals($testedCheck['is_visible'], '0', 'in line ' . __LINE__);
@@ -200,10 +200,10 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
    */
   public function testSystemCheckHushAtSeverity($version) {
     $this->_apiversion = $version;
-    $this->_params = array(
+    $this->_params = [
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 3,
-    );
+    ];
     $this->callAPISuccess('StatusPreference', 'create', $this->_params);
     $result = $this->callAPISuccess('System', 'check');
     foreach ($result['values'] as $check) {
@@ -212,7 +212,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
         break;
       }
       else {
-        $testedCheck = array();
+        $testedCheck = [];
       }
     }
     $this->assertEquals($testedCheck['is_visible'], '0', 'in line ' . __LINE__);
@@ -225,19 +225,19 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
    */
   public function testSystemCheckHushBelowSeverity($version) {
     $this->_apiversion = $version;
-    $this->_params = array(
+    $this->_params = [
       'name' => 'checkDefaultMailbox',
       'ignore_severity' => 2,
-    );
+    ];
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
-    $result = $this->callAPISuccess('System', 'check', array());
+    $result = $this->callAPISuccess('System', 'check', []);
     foreach ($result['values'] as $check) {
       if ($check['name'] == 'checkDefaultMailbox') {
         $testedCheck = $check;
         break;
       }
       else {
-        $testedCheck = array();
+        $testedCheck = [];
       }
     }
     $this->assertEquals($testedCheck['is_visible'], '1', 'in line ' . __LINE__);

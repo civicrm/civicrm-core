@@ -38,10 +38,10 @@ class CRM_Financial_Page_AjaxBatchSummaryTest extends CiviUnitTestCase {
    * does not cause any regression.
    */
   public function testMakeBatchSummary() {
-    $batch = $this->callAPISuccess('Batch', 'create', array('title' => 'test', 'status_id' => 'Open', 'payment_instrument_id' => 'Cash'));
+    $batch = $this->callAPISuccess('Batch', 'create', ['title' => 'test', 'status_id' => 'Open', 'payment_instrument_id' => 'Cash']);
 
     $batchID = $batch['id'];
-    $params = array('id' => $batchID);
+    $params = ['id' => $batchID];
     $makeBatchSummary = CRM_Financial_Page_AJAX::makeBatchSummary($batchID, $params);
 
     $this->assertEquals('Open', $makeBatchSummary['status']);

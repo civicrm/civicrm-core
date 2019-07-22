@@ -40,40 +40,40 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
   protected $_ufGroupId = 11;
   protected $_ufFieldId;
   protected $_contactId;
-  protected $_params = array();
+  protected $_params = [];
 
   protected function setUp() {
     parent::setUp();
     $this->quickCleanup(
-      array(
+      [
         'civicrm_group',
         'civicrm_contact',
         'civicrm_uf_group',
         'civicrm_uf_join',
         'civicrm_uf_match',
-      )
+      ]
     );
     $this->_contactId = $this->individualCreate();
     $this->loadXMLDataSet(dirname(__FILE__) . '/dataset/uf_group_test.xml');
 
-    $this->_params = array(
+    $this->_params = [
       'contact_id' => $this->_contactId,
       'uf_id' => '2',
       'uf_name' => 'blahdyblah@gmail.com',
       'domain_id' => 1,
-    );
+    ];
   }
 
   public function tearDown() {
     //  Truncate the tables
     $this->quickCleanup(
-      array(
+      [
         'civicrm_group',
         'civicrm_contact',
         'civicrm_uf_group',
         'civicrm_uf_join',
         'civicrm_uf_match',
-      )
+      ]
     );
   }
 
@@ -84,9 +84,9 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
    */
   public function testGetUFMatchID($version) {
     $this->_apiversion = $version;
-    $params = array(
+    $params = [
       'uf_id' => 42,
-    );
+    ];
     $result = $this->callAPISuccess('uf_match', 'get', $params);
     $this->assertEquals($result['values'][$result['id']]['contact_id'], 69);
   }
@@ -108,9 +108,9 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
    */
   public function testGetUFID($version) {
     $this->_apiversion = $version;
-    $params = array(
+    $params = [
       'contact_id' => 69,
-    );
+    ];
     $result = $this->callAPIAndDocument('uf_match', 'get', $params, __FUNCTION__, __FILE__);
     $this->assertEquals($result['values'][$result['id']]['uf_id'], 42);
   }
@@ -161,28 +161,28 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
 
     // Case A: Enable CMS integration
     Civi::settings()->set('syncCMSEmail', TRUE);
-    $this->callAPISuccess('email', 'create', array(
+    $this->callAPISuccess('email', 'create', [
       'contact_id' => $this->_contactId,
       'email' => $email1,
       'is_primary' => 1,
-    ));
-    $ufName = $this->callAPISuccess('uf_match', 'getvalue', array(
+    ]);
+    $ufName = $this->callAPISuccess('uf_match', 'getvalue', [
       'contact_id' => $this->_contactId,
       'return' => 'uf_name',
-    ));
+    ]);
     $this->assertEquals($email1, $ufName);
 
     // Case B: Disable CMS integration
     Civi::settings()->set('syncCMSEmail', FALSE);
-    $this->callAPISuccess('email', 'create', array(
+    $this->callAPISuccess('email', 'create', [
       'contact_id' => $this->_contactId,
       'email' => $email2,
       'is_primary' => 1,
-    ));
-    $ufName = $this->callAPISuccess('uf_match', 'getvalue', array(
+    ]);
+    $ufName = $this->callAPISuccess('uf_match', 'getvalue', [
       'contact_id' => $this->_contactId,
       'return' => 'uf_name',
-    ));
+    ]);
     $this->assertNotEquals($email2, $ufName, 'primary email will not match if changed on disabled CMS integration setting');
     $this->assertEquals($email1, $ufName);
   }
@@ -194,15 +194,15 @@ class api_v3_UFMatchTest extends CiviUnitTestCase {
   public function testDelete($version) {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess('uf_match', 'create', $this->_params);
-    $this->assertEquals(1, $this->callAPISuccess('uf_match', 'getcount', array(
+    $this->assertEquals(1, $this->callAPISuccess('uf_match', 'getcount', [
       'id' => $result['id'],
-    )));
-    $this->callAPISuccess('uf_match', 'delete', array(
+    ]));
+    $this->callAPISuccess('uf_match', 'delete', [
       'id' => $result['id'],
-    ));
-    $this->assertEquals(0, $this->callAPISuccess('uf_match', 'getcount', array(
+    ]);
+    $this->assertEquals(0, $this->callAPISuccess('uf_match', 'getcount', [
       'id' => $result['id'],
-    )));
+    ]));
   }
 
 }

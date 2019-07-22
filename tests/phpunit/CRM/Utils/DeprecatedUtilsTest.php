@@ -14,12 +14,12 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
 
   public function tearDown() {
     // truncate a few tables
-    $tablesToTruncate = array(
+    $tablesToTruncate = [
       'civicrm_contact',
       'civicrm_email',
       'civicrm_contribution',
       'civicrm_website',
-    );
+    ];
 
     $this->quickCleanup($tablesToTruncate);
   }
@@ -28,7 +28,7 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
    *  Test civicrm_contact_check_params with no contact type.
    */
   public function testCheckParamsWithNoContactType() {
-    $params = array('foo' => 'bar');
+    $params = ['foo' => 'bar'];
     $contact = _civicrm_api3_deprecated_contact_check_params($params, FALSE);
     $this->assertEquals(1, $contact['is_error']);
   }
@@ -58,7 +58,7 @@ class CRM_Utils_DeprecatedUtilsTest extends CiviUnitTestCase {
    *  params and no params
    */
   public function testCheckParamsWithNoParams() {
-    $params = array();
+    $params = [];
     $contact = _civicrm_api3_deprecated_contact_check_params($params, FALSE);
     $this->assertEquals(1, $contact['is_error']);
   }

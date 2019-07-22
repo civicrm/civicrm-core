@@ -9,7 +9,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
 
-    $this->tablesToTruncate = array(
+    $this->tablesToTruncate = [
       'civicrm_activity',
       'civicrm_contact',
       'civicrm_custom_group',
@@ -22,7 +22,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'civicrm_managed',
       'civicrm_relationship',
       'civicrm_relationship_type',
-    );
+    ];
 
     $this->quickCleanup($this->tablesToTruncate);
 
@@ -59,10 +59,10 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   }
 
   public function testAddCaseToContact() {
-    $params = array(
+    $params = [
       'case_id' => 1,
       'contact_id' => 17,
-    );
+    ];
     CRM_Case_BAO_CaseContact::create($params);
 
     $recent = CRM_Utils_Recent::get();
@@ -80,7 +80,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       // backwards compatibility - but it's more typical that the creator is a different person than the client
       $loggedInUser = $clientId;
     }
-    $caseParams = array(
+    $caseParams = [
       'activity_subject' => 'Case Subject',
       'client_id'        => $clientId,
       'case_type_id'     => 1,
@@ -91,7 +91,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'start_date_time'  => date("YmdHis"),
       'medium_id'        => 2,
       'activity_details' => '',
-    );
+    ];
     $form = new CRM_Case_Form_Case();
     $caseObj = $form->testSubmit($caseParams, "OpenCase", $loggedInUser, "standalone");
     return $caseObj;
@@ -110,13 +110,13 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'contact_type_b' => 'Individual',
     ]);
 
-    $this->callAPISuccess('Relationship', 'create', array(
+    $this->callAPISuccess('Relationship', 'create', [
       'contact_id_a'         => $contactIdA,
       'contact_id_b'         => $contactIdB,
       'relationship_type_id' => $relationshipType,
       'case_id'              => $caseId,
       'is_active'            => $isActive,
-    ));
+    ]);
   }
 
   /**
@@ -128,7 +128,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    */
   private function assertCasesOfUser($loggedInUser, $caseId, $caseCount) {
     $summary = CRM_Case_BAO_Case::getCasesSummary(FALSE);
-    $upcomingCases = CRM_Case_BAO_Case::getCases(FALSE, array(), 'dashboard', TRUE);
+    $upcomingCases = CRM_Case_BAO_Case::getCases(FALSE, [], 'dashboard', TRUE);
     $caseRoles = CRM_Case_BAO_Case::getCaseRoles($loggedInUser, $caseId);
 
     $this->assertEquals($caseCount, $upcomingCases, 'Upcoming case count must be ' . $caseCount);
@@ -167,7 +167,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
   public function testRetrieveCaseIdsByContactId() {
     $caseIds = CRM_Case_BAO_Case::retrieveCaseIdsByContactId(3, FALSE, 'housing_support');
-    $this->assertEquals(array(1), $caseIds);
+    $this->assertEquals([1], $caseIds);
   }
 
   /**

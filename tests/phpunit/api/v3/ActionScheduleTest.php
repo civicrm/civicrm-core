@@ -55,7 +55,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $title = "simpleActionSchedule" . substr(sha1(rand()), 0, 7);
-    $params = array(
+    $params = [
       'title' => $title,
       'recipient' => $assigneeID,
       'limit_to' => 1,
@@ -65,7 +65,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
       'record_activity' => 1,
       'start_action_date' => 'activity_date_time',
       'mapping_id' => CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID,
-    );
+    ];
     $actionSchedule = $this->callAPISuccess('action_schedule', 'create', $params);
     $this->assertTrue(is_numeric($actionSchedule['id']));
     $this->assertTrue($actionSchedule['id'] > 0);
@@ -80,10 +80,10 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
    */
   public function testActionScheduleCreateWithoutRequired($version) {
     $this->_apiversion = $version;
-    $params = array(
+    $params = [
       'subject' => 'this case should fail',
       'scheduled_date_time' => date('Ymd'),
-    );
+    ];
     $this->callAPIFailure('activity', 'create', $params);
   }
 
@@ -98,7 +98,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
     $activityContacts = CRM_Activity_BAO_ActivityContact::buildOptions('record_type_id', 'validate');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $title = "simpleActionSchedule" . substr(sha1(rand()), 0, 7);
-    $params = array(
+    $params = [
       'title' => $title,
       'recipient' => $assigneeID,
       'limit_to' => 1,
@@ -120,7 +120,7 @@ class api_v3_ActionScheduleTest extends CiviUnitTestCase {
       'end_date' => 'activity_date_time',
       'body_html' => 'Test description',
       'subject' => 'Test subject',
-    );
+    ];
     $actionSchedule = $this->callAPISuccess('action_schedule', 'create', $params);
     $this->assertTrue(is_numeric($actionSchedule['id']));
     $this->assertTrue($actionSchedule['id'] > 0);

@@ -113,7 +113,7 @@ class CRM_Activity_BAO_ActivityAssignmentTest extends CiviUnitTestCase {
    */
   public function testGetAssigneeNamesOneId() {
     $activity = $this->activityCreate();
-    $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames(array($activity['id']));
+    $assignees = CRM_Activity_BAO_ActivityAssignment::getAssigneeNames([$activity['id']]);
     $this->assertEquals(count($assignees), 1, '1 assignee names retrieved');
   }
 

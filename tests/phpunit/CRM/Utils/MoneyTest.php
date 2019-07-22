@@ -36,14 +36,14 @@ class CRM_Utils_MoneyTest extends CiviUnitTestCase {
    * @return array
    */
   public function subtractCurrenciesDataProvider() {
-    return array(
-      array(number_format(300.00, 2), number_format(299.99, 2), 'USD', number_format(0.01, 2)),
-      array(2, 1, 'USD', 1),
-      array(0, 0, 'USD', 0),
-      array(1, 2, 'USD', -1),
-      array(number_format(19.99, 2), number_format(20.00, 2), 'USD', number_format(-0.01, 2)),
-      array('notanumber', 5.00, 'USD', NULL),
-    );
+    return [
+      [number_format(300.00, 2), number_format(299.99, 2), 'USD', number_format(0.01, 2)],
+      [2, 1, 'USD', 1],
+      [0, 0, 'USD', 0],
+      [1, 2, 'USD', -1],
+      [number_format(19.99, 2), number_format(20.00, 2), 'USD', number_format(-0.01, 2)],
+      ['notanumber', 5.00, 'USD', NULL],
+    ];
   }
 
   /**

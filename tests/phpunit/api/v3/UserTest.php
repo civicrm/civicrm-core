@@ -43,10 +43,10 @@ class api_v3_UserTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->contactID = $this->createLoggedInUser();
-    $this->params = array(
+    $this->params = [
       'contact_id' => $this->contactID,
       'sequential' => 1,
-    );
+    ];
   }
 
   public function testUserGet() {
@@ -61,7 +61,7 @@ class api_v3_UserTest extends CiviUnitTestCase {
    * Test retrieval of label metadata.
    */
   public function testGetFields() {
-    $result = $this->callAPIAndDocument($this->_entity, 'getfields', array('action' => 'get'), __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'getfields', ['action' => 'get'], __FUNCTION__, __FILE__);
     $this->assertArrayKeyExists('name', $result['values']);
   }
 

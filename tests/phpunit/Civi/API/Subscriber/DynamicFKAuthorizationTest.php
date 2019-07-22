@@ -35,36 +35,36 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     $fileProvider = new \Civi\API\Provider\StaticProvider(
       3,
       'FakeFile',
-      array('id', 'entity_table', 'entity_id'),
-      array(),
-      array(
-        array('id' => self::FILE_WIDGET_ID, 'entity_table' => 'fake_widget', 'entity_id' => self::WIDGET_ID),
-        array('id' => self::FILE_FORBIDDEN_ID, 'entity_table' => 'fake_forbidden', 'entity_id' => self::FORBIDDEN_ID),
-      )
+      ['id', 'entity_table', 'entity_id'],
+      [],
+      [
+        ['id' => self::FILE_WIDGET_ID, 'entity_table' => 'fake_widget', 'entity_id' => self::WIDGET_ID],
+        ['id' => self::FILE_FORBIDDEN_ID, 'entity_table' => 'fake_forbidden', 'entity_id' => self::FORBIDDEN_ID],
+      ]
     );
 
     \CRM_Core_DAO_AllCoreTables::registerEntityType('Widget', 'CRM_Fake_DAO_Widget', 'fake_widget');
     $widgetProvider = new \Civi\API\Provider\StaticProvider(3, 'Widget',
-      array('id', 'title'),
-      array(),
-      array(
-        array('id' => self::WIDGET_ID, 'title' => 'my widget'),
-      )
+      ['id', 'title'],
+      [],
+      [
+        ['id' => self::WIDGET_ID, 'title' => 'my widget'],
+      ]
     );
 
     \CRM_Core_DAO_AllCoreTables::registerEntityType('Forbidden', 'CRM_Fake_DAO_Forbidden', 'fake_forbidden');
     $forbiddenProvider = new \Civi\API\Provider\StaticProvider(
       3,
       'Forbidden',
-      array('id', 'label'),
-      array(
+      ['id', 'label'],
+      [
         'create' => \CRM_Core_Permission::ALWAYS_DENY_PERMISSION,
         'get' => \CRM_Core_Permission::ALWAYS_DENY_PERMISSION,
         'delete' => \CRM_Core_Permission::ALWAYS_DENY_PERMISSION,
-      ),
-      array(
-        array('id' => self::FORBIDDEN_ID, 'label' => 'my forbidden'),
-      )
+      ],
+      [
+        ['id' => self::FORBIDDEN_ID, 'label' => 'my forbidden'],
+      ]
     );
 
     $this->dispatcher = new EventDispatcher();
@@ -76,7 +76,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     $this->dispatcher->addSubscriber(new DynamicFKAuthorization(
       $this->kernel,
       'FakeFile',
-      array('create', 'get'),
+      ['create', 'get'],
       // Given a file ID, determine the entity+table it's attached to.
       "select
       case %1
@@ -97,7 +97,7 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
       ",
       // Get a list of custom fields (field_name,table_name,extends)
       "select",
-      array('fake_widget', 'fake_forbidden')
+      ['fake_widget', 'fake_forbidden']
     ));
   }
 
@@ -110,18 +110,18 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
    * @return array
    */
   public function okDataProvider() {
-    $cases = array();
+    $cases = [];
 
-    $cases[] = array('Widget', 'create', array('id' => self::WIDGET_ID));
-    $cases[] = array('Widget', 'get', array('id' => self::WIDGET_ID));
+    $cases[] = ['Widget', 'create', ['id' => self::WIDGET_ID]];
+    $cases[] = ['Widget', 'get', ['id' => self::WIDGET_ID]];
 
-    $cases[] = array('FakeFile', 'create', array('id' => self::FILE_WIDGET_ID));
-    $cases[] = array('FakeFile', 'get', array('id' => self::FILE_WIDGET_ID));
-    $cases[] = array(
+    $cases[] = ['FakeFile', 'create', ['id' => self::FILE_WIDGET_ID]];
+    $cases[] = ['FakeFile', 'get', ['id' => self::FILE_WIDGET_ID]];
+    $cases[] = [
       'FakeFile',
       'create',
-      array('entity_table' => 'fake_widget', 'entity_id' => self::WIDGET_ID),
-    );
+      ['entity_table' => 'fake_widget', 'entity_id' => self::WIDGET_ID],
+    ];
 
     return $cases;
   }
@@ -130,48 +130,48 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
    * @return array
    */
   public function badDataProvider() {
-    $cases = array();
+    $cases = [];
 
-    $cases[] = array('Forbidden', 'create', array('id' => self::FORBIDDEN_ID), '/Authorization failed/');
-    $cases[] = array('Forbidden', 'get', array('id' => self::FORBIDDEN_ID), '/Authorization failed/');
+    $cases[] = ['Forbidden', 'create', ['id' => self::FORBIDDEN_ID], '/Authorization failed/'];
+    $cases[] = ['Forbidden', 'get', ['id' => self::FORBIDDEN_ID], '/Authorization failed/'];
 
-    $cases[] = array('FakeFile', 'create', array('id' => self::FILE_FORBIDDEN_ID), '/Authorization failed/');
-    $cases[] = array('FakeFile', 'get', array('id' => self::FILE_FORBIDDEN_ID), '/Authorization failed/');
+    $cases[] = ['FakeFile', 'create', ['id' => self::FILE_FORBIDDEN_ID], '/Authorization failed/'];
+    $cases[] = ['FakeFile', 'get', ['id' => self::FILE_FORBIDDEN_ID], '/Authorization failed/'];
 
-    $cases[] = array('FakeFile', 'create', array('entity_table' => 'fake_forbidden'), '/Authorization failed/');
-    $cases[] = array('FakeFile', 'get', array('entity_table' => 'fake_forbidden'), '/Authorization failed/');
+    $cases[] = ['FakeFile', 'create', ['entity_table' => 'fake_forbidden'], '/Authorization failed/'];
+    $cases[] = ['FakeFile', 'get', ['entity_table' => 'fake_forbidden'], '/Authorization failed/'];
 
-    $cases[] = array(
+    $cases[] = [
       'FakeFile',
       'create',
-      array('entity_table' => 'fake_forbidden', 'entity_id' => self::FORBIDDEN_ID),
+      ['entity_table' => 'fake_forbidden', 'entity_id' => self::FORBIDDEN_ID],
       '/Authorization failed/',
-    );
-    $cases[] = array(
+    ];
+    $cases[] = [
       'FakeFile',
       'get',
-      array('entity_table' => 'fake_forbidden', 'entity_id' => self::FORBIDDEN_ID),
+      ['entity_table' => 'fake_forbidden', 'entity_id' => self::FORBIDDEN_ID],
       '/Authorization failed/',
-    );
+    ];
 
-    $cases[] = array(
+    $cases[] = [
       'FakeFile',
       'create',
-      array(),
+      [],
       "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table/",
-    );
-    $cases[] = array(
+    ];
+    $cases[] = [
       'FakeFile',
       'get',
-      array(),
+      [],
       "/Mandatory key\\(s\\) missing from params array: 'id' or 'entity_table/",
-    );
+    ];
 
-    $cases[] = array('FakeFile', 'create', array('entity_table' => 'unknown'), '/Unrecognized target entity/');
-    $cases[] = array('FakeFile', 'get', array('entity_table' => 'unknown'), '/Unrecognized target entity/');
+    $cases[] = ['FakeFile', 'create', ['entity_table' => 'unknown'], '/Unrecognized target entity/'];
+    $cases[] = ['FakeFile', 'get', ['entity_table' => 'unknown'], '/Unrecognized target entity/'];
 
     // We should be allowed to lookup files for fake_widgets, but we need an ID.
-    $cases[] = array('FakeFile', 'get', array('entity_table' => 'fake_widget'), '/Missing entity_id/');
+    $cases[] = ['FakeFile', 'get', ['entity_table' => 'fake_widget'], '/Missing entity_id/'];
 
     return $cases;
   }
@@ -187,12 +187,12 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     $params['debug'] = 1;
     $params['check_permissions'] = 1;
     $result = $this->kernel->run($entity, $action, $params);
-    $this->assertFalse((bool) $result['is_error'], print_r(array(
+    $this->assertFalse((bool) $result['is_error'], print_r([
       '$entity' => $entity,
       '$action' => $action,
       '$params' => $params,
       '$result' => $result,
-    ), TRUE));
+    ], TRUE));
   }
 
   /**
@@ -207,12 +207,12 @@ class DynamicFKAuthorizationTest extends \CiviUnitTestCase {
     $params['debug'] = 1;
     $params['check_permissions'] = 1;
     $result = $this->kernel->run($entity, $action, $params);
-    $this->assertTrue((bool) $result['is_error'], print_r(array(
+    $this->assertTrue((bool) $result['is_error'], print_r([
       '$entity' => $entity,
       '$action' => $action,
       '$params' => $params,
       '$result' => $result,
-    ), TRUE));
+    ], TRUE));
     $this->assertRegExp($expectedError, $result['error_message']);
   }
 

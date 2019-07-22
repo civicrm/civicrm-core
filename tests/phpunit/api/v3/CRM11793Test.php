@@ -55,9 +55,9 @@ class api_v3_CRM11793Test extends CiviUnitTestCase {
     $result = $this->callAPISuccess(
       'contact',
       'get',
-      array(
+      [
         'contact_type' => $contactType,
-      )
+      ]
     );
 
     foreach ($result['values'] as $idx => $contact) {

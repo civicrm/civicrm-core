@@ -41,36 +41,36 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
   }
 
   public function _populateOptionAndCustomGroup($type = NULL) {
-    $dataValues = array(
-      'integer' => array(1, 2, 3),
-      'number' => array(10.11, 20.22, 30.33),
-      'string' => array(substr(sha1(rand()), 0, 4) . '(', substr(sha1(rand()), 0, 3) . '|', substr(sha1(rand()), 0, 2) . ','),
+    $dataValues = [
+      'integer' => [1, 2, 3],
+      'number' => [10.11, 20.22, 30.33],
+      'string' => [substr(sha1(rand()), 0, 4) . '(', substr(sha1(rand()), 0, 3) . '|', substr(sha1(rand()), 0, 2) . ','],
       // 'country' => array_rand(CRM_Core_PseudoConstant::country(FALSE, FALSE), 3),
       // This does not work in the test at the moment due to caching issues.
       //'state_province' => array_rand(CRM_Core_PseudoConstant::stateProvince(FALSE, FALSE), 3),
       'date' => NULL,
       'contact' => NULL,
       'boolean' => NULL,
-    );
+    ];
 
-    $dataValues = !empty($type) ? array($type => $dataValues[$type]) : $dataValues;
+    $dataValues = !empty($type) ? [$type => $dataValues[$type]] : $dataValues;
 
     foreach ($dataValues as $dataType => $values) {
-      $this->optionGroup[$dataType] = array('values' => $values);
+      $this->optionGroup[$dataType] = ['values' => $values];
       if (!empty($values)) {
         $result = $this->callAPISuccess('OptionGroup', 'create',
-          array(
+          [
             'name' => "{$dataType}_group",
-            'api.option_value.create' => array('label' => "$dataType 1", 'value' => $values[0]),
-            'api.option_value.create.1' => array('label' => "$dataType 2", 'value' => $values[1]),
-            'api.option_value.create.2' => array('label' => "$dataType 3", 'value' => $values[2]),
-          )
+            'api.option_value.create' => ['label' => "$dataType 1", 'value' => $values[0]],
+            'api.option_value.create.1' => ['label' => "$dataType 2", 'value' => $values[1]],
+            'api.option_value.create.2' => ['label' => "$dataType 3", 'value' => $values[2]],
+          ]
         );
         $this->optionGroup[$dataType]['id'] = $result['id'];
       }
       elseif ($dataType == 'contact') {
         for ($i = 0; $i < 3; $i++) {
-          $result = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . '@yahoo.com'));
+          $result = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . '@yahoo.com']);
           $this->optionGroup[$dataType]['values'][$i] = $result['id'];
         }
       }
@@ -80,12 +80,12 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
   }
 
   public function tearDown() {
-    $tablesToTruncate = array(
+    $tablesToTruncate = [
       'civicrm_email',
       'civicrm_custom_field',
       'civicrm_custom_group',
       'civicrm_contact',
-    );
+    ];
 
     // true tells quickCleanup to drop any tables that might have been created in the test
     $this->quickCleanup($tablesToTruncate, TRUE);
@@ -94,9 +94,9 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     if (!empty($this->optionGroup)) {
       foreach ($this->optionGroup as $type => $value) {
         if (!empty($value['id'])) {
-          $count = $this->callAPISuccess('OptionGroup', 'get', array('id' => $value['id']));
+          $count = $this->callAPISuccess('OptionGroup', 'get', ['id' => $value['id']]);
           if ((bool) $count['count']) {
-            $this->callAPISuccess('OptionGroup', 'delete', array('id' => $value['id']));
+            $this->callAPISuccess('OptionGroup', 'delete', ['id' => $value['id']]);
           }
         }
       }
@@ -105,13 +105,13 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
 
   public function testCreateCustomValue() {
     $this->_populateOptionAndCustomGroup();
-    $this->_customField = $this->customFieldCreate(array('custom_group_id' => $this->ids['string']['custom_group_id']));
+    $this->_customField = $this->customFieldCreate(['custom_group_id' => $this->ids['string']['custom_group_id']]);
     $this->_customFieldID = $this->_customField['id'];
 
     $customFieldDataType = CRM_Core_BAO_CustomField::dataType();
     $dataToHtmlTypes = CRM_Core_BAO_CustomField::dataToHtml();
     $count = 0;
-    $optionSupportingHTMLTypes = array('Select', 'Radio', 'CheckBox', 'Autocomplete-Select', 'Multi-Select');
+    $optionSupportingHTMLTypes = ['Select', 'Radio', 'CheckBox', 'Autocomplete-Select', 'Multi-Select'];
 
     foreach ($customFieldDataType as $dataType => $label) {
       switch ($dataType) {
@@ -126,12 +126,12 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
         case 'Boolean':
 
           //Based on the custom field data-type choose desired SQL operators(to test with) and basic $type
-          if (in_array($dataType, array('String', 'Link'))) {
-            $validSQLOperators = array('=', '!=', 'IN', 'NOT IN', 'LIKE', 'NOT LIKE', 'IS NOT NULL', 'IS NULL');
+          if (in_array($dataType, ['String', 'Link'])) {
+            $validSQLOperators = ['=', '!=', 'IN', 'NOT IN', 'LIKE', 'NOT LIKE', 'IS NOT NULL', 'IS NULL'];
             $type = 'string';
           }
           elseif ($dataType == 'Boolean') {
-            $validSQLOperators = array('=', '!=', 'IS NOT NULL', 'IS NULL');
+            $validSQLOperators = ['=', '!=', 'IS NOT NULL', 'IS NULL'];
             $type = 'boolean';
           }
           else {
@@ -150,7 +150,7 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
             else {
               $type = $dataType == 'Int' ? 'integer' : 'number';
             }
-            $validSQLOperators = array('=', '!=', 'IN', 'NOT IN', '<=', '>=', '>', '<', 'IS NOT NULL', 'IS NULL');
+            $validSQLOperators = ['=', '!=', 'IN', 'NOT IN', '<=', '>=', '>', '<', 'IS NOT NULL', 'IS NULL'];
           }
 
           //Create custom field of $dataType and html-type $html
@@ -159,17 +159,17 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
             // the LIKE operator could potentially bypass ACLs (as could IS NOT NULL) and some thought needs to be given
             // to it.
             if (in_array($html, $optionSupportingHTMLTypes)) {
-              $validSQLOperators = array_diff($validSQLOperators, array('LIKE', 'NOT LIKE'));
+              $validSQLOperators = array_diff($validSQLOperators, ['LIKE', 'NOT LIKE']);
             }
-            $params = array(
+            $params = [
               'custom_group_id' => $this->ids[$type]['custom_group_id'],
               'label' => "$dataType - $html",
               'data_type' => $dataType,
               'html_type' => $html,
               'default_value' => NULL,
-            );
-            if (!in_array($html, array('Text', 'TextArea')) && !in_array($dataType, array('Link', 'Date', 'ContactReference', 'Boolean'))) {
-              $params += array('option_group_id' => $this->optionGroup[$type]['id']);
+            ];
+            if (!in_array($html, ['Text', 'TextArea']) && !in_array($dataType, ['Link', 'Date', 'ContactReference', 'Boolean'])) {
+              $params += ['option_group_id' => $this->optionGroup[$type]['id']];
             }
             $customField = $this->customFieldCreate($params);
             //Now test with $validSQLOperator SQL operators against its custom value(s)
@@ -189,10 +189,10 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
   public function _testCustomValue($customField, $sqlOps, $type) {
     $isSerialized = CRM_Core_BAO_CustomField::isSerialized($customField);
     $customId = $customField['id'];
-    $params = array(
+    $params = [
       'contact_type' => 'Individual',
       'email' => substr(sha1(rand()), 0, 7) . 'man1@yahoo.com',
-    );
+    ];
     $result = $this->callAPISuccess('Contact', 'create', $params);
     $contactId = $result['id'];
 
@@ -268,12 +268,12 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
       switch ($op) {
         case '=':
-          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => (is_array($selectedValue) ? implode(CRM_Core_DAO::VALUE_SEPARATOR, $selectedValue) : $selectedValue)));
+          $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customId => (is_array($selectedValue) ? implode(CRM_Core_DAO::VALUE_SEPARATOR, $selectedValue) : $selectedValue)]);
           $this->assertEquals($contactId, $result['id']);
           break;
 
         case '!=':
-          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $notselectedValue)));
+          $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customId => [$op => $notselectedValue]]);
           $this->assertEquals(TRUE, array_key_exists($contactId, $result['values']));
           break;
 
@@ -286,24 +286,24 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
           }
           // To be precise in for these operator we can't just rely on one contact,
           // hence creating multiple contact with custom value less/more then $selectedValue respectively
-          $result = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . 'man2@yahoo.com'));
+          $result = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . 'man2@yahoo.com']);
           $contactId2 = $result['id'];
-          $this->callAPISuccess('CustomValue', 'create', array('entity_id' => $contactId2, 'custom_' . $customId => $lesserSelectedValue));
+          $this->callAPISuccess('CustomValue', 'create', ['entity_id' => $contactId2, 'custom_' . $customId => $lesserSelectedValue]);
 
           if ($op == '>') {
-            $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $lesserSelectedValue)));
+            $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customId => [$op => $lesserSelectedValue]]);
             $this->assertEquals($contactId, $result['id']);
           }
           elseif ($op == '<') {
-            $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $selectedValue)));
+            $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customId => [$op => $selectedValue]]);
             $this->assertEquals($contactId2, $result['id']);
           }
           else {
-            $result = $this->callAPISuccess('Contact', 'create', array('contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . 'man3@yahoo.com'));
+            $result = $this->callAPISuccess('Contact', 'create', ['contact_type' => 'Individual', 'email' => substr(sha1(rand()), 0, 7) . 'man3@yahoo.com']);
             $contactId3 = $result['id'];
-            $this->callAPISuccess('CustomValue', 'create', array('entity_id' => $contactId3, 'custom_' . $customId => $greaterSelectedValue));
+            $this->callAPISuccess('CustomValue', 'create', ['entity_id' => $contactId3, 'custom_' . $customId => $greaterSelectedValue]);
 
-            $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $selectedValue)));
+            $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customId => [$op => $selectedValue]]);
 
             $this->assertEquals($contactId, $result['values'][$contactId]['id']);
             if ($op == '>=') {
@@ -312,46 +312,46 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
             else {
               $this->assertEquals($contactId2, $result['values'][$contactId2]['id']);
             }
-            $this->callAPISuccess('contact', 'delete', array('id' => $contactId3));
+            $this->callAPISuccess('contact', 'delete', ['id' => $contactId3]);
           }
 
-          $this->callAPISuccess('contact', 'delete', array('id' => $contactId2));
+          $this->callAPISuccess('contact', 'delete', ['id' => $contactId2]);
           break;
 
         case 'IN':
-          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => (array) $selectedValue)));
+          $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customId => [$op => (array) $selectedValue]]);
           $this->assertEquals($contactId, $result['id']);
           break;
 
         case 'NOT IN':
-          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => (array) $notselectedValue)));
+          $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customId => [$op => (array) $notselectedValue]]);
           $this->assertEquals($contactId, $result['id']);
           break;
 
         case 'LIKE':
           $selectedValue = is_array($selectedValue) ? $selectedValue[0] : $selectedValue;
-          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => "%$selectedValue%")));
+          $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customId => [$op => "%$selectedValue%"]]);
           $this->assertEquals($contactId, $result['id']);
           break;
 
         case 'NOT LIKE':
-          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => $notselectedValue)));
+          $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customId => [$op => $notselectedValue]]);
           $this->assertEquals($contactId, $result['id']);
           break;
 
         case 'IS NULL':
-          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => 1)));
+          $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customId => [$op => 1]]);
           $this->assertEquals(FALSE, array_key_exists($contactId, $result['values']));
           break;
 
         case 'IS NOT NULL':
-          $result = $this->callAPISuccess('Contact', 'Get', array('custom_' . $customId => array($op => 1)));
+          $result = $this->callAPISuccess('Contact', 'Get', ['custom_' . $customId => [$op => 1]]);
           $this->assertEquals($contactId, $result['id']);
           break;
       }
     }
 
-    $this->callAPISuccess('Contact', 'delete', array('id' => $contactId));
+    $this->callAPISuccess('Contact', 'delete', ['id' => $contactId]);
   }
 
   /**
@@ -364,31 +364,31 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
   public function testAlterOptionValue() {
     $this->_populateOptionAndCustomGroup('string');
 
-    $selectField = $this->customFieldCreate(array(
+    $selectField = $this->customFieldCreate([
       'custom_group_id' => $this->ids['string']['custom_group_id'],
       'label' => 'Custom Select',
       'html_type' => 'Select',
       'option_group_id' => $this->optionGroup['string']['id'],
-    ));
-    $selectField = civicrm_api3('customField', 'getsingle', array('id' => $selectField['id']));
-    $radioField = $this->customFieldCreate(array(
+    ]);
+    $selectField = civicrm_api3('customField', 'getsingle', ['id' => $selectField['id']]);
+    $radioField = $this->customFieldCreate([
       'custom_group_id' => $this->ids['string']['custom_group_id'],
       'label' => 'Custom Radio',
       'html_type' => 'Radio',
       'option_group_id' => $selectField['option_group_id'],
-    ));
-    $multiSelectField = $this->customFieldCreate(array(
+    ]);
+    $multiSelectField = $this->customFieldCreate([
       'custom_group_id' => $this->ids['string']['custom_group_id'],
       'label' => 'Custom Multi-Select',
       'html_type' => 'Multi-Select',
       'option_group_id' => $selectField['option_group_id'],
-    ));
+    ]);
     $selectName = 'custom_' . $selectField['id'];
     $radioName = 'custom_' . $radioField['id'];
     $multiSelectName = 'custom_' . $multiSelectField['id'];
     $controlFieldName = 'custom_' . $this->ids['string']['custom_field_id'];
 
-    $params = array(
+    $params = [
       'first_name' => 'abc4',
       'last_name' => 'xyz4',
       'contact_type' => 'Individual',
@@ -398,109 +398,109 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
       $radioName => $this->optionGroup['string']['values'][1],
       // The control group in a science experiment should be unaffected
       $controlFieldName => $this->optionGroup['string']['values'][2],
-    );
+    ];
 
     $contact = $this->callAPISuccess('Contact', 'create', $params);
 
-    $result = $this->callAPISuccess('Contact', 'getsingle', array(
+    $result = $this->callAPISuccess('Contact', 'getsingle', [
       'id' => $contact['id'],
-      'return' => array($selectName, $multiSelectName),
-    ));
+      'return' => [$selectName, $multiSelectName],
+    ]);
     $this->assertEquals($params[$selectName], $result[$selectName]);
     $this->assertEquals($params[$multiSelectName], $result[$multiSelectName]);
 
-    $this->callAPISuccess('OptionValue', 'create', array(
+    $this->callAPISuccess('OptionValue', 'create', [
       'value' => 'one-modified',
       'option_group_id' => $selectField['option_group_id'],
       'name' => 'string 1',
-      'options' => array(
-        'match-mandatory' => array('option_group_id', 'name'),
-      ),
-    ));
+      'options' => [
+        'match-mandatory' => ['option_group_id', 'name'],
+      ],
+    ]);
 
-    $result = $this->callAPISuccess('Contact', 'getsingle', array(
+    $result = $this->callAPISuccess('Contact', 'getsingle', [
       'id' => $contact['id'],
-      'return' => array($selectName, $multiSelectName, $controlFieldName, $radioName),
-    ));
+      'return' => [$selectName, $multiSelectName, $controlFieldName, $radioName],
+    ]);
     // Ensure the relevant fields have been updated
     $this->assertEquals('one-modified', $result[$selectName]);
-    $this->assertEquals(array('one-modified', $params[$radioName], $params[$controlFieldName]), $result[$multiSelectName]);
+    $this->assertEquals(['one-modified', $params[$radioName], $params[$controlFieldName]], $result[$multiSelectName]);
     // This field should not have changed because we didn't alter this option
     $this->assertEquals($params[$radioName], $result[$radioName]);
     // This should not have changed because this field doesn't use the affected option group
     $this->assertEquals($params[$controlFieldName], $result[$controlFieldName]);
     // Add test of proof that multivalue fields.
-    $this->callAPISuccess('CustomValue', 'create', array(
+    $this->callAPISuccess('CustomValue', 'create', [
       'entity_id' => $contact['id'],
-      $multiSelectName => array($params[$radioName], $params[$controlFieldName]),
-    ));
-    $result = $this->callAPISuccess('Contact', 'getsingle', array(
+      $multiSelectName => [$params[$radioName], $params[$controlFieldName]],
+    ]);
+    $result = $this->callAPISuccess('Contact', 'getsingle', [
       'id' => $contact['id'],
-      'return' => array($selectName, $multiSelectName, $controlFieldName, $radioName),
-    ));
+      'return' => [$selectName, $multiSelectName, $controlFieldName, $radioName],
+    ]);
 
-    $this->assertEquals(array($params[$radioName], $params[$controlFieldName]), $result[$multiSelectName]);
+    $this->assertEquals([$params[$radioName], $params[$controlFieldName]], $result[$multiSelectName]);
   }
 
   public function testGettree() {
-    $cg = $this->callAPISuccess('CustomGroup', 'create', array(
+    $cg = $this->callAPISuccess('CustomGroup', 'create', [
       'title' => 'TestGettree',
       'extends' => 'Individual',
-    ));
-    $cf = $this->callAPISuccess('CustomField', 'create', array(
+    ]);
+    $cf = $this->callAPISuccess('CustomField', 'create', [
       'custom_group_id' => $cg['id'],
       'label' => 'Got Options',
       'name' => 'got_options',
       "data_type" => "String",
       "html_type" => "Multi-Select",
-      'option_values' => array('1' => 'One', '2' => 'Two', '3' => 'Three'),
-    ));
+      'option_values' => ['1' => 'One', '2' => 'Two', '3' => 'Three'],
+    ]);
     $fieldName = 'custom_' . $cf['id'];
-    $contact = $this->individualCreate(array($fieldName => array('2', '3')));
+    $contact = $this->individualCreate([$fieldName => ['2', '3']]);
 
     // Verify values are formatted correctly
-    $tree = $this->callAPISuccess('CustomValue', 'gettree', array('entity_type' => 'Contact', 'entity_id' => $contact));
-    $this->assertEquals(array('2', '3'), $tree['values']['TestGettree']['fields']['got_options']['value']['data']);
+    $tree = $this->callAPISuccess('CustomValue', 'gettree', ['entity_type' => 'Contact', 'entity_id' => $contact]);
+    $this->assertEquals(['2', '3'], $tree['values']['TestGettree']['fields']['got_options']['value']['data']);
     $this->assertEquals('Two, Three', $tree['values']['TestGettree']['fields']['got_options']['value']['display']);
 
     // Try limiting the return params
-    $tree = $this->callAPISuccess('CustomValue', 'gettree', array(
+    $tree = $this->callAPISuccess('CustomValue', 'gettree', [
       'entity_type' => 'Contact',
       'entity_id' => $contact,
-      'return' => array(
+      'return' => [
         'custom_group.id',
         'custom_field.id',
-      ),
-    ));
-    $this->assertEquals(array('2', '3'), $tree['values']['TestGettree']['fields']['got_options']['value']['data']);
+      ],
+    ]);
+    $this->assertEquals(['2', '3'], $tree['values']['TestGettree']['fields']['got_options']['value']['data']);
     $this->assertEquals('Two, Three', $tree['values']['TestGettree']['fields']['got_options']['value']['display']);
-    $this->assertEquals(array('id', 'fields'), array_keys($tree['values']['TestGettree']));
+    $this->assertEquals(['id', 'fields'], array_keys($tree['values']['TestGettree']));
 
     // Ensure display values are returned even if data is not
-    $tree = $this->callAPISuccess('CustomValue', 'gettree', array(
+    $tree = $this->callAPISuccess('CustomValue', 'gettree', [
       'entity_type' => 'Contact',
       'entity_id' => $contact,
-      'return' => array(
+      'return' => [
         'custom_value.display',
-      ),
-    ));
+      ],
+    ]);
     $this->assertEquals('Two, Three', $tree['values']['TestGettree']['fields']['got_options']['value']['display']);
     $this->assertFalse(isset($tree['values']['TestGettree']['fields']['got_options']['value']['data']));
 
     // Verify that custom set appears for individuals even who don't have any custom data
     $contact2 = $this->individualCreate();
-    $tree = $this->callAPISuccess('CustomValue', 'gettree', array('entity_type' => 'Contact', 'entity_id' => $contact2));
+    $tree = $this->callAPISuccess('CustomValue', 'gettree', ['entity_type' => 'Contact', 'entity_id' => $contact2]);
     $this->assertArrayHasKey('TestGettree', $tree['values']);
 
     // Verify that custom set doesn't appear for other contact types
     $org = $this->organizationCreate();
-    $tree = $this->callAPISuccess('CustomValue', 'gettree', array('entity_type' => 'Contact', 'entity_id' => $org));
+    $tree = $this->callAPISuccess('CustomValue', 'gettree', ['entity_type' => 'Contact', 'entity_id' => $org]);
     $this->assertArrayNotHasKey('TestGettree', $tree['values']);
 
   }
 
   public function testGettree_getfields() {
-    $fields = $this->callAPISuccess('CustomValue', 'getfields', array('api_action' => 'gettree'));
+    $fields = $this->callAPISuccess('CustomValue', 'getfields', ['api_action' => 'gettree']);
     $fields = $fields['values'];
     $this->assertTrue((bool) $fields['entity_id']['api.required']);
     $this->assertTrue((bool) $fields['entity_type']['api.required']);
@@ -514,26 +514,26 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
    */
   public function testUpdateCustomGreetings() {
     // Create a custom group with one field.
-    $customGroupResult = $this->callAPISuccess('CustomGroup', 'create', array(
+    $customGroupResult = $this->callAPISuccess('CustomGroup', 'create', [
       'sequential' => 1,
       'title' => "test custom group",
       'extends' => "Individual",
-    ));
-    $customFieldResult = $this->callAPISuccess('CustomField', 'create', array(
+    ]);
+    $customFieldResult = $this->callAPISuccess('CustomField', 'create', [
       'custom_group_id' => $customGroupResult['id'],
       'label' => "greeting test",
       'data_type' => "String",
       'html_type' => "Text",
-    ));
+    ]);
     $customFieldId = $customFieldResult['id'];
 
     // Create a contact with an email greeting format that includes the new custom field.
-    $contactResult = $this->callAPISuccess('Contact', 'create', array(
+    $contactResult = $this->callAPISuccess('Contact', 'create', [
       'contact_type' => 'Individual',
       'email' => substr(sha1(rand()), 0, 7) . '@yahoo.com',
       'email_greeting_id' => "Customized",
       'email_greeting_custom' => "Dear {contact.custom_{$customFieldId}}",
-    ));
+    ]);
     $cid = $contactResult['id'];
 
     // Define testing values.
@@ -541,13 +541,13 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $testGreetingValue = "Dear $uniq";
 
     // Update contact's custom field with CustomValue.create
-    $customValueResult = $this->callAPISuccess('CustomValue', 'create', array(
+    $customValueResult = $this->callAPISuccess('CustomValue', 'create', [
       'entity_id' => $cid,
       "custom_{$customFieldId}" => $uniq,
       'entity_table' => "civicrm_contact",
-    ));
+    ]);
 
-    $contact = $this->callAPISuccessGetSingle('Contact', array('id' => $cid, 'return' => 'email_greeting'));
+    $contact = $this->callAPISuccessGetSingle('Contact', ['id' => $cid, 'return' => 'email_greeting']);
     $this->assertEquals($testGreetingValue, $contact['email_greeting_display']);
 
   }

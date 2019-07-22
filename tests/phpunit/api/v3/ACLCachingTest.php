@@ -46,9 +46,9 @@ class api_v3_ACLCachingTest extends CiviUnitTestCase {
    * @see CiviUnitTestCase::tearDown()
    */
   public function tearDown() {
-    $tablesToTruncate = array(
+    $tablesToTruncate = [
       'civicrm_activity',
-    );
+    ];
     $this->quickCleanup($tablesToTruncate, TRUE);
   }
 
@@ -58,12 +58,12 @@ class api_v3_ACLCachingTest extends CiviUnitTestCase {
    */
   public function testActivityCreateCustomBefore($version) {
     $this->_apiversion = $version;
-    $values = $this->callAPISuccess('custom_field', 'getoptions', array('field' => 'custom_group_id'));
+    $values = $this->callAPISuccess('custom_field', 'getoptions', ['field' => 'custom_group_id']);
     $this->assertTrue($values['count'] == 0);
-    $this->CustomGroupCreate(array('extends' => 'Activity'));
-    $groupCount = $this->callAPISuccess('custom_group', 'getcount', array('extends' => 'activity'));
+    $this->CustomGroupCreate(['extends' => 'Activity']);
+    $groupCount = $this->callAPISuccess('custom_group', 'getcount', ['extends' => 'activity']);
     $this->assertEquals($groupCount, 1, 'one group should now exist');
-    $values = $this->callAPISuccess('custom_field', 'getoptions', array('field' => 'custom_group_id'));
+    $values = $this->callAPISuccess('custom_field', 'getoptions', ['field' => 'custom_group_id']);
     $this->assertTrue($values['count'] == 1, 'check that cached value is not retained for custom_group_id');
   }
 

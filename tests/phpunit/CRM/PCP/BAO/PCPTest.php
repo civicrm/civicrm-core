@@ -58,7 +58,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     $this->assertEquals($params['link_text'], $pcpBlock->link_text, 'Check for link text.');
     $this->assertEquals($params['is_active'], $pcpBlock->is_active, 'Check for is_active.');
     // Delete our test object
-    $delParams = array('id' => $pcpBlock->id);
+    $delParams = ['id' => $pcpBlock->id];
     // FIXME: Currently this delete fails with an FK constraint error: DELETE FROM civicrm_contribution_type  WHERE (  civicrm_contribution_type.id = 5 )
     // CRM_Core_DAO::deleteTestObjects( 'CRM_PCP_DAO_PCPBlock', $delParams );
   }
@@ -85,7 +85,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     $this->assertEquals($params['is_active'], $pcp->is_active, 'Check for is_active.');
 
     // Delete our test object
-    $delParams = array('id' => $pcp->id);
+    $delParams = ['id' => $pcp->id];
     // FIXME: Currently this delete fails with an FK constraint error: DELETE FROM civicrm_contribution_type  WHERE (  civicrm_contribution_type.id = 5 )
     // CRM_Core_DAO::deleteTestObjects( 'CRM_PCP_DAO_PCP', $delParams );
   }
@@ -113,7 +113,7 @@ class CRM_PCP_BAO_PCPTest extends CiviUnitTestCase {
     $this->assertEquals($params['is_active'], $pcp->is_active, 'Check for is_active.');
 
     // Delete our test object
-    $delParams = array('id' => $pcp->id);
+    $delParams = ['id' => $pcp->id];
     // FIXME: Currently this delete fails with an FK constraint error: DELETE FROM civicrm_contribution_type  WHERE (  civicrm_contribution_type.id = 5 )
     // CRM_Core_DAO::deleteTestObjects( 'CRM_PCP_DAO_PCP', $delParams );
   }

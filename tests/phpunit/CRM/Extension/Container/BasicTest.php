@@ -17,12 +17,12 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
   public function testGetKeysEmpty() {
     $basedir = $this->createTempDir('ext-empty-');
     $c = new CRM_Extension_Container_Basic($basedir, 'http://example/basedir', NULL, NULL);
-    $this->assertEquals($c->getKeys(), array());
+    $this->assertEquals($c->getKeys(), []);
   }
 
   public function testGetKeys() {
     list($basedir, $c) = $this->_createContainer();
-    $this->assertEquals($c->getKeys(), array('test.foo', 'test.foo.bar'));
+    $this->assertEquals($c->getKeys(), ['test.foo', 'test.foo.bar']);
   }
 
   public function testGetPath() {
@@ -82,7 +82,7 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
   }
 
   public function testCaching() {
-    $cache = new CRM_Utils_Cache_Arraycache(array());
+    $cache = new CRM_Utils_Cache_Arraycache([]);
     $this->assertTrue(!is_array($cache->get('basic-scan')));
     list($basedir, $c) = $this->_createContainer($cache, 'basic-scan');
     $this->assertEquals('http://example/basedir/foo', $c->getResUrl('test.foo'));
@@ -108,18 +108,18 @@ class CRM_Extension_Container_BasicTest extends CiviUnitTestCase {
     file_put_contents("$basedir/foo/bar/info.xml", "<extension key='test.foo.bar' type='report'><file>oddball</file></extension>");
     // not needed for now // file_put_contents("$basedir/foo/bar/oddball.php", "<?php\n");
     $c = new CRM_Extension_Container_Basic($basedir . $appendPathGarbage, 'http://example/basedir' . $appendPathGarbage, $cache, $cacheKey);
-    return array($basedir, $c);
+    return [$basedir, $c];
   }
 
   public function testConvertPathsToUrls() {
-    $relPaths = array(
+    $relPaths = [
       'foo.bar' => 'foo\bar',
       'whiz.bang' => 'tests\extensions\whiz\bang',
-    );
-    $expectedRelUrls = array(
+    ];
+    $expectedRelUrls = [
       'foo.bar' => 'foo/bar',
       'whiz.bang' => 'tests/extensions/whiz/bang',
-    );
+    ];
     $actualRelUrls = CRM_Extension_Container_Basic::convertPathsToUrls('\\', $relPaths);
     $this->assertEquals($expectedRelUrls, $actualRelUrls);
   }

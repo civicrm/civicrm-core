@@ -10,11 +10,11 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
    * @return array
    */
   public function randomDecimalCases() {
-    $cases = array();
+    $cases = [];
     // array(array $precision, int $expectedMinInclusive, int $expectedMaxExclusive)
-    $cases[] = array(array(1, 0), 0, 10);
-    $cases[] = array(array(5, 2), 0, 1000);
-    $cases[] = array(array(10, 8), 0, 100);
+    $cases[] = [[1, 0], 0, 10];
+    $cases[] = [[5, 2], 0, 1000];
+    $cases[] = [[10, 8], 0, 100];
     return $cases;
   }
 
@@ -43,14 +43,14 @@ class CRM_Utils_NumberTest extends CiviUnitTestCase {
    * @return array
    */
   public function truncDecimalCases() {
-    $cases = array();
+    $cases = [];
     // array($value, $precision, $expectedValue)
-    $cases[] = array(523, array(1, 0), 5);
-    $cases[] = array(523, array(5, 2), 523);
-    $cases[] = array(523, array(10, 8), 52.3);
-    $cases[] = array(12345, array(3, 3), 0.123);
-    $cases[] = array(0.12345, array(10, 0), 12345);
-    $cases[] = array(-123.45, array(4, 2), -12.34);
+    $cases[] = [523, [1, 0], 5];
+    $cases[] = [523, [5, 2], 523];
+    $cases[] = [523, [10, 8], 52.3];
+    $cases[] = [12345, [3, 3], 0.123];
+    $cases[] = [0.12345, [10, 0], 12345];
+    $cases[] = [-123.45, [4, 2], -12.34];
     return $cases;
   }
 

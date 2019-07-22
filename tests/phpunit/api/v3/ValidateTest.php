@@ -41,48 +41,48 @@ class api_v3_ValidateTest extends CiviUnitTestCase {
   }
 
   public function testEmptyContactValidate() {
-    $validation = $this->callAPISuccess('Contact', 'validate', array('action' => "create"));
-    $expectedOut = array(
-      'contact_type' => array(
+    $validation = $this->callAPISuccess('Contact', 'validate', ['action' => "create"]);
+    $expectedOut = [
+      'contact_type' => [
         'message' => "Mandatory key(s) missing from params array: contact_type",
         'code' => "mandatory_missing",
-      ),
-    );
+      ],
+    ];
     $this->assertEquals($validation['values'][0], $expectedOut);
   }
 
   public function testContributionValidate() {
-    $validation = $this->callAPISuccess('Contribution', 'validate', array('action' => "create", 'total_amount' => "100w"));
-    $totalAmountErrors = array(
+    $validation = $this->callAPISuccess('Contribution', 'validate', ['action' => "create", 'total_amount' => "100w"]);
+    $totalAmountErrors = [
       'message' => "total_amount is  not a valid amount: 100w",
       'code' => "incorrect_value",
-    );
+    ];
 
-    $contactIdErrors = array(
+    $contactIdErrors = [
       'message' => "Mandatory key(s) missing from params array: contact_id",
       'code' => "mandatory_missing",
-    );
+    ];
 
     $this->assertEquals($validation['values'][0]['total_amount'], $totalAmountErrors);
     $this->assertEquals($validation['values'][0]['contact_id'], $contactIdErrors);
   }
 
   public function testContributionDateValidate() {
-    $params = array(
+    $params = [
       'action' => "create",
       'financial_type_id' => "1",
       'total_amount' => "100",
       'contact_id' => "1",
       'receive_date' => 'abc',
-    );
+    ];
     $validation = $this->callAPISuccess('Contribution', 'validate', $params);
 
-    $expectedOut = array(
-      'receive_date' => array(
+    $expectedOut = [
+      'receive_date' => [
         'message' => "receive_date is not a valid date: abc",
         'code' => "incorrect_value",
-      ),
-    );
+      ],
+    ];
 
     $this->assertEquals($validation['values'][0], $expectedOut);
   }

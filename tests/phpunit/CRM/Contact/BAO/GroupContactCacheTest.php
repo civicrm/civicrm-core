@@ -40,31 +40,31 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     list($group, $living, $deceased) = $this->setupSmartGroup();
 
     // Add $n1 to $g
-    $this->callAPISuccess('group_contact', 'create', array(
+    $this->callAPISuccess('group_contact', 'create', [
       'contact_id' => $living[0]->id,
       'group_id' => $group->id,
-    ));
+    ]);
 
     CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
     $this->assertCacheMatches(
-      array($deceased[0]->id, $deceased[1]->id, $deceased[2]->id, $living[0]->id),
+      [$deceased[0]->id, $deceased[1]->id, $deceased[2]->id, $living[0]->id],
       $group->id
     );
 
     // Remove $y1 from $g
-    $this->callAPISuccess('group_contact', 'create', array(
+    $this->callAPISuccess('group_contact', 'create', [
       'contact_id' => $deceased[0]->id,
       'group_id' => $group->id,
       'status' => 'Removed',
-    ));
+    ]);
 
     CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
     $this->assertCacheMatches(
-      array(
+      [
         $deceased[1]->id,
         $deceased[2]->id,
         $living[0]->id,
-      ),
+      ],
       $group->id
     );
   }
@@ -74,67 +74,67 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    */
   public function testRemoveFromParentSmartGroup() {
     // Create smart group $parent
-    $params = array(
+    $params = [
       'name' => 'Deceased Contacts',
       'title' => 'Deceased Contacts',
       'is_active' => 1,
-      'formValues' => array('is_deceased' => 1),
-    );
+      'formValues' => ['is_deceased' => 1],
+    ];
     $parent = CRM_Contact_BAO_Group::createSmartGroup($params);
-    $this->registerTestObjects(array($parent));
+    $this->registerTestObjects([$parent]);
 
     // Create group $child in $parent
-    $params = array(
+    $params = [
       'name' => 'Child Group',
       'title' => 'Child Group',
       'is_active' => 1,
-      'parents' => array($parent->id => 1),
-    );
+      'parents' => [$parent->id => 1],
+    ];
     $child = CRM_Contact_BAO_Group::create($params);
-    $this->registerTestObjects(array($child));
+    $this->registerTestObjects([$child]);
 
     // Create $c1, $c2, $c3
-    $deceased = $this->createTestObject('CRM_Contact_DAO_Contact', array('is_deceased' => 1), 3);
+    $deceased = $this->createTestObject('CRM_Contact_DAO_Contact', ['is_deceased' => 1], 3);
 
     // Add $c1, $c2, $c3 to $child
     foreach ($deceased as $contact) {
-      $this->callAPISuccess('group_contact', 'create', array(
+      $this->callAPISuccess('group_contact', 'create', [
         'contact_id' => $contact->id,
         'group_id' => $child->id,
-      ));
+      ]);
     }
 
     CRM_Contact_BAO_GroupContactCache::load($parent, TRUE);
     $this->assertCacheMatches(
-      array($deceased[0]->id, $deceased[1]->id, $deceased[2]->id),
+      [$deceased[0]->id, $deceased[1]->id, $deceased[2]->id],
       $parent->id
     );
 
     // Remove $c1 from $parent
-    $this->callAPISuccess('group_contact', 'create', array(
+    $this->callAPISuccess('group_contact', 'create', [
       'contact_id' => $deceased[0]->id,
       'group_id' => $parent->id,
       'status' => 'Removed',
-    ));
+    ]);
 
     // Assert $c1 not in $parent
     CRM_Contact_BAO_GroupContactCache::load($parent, TRUE);
     $this->assertCacheMatches(
-      array(
+      [
         $deceased[1]->id,
         $deceased[2]->id,
-      ),
+      ],
       $parent->id
     );
 
     // Assert $c1 still in $child
     $this->assertDBQuery(1,
       'select count(*) from civicrm_group_contact where group_id=%1 and contact_id=%2 and status=%3',
-      array(
-        1 => array($child->id, 'Integer'),
-        2 => array($deceased[0]->id, 'Integer'),
-        3 => array('Added', 'String'),
-      )
+      [
+        1 => [$child->id, 'Integer'],
+        2 => [$deceased[0]->id, 'Integer'],
+        3 => ['Added', 'String'],
+      ]
     );
   }
 
@@ -147,9 +147,9 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    */
   public function assertCacheMatches($expectedContactIds, $groupId) {
     $sql = 'SELECT contact_id FROM civicrm_group_contact_cache WHERE group_id = %1';
-    $params = array(1 => array($groupId, 'Integer'));
+    $params = [1 => [$groupId, 'Integer']];
     $dao = CRM_Core_DAO::executeQuery($sql, $params);
-    $actualContactIds = array();
+    $actualContactIds = [];
     while ($dao->fetch()) {
       $actualContactIds[] = $dao->contact_id;
     }
@@ -164,9 +164,9 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    */
   public function testOpportunisticRefreshCacheNoChangeIfNotExpired() {
     list($group, $living, $deceased) = $this->setupSmartGroup();
-    $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
+    $this->callAPISuccess('Contact', 'create', ['id' => $deceased[0]->id, 'is_deceased' => 0]);
     $this->assertCacheMatches(
-      array($deceased[0]->id, $deceased[1]->id, $deceased[2]->id),
+      [$deceased[0]->id, $deceased[1]->id, $deceased[2]->id],
       $group->id
     );
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
@@ -179,7 +179,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    */
   public function testOpportunisticRefreshChangeIfCacheDateFieldStale() {
     list($group, $living, $deceased) = $this->setupSmartGroup();
-    $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
+    $this->callAPISuccess('Contact', 'create', ['id' => $deceased[0]->id, 'is_deceased' => 0]);
     CRM_Core_DAO::executeQuery('UPDATE civicrm_group SET cache_date = DATE_SUB(NOW(), INTERVAL 7 MINUTE) WHERE id = ' . $group->id);
     $group->find(TRUE);
     Civi::$statics['CRM_Contact_BAO_GroupContactCache']['is_refresh_init'] = FALSE;
@@ -194,12 +194,12 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    */
   public function testOpportunisticRefreshNoChangeWithDeterministicSetting() {
     list($group, $living, $deceased) = $this->setupSmartGroup();
-    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'deterministic'));
-    $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
+    $this->callAPISuccess('Setting', 'create', ['smart_group_cache_refresh_mode' => 'deterministic']);
+    $this->callAPISuccess('Contact', 'create', ['id' => $deceased[0]->id, 'is_deceased' => 0]);
     $this->makeCacheStale($group);
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
     $this->assertCacheNotRefreshed($deceased, $group);
-    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'opportunistic'));
+    $this->callAPISuccess('Setting', 'create', ['smart_group_cache_refresh_mode' => 'opportunistic']);
   }
 
   /**
@@ -207,12 +207,12 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    */
   public function testDeterministicRefreshChangeWithDeterministicSetting() {
     list($group, $living, $deceased) = $this->setupSmartGroup();
-    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'deterministic'));
-    $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
+    $this->callAPISuccess('Setting', 'create', ['smart_group_cache_refresh_mode' => 'deterministic']);
+    $this->callAPISuccess('Contact', 'create', ['id' => $deceased[0]->id, 'is_deceased' => 0]);
     $this->makeCacheStale($group);
     CRM_Contact_BAO_GroupContactCache::deterministicCacheFlush();
     $this->assertCacheRefreshed($group);
-    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'opportunistic'));
+    $this->callAPISuccess('Setting', 'create', ['smart_group_cache_refresh_mode' => 'opportunistic']);
   }
 
   /**
@@ -220,11 +220,11 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    */
   public function testDeterministicRefreshChangeDoesNotTouchNonExpired() {
     list($group, $living, $deceased) = $this->setupSmartGroup();
-    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'deterministic'));
-    $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
+    $this->callAPISuccess('Setting', 'create', ['smart_group_cache_refresh_mode' => 'deterministic']);
+    $this->callAPISuccess('Contact', 'create', ['id' => $deceased[0]->id, 'is_deceased' => 0]);
     CRM_Contact_BAO_GroupContactCache::deterministicCacheFlush();
     $this->assertCacheNotRefreshed($deceased, $group);
-    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'opportunistic'));
+    $this->callAPISuccess('Setting', 'create', ['smart_group_cache_refresh_mode' => 'opportunistic']);
   }
 
   /**
@@ -234,8 +234,8 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    */
   public function testDeterministicRefreshChangeWithOpportunisticSetting() {
     list($group, $living, $deceased) = $this->setupSmartGroup();
-    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'opportunistic'));
-    $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
+    $this->callAPISuccess('Setting', 'create', ['smart_group_cache_refresh_mode' => 'opportunistic']);
+    $this->callAPISuccess('Contact', 'create', ['id' => $deceased[0]->id, 'is_deceased' => 0]);
     $this->makeCacheStale($group);
     CRM_Contact_BAO_GroupContactCache::deterministicCacheFlush();
     $this->assertCacheRefreshed($group);
@@ -246,10 +246,10 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    */
   public function testJobWrapper() {
     list($group, $living, $deceased) = $this->setupSmartGroup();
-    $this->callAPISuccess('Setting', 'create', array('smart_group_cache_refresh_mode' => 'opportunistic'));
-    $this->callAPISuccess('Contact', 'create', array('id' => $deceased[0]->id, 'is_deceased' => 0));
+    $this->callAPISuccess('Setting', 'create', ['smart_group_cache_refresh_mode' => 'opportunistic']);
+    $this->callAPISuccess('Contact', 'create', ['id' => $deceased[0]->id, 'is_deceased' => 0]);
     $this->makeCacheStale($group);
-    $this->callAPISuccess('Job', 'group_cache_flush', array());
+    $this->callAPISuccess('Job', 'group_cache_flush', []);
     $this->assertCacheRefreshed($group);
   }
 
@@ -266,7 +266,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    * This method is called before a test is executed.
    */
   protected function setUp() {
-    $this->_testObjects = array();
+    $this->_testObjects = [];
     parent::setUp();
   }
 
@@ -292,13 +292,13 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    *
    * @return array|NULL|object
    */
-  public function createTestObject($daoName, $params = array(), $numObjects = 1, $createOnly = FALSE) {
+  public function createTestObject($daoName, $params = [], $numObjects = 1, $createOnly = FALSE) {
     $objects = CRM_Core_DAO::createTestObject($daoName, $params, $numObjects, $createOnly);
     if (is_array($objects)) {
       $this->registerTestObjects($objects);
     }
     else {
-      $this->registerTestObjects(array($objects));
+      $this->registerTestObjects([$objects]);
     }
     return $objects;
   }
@@ -328,10 +328,10 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   public function deleteTestObjects() {
     foreach ($this->_testObjects as $daoName => $daoIds) {
       foreach ($daoIds as $daoId) {
-        CRM_Core_DAO::deleteTestObjects($daoName, array('id' => $daoId));
+        CRM_Core_DAO::deleteTestObjects($daoName, ['id' => $daoId]);
       }
     }
-    $this->_testObjects = array();
+    $this->_testObjects = [];
   }
 
   /**
@@ -340,18 +340,18 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    * @return array
    */
   protected function setupSmartGroup() {
-    $params = array(
+    $params = [
       'name' => 'Deceased Contacts',
       'title' => 'Deceased Contacts',
       'is_active' => 1,
-      'formValues' => array('is_deceased' => 1),
-    );
+      'formValues' => ['is_deceased' => 1],
+    ];
     $group = CRM_Contact_BAO_Group::createSmartGroup($params);
-    $this->registerTestObjects(array($group));
+    $this->registerTestObjects([$group]);
 
     // Create contacts $y1, $y2, $y3 which do match $g; create $n1, $n2, $n3 which do not match $g
-    $living = $this->createTestObject('CRM_Contact_DAO_Contact', array('is_deceased' => 0), 3);
-    $deceased = $this->createTestObject('CRM_Contact_DAO_Contact', array('is_deceased' => 1), 3);
+    $living = $this->createTestObject('CRM_Contact_DAO_Contact', ['is_deceased' => 0], 3);
+    $deceased = $this->createTestObject('CRM_Contact_DAO_Contact', ['is_deceased' => 1], 3);
     $this->assertEquals(3, count($deceased));
     $this->assertEquals(3, count($living));
 
@@ -359,11 +359,11 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
     $group->find(TRUE);
     $this->assertCacheMatches(
-      array($deceased[0]->id, $deceased[1]->id, $deceased[2]->id),
+      [$deceased[0]->id, $deceased[1]->id, $deceased[2]->id],
       $group->id
     );
     // Reload the group so we have the cache_date & refresh_date.
-    return array($group, $living, $deceased);
+    return [$group, $living, $deceased];
   }
 
   /**
@@ -374,10 +374,10 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    */
   protected function assertCacheNotRefreshed($deceased, $group) {
     $this->assertCacheMatches(
-      array($deceased[0]->id, $deceased[1]->id, $deceased[2]->id),
+      [$deceased[0]->id, $deceased[1]->id, $deceased[2]->id],
       $group->id
     );
-    $afterGroup = $this->callAPISuccessGetSingle('Group', array('id' => $group->id));
+    $afterGroup = $this->callAPISuccessGetSingle('Group', ['id' => $group->id]);
     $this->assertEquals($group->cache_date, $afterGroup['cache_date']);
   }
 
@@ -400,11 +400,11 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    */
   protected function assertCacheRefreshed($group) {
     $this->assertCacheMatches(
-      array(),
+      [],
       $group->id
     );
 
-    $afterGroup = $this->callAPISuccessGetSingle('Group', array('id' => $group->id));
+    $afterGroup = $this->callAPISuccessGetSingle('Group', ['id' => $group->id]);
     $this->assertTrue(empty($afterGroup['cache_date']), 'refresh date should not be set as the cache is not built');
     $this->assertTrue(empty($afterGroup['refresh_date']), 'refresh date should not be set as the cache is not built');
   }
@@ -413,24 +413,24 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
    * Test Smart group search
    */
   public function testSmartGroupSearchBuilder() {
-    $returnProperties = array(
+    $returnProperties = [
       'contact_type' => 1,
       'contact_sub_type' => 1,
       'sort_name' => 1,
       'group' => 1,
-    );
+    ];
     list($group, $living, $deceased) = $this->setupSmartGroup();
 
-    $params = array(
+    $params = [
       'name' => 'Living Contacts',
       'title' => 'Living Contacts',
       'is_active' => 1,
-      'formValues' => array('is_deceased' => 0),
-    );
+      'formValues' => ['is_deceased' => 0],
+    ];
     $group2 = CRM_Contact_BAO_Group::createSmartGroup($params);
 
     //Filter on smart group with =, !=, IN and NOT IN operator.
-    $params = array(array('group', '=', $group2->id, 1, 0));
+    $params = [['group', '=', $group2->id, 1, 0]];
     $query = new CRM_Contact_BAO_Query(
       $params, $returnProperties,
       NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS,
@@ -446,7 +446,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $this->assertContains($expectedWhere, $query->_whereClause);
     $this->_assertContactIds($query, "group_id = {$group2->id}");
 
-    $params = array(array('group', '!=', $group->id, 1, 0));
+    $params = [['group', '!=', $group->id, 1, 0]];
     $query = new CRM_Contact_BAO_Query(
       $params, $returnProperties,
       NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS,
@@ -459,7 +459,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $this->assertContains($expectedWhere, $query->_whereClause);
     $this->_assertContactIds($query, "group_id != {$group->id}");
 
-    $params = array(array('group', 'IN', array($group->id, $group2->id), 1, 0));
+    $params = [['group', 'IN', [$group->id, $group2->id], 1, 0]];
     $query = new CRM_Contact_BAO_Query(
       $params, $returnProperties,
       NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS,
@@ -471,7 +471,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
     $this->assertContains($expectedWhere, $query->_whereClause);
     $this->_assertContactIds($query, "group_id IN ({$group->id}, {$group2->id})");
 
-    $params = array(array('group', 'NOT IN', array($group->id), 1, 0));
+    $params = [['group', 'NOT IN', [$group->id], 1, 0]];
     $query = new CRM_Contact_BAO_Query(
       $params, $returnProperties,
       NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS,
@@ -487,24 +487,24 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
   }
 
   public function testMultipleGroupWhereClause() {
-    $returnProperties = array(
+    $returnProperties = [
       'contact_type' => 1,
       'contact_sub_type' => 1,
       'sort_name' => 1,
       'group' => 1,
-    );
+    ];
     list($group, $living, $deceased) = $this->setupSmartGroup();
 
-    $params = array(
+    $params = [
       'name' => 'Living Contacts',
       'title' => 'Living Contacts',
       'is_active' => 1,
-      'formValues' => array('is_deceased' => 0),
-    );
+      'formValues' => ['is_deceased' => 0],
+    ];
     $group2 = CRM_Contact_BAO_Group::createSmartGroup($params);
 
     //Filter on smart group with =, !=, IN and NOT IN operator.
-    $params = array(array('group', '=', $group2->id, 1, 0), array('group', '=', $group->id, 1, 0));
+    $params = [['group', '=', $group2->id, 1, 0], ['group', '=', $group->id, 1, 0]];
     $query = new CRM_Contact_BAO_Query(
       $params, $returnProperties,
       NULL, FALSE, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS,
@@ -539,7 +539,7 @@ class CRM_Contact_BAO_GroupContactCacheTest extends CiviUnitTestCase {
       FALSE, FALSE, FALSE,
       TRUE, FALSE
     ));
-    $expectedContactIds = array();
+    $expectedContactIds = [];
     $groupDAO = CRM_Core_DAO::executeQuery("SELECT contact_id FROM civicrm_group_contact_cache WHERE {$groupWhereClause}");
     while ($groupDAO->fetch()) {
       $expectedContactIds[] = $groupDAO->contact_id;

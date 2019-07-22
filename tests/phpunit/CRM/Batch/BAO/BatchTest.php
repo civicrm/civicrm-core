@@ -47,7 +47,7 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
 
     // create two contributions: one check and one credit card
 
-    $contactId = $this->individualCreate(array('first_name' => 'John', 'last_name' => 'Doe'));
+    $contactId = $this->individualCreate(['first_name' => 'John', 'last_name' => 'Doe']);
     $this->contributionCreate([
       'contact_id' => $contactId,
       'total_amount' => 1,
@@ -83,13 +83,13 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
 
     //create an empty batch to use for the search, and run the search
 
-    $batchParams = array('title' => 'Test Batch');
+    $batchParams = ['title' => 'Test Batch'];
     $batchParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Open');
     $batch = CRM_Batch_BAO_Batch::create($batchParams);
     $entityId = $batch->id;
-    $returnvalues = array(
+    $returnvalues = [
       'civicrm_financial_trxn.payment_instrument_id as payment_method',
-    );
+    ];
     $notPresent = TRUE;
     $params['contribution_payment_instrument_id']
       = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check');

@@ -23,10 +23,10 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
     $config = CRM_Core_Config::singleton();
     $this->assertTrue($config->userSystem instanceof CRM_Utils_System_UnitTests);
     $expected = '/index.php?q=civicrm/foo/bar&foo=ab&bar=cd%26ef';
-    $actual = CRM_Utils_System::url('civicrm/foo/bar', array(
+    $actual = CRM_Utils_System::url('civicrm/foo/bar', [
       'foo' => 'ab',
       'bar' => 'cd&ef',
-    ), FALSE, NULL, FALSE);
+    ], FALSE, NULL, FALSE);
     $this->assertEquals($expected, $actual);
   }
 
@@ -45,7 +45,7 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
    * @dataProvider getURLs
    */
   public function testRedirectHook($url, $parsedUrl) {
-    $this->hookClass->setHook('civicrm_alterRedirect', array($this, 'hook_civicrm_alterRedirect'));
+    $this->hookClass->setHook('civicrm_alterRedirect', [$this, 'hook_civicrm_alterRedirect']);
     try {
       CRM_Utils_System::redirect($url, [
         'expected' => $parsedUrl,

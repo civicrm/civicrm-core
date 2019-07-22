@@ -37,7 +37,7 @@ class ChangeSetTest extends \CiviUnitTestCase {
    */
   public function testInsertAfter() {
     $changeSet = ChangeSet::create(__FUNCTION__);
-    $counts = array('~/foo.html' => 0);
+    $counts = ['~/foo.html' => 0];
 
     $changeSet->alterHtml('~/foo.html', function (\phpQueryObject $doc, $file) use (&$counts) {
       $counts[$file]++;
@@ -51,9 +51,9 @@ class ChangeSetTest extends \CiviUnitTestCase {
       throw new \Exception("This should not be called. The file does not exist!");
     });
 
-    $results = ChangeSet::applyResourceFilters(array($changeSet), 'partials', array(
+    $results = ChangeSet::applyResourceFilters([$changeSet], 'partials', [
       '~/foo.html' => '<span><p class="foo">Hello</p><p class="bar">Goodbye</p></span>',
-    ));
+    ]);
 
     $this->assertHtmlEquals(
       '<span><p class="foo">Hello</p><p ng-if="alpha.beta() && true">world</p><p class="bar">Goodbye</p><p>cruel world</p></span>',
@@ -67,7 +67,7 @@ class ChangeSetTest extends \CiviUnitTestCase {
    */
   public function testAppendPrepend() {
     $changeSet = ChangeSet::create(__FUNCTION__);
-    $counts = array('~/foo.html' => 0);
+    $counts = ['~/foo.html' => 0];
 
     $changeSet->alterHtml('~/foo.html', function (\phpQueryObject $doc, $file) use (&$counts) {
       $counts[$file]++;
@@ -81,10 +81,10 @@ class ChangeSetTest extends \CiviUnitTestCase {
       throw new \Exception("This should not be called. The file does not exist!");
     });
 
-    $originals = array(
+    $originals = [
       '~/foo.html' => '<span><p class="foo">Hello</p><p class="bar">Goodbye</p></span>',
-    );
-    $results = ChangeSet::applyResourceFilters(array($changeSet), 'partials', $originals);
+    ];
+    $results = ChangeSet::applyResourceFilters([$changeSet], 'partials', $originals);
 
     $this->assertHtmlEquals(
       '<span><p class="foo">Hello<p ng-if="!!gamma()">world</p></p><p class="bar"><span>Cruel world,</span>Goodbye</p></span>',

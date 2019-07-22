@@ -48,12 +48,12 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    CRM_Utils_Hook::singleton()->setHook('civicrm_fieldOptions', array($this, 'hook_civicrm_fieldOptions'));
+    CRM_Utils_Hook::singleton()->setHook('civicrm_fieldOptions', [$this, 'hook_civicrm_fieldOptions']);
   }
 
   public function tearDown() {
     parent::tearDown();
-    $this->quickCleanup(array('civicrm_custom_field', 'civicrm_custom_group'));
+    $this->quickCleanup(['civicrm_custom_field', 'civicrm_custom_group']);
   }
 
   /**
@@ -72,30 +72,30 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
      * - exclude: Any one value which should not be in the list.
      * - max: integer (default = 10) maximum number of option values expected.
      */
-    $fields = array(
-      'CRM_Core_BAO_Address' => array(
-        array(
+    $fields = [
+      'CRM_Core_BAO_Address' => [
+        [
           'fieldName' => 'state_province_id',
           'sample' => 'California',
           'max' => 60,
-          'props' => array('country_id' => 1228),
-        ),
-      ),
-      'CRM_Contact_BAO_Contact' => array(
-        array(
+          'props' => ['country_id' => 1228],
+        ],
+      ],
+      'CRM_Contact_BAO_Contact' => [
+        [
           'fieldName' => 'contact_sub_type',
           'sample' => 'Team',
           'exclude' => 'Organization',
-          'props' => array('contact_type' => 'Organization'),
-        ),
-      ),
-    );
+          'props' => ['contact_type' => 'Organization'],
+        ],
+      ],
+    ];
 
     foreach ($fields as $baoName => $baoFields) {
       foreach ($baoFields as $field) {
         $message = "BAO name: '{$baoName}', field: '{$field['fieldName']}'";
 
-        $props = CRM_Utils_Array::value('props', $field, array());
+        $props = CRM_Utils_Array::value('props', $field, []);
         $optionValues = $baoName::buildOptions($field['fieldName'], 'create', $props);
         $this->assertNotEmpty($optionValues, $message);
 
@@ -122,8 +122,8 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
 
     // Test replacing all options with a hook
     $this->targetField = 'case_type_id';
-    $this->replaceOptions = array('foo' => 'Foo', 'bar' => 'Bar');
-    $result = $this->callAPISuccess('case', 'getoptions', array('field' => 'case_type_id'));
+    $this->replaceOptions = ['foo' => 'Foo', 'bar' => 'Bar'];
+    $result = $this->callAPISuccess('case', 'getoptions', ['field' => 'case_type_id']);
     $this->assertEquals($result['values'], $this->replaceOptions);
 
     // TargetField doesn't match - should get unmodified option list
@@ -132,7 +132,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
 
     // This time we should get foo bar appended to the list
     $this->targetField = 'gender_id';
-    $this->appendOptions = array('foo' => 'Foo', 'bar' => 'Bar');
+    $this->appendOptions = ['foo' => 'Foo', 'bar' => 'Bar'];
     $this->replaceOptions = NULL;
     CRM_Core_PseudoConstant::flush();
     $result = CRM_Contact_BAO_Contact::buildOptions('gender_id');
@@ -145,65 +145,65 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
   public function testHookFieldOptionsWithCustomFields() {
     // Create a custom field group for testing.
     $custom_group_name = md5(microtime());
-    $api_params = array(
+    $api_params = [
       'title' => $custom_group_name,
       'extends' => 'Individual',
       'is_active' => TRUE,
-    );
+    ];
     $customGroup = $this->callAPISuccess('customGroup', 'create', $api_params);
 
     // Add a custom select field.
-    $api_params = array(
+    $api_params = [
       'custom_group_id' => $customGroup['id'],
       'label' => $custom_group_name . 1,
       'html_type' => 'Select',
       'data_type' => 'String',
-      'option_values' => array(
+      'option_values' => [
         'foo' => 'Foo',
         'bar' => 'Bar',
-      ),
-    );
+      ],
+    ];
     $result = $this->callAPISuccess('custom_field', 'create', $api_params);
     $customField1 = $result['id'];
 
     // Add a custom country field.
-    $api_params = array(
+    $api_params = [
       'custom_group_id' => $customGroup['id'],
       'label' => $custom_group_name . 2,
       'html_type' => 'Select Country',
       'data_type' => 'Country',
-    );
+    ];
     $result = $this->callAPISuccess('custom_field', 'create', $api_params);
     $customField2 = $result['id'];
 
     // Add a custom boolean field.
-    $api_params = array(
+    $api_params = [
       'custom_group_id' => $customGroup['id'],
       'label' => $custom_group_name . 3,
       'html_type' => 'Radio',
       'data_type' => 'Boolean',
-    );
+    ];
     $result = $this->callAPISuccess('custom_field', 'create', $api_params);
     $customField3 = $result['id'];
 
     $this->targetField = 'custom_' . $customField1;
     $this->replaceOptions = NULL;
-    $this->appendOptions = array('baz' => 'Baz');
+    $this->appendOptions = ['baz' => 'Baz'];
     $field = new CRM_Core_BAO_CustomField();
     $field->id = $customField1;
-    $this->assertEquals(array('foo' => 'Foo', 'bar' => 'Bar', 'baz' => 'Baz'), $field->getOptions());
+    $this->assertEquals(['foo' => 'Foo', 'bar' => 'Bar', 'baz' => 'Baz'], $field->getOptions());
 
     $this->targetField = 'custom_' . $customField2;
-    $this->replaceOptions = array('nowhere' => 'Nowhere');
+    $this->replaceOptions = ['nowhere' => 'Nowhere'];
     $field = new CRM_Core_BAO_CustomField();
     $field->id = $customField2;
     $this->assertEquals($this->replaceOptions + $this->appendOptions, $field->getOptions());
 
     $this->targetField = 'custom_' . $customField3;
     $this->replaceOptions = NULL;
-    $this->appendOptions = array(2 => 'Maybe');
+    $this->appendOptions = [2 => 'Maybe'];
     $options = CRM_Core_PseudoConstant::get('CRM_Core_BAO_CustomField', $this->targetField);
-    $this->assertEquals(array(1 => 'Yes', 0 => 'No', 2 => 'Maybe'), $options);
+    $this->assertEquals([1 => 'Yes', 0 => 'No', 2 => 'Maybe'], $options);
   }
 
   /**

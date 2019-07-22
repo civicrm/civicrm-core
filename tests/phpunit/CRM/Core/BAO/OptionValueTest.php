@@ -46,16 +46,16 @@ class CRM_Core_BAO_OptionValueTest extends CiviUnitTestCase {
    * Ensure only one option value exists after calling ensureOptionValueExists.
    */
   public function testEnsureOptionValueExistsExistingValue() {
-    CRM_Core_BAO_OptionValue::ensureOptionValueExists(array('name' => 'Completed', 'option_group_id' => 'contribution_status'));
-    $this->callAPISuccessGetSingle('OptionValue', array('name' => 'Completed', 'option_group_id' => 'contribution_status'));
+    CRM_Core_BAO_OptionValue::ensureOptionValueExists(['name' => 'Completed', 'option_group_id' => 'contribution_status']);
+    $this->callAPISuccessGetSingle('OptionValue', ['name' => 'Completed', 'option_group_id' => 'contribution_status']);
   }
 
   /**
    * Ensure only one option value exists adds a new value.
    */
   public function testEnsureOptionValueExistsNewValue() {
-    CRM_Core_BAO_OptionValue::ensureOptionValueExists(array('name' => 'Bombed', 'option_group_id' => 'contribution_status'));
-    $optionValues = $this->callAPISuccess('OptionValue', 'get', array('option_group_id' => 'contribution_status'));
+    CRM_Core_BAO_OptionValue::ensureOptionValueExists(['name' => 'Bombed', 'option_group_id' => 'contribution_status']);
+    $optionValues = $this->callAPISuccess('OptionValue', 'get', ['option_group_id' => 'contribution_status']);
     foreach ($optionValues['values'] as $value) {
       if ($value['name'] == 'Bombed') {
         return;
@@ -71,13 +71,13 @@ class CRM_Core_BAO_OptionValueTest extends CiviUnitTestCase {
    * decision to disable it & leaving it in that state.
    */
   public function testEnsureOptionValueExistsDisabled() {
-    $optionValue = CRM_Core_BAO_OptionValue::ensureOptionValueExists(array('name' => 'Crashed', 'option_group_id' => 'contribution_status', 'is_active' => 0));
-    $value = $this->callAPISuccessGetSingle('OptionValue', array('name' => 'Crashed', 'option_group_id' => 'contribution_status'));
+    $optionValue = CRM_Core_BAO_OptionValue::ensureOptionValueExists(['name' => 'Crashed', 'option_group_id' => 'contribution_status', 'is_active' => 0]);
+    $value = $this->callAPISuccessGetSingle('OptionValue', ['name' => 'Crashed', 'option_group_id' => 'contribution_status']);
     $this->assertEquals(0, $value['is_active']);
     $this->assertEquals($value['id'], $optionValue['id']);
 
-    $optionValue = CRM_Core_BAO_OptionValue::ensureOptionValueExists(array('name' => 'Crashed', 'option_group_id' => 'contribution_status'));
-    $value = $this->callAPISuccessGetSingle('OptionValue', array('name' => 'Crashed', 'option_group_id' => 'contribution_status'));
+    $optionValue = CRM_Core_BAO_OptionValue::ensureOptionValueExists(['name' => 'Crashed', 'option_group_id' => 'contribution_status']);
+    $value = $this->callAPISuccessGetSingle('OptionValue', ['name' => 'Crashed', 'option_group_id' => 'contribution_status']);
     $this->assertEquals(0, $value['is_active']);
     $this->assertEquals($value['id'], $optionValue['id']);
   }

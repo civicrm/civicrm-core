@@ -57,10 +57,10 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    * by rebuilding reports.
    */
   public function testNoDuplicateAllReportsLink() {
-    $existing_links = $this->callAPISuccess('Navigation', 'get', array('label' => 'All Reports', 'sequential' => 1));
+    $existing_links = $this->callAPISuccess('Navigation', 'get', ['label' => 'All Reports', 'sequential' => 1]);
     $this->assertNotEquals($existing_links['values'][0]['parent_id'], $existing_links['values'][1]['parent_id']);
     CRM_Core_BAO_Navigation::rebuildReportsNavigation(CRM_Core_Config::domainID());
-    $new_links = $this->callAPISuccess('Navigation', 'get', array('label' => 'All Reports', 'sequential' => 1));
+    $new_links = $this->callAPISuccess('Navigation', 'get', ['label' => 'All Reports', 'sequential' => 1]);
     $this->assertEquals($existing_links['values'][0]['parent_id'], $new_links['values'][0]['parent_id']);
     $this->assertEquals($existing_links['values'][1]['parent_id'], $new_links['values'][1]['parent_id']);
   }
@@ -98,16 +98,16 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     $name = "Test Menu Link {$random_string}";
     $url = "civicrm/test/{$random_string}";
     $url_params = "reset=1";
-    $params = array(
+    $params = [
       'name' => $name,
       'label' => ts($name),
       'url' => "{$url}?{$url_params}",
       'parent_id' => NULL,
       'is_active' => TRUE,
-      'permission' => array(
+      'permission' => [
         'access CiviCRM',
-      ),
-    );
+      ],
+    ];
     CRM_Core_BAO_Navigation::add($params);
     $new_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, $url_params);
     $this->assertObjectHasAttribute('id', $new_nav);
@@ -126,16 +126,16 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
     $name = "Test Menu Link {$random_string}";
     $url = "civicrm/test/{$random_string}";
     $url_params = "reset=1&output=criteria";
-    $params = array(
+    $params = [
       'name' => $name,
       'label' => ts($name),
       'url' => "{$url}?{$url_params}",
       'parent_id' => NULL,
       'is_active' => TRUE,
-      'permission' => array(
+      'permission' => [
         'access CiviCRM',
-      ),
-    );
+      ],
+    ];
     CRM_Core_BAO_Navigation::add($params);
     $new_nav = CRM_Core_BAO_Navigation::getNavItemByUrl($url, 'reset=1%');
     $this->assertObjectHasAttribute('id', $new_nav);
@@ -169,24 +169,24 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    * everywhere. They should be unchanged.
    */
   public function testFixNavigationMenu_preserveIDs() {
-    $input[10] = array(
-      'attributes' => array(
+    $input[10] = [
+      'attributes' => [
         'label' => 'Custom Menu Entry',
         'parentID' => NULL,
         'navID' => 10,
         'active' => 1,
-      ),
-      'child' => array(
-        '11' => array(
-          'attributes' => array(
+      ],
+      'child' => [
+        '11' => [
+          'attributes' => [
             'label' => 'Custom Child Menu',
             'parentID' => 10,
             'navID' => 11,
-          ),
+          ],
           'child' => NULL,
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
     $output = $input;
     CRM_Core_BAO_Navigation::fixNavigationMenu($output);
@@ -202,29 +202,29 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
    * should be filled in, and others should be preserved.
    */
   public function testFixNavigationMenu_inferIDs() {
-    $input[10] = array(
-      'attributes' => array(
+    $input[10] = [
+      'attributes' => [
         'label' => 'Custom Menu Entry',
         'parentID' => NULL,
         'navID' => 10,
         'active' => 1,
-      ),
-      'child' => array(
-        '0' => array(
-          'attributes' => array(
+      ],
+      'child' => [
+        '0' => [
+          'attributes' => [
             'label' => 'Custom Child Menu',
-          ),
+          ],
           'child' => NULL,
-        ),
-        '100' => array(
-          'attributes' => array(
+        ],
+        '100' => [
+          'attributes' => [
             'label' => 'Custom Child Menu 2',
             'navID' => 100,
-          ),
+          ],
           'child' => NULL,
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
     $output = $input;
     CRM_Core_BAO_Navigation::fixNavigationMenu($output);
@@ -243,30 +243,30 @@ class CRM_Core_BAO_NavigationTest extends CiviUnitTestCase {
   }
 
   public function testFixNavigationMenu_inferIDs_deep() {
-    $input[10] = array(
-      'attributes' => array(
+    $input[10] = [
+      'attributes' => [
         'label' => 'Custom Menu Entry',
         'parentID' => NULL,
         'navID' => 10,
         'active' => 1,
-      ),
-      'child' => array(
-        '0' => array(
-          'attributes' => array(
+      ],
+      'child' => [
+        '0' => [
+          'attributes' => [
             'label' => 'Custom Child Menu',
-          ),
-          'child' => array(
-            '100' => array(
-              'attributes' => array(
+          ],
+          'child' => [
+            '100' => [
+              'attributes' => [
                 'label' => 'Custom Child Menu 2',
                 'navID' => 100,
-              ),
+              ],
               'child' => NULL,
-            ),
-          ),
-        ),
-      ),
-    );
+            ],
+          ],
+        ],
+      ],
+    ];
 
     $output = $input;
     CRM_Core_BAO_Navigation::fixNavigationMenu($output);

@@ -53,20 +53,20 @@ class api_v3_CustomApiTest extends CiviUnitTestCase {
    */
   public function testCustomApi() {
     $this->installApi();
-    $this->callAPISuccess('MailingProviderData', 'create', array(
+    $this->callAPISuccess('MailingProviderData', 'create', [
       'contact_identifier' => 'xyz',
       'mailing_identifier' => 'abx',
-    ));
-    $this->callAPISuccess('Mailing', 'create', array('name' => 'CiviMail', 'hash' => 'abx'));
-    $result = $this->callAPISuccess('MailingProviderData', 'get', array('return' => array('mailing_identifier.name', 'contact_identifier', 'mailing_identifier')));
+    ]);
+    $this->callAPISuccess('Mailing', 'create', ['name' => 'CiviMail', 'hash' => 'abx']);
+    $result = $this->callAPISuccess('MailingProviderData', 'get', ['return' => ['mailing_identifier.name', 'contact_identifier', 'mailing_identifier']]);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals('xyzabx2017-01-01 00:00:00', $result['id']);
     $this->assertEquals('xyzabx2017-01-01 00:00:00', $result['id']);
-    $this->assertEquals(array(
+    $this->assertEquals([
       'contact_identifier' => 'xyz',
       'mailing_identifier' => 'abx',
       'mailing_identifier.name' => 'CiviMail',
-    ), reset($result['values']));
+    ], reset($result['values']));
   }
 
   /**
@@ -75,11 +75,11 @@ class api_v3_CustomApiTest extends CiviUnitTestCase {
    * @param array $entityTypes
    */
   public function hookEntityTypes(&$entityTypes) {
-    $entityTypes['CRM_Omnimail_DAO_MailingProviderData'] = array(
+    $entityTypes['CRM_Omnimail_DAO_MailingProviderData'] = [
       'name' => 'MailingProviderData',
       'class' => 'CRM_Omnimail_DAO_MailingProviderData',
       'table' => 'civicrm_maiing_provider_data',
-    );
+    ];
   }
 
   /**
@@ -87,7 +87,7 @@ class api_v3_CustomApiTest extends CiviUnitTestCase {
    */
   public function installApi() {
     require_once __DIR__ . '/custom_api/MailingProviderData.php';
-    $this->hookClass->setHook('civicrm_entityTypes', array($this, 'hookEntityTypes'));
+    $this->hookClass->setHook('civicrm_entityTypes', [$this, 'hookEntityTypes']);
     CRM_Core_DAO_AllCoreTables::init(TRUE);
     CRM_Core_DAO::executeQuery(
       "CREATE TABLE IF NOT EXISTS `civicrm_mailing_provider_data` (

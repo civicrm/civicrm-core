@@ -11,22 +11,22 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
 
-    $this->visibilityOptionsKeys = CRM_Price_BAO_PriceFieldValue::buildOptions('visibility_id', NULL, array(
+    $this->visibilityOptionsKeys = CRM_Price_BAO_PriceFieldValue::buildOptions('visibility_id', NULL, [
       'labelColumn' => 'name',
       'flip' => TRUE,
-    ));
+    ]);
 
-    $this->publicFieldParams = $this->initializeFieldParameters(array(
+    $this->publicFieldParams = $this->initializeFieldParameters([
       'label' => 'Public Price Field',
       'name' => 'public_price',
       'visibility_id' => $this->visibilityOptionsKeys['public'],
-    ));
+    ]);
 
-    $this->adminFieldParams = $this->initializeFieldParameters(array(
+    $this->adminFieldParams = $this->initializeFieldParameters([
       'label' => 'Public Price Field',
       'name' => 'public_price',
       'visibility_id' => $this->visibilityOptionsKeys['admin'],
-    ));
+    ]);
   }
 
   public function testPublicFieldWithOnlyAdminOptionsIsNotAllowed() {
@@ -36,7 +36,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
 
     $form = new CRM_Price_Form_Field();
     $form->_action = CRM_Core_Action::ADD;
-    $files = array();
+    $files = [];
 
     $validationResult = $form->formRule($this->publicFieldParams, $files, $form);
     $this->assertType('array', $validationResult);
@@ -50,7 +50,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
 
     $form = new CRM_Price_Form_Field();
     $form->_action = CRM_Core_Action::ADD;
-    $files = array();
+    $files = [];
 
     $validationResult = $form->formRule($this->adminFieldParams, $files, $form);
     $this->assertType('array', $validationResult);
@@ -58,7 +58,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
   }
 
   private function initializeFieldParameters($params) {
-    $defaultParams = array(
+    $defaultParams = [
       'label' => 'Price Field',
       'name' => CRM_Utils_String::titleToVar('Price Field'),
       'html_type' => 'Select',
@@ -68,7 +68,7 @@ class CRM_Price_Form_FieldTest extends CiviUnitTestCase {
       'is_enter_qty' => 1,
       'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
       'visibility_id' => $this->visibilityOptionsKeys['public'],
-    );
+    ];
 
     for ($index = 1; $index <= CRM_Price_Form_Field::NUM_OPTION; $index++) {
       $defaultParams['option_label'][$index] = NULL;

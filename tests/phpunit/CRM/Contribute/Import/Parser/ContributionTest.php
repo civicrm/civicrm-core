@@ -10,7 +10,7 @@
  * @group headless
  */
 class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
-  protected $_tablesToTruncate = array();
+  protected $_tablesToTruncate = [];
 
   /**
    * Setup function.
@@ -32,33 +32,33 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    */
   public function testImportParserWithSoftCreditsByExternalIdentifier($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
-    $contact1Params = array(
+    $contact1Params = [
       'first_name' => 'Contact',
       'last_name' => 'One',
       'external_identifier' => 'ext-1',
       'contact_type' => 'Individual',
-    );
-    $contact2Params = array(
+    ];
+    $contact2Params = [
       'first_name' => 'Contact',
       'last_name' => 'Two',
       'external_identifier' => 'ext-2',
       'contact_type' => 'Individual',
-    );
+    ];
     $contact1Id = $this->individualCreate($contact1Params);
     $contact2Id = $this->individualCreate($contact2Params);
-    $values = array(
+    $values = [
       "total_amount" => $this->formatMoneyInput(1230.99),
       "financial_type" => "Donation",
       "external_identifier" => "ext-1",
       "soft_credit" => "ext-2",
-    );
-    $mapperSoftCredit = array(NULL, NULL, NULL, "external_identifier");
-    $mapperSoftCreditType = array(NULL, NULL, NULL, "1");
+    ];
+    $mapperSoftCredit = [NULL, NULL, NULL, "external_identifier"];
+    $mapperSoftCreditType = [NULL, NULL, NULL, "1"];
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Contribute_Import_Parser::SOFT_CREDIT, $mapperSoftCredit, NULL, $mapperSoftCreditType);
-    $params = array(
+    $params = [
       "contact_id" => $contact1Id,
-    );
-    $values = array();
+    ];
+    $values = [];
     $contributionsOfMainContact = CRM_Contribute_BAO_Contribution::retrieve($params, $values, $values);
     $this->assertEquals(1230.99, $contributionsOfMainContact->total_amount);
     $this->assertEquals(1230.99, $contributionsOfMainContact->net_amount);

@@ -41,14 +41,14 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
   public function testAdd() {
     $contactId = $this->individualCreate();
 
-    $params = array();
-    $params = array(
+    $params = [];
+    $params = [
       'phone' => '(415) 222-1011 x 221',
       'is_primary' => 1,
       'location_type_id' => 1,
       'phone_type' => 'Mobile',
       'contact_id' => $contactId,
-    );
+    ];
 
     CRM_Core_BAO_Phone::add($params);
 
@@ -62,12 +62,12 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
 
     // Now call add() to modify the existing phone number
 
-    $params = array();
-    $params = array(
+    $params = [];
+    $params = [
       'id' => $phoneId,
       'contact_id' => $contactId,
       'phone' => '(415) 222-5432',
-    );
+    ];
 
     CRM_Core_BAO_Phone::add($params);
 
@@ -82,12 +82,12 @@ class CRM_Core_BAO_PhoneTest extends CiviUnitTestCase {
    * AllPhones() method - get all Phones for our contact, with primary Phone first.
    */
   public function testAllPhones() {
-    $contactParams = array(
+    $contactParams = [
       'first_name' => 'Alan',
       'last_name' => 'Smith',
-      'api.phone.create' => array('phone' => '(415) 222-1011 x 221', 'location_type_id' => 'Home'),
-      'api.phone.create.1' => array('phone' => '(415) 222-5432', 'location_type_id' => 'Work'),
-    );
+      'api.phone.create' => ['phone' => '(415) 222-1011 x 221', 'location_type_id' => 'Home'],
+      'api.phone.create.1' => ['phone' => '(415) 222-5432', 'location_type_id' => 'Work'],
+    ];
 
     $contactId = $this->individualCreate($contactParams);
 

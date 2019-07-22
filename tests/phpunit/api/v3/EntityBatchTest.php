@@ -44,16 +44,16 @@ class api_v3_EntityBatchTest extends CiviUnitTestCase {
     parent::setUp();
     $this->useTransaction(TRUE);
 
-    $entityParams = array('contact_id' => 1);
+    $entityParams = ['contact_id' => 1];
 
     $this->_entity = 'EntityBatch';
     $this->_entityID = $this->contributionCreate($entityParams);
     $this->_batchID = $this->batchCreate();
-    $this->params = array(
+    $this->params = [
       'entity_id' => $this->_entityID,
       'batch_id' => $this->_batchID,
       'entity_table' => 'civicrm_financial_trxn',
-    );
+    ];
   }
 
   public function testCreateEntityBatch() {
@@ -68,14 +68,14 @@ class api_v3_EntityBatchTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument($this->_entity, 'get', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
-    $this->callAPISuccess($this->_entity, 'delete', array('id' => $result['id']));
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
   }
 
   public function testDeleteEntityBatch() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $deleteParams = array('id' => $result['id']);
+    $deleteParams = ['id' => $result['id']];
     $result = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
     $this->assertEquals(0, $checkDeleted['count']);
   }
 

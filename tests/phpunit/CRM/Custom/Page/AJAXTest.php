@@ -43,18 +43,18 @@ class CRM_Custom_Page_AJAXTest extends CiviUnitTestCase {
    */
   public function testMultiRecordFieldList() {
     //create multi record custom group
-    $ids = $this->CustomGroupMultipleCreateWithFields(array('style' => 'Tab with table'));
-    $params = array(
+    $ids = $this->CustomGroupMultipleCreateWithFields(['style' => 'Tab with table']);
+    $params = [
       'contact_type' => 'Individual',
       'first_name' => 'Test',
       'last_name' => 'Contact',
-    );
+    ];
     $customFields = $ids['custom_field_id'];
     $result = $this->callAPISuccess('contact', 'create', $params);
     $contactId = $result['id'];
 
     //enter values for custom fields
-    $customParams = array(
+    $customParams = [
       "custom_{$customFields[0]}_-1" => "test value {$customFields[0]} one",
       "custom_{$customFields[0]}_-2" => "test value {$customFields[0]} two",
       "custom_{$customFields[0]}_-3" => "test value {$customFields[0]} three",
@@ -64,30 +64,30 @@ class CRM_Custom_Page_AJAXTest extends CiviUnitTestCase {
       "custom_{$customFields[2]}_-1" => "test value {$customFields[2]} one",
       "custom_{$customFields[2]}_-2" => "test value {$customFields[2]} two",
       "custom_{$customFields[2]}_-3" => "test value {$customFields[2]} three",
-    );
+    ];
     CRM_Core_BAO_CustomValueTable::postProcess($customParams, "civicrm_contact", $contactId, NULL);
 
-    $_GET = array(
+    $_GET = [
       'cid' => $contactId,
       'cgid' => $ids['custom_group_id'],
       'is_unit_test' => TRUE,
-    );
+    ];
     $multiRecordFields = CRM_Custom_Page_AJAX::getMultiRecordFieldList();
 
     //check sorting
     foreach ($customFields as $fieldId) {
       $columnName = "field_{$fieldId}{$ids['custom_group_id']}_{$fieldId}";
-      $_GET['columns'][] = array(
+      $_GET['columns'][] = [
         'data' => $columnName,
-      );
+      ];
     }
     // get the results in descending order
-    $_GET['order'] = array(
-      '0' => array(
+    $_GET['order'] = [
+      '0' => [
         'column' => 0,
         'dir' => 'desc',
-      ),
-    );
+      ],
+    ];
     $sortedRecords = CRM_Custom_Page_AJAX::getMultiRecordFieldList();
 
     $this->assertEquals(3, $sortedRecords['recordsTotal']);
@@ -106,8 +106,8 @@ class CRM_Custom_Page_AJAXTest extends CiviUnitTestCase {
 
     $sorted = FALSE;
     // sorted order result should be two, three, one
-    $sortedCount = array(1 => 2, 2 => 3, 3 => 1);
-    foreach (array($multiRecordFields, $sortedRecords) as $records) {
+    $sortedCount = [1 => 2, 2 => 3, 3 => 1];
+    foreach ([$multiRecordFields, $sortedRecords] as $records) {
       $count = 1;
       foreach ($records['data'] as $key => $val) {
         //check links for result sorted in descending order

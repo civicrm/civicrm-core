@@ -31,13 +31,13 @@
  * @package CiviCRM
  */
 class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
-  protected $_tablesToTruncate = array(
+  protected $_tablesToTruncate = [
     'civicrm_contact',
     'civicrm_email',
     'civicrm_phone',
     'civicrm_address',
     'civicrm_contribution',
-  );
+  ];
 
   public function setUp() {
     parent::setUp();
@@ -55,23 +55,23 @@ class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
   public function testLongCustomFieldNames() {
     // Create custom group with long name and custom field with long name.
     $long_name = 'this is a very very very very long name with 65 characters in it';
-    $group_params = array(
+    $group_params = [
       'title' => $long_name,
       'extends' => 'Activity',
-    );
+    ];
     $result = $this->customGroupCreate($group_params);
     $custom_group_id = $result['id'];
-    $field_params = array(
+    $field_params = [
       'custom_group_id' => $custom_group_id,
       'label' => $long_name,
-    );
+    ];
     $result = $this->customFieldCreate($field_params);
     $custom_field_id = $result['id'];
-    $input = array(
-      'fields' => array(
+    $input = [
+      'fields' => [
         'custom_' . $custom_field_id,
-      ),
-    );
+      ],
+    ];
     $obj = $this->getReportObject('CRM_Report_Form_Activity', $input);
     //$params = $obj->_params;
     //$params['fields'] = array('custom_' . $custom_field_id);
@@ -86,40 +86,40 @@ class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
   public function testTargetAddressFields() {
     $countryNames = array_flip(CRM_Core_PseudoConstant::country());
     // Create contact 1 and 2 with address fields, later considered as target contacts for activity
-    $contactID1 = $this->individualCreate(array(
-      'api.Address.create' => array(
+    $contactID1 = $this->individualCreate([
+      'api.Address.create' => [
         'contact_id' => '$value.id',
         'location_type_id' => 'Home',
         'city' => 'ABC',
         'country_id' => $countryNames['India'],
-      ),
-    ));
-    $contactID2 = $this->individualCreate(array(
-      'api.Address.create' => array(
+      ],
+    ]);
+    $contactID2 = $this->individualCreate([
+      'api.Address.create' => [
         'contact_id' => '$value.id',
         'location_type_id' => 'Home',
         'city' => 'DEF',
         'country_id' => $countryNames['United States'],
-      ),
-    ));
+      ],
+    ]);
     // Create Contact 3 later considered as assignee contact of activity
-    $contactID3 = $this->individualCreate(array(
-      'api.Address.create' => array(
+    $contactID3 = $this->individualCreate([
+      'api.Address.create' => [
         'contact_id' => '$value.id',
         'location_type_id' => 'Home',
         'city' => 'GHI',
         'country_id' => $countryNames['China'],
-      ),
-    ));
+      ],
+    ]);
 
     // create dummy activity type
-    $activityTypeID = CRM_Utils_Array::value('id', $this->callAPISuccess('option_value', 'create', array(
+    $activityTypeID = CRM_Utils_Array::value('id', $this->callAPISuccess('option_value', 'create', [
       'option_group_id' => 'activity_type',
       'name' => 'Test activity type',
       'label' => 'Test activity type',
-    )));
+    ]));
     // create activity
-    $result = $this->callAPISuccess('activity', 'create', array(
+    $result = $this->callAPISuccess('activity', 'create', [
       'subject' => 'Make-it-Happen Meeting',
       'activity_date_time' => date('Ymd'),
       'duration' => 120,
@@ -128,20 +128,20 @@ class CRM_Report_Form_ActivityTest extends CiviReportTestCase {
       'status_id' => 1,
       'activity_type_id' => 'Test activity type',
       'source_contact_id' => $this->individualCreate(),
-      'target_contact_id' => array($contactID1, $contactID2),
+      'target_contact_id' => [$contactID1, $contactID2],
       'assignee_contact_id' => $contactID3,
-    ));
+    ]);
     // display city and country field so that we can check its value
-    $input = array(
-      'fields' => array(
+    $input = [
+      'fields' => [
         'city',
         'country_id',
-      ),
-      'order_bys' => array(
-        'city' => array(),
-        'country_id' => array('default' => TRUE),
-      ),
-    );
+      ],
+      'order_bys' => [
+        'city' => [],
+        'country_id' => ['default' => TRUE],
+      ],
+    ];
     // generate result
     $obj = $this->getReportObject('CRM_Report_Form_Activity', $input);
     $rows = $obj->getResultSet();

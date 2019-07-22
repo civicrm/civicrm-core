@@ -61,7 +61,7 @@ class api_v3_SystemTest extends CiviUnitTestCase {
 
     $this->assertEquals('abc', Civi::cache()->get(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH)));
 
-    $params = array();
+    $params = [];
     $result = $this->callAPIAndDocument('system', 'flush', $params, __FUNCTION__, __FILE__, "Flush all system caches", 'Flush');
 
     $this->assertTrue(NULL === Civi::cache()->get(CRM_Utils_Cache::cleanKey(self::TEST_CACHE_PATH)));
@@ -71,11 +71,11 @@ class api_v3_SystemTest extends CiviUnitTestCase {
    * Test system log function.
    */
   public function testSystemLog() {
-    $this->callAPISuccess('system', 'log', array('level' => 'info', 'message' => 'We wish you a merry Christmas'));
-    $result = $this->callAPISuccess('SystemLog', 'getsingle', array(
+    $this->callAPISuccess('system', 'log', ['level' => 'info', 'message' => 'We wish you a merry Christmas']);
+    $result = $this->callAPISuccess('SystemLog', 'getsingle', [
       'sequential' => 1,
-      'message' => array('LIKE' => '%Chris%'),
-    ));
+      'message' => ['LIKE' => '%Chris%'],
+    ]);
     $this->assertEquals($result['message'], 'We wish you a merry Christmas');
     $this->assertEquals($result['level'], 'info');
   }
@@ -84,17 +84,17 @@ class api_v3_SystemTest extends CiviUnitTestCase {
    * Test system log function.
    */
   public function testSystemLogNoLevel() {
-    $this->callAPISuccess('system', 'log', array('message' => 'We wish you a merry Christmas', 'level' => 'alert'));
-    $result = $this->callAPISuccess('SystemLog', 'getsingle', array(
+    $this->callAPISuccess('system', 'log', ['message' => 'We wish you a merry Christmas', 'level' => 'alert']);
+    $result = $this->callAPISuccess('SystemLog', 'getsingle', [
       'sequential' => 1,
-      'message' => array('LIKE' => '%Chris%'),
-    ));
+      'message' => ['LIKE' => '%Chris%'],
+    ]);
     $this->assertEquals($result['message'], 'We wish you a merry Christmas');
     $this->assertEquals($result['level'], 'alert');
   }
 
   public function testSystemGet() {
-    $result = $this->callAPISuccess('system', 'get', array());
+    $result = $this->callAPISuccess('system', 'get', []);
     $this->assertRegExp('/^[0-9]+\.[0-9]+\.[0-9a-z\-]+$/', $result['values'][0]['version']);
     $this->assertEquals('UnitTests', $result['values'][0]['uf']);
   }

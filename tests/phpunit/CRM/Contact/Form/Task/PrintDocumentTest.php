@@ -37,10 +37,10 @@ class CRM_Contact_Form_Task_PrintDocumentTest extends CiviUnitTestCase {
 
   protected function setUp() {
     parent::setUp();
-    $this->_contactIds = array(
-      $this->individualCreate(array('first_name' => 'Antonia', 'last_name' => 'D`souza')),
-      $this->individualCreate(array('first_name' => 'Anthony', 'last_name' => 'Collins')),
-    );
+    $this->_contactIds = [
+      $this->individualCreate(['first_name' => 'Antonia', 'last_name' => 'D`souza']),
+      $this->individualCreate(['first_name' => 'Anthony', 'last_name' => 'Collins']),
+    ];
     $this->_docTypes = CRM_Core_SelectValues::documentApplicationType();
   }
 
@@ -48,13 +48,13 @@ class CRM_Contact_Form_Task_PrintDocumentTest extends CiviUnitTestCase {
    * Test the documents got token replaced rightfully.
    */
   public function testPrintDocument() {
-    foreach (array('docx', 'odt') as $docType) {
-      $formValues = array(
-        'document_file' => array(
+    foreach (['docx', 'odt'] as $docType) {
+      $formValues = [
+        'document_file' => [
           'name' => __DIR__ . "/sample_documents/Template.$docType",
           'type' => $this->_docTypes[$docType],
-        ),
-      );
+        ],
+      ];
       $this->_testDocumentContent($formValues, $docType);
     }
   }
@@ -66,13 +66,13 @@ class CRM_Contact_Form_Task_PrintDocumentTest extends CiviUnitTestCase {
    * @param array $type
    */
   public function _testDocumentContent($formValues, $type) {
-    $html = array();
+    $html = [];
     $form = new CRM_Contact_Form_Task_PDFLetterCommon();
     list($formValues, $categories, $html_message, $messageToken, $returnProperties) = $form->processMessageTemplate($formValues);
     list($html_message, $zip) = CRM_Utils_PDF_Document::unzipDoc($formValues['document_file_path'], $formValues['document_type']);
 
     foreach ($this->_contactIds as $item => $contactId) {
-      $params = array('contact_id' => $contactId);
+      $params = ['contact_id' => $contactId];
       list($contact) = CRM_Utils_Token::getTokenDetails($params,
         $returnProperties,
         FALSE,

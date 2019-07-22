@@ -13,7 +13,7 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_post', array($this, 'onPost'));
+    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_post', [$this, 'onPost']);
   }
 
   /**
@@ -21,12 +21,12 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
    * fact that the hook manipulated the actual DB content.
    */
   public function testNoReload() {
-    $result = $this->callAPISuccess('contact', 'create', array(
+    $result = $this->callAPISuccess('contact', 'create', [
       'contact_type' => 'Individual',
       'first_name' => 'First',
       'last_name' => 'Last',
       'nick_name' => 'Firstie',
-    ));
+    ]);
     $this->assertEquals('First', $result['values'][$result['id']]['first_name']);
     // munged by hook, but we haven't realized it
     $this->assertEquals('Firstie', $result['values'][$result['id']]['nick_name']);
@@ -36,15 +36,15 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
    * When the reload option is unrecognized, generate an error
    */
   public function testReloadInvalid() {
-    $this->callAPIFailure('contact', 'create', array(
+    $this->callAPIFailure('contact', 'create', [
       'contact_type' => 'Individual',
       'first_name' => 'First',
       'last_name' => 'Last',
       'nick_name' => 'Firstie',
-      'options' => array(
+      'options' => [
         'reload' => 'invalid',
-      ),
-    ));
+      ],
+    ]);
   }
 
   /**
@@ -52,15 +52,15 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
    * differs from the inputted nick_name.
    */
   public function testReloadDefault() {
-    $result = $this->callAPISuccess('contact', 'create', array(
+    $result = $this->callAPISuccess('contact', 'create', [
       'contact_type' => 'Individual',
       'first_name' => 'First',
       'last_name' => 'Last',
       'nick_name' => 'Firstie',
-      'options' => array(
+      'options' => [
         'reload' => 1,
-      ),
-    ));
+      ],
+    ]);
     $this->assertEquals('First', $result['values'][$result['id']]['first_name']);
     $this->assertEquals('munged', $result['values'][$result['id']]['nick_name']);
   }
@@ -70,18 +70,18 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
    * the chain results.
    */
   public function testReloadNoChainInterference() {
-    $result = $this->callAPISuccess('contact', 'create', array(
+    $result = $this->callAPISuccess('contact', 'create', [
       'contact_type' => 'Individual',
       'first_name' => 'First',
       'last_name' => 'Last',
       'nick_name' => 'Firstie',
-      'api.Email.create' => array(
+      'api.Email.create' => [
         'email' => 'test@example.com',
-      ),
-      'options' => array(
+      ],
+      'options' => [
         'reload' => 1,
-      ),
-    ));
+      ],
+    ]);
     $this->assertEquals('First', $result['values'][$result['id']]['first_name']);
     $this->assertEquals('munged', $result['values'][$result['id']]['nick_name']);
     $this->assertAPISuccess($result['values'][$result['id']]['api.Email.create']);
@@ -92,19 +92,19 @@ class CRM_Utils_API_ReloadOptionTest extends CiviUnitTestCase {
    * the chain results, even if sequential=1.
    */
   public function testReloadNoChainInterferenceSequential() {
-    $result = $this->callAPISuccess('contact', 'create', array(
+    $result = $this->callAPISuccess('contact', 'create', [
       'sequential' => 1,
       'contact_type' => 'Individual',
       'first_name' => 'First',
       'last_name' => 'Last',
       'nick_name' => 'Firstie',
-      'api.Email.create' => array(
+      'api.Email.create' => [
         'email' => 'test@example.com',
-      ),
-      'options' => array(
+      ],
+      'options' => [
         'reload' => 1,
-      ),
-    ));
+      ],
+    ]);
     $this->assertEquals('First', $result['values'][0]['first_name']);
     $this->assertEquals('munged', $result['values'][0]['nick_name']);
     $this->assertAPISuccess($result['values'][0]['api.Email.create']);
