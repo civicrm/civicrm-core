@@ -108,12 +108,24 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
         ],
         'grouping' => 'contact-fields',
       ],
+      'civicrm_option_value' => [
+        'dao' => 'CRM_Core_DAO_OptionValue',
+        'fields' => [
+          'label' => [
+            'title' => ts('Activity Type'),
+            'required' => TRUE,
+            'type' => CRM_Utils_Type::T_STRING,
+            'dbAlias' => 'civicrm_option_value.label'
+          ],
+        ],
+      ],
       'civicrm_activity' => [
         'dao' => 'CRM_Activity_DAO_Activity',
         'fields' => [
           'activity_type_id' => [
-            'title' => ts('Activity Type'),
+            'title' => ts('Activity Type ID'),
             'required' => TRUE,
+            'no_display' => TRUE,
             'type' => CRM_Utils_Type::T_STRING,
           ],
           'status_id' => [
@@ -181,6 +193,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
           ],
           'activity_type_id' => [
             'title' => ts('Activity Type'),
+            'dbAlias' => 'civicrm_option_value.label'
           ],
         ],
         'grouping' => 'activity-fields',
@@ -477,7 +490,7 @@ class CRM_Report_Form_ActivitySummary extends CRM_Report_Form {
     $this->groupBy(FALSE);
 
     // build the query to calulate duration sum
-    $sql = "SELECT SUM(activity_civireport.duration) as civicrm_activity_duration_total {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_orderBy} {$this->_limit}";
+    $sql = "SELECT SUM(activity_civireport.duration) as civicrm_activity_duration_total {$this->_from} {$this->_where} {$this->_groupBy} {$this->_having} {$this->_limit}";
 
     // create temp table to store duration
     $this->_tempDurationSumTableName = $this->createTemporaryTable('tempDurationSumTable', "
