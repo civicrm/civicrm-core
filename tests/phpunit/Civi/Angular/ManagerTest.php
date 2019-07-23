@@ -59,12 +59,12 @@ class ManagerTest extends \CiviUnitTestCase {
   public function testGetModules() {
     $modules = $this->angular->getModules();
 
-    $counts = array(
+    $counts = [
       'js' => 0,
       'css' => 0,
       'partials' => 0,
       'settings' => 0,
-    );
+    ];
 
     foreach ($modules as $module) {
       $this->assertTrue(is_array($module));
@@ -117,7 +117,7 @@ class ManagerTest extends \CiviUnitTestCase {
    * Get HTML fragments from an example module. The HTML is modified via hook.
    */
   public function testGetPartials_Hooked() {
-    \CRM_Utils_Hook::singleton()->setHook('civicrm_alterAngular', array($this, 'hook_civicrm_alterAngular'));
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_alterAngular', [$this, 'hook_civicrm_alterAngular']);
 
     $partials = $this->angular->getPartials('crmMailing');
     $this->assertRegExp('/ng-form="crmMailingSubform" cat-stevens="ts\\(\'wild world\'\\)">/', $partials['~/crmMailing/EditMailingCtrl/2step.html']);
@@ -125,9 +125,9 @@ class ManagerTest extends \CiviUnitTestCase {
   }
 
   public function testGetJs_Asset() {
-    \CRM_Utils_Hook::singleton()->setHook('civicrm_angularModules', array($this, 'hook_civicrm_angularModules_fooBar'));
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_angularModules', [$this, 'hook_civicrm_angularModules_fooBar']);
 
-    $paths = $this->angular->getResources(array('fooBar'), 'js', 'path');
+    $paths = $this->angular->getResources(['fooBar'], 'js', 'path');
     $this->assertRegExp('/visual-bundle.[a-z0-9]+.js/', $paths[0]);
     $this->assertRegExp('/crossfilter/', file_get_contents($paths[0]));
 
@@ -149,7 +149,7 @@ class ManagerTest extends \CiviUnitTestCase {
    * Get a translatable string from an example module. The HTML is modified via hook.
    */
   public function testGetStrings_Hooked() {
-    \CRM_Utils_Hook::singleton()->setHook('civicrm_alterAngular', array($this, 'hook_civicrm_alterAngular'));
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_alterAngular', [$this, 'hook_civicrm_alterAngular']);
 
     $strings = $this->angular->getStrings('crmMailing');
     $this->assertTrue(in_array('wild world', $strings));
@@ -160,7 +160,7 @@ class ManagerTest extends \CiviUnitTestCase {
    * Get the list of dependencies for an Angular module.
    */
   public function testGetRequires() {
-    $requires = $this->angular->getResources(array('crmMailing'), 'requires', 'requires');
+    $requires = $this->angular->getResources(['crmMailing'], 'requires', 'requires');
     $this->assertTrue(in_array('ngRoute', $requires['crmMailing']));
     $this->assertFalse(in_array('crmCatStevens', $requires['crmMailing']));
     // If crmMailing changes, feel free to use a different example.
@@ -170,9 +170,9 @@ class ManagerTest extends \CiviUnitTestCase {
    * Get the list of dependencies for an Angular module. It can be modified via hook.
    */
   public function testGetRequires_Hooked() {
-    \CRM_Utils_Hook::singleton()->setHook('civicrm_alterAngular', array($this, 'hook_civicrm_alterAngular'));
+    \CRM_Utils_Hook::singleton()->setHook('civicrm_alterAngular', [$this, 'hook_civicrm_alterAngular']);
 
-    $requires = $this->angular->getResources(array('crmMailing'), 'requires', 'requires');
+    $requires = $this->angular->getResources(['crmMailing'], 'requires', 'requires');
     $this->assertTrue(in_array('ngRoute', $requires['crmMailing']));
     $this->assertTrue(in_array('crmCatStevens', $requires['crmMailing']));
     // If crmMailing changes, feel free to use a different example.
@@ -183,7 +183,7 @@ class ManagerTest extends \CiviUnitTestCase {
    */
   public function testResolveDeps() {
     // If crmMailing changes, feel free to use a different example.
-    $expected = array(
+    $expected = [
       'angularFileUpload',
       'crmAttachment',
       'crmAutosave',
@@ -196,8 +196,8 @@ class ManagerTest extends \CiviUnitTestCase {
       'ngRoute',
       'ngSanitize',
       'ui.utils',
-    );
-    $input = array('crmMailing', 'crmCxn');
+    ];
+    $input = ['crmMailing', 'crmCxn'];
     $actual = $this->angular->resolveDependencies($input);
     sort($expected);
     sort($actual);
@@ -221,13 +221,13 @@ class ManagerTest extends \CiviUnitTestCase {
   }
 
   public function hook_civicrm_angularModules_fooBar(&$angularModules) {
-    $angularModules['fooBar'] = array(
+    $angularModules['fooBar'] = [
       'ext' => 'civicrm',
-      'js' => array(
+      'js' => [
         'assetBuilder://visual-bundle.js',
         'ext://civicrm/js/Common.js',
-      ),
-    );
+      ],
+    ];
   }
 
 }

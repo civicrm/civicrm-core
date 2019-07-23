@@ -20,31 +20,31 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    $this->quickCleanup(array('civicrm_contact', 'civicrm_activity'));
-    $this->callbackLog = array();
-    $this->cids = array();
+    $this->quickCleanup(['civicrm_contact', 'civicrm_activity']);
+    $this->callbackLog = [];
+    $this->cids = [];
   }
 
   /**
    * @return array
    */
   public function dataCreateStyle() {
-    return array(
-      array('sql-insert'),
-      array('bao-create'),
-    );
+    return [
+      ['sql-insert'],
+      ['bao-create'],
+    ];
   }
 
   /**
    * @return array
    */
   public function dataCreateAndCommitStyles() {
-    return array(
-      array('sql-insert', 'implicit-commit'),
-      array('sql-insert', 'explicit-commit'),
-      array('bao-create', 'implicit-commit'),
-      array('bao-create', 'explicit-commit'),
-    );
+    return [
+      ['sql-insert', 'implicit-commit'],
+      ['sql-insert', 'explicit-commit'],
+      ['bao-create', 'implicit-commit'],
+      ['bao-create', 'explicit-commit'],
+    ];
   }
 
   /**
@@ -57,7 +57,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   public function testBasicCommit($createStyle, $commitStyle) {
     $this->createContactWithTransaction('reuse-tx', $createStyle, $commitStyle);
     $this->assertCount(1, $this->cids);
-    $this->assertContactsExistByOffset(array(0 => TRUE));
+    $this->assertContactsExistByOffset([0 => TRUE]);
   }
 
   /**
@@ -67,7 +67,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   public function testBasicRollback($createStyle) {
     $this->createContactWithTransaction('reuse-tx', $createStyle, 'rollback');
     $this->assertCount(1, $this->cids);
-    $this->assertContactsExistByOffset(array(0 => FALSE));
+    $this->assertContactsExistByOffset([0 => FALSE]);
   }
 
   /**
@@ -83,17 +83,17 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   public function testBatchRollback($createStyle, $commitStyle) {
     $this->runBatch(
       'reuse-tx',
-      array(
+      [
         // cid 0
-        array('reuse-tx', $createStyle, $commitStyle),
+        ['reuse-tx', $createStyle, $commitStyle],
         // cid 1
-        array('reuse-tx', $createStyle, $commitStyle),
-      ),
-      array(0 => TRUE, 1 => TRUE),
+        ['reuse-tx', $createStyle, $commitStyle],
+      ],
+      [0 => TRUE, 1 => TRUE],
       'rollback'
     );
     $this->assertCount(2, $this->cids);
-    $this->assertContactsExistByOffset(array(0 => FALSE, 1 => FALSE));
+    $this->assertContactsExistByOffset([0 => FALSE, 1 => FALSE]);
   }
 
   /**
@@ -111,19 +111,19 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   public function testMixedBatchCommit_nesting($createStyle, $commitStyle) {
     $this->runBatch(
       'reuse-tx',
-      array(
+      [
         // cid 0
-        array('nest-tx', $createStyle, $commitStyle),
+        ['nest-tx', $createStyle, $commitStyle],
         // cid 1
-        array('nest-tx', $createStyle, 'rollback'),
+        ['nest-tx', $createStyle, 'rollback'],
         // cid 2
-        array('nest-tx', $createStyle, $commitStyle),
-      ),
-      array(0 => TRUE, 1 => FALSE, 2 => TRUE),
+        ['nest-tx', $createStyle, $commitStyle],
+      ],
+      [0 => TRUE, 1 => FALSE, 2 => TRUE],
       $commitStyle
     );
     $this->assertCount(3, $this->cids);
-    $this->assertContactsExistByOffset(array(0 => TRUE, 1 => FALSE, 2 => TRUE));
+    $this->assertContactsExistByOffset([0 => TRUE, 1 => FALSE, 2 => TRUE]);
   }
 
   /**
@@ -141,19 +141,19 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   public function testMixedBatchCommit_reuse($createStyle, $commitStyle) {
     $this->runBatch(
       'reuse-tx',
-      array(
+      [
         // cid 0
-        array('reuse-tx', $createStyle, $commitStyle),
+        ['reuse-tx', $createStyle, $commitStyle],
         // cid 1
-        array('reuse-tx', $createStyle, 'rollback'),
+        ['reuse-tx', $createStyle, 'rollback'],
         // cid 2
-        array('reuse-tx', $createStyle, $commitStyle),
-      ),
-      array(0 => TRUE, 1 => TRUE, 2 => TRUE),
+        ['reuse-tx', $createStyle, $commitStyle],
+      ],
+      [0 => TRUE, 1 => TRUE, 2 => TRUE],
       $commitStyle
     );
     $this->assertCount(3, $this->cids);
-    $this->assertContactsExistByOffset(array(0 => FALSE, 1 => FALSE, 2 => FALSE));
+    $this->assertContactsExistByOffset([0 => FALSE, 1 => FALSE, 2 => FALSE]);
   }
 
   /**
@@ -171,20 +171,20 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $this->assertFalse(CRM_Core_Transaction::isActive());
     $this->runBatch(
       'reuse-tx',
-      array(
+      [
         // cid 0
-        array('nest-tx', $createStyle, $commitStyle),
+        ['nest-tx', $createStyle, $commitStyle],
         // cid 1
-        array('nest-tx', $createStyle, 'rollback'),
+        ['nest-tx', $createStyle, 'rollback'],
         // cid 2
-        array('nest-tx', $createStyle, $commitStyle),
-      ),
-      array(0 => TRUE, 1 => FALSE, 2 => TRUE),
+        ['nest-tx', $createStyle, $commitStyle],
+      ],
+      [0 => TRUE, 1 => FALSE, 2 => TRUE],
       'rollback'
     );
     $this->assertFalse(CRM_Core_Transaction::isActive());
     $this->assertCount(3, $this->cids);
-    $this->assertContactsExistByOffset(array(0 => FALSE, 1 => FALSE, 2 => FALSE));
+    $this->assertContactsExistByOffset([0 => FALSE, 1 => FALSE, 2 => FALSE]);
   }
 
   public function testIsActive() {
@@ -218,58 +218,58 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   public function testCallback_commit() {
     $tx = new CRM_Core_Transaction();
 
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, array($this, '_preCommit'), array(
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, [$this, '_preCommit'], [
       'qwe',
       'rty',
-    ));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, array($this, '_postCommit'), array(
+    ]);
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, [$this, '_postCommit'], [
       'uio',
       'p[]',
-    ));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, array(
+    ]);
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, [
       $this,
       '_preRollback',
-    ), array('asd', 'fgh'));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, array(
+    ], ['asd', 'fgh']);
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, [
       $this,
       '_postRollback',
-    ), array('jkl', ';'));
+    ], ['jkl', ';']);
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET id = 100 WHERE id = 100');
 
-    $this->assertEquals(array(), $this->callbackLog);
+    $this->assertEquals([], $this->callbackLog);
     $tx = NULL;
-    $this->assertEquals(array('_preCommit', 'qwe', 'rty'), $this->callbackLog[0]);
-    $this->assertEquals(array('_postCommit', 'uio', 'p[]'), $this->callbackLog[1]);
+    $this->assertEquals(['_preCommit', 'qwe', 'rty'], $this->callbackLog[0]);
+    $this->assertEquals(['_postCommit', 'uio', 'p[]'], $this->callbackLog[1]);
   }
 
   public function testCallback_rollback() {
     $tx = new CRM_Core_Transaction();
 
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, array($this, '_preCommit'), array(
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_COMMIT, [$this, '_preCommit'], [
       'ewq',
       'ytr',
-    ));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, array($this, '_postCommit'), array(
+    ]);
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_COMMIT, [$this, '_postCommit'], [
       'oiu',
       '][p',
-    ));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, array(
+    ]);
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_PRE_ROLLBACK, [
       $this,
       '_preRollback',
-    ), array('dsa', 'hgf'));
-    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, array(
+    ], ['dsa', 'hgf']);
+    CRM_Core_Transaction::addCallback(CRM_Core_Transaction::PHASE_POST_ROLLBACK, [
       $this,
       '_postRollback',
-    ), array('lkj', ';'));
+    ], ['lkj', ';']);
 
     CRM_Core_DAO::executeQuery('UPDATE civicrm_contact SET id = 100 WHERE id = 100');
     $tx->rollback();
 
-    $this->assertEquals(array(), $this->callbackLog);
+    $this->assertEquals([], $this->callbackLog);
     $tx = NULL;
-    $this->assertEquals(array('_preRollback', 'dsa', 'hgf'), $this->callbackLog[0]);
-    $this->assertEquals(array('_postRollback', 'lkj', ';'), $this->callbackLog[1]);
+    $this->assertEquals(['_preRollback', 'dsa', 'hgf'], $this->callbackLog[0]);
+    $this->assertEquals(['_postRollback', 'lkj', ';'], $this->callbackLog[1]);
   }
 
   /**
@@ -283,9 +283,9 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     $test = $this;
     CRM_Core_Transaction::create(TRUE)->run(function ($tx) use (&$test, $createStyle, $commitStyle) {
       $test->createContactWithTransaction('nest-tx', $createStyle, $commitStyle);
-      $test->assertContactsExistByOffset(array(0 => TRUE));
+      $test->assertContactsExistByOffset([0 => TRUE]);
     });
-    $this->assertContactsExistByOffset(array(0 => TRUE));
+    $this->assertContactsExistByOffset([0 => TRUE]);
   }
 
   /**
@@ -303,7 +303,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
     try {
       CRM_Core_Transaction::create(TRUE)->run(function ($tx) use (&$test, $createStyle, $commitStyle) {
         $test->createContactWithTransaction('nest-tx', $createStyle, $commitStyle);
-        $test->assertContactsExistByOffset(array(0 => TRUE));
+        $test->assertContactsExistByOffset([0 => TRUE]);
         throw new Exception("Ruh-roh");
       });
     }
@@ -314,7 +314,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
       }
     }
     $this->assertTrue($e instanceof Exception);
-    $this->assertContactsExistByOffset(array(0 => FALSE));
+    $this->assertContactsExistByOffset([0 => FALSE]);
   }
 
   /**
@@ -324,9 +324,9 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
   public function assertContactsExist($cids, $exist = TRUE) {
     foreach ($cids as $cid) {
       $this->assertTrue(is_numeric($cid));
-      $this->assertDBQuery($exist ? 1 : 0, 'SELECT count(*) FROM civicrm_contact WHERE id = %1', array(
-        1 => array($cid, 'Integer'),
-      ));
+      $this->assertDBQuery($exist ? 1 : 0, 'SELECT count(*) FROM civicrm_contact WHERE id = %1', [
+        1 => [$cid, 'Integer'],
+      ]);
     }
   }
 
@@ -340,9 +340,9 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
       $this->assertTrue(isset($this->cids[$generalOffset + $offset]), "Find cid at offset($generalOffset + $offset)");
       $cid = $this->cids[$generalOffset + $offset];
       $this->assertTrue(is_numeric($cid));
-      $this->assertDBQuery($expectExists ? 1 : 0, 'SELECT count(*) FROM civicrm_contact WHERE id = %1', array(
-        1 => array($cid, 'Integer'),
-      ), "Check contact at offset($generalOffset + $offset)");
+      $this->assertDBQuery($expectExists ? 1 : 0, 'SELECT count(*) FROM civicrm_contact WHERE id = %1', [
+        1 => [$cid, 'Integer'],
+      ], "Check contact at offset($generalOffset + $offset)");
     }
   }
 
@@ -377,18 +377,18 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
       $cid = $r->getConnection()->lastInsertId();
     }
     elseif ($insert == 'bao-create') {
-      $params = array(
+      $params = [
         'contact_type' => 'Individual',
         'first_name' => 'FF',
         'last_name' => 'LL',
-      );
+      ];
       $r = CRM_Contact_BAO_Contact::create($params);
       $cid = $r->id;
     }
 
     $this->cids[] = $cid;
 
-    $this->assertContactsExist(array($cid), TRUE);
+    $this->assertContactsExist([$cid], TRUE);
 
     if ($outcome == 'rollback') {
       $tx->rollback();
@@ -444,7 +444,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    * @param $arg2
    */
   public function _preCommit($arg1, $arg2) {
-    $this->callbackLog[] = array('_preCommit', $arg1, $arg2);
+    $this->callbackLog[] = ['_preCommit', $arg1, $arg2];
   }
 
   /**
@@ -452,7 +452,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    * @param $arg2
    */
   public function _postCommit($arg1, $arg2) {
-    $this->callbackLog[] = array('_postCommit', $arg1, $arg2);
+    $this->callbackLog[] = ['_postCommit', $arg1, $arg2];
   }
 
   /**
@@ -460,7 +460,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    * @param $arg2
    */
   public function _preRollback($arg1, $arg2) {
-    $this->callbackLog[] = array('_preRollback', $arg1, $arg2);
+    $this->callbackLog[] = ['_preRollback', $arg1, $arg2];
   }
 
   /**
@@ -468,7 +468,7 @@ class CRM_Core_TransactionTest extends CiviUnitTestCase {
    * @param $arg2
    */
   public function _postRollback($arg1, $arg2) {
-    $this->callbackLog[] = array('_postRollback', $arg1, $arg2);
+    $this->callbackLog[] = ['_postRollback', $arg1, $arg2];
   }
 
 }

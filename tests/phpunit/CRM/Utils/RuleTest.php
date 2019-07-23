@@ -23,14 +23,14 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @return array
    */
   public function integerDataProvider() {
-    return array(
-      array(10, TRUE),
-      array('145E+3', FALSE),
-      array('10', TRUE),
-      array(-10, TRUE),
-      array('-10', TRUE),
-      array('-10foo', FALSE),
-    );
+    return [
+      [10, TRUE],
+      ['145E+3', FALSE],
+      ['10', TRUE],
+      [-10, TRUE],
+      ['-10', TRUE],
+      ['-10foo', FALSE],
+    ];
   }
 
   /**
@@ -46,14 +46,14 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @return array
    */
   public function positiveDataProvider() {
-    return array(
-      array(10, TRUE),
-      array('145.0E+3', FALSE),
-      array('10', TRUE),
-      array(-10, FALSE),
-      array('-10', FALSE),
-      array('-10foo', FALSE),
-    );
+    return [
+      [10, TRUE],
+      ['145.0E+3', FALSE],
+      ['10', TRUE],
+      [-10, FALSE],
+      ['-10', FALSE],
+      ['-10foo', FALSE],
+    ];
   }
 
   /**
@@ -69,14 +69,14 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @return array
    */
   public function numericDataProvider() {
-    return array(
-      array(10, TRUE),
-      array('145.0E+3', FALSE),
-      array('10', TRUE),
-      array(-10, TRUE),
-      array('-10', TRUE),
-      array('-10foo', FALSE),
-    );
+    return [
+      [10, TRUE],
+      ['145.0E+3', FALSE],
+      ['10', TRUE],
+      [-10, TRUE],
+      ['-10', TRUE],
+      ['-10foo', FALSE],
+    ];
   }
 
   /**
@@ -92,24 +92,24 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @return array
    */
   public function moneyDataProvider() {
-    return array(
-      array(10, TRUE),
-      array('145.0E+3', FALSE),
-      array('10', TRUE),
-      array(-10, TRUE),
-      array('-10', TRUE),
-      array('-10foo', FALSE),
-      array('-10.0345619', TRUE),
-      array('-10.010,4345619', TRUE),
-      array('10.0104345619', TRUE),
-      array('-0', TRUE),
-      array('-.1', TRUE),
-      array('.1', TRUE),
+    return [
+      [10, TRUE],
+      ['145.0E+3', FALSE],
+      ['10', TRUE],
+      [-10, TRUE],
+      ['-10', TRUE],
+      ['-10foo', FALSE],
+      ['-10.0345619', TRUE],
+      ['-10.010,4345619', TRUE],
+      ['10.0104345619', TRUE],
+      ['-0', TRUE],
+      ['-.1', TRUE],
+      ['.1', TRUE],
       // Test currency symbols too, default locale uses $, so if we wanted to test others we'd need to reconfigure locale
-      array('$500.3333', TRUE),
-      array('-$500.3333', TRUE),
-      array('$-500.3333', TRUE),
-    );
+      ['$500.3333', TRUE],
+      ['-$500.3333', TRUE],
+      ['$-500.3333', TRUE],
+    ];
   }
 
   /**
@@ -146,10 +146,10 @@ class CRM_Utils_RuleTest extends CiviUnitTestCase {
    * @return array
    */
   public function extenionKeyTests() {
-    $keys = array();
-    $keys[] = array('org.civicrm.multisite', TRUE);
-    $keys[] = array('au.org.contribute2016', TRUE);
-    $keys[] = array('%3Csvg%20onload=alert(0)%3E', FALSE);
+    $keys = [];
+    $keys[] = ['org.civicrm.multisite', TRUE];
+    $keys[] = ['au.org.contribute2016', TRUE];
+    $keys[] = ['%3Csvg%20onload=alert(0)%3E', FALSE];
     return $keys;
   }
 

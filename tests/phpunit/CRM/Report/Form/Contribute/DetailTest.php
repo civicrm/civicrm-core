@@ -31,38 +31,38 @@
  * @package CiviCRM
  */
 class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
-  protected $_tablesToTruncate = array(
+  protected $_tablesToTruncate = [
     'civicrm_contact',
     'civicrm_email',
     'civicrm_phone',
     'civicrm_address',
     'civicrm_contribution',
-  );
+  ];
 
   /**
    * @return array
    */
   public function dataProvider() {
-    return array(
-      array(
+    return [
+      [
         'CRM_Report_Form_Contribute_Detail',
-        array(
-          'fields' => array(
+        [
+          'fields' => [
             'sort_name',
             'first_name',
             'email',
             'total_amount',
-          ),
-          'filters' => array(
+          ],
+          'filters' => [
             'total_amount_op' => 'gte',
             'total_amount_value' => 50,
-          ),
+          ],
           // FIXME: add filters
-        ),
+        ],
         'fixtures/dataset-ascii.sql',
         'fixtures/report-ascii.csv',
-      ),
-    );
+      ],
+    ];
   }
 
   public function setUp() {
@@ -111,26 +111,26 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
    * @return array
    */
   public function postalCodeDataProvider() {
-    return array(
-      array(
+    return [
+      [
         'CRM_Report_Form_Contribute_Detail',
-        array(
-          'fields' => array(
+        [
+          'fields' => [
             'sort_name',
             'first_name',
             'email',
             'total_amount',
             'postal_code',
-          ),
-          'filters' => array(
+          ],
+          'filters' => [
             'postal_code_value' => 'B10 G56',
             'postal_code_op' => 'has',
-          ),
-        ),
+          ],
+        ],
         'fixtures/dataset-ascii.sql',
         'fixtures/DetailPostalCodeTest-ascii.csv',
-      ),
-    );
+      ],
+    ];
   }
 
   /**
@@ -159,11 +159,11 @@ class CRM_Report_Form_Contribute_DetailTest extends CiviReportTestCase {
   public function testMultipleSoftCredits() {
     $this->quickCleanup($this->_tablesToTruncate);
 
-    $solParams = array(
+    $solParams = [
       'first_name' => 'Solicitor 1',
       'last_name' => 'User ' . rand(),
       'contact_type' => 'Individual',
-    );
+    ];
     $solicitor1Id = $this->individualCreate($solParams);
     $solParams['first_name'] = 'Solicitor 2';
     $solicitor2Id = $this->individualCreate($solParams);

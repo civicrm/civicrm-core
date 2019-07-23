@@ -190,12 +190,12 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
 
     $this->mut = new \CiviMailUtils($this, TRUE);
 
-    $this->cronSchedule = array(
+    $this->cronSchedule = [
       'start' => '2015-01-20 00:00:00',
       'end' => '2015-03-01 00:00:00',
       // seconds
       'interval' => 24 * 60 * 60,
-    );
+    ];
 
     $this->schedule = new \CRM_Core_DAO_ActionSchedule();
     $this->schedule->title = $this->getName(TRUE);
@@ -209,24 +209,24 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
     $this->schedule->msg_template_id = NULL;
     $this->schedule->record_activity = NULL;
 
-    $this->contacts['alice'] = $this->callAPISuccess('Contact', 'create', array(
+    $this->contacts['alice'] = $this->callAPISuccess('Contact', 'create', [
       'contact_type' => 'Individual',
       'first_name' => 'Alice',
       'last_name' => 'Exemplar',
       'email' => 'alice@example.org',
-    ));
-    $this->contacts['bob'] = $this->callAPISuccess('Contact', 'create', array(
+    ]);
+    $this->contacts['bob'] = $this->callAPISuccess('Contact', 'create', [
       'contact_type' => 'Individual',
       'first_name' => 'Bob',
       'last_name' => 'Exemplar',
       'email' => 'bob@example.org',
-    ));
-    $this->contacts['carol'] = $this->callAPISuccess('Contact', 'create', array(
+    ]);
+    $this->contacts['carol'] = $this->callAPISuccess('Contact', 'create', [
       'contact_type' => 'Individual',
       'first_name' => 'Carol',
       'last_name' => 'Exemplar',
       'email' => 'carol@example.org',
-    ));
+    ]);
   }
 
   /**
@@ -248,30 +248,30 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
     }
     $this->schedule->save();
 
-    $actualMessages = array();
+    $actualMessages = [];
     foreach ($this->cronTimes() as $time) {
       \CRM_Utils_Time::setTime($time);
-      $this->callAPISuccess('job', 'send_reminder', array());
+      $this->callAPISuccess('job', 'send_reminder', []);
       foreach ($this->mut->getAllMessages('ezc') as $message) {
         /** @var \ezcMail $message */
-        $simpleMessage = array(
+        $simpleMessage = [
           'time' => $time,
           'to' => \CRM_Utils_Array::collect('email', $message->to),
           'subject' => $message->subject,
-        );
+        ];
         sort($simpleMessage['to']);
         $actualMessages[] = $simpleMessage;
         $this->mut->clearMessages();
       }
     }
 
-    $errorText = "Incorrect messages: " . print_r(array(
+    $errorText = "Incorrect messages: " . print_r([
       'actualMessages' => $actualMessages,
       'expectMessages' => $expectMessages,
-    ), 1);
+    ], 1);
     $this->assertEquals(count($expectMessages), count($actualMessages), $errorText);
-    usort($expectMessages, array(__CLASS__, 'compareSimpleMsgs'));
-    usort($actualMessages, array(__CLASS__, 'compareSimpleMsgs'));
+    usort($expectMessages, [__CLASS__, 'compareSimpleMsgs']);
+    usort($actualMessages, [__CLASS__, 'compareSimpleMsgs']);
     foreach ($expectMessages as $offset => $expectMessage) {
       $actualMessage = $actualMessages[$offset];
       $this->assertApproxEquals(strtotime($expectMessage['time']), strtotime($actualMessage['time']), $this->dateTolerance, $errorText);
@@ -287,7 +287,7 @@ abstract class AbstractMappingTest extends \CiviUnitTestCase {
 
   protected function cronTimes() {
     $skew = 0;
-    $times = array();
+    $times = [];
     $end = strtotime($this->cronSchedule['end']);
     for ($time = strtotime($this->cronSchedule['start']); $time < $end; $time += $this->cronSchedule['interval']) {
       $times[] = date('Y-m-d H:i:s', $time + $skew);

@@ -12,24 +12,24 @@ class CRM_Utils_RestTest extends CiviUnitTestCase {
 
   public function testProcessMultiple() {
     $_SERVER['REQUEST_METHOD'] = 'POST';
-    $input = array(
-      'cow' => array(
+    $input = [
+      'cow' => [
         'contact',
         'create',
-        array(
+        [
           'contact_type' => 'Individual',
           'first_name' => 'Cow',
-        ),
-      ),
-      'sheep' => array(
+        ],
+      ],
+      'sheep' => [
         'contact',
         'create',
-        array(
+        [
           'contact_type' => 'Individual',
           'first_name' => 'Sheep',
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
     $_REQUEST['json'] = json_encode($input);
     $output = CRM_Utils_REST::processMultiple();
     $this->assertGreaterThan(0, $output['cow']['id']);

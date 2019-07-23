@@ -14,11 +14,11 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
    *  Test that search form returns correct number of rows for complex regex filters.
    */
   public function testSearch() {
-    $priceFieldValues = $this->createPriceSet('event', NULL, array(
+    $priceFieldValues = $this->createPriceSet('event', NULL, [
       'html_type'    => 'Radio',
-      'option_label' => array('1' => 'Radio Label A (inc. GST)', '2' => 'Radio Label B (inc. GST)'),
-      'option_name'  => array('1' => 'Radio Label A', '2' => 'Radio Label B'),
-    ));
+      'option_label' => ['1' => 'Radio Label A (inc. GST)', '2' => 'Radio Label B (inc. GST)'],
+      'option_name'  => ['1' => 'Radio Label A', '2' => 'Radio Label B'],
+    ]);
 
     $priceFieldValues = $priceFieldValues['values'];
     $participantPrice = NULL;
@@ -30,7 +30,7 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
     $event = $this->eventCreate();
     $individualID = $this->individualCreate();
     $today = new DateTime();
-    $this->participantCreate(array(
+    $this->participantCreate([
       'event_id'      => $event['id'],
       'contact_id'    => $individualID,
       'status_id'     => 1,
@@ -38,18 +38,18 @@ class CRM_Event_Form_SearchTest extends CiviUnitTestCase {
       'fee_amount'    => $participantPrice['amount'],
       'fee_currency'  => 'USD',
       'register_date' => $today->format('YmdHis'),
-    ));
+    ]);
 
     $form = new CRM_Event_Form_Search();
     $form->controller = new CRM_Event_Controller_Search();
     $form->preProcess();
-    $form->testSubmit(array(
+    $form->testSubmit([
       'participant_test' => 0,
-      'participant_fee_id' => array(
+      'participant_fee_id' => [
         $participantPrice['id'],
-      ),
+      ],
       'radio_ts'         => 'ts_all',
-    ));
+    ]);
     $rows = $form->controller->get('rows');
     $this->assertEquals(1, count($rows), 'Exactly one row should be returned for given price field value.');
   }

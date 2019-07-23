@@ -41,13 +41,13 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
    * Return a list of persistent and transient queue providers.
    */
   public function getQueueSpecs() {
-    $queueSpecs = array();
-    $queueSpecs[] = array(
-      array(
+    $queueSpecs = [];
+    $queueSpecs[] = [
+      [
         'type' => 'Sql',
         'name' => 'test-queue',
-      ),
-    );
+      ],
+    ];
     return $queueSpecs;
   }
 
@@ -63,7 +63,7 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
   public function tearDown() {
     CRM_Utils_Time::resetTime();
 
-    $tablesToTruncate = array('civicrm_queue_item');
+    $tablesToTruncate = ['civicrm_queue_item'];
     $this->quickCleanup($tablesToTruncate);
   }
 
@@ -77,15 +77,15 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
     $this->queue = $this->queueService->create($queueSpec);
     $this->assertTrue($this->queue instanceof CRM_Queue_Queue);
 
-    $this->queue->createItem(array(
+    $this->queue->createItem([
       'test-key' => 'a',
-    ));
-    $this->queue->createItem(array(
+    ]);
+    $this->queue->createItem([
       'test-key' => 'b',
-    ));
-    $this->queue->createItem(array(
+    ]);
+    $this->queue->createItem([
       'test-key' => 'c',
-    ));
+    ]);
 
     $this->assertEquals(3, $this->queue->numberOfItems());
     $item = $this->queue->claimItem();
@@ -98,24 +98,24 @@ class CRM_Queue_Queue_SqlTest extends CiviUnitTestCase {
     $this->queue->deleteItem($item);
 
     $this->queue->createItem(
-      array(
+      [
         'test-key' => 'start',
-      ),
-      array(
+      ],
+      [
         'weight' => -1,
-      )
+      ]
     );
     $this->queue->createItem(
-      array(
+      [
         'test-key' => 'end',
-      ),
-      array(
+      ],
+      [
         'weight' => 1,
-      )
+      ]
     );
-    $this->queue->createItem(array(
+    $this->queue->createItem([
       'test-key' => 'd',
-    ));
+    ]);
 
     $this->assertEquals(4, $this->queue->numberOfItems());
     $item = $this->queue->claimItem();

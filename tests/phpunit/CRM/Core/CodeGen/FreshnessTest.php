@@ -11,7 +11,7 @@ class CRM_Core_CodeGen_FreshnessTest extends CiviUnitTestCase {
 
   public function testDAOs() {
     $tasks = $this->findTasks('CRM_Core_CodeGen_DAO');
-    $names = array();
+    $names = [];
     foreach ($tasks as $task) {
       /** @var CRM_Core_CodeGen_DAO $task */
       $names[] = $task->name;
@@ -40,7 +40,7 @@ class CRM_Core_CodeGen_FreshnessTest extends CiviUnitTestCase {
   protected function findTasks($clazz) {
     $genCode = $this->createCodeGen();
     $tasks = $genCode->getTasks();
-    $matches = array();
+    $matches = [];
     foreach ($tasks as $task) {
       if ($task instanceof $clazz) {
         $matches[] = $task;

@@ -24,7 +24,7 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
     $this->assertFalse(isset($exports['contact_id']));
 
     // 2. Now, let's hook into it...
-    $this->hookClass->setHook('civicrm_entityTypes', array($this, '_hook_civicrm_entityTypes'));
+    $this->hookClass->setHook('civicrm_entityTypes', [$this, '_hook_civicrm_entityTypes']);
     unset(Civi::$statics['CRM_Core_DAO_Email']);
     CRM_Core_DAO_AllCoreTables::init(1);
 
@@ -69,7 +69,7 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
     // Not sure how we should be setting the locales, but this works for testing purposes
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
-    $domain->locales = implode(CRM_Core_DAO::VALUE_SEPARATOR, array('en_UK', 'fr_FR'));
+    $domain->locales = implode(CRM_Core_DAO::VALUE_SEPARATOR, ['en_UK', 'fr_FR']);
     $domain->save();
 
     // Check indices with localization
@@ -86,118 +86,118 @@ class CRM_Core_DAO_AllCoreTablesTest extends CiviUnitTestCase {
    */
   public function testMultilingualize() {
     // in civicrm_group, title is localizable, name is not
-    $originalIndices = array(
-      'test_index1' => array(
+    $originalIndices = [
+      'test_index1' => [
         'name' => 'test_index1',
-        'field' => array(
+        'field' => [
           'name',
-        ),
+        ],
         'localizable' => 0,
-      ),
-      'test_index2' => array(
+      ],
+      'test_index2' => [
         'name' => 'test_index2',
-        'field' => array(
+        'field' => [
           'title',
-        ),
+        ],
         'localizable' => 1,
-      ),
-      'test_index3' => array(
+      ],
+      'test_index3' => [
         'name' => 'test_index3',
-        'field' => array(
+        'field' => [
           'name(3)',
-        ),
+        ],
         'localizable' => 0,
-      ),
-      'test_index4' => array(
+      ],
+      'test_index4' => [
         'name' => 'test_index4',
-        'field' => array(
+        'field' => [
           'title(4)',
-        ),
+        ],
         'localizable' => 1,
-      ),
-      'test_index5' => array(
+      ],
+      'test_index5' => [
         'name' => 'test_index5',
-        'field' => array(
+        'field' => [
           'title(4)',
           'name(3)',
-        ),
+        ],
         'localizable' => 1,
-      ),
-    );
+      ],
+    ];
 
-    $expectedIndices = array(
-      'test_index1' => array(
+    $expectedIndices = [
+      'test_index1' => [
         'name' => 'test_index1',
-        'field' => array(
+        'field' => [
           'name',
-        ),
+        ],
         'localizable' => 0,
         'sig' => 'civicrm_group::0::name',
-      ),
-      'test_index2_en_UK' => array(
+      ],
+      'test_index2_en_UK' => [
         'name' => 'test_index2_en_UK',
-        'field' => array(
+        'field' => [
           'title_en_UK',
-        ),
+        ],
         'localizable' => 1,
         'sig' => 'civicrm_group::0::title_en_UK',
-      ),
-      'test_index2_fr_FR' => array(
+      ],
+      'test_index2_fr_FR' => [
         'name' => 'test_index2_fr_FR',
-        'field' => array(
+        'field' => [
           'title_fr_FR',
-        ),
+        ],
         'localizable' => 1,
         'sig' => 'civicrm_group::0::title_fr_FR',
-      ),
-      'test_index3' => array(
+      ],
+      'test_index3' => [
         'name' => 'test_index3',
-        'field' => array(
+        'field' => [
           'name(3)',
-        ),
+        ],
         'localizable' => 0,
         'sig' => 'civicrm_group::0::name(3)',
-      ),
-      'test_index4_en_UK' => array(
+      ],
+      'test_index4_en_UK' => [
         'name' => 'test_index4_en_UK',
-        'field' => array(
+        'field' => [
           'title_en_UK(4)',
-        ),
+        ],
         'localizable' => 1,
         'sig' => 'civicrm_group::0::title_en_UK(4)',
-      ),
-      'test_index4_fr_FR' => array(
+      ],
+      'test_index4_fr_FR' => [
         'name' => 'test_index4_fr_FR',
-        'field' => array(
+        'field' => [
           'title_fr_FR(4)',
-        ),
+        ],
         'localizable' => 1,
         'sig' => 'civicrm_group::0::title_fr_FR(4)',
-      ),
-      'test_index5_en_UK' => array(
+      ],
+      'test_index5_en_UK' => [
         'name' => 'test_index5_en_UK',
-        'field' => array(
+        'field' => [
           'title_en_UK(4)',
           'name(3)',
-        ),
+        ],
         'localizable' => 1,
         'sig' => 'civicrm_group::0::title_en_UK(4)::name(3)',
-      ),
-      'test_index5_fr_FR' => array(
+      ],
+      'test_index5_fr_FR' => [
         'name' => 'test_index5_fr_FR',
-        'field' => array(
+        'field' => [
           'title_fr_FR(4)',
           'name(3)',
-        ),
+        ],
         'localizable' => 1,
         'sig' => 'civicrm_group::0::title_fr_FR(4)::name(3)',
-      ),
-    );
+      ],
+    ];
 
     // Not sure how we should be setting the locales, but this works for testing purposes
     $domain = new CRM_Core_DAO_Domain();
     $domain->find(TRUE);
-    $domain->locales = implode(CRM_Core_DAO::VALUE_SEPARATOR, array('en_UK', 'fr_FR'));
+    $domain->locales = implode(CRM_Core_DAO::VALUE_SEPARATOR, ['en_UK', 'fr_FR']);
     $domain->save();
 
     // needs a real DAO so use Group

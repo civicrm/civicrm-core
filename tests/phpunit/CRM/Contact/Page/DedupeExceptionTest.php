@@ -59,14 +59,14 @@ class CRM_Contact_Page_DedupeExceptionTest extends CiviUnitTestCase {
     ]);
     $page          = new CRM_Contact_Page_DedupeException();
     $totalitems    = civicrm_api3('Exception', "getcount", []);
-    $params        = array(
+    $params        = [
       'total' => $totalitems,
       'rowCount' => CRM_Utils_Pager::ROWCOUNT,
       'status' => ts('Dedupe Exceptions %%StatusMessage%%'),
       'buttonBottom' => 'PagerBottomButton',
       'buttonTop' => 'PagerTopButton',
       'pageID' => $page->get(CRM_Utils_Pager::PAGE_ID),
-    );
+    ];
     $page->_pager  = new CRM_Utils_Pager($params);
     $exceptions    = $page->getExceptions();
     $expectedArray = [

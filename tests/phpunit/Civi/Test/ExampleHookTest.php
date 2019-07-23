@@ -20,9 +20,9 @@ class ExampleHookTest extends \PHPUnit\Framework\TestCase implements HeadlessInt
   }
 
   protected function setUp() {
-    $this->contact = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact', array(
+    $this->contact = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact', [
       'contact_type' => 'Individual',
-    ));
+    ]);
     $session = \CRM_Core_Session::singleton();
     $session->set('userID', $this->contact->id);
   }

@@ -15,13 +15,13 @@ class CRM_Extension_Container_StaticTest extends CiviUnitTestCase {
   }
 
   public function testGetKeysEmpty() {
-    $c = new CRM_Extension_Container_Static(array());
-    $this->assertEquals($c->getKeys(), array());
+    $c = new CRM_Extension_Container_Static([]);
+    $this->assertEquals($c->getKeys(), []);
   }
 
   public function testGetKeys() {
     $c = $this->_createContainer();
-    $this->assertEquals($c->getKeys(), array('test.foo', 'test.foo.bar'));
+    $this->assertEquals($c->getKeys(), ['test.foo', 'test.foo.bar']);
   }
 
   public function testGetPath() {
@@ -56,16 +56,16 @@ class CRM_Extension_Container_StaticTest extends CiviUnitTestCase {
    * @return CRM_Extension_Container_Static
    */
   public function _createContainer() {
-    return new CRM_Extension_Container_Static(array(
-      'test.foo' => array(
+    return new CRM_Extension_Container_Static([
+      'test.foo' => [
         'path' => '/path/to/foo',
         'resUrl' => 'http://foo',
-      ),
-      'test.foo.bar' => array(
+      ],
+      'test.foo.bar' => [
         'path' => '/path/to/bar',
         'resUrl' => 'http://foobar',
-      ),
-    ));
+      ],
+    ]);
   }
 
 }

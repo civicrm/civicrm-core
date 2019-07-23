@@ -56,11 +56,11 @@ class CRM_Mailing_MailingSystemTest extends CRM_Mailing_BaseMailingSystemTest {
 
   public function setUp() {
     parent::setUp();
-    Civi::settings()->add(array('experimentalFlexMailerEngine' => FALSE));
+    Civi::settings()->add(['experimentalFlexMailerEngine' => FALSE]);
 
     $hooks = \CRM_Utils_Hook::singleton();
     $hooks->setHook('civicrm_alterMailParams',
-      array($this, 'hook_alterMailParams'));
+      [$this, 'hook_alterMailParams']);
   }
 
   /**

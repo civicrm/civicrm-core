@@ -1,6 +1,6 @@
 <?php
-return array(
-  'test_key' => array(
+return [
+  'test_key' => [
     'group_name' => 'Test Settings',
     'group' => 'test',
     'name' => 'test_key',
@@ -13,8 +13,8 @@ return array(
     'help_text' => '',
     'html_type' => 'Text',
     'quick_form_type' => 'Element',
-  ),
-  'test_secret' => array(
+  ],
+  'test_secret' => [
     'group_name' => 'Test Settings',
     'group' => 'test',
     'name' => 'test_secret',
@@ -27,8 +27,8 @@ return array(
     'help_text' => '',
     'html_type' => 'Text',
     'quick_form_type' => 'Element',
-  ),
-  'test_public_certificate' => array(
+  ],
+  'test_public_certificate' => [
     'group_name' => 'Test Settings',
     'group' => 'test',
     'name' => 'test_public_certificate',
@@ -40,12 +40,12 @@ return array(
     'description' => 'Enter the full path to your public Certificate',
     'help_text' => '',
     'html_type' => 'Text',
-    'html_attributes' => array(
+    'html_attributes' => [
       'size' => 50,
-    ),
+    ],
     'quick_form_type' => 'Element',
-  ),
-  'test_private_key' => array(
+  ],
+  'test_private_key' => [
     'group_name' => 'Test Settings',
     'group' => 'test',
     'name' => 'test_private_key',
@@ -58,5 +58,5 @@ return array(
     'help_text' => '',
     'html_type' => 'Text',
     'quick_form_type' => 'Element',
-  ),
-);
+  ],
+];

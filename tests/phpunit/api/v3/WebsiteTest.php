@@ -46,11 +46,11 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
 
     $this->_entity = 'website';
     $this->_contactID = $this->organizationCreate();
-    $this->params = array(
+    $this->params = [
       'contact_id' => $this->_contactID,
       'url' => 'website.com',
       'website_type_id' => 1,
-    );
+    ];
   }
 
   /**
@@ -75,7 +75,7 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument($this->_entity, 'get', $this->params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
-    $this->callAPISuccess('website', 'delete', array('id' => $result['id']));
+    $this->callAPISuccess('website', 'delete', ['id' => $result['id']]);
   }
 
   /**
@@ -85,9 +85,9 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
   public function testDeleteWebsite($version) {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $deleteParams = array('id' => $result['id']);
+    $deleteParams = ['id' => $result['id']];
     $result = $this->callAPIAndDocument($this->_entity, 'delete', $deleteParams, __FUNCTION__, __FILE__);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
     $this->assertEquals(0, $checkDeleted['count']);
   }
 
@@ -98,9 +98,9 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
   public function testDeleteWebsiteInvalid($version) {
     $this->_apiversion = $version;
     $result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $deleteParams = array('id' => 600);
+    $deleteParams = ['id' => 600];
     $result = $this->callAPIFailure($this->_entity, 'delete', $deleteParams);
-    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', array());
+    $checkDeleted = $this->callAPISuccess($this->_entity, 'get', []);
     $this->assertEquals(1, $checkDeleted['count']);
   }
 
@@ -108,11 +108,11 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
    * Test retrieval of metadata.
    */
   public function testGetMetadata() {
-    $result = $this->callAPIAndDocument($this->_entity, 'get', array(
-      'options' => array(
-        'metadata' => array('fields'),
-      ),
-    ), __FUNCTION__, __FILE__, 'Demonostrates returning field metadata', 'GetWithMetadata');
+    $result = $this->callAPIAndDocument($this->_entity, 'get', [
+      'options' => [
+        'metadata' => ['fields'],
+      ],
+    ], __FUNCTION__, __FILE__, 'Demonostrates returning field metadata', 'GetWithMetadata');
     $this->assertEquals('Website', $result['metadata']['fields']['url']['title']);
   }
 
@@ -122,7 +122,7 @@ class api_v3_WebsiteTest extends CiviUnitTestCase {
    */
   public function testGetFields($version) {
     $this->_apiversion = $version;
-    $result = $this->callAPIAndDocument($this->_entity, 'getfields', array('action' => 'get'), __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'getfields', ['action' => 'get'], __FUNCTION__, __FILE__);
     $this->assertArrayKeyExists('url', $result['values']);
   }
 

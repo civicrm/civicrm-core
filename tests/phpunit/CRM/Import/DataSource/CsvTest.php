@@ -39,12 +39,12 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    */
   public function testToCsv($fileName) {
     $dataSource = new CRM_Import_DataSource_Csv();
-    $params = array(
-      'uploadFile' => array(
+    $params = [
+      'uploadFile' => [
         'name' => __DIR__ . '/' . $fileName,
-      ),
+      ],
       'skipColumnHeader' => TRUE,
-    );
+    ];
 
     // Get the PEAR::DB object
     $dao = new CRM_Core_DAO();
@@ -72,7 +72,7 @@ class CRM_Import_DataSource_CsvTest extends CiviUnitTestCase {
    * @return array
    */
   public function getCsvFiles() {
-    return array(array('import.csv'), array('yogi.csv'));
+    return [['import.csv'], ['yogi.csv']];
   }
 
 }

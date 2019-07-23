@@ -65,7 +65,7 @@ class CRM_Core_BAO_CacheTest extends CiviUnitTestCase {
 
     $ex = [];
 
-    $ex[] = [array('abc' => 'def')];
+    $ex[] = [['abc' => 'def']];
     $ex[] = [0];
     $ex[] = ['hello world'];
     $ex[] = ['Scarabée'];

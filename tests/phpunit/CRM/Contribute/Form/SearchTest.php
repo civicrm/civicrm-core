@@ -117,7 +117,7 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $form->testProcessContribution($batchEntry);
 
     // fetch created contributions
-    $entities = $this->callAPISuccess('EntityBatch', 'get', array('batch_id' => $batchID));
+    $entities = $this->callAPISuccess('EntityBatch', 'get', ['batch_id' => $batchID]);
     $ids = [];
     foreach ($entities['values'] as $value) {
       $ids[] = $value['entity_id'];
@@ -127,29 +127,29 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
     $useCases = [
       // Case 1: Search for ONLY those contributions which are created from batch
       [
-        'form_value' => array('contribution_batch_id' => 'IS NOT NULL'),
+        'form_value' => ['contribution_batch_id' => 'IS NOT NULL'],
         'expected_count' => 2,
-        'expected_contribution' => array($batchContriID1, $batchContriID2),
+        'expected_contribution' => [$batchContriID1, $batchContriID2],
         'expected_qill' => 'Batch Name Not Null',
       ],
       // Case 2: Search for ONLY those contributions which are NOT created from batch
       [
-        'form_value' => array('contribution_batch_id' => 'IS NULL'),
+        'form_value' => ['contribution_batch_id' => 'IS NULL'],
         'expected_count' => 1,
-        'expected_contribution' => array($nonBatchContriID),
+        'expected_contribution' => [$nonBatchContriID],
         'expected_qill' => 'Batch Name Is Null',
       ],
       // Case 3: Search for ONLY those contributions which are created from batch ID - $batchID
       [
-        'form_value' => array('contribution_batch_id' => $batchID),
+        'form_value' => ['contribution_batch_id' => $batchID],
         'expected_count' => 2,
-        'expected_contribution' => array($batchContriID1, $batchContriID2),
+        'expected_contribution' => [$batchContriID1, $batchContriID2],
         'expected_qill' => 'Batch Name = ' . $batchTitle,
       ],
     ];
     foreach ($useCases as $case) {
       $fv = $case['form_value'];
-      CRM_Contact_BAO_Query::processSpecialFormValue($fv, array('contribution_batch_id'));
+      CRM_Contact_BAO_Query::processSpecialFormValue($fv, ['contribution_batch_id']);
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
       list($select, $from, $where) = $query->query();
 
@@ -173,85 +173,85 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
    */
   public function testCardTypeFilter() {
     $this->quickCleanup($this->_tablesToTruncate);
-    $contactID1 = $this->individualCreate(array(), 1);
-    $contactID2 = $this->individualCreate(array(), 2);
-    $Contribution1 = $this->callAPISuccess('Contribution', 'create', array(
+    $contactID1 = $this->individualCreate([], 1);
+    $contactID2 = $this->individualCreate([], 2);
+    $Contribution1 = $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 1,
       'total_amount' => 100,
       'receive_date' => date('Ymd'),
       'payment_instrument' => 1,
       'contribution_status_id' => 1,
       'contact_id' => $contactID1,
-    ));
-    $params = array(
+    ]);
+    $params = [
       'to_financial_account_id' => 1,
       'status_id' => 1,
       'contribution_id' => $Contribution1['id'],
       'payment_instrument_id' => 1,
       'card_type_id' => 1,
       'total_amount' => 100,
-    );
+    ];
     CRM_Core_BAO_FinancialTrxn::create($params);
-    $this->callAPISuccess('Contribution', 'create', array(
+    $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 1,
       'total_amount' => 150,
       'receive_date' => date('Ymd'),
       'payment_instrument' => 1,
       'contribution_status_id' => 1,
       'contact_id' => $contactID1,
-    ));
-    $Contribution3 = $this->callAPISuccess('Contribution', 'create', array(
+    ]);
+    $Contribution3 = $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 1,
       'total_amount' => 200,
       'receive_date' => date('Ymd'),
       'payment_instrument' => 1,
       'contribution_status_id' => 1,
       'contact_id' => $contactID2,
-    ));
-    $params = array(
+    ]);
+    $params = [
       'to_financial_account_id' => 1,
       'status_id' => 1,
       'contribution_id' => $Contribution3['id'],
       'payment_instrument_id' => 1,
       'card_type_id' => 2,
       'total_amount' => 200,
-    );
+    ];
     CRM_Core_BAO_FinancialTrxn::create($params);
 
-    $useCases = array(
+    $useCases = [
       // Case 1: Search for ONLY those contributions which have card type
-      array(
-        'form_value' => array('financial_trxn_card_type_id' => 'IS NOT NULL'),
+      [
+        'form_value' => ['financial_trxn_card_type_id' => 'IS NOT NULL'],
         'expected_count' => 2,
-        'expected_contribution' => array($Contribution1['id'], $Contribution3['id']),
+        'expected_contribution' => [$Contribution1['id'], $Contribution3['id']],
         'expected_qill' => 'Card Type Not Null',
-      ),
+      ],
       // Case 2: Search for ONLY those contributions which have Card Type as Visa
-      array(
-        'form_value' => array('financial_trxn_card_type_id' => array(1)),
+      [
+        'form_value' => ['financial_trxn_card_type_id' => [1]],
         'expected_count' => 1,
-        'expected_contribution' => array($Contribution1['id']),
+        'expected_contribution' => [$Contribution1['id']],
         'expected_qill' => 'Card Type In Visa',
-      ),
+      ],
       // Case 3: Search for ONLY those contributions which have Card Type as Amex
-      array(
-        'form_value' => array('financial_trxn_card_type_id' => array(3)),
+      [
+        'form_value' => ['financial_trxn_card_type_id' => [3]],
         'expected_count' => 0,
-        'expected_contribution' => array(),
+        'expected_contribution' => [],
         'expected_qill' => 'Card Type In Amex',
-      ),
+      ],
       // Case 4: Search for ONLY those contributions which have Card Type as Visa or MasterCard
-      array(
-        'form_value' => array('financial_trxn_card_type_id' => array(1, 2)),
+      [
+        'form_value' => ['financial_trxn_card_type_id' => [1, 2]],
         'expected_count' => 2,
-        'expected_contribution' => array($Contribution1['id'], $Contribution3['id']),
+        'expected_contribution' => [$Contribution1['id'], $Contribution3['id']],
         'expected_qill' => 'Card Type In Visa, MasterCard',
-      ),
-    );
+      ],
+    ];
 
     foreach ($useCases as $case) {
       $fv = $case['form_value'];
-      CRM_Contact_BAO_Query::processSpecialFormValue($fv, array('financial_trxn_card_type_id'));
+      CRM_Contact_BAO_Query::processSpecialFormValue($fv, ['financial_trxn_card_type_id']);
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
       list($select, $from, $where) = $query->query();
 
@@ -275,17 +275,17 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
    */
   public function testCardNumberFilter() {
     $this->quickCleanup($this->_tablesToTruncate);
-    $contactID1 = $this->individualCreate(array(), 1);
-    $contactID2 = $this->individualCreate(array(), 2);
-    $Contribution1 = $this->callAPISuccess('Contribution', 'create', array(
+    $contactID1 = $this->individualCreate([], 1);
+    $contactID2 = $this->individualCreate([], 2);
+    $Contribution1 = $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 1,
       'total_amount' => 100,
       'receive_date' => date('Ymd'),
       'payment_instrument' => 1,
       'contribution_status_id' => 1,
       'contact_id' => $contactID1,
-    ));
-    $params = array(
+    ]);
+    $params = [
       'to_financial_account_id' => 1,
       'status_id' => 1,
       'contribution_id' => $Contribution1['id'],
@@ -293,25 +293,25 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'card_type_id' => 1,
       'total_amount' => 100,
       'pan_truncation' => 1234,
-    );
+    ];
     CRM_Core_BAO_FinancialTrxn::create($params);
-    $this->callAPISuccess('Contribution', 'create', array(
+    $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 1,
       'total_amount' => 150,
       'receive_date' => date('Ymd'),
       'payment_instrument' => 1,
       'contribution_status_id' => 1,
       'contact_id' => $contactID1,
-    ));
-    $Contribution3 = $this->callAPISuccess('Contribution', 'create', array(
+    ]);
+    $Contribution3 = $this->callAPISuccess('Contribution', 'create', [
       'financial_type_id' => 1,
       'total_amount' => 200,
       'receive_date' => date('Ymd'),
       'payment_instrument' => 1,
       'contribution_status_id' => 1,
       'contact_id' => $contactID2,
-    ));
-    $params = array(
+    ]);
+    $params = [
       'to_financial_account_id' => 1,
       'status_id' => 1,
       'contribution_id' => $Contribution3['id'],
@@ -319,36 +319,36 @@ class CRM_Contribute_Form_SearchTest extends CiviUnitTestCase {
       'card_type_id' => 2,
       'total_amount' => 200,
       'pan_truncation' => 5678,
-    );
+    ];
     CRM_Core_BAO_FinancialTrxn::create($params);
 
-    $useCases = array(
+    $useCases = [
       // Case 1: Search for ONLY those contributions which have card number
-      array(
-        'form_value' => array('financial_trxn_pan_truncation' => 'IS NOT NULL'),
+      [
+        'form_value' => ['financial_trxn_pan_truncation' => 'IS NOT NULL'],
         'expected_count' => 2,
-        'expected_contribution' => array($Contribution1['id'], $Contribution3['id']),
+        'expected_contribution' => [$Contribution1['id'], $Contribution3['id']],
         'expected_qill' => 'Card Number Not Null',
-      ),
+      ],
       // Case 2: Search for ONLY those contributions which have Card Number as 1234
-      array(
-        'form_value' => array('financial_trxn_pan_truncation' => 1234),
+      [
+        'form_value' => ['financial_trxn_pan_truncation' => 1234],
         'expected_count' => 1,
-        'expected_contribution' => array($Contribution1['id']),
+        'expected_contribution' => [$Contribution1['id']],
         'expected_qill' => 'Card Number Like %1234%',
-      ),
+      ],
       // Case 3: Search for ONLY those contributions which have Card Number as 8888
-      array(
-        'form_value' => array('financial_trxn_pan_truncation' => 8888),
+      [
+        'form_value' => ['financial_trxn_pan_truncation' => 8888],
         'expected_count' => 0,
-        'expected_contribution' => array(),
+        'expected_contribution' => [],
         'expected_qill' => 'Card Number Like %8888%',
-      ),
-    );
+      ],
+    ];
 
     foreach ($useCases as $case) {
       $fv = $case['form_value'];
-      CRM_Contact_BAO_Query::processSpecialFormValue($fv, array('financial_trxn_pan_truncation'));
+      CRM_Contact_BAO_Query::processSpecialFormValue($fv, ['financial_trxn_pan_truncation']);
       $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($fv));
       list($select, $from, $where) = $query->query();
 

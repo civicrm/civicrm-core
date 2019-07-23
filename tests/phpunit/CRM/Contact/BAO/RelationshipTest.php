@@ -155,54 +155,54 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
   }
 
   public function getRelationshipTypeDuplicates() {
-    $relationshipTypeList = array(
+    $relationshipTypeList = [
       '1_a_b' => 'duplicate one',
       '1_b_a' => 'duplicate one',
       '2_a_b' => 'two a',
       '2_b_a' => 'two b',
-    );
-    $data = array(
-      array(
+    ];
+    $data = [
+      [
         $relationshipTypeList,
         'a_b',
-        array(
+        [
           '1_a_b' => 'duplicate one',
           '2_a_b' => 'two a',
           '2_b_a' => 'two b',
-        ),
+        ],
         'With suffix a_b',
-      ),
-      array(
+      ],
+      [
         $relationshipTypeList,
         'b_a',
-        array(
+        [
           '1_b_a' => 'duplicate one',
           '2_a_b' => 'two a',
           '2_b_a' => 'two b',
-        ),
+        ],
         'With suffix b_a',
-      ),
-      array(
+      ],
+      [
         $relationshipTypeList,
         NULL,
-        array(
+        [
           '1_a_b' => 'duplicate one',
           '2_a_b' => 'two a',
           '2_b_a' => 'two b',
-        ),
+        ],
         'With suffix NULL',
-      ),
-      array(
+      ],
+      [
         $relationshipTypeList,
         NULL,
-        array(
+        [
           '1_a_b' => 'duplicate one',
           '2_a_b' => 'two a',
           '2_b_a' => 'two b',
-        ),
+        ],
         'With suffix "" (empty string)',
-      ),
-    );
+      ],
+    ];
     return $data;
   }
 

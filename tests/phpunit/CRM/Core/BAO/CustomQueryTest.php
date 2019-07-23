@@ -14,9 +14,9 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function tearDown() {
-    $tablesToTruncate = array(
+    $tablesToTruncate = [
       'civicrm_contact',
-    );
+    ];
     $this->quickCleanup($tablesToTruncate, TRUE);
     parent::tearDown();
   }
@@ -26,19 +26,19 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    */
   public function testSearchCustomDataDateRelative() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
-    $dateCustomField = $this->customFieldCreate(array(
+    $dateCustomField = $this->customFieldCreate([
       'custom_group_id' => $ids['custom_group_id'],
       'label' => 'date field',
       'data_type' => 'Date',
       'html_type' => 'Select Date',
       'default_value' => NULL,
-    ));
+    ]);
     $dateCustomFieldName = 'custom_' . $dateCustomField['id'];
-    $formValues = array(
+    $formValues = [
       $dateCustomFieldName . '_relative' => 'this.year',
       $dateCustomFieldName . '_from' => '',
       $dateCustomFieldName . '_to' => '',
-    );
+    ];
     // Assigning the relevant form value to be within a custom key is normally done in
     // build field params. It would be better if it were all done in convertFormValues
     // but for now we just imitate it.
@@ -90,21 +90,21 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    */
   public function testSearchCustomDataDateFromTo() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
-    $dateCustomField = $this->customFieldCreate(array(
+    $dateCustomField = $this->customFieldCreate([
       'custom_group_id' => $ids['custom_group_id'],
       'label' => 'date field',
       'data_type' => 'Date',
       'html_type' => 'Select Date',
       'default_value' => NULL,
-    ));
+    ]);
     $dateCustomFieldName = 'custom_' . $dateCustomField['id'];
     // Assigning the relevant form value to be within a custom key is normally done in
     // build field params. It would be better if it were all done in convertFormValues
     // but for now we just imitate it.
-    $formValues = array(
+    $formValues = [
       $dateCustomFieldName . '_from' => '2014-06-06',
       $dateCustomFieldName . '_to' => '2015-06-06',
-    );
+    ];
 
     $params[$dateCustomField['id']] = CRM_Contact_BAO_Query::convertFormValues($formValues);
     $queryObj = new CRM_Core_BAO_CustomQuery($params);
@@ -125,20 +125,20 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    */
   public function testSearchCustomDataFromTo() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
-    $datas = array(
+    $datas = [
       'Int' => 2,
       'Float' => 12.123,
       'Money' => 91.21,
-    );
+    ];
     foreach ($datas as $type => $data) {
       $customField = $this->customFieldCreate(
-        array(
+        [
           'custom_group_id' => $ids['custom_group_id'],
           'label' => "$type field",
           'data_type' => $type,
           'html_type' => 'Text',
           'default_value' => NULL,
-        )
+        ]
       );
       $customFieldName = 'custom_' . $customField['id'];
       // Assigning the relevant form value to be within a custom key is normally done in
@@ -146,12 +146,12 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       // but for now we just imitate it.
       $from = $data - 1;
       $to = $data;
-      $formValues = array(
+      $formValues = [
         $customFieldName . '_from' => $from,
         $customFieldName . '_to' => $to,
-      );
+      ];
 
-      $params = array($customField['id'] => CRM_Contact_BAO_Query::convertFormValues($formValues));
+      $params = [$customField['id'] => CRM_Contact_BAO_Query::convertFormValues($formValues)];
       $queryObj = new CRM_Core_BAO_CustomQuery($params);
       $queryObj->Query();
       $this->assertEquals(
@@ -167,22 +167,22 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    */
   public function testSearchCustomDataFromAndTo() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
-    $datas = array(
+    $datas = [
       'Date' => '2015-06-06',
       'Int' => 2,
       'Float' => 12.123,
       'Money' => 91.21,
-    );
+    ];
     foreach ($datas as $type => $data) {
       $isDate = ($type === 'Date');
       $customField = $this->customFieldCreate(
-        array(
+        [
           'custom_group_id' => $ids['custom_group_id'],
           'label' => "$type field",
           'data_type' => $type,
           'html_type' => ($isDate) ? 'Select Date' : 'Text',
           'default_value' => NULL,
-        )
+        ]
       );
       $customFieldName = 'custom_' . $customField['id'];
 
@@ -194,11 +194,11 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       // but for now we just imitate it.
 
       //Scenrio 2 : TO date filter
-      $formValues = array(
+      $formValues = [
         $customFieldName . '_to' => $data,
-      );
+      ];
 
-      $params = array($customField['id'] => CRM_Contact_BAO_Query::convertFormValues($formValues));
+      $params = [$customField['id'] => CRM_Contact_BAO_Query::convertFormValues($formValues)];
       $queryObj = new CRM_Core_BAO_CustomQuery($params);
       $queryObj->Query();
       $wierdStringThatMeansGreaterEquals = chr(226) . chr(137) . chr(164);
@@ -212,11 +212,11 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
       );
 
       //Scenrio 2 : FROM date filter
-      $formValues = array(
+      $formValues = [
         $customFieldName . '_from' => $data,
-      );
+      ];
 
-      $params = array($customField['id'] => CRM_Contact_BAO_Query::convertFormValues($formValues));
+      $params = [$customField['id'] => CRM_Contact_BAO_Query::convertFormValues($formValues)];
       $queryObj = new CRM_Core_BAO_CustomQuery($params);
       $queryObj->Query();
       $wierdStringThatMeansLessThanEquals = chr(226) . chr(137) . chr(165);
@@ -238,19 +238,19 @@ class CRM_Core_BAO_CustomQueryTest extends CiviUnitTestCase {
    */
   public function testSearchCustomDataDateEquals() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTestTest');
-    $dateCustomField = $this->customFieldCreate(array(
+    $dateCustomField = $this->customFieldCreate([
       'custom_group_id' => $ids['custom_group_id'],
       'label' => 'date field',
       'data_type' => 'Date',
       'html_type' => 'Select Date',
       'default_value' => NULL,
-    ));
+    ]);
     $dateCustomFieldName = 'custom_' . $dateCustomField['id'];
-    $this->individualCreate(array($dateCustomFieldName => "2015-01-01"));
+    $this->individualCreate([$dateCustomFieldName => "2015-01-01"]);
     // Assigning the relevant form value to be within a custom key is normally done in
     // build field params. It would be better if it were all done in convertFormValues
     // but for now we just imitate it.
-    $formValues = array($dateCustomFieldName => '2015-06-06');
+    $formValues = [$dateCustomFieldName => '2015-06-06'];
     $params[$dateCustomField['id']] = CRM_Contact_BAO_Query::convertFormValues($formValues);
     $queryObj = new CRM_Core_BAO_CustomQuery($params);
     $queryObj->Query();

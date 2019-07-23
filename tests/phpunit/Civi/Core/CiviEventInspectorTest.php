@@ -11,7 +11,7 @@ class CiviEventInspectorTest extends \CiviUnitTestCase {
     $inspector = new CiviEventInspector();
     $eventDef = $inspector->get('hook_civicrm_alterSettingsMetaData');
     $this->assertEquals('hook_civicrm_alterSettingsMetaData', $eventDef['name']);
-    $this->assertEquals(array('settingsMetaData', 'domainID', 'profile'), array_keys($eventDef['fields']));
+    $this->assertEquals(['settingsMetaData', 'domainID', 'profile'], array_keys($eventDef['fields']));
     $this->assertEquals('hook', $eventDef['type']);
     $this->assertNotEmpty($eventDef['description_html']);
     $this->assertTrue($eventDef['fields']['settingsMetaData']['ref']);

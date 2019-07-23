@@ -57,19 +57,19 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
    *        - subject: regex
    */
   public function createTestCases() {
-    $cs = array();
+    $cs = [];
 
-    $cs[] = array(
+    $cs[] = [
       '2015-02-01 00:00:00',
       'addAliceMeeting scheduleForAny startOnTime useHelloFirstName recipientIsActivitySource',
-      array(
-        array(
+      [
+        [
           'time' => '2015-02-01 00:00:00',
-          'to' => array('alice@example.org'),
+          'to' => ['alice@example.org'],
           'subject' => '/Hello, Alice.*via subject/',
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
     // FIXME: CRM-19415: This test should pass...
     //    $cs[] = array(
@@ -85,61 +85,61 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
     //      ),
     //    );
 
-    $cs[] = array(
+    $cs[] = [
       '2015-02-01 00:00:00',
       'addAliceMeeting addBobPhoneCall scheduleForMeeting startOnTime useHelloFirstName recipientIsActivitySource',
-      array(
-        array(
+      [
+        [
           'time' => '2015-02-01 00:00:00',
-          'to' => array('alice@example.org'),
+          'to' => ['alice@example.org'],
           'subject' => '/Hello, Alice.*via subject/',
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
-    $cs[] = array(
+    $cs[] = [
       '2015-02-01 00:00:00',
       'addAliceMeeting addBobPhoneCall scheduleForAny startOnTime useHelloFirstName recipientIsActivitySource',
-      array(
-        array(
+      [
+        [
           'time' => '2015-02-01 00:00:00',
-          'to' => array('alice@example.org'),
+          'to' => ['alice@example.org'],
           'subject' => '/Hello, Alice.*via subject/',
-        ),
-        array(
+        ],
+        [
           'time' => '2015-02-01 00:00:00',
-          'to' => array('bob@example.org'),
+          'to' => ['bob@example.org'],
           'subject' => '/Hello, Bob.*via subject/',
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
-    $cs[] = array(
+    $cs[] = [
       '2015-02-02 00:00:00',
       'addAliceMeeting addBobPhoneCall scheduleForPhoneCall startWeekBefore repeatTwoWeeksAfter useHelloFirstName recipientIsActivitySource',
-      array(
-        array(
+      [
+        [
           'time' => '2015-01-26 00:00:00',
-          'to' => array('bob@example.org'),
+          'to' => ['bob@example.org'],
           'subject' => '/Hello, Bob.*via subject/',
-        ),
-        array(
+        ],
+        [
           'time' => '2015-02-02 00:00:00',
-          'to' => array('bob@example.org'),
+          'to' => ['bob@example.org'],
           'subject' => '/Hello, Bob.*via subject/',
-        ),
-        array(
+        ],
+        [
           'time' => '2015-02-09 00:00:00',
-          'to' => array('bob@example.org'),
+          'to' => ['bob@example.org'],
           'subject' => '/Hello, Bob.*via subject/',
-        ),
-        array(
+        ],
+        [
           'time' => '2015-02-16 00:00:00',
-          'to' => array('bob@example.org'),
+          'to' => ['bob@example.org'],
           'subject' => '/Hello, Bob.*via subject/',
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
     return $cs;
   }
@@ -148,28 +148,28 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
    * Create an activity record for Alice with type "Meeting".
    */
   public function addAliceMeeting() {
-    $this->callAPISuccess('Activity', 'create', array(
+    $this->callAPISuccess('Activity', 'create', [
       'source_contact_id' => $this->contacts['alice']['id'],
       'activity_type_id' => 'Meeting',
       'subject' => 'Subject for Alice',
       'activity_date_time' => date('Y-m-d H:i:s', strtotime($this->targetDate)),
       'status_id' => 2,
-      'assignee_contact_id' => array($this->contacts['carol']['id']),
-    ));
+      'assignee_contact_id' => [$this->contacts['carol']['id']],
+    ]);
   }
 
   /**
    * Create a contribution record for Bob with type "Donation".
    */
   public function addBobPhoneCall() {
-    $this->callAPISuccess('Activity', 'create', array(
+    $this->callAPISuccess('Activity', 'create', [
       'source_contact_id' => $this->contacts['bob']['id'],
       'activity_type_id' => 'Phone Call',
       'subject' => 'Subject for Bob',
       'activity_date_time' => date('Y-m-d H:i:s', strtotime($this->targetDate)),
       'status_id' => 2,
-      'assignee_contact_id' => array($this->contacts['carol']['id']),
-    ));
+      'assignee_contact_id' => [$this->contacts['carol']['id']],
+    ]);
   }
 
   /**
@@ -179,8 +179,8 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
     $actTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
     $this->schedule->mapping_id = CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID;
     $this->schedule->start_action_date = 'receive_date';
-    $this->schedule->entity_value = CRM_Utils_Array::implodePadded(array(array_search('Meeting', $actTypes)));
-    $this->schedule->entity_status = CRM_Utils_Array::implodePadded(array(2));
+    $this->schedule->entity_value = CRM_Utils_Array::implodePadded([array_search('Meeting', $actTypes)]);
+    $this->schedule->entity_status = CRM_Utils_Array::implodePadded([2]);
   }
 
   /**
@@ -190,7 +190,7 @@ class CRM_Activity_ActionMappingTest extends \Civi\ActionSchedule\AbstractMappin
     $actTypes = CRM_Activity_BAO_Activity::buildOptions('activity_type_id');
     $this->schedule->mapping_id = CRM_Activity_ActionMapping::ACTIVITY_MAPPING_ID;
     $this->schedule->start_action_date = 'receive_date';
-    $this->schedule->entity_value = CRM_Utils_Array::implodePadded(array(array_search('Phone Call', $actTypes)));
+    $this->schedule->entity_value = CRM_Utils_Array::implodePadded([array_search('Phone Call', $actTypes)]);
     $this->schedule->entity_status = CRM_Utils_Array::implodePadded(NULL);
   }
 

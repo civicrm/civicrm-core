@@ -50,11 +50,11 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
    *  IDs should be selected when the form values are applied to the
    *  database in dataset.xml
    */
-  private $dataset = array(
+  private $dataset = [
     //  Include static group 3
-    array(
-      'fv' => array('group' => '3'),
-      'id' => array(
+    [
+      'fv' => ['group' => '3'],
+      'id' => [
         '17',
         '18',
         '19',
@@ -63,12 +63,12 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
         '22',
         '23',
         '24',
-      ),
-    ),
+      ],
+    ],
     //  Include static group 5
-    array(
-      'fv' => array('group' => '5'),
-      'id' => array(
+    [
+      'fv' => ['group' => '5'],
+      'id' => [
         '13',
         '14',
         '15',
@@ -77,12 +77,12 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
         '22',
         '23',
         '24',
-      ),
-    ),
+      ],
+    ],
     //  Include static groups 3 and 5
-    array(
-      'fv' => array('group' => array('3', '5')),
-      'id' => array(
+    [
+      'fv' => ['group' => ['3', '5']],
+      'id' => [
         '13',
         '14',
         '15',
@@ -95,12 +95,12 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
         '22',
         '23',
         '24',
-      ),
-    ),
+      ],
+    ],
     //  Include static groups 3 and 5 in legacy format
-    array(
-      'fv' => array('group' => array('3' => 1, '5' => 1)),
-      'id' => array(
+    [
+      'fv' => ['group' => ['3' => 1, '5' => 1]],
+      'id' => [
         '13',
         '14',
         '15',
@@ -113,12 +113,12 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
         '22',
         '23',
         '24',
-      ),
-    ),
+      ],
+    ],
     //  Include tag 7
-    array(
-      'fv' => array('tag' => '7'),
-      'id' => array(
+    [
+      'fv' => ['tag' => '7'],
+      'id' => [
         '11',
         '12',
         '15',
@@ -127,12 +127,12 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
         '20',
         '23',
         '24',
-      ),
-    ),
+      ],
+    ],
     //  Include tag 9
-    array(
-      'fv' => array('tag' => array('9' => 1)),
-      'id' => array(
+    [
+      'fv' => ['tag' => ['9' => 1]],
+      'id' => [
         '10',
         '12',
         '14',
@@ -141,12 +141,12 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
         '20',
         '22',
         '24',
-      ),
-    ),
+      ],
+    ],
     //  Include tags 7 and 9
-    array(
-      'fv' => array('tag' => array('7', '9')),
-      'id' => array(
+    [
+      'fv' => ['tag' => ['7', '9']],
+      'id' => [
         '10',
         '11',
         '12',
@@ -159,24 +159,24 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
         '22',
         '23',
         '24',
-      ),
-    ),
+      ],
+    ],
     // gender_id 1 = 'Female'
-    array(
-      'fv' => array('gender_id' => 1),
-      'id' => array('9', '20', '22'),
-    ),
+    [
+      'fv' => ['gender_id' => 1],
+      'id' => ['9', '20', '22'],
+    ],
     // prefix_id 2 = 'Ms.'
-    array(
-      'fv' => array('prefix_id' => 2),
-      'id' => array('10', '13'),
-    ),
+    [
+      'fv' => ['prefix_id' => 2],
+      'id' => ['10', '13'],
+    ],
     // suffix_id 6 = 'V'
-    array(
-      'fv' => array('suffix_id' => 6),
-      'id' => array('16', '19', '20', '21'),
-    ),
-  );
+    [
+      'fv' => ['suffix_id' => 6],
+      'id' => ['16', '19', '20', '21'],
+    ],
+  ];
 
   public function _construct() {
     $this->i = 0;
@@ -192,15 +192,15 @@ class CRM_Contact_BAO_QueryTestDataProvider implements Iterator {
   public function current() {
     $count = count($this->dataset[$this->i]['id']);
     $ids = $this->dataset[$this->i]['id'];
-    $full = array();
+    $full = [];
     foreach ($this->dataset[$this->i]['id'] as $key => $value) {
-      $full[] = array(
+      $full[] = [
         'contact_id' => $value,
         'contact_type' => 'Individual',
         'sort_name' => "Test Contact $value",
-      );
+      ];
     }
-    return array($this->dataset[$this->i]['fv'], $count, $ids, $full);
+    return [$this->dataset[$this->i]['fv'], $count, $ids, $full];
   }
 
   /**

@@ -34,24 +34,24 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     // FIXME: something NULLs $GLOBALS['_HTML_QuickForm_registered_rules'] when the tests are ran all together
-    $GLOBALS['_HTML_QuickForm_registered_rules'] = array(
-      'required' => array('html_quickform_rule_required', 'HTML/QuickForm/Rule/Required.php'),
-      'maxlength' => array('html_quickform_rule_range', 'HTML/QuickForm/Rule/Range.php'),
-      'minlength' => array('html_quickform_rule_range', 'HTML/QuickForm/Rule/Range.php'),
-      'rangelength' => array('html_quickform_rule_range', 'HTML/QuickForm/Rule/Range.php'),
-      'email' => array('html_quickform_rule_email', 'HTML/QuickForm/Rule/Email.php'),
-      'regex' => array('html_quickform_rule_regex', 'HTML/QuickForm/Rule/Regex.php'),
-      'lettersonly' => array('html_quickform_rule_regex', 'HTML/QuickForm/Rule/Regex.php'),
-      'alphanumeric' => array('html_quickform_rule_regex', 'HTML/QuickForm/Rule/Regex.php'),
-      'numeric' => array('html_quickform_rule_regex', 'HTML/QuickForm/Rule/Regex.php'),
-      'nopunctuation' => array('html_quickform_rule_regex', 'HTML/QuickForm/Rule/Regex.php'),
-      'nonzero' => array('html_quickform_rule_regex', 'HTML/QuickForm/Rule/Regex.php'),
-      'callback' => array('html_quickform_rule_callback', 'HTML/QuickForm/Rule/Callback.php'),
-      'compare' => array('html_quickform_rule_compare', 'HTML/QuickForm/Rule/Compare.php'),
-    );
+    $GLOBALS['_HTML_QuickForm_registered_rules'] = [
+      'required' => ['html_quickform_rule_required', 'HTML/QuickForm/Rule/Required.php'],
+      'maxlength' => ['html_quickform_rule_range', 'HTML/QuickForm/Rule/Range.php'],
+      'minlength' => ['html_quickform_rule_range', 'HTML/QuickForm/Rule/Range.php'],
+      'rangelength' => ['html_quickform_rule_range', 'HTML/QuickForm/Rule/Range.php'],
+      'email' => ['html_quickform_rule_email', 'HTML/QuickForm/Rule/Email.php'],
+      'regex' => ['html_quickform_rule_regex', 'HTML/QuickForm/Rule/Regex.php'],
+      'lettersonly' => ['html_quickform_rule_regex', 'HTML/QuickForm/Rule/Regex.php'],
+      'alphanumeric' => ['html_quickform_rule_regex', 'HTML/QuickForm/Rule/Regex.php'],
+      'numeric' => ['html_quickform_rule_regex', 'HTML/QuickForm/Rule/Regex.php'],
+      'nopunctuation' => ['html_quickform_rule_regex', 'HTML/QuickForm/Rule/Regex.php'],
+      'nonzero' => ['html_quickform_rule_regex', 'HTML/QuickForm/Rule/Regex.php'],
+      'callback' => ['html_quickform_rule_callback', 'HTML/QuickForm/Rule/Callback.php'],
+      'compare' => ['html_quickform_rule_compare', 'HTML/QuickForm/Rule/Compare.php'],
+    ];
 
     $this->_contactID = $this->organizationCreate();
-    $this->_membershipTypeID = $this->membershipTypeCreate(array('member_of_contact_id' => $this->_contactID));
+    $this->_membershipTypeID = $this->membershipTypeCreate(['member_of_contact_id' => $this->_contactID]);
     // add a random number to avoid silly conflicts with old data
     $this->_membershipStatusID = $this->membershipStatusCreate('test status' . rand(1, 1000));
   }
@@ -61,7 +61,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    */
   public function tearDown() {
-    $this->membershipTypeDelete(array('id' => $this->_membershipTypeID));
+    $this->membershipTypeDelete(['id' => $this->_membershipTypeID]);
     $this->membershipStatusDelete($this->_membershipStatusID);
     $this->contactDelete($this->_contactID);
 
@@ -75,7 +75,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * @return array|int
    */
   private function createMembershipType($organizationId, $withRelationship = FALSE) {
-    $membershipType = $this->callAPISuccess('MembershipType', 'create', array(
+    $membershipType = $this->callAPISuccess('MembershipType', 'create', [
       //Default domain ID
       'domain_id' => 1,
       'member_of_contact_id' => $organizationId,
@@ -86,7 +86,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'name' => "Organiation Membership Type",
       'relationship_type_id' => ($withRelationship) ? 5 : NULL,
       'relationship_direction' => ($withRelationship) ? 'b_a' : NULL,
-    ));
+    ]);
     return $membershipType["values"][$membershipType["id"]];
   }
 
@@ -96,9 +96,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
    * @return array|int
    */
   private function getRelatedMembershipsCount($membershipId) {
-    return $this->callAPISuccess("Membership", "getcount", array(
+    return $this->callAPISuccess("Membership", "getcount", [
       'owner_membership_id' => $membershipId,
-    ));
+    ]);
   }
 
   /**
@@ -112,24 +112,24 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $organizationId = $this->organizationCreate();
 
     // Create relationship between organization and individual contact
-    $this->callAPISuccess('Relationship', 'create', array(
+    $this->callAPISuccess('Relationship', 'create', [
       // Employer of relationship
       'relationship_type_id' => 5,
       'contact_id_a'         => $contactId,
       'contact_id_b'         => $organizationId,
       'is_active'            => 1,
-    ));
+    ]);
 
     // Create two membership types one with relationship and one without.
     $membershipTypeWithRelationship = $this->createMembershipType($membershipOrganizationId, TRUE);
     $membershipTypeWithoutRelationship = $this->createMembershipType($membershipOrganizationId);
 
     // Creating membership of organisation
-    $membership = $this->callAPISuccess("Membership", "create", array(
+    $membership = $this->callAPISuccess("Membership", "create", [
       'membership_type_id' => $membershipTypeWithRelationship["id"],
       'contact_id'         => $organizationId,
       'status_id'          => $this->_membershipStatusID,
-    ));
+    ]);
 
     $membership = $membership["values"][$membership["id"]];
 
@@ -153,7 +153,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
@@ -162,8 +162,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     CRM_Member_BAO_Membership::create($params, $ids);
 
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
@@ -172,8 +172,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     // Now call create() to modify an existing Membership
 
-    $params = array();
-    $params = array(
+    $params = [];
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
@@ -182,10 +182,10 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array(
+    ];
+    $ids = [
       'membership' => $membershipId,
-    );
+    ];
     CRM_Member_BAO_Membership::create($params, $ids);
 
     $membershipTypeId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId,
@@ -208,7 +208,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd'),
@@ -217,16 +217,16 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-    );
+    ];
 
-    $ids = array();
+    $ids = [];
     CRM_Member_BAO_Membership::create($params, $ids);
 
     $membershipId1 = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
     );
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', $last_month),
@@ -235,16 +235,16 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Source123',
       'is_override' => 0,
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     CRM_Member_BAO_Membership::create($params, $ids);
 
     $membershipId2 = $this->assertDBNotNull('CRM_Member_BAO_Membership', 'source123', 'id',
       'source', 'Database check for created membership.'
     );
 
-    $membership = array('contact_id' => $contactId);
-    $membershipValues = array();
+    $membership = ['contact_id' => $contactId];
+    $membershipValues = [];
     CRM_Member_BAO_Membership::getValues($membership, $membershipValues, TRUE);
 
     $this->assertEquals($membershipValues[$membershipId1]['membership_id'], $membershipId1, 'Verify membership record 1 is fetched.');
@@ -259,7 +259,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function testRetrieve() {
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
@@ -268,15 +268,15 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     CRM_Member_BAO_Membership::create($params, $ids);
 
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
     );
-    $params = array('id' => $membershipId);
-    $values = array();
+    $params = ['id' => $membershipId];
+    $values = [];
     CRM_Member_BAO_Membership::retrieve($params, $values);
     $this->assertEquals($values['id'], $membershipId, 'Verify membership record is retrieved.');
 
@@ -287,7 +287,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function testActiveMembers() {
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
@@ -296,20 +296,20 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     CRM_Member_BAO_Membership::create($params, $ids);
 
     $membershipId1 = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
     );
 
-    $params = array('id' => $membershipId1);
-    $values1 = array();
+    $params = ['id' => $membershipId1];
+    $values1 = [];
     CRM_Member_BAO_Membership::retrieve($params, $values1);
-    $membership = array($membershipId1 => $values1);
+    $membership = [$membershipId1 => $values1];
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
@@ -318,16 +318,16 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'PaySource',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     CRM_Member_BAO_Membership::create($params, $ids);
 
     $membershipId2 = $this->assertDBNotNull('CRM_Member_BAO_Membership', 'PaySource', 'id',
       'source', 'Database check for created membership.'
     );
 
-    $params = array('id' => $membershipId2);
-    $values2 = array();
+    $params = ['id' => $membershipId2];
+    $values2 = [];
     CRM_Member_BAO_Membership::retrieve($params, $values2);
     $membership[$membershipId2] = $values2;
 
@@ -347,7 +347,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function testDeleteMembership() {
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
@@ -356,8 +356,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     CRM_Member_BAO_Membership::create($params, $ids);
 
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
@@ -374,7 +374,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function testGetContactMembership() {
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
@@ -383,8 +383,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     CRM_Member_BAO_Membership::create($params, $ids);
 
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
@@ -406,7 +406,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function testgetContributionPageId() {
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
@@ -415,8 +415,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     CRM_Member_BAO_Membership::create($params, $ids);
 
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
@@ -436,7 +436,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function testgetMembershipStarts() {
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
@@ -445,8 +445,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     CRM_Member_BAO_Membership::create($params, $ids);
 
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
@@ -467,7 +467,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function testGetMembershipCount() {
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
@@ -476,8 +476,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     CRM_Member_BAO_Membership::create($params, $ids);
 
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
@@ -497,7 +497,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function testSortName() {
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => '2006-01-21',
@@ -506,7 +506,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-    );
+    ];
 
     $membership = $this->callAPISuccess('Membership', 'create', $params);
 
@@ -522,7 +522,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   public function testdeleteRelatedMemberships() {
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', strtotime('2006-01-21')),
@@ -531,8 +531,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array();
+    ];
+    $ids = [];
 
     CRM_Member_BAO_Membership::create($params, $ids);
 
@@ -553,7 +553,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate();
     $joinDate = $startDate = date("Ymd", strtotime(date("Ymd") . " -6 month"));
     $endDate = date("Ymd", strtotime($joinDate . " +1 year -1 day"));
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => $joinDate,
@@ -562,8 +562,8 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     $membership = CRM_Member_BAO_Membership::create($params, $ids);
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
       'contact_id', 'Database check for created membership.'
@@ -620,7 +620,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     $contactId = $this->individualCreate();
     $joinDate = $startDate = date("Ymd", strtotime(date("Ymd") . " -1 year -15 days"));
     $endDate = date("Ymd", strtotime($joinDate . " +1 year -1 day"));
-    $params = array(
+    $params = [
       'contact_id' => $contactId,
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => $joinDate,
@@ -628,9 +628,9 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'end_date' => $endDate,
       'source' => 'Payment',
       'status_id' => $statusId,
-    );
+    ];
 
-    $ids = array();
+    $ids = [];
     $membership = CRM_Member_BAO_Membership::create($params, $ids);
 
     $membershipId = $this->assertDBNotNull('CRM_Member_BAO_Membership', $contactId, 'id',
@@ -643,11 +643,11 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
     );
 
     //verify all dates.
-    $dates = array(
+    $dates = [
       'startDate' => 'start_date',
       'joinDate' => 'join_date',
       'endDate' => 'end_date',
-    );
+    ];
 
     foreach ($dates as $date => $dbDate) {
       $this->assertEquals($membership->$dbDate, $$date,
@@ -697,7 +697,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   public function testUpdateAllMembershipStatusConvertExpiredOverriddenStatusToNormal() {
-    $params = array(
+    $params = [
       'contact_id' => $this->individualCreate(),
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', time()),
@@ -707,17 +707,17 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'is_override' => 1,
       'status_override_end_date' => date('Ymd', strtotime('-1 day')),
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     $createdMembership = CRM_Member_BAO_Membership::create($params, $ids);
 
     CRM_Member_BAO_Membership::updateAllMembershipStatus();
 
-    $membershipAfterProcess = civicrm_api3('Membership', 'get', array(
+    $membershipAfterProcess = civicrm_api3('Membership', 'get', [
       'sequential' => 1,
       'id' => $createdMembership->id,
-      'return' => array('id', 'is_override', 'status_override_end_date'),
-    ))['values'][0];
+      'return' => ['id', 'is_override', 'status_override_end_date'],
+    ])['values'][0];
 
     $this->assertEquals($createdMembership->id, $membershipAfterProcess['id']);
     $this->assertArrayNotHasKey('is_override', $membershipAfterProcess);
@@ -725,7 +725,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   public function testUpdateAllMembershipStatusHandleOverriddenWithEndOverrideDateEqualTodayAsExpired() {
-    $params = array(
+    $params = [
       'contact_id' => $this->individualCreate(),
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', time()),
@@ -735,17 +735,17 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'is_override' => 1,
       'status_override_end_date' => date('Ymd', time()),
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     $createdMembership = CRM_Member_BAO_Membership::create($params, $ids);
 
     CRM_Member_BAO_Membership::updateAllMembershipStatus();
 
-    $membershipAfterProcess = civicrm_api3('Membership', 'get', array(
+    $membershipAfterProcess = civicrm_api3('Membership', 'get', [
       'sequential' => 1,
       'id' => $createdMembership->id,
-      'return' => array('id', 'is_override', 'status_override_end_date'),
-    ))['values'][0];
+      'return' => ['id', 'is_override', 'status_override_end_date'],
+    ])['values'][0];
 
     $this->assertEquals($createdMembership->id, $membershipAfterProcess['id']);
     $this->assertArrayNotHasKey('is_override', $membershipAfterProcess);
@@ -753,7 +753,7 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
   }
 
   public function testUpdateAllMembershipStatusDoesNotConvertOverridenMembershipWithoutEndOverrideDateToNormal() {
-    $params = array(
+    $params = [
       'contact_id' => $this->individualCreate(),
       'membership_type_id' => $this->_membershipTypeID,
       'join_date' => date('Ymd', time()),
@@ -762,17 +762,17 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
       'source' => 'Payment',
       'is_override' => 1,
       'status_id' => $this->_membershipStatusID,
-    );
-    $ids = array();
+    ];
+    $ids = [];
     $createdMembership = CRM_Member_BAO_Membership::create($params, $ids);
 
     CRM_Member_BAO_Membership::updateAllMembershipStatus();
 
-    $membershipAfterProcess = civicrm_api3('Membership', 'get', array(
+    $membershipAfterProcess = civicrm_api3('Membership', 'get', [
       'sequential' => 1,
       'id' => $createdMembership->id,
-      'return' => array('id', 'is_override', 'status_override_end_date'),
-    ))['values'][0];
+      'return' => ['id', 'is_override', 'status_override_end_date'],
+    ])['values'][0];
 
     $this->assertEquals($createdMembership->id, $membershipAfterProcess['id']);
     $this->assertEquals(1, $membershipAfterProcess['is_override']);

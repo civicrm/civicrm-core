@@ -53,20 +53,20 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
   }
 
   public function fromToData() {
-    $cases = array();
+    $cases = [];
     // Absolute dates
-    $cases[] = array('20170901000000', '20170913235959', 0, '09/01/2017', '09/13/2017');
+    $cases[] = ['20170901000000', '20170913235959', 0, '09/01/2017', '09/13/2017'];
     // "Today" relative date filter
     $date = new DateTime();
     $expectedFrom = $date->format('Ymd') . '000000';
     $expectedTo = $date->format('Ymd') . '235959';
-    $cases[] = array($expectedFrom, $expectedTo, 'this.day', '', '');
+    $cases[] = [$expectedFrom, $expectedTo, 'this.day', '', ''];
     // "yesterday" relative date filter
     $date = new DateTime();
     $date->sub(new DateInterval('P1D'));
     $expectedFrom = $date->format('Ymd') . '000000';
     $expectedTo = $date->format('Ymd') . '235959';
-    $cases[] = array($expectedFrom, $expectedTo, 'previous.day', '', '');
+    $cases[] = [$expectedFrom, $expectedTo, 'previous.day', '', ''];
     return $cases;
   }
 

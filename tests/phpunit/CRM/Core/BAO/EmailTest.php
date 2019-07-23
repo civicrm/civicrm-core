@@ -9,7 +9,7 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
 
-    $this->quickCleanup(array('civicrm_contact', 'civicrm_email'));
+    $this->quickCleanup(['civicrm_contact', 'civicrm_email']);
   }
 
   /**
@@ -18,13 +18,13 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
   public function testAdd() {
     $contactId = $this->individualCreate();
 
-    $params = array();
-    $params = array(
+    $params = [];
+    $params = [
       'email' => 'jane.doe@example.com',
       'is_primary' => 1,
       'location_type_id' => 1,
       'contact_id' => $contactId,
-    );
+    ];
 
     CRM_Core_BAO_Email::add($params);
 
@@ -34,13 +34,13 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
 
     // Now call add() to modify an existing email address
 
-    $params = array();
-    $params = array(
+    $params = [];
+    $params = [
       'id' => $emailId,
       'contact_id' => $contactId,
       'is_bulkmail' => 1,
       'on_hold' => 1,
-    );
+    ];
 
     CRM_Core_BAO_Email::add($params);
 
@@ -58,12 +58,12 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
   public function testHoldEmail() {
     $contactId = $this->individualCreate();
 
-    $params = array(
+    $params = [
       'email' => 'jane.doe@example.com',
       'is_primary' => 1,
       'location_type_id' => 1,
       'contact_id' => $contactId,
-    );
+    ];
 
     CRM_Core_BAO_Email::add($params);
 
@@ -72,12 +72,12 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
     );
 
     // Now call add() to update on_hold=1 ("On Hold Bounce") and check record state
-    $params = array();
-    $params = array(
+    $params = [];
+    $params = [
       'id' => $emailId,
       'contact_id' => $contactId,
       'on_hold' => 1,
-    );
+    ];
 
     CRM_Core_BAO_Email::add($params);
 
@@ -96,12 +96,12 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
     );
 
     // Now call add() to update on_hold=2 ("On Hold Opt-out") and check record state
-    $params = array();
-    $params = array(
+    $params = [];
+    $params = [
       'id' => $emailId,
       'contact_id' => $contactId,
       'on_hold' => 2,
-    );
+    ];
 
     CRM_Core_BAO_Email::add($params);
 
@@ -120,12 +120,12 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
     );
 
     // Now call add() with on_hold=null (not on hold) and verify that reset_date is set.
-    $params = array();
-    $params = array(
+    $params = [];
+    $params = [
       'id' => $emailId,
       'contact_id' => $contactId,
       'on_hold' => 'null',
-    );
+    ];
 
     CRM_Core_BAO_Email::add($params);
     $this->assertDBCompareValue('CRM_Core_DAO_Email', $emailId, 'on_hold', 'id', 0,
@@ -152,13 +152,13 @@ class CRM_Core_BAO_EmailTest extends CiviUnitTestCase {
    * AllEmails() method - get all emails for our contact, with primary email first
    */
   public function testAllEmails() {
-    $contactParams = array(
+    $contactParams = [
       'first_name' => 'Alan',
       'last_name' => 'Smith',
       'email' => 'alan.smith1@example.com',
-      'api.email.create.0' => array('email' => 'alan.smith2@example.com', 'location_type_id' => 'Home'),
-      'api.email.create.1' => array('email' => 'alan.smith3@example.com', 'location_type_id' => 'Main'),
-    );
+      'api.email.create.0' => ['email' => 'alan.smith2@example.com', 'location_type_id' => 'Home'],
+      'api.email.create.1' => ['email' => 'alan.smith3@example.com', 'location_type_id' => 'Main'],
+    ];
 
     $contactId = $this->individualCreate($contactParams);
 

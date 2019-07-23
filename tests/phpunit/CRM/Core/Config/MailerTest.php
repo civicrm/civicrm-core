@@ -45,34 +45,34 @@ class CRM_Core_Config_MailerTest extends CiviUnitTestCase {
   public $calls;
 
   public function setUp() {
-    $this->calls = array(
+    $this->calls = [
       'civicrm_alterMailer' => 0,
       'send' => 0,
-    );
+    ];
     parent::setUp();
   }
 
   public function testHookAlterMailer() {
     $test = $this;
-    $mockMailer = new CRM_Utils_FakeObject(array(
+    $mockMailer = new CRM_Utils_FakeObject([
       'send' => function ($recipients, $headers, $body) use ($test) {
         $test->calls['send']++;
-        $test->assertEquals(array('to@example.org'), $recipients);
+        $test->assertEquals(['to@example.org'], $recipients);
         $test->assertEquals('Subject Example', $headers['Subject']);
       },
-    ));
+    ]);
 
     CRM_Utils_Hook::singleton()->setHook('civicrm_alterMailer',
     function (&$mailer, $driver, $params) use ($test, $mockMailer) {
       $test->calls['civicrm_alterMailer']++;
       $test->assertTrue(is_string($driver) && !empty($driver));
       $test->assertTrue(is_array($params));
-      $test->assertTrue(is_callable(array($mailer, 'send')));
+      $test->assertTrue(is_callable([$mailer, 'send']));
       $mailer = $mockMailer;
     }
     );
 
-    $params = array();
+    $params = [];
     $params['groupName'] = 'CRM_Core_Config_MailerTest';
     $params['from'] = 'From Example <from@example.com>';
     $params['toName'] = 'To Example';

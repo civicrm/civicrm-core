@@ -59,13 +59,13 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
 
     // params for saved search that returns all volunteers for the
     // default organization.
-    $this->params = array(
-      'form_values' => array(
+    $this->params = [
+      'form_values' => [
         // Is volunteer for
         'relation_type_id' => '6_a_b',
         'relation_target_name' => 'Default Organization',
-      ),
-    );
+      ],
+    ];
   }
 
   /**
@@ -101,7 +101,7 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
 
     // Act:
     $get_result = $this->callAPIAndDocument(
-        $this->_entity, 'get', array('id' => $create_result['id']), __FUNCTION__, __FILE__);
+        $this->_entity, 'get', ['id' => $create_result['id']], __FUNCTION__, __FILE__);
 
     // Assert:
     $this->assertEquals(1, $get_result['count']);
@@ -120,24 +120,24 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
   public function testCreateSavedSearchWithSmartGroup() {
     // First create a volunteer for the default organization
 
-    $result = $this->callAPISuccess('Contact', 'create', array(
+    $result = $this->callAPISuccess('Contact', 'create', [
       'first_name' => 'Joe',
       'last_name' => 'Schmoe',
       'contact_type' => 'Individual',
-      'api.Relationship.create' => array(
+      'api.Relationship.create' => [
         'contact_id_a' => '$value.id',
         // default organization:
         'contact_id_b' => 1,
         // volunteer relationship:
         'relationship_type_id' => 6,
         'is_active' => 1,
-      ),
-    ));
+      ],
+    ]);
     $contact_id = $result['id'];
 
     // Now create our saved search, and chain the creation of a smart group.
     $params = $this->params;
-    $params['api.Group.create'] = array(
+    $params['api.Group.create'] = [
       'name' => 'my_smartgroup',
       'title' => 'my smartgroup',
       'description' => 'Volunteers for the default organization',
@@ -146,7 +146,7 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
       'visibility' => 'User and User Admin Only',
       'is_hidden' => 0,
       'is_reserved' => 0,
-    );
+    ];
 
     $create_result = $this->callAPIAndDocument(
         $this->_entity, 'create', $params, __FUNCTION__, __FILE__);
@@ -156,7 +156,7 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
 
     // Search for contacts in our new smart group
     $get_result = $this->callAPISuccess(
-      'Contact', 'get', array('group' => $group_id), __FUNCTION__, __FILE__);
+      'Contact', 'get', ['group' => $group_id], __FUNCTION__, __FILE__);
 
     // Expect our contact to be there.
     $this->assertEquals(1, $get_result['count']);
@@ -166,10 +166,10 @@ class api_v3_SavedSearchTest extends CiviUnitTestCase {
   public function testDeleteSavedSearch() {
     // Create saved search, delete it again, and try to get it
     $create_result = $this->callAPISuccess($this->_entity, 'create', $this->params);
-    $delete_params = array('id' => $create_result['id']);
+    $delete_params = ['id' => $create_result['id']];
     $this->callAPIAndDocument(
         $this->_entity, 'delete', $delete_params, __FUNCTION__, __FILE__);
-    $get_result = $this->callAPISuccess($this->_entity, 'get', array());
+    $get_result = $this->callAPISuccess($this->_entity, 'get', []);
 
     $this->assertEquals(0, $get_result['count']);
   }

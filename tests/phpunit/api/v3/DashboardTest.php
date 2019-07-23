@@ -46,12 +46,12 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
 
   public function testDashboardCreate() {
     $oldCount = CRM_Core_DAO::singleValueQuery('select count(*) from civicrm_dashboard');
-    $params = array(
+    $params = [
       'label' => 'New Dashlet element',
       'name' => 'New Dashlet element',
       'url' => 'civicrm/report/list&reset=1&compid=99',
       'fullscreen_url' => 'civicrm/report/list&compid=99&reset=1&context=dashletFullscreen',
-    );
+    ];
     $dashboard = $this->callAPISuccess('dashboard', 'create', $params);
     $this->assertTrue(is_numeric($dashboard['id']), "In line " . __LINE__);
     $this->assertTrue($dashboard['id'] > 0, "In line " . __LINE__);
@@ -68,13 +68,13 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
    */
   public function testDashboardCreateByNonAdmins() {
     $loggedInContactID = $this->createLoggedInUser();
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array();
-    $params = array(
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = [];
+    $params = [
       'label' => 'New Dashlet element',
       'name' => 'New Dashlet element',
       'url' => 'civicrm/report/list&reset=1&compid=99',
       'fullscreen_url' => 'civicrm/report/list&compid=99&reset=1&context=dashletFullscreen',
-    );
+    ];
     $dashboard = $this->callAPISuccess('dashboard', 'create', $params);
     $this->assertTrue(is_numeric($dashboard['id']), "In line " . __LINE__);
     $this->assertTrue($dashboard['id'] > 0, "In line " . __LINE__);
@@ -89,13 +89,13 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
    * Ensure that where is_active is specifically set to 0 is_active returns 0.
    */
   public function testDashboardCreateNotActive() {
-    $params = array(
+    $params = [
       'label' => 'New Dashlet element',
       'name' => 'New Dashlet element',
       'url' => 'civicrm/report/list&reset=1&compid=99&snippet=5',
       'fullscreen_url' => 'civicrm/report/list&compid=99&reset=1&snippet=5&context=dashletFullscreen',
       'is_active' => 0,
-    );
+    ];
     $dashboard = $this->callAPISuccess('dashboard', 'create', $params);
     $this->assertEquals($dashboard['values'][$dashboard['id']]['is_active'], 0);
   }
@@ -105,9 +105,9 @@ class api_v3_DashboardTest extends CiviUnitTestCase {
    * @param $oldCount
    */
   public function DashboardDelete($id, $oldCount) {
-    $params = array(
+    $params = [
       'id' => $id,
-    );
+    ];
     $dashboardget = $this->callAPISuccess('dashboard', 'get', $params);
     $this->assertEquals($id, $dashboardget['id']);
     $dashboard = $this->callAPISuccess('dashboard', 'delete', $params);

@@ -31,12 +31,12 @@
  * @package CiviCRM
  */
 class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
-  protected $_tablesToTruncate = array(
+  protected $_tablesToTruncate = [
     'civicrm_contact',
     'civicrm_email',
     'civicrm_phone',
     'civicrm_address',
-  );
+  ];
 
   public function setUp() {
     parent::setUp();

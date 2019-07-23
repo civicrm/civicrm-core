@@ -14,16 +14,16 @@ class CRM_Utils_HookTest extends CiviUnitTestCase {
 
   public function setUp() {
     parent::setUp();
-    $this->fakeModules = array(
+    $this->fakeModules = [
       'hooktesta',
       'hooktestb',
       'hooktestc',
       'hooktestd',
       'hookteste',
-    );
+    ];
     // our goal is to test a helper in CRM_Utils_Hook, but we need a concrete class
     $this->hook = new CRM_Utils_Hook_UnitTests();
-    $this->log = array();
+    $this->log = [];
     self::$activeTest = $this;
   }
 
@@ -39,14 +39,14 @@ class CRM_Utils_HookTest extends CiviUnitTestCase {
     $arg1 = 'whatever';
     $this->hook->runHooks($this->fakeModules, 'civicrm_testRunHooks_outer', 1, $arg1, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject);
     $this->assertEquals(
-      array(
+      [
         'a-outer',
         'b-outer-1',
         'a-inner',
         'b-inner',
         'b-outer-2',
         'c-outer',
-      ),
+      ],
       $this->log
     );
   }
@@ -57,11 +57,11 @@ class CRM_Utils_HookTest extends CiviUnitTestCase {
   public function testRunHooks_merge() {
     $result = $this->hook->runHooks($this->fakeModules, 'civicrm_testRunHooks_merge', 0, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject, CRM_Utils_Hook::$_nullObject);
     $this->assertEquals(
-      array(
+      [
         'from-module-a1',
         'from-module-a2',
         'from-module-e',
-      ),
+      ],
       $result
     );
   }
@@ -104,7 +104,7 @@ function hooktestb_civicrm_testRunHooks_inner() {
  * @return array
  */
 function hooktesta_civicrm_testRunHooks_merge() {
-  return array('from-module-a1', 'from-module-a2');
+  return ['from-module-a1', 'from-module-a2'];
 }
 
 // OMIT: function hooktestb_civicrm_testRunHooks_merge
@@ -113,7 +113,7 @@ function hooktesta_civicrm_testRunHooks_merge() {
  * Implements hook_civicrm_testRunHooks_merge().
  */
 function hooktestc_civicrm_testRunHooks_merge() {
-  return array();
+  return [];
 }
 
 /**
@@ -127,5 +127,5 @@ function hooktestd_civicrm_testRunHooks_merge() {
  * @return array
  */
 function hookteste_civicrm_testRunHooks_merge() {
-  return array('from-module-e');
+  return ['from-module-e'];
 }

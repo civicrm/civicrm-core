@@ -68,33 +68,33 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
 
     // Take a semi-random OptionGroup and test manually changing its label
     // in one language, while making sure it stays the same in English.
-    $group = $this->callAPISuccess('OptionGroup', 'getsingle', array(
+    $group = $this->callAPISuccess('OptionGroup', 'getsingle', [
       'name' => 'contact_edit_options',
-    ));
+    ]);
 
-    $english_original = $this->callAPISuccess('OptionValue', 'getsingle', array(
+    $english_original = $this->callAPISuccess('OptionValue', 'getsingle', [
       'option_group_id' => $group['id'],
       'name' => 'IM',
-    ));
+    ]);
 
-    $this->callAPISuccess('OptionValue', 'create', array(
+    $this->callAPISuccess('OptionValue', 'create', [
       'id' => $english_original['id'],
       'name' => 'IM',
       'label' => 'Messagerie instantanée',
       'option.language' => 'fr_CA',
-    ));
+    ]);
 
-    $french = $this->callAPISuccess('OptionValue', 'getsingle', array(
+    $french = $this->callAPISuccess('OptionValue', 'getsingle', [
       'option_group_id' => $group['id'],
       'name' => 'IM',
       'options' => ['language' => 'fr_CA'],
-    ));
+    ]);
 
     // Ensure that after language is changed in previous call it will go back to the default.
-    $default = $this->callAPISuccess('OptionValue', 'getsingle', array(
+    $default = $this->callAPISuccess('OptionValue', 'getsingle', [
       'option_group_id' => $group['id'],
       'name' => 'IM',
-    ));
+    ]);
 
     $this->assertEquals($french['label'], 'Messagerie instantanée');
     $this->assertEquals($default['label'], $english_original['label']);
@@ -108,15 +108,15 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
     $this->enableMultilingual();
 
     // list of entities which has mandatory attributes
-    $specialEntities = array(
-      'Attachment' => array('id' => 13),
-      'CustomValue' => array('entity_id' => 13),
-      'MailingContact' => array('contact_id' => 13),
-      'Profile' => array('profile_id' => 13),
-      'MailingGroup' => array('mailing_id' => 13),
-    );
+    $specialEntities = [
+      'Attachment' => ['id' => 13],
+      'CustomValue' => ['entity_id' => 13],
+      'MailingContact' => ['contact_id' => 13],
+      'Profile' => ['profile_id' => 13],
+      'MailingGroup' => ['mailing_id' => 13],
+    ];
     // deprecated or API.Get is not supported/implemented
-    $skippableEntities = array(
+    $skippableEntities = [
       'Logging',
       'MailingEventConfirm',
       'MailingEventResubscribe',
@@ -131,13 +131,13 @@ class api_v3_MultilingualTest extends CiviUnitTestCase {
       'UFGroup',
       // need loggedIn user id
       'User',
-    );
+    ];
     // fetch all entities
-    $entities = $this->callAPISuccess('Entity', 'get', array());
+    $entities = $this->callAPISuccess('Entity', 'get', []);
     $skippableEntities = array_merge($skippableEntities, $entities['deprecated']);
 
     foreach ($entities['values'] as $entity) {
-      $params = array('check_permissions' => 1);
+      $params = ['check_permissions' => 1];
       if (in_array($entity, $skippableEntities) && $entity != 'MailingGroup') {
         continue;
       }

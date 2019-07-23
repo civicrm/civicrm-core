@@ -39,7 +39,7 @@ class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
    * Check method create()
    */
   public function testGetCreditCards() {
-    $params = array(
+    $params = [
       'name' => 'API_Test_PP_Type',
       'title' => 'API Test Payment Processor Type',
       'class_name' => 'CRM_Core_Payment_APITest',
@@ -47,18 +47,18 @@ class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
       'payment_processor_type_id' => 1,
       'is_recur' => 0,
       'domain_id' => 1,
-      'accepted_credit_cards' => json_encode(array(
+      'accepted_credit_cards' => json_encode([
         'Visa' => 'Visa',
         'Mastercard' => 'Mastercard',
         'Amex' => 'Amex',
-      )),
-    );
+      ]),
+    ];
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::create($params);
-    $expectedCards = array(
+    $expectedCards = [
       'Visa' => 'Visa',
       'Mastercard' => 'Mastercard',
       'Amex' => 'Amex',
-    );
+    ];
     $cards = CRM_Financial_BAO_PaymentProcessor::getCreditCards($paymentProcessor->id);
     $this->assertEquals($cards, $expectedCards, 'Verify correct credit card types are returned');
   }

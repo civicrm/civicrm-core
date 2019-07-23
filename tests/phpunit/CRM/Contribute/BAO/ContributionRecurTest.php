@@ -30,12 +30,12 @@
  * @group headless
  */
 class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
-  protected $_params = array();
+  protected $_params = [];
 
   public function setUp() {
     parent::setUp();
     $this->_ids['payment_processor'] = $this->paymentProcessorCreate();
-    $this->_params = array(
+    $this->_params = [
       'contact_id' => $this->individualCreate(),
       'amount' => 3.00,
       'frequency_unit' => 'week',
@@ -62,11 +62,11 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'payment_instrument_id' => 1,
       'campaign_id' => NULL,
-    );
+    ];
   }
 
   public function teardown() {
-    $this->quickCleanup(array('civicrm_contribution_recur', 'civicrm_payment_processor'));
+    $this->quickCleanup(['civicrm_contribution_recur', 'civicrm_payment_processor']);
   }
 
   /**
@@ -99,7 +99,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
    */
   public function testSupportFinancialTypeChange() {
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
-    $this->callAPISuccess('Contribution', 'create', array(
+    $this->callAPISuccess('Contribution', 'create', [
       'contribution_recur_id' => $contributionRecur['id'],
       'total_amount' => '3.00',
       'financial_type_id' => 1,
@@ -108,7 +108,7 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
       'contact_id' => $this->individualCreate(),
       'contribution_status_id' => 1,
       'receive_date' => 'yesterday',
-    ));
+    ]);
     $this->assertTrue(CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($contributionRecur['id']));
   }
 
@@ -119,10 +119,10 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $createParams = $this->_params;
     $createParams['currency'] = 'XAU';
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $createParams);
-    $editParams = array(
+    $editParams = [
       'id' => $contributionRecur['id'],
       'end_date' => '+ 4 weeks',
-    );
+    ];
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $editParams);
     $dao = new CRM_Contribute_BAO_ContributionRecur();
     $dao->id = $contributionRecur['id'];

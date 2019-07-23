@@ -19,23 +19,23 @@ class CRM_Core_Smarty_plugins_CrmScopeTest extends CiviUnitTestCase {
    * @return array
    */
   public function scopeCases() {
-    $cases = array();
-    $cases[] = array('', '{crmScope}{/crmScope}');
-    $cases[] = array('', '{crmScope x=1}{/crmScope}');
-    $cases[] = array('x=', 'x={$x}');
-    $cases[] = array('x=1', '{crmScope x=1}x={$x}{/crmScope}');
-    $cases[] = array('x=1', '{$x}{crmScope x=1}x={$x}{/crmScope}{$x}');
-    $cases[] = array('x=1 x=2 x=1', '{crmScope x=1}x={$x} {crmScope x=2}x={$x}{/crmScope} x={$x}{/crmScope}');
-    $cases[] = array(
+    $cases = [];
+    $cases[] = ['', '{crmScope}{/crmScope}'];
+    $cases[] = ['', '{crmScope x=1}{/crmScope}'];
+    $cases[] = ['x=', 'x={$x}'];
+    $cases[] = ['x=1', '{crmScope x=1}x={$x}{/crmScope}'];
+    $cases[] = ['x=1', '{$x}{crmScope x=1}x={$x}{/crmScope}{$x}'];
+    $cases[] = ['x=1 x=2 x=1', '{crmScope x=1}x={$x} {crmScope x=2}x={$x}{/crmScope} x={$x}{/crmScope}'];
+    $cases[] = [
       'x=1 x=2 x=3 x=2 x=1',
       '{crmScope x=1}x={$x} {crmScope x=2}x={$x} {crmScope x=3}x={$x}{/crmScope} x={$x}{/crmScope} x={$x}{/crmScope}',
-    );
-    $cases[] = array('x=1,y=9', '{crmScope x=1 y=9}x={$x},y={$y}{/crmScope}');
-    $cases[] = array(
+    ];
+    $cases[] = ['x=1,y=9', '{crmScope x=1 y=9}x={$x},y={$y}{/crmScope}'];
+    $cases[] = [
       'x=1,y=9 x=1,y=8 x=1,y=9',
       '{crmScope x=1 y=9}x={$x},y={$y} {crmScope y=8}x={$x},y={$y}{/crmScope} x={$x},y={$y}{/crmScope}',
-    );
-    $cases[] = array('x=', 'x={$x}');
+    ];
+    $cases[] = ['x=', 'x={$x}'];
     return $cases;
   }
 

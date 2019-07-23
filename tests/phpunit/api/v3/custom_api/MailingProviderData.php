@@ -108,8 +108,8 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
    */
   public static function &fields() {
     if (!isset(Civi::$statics[__CLASS__]['fields'])) {
-      Civi::$statics[__CLASS__]['fields'] = array(
-        'contact_identifier' => array(
+      Civi::$statics[__CLASS__]['fields'] = [
+        'contact_identifier' => [
           'name' => 'contact_identifier',
           'type' => CRM_Utils_Type::T_STRING,
           'title' => ts('Contact Identifier') ,
@@ -120,8 +120,8 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
           'entity' => 'MailingProviderData',
           'bao' => 'CRM_Omnimail_DAO_MailingProviderData',
           'localizable' => 0,
-        ) ,
-        'mailing_identifier' => array(
+        ] ,
+        'mailing_identifier' => [
           'name' => 'mailing_identifier',
           'type' => CRM_Utils_Type::T_STRING,
           'title' => ts('Mailing Identifier') ,
@@ -132,8 +132,8 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
           'entity' => 'MailingProviderData',
           'bao' => 'CRM_Omnimail_DAO_MailingProviderData',
           'localizable' => 0,
-        ) ,
-        'email' => array(
+        ] ,
+        'email' => [
           'name' => 'email',
           'type' => CRM_Utils_Type::T_STRING,
           'title' => ts('Email') ,
@@ -144,8 +144,8 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
           'entity' => 'MailingProviderData',
           'bao' => 'CRM_Omnimail_DAO_MailingProviderData',
           'localizable' => 0,
-        ) ,
-        'event_type' => array(
+        ] ,
+        'event_type' => [
           'name' => 'event_type',
           'type' => CRM_Utils_Type::T_STRING,
           'title' => ts('Recipient Action Type') ,
@@ -156,8 +156,8 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
           'entity' => 'MailingProviderData',
           'bao' => 'CRM_Omnimail_DAO_MailingProviderData',
           'localizable' => 0,
-        ) ,
-        'recipient_action_datetime' => array(
+        ] ,
+        'recipient_action_datetime' => [
           'name' => 'recipient_action_datetime',
           'type' => CRM_Utils_Type::T_TIMESTAMP,
           'title' => ts('Recipient Action Datetime') ,
@@ -166,8 +166,8 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
           'entity' => 'MailingProviderData',
           'bao' => 'CRM_Omnimail_DAO_MailingProviderData',
           'localizable' => 0,
-        ),
-        'contact_id' => array(
+        ],
+        'contact_id' => [
           'name' => 'contact_id',
           'type' => CRM_Utils_Type::T_INT,
           'description' => 'Contact in CiviCRM',
@@ -175,8 +175,8 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
           'entity' => 'MailingProviderData',
           'bao' => 'CRM_Omnimail_DAO_MailingProviderData',
           'localizable' => 0,
-        ) ,
-        'is_civicrm_updated' => array(
+        ] ,
+        'is_civicrm_updated' => [
           'name' => 'is_civicrm_updated',
           'type' => CRM_Utils_Type::T_BOOLEAN,
           'description' => 'Has the action been synchronised through to CiviCRM',
@@ -184,8 +184,8 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
           'entity' => 'MailingProviderData',
           'bao' => 'CRM_Omnimail_DAO_MailingProviderData',
           'localizable' => 0,
-        ) ,
-      );
+        ] ,
+      ];
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);
     }
     return Civi::$statics[__CLASS__]['fields'];
@@ -230,7 +230,7 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
    * @return array
    */
   public static function &import($prefix = FALSE) {
-    $r = CRM_Core_DAO_AllCoreTables::getImports(__CLASS__, 'mailing_provider_data', $prefix, array());
+    $r = CRM_Core_DAO_AllCoreTables::getImports(__CLASS__, 'mailing_provider_data', $prefix, []);
     return $r;
   }
 
@@ -242,7 +242,7 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
    * @return array
    */
   public static function &export($prefix = FALSE) {
-    $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'mailing_provider_data', $prefix, array());
+    $r = CRM_Core_DAO_AllCoreTables::getExports(__CLASS__, 'mailing_provider_data', $prefix, []);
     return $r;
   }
 
@@ -250,7 +250,7 @@ class CRM_Omnimail_DAO_MailingProviderData extends CRM_Core_DAO {
    * Returns the list of indices
    */
   public static function indices($localize = TRUE) {
-    $indices = array();
+    $indices = [];
     return ($localize && !empty($indices)) ? CRM_Core_DAO_AllCoreTables::multilingualize(__CLASS__, $indices) : $indices;
   }
 

@@ -55,20 +55,20 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
    */
   public function testCreateAndDeletePledgeBlock() {
 
-    $pledgeFrequencyUnit = array(
+    $pledgeFrequencyUnit = [
       'week' => 1,
       'month' => 1,
       'year' => 1,
-    );
+    ];
 
-    $params = array(
+    $params = [
       'entity_id' => $this->_contributionPageId,
       'entity_table' => 'civicrm_contribution_page',
       'pledge_frequency_unit' => $pledgeFrequencyUnit,
       'max_reminders' => 2,
       'initial_reminder_day' => 2,
       'additional_reminder_day' => 1,
-    );
+    ];
 
     //Checking for pledgeBlock id in the Pledge_block table.
     $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::create($params);
@@ -88,20 +88,20 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
    */
   public function testAddPledgeBlock() {
 
-    $pledgeFrequencyUnit = array(
+    $pledgeFrequencyUnit = [
       'week' => 1,
       'month' => 1,
       'year' => 1,
-    );
+    ];
 
-    $params = array(
+    $params = [
       'entity_id' => $this->_contributionPageId,
       'entity_table' => 'civicrm_contribution_page',
       'pledge_frequency_unit' => $pledgeFrequencyUnit,
       'max_reminders' => 2,
       'initial_reminder_day' => 2,
       'additional_reminder_day' => 1,
-    );
+    ];
 
     // check for add pledge block
     $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::add($params);
@@ -109,7 +109,7 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
       $this->assertEquals($value, $pledgeBlock->$param);
     }
 
-    $params = array(
+    $params = [
       'id' => $pledgeBlock->id,
       'entity_id' => $this->_contributionPageId,
       'entity_table' => 'civicrm_contribution_page',
@@ -118,7 +118,7 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
       'initial_reminder_day' => 3,
       'additional_reminder_day' => 2,
       'is_pledge_interval' => 1,
-    );
+    ];
 
     // also check for edit pledge block
     $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::add($params);
@@ -132,29 +132,29 @@ class CRM_Pledge_BAO_PledgeBlockTest extends CiviUnitTestCase {
    */
   public function testRetrieveAndGetPledgeBlock() {
 
-    $pledgeFrequencyUnit = array(
+    $pledgeFrequencyUnit = [
       'week' => 1,
       'month' => 1,
       'year' => 1,
-    );
+    ];
 
-    $params = array(
+    $params = [
       'entity_id' => $this->_contributionPageId,
       'entity_table' => 'civicrm_contribution_page',
       'pledge_frequency_unit' => $pledgeFrequencyUnit,
       'max_reminders' => 2,
       'initial_reminder_day' => 2,
       'additional_reminder_day' => 1,
-    );
+    ];
 
     $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::create($params);
 
     // use retrieve() method
-    $retrieveParams = array(
+    $retrieveParams = [
       'entity_id' => $this->_contributionPageId,
       'entity_table' => 'civicrm_contribution_page',
-    );
-    $default = array();
+    ];
+    $default = [];
     $retrievePledgeBlock = CRM_Pledge_BAO_PledgeBlock::retrieve($retrieveParams, $default);
 
     // use getPledgeBlock() method

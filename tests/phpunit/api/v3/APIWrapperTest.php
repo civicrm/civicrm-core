@@ -46,7 +46,7 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
   protected function setUp() {
     parent::setUp();
     $this->useTransaction(TRUE);
-    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_apiWrappers', array($this, 'onApiWrappers'));
+    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_apiWrappers', [$this, 'onApiWrappers']);
   }
 
   /**
@@ -74,11 +74,11 @@ class api_v3_APIWrapperTest extends CiviUnitTestCase {
     // the wrapper intervenes (fromApiInput)
     // Note: The output would define "display_name", but the wrapper
     // intervenes (toApiOutput) and replaces with "display_name_munged".
-    $result = $this->callAPISuccess('contact', 'create', array(
+    $result = $this->callAPISuccess('contact', 'create', [
       'contact_type' => 'Invalid',
       'first_name' => 'First',
       'last_name' => 'Last',
-    ));
+    ]);
     $this->assertEquals('First', $result['values'][$result['id']]['first_name']);
     $this->assertEquals('MUNGE! First Last', $result['values'][$result['id']]['display_name_munged']);
   }

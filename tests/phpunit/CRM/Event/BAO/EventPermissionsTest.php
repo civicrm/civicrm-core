@@ -39,17 +39,17 @@ class CRM_Event_BAO_EventPermissionsTest extends CiviUnitTestCase {
   }
 
   public function createOwnEvent() {
-    $event = $this->eventCreate(array(
+    $event = $this->eventCreate([
       'created_id' => $this->_contactId,
-    ));
+    ]);
     $this->_ownEventId = $event['id'];
   }
 
   public function createOtherEvent() {
     $this->_otherContactId = $this->_contactId + 1;
-    $event = $this->eventCreate(array(
+    $event = $this->eventCreate([
       'created_id' => $this->_otherContactId,
-    ));
+    ]);
     $this->_otherEventId = $event['id'];
   }
 

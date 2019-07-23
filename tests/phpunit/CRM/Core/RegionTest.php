@@ -42,12 +42,12 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    * Disable the normal content of a {crmRegion} and apply different content from a snippet
    */
   public function testOverride() {
-    CRM_Core_Region::instance('testOverride')->update('default', array(
+    CRM_Core_Region::instance('testOverride')->update('default', [
       'disabled' => TRUE,
-    ));
-    CRM_Core_Region::instance('testOverride')->add(array(
+    ]);
+    CRM_Core_Region::instance('testOverride')->add([
       'markup' => 'override<br/>',
-    ));
+    ]);
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testOverride}default<br/>{/crmRegion}');
@@ -59,46 +59,46 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    * Test that each of the major content formats are correctly evaluated.
    */
   public function testAllTypes() {
-    CRM_Core_Region::instance('testAllTypes')->add(array(
+    CRM_Core_Region::instance('testAllTypes')->add([
       'markup' => 'some-markup<br/>',
-    ));
-    CRM_Core_Region::instance('testAllTypes')->add(array(
+    ]);
+    CRM_Core_Region::instance('testAllTypes')->add([
       // note: 'template' would normally be a file name
       'template' => 'string:smarty-is-{$snippet.extrainfo}<br/>',
       'extrainfo' => 'dynamic',
-    ));
-    CRM_Core_Region::instance('testAllTypes')->add(array(
+    ]);
+    CRM_Core_Region::instance('testAllTypes')->add([
       // note: returns a value which gets appended to the region
       'callback' => 'implode',
-      'arguments' => array('-', array('callback', 'with', 'specific', 'args<br/>')),
-    ));
-    CRM_Core_Region::instance('testAllTypes')->add(array(
+      'arguments' => ['-', ['callback', 'with', 'specific', 'args<br/>']],
+    ]);
+    CRM_Core_Region::instance('testAllTypes')->add([
       // note: returns a value which gets appended to the region
       'callback' => function(&$spec, &$html) {
          return "callback-return<br/>";
       },
-    ));
-    CRM_Core_Region::instance('testAllTypes')->add(array(
+    ]);
+    CRM_Core_Region::instance('testAllTypes')->add([
       // note: returns void; directly modifies region's $html
       'callback' => function(&$spec, &$html) {
         $html = "callback-ref<br/>" . $html;
       },
-    ));
-    CRM_Core_Region::instance('testAllTypes')->add(array(
+    ]);
+    CRM_Core_Region::instance('testAllTypes')->add([
       'scriptUrl' => '/foo%20bar.js',
-    ));
-    CRM_Core_Region::instance('testAllTypes')->add(array(
+    ]);
+    CRM_Core_Region::instance('testAllTypes')->add([
       'script' => 'alert("hi");',
-    ));
-    CRM_Core_Region::instance('testAllTypes')->add(array(
+    ]);
+    CRM_Core_Region::instance('testAllTypes')->add([
       'jquery' => '$("div");',
-    ));
-    CRM_Core_Region::instance('testAllTypes')->add(array(
+    ]);
+    CRM_Core_Region::instance('testAllTypes')->add([
       'styleUrl' => '/foo%20bar.css',
-    ));
-    CRM_Core_Region::instance('testAllTypes')->add(array(
+    ]);
+    CRM_Core_Region::instance('testAllTypes')->add([
       'style' => 'body { background: black; }',
-    ));
+    ]);
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testAllTypes}default<br/>{/crmRegion}');
@@ -120,23 +120,23 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    * Test of nested arrangement in which one {crmRegion} directly includes another {crmRegion}
    */
   public function testDirectNest() {
-    CRM_Core_Region::instance('testDirectNestOuter')->add(array(
+    CRM_Core_Region::instance('testDirectNestOuter')->add([
       'template' => 'string:O={$snippet.weight} ',
       'weight' => -5,
-    ));
-    CRM_Core_Region::instance('testDirectNestOuter')->add(array(
+    ]);
+    CRM_Core_Region::instance('testDirectNestOuter')->add([
       'template' => 'string:O={$snippet.weight} ',
       'weight' => 5,
-    ));
+    ]);
 
-    CRM_Core_Region::instance('testDirectNestInner')->add(array(
+    CRM_Core_Region::instance('testDirectNestInner')->add([
       'template' => 'string:I={$snippet.weight} ',
       'weight' => -5,
-    ));
-    CRM_Core_Region::instance('testDirectNestInner')->add(array(
+    ]);
+    CRM_Core_Region::instance('testDirectNestInner')->add([
       'template' => 'string:I={$snippet.weight} ',
       'weight' => 5,
-    ));
+    ]);
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testDirectNestOuter}left {crmRegion name=testDirectNestInner}middle {/crmRegion}right {/crmRegion}');
@@ -148,15 +148,15 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    * Test of nested arrangement in which one {crmRegion} is enhanced with a snippet which, in turn, includes another {crmRegion}
    */
   public function testIndirectNest() {
-    CRM_Core_Region::instance('testIndirectNestOuter')->add(array(
+    CRM_Core_Region::instance('testIndirectNestOuter')->add([
       // Note: all three $snippet references are bound to the $snippet which caused this template to be included,
       // regardless of any nested {crmRegion}s
       'template' => 'string: O={$snippet.region}{crmRegion name=testIndirectNestInner} O={$snippet.region}{/crmRegion} O={$snippet.region}',
-    ));
+    ]);
 
-    CRM_Core_Region::instance('testIndirectNestInner')->add(array(
+    CRM_Core_Region::instance('testIndirectNestInner')->add([
       'template' => 'string: I={$snippet.region}',
-    ));
+    ]);
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testIndirectNestOuter}default{/crmRegion}');
@@ -168,14 +168,14 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
    * Output from an inner-region should not be executed verbatim; this is obvious but good to verify
    */
   public function testNoInjection() {
-    CRM_Core_Region::instance('testNoInjectionOuter')->add(array(
+    CRM_Core_Region::instance('testNoInjectionOuter')->add([
       'template' => 'string:{$snippet.scarystuff} ',
       'scarystuff' => '{$is_outer_scary}',
-    ));
-    CRM_Core_Region::instance('testNoInjectionInner')->add(array(
+    ]);
+    CRM_Core_Region::instance('testNoInjectionInner')->add([
       'template' => 'string:{$snippet.scarystuff} ',
       'scarystuff' => '{$is_inner_scary}',
-    ));
+    ]);
 
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('is_outer_scary', 'egad');
@@ -193,14 +193,14 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   public function testSmartyVars() {
     $smarty = CRM_Core_Smarty::singleton();
     $smarty->assign('extrainfo', 'one');
-    CRM_Core_Region::instance('testSmartyVars')->add(array(
+    CRM_Core_Region::instance('testSmartyVars')->add([
       'template' => 'string:var-style-{$extrainfo}<br/>',
-    ));
+    ]);
 
-    CRM_Core_Region::instance('testSmartyVars')->add(array(
+    CRM_Core_Region::instance('testSmartyVars')->add([
       'template' => 'string:var-style-{$snippet.extrainfo}<br/>',
       'extrainfo' => 'two',
-    ));
+    ]);
 
     $actual = $smarty->fetch('string:{crmRegion name=testSmartyVars}default<br/>{/crmRegion}');
     $expected = 'default<br/>var-style-one<br/>var-style-two<br/>';
@@ -208,22 +208,22 @@ class CRM_Core_RegionTest extends CiviUnitTestCase {
   }
 
   public function testWeight() {
-    CRM_Core_Region::instance('testWeight')->add(array(
+    CRM_Core_Region::instance('testWeight')->add([
       'markup' => 'prepend-5<br/>',
       'weight' => -5,
-    ));
-    CRM_Core_Region::instance('testWeight')->add(array(
+    ]);
+    CRM_Core_Region::instance('testWeight')->add([
       'markup' => 'append+3<br/>',
       'weight' => 3,
-    ));
-    CRM_Core_Region::instance('testWeight')->add(array(
+    ]);
+    CRM_Core_Region::instance('testWeight')->add([
       'markup' => 'prepend-3<br/>',
       'weight' => -3,
-    ));
-    CRM_Core_Region::instance('testWeight')->add(array(
+    ]);
+    CRM_Core_Region::instance('testWeight')->add([
       'markup' => 'append+5<br/>',
       'weight' => 5,
-    ));
+    ]);
 
     $smarty = CRM_Core_Smarty::singleton();
     $actual = $smarty->fetch('string:{crmRegion name=testWeight}default<br/>{/crmRegion}');

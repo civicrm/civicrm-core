@@ -11,19 +11,19 @@ class CRM_Core_Permission_JoomlaTest extends CiviUnitTestCase {
    *   (0 => input to translatePermission, 1 => expected output from translatePermission)
    */
   public function translateData() {
-    $cases = array();
+    $cases = [];
 
-    $cases[] = array("administer CiviCRM", array("civicrm.administer_civicrm", "com_civicrm"));
+    $cases[] = ["administer CiviCRM", ["civicrm.administer_civicrm", "com_civicrm"]];
     // TODO $cases[] = array("cms:universal name", "local name");
     // TODO $cases[] = array("cms:universal name2", "local name2");
-    $cases[] = array("cms:unknown universal name", CRM_Core_Permission::ALWAYS_DENY_PERMISSION);
-    $cases[] = array(
+    $cases[] = ["cms:unknown universal name", CRM_Core_Permission::ALWAYS_DENY_PERMISSION];
+    $cases[] = [
       "Joomla:civicrmplusplus.extragood:com_civicrmplusplus",
-      array("civicrmplusplus.extragood", "com_civicrmplusplus"),
-    );
-    $cases[] = array("otherruntime:foo", CRM_Core_Permission::ALWAYS_DENY_PERMISSION);
-    $cases[] = array(CRM_Core_Permission::ALWAYS_DENY_PERMISSION, CRM_Core_Permission::ALWAYS_DENY_PERMISSION);
-    $cases[] = array(CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION, CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION);
+      ["civicrmplusplus.extragood", "com_civicrmplusplus"],
+    ];
+    $cases[] = ["otherruntime:foo", CRM_Core_Permission::ALWAYS_DENY_PERMISSION];
+    $cases[] = [CRM_Core_Permission::ALWAYS_DENY_PERMISSION, CRM_Core_Permission::ALWAYS_DENY_PERMISSION];
+    $cases[] = [CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION, CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION];
 
     return $cases;
   }
