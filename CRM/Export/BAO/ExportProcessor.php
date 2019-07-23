@@ -1408,7 +1408,7 @@ class CRM_Export_BAO_ExportProcessor {
       switch ($queryFields[$columnName]['type']) {
         case CRM_Utils_Type::T_INT:
         case CRM_Utils_Type::T_BOOLEAN:
-          if (in_array($columnName, $lookUp)) {
+          if (in_array($columnName, $lookUp) || $queryFields[$columnName]['data_type'] == 'ContactReference') {
             return "$fieldName varchar(255)";
           }
           else {
