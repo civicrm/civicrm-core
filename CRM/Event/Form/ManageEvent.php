@@ -274,6 +274,8 @@ class CRM_Event_Form_ManageEvent extends CRM_Core_Form {
       $defaults['is_template'] = $this->_isTemplate;
       $defaults['template_id'] = $defaults['id'];
       unset($defaults['id']);
+      unset($defaults['start_date']);
+      unset($defaults['end_date']);
     }
     else {
       $defaults['is_active'] = 1;
