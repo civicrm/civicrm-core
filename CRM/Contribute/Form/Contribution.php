@@ -1023,8 +1023,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *   Contact ID
    *
    * @return bool|\CRM_Contribute_DAO_Contribution
+   *
    * @throws \CRM_Core_Exception
    * @throws \Civi\Payment\Exception\PaymentProcessorException
+   * @throws \CiviCRM_API3_Exception
    */
   protected function processCreditCard($submittedValues, $lineItem, $contactID) {
     $isTest = ($this->_mode == 'test') ? 1 : 0;
@@ -1287,7 +1289,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * @param int $action
    * @param string|null $creditCardMode
    *
+   * @return CRM_Contribute_BAO_Contribution
+   *
+   * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function testSubmit($params, $action, $creditCardMode = NULL) {
     $defaults = [
@@ -1347,8 +1353,11 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    *
    * @param $pledgePaymentID
    *
-   * @return array
-   * @throws \Exception
+   * @return \CRM_Contribute_BAO_Contribution
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   protected function submit($submittedValues, $action, $pledgePaymentID) {
     $pId = $contribution = $isRelatedId = FALSE;

@@ -893,7 +893,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    *   Is this recurring?
    *
    * @return \CRM_Contribute_DAO_Contribution
-   * @throws \Exception
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function processFormContribution(
     &$form,
