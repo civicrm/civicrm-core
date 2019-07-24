@@ -402,143 +402,9 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $warning = 0;
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', array(1 => $i)), NULL);
-      $jsSet = FALSE;
+
       if ($this->get('savedMapping')) {
-        if (isset($mappingName[$i])) {
-          if ($mappingName[$i] != ts('- do not import -')) {
-
-            if (isset($mappingRelation[$i])) {
-              // relationship mapping
-              switch ($this->get('contactType')) {
-                case CRM_Import_Parser::CONTACT_INDIVIDUAL:
-                  $contactType = 'Individual';
-                  break;
-
-                case CRM_Import_Parser::CONTACT_HOUSEHOLD:
-                  $contactType = 'Household';
-                  break;
-
-                case CRM_Import_Parser::CONTACT_ORGANIZATION:
-                  $contactType = 'Organization';
-              }
-              //CRM-5125
-              $contactSubType = NULL;
-              if ($this->get('contactSubType')) {
-                $contactSubType = $this->get('contactSubType');
-              }
-
-              $relations = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $contactType,
-                FALSE, 'label', TRUE, $contactSubType
-              );
-
-              foreach ($relations as $key => $var) {
-                if ($key == $mappingRelation[$i]) {
-                  $relation = $key;
-                  break;
-                }
-              }
-
-              $contactDetails = strtolower(str_replace(" ", "_", $mappingName[$i]));
-              $websiteTypeId = isset($mappingWebsiteType[$i]) ? $mappingWebsiteType[$i] : NULL;
-              $locationId = isset($mappingLocation[$i]) ? $mappingLocation[$i] : 0;
-              $phoneType = isset($mappingPhoneType[$i]) ? $mappingPhoneType[$i] : NULL;
-              //get provider id from saved mappings
-              $imProvider = isset($mappingImProvider[$i]) ? $mappingImProvider[$i] : NULL;
-
-              if ($websiteTypeId) {
-                $defaults["mapper[$i]"] = array($relation, $contactDetails, $websiteTypeId);
-                if (!$websiteTypeId) {
-                  $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
-                }
-              }
-              else {
-                // default for IM/phone when mapping with relation is true
-                $typeId = NULL;
-                if (isset($phoneType)) {
-                  $typeId = $phoneType;
-                }
-                elseif (isset($imProvider)) {
-                  $typeId = $imProvider;
-                }
-                $defaults["mapper[$i]"] = array($relation, $contactDetails, $locationId, $typeId);
-                if (!$locationId) {
-                  $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
-                }
-              }
-              // fix for edge cases, CRM-4954
-              if ($contactDetails == 'image_url') {
-                $contactDetails = str_replace('url', 'URL', $contactDetails);
-              }
-
-              if (!$contactDetails) {
-                $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
-              }
-
-              if ((!$phoneType) && (!$imProvider)) {
-                $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
-              }
-              //$js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
-              $jsSet = TRUE;
-            }
-            else {
-              $mappingHeader = array_keys($this->_mapperFields, $mappingName[$i]);
-              $websiteTypeId = isset($mappingWebsiteType[$i]) ? $mappingWebsiteType[$i] : NULL;
-              $locationId = isset($mappingLocation[$i]) ? $mappingLocation[$i] : 0;
-              $phoneType = isset($mappingPhoneType[$i]) ? $mappingPhoneType[$i] : NULL;
-              // get IM service provider id
-              $imProvider = isset($mappingImProvider[$i]) ? $mappingImProvider[$i] : NULL;
-
-              if ($websiteTypeId) {
-                if (!$websiteTypeId) {
-                  $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
-                }
-                $defaults["mapper[$i]"] = array($mappingHeader[0], $websiteTypeId);
-              }
-              else {
-                if (!$locationId) {
-                  $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
-                }
-                //default for IM/phone without related contact
-                $typeId = NULL;
-                if (isset($phoneType)) {
-                  $typeId = $phoneType;
-                }
-                elseif (isset($imProvider)) {
-                  $typeId = $imProvider;
-                }
-                $defaults["mapper[$i]"] = array($mappingHeader[0], $locationId, $typeId);
-              }
-
-              if ((!$phoneType) && (!$imProvider)) {
-                $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
-              }
-
-              $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
-
-              $jsSet = TRUE;
-            }
-          }
-          else {
-            $defaults["mapper[$i]"] = array();
-          }
-          if (!$jsSet) {
-            for ($k = 1; $k < 4; $k++) {
-              $js .= "{$formName}['mapper[$i][$k]'].style.display = 'none';\n";
-            }
-          }
-        }
-        else {
-          // this load section to help mapping if we ran out of saved columns when doing Load Mapping
-          $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
-
-          if ($hasColumnNames) {
-            $defaults["mapper[$i]"] = array($this->defaultFromColumnName($this->_columnNames[$i], $columnPatterns));
-          }
-          else {
-            $defaults["mapper[$i]"] = array($this->defaultFromData($dataPatterns, $i));
-          }
-        }
-        //end of load mapping
+        list($mappingName, $key, $defaults, $js, $columnPatterns, $dataPatterns) = $this->loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames);
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
@@ -985,6 +851,160 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
     $saveMappingFields->save();
     return $saveMappingFields->mapping_id;
+  }
+
+  /**
+   * @param $mappingName
+   * @param int $i
+   * @param $mappingRelation
+   * @param $mappingWebsiteType
+   * @param $mappingLocation
+   * @param $mappingPhoneType
+   * @param $mappingImProvider
+   * @param array $defaults
+   * @param string $formName
+   * @param string $js
+   * @param bool $hasColumnNames
+   *
+   * @return array
+   */
+  protected function loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames) {
+    $jsSet = FALSE;
+    if (isset($mappingName[$i])) {
+      if ($mappingName[$i] != ts('- do not import -')) {
+
+        if (isset($mappingRelation[$i])) {
+          // relationship mapping
+          switch ($this->get('contactType')) {
+            case CRM_Import_Parser::CONTACT_INDIVIDUAL:
+              $contactType = 'Individual';
+              break;
+
+            case CRM_Import_Parser::CONTACT_HOUSEHOLD:
+              $contactType = 'Household';
+              break;
+
+            case CRM_Import_Parser::CONTACT_ORGANIZATION:
+              $contactType = 'Organization';
+          }
+          //CRM-5125
+          $contactSubType = NULL;
+          if ($this->get('contactSubType')) {
+            $contactSubType = $this->get('contactSubType');
+          }
+
+          $relations = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $contactType,
+            FALSE, 'label', TRUE, $contactSubType
+          );
+
+          foreach ($relations as $key => $var) {
+            if ($key == $mappingRelation[$i]) {
+              $relation = $key;
+              break;
+            }
+          }
+
+          $contactDetails = strtolower(str_replace(" ", "_", $mappingName[$i]));
+          $websiteTypeId = isset($mappingWebsiteType[$i]) ? $mappingWebsiteType[$i] : NULL;
+          $locationId = isset($mappingLocation[$i]) ? $mappingLocation[$i] : 0;
+          $phoneType = isset($mappingPhoneType[$i]) ? $mappingPhoneType[$i] : NULL;
+          //get provider id from saved mappings
+          $imProvider = isset($mappingImProvider[$i]) ? $mappingImProvider[$i] : NULL;
+
+          if ($websiteTypeId) {
+            $defaults["mapper[$i]"] = [$relation, $contactDetails, $websiteTypeId];
+            if (!$websiteTypeId) {
+              $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
+            }
+          }
+          else {
+            // default for IM/phone when mapping with relation is true
+            $typeId = NULL;
+            if (isset($phoneType)) {
+              $typeId = $phoneType;
+            }
+            elseif (isset($imProvider)) {
+              $typeId = $imProvider;
+            }
+            $defaults["mapper[$i]"] = [$relation, $contactDetails, $locationId, $typeId];
+            if (!$locationId) {
+              $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
+            }
+          }
+          // fix for edge cases, CRM-4954
+          if ($contactDetails == 'image_url') {
+            $contactDetails = str_replace('url', 'URL', $contactDetails);
+          }
+
+          if (!$contactDetails) {
+            $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
+          }
+
+          if ((!$phoneType) && (!$imProvider)) {
+            $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
+          }
+          //$js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
+          $jsSet = TRUE;
+        }
+        else {
+          $mappingHeader = array_keys($this->_mapperFields, $mappingName[$i]);
+          $websiteTypeId = isset($mappingWebsiteType[$i]) ? $mappingWebsiteType[$i] : NULL;
+          $locationId = isset($mappingLocation[$i]) ? $mappingLocation[$i] : 0;
+          $phoneType = isset($mappingPhoneType[$i]) ? $mappingPhoneType[$i] : NULL;
+          // get IM service provider id
+          $imProvider = isset($mappingImProvider[$i]) ? $mappingImProvider[$i] : NULL;
+
+          if ($websiteTypeId) {
+            if (!$websiteTypeId) {
+              $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
+            }
+            $defaults["mapper[$i]"] = [$mappingHeader[0], $websiteTypeId];
+          }
+          else {
+            if (!$locationId) {
+              $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
+            }
+            //default for IM/phone without related contact
+            $typeId = NULL;
+            if (isset($phoneType)) {
+              $typeId = $phoneType;
+            }
+            elseif (isset($imProvider)) {
+              $typeId = $imProvider;
+            }
+            $defaults["mapper[$i]"] = [$mappingHeader[0], $locationId, $typeId];
+          }
+
+          if ((!$phoneType) && (!$imProvider)) {
+            $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
+          }
+
+          $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
+
+          $jsSet = TRUE;
+        }
+      }
+      else {
+        $defaults["mapper[$i]"] = [];
+      }
+      if (!$jsSet) {
+        for ($k = 1; $k < 4; $k++) {
+          $js .= "{$formName}['mapper[$i][$k]'].style.display = 'none';\n";
+        }
+      }
+    }
+    else {
+      // this load section to help mapping if we ran out of saved columns when doing Load Mapping
+      $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
+
+      if ($hasColumnNames) {
+        $defaults["mapper[$i]"] = [$this->defaultFromColumnName($this->_columnNames[$i], $columnPatterns)];
+      }
+      else {
+        $defaults["mapper[$i]"] = [$this->defaultFromData($dataPatterns, $i)];
+      }
+    }
+    return [$mappingName, $key, $defaults, $js, $columnPatterns, $dataPatterns];
   }
 
 }
