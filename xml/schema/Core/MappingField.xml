@@ -35,6 +35,7 @@
   </foreignKey>
   <field>
     <name>name</name>
+    <title>Field Name (or unique reference)</title>
     <type>varchar</type>
     <length>255</length>
     <comment>Mapping field key</comment>
@@ -42,6 +43,7 @@
   </field>
   <field>
     <name>contact_type</name>
+    <title>Contact Type</title>
     <type>varchar</type>
     <length>64</length>
     <comment>Contact Type in mapping</comment>
@@ -52,6 +54,7 @@
   </field>
   <field>
     <name>column_number</name>
+    <title>Column Number to map to</title>
     <type>int unsigned</type>
     <required>true</required>
     <comment>Column number for mapping set</comment>
@@ -80,6 +83,7 @@
   </field>
   <field>
     <name>phone_type_id</name>
+    <title>Phone Type</title>
     <type>int unsigned</type>
     <title>Phone type ID</title>
     <comment>Which type of phone does this number belongs.</comment>
@@ -126,12 +130,14 @@
   </foreignKey>
   <field>
     <name>relationship_direction</name>
+    <title>Relationship Direction</title>
     <type>varchar</type>
     <length>6</length>
     <add>1.7</add>
   </field>
   <field>
     <name>grouping</name>
+    <title>Field Grouping</title>
     <type>int unsigned</type>
     <default>1</default>
     <comment>Used to group mapping_field records into related sets (e.g. for criteria sets in search builder
@@ -141,6 +147,7 @@
   <field>
     <name>operator</name>
     <type>varchar</type>
+    <title>Operator</title>
     <length>16</length>
     <type>enum</type>
     <comment>SQL WHERE operator for search-builder mapping fields (search criteria).</comment>
@@ -154,6 +161,7 @@
   </field>
   <field>
     <name>value</name>
+    <title>Search builder where clause</title>
     <type>varchar</type>
     <length>255</length>
     <comment>SQL WHERE value for search-builder mapping fields.</comment>
