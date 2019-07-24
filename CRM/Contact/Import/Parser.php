@@ -107,7 +107,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    */
   public function run(
     $tableName,
-    &$mapper,
+    $mapper = [],
     $mode = self::MODE_PREVIEW,
     $contactType = self::CONTACT_INDIVIDUAL,
     $primaryKeyName = '_id',
