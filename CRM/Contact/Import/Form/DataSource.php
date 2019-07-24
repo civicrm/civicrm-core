@@ -307,17 +307,16 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       $this->_params = $this->controller->exportValues($this->_name);
 
       $storeParams = [
-        'onDuplicate' => 'onDuplicate',
-        'dedupe' => 'dedupe',
-        'contactType' => 'contactType',
-        'contactSubType' => 'subType',
-        'dateFormats' => 'dateFormats',
-        'savedMapping' => 'savedMapping',
+        'onDuplicate' => $this->exportValue('onDuplicate'),
+        'dedupe' => $this->exportValue('dedupe'),
+        'contactType' => $this->exportValue('contactType'),
+        'contactSubType' => $this->exportValue('subType'),
+        'dateFormats' => $this->exportValue('dateFormats'),
+        'savedMapping' => $this->exportValue('savedMapping'),
       ];
 
-      foreach ($storeParams as $storeName => $storeValueName) {
-        $$storeName = $this->exportValue($storeValueName);
-        $this->set($storeName, $$storeName);
+      foreach ($storeParams as $storeName => $value) {
+        $this->set($storeName, $value);
       }
       $this->set('disableUSPS', !empty($this->_params['disableUSPS']));
 
@@ -325,7 +324,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       $this->set('skipColumnHeader', CRM_Utils_Array::value('skipColumnHeader', $this->_params));
 
       $session = CRM_Core_Session::singleton();
-      $session->set('dateTypes', $dateFormats);
+      $session->set('dateTypes', $storeParams['dateFormats']);
 
       // Get the PEAR::DB object
       $dao = new CRM_Core_DAO();
@@ -349,14 +348,14 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
       $parser->run($importTableName,
         $mapper,
         CRM_Import_Parser::MODE_MAPFIELD,
-        $contactType,
+        $storeParams['contactType'],
         $fieldNames['pk'],
         $fieldNames['status'],
         CRM_Import_Parser::DUPLICATE_SKIP,
         NULL, NULL, FALSE,
         CRM_Contact_Import_Parser::DEFAULT_TIMEOUT,
-        $contactSubType,
-        $dedupe
+        $storeParams['contactSubType'],
+        $storeParams['dedupe']
       );
 
       // add all the necessary variables to the form
