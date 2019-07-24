@@ -1436,7 +1436,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
             }
             break;
 
-          case 'gender':
           case 'gender_id':
             if (!self::checkGender($value)) {
               self::addToErrorMsg(ts('Gender'), $errorMessage);
