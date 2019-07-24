@@ -739,23 +739,8 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function runQuery($params, $order) {
     $returnProperties = $this->getReturnProperties();
-    $addressWhere = '';
     $params = array_merge($params, $this->getWhereParams());
-    if ($this->isPostalableOnly) {
-      if (array_key_exists('street_address', $returnProperties)) {
-        $addressWhere = " civicrm_address.street_address <> ''";
-        if (array_key_exists('supplemental_address_1', $returnProperties)) {
-          // We need this to be an OR rather than AND on the street_address so, hack it in.
-          $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
-            'address_options', TRUE, NULL, TRUE
-          );
-          if (!empty($addressOptions['supplemental_address_1'])) {
-            $addressWhere .= " OR civicrm_address.supplemental_address_1 <> ''";
-          }
-        }
-        $addressWhere = ' AND (' . $addressWhere . ')';
-      }
-    }
+
     $query = new CRM_Contact_BAO_Query($params, $returnProperties, NULL,
       FALSE, FALSE, $this->getQueryMode(),
       FALSE, TRUE, TRUE, NULL, $this->getQueryOperator()
@@ -778,6 +763,22 @@ class CRM_Export_BAO_ExportProcessor {
     foreach ($params as $value) {
       if ($value[0] == 'contact_is_deleted') {
         unset($whereClauses['trash_clause']);
+      }
+    }
+
+    if ($this->isPostalableOnly) {
+      if (array_key_exists('street_address', $returnProperties)) {
+        $addressWhere = " civicrm_address.street_address <> ''";
+        if (array_key_exists('supplemental_address_1', $returnProperties)) {
+          // We need this to be an OR rather than AND on the street_address so, hack it in.
+          $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
+            'address_options', TRUE, NULL, TRUE
+          );
+          if (!empty($addressOptions['supplemental_address_1'])) {
+            $addressWhere .= " OR civicrm_address.supplemental_address_1 <> ''";
+          }
+        }
+        $whereClauses['address'] = $addressWhere;
       }
     }
 

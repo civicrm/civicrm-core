@@ -1201,6 +1201,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @param array $addressReason
    *
    * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportDeceasedDoNotMail($reason, $addressReason) {
     $contactA = $this->callAPISuccess('contact', 'create', [
@@ -1237,37 +1238,21 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'is_primary' => 1,
     ], $addressReason));
 
-    //export and merge contacts with same address
-    list($tableName, $sqlColumns, $headerRows, $processor) = CRM_Export_BAO_Export::exportComponents(
-      TRUE,
-      [$contactA['id'], $contactB['id']],
-      [],
-      NULL,
-      NULL,
-      NULL,
-      CRM_Export_Form_Select::CONTACT_EXPORT,
-      "contact_a.id IN ({$contactA['id']}, {$contactB['id']})",
-      NULL,
-      TRUE,
-      FALSE,
-      [
-        'mergeOption' => TRUE,
-        'suppress_csv_for_testing' => TRUE,
+    $this->doExportTest([
+      'selectAll' => TRUE,
+      'ids' => [$contactA['id'], $contactB['id']],
+      'exportParams' => [
         'postal_mailing_export' => [
           'postal_mailing_export' => TRUE,
         ],
-      ]
-    );
+        'mergeSameAddress' => TRUE,
+      ],
+    ]);
+    $row = $this->csv->fetchOne(0);
 
-    $this->assertTrue(!in_array('state_province_id', $processor->getHeaderRows()));
-    $greeting = CRM_Core_DAO::singleValueQuery("SELECT email_greeting FROM {$tableName}");
-
-    //Assert email_greeting is not merged
-    $this->assertNotContains(',', (string) $greeting);
-
-    // delete the export temp table and component table
-    $sql = "DROP TABLE IF EXISTS {$tableName}";
-    CRM_Core_DAO::executeQuery($sql);
+    $this->assertTrue(!in_array('Stage', $this->processor->getHeaderRows()));
+    $this->assertEquals('Dear John', $row['Email Greeting']);
+    $this->assertCount(1, $this->csv);
   }
 
   /**
