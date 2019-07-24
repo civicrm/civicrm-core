@@ -1,5 +1,7 @@
 <?php
 
+use Civi\Payment\Exception\PaymentProcessorException;
+
 /**
  * Class CRM_Core_Payment_PayPalProIPNTest
  * @group headless
@@ -37,6 +39,9 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
   /**
    * Ensure recurring contributions from Contribution Pages
    * with receipt turned off don't send a receipt.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testIPNPaymentRecurNoReceipt() {
     $mut = new CiviMailUtils($this, TRUE);
@@ -57,40 +62,44 @@ class CRM_Core_Payment_AuthorizeNetIPNTest extends CiviUnitTestCase {
     // has is_email_receipt set to 0.
     $form = new CRM_Contribute_Form_Contribution();
     $form->_mode = 'Live';
-    $contribution = $form->testSubmit([
-      'total_amount' => 200,
-      'financial_type_id' => 1,
-      'receive_date' => date('m/d/Y'),
-      'receive_date_time' => date('H:i:s'),
-      'contact_id' => $this->_contactID,
-      'contribution_status_id' => 1,
-      'credit_card_number' => 4444333322221111,
-      'cvv2' => 123,
-      'credit_card_exp_date' => [
-        'M' => 9,
-        'Y' => 2025,
-      ],
-      'credit_card_type' => 'Visa',
-      'billing_first_name' => 'Junko',
-      'billing_middle_name' => '',
-      'billing_last_name' => 'Adams',
-      'billing_street_address-5' => time() . ' Lincoln St S',
-      'billing_city-5' => 'Maryknoll',
-      'billing_state_province_id-5' => 1031,
-      'billing_postal_code-5' => 10545,
-      'billing_country_id-5' => 1228,
-      'frequency_interval' => 1,
-      'frequency_unit' => 'month',
-      'installments' => '',
-      'hidden_AdditionalDetail' => 1,
-      'hidden_Premium' => 1,
-      'payment_processor_id' => $this->_paymentProcessorID,
-      'currency' => 'USD',
-      'source' => 'bob sled race',
-      'contribution_page_id' => $this->_contributionPageID,
-      'is_recur' => TRUE,
-    ], CRM_Core_Action::ADD);
-
+    try {
+      $contribution = $form->testSubmit([
+        'total_amount' => 200,
+        'financial_type_id' => 1,
+        'receive_date' => date('m/d/Y'),
+        'receive_date_time' => date('H:i:s'),
+        'contact_id' => $this->_contactID,
+        'contribution_status_id' => 1,
+        'credit_card_number' => 4444333322221111,
+        'cvv2' => 123,
+        'credit_card_exp_date' => [
+          'M' => 9,
+          'Y' => 2025,
+        ],
+        'credit_card_type' => 'Visa',
+        'billing_first_name' => 'Junko',
+        'billing_middle_name' => '',
+        'billing_last_name' => 'Adams',
+        'billing_street_address-5' => time() . ' Lincoln St S',
+        'billing_city-5' => 'Maryknoll',
+        'billing_state_province_id-5' => 1031,
+        'billing_postal_code-5' => 10545,
+        'billing_country_id-5' => 1228,
+        'frequency_interval' => 1,
+        'frequency_unit' => 'month',
+        'installments' => '',
+        'hidden_AdditionalDetail' => 1,
+        'hidden_Premium' => 1,
+        'payment_processor_id' => $this->_paymentProcessorID,
+        'currency' => 'USD',
+        'source' => 'bob sled race',
+        'contribution_page_id' => $this->_contributionPageID,
+        'is_recur' => TRUE,
+      ], CRM_Core_Action::ADD);
+    }
+    catch (PaymentProcessorException $e) {
+      $this->markTestSkipped('Error from A.net - cannot proceed');
+    }
     $this->_contributionID = $contribution->id;
     $this->_contributionRecurID = $contribution->contribution_recur_id;
     $recur_params = [
