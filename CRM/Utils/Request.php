@@ -215,6 +215,7 @@ class CRM_Utils_Request {
    *   Where to look for the value - GET|POST|REQUEST
    *
    * @return mixed
+   * @throws \CRM_Core_Exception
    */
   public static function retrieveValue($name, $type, $defaultValue = NULL, $isRequired = FALSE, $method = 'REQUEST') {
     $null = NULL;

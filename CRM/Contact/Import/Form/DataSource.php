@@ -46,6 +46,8 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
 
@@ -88,12 +90,11 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     }
 
     $this->_dataSourceIsValid = FALSE;
-    $this->_dataSource = CRM_Utils_Request::retrieve(
+    $this->_dataSource = CRM_Utils_Request::retrieveValue(
       'dataSource',
       'String',
-      CRM_Core_DAO::$_nullObject,
-      FALSE,
       NULL,
+      FALSE,
       'GET'
     );
 
