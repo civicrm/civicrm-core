@@ -18,10 +18,10 @@
   <version>0.2</version>
   <develStage>alpha</develStage>
   <compatibility>
-    <ver>5.3</ver>
+    <ver>5.17</ver>
   </compatibility>
   <requires>
-    <ext>org.civicrm.api4</ext>
+    <ext version="~4.5">org.civicrm.api4</ext>
   </requires>
   <comments>This is a new, undeveloped module</comments>
   <civix>
