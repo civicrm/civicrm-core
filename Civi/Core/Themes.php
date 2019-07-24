@@ -85,7 +85,7 @@ class Themes {
     if ($this->activeThemeKey === NULL) {
       // Ambivalent: is it better to use $config->userFrameworkFrontend or $template->get('urlIsPublic')?
       $config = \CRM_Core_Config::singleton();
-      $settingKey = $config->userFrameworkFrontend ? 'theme_frontend' : 'theme_backend';
+      $settingKey = $config->userSystem->isFrontEndPage() ? 'theme_frontend' : 'theme_backend';
 
       $themeKey = Civi::settings()->get($settingKey);
       if ($themeKey === 'default') {
