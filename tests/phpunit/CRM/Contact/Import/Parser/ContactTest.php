@@ -519,20 +519,16 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    */
   public function testImportFill() {
     // Create a custom field group for testing.
-    $custom_group_name = 'importFillGroup';
-    $results = $this->callAPISuccess('customGroup', 'get', ['title' => $custom_group_name]);
-    if ($results['count'] == 0) {
-      $api_params = [
-        'title' => $custom_group_name,
-        'extends' => 'Individual',
-        'is_active' => TRUE,
-      ];
-      $customGroup = $this->callAPISuccess('customGroup', 'create', $api_params);
-    }
+    $this->createCustomGroup([
+      'title' => 'importFillGroup',
+      'extends' => 'Individual',
+      'is_active' => TRUE,
+    ]);
+    $customGroupID = $this->ids['CustomGroup']['importFillGroup'];
 
     // Add two custom fields.
     $api_params = [
-      'custom_group_id' => $customGroup['id'],
+      'custom_group_id' => $customGroupID,
       'label' => 'importFillField1',
       'html_type' => 'Select',
       'data_type' => 'String',
@@ -545,7 +541,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $customField1 = $result['id'];
 
     $api_params = [
-      'custom_group_id' => $customGroup['id'],
+      'custom_group_id' => $customGroupID,
       'label' => 'importFillField2',
       'html_type' => 'Select',
       'data_type' => 'String',
@@ -560,8 +556,6 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     // Now set up values.
     $original_gender = 'Male';
     $original_custom1 = 'foo';
-    $original_job_title = '';
-    $original_custom2 = '';
     $original_email = 'test-import-fill@example.org';
 
     $import_gender = 'Female';
