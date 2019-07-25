@@ -483,7 +483,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testModifyQuery() {
-    $listener = function(\Civi\Core\Event\GenericHookEvent $e) {
+    $listener = function(\Symfony\Component\EventDispatcher\Event $e) {
       $e->query = '/* User :  hooked */' . $e->query;
     };
     Civi::dispatcher()->addListener('civi.db.query', $listener);
@@ -498,7 +498,7 @@ class CRM_Core_DAOTest extends CiviUnitTestCase {
    * Demonstrate it is modified showing the query now breaks.
    */
   public function testModifyAndBreakQuery() {
-    $listener = function(\Civi\Core\Event\GenericHookEvent $e) {
+    $listener = function($e) {
       $e->query = '/* Forgot trailing comment marker' . $e->query;
     };
     Civi::dispatcher()->addListener('civi.db.query', $listener);
