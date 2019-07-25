@@ -863,7 +863,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       }
 
       $eventId = CRM_Utils_Array::value('event_id', $values);
-      if (!empty($contactId) && !empty($eventId)) {
+
+      $event = new CRM_Event_DAO_Event();
+      $event->id = $eventId;
+      $event->find(TRUE);
+
+      if (!$event->allow_same_participant_emails && !empty($contactId) && !empty($eventId)) {
         $cancelledStatusID = CRM_Core_PseudoConstant::getKey('CRM_Event_BAO_Participant', 'status_id', 'Cancelled');
         $dupeCheck = new CRM_Event_BAO_Participant();
         $dupeCheck->contact_id = $contactId;
