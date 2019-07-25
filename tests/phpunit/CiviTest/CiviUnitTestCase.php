@@ -344,7 +344,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     CRM_Utils_System::flushCache();
 
     // initialize the object once db is loaded
-    \Civi::reset();
+    \Civi::$statics = array();
     // ugh, performance
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
 
