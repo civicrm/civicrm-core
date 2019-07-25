@@ -37,13 +37,30 @@
  * @group headless
  */
 class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
-  protected $_tablesToTruncate = ['civicrm_address', 'civicrm_phone', 'civicrm_email'];
+  use CRMTraits_Custom_CustomDataTrait;
+
+  /**
+   * Main entity for the class.
+   *
+   * @var string
+   */
+  protected $entity = 'Contact';
 
   /**
    * Setup function.
    */
   public function setUp() {
     parent::setUp();
+  }
+
+  /**
+   * Tear down after test.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function tearDown() {
+    $this->quickCleanup(['civicrm_address', 'civicrm_phone', 'civicrm_email'], TRUE);
+    parent::tearDown();
   }
 
   /**
@@ -314,6 +331,44 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     ];
     $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, [NULL, NULL, 'Primary', NULL, NULL]);
     $this->callAPISuccessGetSingle('Contact', $contactValues);
+  }
+
+  /**
+   * Test that labels work for importing custom data.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCustomDataLabel() {
+    $this->createCustomGroupWithFieldOfType([], 'select');
+    $contactValues = [
+      'first_name' => 'Bill',
+      'last_name' => 'Gates',
+      'email' => 'bill.gates@microsoft.com',
+      'nick_name' => 'Billy-boy',
+      $this->getCustomFieldName('select') => 'Yellow',
+    ];
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, [NULL, NULL, 'Primary', NULL, NULL]);
+    $contact = $this->callAPISuccessGetSingle('Contact', array_merge($contactValues, ['return' => $this->getCustomFieldName('select')]));
+    $this->assertEquals('Y', $contact[$this->getCustomFieldName('select')]);
+  }
+
+  /**
+   * Test that names work for importing custom data.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCustomDataName() {
+    $this->createCustomGroupWithFieldOfType([], 'select');
+    $contactValues = [
+      'first_name' => 'Bill',
+      'last_name' => 'Gates',
+      'email' => 'bill.gates@microsoft.com',
+      'nick_name' => 'Billy-boy',
+      $this->getCustomFieldName('select') => 'Y',
+    ];
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, [NULL, NULL, 'Primary', NULL, NULL]);
+    $contact = $this->callAPISuccessGetSingle('Contact', array_merge($contactValues, ['return' => $this->getCustomFieldName('select')]));
+    $this->assertEquals('Y', $contact[$this->getCustomFieldName('select')]);
   }
 
   /**
