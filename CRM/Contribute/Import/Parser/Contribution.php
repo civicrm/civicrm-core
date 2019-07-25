@@ -806,7 +806,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         case 'total_amount':
         case 'fee_amount':
         case 'net_amount':
-        // @todo add test like testPaymentTypeLabel & remove these lines as we can anticipate error will still be caught & handled.
+          // @todo add test like testPaymentTypeLabel & remove these lines as we can anticipate error will still be caught & handled.
           if (!CRM_Utils_Rule::money($value)) {
             return civicrm_api3_create_error("$key not a valid amount: $value");
           }
@@ -830,14 +830,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           }
           if (empty($values['financial_type_id'])) {
             return civicrm_api3_create_error("Financial Type is not valid: $value");
-          }
-          break;
-
-        case 'contribution_status_id':
-          // @todo add test like testPaymentTypeLabel & remove these lines in favour of 'default' part of switch.
-          require_once 'CRM/Core/PseudoConstant.php';
-          if (!$values['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $value)) {
-            return civicrm_api3_create_error("Contribution Status is not valid: $value");
           }
           break;
 
@@ -1011,8 +1003,13 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           break;
 
         default:
-          if  (isset($fields[$key]) && !empty($fields[$key]['is_pseudofield_for'])) {
-            $realField = $fields[$key]['is_pseudofield_for'];
+          // Hande name or label for fields with options.
+          if (isset($fields[$key]) &&
+            // Yay - just for a surprise we are inconsistent on whether we pass the pseudofield (payment_instrument)
+            // or the field name (contribution_status_id)
+            (!empty($fields[$key]['is_pseudofield_for']) || !empty($fields[$key]['pseudoconstant']))
+          ) {
+            $realField = $fields[$key]['is_pseudofield_for'] ?? $key;
             $realFieldSpec = $fields[$realField];
             /* @var \CRM_Core_DAO $bao */
             $bao = $realFieldSpec['bao'];

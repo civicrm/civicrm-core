@@ -15,8 +15,9 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   /**
    * Setup function.
    */
-  public function setUp() {
-    parent::setUp();
+  public function tearDown() {
+    $this->quickCleanUpFinancialEntities();
+    parent::tearDown();
   }
 
   /**
@@ -55,9 +56,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $mapperSoftCredit = [NULL, NULL, NULL, "external_identifier"];
     $mapperSoftCreditType = [NULL, NULL, NULL, "1"];
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Contribute_Import_Parser::SOFT_CREDIT, $mapperSoftCredit, NULL, $mapperSoftCreditType);
-    $params = [
-      "contact_id" => $contact1Id,
-    ];
+    $params = ['contact_id' => $contact1Id];
     $values = [];
     $contributionsOfMainContact = CRM_Contribute_BAO_Contribution::retrieve($params, $values, $values);
     $this->assertEquals(1230.99, $contributionsOfMainContact->total_amount);
@@ -110,8 +109,37 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     ]);
     $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'not at all random'];
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
-    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'payment_instrument_id'  => 'random']);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'payment_instrument_id' => 'random']);
     $this->assertEquals('not at all random', $contribution['payment_instrument']);
+  }
+
+  /**
+   * Test handling of contribution statuses.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testContributionStatusLabel() {
+    $contactID = $this->individualCreate();
+    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'Check', 'contribution_status_id' => 'Pending'];
+    // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
+    $this->assertEquals('Pending', $contribution['contribution_status']);
+
+    $this->callAPISuccess('OptionValue', 'create', [
+      'option_group_id' => 'contribution_status',
+      'value' => 777,
+      'name' => 'random',
+      'label' => 'not at all random',
+    ]);
+    $values['contribution_status_id'] = 'not at all random';
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'contribution_status_id' => 'random']);
+    $this->assertEquals('not at all random', $contribution['contribution_status']);
+
+    $values['contribution_status_id'] = 'just say no';
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::ERROR);
+    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID], 2);
   }
 
   /**
