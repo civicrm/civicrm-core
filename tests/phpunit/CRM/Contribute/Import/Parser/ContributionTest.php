@@ -90,6 +90,31 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test payment types are passed.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testPaymentTypeLabel() {
+    $contactID = $this->individualCreate();
+    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'Check'];
+    // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
+    $this->assertEquals('Check', $contribution['payment_instrument']);
+
+    $this->callAPISuccess('OptionValue', 'create', [
+      'option_group_id' => 'payment_instrument',
+      'value' => 777,
+      'name' => 'random',
+      'label' => 'not at all random',
+    ]);
+    $values = ['contribution_contact_id' => $contactID, 'total_amount' => 10, 'financial_type' => 'Donation', 'payment_instrument' => 'not at all random'];
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID, 'payment_instrument_id'  => 'random']);
+    $this->assertEquals('not at all random', $contribution['payment_instrument']);
+  }
+
+  /**
    * Run the import parser.
    *
    * @param array $originalValues
@@ -102,7 +127,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * @param array|null $fields
    *   Array of field names. Will be calculated from $originalValues if not passed in.
    */
-  protected function runImport($originalValues, $onDuplicateAction, $expectedResult, $mapperSoftCredit = NULL, $mapperPhoneType = NULL, $mapperSoftCreditType = NULL, $fields = NULL) {
+  protected function runImport($originalValues, $onDuplicateAction, $expectedResult, $mapperSoftCredit = [], $mapperPhoneType = NULL, $mapperSoftCreditType = [], $fields = NULL) {
     if (!$fields) {
       $fields = array_keys($originalValues);
     }

@@ -650,11 +650,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     require_once 'CRM/Utils/DeprecatedUtils.php';
     // copy all the contribution fields as is
     require_once 'api/v3/utils.php';
-    $fields = CRM_Contribute_DAO_Contribution::fields();
+    $fields = CRM_Core_DAO::getExportableFieldsWithPseudoConstants('CRM_Contribute_BAO_Contribution');
 
     _civicrm_api3_store_values($fields, $params, $values);
 
-    require_once 'CRM/Core/OptionGroup.php';
     $customFields = CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE);
 
     foreach ($params as $key => $value) {
@@ -807,6 +806,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         case 'total_amount':
         case 'fee_amount':
         case 'net_amount':
+        // @todo add test like testPaymentTypeLabel & remove these lines as we can anticipate error will still be caught & handled.
           if (!CRM_Utils_Rule::money($value)) {
             return civicrm_api3_create_error("$key not a valid amount: $value");
           }
@@ -819,6 +819,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           break;
 
         case 'financial_type':
+          // @todo add test like testPaymentTypeLabel & remove these lines in favour of 'default' part of switch.
           require_once 'CRM/Contribute/PseudoConstant.php';
           $contriTypes = CRM_Contribute_PseudoConstant::financialType();
           foreach ($contriTypes as $val => $type) {
@@ -832,15 +833,8 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           }
           break;
 
-        case 'payment_instrument':
-          require_once 'CRM/Core/PseudoConstant.php';
-          $values['payment_instrument_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $value);
-          if (empty($values['payment_instrument_id'])) {
-            return civicrm_api3_create_error("Payment Instrument is not valid: $value");
-          }
-          break;
-
         case 'contribution_status_id':
+          // @todo add test like testPaymentTypeLabel & remove these lines in favour of 'default' part of switch.
           require_once 'CRM/Core/PseudoConstant.php';
           if (!$values['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $value)) {
             return civicrm_api3_create_error("Contribution Status is not valid: $value");
@@ -1017,6 +1011,22 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           break;
 
         default:
+          if  (isset($fields[$key]) && !empty($fields[$key]['is_pseudofield_for'])) {
+            $realField = $fields[$key]['is_pseudofield_for'];
+            $realFieldSpec = $fields[$realField];
+            /* @var \CRM_Core_DAO $bao */
+            $bao = $realFieldSpec['bao'];
+            // Get names & labels - we will try to match name first but if not available then see if
+            // we have a label that can be converted to a name.
+            // For historical reasons use validate as context - ie disabled name matches ARE permitted per prior to change.
+            $nameOptions = $bao::buildOptions($realField, 'validate');
+            if (!isset($nameOptions[$value])) {
+              $labelOptions = array_flip($bao::buildOptions($realField, 'match'));
+              if (isset($labelOptions[$params[$key]])) {
+                $values[$key] = $labelOptions[$params[$key]];
+              }
+            }
+          }
           break;
       }
     }
