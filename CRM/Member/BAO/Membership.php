@@ -397,11 +397,12 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
     //insert payment record for this membership
     if (!empty($params['relate_contribution_id'])) {
-      CRM_Member_BAO_MembershipPayment::create(array(
+      $membershipPaymentParams = [
         'membership_id' => $membership->id,
         'membership_type_id' => $membership->membership_type_id,
         'contribution_id' => $params['relate_contribution_id'],
-      ));
+      ];
+      civicrm_api3('MembershipPayment', 'create', $membershipPaymentParams);
     }
 
     $transaction->commit();
@@ -1803,20 +1804,6 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
   }
 
   /**
-   * Create linkages between membership & contribution - note this is the wrong place for this code but this is a
-   * refactoring step. This should be BAO functionality
-   * @param $membership
-   * @param $membershipContribution
-   */
-  public static function linkMembershipPayment($membership, $membershipContribution) {
-    CRM_Member_BAO_MembershipPayment::create(array(
-      'membership_id' => $membership->id,
-      'membership_type_id' => $membership->membership_type_id,
-      'contribution_id' => $membershipContribution->id,
-    ));
-  }
-
-  /**
    * @param int $contactID
    * @param int $membershipTypeID
    * @param bool $is_test
@@ -2507,11 +2494,12 @@ WHERE      civicrm_membership.is_test = 0
 
     //insert payment record for this membership
     if (empty($ids['contribution']) || !empty($params['is_recur'])) {
-      CRM_Member_BAO_MembershipPayment::create(array(
+      civicrm_api3('MembershipPayment', 'create', [
         'membership_id' => $membershipId,
         'contribution_id' => $contribution->id,
-      ));
+      ]);
     }
+
     return $contribution;
   }
 
