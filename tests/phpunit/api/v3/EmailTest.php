@@ -89,9 +89,9 @@ class api_v3_EmailTest extends CiviUnitTestCase {
     $this->_apiversion = $version;
     $params = $this->_params;
     unset($params['location_type_id']);
-    $result = $this->callAPIAndDocument('email', 'create', $params, __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
     $this->assertEquals(CRM_Core_BAO_LocationType::getDefault()->id, $result['values'][$result['id']]['location_type_id']);
-    $delresult = $this->callAPISuccess('email', 'delete', ['id' => $result['id']]);
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
   }
 
   /**

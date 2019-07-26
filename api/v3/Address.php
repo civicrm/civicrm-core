@@ -125,6 +125,10 @@ function _civicrm_api3_address_create_spec(&$params) {
     'name' => 'world_region',
     'type' => CRM_Utils_Type::T_TEXT,
   ];
+  $defaultLocation = CRM_Core_BAO_LocationType::getDefault();
+  if ($defaultLocation) {
+    $params['location_type_id']['api.default'] = $defaultLocation->id;
+  }
 }
 
 /**
