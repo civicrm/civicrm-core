@@ -282,6 +282,8 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   /**
    * Test that address custom fields can be imported
    * FIXME: Api4
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testAddressWithCustomData() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate('Address', 'AddressTest.php');
@@ -293,6 +295,25 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, [0 => NULL, 1 => NULL, 2 => NULL, 3 => NULL, 4 => NULL, 5 => 'Primary', 6 => 'Primary']);
     $address = $this->callAPISuccessGetSingle('Address', ['street_address' => 'Big Mansion', 'return' => 'custom_' . $ids['custom_field_id']]);
     $this->assertEquals('Update', $address['custom_' . $ids['custom_field_id']]);
+  }
+
+  /**
+   * Test gender works when you specify the label.
+   *
+   * There is an expectation that you can import by label here.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGenderLabel() {
+    $contactValues = [
+      'first_name' => 'Bill',
+      'last_name' => 'Gates',
+      'email' => 'bill.gates@microsoft.com',
+      'nick_name' => 'Billy-boy',
+      'gender_id' => 'Female',
+    ];
+    $this->runImport($contactValues, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::VALID, [NULL, NULL, 'Primary', NULL, NULL]);
+    $this->callAPISuccessGetSingle('Contact', $contactValues);
   }
 
   /**
@@ -631,7 +652,7 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
    *   Optional extra parameters to set.
    *
    * @return array
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   protected function setUpBaseContact($params = []) {
     $originalValues = array_merge([

@@ -819,10 +819,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       elseif ($key == 'is_deceased' && $val) {
         $params[$key] = CRM_Utils_String::strtoboolstr($val);
       }
-      elseif ($key == 'gender') {
-        //CRM-4360
-        $params[$key] = $this->checkGender($val);
-      }
     }
 
     //now format custom data.
