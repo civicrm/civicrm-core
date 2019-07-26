@@ -1560,36 +1560,13 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    *   behaviour unchanged).
    *
    * @return array
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function buildMembershipTypeValues(&$form, $membershipTypeID = array(), $activeOnly = FALSE) {
-    $whereClause = " WHERE domain_id = " . CRM_Core_Config::domainID();
+  public static function buildMembershipTypeValues(&$form, $membershipTypeID = [], $activeOnly = FALSE) {
     $membershipTypeIDS = (array) $membershipTypeID;
 
-    if ($activeOnly) {
-      $whereClause .= " AND is_active = 1 ";
-    }
-    if (!empty($membershipTypeIDS)) {
-      $allIDs = implode(',', $membershipTypeIDS);
-      $whereClause .= " AND id IN ( $allIDs )";
-    }
     CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes, CRM_Core_Action::ADD);
-
-    if ($financialTypes) {
-      $whereClause .= " AND financial_type_id IN (" . implode(',', array_keys($financialTypes)) . ")";
-    }
-    else {
-      $whereClause .= " AND financial_type_id IN (0)";
-    }
-
-    $query = "
-SELECT *
-FROM   civicrm_membership_type
-       $whereClause;
-";
-    $dao = CRM_Core_DAO::executeQuery($query);
-
-    $membershipTypeValues = array();
-    $membershipTypeFields = array(
+    $membershipTypeFields = [
       'id',
       'minimum_fee',
       'name',
@@ -1603,17 +1580,31 @@ FROM   civicrm_membership_type
       'max_related',
       'duration_unit',
       'duration_interval',
-    );
+    ];
 
-    while ($dao->fetch()) {
-      $membershipTypeValues[$dao->id] = array();
-      foreach ($membershipTypeFields as $mtField) {
-        $membershipTypeValues[$dao->id][$mtField] = $dao->$mtField;
-      }
+    $membershipTypeParams = [
+      'return' => $membershipTypeFields,
+      'options' => ['limit' => 0],
+    ];
+    if ($activeOnly) {
+      $membershipTypeParams['is_active'] = 1;
+    }
+    $membershipTypeParams['financial_type_id'] = ['IN' => empty($financialTypes) ? [0] : array_keys($financialTypes)];
+
+    if (!empty($membershipTypeIDS)) {
+      $membershipTypeParams['id'] = ['IN' => $membershipTypeIDS];
     }
 
+    $membershipTypeValues = civicrm_api3('MembershipType', 'get', $membershipTypeParams)['values'];
+    // @fixme The foreach to modify the API values is just to make sure we return exactly the same as this function did before switching to the API
+    foreach ($membershipTypeValues as $fmembershipTypeID => $membershipTypeDetail) {
+      $membershipTypeValues[$fmembershipTypeID]['relationship_type_id'] = isset($membershipTypeDetail['relationship_type_id']) ? CRM_Utils_Array::first($membershipTypeDetail['relationship_type_id']) : NULL;
+      $membershipTypeValues[$fmembershipTypeID]['relationship_direction'] = isset($membershipTypeDetail['relationship_direction']) ? CRM_Utils_Array::first($membershipTypeDetail['relationship_direction']) : NULL;
+      if (!isset($membershipTypeDetail['max_related'])) {
+        $membershipTypeValues[$fmembershipTypeID]['max_related'] = NULL;
+      }
+    }
     CRM_Utils_Hook::membershipTypeValues($form, $membershipTypeValues);
-
     if (is_numeric($membershipTypeID) &&
       $membershipTypeID > 0
     ) {

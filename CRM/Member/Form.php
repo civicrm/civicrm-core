@@ -160,11 +160,13 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
 
     $this->assign('context', $this->_context);
     $this->assign('membershipMode', $this->_mode);
+    $this->_recurMembershipTypes = [];
     $this->allMembershipTypeDetails = CRM_Member_BAO_Membership::buildMembershipTypeValues($this, [], TRUE);
-    foreach ($this->allMembershipTypeDetails as $index => $membershipType) {
-      if ($membershipType['auto_renew']) {
-        $this->_recurMembershipTypes[$index] = $membershipType;
-        $this->membershipTypeRenewalStatus[$index] = $membershipType['auto_renew'];
+    foreach ($this->allMembershipTypeDetails as $membershipTypeKey => $membershipTypeDetail) {
+      // Can be 1:optional or 2:required
+      if (CRM_Utils_Array::value('auto_renew', $membershipTypeDetail)) {
+        $this->_recurMembershipTypes[$membershipTypeKey] = $membershipTypeDetail;
+        $this->membershipTypeRenewalStatus[$membershipTypeKey] = $membershipTypeDetail['auto_renew'];
       }
     }
   }
@@ -173,9 +175,9 @@ class CRM_Member_Form extends CRM_Contribute_Form_AbstractEditPayment {
    * Set default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
-   *
    * @return array
    *   defaults
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
     $defaults = [];
