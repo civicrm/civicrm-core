@@ -1418,7 +1418,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
         $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
         $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
-        $ids['contribution'] = $contribution->id;
+        $params['contribution_id'] = $paymentParams['contributionID'];
         $params['contribution_recur_id'] = $paymentParams['contributionRecurID'];
       }
       $paymentStatus = NULL;
@@ -1522,6 +1522,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           unset($membershipParams['lineItems']);
         }
         $membershipParams['payment_instrument_id'] = $paymentInstrumentID;
+        // @todo stop passing $ids (membership and userId only are set above)
         $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
         $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
         unset($params['lineItems']);
@@ -1618,7 +1619,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           if (!empty($softParams)) {
             $membershipParams['soft_credit'] = $softParams;
           }
-
+          // @todo stop passing $ids (membership and userId only are set above)
           $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
           $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
           unset($params['lineItems']);

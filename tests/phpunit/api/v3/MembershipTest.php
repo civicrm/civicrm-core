@@ -1206,6 +1206,7 @@ class api_v3_MembershipTest extends CiviUnitTestCase {
       'skipStatusCal' => 1,
       'is_for_organization' => 1,
     ];
+    // @todo stop passing empty $ids
     $ids = [];
     $membership = CRM_Member_BAO_Membership::create($params, $ids);
 

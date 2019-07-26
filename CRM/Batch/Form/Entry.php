@@ -860,6 +860,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           unset($value['membership_start_date']);
           unset($value['membership_end_date']);
           $ids = [];
+          // @todo stop passing empty $ids
           $membership = CRM_Member_BAO_Membership::create($value, $ids);
         }
 
