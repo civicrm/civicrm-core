@@ -421,7 +421,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       $group->name = substr($group->name, 0, -4) . "_{$group->id}";
     }
 
-    $group->buildClause();
     $group->save();
 
     // add custom field values
@@ -499,25 +498,6 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       );
     }
     return $group;
-  }
-
-  /**
-   * Given a saved search compute the clause and the tables
-   * and store it for future use
-   */
-  public function buildClause() {
-    $params = [['group', 'IN', [$this->id], 0, 0]];
-
-    if (!empty($params)) {
-      $tables = $whereTables = [];
-      $this->where_clause = CRM_Contact_BAO_Query::getWhereClause($params, NULL, $tables, $whereTables);
-      if (!empty($tables)) {
-        $this->select_tables = serialize($tables);
-      }
-      if (!empty($whereTables)) {
-        $this->where_tables = serialize($whereTables);
-      }
-    }
   }
 
   /**
