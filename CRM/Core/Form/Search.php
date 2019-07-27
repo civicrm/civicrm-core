@@ -268,6 +268,8 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * @param string $entity
    *
    * @return array
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function getEntityDefaults($entity) {
     $defaults = [];
@@ -284,6 +286,12 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
             $defaults[$fieldName . '_relative'] = 0;
             $defaults[$fieldName . '_low'] = $low ? date('Y-m-d H:i:s', strtotime($low)) : NULL;
             $defaults[$fieldName . '_high'] = $high ? date('Y-m-d H:i:s', strtotime($high)) : NULL;
+          }
+          else {
+            $relative = CRM_Utils_Request::retrieveValue($fieldName . '_relative', 'String', NULL, NULL, 'GET');
+            if (!empty($relative) && isset(CRM_Core_OptionGroup::values('relative_date_filters')[$relative])) {
+              $defaults[$fieldName . '_relative'] = $relative;
+            }
           }
         }
       }
