@@ -36,8 +36,10 @@ class api_v3_PhoneTest extends CiviUnitTestCase {
   protected $_contactID;
   protected $_locationType;
   protected $_params;
+  protected $_entity;
 
   public function setUp() {
+    $this->_entity = 'Phone';
     parent::setUp();
     $this->useTransaction();
 
