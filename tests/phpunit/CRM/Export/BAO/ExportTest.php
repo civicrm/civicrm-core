@@ -7,6 +7,7 @@
  */
 class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
+  use CRMTraits_Custom_CustomDataTrait;
   /**
    * Contact IDs created for testing.
    *
@@ -700,34 +701,35 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test master_address_id field.
+   * Test custom data exporting.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportCustomData() {
     $this->setUpContactExportData();
-
-    $customData = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, 'ContactTest.php');
-
+    $this->entity = 'Contact';
+    $this->createCustomGroupWithFieldsOfAllTypes();
     $this->callAPISuccess('Contact', 'create', [
       'id' => $this->contactIDs[1],
-      'custom_' . $customData['custom_field_id'] => 'BlahdeBlah',
+      $this->getCustomFieldName('text') => 'BlahdeBlah',
+      $this->getCustomFieldName('country') => 'LA',
       'api.Address.create' => ['location_type_id' => 'Billing', 'city' => 'Waipu'],
     ]);
     $selectedFields = [
-      ['Individual', 'city', CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', 'Billing')],
-      ['Individual', 'custom_1'],
+      ['name' => 'city', 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', 'Billing')],
+      ['name' => $this->getCustomFieldName('text')],
+      ['name' => $this->getCustomFieldName('country')],
     ];
 
-    list($tableName, $sqlColumns) = $this->doExport($selectedFields, $this->contactIDs[1]);
-    $this->assertEquals([
-      'billing_city' => 'billing_city varchar(64)',
-      'custom_1' => 'custom_1 varchar(255)',
-    ], $sqlColumns);
-
-    $dao = CRM_Core_DAO::executeQuery('SELECT * FROM ' . $tableName);
-    while ($dao->fetch()) {
-      $this->assertEquals('BlahdeBlah', $dao->custom_1);
-      $this->assertEquals('Waipu', $dao->billing_city);
-    }
+    $this->doExportTest([
+      'fields' => $selectedFields,
+      'ids' => [$this->contactIDs[1]],
+    ]);
+    $row = $this->csv->fetchOne();
+    $this->assertEquals('BlahdeBlah', $row['Enter text here']);
+    $this->assertEquals('Waipu', $row['Billing-City']);
+    $this->assertEquals("Lao People's Democratic Republic", $row['Country']);
   }
 
   /**
