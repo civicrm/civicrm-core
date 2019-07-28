@@ -418,28 +418,6 @@ LIMIT $offset, $limit
   }
 
   /**
-   * Build componentPayment fields.
-   *
-   * This is no longer used by export but BAO_Mapping still calls it & we
-   * should find a generic way to handle this or move this to that class.
-   *
-   * @deprecated
-   */
-  public static function componentPaymentFields() {
-    static $componentPaymentFields;
-    if (!isset($componentPaymentFields)) {
-      $componentPaymentFields = [
-        'componentPaymentField_total_amount' => ts('Total Amount'),
-        'componentPaymentField_contribution_status' => ts('Contribution Status'),
-        'componentPaymentField_received_date' => ts('Date Received'),
-        'componentPaymentField_payment_instrument' => ts('Payment Method'),
-        'componentPaymentField_transaction_id' => ts('Transaction ID'),
-      ];
-    }
-    return $componentPaymentFields;
-  }
-
-  /**
    * Get the values of linked household contact.
    *
    * @param CRM_Core_DAO $relDAO

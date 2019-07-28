@@ -869,7 +869,13 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
         // @todo - review this - inconsistent with other entities & hacky.
         if ($exportMode == CRM_Export_Form_Select::EVENT_EXPORT) {
           $componentPaymentFields = [];
-          foreach (CRM_Export_BAO_Export::componentPaymentFields() as $payField => $payTitle) {
+          foreach ([
+            'componentPaymentField_total_amount' => ts('Total Amount'),
+            'componentPaymentField_contribution_status' => ts('Contribution Status'),
+            'componentPaymentField_received_date' => ts('Date Received'),
+            'componentPaymentField_payment_instrument' => ts('Payment Method'),
+            'componentPaymentField_transaction_id' => ts('Transaction ID'),
+          ] as $payField => $payTitle) {
             $componentPaymentFields[$payField] = ['title' => $payTitle];
           }
           $fields['Participant'] = array_merge($fields['Participant'], $componentPaymentFields);
