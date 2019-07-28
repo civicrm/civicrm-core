@@ -1765,6 +1765,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @param array $expectedHeaders
    *
    * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
+   *
    * @dataProvider getSqlColumnsOutput
    */
   public function testGetSQLColumnsAndHeaders($exportMode, $expected, $expectedHeaders) {
@@ -1774,25 +1776,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     // eventually aspire to call $provider->getSQLColumns straight after it
     // is intiated.
     $this->setupBaseExportData($exportMode);
-
-    $result = CRM_Export_BAO_Export::exportComponents(
-      TRUE,
-      [1],
-      [],
-      NULL,
-      NULL,
-      NULL,
-      $exportMode,
-      NULL,
-      NULL,
-      FALSE,
-      FALSE,
-      [
-        'suppress_csv_for_testing' => TRUE,
-      ]
-    );
-    $this->assertEquals($expected, $result[1]);
-    $this->assertEquals($expectedHeaders, $result[2]);
+    $this->doExportTest(['selectAll' => TRUE, 'exportMode' => $exportMode, 'ids' => [1]]);
+    $this->assertEquals($expected, $this->processor->getSQLColumns());
+    $this->assertEquals($expectedHeaders, $this->processor->getHeaderRows());
   }
 
   /**
