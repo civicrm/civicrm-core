@@ -2492,8 +2492,11 @@ WHERE      civicrm_membership.is_test = 0
     // store contribution id
     $params['contribution_id'] = $contribution->id;
 
-    //insert payment record for this membership
-    if (empty($ids['contribution']) || !empty($params['is_recur'])) {
+    // Create membership payment if it does not already exist
+    $membershipPayment = civicrm_api3('MembershipPayment', 'get', [
+      'contribution_id' => $contribution->id,
+    ]);
+    if (empty($membershipPayment['count'])) {
       civicrm_api3('MembershipPayment', 'create', [
         'membership_id' => $membershipId,
         'contribution_id' => $contribution->id,
