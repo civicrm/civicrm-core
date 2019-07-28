@@ -639,35 +639,21 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Test exporting relationships.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportRelationshipsMergeToHouseholdAllFields() {
     list($householdID) = $this->setUpHousehold();
-    list($tableName) = CRM_Export_BAO_Export::exportComponents(
-      FALSE,
-      $this->contactIDs,
-      [],
-      NULL,
-      NULL,
-      NULL,
-      CRM_Export_Form_Select::CONTACT_EXPORT,
-      "contact_a.id IN (" . implode(",", $this->contactIDs) . ")",
-      NULL,
-      FALSE,
-      TRUE,
-      [
-        'suppress_csv_for_testing' => TRUE,
-      ]
-    );
-    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM {$tableName}");
-    while ($dao->fetch()) {
-      $this->assertEquals('Unit Test household', $dao->display_name);
-      $this->assertEquals('Portland', $dao->city);
-      $this->assertEquals('ME', $dao->state_province);
-      $this->assertEquals($householdID, $dao->civicrm_primary_id);
-      $this->assertEquals($householdID, $dao->civicrm_primary_id);
-      $this->assertEquals('Unit Test household', $dao->addressee);
-      $this->assertEquals(1, $dao->N);
-    }
+    $this->doExportTest(['ids' => $this->contactIDs, 'mergeSameHousehold' => TRUE]);
+    $row = $this->csv->fetchOne();
+    $this->assertCount(1, $this->csv);
+    $this->assertEquals('Unit Test household', $row['Display Name']);
+    $this->assertEquals('Portland', $row['City']);
+    $this->assertEquals('ME', $row['State']);
+    $this->assertEquals($householdID, $row['Household ID']);
+    $this->assertEquals('Unit Test household', $row['Addressee']);
+    $this->assertEquals('Dear Unit Test household', $row['Postal Greeting']);
   }
 
   /**
