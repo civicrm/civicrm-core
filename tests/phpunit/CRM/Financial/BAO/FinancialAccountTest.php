@@ -103,20 +103,21 @@ class CRM_Financial_BAO_FinancialAccountTest extends CiviUnitTestCase {
 
   /**
    * Check method del()
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function testdel() {
-    $params = array(
+  public function testDel() {
+    $params = [
       'name' => 'Donations',
       'is_deductible' => 0,
       'is_active' => 1,
-    );
-    $ids = array();
-    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, $ids);
+    ];
+    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params);
 
     CRM_Financial_BAO_FinancialAccount::del($financialAccount->id);
-    $params = array('id' => $financialAccount->id);
-    $result = CRM_Financial_BAO_FinancialAccount::retrieve($params, $defaults);
-    $this->assertEquals(empty($result), TRUE, 'Verify financial account record deletion.');
+    $params = ['id' => $financialAccount->id];
+    $result = CRM_Financial_BAO_FinancialAccount::retrieve($params);
+    $this->assertEmpty($result, 'Verify financial account record deletion.');
   }
 
   /**

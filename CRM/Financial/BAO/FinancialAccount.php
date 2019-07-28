@@ -49,7 +49,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    *
    * @return CRM_Financial_BAO_FinancialAccount
    */
-  public static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, $defaults = []) {
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
     $financialAccount->copyValues($params);
     if ($financialAccount->find(TRUE)) {
