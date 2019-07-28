@@ -522,12 +522,16 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * does NOT retain the gender of the former.
    *
    * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportPseudoField() {
     $this->setUpContactExportData();
-    $selectedFields = [['Individual', 'gender_id']];
-    list($tableName, $sqlColumns) = $this->doExport($selectedFields, $this->contactIDs);
-    $this->assertEquals('Female,', CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(gender_id) FROM {$tableName}"));
+    $this->callAPISuccess('OptionValue', 'create', ['option_group_id' => 'gender', 'name' => 'Really long string', 'value' => 678, 'label' => 'Really long string']);
+    $selectedFields = [['contact_type' => 'Individual', 'name' => 'gender_id']];
+    $this->callAPISuccess('Contact', 'create', ['id' => $this->contactIDs[0], 'gender_id' => 678]);
+    $this->doExportTest(['fields' => $selectedFields, 'ids' => $this->contactIDs]);
+    $row = $this->csv->fetchOne();
+    $this->assertEquals('Really long string', $row['Gender']);
   }
 
   /**
@@ -2484,12 +2488,12 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'prefix_id' => 'prefix_id varchar(255)',
       'suffix_id' => 'suffix_id varchar(255)',
       'formal_title' => 'formal_title varchar(64)',
-      'communication_style_id' => 'communication_style_id varchar(16)',
+      'communication_style_id' => 'communication_style_id varchar(255)',
       'email_greeting_id' => 'email_greeting_id varchar(16)',
       'postal_greeting_id' => 'postal_greeting_id varchar(16)',
       'addressee_id' => 'addressee_id varchar(16)',
       'job_title' => 'job_title varchar(255)',
-      'gender_id' => 'gender_id varchar(16)',
+      'gender_id' => 'gender_id varchar(255)',
       'birth_date' => 'birth_date varchar(32)',
       'is_deceased' => 'is_deceased varchar(16)',
       'deceased_date' => 'deceased_date varchar(32)',
@@ -2670,12 +2674,12 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'prefix_id' => 'prefix_id varchar(255)',
       'suffix_id' => 'suffix_id varchar(255)',
       'formal_title' => 'formal_title varchar(64)',
-      'communication_style_id' => 'communication_style_id varchar(16)',
+      'communication_style_id' => 'communication_style_id varchar(255)',
       'email_greeting_id' => 'email_greeting_id varchar(16)',
       'postal_greeting_id' => 'postal_greeting_id varchar(16)',
       'addressee_id' => 'addressee_id varchar(16)',
       'job_title' => 'job_title varchar(255)',
-      'gender_id' => 'gender_id varchar(16)',
+      'gender_id' => 'gender_id varchar(255)',
       'birth_date' => 'birth_date varchar(32)',
       'is_deceased' => 'is_deceased varchar(16)',
       'deceased_date' => 'deceased_date varchar(32)',
