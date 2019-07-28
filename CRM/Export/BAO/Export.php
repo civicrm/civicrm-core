@@ -42,40 +42,6 @@ class CRM_Export_BAO_Export {
   const EXPORT_ROW_COUNT = 100000;
 
   /**
-   * Get Export component
-   *
-   * @param int $exportMode
-   *   Export mode.
-   *
-   * @return string
-   *   CiviCRM Export Component
-   */
-  public static function exportComponent($exportMode) {
-    switch ($exportMode) {
-      case CRM_Export_Form_Select::CONTRIBUTE_EXPORT:
-        $component = 'civicrm_contribution';
-        break;
-
-      case CRM_Export_Form_Select::EVENT_EXPORT:
-        $component = 'civicrm_participant';
-        break;
-
-      case CRM_Export_Form_Select::MEMBER_EXPORT:
-        $component = 'civicrm_membership';
-        break;
-
-      case CRM_Export_Form_Select::PLEDGE_EXPORT:
-        $component = 'civicrm_pledge';
-        break;
-
-      case CRM_Export_Form_Select::GRANT_EXPORT:
-        $component = 'civicrm_grant';
-        break;
-    }
-    return $component;
-  }
-
-  /**
    * Get the list the export fields.
    *
    * @param int $selectAll
@@ -617,13 +583,19 @@ LIMIT $offset, $limit
       }
       return $relIDs;
     }
-    $component = self::exportComponent($exportMode);
+    $componentMapping = [
+      CRM_Export_Form_Select::CONTRIBUTE_EXPORT => 'civicrm_contribution',
+      CRM_Export_Form_Select::EVENT_EXPORT => 'civicrm_participant',
+      CRM_Export_Form_Select::MEMBER_EXPORT => 'civicrm_membership',
+      CRM_Export_Form_Select::PLEDGE_EXPORT => 'civicrm_pledge',
+      CRM_Export_Form_Select::GRANT_EXPORT => 'civicrm_grant',
+    ];
 
     if ($exportMode == CRM_Export_Form_Select::CASE_EXPORT) {
       return CRM_Case_BAO_Case::retrieveContactIdsByCaseId($ids);
     }
     else {
-      return CRM_Core_DAO::getContactIDsFromComponent($ids, $component);
+      return CRM_Core_DAO::getContactIDsFromComponent($ids, $componentMapping[$exportMode]);
     }
   }
 
