@@ -122,6 +122,22 @@ class api_v3_AddressTest extends CiviUnitTestCase {
   }
 
   /**
+   * If no location is specified when creating a new address, it should default to
+   * the LocationType default
+   *
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateAddressDefaultLocation($version) {
+    $this->_apiversion = $version;
+    $params = $this->_params;
+    unset($params['location_type_id']);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals(CRM_Core_BAO_LocationType::getDefault()->id, $result['values'][$result['id']]['location_type_id']);
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
+  }
+
+  /**
    * FIXME: Api4
    */
   public function testCreateAddressTooLongSuffix() {
