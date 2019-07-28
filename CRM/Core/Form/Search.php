@@ -400,6 +400,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * Add generic fields that specify the contact.
    */
   protected function addContactSearchFields() {
+    $this->searchFieldMetadata['Contact']['contact_tags'] = ['name' => 'tags', 'title' => $this->getTagLabel(), 'type' => CRM_Utils_Type::T_STRING, 'is_pseudofield' => TRUE];
     if (!$this->isFormInViewOrEditMode()) {
       return;
     }
