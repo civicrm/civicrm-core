@@ -1397,11 +1397,6 @@ class CRM_Export_BAO_ExportProcessor {
       return "$fieldName varchar(128)";
     }
 
-    if (substr($fieldName, -11) == 'campaign_id') {
-      // CRM-14398
-      return "$fieldName varchar(128)";
-    }
-
     $queryFields = $this->getQueryFields();
     // @todo remove the enotice avoidance here, ensure all columns are declared.
     // tests will fail on the enotices until they all are & then all the 'else'
