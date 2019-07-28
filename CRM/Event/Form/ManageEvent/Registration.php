@@ -166,7 +166,7 @@ class CRM_Event_Form_ManageEvent_Registration extends CRM_Event_Form_ManageEvent
             $defaults["additional_custom_post_id_multiple[$key]"] = $value;
           }
         }
-        $this->assign('profilePostMultipleAdd', CRM_Utils_Array::value('additional_custom_post', $defaults));
+        $this->assign('profilePostMultipleAdd', CRM_Utils_Array::value('additional_custom_post', $defaults, []));
       }
     }
     else {
