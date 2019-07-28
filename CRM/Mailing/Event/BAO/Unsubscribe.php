@@ -217,10 +217,10 @@ WHERE  email = %2
     // list.
 
     while (!empty($mailings)) {
-      $do->query("
+      $do = CRM_Core_DAO::executeQuery("
                 SELECT      $mg.entity_table as entity_table,
                             $mg.entity_id as entity_id
-                FROM        $mg
+                FROM        civicrm_mailing_group $mg
                 WHERE       $mg.mailing_id IN (" . implode(', ', $mailings) . ")
                     AND     $mg.group_type = 'Include'");
 
@@ -255,12 +255,12 @@ WHERE  email = %2
     if ($groupIds || $baseGroupIds) {
       $groupIdClause = "AND $group.id IN (" . implode(', ', array_merge($groupIds, $baseGroupIds)) . ")";
     }
-    $do->query("
+    $do = CRM_Core_DAO::executeQuery("
             SELECT      $group.id as group_id,
                         $group.title as title,
                         $group.description as description
-            FROM        $group
-            LEFT JOIN   $gc
+            FROM        civicrm_group $group
+            LEFT JOIN   civicrm_group_contact $gc
                 ON      $gc.group_id = $group.id
             WHERE       $group.is_hidden = 0
                         $groupIdClause
