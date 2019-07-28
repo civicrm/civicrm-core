@@ -1818,9 +1818,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     return [
       'participant_campaign_id' => 'participant_campaign_id varchar(16)',
       'participant_contact_id' => 'participant_contact_id varchar(16)',
-      'componentpaymentfield_contribution_status' => 'componentpaymentfield_contribution_status text',
+      'componentpaymentfield_contribution_status' => 'componentpaymentfield_contribution_status varchar(255)',
       'currency' => 'currency varchar(3)',
-      'componentpaymentfield_received_date' => 'componentpaymentfield_received_date text',
+      'componentpaymentfield_received_date' => 'componentpaymentfield_received_date varchar(32)',
       'default_role_id' => 'default_role_id varchar(16)',
       'participant_discount_name' => 'participant_discount_name varchar(16)',
       'event_id' => 'event_id varchar(16)',
@@ -1843,7 +1843,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'participant_register_date' => 'participant_register_date varchar(32)',
       'participant_registered_by_id' => 'participant_registered_by_id varchar(16)',
       'participant_is_test' => 'participant_is_test varchar(16)',
-      'componentpaymentfield_total_amount' => 'componentpaymentfield_total_amount text',
+      'componentpaymentfield_total_amount' => 'componentpaymentfield_total_amount varchar(32)',
       'componentpaymentfield_transaction_id' => 'componentpaymentfield_transaction_id varchar(255)',
       'transferred_to_contact_id' => 'transferred_to_contact_id varchar(16)',
     ];
