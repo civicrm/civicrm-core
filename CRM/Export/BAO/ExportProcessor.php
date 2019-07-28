@@ -589,7 +589,12 @@ class CRM_Export_BAO_ExportProcessor {
    * @return array
    */
   public function getQueryFields() {
-    return $this->queryFields;
+    return array_merge(
+      $this->queryFields,
+      $this->getComponentPaymentFields(),
+      // Contact ID is used by the address fields.
+      ['contact_id' => ['name' => 'contact_id', 'title' => ts('Contact ID')], 'type' => CRM_Utils_Type::T_INT]
+    );
   }
 
   /**
@@ -724,7 +729,8 @@ class CRM_Export_BAO_ExportProcessor {
       return $this->getQueryFields()[$field]['title'];
     }
     elseif ($this->isExportPaymentFields() && array_key_exists($field, $this->getcomponentPaymentFields())) {
-      return CRM_Utils_Array::value($field, $this->getcomponentPaymentFields());
+      $field = CRM_Utils_Array::value($field, $this->getcomponentPaymentFields());
+      return $field['title'];
     }
     else {
       return $field;
@@ -1256,11 +1262,11 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function getComponentPaymentFields() {
     return [
-      'componentPaymentField_total_amount' => ts('Total Amount'),
-      'componentPaymentField_contribution_status' => ts('Contribution Status'),
-      'componentPaymentField_received_date' => ts('Date Received'),
-      'componentPaymentField_payment_instrument' => ts('Payment Method'),
-      'componentPaymentField_transaction_id' => ts('Transaction ID'),
+      'componentPaymentField_total_amount' => ['title' => ts('Total Amount'), 'type' => CRM_Utils_Type::T_MONEY],
+      'componentPaymentField_contribution_status' => ['title' => ts('Contribution Status'), 'type' => CRM_Utils_Type::T_STRING],
+      'componentPaymentField_received_date' => ['title' => ts('Date Received'), 'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME],
+      'componentPaymentField_payment_instrument' => ['title' => ts('Payment Method'), 'type' => CRM_Utils_Type::T_STRING],
+      'componentPaymentField_transaction_id' => ['title' => ts('Transaction ID'), 'type' => CRM_Utils_Type::T_STRING],
     ];
   }
 
@@ -1272,7 +1278,7 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function getPaymentHeaders() {
     if ($this->isExportPaymentFields() && !$this->isExportSpecifiedPaymentFields()) {
-      return $this->getcomponentPaymentFields();
+      return CRM_Utils_Array::collect('title', $this->getcomponentPaymentFields());
     }
     return [];
   }
@@ -1401,7 +1407,7 @@ class CRM_Export_BAO_ExportProcessor {
     // @todo remove the enotice avoidance here, ensure all columns are declared.
     // tests will fail on the enotices until they all are & then all the 'else'
     // below can go.
-    $fieldSpec = $queryFields[$columnName] ?? [];
+    $fieldSpec = $queryFields[$columnName];
 
     // set the sql columns
     if (isset($fieldSpec['type'])) {
