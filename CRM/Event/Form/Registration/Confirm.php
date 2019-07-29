@@ -1002,7 +1002,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     if (!$pending && $result) {
       $contribParams += [
         'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
-        'net_amount' => CRM_Utils_Array::value('net_amount', $result, $params['amount']),
         'trxn_id' => $result['trxn_id'],
         'receipt_date' => $receiptDate,
       ];

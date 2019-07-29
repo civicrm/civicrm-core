@@ -105,6 +105,7 @@ class System {
    * @param int $id
    *
    * @return \CRM_Core_Payment|NULL
+   *
    * @throws \CiviCRM_API3_Exception
    */
   public function getById($id) {
