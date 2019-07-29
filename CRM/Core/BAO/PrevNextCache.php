@@ -467,22 +467,7 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
   }
 
   public static function cleanupCache() {
-    // clean up all prev next caches older than $cacheTimeIntervalDays days
-    $cacheTimeIntervalDays = 2;
-
-    // first find all the cacheKeys that match this
-    $sql = "
-DELETE     pn, c
-FROM       civicrm_cache c
-INNER JOIN civicrm_prevnext_cache pn ON c.path = pn.cachekey
-WHERE      c.group_name = %1
-AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
-";
-    $params = [
-      1 => [CRM_Utils_Cache::cleanKey('CiviCRM Search PrevNextCache'), 'String'],
-      2 => [$cacheTimeIntervalDays, 'Integer'],
-    ];
-    CRM_Core_DAO::executeQuery($sql, $params);
+    Civi::service('prevnext')->cleanup();
   }
 
   /**

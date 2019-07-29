@@ -252,4 +252,12 @@ class CRM_Core_PrevNextCache_Redis implements CRM_Core_PrevNextCache_Interface {
     return [$allKey, $dataKey, $selKey, $maxScore];
   }
 
+  /**
+   * @inheritDoc
+   */
+  public function cleanup() {
+    // Redis already handles cleaning up stale keys.
+    return;
+  }
+
 }
