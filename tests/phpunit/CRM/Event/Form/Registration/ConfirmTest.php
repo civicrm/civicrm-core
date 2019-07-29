@@ -90,6 +90,9 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   public function testPaidSubmit($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
     $paymentProcessorID = $this->processorCreate();
+    /* @var \CRM_Core_Payment_Dummy $processor */
+    $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
+    $processor->setDoDirectPaymentResult(['fee_amount' => 1.67]);
     $params = ['is_monetary' => 1, 'financial_type_id' => 1];
     $event = $this->eventCreate($params);
     $individualID = $this->individualCreate();
@@ -153,6 +156,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('Participant', [], 1);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
     $this->assertEquals(8000.67, $contribution['total_amount']);
+    $this->assertEquals(1.67, $contribution['fee_amount']);
+    $this->assertEquals(7999, $contribution['net_amount']);
     $lastFinancialTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
     $financialTrxn = $this->callAPISuccessGetSingle(
       'FinancialTrxn',
@@ -164,6 +169,35 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals(CRM_Utils_Array::value('payment_processor_id', $financialTrxn), $paymentProcessorID);
     $this->assertEquals(CRM_Utils_Array::value('card_type_id.label', $financialTrxn), 'Visa');
     $this->assertEquals(CRM_Utils_Array::value('pan_truncation', $financialTrxn), 1111);
+
+    // This looks like it's missing an item for the main contribution - but just locking in current behaviour.
+    $financialItems = $this->callAPISuccess('FinancialItem', 'get', [
+      'return' => ['description', 'financial_account_id', 'amount', 'contact_id', 'currency', 'status_id', 'entity_table', 'entity_id'],
+      'sequential' => 1,
+    ])['values'];
+
+    $entityFinancialTrxns = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['sequential' => 1])['values'];
+
+    $this->assertAPIArrayComparison([
+      'entity_table' => 'civicrm_contribution',
+      'entity_id' => $contribution['id'],
+      'financial_trxn_id' => $financialTrxn['id'],
+      'amount' => '8000.67',
+    ], $entityFinancialTrxns[0], ['id']);
+
+    $this->assertAPIArrayComparison([
+      'entity_table' => 'civicrm_contribution',
+      'entity_id' => $contribution['id'],
+      'financial_trxn_id' => $financialTrxn['id'] + 1,
+      'amount' => '1.67',
+    ], $entityFinancialTrxns[1], ['id']);
+
+    $this->assertAPIArrayComparison([
+      'entity_table' => 'civicrm_financial_item',
+      'entity_id' => $financialItems[0]['id'],
+      'financial_trxn_id' => $financialTrxn['id'] + 1,
+      'amount' => '1.67',
+    ], $entityFinancialTrxns[2], ['id', 'entity_id']);
   }
 
   /**
