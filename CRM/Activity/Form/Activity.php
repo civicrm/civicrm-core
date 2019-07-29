@@ -909,19 +909,33 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    */
   public function postProcess($params = NULL) {
     if ($this->_action & CRM_Core_Action::DELETE) {
-      $deleteParams = ['id' => $this->_activityId];
-      $moveToTrash = CRM_Case_BAO_Case::isCaseActivity($this->_activityId);
-      CRM_Activity_BAO_Activity::deleteActivity($deleteParams, $moveToTrash);
+      // Look up any repeat activities to be deleted.
+      $activityIds = array_column(CRM_Core_BAO_RecurringEntity::getEntitiesFor($this->_activityId, 'civicrm_activity', TRUE, NULL), 'id');
+      if (!$activityIds) {
+        // There are no repeat activities to delete - just this one.
+        $activityIds = [$this->_activityId];
+      }
 
-      // delete tags for the entity
-      $tagParams = [
-        'entity_table' => 'civicrm_activity',
-        'entity_id' => $this->_activityId,
-      ];
+      // Delete each activity.
+      foreach ($activityIds as $activityId) {
+        $deleteParams = ['id' => $activityId];
+        $moveToTrash = CRM_Case_BAO_Case::isCaseActivity($activityId);
+        CRM_Activity_BAO_Activity::deleteActivity($deleteParams, $moveToTrash);
 
-      CRM_Core_BAO_EntityTag::del($tagParams);
+        // delete tags for the entity
+        $tagParams = [
+          'entity_table' => 'civicrm_activity',
+          'entity_id' => $activityId,
+        ];
 
-      CRM_Core_Session::setStatus(ts("Selected Activity has been deleted successfully."), ts('Record Deleted'), 'success');
+        CRM_Core_BAO_EntityTag::del($tagParams);
+      }
+
+      CRM_Core_Session::setStatus(
+        ts("Selected Activity has been deleted successfully.", ['plural' => '%count Activities have been deleted successfully.', 'count' => count($activityIds)]),
+        ts('Record Deleted', ['plural' => 'Records Deleted', 'count' => count($activityIds)]), 'success'
+      );
+
       return NULL;
     }
 
