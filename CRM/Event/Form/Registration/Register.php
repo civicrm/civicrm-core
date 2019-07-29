@@ -807,10 +807,16 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $errors['additional_participants'] = ts("There is only enough space left on this event for %1 participant(s).", [1 => $form->_availableRegistrations]);
     }
 
+    $numberAdditionalParticipants = $fields['additional_participants'] ?? 0;
+
+    if ($numberAdditionalParticipants && !CRM_Utils_Rule::positiveInteger($fields['additional_participants'])) {
+      $errors['additional_participants'] = ts('Please enter a whole number for Number of additional people.');
+    }
+
     // during confirmation don't allow to increase additional participants, CRM-4320
-    if ($form->_allowConfirmation && !empty($fields['additional_participants']) &&
+    if ($form->_allowConfirmation && $numberAdditionalParticipants &&
       is_array($form->_additionalParticipantIds) &&
-      $fields['additional_participants'] > count($form->_additionalParticipantIds)
+      $numberAdditionalParticipants > count($form->_additionalParticipantIds)
     ) {
       $errors['additional_participants'] = ts("Oops. It looks like you are trying to increase the number of additional people you are registering for. You can confirm registration for a maximum of %1 additional people.", [1 => count($form->_additionalParticipantIds)]);
     }
@@ -822,12 +828,6 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       ) {
         $errors['bypass_payment'] = ts("Oops. There are enough available spaces in this event. You can not add yourself to the waiting list.");
       }
-    }
-
-    if (!empty($fields['additional_participants']) &&
-      !CRM_Utils_Rule::positiveInteger($fields['additional_participants'])
-    ) {
-      $errors['additional_participants'] = ts('Please enter a whole number for Number of additional people.');
     }
 
     // priceset validations
@@ -844,8 +844,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $errors = array_merge($errors, CRM_Utils_Array::value(0, $priceSetErrors, []));
 
       $totalParticipants = $primaryParticipantCount;
-      if (!empty($fields['additional_participants'])) {
-        $totalParticipants += $fields['additional_participants'];
+      if ($numberAdditionalParticipants) {
+        $totalParticipants += $numberAdditionalParticipants;
       }
 
       if (empty($fields['bypass_payment']) &&
