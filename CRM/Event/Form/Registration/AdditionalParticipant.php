@@ -552,7 +552,6 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
       CRM_Price_BAO_PriceSet::processAmount($self->_values['fee'], $fields, $lineItem);
       if ($fields['amount'] > 0) {
         $validatePayement = TRUE;
-        // $self->_forcePayement = true;
         // return false;
       }
     }

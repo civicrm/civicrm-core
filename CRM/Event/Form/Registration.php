@@ -168,8 +168,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_lineItemParticipantsCount;
   public $_availableRegistrations;
 
-  public $_forcePayement;
-
   /**
    * @var bool
    * @deprecated
@@ -233,8 +231,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     // check for waitlisting.
     $this->_allowWaitlist = $this->get('allowWaitlist');
 
-    $this->_forcePayement = $this->get('forcePayement');
-
     //get the additional participant ids.
     $this->_additionalParticipantIds = $this->get('additionalParticipantIds');
     $config = CRM_Core_Config::singleton();
@@ -252,7 +248,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
       // get all the values from the dao object
       $this->_values = $this->_fields = array();
-      $this->_forcePayement = FALSE;
 
       //retrieve event information
       $params = array('id' => $this->_eventId);
