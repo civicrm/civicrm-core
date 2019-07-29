@@ -446,7 +446,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $this->set('finalAmount', $this->_amount);
     }
     $participantCount = [];
-    $taxAmount = $totalTaxAmount = 0;
+    $totalTaxAmount = 0;
 
     //unset the skip participant from params.
     //build the $participantCount array.
@@ -668,8 +668,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $registerDate = CRM_Utils_Array::value('participant_register_date', $params);
       }
       elseif (!empty($params['participant_register_date']) &&
-        is_array($params['participant_register_date']) &&
-        !empty($params['participant_register_date'])
+        is_array($params['participant_register_date'])
       ) {
         $registerDate = CRM_Utils_Date::format($params['participant_register_date']);
       }
@@ -788,7 +787,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
 
           //lets carry all participant params w/ values.
           foreach ($additionalIDs as $participantID => $contactId) {
-            $participantNum = NULL;
             $participantNum = $participantID;
             if ($participantID == $registerByID) {
               // This is the is primary participant.
@@ -955,7 +953,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
    * @param array $paymentProcessor
    *
    * @return \CRM_Contribute_BAO_Contribution
+   *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function processContribution(
     &$form, $params, $result, $contactID,
@@ -1323,7 +1323,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   /**
    * Process the payment, redirecting back to the page on error.
    *
-   * @param $payment
+   * @param \CRM_Core_Payment $payment
    * @param $value
    *
    * @return array
