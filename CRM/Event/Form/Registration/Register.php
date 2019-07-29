@@ -888,7 +888,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $isZeroAmount = TRUE;
       }
 
-      if ($isZeroAmount && !($form->_forcePayement && !empty($fields['additional_participants']))) {
+      if ($isZeroAmount) {
         $skipPaymentValidation = TRUE;
       }
 
