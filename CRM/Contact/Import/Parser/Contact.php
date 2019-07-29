@@ -477,6 +477,9 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    *
    * @return bool
    *   the result of this processing
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function import($onDuplicate, &$values, $doGeocodeAddress = FALSE) {
     $config = CRM_Core_Config::singleton();
@@ -505,10 +508,7 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
       'contact_type' => $this->_contactType,
     ];
 
-    static $contactFields = NULL;
-    if ($contactFields == NULL) {
-      $contactFields = CRM_Contact_DAO_Contact::import();
-    }
+    $contactFields = CRM_Contact_DAO_Contact::import();
 
     //check if external identifier exists in database
     if (!empty($params['external_identifier']) && (!empty($params['id']) || in_array($onDuplicate, [
