@@ -992,7 +992,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
     // as they would then me membership.contact_id, membership.is_test etc
     return civicrm_api3('Membership', 'get', [
       'id' => ['IN' => $membershipIDs],
-      'return' => ['id', 'contact_id', 'membership_type_id', 'is_test'],
+      'return' => ['id', 'contact_id', 'membership_type_id', 'is_test', 'status_id', 'end_date'],
     ])['values'];
   }
 
@@ -5412,11 +5412,16 @@ LIMIT 1;";
           $membershipParams['membership_type_id'] = $dao->membership_type_id;
         }
       }
-
-      $membershipParams['num_terms'] = $contribution->getNumTermsByContributionAndMembershipType(
-        $membershipParams['membership_type_id'],
-        $primaryContributionID
-      );
+      if (empty($membership['end_date']) || (int) $membership['status_id'] !== CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending')) {
+        // Passing num_terms to the api triggers date calculations, but for pending memberships these may be already calculated.
+        // sigh - they should  be  consistent but removing the end date check causes test failures & maybe UI too?
+        // The api assumes num_terms is a special sauce for 'is_renewal' so we need to not pass it when updating a pending to completed.
+        // @todo once apiv4 ships with core switch to that & find sanity.
+        $membershipParams['num_terms'] = $contribution->getNumTermsByContributionAndMembershipType(
+          $membershipParams['membership_type_id'],
+          $primaryContributionID
+        );
+      }
       // @todo remove all this stuff in favour of letting the api call further down handle in
       // (it is a duplication of what the api does).
       $dates = array_fill_keys([

@@ -346,6 +346,8 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
 
   /**
    * Test submit with a membership block in place works with renewal.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitMembershipBlockNotSeparatePaymentProcessorInstantRenew() {
     $this->setUpMembershipContributionPage();
