@@ -265,15 +265,16 @@ function civicrm_api3_contribution_get($params) {
   $additionalOptions = _civicrm_api3_contribution_get_support_nonunique_returns($params);
   $returnProperties = CRM_Contribute_BAO_Query::defaultReturnProperties($mode);
 
+  // Get the contributions based on parameters passed in
   $contributions = _civicrm_api3_get_using_query_object('Contribution', $params, $additionalOptions, NULL, $mode, $returnProperties);
-
-  foreach ($contributions as $id => $contribution) {
-    $softContribution = CRM_Contribute_BAO_ContributionSoft::getSoftContribution($id, TRUE);
-    $contributions[$id] = array_merge($contribution, $softContribution);
-    // format soft credit for backward compatibility
-    _civicrm_api3_format_soft_credit($contributions[$id]);
-    _civicrm_api3_contribution_add_supported_fields($contributions[$id]);
-
+  if (!empty($contributions)) {
+    $softContributions = CRM_Contribute_BAO_ContributionSoft::getSoftCreditContributionFields(array_keys($contributions), TRUE);
+    foreach ($contributions as $id => $contribution) {
+      $contributions[$id] = isset($softContributions[$id]) ? array_merge($contribution, $softContributions[$id]) : $contribution;
+      // format soft credit for backward compatibility
+      _civicrm_api3_format_soft_credit($contributions[$id]);
+      _civicrm_api3_contribution_add_supported_fields($contributions[$id]);
+    }
   }
   return civicrm_api3_create_success($contributions, $params, 'Contribution', 'get');
 }
