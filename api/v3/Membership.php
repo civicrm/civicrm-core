@@ -117,6 +117,8 @@ function civicrm_api3_membership_create($params) {
     }
     else {
       // This is an existing membership, calculate the membership dates after renewal
+      // num_terms is treated as a 'special sauce' for is_renewal but this
+      // isn't really helpful for completing pendings.
       $calcDates = CRM_Member_BAO_MembershipType::getRenewalDatesForMembershipType(
         $params['id'],
         NULL,

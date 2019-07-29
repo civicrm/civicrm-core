@@ -1372,4 +1372,82 @@ Expires: ',
     $this->disableTaxAndInvoicing();
   }
 
+  /**
+   * Test that membership end_date is correct for multiple terms for pending contribution
+   *
+   * @throws CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreatePendingWithMultipleTerms() {
+    CRM_Core_Session::singleton()->getStatus(TRUE);
+    $form = $this->getForm();
+    $form->preProcess();
+    $this->mut = new CiviMailUtils($this, TRUE);
+    $this->createLoggedInUser();
+    $membershipTypeAnnualRolling = $this->callAPISuccess('membership_type', 'create', [
+      'domain_id' => 1,
+      'name' => "AnnualRollingNew",
+      'member_of_contact_id' => 23,
+      'duration_unit' => "year",
+      'minimum_fee' => 50,
+      'duration_interval' => 1,
+      'period_type' => "rolling",
+      'relationship_type_id' => 20,
+      'relationship_direction' => 'b_a',
+      'financial_type_id' => 2,
+    ]);
+    $params = [
+      'cid' => $this->_individualId,
+      'join_date' => date('Y-m-d'),
+      'start_date' => '',
+      'end_date' => '',
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'),
+      'membership_type_id' => [23, $membershipTypeAnnualRolling['id']],
+      'max_related' => '',
+      'num_terms' => '3',
+      'record_contribution' => 1,
+      'source' => '',
+      'total_amount' => $this->formatMoneyInput(150.00),
+      'financial_type_id' => '2',
+      'soft_credit_type_id' => '11',
+      'soft_credit_contact_id' => '',
+      'from_email_address' => '"Demonstrators Anonymous" <info@example.org>',
+      'receipt_text' => '',
+    ];
+    $form->_contactID = $this->_individualId;
+    $form->testSubmit($params);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+    $contribution = $this->callAPISuccess('Contribution', 'get', [
+      'contact_id' => $this->_individualId,
+    ]);
+    $endDate = (new DateTime(date('Y-m-d')))->modify("+3 years")->modify("-1 day");
+    $endDate = $endDate->format("Y-m-d");
+
+    $this->assertEquals($endDate, $membership['end_date'], 'Membership end date should be ' . $endDate);
+    $this->assertEquals(1, count($contribution['values']), 'Pending contribution should be created.');
+    $contribution = $contribution['values'][$contribution['id']];
+    $additionalPaymentForm = new CRM_Contribute_Form_AdditionalPayment();
+    $additionalPaymentForm->testSubmit([
+      'total_amount' => 150.00,
+      'trxn_date' => date("Y-m-d H:i:s"),
+      'payment_instrument_id' => array_search('Check', $this->paymentInstruments),
+      'check_number' => 'check-12345',
+      'trxn_id' => '',
+      'currency' => 'USD',
+      'fee_amount' => '',
+      'financial_type_id' => 1,
+      'net_amount' => '',
+      'payment_processor_id' => 0,
+      'contact_id' => $this->_individualId,
+      'contribution_id' => $contribution['id'],
+    ]);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['contact_id' => $this->_individualId]);
+    $contribution = $this->callAPISuccess('Contribution', 'get', [
+      'contact_id' => $this->_individualId,
+      'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+    ]);
+    $this->assertEquals($endDate, $membership['end_date'], 'Membership end date should be same (' . $endDate . ') after payment');
+    $this->assertEquals(1, count($contribution['values']), 'Completed contribution should be fetched.');
+  }
+
 }
