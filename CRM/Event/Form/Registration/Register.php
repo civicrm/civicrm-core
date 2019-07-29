@@ -37,29 +37,32 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
   /**
    * The fields involved in this page.
+   *
    * @var array
    */
   public $_fields;
 
   /**
    * The status message that user view.
-   * @var sting
+   *
+   * @var string
    */
-  protected $_waitlistMsg = NULL;
-  protected $_requireApprovalMsg = NULL;
+  protected $_waitlistMsg;
+  protected $_requireApprovalMsg;
 
   /**
    * Deprecated parameter that we hope to remove.
    *
    * @var bool
    */
-  public $_quickConfig = NULL;
+  public $_quickConfig;
 
   /**
    * Skip duplicate check.
    *
    * This can be set using hook_civicrm_buildForm() to override the registration dupe check.
    * CRM-7604
+   *
    * @var bool
    */
   public $_skipDupeRegistrationCheck = FALSE;
@@ -111,6 +114,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     parent::preProcess();
@@ -153,6 +158,11 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
 
   /**
    * Set default values for the form.
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function setDefaultValues() {
     $this->_defaults = [];
@@ -382,7 +392,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
     if ($this->getContactID() === 0 && !$this->_values['event']['is_multiple_registrations']) {
       //@todo we are blocking for multiple registrations because we haven't tested
-      $this->addCidZeroOptions($onlinePaymentProcessorEnabled);
+      $this->addCIDZeroOptions($onlinePaymentProcessorEnabled);
     }
     if (!empty($this->_values['event']['is_pay_later']) &&
       ($this->_allowConfirmation || (!$this->_requireApproval && !$this->_allowWaitlist))
@@ -508,6 +518,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *   True if you want to add formRule.
    * @param int $discountId
    *   Discount id for the event.
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function buildAmount(&$form, $required = TRUE, $discountId = NULL) {
     // build amount only when needed, skip incase of event full and waitlisting is enabled
@@ -777,9 +789,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *   The uploaded files if any.
    * @param CRM_Event_Form_Registration $form
    *
-   *
    * @return bool|array
    *   true if no errors, else array of errors
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function formRule($fields, $files, $form) {
     $errors = [];
