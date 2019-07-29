@@ -134,7 +134,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
       'log_civicrm_activity_contact' => [
         'fk' => 'contact_id',
         'table_name' => 'log_civicrm_activity_contact',
-        'log_type' => 'Activity',
+        'log_type' => 'Activity Contact',
         'field' => 'activity_id',
         'extra_joins' => [
           'table' => 'log_civicrm_activity',
