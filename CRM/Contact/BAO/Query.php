@@ -204,6 +204,32 @@ class CRM_Contact_BAO_Query {
   public $_fields;
 
   /**
+   * Fields hacked for legacy reasons.
+   *
+   * Generally where a field has a option group defining it's options we add them to
+   * the fields array as pseudofields - eg for gender we would add the key 'gender' to fields
+   * using CRM_Core_DAO::appendPseudoConstantsToFields($fields);
+   *
+   * The rendered results would hold an id in the gender_id field and the label in the pseudo 'Gender'
+   * field. The heading for the pseudofield would come form the the option group name & for the id field
+   * from the xml.
+   *
+   * These fields are handled in a more legacy way - ie overwriting 'gender_id' with the label on output
+   * via the convertToPseudoNames function. Ideally we would convert them but they would then need to be fixed
+   * in some other places & there are also some issues around the name (ie. Gender currently has the label in the
+   * schema 'Gender' so adding a second 'Gender' field to search builder & export would be confusing and the standard is
+   * not fully agreed here.
+   *
+   * @var array
+   */
+  protected $legacyHackedFields = [
+    'gender_id' => 'gender',
+    'prefix_id' => 'individual_prefix',
+    'suffix_id' => 'individual_suffix',
+    'communication_style_id' => 'communication_style',
+  ];
+
+  /**
    * The cache to translate the option values into labels.
    *
    * @var array
@@ -481,6 +507,10 @@ class CRM_Contact_BAO_Query {
     }
     else {
       $this->_fields = CRM_Contact_BAO_Contact::exportableFields('All', FALSE, TRUE, TRUE, FALSE, !$skipPermission);
+      //  The legacy hacked fields will output as a string rather than their underlying type.
+      foreach (array_keys($this->legacyHackedFields) as $fieldName) {
+        $this->_fields[$fieldName]['type'] = CRM_Utils_Type::T_STRING;
+      }
 
       $fields = CRM_Core_Component::getQueryFields(!$this->_skipPermission);
       unset($fields['note']);
@@ -6032,12 +6062,7 @@ AND   displayRelType.is_active = 1
       }
     }
     if (!$usedForAPI) {
-      foreach ([
-        'gender_id' => 'gender',
-        'prefix_id' => 'individual_prefix',
-        'suffix_id' => 'individual_suffix',
-        'communication_style_id' => 'communication_style',
-      ] as $realField => $labelField) {
+      foreach ($this->legacyHackedFields as $realField => $labelField) {
         // This is a temporary routine for handling these fields while
         // we figure out how to handled them based on metadata in
         /// export and search builder. CRM-19815, CRM-19830.

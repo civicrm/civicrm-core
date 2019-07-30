@@ -1403,18 +1403,17 @@ class CRM_Export_BAO_ExportProcessor {
     }
 
     $queryFields = $this->getQueryFields();
-    $lookUp = ['prefix_id', 'suffix_id'];
+    // @todo remove the enotice avoidance here, ensure all columns are declared.
+    // tests will fail on the enotices until they all are & then all the 'else'
+    // below can go.
+    $fieldSpec = $queryFields[$columnName] ?? [];
+
     // set the sql columns
-    if (isset($queryFields[$columnName]['type'])) {
-      switch ($queryFields[$columnName]['type']) {
+    if (isset($fieldSpec['type'])) {
+      switch ($fieldSpec['type']) {
         case CRM_Utils_Type::T_INT:
         case CRM_Utils_Type::T_BOOLEAN:
-          if (in_array($columnName, $lookUp)) {
-            return "$fieldName varchar(255)";
-          }
-          else {
-            return "$fieldName varchar(16)";
-          }
+          return "$fieldName varchar(16)";
 
         case CRM_Utils_Type::T_STRING:
           if (isset($queryFields[$columnName]['maxlength'])) {
