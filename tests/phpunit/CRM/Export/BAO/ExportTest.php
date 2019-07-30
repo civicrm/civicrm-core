@@ -1825,10 +1825,13 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Not fatal error if data incomplete.
    *
    * https://lab.civicrm.org/dev/core/issues/819
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportIncompleteSubmission() {
     $this->setUpContactExportData();
-    $this->doExport([['Individual', '']], $this->contactIDs[1]);
+    $this->doExportTest(['fields' => [['contact_type' => 'Individual', 'name' => '']], 'ids' => [$this->contactIDs[1]]]);
   }
 
   /**
@@ -1839,12 +1842,15 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @param int $exportMode
    * @param array $selectedFields
    * @param array $expected
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportSpecifyFields($exportMode, $selectedFields, $expected) {
     $this->ensureComponentIsEnabled($exportMode);
     $this->setUpContributionExportData();
-    list($tableName, $sqlColumns) = $this->doExport($selectedFields, $this->contactIDs[1], $exportMode);
-    $this->assertEquals($expected, $sqlColumns);
+    $this->doExportTest(['fields' => $selectedFields, 'ids' => [$this->contactIDs[1]], 'exportMode' => $exportMode]);
+    $this->assertEquals($expected, $this->processor->getSQLColumns());
   }
 
   /**
@@ -1933,162 +1939,162 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       0 =>
         [
           0 => 'Participant',
-          1 => '',
+          'name' => '',
         ],
       1 =>
         [
           0 => 'Participant',
-          1 => 'participant_campaign_id',
+          'name' => 'participant_campaign_id',
         ],
       2 =>
         [
           0 => 'Participant',
-          1 => 'participant_contact_id',
+          'name' => 'participant_contact_id',
         ],
       3 =>
         [
           0 => 'Participant',
-          1 => 'componentPaymentField_contribution_status',
+          'name' => 'componentPaymentField_contribution_status',
         ],
       4 =>
         [
           0 => 'Participant',
-          1 => 'currency',
+          'name' => 'currency',
         ],
       5 =>
         [
           0 => 'Participant',
-          1 => 'componentPaymentField_received_date',
+          'name' => 'componentPaymentField_received_date',
         ],
       6 =>
         [
           0 => 'Participant',
-          1 => 'default_role_id',
+          'name' => 'default_role_id',
         ],
       7 =>
         [
           0 => 'Participant',
-          1 => 'participant_discount_name',
+          'name' => 'participant_discount_name',
         ],
       8 =>
         [
           0 => 'Participant',
-          1 => 'event_id',
+          'name' => 'event_id',
         ],
       9 =>
         [
           0 => 'Participant',
-          1 => 'event_end_date',
+          'name' => 'event_end_date',
         ],
       10 =>
         [
           0 => 'Participant',
-          1 => 'event_start_date',
+          'name' => 'event_start_date',
         ],
       11 =>
         [
           0 => 'Participant',
-          1 => 'template_title',
+          'name' => 'template_title',
         ],
       12 =>
         [
           0 => 'Participant',
-          1 => 'event_title',
+          'name' => 'event_title',
         ],
       13 =>
         [
           0 => 'Participant',
-          1 => 'participant_fee_amount',
+          'name' => 'participant_fee_amount',
         ],
       14 =>
         [
           0 => 'Participant',
-          1 => 'participant_fee_currency',
+          'name' => 'participant_fee_currency',
         ],
       15 =>
         [
           0 => 'Participant',
-          1 => 'fee_label',
+          'name' => 'fee_label',
         ],
       16 =>
         [
           0 => 'Participant',
-          1 => 'participant_fee_level',
+          'name' => 'participant_fee_level',
         ],
       17 =>
         [
           0 => 'Participant',
-          1 => 'participant_is_pay_later',
+          'name' => 'participant_is_pay_later',
         ],
       18 =>
         [
           0 => 'Participant',
-          1 => 'participant_id',
+          'name' => 'participant_id',
         ],
       19 =>
         [
           0 => 'Participant',
-          1 => 'participant_note',
+          'name' => 'participant_note',
         ],
       20 =>
         [
           0 => 'Participant',
-          1 => 'participant_role_id',
+          'name' => 'participant_role_id',
         ],
       21 =>
         [
           0 => 'Participant',
-          1 => 'participant_role',
+          'name' => 'participant_role',
         ],
       22 =>
         [
           0 => 'Participant',
-          1 => 'participant_source',
+          'name' => 'participant_source',
         ],
       23 =>
         [
           0 => 'Participant',
-          1 => 'participant_status_id',
+          'name' => 'participant_status_id',
         ],
       24 =>
         [
           0 => 'Participant',
-          1 => 'participant_status',
+          'name' => 'participant_status',
         ],
       25 =>
         [
           0 => 'Participant',
-          1 => 'participant_status',
+          'name' => 'participant_status',
         ],
       26 =>
         [
           0 => 'Participant',
-          1 => 'participant_register_date',
+          'name' => 'participant_register_date',
         ],
       27 =>
         [
           0 => 'Participant',
-          1 => 'participant_registered_by_id',
+          'name' => 'participant_registered_by_id',
         ],
       28 =>
         [
           0 => 'Participant',
-          1 => 'participant_is_test',
+          'name' => 'participant_is_test',
         ],
       29 =>
         [
           0 => 'Participant',
-          1 => 'componentPaymentField_total_amount',
+          'name' => 'componentPaymentField_total_amount',
         ],
       30 =>
         [
           0 => 'Participant',
-          1 => 'componentPaymentField_transaction_id',
+          'name' => 'componentPaymentField_transaction_id',
         ],
       31 =>
         [
           0 => 'Participant',
-          1 => 'transferred_to_contact_id',
+          'name' => 'transferred_to_contact_id',
         ],
     ];
   }
