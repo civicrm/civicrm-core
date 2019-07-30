@@ -104,9 +104,6 @@ class CRM_Contact_Form_Search_Criteria {
       }
     }
 
-    // add text box for last name, first name, street name, city
-    $form->add('text', 'email', ts('Complete OR Partial Email'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));
-
     //added contact source
     $form->add('text', 'contact_source', ts('Contact Source'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'contact_source'));
 
@@ -257,10 +254,14 @@ class CRM_Contact_Form_Search_Criteria {
 
   /**
    * Get the metadata for fields to be included on the contact search form.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getSearchFieldMetadata() {
     $fields = [
       'sort_name' => ['title' => ts('Complete OR Partial Name'), 'template_grouping' => 'basic'],
+      'email' => ['title' => ts('Complete OR Partial Email'), 'entity' => 'Email', 'template_grouping' => 'basic'],
+      'contact_tags' => ['name' => 'contact_tags', 'type' => CRM_Utils_Type::T_INT, 'is_pseudofield' => TRUE, 'template_grouping' => 'basic'],
     ];
     $metadata = civicrm_api3('Contact', 'getfields', [])['values'];
     foreach ($fields as $fieldName => $field) {

@@ -402,7 +402,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
      * id of the tagset.
      */
     if (isset($defaults['contact_tags'])) {
-      foreach ($defaults['contact_tags'] as $key => $tagId) {
+      foreach ((array) $defaults['contact_tags'] as $key => $tagId) {
         if (!is_array($tagId)) {
           $parentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $tagId, 'parent_id');
           $element = "contact_taglist[$parentId]";
