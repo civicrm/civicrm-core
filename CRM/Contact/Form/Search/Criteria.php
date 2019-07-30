@@ -291,6 +291,8 @@ class CRM_Contact_Form_Search_Criteria {
   public static function getBasicSearchFields() {
     $userFramework = CRM_Core_Config::singleton()->userFramework;
     return [
+      // For now an empty array is still left in place for ordering.
+      'sort_name' => [],
       'email' => ['name' => 'email'],
       'contact_type' => ['name' => 'contact_type'],
       'group' => [
