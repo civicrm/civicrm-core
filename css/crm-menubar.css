@@ -203,7 +203,7 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   /* hide the button in desktop view */
   #civicrm-menu-nav .crm-menubar-toggle-btn {
     position: absolute;
-    top: -99999px;
+    top: -99999px; /* do not edit this without updating the isMobile() function in crm.menubar.js */
   }
 
   #civicrm-menu {

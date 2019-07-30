@@ -27,13 +27,13 @@
 
       // Wait for crm-container present on the page as it's faster than document.ready
       function insert(markup) {
-        if ($('#crm-container').length) {
+        if ($('.crm-container').length) {
           render(markup);
         } else {
           new MutationObserver(function(mutations, observer) {
             _.each(mutations, function(mutant) {
               _.each(mutant.addedNodes, function(node) {
-                if ($(node).is('#crm-container')) {
+                if ($(node).is('.crm-container')) {
                   render(markup);
                   observer.disconnect();
                 }
@@ -244,7 +244,7 @@
         }
       })
         .on('resize', function() {
-          if ($(window).width() >= 768 && $mainMenuState[0].checked) {
+          if (!isMobile() && $mainMenuState[0].checked) {
             $mainMenuState[0].click();
           }
           handleResize();
@@ -438,11 +438,16 @@
   }
 
   function handleResize() {
-    if ($(window).width() >= 768 && $('#civicrm-menu').height() > 50) {
+    if (!isMobile() && ($('#civicrm-menu').height() >= (2 * $('#civicrm-menu > li').height()))) {
       $('body').addClass('crm-menubar-wrapped');
     } else {
       $('body').removeClass('crm-menubar-wrapped');
     }
+  }
+
+  // Figure out if we've hit the mobile breakpoint, based on the rule in crm-menubar.css
+  function isMobile() {
+    return $('.crm-menubar-toggle-btn', '#civicrm-menu-nav').css('top') !== '-99999px';
   }
 
   function traverse(items, itemName, op) {
