@@ -160,7 +160,6 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     $count = -1;
 
-    $headerRows = $processor->getHeaderRows();
     $sqlColumns = $processor->getSQLColumns();
     $processor->createTempTable();
     $limitReached = FALSE;
@@ -206,22 +205,14 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $processor->mergeSameAddress();
       }
 
-      // call export hook
-      $table = $processor->getTemporaryTable();
-      CRM_Utils_Hook::export($table, $headerRows, $sqlColumns, $exportMode, $componentTable, $ids);
-      if ($table !== $processor->getTemporaryTable()) {
-        CRM_Core_Error::deprecatedFunctionWarning('altering the export table in the hook is deprecated (in some flows the table itself will be)');
-        $processor->setTemporaryTable($table);
-      }
-
       // In order to be able to write a unit test against this function we need to suppress
       // the csv writing. In future hopefully the csv writing & the main processing will be in separate functions.
       if (empty($exportParams['suppress_csv_for_testing'])) {
-        self::writeCSVFromTable($headerRows, $processor);
+        self::writeCSVFromTable($processor);
       }
       else {
         // return tableName sqlColumns headerRows in test context
-        return [$processor->getTemporaryTable(), $sqlColumns, $headerRows, $processor];
+        return [$processor->getTemporaryTable(), $sqlColumns, $processor->getHeaderRows(), $processor];
       }
 
       // delete the export temp table and component table
@@ -374,10 +365,17 @@ VALUES $sqlValueString
   }
 
   /**
-   * @param $headerRows
    * @param \CRM_Export_BAO_ExportProcessor $processor
    */
-  public static function writeCSVFromTable($headerRows, $processor) {
+  public static function writeCSVFromTable($processor) {
+    // call export hook
+    $headerRows = $processor->getHeaderRows();
+    $exportTempTable = $processor->getTemporaryTable();
+    CRM_Utils_Hook::export($exportTempTable, $headerRows, $sqlColumns, $exportMode, $componentTable, $ids);
+    if ($exportTempTable !== $processor->getTemporaryTable()) {
+      CRM_Core_Error::deprecatedFunctionWarning('altering the export table in the hook is deprecated (in some flows the table itself will be)');
+      $processor->setTemporaryTable($exportTempTable);
+    }
     $exportTempTable = $processor->getTemporaryTable();
     $writeHeader = TRUE;
     $offset = 0;
