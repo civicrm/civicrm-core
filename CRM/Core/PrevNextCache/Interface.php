@@ -130,4 +130,9 @@ interface CRM_Core_PrevNextCache_Interface {
    */
   public function fetch($cacheKey, $offset, $rowCount);
 
+  /**
+   * Remove items from prev/next cache no longer current
+   */
+  public function cleanup();
+
 }

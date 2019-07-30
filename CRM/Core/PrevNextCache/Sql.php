@@ -33,6 +33,12 @@
 class CRM_Core_PrevNextCache_Sql implements CRM_Core_PrevNextCache_Interface {
 
   /**
+   * @var int
+   * Days for cache to llast forr
+   */
+  const cacheDays = 2;
+
+  /**
    * Store the results of a SQL query in the cache.
    * @param string $cacheKey
    * @param string $sql
@@ -270,6 +276,26 @@ ORDER BY id
       $cids[] = $dao->cid;
     }
     return $cids;
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function cleanup() {
+    // clean up all prev next caches older than $cacheTimeIntervalDays days
+    // first find all the cacheKeys that match this
+    $sql = "
+      DELETE     pn, c
+      FROM       civicrm_cache c
+      INNER JOIN civicrm_prevnext_cache pn ON c.path = pn.cachekey
+      WHERE      c.group_name = %1
+      AND        c.created_date < date_sub( NOW( ), INTERVAL %2 day )
+    ";
+    $params = [
+      1 => [CRM_Core_BAO_Cache::cleanKey('CiviCRM Search PrevNextCache'), 'String'],
+      2 => [self::cacheDays, 'Integer'],
+    ];
+    CRM_Core_DAO::executeQuery($sql, $params);
   }
 
 }
