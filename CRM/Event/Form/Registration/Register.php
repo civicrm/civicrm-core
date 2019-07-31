@@ -93,6 +93,38 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   public $_paymentFields = [];
 
   /**
+   * Is this submission incurring no costs.
+   *
+   * @param array $fields
+   * @param \CRM_Event_Form_Registration_Register $form
+   *
+   * @return bool
+   */
+  protected static function isZeroAmount($fields, $form): bool {
+    $isZeroAmount = FALSE;
+    if (!empty($fields['priceSetId'])) {
+      if (CRM_Utils_Array::value('amount', $fields) == 0) {
+        $isZeroAmount = TRUE;
+      }
+    }
+    elseif (!empty($fields['amount']) &&
+      (isset($form->_values['discount'][$fields['amount']])
+        && CRM_Utils_Array::value('value', $form->_values['discount'][$fields['amount']]) == 0
+      )
+    ) {
+      $isZeroAmount = TRUE;
+    }
+    elseif (!empty($fields['amount']) &&
+      (isset($form->_values['fee'][$fields['amount']])
+        && CRM_Utils_Array::value('value', $form->_values['fee'][$fields['amount']]) == 0
+      )
+    ) {
+      $isZeroAmount = TRUE;
+    }
+    return $isZeroAmount;
+  }
+
+  /**
    * Get the contact id for the registration.
    *
    * @param array $fields
@@ -787,7 +819,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
    *   The input form values.
    * @param array $files
    *   The uploaded files if any.
-   * @param CRM_Event_Form_Registration $form
+   * @param \CRM_Event_Form_Registration_Register $form
    *
    * @return bool|array
    *   true if no errors, else array of errors
@@ -880,34 +912,12 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         $errors['payment_processor_id'] = ts('Please select a Payment Method');
       }
 
-      $isZeroAmount = $skipPaymentValidation = FALSE;
-      if (!empty($fields['priceSetId'])) {
-        if (CRM_Utils_Array::value('amount', $fields) == 0) {
-          $isZeroAmount = TRUE;
-        }
-      }
-      elseif (!empty($fields['amount']) &&
-        (isset($form->_values['discount'][$fields['amount']])
-          && CRM_Utils_Array::value('value', $form->_values['discount'][$fields['amount']]) == 0
-        )
-      ) {
-        $isZeroAmount = TRUE;
-      }
-      elseif (!empty($fields['amount']) &&
-        (isset($form->_values['fee'][$fields['amount']])
-          && CRM_Utils_Array::value('value', $form->_values['fee'][$fields['amount']]) == 0
-        )
-      ) {
-        $isZeroAmount = TRUE;
-      }
-
-      if ($isZeroAmount) {
-        $skipPaymentValidation = TRUE;
+      if (self::isZeroAmount($fields, $form)) {
+        return empty($errors) ? TRUE : $errors;
       }
 
       // also return if zero fees for valid members
       if (!empty($fields['bypass_payment']) ||
-        $skipPaymentValidation ||
         (!$form->_allowConfirmation && ($form->_requireApproval || $form->_allowWaitlist))
       ) {
         return empty($errors) ? TRUE : $errors;
