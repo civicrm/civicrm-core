@@ -2323,4 +2323,57 @@ WHERE  id IN ( $deleteIDString )
     }
   }
 
+  /**
+   * Write to the csv from the temp table.
+   */
+  public function writeCSVFromTable() {
+    // call export hook
+    $headerRows = $this->getHeaderRows();
+    $exportTempTable = $this->getTemporaryTable();
+    CRM_Utils_Hook::export($exportTempTable, $headerRows, $sqlColumns, $exportMode, $componentTable, $ids);
+    if ($exportTempTable !== $this->getTemporaryTable()) {
+      CRM_Core_Error::deprecatedFunctionWarning('altering the export table in the hook is deprecated (in some flows the table itself will be)');
+      $this->setTemporaryTable($exportTempTable);
+    }
+    $exportTempTable = $this->getTemporaryTable();
+    $writeHeader = TRUE;
+    $offset = 0;
+    // increase this number a lot to avoid making too many queries
+    // LIMIT is not much faster than a no LIMIT query
+    // CRM-7675
+    $limit = 100000;
+
+    $query = "SELECT * FROM $exportTempTable";
+
+    while (1) {
+      $limitQuery = $query . "
+LIMIT $offset, $limit
+";
+      $dao = CRM_Core_DAO::executeQuery($limitQuery);
+
+      if ($dao->N <= 0) {
+        break;
+      }
+
+      $componentDetails = [];
+      while ($dao->fetch()) {
+        $row = [];
+
+        foreach (array_keys($this->getSQLColumns()) as $column) {
+          $row[$column] = $dao->$column;
+        }
+        $componentDetails[] = $row;
+      }
+      CRM_Core_Report_Excel::writeCSVFile($this->getExportFileName(),
+        $headerRows,
+        $componentDetails,
+        NULL,
+        $writeHeader
+      );
+
+      $writeHeader = FALSE;
+      $offset += $limit;
+    }
+  }
+
 }

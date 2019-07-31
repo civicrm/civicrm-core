@@ -208,7 +208,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
       // In order to be able to write a unit test against this function we need to suppress
       // the csv writing. In future hopefully the csv writing & the main processing will be in separate functions.
       if (empty($exportParams['suppress_csv_for_testing'])) {
-        self::writeCSVFromTable($processor);
+        $processor->writeCSVFromTable();
       }
       else {
         // return tableName sqlColumns headerRows in test context
@@ -362,56 +362,6 @@ INSERT INTO $tableName $sqlColumnString
 VALUES $sqlValueString
 ";
     CRM_Core_DAO::executeQuery($sql);
-  }
-
-  /**
-   * @param \CRM_Export_BAO_ExportProcessor $processor
-   */
-  public static function writeCSVFromTable($processor) {
-    // call export hook
-    $headerRows = $processor->getHeaderRows();
-    $exportTempTable = $processor->getTemporaryTable();
-    CRM_Utils_Hook::export($exportTempTable, $headerRows, $sqlColumns, $exportMode, $componentTable, $ids);
-    if ($exportTempTable !== $processor->getTemporaryTable()) {
-      CRM_Core_Error::deprecatedFunctionWarning('altering the export table in the hook is deprecated (in some flows the table itself will be)');
-      $processor->setTemporaryTable($exportTempTable);
-    }
-    $exportTempTable = $processor->getTemporaryTable();
-    $writeHeader = TRUE;
-    $offset = 0;
-    $limit = self::EXPORT_ROW_COUNT;
-
-    $query = "SELECT * FROM $exportTempTable";
-
-    while (1) {
-      $limitQuery = $query . "
-LIMIT $offset, $limit
-";
-      $dao = CRM_Core_DAO::executeQuery($limitQuery);
-
-      if ($dao->N <= 0) {
-        break;
-      }
-
-      $componentDetails = [];
-      while ($dao->fetch()) {
-        $row = [];
-
-        foreach (array_keys($processor->getSQLColumns()) as $column) {
-          $row[$column] = $dao->$column;
-        }
-        $componentDetails[] = $row;
-      }
-      CRM_Core_Report_Excel::writeCSVFile($processor->getExportFileName(),
-        $headerRows,
-        $componentDetails,
-        NULL,
-        $writeHeader
-      );
-
-      $writeHeader = FALSE;
-      $offset += $limit;
-    }
   }
 
   /**
