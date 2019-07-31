@@ -920,7 +920,7 @@ class CRM_Utils_Check_Component_Env extends CRM_Utils_Check_Component {
       );
     }
     // Ensure that the MySQL driver supports utf8mb4 encoding.
-    $version = mysqli_get_client_info(CRM_Core_DAO::getConnection()->connection);
+    $version = mysqli_get_client_info();
     if (strpos($version, 'mysqlnd') !== FALSE) {
       // The mysqlnd driver supports utf8mb4 starting at version 5.0.9.
       $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);
