@@ -133,7 +133,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    */
   public function setDefaultValues() {
     $defaults = (array) $this->_formValues;
-    foreach (['Contact', $this->getDefaultEntity()] as $entity) {
+    foreach (array_keys($this->getSearchFieldMetadata()) as $entity) {
       $defaults = array_merge($this->getEntityDefaults($entity), $defaults);
     }
     return $defaults;
@@ -141,10 +141,15 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
 
   /**
    * Set the form values based on input and preliminary processing.
+   *
+   * @throws \Exception
    */
   protected function setFormValues() {
     if (!empty($_POST) && !$this->_force) {
       $this->_formValues = $this->controller->exportValues($this->_name);
+    }
+    elseif ($this->_force) {
+      $this->_formValues = $this->setDefaultValues();
     }
     $this->convertTextStringsToUseLikeOperator();
   }

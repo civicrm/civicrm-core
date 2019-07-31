@@ -731,7 +731,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $controller->setDynamicAction($setDynamic);
 
     if ($this->_force) {
-
+      $this->loadMetadata();
       $this->postProcess();
 
       /*
@@ -907,6 +907,18 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    */
   public function getTitle() {
     return ts('Search');
+  }
+
+  /**
+   * Load metadata for fields on the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function loadMetadata() {
+    // @todo - check what happens if the person does not have 'access civicontribute' - make sure they
+    // can't by pass acls by passing search criteria in the url.
+    $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
+    $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
   }
 
 }
