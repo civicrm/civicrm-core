@@ -85,6 +85,8 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
   /**
    * Tears down the fixture, for example, closes a network connection.
    * This method is called after a test is executed.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown() {
     $tablesToTruncate = [
@@ -92,12 +94,12 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
       'civicrm_membership_log',
       'civicrm_contribution',
       'civicrm_membership_payment',
+      'civicrm_contact',
     ];
-    $this->quickCleanup($tablesToTruncate);
+    $this->quickCleanup($tablesToTruncate, TRUE);
     $this->relationshipTypeDelete($this->_relationshipTypeId);
     $this->membershipTypeDelete(['id' => $this->_membershipTypeID]);
     $this->membershipStatusDelete($this->_mebershipStatusID);
-    $this->contactDelete($this->_orgContactID);
   }
 
   /**
@@ -171,19 +173,20 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $this->assertContains('Required parameter missing: Status', $importValues);
   }
 
+  /**
+   * Test that the passed in status is respected.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testImportOverriddenMembershipWithStatus() {
     $this->individualCreate(['email' => 'anthony_anderson3@civicrm.org']);
-
-    $fieldMapper = [
-      'mapper[0][0]' => 'email',
-      'mapper[1][0]' => 'membership_type_id',
-      'mapper[2][0]' => 'membership_start_date',
-      'mapper[3][0]' => 'is_override',
-      'mapper[4][0]' => 'status_id',
-    ];
-    $membershipImporter = new CRM_Member_Import_Parser_Membership($fieldMapper);
-    $membershipImporter->init();
-    $membershipImporter->_contactType = 'Individual';
+    $membershipImporter = $this->createImportObject([
+      'email',
+      'membership_type_id',
+      'membership_start_date',
+      'is_override',
+      'status_id',
+    ]);
 
     $importValues = [
       'anthony_anderson3@civicrm.org',
@@ -252,6 +255,66 @@ class CRM_Member_Import_Parser_MembershipTest extends CiviUnitTestCase {
     $importResponse = $membershipImporter->import(CRM_Import_Parser::DUPLICATE_UPDATE, $importValues);
     $this->assertEquals(CRM_Import_Parser::ERROR, $importResponse);
     $this->assertContains('Required parameter missing: Status', $importValues);
+  }
+
+  /**
+   * Test that memberships can still be imported if the status is renamed.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testImportMembershipWithRenamedStatus() {
+    $this->individualCreate(['email' => 'anthony_anderson3@civicrm.org']);
+
+    $this->callAPISuccess('MembershipStatus', 'get', [
+      'name' => 'New',
+      'api.MembershipStatus.create' => [
+        'label' => 'New-renamed',
+      ],
+    ]);
+    $membershipImporter = $this->createImportObject([
+      'email',
+      'membership_type_id',
+      'membership_start_date',
+      'is_override',
+      'status_id',
+    ]);
+
+    $importValues = [
+      'anthony_anderson3@civicrm.org',
+      $this->_membershipTypeID,
+      date('Y-m-d'),
+      TRUE,
+      'New-renamed',
+    ];
+
+    $importResponse = $membershipImporter->import(CRM_Import_Parser::DUPLICATE_UPDATE, $importValues);
+    $this->assertEquals(CRM_Import_Parser::VALID, $importResponse);
+    $createdStatusID = $this->callAPISuccessGetValue('Membership', ['return' => 'status_id']);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'New'), $createdStatusID);
+    $this->callAPISuccess('MembershipStatus', 'get', [
+      'name' => 'New',
+      'api.MembershipStatus.create' => [
+        'label' => 'New',
+      ],
+    ]);
+  }
+
+  /**
+   * Create an import object.
+   *
+   * @param array $fields
+   *
+   * @return \CRM_Member_Import_Parser_Membership
+   */
+  protected function createImportObject(array $fields): \CRM_Member_Import_Parser_Membership {
+    $fieldMapper = [];
+    foreach ($fields as $index => $field) {
+      $fieldMapper['mapper[' . $index . '][0]'] = $field;
+    }
+    $membershipImporter = new CRM_Member_Import_Parser_Membership($fieldMapper);
+    $membershipImporter->init();
+    $membershipImporter->_contactType = 'Individual';
+    return $membershipImporter;
   }
 
 }

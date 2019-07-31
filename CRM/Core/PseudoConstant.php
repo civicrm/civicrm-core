@@ -300,8 +300,8 @@ class CRM_Core_PseudoConstant {
         $cacheKey = $daoName . $fieldName . serialize($params);
 
         // Retrieve cached options
-        if (isset(self::$cache[$cacheKey]) && empty($params['fresh'])) {
-          $output = self::$cache[$cacheKey];
+        if (isset(\Civi::$statics[__CLASS__][$cacheKey]) && empty($params['fresh'])) {
+          $output = \Civi::$statics[__CLASS__][$cacheKey];
         }
         else {
           $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($pseudoconstant['table']);
@@ -386,7 +386,7 @@ class CRM_Core_PseudoConstant {
             }
           }
           CRM_Utils_Hook::fieldOptions($entity, $fieldName, $output, $params);
-          self::$cache[$cacheKey] = $output;
+          \Civi::$statics[__CLASS__][$cacheKey] = $output;
         }
         return $flip ? array_flip($output) : $output;
       }

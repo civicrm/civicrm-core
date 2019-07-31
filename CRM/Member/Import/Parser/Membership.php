@@ -49,6 +49,13 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
   private $_membershipStatusIndex;
 
   /**
+   * Array of metadata for all available fields.
+   *
+   * @var array
+   */
+  protected $fieldMetadata = [];
+
+  /**
    * Array of successfully imported membership id's
    *
    * @var array
@@ -59,12 +66,10 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * Class constructor.
    *
    * @param $mapperKeys
-   * @param null $mapperLocType
-   * @param null $mapperPhoneType
    */
-  public function __construct(&$mapperKeys, $mapperLocType = NULL, $mapperPhoneType = NULL) {
+  public function __construct($mapperKeys) {
     parent::__construct();
-    $this->_mapperKeys = &$mapperKeys;
+    $this->_mapperKeys = $mapperKeys;
   }
 
   /**
@@ -73,9 +78,10 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
    * @return void
    */
   public function init() {
-    $fields = CRM_Member_BAO_Membership::importableFields($this->_contactType, FALSE);
+    $this->fieldMetadata = CRM_Member_BAO_Membership::importableFields($this->_contactType, FALSE);
 
-    foreach ($fields as $name => $field) {
+    foreach ($this->fieldMetadata as $name => $field) {
+      // @todo - we don't really need to do all this.... fieldMetadata is just fine to use as is.
       $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
       $field['dataPattern'] = CRM_Utils_Array::value('dataPattern', $field, '//');
       $field['headerPattern'] = CRM_Utils_Array::value('headerPattern', $field, '//');
@@ -223,6 +229,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             break;
 
           case 'membership_type_id':
+            // @todo - squish into membership status - can use same lines here too.
             $membershipTypes = CRM_Member_PseudoConstant::membershipType();
             if (!CRM_Utils_Array::crmInArray($val, $membershipTypes) &&
               !array_key_exists($val, $membershipTypes)
@@ -232,7 +239,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             break;
 
           case 'status_id':
-            if (!CRM_Utils_Array::crmInArray($val, CRM_Member_PseudoConstant::membershipStatus())) {
+            if (!empty($val) && !$this->parsePseudoConstantField($val, $this->fieldMetadata[$key])) {
               CRM_Contact_Import_Parser_Contact::addToErrorMsg('Membership Status', $errorMessage);
             }
             break;
@@ -324,10 +331,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
               break;
 
             case 'status_id':
-              if (!is_numeric($val)) {
-                unset($params['status_id']);
-                $params['membership_status'] = $val;
-              }
+              // @todo - we can do this based on the presence of 'pseudoconstant' in the metadata rather than field specific.
+              $params[$key] = $this->parsePseudoConstantField($val, $this->fieldMetadata[$key]);
               break;
 
             case 'is_override':
@@ -346,12 +351,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         }
       }
       //date-Format part ends
-
-      static $indieFields = NULL;
-      if ($indieFields == NULL) {
-        $tempIndieFields = CRM_Member_DAO_Membership::import();
-        $indieFields = $tempIndieFields;
-      }
 
       $formatValues = [];
       foreach ($params as $key => $field) {
@@ -719,30 +718,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             throw new Exception('Invalid Membership Type');
           }
           $values['membership_type_id'] = $membershipTypeId;
-          break;
-
-        case 'status_id':
-          if (!CRM_Utils_Array::value($value, CRM_Member_PseudoConstant::membershipStatus())) {
-            throw new Exception('Invalid Membership Status Id');
-          }
-          $values[$key] = $value;
-          break;
-
-        case 'membership_status':
-          $membershipStatusId = CRM_Utils_Array::key(ucfirst($value),
-            CRM_Member_PseudoConstant::membershipStatus()
-          );
-          if ($membershipStatusId) {
-            if (!empty($values['status_id']) &&
-              $membershipStatusId != $values['status_id']
-            ) {
-              throw new Exception('Mismatched membership Status and Membership Status Id');
-            }
-          }
-          else {
-            throw new Exception('Invalid Membership Status');
-          }
-          $values['status_id'] = $membershipStatusId;
           break;
 
         default:

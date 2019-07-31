@@ -520,4 +520,29 @@ abstract class CRM_Import_Parser {
     return $error;
   }
 
+  /**
+   * Parse a field which could be represented by a label or name value rather than the DB value.
+   *
+   * We will try to match name first but if not available then see if we have a label that can be converted to a name.
+   *
+   * @param string|int|null $submittedValue
+   * @param array $fieldSpec
+   *   Metadata for the field
+   *
+   * @return mixed
+   */
+  protected function parsePseudoConstantField($submittedValue, $fieldSpec) {
+    /* @var \CRM_Core_DAO $bao */
+    $bao = $fieldSpec['bao'];
+    // For historical reasons use validate as context - ie disabled name matches ARE permitted.
+    $nameOptions = $bao::buildOptions($fieldSpec['name'], 'validate');
+    if (!isset($nameOptions[$submittedValue])) {
+      $labelOptions = array_flip($bao::buildOptions($fieldSpec['name'], 'match'));
+      if (isset($labelOptions[$submittedValue])) {
+        return array_search($labelOptions[$submittedValue], $nameOptions, TRUE);
+      }
+    }
+    return '';
+  }
+
 }
