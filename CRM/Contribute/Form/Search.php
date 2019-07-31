@@ -414,8 +414,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     if (!$this->_force) {
       return;
     }
-    // Start by loading url defaults.
-    $this->_formValues = $this->setDefaultValues();
 
     $status = CRM_Utils_Request::retrieve('status', 'String');
     if ($status) {
