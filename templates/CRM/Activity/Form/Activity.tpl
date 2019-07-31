@@ -189,9 +189,10 @@
   <tr class="crm-activity-form-block-custom_data">
     <td colspan="2">
       {if $action eq 4}
-      {include file="CRM/Custom/Page/CustomDataView.tpl"}
-        {else}
+        {include file="CRM/Custom/Page/CustomDataView.tpl"}
+      {else}
         <div id="customData"></div>
+        {include file="CRM/common/customDataBlock.tpl"}
       {/if}
     </td>
   </tr>
@@ -293,8 +294,6 @@
       });
     </script>
     {/literal}
-
-    {include file="CRM/common/customDataBlock.tpl"}
   {/if}
   </div>{* end of form block*}
 
