@@ -100,7 +100,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     }
     $this->assertEquals(55, $sum);
 
-    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participants['id'], 'participant', $contribution['id'], $this->eventFeeBlock, $lineItem, 100);
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $participants['id'], 'participant', $contribution['id'], $this->eventFeeBlock, $lineItem);
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($participants['id'], 'participant');
     // Participants is updated to 0 but line remains.
     $this->assertEquals(0, $lineItem[1]['subTotal']);
@@ -170,56 +170,21 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * Initial test of submit function.
    *
    * @param string $thousandSeparator
-   * @param array $fromEmails From Emails array to overwrite the default.
    *
    * @dataProvider getThousandSeparators
    *
    * @throws \Exception
    */
-  public function testSubmitWithPayment($thousandSeparator, $fromEmails = []) {
+  public function testSubmitWithPayment($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
     $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
     $form->_mode = 'Live';
     $form->_quickConfig = TRUE;
+    $form->_fromEmails = [
+      'from_email_id' => ['abc@gmail.com' => 1],
+    ];
     $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
-    if (empty($fromEmails)) {
-      $fromEmails = [
-        'from_email_id' => ['abc@gmail.com' => 1],
-      ];
-    }
-    $form->_fromEmails = $fromEmails;
-    $form->submit([
-      'register_date' => date('Ymd'),
-      'status_id' => 1,
-      'role_id' => 1,
-      'event_id' => $form->_eventId,
-      'credit_card_number' => 4444333322221111,
-      'cvv2' => 123,
-      'credit_card_exp_date' => [
-        'M' => 9,
-        'Y' => 2025,
-      ],
-      'credit_card_type' => 'Visa',
-      'billing_first_name' => 'Junko',
-      'billing_middle_name' => '',
-      'billing_last_name' => 'Adams',
-      'billing_street_address-5' => '790L Lincoln St S',
-      'billing_city-5' => 'Maryknoll',
-      'billing_state_province_id-5' => 1031,
-      'billing_postal_code-5' => 10545,
-      'billing_country_id-5' => 1228,
-      'payment_processor_id' => $paymentProcessorID,
-      'priceSetId' => '6',
-      'price_7' => [
-        13 => 1,
-      ],
-      'amount_level' => 'Too much',
-      'fee_amount' => $this->formatMoneyInput(1550.55),
-      'total_amount' => $this->formatMoneyInput(1550.55),
-      'from_email_address' => array_keys($form->_fromEmails['from_email_id'])[0],
-      'send_receipt' => 1,
-      'receipt_text' => '',
-    ]);
+    $form->submit($this->getSubmitParams($form->_eventId, $paymentProcessorID));
     $participants = $this->callAPISuccess('Participant', 'get', []);
     $this->assertEquals(1, $participants['count']);
     $contribution = $this->callAPISuccessGetSingle('Contribution', []);
@@ -228,11 +193,42 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
   }
 
   /**
+   * Initial test of submit function.
+   *
+   * @param string $thousandSeparator
+   * @param array $fromEmails From Emails array to overwrite the default.
+   *
+   * @dataProvider getThousandSeparators
+   *
+   * @throws \Exception
+   */
+  public function testSubmitWithFailedPayment($thousandSeparator, $fromEmails = []) {
+    $this->setCurrencySeparators($thousandSeparator);
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
+    $form->_mode = 'Live';
+    $form->_quickConfig = TRUE;
+    $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
+    Civi\Payment\System::singleton()->getById($paymentProcessorID)->setDoDirectPaymentResult(['payment_status_id' => 'failed']);
+
+    $form->_fromEmails = [
+      'from_email_id' => ['abc@gmail.com' => 1],
+    ];
+    try {
+      $form->submit($this->getSubmitParams($form->_eventId, $paymentProcessorID));
+    }
+    catch (CRM_Core_Exception_PrematureExitException $e) {
+      return;
+    }
+    $this->fail('should have hit premature exit');
+  }
+
+  /**
    * Test offline participant mail.
    *
    * @param string $thousandSeparator
    *
    * @dataProvider getThousandSeparators
+   * @throws \Exception
    */
   public function testParticipantOfflineReceipt($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
@@ -269,10 +265,20 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
     ]);
 
     // Use the email created as the from email ensuring we are passing a numeric from to test dev/core#1069
-    $this->testSubmitWithPayment($thousandSeparator, ['from_email_id' => [$email['id'] => 1]]);
+    $this->setCurrencySeparators($thousandSeparator);
+    $form = $this->getForm(['is_monetary' => 1, 'financial_type_id' => 1]);
+    $form->_mode = 'Live';
+    $form->_quickConfig = TRUE;
+    $form->_fromEmails = [
+      'from_email_id' => [$email['id'] => 1],
+    ];
+    $paymentProcessorID = $this->processorCreate(['is_test' => 0]);
+    $submitParams = $this->getSubmitParams($form->_eventId, $paymentProcessorID);
+    $submitParams['from_email_address'] = $email['id'];
+    $form->submit($submitParams);
     //Check if type is correctly populated in mails.
     //Also check the string email is present not numeric from.
-    $mail = $mut->checkMailLog([
+    $mut->checkMailLog([
       '<p>Test event type - 1</p>',
       'testloggedinreceiptemail@civicrm.org',
       $this->formatMoneyInput(1550.55),
@@ -286,6 +292,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
    * @param array $eventParams
    *
    * @return CRM_Event_Form_Participant
+   *
    * @throws \CRM_Core_Exception
    */
   protected function getForm($eventParams = []) {
@@ -407,6 +414,50 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'contribution_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
       'payment_instrument_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', 'Check'),
     ]);
+  }
+
+  /**
+   * Get params for submit function.
+   *
+   * @param int $eventID
+   * @param int $paymentProcessorID
+   *
+   * @return array
+   */
+  private function getSubmitParams(int $eventID, int $paymentProcessorID): array {
+    $submitParams = [
+      'register_date' => date('Ymd'),
+      'status_id' => 1,
+      'role_id' => 1,
+      'event_id' => $eventID,
+      'credit_card_number' => 4444333322221111,
+      'cvv2' => 123,
+      'credit_card_exp_date' => [
+        'M' => 9,
+        'Y' => 2025,
+      ],
+      'credit_card_type' => 'Visa',
+      'billing_first_name' => 'Junko',
+      'billing_middle_name' => '',
+      'billing_last_name' => 'Adams',
+      'billing_street_address-5' => '790L Lincoln St S',
+      'billing_city-5' => 'Maryknoll',
+      'billing_state_province_id-5' => 1031,
+      'billing_postal_code-5' => 10545,
+      'billing_country_id-5' => 1228,
+      'payment_processor_id' => $paymentProcessorID,
+      'priceSetId' => '6',
+      'price_7' => [
+        13 => 1,
+      ],
+      'amount_level' => 'Too much',
+      'fee_amount' => $this->formatMoneyInput(1550.55),
+      'total_amount' => $this->formatMoneyInput(1550.55),
+      'from_email_address' => 'abc@gmail.com',
+      'send_receipt' => 1,
+      'receipt_text' => '',
+    ];
+    return $submitParams;
   }
 
 }
