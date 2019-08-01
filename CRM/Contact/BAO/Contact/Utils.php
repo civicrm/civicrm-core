@@ -228,8 +228,9 @@ WHERE  id IN ( $idString )
     $inputLF = CRM_Utils_Array::value(2, $input);
 
     $check = self::generateChecksum($contactID, $inputTS, $inputLF);
-
-    if (!hash_equals($check, $inputCheck)) {
+    // Joomla_11 - If $inputcheck is null without explicitly casting to a string
+    // you get an error.
+    if (!hash_equals($check, (string) $inputCheck)) {
       return FALSE;
     }
 
@@ -374,7 +375,6 @@ UNION
         $ids['relationship'] = $relationship->id;
         CRM_Contact_BAO_Relationship::setIsActive($relationship->id, TRUE);
       }
-      $relationship->free();
     }
 
     //need to handle related meberships. CRM-3792
@@ -457,7 +457,6 @@ WHERE id={$contactId}; ";
             CRM_Core_Action::DELETE
           );
         }
-        $relationship->free();
       }
     }
   }
@@ -799,7 +798,6 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
           $contactDetails[$contact->componentId][$property] = $contact->$property;
         }
       }
-      $contact->free();
     }
 
     return $contactDetails;
@@ -926,7 +924,7 @@ INNER JOIN civicrm_contact contact_target ON ( contact_target.id = act.contact_i
       CRM_Core_BAO_PrevNextCache::deleteItem();
     }
     // clear acl cache if any.
-    // CRM_ACL_BAO_Cache::resetCache();
+    CRM_ACL_BAO_Cache::resetCache();
     CRM_Contact_BAO_GroupContactCache::opportunisticCacheFlush();
   }
 
@@ -1089,7 +1087,7 @@ WHERE id IN (" . implode(',', $contactIds) . ")";
    * @param string $greetingType
    *   Greeting type.
    *
-   * @return int|NULL
+   * @return int|null
    */
   public static function defaultGreeting($contactType, $greetingType) {
     $contactTypeFilters = [

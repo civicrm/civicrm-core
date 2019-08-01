@@ -49,14 +49,14 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * The id of the report instance
    *
-   * @var integer
+   * @var int
    */
   protected $_id;
 
   /**
    * The id of the report template
    *
-   * @var integer;
+   * @var int
    */
   protected $_templateID;
 
@@ -280,14 +280,15 @@ class CRM_Report_Form extends CRM_Core_Form {
    * when $_output mode is not 'html' or 'group' so as not to have to interpret / mess with that part
    * of the code (see limit() fn.
    *
-   * @var integer
+   * @var int
    */
   protected $_limitValue = NULL;
 
   /**
    * This can be set to specify row offset
    * See notes on _limitValue
-   * @var integer
+   *
+   * @var int
    */
   protected $_offsetValue = NULL;
   /**
@@ -300,14 +301,14 @@ class CRM_Report_Form extends CRM_Core_Form {
   /**
    * Flag to indicate if result-set is to be stored in a class variable which could be retrieved using getResultSet() method.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_storeResultSet = FALSE;
 
   /**
    * When _storeResultSet Flag is set use this var to store result set in form of array
    *
-   * @var boolean
+   * @var bool
    */
   protected $_resultSet = [];
 
@@ -325,7 +326,7 @@ class CRM_Report_Form extends CRM_Core_Form {
 
   /**
    * Variables to hold the acl inner join and where clause
-   * @var string|NULL
+   * @var string|null
    */
   protected $_aclFrom = NULL;
   protected $_aclWhere = NULL;
@@ -358,7 +359,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    *
    * (it's unclear if this could be merged with outputMode at this stage)
    *
-   * @var string|NULL
+   * @var string|null
    */
   protected $_format;
 
@@ -380,21 +381,24 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $_havingClauses = [];
 
   /**
-   * DashBoardRowCount Dashboard row count
-   * @var Integer
+   * DashBoardRowCount Dashboard row count.
+   *
+   * @var int
    */
   public $_dashBoardRowCount;
 
   /**
    * Is this being called without a form controller (ie. the report is being render outside the normal form
-   * - e.g the api is retrieving the rows
-   * @var boolean
+   * - e.g the api is retrieving the rows.
+   *
+   * @var bool
    */
   public $noController = FALSE;
 
   /**
-   * Variable to hold the currency alias
-   * @var string|NULL
+   * Variable to hold the currency alias.
+   *
+   * @var string|null
    */
   protected $_currencyColumn = NULL;
 
@@ -419,33 +423,43 @@ class CRM_Report_Form extends CRM_Core_Form {
   public $_section;
 
   /**
-   * @var string Report description.
+   * Report description.
+   *
+   * @var string
    */
   public $_description;
 
   /**
-   * @var bool Is an address field selected.
+   * Is an address field selected.
+   *
+   * @var bool
    *   This was intended to determine if the address table should be joined in
    *   The isTableSelected function is now preferred for this purpose
    */
   protected $_addressField;
 
   /**
-   * @var bool Is an email field selected.
+   * Is an email field selected.
+   *
+   * @var bool
    *   This was intended to determine if the email table should be joined in
    *   The isTableSelected function is now preferred for this purpose
    */
   protected $_emailField;
 
   /**
-   * @var bool Is a phone field selected.
+   * Is a phone field selected.
+   *
+   * @var bool
    *   This was intended to determine if the phone table should be joined in
    *   The isTableSelected function is now preferred for this purpose
    */
   protected $_phoneField;
 
   /**
-   * @var bool Create new report instance? (or update existing) on save.
+   * Create new report instance? (or update existing) on save.
+   *
+   * @var bool
    */
   protected $_createNew;
 
@@ -453,12 +467,15 @@ class CRM_Report_Form extends CRM_Core_Form {
    *  When a grand total row has calculated the status we pop it off to here.
    *
    * This allows us to access it from the stats function and avoid recalculating.
+   *
    * @var array
    */
   protected $rollupRow = [];
 
   /**
-   * @var string Database attributes - character set and collation
+   * Database attributes - character set and collation.
+   *
+   * @var string
    */
   protected $_databaseAttributes = ' DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci';
 
@@ -1164,7 +1181,7 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @return string
    */
   public function createTemporaryTable($identifier, $sql, $isColumns = FALSE, $isMemory = FALSE) {
-    $tempTable = CRM_Utils_SQL_TempTable::build()->setUtf8();
+    $tempTable = CRM_Utils_SQL_TempTable::build();
     if ($isMemory) {
       $tempTable->setMemory();
     }
@@ -1301,7 +1318,10 @@ class CRM_Report_Form extends CRM_Core_Form {
             if (!empty($field['options']) ||
               $fieldName == 'state_province_id' || $fieldName == 'county_id'
             ) {
-              $element = $this->addElement('select', "{$fieldName}_op", ts('Operator:'), $operations);
+              $element = $this->addElement('select', "{$fieldName}_op", ts('Operator:'), $operations,
+                array('onchange' => "return showHideMaxMinVal( '$fieldName', this.value );")
+              );
+
               if (count($operations) <= 1) {
                 $element->freeze();
               }
@@ -1776,6 +1796,8 @@ class CRM_Report_Form extends CRM_Core_Form {
         $result = [
           'in' => ts('Is one of'),
           'notin' => ts('Is not one of'),
+          'nll' => ts('Is empty (Null)'),
+          'nnll' => ts('Is not empty (Null)'),
         ];
         return $result;
 
@@ -2107,12 +2129,30 @@ class CRM_Report_Form extends CRM_Core_Form {
    * @return string
    */
   public function whereSubtypeClause($field, $value, $op) {
+    // Get the correct SQL operator.
+    switch ($op) {
+      case 'notin':
+        $op = 'nhas';
+        $clauseSeparator = 'AND';
+        break;
+
+      case 'in':
+        $op = 'has';
+        $clauseSeparator = 'OR';
+        break;
+    }
+    $sqlOp = $this->getSQLOperator($op);
     $clause = '( ';
     $subtypeFilters = count($value);
-    for ($i = 0; $i < $subtypeFilters; $i++) {
-      $clause .= "{$field['dbAlias']} LIKE '%$value[$i]%'";
-      if ($i !== ($subtypeFilters - 1)) {
-        $clause .= " OR ";
+    if ($sqlOp == 'IS NULL' || $sqlOp == 'IS NOT NULL') {
+      $clause .= "{$field['dbAlias']} $sqlOp";
+    }
+    else {
+      for ($i = 0; $i < $subtypeFilters; $i++) {
+        $clause .= "{$field['dbAlias']} $sqlOp '%$value[$i]%'";
+        if ($i !== ($subtypeFilters - 1)) {
+          $clause .= " $clauseSeparator ";
+        }
       }
     }
     $clause .= ' )';
@@ -2232,7 +2272,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     while ($dao->fetch()) {
       $customFields[$dao->table_name . '_custom_' . $dao->id] = $dao->id;
     }
-    $dao->free();
 
     $entryFound = FALSE;
     foreach ($rows as $rowNum => $row) {
@@ -5611,13 +5650,13 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
 
     $spec = [
       $options['prefix'] . 'name' => [
-        'title' => ts($options['prefix_label'] . 'Address Name'),
+        'title' => $options['prefix_label'] . ts('Address Name'),
         'name' => 'name',
         'is_fields' => TRUE,
       ],
       $options['prefix'] . 'street_number' => [
         'name' => 'street_number',
-        'title' => ts($options['prefix_label'] . 'Street Number'),
+        'title' => $options['prefix_label'] . ts('Street Number'),
         'type' => 1,
         'is_fields' => TRUE,
       ],
@@ -5627,13 +5666,13 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'type' => CRM_Utils_Type::T_INT,
         'no_display' => TRUE,
         'required' => TRUE,
-        'dbAlias' => '(address_civireport.street_number % 2)',
+        'dbAlias' => "({$tableAlias}_civireport.street_number % 2)",
         'is_fields' => TRUE,
         'is_order_bys' => TRUE,
       ],
       $options['prefix'] . 'street_name' => [
         'name' => 'street_name',
-        'title' => ts($options['prefix_label'] . 'Street Name'),
+        'title' => $options['prefix_label'] . ts('Street Name'),
         'type' => 1,
         'is_fields' => TRUE,
         'is_filters' => TRUE,
@@ -5641,30 +5680,30 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_order_bys' => TRUE,
       ],
       $options['prefix'] . 'street_address' => [
-        'title' => ts($options['prefix_label'] . 'Street Address'),
+        'title' => $options['prefix_label'] . ts('Street Address'),
         'name' => 'street_address',
         'is_fields' => TRUE,
         'is_filters' => TRUE,
         'is_group_bys' => TRUE,
       ],
       $options['prefix'] . 'supplemental_address_1' => [
-        'title' => ts($options['prefix_label'] . 'Supplementary Address Field 1'),
+        'title' => $options['prefix_label'] . ts('Supplementary Address Field 1'),
         'name' => 'supplemental_address_1',
         'is_fields' => TRUE,
       ],
       $options['prefix'] . 'supplemental_address_2' => [
-        'title' => ts($options['prefix_label'] . 'Supplementary Address Field 2'),
+        'title' => $options['prefix_label'] . ts('Supplementary Address Field 2'),
         'name' => 'supplemental_address_2',
         'is_fields' => TRUE,
       ],
       $options['prefix'] . 'supplemental_address_3' => [
-        'title' => ts($options['prefix_label'] . 'Supplementary Address Field 3'),
+        'title' => $options['prefix_label'] . ts('Supplementary Address Field 3'),
         'name' => 'supplemental_address_3',
         'is_fields' => TRUE,
       ],
       $options['prefix'] . 'street_number' => [
         'name' => 'street_number',
-        'title' => ts($options['prefix_label'] . 'Street Number'),
+        'title' => $options['prefix_label'] . ts('Street Number'),
         'type' => 1,
         'is_order_bys' => TRUE,
         'is_filters' => TRUE,
@@ -5672,12 +5711,12 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ],
       $options['prefix'] . 'street_unit' => [
         'name' => 'street_unit',
-        'title' => ts($options['prefix_label'] . 'Street Unit'),
+        'title' => $options['prefix_label'] . ts('Street Unit'),
         'type' => 1,
         'is_fields' => TRUE,
       ],
       $options['prefix'] . 'city' => [
-        'title' => ts($options['prefix_label'] . 'City'),
+        'title' => $options['prefix_label'] . ts('City'),
         'name' => 'city',
         'operator' => 'like',
         'is_fields' => TRUE,
@@ -5686,7 +5725,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_order_bys' => TRUE,
       ],
       $options['prefix'] . 'postal_code' => [
-        'title' => ts($options['prefix_label'] . 'Postal Code'),
+        'title' => $options['prefix_label'] . ts('Postal Code'),
         'name' => 'postal_code',
         'type' => 1,
         'is_fields' => TRUE,
@@ -5695,7 +5734,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_order_bys' => TRUE,
       ],
       $options['prefix'] . 'postal_code_suffix' => [
-        'title' => ts($options['prefix_label'] . 'Postal Code Suffix'),
+        'title' => $options['prefix_label'] . ts('Postal Code Suffix'),
         'name' => 'postal_code',
         'type' => 1,
         'is_fields' => TRUE,
@@ -5704,7 +5743,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_order_bys' => TRUE,
       ],
       $options['prefix'] . 'county_id' => [
-        'title' => ts($options['prefix_label'] . 'County'),
+        'title' => $options['prefix_label'] . ts('County'),
         'alter_display' => 'alterCountyID',
         'name' => 'county_id',
         'type' => CRM_Utils_Type::T_INT,
@@ -5715,7 +5754,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_group_bys' => TRUE,
       ],
       $options['prefix'] . 'state_province_id' => [
-        'title' => ts($options['prefix_label'] . 'State/Province'),
+        'title' => $options['prefix_label'] . ts('State/Province'),
         'alter_display' => 'alterStateProvinceID',
         'name' => 'state_province_id',
         'type' => CRM_Utils_Type::T_INT,
@@ -5726,7 +5765,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'is_group_bys' => TRUE,
       ],
       $options['prefix'] . 'country_id' => [
-        'title' => ts($options['prefix_label'] . 'Country'),
+        'title' => $options['prefix_label'] . ts('Country'),
         'alter_display' => 'alterCountryID',
         'name' => 'country_id',
         'is_fields' => TRUE,
@@ -5738,19 +5777,19 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       ],
       $options['prefix'] . 'location_type_id' => [
         'name' => 'is_primary',
-        'title' => ts($options['prefix_label'] . 'Location Type'),
+        'title' => $options['prefix_label'] . ts('Location Type'),
         'type' => CRM_Utils_Type::T_INT,
         'is_fields' => TRUE,
         'alter_display' => 'alterLocationTypeID',
       ],
       $options['prefix'] . 'id' => [
-        'title' => ts($options['prefix_label'] . 'ID'),
+        'title' => $options['prefix_label'] . ts('ID'),
         'name' => 'id',
         'is_fields' => TRUE,
       ],
       $options['prefix'] . 'is_primary' => [
         'name' => 'is_primary',
-        'title' => ts($options['prefix_label'] . 'Primary Address?'),
+        'title' => $options['prefix_label'] . ts('Primary Address?'),
         'type' => CRM_Utils_Type::T_BOOLEAN,
         'is_fields' => TRUE,
       ],
@@ -5907,7 +5946,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     if ($this->groupConcatTested && (!empty($this->_groupByArray) || $this->isForceGroupBy)) {
       if ((empty($field['statistics']) || in_array('GROUP_CONCAT', $field['statistics']))) {
         $label = CRM_Utils_Array::value('title', $field);
-        $alias = "{$tableName}_{$fieldName}";
+        $alias = $field['tplField'] ?? "{$tableName}_{$fieldName}";
         $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $label;
         $this->_selectAliases[] = $alias;
         if (empty($this->_groupByArray[$tableName . '_' . $fieldName])) {

@@ -213,28 +213,28 @@ class CRM_Contact_BAO_Query {
   /**
    * Are we in search mode.
    *
-   * @var boolean
+   * @var bool
    */
   public $_search = TRUE;
 
   /**
    * Should we skip permission checking.
    *
-   * @var boolean
+   * @var bool
    */
   public $_skipPermission = FALSE;
 
   /**
    * Should we skip adding of delete clause.
    *
-   * @var boolean
+   * @var bool
    */
   public $_skipDeleteClause = FALSE;
 
   /**
    * Are we in strict mode (use equality over LIKE)
    *
-   * @var boolean
+   * @var bool
    */
   public $_strict = FALSE;
 
@@ -250,21 +250,21 @@ class CRM_Contact_BAO_Query {
   /**
    * Should we only search on primary location.
    *
-   * @var boolean
+   * @var bool
    */
   public $_primaryLocation = TRUE;
 
   /**
    * Are contact ids part of the query.
    *
-   * @var boolean
+   * @var bool
    */
   public $_includeContactIds = FALSE;
 
   /**
    * Should we use the smart group cache.
    *
-   * @var boolean
+   * @var bool
    */
   public $_smartGroupCache = TRUE;
 
@@ -286,7 +286,7 @@ class CRM_Contact_BAO_Query {
    * Should we enable the distinct clause, used if we are including
    * more than one group
    *
-   * @var boolean
+   * @var bool
    */
   public $_useDistinct = FALSE;
 
@@ -402,14 +402,16 @@ class CRM_Contact_BAO_Query {
    */
   protected $_rangeCache = [];
   /**
-   * Set to true when $this->relationship is run to avoid adding twice
-   * @var Boolean
+   * Set to true when $this->relationship is run to avoid adding twice.
+   *
+   * @var bool
    */
   protected $_relationshipValuesAdded = FALSE;
 
   /**
-   * Set to the name of the temp table if one has been created
-   * @var String
+   * Set to the name of the temp table if one has been created.
+   *
+   * @var string
    */
   public static $_relationshipTempTable = NULL;
 
@@ -434,7 +436,7 @@ class CRM_Contact_BAO_Query {
    * @param null $displayRelationshipType
    * @param string $operator
    * @param string $apiEntity
-   * @param bool|NULL $primaryLocationOnly
+   * @param bool|null $primaryLocationOnly
    */
   public function __construct(
     $params = NULL, $returnProperties = NULL, $fields = NULL,
@@ -541,8 +543,8 @@ class CRM_Contact_BAO_Query {
     if (array_key_exists('civicrm_membership', $this->_whereTables)) {
       $component = 'membership';
     }
-    if (isset($component)) {
-      // @todo should be if (isset($component && !$this->_skipPermission)
+    if (isset($component) && !$this->_skipPermission) {
+      // Unit test coverage in api_v3_FinancialTypeACLTest::testGetACLContribution.
       CRM_Financial_BAO_FinancialType::buildPermissionedClause($this->_whereClause, $component);
     }
 
@@ -1551,22 +1553,20 @@ class CRM_Contact_BAO_Query {
     }
 
     self::filterCountryFromValuesIfStateExists($formValues);
-
+    // We shouldn't have to whitelist fields to not hack but here we are, for now.
+    $nonLegacyDateFields = ['participant_register_date_relative'];
     // Handle relative dates first
     foreach (array_keys($formValues) as $id) {
-      if (preg_match('/_date_relative$/', $id) ||
+      if (
+        !in_array($id, $nonLegacyDateFields) && (
+        preg_match('/_date_relative$/', $id) ||
         $id == 'event_relative' ||
         $id == 'case_from_relative' ||
-        $id == 'case_to_relative' ||
-        $id == 'participant_relative'
+        $id == 'case_to_relative')
       ) {
         if ($id == 'event_relative') {
           $fromRange = 'event_start_date_low';
           $toRange = 'event_end_date_high';
-        }
-        elseif ($id == 'participant_relative') {
-          $fromRange = 'participant_register_date_low';
-          $toRange = 'participant_register_date_high';
         }
         elseif ($id == 'case_from_relative') {
           $fromRange = 'case_from_start_date_low';
@@ -1645,11 +1645,12 @@ class CRM_Contact_BAO_Query {
       ) {
         self::convertCustomRelativeFields($formValues, $params, $values, $id);
       }
-      elseif (preg_match('/_date_relative$/', $id) ||
-        $id == 'event_relative' ||
-        $id == 'case_from_relative' ||
-        $id == 'case_to_relative' ||
-        $id == 'participant_relative'
+      elseif (
+        !in_array($id, $nonLegacyDateFields) && (
+          preg_match('/_date_relative$/', $id) ||
+          $id == 'event_relative' ||
+          $id == 'case_from_relative' ||
+          $id == 'case_to_relative')
       ) {
         // Already handled in previous loop
         continue;
@@ -2709,7 +2710,7 @@ class CRM_Contact_BAO_Query {
       case 'civicrm_worldregion':
         // We can be sure from the calling function that country will already be joined in.
         // we really don't need world_region - we could use a pseudoconstant for it.
-        return "$side JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id ";
+        return " $side JOIN civicrm_worldregion ON civicrm_country.region_id = civicrm_worldregion.id ";
 
       case 'civicrm_location_type':
         return " $side JOIN civicrm_location_type ON civicrm_address.location_type_id = civicrm_location_type.id ";
@@ -2961,6 +2962,8 @@ class CRM_Contact_BAO_Query {
    * Where / qill clause for groups.
    *
    * @param $values
+   *
+   * @throws \CRM_Core_Exception
    */
   public function group($values) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -2970,9 +2973,18 @@ class CRM_Contact_BAO_Query {
       $op = key($value);
       $value = $value[$op];
     }
-
-    // Replace pseudo operators from search builder
-    $op = str_replace('EMPTY', 'NULL', $op);
+    // Translate EMPTY to NULL as EMPTY is cannot be used in it's intended meaning here
+    // so has to be 'squashed into' NULL. (ie. group membership cannot be '').
+    // even one group might equate to multiple when looking at children so IN is simpler.
+    // @todo - also look at != casting but there are rows below to review.
+    $opReplacements = [
+      'EMPTY' => 'NULL',
+      'NOT EMPTY' => 'NOT NULL',
+      '=' => 'IN',
+    ];
+    if (isset($opReplacements[$op])) {
+      $op = $opReplacements[$op];
+    }
 
     if (strpos($op, 'NULL')) {
       $value = NULL;
@@ -2996,31 +3008,21 @@ class CRM_Contact_BAO_Query {
     $regularGroupIDs = $smartGroupIDs = [];
     foreach ((array) $value as $id) {
       if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Group', $id, 'saved_search_id')) {
-        $smartGroupIDs[] = $id;
+        $smartGroupIDs[] = (int) $id;
       }
       else {
-        $regularGroupIDs[] = trim($id);
+        $regularGroupIDs[] = (int) trim($id);
       }
     }
+    $hasNonSmartGroups = count($regularGroupIDs);
 
     $isNotOp = ($op == 'NOT IN' || $op == '!=');
 
-    $statii = [];
-    $gcsValues = $this->getWhereValues('group_contact_status', $grouping);
-    if ($gcsValues &&
-      is_array($gcsValues[2])
-    ) {
-      foreach ($gcsValues[2] as $k => $v) {
-        if ($v) {
-          $statii[] = "'" . CRM_Utils_Type::escape($k, 'String') . "'";
-        }
-      }
-    }
-    else {
-      $statii[] = "'Added'";
-    }
+    $statusJoinClause = $this->getGroupStatusClause($grouping);
+    // If we are searching for 'Removed' contacts then despite it being a smart group we only care about the group_contact table.
+    $isGroupStatusSearch = (!empty($this->getSelectedGroupStatuses($grouping)) && $this->getSelectedGroupStatuses($grouping) !== ["'Added'"]);
     $groupClause = [];
-    if (count($regularGroupIDs) || empty($value)) {
+    if ($hasNonSmartGroups || empty($value) || $isGroupStatusSearch) {
       // include child groups IDs if any
       $childGroupIds = (array) CRM_Contact_BAO_Group::getChildGroupIds($regularGroupIDs);
       foreach ($childGroupIds as $key => $id) {
@@ -3034,44 +3036,44 @@ class CRM_Contact_BAO_Query {
       }
 
       if (empty($regularGroupIDs)) {
-        $regularGroupIDs = [0];
+        if ($isGroupStatusSearch) {
+          $regularGroupIDs = $smartGroupIDs;
+        }
+        // If it is still empty we want a filter that blocks all results.
+        if (empty($regularGroupIDs)) {
+          $regularGroupIDs = [0];
+        }
       }
 
-      // if $regularGroupIDs is populated with regular child group IDs
-      //   then change the mysql operator to desired
-      if (count($regularGroupIDs) > 1) {
-        $op = strpos($op, 'IN') ? $op : ($op == '!=') ? 'NOT IN' : 'IN';
-      }
-      $groupIds = '';
-      if (!empty($regularGroupIDs)) {
-        $groupIds = CRM_Utils_Type::validate(
-          implode(',', (array) $regularGroupIDs),
-          'CommaSeparatedIntegers'
-        );
-      }
       $gcTable = "`civicrm_group_contact-" . uniqid() . "`";
       $joinClause = ["contact_a.id = {$gcTable}.contact_id"];
 
-      if (strpos($op, 'IN') !== FALSE) {
-        $clause = "{$gcTable}.group_id $op ( $groupIds ) ";
-      }
-      elseif ($op == '!=') {
+      // @todo consider just casting != to NOT IN & handling both together.
+      if ($op == '!=') {
+        $groupIds = '';
+        if (!empty($regularGroupIDs)) {
+          $groupIds = CRM_Utils_Type::validate(
+            implode(',', (array) $regularGroupIDs),
+            'CommaSeparatedIntegers'
+          );
+        }
         $clause = "{$gcTable}.contact_id NOT IN (SELECT contact_id FROM civicrm_group_contact cgc WHERE cgc.group_id = $groupIds )";
       }
       else {
-        $clause = "{$gcTable}.group_id $op $groupIds ";
+        $clause = self::buildClause("{$gcTable}.group_id", $op, $regularGroupIDs);
       }
       $groupClause[] = "( {$clause} )";
 
-      if ($statii) {
-        $joinClause[] = "{$gcTable}.status IN (" . implode(', ', $statii) . ")";
+      if ($statusJoinClause) {
+        $joinClause[] = "{$gcTable}.$statusJoinClause";
       }
       $this->_tables[$gcTable] = $this->_whereTables[$gcTable] = " LEFT JOIN civicrm_group_contact {$gcTable} ON (" . implode(' AND ', $joinClause) . ")";
     }
 
     //CRM-19589: contact(s) removed from a Smart Group, resides in civicrm_group_contact table
-    $groupContactCacheClause = '';
-    if (count($smartGroupIDs) || empty($value)) {
+    // If we are only searching for Removed or Pending contacts we don't need to resolve the smart group
+    // as that info is in the group_contact table.
+    if ((count($smartGroupIDs) || empty($value)) && !$isGroupStatusSearch) {
       $this->_groupUniqueKey = uniqid();
       $this->_groupKeys[] = $this->_groupUniqueKey;
       $gccTableAlias = "civicrm_group_contact_cache_{$this->_groupUniqueKey}";
@@ -3101,7 +3103,7 @@ class CRM_Contact_BAO_Query {
     list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Contact_DAO_Group', 'id', $value, $op);
     $this->_qill[$grouping][] = ts("Group(s) %1 %2", [1 => $qillop, 2 => $qillVal]);
     if (strpos($op, 'NULL') === FALSE) {
-      $this->_qill[$grouping][] = ts("Group Status %1", [1 => implode(' ' . ts('or') . ' ', $statii)]);
+      $this->_qill[$grouping][] = ts("Group Status %1", [1 => implode(' ' . ts('or') . ' ', $this->getSelectedGroupStatuses($grouping))]);
     }
   }
 
@@ -4952,7 +4954,7 @@ civicrm_relationship.start_date > {$today}
   public function alphabetQuery() {
     $sqlParts = $this->getSearchSQLParts(NULL, NULL, NULL, FALSE, FALSE, TRUE);
     $query = "SELECT DISTINCT LEFT(contact_a.sort_name, 1) as sort_name
-      {$this->_simpleFromClause}
+      {$sqlParts['from']}
       {$sqlParts['where']}
       {$sqlParts['having']}
       GROUP BY sort_name
@@ -4970,6 +4972,7 @@ civicrm_relationship.start_date > {$today}
    * @return CRM_Core_DAO
    */
   public function getCachedContacts($cids, $includeContactIds) {
+    CRM_Core_DAO::disableFullGroupByMode();
     CRM_Utils_Type::validateAll($cids, 'Positive');
     $this->_includeContactIds = $includeContactIds;
     $onlyDeleted = in_array(['deleted_contacts', '=', '1', '0', '0'], $this->_params);
@@ -4981,7 +4984,9 @@ civicrm_relationship.start_date > {$today}
     $limit = '';
     $query = "$select $from $where $groupBy $order $limit";
 
-    return CRM_Core_DAO::executeQuery($query);
+    $result = CRM_Core_DAO::executeQuery($query);
+    CRM_Core_DAO::reenableFullGroupByMode();
+    return $result;
   }
 
   /**
@@ -5681,10 +5686,8 @@ civicrm_relationship.start_date > {$today}
     }
     else {
       // create temp table with contact ids
-      $tableName = CRM_Core_DAO::createTempTableName('civicrm_transform', TRUE);
 
-      $sql = "CREATE TEMPORARY TABLE $tableName ( contact_id int primary key) ENGINE=HEAP";
-      CRM_Core_DAO::executeQuery($sql);
+      $tableName = CRM_Utils_SQL_TempTable::build()->createWithColumns('contact_id int primary key')->setMemory(TRUE)->getName();
 
       $sql = "
 REPLACE INTO $tableName ( contact_id )
@@ -6497,7 +6500,9 @@ AND   displayRelType.is_active = 1
    * @param string $where
    * @param string $from
    *
+   *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   protected function addBasicStatsToSummary(&$summary, $where, $from) {
     $summary['total']['count'] = 0;
@@ -6972,6 +6977,43 @@ AND   displayRelType.is_active = 1
       $aName,
       $addressJoin,
     ];
+  }
+
+  /**
+   * Get the clause for group status.
+   *
+   * @param int $grouping
+   *
+   * @return string
+   */
+  protected function getGroupStatusClause($grouping) {
+    $statuses = $this->getSelectedGroupStatuses($grouping);
+    return "status IN (" . implode(', ', $statuses) . ")";
+  }
+
+  /**
+   * Get an array of the statuses that have been selected.
+   *
+   * @param string $grouping
+   *
+   * @return array
+   */
+  protected function getSelectedGroupStatuses($grouping) {
+    $statuses = [];
+    $gcsValues = $this->getWhereValues('group_contact_status', $grouping);
+    if ($gcsValues &&
+      is_array($gcsValues[2])
+    ) {
+      foreach ($gcsValues[2] as $k => $v) {
+        if ($v) {
+          $statuses[] = "'" . CRM_Utils_Type::escape($k, 'String') . "'";
+        }
+      }
+    }
+    else {
+      $statuses[] = "'Added'";
+    }
+    return $statuses;
   }
 
 }

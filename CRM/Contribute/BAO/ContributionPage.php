@@ -672,33 +672,33 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         'title' => ts('Copy of') . ' ',
       ],
     ];
-    $copy = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_ContributionPage', [
+    $copy = CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_ContributionPage', [
       'id' => $id,
     ], NULL, $fieldsFix);
 
     //copying all the blocks pertaining to the contribution page
-    $copyPledgeBlock = &CRM_Core_DAO::copyGeneric('CRM_Pledge_DAO_PledgeBlock', [
+    $copyPledgeBlock = CRM_Core_DAO::copyGeneric('CRM_Pledge_DAO_PledgeBlock', [
       'entity_id' => $id,
       'entity_table' => 'civicrm_contribution_page',
     ], [
       'entity_id' => $copy->id,
     ]);
 
-    $copyMembershipBlock = &CRM_Core_DAO::copyGeneric('CRM_Member_DAO_MembershipBlock', [
+    $copyMembershipBlock = CRM_Core_DAO::copyGeneric('CRM_Member_DAO_MembershipBlock', [
       'entity_id' => $id,
       'entity_table' => 'civicrm_contribution_page',
     ], [
       'entity_id' => $copy->id,
     ]);
 
-    $copyUFJoin = &CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin', [
+    $copyUFJoin = CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin', [
       'entity_id' => $id,
       'entity_table' => 'civicrm_contribution_page',
     ], [
       'entity_id' => $copy->id,
     ]);
 
-    $copyWidget = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_Widget', [
+    $copyWidget = CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_Widget', [
       'contribution_page_id' => $id,
     ], [
       'contribution_page_id' => $copy->id,
@@ -707,14 +707,14 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
     //copy price sets
     CRM_Price_BAO_PriceSet::copyPriceSet('civicrm_contribution_page', $id, $copy->id);
 
-    $copyTellFriend = &CRM_Core_DAO::copyGeneric('CRM_Friend_DAO_Friend', [
+    $copyTellFriend = CRM_Core_DAO::copyGeneric('CRM_Friend_DAO_Friend', [
       'entity_id' => $id,
       'entity_table' => 'civicrm_contribution_page',
     ], [
       'entity_id' => $copy->id,
     ]);
 
-    $copyPersonalCampaignPages = &CRM_Core_DAO::copyGeneric('CRM_PCP_DAO_PCPBlock', [
+    $copyPersonalCampaignPages = CRM_Core_DAO::copyGeneric('CRM_PCP_DAO_PCPBlock', [
       'entity_id' => $id,
       'entity_table' => 'civicrm_contribution_page',
     ], [
@@ -722,7 +722,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
       'target_entity_id' => $copy->id,
     ]);
 
-    $copyPremium = &CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_Premium', [
+    $copyPremium = CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_Premium', [
       'entity_id' => $id,
       'entity_table' => 'civicrm_contribution_page',
     ], [

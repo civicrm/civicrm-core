@@ -820,7 +820,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
               $formatting['contact_sub_type'] = $relationType->$direction;
             }
           }
-          $relationType->free();
 
           $contactFields = NULL;
           $contactFields = CRM_Contact_DAO_Contact::import();
@@ -1353,7 +1352,6 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
               $params[$key]['contact_sub_type'] = $relationshipType->$direction;
             }
           }
-          $relationshipType->free();
         }
 
         self::isErrorInCustomData($params[$key], $errorMessage, $csType, $relationships);

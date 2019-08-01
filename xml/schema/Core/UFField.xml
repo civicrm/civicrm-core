@@ -49,6 +49,9 @@
     <length>64</length>
     <required>true</required>
     <comment>Name for CiviCRM field which is being exposed for sharing.</comment>
+    <pseudoconstant>
+      <callback>CRM_Core_BAO_UFField::getAvailableFieldTitles</callback>
+    </pseudoconstant>
     <add>1.1</add>
   </field>
   <field>

@@ -135,8 +135,7 @@
     <type>int unsigned</type>
     <default>1</default>
     <comment>Used to group mapping_field records into related sets (e.g. for criteria sets in search builder
-      mappings).
-    </comment>
+      mappings).</comment>
     <add>1.5</add>
   </field>
   <field>

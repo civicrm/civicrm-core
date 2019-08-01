@@ -112,6 +112,15 @@ class CRM_Upgrade_Incremental_MessageTemplates {
           ['name' => 'payment_or_refund_notification', 'type' => 'html'],
         ],
       ],
+      [
+        'version' => '5.15.alpha1',
+        'upgrade_descriptor' => ts('Use email greeting and fix capitalization'),
+        'label' => ts('Pledge acknowledgement'),
+        'templates' => [
+          ['name' => 'pledge_acknowledge', 'type' => 'text'],
+          ['name' => 'pledge_acknowledge', 'type' => 'html'],
+        ],
+      ],
     ];
   }
 

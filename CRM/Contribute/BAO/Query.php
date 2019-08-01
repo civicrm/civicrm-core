@@ -47,8 +47,12 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    *   Associative array of contribution fields
    */
   public static function getFields($checkPermission = TRUE) {
-    if (!isset(\Civi::$statics[__CLASS__]) || !isset(\Civi::$statics[__CLASS__]['fields']) || !isset(\Civi::$statics[__CLASS__]['contribution'])) {
-      $fields = CRM_Contribute_BAO_Contribution::exportableFields($checkPermission);
+    if (!isset(\Civi::$statics[__CLASS__]) || !isset(\Civi::$statics[__CLASS__]['fields']) || !isset(\Civi::$statics[__CLASS__]['fields']['contribution'])) {
+      // Adding fields with some care as those without unique names could clobber others.
+      // Refer to CRM_Contribute_Form_SearchTest for existing tests ... and to add more!
+      $testedRecurFields = array_fill_keys(['contribution_recur_trxn_id', 'contribution_recur_processor_id', 'contribution_recur_payment_processor_id'], 1);
+      $recurFields = array_intersect_key(CRM_Contribute_DAO_ContributionRecur::fields(), $testedRecurFields);
+      $fields = array_merge($recurFields, CRM_Contribute_BAO_Contribution::exportableFields($checkPermission));
       CRM_Contribute_BAO_Contribution::appendPseudoConstantsToFields($fields);
       unset($fields['contribution_contact_id']);
       \Civi::$statics[__CLASS__]['fields']['contribution'] = $fields;
@@ -137,6 +141,9 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
    *
    * @param array $values
    * @param CRM_Contact_BAO_Query $query
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
@@ -382,13 +389,12 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
       case 'contribution_recur_processor_id':
       case 'contribution_recur_trxn_id':
-        $fieldName = str_replace('contribution_recur_', '', $name);
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution_recur.{$fieldName}",
+        $spec = $fields[$name];
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($spec['where'],
           $op, $value, "String"
         );
-        $recurFields = CRM_Contribute_DAO_ContributionRecur::fields();
-        $query->_qill[$grouping][] = ts("Recurring Contribution %1 %2 '%3'", [1 => $recurFields[$fieldName]['title'], 2 => $op, 3 => $value]);
-        $query->_tables['civicrm_contribution_recur'] = $query->_whereTables['civicrm_contribution_recur'] = 1;
+        $query->_qill[$grouping][] = ts("Recurring Contribution %1 %2 '%3'", [1 => $fields[$name]['title'], 2 => $op, 3 => $value]);
+        $query->_tables[$spec['table_name']] = $query->_whereTables[$spec['table_name']] = 1;
         return;
 
       case 'contribution_recur_payment_made':
@@ -486,8 +492,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       default:
         //all other elements are handle in this case
         $fldName = substr($name, 13);
-        CRM_Financial_BAO_FinancialType::getAvailableFinancialTypes($financialTypes);
-        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_contribution.financial_type_id", 'IN', array_keys($financialTypes), 'String');
         if (!isset($fields[$fldName])) {
           // CRM-12597
           CRM_Core_Session::setStatus(ts(
@@ -914,15 +918,32 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
+   * Get the metadata for fields to be included on the search form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = [
+      'contribution_source',
+      'cancel_reason',
+      'invoice_number',
+    ];
+    $metadata = civicrm_api3('Contribution', 'getfields', [])['values'];
+    return array_intersect_key($metadata, array_flip($fields));
+  }
+
+  /**
    * Add all the elements shared between contribute search and advnaced search.
    *
-   * @param CRM_Core_Form $form
+   * @param \CRM_Contribute_Form_Search $form
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function buildSearchForm(&$form) {
 
-    // Added contribution source
-    $form->addElement('text', 'contribution_source', ts('Contribution Source'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_Contribution', 'source'));
-
+    $form->addSearchFieldMetadata(['Contribution' => self::getSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
     CRM_Core_Form_Date::buildDateRange($form, 'contribution_date', 1, '_low', '_high', ts('From:'), FALSE);
     // CRM-17602
     // This hidden element added for displaying Date Range error correctly. Definitely a dirty hack, but... it works.
@@ -935,7 +956,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     $form->add('text', 'contribution_amount_high', ts('To'), ['size' => 8, 'maxlength' => 8]);
     $form->addRule('contribution_amount_high', ts('Please enter a valid money value (e.g. %1).', [1 => CRM_Utils_Money::format('99.99', ' ')]), 'money');
 
-    $form->addField('cancel_reason', ['entity' => 'Contribution']);
     CRM_Core_Form_Date::buildDateRange($form, 'contribution_cancel_date', 1, '_low', '_high', ts('From:'), FALSE);
     $form->addElement('hidden', 'contribution_cancel_date_range_error');
 
@@ -990,7 +1010,6 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
 
     // Add field for transaction ID search
     $form->addElement('text', 'contribution_trxn_id', ts("Transaction ID"));
-    $form->addElement('text', 'invoice_number', ts("Invoice Number"));
     $form->addElement('text', 'contribution_check_number', ts('Check Number'));
 
     // Add field for pcp display in roll search

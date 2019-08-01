@@ -104,15 +104,20 @@ function civicrm_api3_payment_cancel(&$params) {
     'financial_trxn_id' => $params['id'],
   ];
   $entity = civicrm_api3('EntityFinancialTrxn', 'getsingle', $eftParams);
-  $contributionId = $entity['entity_id'];
-  $params['total_amount'] = $entity['amount'];
-  unset($params['id']);
 
-  $trxn = CRM_Contribute_BAO_Contribution::recordAdditionalPayment($contributionId, $params, 'refund', NULL, FALSE);
+  $paymentParams = [
+    'total_amount' => -$entity['amount'],
+    'contribution_id' => $entity['entity_id'],
+    'trxn_date' => CRM_Utils_Array::value('trxn_date', $params, 'now'),
+  ];
 
-  $values = [];
-  _civicrm_api3_object_to_array_unique_fields($trxn, $values[$trxn->id]);
-  return civicrm_api3_create_success($values, $params, 'Payment', 'cancel', $trxn);
+  foreach (['trxn_id', 'payment_instrument_id'] as $permittedParam) {
+    if (isset($params[$permittedParam])) {
+      $paymentParams[$permittedParam] = $params[$permittedParam];
+    }
+  }
+  $result = civicrm_api3('Payment', 'create', $paymentParams);
+  return civicrm_api3_create_success($result['values'], $params, 'Payment', 'cancel');
 }
 
 /**
@@ -151,23 +156,27 @@ function _civicrm_api3_payment_create_spec(&$params) {
   $params = [
     'contribution_id' => [
       'api.required' => 1,
-      'title' => 'Contribution ID',
+      'title' => ts('Contribution ID'),
       'type' => CRM_Utils_Type::T_INT,
     ],
     'total_amount' => [
       'api.required' => 1,
-      'title' => 'Total Payment Amount',
+      'title' => ts('Total Payment Amount'),
       'type' => CRM_Utils_Type::T_FLOAT,
     ],
     'payment_processor_id' => [
-      'title' => 'Payment Processor ID',
+      'title' => ts('Payment Processor ID'),
       'type' => CRM_Utils_Type::T_INT,
       'description' => ts('Payment processor ID - required for payment processor payments'),
     ],
     'id' => [
-      'title' => 'Payment ID',
+      'title' => ts('Payment ID'),
       'type' => CRM_Utils_Type::T_INT,
       'api.aliases' => ['payment_id'],
+    ],
+    'trxn_date' => [
+      'title' => ts('Cancel Date'),
+      'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
     ],
   ];
 }
@@ -232,6 +241,10 @@ function _civicrm_api3_payment_cancel_spec(&$params) {
       'title' => 'Payment ID',
       'type' => CRM_Utils_Type::T_INT,
       'api.aliases' => ['payment_id'],
+    ],
+    'trxn_date' => [
+      'title' => 'Cancel Date',
+      'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
     ],
   ];
 }

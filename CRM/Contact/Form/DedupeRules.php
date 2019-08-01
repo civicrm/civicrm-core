@@ -113,22 +113,16 @@ class CRM_Contact_Form_DedupeRules extends CRM_Admin_Form {
     );
 
     $this->addField('used', ['label' => ts('Usage')], TRUE);
-    $disabled = [];
     $reserved = $this->addField('is_reserved', ['label' => ts('Reserved?')]);
     if (!empty($this->_defaults['is_reserved'])) {
       $reserved->freeze();
     }
 
     $attributes = ['class' => 'two'];
-    if (!empty($disabled)) {
-      $attributes = array_merge($attributes, $disabled);
-    }
 
     for ($count = 0; $count < self::RULES_COUNT; $count++) {
       $this->add('select', "where_$count", ts('Field'),
-        [
-          NULL => ts('- none -'),
-        ] + $this->_fields, FALSE, $disabled
+        $this->_fields, FALSE, ['class' => 'crm-select2', 'placeholder' => ts('Select Field')]
       );
       $this->addField("length_$count", ['entity' => 'Rule', 'name' => 'rule_length'] + $attributes);
       $this->addField("weight_$count", ['entity' => 'Rule', 'name' => 'rule_weight'] + $attributes);
@@ -245,8 +239,6 @@ UPDATE civicrm_dedupe_rule_group
     $ruleDao = new CRM_Dedupe_DAO_Rule();
     $ruleDao->dedupe_rule_group_id = $rgDao->id;
     $ruleDao->delete();
-    $ruleDao->free();
-
     $substrLenghts = [];
 
     $tables = [];
@@ -267,7 +259,6 @@ UPDATE civicrm_dedupe_rule_group
         $ruleDao->rule_length = $length;
         $ruleDao->rule_weight = $weight;
         $ruleDao->save();
-        $ruleDao->free();
 
         if (!array_key_exists($table, $tables)) {
           $tables[$table] = [];

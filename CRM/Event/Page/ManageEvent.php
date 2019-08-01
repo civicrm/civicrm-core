@@ -314,7 +314,10 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
     $this->_searchResult = CRM_Utils_Request::retrieve('searchResult', 'Boolean', $this);
 
     $whereClause = $this->whereClause($params, FALSE, $this->_force);
-    $this->pagerAToZ($whereClause, $params);
+
+    if (CRM_Core_Config::singleton()->includeAlphabeticalPager) {
+      $this->pagerAToZ($whereClause, $params);
+    }
 
     $params = [];
     $whereClause = $this->whereClause($params, TRUE, $this->_force);

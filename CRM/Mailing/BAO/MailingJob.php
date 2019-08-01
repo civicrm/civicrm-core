@@ -72,7 +72,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     $jobDAO = new CRM_Mailing_BAO_MailingJob();
     $jobDAO->copyValues($params, TRUE);
     $jobDAO->save();
-    if (!empty($params['mailing_id'])) {
+    if (!empty($params['mailing_id']) && empty('is_calling_function_updated_to_reflect_deprecation')) {
       CRM_Mailing_BAO_Mailing::getRecipients($params['mailing_id']);
     }
     CRM_Utils_Hook::post($op, 'MailingJob', $jobDAO->id, $jobDAO);
@@ -509,7 +509,7 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       $config = CRM_Core_Config::singleton();
     }
 
-    if (property_exists($mailing, 'language') && $mailing->language && $mailing->language != 'en_US') {
+    if (property_exists($mailing, 'language') && $mailing->language && $mailing->language != CRM_Core_I18n::getLocale()) {
       $swapLang = CRM_Utils_AutoClean::swap('global://dbLocale?getter', 'call://i18n/setLocale', $mailing->language);
     }
 

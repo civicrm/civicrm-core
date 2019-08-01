@@ -1063,7 +1063,6 @@ SELECT is_primary,
       $addressDAO->copyValues($params);
       $addressDAO->id = $dao->id;
       $addressDAO->save();
-      $addressDAO->free();
     }
   }
 

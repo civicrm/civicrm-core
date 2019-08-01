@@ -1,0 +1,41 @@
+dist: trusty
+language: php
+sudo: true
+
+matrix:
+  fast_finish: true
+  include:
+    - php: 7.0
+      env: SUITE=PHPCache
+    - php: 7.0
+      env: SUITE=Symfony
+    - php: 7.0
+      env: SUITE=Laravel
+    - php: 7.0
+      env: SUITE=Stash
+    - php: 7.1
+      env: SUITE=PHPCache
+    - php: 7.2
+      env: SUITE=PHPCache
+  allow_failures:
+    - env: SUITE=Stash
+
+services:
+  - redis
+  - memcached
+
+cache:
+  directories:
+    - "$HOME/.composer/cache"
+
+before_install:
+  - echo "Disable xdebug" && phpenv config-rm xdebug.ini
+
+install:
+  - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+  - composer update --prefer-source
+
+script:
+  - ./vendor/bin/phpunit --testsuite $SUITE
+

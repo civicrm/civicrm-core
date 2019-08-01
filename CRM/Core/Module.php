@@ -32,8 +32,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
  */
 class CRM_Core_Module {
 
@@ -43,13 +41,17 @@ class CRM_Core_Module {
   public $name;
 
   /**
-   * @var bool, TRUE if fully enabled; FALSE if module exists but is disabled
+   * Is the module enabled.
+   *
+   * @var bool
    */
   public $is_active;
 
   /**
+   * Class constructor.
+   *
    * @param string $name
-   * @param $is_active
+   * @param bool $is_active
    */
   public function __construct($name, $is_active) {
     $this->name = $name;

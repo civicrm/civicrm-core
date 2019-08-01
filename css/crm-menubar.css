@@ -131,7 +131,7 @@ input#crm-qsearch-input {
   border: 1px solid #ccc;
   margin: 4px 4px 0;
   padding: 2px 8px;
-  height: 30px;
+  height: calc($menubarHeight - 10px);
   width: 30px;
   transition: width .5s .05s, background-color .3s .05s;
   color: black;
@@ -183,7 +183,7 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   transform: rotate(180deg);
 }
 
-@media (min-width: 768px) {
+@media (min-width: $breakMin) {
 
   /* Switch to desktop layout
   -----------------------------------------------
@@ -219,12 +219,25 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   }
 
   #civicrm-menu li a {
-    background-color: $semiTransparentMenuColor;
+    background-color: $menuItemColor;
     color: $textColor;
   }
 
   #civicrm-menu > li > a {
-    height: 40px;
+    height: $menubarHeight;
+    padding: 0 8px;
+  }
+
+  #civicrm-menu > li > a > * {
+    vertical-align: middle;
+  }
+
+  /* Pseudo-element to ensure vertical alignment */
+  #civicrm-menu > li:not(#crm-qsearch) > a:after {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
   }
 
   #civicrm-menu > li > a.highlighted {
@@ -250,7 +263,7 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: $breakMax) {
   /* hide the menu in mobile view */
   #crm-menubar-state:not(:checked) ~ #civicrm-menu {
     display: none;

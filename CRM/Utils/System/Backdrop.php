@@ -487,7 +487,7 @@ AND    u.status = 1
    * Determine the native ID of the CMS user.
    *
    * @param string $username
-   * @return int|NULL
+   * @return int|null
    */
   public function getUfId($username) {
     $user = user_load_by_name($username);
@@ -1042,11 +1042,11 @@ AND    u.status = 1
   /**
    * Append Backdrop CSS and JS to coreResourcesList.
    *
-   * @param array $list
+   * @param \Civi\Core\Event\GenericHookEvent $e
    */
-  public function appendCoreResources(&$list) {
-    $list[] = 'css/backdrop.css';
-    $list[] = 'js/crm.backdrop.js';
+  public function appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) {
+    $e->list[] = 'css/backdrop.css';
+    $e->list[] = 'js/crm.backdrop.js';
   }
 
 }

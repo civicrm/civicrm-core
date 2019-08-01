@@ -2,6 +2,8 @@
 
 namespace Civi\Test;
 
+use Civi\API\Exception\NotImplementedException;
+
 /**
  * Class Api3TestTrait
  * @package Civi\Test
@@ -13,6 +15,15 @@ namespace Civi\Test;
  * This trait is intended for use with PHPUnit-based test cases.
  */
 trait Api3TestTrait {
+
+  /**
+   * Get the api versions to test.
+   *
+   * @return array
+   */
+  public function versionThreeAndFour() {
+    return [[3], [4]];
+  }
 
   /**
    * Api version - easier to override than just a define
@@ -66,7 +77,7 @@ trait Api3TestTrait {
       $prefix .= ': ';
     }
     if ($expectedError && !empty($apiResult['is_error'])) {
-      $this->assertEquals($expectedError, $apiResult['error_message'], 'api error message not as expected' . $prefix);
+      $this->assertContains($expectedError, $apiResult['error_message'], 'api error message not as expected' . $prefix);
     }
     $this->assertEquals(1, $apiResult['is_error'], "api call should have failed but it succeeded " . $prefix . (print_r($apiResult, TRUE)));
     $this->assertNotEmpty($apiResult['error_message']);
@@ -92,7 +103,7 @@ trait Api3TestTrait {
     if (!empty($apiResult['trace'])) {
       $errorMessage .= "\n" . print_r($apiResult['trace'], TRUE);
     }
-    $this->assertEquals(0, $apiResult['is_error'], $prefix . $errorMessage);
+    $this->assertEmpty(\CRM_Utils_Array::value('is_error', $apiResult), $prefix . $errorMessage);
   }
 
   /**
@@ -132,7 +143,7 @@ trait Api3TestTrait {
    *
    * @return array|int
    */
-  public function callAPISuccess($entity, $action, $params, $checkAgainst = NULL) {
+  public function callAPISuccess($entity, $action, $params = [], $checkAgainst = NULL) {
     $params = array_merge([
       'version' => $this->_apiversion,
       'debug' => 1,
@@ -264,8 +275,388 @@ trait Api3TestTrait {
    * @param array $params
    * @return array|int
    */
-  public function civicrm_api($entity, $action, $params) {
+  public function civicrm_api($entity, $action, $params = []) {
+    if (\CRM_Utils_Array::value('version', $params) == 4) {
+      return $this->runApi4Legacy($entity, $action, $params);
+    }
     return civicrm_api($entity, $action, $params);
+  }
+
+  /**
+   * Emulate v3 syntax so we can run api3 tests on v4
+   *
+   * @param $v3Entity
+   * @param $v3Action
+   * @param array $v3Params
+   * @return array|int
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
+   * @throws \Exception
+   */
+  public function runApi4Legacy($v3Entity, $v3Action, $v3Params = []) {
+    $v4Entity = self::convertEntityNameToApi4($v3Entity);
+    $v4Action = $v3Action = strtolower($v3Action);
+    $v4Params = ['checkPermissions' => isset($v3Params['check_permissions']) ? (bool) $v3Params['check_permissions'] : FALSE];
+    $sequential = !empty($v3Params['sequential']);
+    $options = \_civicrm_api3_get_options_from_params($v3Params, in_array($v4Entity, ['Contact', 'Participant', 'Event', 'Group', 'Contribution', 'Membership']));
+    $indexBy = in_array($v3Action, ['get', 'create', 'replace']) && !$sequential ? 'id' : NULL;
+    $onlyId = !empty($v3Params['format.only_id']);
+    $onlySuccess = !empty($v3Params['format.is_success']);
+    if (!empty($v3Params['filters']['is_current']) || !empty($params['isCurrent'])) {
+      $v4Params['current'] = TRUE;
+    }
+    $toRemove = ['option.', 'return', 'api.', 'format.'];
+    $chains = [];
+    $custom = [];
+    foreach ($v3Params as $key => $val) {
+      foreach ($toRemove as $remove) {
+        if (strpos($key, $remove) === 0) {
+          if ($remove == 'api.') {
+            $chains[$key] = $val;
+          }
+          unset($v3Params[$key]);
+        }
+      }
+    }
+
+    $v3Fields = civicrm_api3($v3Entity, 'getfields', ['action' => $v3Action])['values'];
+
+    // Fix 'null'
+    foreach ($v3Params as $key => $val) {
+      if ($val === 'null') {
+        $v3Params[$key] = NULL;
+      }
+    }
+
+    if ($v4Entity == 'Setting') {
+      $indexBy = NULL;
+      $v4Params['domainId'] = \CRM_Utils_Array::value('domain_id', $v3Params);
+      if ($v3Action == 'getfields') {
+        if (!empty($v3Params['name'])) {
+          $v3Params['filters']['name'] = $v3Params['name'];
+        }
+        foreach (\CRM_Utils_Array::value('filters', $v3Params, []) as $filter => $val) {
+          $v4Params['where'][] = [$filter, '=', $val];
+        }
+      }
+      if ($v3Action == 'create') {
+        $v4Action = 'set';
+      }
+      if ($v3Action == 'revert') {
+        $v4Params['select'] = (array) $v3Params['name'];
+      }
+      if ($v3Action == 'getvalue') {
+        $options['return'] = [$v3Params['name'] => 1];
+        $v3Params = [];
+      }
+      \CRM_Utils_Array::remove($v3Params, 'domain_id', 'name');
+    }
+
+    \CRM_Utils_Array::remove($v3Params, 'options', 'debug', 'version', 'sort', 'offset', 'rowCount', 'check_permissions', 'sequential', 'filters', 'isCurrent');
+
+    // Work around ugly hack in v3 Domain api
+    if ($v4Entity == 'Domain') {
+      $v3Fields['version'] = ['name' => 'version', 'api.aliases' => ['domain_version']];
+      unset($v3Fields['domain_version']);
+    }
+
+    foreach ($v3Fields as $name => $field) {
+      // Resolve v3 aliases
+      foreach (\CRM_Utils_Array::value('api.aliases', $field, []) as $alias) {
+        if (isset($v3Params[$alias])) {
+          $v3Params[$field['name']] = $v3Params[$alias];
+          unset($v3Params[$alias]);
+        }
+      }
+      // Convert custom field names
+      if (strpos($name, 'custom_') === 0 && is_numeric($name[7])) {
+        // Strictly speaking, using titles instead of names is incorrect, but it works for
+        // unit tests where names and titles are identical and saves an extra db lookup.
+        $custom[$field['groupTitle']][$field['title']] = $name;
+        $v4FieldName = $field['groupTitle'] . '.' . $field['title'];
+        if (isset($v3Params[$name])) {
+          $v3Params[$v4FieldName] = $v3Params[$name];
+          unset($v3Params[$name]);
+        }
+        if (isset($options['return'][$name])) {
+          $options['return'][$v4FieldName] = 1;
+          unset($options['return'][$name]);
+        }
+      }
+    }
+
+    switch ($v3Action) {
+      case 'getcount':
+        $v4Params['select'] = ['row_count'];
+        // No break - keep processing as get
+      case 'getsingle':
+      case 'getvalue':
+        $v4Action = 'get';
+        // No break - keep processing as get
+      case 'get':
+        if ($options['return'] && $v3Action !== 'getcount') {
+          $v4Params['select'] = array_keys($options['return']);
+        }
+        if ($options['limit'] && $v4Entity != 'Setting') {
+          $v4Params['limit'] = $options['limit'];
+        }
+        if ($options['offset']) {
+          $v4Params['offset'] = $options['offset'];
+        }
+        if ($options['sort']) {
+          foreach (explode(',', $options['sort']) as $sort) {
+            list($sortField, $sortDir) = array_pad(explode(' ', trim($sort)), 2, 'ASC');
+            $v4Params['orderBy'][$sortField] = $sortDir;
+          }
+        }
+        break;
+
+      case 'replace':
+        if (empty($v3Params['values'])) {
+          $v4Action = 'delete';
+        }
+        else {
+          $v4Params['records'] = $v3Params['values'];
+        }
+        unset($v3Params['values']);
+        break;
+
+      case 'create':
+      case 'update':
+        if (!empty($v3Params['id'])) {
+          $v4Action = 'update';
+          $v4Params['where'][] = ['id', '=', $v3Params['id']];
+        }
+
+        $v4Params['values'] = $v3Params;
+        unset($v4Params['values']['id']);
+        break;
+
+      case 'delete':
+        if (!empty($v3Params['id'])) {
+          $v4Params['where'][] = ['id', '=', $v3Params['id']];
+        }
+        break;
+
+      case 'getoptions':
+        $indexBy = 0;
+        $v4Action = 'getFields';
+        $v4Params += [
+          'where' => [['name', '=', $v3Params['field']]],
+          'loadOptions' => TRUE,
+        ];
+        break;
+
+      case 'getfields':
+        $v4Action = 'getFields';
+        if (!empty($v3Params['action']) || !empty($v3Params['api_action'])) {
+          $v4Params['action'] = !empty($v3Params['action']) ? $v3Params['action'] : $v3Params['api_action'];
+        }
+        $indexBy = !$sequential ? 'name' : NULL;
+        break;
+    }
+
+    // Ensure this api4 entity/action exists
+    try {
+      $actionInfo = \civicrm_api4($v4Entity, 'getActions', ['checkPermissions' => FALSE, 'where' => [['name', '=', $v4Action]]]);
+    }
+    catch (NotImplementedException $e) {
+      // For now we'll mark the test incomplete if a v4 entity doesn't exit yet
+      $this->markTestIncomplete($e->getMessage());
+    }
+    if (!isset($actionInfo[0])) {
+      throw new \Exception("Api4 $v4Entity $v4Action does not exist.");
+    }
+
+    // Migrate special params like fix_address
+    foreach ($actionInfo[0]['params'] as $v4ParamName => $paramInfo) {
+      // camelCase in api4, lower_case in api3
+      $v3ParamName = strtolower(preg_replace('/(?=[A-Z])/', '_$0', $v4ParamName));
+      if (isset($v3Params[$v3ParamName])) {
+        $v4Params[$v4ParamName] = $v3Params[$v3ParamName];
+        unset($v3Params[$v3ParamName]);
+        if ($paramInfo['type'][0] == 'bool') {
+          $v4Params[$v4ParamName] = (bool) $v4Params[$v4ParamName];
+        }
+      }
+    }
+
+    // Build where clause for 'getcount', 'getsingle', 'getvalue', 'get' & 'replace'
+    if ($v4Action == 'get' || $v3Action == 'replace') {
+      foreach ($v3Params as $key => $val) {
+        $op = '=';
+        if (is_array($val) && count($val) == 1 && array_intersect_key($val, array_flip(\CRM_Core_DAO::acceptedSQLOperators()))) {
+          foreach ($val as $op => $newVal) {
+            $val = $newVal;
+          }
+        }
+        $v4Params['where'][] = [$key, $op, $val];
+      }
+    }
+
+    try {
+      $result = \civicrm_api4($v4Entity, $v4Action, $v4Params, $indexBy);
+    }
+    catch (\Exception $e) {
+      return $onlySuccess ? 0 : [
+        'is_error' => 1,
+        'error_message' => $e->getMessage(),
+        'version' => 4,
+      ];
+    }
+
+    if (($v3Action == 'getsingle' || $v3Action == 'getvalue') && count($result) != 1) {
+      return $onlySuccess ? 0 : [
+        'is_error' => 1,
+        'error_message' => "Expected one $v4Entity but found " . count($result),
+        'count' => count($result),
+      ];
+    }
+
+    if ($onlySuccess) {
+      return 1;
+    }
+
+    if ($v3Action == 'getcount') {
+      return $result->count();
+    }
+
+    if ($onlyId) {
+      return $result->first()['id'];
+    }
+
+    if ($v3Action == 'getvalue' && $v4Entity == 'Setting') {
+      return \CRM_Utils_Array::value('value', $result->first());
+    }
+
+    if ($v3Action == 'getvalue') {
+      return \CRM_Utils_Array::value(array_keys($options['return'])[0], $result->first());
+    }
+
+    // Mimic api3 behavior when using 'replace' action to delete all
+    if ($v3Action == 'replace' && $v4Action == 'delete') {
+      $result->exchangeArray([]);
+    }
+
+    if ($v3Action == 'getoptions') {
+      return [
+        'is_error' => 0,
+        'count' => $result['options'] ? count($result['options']) : 0,
+        'values' => $result['options'] ?: [],
+        'version' => 4,
+      ];
+    }
+
+    // Emulate the weird return format of api3 settings
+    if (($v3Action == 'get' || $v3Action == 'create') && $v4Entity == 'Setting') {
+      $settings = [];
+      foreach ($result as $item) {
+        $settings[$item['domain_id']][$item['name']] = $item['value'];
+      }
+      $result->exchangeArray($sequential ? array_values($settings) : $settings);
+    }
+
+    foreach ($result as $index => $row) {
+      // Run chains
+      foreach ($chains as $key => $params) {
+        $result[$index][$key] = $this->runApi4LegacyChain($key, $params, $v4Entity, $row, $sequential);
+      }
+      // Resolve custom field names
+      foreach ($custom as $group => $fields) {
+        if (isset($row[$group])) {
+          foreach ($fields as $field => $v3FieldName) {
+            if (isset($row[$group][$field])) {
+              $result[$index][$v3FieldName] = $row[$group][$field];
+            }
+          }
+          unset($result[$index][$group]);
+        }
+      }
+    }
+
+    if ($v3Action == 'getsingle') {
+      return $result->first();
+    }
+
+    return [
+      'is_error' => 0,
+      'version' => 4,
+      'count' => count($result),
+      'values' => (array) $result,
+      'id' => is_object($result) && count($result) == 1 ? \CRM_Utils_Array::value('id', $result->first()) : NULL,
+    ];
+  }
+
+  /**
+   * @param string $key
+   * @param mixed $params
+   * @param string $mainEntity
+   * @param array $result
+   * @param bool $sequential
+   * @return array
+   * @throws \API_Exception
+   */
+  protected function runApi4LegacyChain($key, $params, $mainEntity, $result, $sequential) {
+    // Handle an array of multiple calls using recursion
+    if (is_array($params) && isset($params[0]) && is_array($params[0])) {
+      $results = [];
+      foreach ($params as $chain) {
+        $results[] = $this->runApi4LegacyChain($key, $chain, $mainEntity, $result, $sequential);
+      }
+      return $results;
+    }
+
+    // Handle single api call
+    list(, $chainEntity, $chainAction) = explode('.', $key);
+    $lcChainEntity = \_civicrm_api_get_entity_name_from_camel($chainEntity);
+    $chainEntity = self::convertEntityNameToApi4($chainEntity);
+    $lcMainEntity = \_civicrm_api_get_entity_name_from_camel($mainEntity);
+    $params = is_array($params) ? $params : [];
+
+    // Api3 expects this to be inherited
+    $params += ['sequential' => $sequential];
+
+    // Replace $value.field_name
+    foreach ($params as $name => $param) {
+      if (is_string($param) && strpos($param, '$value.') === 0) {
+        $param = substr($param, 7);
+        $params[$name] = \CRM_Utils_Array::value($param, $result);
+      }
+    }
+
+    try {
+      $getFields = civicrm_api4($chainEntity, 'getFields', ['select' => ['name']], 'name');
+    }
+    catch (NotImplementedException $e) {
+      $this->markTestIncomplete($e->getMessage());
+    }
+
+    // Emulate the string-fu guesswork that api3 does
+    if ($chainEntity == $mainEntity && empty($params['id']) &&  !empty($result['id'])) {
+      $params['id'] = $result['id'];
+    }
+    elseif (empty($params['id']) && !empty($result[$lcChainEntity . '_id'])) {
+      $params['id'] = $result[$lcChainEntity . '_id'];
+    }
+    elseif (!empty($result['id']) && isset($getFields[$lcMainEntity . '_id']) && empty($params[$lcMainEntity . '_id'])) {
+      $params[$lcMainEntity . '_id'] = $result['id'];
+    }
+    return $this->runApi4Legacy($chainEntity, $chainAction, $params);
+  }
+
+  /**
+   * Fix the naming differences between api3 & api4 entities.
+   *
+   * @param string $legacyName
+   * @return string
+   */
+  public static function convertEntityNameToApi4($legacyName) {
+    $api4Name = \CRM_Utils_String::convertStringToCamel($legacyName);
+    $map = [
+      'Im' => 'IM',
+      'Acl' => 'ACL',
+    ];
+    return \CRM_Utils_Array::value($api4Name, $map, $api4Name);
   }
 
 }

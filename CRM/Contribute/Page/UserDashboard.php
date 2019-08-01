@@ -74,7 +74,7 @@ class CRM_Contribute_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBo
             'ccid' => $row['contribution_id'],
             'cs' => $this->getUserChecksum(),
             'cid' => $row['contact_id'],
-          ])
+          ]),
         ];
       }
     }

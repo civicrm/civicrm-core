@@ -695,7 +695,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
     //create/update saved search record.
     $savedSearch = new CRM_Contact_BAO_SavedSearch();
     $savedSearch->id = $ssId;
-    $savedSearch->form_values = serialize(CRM_Contact_BAO_Query::convertFormValues($params['form_values']));
+    $formValues = $params['search_context'] === 'builder' ? $params['form_values'] : CRM_Contact_BAO_Query::convertFormValues($params['form_values']);
+    $savedSearch->form_values = serialize($formValues);
     $savedSearch->mapping_id = $mappingId;
     $savedSearch->search_custom_id = CRM_Utils_Array::value('search_custom_id', $params);
     $savedSearch->save();
@@ -1044,7 +1045,7 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
    * @param array $groupIDs
    *   Array of group ids.
    *
-   * @param NULL $parents
+   * @param string $parents
    * @param string $spacer
    * @param bool $titleOnly
    *
@@ -1112,7 +1113,6 @@ WHERE  id IN $groupIdString
         ];
       }
     }
-    $dao->free();
 
     $hierarchy = [];
     for ($i = 0; $i < count($roots); $i++) {

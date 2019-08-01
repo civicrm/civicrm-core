@@ -46,14 +46,14 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
   /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_limit = NULL;
 
@@ -159,6 +159,9 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
   /**
    * Build the form object.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
     if ($this->isFormInViewOrEditMode()) {
@@ -261,7 +264,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     if (!empty($_POST) && !$this->_force) {
       $this->_formValues = $this->controller->exportValues($this->_name);
     }
-
+    $this->convertTextStringsToUseLikeOperator();
     $this->fixFormValues();
 
     // We don't show test records in summaries or dashboards
@@ -284,7 +287,6 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
         'financial_type_id',
         'contribution_soft_credit_type_id',
         'contribution_status_id',
-        'contribution_source',
         'contribution_trxn_id',
         'contribution_page_id',
         'contribution_product_id',

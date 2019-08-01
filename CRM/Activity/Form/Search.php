@@ -46,14 +46,14 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
   /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Are we restricting ourselves to a single contact.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_limit = NULL;
 
@@ -351,16 +351,6 @@ class CRM_Activity_Form_Search extends CRM_Core_Form_Search {
    */
   public function getFormValues() {
     return NULL;
-  }
-
-  /**
-   * This virtual function is used to set the default values of various form elements.
-   *
-   * @return array|NULL
-   *   reference to the array of default values
-   */
-  public function setDefaultValues() {
-    return array_merge($this->getEntityDefaults($this->getDefaultEntity()), (array) $this->_formValues);
   }
 
   /**

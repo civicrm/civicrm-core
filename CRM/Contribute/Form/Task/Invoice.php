@@ -43,7 +43,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
    * Are we operating in "single mode", i.e. updating the task of only
    * one specific contribution?
    *
-   * @var boolean
+   * @var bool
    */
   public $_single = FALSE;
 

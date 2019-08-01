@@ -152,8 +152,7 @@
     <import>true</import>
     <headerPattern>/legal\s?id/i</headerPattern>
     <dataPattern>/\w+?\d{5,}/</dataPattern>
-    <comment>May be used for SSN, EIN/TIN, Household ID (census) or other applicable unique legal/government ID.
-    </comment>
+    <comment>May be used for SSN, EIN/TIN, Household ID (census) or other applicable unique legal/government ID.</comment>
     <add>1.1</add>
     <html>
       <type>Text</type>
@@ -352,6 +351,7 @@
     <length>32</length>
     <comment>API Key for validating requests related to this contact.</comment>
     <add>2.2</add>
+    <protected>true</protected>
   </field>
   <index>
     <name>index_api_key</name>

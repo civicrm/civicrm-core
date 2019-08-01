@@ -188,15 +188,18 @@ class CRM_Custom_Form_CustomData {
   }
 
   /**
-   * @param $form
-   * @param $subType
-   * @param $gid
-   * @param $onlySubType
-   * @param $getCachedTree
+   * Add the group data as a formatted array to the form.
+   *
+   * @param CRM_Core_Form $form
+   * @param string $subType
+   * @param int $gid
+   * @param bool $onlySubType
+   * @param bool $getCachedTree
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
-  public static function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL, $getCachedTree = FALSE) {
+  public static function setGroupTree(&$form, $subType, $gid, $onlySubType = NULL, $getCachedTree = TRUE) {
     $singleRecord = NULL;
     if (!empty($form->_groupCount) && !empty($form->_multiRecordDisplay) && $form->_multiRecordDisplay == 'single') {
       $singleRecord = $form->_groupCount;

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.8/phpunit.xsd"
+  backupGlobals="false"
+  backupStaticAttributes="false"
+  colors="true"
+  convertErrorsToExceptions="true"
+  convertNoticesToExceptions="true"
+  convertWarningsToExceptions="true"
+  processIsolation="false"
+  stopOnFailure="false"
+  syntaxCheck="false"
+  bootstrap="vendor/autoload.php"
+  >
+  <testsuites>
+    <testsuite name="PHPCache">
+      <directory>./vendor/cache/cache/src/Adapter/Redis/Tests/</directory>
+      <directory>./vendor/cache/cache/src/Bridge/SimpleCache/Tests/</directory>
+    </testsuite>
+
+    <testsuite name="Laravel">
+      <directory>./vendor/cache/cache/src/Adapter/Illuminate/Tests/</directory>
+    </testsuite>
+
+    <testsuite name="Symfony">
+      <file>./vendor/symfony/cache/Tests/Adapter/FilesystemAdapterTest.php</file>
+    </testsuite>
+
+    <testsuite name="Stash">
+      <file>./tests/StashTest.php</file>
+    </testsuite>
+  </testsuites>
+
+  <filter>
+    <whitelist>
+      <directory>./</directory>
+      <exclude>
+        <directory>./Tests</directory>
+        <directory>./vendor</directory>
+      </exclude>
+    </whitelist>
+  </filter>
+</phpunit>

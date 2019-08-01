@@ -67,21 +67,21 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Is participant able to walk registration wizard.
    *
-   * @var Boolean
+   * @var bool
    */
   public $_allowConfirmation;
 
   /**
    * Is participant requires approval.
    *
-   * @var Boolean
+   * @var bool
    */
   public $_requireApproval;
 
   /**
    * Is event configured for waitlist.
    *
-   * @var Boolean
+   * @var bool
    */
   public $_allowWaitlist;
 
@@ -157,7 +157,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Is event already full.
    *
-   * @var boolean
+   * @var bool
    *
    */
 

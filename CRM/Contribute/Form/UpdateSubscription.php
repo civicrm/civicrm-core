@@ -71,24 +71,10 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     parent::preProcess();
     $this->setAction(CRM_Core_Action::UPDATE);
 
-    if ($this->contributionRecurID) {
-      try {
-        $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessorForRecurringContribution($this->contributionRecurID);
-      }
-      catch (CRM_Core_Exception $e) {
-        CRM_Core_Error::statusBounce(ts('There is no valid processor for this subscription so it cannot be edited.'));
-      }
-      catch (CiviCRM_API3_Exception $e) {
-        CRM_Core_Error::statusBounce(ts('There is no valid processor for this subscription so it cannot be edited.'));
-      }
-      $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->contributionRecurID);
-    }
-
     if ($this->_coid) {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'info');
       // @todo test & replace with $this->_paymentProcessorObj =  Civi\Payment\System::singleton()->getById($this->_paymentProcessor['id']);
       $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
-      $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
       $this->contributionRecurID = $this->_subscriptionDetails->recur_id;
     }
     elseif ($this->contributionRecurID) {

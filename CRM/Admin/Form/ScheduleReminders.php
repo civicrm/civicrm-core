@@ -463,7 +463,6 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
 
     // we need to set this on the form so that hooks can identify the created entity
     $this->set('id', $bao->id);
-    $bao->free();
 
     $status = ts("Your new Reminder titled %1 has been saved.",
       [1 => "<strong>{$values['title']}</strong>"]

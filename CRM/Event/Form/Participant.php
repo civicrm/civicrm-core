@@ -52,7 +52,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
   /**
    * The values for the quickconfig for priceset.
    *
-   * @var boolean
+   * @var bool
    */
   public $_quickConfig = NULL;
 
@@ -106,7 +106,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
    * Are we operating in "single mode", i.e. adding / editing only
    * one participant record, or is this a batch add operation
    *
-   * @var boolean
+   * @var bool
    */
   public $_single = FALSE;
 
@@ -1002,7 +1002,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
       $contributionParams = ['skipCleanMoney' => TRUE];
       $lineItem = [];
       $additionalParticipantDetails = [];
-      if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+      if (Civi::settings()->get('deferred_revenue_enabled')) {
         $eventStartDate = CRM_Core_DAO::getFieldValue('CRM_Event_DAO_Event', $this->_eventId, 'start_date');
         if (strtotime($eventStartDate) > strtotime(date('Ymt'))) {
           $contributionParams['revenue_recognition_date'] = date('Ymd', strtotime($eventStartDate));

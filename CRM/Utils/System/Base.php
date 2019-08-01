@@ -254,10 +254,9 @@ abstract class CRM_Utils_System_Base {
     }
     $out = $content;
 
-    $config = &CRM_Core_Config::singleton();
     if (
       !$print &&
-      $config->userFramework == 'WordPress'
+      CRM_Core_Config::singleton()->userFramework == 'WordPress'
     ) {
       if (!function_exists('is_admin')) {
         throw new \Exception('Function "is_admin()" is missing, even though WordPress is the user framework.');
@@ -681,7 +680,7 @@ abstract class CRM_Utils_System_Base {
     }
 
     return [
-      'url' => CRM_Utils_File::addTrailingSlash($userFrameworkResourceURL),
+      'url' => CRM_Utils_File::addTrailingSlash($userFrameworkResourceURL, '/'),
       'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
     ];
   }
@@ -914,9 +913,17 @@ abstract class CRM_Utils_System_Base {
   /**
    * Append to coreResourcesList.
    *
-   * @param array $list
+   * @param \Civi\Core\Event\GenericHookEvent $e
    */
-  public function appendCoreResources(&$list) {
+  public function appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) {
+  }
+
+  /**
+   * Modify dynamic assets.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $e
+   */
+  public function alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) {
   }
 
   /**
@@ -936,6 +943,20 @@ abstract class CRM_Utils_System_Base {
   public function synchronizeUsers() {
     throw new Exception('CMS user creation not supported for this framework');
     return [];
+  }
+
+  /**
+   * Send an HTTP Response base on PSR HTTP RespnseInterface response.
+   *
+   * @param \Psr\Http\Message\ResponseInterface $response
+   */
+  public function sendResponse(\Psr\Http\Message\ResponseInterface $response) {
+    http_response_code($response->getStatusCode());
+    foreach ($response->getHeaders() as $name => $values) {
+      CRM_Utils_System::setHttpHeader($name, implode(', ', (array) $values));
+    }
+    echo $response->getBody();
+    CRM_Utils_System::civiExit();
   }
 
 }

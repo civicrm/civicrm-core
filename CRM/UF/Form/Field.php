@@ -82,7 +82,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
    * Is this profile has searchable field.
    * or is any field having in selector true.
    *
-   * @var boolean.
+   * @var bool
    */
   protected $_hasSearchableORInSelector;
 
@@ -531,13 +531,8 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $name = $this->_selectFields[$params['field_name'][1]];
     }
 
-    //Hack for Formatting Field Name
-    if ($params['field_name'][0] == 'Formatting') {
-      $fieldName = 'formatting_' . rand(1000, 9999);
-    }
-    else {
-      $fieldName = $params['field_name'][1];
-    }
+    // If field_name is missing, it's formatting
+    $fieldName = CRM_Utils_Array::value(1, $params['field_name'], 'formatting');
 
     //check for duplicate fields
     $apiFormattedParams = $params;

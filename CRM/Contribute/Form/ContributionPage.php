@@ -53,21 +53,21 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
   /**
    * Are we in single form mode or wizard mode?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single;
 
   /**
    * Is this the first page?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_first = FALSE;
 
   /**
    * Is this the last page?
    *
-   * @var boolean
+   * @var bool
    */
   protected $_last = FALSE;
 
@@ -339,7 +339,7 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
       // @todo look to change to $defaults['start_date'] = date('Ymd His');
       // main settings form overrides this to implement above but this is left here
       // 'in case' another extending form uses start_date - for now
-      list($defaults['start_date'], $defaults['start_date_time']) = CRM_Utils_Date::setDateDefaults();
+      $defaults['start_date'] = date('Y-m-d H:i:s');
     }
 
     if (!empty($defaults['recur_frequency_unit'])) {

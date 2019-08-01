@@ -52,7 +52,7 @@ abstract class CRM_Financial_BAO_ExportFormat {
 
   /**
    * Download Exported file.
-   * @var boolean
+   * @var bool
    */
   public $_isDownloadFile;
 

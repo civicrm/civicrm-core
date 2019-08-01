@@ -278,7 +278,10 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
     $ccc = $this->_aliases['civicrm_case_contact'];
 
     foreach ($this->_columns['civicrm_relationship']['filters'] as $fieldName => $field) {
-      if (!empty($this->_params[$fieldName . '_op']) && isset($this->_params[$fieldName . '_value'])) {
+      if (!empty($this->_params[$fieldName . '_op'])
+        && array_key_exists("{$fieldName}_value", $this->_params)
+        && !CRM_Utils_System::isNull($this->_params["{$fieldName}_value"])
+      ) {
         $this->_relField = TRUE;
         break;
       }

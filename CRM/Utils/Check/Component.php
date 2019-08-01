@@ -62,16 +62,20 @@ abstract class CRM_Utils_Check_Component {
    * Check if file exists on given URL.
    *
    * @param string $url
-   * @param float $timeout
+   * @param float|bool $timeoutOverride
    *
    * @return bool
    */
-  public function fileExists($url, $timeout = 0.50) {
+  public function fileExists($url, $timeoutOverride = FALSE) {
+    // Timeout past in maybe 0 in which case we should still permit it (0 is infinite).
+    if (!$timeoutOverride && $timeoutOverride !== 0) {
+      $timeoutOverride = (float) Civi::settings()->get('http_timeout');
+    }
     $fileExists = FALSE;
     try {
       $guzzleClient = new GuzzleHttp\Client();
       $guzzleResponse = $guzzleClient->request('GET', $url, array(
-        'timeout' => $timeout,
+        'timeout' => $timeoutOverride,
       ));
       $fileExists = ($guzzleResponse->getStatusCode() == 200);
     }

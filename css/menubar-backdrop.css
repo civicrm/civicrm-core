@@ -1,11 +1,11 @@
-@media (min-width: 768px) {
+@media (min-width: $breakMin) {
 
   body.crm-menubar-visible.crm-menubar-over-cms-menu {
     border-top: 0 none !important;
-    margin-top: 40px;
+    margin-top: $menubarHeight;
   }
   body.crm-menubar-visible.crm-menubar-over-cms-menu.crm-menubar-wrapped {
-    margin-top: 80px;
+    margin-top: calc($menubarHeight * 2);
   }
   body.crm-menubar-visible.crm-menubar-over-cms-menu #admin-bar {
     visibility: hidden;
@@ -28,7 +28,7 @@
   }
 
 }
-@media (max-width: 768px) {
+@media (max-width: $breakMax) {
 
   body.backdrop-admin-bar-position-absolute #civicrm-menu-nav {
     position: absolute;

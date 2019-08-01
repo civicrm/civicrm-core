@@ -58,17 +58,23 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
   protected $componentID;
 
   /**
-   * @var array in-memory cache to optimize redundant get()s
+   * In-memory cache to optimize redundant get()s.
+   *
+   * @var array
    */
   protected $valueCache;
 
   /**
-   * @var array in-memory cache to optimize redundant get()s
+   * In-memory cache to optimize redundant get()s.
+   *
+   * @var array
    *   Note: expiresCache[$key]===NULL means cache-miss
    */
   protected $expiresCache;
 
   /**
+   * Table.
+   *
    * @var string
    */
   protected $table;

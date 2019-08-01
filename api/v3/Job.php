@@ -258,9 +258,8 @@ function _civicrm_api3_job_send_reminder(&$params) {
  * @return array
  */
 function civicrm_api3_job_mail_report($params) {
-  ob_start();
   $result = CRM_Report_Utils_Report::processReport($params);
-  $output = ob_get_clean();
+
   if ($result['is_error'] == 0) {
     // this should be handling by throwing exceptions but can't remove until we can test that.
     return civicrm_api3_create_success();

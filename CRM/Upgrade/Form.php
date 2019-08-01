@@ -49,6 +49,9 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
 
   /**
    * Minimum php version required to run (equal to or lower than the minimum install version)
+   *
+   * Even though 5.6 is no longer supported, this value is left here for a while
+   * so as not to block stragglers from upgrading.
    */
   const MINIMUM_PHP_VERSION = '5.6';
 
@@ -60,7 +63,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   /**
    * Upgrade for multilingual.
    *
-   * @var boolean
+   * @var bool
    */
   public $multilingual = FALSE;
 

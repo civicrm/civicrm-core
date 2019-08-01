@@ -1,21 +1,21 @@
-@media (min-width: 768px) {
+@media (min-width: $breakMin) {
 
   body.crm-menubar-over-cms-menu.crm-menubar-visible {
-    padding-top: 40px;
+    padding-top: $menubarHeight;
   }
   body.crm-menubar-over-cms-menu.crm-menubar-visible.crm-menubar-wrapped {
-    padding-top: 80px;
+    padding-top: calc($menubarHeight * 2);
   }
 
   body.crm-menubar-below-cms-menu.crm-menubar-visible {
-    margin-top: 40px;
+    margin-top: $menubarHeight;
   }
   body.crm-menubar-below-cms-menu.crm-menubar-visible.crm-menubar-wrapped {
-    margin-top: 80px;
+    margin-top: calc($menubarHeight * 2);
   }
 
 }
-@media (max-width: 768px) {
+@media (max-width: $breakMax) {
 
   body #civicrm-menu-nav {
     position: absolute;

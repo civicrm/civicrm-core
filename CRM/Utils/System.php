@@ -51,6 +51,9 @@
  * @method static int getLoggedInUfID() Get current logged in user id.
  * @method static setHttpHeader(string $name, string $value) Set http header.
  * @method static array synchronizeUsers() Create CRM contacts for all existing CMS users.
+ * @method static appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_coreResourceList.
+ * @method static alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_getAssetUrl.
+ * @method static sendResponse(\Psr\Http\Message\ResponseInterface $response) function to handle RepsoseInterface for delivering HTTP Responses.
  */
 class CRM_Utils_System {
 
@@ -214,8 +217,7 @@ class CRM_Utils_System {
     $print = FALSE,
     $maintenance = FALSE
   ) {
-    $config = &CRM_Core_Config::singleton();
-    return $config->userSystem->theme($content, $print, $maintenance);
+    return CRM_Core_Config::singleton()->userSystem->theme($content, $print, $maintenance);
   }
 
   /**
@@ -1385,7 +1387,7 @@ class CRM_Utils_System {
    * @return mixed
    */
   public static function formatDocUrl($url) {
-    return preg_replace('#^user/#', 'user/en/stable/', $url);
+    return preg_replace('#^(user|sysadmin|dev)/#', '\1/en/stable/', $url);
   }
 
   /**
@@ -1393,9 +1395,14 @@ class CRM_Utils_System {
    *
    * @param int $status
    *   (optional) Code with which to exit.
+   *
+   * @throws \CRM_Core_PrematureExit_Exception
    */
   public static function civiExit($status = 0) {
 
+    if (CIVICRM_UF === 'UnitTests') {
+      throw new CRM_Core_Exception_PrematureExitException('civiExit called');
+    }
     if ($status > 0) {
       http_response_code(500);
     }
@@ -1612,8 +1619,7 @@ class CRM_Utils_System {
     $addLanguagePart = TRUE,
     $removeLanguagePart = FALSE
   ) {
-    $config = &CRM_Core_Config::singleton();
-    return $config->userSystem->languageNegotiationURL($url, $addLanguagePart, $removeLanguagePart);
+    return CRM_Core_Config::singleton()->userSystem->languageNegotiationURL($url, $addLanguagePart, $removeLanguagePart);
   }
 
   /**
@@ -1859,6 +1865,14 @@ class CRM_Utils_System {
     }
 
     return NULL;
+  }
+
+  /**
+   * Return an HTTP Response with appropriate content and status code set.
+   * @param \Psr\Http\Message\ResponseInterface $response
+   */
+  public static function sendResponse(\Psr\Http\Message\ResponseInterface $response) {
+    $config = CRM_Core_Config::singleton()->userSystem->sendResponse($response);
   }
 
 }

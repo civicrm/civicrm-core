@@ -61,7 +61,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   /**
    * Have we already done this search
    *
-   * @var boolean
+   * @var bool
    */
   protected $_done;
 
@@ -104,9 +104,11 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   /**
    * Metadata for fields on the search form.
    *
+   * Instantiate with empty array for contact to prevent e-notices.
+   *
    * @var array
    */
-  protected $searchFieldMetadata = [];
+  protected $searchFieldMetadata = ['Contact' => []];
 
   /**
    * @return array
@@ -123,9 +125,20 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
   }
 
   /**
+   * This virtual function is used to set the default values of various form elements.
+   *
+   * @return array|NULL
+   *   reference to the array of default values
+   * @throws \Exception
+   */
+  public function setDefaultValues() {
+    return array_merge($this->getEntityDefaults($this->getDefaultEntity()), (array) $this->_formValues);
+  }
+
+  /**
    * Common buildForm tasks required by all searches.
    */
-  public function buildQuickform() {
+  public function buildQuickForm() {
     CRM_Core_Resources::singleton()
       ->addScriptFile('civicrm', 'js/crm.searchForm.js', 1, 'html-header')
       ->addStyleFile('civicrm', 'css/searchForm.css', 1, 'html-header');
@@ -159,7 +172,11 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
           $this->addDatePickerRange($fieldName, $fieldSpec['title'], ($fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)));
         }
         else {
-          $this->addField($fieldName, ['entity' => $entity]);
+          $props = ['entity' => $entity];
+          if (isset($fields[$fieldName]['title'])) {
+            $props['label'] = $fields[$fieldName]['title'];
+          }
+          $this->addField($fieldName, $props);
         }
       }
     }
@@ -186,7 +203,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     foreach ($form->getSearchFieldMetadata() as $entity => $spec) {
       foreach ($spec as $fieldName => $fieldSpec) {
         if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || $fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
-          if (isset($fields[$fieldName . '_high']) && isset($fields[$fieldName . '_low']) && empty($fields[$fieldName . '_relative'])) {
+          if (!empty($fields[$fieldName . '_high']) && !empty($fields[$fieldName . '_low']) && empty($fields[$fieldName . '_relative'])) {
             if (strtotime($fields[$fieldName . '_low']) > strtotime($fields[$fieldName . '_high'])) {
               $errors[$fieldName . '_low'] = ts('%1: Please check that your date range is in correct chronological order.', [1 => $fieldSpec['title']]);
             }
@@ -252,6 +269,23 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       }
     }
     return $defaults;
+  }
+
+  /**
+   * Convert any submitted text fields to use 'like' rather than '=' as the operator.
+   *
+   * This excludes any with options.
+   *
+   * Note this will only pick up fields declared via metadata.
+   */
+  protected function convertTextStringsToUseLikeOperator() {
+    foreach (CRM_Utils_Array::value($this->getDefaultEntity(), $this->getSearchFieldMetadata(), []) as $fieldName => $field) {
+      if (!empty($this->_formValues[$fieldName]) && empty($field['options']) && empty($field['pseudoconstant'])) {
+        if (in_array($field['type'], [CRM_Utils_Type::T_STRING, CRM_Utils_Type::T_TEXT])) {
+          $this->_formValues[$fieldName] = ['LIKE' => CRM_Contact_BAO_Query::getWildCardedValue(TRUE, 'LIKE', $this->_formValues[$fieldName])];
+        }
+      }
+    }
   }
 
   /**

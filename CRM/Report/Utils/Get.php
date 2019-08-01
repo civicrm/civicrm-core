@@ -178,6 +178,11 @@ class CRM_Report_Utils_Get {
         }
         break;
 
+      case 'nll':
+      case 'nnll':
+        $defaults["{$fieldName}_op"] = $fieldOP;
+        break;
+
       case 'in':
       case 'notin':
         // send the type as string so that multiple values can also be retrieved from url.

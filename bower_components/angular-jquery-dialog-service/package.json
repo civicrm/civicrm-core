@@ -1,0 +1,9 @@
+{
+  "name" : "angular-jquery-dialog-service",
+  "description": "An Angular.js service that allows you to easily work with jQuery UI dialogs.",
+  "homepage": "https://github.com/jwstadler/angular-jquery-dialog-service",
+  "author": "Jason Stadler",
+  "repository": {"type": "git", "url": "git://github.com/jwstadler/angular-jquery-dialog-service.git"},
+  "main": "dialog-service.js",
+  "version": "0.8.1"
+}

@@ -13,8 +13,8 @@
     <url desc="Documentation">https://wiki.civicrm.org/confluence/display/CRM/API+v4+Spec</url>
     <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
-  <releaseDate>2019-05-12</releaseDate>
-  <version>4.4.1</version>
+  <releaseDate>2019-05-22</releaseDate>
+  <version>4.4.2</version>
   <develStage>stable</develStage>
   <compatibility>
     <ver>5.13</ver>

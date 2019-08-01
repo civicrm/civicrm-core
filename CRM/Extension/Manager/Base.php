@@ -35,7 +35,9 @@
 class CRM_Extension_Manager_Base implements CRM_Extension_Manager_Interface {
 
   /**
-   * @var bool hether to automatically uninstall and install during 'replace'
+   * Whether to automatically uninstall and install during 'replace'.
+   *
+   * @var bool
    */
   public $autoReplace;
 

@@ -34,7 +34,14 @@ class DAODeleteAction extends AbstractBatchAction {
   protected function deleteObjects($items) {
     $ids = [];
     $baoName = $this->getBaoName();
-    if (method_exists($baoName, 'del')) {
+
+    if ($this->getCheckPermissions()) {
+      foreach ($items as $item) {
+        $this->checkContactPermissions($baoName, $item);
+      }
+    }
+
+    if ($this->getEntityName() !== 'EntityTag' && method_exists($baoName, 'del')) {
       foreach ($items as $item) {
         $args = [$item['id']];
         $bao = call_user_func_array([$baoName, 'del'], $args);

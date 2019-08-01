@@ -293,7 +293,7 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
    * @param bool $showStatus
    *   Do we need to set status or not.
    *
-   * @return int|NULL
+   * @return int|null
    *   no of deleted notes on success, null otherwise
    */
   public static function del($id, $showStatus = TRUE) {
@@ -315,12 +315,10 @@ class CRM_Core_BAO_Note extends CRM_Core_DAO_Note {
       $childNote = new CRM_Core_DAO_Note();
       $childNote->id = $childId;
       $childNote->delete();
-      $childNote->free();
       $recent[] = $childId;
     }
 
     $return = $note->delete();
-    $note->free();
     if ($showStatus) {
       CRM_Core_Session::setStatus($status, ts('Deleted'), 'success');
     }

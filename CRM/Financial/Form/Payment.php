@@ -51,7 +51,7 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
   public $isBackOffice = FALSE;
 
   /**
-   * @var String
+   * @var string
    */
   public $_formName = '';
 
@@ -78,11 +78,6 @@ class CRM_Financial_Form_Payment extends CRM_Core_Form {
     $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($this->_paymentProcessorID);
 
     CRM_Core_Payment_ProcessorForm::preProcess($this);
-
-    self::addCreditCardJs($this->_paymentProcessorID);
-
-    $this->assign('paymentProcessorID', $this->_paymentProcessorID);
-    $this->assign('currency', $this->currency);
 
     $this->assign('suppressForm', TRUE);
     $this->controller->_generateQFKey = FALSE;

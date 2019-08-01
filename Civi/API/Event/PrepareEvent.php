@@ -26,6 +26,7 @@
  */
 
 namespace Civi\API\Event;
+use Civi\API\Provider\WrappingProvider;
 
 /**
  * Class PrepareEvent
@@ -40,6 +41,30 @@ class PrepareEvent extends Event {
    */
   public function setApiRequest($apiRequest) {
     $this->apiRequest = $apiRequest;
+    return $this;
+  }
+
+  /**
+   * Replace the normal implementation of an API call with some wrapper.
+   *
+   * The wrapper has discretion to call -- or not call -- or iterate with --
+   * the original API implementation, with original or substituted arguments.
+   *
+   * Ex:
+   *
+   * $event->wrapApi(function($apiRequest, $continue){
+   *   echo "Hello\n";
+   *   $continue($apiRequest);
+   *   echo "Goodbye\n";
+   * });
+   *
+   * @param callable $callback
+   *   The custom API implementation.
+   *   Function(array $apiRequest, callable $continue).
+   * @return PrepareEvent
+   */
+  public function wrapApi($callback) {
+    $this->apiProvider = new WrappingProvider($callback, $this->apiProvider);
     return $this;
   }
 
