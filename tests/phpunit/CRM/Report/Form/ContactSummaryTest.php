@@ -196,4 +196,36 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
     }
   }
 
+  /**
+   * Test that Loation Type prints out a sensible piece of data
+   */
+  public function testLocationTypeIdHandling() {
+    $customLocationType = $this->callAPISuccess('LocationType', 'create', [
+      'name' => 'Custom Location Type',
+      'display_name' => 'CiviTest Custom Location Type',
+      'is_active' => 1,
+    ]);
+    $this->individualCreate([
+      'api.Address.create' => [
+        'location_type_id' => $customLocationType['id'],
+        'is_primary' => 1,
+        'street_number' => 3,
+      ],
+    ]);
+    $input = [
+      'fields' => [
+        'address_street_number',
+        'address_odd_street_number',
+        'address_location_type_id',
+      ],
+    ];
+    $obj = $this->getReportObject('CRM_Report_Form_Contact_Summary', $input);
+    $obj->setParams($obj->getParams());
+    $sql = $obj->buildQuery(TRUE);
+    $rows = [];
+    $obj->buildRows($sql, $rows);
+    $obj->formatDisplay($rows);
+    $this->assertEquals('CiviTest Custom Location Type', $rows[0]['civicrm_address_address_location_type_id']);
+  }
+
 }

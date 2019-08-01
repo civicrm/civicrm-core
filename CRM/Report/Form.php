@@ -5777,7 +5777,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'options' => CRM_Core_PseudoConstant::country(),
       ],
       $options['prefix'] . 'location_type_id' => [
-        'name' => 'is_primary',
+        'name' => 'location_type_id',
         'title' => $options['prefix_label'] . ts('Location Type'),
         'type' => CRM_Utils_Type::T_INT,
         'is_fields' => TRUE,
