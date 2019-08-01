@@ -1011,18 +1011,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           ) {
             $realField = $fields[$key]['is_pseudofield_for'] ?? $key;
             $realFieldSpec = $fields[$realField];
-            /* @var \CRM_Core_DAO $bao */
-            $bao = $realFieldSpec['bao'];
-            // Get names & labels - we will try to match name first but if not available then see if
-            // we have a label that can be converted to a name.
-            // For historical reasons use validate as context - ie disabled name matches ARE permitted per prior to change.
-            $nameOptions = $bao::buildOptions($realField, 'validate');
-            if (!isset($nameOptions[$value])) {
-              $labelOptions = array_flip($bao::buildOptions($realField, 'match'));
-              if (isset($labelOptions[$params[$key]])) {
-                $values[$key] = $labelOptions[$params[$key]];
-              }
-            }
+            $values[$key] = $this->parsePseudoConstantField($value, $realFieldSpec);
           }
           break;
       }
