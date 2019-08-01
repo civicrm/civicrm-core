@@ -2412,12 +2412,6 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
       }
     }
 
-    // build array of section totals
-    $this->sectionTotals();
-
-    // process grand-total row
-    $this->grandTotal($rows);
-
     // Find alter display functions.
     $firstRow = reset($rows);
     if ($firstRow) {
@@ -2457,6 +2451,12 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
     // use this method for formatting rows for display purpose.
     $this->alterDisplay($rows);
     CRM_Utils_Hook::alterReportVar('rows', $rows, $this);
+
+    // build array of section totals
+    $this->sectionTotals();
+
+    // process grand-total row
+    $this->grandTotal($rows);
 
     // use this method for formatting custom rows for display purpose.
     $this->alterCustomDataDisplay($rows);
