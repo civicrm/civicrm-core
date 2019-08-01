@@ -4711,6 +4711,8 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *      Not currently used in core but may be used in override extensions.
    */
   protected function joinAddressFromContact($prefix = '', $extra = []) {
+    $defaults = ['primary_only' => TRUE];
+    $params = array_merge($defaults, $extra);
     $addressTables = ['civicrm_address', 'civicrm_country', 'civicrm_worldregion', 'civicrm_state_province'];
     $isJoinRequired = $this->_addressField;
     foreach ($addressTables as $addressTable) {
@@ -4719,11 +4721,15 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       }
     }
     if ($isJoinRequired) {
-      $this->_from .= "
+      $fromJoin = "
                  LEFT JOIN civicrm_address {$this->_aliases[$prefix . 'civicrm_address']}
                            ON ({$this->_aliases[$prefix . 'civicrm_contact']}.id =
-                               {$this->_aliases[$prefix . 'civicrm_address']}.contact_id) AND
+                               {$this->_aliases[$prefix . 'civicrm_address']}.contact_id)";
+      if ($params['primary_only']) {
+        $fromJoin .= "  AND
                                {$this->_aliases[$prefix . 'civicrm_address']}.is_primary = 1\n";
+      }
+      $this->_from .= $fromJoin;
     }
   }
 
@@ -4738,15 +4744,21 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *      Not currently used in core but may be used in override extensions.
    */
   protected function joinCountryFromAddress($prefix = '', $extra = []) {
+    $defaults = ['primary_only' => TRUE];
+    $params = array_merge($defaults, $extra);
     // include country field if country column is to be included
     if ($this->isTableSelected($prefix . 'civicrm_country') || $this->isTableSelected($prefix . 'civicrm_worldregion')) {
       if (empty($this->_aliases[$prefix . 'civicrm_country'])) {
         $this->_aliases[$prefix . 'civicrm_country'] = $prefix . '_report_country';
       }
-      $this->_from .= "
+      $fromJoin = "
             LEFT JOIN civicrm_country {$this->_aliases[$prefix . 'civicrm_country']}
-                   ON {$this->_aliases[$prefix . 'civicrm_address']}.country_id = {$this->_aliases[$prefix . 'civicrm_country']}.id AND
+                   ON {$this->_aliases[$prefix . 'civicrm_address']}.country_id = {$this->_aliases[$prefix . 'civicrm_country']}.id";
+      if ($params['primary_only']) {
+        $fromJoin .= " AND
                       {$this->_aliases[$prefix . 'civicrm_address']}.is_primary = 1 ";
+      }
+      $this->_from .= $fromJoin;
     }
   }
 
@@ -4761,12 +4773,18 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *      Not currently used in core but may be used in override extensions.
    */
   protected function joinPhoneFromContact($prefix = '', $extra = []) {
+    $defaults = ['primary_only' => TRUE];
+    $params = array_merge($defaults, $extra);
     // include phone field if phone column is to be included
     if ($this->isTableSelected($prefix . 'civicrm_phone')) {
-      $this->_from .= "
+      $fromJoin = "
       LEFT JOIN civicrm_phone {$this->_aliases[$prefix . 'civicrm_phone']}
-             ON {$this->_aliases[$prefix . 'civicrm_contact']}.id = {$this->_aliases[$prefix . 'civicrm_phone']}.contact_id AND
+             ON {$this->_aliases[$prefix . 'civicrm_contact']}.id = {$this->_aliases[$prefix . 'civicrm_phone']}.contact_id";
+      if ($params['primary_only']) {
+        $fromJoin .= " AND
                 {$this->_aliases[$prefix . 'civicrm_phone']}.is_primary = 1\n";
+      }
+      $this->_from .= $fromJoin;
     }
   }
 
@@ -4781,12 +4799,18 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
    *      Not currently used in core but may be used in override extensions.
    */
   protected function joinEmailFromContact($prefix = '', $extra = []) {
+    $defaults = ['primary_only' => TRUE];
+    $params = array_merge($defaults, $extra);
     // include email field if email column is to be included
     if ($this->isTableSelected($prefix . 'civicrm_email')) {
-      $this->_from .= "
+      $fromJoin = "
             LEFT JOIN  civicrm_email {$this->_aliases[$prefix . 'civicrm_email']}
-                   ON ({$this->_aliases[$prefix . 'civicrm_contact']}.id = {$this->_aliases[$prefix . 'civicrm_email']}.contact_id AND
-                       {$this->_aliases[$prefix . 'civicrm_email']}.is_primary = 1) ";
+                   ON {$this->_aliases[$prefix . 'civicrm_contact']}.id = {$this->_aliases[$prefix . 'civicrm_email']}.contact_id";
+      if ($params['primary_only']) {
+        $fromJoin .= " AND
+                       {$this->_aliases[$prefix . 'civicrm_email']}.is_primary = 1 ";
+      }
+      $this->_from .= $fromJoin;
     }
   }
 

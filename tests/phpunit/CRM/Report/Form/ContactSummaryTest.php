@@ -51,6 +51,11 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
    * Ensure the new Odd/Event street number sort column works correctly
    */
   public function testOddEvenStreetNumber() {
+    $customLocationType = $this->callAPISuccess('LocationType', 'create', [
+      'name' => 'Custom Location Type',
+      'display_name' => 'CiviTest Custom Location Type',
+      'is_active' => 1,
+    ]);
     // Create 5 contacts where:
     //  Contact A - Odd Street number - 3
     //  Contact B - Odd Street number - 5
@@ -88,7 +93,13 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
       ]),
       'no_street_number' => $this->individualCreate(),
     ];
-
+    // Create a non primary address to check that we are only outputting primary contact details.
+    $this->callAPISuccess('Address', 'create', [
+      'contact_id' => $contactIDs['even_street_number_2'],
+      'location_type_id' => $customLocationType['id'],
+      'is_primary' => 0,
+      'street_number' => 6,
+    ]);
     $input = [
       'fields' => [
         'address_street_number',
@@ -193,7 +204,14 @@ class CRM_Report_Form_ContactSummaryTest extends CiviReportTestCase {
       $this->assertEquals($case['expected_contact_ids'], CRM_Utils_Array::collect('civicrm_contact_id', $rows));
       // check the order clause
       $this->assertEquals(TRUE, !empty(strstr($sql, $case['expected_orderby_clause'])));
+      // Ensure that we are only fetching primary fields.
+      foreach ($rows as $row) {
+        if ($row['civicrm_contact_id'] == $contactIDs['even_street_number_2']) {
+          $this->assertEquals(4, $row['civicrm_address_address_street_number']);
+        }
+      }
     }
+    $this->callAPISuccess('LocationType', 'Delete', ['id' => $customLocationType['id']]);
   }
 
   /**
