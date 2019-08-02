@@ -445,7 +445,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'custom_field_id' => $this->getCustomFieldID('country'),
         'options_per_line' => NULL,
         'text_length' => NULL,
-        'data_type' => 'Int',
+        'data_type' => 'Country',
         'html_type' => 'Select Country',
         'is_search_range' => '0',
         'id' => $this->getCustomFieldID('country'),
@@ -467,6 +467,12 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'where' => 'civicrm_value_custom_group_' . $customGroupID . '.country_' . $this->getCustomFieldID('country'),
         'extends_table' => 'civicrm_contact',
         'search_table' => 'contact_a',
+        'pseudoconstant' => [
+          'table' => 'civicrm_country',
+          'keyColumn' => 'id',
+          'labelColumn' => 'name',
+          'nameColumn' => 'iso_code',
+        ],
       ],
       $this->getCustomFieldName('file') => [
         'name' => $this->getCustomFieldName('file'),

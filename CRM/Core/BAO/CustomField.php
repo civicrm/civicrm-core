@@ -541,7 +541,6 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           // Search table is used by query object searches..
           $fields[$dao->id]['search_table'] = ($fields[$dao->id]['extends_table'] == 'civicrm_contact') ? 'contact_a' : $fields[$dao->id]['extends_table'];
           self::getOptionsForField($fields[$dao->id], $dao->option_group_name);
-
         }
 
         Civi::cache('fields')->set("custom importableFields $cacheKey", $fields);

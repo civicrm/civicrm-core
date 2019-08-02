@@ -1408,6 +1408,9 @@ class CRM_Export_BAO_ExportProcessor {
       switch ($fieldSpec['type']) {
         case CRM_Utils_Type::T_INT:
         case CRM_Utils_Type::T_BOOLEAN:
+          if (in_array(CRM_Utils_Array::value('data_type', $fieldSpec), ['Country', 'StateProvince', 'ContactReference'])) {
+            return "$fieldName varchar(255)";
+          }
           return "$fieldName varchar(16)";
 
         case CRM_Utils_Type::T_STRING:
@@ -1464,8 +1467,6 @@ class CRM_Export_BAO_ExportProcessor {
                 $length = max(512, CRM_Utils_Array::value('text_length', $queryFields[$columnName]));
                 return "$fieldName varchar($length)";
 
-              case 'Country':
-              case 'StateProvince':
               case 'Link':
                 return "$fieldName varchar(255)";
 

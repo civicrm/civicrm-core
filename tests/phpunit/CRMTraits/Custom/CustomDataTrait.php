@@ -142,7 +142,7 @@ trait CRMTraits_Custom_CustomDataTrait {
     $ids['file'] = $fileField['id'];
     $ids['country'] = $this->customFieldCreate([
       'custom_group_id' => $customGroupID,
-      'data_type' => 'Int',
+      'data_type' => 'Country',
       'html_type' => 'Select Country',
       'default_value' => '',
       'label' => 'Country',
