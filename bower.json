@@ -34,7 +34,8 @@
     "phantomjs-polyfill": "^0.0.2",
     "es6-promise": "^4.2.4",
     "angular-xeditable": "^0.9.0",
-    "checklist-model": "~1"
+    "checklist-model": "~1",
+    "css-color-names": "~1"
   },
   "resolutions": {
     "angular": "~1.5.11",
