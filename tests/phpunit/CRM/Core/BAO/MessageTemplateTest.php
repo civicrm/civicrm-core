@@ -21,6 +21,7 @@ class CRM_Core_BAO_MessageTemplateTest extends CiviUnitTestCase {
     $tplParams = [
       'isCaseActivity' => 1,
       'client_id' => $client_id,
+      // activityTypeName means label here not name, but it's ok because label is desired here (dev/core#1116-ok-label)
       'activityTypeName' => 'Follow up',
       'activity' => [
         'fields' => [
