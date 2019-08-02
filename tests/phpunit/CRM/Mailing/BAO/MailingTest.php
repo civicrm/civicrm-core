@@ -422,6 +422,49 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test That No BUlk Emails User Optt Out is resepected when constructing a mailing
+   */
+  public function testGetReceipientNoBulkEmails() {
+    // Set up groups; 3 standard, 4 smart
+    $groupIDs = [];
+    $params = [
+      'name' => 'Test static group 1',
+      'title' => 'Test static group 1',
+      'is_active' => 1,
+    ];
+    $groupIDs[] = $this->groupCreate($params);
+
+    // Create contacts
+    $contactIDs = [
+      $this->individualCreate(['last_name' => 'test_contact1'], 0),
+      $this->individualCreate(['last_name' => 'test_contact2', 'is_opt_out' => 1], 1),
+    ];
+
+    // Add contacts to static groups
+    $this->callAPISuccess('GroupContact', 'Create', [
+      'group_id' => $groupIDs[0],
+      'contact_id' => $contactIDs[0],
+    ]);
+    $this->callAPISuccess('GroupContact', 'Create', [
+      'group_id' => $groupIDs[0],
+      'contact_id' => $contactIDs[1],
+    ]);
+
+    // Check that we can include static groups in the mailing.
+    // Expected: Contacts [0-3] should be included.
+    $mailing = $this->callAPISuccess('Mailing', 'create', []);
+    $this->createMailingGroup($mailing['id'], $groupIDs[0]);
+    $this->assertRecipientsCorrect($mailing['id'], [$contactIDs[0]]);
+    $this->deleteMailing($mailing['id']);
+    foreach ($groupIDs as $groupID) {
+      $this->groupDelete($groupID);
+    }
+    foreach ($contactIDs as $contactID) {
+      $this->contactDelete($contactID);
+    }
+  }
+
+  /**
    * Test CRM_Mailing_BAO_Mailing::getRecipients() on sms mode
    */
   public function testgetRecipientsSMS() {
