@@ -1670,21 +1670,9 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       foreach ($details['memberships'] as $membershipId => $membershipValues) {
         $relTypeIds = [];
         if ($action & CRM_Core_Action::DELETE) {
-          // Delete memberships of the related contacts only if relationship type exists for membership type
-          $query = "
-SELECT relationship_type_id, relationship_direction
-  FROM civicrm_membership_type
- WHERE id = {$membershipValues['membership_type_id']}";
-          $dao = CRM_Core_DAO::executeQuery($query);
-          $relTypeDirs = [];
-          while ($dao->fetch()) {
-            $relTypeId = $dao->relationship_type_id;
-            $relDirection = $dao->relationship_direction;
-          }
-          $relTypeIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $relTypeId);
-          if (in_array($values[$cid]['relationshipTypeId'], $relTypeIds
-            //CRM-16300 check if owner membership exist for related membership
-            ) && !empty($membershipValues['owner_membership_id']) && !empty($values[$mainRelatedContactId]['memberships'][$membershipValues['owner_membership_id']])) {
+          // @todo don't return relTypeId here - but it seems to be used later in a cryptic way (hint cryptic is not a complement).
+          list($relTypeId, $isDeletable) = self::isInheritedMembershipInvalidated($membershipValues, $values, $cid, $mainRelatedContactId);
+          if ($isDeletable) {
             CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['membership_contact_id']);
           }
           continue;
@@ -2322,6 +2310,33 @@ AND cc.sort_name LIKE '%$name%'";
   private static function isRelationshipTypeCurrentEmployer(int $existingTypeID): bool {
     $isCurrentEmployerRelationshipType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $existingTypeID, 'name_b_a') === 'Employer of';
     return $isCurrentEmployerRelationshipType;
+  }
+
+  /**
+   * Is the inherited relationship invalidated by this relationship change.
+   *
+   * @param $membershipValues
+   * @param array $values
+   * @param int $cid
+   * @param int $mainRelatedContactId
+   *
+   * @return array
+   */
+  private static function isInheritedMembershipInvalidated($membershipValues, array $values, $cid, $mainRelatedContactId): array {
+    // Delete memberships of the related contacts only if relationship type exists for membership type
+    $query = "
+SELECT relationship_type_id, relationship_direction
+  FROM civicrm_membership_type
+ WHERE id = {$membershipValues['membership_type_id']}";
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      $relTypeId = $dao->relationship_type_id;
+    }
+    $relTypeIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $relTypeId);
+    $isDeletable = in_array($values[$cid]['relationshipTypeId'], $relTypeIds
+      //CRM-16300 check if owner membership exist for related membership
+      ) && !empty($membershipValues['owner_membership_id']) && !empty($values[$mainRelatedContactId]['memberships'][$membershipValues['owner_membership_id']]);
+    return [$relTypeId, $isDeletable];
   }
 
 }
