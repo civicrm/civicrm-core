@@ -789,12 +789,13 @@ class CRM_Core_Resources {
       $items[] = 'bower_components/smartmenus/dist/jquery.smartmenus.min.js';
       $items[] = 'bower_components/smartmenus/dist/addons/keyboard/jquery.smartmenus.keyboard.min.js';
       $items[] = 'js/crm.menubar.js';
+      // @see CRM_Core_Resources::renderMenubarStylesheet
       $items[] = Civi::service('asset_builder')->getUrl('crm-menubar.css', [
-        'color' => Civi::settings()->get('menubar_color'),
+        'menubarColor' => Civi::settings()->get('menubar_color'),
         'height' => 40,
         'breakpoint' => 768,
-        'opacity' => .88,
       ]);
+      // Variables for crm.menubar.js
       $items[] = [
         'menubar' => [
           'position' => $position,
@@ -861,7 +862,7 @@ class CRM_Core_Resources {
       return;
     }
     $e->mimeType = 'text/css';
-    $e->content = '';
+    $content = '';
     $config = CRM_Core_Config::singleton();
     $cms = strtolower($config->userFramework);
     $cms = $cms === 'drupal' ? 'drupal7' : $cms;
@@ -871,26 +872,23 @@ class CRM_Core_Resources {
       "css/menubar-$cms.css",
     ];
     foreach ($items as $item) {
-      $e->content .= file_get_contents(self::singleton()->getPath('civicrm', $item));
+      $content .= file_get_contents(self::singleton()->getPath('civicrm', $item));
     }
-    $color = $e->params['color'];
-    if (!CRM_Utils_Rule::color($color)) {
-      $color = Civi::settings()->getDefault('menubar_color');
-    }
+    $params = $e->params;
+    // "color" is deprecated in favor of the more specific "menubarColor"
+    $menubarColor = $params['color'] ?? $params['menubarColor'];
     $vars = [
-      'resourceBase' => rtrim($config->resourceBase, '/'),
-      'menubarHeight' => $e->params['height'] . 'px',
-      'breakMin' => $e->params['breakpoint'] . 'px',
-      'breakMax' => ($e->params['breakpoint'] - 1) . 'px',
-      'menubarColor' => $color,
-      'menuItemColor' => 'rgba(' . implode(', ', CRM_Utils_Color::getRgb($color)) . ", {$e->params['opacity']})",
-      'highlightColor' => CRM_Utils_Color::getHighlight($color),
-      'textColor' => CRM_Utils_Color::getContrast($color, '#333', '#ddd'),
+      '$resourceBase' => rtrim($config->resourceBase, '/'),
+      '$menubarHeight' => $params['height'] . 'px',
+      '$breakMin' => $params['breakpoint'] . 'px',
+      '$breakMax' => ($params['breakpoint'] - 1) . 'px',
+      '$menubarColor' => $menubarColor,
+      '$menuItemColor' => $params['menuItemColor'] ?? 'rgba(' . implode(', ', CRM_Utils_Color::getRgb($menubarColor)) . ", .9)",
+      '$highlightColor' => $params['highlightColor'] ?? CRM_Utils_Color::getHighlight($menubarColor),
+      '$textColor' => $params['textColor'] ?? CRM_Utils_Color::getContrast($menubarColor, '#333', '#ddd'),
     ];
-    $vars['highlightTextColor'] = CRM_Utils_Color::getContrast($vars['highlightColor'], '#333', '#ddd');
-    foreach ($vars as $var => $val) {
-      $e->content = str_replace('$' . $var, $val, $e->content);
-    }
+    $vars['$highlightTextColor'] = $params['highlightTextColor'] ?? CRM_Utils_Color::getContrast($vars['$highlightColor'], '#333', '#ddd');
+    $e->content = str_replace(array_keys($vars), array_values($vars), $content);
   }
 
   /**

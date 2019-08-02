@@ -1046,7 +1046,7 @@ return [
     'is_contact' => 0,
     'description' => ts('Color of the CiviCRM main menu.'),
     'help_text' => NULL,
-    'validate_callback' => 'CRM_Utils_Rule::color',
+    'validate_callback' => 'CRM_Utils_Color::normalize',
   ],
   'requestableMimeTypes' => [
     'group_name' => 'CiviCRM Preferences',
