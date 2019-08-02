@@ -58,6 +58,11 @@ function _civicrm_api3_relationship_create_spec(&$params) {
   $params['contact_id_b']['api.required'] = 1;
   $params['relationship_type_id']['api.required'] = 1;
   $params['is_active']['api.default'] = 1;
+  $params['is_current_employer'] = [
+    'title' => 'Is Current Employer?',
+    'description' => 'This is a optional parameter used to add employer contact when \'Employee Of\' relationship is created',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  ];
 }
 
 /**

@@ -117,23 +117,24 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
 
   /**
    * Test Current Employer is correctly set.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCurrentEmployerRelationship() {
     $employerRelationshipID = $this->callAPISuccessGetValue('RelationshipType', [
-      'return' => "id",
-      'name_b_a' => "Employer Of",
+      'return' => 'id',
+      'name_b_a' => 'Employer Of',
     ]);
     $employerRelationship = $this->callAPISuccess('Relationship', 'create', [
       'contact_id_a' => $this->_cId_a,
       'contact_id_b' => $this->_cId_b,
       'relationship_type_id' => $employerRelationshipID,
+      'is_current_employer' => 1,
     ]);
-    $params = [$this->_cId_a => $this->_cId_b];
-    CRM_Contact_BAO_Contact_Utils::setCurrentEmployer($params);
 
     //Check if current employer is correctly set.
     $employer = $this->callAPISuccessGetValue('Contact', [
-      'return' => "current_employer",
+      'return' => 'current_employer',
       'id' => $this->_cId_a,
     ]);
     $organisation = $this->callAPISuccessGetValue('Contact', [
@@ -148,7 +149,7 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
       'relationship_type_id' => $this->_relTypeID,
     ]);
     $employeeContact = $this->callAPISuccessGetSingle('Contact', [
-      'return' => ["current_employer"],
+      'return' => ['current_employer'],
       'id' => $this->_cId_a,
     ]);
     //current employer should be removed.
@@ -1356,6 +1357,50 @@ class api_v3_RelationshipTest extends CiviUnitTestCase {
     // Deleting the organization should cause the related membership to be deleted.
     $this->callAPISuccess('contact', 'delete', ['id' => $this->_cId_b]);
     $this->callAPISuccessGetCount('membership', ['contact_id' => $this->_cId_a], 0);
+  }
+
+  /**
+   * Test api respects is_current_employer.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testRelationshipCreateWithEmployerData() {
+    // CASE A: Create a current employee relationship without setting end date, ensure that employer field is set
+    $params = [
+      'relationship_type_id' => '5_a_b',
+      'related_contact_id' => $this->_cId_b,
+      'start_date' => '2008-12-20',
+      'end_date' => NULL,
+      'is_active' => 1,
+      'is_current_employer' => 1,
+      'is_permission_a_b' => 0,
+      'is_permission_b_a' => 0,
+    ];
+    $reln = new CRM_Contact_Form_Relationship();
+    $reln->_action = CRM_Core_Action::ADD;
+    $reln->_contactId = $this->_cId_a;
+    list ($params, $relationshipIds) = $reln->submit($params);
+    $this->assertEquals(
+      $this->_cId_b,
+      $this->callAPISuccess('Contact', 'getvalue', [
+        'id' => $this->_cId_a,
+        'return' => 'current_employer_id',
+      ]));
+    // CASE B: Create a past employee relationship by setting end date of past, ensure that employer field is cleared
+    $params = [
+      'relationship_type_id' => '5_a_b',
+      'related_contact_id' => $this->_cId_b,
+      // set date to past date
+      'end_date' => '2010-12-20',
+    ];
+    $reln->_action = CRM_Core_Action::UPDATE;
+    $reln->_relationshipId = $relationshipIds[0];
+    list ($params, $relationshipIds) = $reln->submit($params);
+    $this->assertEmpty($this->callAPISuccess('Contact', 'getvalue', [
+      'id' => $this->_cId_a,
+      'return' => 'current_employer_id',
+    ]));
+    $this->callAPISuccess('relationship', 'delete', ['id' => $relationshipIds[0]]);
   }
 
 }
