@@ -189,6 +189,7 @@
     <length>64</length>
     <comment>FK to Relationship Type ID</comment>
     <add>1.5</add>
+    <serialize>SEPARATOR_TRIMMED</serialize>
   </field>
   <foreignKey>
     <name>relationship_type_id</name>
@@ -207,6 +208,7 @@
     <type>varchar</type>
     <length>128</length>
     <add>1.7</add>
+    <serialize>SEPARATOR_TRIMMED</serialize>
   </field>
   <field>
     <name>max_related</name>

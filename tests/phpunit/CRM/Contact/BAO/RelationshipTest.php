@@ -206,4 +206,69 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     return $data;
   }
 
+  /**
+   * Test that two similar memberships are not created for two relationships
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testSingleMembershipForTwoRelationships() {
+    $individualID = $this->individualCreate(['display_name' => 'Individual A']);
+    $organisationID = $this->organizationCreate(['organization_name' => 'Organization B']);
+    $membershipOrganisationID = $this->organizationCreate(['organization_name' => 'Membership Organization']);
+    $orgToPersonTypeId1 = $this->relationshipTypeCreate(['name_a_b' => 'Inherited_Relationship_1_A_B', 'name_b_a' => 'Inherited_Relationship_1_B_A']);
+    $orgToPersonTypeId2 = $this->relationshipTypeCreate(['name_a_b' => 'Inherited_Relationship_2_A_B', 'name_b_a' => 'Inherited_Relationship_2_B_A']);
+
+    $membershipType = $this->callAPISuccess('MembershipType', 'create', [
+      'member_of_contact_id' => $membershipOrganisationID,
+      'financial_type_id' => 'Member Dues',
+      'duration_unit' => 'year',
+      'duration_interval' => 1,
+      'period_type' => 'rolling',
+      'name' => 'Inherited Membership',
+      'relationship_type_id' => [$orgToPersonTypeId1, $orgToPersonTypeId2],
+      'relationship_direction' => ['b_a', 'a_b'],
+    ]);
+    $membershipType = $this->callAPISuccessGetSingle('MembershipType', ['id' => $membershipType['id']]);
+    // Check the metadata worked....
+    $this->assertEquals([$orgToPersonTypeId1, $orgToPersonTypeId2], $membershipType['relationship_type_id']);
+    $this->assertEquals(['b_a', 'a_b'], $membershipType['relationship_direction']);
+
+    $this->callAPISuccess('Membership', 'create', [
+      'membership_type_id' => $membershipType['id'],
+      'contact_id' => $organisationID,
+    ]);
+
+    $relationshipOne = $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $individualID,
+      'contact_id_b' => $organisationID,
+      'relationship_type_id' => $orgToPersonTypeId1,
+    ]);
+    $relationshipTwo = $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $individualID,
+      'contact_id_b' => $organisationID,
+      'relationship_type_id' => $orgToPersonTypeId2,
+    ]);
+
+    /*
+     * @todo this section not yet working due to bug in would-be-tested code.
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+    $relationshipTwo['is_active'] = 0;
+    $this->callAPISuccess('Relationship', 'create', $relationshipTwo);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+    $relationshipOne['is_active'] = 0;
+    $this->callAPISuccess('Relationship', 'create', $relationshipOne);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 0);
+    $relationshipOne['is_active'] = 1;
+    $this->callAPISuccess('Relationship', 'create', $relationshipOne);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+    $relationshipTwo['is_active'] = 1;
+    $this->callAPISuccess('Relationship', 'create', $relationshipTwo);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+    $this->callAPISuccess('Relationship', 'delete', ['id' => $relationshipTwo['id']]);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+    $this->callAPISuccess('Relationship', 'delete', ['id' => $relationshipOne['id']]);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 0);
+     */
+  }
+
 }
