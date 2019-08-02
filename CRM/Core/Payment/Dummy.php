@@ -14,6 +14,8 @@
  * $Id: Dummy.php 45429 2013-02-06 22:11:18Z lobo $
  */
 
+use Civi\Payment\Exception\PaymentProcessorException;
+
 /**
  * Dummy payment processor
  */
@@ -73,6 +75,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    *
    * @return array
    *   the result in a nice formatted array (or an error object)
+   * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
   public function doDirectPayment(&$params) {
     // Invoke hook_civicrm_paymentProcessor
@@ -99,6 +102,9 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     //end of hook invocation
     if (!empty($this->_doDirectPaymentResult)) {
       $result = $this->_doDirectPaymentResult;
+      if (CRM_Utils_Array::value('payment_status_id', $result) === 'failed') {
+        throw new PaymentProcessorException($result['message'] ?? 'failed');
+      }
       $result['trxn_id'] = array_shift($this->_doDirectPaymentResult['trxn_id']);
       return $result;
     }
