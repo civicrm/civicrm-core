@@ -275,7 +275,7 @@
   </item>
   <item>
      <path>civicrm/admin/scheduleReminders</path>
-     <title>Schedule Reminders</title>[A
+     <title>Schedule Reminders</title>
      <desc>Schedule Reminders.</desc>
      <page_callback>CRM_Admin_Page_ScheduleReminders</page_callback>
      <access_callback>1</access_callback>
@@ -719,6 +719,7 @@
      <path>civicrm/sms/callback</path>
      <page_callback>CRM_SMS_Page_Callback</page_callback>
      <access_callback>1</access_callback>
+     <is_public>true</is_public>
   </item>
   <item>
     <path>civicrm/admin/badgelayout</path>
