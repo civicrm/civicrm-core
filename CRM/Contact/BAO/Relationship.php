@@ -2281,8 +2281,9 @@ AND cc.sort_name LIKE '%$name%'";
   public static function isCurrentEmployerNeedingToBeCleared($params, $relationshipId, $updatedRelTypeID = NULL) {
     $existingTypeID = (int) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Relationship', $relationshipId, 'relationship_type_id');
     $updatedRelTypeID = $updatedRelTypeID ? $updatedRelTypeID : $existingTypeID;
+    $currentEmployerID = (int) civicrm_api3('Contact', 'getvalue', ['return' => 'current_employer_id', 'id' => $params['contact_id_a']]);
 
-    if (!self::isRelationshipTypeCurrentEmployer($existingTypeID)) {
+    if ($currentEmployerID !== (int) $params['contact_id_b'] || !self::isRelationshipTypeCurrentEmployer($existingTypeID)) {
       return FALSE;
     }
     //Clear employer if relationship is expired.
@@ -2294,7 +2295,16 @@ AND cc.sort_name LIKE '%$name%'";
     if ((isset($params['is_current_employer']) && empty($params['is_current_employer']))
       || ((isset($params['is_active']) && empty($params['is_active'])))
       || $existingTypeID != $updatedRelTypeID) {
-      return TRUE;
+      // If there are no other active employer relationships between the same 2 contacts...
+      if (!civicrm_api3('Relationship', 'getcount', [
+        'is_active' => 1,
+        'relationship_type_id' => $existingTypeID,
+        'id' => ['<>' => $params['id']],
+        'contact_id_a' => $params['contact_id_a'],
+        'contact_id_b' => $params['contact_id_b'],
+      ])) {
+        return TRUE;
+      }
     }
 
     return FALSE;
