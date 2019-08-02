@@ -278,13 +278,15 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
    * This is the function that check/add if the relationship created is valid.
    *
    * @param array $params
-   *   (reference ) an assoc array of name/value pairs.
+   *   Array of name/value pairs.
    * @param array $ids
    *   The array that holds all the db ids.
    * @param int $contactId
    *   This is contact id for adding relationship.
    *
    * @return CRM_Contact_BAO_Relationship
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function add($params, $ids = [], $contactId = NULL) {
     $params['id'] = CRM_Utils_Array::value('relationship', $ids, CRM_Utils_Array::value('id', $params));
@@ -311,6 +313,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     if (!empty($params['id']) && self::isCurrentEmployerNeedingToBeCleared($params, $params['id'], $type)) {
       CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($params['contact_id_a']);
     }
+
     $relationship = new CRM_Contact_BAO_Relationship();
     //@todo this code needs to be updated for the possibility that not all fields are set
     // by using $relationship->copyValues($params);
@@ -340,7 +343,18 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     }
 
     $relationship->save();
-
+    // is_current_employer is an optional parameter that triggers updating the employer_id field to reflect
+    // the relationship being updated. As of writing only truthy versions of the parameter are respected.
+    // https://github.com/civicrm/civicrm-core/pull/13331 attempted to cover both but stalled in QA
+    // so currently we have a cut down version.
+    if (!empty($params['is_current_employer'])) {
+      if (!$relationship->relationship_type_id || !$relationship->contact_id_a || !$relationship->contact_id_b) {
+        $relationship->fetch();
+      }
+      if (self::isRelationshipTypeCurrentEmployer($relationship->relationship_type_id)) {
+        CRM_Contact_BAO_Contact_Utils::setCurrentEmployer([$relationship->contact_id_a => $relationship->contact_id_b]);
+      }
+    }
     // add custom field values
     if (!empty($params['custom'])) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_relationship', $relationship->id);
@@ -1968,6 +1982,7 @@ AND cc.sort_name LIKE '%$name%'";
    *
    * @return bool
    *   True on success, false if error is encountered.
+   * @throws \CiviCRM_API3_Exception
    */
   public static function disableExpiredRelationships() {
     $query = "SELECT id FROM civicrm_relationship WHERE is_active = 1 AND end_date < CURDATE()";
@@ -2261,13 +2276,13 @@ AND cc.sort_name LIKE '%$name%'";
    *
    * @return bool
    *   TRUE if current employer needs to be cleared.
+   * @throws \CiviCRM_API3_Exception
    */
   public static function isCurrentEmployerNeedingToBeCleared($params, $relationshipId, $updatedRelTypeID = NULL) {
-    $existingTypeID = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Relationship', $relationshipId, 'relationship_type_id');
-    $existingTypeName = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $existingTypeID, 'name_b_a');
+    $existingTypeID = (int) CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Relationship', $relationshipId, 'relationship_type_id');
     $updatedRelTypeID = $updatedRelTypeID ? $updatedRelTypeID : $existingTypeID;
 
-    if ($existingTypeName !== 'Employer of') {
+    if (!self::isRelationshipTypeCurrentEmployer($existingTypeID)) {
       return FALSE;
     }
     //Clear employer if relationship is expired.
@@ -2283,6 +2298,20 @@ AND cc.sort_name LIKE '%$name%'";
     }
 
     return FALSE;
+  }
+
+  /**
+   * Is this a current employer relationship type.
+   *
+   * @todo - this could use cached pseudoconstant lookups.
+   *
+   * @param int $existingTypeID
+   *
+   * @return bool
+   */
+  private static function isRelationshipTypeCurrentEmployer(int $existingTypeID): bool {
+    $isCurrentEmployerRelationshipType = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_RelationshipType', $existingTypeID, 'name_b_a') === 'Employer of';
+    return $isCurrentEmployerRelationshipType;
   }
 
 }
