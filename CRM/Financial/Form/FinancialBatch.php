@@ -235,6 +235,7 @@ class CRM_Financial_Form_FinancialBatch extends CRM_Contribute_Form {
 
     // create activity.
     $activityParams = [
+      // activityTypeName - dev/core#1116-unknown-if-ok
       'activity_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_type_id', $activityTypeName),
       'subject' => $batch->title . "- Batch",
       'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Activity_DAO_Activity', 'activity_status_id', 'Completed'),

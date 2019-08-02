@@ -150,10 +150,12 @@
   </tr>
   <tr class="crm-activity-form-block-details">
     <td class="label">{$form.details.label}</td>
+    {* activityTypeName means label here not name, but it should be name (dev/core#1116-fixme) *}
     {if $activityTypeName eq "Print PDF Letter"}
       <td class="view-value">
       {$form.details.html}
       </td>
+    {* activityTypeName means label here not name, but it should be name (dev/core#1116-fixme) *}
     {elseif $activityTypeName eq "Inbound Email"}
       <td class="view-value">
        {$form.details.html|crmStripAlternatives|nl2br}
