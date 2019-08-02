@@ -77,6 +77,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'civicrm_case',
       'civicrm_case_contact',
       'civicrm_case_activity',
+      'civicrm_campaign',
     ]);
 
     if (!empty($this->locationTypes)) {
@@ -538,32 +539,28 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * Test that when exporting a pseudoField it is reset for NULL entries.
    *
    * This is specific to the example in CRM-14398
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportPseudoFieldCampaign() {
     $this->setUpContributionExportData();
-    $campaign = $this->callAPISuccess('Campaign', 'create', ['title' => 'Big campaign']);
-    $this->callAPISuccess('Contribution', 'create', ['campaign_id' => 'Big_campaign', 'id' => $this->contributionIDs[0]]);
+    $campaign = $this->callAPISuccess('Campaign', 'create', ['title' => 'Big campaign and kinda long too']);
+    $this->callAPISuccess('Contribution', 'create', ['campaign_id' => 'Big_campaign_and_kinda_long_too', 'id' => $this->contributionIDs[0]]);
     $selectedFields = [
       ['contact_type' => 'Individual', 'name' => 'gender_id'],
       ['contact_type' => 'Contribution', 'name' => 'contribution_campaign_title'],
+      ['contact_type' => 'Contribution', 'name' => 'contribution_campaign_id'],
     ];
-    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
-      TRUE,
-      $this->contactIDs[1],
-      [],
-      NULL,
-      $selectedFields,
-      NULL,
-      CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
-      "contact_a.id IN (" . implode(",", $this->contactIDs) . ")",
-      NULL,
-      FALSE,
-      FALSE,
-      [
-        'suppress_csv_for_testing' => TRUE,
-      ]
-    );
-    $this->assertEquals('Big campaign,', CRM_Core_DAO::singleValueQuery("SELECT GROUP_CONCAT(contribution_campaign_title) FROM {$tableName}"));
+    $this->doExportTest([
+      'ids' => [$this->contactIDs[1]],
+      'exportMode' => CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
+      'fields' => $selectedFields,
+      'componentClause' => "contact_a.id IN (" . implode(",", $this->contactIDs) . ")",
+    ]);
+    $row = $this->csv->fetchOne();
+    $this->assertEquals('Big campaign and kinda long too', $row['Campaign Title']);
+    $this->assertEquals($campaign['id'], $row['Campaign ID']);
   }
 
   /**
@@ -611,6 +608,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    * @param bool $includeHouseHold
    *
    * @throws CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportRelationshipsMergeToHousehold($includeHouseHold) {
     list($householdID, $houseHoldTypeID) = $this->setUpHousehold();
@@ -625,45 +623,17 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ['contact_type' => 'Individual', 'name' => 'state_province', 'location_type_id' => ''],
       ['contact_type' => 'Individual', 'name' => 'contact_source', 'location_type_id' => ''],
     ];
-    list($tableName, $sqlColumns, $headerRows) = CRM_Export_BAO_Export::exportComponents(
-      FALSE,
-      $this->contactIDs,
-      [],
-      NULL,
-      $selectedFields,
-      NULL,
-      CRM_Export_Form_Select::CONTACT_EXPORT,
-      "contact_a.id IN (" . implode(",", $this->contactIDs) . ")",
-      NULL,
-      FALSE,
-      TRUE,
-      [
-        'suppress_csv_for_testing' => TRUE,
-      ]
-    );
-    $dao = CRM_Core_DAO::executeQuery("SELECT * FROM {$tableName}");
-    while ($dao->fetch()) {
-      $this->assertEquals(1, $dao->N);
-      $this->assertEquals('Portland', $dao->city);
-      $this->assertEquals('ME', $dao->state_province);
-      $this->assertEquals($householdID, $dao->civicrm_primary_id);
-      $this->assertEquals($householdID, $dao->civicrm_primary_id);
-      $this->assertEquals('household sauce', $dao->contact_source);
-    }
-
-    $this->assertEquals([
-      0 => 'City',
-      1 => 'State',
-      2 => 'Contact Source',
-      3 => 'Household ID',
-    ], $headerRows);
-    $this->assertEquals(
-      [
-        'city' => 'city varchar(64)',
-        'state_province' => 'state_province varchar(64)',
-        'civicrm_primary_id' => 'civicrm_primary_id varchar(16)',
-        'contact_source' => 'contact_source varchar(255)',
-      ], $sqlColumns);
+    $this->doExportTest([
+      'ids' => $this->contactIDs,
+      'fields' => $selectedFields,
+      'mergeSameHousehold' => TRUE,
+    ]);
+    $row = $this->csv->fetchOne();
+    $this->assertEquals(1, count($this->csv));
+    $this->assertEquals('Portland', $row['City']);
+    $this->assertEquals('ME', $row['State']);
+    $this->assertEquals($householdID, $row['Household ID']);
+    $this->assertEquals('household sauce', $row['Contact Source']);
   }
 
   /**
@@ -1902,7 +1872,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   public function getAllSpecifiableParticipantReturnColumns() {
     return [
-      'participant_campaign_id' => 'participant_campaign_id varchar(128)',
+      'participant_campaign_id' => 'participant_campaign_id varchar(16)',
       'participant_contact_id' => 'participant_contact_id varchar(16)',
       'componentpaymentfield_contribution_status' => 'componentpaymentfield_contribution_status text',
       'currency' => 'currency varchar(3)',
@@ -2608,7 +2578,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'source_contact' => 'source_contact varchar(255)',
       'source_record_id' => 'source_record_id varchar(255)',
       'activity_is_test' => 'activity_is_test varchar(16)',
-      'activity_campaign_id' => 'activity_campaign_id varchar(128)',
+      'activity_campaign_id' => 'activity_campaign_id varchar(16)',
       'result' => 'result text',
       'activity_engagement_level' => 'activity_engagement_level varchar(16)',
       'parent_id' => 'parent_id varchar(255)',
@@ -2642,7 +2612,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'participant_discount_name' => 'participant_discount_name varchar(16)',
       'participant_fee_currency' => 'participant_fee_currency varchar(3)',
       'participant_registered_by_id' => 'participant_registered_by_id varchar(16)',
-      'participant_campaign_id' => 'participant_campaign_id varchar(128)',
+      'participant_campaign_id' => 'participant_campaign_id varchar(16)',
     ];
   }
 
@@ -2760,7 +2730,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'contribution_note' => 'contribution_note text',
       'contribution_batch' => 'contribution_batch text',
       'contribution_campaign_title' => 'contribution_campaign_title varchar(255)',
-      'contribution_campaign_id' => 'contribution_campaign_id varchar(128)',
+      'contribution_campaign_id' => 'contribution_campaign_id varchar(16)',
       'contribution_soft_credit_name' => 'contribution_soft_credit_name varchar(255)',
       'contribution_soft_credit_amount' => 'contribution_soft_credit_amount varchar(255)',
       'contribution_soft_credit_type' => 'contribution_soft_credit_type varchar(255)',
@@ -2790,7 +2760,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'pledge_frequency_interval' => 'pledge_frequency_interval varchar(255)',
       'pledge_frequency_unit' => 'pledge_frequency_unit varchar(255)',
       'pledge_currency' => 'pledge_currency text',
-      'pledge_campaign_id' => 'pledge_campaign_id varchar(128)',
+      'pledge_campaign_id' => 'pledge_campaign_id varchar(16)',
       'pledge_balance_amount' => 'pledge_balance_amount text',
       'pledge_payment_id' => 'pledge_payment_id varchar(16)',
       'pledge_payment_scheduled_amount' => 'pledge_payment_scheduled_amount varchar(32)',
@@ -2822,7 +2792,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'owner_membership_id' => 'owner_membership_id varchar(16)',
       'max_related' => 'max_related text',
       'membership_recur_id' => 'membership_recur_id varchar(255)',
-      'member_campaign_id' => 'member_campaign_id varchar(128)',
+      'member_campaign_id' => 'member_campaign_id varchar(16)',
       'member_is_override' => 'member_is_override text',
       'member_auto_renew' => 'member_auto_renew text',
     ];
