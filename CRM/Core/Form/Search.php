@@ -187,12 +187,17 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     $this->_action = CRM_Core_Action::ADVANCED;
     foreach ($this->getSearchFieldMetadata() as $entity => $fields) {
       foreach ($fields as $fieldName => $fieldSpec) {
-        if ($fieldSpec['type'] === CRM_Utils_Type::T_DATE || $fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
+        $fieldType = $fieldSpec['type'] ?? '';
+        if ($fieldType === CRM_Utils_Type::T_DATE || $fieldType === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)) {
           $title = empty($fieldSpec['unique_title']) ? $fieldSpec['title'] : $fieldSpec['unique_title'];
-          $this->addDatePickerRange($fieldName, $title, ($fieldSpec['type'] === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)));
+          $this->addDatePickerRange($fieldName, $title, ($fieldType === (CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME)));
         }
         else {
-          $props = ['entity' => $entity];
+          // Not quite sure about moving to a mix of keying by entity vs permitting entity to
+          // be passed in. The challenge of the former is that it doesn't permit ordering.
+          // Perhaps keying was the wrong starting point & we should do a flat array as all
+          // fields eventually need to be unique.
+          $props = ['entity' => $fieldSpec['entity'] ?? $entity];
           if (isset($fields[$fieldName]['unique_title'])) {
             $props['label'] = $fields[$fieldName]['unique_title'];
           }
