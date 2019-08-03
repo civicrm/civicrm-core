@@ -2396,6 +2396,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'contribution_page_id' => $this->_contributionPageID,
       'payment_processor_id' => $this->_paymentProcessorID,
       'is_test' => 0,
+      'receive_date' => '2019-07-25 07:34:23',
       'skipCleanMoney' => TRUE,
     ], $contributionParams);
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge(array(
@@ -2439,6 +2440,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'financial_type_id' => 1,
         'invoice_id' => 'abcd',
         'trxn_id' => 345,
+        'receive_date' => '2019-07-25 07:34:23',
       ));
     }
     $this->setupRecurringPaymentProcessorTransaction($recurParams);
@@ -2448,6 +2450,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'membership_type_id' => $this->ids['membership_type'],
       'contribution_recur_id' => $this->_contributionRecurID,
       'format.only_id' => TRUE,
+      'source' => 'Payment',
     ));
     //CRM-15055 creates line items we don't want so get rid of them so we can set up our own line items
     CRM_Core_DAO::executeQuery("TRUNCATE civicrm_line_item");

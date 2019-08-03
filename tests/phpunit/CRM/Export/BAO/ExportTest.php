@@ -187,8 +187,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'selectAll' => TRUE,
       'ids'  => $this->membershipIDs,
       'exportMode' => CRM_Export_Form_Select::MEMBER_EXPORT,
-      'componentClause' => 'civicrm_membership.id IN ( ' . implode(',', $this->membershipIDs) . ')',
+      'componentClause' => 'civicrm_membership.id IN ( ' . $this->ids['membership'] . ')',
     ]);
+    $membership = $this->callAPISuccessGetSingle('Membership', ['id' => $this->ids['membership']]);
 
     $row = $this->csv->fetchOne();
     $expected = [
@@ -275,22 +276,23 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Membership Type' => 'General',
       'Test' => '',
       'Is Pay Later' => '',
-      'Member Since' => '2007-01-21',
-      'Membership Start Date' => '2007-01-21',
-      'Membership Expiration Date' => '2007-12-21',
+      'Member Since' => $membership['join_date'],
+      'Membership Start Date' => $membership['start_date'],
+      'Membership Expiration Date' => $membership['end_date'],
       'Source' => 'Payment',
-      'Membership Status' => 'Expired',
+      'Membership Status' => 'New',
       'Membership ID' => '2',
       'Primary Member ID' => '',
       'max_related' => '',
-      'membership_recur_id' => '',
+      'membership_recur_id' => 1,
       'Campaign ID' => '',
       'member_is_override' => '',
+      // Nothing is returned for auto-renew - this is incorrect based on the intent - but we are adding a test to confirm not fix here.
       'member_auto_renew' => '',
-      'Total Amount' => '100.00',
-      'Contribution Status' => 'Completed',
+      'Total Amount' => '200.00',
+      'Contribution Status' => 'Pending',
       'Date Received' => '2019-07-25 07:34:23',
-      'Payment Method' => 'Credit Card',
+      'Payment Method' => 'Check',
       'Transaction ID' => '',
     ];
     $this->assertExpectedOutput($expected, $row);
@@ -398,21 +400,22 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->setUpContactExportData();
     // Create an extra so we don't get false passes due to 1
     $this->contactMembershipCreate(['contact_id' => $this->contactIDs[0]]);
-    $this->membershipIDs[] = $this->contactMembershipCreate(['contact_id' => $this->contactIDs[0]]);
-    $this->setUpContributionExportData();
-    $this->callAPISuccess('membership_payment', 'create', [
-      'contribution_id' => $this->contributionIDs[0],
-      'membership_id' => $this->membershipIDs[0],
-    ]);
-    $this->callAPISuccess('LineItem', 'get', [
-      'entity_table' => 'civicrm_membership',
-      'membership_id' => $this->membershipIDs[0],
-      'api.LineItem.create' => ['contribution_id' => $this->contributionIDs[0]],
-    ]);
+
+    $this->_contactID = $this->contactIDs[0];
+    $this->_invoiceID = 1234;
+    $this->_contributionPageID = NULL;
+    $this->_paymentProcessorID = $this->paymentProcessorCreate();
+    $this->setupMembershipRecurringPaymentProcessorTransaction();
+
+    $membershipID = $this->callAPISuccessGetValue('Membership', ['return' => 'id', 'contact_id' => $this->_contactID, 'options' => ['limit' => 1, 'sort' => 'id DESC']]);
+
+    $this->membershipIDs[] = $membershipID;
   }
 
   /**
    * Set up data to test case export.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setupCaseExportData() {
     $contactID1 = $this->individualCreate();
