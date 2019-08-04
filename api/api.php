@@ -36,6 +36,7 @@ function civicrm_api($entity, $action, $params, $extra = NULL) {
  *   Array to be passed to function.
  *
  * @throws CiviCRM_API3_Exception
+ *
  * @return array
  */
 function civicrm_api3($entity, $action, $params = []) {
