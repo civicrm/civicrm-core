@@ -1431,6 +1431,10 @@ WHERE civicrm_event.is_active = 1
    *   Formatted array of key value.
    *
    * @param array $profileFields
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function displayProfile(&$params, $gid, &$groupTitle, &$values, &$profileFields = []) {
     if ($gid) {

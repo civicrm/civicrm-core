@@ -1217,11 +1217,13 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
   }
 
   /**
-   * Assign Profiles.
+   * Assign Profiles to the template.
    *
-   * @param CRM_Core_Form $form
+   * @param CRM_Event_Form_Registration_Confirm $form
+   *
+   * @throws \Exception
    */
-  public static function assignProfiles(&$form) {
+  public static function assignProfiles($form) {
     $participantParams = $form->_params;
     $formattedValues = $profileFields = [];
     $count = 1;
@@ -1234,7 +1236,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $prefix1 = '';
         $prefix2 = '';
       }
-      if ($participantValue != 'skip') {
+      if ($participantValue !== 'skip') {
         //get the customPre profile info
         if (!empty($form->_values[$prefix2 . 'custom_pre_id'])) {
           $values = $groupName = [];
