@@ -34,6 +34,8 @@
  */
 class api_v3_ContributionTest extends CiviUnitTestCase {
 
+  use CRMTraits_Profile_ProfileTrait;
+
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
@@ -3008,12 +3010,16 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    *
    * Note that we are creating a logged in user because email goes out from
    * that person
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCompleteTransactionWithParticipantRecord() {
     $mut = new CiviMailUtils($this, TRUE);
     $mut->clearMessages();
     $this->_individualId = $this->createLoggedInUser();
     $contributionID = $this->createPendingParticipantContribution();
+    $this->createJoinedProfile(['entity_id' => $this->_ids['event']['test'], 'entity_table' => 'civicrm_event']);
+
     $this->callAPISuccess('contribution', 'completetransaction', [
       'id' => $contributionID,
     ]
@@ -3025,7 +3031,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals(1, $participantStatus);
 
     //Assert only three activities are created.
-    $activities = CRM_Activity_BAO_Activity::getContactActivity($this->_individualId);
+    $activities = $this->callAPISuccess('Activity', 'get', [
+      'contact_id' => $this->_individualId,
+    ])['values'];
+
     $this->assertEquals(3, count($activities));
     $activityNames = array_count_values(CRM_Utils_Array::collect('activity_name', $activities));
     // record two activities before and after completing payment for Event registration
@@ -3037,7 +3046,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'Annual CiviCRM meet',
       'Event',
       'This letter is a confirmation that your registration has been received and your status has been updated to Registered.',
-    ]);
+      'First Name: Logged In',
+      'Public title',
+    ], ['Back end title']);
     $mut->stop();
   }
 
@@ -3487,8 +3498,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Create a pending contribution & linked pending participant record (along with an event).
    */
   public function createPendingParticipantContribution() {
-    $event = $this->eventCreate(['is_email_confirm' => 1, 'confirm_from_email' => 'test@civicrm.org']);
-    $participantID = $this->participantCreate(['event_id' => $event['id'], 'status_id' => 6, 'contact_id' => $this->_individualId]);
+    $this->_ids['event']['test'] = $this->eventCreate(['is_email_confirm' => 1, 'confirm_from_email' => 'test@civicrm.org'])['id'];
+    $participantID = $this->participantCreate(['event_id' => $this->_ids['event']['test'], 'status_id' => 6, 'contact_id' => $this->_individualId]);
     $this->_ids['participant'] = $participantID;
     $params = array_merge($this->_params, ['contact_id' => $this->_individualId, 'contribution_status_id' => 2, 'financial_type_id' => 'Event Fee']);
     $contribution = $this->callAPISuccess('contribution', 'create', $params);

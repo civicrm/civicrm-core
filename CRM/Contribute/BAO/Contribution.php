@@ -5890,7 +5890,7 @@ LIMIT 1;";
     $eventParams = [
       'id' => $eventID,
     ];
-    $values = ['event' =>[]];
+    $values = ['event' => []];
 
     CRM_Event_BAO_Event::retrieve($eventParams, $values['event']);
     // add custom fields for event

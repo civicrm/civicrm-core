@@ -3627,4 +3627,18 @@ SELECT  group_id
     }
   }
 
+  /**
+   * Get the frontend_title for the profile, falling back on 'title' if none.
+   *
+   * @param int $profileID
+   *
+   * @return string
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getFrontEndTitle(int $profileID) {
+    $profile = civicrm_api3('UFGroup', 'getsingle', ['id' => $profileID, 'return' => ['title', 'frontend_title']]);
+    return $profile['frontend_title'] ?? $profile['title'];
+  }
+
 }
