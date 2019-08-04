@@ -2913,6 +2913,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   The set of ids related to the input.
    *
    * @return array
+   * @throws \CRM_Core_Exception
    */
   public function _gatherMessageValues($input, &$values, $ids = []) {
     // set display address of contributor
@@ -2994,92 +2995,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       }
     }
     else {
-      // event
-      $eventParams = [
-        'id' => $this->_relatedObjects['event']->id,
-      ];
-      $values['event'] = [];
-
-      CRM_Event_BAO_Event::retrieve($eventParams, $values['event']);
-      // add custom fields for event
-      $eventGroupTree = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, $this->_relatedObjects['event']->id);
-
-      $eventCustomGroup = [];
-      foreach ($eventGroupTree as $key => $group) {
-        if ($key === 'info') {
-          continue;
-        }
-
-        foreach ($group['fields'] as $k => $customField) {
-          $groupLabel = $group['title'];
-          if (!empty($customField['customValue'])) {
-            foreach ($customField['customValue'] as $customFieldValues) {
-              $eventCustomGroup[$groupLabel][$customField['label']] = CRM_Utils_Array::value('data', $customFieldValues);
-            }
-          }
-        }
-      }
-      $values['event']['customGroup'] = $eventCustomGroup;
-
-      //get participant details
-      $participantParams = [
-        'id' => $this->_relatedObjects['participant']->id,
-      ];
-
-      $values['participant'] = [];
-
-      CRM_Event_BAO_Participant::getValues($participantParams, $values['participant'], $participantIds);
-      // add custom fields for event
-      $participantGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', NULL, $this->_relatedObjects['participant']->id);
-      $participantCustomGroup = [];
-      foreach ($participantGroupTree as $key => $group) {
-        if ($key === 'info') {
-          continue;
-        }
-
-        foreach ($group['fields'] as $k => $customField) {
-          $groupLabel = $group['title'];
-          if (!empty($customField['customValue'])) {
-            foreach ($customField['customValue'] as $customFieldValues) {
-              $participantCustomGroup[$groupLabel][$customField['label']] = CRM_Utils_Array::value('data', $customFieldValues);
-            }
-          }
-        }
-      }
-      $values['participant']['customGroup'] = $participantCustomGroup;
-
-      //get location details
-      $locationParams = [
-        'entity_id' => $this->_relatedObjects['event']->id,
-        'entity_table' => 'civicrm_event',
-      ];
-      $values['location'] = CRM_Core_BAO_Location::getValues($locationParams);
-
-      $ufJoinParams = [
-        'entity_table' => 'civicrm_event',
-        'entity_id' => $ids['event'],
-        'module' => 'CiviEvent',
-      ];
-
-      list($custom_pre_id,
-        $custom_post_ids
-        ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-
-      $values['custom_pre_id'] = $custom_pre_id;
-      $values['custom_post_id'] = $custom_post_ids;
-
-      // set lineItem for event contribution
-      if ($this->id) {
-        $participantIds = CRM_Event_BAO_Participant::getParticipantIds($this->id);
-        if (!empty($participantIds)) {
-          foreach ($participantIds as $pIDs) {
-            $lineItem = CRM_Price_BAO_LineItem::getLineItems($pIDs);
-            if (!CRM_Utils_System::isNull($lineItem)) {
-              $values['lineItem'][] = $lineItem;
-            }
-          }
-        }
-      }
+      $values = array_merge($values, $this->loadEventMessageTemplateParams((int) $ids['event'], (int) $this->_relatedObjects['participant']->id, $this->id));
     }
 
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Contribution', NULL, $this->id);
@@ -5957,6 +5873,106 @@ LIMIT 1;";
     }
 
     return NULL;
+  }
+
+  /**
+   * Load the values needed for the event message.
+   *
+   * @param int $eventID
+   * @param int $participantID
+   * @param int|null $contributionID
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected function loadEventMessageTemplateParams(int $eventID, int $participantID, $contributionID): array {
+
+    $eventParams = [
+      'id' => $eventID,
+    ];
+    $values = ['event' =>[]];
+
+    CRM_Event_BAO_Event::retrieve($eventParams, $values['event']);
+    // add custom fields for event
+    $eventGroupTree = CRM_Core_BAO_CustomGroup::getTree('Event', NULL, $eventID);
+
+    $eventCustomGroup = [];
+    foreach ($eventGroupTree as $key => $group) {
+      if ($key === 'info') {
+        continue;
+      }
+
+      foreach ($group['fields'] as $k => $customField) {
+        $groupLabel = $group['title'];
+        if (!empty($customField['customValue'])) {
+          foreach ($customField['customValue'] as $customFieldValues) {
+            $eventCustomGroup[$groupLabel][$customField['label']] = CRM_Utils_Array::value('data', $customFieldValues);
+          }
+        }
+      }
+    }
+    $values['event']['customGroup'] = $eventCustomGroup;
+
+    //get participant details
+    $participantParams = [
+      'id' => $participantID,
+    ];
+
+    $values['participant'] = [];
+
+    CRM_Event_BAO_Participant::getValues($participantParams, $values['participant'], $participantIds);
+    // add custom fields for event
+    $participantGroupTree = CRM_Core_BAO_CustomGroup::getTree('Participant', NULL, $participantID);
+    $participantCustomGroup = [];
+    foreach ($participantGroupTree as $key => $group) {
+      if ($key === 'info') {
+        continue;
+      }
+
+      foreach ($group['fields'] as $k => $customField) {
+        $groupLabel = $group['title'];
+        if (!empty($customField['customValue'])) {
+          foreach ($customField['customValue'] as $customFieldValues) {
+            $participantCustomGroup[$groupLabel][$customField['label']] = CRM_Utils_Array::value('data', $customFieldValues);
+          }
+        }
+      }
+    }
+    $values['participant']['customGroup'] = $participantCustomGroup;
+
+    //get location details
+    $locationParams = [
+      'entity_id' => $eventID,
+      'entity_table' => 'civicrm_event',
+    ];
+    $values['location'] = CRM_Core_BAO_Location::getValues($locationParams);
+
+    $ufJoinParams = [
+      'entity_table' => 'civicrm_event',
+      'entity_id' => $eventID,
+      'module' => 'CiviEvent',
+    ];
+
+    list($custom_pre_id,
+      $custom_post_ids
+      ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
+
+    $values['custom_pre_id'] = $custom_pre_id;
+    $values['custom_post_id'] = $custom_post_ids;
+
+    // set lineItem for event contribution
+    if ($contributionID) {
+      $participantIds = CRM_Event_BAO_Participant::getParticipantIds($contributionID);
+      if (!empty($participantIds)) {
+        foreach ($participantIds as $pIDs) {
+          $lineItem = CRM_Price_BAO_LineItem::getLineItems($pIDs);
+          if (!CRM_Utils_System::isNull($lineItem)) {
+            $values['lineItem'][] = $lineItem;
+          }
+        }
+      }
+    }
+    return $values;
   }
 
 }
