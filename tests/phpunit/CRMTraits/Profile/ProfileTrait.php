@@ -30,35 +30,50 @@
  *
  * Trait for working with Price Sets in tests
  */
-trait CRMTraits_Financial_PriceSetTrait {
+trait CRMTraits_Profile_ProfileTrait {
 
   /**
-   * Create a contribution with 2 line items.
+   * Add a profile to a contribution page.
    *
-   * This also involves creating t
-   *
-   * @param $params
-   * @param array $lineItemFinancialTypes
-   *   Financial Types, if an override is intended.
+   * @param array $joinParams
+   *   Must contain entity_id at minimum.
+   * @param array $ufGroupParams
    */
-  protected function createContributionWithTwoLineItemsAgainstPriceSet($params, $lineItemFinancialTypes = []) {
-    $params = array_merge(['total_amount' => 300, 'financial_type_id' => 'Donation'], $params);
-    $priceFields = $this->createPriceSet('contribution');
-    foreach ($priceFields['values'] as $key => $priceField) {
-      $financialTypeID = (!empty($lineItemFinancialTypes) ? array_shift($lineItemFinancialTypes) : $priceField['financial_type_id']);
-      $params['line_items'][]['line_item'][$key] = [
-        'price_field_id' => $priceField['price_field_id'],
-        'price_field_value_id' => $priceField['id'],
-        'label' => $priceField['label'],
-        'field_title' => $priceField['label'],
-        'qty' => 1,
-        'unit_price' => $priceField['amount'],
-        'line_total' => $priceField['amount'],
-        'financial_type_id' => $financialTypeID,
-        'entity_table' => 'civicrm_contribution',
-      ];
+  protected function createJoinedProfile($joinParams, $ufGroupParams = []) {
+    $this->createProfile($ufGroupParams);
+    $joinParams = array_merge([
+      'uf_group_id' => 'our profile',
+      'entity_table' => 'civicrm_contribution_page',
+      'weight' => 1,
+    ], $joinParams);
+    if (empty($joinParams['module'])) {
+      $joinParams['module'] = $joinParams['entity_table'] === 'civicrm_event' ? 'CiviEvent' : 'CiviContribute';
     }
-    $this->callAPISuccess('order', 'create', $params);
+    if ($joinParams['module'] !== 'CiviContribute' && empty($joinParams['module_data'])) {
+      $params['module_data'] = [$joinParams['module'] => []];
+    }
+    $this->callAPISuccess('UFJoin', 'create', $joinParams);
+  }
+
+  /**
+   * Create a profile.
+   *
+   * @param $ufGroupParams
+   */
+  protected function createProfile($ufGroupParams) {
+    $profile = $this->callAPISuccess('UFGroup', 'create', array_merge([
+      'group_type' => 'Contact',
+      'title' => 'Back end title',
+      'frontend_title' => 'Public title',
+      'name' => 'our profile',
+
+    ], $ufGroupParams));
+    $this->ids['UFGroup'][$profile['values'][$profile['id']]['name']] = $profile['id'];
+
+    $this->callAPISuccess('UFField', 'create', [
+      'uf_group_id' => $profile['id'],
+      'field_name' => 'first_name',
+    ]);
   }
 
 }
