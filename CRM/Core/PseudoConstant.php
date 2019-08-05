@@ -253,20 +253,6 @@ class CRM_Core_PseudoConstant {
         'labelColumn' => CRM_Utils_Array::value('labelColumn', $pseudoconstant),
       ];
 
-      if ($context == 'abbreviate') {
-        switch ($fieldName) {
-          case 'state_province_id':
-            $params['labelColumn'] = 'abbreviation';
-            break;
-
-          case 'country_id':
-            $params['labelColumn'] = 'iso_code';
-            break;
-
-          default:
-        }
-      }
-
       // Fetch option group from option_value table
       if (!empty($pseudoconstant['optionGroupName'])) {
         if ($context == 'validate') {
@@ -327,6 +313,12 @@ class CRM_Core_PseudoConstant {
               $params[$nameField] = 'name';
             }
           }
+
+          // Use abbrColum if context is abbreviate
+          if ($context == 'abbreviate' && (in_array('abbreviation', $availableFields) || !empty($pseudoconstant['abbrColumn']))) {
+            $params['labelColumn'] = $pseudoconstant['abbrColumn'] ?? 'abbreviation';
+          }
+
           // Condition param can be passed as an sql clause string or an array of clauses
           if (!empty($params['condition'])) {
             $wheres[] = implode(' AND ', (array) $params['condition']);

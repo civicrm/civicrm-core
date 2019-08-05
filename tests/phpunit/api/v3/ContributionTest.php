@@ -4297,4 +4297,18 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->callAPISuccessGetCount('Contribution', [], 2);
   }
 
+  public function testGetCurrencyOptions() {
+    $result = $this->callAPISuccess('Contribution', 'getoptions', [
+      'field' => 'currency',
+    ]);
+    $this->assertEquals('US Dollar', $result['values']['USD']);
+    $this->assertNotContains('$', $result['values']);
+    $result = $this->callAPISuccess('Contribution', 'getoptions', [
+      'field' => 'currency',
+      'context' => "abbreviate",
+    ]);
+    $this->assertEquals('$', $result['values']['USD']);
+    $this->assertNotContains('US Dollar', $result['values']);
+  }
+
 }

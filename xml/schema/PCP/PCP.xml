@@ -176,6 +176,7 @@
       <keyColumn>name</keyColumn>
       <labelColumn>full_name</labelColumn>
       <nameColumn>name</nameColumn>
+      <abbrColumn>symbol</abbrColumn>
     </pseudoconstant>
     <html>
       <type>Select</type>
