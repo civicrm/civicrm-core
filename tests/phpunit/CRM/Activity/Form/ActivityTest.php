@@ -186,4 +186,32 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
     $form->postProcess();
   }
 
+  /**
+   * This is a bit messed up having a variable called name that means label but we don't want to fix it because it's a form member variable _activityTypeName that might be used in form hooks, so just make sure it doesn't flip between name and label. dev/core#1116
+   */
+  public function testActivityTypeNameIsReallyLabel() {
+    $form = new CRM_Activity_Form_Activity();
+
+    // the actual value is irrelevant we just need something for the tested function to act on
+    $form->_currentlyViewedContactId = $this->source;
+
+    // Let's make a new activity type that has a different name from its label just to be sure.
+    $actParams = [
+      'option_group_id' => 'activity_type',
+      'name' => 'wp1234',
+      'label' => 'Water Plants',
+      'is_active' => 1,
+      'is_default' => 0,
+    ];
+    $result = $this->callAPISuccess('option_value', 'create', $actParams);
+
+    $form->_activityTypeId = $result['values'][$result['id']]['value'];
+    $this->assertNotEmpty($form->_activityTypeId);
+
+    // Assign name, I mean label.
+    $form->assignActivityTypeName();
+
+    $this->assertEquals('Water Plants', $form->_activityTypeName);
+  }
+
 }

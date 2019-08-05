@@ -59,6 +59,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
   /**
    * The name of activity type.
+   * Except it's actually label ha ha - dev/core#1116
+   * But we don't want to touch this because it's a form member variable and so people might be using it in hooks and such.
    *
    * @var string
    */
@@ -323,30 +325,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       );
     }
 
-    // Assigning Activity type name.
-    if ($this->_activityTypeId) {
-      $activityTName = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $this->_activityTypeId, 'label');
-      if ($activityTName[$this->_activityTypeId]) {
-        $this->_activityTypeName = $activityTName[$this->_activityTypeId];
-        $this->assign('activityTName', $activityTName[$this->_activityTypeId]);
-      }
-      // Set title.
-      if (isset($activityTName)) {
-        $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTName);
-
-        if ($this->_currentlyViewedContactId) {
-          $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
-          // Check if this is default domain contact CRM-10482.
-          if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
-            $displayName .= ' (' . ts('default organization') . ')';
-          }
-          CRM_Utils_System::setTitle($displayName . ' - ' . $activityName);
-        }
-        else {
-          CRM_Utils_System::setTitle(ts('%1 Activity', [1 => $activityName]));
-        }
-      }
-    }
+    $this->assignActivityTypeName();
 
     // Check the mode when this form is called either single or as
     // search task action.
@@ -405,6 +384,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     if ($this->_activityTypeId) {
       // Set activity type name and description to template.
+      // activityTypeName means label here not name, but it should be name (dev/core#1116-fixme)
+      // This is double-fun because we already assigned it above (incorrectly to label also) using an even different method. However note that parent::postProcess can get called in between the two places, which could theoretically change it, and so maybe at one time this was here to reset it again?
       list($this->_activityTypeName, $activityTypeDescription) = CRM_Core_BAO_OptionValue::getActivityTypeDetails($this->_activityTypeId);
       $this->assign('activityTypeName', $this->_activityTypeName);
       $this->assign('activityTypeDescription', $activityTypeDescription);
@@ -530,6 +511,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         $this->_values['details'] = CRM_Utils_String::stripAlternatives($this->_values['details']) ?: '';
       }
 
+      // activityTypeName means label here not name, but it should be name (dev/core#1116-fixme)
       if ($this->_activityTypeName === 'Inbound Email' &&
         !CRM_Core_Permission::check('edit inbound email basic information and content')
       ) {
@@ -787,6 +769,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     // we need to hide activity tagset for special activities
     $specialActivities = ['Open Case'];
 
+    // activityTypeName means label here not name, but it should be name (dev/core#1116-fixme)
     if (!in_array($this->_activityTypeName, $specialActivities)) {
       // build tag widget
       $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_activity');
@@ -1243,6 +1226,42 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     if ($this->_activityTypeFile) {
       $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
       $className::endPostProcess($this, $params, $activity);
+    }
+  }
+
+  /**
+   * assignActivityTypeName()
+   * Which really means label, but we don't want to fix it because it sets a form member variable _activityTypeName which might be used in form hooks. dev/core#1116
+   * So just pull out this section which was in preprocess() so it can be tested at least.
+   */
+  public function assignActivityTypeName() {
+    if ($this->_activityTypeId) {
+      // activityTName means label here not name, but it should be name (dev/core#1123-fixme). Except see the note just below where since _activityTypeName is built from it and we don't want to touch that much.
+      $activityTName = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $this->_activityTypeId, 'label');
+      if ($activityTName[$this->_activityTypeId]) {
+        // activityTypeName means label here not name, but it should be name (dev/core#1116-fixme) BUT!!! This is a form member variable, and so people might be using it in hooks and such. So we're not going to fix this, just note that it is label.
+        $this->_activityTypeName = $activityTName[$this->_activityTypeId];
+        $this->assign('activityTName', $activityTName[$this->_activityTypeId]);
+      }
+      // Set title.
+      if (isset($activityTName)) {
+        // activityName means label here not name, but it's ok because label is desired here (dev/core#1116-ok-label)
+        $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTName);
+
+        if ($this->_currentlyViewedContactId) {
+          $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
+          // Check if this is default domain contact CRM-10482.
+          if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
+            $displayName .= ' (' . ts('default organization') . ')';
+          }
+          // activityName means label here not name, but it's ok because label is desired here (dev/core#1116-ok-label)
+          CRM_Utils_System::setTitle($displayName . ' - ' . $activityName);
+        }
+        else {
+          // activityName means label here not name, but it's ok because label is desired here (dev/core#1116-ok-label)
+          CRM_Utils_System::setTitle(ts('%1 Activity', [1 => $activityName]));
+        }
+      }
     }
   }
 
