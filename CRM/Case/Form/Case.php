@@ -131,9 +131,9 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       $this->_action = CRM_Core_Action::ADD;
     }
 
-    $this->_caseId = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $this->_caseId = CRM_Utils_Request::retrieve('id', 'Positive');
 
-    $this->_currentlyViewedContactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $this->_currentlyViewedContactId = CRM_Utils_Request::retrieve('cid', 'Positive');
 
     if ($this->_action & CRM_Core_Action::ADD && !$this->_currentlyViewedContactId) {
       // check for add contacts permissions
@@ -241,6 +241,8 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   public function buildQuickForm() {
     $xmlProcessorProcess = new CRM_Case_XMLProcessor_Process();
     $isMultiClient = $xmlProcessorProcess->getAllowMultipleCaseClients();
+    $this->add('hidden', 'cid', CRM_Utils_Request::retrieve('cid', 'Positive'));
+    $this->add('hidden', 'id', CRM_Utils_Request::retrieve('id', 'Positive'));
     $this->assign('multiClient', $isMultiClient);
 
     if ($this->_action & CRM_Core_Action::DELETE || $this->_action & CRM_Core_Action::RENEW) {
@@ -365,6 +367,17 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
   public function submit(&$params) {
     $params['now'] = date("Ymd");
 
+    if (empty($this->_currentlyViewedContactId) && !empty($params['cid'])) {
+      $this->_currentlyViewedContactId = $params['cid'];
+    }
+    elseif (empty($this->_currentlyViewedContactId) && !empty($params['client_id'])) {
+      $this->_currentlyViewedContactId = $params['client_id'];
+    }
+
+    if (empty($this->_caseId) && !empty($params['id'])) {
+      $this->_caseId = $params['id'];
+    }
+
     // 1. call begin post process
     if ($this->_activityTypeFile) {
       $className = "CRM_Case_Form_Activity_{$this->_activityTypeFile}";
@@ -386,6 +399,11 @@ class CRM_Case_Form_Case extends CRM_Core_Form {
       $params['case_type'] = CRM_Core_DAO::getFieldValue('CRM_Case_DAO_CaseType', $params['case_type_id'], 'name', 'id');
       $params['subject'] = $params['activity_subject'];
     }
+
+    if (empty($params['id'])) {
+      unset($params['id']);
+    }
+
     $caseObj = CRM_Case_BAO_Case::create($params);
     $this->_caseId = $params['case_id'] = $caseObj->id;
     // unset any ids, custom data
