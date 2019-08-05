@@ -78,6 +78,11 @@ class CRM_Utils_TokenTest extends CiviUnitTestCase {
     $escapeSmarty = TRUE;
     CRM_Utils_Token::replaceGreetingTokens($tokenString, $contactDetails, $contactId, $className, $escapeSmarty);
     $this->assertEquals($tokenString, 'First Name: Morticia Last Name: Addams Birth Date:  Prefix: Ms. Suffix: ');
+
+    // Test compatibility with custom tokens (#14943)
+    $tokenString = 'Custom {custom.custom}';
+    CRM_Utils_Token::replaceGreetingTokens($tokenString, $contactDetails, $contactId, $className, $escapeSmarty);
+    $this->assertEquals($tokenString, 'Custom ');
   }
 
   /**
