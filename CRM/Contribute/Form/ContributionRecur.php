@@ -108,6 +108,13 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   protected $subscriptionDetails = [];
 
   /**
+   * Is the from being accessed by a front end user to update their own recurring.
+   *
+   * @var bool
+   */
+  protected $selfService;
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -202,6 +209,25 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   protected function getSubscriptionContactID() {
     $sub = $this->getSubscriptionDetails();
     return isset($sub->contact_id) ? $sub->contact_id : FALSE;
+  }
+
+  /**
+   * Is this being used by a front end user to update their own recurring.
+   *
+   * @return bool
+   */
+  protected function isSelfService() {
+    if (!is_null($this->selfService)) {
+      return $this->selfService;
+    }
+    $this->selfService = FALSE;
+    if (!CRM_Core_Permission::check('edit contributions')) {
+      if ($this->_subscriptionDetails->contact_id != $this->getContactID()) {
+        CRM_Core_Error::statusBounce(ts('You do not have permission to cancel this recurring contribution.'));
+      }
+      $this->selfService = TRUE;
+    }
+    return $this->selfService;
   }
 
 }
