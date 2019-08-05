@@ -120,33 +120,10 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
     else {
       $savedMapping = $this->get('savedMapping');
 
-      list($mappingName, $mappingContactType, $mappingLocation, $mappingPhoneType, $mappingRelation) = CRM_Core_BAO_Mapping::getMappingFields($savedMapping);
-
-      $mappingName = $mappingName[1];
-      $mappingContactType = $mappingContactType[1];
-      $mappingLocation = CRM_Utils_Array::value('1', CRM_Utils_Array::value(1, $mappingLocation));
-      $mappingPhoneType = CRM_Utils_Array::value('1', CRM_Utils_Array::value(1, $mappingPhoneType));
-      $mappingRelation = CRM_Utils_Array::value('1', CRM_Utils_Array::value(1, $mappingRelation));
-
-      //mapping is to be loaded from database
-
-      $params = ['id' => $savedMapping];
-      $temp = [];
-      $mappingDetails = CRM_Core_BAO_Mapping::retrieve($params, $temp);
-
-      $this->assign('loadedMapping', $mappingDetails->name);
+      $mappingName = (string) civicrm_api3('Mapping', 'getvalue', ['id' => $savedMapping, 'return' => 'name']);
       $this->set('loadedMapping', $savedMapping);
-
-      $getMappingName = new CRM_Core_DAO_Mapping();
-      $getMappingName->id = $savedMapping;
-      $getMappingName->mapping_type = 'Import Contributions';
-      $getMappingName->find();
-      while ($getMappingName->fetch()) {
-        $mapperName = $getMappingName->name;
-      }
-
-      $this->assign('savedName', $mapperName);
-
+      $this->assign('loadedMapping', $mappingName);
+      $this->assign('savedName', $mappingName);
       $this->add('hidden', 'mappingId', $savedMapping);
 
       $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
@@ -202,6 +179,10 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
       $jsSet = FALSE;
       if ($this->get('savedMapping')) {
+        list($mappingName, $mappingContactType) = CRM_Core_BAO_Mapping::getMappingFields($savedMapping);
+
+        $mappingName = $mappingName[1];
+        $mappingContactType = $mappingContactType[1];
         if (isset($mappingName[$i])) {
           if ($mappingName[$i] != ts('- do not import -')) {
 
