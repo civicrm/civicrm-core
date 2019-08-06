@@ -716,14 +716,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           $is_test
         );
 
-        $errorText = 'Your %1 membership was previously cancelled and can not be renewed online. Please contact the site administrator for assistance.';
         foreach ($self->_values['fee'] as $fieldKey => $fieldValue) {
           if ($fieldValue['html_type'] != 'Text' && CRM_Utils_Array::value('price_' . $fieldKey, $fields)) {
             if (!is_array($fields['price_' . $fieldKey]) && isset($fieldValue['options'][$fields['price_' . $fieldKey]])) {
               if (array_key_exists('membership_type_id', $fieldValue['options'][$fields['price_' . $fieldKey]])
                 && in_array($fieldValue['options'][$fields['price_' . $fieldKey]]['membership_type_id'], $currentMemberships)
               ) {
-                $errors['price_' . $fieldKey] = ts($errorText, [1 => CRM_Member_PseudoConstant::membershipType($fieldValue['options'][$fields['price_' . $fieldKey]]['membership_type_id'])]);
+                $errors['price_' . $fieldKey] = ts('Your %1 membership was previously cancelled and can not be renewed online. Please contact the site administrator for assistance.', [1 => CRM_Member_PseudoConstant::membershipType($fieldValue['options'][$fields['price_' . $fieldKey]]['membership_type_id'])]);
               }
             }
             else {
@@ -732,7 +731,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
                   if (array_key_exists('membership_type_id', $fieldValue['options'][$key])
                     && in_array($fieldValue['options'][$key]['membership_type_id'], $currentMemberships)
                   ) {
-                    $errors['price_' . $fieldKey] = ts($errorText, [1 => CRM_Member_PseudoConstant::membershipType($fieldValue['options'][$key]['membership_type_id'])]);
+                    $errors['price_' . $fieldKey] = ts('Your %1 membership was previously cancelled and can not be renewed online. Please contact the site administrator for assistance.', [1 => CRM_Member_PseudoConstant::membershipType($fieldValue['options'][$key]['membership_type_id'])]);
                   }
                 }
               }

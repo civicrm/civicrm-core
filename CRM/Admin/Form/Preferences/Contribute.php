@@ -116,15 +116,15 @@ class CRM_Admin_Form_Preferences_Contribute extends CRM_Admin_Form_Preferences {
         'title' => ts('Tax Display Settings'),
         'weight' => 8,
         'option_values' => [
-          'Do_not_show' => ts('Do not show breakdown, only show total -i.e ' .
-            CRM_Core_BAO_Country::defaultCurrencySymbol() . '120.00'),
-          'Inclusive' => ts('Show [tax term] inclusive price - i.e. ' .
-            CRM_Core_BAO_Country::defaultCurrencySymbol() .
-            '120.00 (includes [tax term] of ' .
-            CRM_Core_BAO_Country::defaultCurrencySymbol() . '20.00)'),
-          'Exclusive' => ts('Show [tax term] exclusive price - i.e. ' .
-            CRM_Core_BAO_Country::defaultCurrencySymbol() . '100.00 + ' .
-            CRM_Core_BAO_Country::defaultCurrencySymbol() . '20.00 [tax term]'),
+          'Do_not_show' => ts('Do not show breakdown, only show total - i.e %1', [
+            1 => CRM_Utils_Money::format(120),
+          ]),
+          'Inclusive' => ts('Show [tax term] inclusive price - i.e. %1', [
+            1 => ts('%1 (includes [tax term] of %2)', [1 => CRM_Utils_Money::format(120), 2 => CRM_Utils_Money::format(20)]),
+          ]),
+          'Exclusive' => ts('Show [tax term] exclusive price - i.e. %1', [
+            1 => ts('%1 + %2 [tax term]', [1 => CRM_Utils_Money::format(120), 2 => CRM_Utils_Money::format(20)]),
+          ]),
         ],
       ],
     ];
