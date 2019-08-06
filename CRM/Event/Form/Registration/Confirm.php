@@ -281,12 +281,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         }
       }
 
-      $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-      $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
-      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
-      if ($invoicing) {
+      if (CRM_Invoicing_Utils::isInvoicingEnabled()) {
         $this->assign('totalTaxAmount', $taxAmount);
-        $this->assign('taxTerm', $taxTerm);
+        $this->assign('taxTerm', CRM_Invoicing_Utils::getTaxTerm());
         $this->assign('individual', $individual);
         $this->set('individual', $individual);
       }
@@ -702,8 +699,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
 
       $entityTable = 'civicrm_participant';
-      $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-      $invoicing = CRM_Utils_Array::value('invoicing', $invoiceSettings);
       $totalTaxAmount = 0;
       $dataArray = [];
       foreach ($this->_lineItem as $key => $value) {
@@ -718,7 +713,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           $lineItem[$this->_priceSetId] = $value;
           CRM_Price_BAO_LineItem::processPriceSet($entityId, $lineItem, $contribution, $entityTable);
         }
-        if ($invoicing) {
+        if (CRM_Invoicing_Utils::isInvoicingEnabled()) {
           foreach ($value as $line) {
             if (isset($line['tax_amount']) && isset($line['tax_rate'])) {
               $totalTaxAmount = $line['tax_amount'] + $totalTaxAmount;
@@ -732,10 +727,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
           }
         }
       }
-      if ($invoicing) {
-        $this->assign('dataArray', $dataArray);
-        $this->assign('totalTaxAmount', $totalTaxAmount);
-      }
+      $this->assign('dataArray', $dataArray);
+      $this->assign('totalTaxAmount', $totalTaxAmount);
     }
 
     //update status and send mail to cancelled additional participants, CRM-4320
@@ -915,7 +908,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
             if ($lineItemValue = CRM_Utils_Array::value($participantNum, $lineItems)) {
               $lineItem[] = $lineItemValue;
             }
-            if ($invoicing) {
+            if (CRM_Invoicing_Utils::isInvoicingEnabled()) {
               $individual = $this->get('individual');
               $dataArray[key($dataArray)] = $individual[$participantNum]['totalTaxAmt'];
               $this->assign('dataArray', $dataArray);
