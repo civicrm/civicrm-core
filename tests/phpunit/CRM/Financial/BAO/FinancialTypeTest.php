@@ -208,18 +208,22 @@ class CRM_Financial_BAO_FinancialTypeTest extends CiviUnitTestCase {
     $this->setACL();
     CRM_Financial_BAO_FinancialType::permissionedFinancialTypes($permissions, TRUE);
     $financialTypes = CRM_Contribute_PseudoConstant::financialType();
-    $prefix = ts('CiviCRM') . ': ';
-    $actions = ['add', 'view', 'edit', 'delete'];
+    $actions = [
+      'add' => ts('add'),
+      'view' => ts('view'),
+      'edit' => ts('edit'),
+      'delete' => ts('delete'),
+    ];
     foreach ($financialTypes as $id => $type) {
-      foreach ($actions as $action) {
+      foreach ($actions as $action => $action_ts) {
         $checkPerms[$action . ' contributions of type ' . $type] = [
-          $prefix . ts($action . ' contributions of type ') . $type,
-          ts(ucfirst($action) . ' contributions of type ') . $type,
+          ts("CiviCRM: %1 contributions of type %2", [1 => $action_ts, 2 => $type]),
+          ts('%1 contributions of type %2', [1 => $action_ts, 2 => $type]),
         ];
       }
     }
     $checkPerms['administer CiviCRM Financial Types'] = [
-      $prefix . ts('administer CiviCRM Financial Types'),
+      ts('CiviCRM: administer CiviCRM Financial Types'),
       ts('Administer access to Financial Types'),
     ];
     $this->assertEquals($permissions, $checkPerms, 'Verify that permissions for each financial type have been added');

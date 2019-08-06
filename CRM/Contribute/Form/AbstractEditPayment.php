@@ -391,9 +391,9 @@ WHERE  contribution_id = {$id}
       // for some reason there was a need to filter here per commit history - but this indicates a problem
       // somewhere else.
       if ($processor['is_test'] == ($this->_mode == 'test')) {
-        $this->_processors[$id] = ts($processor['name']);
+        $this->_processors[$id] = $processor['name'];
         if (!empty($processor['description'])) {
-          $this->_processors[$id] .= ' : ' . ts($processor['description']);
+          $this->_processors[$id] .= ' : ' . $processor['description'];
         }
         if ($processor['is_recur']) {
           $this->_recurPaymentProcessors[$id] = $this->_processors[$id];

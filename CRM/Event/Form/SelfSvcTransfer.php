@@ -218,9 +218,9 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     }
     // for front-end user show and use the basic three fields used to create a contact
     else {
-      $this->add('text', 'email', ts('To Email'), ts($this->_contact_email), TRUE);
-      $this->add('text', 'last_name', ts('To Last Name'), ts($this->_to_contact_last_name), TRUE);
-      $this->add('text', 'first_name', ts('To First Name'), ts($this->_to_contact_first_name), TRUE);
+      $this->add('text', 'email', ts('To Email'), $this->_contact_email, TRUE);
+      $this->add('text', 'last_name', ts('To Last Name'), $this->_to_contact_last_name, TRUE);
+      $this->add('text', 'first_name', ts('To First Name'), $this->_to_contact_first_name, TRUE);
     }
 
     $this->addButtons([

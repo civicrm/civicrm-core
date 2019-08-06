@@ -323,12 +323,12 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       $endDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('end_date', $this->_values));
       $now = date('YmdHis');
       if ($endDate && $endDate < $now) {
-        throw new CRM_Contribute_Exception_PastContributionPageException(ts('The page you requested has past its end date on ' . CRM_Utils_Date::customFormat($endDate)), $this->_id);
+        throw new CRM_Contribute_Exception_PastContributionPageException(ts('The page you requested has past its end date on %1', [1 => CRM_Utils_Date::customFormat($endDate)]), $this->_id);
       }
 
       $startDate = CRM_Utils_Date::processDate(CRM_Utils_Array::value('start_date', $this->_values));
       if ($startDate && $startDate > $now) {
-        throw new CRM_Contribute_Exception_FutureContributionPageException(ts('The page you requested will be active from ' . CRM_Utils_Date::customFormat($startDate)), $this->_id);
+        throw new CRM_Contribute_Exception_FutureContributionPageException(ts('The page you requested will be active from %1', [1 => CRM_Utils_Date::customFormat($startDate)]), $this->_id);
       }
 
       $this->assignBillingType();
@@ -945,7 +945,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
           }
         }
 
-        $form->assign('fieldSetTitle', ts(CRM_Core_BAO_UFGroup::getTitle($form->_values['onbehalf_profile_id'])));
+        $form->assign('fieldSetTitle', CRM_Core_BAO_UFGroup::getTitle($form->_values['onbehalf_profile_id']));
 
         if (CRM_Utils_Array::value('is_for_organization', $form->_values)) {
           if ($form->_values['is_for_organization'] == 2) {

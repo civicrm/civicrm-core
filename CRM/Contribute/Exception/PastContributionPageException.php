@@ -8,7 +8,7 @@ class CRM_Contribute_Exception_PastContributionPageException extends Exception {
    * @param int $id
    */
   public function __construct($message, $id) {
-    parent::__construct(ts($message));
+    parent::__construct($message);
     $this->id = $id;
     CRM_Core_Error::debug_log_message('Access to contribution page with past end date attempted - page number ' . $id);
   }
