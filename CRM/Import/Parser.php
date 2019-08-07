@@ -138,6 +138,33 @@ abstract class CRM_Import_Parser {
   protected $_fields;
 
   /**
+   * Metadata for all available fields, keyed by unique name.
+   *
+   * This is intended to supercede $_fields which uses a special sauce format which
+   * importableFieldsMetadata uses the standard getfields type format.
+   *
+   * @var array
+   */
+  protected $importableFieldsMetadata = [];
+
+  /**
+   * Get metadata for all importable fields in std getfields style format.
+   *
+   * @return array
+   */
+  public function getImportableFieldsMetadata(): array {
+    return $this->importableFieldsMetadata;
+  }
+
+  /**
+   * Set metadata for all importable fields in std getfields style format.
+   * @param array $importableFieldsMetadata
+   */
+  public function setImportableFieldsMetadata(array $importableFieldsMetadata) {
+    $this->importableFieldsMetadata = $importableFieldsMetadata;
+  }
+
+  /**
    * Array of the fields that are actually part of the import process
    * the position in the array also dictates their position in the import
    * file
