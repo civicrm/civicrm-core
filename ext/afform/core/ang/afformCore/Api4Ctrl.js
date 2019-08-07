@@ -40,7 +40,13 @@
 
         var mode = $scope.affApi4Refresh ? $scope.affApi4Refresh : 'auto';
         switch (mode) {
-          case 'auto': $scope.$watch('affApi4Ctrl', ctrl.refresh, true); break;
+          case 'auto':
+            // Note: Do NOT watch '.result' or '.loading' - causes infinite reloads.
+            $scope.$watchCollection('affApi4Ctrl.params', ctrl.refresh, true);
+            $scope.$watch('affApi4Ctrl.index', ctrl.refresh, true);
+            $scope.$watch('affApi4Ctrl.entity', ctrl.refresh, true);
+            $scope.$watch('affApi4Ctrl.action', ctrl.refresh, true);
+            break;
           case 'init': ctrl.refresh(); break;
           case 'manual': break;
           default: throw 'Unrecognized refresh mode: '+ mode;
