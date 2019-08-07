@@ -348,6 +348,7 @@
       <keyColumn>id</keyColumn>
       <labelColumn>name</labelColumn>
       <nameColumn>iso_code</nameColumn>
+      <abbrColumn>iso_code</abbrColumn>
     </pseudoconstant>
     <localize_context>country</localize_context>
     <html>

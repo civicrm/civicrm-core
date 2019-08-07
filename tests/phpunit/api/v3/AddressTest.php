@@ -604,4 +604,19 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->assertEquals('San Francisco', $goodResult['values'][4]);
   }
 
+  public function testGetOptionsAbbr() {
+    $result = $this->callAPISuccess('Address', 'getoptions', [
+      'field' => 'country_id',
+      'context' => "abbreviate",
+    ]);
+    $this->assertContains('US', $result['values']);
+    $this->assertNotContains('United States', $result['values']);
+    $result = $this->callAPISuccess('Address', 'getoptions', [
+      'field' => 'state_province_id',
+      'context' => "abbreviate",
+    ]);
+    $this->assertContains('AL', $result['values']);
+    $this->assertNotContains('Alabama', $result['values']);
+  }
+
 }
