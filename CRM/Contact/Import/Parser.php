@@ -181,11 +181,11 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     if ($mode == self::MODE_IMPORT) {
       $query .= " WHERE $statusFieldName = 'NEW'";
     }
-    $dao = new CRM_Core_DAO();
-    $db = $dao->getDatabaseConnection();
-    $result = $db->query($query);
 
-    while ($values = $result->fetchRow(DB_FETCHMODE_ORDERED)) {
+    $result = CRM_Core_DAO::executeQuery($query);
+
+    while ($result->fetch()) {
+      $values = $result->toArray();
       $this->_rowCount++;
 
       /* trim whitespace around the values */
