@@ -801,6 +801,67 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test that ContactReference fields are updated to point to the main contact
+   * after a merge is performed and the duplicate contact is deleted.
+   */
+  public function testMigrationOfContactReferenceCustomField() {
+    // Create Custom Fields
+    $contactGroup = $this->setupCustomGroupForIndividual();
+    $activityGroup = $this->customGroupCreate([
+      'name'    => 'test_group_activity',
+      'extends' => 'Activity',
+    ]);
+    $refFieldContact = $this->customFieldCreate([
+      'custom_group_id' => $contactGroup['id'],
+      'label'           => 'field_1' . $contactGroup['id'],
+      'data_type'       => 'ContactReference',
+      'default_value'   => NULL,
+    ]);
+    $refFieldActivity = $this->customFieldCreate([
+      'custom_group_id' => $activityGroup['id'],
+      'label'           => 'field_1' . $activityGroup['id'],
+      'data_type'       => 'ContactReference',
+      'default_value'   => NULL,
+    ]);
+
+    // Contacts setup
+    $this->setupMatchData();
+    $originalContactID = $this->contacts[0]['id'];
+    $duplicateContactID = $this->contacts[1]['id'];
+
+    // create a contact that won't be merged but has a ContactReference field
+    // pointing to the duplicate (to be deleted) contact
+    $unrelatedContact = $this->individualCreate([
+      'first_name'               => 'Unrelated',
+      'first_name'               => 'Contact',
+      'email'                    => 'unrelated@example.com',
+      "custom_{$refFieldContact['id']}" => $duplicateContactID,
+    ]);
+    // also create an activity with a ContactReference custom field
+    $activity = $this->activityCreate([
+      'target_contact_id'                => $unrelatedContact,
+      "custom_{$refFieldActivity['id']}" => $duplicateContactID,
+    ]);
+
+    // verify that the fields were set
+    $this->assertCustomFieldValue($unrelatedContact, $duplicateContactID, "custom_{$refFieldContact['id']}");
+    $this->assertEntityCustomFieldValue('Activity', $activity['id'], $duplicateContactID, "custom_{$refFieldActivity['id']}_id");
+
+    // Perform merge
+    $this->mergeContacts($originalContactID, $duplicateContactID, []);
+
+    // verify that the ContactReference fields were updated to point to the surviving contact post-merge
+    $this->assertCustomFieldValue($unrelatedContact, $originalContactID, "custom_{$refFieldContact['id']}");
+    $this->assertEntityCustomFieldValue('Activity', $activity['id'], $originalContactID, "custom_{$refFieldActivity['id']}_id");
+
+    // cleanup created custom set
+    $this->callAPISuccess('CustomField', 'delete', ['id' => $refFieldContact['id']]);
+    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $contactGroup['id']]);
+    $this->callAPISuccess('CustomField', 'delete', ['id' => $refFieldActivity['id']]);
+    $this->callAPISuccess('CustomGroup', 'delete', ['id' => $activityGroup['id']]);
+  }
+
+  /**
    * Calls merge method on given contacts, with values given in $params array.
    *
    * @param $originalContactID
@@ -835,8 +896,21 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
    * @param $customFieldName
    */
   private function assertCustomFieldValue($contactID, $expectedValue, $customFieldName) {
-    $data = $this->callAPISuccess('Contact', 'getsingle', [
-      'id' => $contactID,
+    $this->assertEntityCustomFieldValue('Contact', $contactID, $expectedValue, $customFieldName);
+  }
+
+  /**
+   * Check if the custom field of the given field and entity id matches the
+   * expected value
+   *
+   * @param $entity
+   * @param $id
+   * @param $expectedValue
+   * @param $customFieldName
+   */
+  private function assertEntityCustomFieldValue($entity, $id, $expectedValue, $customFieldName) {
+    $data = $this->callAPISuccess($entity, 'getsingle', [
+      'id'     => $id,
       'return' => [$customFieldName],
     ]);
 
@@ -918,7 +992,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
     foreach ($fixtures as $fixture) {
       $contactID = $this->individualCreate($fixture);
       $this->contacts[] = array_merge($fixture, ['id' => $contactID]);
-      sleep(5);
+      sleep(2);
     }
     $organizationFixtures = [
       [
