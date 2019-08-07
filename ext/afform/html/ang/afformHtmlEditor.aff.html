@@ -10,7 +10,7 @@
     <div>
       <a ng-href="#/">{{ts('Back')}}</a>
       |
-      <a aff-api4-action="['Afform', 'update', {layoutFormat: 'html', where: [['name', '=', resultForm.name]], values:{layout: resultForm.layout}}]">{{ts('Save')}}</a>
+      <a aff-api4-action="['Afform', 'update', {layoutFormat: 'html', where: [['name', '=', resultForm.name]], values:resultForm}]">{{ts('Save')}}</a>
       <span ng-if="resultForm.server_route">
         | <a target="_blank" ng-href="{{crmUrl(resultForm.server_route)}}">Open</a>
       </span>
