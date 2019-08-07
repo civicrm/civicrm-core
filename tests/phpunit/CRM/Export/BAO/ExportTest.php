@@ -287,8 +287,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'membership_recur_id' => 1,
       'Campaign ID' => '',
       'member_is_override' => '',
-      // Nothing is returned for auto-renew - this is incorrect based on the intent - but we are adding a test to confirm not fix here.
-      'member_auto_renew' => '',
       'Total Amount' => '200.00',
       'Contribution Status' => 'Pending',
       'Date Received' => '2019-07-25 07:34:23',
@@ -1595,7 +1593,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'membership_recur_id' => 1,
       'member_campaign_id' => 1,
       'member_is_override' => 1,
-      'member_auto_renew' => 1,
     ];
   }
 
@@ -2367,7 +2364,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       92 => 'membership_recur_id',
       93 => 'Campaign ID',
       94 => 'member_is_override',
-      95 => 'member_auto_renew',
     ];
   }
 
@@ -2771,7 +2767,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'membership_recur_id' => 'membership_recur_id varchar(255)',
       'member_campaign_id' => 'member_campaign_id varchar(16)',
       'member_is_override' => 'member_is_override text',
-      'member_auto_renew' => 'member_auto_renew text',
     ];
   }
 
