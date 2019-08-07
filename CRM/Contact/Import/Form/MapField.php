@@ -400,7 +400,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
 
       if ($this->get('savedMapping')) {
-        list($mappingName, $key, $defaults, $js, $columnPatterns, $dataPatterns) = $this->loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames);
+        list($mappingName, $key, $defaults, $js) = $this->loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
@@ -860,10 +860,12 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param string $formName
    * @param string $js
    * @param bool $hasColumnNames
+   * @param array $dataPatterns
+   * @param array $columnPatterns
    *
    * @return array
    */
-  protected function loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames) {
+  protected function loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns) {
     $jsSet = FALSE;
     if (isset($mappingName[$i])) {
       if ($mappingName[$i] != ts('- do not import -')) {
@@ -999,7 +1001,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         $defaults["mapper[$i]"] = [$this->defaultFromData($dataPatterns, $i)];
       }
     }
-    return [$mappingName, $key, $defaults, $js, $columnPatterns, $dataPatterns];
+    return [$mappingName, $key, $defaults, $js];
   }
 
 }
