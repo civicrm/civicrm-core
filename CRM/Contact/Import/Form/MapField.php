@@ -66,7 +66,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return string
    */
-  public function defaultFromColumnName($columnName, &$patterns) {
+  public function defaultFromColumnName($columnName, $patterns) {
 
     if (!preg_match('/^[a-z0-9 ]$/i', $columnName)) {
       if ($columnKey = array_search($columnName, $this->_mapperFields)) {
@@ -541,7 +541,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return array
    */
-  public function formatCustomFieldName(&$fields) {
+  public function formatCustomFieldName($fields) {
     //CRM-2676, replacing the conflict for same custom field name from different custom group.
     $fieldIds = $formattedFieldNames = [];
     foreach ($fields as $key => $value) {

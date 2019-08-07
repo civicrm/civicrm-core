@@ -121,7 +121,7 @@ abstract class CRM_Import_Form_MapField extends CRM_Core_Form {
    *
    * @return string
    */
-  public function defaultFromData(&$patterns, $index) {
+  public function defaultFromData($patterns, $index) {
     $best = '';
     $bestHits = 0;
     $n = count($this->_dataValues);
