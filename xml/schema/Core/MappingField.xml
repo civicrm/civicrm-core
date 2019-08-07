@@ -66,6 +66,11 @@
     <title>Location type ID</title>
     <comment>Location type of this mapping, if required</comment>
     <add>1.2</add>
+    <pseudoconstant>
+      <table>civicrm_location_type</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>display_name</labelColumn>
+    </pseudoconstant>
   </field>
   <foreignKey>
     <name>location_type_id</name>
