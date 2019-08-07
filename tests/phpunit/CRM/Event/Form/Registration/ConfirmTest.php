@@ -8,6 +8,8 @@
  */
 class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
 
+  use CRMTraits_Profile_ProfileTrait;
+
   public function setUp() {
     $this->useTransaction(TRUE);
     parent::setUp();
@@ -349,6 +351,37 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     ]);
     $contribution = $this->callAPISuccess('Contribution', 'get', ['invoice_id' => '57adc34957a29171948e8643ce906332']);
     $this->assertEquals($contribution['count'], '0', "Contribution should not be created for zero fee event registration when no price field selected.");
+  }
+
+  /**
+   * Test form profile assignment.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \Exception
+   */
+  public function testAssignProfiles() {
+    $event = $this->eventCreate();
+    $this->createJoinedProfile(['entity_table' => 'civicrm_event', 'entity_id' => $event['id']]);
+
+    /* @var \CRM_Event_Form_Registration_Confirm $form */
+    $form = $this->getFormObject('CRM_Event_Form_Registration_Confirm');
+    $form->set('params', [[]]);
+    $form->set('id', $event['id']);
+    $form->set('values', [
+      'event' => $event['values'][$event['id']],
+      'location' => [],
+      'custom_pre_id' => $this->ids['UFGroup']['our profile'],
+    ]);
+    $form->preProcess();
+
+    CRM_Event_Form_Registration_Confirm::assignProfiles($form);
+
+    $smarty = CRM_Core_Smarty::singleton();
+    $tplVar = $smarty->get_template_vars();
+    $this->assertEquals([
+      'CustomPre' => ['First Name' => NULL],
+      'CustomPreGroupTitle' => 'Public title',
+    ], $tplVar['primaryParticipantProfile']);
   }
 
 }

@@ -283,7 +283,8 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
    *
    * @return array
    *   The fields that belong to this ufgroup(s)
-   * @throws \Exception
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function getFields(
     $id,
@@ -366,7 +367,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     }
 
     if (empty($fields) && !$validGroup) {
-      CRM_Core_Error::fatal(ts('The requested Profile (gid=%1) is disabled OR it is not configured to be used for \'Profile\' listings in its Settings OR there is no Profile with that ID OR you do not have permission to access this profile. Please contact the site administrator if you need assistance.',
+      throw new CRM_Core_Exception(ts('The requested Profile (gid=%1) is disabled OR it is not configured to be used for \'Profile\' listings in its Settings OR there is no Profile with that ID OR you do not have permission to access this profile. Please contact the site administrator if you need assistance.',
         [1 => implode(',', $profileIds)]
       ));
     }
@@ -3624,6 +3625,20 @@ SELECT  group_id
         $fields["phone_ext-{$fieldSuffix}"]['is_required'] = 0;
       }
     }
+  }
+
+  /**
+   * Get the frontend_title for the profile, falling back on 'title' if none.
+   *
+   * @param int $profileID
+   *
+   * @return string
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getFrontEndTitle(int $profileID) {
+    $profile = civicrm_api3('UFGroup', 'getsingle', ['id' => $profileID, 'return' => ['title', 'frontend_title']]);
+    return $profile['frontend_title'] ?? $profile['title'];
   }
 
 }
