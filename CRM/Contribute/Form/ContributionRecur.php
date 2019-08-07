@@ -108,7 +108,7 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   protected $subscriptionDetails = [];
 
   /**
-   * Is the from being accessed by a front end user to update their own recurring.
+   * Is the form being accessed by a front end user to update their own recurring.
    *
    * @var bool
    */
