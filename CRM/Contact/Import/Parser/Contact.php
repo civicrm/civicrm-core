@@ -146,50 +146,8 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * The initializer code, called before processing.
    */
   public function init() {
-    $contactFields = CRM_Contact_BAO_Contact::importableFields($this->_contactType);
-    // exclude the address options disabled in the Address Settings
-    $fields = CRM_Core_BAO_Address::validateAddressOptions($contactFields);
-
-    //CRM-5125
-    //supporting import for contact subtypes
-    $csType = NULL;
-    if (!empty($this->_contactSubType)) {
-      //custom fields for sub type
-      $subTypeFields = CRM_Core_BAO_CustomField::getFieldsForImport($this->_contactSubType);
-
-      if (!empty($subTypeFields)) {
-        foreach ($subTypeFields as $customSubTypeField => $details) {
-          $fields[$customSubTypeField] = $details;
-        }
-      }
-    }
-
-    //Relationship importables
-    $this->_relationships = $relations
-      = CRM_Contact_BAO_Relationship::getContactRelationshipType(
-        NULL, NULL, NULL, $this->_contactType,
-        FALSE, 'label', TRUE, $this->_contactSubType
-      );
-    asort($relations);
-
-    foreach ($relations as $key => $var) {
-      list($type) = explode('_', $key);
-      $relationshipType[$key]['title'] = $var;
-      $relationshipType[$key]['headerPattern'] = '/' . preg_quote($var, '/') . '/';
-      $relationshipType[$key]['import'] = TRUE;
-      $relationshipType[$key]['relationship_type_id'] = $type;
-      $relationshipType[$key]['related'] = TRUE;
-    }
-
-    if (!empty($relationshipType)) {
-      $fields = array_merge($fields, [
-        'related' => [
-          'title' => ts('- related contact info -'),
-        ],
-      ], $relationshipType);
-    }
-
-    foreach ($fields as $name => $field) {
+    $this->setFieldMetadata();
+    foreach ($this->getImportableFieldsMetadata() as $name => $field) {
       $this->addField($name, $field['title'], CRM_Utils_Array::value('type', $field), CRM_Utils_Array::value('headerPattern', $field), CRM_Utils_Array::value('dataPattern', $field), CRM_Utils_Array::value('hasLocationType', $field));
     }
 
@@ -2090,6 +2048,55 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
 
     return $parserParameters;
 
+  }
+
+  /**
+   * Set field metadata.
+   */
+  protected function setFieldMetadata() {
+    $contactFields = CRM_Contact_BAO_Contact::importableFields($this->_contactType);
+    // exclude the address options disabled in the Address Settings
+    $fields = CRM_Core_BAO_Address::validateAddressOptions($contactFields);
+
+    //CRM-5125
+    //supporting import for contact subtypes
+    $csType = NULL;
+    if (!empty($this->_contactSubType)) {
+      //custom fields for sub type
+      $subTypeFields = CRM_Core_BAO_CustomField::getFieldsForImport($this->_contactSubType);
+
+      if (!empty($subTypeFields)) {
+        foreach ($subTypeFields as $customSubTypeField => $details) {
+          $fields[$customSubTypeField] = $details;
+        }
+      }
+    }
+
+    //Relationship importables
+    $this->_relationships = $relations
+      = CRM_Contact_BAO_Relationship::getContactRelationshipType(
+      NULL, NULL, NULL, $this->_contactType,
+      FALSE, 'label', TRUE, $this->_contactSubType
+    );
+    asort($relations);
+
+    foreach ($relations as $key => $var) {
+      list($type) = explode('_', $key);
+      $relationshipType[$key]['title'] = $var;
+      $relationshipType[$key]['headerPattern'] = '/' . preg_quote($var, '/') . '/';
+      $relationshipType[$key]['import'] = TRUE;
+      $relationshipType[$key]['relationship_type_id'] = $type;
+      $relationshipType[$key]['related'] = TRUE;
+    }
+
+    if (!empty($relationshipType)) {
+      $fields = array_merge($fields, [
+        'related' => [
+          'title' => ts('- related contact info -'),
+        ],
+      ], $relationshipType);
+    }
+    $this->setImportableFieldsMetadata($fields);
   }
 
 }
