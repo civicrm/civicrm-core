@@ -1455,8 +1455,7 @@ WHERE civicrm_event.is_active = 1
       }
 
       if (!empty($fields)) {
-        $profile = civicrm_api3('UFGroup', 'getsingle', ['id' => $gid, ['return' => ['title', 'frontend_title']]]);
-        $groupTitle['groupTitle'] = $profile['frontend_title'] ?? $profile['title'];
+        $groupTitle['groupTitle'] = CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $gid);
       }
 
       $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
