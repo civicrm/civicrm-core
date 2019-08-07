@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<menu>
-  <item>
-    <path>civicrm/admin/afform/html</path>
-    <page_callback>CRM_AfformHtml_Page_HtmlEditor</page_callback>
-    <title>HtmlEditor</title>
-    <access_arguments>administer CiviCRM</access_arguments>
-  </item>
-</menu>
