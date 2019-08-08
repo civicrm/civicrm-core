@@ -333,7 +333,8 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       }
       // Set title.
       if (isset($activityTypeDisplayLabels)) {
-        $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTypeDisplayLabels);
+        // FIXME - it's not clear why the if line just above is needed here and why we can't just set this once above and re-use. What is interesting, but can't possibly be the reason, is that the first if block will fail if the label is the string '0', whereas this one won't. But who would have an activity type called '0'?
+        $activityTypeDisplayLabel = CRM_Utils_Array::value($this->_activityTypeId, $activityTypeDisplayLabels);
 
         if ($this->_currentlyViewedContactId) {
           $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
@@ -341,10 +342,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
           if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
             $displayName .= ' (' . ts('default organization') . ')';
           }
-          CRM_Utils_System::setTitle($displayName . ' - ' . $activityName);
+          CRM_Utils_System::setTitle($displayName . ' - ' . $activityTypeDisplayLabel);
         }
         else {
-          CRM_Utils_System::setTitle(ts('%1 Activity', [1 => $activityName]));
+          CRM_Utils_System::setTitle(ts('%1 Activity', [1 => $activityTypeDisplayLabel]));
         }
       }
     }
