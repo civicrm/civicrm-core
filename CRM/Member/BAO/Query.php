@@ -454,7 +454,6 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         'membership_recur_id' => 1,
         'member_campaign_id' => 1,
         'member_is_override' => 1,
-        'member_auto_renew' => 1,
       ];
 
       if ($includeCustomFields) {
