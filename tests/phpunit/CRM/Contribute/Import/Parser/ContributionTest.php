@@ -155,7 +155,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
    * @param array|null $fields
    *   Array of field names. Will be calculated from $originalValues if not passed in.
    */
-  protected function runImport($originalValues, $onDuplicateAction, $expectedResult, $mapperSoftCredit = [], $mapperPhoneType = NULL, $mapperSoftCreditType = [], $fields = NULL) {
+  protected function runImport($originalValues, $onDuplicateAction, $expectedResult, $mapperSoftCredit = NULL, $mapperPhoneType = NULL, $mapperSoftCreditType = NULL, $fields = NULL) {
     if (!$fields) {
       $fields = array_keys($originalValues);
     }
