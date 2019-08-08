@@ -400,7 +400,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
 
       if ($this->get('savedMapping')) {
-        list($mappingName, $key, $defaults, $js) = $this->loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
+        list($mappingName, $defaults, $js) = $this->loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
@@ -969,7 +969,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
             elseif (isset($imProvider)) {
               $typeId = $imProvider;
             }
-            $defaults["mapper[$i]"] = [$mappingHeader[0], $locationId, $typeId];
+            $defaults["mapper[$i]"] = [$mappingHeader[0] ?? '', $locationId, $typeId];
           }
 
           if ((!$phoneType) && (!$imProvider)) {
@@ -1001,7 +1001,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         $defaults["mapper[$i]"] = [$this->defaultFromData($dataPatterns, $i)];
       }
     }
-    return [$mappingName, $key, $defaults, $js];
+    return [$mappingName, $defaults, $js];
   }
 
 }
