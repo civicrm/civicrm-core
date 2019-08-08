@@ -220,7 +220,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     if (isset($params['total_amount']) && $params['total_amount'] == 0) {
       $params['total_amount'] = '0.00';
     }
-    $this->formatInput($params);
+    $this->formatInput($params, $formatted);
 
     static $indieFields = NULL;
     if ($indieFields == NULL) {
@@ -593,8 +593,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * CRM_Contribute_Import_Parser_ContributionTest.
    *
    * @param array $params
+   * @param array $formatted
    */
-  public function formatInput(&$params) {
+  public function formatInput(&$params, &$formatted = []) {
     $dateType = CRM_Core_Session::singleton()->get('dateTypes');
     $customDataType = !empty($params['contact_type']) ? $params['contact_type'] : 'Contribution';
     $customFields = CRM_Core_BAO_CustomField::getFields($customDataType);
@@ -619,7 +620,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         }
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
           if ($customFields[$customFieldID]['data_type'] == 'Date') {
-            CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $params, $dateType, $key);
+            CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
             unset($params[$key]);
           }
           elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
