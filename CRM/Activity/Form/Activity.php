@@ -325,14 +325,15 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // Assigning Activity type name.
     if ($this->_activityTypeId) {
-      $activityTName = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $this->_activityTypeId, 'label');
-      if ($activityTName[$this->_activityTypeId]) {
-        $this->_activityTypeName = $activityTName[$this->_activityTypeId];
-        $this->assign('activityTName', $activityTName[$this->_activityTypeId]);
+      $activityTypeDisplayLabels = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $this->_activityTypeId, 'label');
+      if ($activityTypeDisplayLabels[$this->_activityTypeId]) {
+        $this->_activityTypeName = $activityTypeDisplayLabels[$this->_activityTypeId];
+        // can't change this instance of activityTName yet - will come back to it dev/core#1116
+        $this->assign('activityTName', $activityTypeDisplayLabels[$this->_activityTypeId]);
       }
       // Set title.
-      if (isset($activityTName)) {
-        $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTName);
+      if (isset($activityTypeDisplayLabels)) {
+        $activityName = CRM_Utils_Array::value($this->_activityTypeId, $activityTypeDisplayLabels);
 
         if ($this->_currentlyViewedContactId) {
           $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
