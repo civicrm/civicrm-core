@@ -59,6 +59,7 @@ class CRM_Core_Error_Log extends \Psr\Log\AbstractLogger {
   public function log($level, $message, array $context = []) {
     // FIXME: This flattens a $context a bit prematurely. When integrating
     // with external/CMS logs, we should pass through $context.
+    $prefix = '';
     if (!empty($context)) {
       if (isset($context['exception'])) {
         $context['exception'] = CRM_Core_Error::formatTextException($context['exception']);
@@ -68,8 +69,11 @@ class CRM_Core_Error_Log extends \Psr\Log\AbstractLogger {
       if (CRM_Utils_System::isDevelopment() && CRM_Utils_Array::value('civi.tag', $context) === 'deprecated') {
         trigger_error($message, E_USER_DEPRECATED);
       }
+      if (isset($context['civi.prefix'])) {
+        $prefix = $context['civi.prefix'];
+      }
     }
-    CRM_Core_Error::debug_log_message($message, FALSE, '', $this->map[$level]);
+    CRM_Core_Error::debug_log_message($message, FALSE, $prefix, $this->map[$level]);
   }
 
 }

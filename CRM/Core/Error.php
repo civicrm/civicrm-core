@@ -39,6 +39,8 @@ require_once 'CRM/Core/Exception.php';
 
 require_once 'Log.php';
 
+use Psr\Log\LogLevel;
+
 /**
  * Class CRM_Exception
  */
@@ -232,7 +234,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $errorDetails = CRM_Core_Error::debug('', $error, FALSE);
     $template->assign_by_ref('errorDetails', $errorDetails);
 
-    CRM_Core_Error::debug_var('Fatal Error Details', $error);
+    CRM_Core_Error::debug_var('Fatal Error Details', $error, TRUE, TRUE, '', LogLevel::ERROR);
     CRM_Core_Error::backtrace('backTrace', TRUE);
 
     if ($config->initialized) {
@@ -339,7 +341,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
     if (self::$modeException) {
       // CRM-11043
-      CRM_Core_Error::debug_var('Fatal Error Details', $vars);
+      CRM_Core_Error::debug_var('Fatal Error Details', $vars, TRUE, TRUE, '', LogLevel::ERROR);
       CRM_Core_Error::backtrace('backTrace', TRUE);
 
       $details = 'A fatal error was triggered';
@@ -381,7 +383,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       self::backtrace();
     }
 
-    CRM_Core_Error::debug_var('Fatal Error Details', $vars);
+    CRM_Core_Error::debug_var('Fatal Error Details', $vars, TRUE, TRUE, '', LogLevel::ERROR);
     CRM_Core_Error::backtrace('backTrace', TRUE);
 
     // If we are in an ajax callback, format output appropriately
@@ -421,7 +423,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     }
     catch (Exception $other) {
       // if the exception-handler generates an exception, then that sucks! oh, well. carry on.
-      CRM_Core_Error::debug_var('handleUnhandledException_nestedException', self::formatTextException($other));
+      CRM_Core_Error::debug_var('handleUnhandledException_nestedException', self::formatTextException($other), TRUE, TRUE, '', LogLevel::ERROR);
     }
     $config = CRM_Core_Config::singleton();
     $vars = [
@@ -459,7 +461,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     // Case C: Default error handler
 
     // log to file
-    CRM_Core_Error::debug_var('Fatal Error Details', $vars, FALSE);
+    CRM_Core_Error::debug_var('Fatal Error Details', $vars, FALSE, TRUE, '', LogLevel::ERROR);
     CRM_Core_Error::backtrace('backTrace', TRUE);
 
     // print to screen
@@ -544,6 +546,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *   Log or return the output?
    * @param string $prefix
    *   Prefix for output logfile.
+   * @param string $level
+   *   The PSR-3 log level.
    *
    * @return string
    *   The generated output
@@ -551,7 +555,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @see CRM_Core_Error::debug()
    * @see CRM_Core_Error::debug_log_message()
    */
-  public static function debug_var($variable_name, $variable, $print = TRUE, $log = TRUE, $prefix = '') {
+  public static function debug_var($variable_name, $variable, $print = TRUE, $log = TRUE, $prefix = '', $level = LogLevel::INFO) {
     // check if variable is set
     if (!isset($variable)) {
       $out = "\$$variable_name is not set";
@@ -574,7 +578,15 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         reset($variable);
       }
     }
-    return self::debug_log_message($out, FALSE, $prefix);
+    Civi::log()->log($level, $out, ['civi.prefix' => $prefix]);
+    return self::debugOutput($out);
+  }
+
+  /**
+   * Generates debug HTML output.
+   */
+  public static function debugOutput($message) {
+    return '<p/><code>' . htmlspecialchars($message) . '</code>';
   }
 
   /**
@@ -600,7 +612,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $file_log = self::createDebugLogger($prefix);
     $file_log->log("$message\n", $priority);
 
-    $str = '<p/><code>' . htmlspecialchars($message) . '</code>';
+    $str = self::debugOutput($message);
     if ($out && CRM_Core_Permission::check('view debug output')) {
       echo $str;
     }
@@ -635,7 +647,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
         CRM_Core_Error::backtrace($string, TRUE);
       }
       elseif (CIVICRM_DEBUG_LOG_QUERY) {
-        CRM_Core_Error::debug_var('Query', $string, TRUE, TRUE, 'sql_log');
+        CRM_Core_Error::debug_var('Query', $string, TRUE, TRUE, 'sql_log', LogLevel::DEBUG);
       }
     }
   }
@@ -647,7 +659,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    */
   public static function debug_query_result($query) {
     $results = CRM_Core_DAO::executeQuery($query)->fetchAll();
-    CRM_Core_Error::debug_var('dao result', ['query' => $query, 'results' => $results]);
+    CRM_Core_Error::debug_var('dao result', ['query' => $query, 'results' => $results], TRUE, TRUE, '', LogLevel::DEBUG);
   }
 
   /**
@@ -731,7 +743,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
       CRM_Core_Error::debug($msg, $message);
     }
     else {
-      CRM_Core_Error::debug_var($msg, $message);
+      CRM_Core_Error::debug_var($msg, $message, TRUE, TRUE, '', LogLevel::DEBUG);
     }
   }
 
@@ -948,7 +960,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    * @throws PEAR_Exception
    */
   public static function exceptionHandler($pearError) {
-    CRM_Core_Error::debug_var('Fatal Error Details', self::getErrorDetails($pearError));
+    CRM_Core_Error::debug_var('Fatal Error Details', self::getErrorDetails($pearError), TRUE, TRUE, '', LogLevel::ERROR);
     CRM_Core_Error::backtrace('backTrace', TRUE);
     throw new PEAR_Exception($pearError->getMessage(), $pearError);
   }
@@ -962,7 +974,7 @@ class CRM_Core_Error extends PEAR_ErrorStack {
    *   $obj
    */
   public static function nullHandler($obj) {
-    CRM_Core_Error::debug_log_message("Ignoring exception thrown by nullHandler: {$obj->code}, {$obj->message}");
+    Civi::log()->error("Ignoring exception thrown by nullHandler: {$obj->code}, {$obj->message}");
     CRM_Core_Error::backtrace('backTrace', TRUE);
     return $obj;
   }
