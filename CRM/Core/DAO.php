@@ -2375,6 +2375,7 @@ SELECT contact_id
       }
     }
     self::appendCustomTablesExtendingContacts($contactReferences);
+    self::appendCustomContactReferenceFields($contactReferences);
 
     // FixME for time being adding below line statically as no Foreign key constraint defined for table 'civicrm_entity_tag'
     $contactReferences['civicrm_entity_tag'][] = 'entity_id';
@@ -2398,7 +2399,26 @@ SELECT contact_id
     $customValueTables = CRM_Core_BAO_CustomGroup::getAllCustomGroupsByBaseEntity('Contact');
     $customValueTables->find();
     while ($customValueTables->fetch()) {
-      $cidRefs[$customValueTables->table_name] = ['entity_id'];
+      $cidRefs[$customValueTables->table_name][] = 'entity_id';
+    }
+  }
+
+  /**
+   * Add custom ContactReference fields to the list of contact references
+   *
+   * This includes active and inactive fields/groups
+   *
+   * @param array $cidRefs
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function appendCustomContactReferenceFields(&$cidRefs) {
+    $fields = civicrm_api3('CustomField', 'get', [
+      'return'    => ['column_name', 'custom_group_id.table_name'],
+      'data_type' => 'ContactReference',
+    ])['values'];
+    foreach ($fields as $field) {
+      $cidRefs[$field['custom_group_id.table_name']][] = $field['column_name'];
     }
   }
 

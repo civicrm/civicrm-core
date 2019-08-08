@@ -504,6 +504,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     if ($customTableToCopyFrom !== NULL) {
       // @todo this duplicates cidRefs?
       CRM_Core_DAO::appendCustomTablesExtendingContacts($customTables);
+      CRM_Core_DAO::appendCustomContactReferenceFields($customTables);
       $customTables = array_keys($customTables);
     }
 
@@ -529,7 +530,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       // skipping non selected single-value custom table's value migration
       if (!in_array($table, $multi_value_tables)) {
         if ($customTableToCopyFrom !== NULL && in_array($table, $customTables) && !in_array($table, $customTableToCopyFrom)) {
-          continue;
+          if (isset($cidRefs[$table]) && ($delCol = array_search('entity_id', $cidRefs[$table])) !== FALSE) {
+            // remove entity_id from the field list
+            unset($cidRefs[$table][$delCol]);
+          }
         }
       }
 
@@ -560,7 +564,13 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           $preOperationSqls = self::operationSql($mainId, $otherId, $table, $tableOperations);
           $sqls = array_merge($sqls, $preOperationSqls);
 
-          if ($customTableToCopyFrom !== NULL && in_array($table, $customTableToCopyFrom) && !self::customRecordExists($mainId, $table, $field)) {
+          if ($customTableToCopyFrom !== NULL && in_array($table, $customTableToCopyFrom) && !self::customRecordExists($mainId, $table, $field) && $field == 'entity_id') {
+            // this is the entity_id column of a custom field group where:
+            // - the custom table should be copied as indicated by $customTableToCopyFrom
+            //   e.g. because a field in the group was selected in a form
+            // - AND no record exists yet for the $mainId contact
+            // we only do this for column "entity_id" as we wouldn't want to
+            // run this INSERT for ContactReference fields
             $sqls[] = "INSERT INTO $table ($field) VALUES ($mainId)";
           }
           $sqls[] = "UPDATE IGNORE $table SET $field = $mainId WHERE $field = $otherId";
