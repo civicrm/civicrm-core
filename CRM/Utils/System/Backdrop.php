@@ -880,9 +880,6 @@ AND    u.status = 1
       else {
         $contactMatching++;
       }
-      if (is_object($match)) {
-        $match->free();
-      }
     }
 
     return [

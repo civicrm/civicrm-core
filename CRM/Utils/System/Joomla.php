@@ -897,9 +897,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
       else {
         $contactMatching++;
       }
-      if (is_object($match)) {
-        $match->free();
-      }
     }
 
     return [
