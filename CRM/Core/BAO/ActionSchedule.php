@@ -659,7 +659,7 @@ FROM civicrm_action_schedule cas
       'controller' => __CLASS__,
       'actionSchedule' => $schedule,
       'actionMapping' => $mapping,
-      'smarty' => TRUE,
+      'smarty' => (defined('CIVICRM_MAIL_SMARTY') ? (bool) CIVICRM_MAIL_SMARTY : FALSE),
     ]);
     $tp->addMessage('body_text', $schedule->body_text, 'text/plain');
     $tp->addMessage('body_html', $schedule->body_html, 'text/html');
