@@ -1102,7 +1102,10 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $mailSend = FALSE;
     $this->processBillingAddress();
     $formValues = $this->_params;
-    $formValues = $this->setPriceSetParameters($formValues);
+    // Fix for dev/core/issues/860: don't overwrite _priceSet if populated.
+    if (empty($this->_priceSet)) {
+      $formValues = $this->setPriceSetParameters($formValues);
+    }
 
     if ($this->_id) {
       $ids['membership'] = $params['id'] = $this->_id;
