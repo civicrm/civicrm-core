@@ -616,9 +616,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       else {
         $contactMatching++;
       }
-      if (is_object($match)) {
-        $match->free();
-      }
     }
 
     return [
