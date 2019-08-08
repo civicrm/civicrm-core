@@ -2050,6 +2050,18 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called while preparing a summary overlay profile
+   *
+   * @param int $profileID
+   * @param string $contactType
+   * @return mixed
+   */
+  public static function summaryOverlayProfile(&$profileID, $contactType) {
+    return self::singleton()->invoke(array('profileID', 'contactType'), $profileID, $contactType, self::$_nullObject, self::$_nullObject,
+      self::$_nullObject, self::$_nullObject, 'civicrm_summaryOverlayProfile');
+  }
+
+  /**
    * This hook is called while preparing a list of contacts (based on a profile)
    *
    * @param string $profileName

@@ -97,6 +97,7 @@ class CRM_Contact_BAO_Contact_Utils {
       if (!$summaryOverlayProfileId) {
         $summaryOverlayProfileId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', 'summary_overlay', 'id', 'name');
       }
+      CRM_Utils_Hook::summaryOverlayProfile($summaryOverlayProfileId, $contactType);
 
       $profileURL = CRM_Utils_System::url('civicrm/profile/view',
         "reset=1&gid={$summaryOverlayProfileId}&id={$contactId}&snippet=4"
