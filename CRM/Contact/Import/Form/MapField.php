@@ -969,7 +969,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
             elseif (isset($imProvider)) {
               $typeId = $imProvider;
             }
-            $defaults["mapper[$i]"] = [$mappingHeader[0], $locationId, $typeId];
+            $defaults["mapper[$i]"] = [$mappingHeader[0] ?? '', $locationId, $typeId];
           }
 
           if ((!$phoneType) && (!$imProvider)) {
