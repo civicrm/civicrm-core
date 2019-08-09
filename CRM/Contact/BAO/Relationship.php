@@ -1707,7 +1707,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         $relTypeIds = [];
         if ($action & CRM_Core_Action::DELETE) {
           // @todo don't return relTypeId here - but it seems to be used later in a cryptic way (hint cryptic is not a complement).
-          list($relTypeId, $isDeletable) = self::isInheritedMembershipInvalidated($membershipValues, $values, $cid, $mainRelatedContactId);
+          list($relTypeId, $isDeletable) = self::isInheritedMembershipInvalidated($membershipValues, $values, $cid, $mainRelatedContactId, $relTypeId);
           if ($isDeletable) {
             CRM_Member_BAO_Membership::deleteRelatedMemberships($membershipValues['owner_membership_id'], $membershipValues['membership_contact_id']);
           }
@@ -2406,14 +2406,48 @@ AND cc.sort_name LIKE '%$name%'";
    * @param int $cid
    * @param int $mainRelatedContactId
    *
+   * @param int $relTypeId
+   *
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  private static function isInheritedMembershipInvalidated($membershipValues, array $values, $cid, $mainRelatedContactId): array {
+  private static function isInheritedMembershipInvalidated($membershipValues, array $values, $cid, $mainRelatedContactId, $relTypeId = null): array {
     $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($membershipValues['membership_type_id']);
     $relTypeIds = $membershipType['relationship_type_id'];
+	  $relDirections = $membershipType['relationship_direction'];
+
+	  $similarMemberships = 0;
+    if (!empty($relTypeIds)) {
+      $relquery = [];
+      foreach ($relTypeIds as $key => $reltype_id) {
+        if ($reltype_id == $relTypeId) {
+          continue;
+        }
+        // b to a relationship
+        $relquery[] = "(relationship_type_id = $reltype_id AND contact_id_a = $cid AND contact_id_b = $mainRelatedContactId)";
+        if ($relDirections[$key] == 'a_b') {
+          // a_b may be a_b or any direction
+          $relquery[] = "(relationship_type_id = $reltype_id AND contact_id_a = $mainRelatedContactId AND contact_id_b = $cid)";
+        }
+      }
+
+      if (!empty($relquery)) {
+        $relquery = '(' . implode(' OR ', $relquery) . ') AND';
+      }
+      else {
+        $relquery = '';
+      }
+
+      $similarMemberships = "SELECT COUNT(id)
+FROM civicrm_relationship
+WHERE $relquery
+is_active = 1 AND
+(end_date IS NULL OR end_date > CURRENT_DATE())";
+      $similarMemberships = CRM_Core_DAO::singleValueQuery($similarMemberships);
+    }
+
     $membshipInheritedFrom = $membershipValues['owner_membership_id'] ?? NULL;
-    if (!$membshipInheritedFrom || !in_array($values[$cid]['relationshipTypeId'], $relTypeIds)) {
+    if (!$membshipInheritedFrom || !in_array($values[$cid]['relationshipTypeId'], $relTypeIds) || $similarMemberships != 0) {
       return [implode(',', $relTypeIds), FALSE];
     }
     //CRM-16300 check if owner membership exist for related membership
