@@ -727,7 +727,7 @@ WHERE  id = %1";
               $field['options'][$optionValueId]['tax_amount'] = round($taxAmount['tax_amount'], 2);
             }
           }
-          if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
+          if (!empty($field['options'][$optionValueId]['tax_rate'])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
           }
           $totalPrice += $lineItem[$firstOption['id']]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[key($field['options'])]);
@@ -742,7 +742,7 @@ WHERE  id = %1";
           $optionValueId = CRM_Utils_Array::key(1, $params["price_{$id}"]);
 
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, $amount_override);
-          if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
+          if (!empty($field['options'][$optionValueId]['tax_rate'])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
             if ($amount_override) {
               $lineItem[$optionValueId]['line_total'] = $lineItem[$optionValueId]['unit_price'] = CRM_Utils_Rule::cleanMoney($lineItem[$optionValueId]['line_total'] - $lineItem[$optionValueId]['tax_amount']);
@@ -765,7 +765,7 @@ WHERE  id = %1";
           $optionValueId = CRM_Utils_Array::key(1, $params["price_{$id}"]);
 
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, CRM_Utils_Array::value('partial_payment_total', $params));
-          if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionValueId])) {
+          if (!empty($field['options'][$optionValueId]['tax_rate'])) {
             $lineItem = self::setLineItem($field, $lineItem, $optionValueId, $totalTax);
           }
           $totalPrice += $lineItem[$optionValueId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionValueId]);
@@ -782,7 +782,7 @@ WHERE  id = %1";
 
           CRM_Price_BAO_LineItem::format($id, $params, $field, $lineItem, CRM_Utils_Array::value('partial_payment_total', $params));
           foreach ($params["price_{$id}"] as $optionId => $option) {
-            if (CRM_Utils_Array::value('tax_rate', $field['options'][$optionId])) {
+            if (!empty($field['options'][$optionId]['tax_rate'])) {
               $lineItem = self::setLineItem($field, $lineItem, $optionId, $totalTax);
             }
             $totalPrice += $lineItem[$optionId]['line_total'] + CRM_Utils_Array::value('tax_amount', $lineItem[$optionId]);

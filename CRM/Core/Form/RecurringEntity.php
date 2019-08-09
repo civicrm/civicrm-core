@@ -369,7 +369,7 @@ class CRM_Core_Form_RecurringEntity {
 
         //exclude dates
         $excludeDateList = [];
-        if (CRM_Utils_Array::value('exclude_date_list', $params) && CRM_Utils_Array::value('parent_entity_id', $params) && $actionScheduleObj->entity_value) {
+        if (!empty($params['exclude_date_list']) && !empty($params['parent_entity_id']) && $actionScheduleObj->entity_value) {
           //Since we get comma separated values lets get them in array
           $excludeDates = explode(",", $params['exclude_date_list']);
 

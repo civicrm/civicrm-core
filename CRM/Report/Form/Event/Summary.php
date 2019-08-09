@@ -349,7 +349,7 @@ class CRM_Report_Form_Event_Summary extends CRM_Report_Form {
           $rows[$key]['civicrm_event_id'] . ") ";
       }
 
-      if (CRM_Utils_Array::value('totalAmount', $rows[$key]) == 0) {
+      if (empty($rows[$key]['totalAmount'])) {
         $countEvent = count($rows);
       }
 

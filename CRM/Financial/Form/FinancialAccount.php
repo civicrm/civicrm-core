@@ -143,7 +143,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
       if ($values['financial_account_type_id'] != $financialAccountTypeId) {
         $errorMsg['financial_account_type_id'] = ts('Taxable accounts should have Financial Account Type set to Liability.');
       }
-      if (CRM_Utils_Array::value('tax_rate', $values) == NULL) {
+      if (!isset($values['tax_rate'])) {
         $errorMsg['tax_rate'] = ts('Please enter value for tax rate');
       }
     }

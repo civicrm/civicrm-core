@@ -487,7 +487,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
       $realSetting = \Civi::$statics[__CLASS__]['is_acl_enabled'] = Civi::settings()->get('acl_financial_type');
       if (!$realSetting) {
         $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
-        if (CRM_Utils_Array::value('acl_financial_type', $contributeSettings)) {
+        if (!empty($contributeSettings['acl_financial_type'])) {
           \Civi::$statics[__CLASS__]['is_acl_enabled'] = TRUE;
         }
       }
