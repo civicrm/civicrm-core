@@ -249,15 +249,18 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
       'relationship_type_id' => $orgToPersonTypeId2,
     ]);
 
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+
+    // Disable the relationship & check the membership is removed.
+    $relationshipOne['is_active'] = 0;
+    $this->callAPISuccess('Relationship', 'create', array_merge($relationshipOne, ['is_active' => 0]));
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 0);
     /*
      * @todo this section not yet working due to bug in would-be-tested code.
-    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
     $relationshipTwo['is_active'] = 0;
     $this->callAPISuccess('Relationship', 'create', $relationshipTwo);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
-    $relationshipOne['is_active'] = 0;
-    $this->callAPISuccess('Relationship', 'create', $relationshipOne);
-    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 0);
+
     $relationshipOne['is_active'] = 1;
     $this->callAPISuccess('Relationship', 'create', $relationshipOne);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
