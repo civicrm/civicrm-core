@@ -1585,7 +1585,7 @@ function civicrm_api3_contact_duplicatecheck($params) {
     $params['match'],
     $params['match']['contact_type'],
     $params['rule_type'],
-    CRM_Utils_Array::value('exclude', $params, []),
+    $params['exclude'] ?? [],
     CRM_Utils_Array::value('check_permissions', $params),
     CRM_Utils_Array::value('dedupe_rule_id', $params)
   );

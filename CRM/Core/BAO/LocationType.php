@@ -124,9 +124,9 @@ class CRM_Core_BAO_LocationType extends CRM_Core_DAO_LocationType {
    */
   public static function create(&$params) {
     if (empty($params['id'])) {
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-      $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
-      $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
+      $params['is_active'] = $params['is_active'] ?? FALSE;
+      $params['is_default'] = $params['is_default'] ?? FALSE;
+      $params['is_reserved'] = $params['is_reserved'] ?? FALSE;
     }
 
     $locationType = new CRM_Core_DAO_LocationType();

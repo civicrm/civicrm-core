@@ -92,7 +92,7 @@ function civicrm_api3_order_create($params) {
     $priceSetID = NULL;
     CRM_Contribute_BAO_Contribution::checkLineItems($params);
     foreach ($params['line_items'] as $lineItems) {
-      $entityParams = CRM_Utils_Array::value('params', $lineItems, []);
+      $entityParams = $lineItems['params'] ?? [];
       if (!empty($entityParams) && !empty($lineItems['line_item'])) {
         $item = reset($lineItems['line_item']);
         $entity = str_replace('civicrm_', '', $item['entity_table']);

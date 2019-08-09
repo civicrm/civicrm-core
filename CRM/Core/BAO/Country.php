@@ -143,7 +143,7 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
           'labelColumn' => 'symbol',
           'orderColumn' => TRUE,
         ]);
-        $cachedSymbol = CRM_Utils_Array::value($currency, $currencySymbols, '');
+        $cachedSymbol = $currencySymbols[$currency] ?? '';
       }
       else {
         $cachedSymbol = '$';

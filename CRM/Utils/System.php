@@ -364,11 +364,11 @@ class CRM_Utils_System {
     return self::url(
       $p,
       CRM_Utils_Array::value('q', $params),
-      CRM_Utils_Array::value('a', $params, FALSE),
+      $params['a'] ?? FALSE,
       CRM_Utils_Array::value('f', $params),
-      CRM_Utils_Array::value('h', $params, TRUE),
-      CRM_Utils_Array::value('fe', $params, FALSE),
-      CRM_Utils_Array::value('fb', $params, FALSE)
+      $params['h'] ?? TRUE,
+      $params['fe'] ?? FALSE,
+      $params['fb'] ?? FALSE
     );
   }
 
@@ -1837,7 +1837,7 @@ class CRM_Utils_System {
    *   - url: string
    */
   public static function createDefaultCrudLink($crudLinkSpec) {
-    $crudLinkSpec['action'] = CRM_Utils_Array::value('action', $crudLinkSpec, CRM_Core_Action::VIEW);
+    $crudLinkSpec['action'] = $crudLinkSpec['action'] ?? CRM_Core_Action::VIEW;
     $daoClass = CRM_Core_DAO_AllCoreTables::getClassForTable($crudLinkSpec['entity_table']);
     if (!$daoClass) {
       return NULL;

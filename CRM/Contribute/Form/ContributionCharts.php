@@ -115,7 +115,7 @@ class CRM_Contribute_Form_ContributionCharts extends CRM_Core_Form {
       }
 
       foreach ($abbrMonthNames as $monthKey => $monthName) {
-        $val = CRM_Utils_Array::value($monthKey, $chartInfoMonthly['By Month'], 0);
+        $val = $chartInfoMonthly['By Month'][$monthKey] ?? 0;
 
         // don't include zero value month.
         if (!$val && ($chartType != 'bvg')) {

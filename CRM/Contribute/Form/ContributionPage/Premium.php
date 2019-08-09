@@ -135,8 +135,8 @@ class CRM_Contribute_Form_ContributionPage_Premium extends CRM_Contribute_Form_C
       $params['id'] = $premiumID;
     }
 
-    $params['premiums_active'] = CRM_Utils_Array::value('premiums_active', $params, FALSE);
-    $params['premiums_display_min_contribution'] = CRM_Utils_Array::value('premiums_display_min_contribution', $params, FALSE);
+    $params['premiums_active'] = $params['premiums_active'] ?? FALSE;
+    $params['premiums_display_min_contribution'] = $params['premiums_display_min_contribution'] ?? FALSE;
     $params['entity_table'] = 'civicrm_contribution_page';
     $params['entity_id'] = $this->_id;
 

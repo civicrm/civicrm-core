@@ -128,7 +128,7 @@ EOS;
     foreach ($this->events_by_slot as $slot_name => $events) {
       $slot_index++;
       $field_name = "slot_$slot_index";
-      $session_event_id = CRM_Utils_Array::value($field_name, $params, NULL);
+      $session_event_id = $params[$field_name] ?? NULL;
       if (!$session_event_id) {
         continue;
       }

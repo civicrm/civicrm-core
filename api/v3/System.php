@@ -45,8 +45,8 @@
  */
 function civicrm_api3_system_flush($params) {
   CRM_Core_Invoke::rebuildMenuAndCaches(
-    CRM_Utils_Array::value('triggers', $params, FALSE),
-    CRM_Utils_Array::value('session', $params, FALSE)
+    $params['triggers'] ?? FALSE,
+    $params['session'] ?? FALSE
   );
   return civicrm_api3_create_success();
 }

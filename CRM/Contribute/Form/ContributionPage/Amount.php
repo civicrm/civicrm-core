@@ -483,7 +483,7 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
     }
 
     foreach ($fields as $field => $defaultVal) {
-      $val = CRM_Utils_Array::value($field, $params, $defaultVal);
+      $val = $params[$field] ?? $defaultVal;
       if (in_array($field, $resetFields)) {
         $val = $defaultVal;
       }
@@ -502,8 +502,8 @@ class CRM_Contribute_Form_ContributionPage_Amount extends CRM_Contribute_Form_Co
       $params['recur_frequency_unit'] = implode(CRM_Core_DAO::VALUE_SEPARATOR,
         array_keys($params['recur_frequency_unit'])
       );
-      $params['is_recur_interval'] = CRM_Utils_Array::value('is_recur_interval', $params, FALSE);
-      $params['is_recur_installments'] = CRM_Utils_Array::value('is_recur_installments', $params, FALSE);
+      $params['is_recur_interval'] = $params['is_recur_interval'] ?? FALSE;
+      $params['is_recur_installments'] = $params['is_recur_installments'] ?? FALSE;
     }
 
     if (CRM_Utils_Array::value('adjust_recur_start_date', $params)) {

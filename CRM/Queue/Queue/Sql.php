@@ -97,7 +97,7 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
     $dao->queue_name = $this->getName();
     $dao->submit_time = CRM_Utils_Time::getTime('YmdHis');
     $dao->data = serialize($data);
-    $dao->weight = CRM_Utils_Array::value('weight', $options, 0);
+    $dao->weight = $options['weight'] ?? 0;
     $dao->save();
   }
 

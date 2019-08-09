@@ -219,9 +219,9 @@ function _civicrm_api3_attachment_delete_spec(&$spec) {
   unset($spec['id']['api.required']);
   $entityFileFields = CRM_Core_DAO_EntityFile::fields();
   $spec['entity_table'] = $entityFileFields['entity_table'];
-  $spec['entity_table']['title'] = CRM_Utils_Array::value('title', $spec['entity_table'], 'Entity Table') . ' (write-once)';
+  $spec['entity_table']['title'] .= ' (write-once)';
   $spec['entity_id'] = $entityFileFields['entity_id'];
-  $spec['entity_id']['title'] = CRM_Utils_Array::value('title', $spec['entity_id'], 'Entity ID') . ' (write-once)';
+  $spec['entity_id']['title'] .= ' (write-once)';
 }
 
 /**
@@ -352,7 +352,7 @@ function __civicrm_api3_attachment_find($params, $id, $file, $entityFile, $isTru
  * @throws API_Exception validation errors
  */
 function _civicrm_api3_attachment_parse_params($params) {
-  $id = CRM_Utils_Array::value('id', $params, NULL);
+  $id = $params['id'] ?? NULL;
   if ($id && !is_numeric($id)) {
     throw new API_Exception("Malformed id");
   }
@@ -479,10 +479,10 @@ function _civicrm_api3_attachment_getfields() {
   $spec['upload_date'] = $fileFields['upload_date'];
   $spec['entity_table'] = $entityFileFields['entity_table'];
   // Would be hard to securely handle changes.
-  $spec['entity_table']['title'] = CRM_Utils_Array::value('title', $spec['entity_table'], 'Entity Table') . ' (write-once)';
+  $spec['entity_table']['title'] .= ' (write-once)';
   $spec['entity_id'] = $entityFileFields['entity_id'];
   // would be hard to securely handle changes
-  $spec['entity_id']['title'] = CRM_Utils_Array::value('title', $spec['entity_id'], 'Entity ID') . ' (write-once)';
+  $spec['entity_id']['title'] .= ' (write-once)';
   $spec['url'] = [
     'title' => 'URL (read-only)',
     'description' => 'URL for downloading the file (not searchable, expire-able)',

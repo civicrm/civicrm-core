@@ -450,7 +450,7 @@ class CRM_Activity_Selector_Activity extends CRM_Core_Selector_Base implements C
       $row['status'] = $row['status_id'] ? $activityStatus[$row['status_id']] : NULL;
 
       if ($engagementLevel = CRM_Utils_Array::value('engagement_level', $row)) {
-        $row['engagement_level'] = CRM_Utils_Array::value($engagementLevel, $engagementLevels, $engagementLevel);
+        $row['engagement_level'] = $engagementLevels[$engagementLevel] ?? $engagementLevel;
       }
 
       // CRM-3553

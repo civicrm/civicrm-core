@@ -96,8 +96,8 @@ class CRM_Admin_Form_LocationType extends CRM_Admin_Form {
 
     // store the submitted values in an array
     $params = $this->exportValues();
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
+    $params['is_active'] = $params['is_active'] ?? FALSE;
+    $params['is_default'] = $params['is_default'] ?? FALSE;
 
     // action is taken depending upon the mode
     $locationType = new CRM_Core_DAO_LocationType();

@@ -643,7 +643,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         'limit' => 0,
       ],
     ]);
-    return CRM_Utils_Array::value('values', $memberTypesSameParentOrg, []);
+    return $memberTypesSameParentOrg['values'] ?? [];
   }
 
   /**

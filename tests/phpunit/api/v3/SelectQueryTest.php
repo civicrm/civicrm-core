@@ -75,7 +75,7 @@ class api_v3_SelectQueryTest extends CiviUnitTestCase {
   public function hook_civicrm_selectWhereClause($entity, &$clauses) {
     if ($entity == $this->hookEntity) {
       foreach ($this->hookCondition as $field => $clause) {
-        $clauses[$field] = array_merge(CRM_Utils_Array::value($field, $clauses, []), $clause);
+        $clauses[$field] = array_merge($clauses[$field] ?? [], $clause);
       }
     }
   }

@@ -139,7 +139,7 @@ function civicrm_api3_cxn_unregister($params) {
 
   /** @var \Civi\Cxn\Rpc\RegistrationClient $client */
   $client = \Civi::service('cxn_reg_client');
-  list($cxnId, $result) = $client->unregister($appMeta, CRM_Utils_Array::value('force', $params, FALSE));
+  list($cxnId, $result) = $client->unregister($appMeta, $params['force'] ?? FALSE);
 
   return $result;
 }

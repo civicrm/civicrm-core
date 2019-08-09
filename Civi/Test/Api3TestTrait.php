@@ -344,7 +344,7 @@ trait Api3TestTrait {
         if (!empty($v3Params['name'])) {
           $v3Params['filters']['name'] = $v3Params['name'];
         }
-        foreach (\CRM_Utils_Array::value('filters', $v3Params, []) as $filter => $val) {
+        foreach ($v3Params['filters'] ?? [] as $filter => $val) {
           $v4Params['where'][] = [$filter, '=', $val];
         }
       }
@@ -371,7 +371,7 @@ trait Api3TestTrait {
 
     foreach ($v3Fields as $name => $field) {
       // Resolve v3 aliases
-      foreach (\CRM_Utils_Array::value('api.aliases', $field, []) as $alias) {
+      foreach ($field['api.aliases'] ?? [] as $alias) {
         if (isset($v3Params[$alias])) {
           $v3Params[$field['name']] = $v3Params[$alias];
           unset($v3Params[$alias]);
@@ -665,7 +665,7 @@ trait Api3TestTrait {
       'Im' => 'IM',
       'Acl' => 'ACL',
     ];
-    return \CRM_Utils_Array::value($api4Name, $map, $api4Name);
+    return $map[$api4Name] ?? $api4Name;
   }
 
 }

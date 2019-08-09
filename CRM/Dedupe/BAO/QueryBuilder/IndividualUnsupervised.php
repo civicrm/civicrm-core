@@ -36,10 +36,10 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualUnsupervised extends CRM_Dedupe_BAO_
    * @return array
    */
   public static function record($rg) {
-    $civicrm_email = CRM_Utils_Array::value('civicrm_email', $rg->params, []);
+    $civicrm_email = $rg->params['civicrm_email'] ?? [];
 
     $params = [
-      1 => [CRM_Utils_Array::value('email', $civicrm_email, ''), 'String'],
+      1 => [$civicrm_email['email'] ?? '', 'String'],
     ];
 
     return [

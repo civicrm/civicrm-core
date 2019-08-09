@@ -175,7 +175,7 @@ class CRM_Core_Action {
       self::$_description = array_flip(self::$_names);
     }
 
-    return CRM_Utils_Array::value($mask, self::$_description, 'NO DESCRIPTION SET');
+    return self::$_description[$mask] ?? 'NO DESCRIPTION SET';
   }
 
   /**
@@ -240,7 +240,7 @@ class CRM_Core_Action {
           );
         }
         else {
-          $urlPath = CRM_Utils_Array::value('url', $link, '#');
+          $urlPath = $link['url'] ?? '#';
         }
 
         $classes = 'action-item crm-hover-button';

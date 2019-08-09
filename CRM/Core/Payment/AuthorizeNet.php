@@ -547,7 +547,7 @@ class CRM_Core_Payment_AuthorizeNet extends CRM_Core_Payment {
    *   not set
    */
   public function _getParam($field, $xmlSafe = FALSE) {
-    $value = CRM_Utils_Array::value($field, $this->_params, '');
+    $value = $this->_params[$field] ?? '';
     if ($xmlSafe) {
       $value = str_replace(['&', '"', "'", '<', '>'], '', $value);
     }

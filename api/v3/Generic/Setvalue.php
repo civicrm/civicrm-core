@@ -72,7 +72,7 @@ function civicrm_api3_generic_setValue($apiRequest) {
   }
 
   $def = $fields[$fieldKey];
-  $title = CRM_Utils_Array::value('title', $def, ts('Field'));
+  $title = $def['title'] ?? ts('Field');
   // Disallow empty values except for the number zero.
   // TODO: create a utility for this since it's needed in many places
   if (!empty($def['required']) || !empty($def['is_required'])) {

@@ -388,7 +388,6 @@ class CRM_Core_Menu {
         $values[$item['adminGroup']] = array();
         $values[$item['adminGroup']]['fields'] = array();
       }
-      $weight = CRM_Utils_Array::value('weight', $item, 0);
       $values[$item['adminGroup']]['fields']["{weight}.{$item['title']}"] = $value;
       $values[$item['adminGroup']]['component_id'] = $item['component_id'];
     }

@@ -106,8 +106,8 @@ function civicrm_api3_dedupe_getstatistics($params) {
   $stats = CRM_Dedupe_Merger::getMergeStats(CRM_Dedupe_Merger::getMergeCacheKeyString(
     $params['rule_group_id'],
     CRM_Utils_Array::value('group_id', $params),
-    CRM_Utils_Array::value('criteria', $params, []),
-    CRM_Utils_Array::value('check_permissions', $params, [])
+    $params['criteria'] ?? [],
+    $params['check_permissions'] ?? []
   ));
   return civicrm_api3_create_success($stats);
 }
@@ -150,7 +150,7 @@ function _civicrm_api3_dedupe_getstatistics_spec(&$params) {
  */
 function civicrm_api3_dedupe_getduplicates($params) {
   $options = _civicrm_api3_get_options_from_params($params);
-  $dupePairs = CRM_Dedupe_Merger::getDuplicatePairs($params['rule_group_id'], NULL, TRUE, $options['limit'], FALSE, TRUE, $params['criteria'], CRM_Utils_Array::value('check_permissions', $params), CRM_Utils_Array::value('search_limit', $params, 0));
+  $dupePairs = CRM_Dedupe_Merger::getDuplicatePairs($params['rule_group_id'], NULL, TRUE, $options['limit'], FALSE, TRUE, $params['criteria'], CRM_Utils_Array::value('check_permissions', $params), $params['search_limit'] ?? 0);
   return civicrm_api3_create_success($dupePairs);
 }
 

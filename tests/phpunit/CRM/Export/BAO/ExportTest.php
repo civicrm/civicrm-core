@@ -2807,22 +2807,22 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   protected function doExportTest($params) {
     $this->startCapturingOutput();
     try {
-      $exportMode = CRM_Utils_Array::value('exportMode', $params, CRM_Export_Form_Select::CONTACT_EXPORT);
-      $ids = CRM_Utils_Array::value('ids', $params, ($exportMode === CRM_Export_Form_Select::CONTACT_EXPORT ? $this->contactIDs : []));
+      $exportMode = $params['exportMode'] ?? CRM_Export_Form_Select::CONTACT_EXPORT;
+      $ids = $params['ids'] ?? ($exportMode === CRM_Export_Form_Select::CONTACT_EXPORT ? $this->contactIDs : []);
       $defaultClause = (empty($ids) ? NULL : "contact_a.id IN (" . implode(',', $ids) . ")");
       CRM_Export_BAO_Export::exportComponents(
-        CRM_Utils_Array::value('selectAll', $params, (empty($params['fields']))),
+        $params['selectAll'] ?? (empty($params['fields'])),
         $ids,
-        CRM_Utils_Array::value('params', $params, []),
+        $params['params'] ?? [],
         CRM_Utils_Array::value('order', $params),
-        CRM_Utils_Array::value('fields', $params, []),
+        $params['fields'] ?? [],
         CRM_Utils_Array::value('moreReturnProperties', $params),
         $exportMode,
-        CRM_Utils_Array::value('componentClause', $params, $defaultClause),
+        $params['componentClause'] ?? $defaultClause,
         CRM_Utils_Array::value('componentTable', $params),
-        CRM_Utils_Array::value('mergeSameAddress', $params, FALSE),
-        CRM_Utils_Array::value('mergeSameHousehold', $params, FALSE),
-        CRM_Utils_Array::value('exportParams', $params, [])
+        $params['mergeSameAddress'] ?? FALSE,
+        $params['mergeSameHousehold'] ?? FALSE,
+        $params['exportParams'] ?? []
       );
     }
     catch (CRM_Core_Exception_PrematureExitException $e) {

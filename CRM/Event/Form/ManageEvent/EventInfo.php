@@ -112,9 +112,9 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     $this->assign('description', CRM_Utils_Array::value('description', $defaults));
 
     // Provide suggested text for event full and waitlist messages if they're empty
-    $defaults['event_full_text'] = CRM_Utils_Array::value('event_full_text', $defaults, ts('This event is currently full.'));
+    $defaults['event_full_text'] = $defaults['event_full_text'] ?? ts('This event is currently full.');
 
-    $defaults['waitlist_text'] = CRM_Utils_Array::value('waitlist_text', $defaults, ts('This event is currently full. However you can register now and get added to a waiting list. You will be notified if spaces become available.'));
+    $defaults['waitlist_text'] = $defaults['waitlist_text'] ?? ts('This event is currently full. However you can register now and get added to a waiting list. You will be notified if spaces become available.');
     $defaults['template_id'] = $this->_templateId;
     return $defaults;
   }
@@ -233,12 +233,12 @@ class CRM_Event_Form_ManageEvent_EventInfo extends CRM_Event_Form_ManageEvent {
     //format params
     $params['start_date'] = CRM_Utils_Array::value('start_date', $params);
     $params['end_date'] = CRM_Utils_Array::value('end_date', $params);
-    $params['has_waitlist'] = CRM_Utils_Array::value('has_waitlist', $params, FALSE);
-    $params['is_map'] = CRM_Utils_Array::value('is_map', $params, FALSE);
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-    $params['is_public'] = CRM_Utils_Array::value('is_public', $params, FALSE);
-    $params['is_share'] = CRM_Utils_Array::value('is_share', $params, FALSE);
-    $params['default_role_id'] = CRM_Utils_Array::value('default_role_id', $params, FALSE);
+    $params['has_waitlist'] = $params['has_waitlist'] ?? FALSE;
+    $params['is_map'] = $params['is_map'] ?? FALSE;
+    $params['is_active'] = $params['is_active'] ?? FALSE;
+    $params['is_public'] = $params['is_public'] ?? FALSE;
+    $params['is_share'] = $params['is_share'] ?? FALSE;
+    $params['default_role_id'] = $params['default_role_id'] ?? FALSE;
     $params['id'] = $this->_id;
 
     //merge params with defaults from templates

@@ -309,7 +309,7 @@ class CRM_Report_Form_Contact_LoggingSummary extends CRM_Logging_ReportSummary {
     $entity = $this->currentLogTable;
 
     $detail = $this->_logTables[$entity];
-    $tableName = CRM_Utils_Array::value('table_name', $detail, $entity);
+    $tableName = $detail['table_name'] ?? $entity;
     $clause = CRM_Utils_Array::value('entity_table', $detail);
     $clause = $clause ? "AND entity_log_civireport.entity_table = 'civicrm_contact'" : NULL;
 

@@ -62,9 +62,9 @@ function civicrm_api3_setting_getfields($params) {
   }
   $result = CRM_Core_BAO_Setting::getSettingSpecification(
     CRM_Utils_Array::value('component_id', $params),
-    CRM_Utils_Array::value('filters', $params, []),
-    CRM_Utils_Array::value('domain_id', $params, NULL),
-    CRM_Utils_Array::value('profile', $params, NULL)
+    $params['filters'] ?? [],
+    $params['domain_id'] ?? NULL,
+    $params['profile'] ?? NULL
   );
   // find any supplemental information
   if (!empty($params['action'])) {
@@ -301,7 +301,7 @@ function _civicrm_api3_setting_create_spec(&$params) {
  */
 function civicrm_api3_setting_get($params) {
   $domains = _civicrm_api3_setting_getDomainArray($params);
-  $result = CRM_Core_BAO_Setting::getItems($params, $domains, CRM_Utils_Array::value('return', $params, []));
+  $result = CRM_Core_BAO_Setting::getItems($params, $domains, $params['return'] ?? []);
   return civicrm_api3_create_success($result, $params, 'Setting', 'get');
 }
 

@@ -53,7 +53,7 @@ class CRM_Utils_MailTest extends CiviUnitTestCase {
     foreach ($values as $value) {
       $result = CRM_Utils_Mail::formatRFC822Email($value['name'],
         $value['email'],
-        CRM_Utils_Array::value('useQuote', $value, FALSE)
+        $value['useQuote'] ?? FALSE
       );
       $this->assertEquals($result, $value['result'], 'Expected encoding does not match');
     }

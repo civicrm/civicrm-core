@@ -105,7 +105,7 @@ class CRM_Upgrade_Incremental_php_FiveFour extends CRM_Upgrade_Incremental_Base 
         'option_group_id' => 'activity_default_assignee',
         'name' => $option['name'],
         'label' => $option['label'],
-        'is_default' => CRM_Utils_Array::value('is_default', $option, 0),
+        'is_default' => $option['is_default'] ?? 0,
         'is_active' => TRUE,
       ]);
     }

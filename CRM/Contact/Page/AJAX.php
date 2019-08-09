@@ -259,7 +259,7 @@ class CRM_Contact_Page_AJAX {
         // first check if there is any existing relationship present with same parameters.
         // If yes then update the relationship by setting active and start date to current time
         $relationship = civicrm_api3('Relationship', 'get', $params)['values'];
-        $params = array_merge(CRM_Utils_Array::value(0, $relationship, $params), [
+        $params = array_merge($relationship[0] ?? $params, [
           'start_date' => 'now',
           'is_active' => TRUE,
           'end_date' => '',
@@ -403,7 +403,7 @@ class CRM_Contact_Page_AJAX {
 
       if ($queryString) {
         $result = [];
-        $offset = CRM_Utils_Array::value('offset', $_GET, 0);
+        $offset = $_GET['offset'] ?? 0;
         $rowCount = Civi::settings()->get('search_autocomplete_count');
 
         $offset = CRM_Utils_Type::escape($offset, 'Int');
@@ -986,10 +986,10 @@ LIMIT {$offset}, {$rowCount}
   public static function selectUnselectContacts() {
     $name = CRM_Utils_Array::value('name', $_REQUEST);
     $cacheKey = CRM_Utils_Array::value('qfKey', $_REQUEST);
-    $state = CRM_Utils_Array::value('state', $_REQUEST, 'checked');
-    $variableType = CRM_Utils_Array::value('variableType', $_REQUEST, 'single');
+    $state = $_REQUEST['state'] ?? 'checked';
+    $variableType = $_REQUEST['variableType'] ?? 'single';
 
-    $actionToPerform = CRM_Utils_Array::value('action', $_REQUEST, 'select');
+    $actionToPerform = $_REQUEST['action'] ?? 'select';
 
     if ($variableType == 'multiple') {
       // action post value only works with multiple type variable

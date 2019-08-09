@@ -682,7 +682,7 @@ class CRM_Activity_BAO_Query {
   public static function whereClauseSingleActivityText(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
     $activityOptionValues = $query->getWhereValues('activity_option', $grouping);
-    $activityOption = CRM_Utils_Array::value(2, $activityOptionValues, 6);
+    $activityOption = $activityOptionValues[2] ?? 6;
 
     $query->_useDistinct = TRUE;
 

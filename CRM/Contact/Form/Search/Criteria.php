@@ -265,7 +265,7 @@ class CRM_Contact_Form_Search_Criteria {
     ];
     $metadata = civicrm_api3('Contact', 'getfields', [])['values'];
     foreach ($fields as $fieldName => $field) {
-      $fields[$fieldName] = array_merge(CRM_Utils_Array::value($fieldName, $metadata, []), $field);
+      $fields[$fieldName] = array_merge($metadata[$fieldName] ?? [], $field);
     }
     return $fields;
   }
@@ -389,7 +389,7 @@ class CRM_Contact_Form_Search_Criteria {
       'street_unit' => [ts('Apt/Unit/Suite'), $attributes['street_unit'], NULL, NULL],
     ];
 
-    $parseStreetAddress = CRM_Utils_Array::value('street_address_parsing', $addressOptions, 0);
+    $parseStreetAddress = $addressOptions['street_address_parsing'] ?? 0;
     $form->assign('parseStreetAddress', $parseStreetAddress);
     foreach ($elements as $name => $v) {
       list($title, $attributes, $select, $multiSelect) = $v;

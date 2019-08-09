@@ -71,7 +71,7 @@ class CRM_Utils_Cache {
       // a generic method for utilizing any of the available db caches.
       $dbCacheClass = 'CRM_Utils_Cache_' . $className;
       $settings = self::getCacheSettings($className);
-      $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . 'default' . self::DELIMITER;
+      $settings['prefix'] = ($settings['prefix'] ?? '') . self::DELIMITER . 'default' . self::DELIMITER;
       self::$_singleton = new $dbCacheClass($settings);
     }
     return self::$_singleton;
@@ -192,7 +192,7 @@ class CRM_Utils_Cache {
           if (defined('CIVICRM_DB_CACHE_CLASS') && in_array(CIVICRM_DB_CACHE_CLASS, ['Memcache', 'Memcached', 'Redis'])) {
             $dbCacheClass = 'CRM_Utils_Cache_' . CIVICRM_DB_CACHE_CLASS;
             $settings = self::getCacheSettings(CIVICRM_DB_CACHE_CLASS);
-            $settings['prefix'] = CRM_Utils_Array::value('prefix', $settings, '') . self::DELIMITER . $params['name'] . self::DELIMITER;
+            $settings['prefix'] = ($settings['prefix'] ?? '') . self::DELIMITER . $params['name'] . self::DELIMITER;
             $cache = new $dbCacheClass($settings);
             if (!empty($params['withArray'])) {
               $cache = $params['withArray'] === 'fast' ? new CRM_Utils_Cache_FastArrayDecorator($cache) : new CRM_Utils_Cache_ArrayDecorator($cache);
@@ -205,7 +205,7 @@ class CRM_Utils_Cache {
           if (defined('CIVICRM_DSN') && CIVICRM_DSN) {
             return new CRM_Utils_Cache_SqlGroup([
               'group' => $params['name'],
-              'prefetch' => CRM_Utils_Array::value('prefetch', $params, FALSE),
+              'prefetch' => $params['prefetch'] ?? FALSE,
             ]);
           }
           break;

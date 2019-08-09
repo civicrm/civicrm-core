@@ -274,7 +274,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
         if (empty($val['options'])) {
           continue;
         }
-        $optionFullIds = CRM_Utils_Array::value('option_full_ids', $val, []);
+        $optionFullIds = $val['option_full_ids'] ?? [];
         foreach ($val['options'] as $keys => $values) {
           if ($values['is_default'] && empty($values['is_full'])) {
 
@@ -297,7 +297,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     if ($this->_allowConfirmation) {
       $this->_contactId = $contactID;
       $this->_discountId = $discountId;
-      $forcePayLater = CRM_Utils_Array::value('is_pay_later', $this->_defaults, FALSE);
+      $forcePayLater = $this->_defaults['is_pay_later'] ?? FALSE;
       $this->_defaults = array_merge($this->_defaults, CRM_Event_Form_EventFees::setDefaultValues($this));
       $this->_defaults['is_pay_later'] = $forcePayLater;
 
@@ -647,14 +647,14 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
             $adminVisibilityID = CRM_Price_BAO_PriceField::getVisibilityOptionID('admin');
 
             foreach ($options as $key => $currentOption) {
-              $optionVisibility = CRM_Utils_Array::value('visibility_id', $currentOption, $publicVisibilityID);
+              $optionVisibility = $currentOption['visibility_id'] ?? $publicVisibilityID;
               if ($optionVisibility == $adminVisibilityID) {
                 unset($options[$key]);
               }
             }
           }
 
-          $optionFullIds = CRM_Utils_Array::value('option_full_ids', $field, []);
+          $optionFullIds = $field['option_full_ids'] ?? [];
 
           //soft suppress required rule when option is full.
           if (!empty($optionFullIds) && (count($options) == count($optionFullIds))) {
@@ -760,10 +760,10 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       }
       foreach ($field['options'] as & $option) {
         $optId = $option['id'];
-        $count = CRM_Utils_Array::value('count', $option, 0);
-        $maxValue = CRM_Utils_Array::value('max_value', $option, 0);
-        $dbTotalCount = CRM_Utils_Array::value($optId, $recordedOptionsCount, 0);
-        $currentTotalCount = CRM_Utils_Array::value($optId, $currentOptionsCount, 0);
+        $count = $option['count'] ?? 0;
+        $maxValue = $option['max_value'] ?? 0;
+        $dbTotalCount = $recordedOptionsCount[$optId] ?? 0;
+        $currentTotalCount = $currentOptionsCount[$optId] ?? 0;
 
         $totalCount = $currentTotalCount + $dbTotalCount;
         $isFull = FALSE;
@@ -876,7 +876,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $primaryParticipantCount = self::getParticipantCount($form, $ppParams);
 
       //get price set fields errors in.
-      $errors = array_merge($errors, CRM_Utils_Array::value(0, $priceSetErrors, []));
+      $errors = array_merge($errors, $priceSetErrors[0] ?? []);
 
       $totalParticipants = $primaryParticipantCount;
       if (!empty($fields['additional_participants'])) {
@@ -988,7 +988,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     $this->set('is_pay_later', $params['is_pay_later']);
 
     // assign pay later stuff
-    $this->_params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, FALSE);
+    $this->_params['is_pay_later'] = $params['is_pay_later'] ?? FALSE;
     $this->assign('is_pay_later', $params['is_pay_later']);
     if ($params['is_pay_later']) {
       $this->assign('pay_later_text', $this->_values['event']['pay_later_text']);
@@ -1155,7 +1155,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           "_qf_Register_display=1&qfKey={$this->controller->_key}",
           TRUE, NULL, FALSE
         );
-        if (CRM_Utils_Array::value('additional_participants', $params, FALSE)) {
+        if ($params['additional_participants'] ?? FALSE) {
           $urlArgs = "_qf_Participant_1_display=1&rfp=1&qfKey={$this->controller->_key}";
         }
         else {
@@ -1194,7 +1194,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     // If registering > 1 participant, give status message
-    if (CRM_Utils_Array::value('additional_participants', $params, FALSE)) {
+    if ($params['additional_participants'] ?? FALSE) {
       $statusMsg = ts('Registration information for participant 1 has been saved.');
       CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
     }

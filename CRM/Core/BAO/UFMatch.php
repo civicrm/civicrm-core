@@ -105,9 +105,9 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
       //get logged in user ids, and set to session.
       if ($isUserLoggedIn) {
         $userIds = self::getUFValues();
-        $session->set('ufID', CRM_Utils_Array::value('uf_id', $userIds, ''));
-        $session->set('userID', CRM_Utils_Array::value('contact_id', $userIds, ''));
-        $session->set('ufUniqID', CRM_Utils_Array::value('uf_name', $userIds, ''));
+        $session->set('ufID', $userIds['uf_id'] ?? '');
+        $session->set('userID', $userIds['contact_id'] ?? '');
+        $session->set('ufUniqID', $userIds['uf_name'] ?? '');
       }
     }
 
@@ -130,9 +130,9 @@ class CRM_Core_BAO_UFMatch extends CRM_Core_DAO_UFMatch {
       //are we processing logged in user.
       if ($loggedInUserUfID && $loggedInUserUfID != $ufID) {
         $userIds = self::getUFValues($loggedInUserUfID);
-        $ufID = CRM_Utils_Array::value('uf_id', $userIds, '');
-        $userID = CRM_Utils_Array::value('contact_id', $userIds, '');
-        $ufUniqID = CRM_Utils_Array::value('uf_name', $userIds, '');
+        $ufID = $userIds['uf_id'] ?? '';
+        $userID = $userIds['contact_id'] ?? '';
+        $ufUniqID = $userIds['uf_name'] ?? '';
       }
     }
 

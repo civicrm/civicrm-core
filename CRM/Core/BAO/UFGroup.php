@@ -480,7 +480,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
     if (isset($field->phone_type_id)) {
       $name .= "-{$field->phone_type_id}";
     }
-    $fieldMetaData = CRM_Utils_Array::value($name, $importableFields, (isset($importableFields[$field->field_name]) ? $importableFields[$field->field_name] : []));
+    $fieldMetaData = $importableFields[$name] ?? $importableFields[$field->field_name] ?? [];
 
     // No lie: this is bizarre; why do we need to mix so many UFGroup properties into UFFields?
     // I guess to make field self sufficient with all the required data and avoid additional calls
@@ -1462,7 +1462,7 @@ class CRM_Core_BAO_UFGroup extends CRM_Core_DAO_UFGroup {
       'is_cms_user',
     ];
     foreach ($fields as $field) {
-      $params[$field] = CRM_Utils_Array::value($field, $params, FALSE);
+      $params[$field] = $params[$field] ?? FALSE;
     }
 
     $params['limit_listings_group_id'] = CRM_Utils_Array::value('group', $params);
@@ -1822,7 +1822,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
     $view = $field['is_view'];
     $required = ($mode == CRM_Profile_Form::MODE_SEARCH) ? FALSE : $field['is_required'];
     $search = ($mode == CRM_Profile_Form::MODE_SEARCH) ? TRUE : FALSE;
-    $isShared = CRM_Utils_Array::value('is_shared', $field, 0);
+    $isShared = $field['is_shared'] ?? 0;
 
     // do not display view fields in drupal registration form
     // CRM-4632

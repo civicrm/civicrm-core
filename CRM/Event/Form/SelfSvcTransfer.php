@@ -291,10 +291,10 @@ class CRM_Event_Form_SelfSvcTransfer extends CRM_Core_Form {
     }
     if (empty($errors) && empty($contact_id)) {
       $params = [
-        'email-Primary' => CRM_Utils_Array::value('email', $fields, NULL),
-        'first_name' => CRM_Utils_Array::value('first_name', $fields, NULL),
-        'last_name' => CRM_Utils_Array::value('last_name', $fields, NULL),
-        'is_deleted' => CRM_Utils_Array::value('is_deleted', $fields, FALSE),
+        'email-Primary' => $fields['email'] ?? NULL,
+        'first_name' => $fields['first_name'] ?? NULL,
+        'last_name' => $fields['last_name'] ?? NULL,
+        'is_deleted' => $fields['is_deleted'] ?? FALSE,
       ];
       //create new contact for this name/email pair
       //if new contact, no need to check for contact already registered

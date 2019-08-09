@@ -303,7 +303,7 @@ class api_v3_MembershipTypeTest extends CiviUnitTestCase {
       $membetype = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($type);
       $fieldParams['option_id'] = [1 => $priceFieldValue['id']];
       $fieldParams['option_label'][$rowCount] = CRM_Utils_Array::value('name', $membetype);
-      $fieldParams['option_amount'][$rowCount] = CRM_Utils_Array::value('minimum_fee', $membetype, 0);
+      $fieldParams['option_amount'][$rowCount] = $membetype['minimum_fee'] ?? 0;
       $fieldParams['option_weight'][$rowCount] = CRM_Utils_Array::value('weight', $membetype);
       $fieldParams['option_description'][$rowCount] = CRM_Utils_Array::value('description', $membetype);
       $fieldParams['option_financial_type_id'][$rowCount] = CRM_Utils_Array::value('financial_type_id', $membetype);

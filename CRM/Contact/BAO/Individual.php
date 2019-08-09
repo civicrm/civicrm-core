@@ -66,13 +66,13 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
     }
 
     $sortName = $displayName = '';
-    $firstName = CRM_Utils_Array::value('first_name', $params, '');
-    $middleName = CRM_Utils_Array::value('middle_name', $params, '');
-    $lastName = CRM_Utils_Array::value('last_name', $params, '');
-    $nickName = CRM_Utils_Array::value('nick_name', $params, '');
-    $prefix_id = CRM_Utils_Array::value('prefix_id', $params, '');
-    $suffix_id = CRM_Utils_Array::value('suffix_id', $params, '');
-    $formalTitle = CRM_Utils_Array::value('formal_title', $params, '');
+    $firstName = $params['first_name'] ?? '';
+    $middleName = $params['middle_name'] ?? '';
+    $lastName = $params['last_name'] ?? '';
+    $nickName = $params['nick_name'] ?? '';
+    $prefix_id = $params['prefix_id'] ?? '';
+    $suffix_id = $params['suffix_id'] ?? '';
+    $formalTitle = $params['formal_title'] ?? '';
 
     // get prefix and suffix names
     $prefix = $suffix = NULL;
@@ -83,7 +83,7 @@ class CRM_Contact_BAO_Individual extends CRM_Contact_DAO_Contact {
       $params['individual_suffix'] = $suffix = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'suffix_id', $suffix_id);
     }
 
-    $params['is_deceased'] = CRM_Utils_Array::value('is_deceased', $params, FALSE);
+    $params['is_deceased'] = $params['is_deceased'] ?? FALSE;
 
     $individual = NULL;
     if ($contact->id) {

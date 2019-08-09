@@ -434,7 +434,7 @@ class CRM_Core_Block {
 
     foreach ($values as $key => $val) {
       if (!empty($val['title'])) {
-        $values[$key]['name'] = CRM_Utils_Array::value('name', $val, $val['title']);
+        $values[$key]['name'] = $val['name'] ?? $val['title'];
       }
     }
 

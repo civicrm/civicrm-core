@@ -177,14 +177,14 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       'amount_level' => CRM_Utils_Array::value('amount_level', $params),
       'invoice_id' => $params['invoiceID'],
       'currency' => $params['currencyID'],
-      'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
+      'is_pay_later' => $params['is_pay_later'] ?? 0,
       //configure cancel reason, cancel date and thankyou date
       //from 'contribution' type profile if included
-      'cancel_reason' => CRM_Utils_Array::value('cancel_reason', $params, 0),
+      'cancel_reason' => $params['cancel_reason'] ?? 0,
       'cancel_date' => isset($params['cancel_date']) ? CRM_Utils_Date::format($params['cancel_date']) : NULL,
       'thankyou_date' => isset($params['thankyou_date']) ? CRM_Utils_Date::format($params['thankyou_date']) : NULL,
       //setting to make available to hook - although seems wrong to set on form for BAO hook availability
-      'skipLineItem' => CRM_Utils_Array::value('skipLineItem', $params, 0),
+      'skipLineItem' => $params['skipLineItem'] ?? 0,
     ];
 
     if ($paymentProcessorOutcome) {
@@ -1111,7 +1111,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $recurParams['is_email_receipt'] = CRM_Utils_Array::value('is_email_receipt', $params);
     // we need to add a unique trxn_id to avoid a unique key error
     // in paypal IPN we reset this when paypal sends us the real trxn id, CRM-2991
-    $recurParams['trxn_id'] = CRM_Utils_Array::value('trxn_id', $params, $params['invoiceID']);
+    $recurParams['trxn_id'] = $params['trxn_id'] ?? $params['invoiceID'];
     $recurParams['financial_type_id'] = $contributionType->id;
 
     $campaignId = CRM_Utils_Array::value('campaign_id', $params, CRM_Utils_Array::value('campaign_id', $form->_values));
@@ -1434,7 +1434,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $isProcessSeparateMembershipTransaction, $financialTypeID, $unprocessedLineItems, $isPending) {
 
     $membershipContribution = NULL;
-    $isTest = CRM_Utils_Array::value('is_test', $membershipParams, FALSE);
+    $isTest = $membershipParams['is_test'] ?? FALSE;
     $errors = $paymentResults = [];
     $form->_values['isMembership'] = TRUE;
     $isRecurForFirstTransaction = CRM_Utils_Array::value('is_recur', $form->_params, CRM_Utils_Array::value('is_recur', $membershipParams));
@@ -1487,7 +1487,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           unset($membershipParams['is_recur']);
         }
         list($membershipContribution, $secondPaymentResult) = $this->processSecondaryFinancialTransaction($contactID, $form, array_merge($membershipParams, ['skipLineItem' => 1]),
-          $isTest, $unprocessedLineItems, CRM_Utils_Array::value('minimum_fee', $membershipDetails, 0), CRM_Utils_Array::value('financial_type_id', $membershipDetails));
+          $isTest, $unprocessedLineItems, $membershipDetails['minimum_fee'] ?? 0, CRM_Utils_Array::value('financial_type_id', $membershipDetails));
         $paymentResults[] = ['contribution_id' => $membershipContribution->id, 'result' => $secondPaymentResult];
         $totalAmount = $membershipContribution->total_amount;
       }
@@ -1508,7 +1508,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     }
     //@todo it should no longer be possible for it to get to this point & membership to not be an array
     if (is_array($membershipTypeIDs) && !empty($membershipContributionID)) {
-      $typesTerms = CRM_Utils_Array::value('types_terms', $membershipParams, []);
+      $typesTerms = $membershipParams['types_terms'] ?? [];
 
       $membershipLines = $nonMembershipLines = [];
       foreach ($unprocessedLineItems as $priceSetID => $lines) {
@@ -1531,7 +1531,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
           $membershipLineItems = $unprocessedLineItems;
         }
         $i++;
-        $numTerms = CRM_Utils_Array::value($memType, $typesTerms, 1);
+        $numTerms = $typesTerms[$memType] ?? 1;
         if (!empty($membershipContribution)) {
           $pendingStatus = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
           $pending = ($membershipContribution->contribution_status_id == $pendingStatus) ? TRUE : FALSE;
@@ -1943,7 +1943,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $form->_fields['billing_last_name'] = 1;
     // CRM-18854 - Set form values to allow pledge to be created for api test.
     if (CRM_Utils_Array::value('pledge_block_id', $params)) {
-      $form->_values['pledge_id'] = CRM_Utils_Array::value('pledge_id', $params, NULL);
+      $form->_values['pledge_id'] = $params['pledge_id'] ?? NULL;
       $form->_values['pledge_block_id'] = $params['pledge_block_id'];
       $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($params['id']);
       $form->_values['max_reminders'] = $pledgeBlock['max_reminders'];
@@ -2069,7 +2069,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $pledgeBlock = CRM_Pledge_BAO_PledgeBlock::getPledgeBlock($this->_id);
       if (CRM_Utils_Array::value('start_date', $this->_params) || !CRM_Utils_Array::value('is_pledge_start_date_visible', $pledgeBlock)
           || !CRM_Utils_Array::value('is_pledge_start_date_editable', $pledgeBlock)) {
-        $pledgeStartDate = CRM_Utils_Array::value('start_date', $this->_params, NULL);
+        $pledgeStartDate = $this->_params['start_date'] ?? NULL;
         $this->_params['receive_date'] = CRM_Pledge_BAO_Pledge::getPledgeStartDate($pledgeStartDate, $pledgeBlock);
         $recurParams = CRM_Pledge_BAO_Pledge::buildRecurParams($this->_params);
         $this->_params = array_merge($this->_params, $recurParams);
@@ -2464,7 +2464,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         civicrm_api3('contribution', 'completetransaction', [
           'id' => $contributionID,
           'trxn_id' => CRM_Utils_Array::value('trxn_id', $result),
-          'payment_processor_id' => CRM_Utils_Array::value('payment_processor_id', $result, $this->_paymentProcessor['id']),
+          'payment_processor_id' => $result['payment_processor_id'] ?? $this->_paymentProcessor['id'],
           'is_transactional' => FALSE,
           'fee_amount' => CRM_Utils_Array::value('fee_amount', $result),
           'receive_date' => CRM_Utils_Array::value('receive_date', $result),

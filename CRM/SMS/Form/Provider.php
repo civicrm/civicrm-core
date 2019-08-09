@@ -168,8 +168,8 @@ class CRM_SMS_Form_Provider extends CRM_Core_Form {
     }
 
     $recData = $values = $this->controller->exportValues($this->_name);
-    $recData['is_active'] = CRM_Utils_Array::value('is_active', $recData, 0);
-    $recData['is_default'] = CRM_Utils_Array::value('is_default', $recData, 0);
+    $recData['is_active'] = $recData['is_active'] ?? 0;
+    $recData['is_default'] = $recData['is_default'] ?? 0;
 
     if ($this->_action && (CRM_Core_Action::UPDATE || CRM_Core_Action::ADD)) {
       if ($this->_id) {

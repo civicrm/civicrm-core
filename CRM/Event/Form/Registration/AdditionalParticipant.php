@@ -103,7 +103,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
           continue;
         }
 
-        $optionsFull = CRM_Utils_Array::value('option_full_ids', $val, []);
+        $optionsFull = $val['option_full_ids'] ?? [];
         foreach ($val['options'] as $keys => $values) {
           if ($values['is_default'] && !in_array($keys, $optionsFull)) {
             if ($val['html_type'] == 'CheckBox') {
@@ -259,7 +259,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
       //truly spaces are greater than required.
       if (is_numeric($spaces) && $spaces >= ($processedCnt + $currentPageMaxCount)) {
-        if (CRM_Utils_Array::value('amount', $this->_params[0], 0) == 0 || $this->_requireApproval) {
+        if (empty($this->_params[0]['amount']) || $this->_requireApproval) {
           $this->_allowWaitlist = FALSE;
           $this->set('allowWaitlist', $this->_allowWaitlist);
           if ($this->_requireApproval) {
@@ -285,9 +285,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
         CRM_Core_Session::setStatus($statusMessage, ts('Registration Error'), 'error');
       }
       elseif ($processedCnt == $spaces) {
-        if (CRM_Utils_Array::value('amount', $this->_params[0], 0) == 0
-          || $realPayLater || $this->_requireApproval
-        ) {
+        if (empty($this->_params[0]['amount']) || $realPayLater || $this->_requireApproval) {
           $this->_resetAllowWaitlist = TRUE;
           if ($this->_requireApproval) {
             $statusMessage = ts("If you skip this participant there will be enough spaces in the event for your group (you will not be wait listed). Registration for this event requires approval. You will receive an email once your registration has been reviewed.");
@@ -335,7 +333,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
           !$this->_allowWaitlist &&
           !$realPayLater &&
           !$this->_requireApproval &&
-          !(CRM_Utils_Array::value('amount', $this->_params[0], 0) == 0)
+          !empty($this->_params[0]['amount'])
         ) {
           $paymentBypassed = ts('Please go back to the main registration page, to complete payment information.');
         }
@@ -472,7 +470,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
 
         //validate price field params.
         $priceSetErrors = self::validatePriceSet($self, $allParticipantParams);
-        $errors = array_merge($errors, CRM_Utils_Array::value($addParticipantNum, $priceSetErrors, []));
+        $errors = array_merge($errors, $priceSetErrors[$addParticipantNum] ?? []);
 
         if (!$self->_allowConfirmation &&
           is_numeric($self->_availableRegistrations)
@@ -481,7 +479,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
             !$self->_allowWaitlist &&
             !$realPayLater &&
             !$self->_requireApproval &&
-            !(CRM_Utils_Array::value('amount', $self->_params[0], 0) == 0) &&
+            !empty($self->_params[0]['amount']) &&
             $totalParticipants < $self->_availableRegistrations
           ) {
             $errors['_qf_default'] = ts("Your event registration will be confirmed. Please go back to the main registration page, to complete payment information.");
@@ -509,7 +507,7 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
         !$self->_allowWaitlist &&
         !$realPayLater &&
         !$self->_requireApproval &&
-        !(CRM_Utils_Array::value('amount', $self->_params[0], 0) == 0)
+        !empty($self->_params[0]['amount'])
       ) {
         $errors['_qf_default'] = ts("You are going to skip the last participant, your event registration will be confirmed. Please go back to the main registration page, to complete payment information.");
       }

@@ -125,7 +125,7 @@ class CRM_Dedupe_Finder {
     if (!$params) {
       return [];
     }
-    $checkPermission = CRM_Utils_Array::value('check_permission', $params, TRUE);
+    $checkPermission = $params['check_permission'] ?? TRUE;
     // This may no longer be required - see https://github.com/civicrm/civicrm-core/pull/13176
     $params = array_filter($params);
 

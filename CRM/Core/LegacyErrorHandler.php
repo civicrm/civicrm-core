@@ -18,7 +18,7 @@ class CRM_Core_LegacyErrorHandler {
       $session->setStatus(
         $message,
         CRM_Utils_Array::value('message_title', $params),
-        CRM_Utils_Array::value('message_type', $params, 'error')
+        $params['message_type'] ?? 'error'
       );
 
       // @todo remove this code - legacy redirect path is an interim measure for moving redirects out of BAO

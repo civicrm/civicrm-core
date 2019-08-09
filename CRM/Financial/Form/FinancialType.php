@@ -148,7 +148,7 @@ class CRM_Financial_Form_FinancialType extends CRM_Contribute_Form {
         'is_reserved',
         'is_deductible',
       ] as $field) {
-        $params[$field] = CRM_Utils_Array::value($field, $params, FALSE);
+        $params[$field] = $params[$field] ?? FALSE;
       }
       $financialType = civicrm_api3('FinancialType', 'create', $params);
       if ($this->_action & CRM_Core_Action::UPDATE) {

@@ -82,9 +82,9 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
 
     foreach ($this->fieldMetadata as $name => $field) {
       // @todo - we don't really need to do all this.... fieldMetadata is just fine to use as is.
-      $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
-      $field['dataPattern'] = CRM_Utils_Array::value('dataPattern', $field, '//');
-      $field['headerPattern'] = CRM_Utils_Array::value('headerPattern', $field, '//');
+      $field['type'] = $field['type'] ?? CRM_Utils_Type::T_INT;
+      $field['dataPattern'] = $field['dataPattern'] ?? '//';
+      $field['headerPattern'] = $field['headerPattern'] ?? '//';
       $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
     }
 

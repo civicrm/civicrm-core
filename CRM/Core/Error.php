@@ -824,8 +824,8 @@ class CRM_Core_Error extends PEAR_ErrorStack {
 
       $ret[] = sprintf(
         "%s(%s): %s%s(%s)",
-        CRM_Utils_Array::value('file', $trace, '[internal function]'),
-        CRM_Utils_Array::value('line', $trace, ''),
+        $trace['file'] ?? '[internal function]',
+        $trace['line'] ?? '',
         $className,
         $fnName,
         implode(", ", $args)

@@ -178,8 +178,8 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
     }
     $pseudoExtraParam = [];
     $fieldName = str_replace(['_high', '_low'], '', $name);
-    $fieldSpec = CRM_Utils_Array::value($fieldName, $fields, []);
-    $tableName = CRM_Utils_Array::value('table_name', $fieldSpec, 'civicrm_contribution');
+    $fieldSpec = $fields[$fieldName] ?? [];
+    $tableName = $fieldSpec['table_name'] ?? 'civicrm_contribution';
     $dataType = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $fieldSpec));
     if ($dataType === 'Timestamp' || $dataType === 'Date') {
       $title = empty($fieldSpec['unique_title']) ? $fieldSpec['title'] : $fieldSpec['unique_title'];

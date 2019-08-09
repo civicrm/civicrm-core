@@ -745,7 +745,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
    */
   public static function handlePaymentNotification() {
     $params = array_merge($_GET, $_REQUEST);
-    $q = explode('/', CRM_Utils_Array::value('q', $params, ''));
+    $q = explode('/', $params['q'] ?? '');
     $lastParam = array_pop($q);
     if (is_numeric($lastParam)) {
       $params['processor_id'] = $lastParam;

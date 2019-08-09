@@ -1436,7 +1436,7 @@ class CRM_Contact_BAO_Query {
         // make sure there is only one element
         // this is used when we are running under smog and need to know
         // how the contact was added (CRM-1203)
-        $groups = (array) CRM_Utils_Array::value($this->_paramLookup['group'][0][1], $this->_paramLookup['group'][0][2], $this->_paramLookup['group'][0][2]);
+        $groups = (array) ($this->_paramLookup['group'][0][2][$this->_paramLookup['group'][0][1]] ?? $this->_paramLookup['group'][0][2]);
         if ((count($this->_paramLookup['group']) == 1) &&
           (count($groups) == 1)
         ) {
@@ -2641,7 +2641,7 @@ class CRM_Contact_BAO_Query {
       $k = 99;
       if (strpos($key, '-') !== FALSE) {
         $keyArray = explode('-', $key);
-        $k = CRM_Utils_Array::value('civicrm_' . $keyArray[1], $info, 99);
+        $k = $info['civicrm_' . $keyArray[1]] ?? 99;
       }
       elseif (strpos($key, '_') !== FALSE) {
         $keyArray = explode('_', $key);
@@ -2649,11 +2649,11 @@ class CRM_Contact_BAO_Query {
           $k = CRM_Utils_Array::value(implode('_', $keyArray), $info, 99);
         }
         else {
-          $k = CRM_Utils_Array::value($key, $info, 99);
+          $k = $info[$key] ?? 99;
         }
       }
       else {
-        $k = CRM_Utils_Array::value($key, $info, 99);
+        $k = $info[$key] ?? 99;
       }
       $tempTable[$k . ".$key"] = $key;
     }
@@ -3033,7 +3033,7 @@ class CRM_Contact_BAO_Query {
     }
 
     if (isset($value)) {
-      $value = CRM_Utils_Array::value($op, $value, $value);
+      $value = $value[$op] ?? $value;
     }
 
     if ($name == 'group_type') {
@@ -3404,7 +3404,7 @@ WHERE  $smartGroupClause
     list($name, $op, $value, $grouping, $wildcard) = $values;
 
     $noteOptionValues = $this->getWhereValues('note_option', $grouping);
-    $noteOption = CRM_Utils_Array::value('2', $noteOptionValues, '6');
+    $noteOption = $noteOptionValues['2'] ?? '6';
     $noteOption = ($name == 'note_body') ? 2 : (($name == 'note_subject') ? 3 : $noteOption);
 
     $this->_useDistinct = TRUE;
@@ -4722,8 +4722,8 @@ civicrm_relationship.start_date > {$today}
         return;
       }
 
-      $from = CRM_Utils_Array::value($customFieldName . '_from', $formValues, NULL);
-      $to = CRM_Utils_Array::value($customFieldName . '_to', $formValues, NULL);
+      $from = $formValues[$customFieldName . '_from'] ?? NULL;
+      $to = $formValues[$customFieldName . '_to'] ?? NULL;
 
       if (self::isCustomDateField($customFieldName)) {
         list($from, $to) = CRM_Utils_Date::getFromTo(NULL, $from, $to);
@@ -6008,7 +6008,7 @@ AND   displayRelType.is_active = 1
             $dao->$key = CRM_Core_PseudoConstant::getLabel($value['bao'], $value['idCol'], $val);
           }
         }
-        elseif ($baoName = CRM_Utils_Array::value('bao', $value, NULL)) {
+        elseif ($baoName = $value['bao'] ?? NULL) {
           //preserve id value
           $idColumn = "{$key}_id";
           $dao->$idColumn = $val;
@@ -6159,7 +6159,7 @@ AND   displayRelType.is_active = 1
 
     // if Operator chosen is NULL/EMPTY then
     if (strpos($op, 'NULL') !== FALSE || strpos($op, 'EMPTY') !== FALSE) {
-      return [CRM_Utils_Array::value($op, $qillOperators, $op), ''];
+      return [$qillOperators[$op] ?? $op, ''];
     }
 
     if ($fieldName == 'activity_type_id') {
@@ -6175,7 +6175,7 @@ AND   displayRelType.is_active = 1
       $pseudoOptions = CRM_Core_PseudoConstant::worldRegion();
     }
     elseif ($daoName == 'CRM_Event_DAO_Event' && $fieldName == 'id') {
-      $checkPermission = CRM_Utils_Array::value('check_permission', $pseudoExtraParam, TRUE);
+      $checkPermission = $pseudoExtraParam['check_permission'] ?? TRUE;
       $pseudoOptions = CRM_Event_BAO_Event::getEvents(0, $fieldValue, TRUE, $checkPermission, TRUE);
     }
     elseif ($fieldName == 'contribution_product_id') {
@@ -6195,7 +6195,7 @@ AND   displayRelType.is_active = 1
       $qillString = [];
       if (!empty($pseudoOptions)) {
         foreach ((array) $fieldValue as $val) {
-          $qillString[] = CRM_Utils_Array::value($val, $pseudoOptions, $val);
+          $qillString[] = $pseudoOptions[$val] ?? $val;
         }
         $fieldValue = implode(', ', $qillString);
       }
@@ -6222,7 +6222,7 @@ AND   displayRelType.is_active = 1
       $fieldValue = CRM_Utils_Date::customFormat($fieldValue);
     }
 
-    return [CRM_Utils_Array::value($op, $qillOperators, $op), $fieldValue];
+    return [$qillOperators[$op] ?? $op, $fieldValue];
   }
 
   /**
@@ -6395,14 +6395,14 @@ AND   displayRelType.is_active = 1
       // is not declared for them.
       // @todo so far only integer fields are being handled. If we add string fields we need to look at
       // escaping.
-      $pseudoConstantMetadata = CRM_Utils_Array::value('pseudoconstant', $fieldSpec, FALSE);
+      $pseudoConstantMetadata = $fieldSpec['pseudoconstant'] ?? FALSE;
       if (!empty($pseudoConstantMetadata)
       ) {
         if (!empty($pseudoConstantMetadata['optionGroupName'])
           || $this->isPseudoFieldAnFK($fieldSpec)
         ) {
           $sortedOptions = $fieldSpec['bao']::buildOptions($fieldSpec['name'], NULL, [
-            'orderColumn' => CRM_Utils_Array::value('labelColumn', $pseudoConstantMetadata, 'label'),
+            'orderColumn' => $pseudoConstantMetadata['labelColumn'] ?? 'label',
           ]);
           $fieldIDsInOrder = implode(',', array_keys($sortedOptions));
           // Pretty sure this validation ALSO happens in the order clause & this can't be reached but...
@@ -6844,7 +6844,7 @@ AND   displayRelType.is_active = 1
     if (!empty($field) && empty($field['name'])) {
       // standardising field formatting here - over time we can phase out variants.
       // all paths using this currently unit tested
-      $field['name'] = CRM_Utils_Array::value('field_name', $field, CRM_Utils_Array::value('idCol', $field, $fieldName));
+      $field['name'] = $field['field_name'] ?? $field['idCol'] ?? $fieldName;
     }
     return $field;
   }

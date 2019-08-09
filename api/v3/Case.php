@@ -587,7 +587,7 @@ function civicrm_api3_case_delete($params) {
   //check parameters
   civicrm_api3_verify_mandatory($params, NULL, ['id']);
 
-  if (CRM_Case_BAO_Case::deleteCase($params['id'], CRM_Utils_Array::value('move_to_trash', $params, FALSE))) {
+  if (CRM_Case_BAO_Case::deleteCase($params['id'], $params['move_to_trash'] ?? FALSE)) {
     return civicrm_api3_create_success($params, $params, 'Case', 'delete');
   }
   else {

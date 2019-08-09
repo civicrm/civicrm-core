@@ -1063,7 +1063,7 @@ WHERE civicrm_event.is_active = 1
     ];
 
     //get the params submitted by participant.
-    $participantParams = CRM_Utils_Array::value($participantId, $values['params'], []);
+    $participantParams = $values['params'][$participantId] ?? [];
 
     if (!$returnMessageText) {
       //send notification email if field values are set (CRM-1941)
@@ -1108,8 +1108,8 @@ WHERE civicrm_event.is_active = 1
         $postProfileID = CRM_Utils_Array::value('custom_post_id', $values);
 
         if (!empty($values['params']['additionalParticipant'])) {
-          $preProfileID = CRM_Utils_Array::value('additional_custom_pre_id', $values, $preProfileID);
-          $postProfileID = CRM_Utils_Array::value('additional_custom_post_id', $values, $postProfileID);
+          $preProfileID = $values['additional_custom_pre_id'] ?? $preProfileID;
+          $postProfileID = $values['additional_custom_post_id'] ?? $postProfileID;
         }
 
         $profilePre = self::buildCustomDisplay($preProfileID,
@@ -1318,9 +1318,9 @@ WHERE civicrm_event.is_active = 1
           }
           // suppress all file fields from display
           if (
-            CRM_Utils_Array::value('data_type', $v, '') == 'File' ||
-            CRM_Utils_Array::value('name', $v, '') == 'image_URL' ||
-            CRM_Utils_Array::value('field_type', $v) == 'Formatting'
+            ($v['data_type'] ?? '') == 'File' ||
+            ($v['name'] ?? '') == 'image_URL' ||
+            ($v['field_type'] ?? '') == 'Formatting'
           ) {
             unset($fields[$k]);
           }
@@ -1347,9 +1347,7 @@ WHERE civicrm_event.is_active = 1
             while ($grp->fetch()) {
               $grpTitles[] = $grp->title;
             }
-            if (!empty($grpTitles) &&
-              CRM_Utils_Array::value('title', CRM_Utils_Array::value('group', $fields))
-            ) {
+            if (!empty($grpTitles) && !empty($fields['group']['title'])) {
               $values[$fields['group']['title']] = implode(', ', $grpTitles);
             }
             unset($fields['group']);
@@ -1777,7 +1775,7 @@ WHERE  id = $cfID
           //get the params submitted by participant.
           $participantParams = NULL;
           if (isset($values['params'])) {
-            $participantParams = CRM_Utils_Array::value($pId, $values['params'], []);
+            $participantParams = $values['params'][$pId] ?? [];
           }
 
           list($profilePre, $groupTitles) = self::buildCustomDisplay($preProfileID,
@@ -1998,7 +1996,7 @@ WHERE  ce.loc_block_id = $locBlockId";
     $participant = new CRM_Event_DAO_Participant();
     $participant->copyValues($params);
 
-    $participant->is_test = CRM_Utils_Array::value('is_test', $params, 0);
+    $participant->is_test = $params['is_test'] ?? 0;
     $participant->selectAdd();
     $participant->selectAdd('status_id');
     if ($participant->find(TRUE) && array_key_exists($participant->status_id, $statusTypes)) {

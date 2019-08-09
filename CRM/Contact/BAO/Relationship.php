@@ -61,7 +61,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     $extendedParams = self::loadExistingRelationshipDetails($params);
     // When id is specified we always wan't to update, so we don't need to
     // check for duplicate relations.
-    if (!isset($params['id']) && self::checkDuplicateRelationship($extendedParams, $extendedParams['contact_id_a'], $extendedParams['contact_id_b'], CRM_Utils_Array::value('id', $extendedParams, 0))) {
+    if (!isset($params['id']) && self::checkDuplicateRelationship($extendedParams, $extendedParams['contact_id_a'], $extendedParams['contact_id_b'], $extendedParams['id'] ?? 0)) {
       throw new CRM_Core_Exception('Duplicate Relationship');
     }
     $params = $extendedParams;
@@ -1046,7 +1046,7 @@ WHERE  relationship_type_id = " . CRM_Utils_Type::escape($type, 'Integer');
     ]);
 
     if (is_array($result) && !empty($result['is_error']) && $result['error_message'] != 'Duplicate Relationship') {
-      throw new CiviCRM_API3_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
+      throw new CiviCRM_API3_Exception($result['error_message'], $result['error_code'] ?? 'undefined', $result);
     }
 
     return TRUE;
@@ -1517,7 +1517,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
     // Check the end date and set the status of the relationship
     // accordingly.
     $status = self::CURRENT;
-    $targetContact = $targetContact = CRM_Utils_Array::value('contact_check', $params, []);
+    $targetContact = $targetContact = $params['contact_check'] ?? [];
     $today = date('Ymd');
 
     // If a relationship hasn't yet started, just return for now
@@ -1664,7 +1664,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
         continue;
       }
 
-      $relatedContacts = array_keys(CRM_Utils_Array::value('relatedContacts', $details, []));
+      $relatedContacts = array_keys($details['relatedContacts'] ?? []);
       $mainRelatedContactId = reset($relatedContacts);
 
       foreach ($details['memberships'] as $membershipId => $membershipValues) {
@@ -1767,7 +1767,7 @@ SELECT count(*)
  WHERE membership_type_id = {$membershipValues['membership_type_id']} AND owner_membership_id = {$membershipValues['owner_membership_id']}
     AND is_current_member = 1";
             $result = CRM_Core_DAO::singleValueQuery($query);
-            if ($result < CRM_Utils_Array::value('max_related', $membershipValues, PHP_INT_MAX)) {
+            if ($result < $membershipValues['max_related'] ?? PHP_INT_MAX) {
               CRM_Member_BAO_Membership::create($membershipValues);
             }
           }
@@ -2134,7 +2134,7 @@ AND cc.sort_name LIKE '%$name%'";
             'civicrm/contact/view',
             "reset=1&cid={$values['cid']}");
 
-        $relationship['relation'] = CRM_Utils_Array::value('case', $values, '') . CRM_Utils_System::href(
+        $relationship['relation'] = $values['case'] ?? '' . CRM_Utils_System::href(
             $values['relation'],
             'civicrm/contact/view/rel',
             "action=view&reset=1&cid={$values['cid']}&id={$values['id']}&rtype={$values['rtype']}");
@@ -2225,7 +2225,7 @@ AND cc.sort_name LIKE '%$name%'";
    */
   public static function buildRelationshipTypeOptions($params = []) {
     $contactId = CRM_Utils_Array::value('contact_id', $params);
-    $direction = CRM_Utils_Array::value('relationship_direction', $params, 'a_b');
+    $direction = $params['relationship_direction'] ?? 'a_b';
     $relationshipId = CRM_Utils_Array::value('relationship_id', $params);
     $contactType = CRM_Utils_Array::value('contact_type', $params);
     $isForm = CRM_Utils_Array::value('is_form', $params);

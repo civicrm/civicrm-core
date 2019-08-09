@@ -228,7 +228,7 @@ class CRM_Core_PseudoConstant {
     $fieldSpec = $dao->getFieldSpec($fieldName);
 
     // Ensure we have the canonical name for this field
-    $fieldName = CRM_Utils_Array::value('name', $fieldSpec, $fieldName);
+    $fieldName = $fieldSpec['name'] ?? $fieldName;
 
     // Return false if field doesn't exist.
     if (empty($fieldSpec)) {
@@ -248,7 +248,7 @@ class CRM_Core_PseudoConstant {
 
       // Merge params with schema defaults
       $params += [
-        'condition' => CRM_Utils_Array::value('condition', $pseudoconstant, []),
+        'condition' => $pseudoconstant['condition'] ?? [],
         'keyColumn' => CRM_Utils_Array::value('keyColumn', $pseudoconstant),
         'labelColumn' => CRM_Utils_Array::value('labelColumn', $pseudoconstant),
       ];
@@ -593,12 +593,12 @@ class CRM_Core_PseudoConstant {
    */
   public static function &activityType() {
     $args = func_get_args();
-    $all = CRM_Utils_Array::value(0, $args, TRUE);
-    $includeCaseActivities = CRM_Utils_Array::value(1, $args, FALSE);
-    $reset = CRM_Utils_Array::value(2, $args, FALSE);
-    $returnColumn = CRM_Utils_Array::value(3, $args, 'label');
-    $includeCampaignActivities = CRM_Utils_Array::value(4, $args, FALSE);
-    $onlyComponentActivities = CRM_Utils_Array::value(5, $args, FALSE);
+    $all = $args[0] ?? TRUE;
+    $includeCaseActivities = $args[1] ?? FALSE;
+    $reset = $args[2] ?? FALSE;
+    $returnColumn = $args[3] ?? 'label';
+    $includeCampaignActivities = $args[4] ?? FALSE;
+    $onlyComponentActivities = $args[5] ?? FALSE;
     $index = (int) $all . '_' . $returnColumn . '_' . (int) $includeCaseActivities;
     $index .= '_' . (int) $includeCampaignActivities;
     $index .= '_' . (int) $onlyComponentActivities;

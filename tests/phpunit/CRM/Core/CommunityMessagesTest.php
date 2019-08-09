@@ -336,7 +336,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $freq = [];
     for ($i = 0; $i < $trials; $i++) {
       $message = $communityMessages->pick();
-      $freq[$message['markup']] = CRM_Utils_Array::value($message['markup'], $freq, 0) + 1;
+      $freq[$message['markup']] = $freq[$message['markup']] ?? 0 + 1;
     }
 
     // assert the probabilities
@@ -364,7 +364,7 @@ class CRM_Core_CommunityMessagesTest extends CiviUnitTestCase {
     $freq = [];
     for ($i = 0; $i < $trials; $i++) {
       $message = $communityMessages->pick();
-      $freq[$message['markup']] = CRM_Utils_Array::value($message['markup'], $freq, 0) + 1;
+      $freq[$message['markup']] = $freq[$message['markup']] ?? 0 + 1;
     }
 
     $this->assertEquals($trials, $freq['<h1>Two</h1>']);

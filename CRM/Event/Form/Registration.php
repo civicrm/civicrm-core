@@ -502,7 +502,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     // assign pay later stuff
-    $params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, FALSE);
+    $params['is_pay_later'] = $params['is_pay_later'] ?? FALSE;
     $this->assign('is_pay_later', $params['is_pay_later']);
     if ($params['is_pay_later']) {
       $this->assign('pay_later_text', $this->_values['event']['pay_later_text']);
@@ -732,7 +732,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       'Participant'
     );
 
-    $createPayment = (CRM_Utils_Array::value('amount', $this->_params, 0) != 0) ? TRUE : FALSE;
+    $createPayment = !empty($this->_params['amount']);
 
     // force to create zero amount payment, CRM-5095
     // we know the amout is zero since createPayment is false
@@ -835,7 +835,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         $participantFields['participant_source']['maxlength']
       ),
       'fee_level' => CRM_Utils_Array::value('amount_level', $params),
-      'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
+      'is_pay_later' => $params['is_pay_later'] ?? 0,
       'fee_amount' => CRM_Utils_Array::value('fee_amount', $params),
       'registered_by_id' => CRM_Utils_Array::value('registered_by_id', $params),
       'discount_id' => CRM_Utils_Array::value('discount_id', $params),
@@ -1103,7 +1103,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
             $currentCount = $priceSetFields[$priceFieldId]['options'][$optId] * $optVal;
           }
 
-          $optionsCount[$optId] = $currentCount + CRM_Utils_Array::value($optId, $optionsCount, 0);
+          $optionsCount[$optId] = $currentCount + ($optionsCount[$optId] ?? 0);
         }
       }
     }
@@ -1385,10 +1385,10 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     //validate for option max value.
     foreach ($optionMaxValues as $fieldId => $values) {
-      $options = CRM_Utils_Array::value('options', $feeBlock[$fieldId], array());
+      $options = $feeBlock[$fieldId]['options'] ?? [];
       foreach ($values as $optId => $total) {
         $optMax = $optionsMaxValueDetails[$fieldId]['options'][$optId];
-        $opDbCount = CRM_Utils_Array::value('db_total_count', $options[$optId], 0);
+        $opDbCount = $options[$optId]['db_total_count'] ?? 0;
         $total += $opDbCount;
         if ($optMax && ($total > $optMax)) {
           if ($opDbCount && ($opDbCount >= $optMax)) {

@@ -158,11 +158,11 @@ class CRM_Core_Config_Runtime extends CRM_Core_Config_MagicMerge {
         // e.g. one codebase, multi database
         parse_url(CIVICRM_DSN, PHP_URL_PATH),
         // e.g. CMS vs extern vs installer
-        \CRM_Utils_Array::value('SCRIPT_FILENAME', $_SERVER, ''),
+        $_SERVER['SCRIPT_FILENAME'] ?? '',
         // e.g. name-based vhosts
-        \CRM_Utils_Array::value('HTTP_HOST', $_SERVER, ''),
+        $_SERVER['HTTP_HOST'] ?? '',
         // e.g. port-based vhosts
-        \CRM_Utils_Array::value('SERVER_PORT', $_SERVER, ''),
+        $_SERVER['SERVER_PORT'] ?? '',
         // Depending on deployment arch, these signals *could* be redundant, but who cares?
       ]));
     }

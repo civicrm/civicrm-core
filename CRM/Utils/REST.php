@@ -583,7 +583,7 @@ class CRM_Utils_REST {
         $call[0],
         $call[1],
       ];
-      $output[$key] = self::process($args, CRM_Utils_Array::value(2, $call, []));
+      $output[$key] = self::process($args, $call[2] ?? []);
     }
     return $output;
   }

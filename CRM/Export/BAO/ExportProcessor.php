@@ -1140,7 +1140,7 @@ class CRM_Export_BAO_ExportProcessor {
         'componentPaymentField_transaction_id' => 'trxn_id',
         'componentPaymentField_received_date' => 'receive_date',
       ];
-      return CRM_Utils_Array::value($payFieldMapper[$field], $paymentData, '');
+      return $paymentData[$payFieldMapper[$field]] ?? '';
     }
     else {
       // if field is empty or null
@@ -1321,8 +1321,8 @@ class CRM_Export_BAO_ExportProcessor {
     $relIMProviderId = NULL;
     $relLocTypeId = CRM_Utils_Array::value('location_type_id', $value);
     $locationName = CRM_Core_PseudoConstant::getName('CRM_Core_BAO_Address', 'location_type_id', $relLocTypeId);
-    $relPhoneTypeId = CRM_Utils_Array::value('phone_type_id', $value, ($locationName ? 'Primary' : NULL));
-    $relIMProviderId = CRM_Utils_Array::value('im_provider_id', $value, ($locationName ? 'Primary' : NULL));
+    $relPhoneTypeId = $value['phone_type_id'] ?? ($locationName ? 'Primary' : NULL);
+    $relIMProviderId = $value['im_provider_id'] ?? ($locationName ? 'Primary' : NULL);
     if (in_array($relationField, $this->getValidLocationFields()) && $locationName) {
       if ($relationField === 'phone') {
         $this->relationshipReturnProperties[$relationshipKey]['location'][$locationName]['phone-' . $relPhoneTypeId] = 1;

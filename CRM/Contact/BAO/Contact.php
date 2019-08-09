@@ -184,7 +184,7 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
     ) {
       $allNull = FALSE;
       foreach (self::$_commPrefs as $name) {
-        $contact->$name = CRM_Utils_Array::value($name, $privacy, FALSE);
+        $contact->$name = $privacy[$name] ?? FALSE;
       }
     }
 
@@ -2023,8 +2023,8 @@ ORDER BY civicrm_email.is_primary DESC";
 
     // manage is_opt_out
     if (array_key_exists('is_opt_out', $fields) && array_key_exists('is_opt_out', $params)) {
-      $wasOptOut = CRM_Utils_Array::value('is_opt_out', $contactDetails, FALSE);
-      $isOptOut = CRM_Utils_Array::value('is_opt_out', $params, FALSE);
+      $wasOptOut = $contactDetails['is_opt_out'] ?? FALSE;
+      $isOptOut = $params['is_opt_out'] ?? FALSE;
       $data['is_opt_out'] = $isOptOut;
       // on change, create new civicrm_subscription_history entry
       if (($wasOptOut != $isOptOut) && !empty($contactDetails['contact_id'])) {
@@ -3715,13 +3715,13 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
       ];
       foreach ($retrieved['values'] as $id => $profile) {
         if (in_array($profile['name'], $profiles)) {
-          $links[] = array(
+          $links[] = [
             'label' => $profile['title'],
             'url' => CRM_Utils_System::url('civicrm/profile/create', "reset=1&context=dialog&gid=$id",
               NULL, NULL, FALSE, FALSE, TRUE),
             'type' => ucfirst(str_replace('new_', '', $profile['name'])),
-            'icon' => CRM_Utils_Array::value(str_replace('new_', '', $profile['name']), $icons),
-          );
+            'icon' => $icons[str_replace('new_', '', $profile['name'])] ?? NULL,
+          ];
         }
         else {
           $append[] = $id;

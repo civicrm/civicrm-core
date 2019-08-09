@@ -635,7 +635,7 @@ class CRM_Core_SelectValues {
         }
         else {
           // Support legacy token names
-          $tokenName = CRM_Utils_Array::value($val, $legacyTokenNames, $val);
+          $tokenName = $legacyTokenNames[$val] ?? $val;
           $tokens["{contact.$tokenName}"] = $exportFields[$val]['title'];
         }
       }

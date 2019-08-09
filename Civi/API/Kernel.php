@@ -344,7 +344,7 @@ class Kernel {
     $data['entity'] = \CRM_Utils_Array::value('entity', $apiRequest);
     $data['action'] = \CRM_Utils_Array::value('action', $apiRequest);
 
-    if (\CRM_Utils_Array::value('debug', \CRM_Utils_Array::value('params', $apiRequest))
+    if (!empty($apiRequest['params']['debug'])
       // prevent recursion
       && empty($data['trace'])
     ) {

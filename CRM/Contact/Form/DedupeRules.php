@@ -217,7 +217,7 @@ UPDATE civicrm_dedupe_rule_group
     }
 
     $rgDao->title = $values['title'];
-    $rgDao->is_reserved = CRM_Utils_Array::value('is_reserved', $values, FALSE);
+    $rgDao->is_reserved = $values['is_reserved'] ?? FALSE;
     $rgDao->used = $values['used'];
     $rgDao->contact_type = $this->_contactType;
     $rgDao->threshold = $values['threshold'];

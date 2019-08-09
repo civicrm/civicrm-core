@@ -183,8 +183,8 @@ class CRM_Campaign_Form_Survey_Main extends CRM_Campaign_Form_Survey {
       $params['created_date'] = date('YmdHis');
     }
 
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, 0);
-    $params['is_default'] = CRM_Utils_Array::value('is_default', $params, 0);
+    $params['is_active'] = $params['is_active'] ?? 0;
+    $params['is_default'] = $params['is_default'] ?? 0;
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params, $this->getEntityId(), $this->getDefaultEntity());
 

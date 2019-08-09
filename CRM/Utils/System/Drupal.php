@@ -529,9 +529,9 @@ AND    u.status = 1
 
     $uid = CRM_Utils_Array::value('uid', $params);
     if (!$uid) {
-      //load user, we need to check drupal permissions.
-      $name = CRM_Utils_Array::value('name', $params, FALSE) ? $params['name'] : trim(CRM_Utils_Array::value('name', $_REQUEST));
-      $pass = CRM_Utils_Array::value('pass', $params, FALSE) ? $params['pass'] : trim(CRM_Utils_Array::value('pass', $_REQUEST));
+      // Load user, we need to check drupal permissions.
+      $name = $params['name'] ?? trim($_REQUEST['name'] ?? '');
+      $pass = $params['pass'] ?? trim($_REQUEST['pass'] ?? '');
 
       if ($name) {
         $uid = user_authenticate($name, $pass);

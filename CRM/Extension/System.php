@@ -97,11 +97,11 @@ class CRM_Extension_System {
    */
   public function __construct($parameters = []) {
     $config = CRM_Core_Config::singleton();
-    $parameters['extensionsDir'] = CRM_Utils_Array::value('extensionsDir', $parameters, $config->extensionsDir);
-    $parameters['extensionsURL'] = CRM_Utils_Array::value('extensionsURL', $parameters, $config->extensionsURL);
-    $parameters['resourceBase'] = CRM_Utils_Array::value('resourceBase', $parameters, $config->resourceBase);
-    $parameters['uploadDir'] = CRM_Utils_Array::value('uploadDir', $parameters, $config->uploadDir);
-    $parameters['userFrameworkBaseURL'] = CRM_Utils_Array::value('userFrameworkBaseURL', $parameters, $config->userFrameworkBaseURL);
+    $parameters['extensionsDir'] = $parameters['extensionsDir'] ?? $config->extensionsDir;
+    $parameters['extensionsURL'] = $parameters['extensionsURL'] ?? $config->extensionsURL;
+    $parameters['resourceBase'] = $parameters['resourceBase'] ?? $config->resourceBase;
+    $parameters['uploadDir'] = $parameters['uploadDir'] ?? $config->uploadDir;
+    $parameters['userFrameworkBaseURL'] = $parameters['userFrameworkBaseURL'] ?? $config->userFrameworkBaseURL;
     if (!array_key_exists('civicrm_root', $parameters)) {
       $parameters['civicrm_root'] = $GLOBALS['civicrm_root'];
     }

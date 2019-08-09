@@ -123,7 +123,7 @@ class CRM_Utils_OpenFlashChart {
       }
 
       // get the currency to set in tooltip.
-      $tooltip = CRM_Utils_Array::value('tip', $params, "$symbol #val#");
+      $tooltip = $params['tip'] ?? "$symbol #val#";
       $bars[$barCount]->set_tooltip($tooltip);
     }
 
@@ -228,7 +228,7 @@ class CRM_Utils_OpenFlashChart {
     $pie->add_animation(new pie_bounce(2));
 
     // set the tooltip.
-    $tooltip = CRM_Utils_Array::value('tip', $params, "Amount is $symbol #val# of $symbol #total# <br>#percent#");
+    $tooltip = $params['tip'] ?? "Amount is $symbol #val# of $symbol #total# <br>#percent#";
     $pie->set_tooltip($tooltip);
 
     // set colours.
@@ -282,8 +282,8 @@ class CRM_Utils_OpenFlashChart {
 
       $xValueLabels[] = (string) $xVal;
       foreach ($criteria as $criteria) {
-        $xReferences[$criteria][$xVal] = (double) CRM_Utils_Array::value($criteria, $yVal, 0);
-        $yValues[] = (double) CRM_Utils_Array::value($criteria, $yVal, 0);
+        $xReferences[$criteria][$xVal] = (double) ($yVal[$criteria] ?? 0);
+        $yValues[] = (double) ($yVal[$criteria] ?? 0);
       }
     }
 
@@ -297,14 +297,14 @@ class CRM_Utils_OpenFlashChart {
     $symbol = CRM_Core_BAO_Country::defaultCurrencySymbol();
 
     // set the tooltip.
-    $tooltip = CRM_Utils_Array::value('tip', $params, "$symbol #val#");
+    $tooltip = $params['tip'] ?? "$symbol #val#";
 
     $count = 0;
     foreach ($xReferences as $criteria => $values) {
       $toolTipVal = $tooltip;
       // for separate tooltip for each criteria
       if (is_array($tooltip)) {
-        $toolTipVal = CRM_Utils_Array::value($criteria, $tooltip, "$symbol #val#");
+        $toolTipVal = $tooltip[$criteria] ?? "$symbol #val#";
       }
 
       // create bar_3d object
@@ -448,15 +448,15 @@ class CRM_Utils_OpenFlashChart {
         $graph[$key] = array_combine($dateKeys, $rows['multiValue'][$key]);
       }
       $chartData = [
-        'legend' => "$legend " . CRM_Utils_Array::value('legend', $rows, ts('Contribution')) . ' ' . ts('Summary'),
+        'legend' => "$legend " . ($rows['legend'] ?? ts('Contribution')) . ' ' . ts('Summary'),
         'values' => $graph[0],
         'multiValues' => $graph,
-        'barKeys' => CRM_Utils_Array::value('barKeys', $rows, []),
+        'barKeys' => $rows['barKeys'] ?? [],
       ];
     }
 
     // rotate the x labels.
-    $chartData['xLabelAngle'] = CRM_Utils_Array::value('xLabelAngle', $rows, 0);
+    $chartData['xLabelAngle'] = $rows['xLabelAngle'] ?? 0;
     if (!empty($rows['tip'])) {
       $chartData['tip'] = $rows['tip'];
     }
@@ -500,7 +500,7 @@ class CRM_Utils_OpenFlashChart {
     ];
 
     // rotate the x labels.
-    $chartData['xLabelAngle'] = CRM_Utils_Array::value('xLabelAngle', $chartInfo, 20);
+    $chartData['xLabelAngle'] = $chartInfo['xLabelAngle'] ?? 20;
     if (!empty($chartInfo['tip'])) {
       $chartData['tip'] = $chartInfo['tip'];
     }
@@ -534,10 +534,10 @@ class CRM_Utils_OpenFlashChart {
       $openFlashChart = [];
       if ($chartObj) {
         // calculate chart size.
-        $xSize = CRM_Utils_Array::value('xSize', $params, 400);
-        $ySize = CRM_Utils_Array::value('ySize', $params, 300);
+        $xSize = $params['xSize'] ?? 400;
+        $ySize = $params['ySize'] ?? 300;
         if ($chart == 'barChart') {
-          $ySize = CRM_Utils_Array::value('ySize', $params, 250);
+          $ySize = $params['ySize'] ?? 250;
           $xSize = 60 * count($params['values']);
           // hack to show tooltip.
           if ($xSize < 200) {

@@ -480,7 +480,7 @@ class CRM_Core_BAO_EntityTag extends CRM_Core_DAO_EntityTag {
       // TODO: This will only work when api.entity is "entity_tag". What about others?
       if ($context == 'search' || $context == 'create') {
         $dummyArray = [];
-        return CRM_Core_BAO_Tag::getTags(CRM_Utils_Array::value('entity_table', $props, 'civicrm_contact'), $dummyArray, CRM_Utils_Array::value('parent_id', $params), '- ');
+        return CRM_Core_BAO_Tag::getTags($props['entity_table'] ?? 'civicrm_contact', $dummyArray, CRM_Utils_Array::value('parent_id', $params), '- ');
       }
     }
 

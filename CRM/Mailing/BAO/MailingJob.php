@@ -923,7 +923,7 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
         'Canceled' => ts('Canceled'),
       ];
     }
-    return CRM_Utils_Array::value($status, $translation, ts('Not scheduled'));
+    return $translation[$status] ?? ts('Not scheduled');
   }
 
   /**

@@ -91,7 +91,7 @@ class CRM_Utils_Wrapper {
           $sessionVar = CRM_Utils_Array::value('sessionVar', $params);
           $type = CRM_Utils_Array::value('type', $params);
           $default = CRM_Utils_Array::value('default', $params);
-          $abort = CRM_Utils_Array::value('abort', $params, FALSE);
+          $abort = $params['abort'] ?? FALSE;
 
           $value = NULL;
           $value = CRM_Utils_Request::retrieve(

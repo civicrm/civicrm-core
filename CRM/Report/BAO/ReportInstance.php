@@ -63,8 +63,8 @@ class CRM_Report_BAO_ReportInstance extends CRM_Report_DAO_ReportInstance {
     }
 
     if (!$instanceID || !isset($params['id'])) {
-      $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, FALSE);
-      $params['domain_id'] = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
+      $params['is_reserved'] = $params['is_reserved'] ?? FALSE;
+      $params['domain_id'] = $params['domain_id'] ?? CRM_Core_Config::domainID();
       // CRM-17256 set created_id on report creation.
       $params['created_id'] = isset($params['created_id']) ? $params['created_id'] : CRM_Core_Session::getLoggedInContactID();
     }

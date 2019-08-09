@@ -66,7 +66,7 @@ function civicrm_api3_group_contact_get($params) {
     //ie. id passed in so we have to return something
     return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
-  $status = CRM_Utils_Array::value('status', $params, 'Added');
+  $status = $params['status'] ?? 'Added';
 
   $groupId = CRM_Utils_Array::value('group_id', $params);
   $values = CRM_Contact_BAO_GroupContact::getContactGroup($params['contact_id'], $status, NULL, FALSE, TRUE, FALSE, TRUE, $groupId);
@@ -132,7 +132,7 @@ function civicrm_api3_group_contact_create($params) {
       $params['contact_id'] = $info['values'][$params['id']]['contact_id'];
     }
   }
-  $action = CRM_Utils_Array::value('status', $params, 'Added');
+  $action = $params['status'] ?? 'Added';
   return _civicrm_api3_group_contact_common($params, $action);
 }
 
@@ -164,7 +164,7 @@ function civicrm_api3_group_contact_delete($params) {
   if ($groupContact['count'] == 0 && $groupContact2['count'] == 0) {
     throw new API_Exception('Cannot Delete GroupContact');
   }
-  $params['status'] = CRM_Utils_Array::value('status', $params, empty($params['skip_undelete']) ? 'Removed' : 'Deleted');
+  $params['status'] = $params['status'] ?? (empty($params['skip_undelete']) ? 'Removed' : 'Deleted');
   // "Deleted" isn't a real option so skip the api wrapper to avoid pseudoconstant validation
   return civicrm_api3_group_contact_create($params);
 }
@@ -233,8 +233,8 @@ function _civicrm_api3_group_contact_common($params, $op = 'Added') {
     }
   }
 
-  $method = CRM_Utils_Array::value('method', $params, 'API');
-  $status = CRM_Utils_Array::value('status', $params, $op);
+  $method = $params['method'] ?? 'API';
+  $status = $params['status'] ?? $op;
   $tracking = CRM_Utils_Array::value('tracking', $params);
 
   if ($op == 'Added' || $op == 'Pending') {
@@ -290,7 +290,7 @@ function civicrm_api3_group_contact_update_status($params) {
   CRM_Contact_BAO_GroupContact::addContactsToGroup(
     [$params['contact_id']],
     $params['group_id'],
-    CRM_Utils_Array::value('method', $params, 'API'),
+    $params['method'] ?? 'API',
     'Added',
     CRM_Utils_Array::value('tracking', $params)
   );

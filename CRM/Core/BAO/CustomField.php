@@ -1117,7 +1117,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
           $display = implode(', ', $v);
         }
         else {
-          $display = CRM_Utils_Array::value($value, $field['options'], '');
+          $display = $field['options'][$value] ?? '';
         }
         break;
 
@@ -1886,7 +1886,7 @@ WHERE  id IN ( %1, %2 )
       }
 
       $optionValue->weight = $params['option_weight'][$optionName];
-      $optionValue->is_active = CRM_Utils_Array::value($optionName, $params['option_status'], FALSE);
+      $optionValue->is_active = $params['option_status'][$optionName] ?? FALSE;
       $optionValue->save();
     }
   }
@@ -2463,7 +2463,7 @@ WHERE      f.id IN ($ids)";
       }
       $dataType = $field->data_type;
 
-      $profileField = CRM_Utils_Array::value($key, $profileFields, array());
+      $profileField = $profileFields[$key] ?? array();
       $fieldTitle = CRM_Utils_Array::value('title', $profileField);
       $isRequired = CRM_Utils_Array::value('is_required', $profileField);
       if (!$fieldTitle) {

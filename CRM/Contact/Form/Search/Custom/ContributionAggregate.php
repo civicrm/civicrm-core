@@ -197,7 +197,7 @@ civicrm_contact AS contact_a {$this->_aclFrom}
     ];
     $metadata = civicrm_api3('Contribution', 'getfields', [])['values'];
     foreach ($fields as $fieldName => $field) {
-      $fields[$fieldName] = array_merge(CRM_Utils_Array::value($fieldName, $metadata, []), $field);
+      $fields[$fieldName] = array_merge($metadata[$fieldName] ?? [], $field);
     }
     return $fields;
   }

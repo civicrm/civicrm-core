@@ -157,7 +157,7 @@ class CRM_Admin_Form_PaymentProcessorType extends CRM_Admin_Form {
     $attributes = CRM_Core_DAO::getAttribute('CRM_Financial_DAO_PaymentProcessorType');
 
     foreach ($this->_fields as $field) {
-      $required = CRM_Utils_Array::value('required', $field, FALSE);
+      $required = $field['required'] ?? FALSE;
       $this->add('text', $field['name'],
         $field['label'], $attributes['name'], $required
       );
@@ -221,9 +221,9 @@ UPDATE civicrm_payment_processor SET is_default = 0";
     $dao = new CRM_Financial_DAO_PaymentProcessorType();
 
     $dao->id = $this->_id;
-    $dao->is_default = CRM_Utils_Array::value('is_default', $values, 0);
-    $dao->is_active = CRM_Utils_Array::value('is_active', $values, 0);
-    $dao->is_recur = CRM_Utils_Array::value('is_recur', $values, 0);
+    $dao->is_default = $values['is_default'] ?? 0;
+    $dao->is_active = $values['is_active'] ?? 0;
+    $dao->is_recur = $values['is_recur'] ?? 0;
 
     $dao->name = $values['name'];
     $dao->description = $values['description'];

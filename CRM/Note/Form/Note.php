@@ -75,7 +75,7 @@ class CRM_Note_Form_Note extends CRM_Core_Form {
     $this->_entityTable = $this->get('entityTable');
     $this->_entityId = $this->get('entityId');
     $this->_id = $this->get('id');
-    $this->_parentId = CRM_Utils_Array::value('parentId', $_GET, 0);
+    $this->_parentId = $_GET['parentId'] ?? 0;
     if ($this->_parentId) {
       $this->assign('parentId', $this->_parentId);
     }

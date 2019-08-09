@@ -312,7 +312,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     }
 
     $params = $this->controller->exportValues($this->_name);
-    $groups = CRM_Utils_Array::value('groups', $params, []);
+    $groups = $params['groups'] ?? [];
     $newGroupName = CRM_Utils_Array::value('newGroupName', $params);
     $newGroupDesc = CRM_Utils_Array::value('newGroupDesc', $params);
 

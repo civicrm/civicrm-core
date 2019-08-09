@@ -563,7 +563,7 @@ INNER JOIN  civicrm_price_field field       ON ( value.price_field_id = field.id
       if ($lineItem->html_type == 'Text') {
         $count *= $lineItem->qty;
       }
-      $optionsCount[$lineItem->valueId] = $count + CRM_Utils_Array::value($lineItem->valueId, $optionsCount, 0);
+      $optionsCount[$lineItem->valueId] = $count + ($optionsCount[$lineItem->valueId] ?? 0);
     }
 
     return $optionsCount;

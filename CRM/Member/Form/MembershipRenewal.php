@@ -493,12 +493,12 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     $this->storeContactFields($this->_params);
     $this->beginPostProcess();
     $now = CRM_Utils_Date::getToday(NULL, 'YmdHis');
-    $this->assign('receive_date', CRM_Utils_Array::value('receive_date', $this->_params, date('Y-m-d H:i:s')));
+    $this->assign('receive_date', $this->_params['receive_date'] ?? date('Y-m-d H:i:s'));
     $this->processBillingAddress();
     list($userName) = CRM_Contact_BAO_Contact_Location::getEmailDetails(CRM_Core_Session::singleton()->get('userID'));
-    $this->_params['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_params,
-      CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee')
-    );
+    if (!isset($this->_params['total_amount'])) {
+      $this->_params['total_amount'] = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $this->_memType, 'minimum_fee');
+    }
     $this->_membershipId = $this->_id;
     $customFieldsFormatted = CRM_Core_BAO_CustomField::postProcess($this->_params,
       $this->_id,

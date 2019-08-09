@@ -206,7 +206,7 @@ class CRM_Mailing_PseudoConstant extends CRM_Core_PseudoConstant {
         self::$defaultComponent[$dao->component_type] = $dao->id;
       }
     }
-    $value = CRM_Utils_Array::value($type, self::$defaultComponent, $undefined);
+    $value = self::$defaultComponent[$type] ?? $undefined;
     return $value;
   }
 

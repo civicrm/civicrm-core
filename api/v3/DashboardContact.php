@@ -89,7 +89,7 @@ function _civicrm_api3_dashboard_contact_create_spec(&$params) {
 function _civicrm_api3_dashboard_contact_check_params(&$params) {
   $dashboard_id = CRM_Utils_Array::value('dashboard_id', $params);
   if ($dashboard_id) {
-    $allDashlets = CRM_Core_BAO_Dashboard::getDashlets(TRUE, CRM_Utils_Array::value('check_permissions', $params, 0));
+    $allDashlets = CRM_Core_BAO_Dashboard::getDashlets(TRUE, $params['check_permissions'] ?? 0);
     if (!isset($allDashlets[$dashboard_id])) {
       return civicrm_api3_create_error('Invalid or inaccessible dashboard ID');
     }

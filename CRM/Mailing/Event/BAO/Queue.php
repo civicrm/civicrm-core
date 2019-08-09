@@ -68,7 +68,7 @@ class CRM_Mailing_Event_BAO_Queue extends CRM_Mailing_Event_DAO_Queue {
    */
   public static function hash($params) {
     $jobId = $params['job_id'];
-    $emailId = CRM_Utils_Array::value('email_id', $params, '');
+    $emailId = $params['email_id'] ?? '';
     $contactId = $params['contact_id'];
 
     return substr(sha1("{$jobId}:{$emailId}:{$contactId}:" . time()),

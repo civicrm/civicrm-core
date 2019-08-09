@@ -155,7 +155,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $rfp = CRM_Utils_Request::retrieve('rfp', 'Boolean', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'GET');
 
     //we lost rfp in case of additional participant. So set it explicitly.
-    if ($rfp || CRM_Utils_Array::value('additional_participants', $this->_params[0], FALSE)) {
+    if ($rfp || !empty($this->_params[0]['additional_participants'])) {
       if (!empty($this->_paymentProcessor) &&  $this->_paymentProcessor['object']->supports('preApproval')) {
         $preApprovalParams = $this->_paymentProcessor['object']->getPreApprovalDetails($this->get('pre_approval_parameters'));
         $params = array_merge($this->_params, $preApprovalParams);
@@ -456,7 +456,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       elseif ($participantNum) {
         $participantCount[$participantNum] = 'participant';
       }
-      $totalTaxAmount += CRM_Utils_Array::value('tax_amount', $record, 0);
+      $totalTaxAmount += $record['tax_amount'] ?? 0;
       if (CRM_Utils_Array::value('is_primary', $record)) {
         $taxAmount = &$params[$participantNum]['tax_amount'];
       }
@@ -981,7 +981,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       'invoice_id' => $params['invoiceID'],
       'currency' => $params['currencyID'],
       'source' => !empty($params['participant_source']) ? $params['participant_source'] : $params['description'],
-      'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
+      'is_pay_later' => $params['is_pay_later'] ?? 0,
       'campaign_id' => CRM_Utils_Array::value('campaign_id', $params),
       'card_type_id' => CRM_Utils_Array::value('card_type_id', $params),
       'pan_truncation' => CRM_Utils_Array::value('pan_truncation', $params),

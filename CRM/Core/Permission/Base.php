@@ -66,7 +66,7 @@ class CRM_Core_Permission_Base {
 
       // pass through
       case 'cms':
-        return CRM_Utils_Array::value($name, $map, CRM_Core_Permission::ALWAYS_DENY_PERMISSION);
+        return $map[$name] ?? CRM_Core_Permission::ALWAYS_DENY_PERMISSION;
 
       case NULL:
         return $name;

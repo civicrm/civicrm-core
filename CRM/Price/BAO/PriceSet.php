@@ -631,7 +631,7 @@ WHERE  id = %1";
           if (!empty($form->_priceSet['fields'])) {
             foreach ($form->_priceSet['fields'] as $field) {
               foreach ($field['options'] as $option) {
-                $count = CRM_Utils_Array::value('count', $option, 0);
+                $count = $option['count'] ?? 0;
                 $optionsCountDetails['fields'][$field['id']]['options'][$option['id']] = $count;
               }
             }
@@ -646,7 +646,7 @@ WHERE  id = %1";
         if (!empty($form->_priceSet['fields'])) {
           foreach ($form->_priceSet['fields'] as $field) {
             foreach ($field['options'] as $option) {
-              $maxVal = CRM_Utils_Array::value('max_value', $option, 0);
+              $maxVal = $option['max_value'] ?? 0;
               $optionsMaxValueDetails['fields'][$field['id']]['options'][$option['id']] = $maxVal;
               $optionsMaxValueTotal += $maxVal;
             }
@@ -1065,7 +1065,7 @@ WHERE  id = %1";
             'price_' . $field['id'],
             $field['id'],
             FALSE,
-            CRM_Utils_Array::value('is_required', $field, FALSE),
+            $field['is_required'] ?? FALSE,
             NULL,
             $options
           );

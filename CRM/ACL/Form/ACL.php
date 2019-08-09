@@ -264,7 +264,7 @@ class CRM_ACL_Form_ACL extends CRM_Admin_Form {
     }
     else {
       $params = $this->controller->exportValues($this->_name);
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+      $params['is_active'] = $params['is_active'] ?? FALSE;
       $params['deny'] = 0;
       $params['entity_table'] = 'civicrm_acl_role';
 

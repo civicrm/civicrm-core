@@ -175,8 +175,8 @@ class CRM_Core_Component {
     $info = self::_info();
     $config = CRM_Core_Config::singleton();
 
-    $firstArg = CRM_Utils_Array::value(1, $args, '');
-    $secondArg = CRM_Utils_Array::value(2, $args, '');
+    $firstArg = $args[1] ?? '';
+    $secondArg = $args[2] ?? '';
     foreach ($info as $name => $comp) {
       if (in_array($name, $config->enableComponents) &&
         (($comp->info['url'] === $firstArg && $type == 'main') ||

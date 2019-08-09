@@ -15,20 +15,20 @@ class CRM_Dedupe_BAO_QueryBuilder_IndividualSupervised extends CRM_Dedupe_BAO_Qu
    */
   public static function record($rg) {
 
-    $civicrm_contact = CRM_Utils_Array::value('civicrm_contact', $rg->params, []);
-    $civicrm_email = CRM_Utils_Array::value('civicrm_email', $rg->params, []);
+    $civicrm_contact = $rg->params['civicrm_contact'] ?? [];
+    $civicrm_email = $rg->params['civicrm_email'] ?? [];
 
     $params = [
       1 => [
-        CRM_Utils_Array::value('first_name', $civicrm_contact, ''),
+        $civicrm_contact['first_name'] ?? '',
         'String',
       ],
       2 => [
-        CRM_Utils_Array::value('last_name', $civicrm_contact, ''),
+        $civicrm_contact['last_name'] ?? '',
         'String',
       ],
       3 => [
-        CRM_Utils_Array::value('email', $civicrm_email, ''),
+        $civicrm_email['email'] ?? '',
         'String',
       ],
     ];

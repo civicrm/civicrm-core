@@ -254,7 +254,7 @@ function civicrm_api3_extension_download($params) {
   }
   CRM_Extension_System::singleton()->getCache()->flush();
   CRM_Extension_System::singleton(TRUE);
-  if (CRM_Utils_Array::value('install', $params, TRUE)) {
+  if (!empty($params['install'])) {
     CRM_Extension_System::singleton()->getManager()->install([$params['key']]);
   }
 
@@ -400,7 +400,7 @@ function civicrm_api3_extension_getremote($params) {
     $info = array_merge($info, (array) $obj);
     $result[] = $info;
   }
-  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', CRM_Utils_Array::value('return', $params, []));
+  return _civicrm_api3_basic_array_get('Extension', $params, $result, 'id', $params['return'] ?? []);
 }
 
 /**

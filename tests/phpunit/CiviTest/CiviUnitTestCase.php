@@ -1852,7 +1852,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         $keys[CRM_Utils_Array::Value('name', $settings, $field)] = $field;
       }
       else {
-        $keys[CRM_Utils_Array::Value('name', $settings, $field)] = CRM_Utils_Array::value('name', $settings, $field);
+        $keys[CRM_Utils_Array::Value('name', $settings, $field)] = $settings['name'] ?? $field;
       }
       $type = CRM_Utils_Array::value('type', $settings);
       if ($type == CRM_Utils_Type::T_DATE) {
@@ -2811,7 +2811,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     if ($context != 'online' && $context != 'payLater') {
       $compareParams = array(
         'to_financial_account_id' => 6,
-        'total_amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'total_amount' => $params['total_amount'] ?? 100,
         'status_id' => 1,
       );
     }
@@ -2821,15 +2821,15 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     elseif ($context == 'online') {
       $compareParams = array(
         'to_financial_account_id' => 12,
-        'total_amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'total_amount' => $params['total_amount'] ?? 100,
         'status_id' => 1,
-        'payment_instrument_id' => CRM_Utils_Array::value('payment_instrument_id', $params, 1),
+        'payment_instrument_id' => $params['payment_instrument_id'] ?? 1,
       );
     }
     elseif ($context == 'payLater') {
       $compareParams = array(
         'to_financial_account_id' => 7,
-        'total_amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'total_amount' => $params['total_amount'] ?? 100,
         'status_id' => 2,
       );
     }
@@ -2843,15 +2843,15 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'id' => $entityTrxn['entity_id'],
     );
     $compareParams = array(
-      'amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+      'amount' => $params['total_amount'] ?? 100,
       'status_id' => 1,
-      'financial_account_id' => CRM_Utils_Array::value('financial_account_id', $params, 1),
+      'financial_account_id' => $params['financial_account_id'] ?? 1,
     );
     if ($context == 'payLater') {
       $compareParams = array(
-        'amount' => CRM_Utils_Array::value('total_amount', $params, 100),
+        'amount' => $params['total_amount'] ?? 100,
         'status_id' => 3,
-        'financial_account_id' => CRM_Utils_Array::value('financial_account_id', $params, 1),
+        'financial_account_id' => $params['financial_account_id'] ?? 1,
       );
     }
     $this->assertDBCompareValues('CRM_Financial_DAO_FinancialItem', $fitemParams, $compareParams);

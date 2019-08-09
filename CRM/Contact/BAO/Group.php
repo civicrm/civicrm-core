@@ -360,12 +360,12 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
           'is_active' => 1,
         ]);
         if (count($parentIds) >= 1 && $activeParentsCount <= 1) {
-          $setDisable = self::setIsActive($childValue, CRM_Utils_Array::value('is_active', $params, 1));
+          $setDisable = self::setIsActive($childValue, $params['is_active'] ?? 1);
         }
       }
     }
     // form the name only if missing: CRM-627
-    $nameParam = CRM_Utils_Array::value('name', $params, NULL);
+    $nameParam = $params['name'] ?? NULL;
     if (!$nameParam && empty($params['id'])) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
@@ -714,8 +714,8 @@ class CRM_Contact_BAO_Group extends CRM_Contact_DAO_Group {
       //create group only when new saved search.
       $groupParams = [
         'title' => "Hidden Smart Group {$ssId}",
-        'is_active' => CRM_Utils_Array::value('is_active', $params, 1),
-        'is_hidden' => CRM_Utils_Array::value('is_hidden', $params, 1),
+        'is_active' => $params['is_active'] ?? 1,
+        'is_hidden' => $params['is_hidden'] ?? 1,
         'group_type' => CRM_Utils_Array::value('group_type', $params),
         'visibility' => CRM_Utils_Array::value('visibility', $params),
         'saved_search_id' => $ssId,

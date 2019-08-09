@@ -306,7 +306,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       $params['created_date'] = date('YmdHis');
     }
     // format params
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $params['is_active'] = $params['is_active'] ?? FALSE;
     $params['last_modified_id'] = $session->get('userID');
     $params['last_modified_date'] = date('YmdHis');
     $result = self::submit($params, $this);

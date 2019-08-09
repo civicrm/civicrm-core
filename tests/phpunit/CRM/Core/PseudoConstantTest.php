@@ -1056,7 +1056,7 @@ class CRM_Core_PseudoConstantTest extends CiviUnitTestCase {
         }
 
         // Ensure count of optionValues is not extraordinarily high.
-        $max = CRM_Utils_Array::value('max', $field, 20);
+        $max = $field['max'] ?? 20;
         $this->assertLessThanOrEqual($max, count($optionValues), $message);
       }
     }

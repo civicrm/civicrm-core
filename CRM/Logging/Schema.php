@@ -784,7 +784,7 @@ COLS;
     $query = preg_replace("/^CREATE TABLE `$table`/i", "CREATE TABLE `{$this->db}`.log_$table", $query);
     $query = preg_replace("/ AUTO_INCREMENT/i", '', $query);
     $query = preg_replace("/^  [^`].*$/m", '', $query);
-    $engine = strtoupper(CRM_Utils_Array::value('engine', $this->logTableSpec[$table], self::ENGINE));
+    $engine = strtoupper($this->logTableSpec[$table]['engine'] ?? self::ENGINE);
     $engine .= " " . CRM_Utils_Array::value('engine_config', $this->logTableSpec[$table]);
     $query = preg_replace("/^\) ENGINE=[^ ]+ /im", ') ENGINE=' . $engine . ' ', $query);
 

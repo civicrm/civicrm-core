@@ -478,7 +478,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     foreach ($params as $dashboardIDs) {
       $contactID = CRM_Utils_Array::value('contact_id', $dashboardIDs);
       $dashboardID = CRM_Utils_Array::value('dashboard_id', $dashboardIDs);
-      $column = CRM_Utils_Array::value('column_no', $dashboardIDs, 0);
+      $column = $dashboardIDs['column_no'] ?? 0;
       $columns[$column][$dashboardID] = 0;
     }
     self::saveDashletChanges($columns, $contactID);

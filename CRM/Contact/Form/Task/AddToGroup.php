@@ -191,7 +191,7 @@ class CRM_Contact_Form_Task_AddToGroup extends CRM_Contact_Form_Task {
    */
   public function postProcess() {
     $params = $this->controller->exportValues();
-    $groupOption = CRM_Utils_Array::value('group_option', $params, NULL);
+    $groupOption = $params['group_option'] ?? NULL;
     if ($groupOption) {
       $groupParams = [];
       $groupParams['title'] = $params['title'];

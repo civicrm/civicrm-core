@@ -249,7 +249,7 @@ class CRM_Grant_BAO_Grant extends CRM_Grant_DAO_Grant {
     if (!$id) {
       $id = CRM_Utils_Array::value('contact_id', $params);
     }
-    if (!empty($params['note']) || CRM_Utils_Array::value('id', CRM_Utils_Array::value('note', $ids))) {
+    if (!empty($params['note']) || !empty($ids['note']['id'])) {
       $noteParams = [
         'entity_table' => 'civicrm_grant',
         'note' => $params['note'] = $params['note'] ? $params['note'] : "null",

@@ -407,7 +407,7 @@ SELECT count(*)
     $customOption->weight = $params['weight'];
     $customOption->description = $params['description'];
     $customOption->value = $params['value'];
-    $customOption->is_active = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $customOption->is_active = $params['is_active'] ?? FALSE;
 
     $oldWeight = NULL;
     if ($this->_id) {

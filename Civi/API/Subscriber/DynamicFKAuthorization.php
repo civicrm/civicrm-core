@@ -185,7 +185,7 @@ class DynamicFKAuthorization implements EventSubscriberInterface {
         $this->authorizeDelegate(
           $apiRequest['action'],
           $apiRequest['params']['entity_table'],
-          \CRM_Utils_Array::value('entity_id', $apiRequest['params'], NULL),
+          $apiRequest['params']['entity_id'] ?? NULL,
           $apiRequest
         );
         return;

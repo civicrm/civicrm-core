@@ -1017,8 +1017,8 @@ class CRM_Report_Form extends CRM_Core_Form {
           ) {
             $order_by = [
               'column' => $fieldName,
-              'order' => CRM_Utils_Array::value('default_order', $field, 'ASC'),
-              'section' => CRM_Utils_Array::value('default_is_section', $field, 0),
+              'order' => $field['default_order'] ?? 'ASC',
+              'section' => $field['default_is_section'] ?? 0,
             ];
 
             if (!empty($field['default_weight'])) {
@@ -2997,7 +2997,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
           }
           elseif (array_key_exists('extends', $table)) {
             // For custom fields referenced in $this->_customGroupExtends
-            $fields = CRM_Utils_Array::value('fields', $table, []);
+            $fields = $table['fields'] ?? [];
           }
           else {
             continue;
@@ -3340,7 +3340,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                 $this->setEntityRefDefaults($field, $tableName);
                 $result = civicrm_api3($field['attributes']['entity'], 'getlist',
                   ['id' => $val] +
-                  CRM_Utils_Array::value('api', $field['attributes'], []));
+                  $field['attributes']['api'] ?? []);
                 $values = [];
                 foreach ($result['values'] as $v) {
                   $values[] = $v['label'];
@@ -3351,7 +3351,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                 $value = $pair[$op];
               }
               elseif (is_array($val) && (!empty($val))) {
-                $options = CRM_Utils_Array::value('options', $field, []);
+                $options = $field['options'] ?? [];
                 foreach ($val as $key => $valIds) {
                   if (isset($options[$valIds])) {
                     $val[$key] = $options[$valIds];
@@ -3367,7 +3367,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
                 is_array($field['options']) && !empty($field['options'])
               ) {
                 $value = CRM_Utils_Array::value($op, $pair) . " " .
-                  CRM_Utils_Array::value($val, $field['options'], $val);
+                  $field['options'][$val] ?? $val;
               }
               elseif ($val) {
                 $value = CRM_Utils_Array::value($op, $pair) . " " . $val;
@@ -4052,7 +4052,7 @@ ORDER BY cg.weight, cf.weight";
       }
 
       if (!array_key_exists('type', $curFields[$fieldName])) {
-        $curFields[$fieldName]['type'] = CRM_Utils_Array::value('type', $curFilters[$fieldName], []);
+        $curFields[$fieldName]['type'] = $curFilters[$fieldName]['type'] ?? [];
       }
 
       if ($addFields) {
@@ -4093,7 +4093,7 @@ ORDER BY cg.weight, cf.weight";
         if ((!$this->isFieldSelected($prop)) || ($joinsForFiltersOnly && !$this->isFieldFiltered($prop))) {
           continue;
         }
-        $baseJoin = CRM_Utils_Array::value($prop['extends'], $this->_customGroupExtendsJoin, "{$this->_aliases[$extendsTable]}.id");
+        $baseJoin = $this->_customGroupExtendsJoin[$prop['extends']] ?? "{$this->_aliases[$extendsTable]}.id";
 
         $customJoin = is_array($this->_customGroupJoin) ? $this->_customGroupJoin[$table] : $this->_customGroupJoin;
         $this->_from .= "
@@ -4418,7 +4418,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
         'fields' => [
           'address_name' => [
             'title' => ts('Address Name'),
-            'default' => CRM_Utils_Array::value('name', $defaults, FALSE),
+            'default' => $defaults['name'] ?? FALSE,
             'name' => 'name',
           ],
         ],
@@ -4428,7 +4428,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
     foreach ($defaultAddressFields as $fieldName => $fieldLabel) {
       $addressFields['civicrm_address']['fields'][$fieldName] = [
         'title' => $fieldLabel,
-        'default' => CRM_Utils_Array::value($fieldName, $defaults, FALSE),
+        'default' => $defaults[$fieldName] ?? FALSE,
       ];
     }
 
@@ -4978,7 +4978,7 @@ LEFT JOIN civicrm_contact {$field['alias']} ON {$field['alias']}.id = {$this->_a
       'is_deceased' => [
         'title' => ts('Deceased'),
         'type' => CRM_Utils_Type::T_BOOLEAN,
-        'default' => CRM_Utils_Array::value('deceased', $defaults, 0),
+        'default' => $defaults['deceased'] ?? 0,
       ],
       'do_not_email' => [
         'title' => ts('Do not email'),

@@ -122,8 +122,8 @@ function civicrm_api3_activity_create($params) {
   }
 
   // this should all be handled at the BAO layer
-  $params['deleteActivityAssignment'] = CRM_Utils_Array::value('deleteActivityAssignment', $params, $deleteActivityAssignment);
-  $params['deleteActivityTarget'] = CRM_Utils_Array::value('deleteActivityTarget', $params, $deleteActivityTarget);
+  $params['deleteActivityAssignment'] = $params['deleteActivityAssignment'] ?? $deleteActivityAssignment;
+  $params['deleteActivityTarget'] = $params['deleteActivityTarget'] ?? $deleteActivityTarget;
 
   if ($case_id && $createRevision) {
     // This is very similar to the copy-to-case action.

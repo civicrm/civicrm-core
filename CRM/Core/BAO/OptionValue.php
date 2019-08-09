@@ -74,16 +74,16 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
    * @param array $params
    */
   public static function setDefaults(&$params) {
-    if (CRM_Utils_Array::value('label', $params, NULL) === NULL) {
+    if (!isset($params['label'])) {
       $params['label'] = $params['name'];
     }
-    if (CRM_Utils_Array::value('name', $params, NULL) === NULL) {
+    if (!isset($params['name'])) {
       $params['name'] = $params['label'];
     }
-    if (CRM_Utils_Array::value('weight', $params, NULL) === NULL) {
+    if (!isset($params['weight'])) {
       $params['weight'] = self::getDefaultWeight($params);
     }
-    if (CRM_Utils_Array::value('value', $params, NULL) === NULL) {
+    if (!isset($params['value'])) {
       $params['value'] = self::getDefaultValue($params);
     }
   }
@@ -177,10 +177,10 @@ class CRM_Core_BAO_OptionValue extends CRM_Core_DAO_OptionValue {
     // complex defaults like the domain id below would make sense in the setDefauls function
     // but unclear what other ways this function is being used
     if (!$id) {
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-      $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
-      $params['is_optgroup'] = CRM_Utils_Array::value('is_optgroup', $params, FALSE);
-      $params['filter'] = CRM_Utils_Array::value('filter', $params, FALSE);
+      $params['is_active'] = $params['is_active'] ?? FALSE;
+      $params['is_default'] = $params['is_default'] ?? FALSE;
+      $params['is_optgroup'] = $params['is_optgroup'] ?? FALSE;
+      $params['filter'] = $params['filter'] ?? FALSE;
     }
     // Update custom field data to reflect the new value
     elseif (isset($params['value'])) {

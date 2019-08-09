@@ -431,7 +431,7 @@ class CiviContributeProcessor {
     }
 
     $params['custom'] = CRM_Core_BAO_CustomField::postProcess($params,
-      CRM_Utils_Array::value('id', $params, NULL),
+      $params['id'] ?? NULL,
       'Contribution'
     );
     // create contribution

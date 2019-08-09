@@ -764,7 +764,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           }
         }
         // $membershipFieldId is set and additional amount is 'No thank you' or NULL then throw error
-        if ($membershipFieldId && !(CRM_Utils_Array::value('price_' . $contributionFieldId, $fields, -1) > 0) && empty($fields['price_' . $otherFieldId])) {
+        if ($membershipFieldId && !(($fields['price_' . $contributionFieldId] ?? -1) > 0) && empty($fields['price_' . $otherFieldId])) {
           $errors["price_{$errorKey}"] = ts('Additional Contribution is required.');
         }
       }
@@ -1203,7 +1203,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     // Would be nice to someday understand the point of this set.
     $this->set('is_pay_later', $params['is_pay_later']);
     // assign pay later stuff
-    $this->_params['is_pay_later'] = CRM_Utils_Array::value('is_pay_later', $params, FALSE);
+    $this->_params['is_pay_later'] = $params['is_pay_later'] ?? FALSE;
     $this->assign('is_pay_later', $params['is_pay_later']);
     if ($params['is_pay_later']) {
       $this->assign('pay_later_text', $this->_values['pay_later_text']);

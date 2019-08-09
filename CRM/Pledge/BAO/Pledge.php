@@ -211,7 +211,7 @@ class CRM_Pledge_BAO_Pledge extends CRM_Pledge_DAO_Pledge {
         'actual_amount',
       );
       foreach ($paymentKeys as $key) {
-        $paymentParams[$key] = CRM_Utils_Array::value($key, $params, NULL);
+        $paymentParams[$key] = $params[$key] ?? NULL;
       }
       CRM_Pledge_BAO_PledgePayment::create($paymentParams);
     }
@@ -851,7 +851,7 @@ GROUP BY  currency
 
     $returnMessages = array();
 
-    $sendReminders = CRM_Utils_Array::value('send_reminders', $params, FALSE);
+    $sendReminders = $params['send_reminders'] ?? FALSE;
 
     $allStatus = array_flip(CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name'));
     $allPledgeStatus = CRM_Core_OptionGroup::values('pledge_status',

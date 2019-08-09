@@ -539,9 +539,9 @@ function civicrm_api3_job_process_batch_merge($params) {
   }
   $rgid = CRM_Utils_Array::value('rgid', $params);
   $gid = CRM_Utils_Array::value('gid', $params);
-  $mode = CRM_Utils_Array::value('mode', $params, 'safe');
+  $mode = $params['mode'] ?? 'safe';
 
-  $result = CRM_Dedupe_Merger::batchMerge($rule_group_id, $gid, $mode, 1, 2, CRM_Utils_Array::value('criteria', $params, []), CRM_Utils_Array::value('check_permissions', $params));
+  $result = CRM_Dedupe_Merger::batchMerge($rule_group_id, $gid, $mode, 1, 2, $params['criteria'] ?? [], !empty($params['check_permissions']));
 
   return civicrm_api3_create_success($result, $params);
 }
@@ -617,15 +617,15 @@ function civicrm_api3_job_run_payment_cron($params) {
  *   Sends in various config parameters to decide what needs to be cleaned.
  */
 function civicrm_api3_job_cleanup($params) {
-  $session   = CRM_Utils_Array::value('session', $params, TRUE);
-  $tempTable = CRM_Utils_Array::value('tempTables', $params, TRUE);
-  $jobLog    = CRM_Utils_Array::value('jobLog', $params, TRUE);
-  $expired   = CRM_Utils_Array::value('expiredDbCache', $params, TRUE);
-  $prevNext  = CRM_Utils_Array::value('prevNext', $params, TRUE);
-  $dbCache   = CRM_Utils_Array::value('dbCache', $params, FALSE);
-  $memCache  = CRM_Utils_Array::value('memCache', $params, FALSE);
-  $tplCache  = CRM_Utils_Array::value('tplCache', $params, FALSE);
-  $wordRplc  = CRM_Utils_Array::value('wordRplc', $params, FALSE);
+  $session   = $params['session'] ?? TRUE;
+  $tempTable = $params['tempTables'] ?? TRUE;
+  $jobLog    = $params['jobLog'] ?? TRUE;
+  $expired   = $params['expiredDbCache'] ?? TRUE;
+  $prevNext  = $params['prevNext'] ?? TRUE;
+  $dbCache   = $params['dbCache'] ?? FALSE;
+  $memCache  = $params['memCache'] ?? FALSE;
+  $tplCache  = $params['tplCache'] ?? FALSE;
+  $wordRplc  = $params['wordRplc'] ?? FALSE;
 
   if ($session || $tempTable || $prevNext || $expired) {
     CRM_Core_BAO_Cache::cleanup($session, $tempTable, $prevNext, $expired);
@@ -688,7 +688,7 @@ function civicrm_api3_job_group_rebuild($params) {
     throw new API_Exception('Could not acquire lock, another GroupRebuild process is running');
   }
 
-  $limit = CRM_Utils_Array::value('limit', $params, 0);
+  $limit = $params['limit'] ?? 0;
 
   CRM_Contact_BAO_GroupContactCache::loadAll(NULL, $limit);
   $lock->release();

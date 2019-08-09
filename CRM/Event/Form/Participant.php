@@ -1030,7 +1030,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         //also add additional participant's fee level/priceset
         if (CRM_Event_BAO_Participant::isPrimaryParticipant($this->_id)) {
           $additionalIds = CRM_Event_BAO_Participant::getAdditionalParticipantIds($this->_id);
-          $hasLineItems = CRM_Utils_Array::value('priceSetId', $params, FALSE);
+          $hasLineItems = $params['priceSetId'] ?? FALSE;
           $additionalParticipantDetails = CRM_Event_BAO_Participant::getFeeDetails($additionalIds,
             $hasLineItems
           );
@@ -1396,7 +1396,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $contributionParams['non_deductible_amount'] = 'null';
         $contributionParams['receipt_date'] = !empty($params['send_receipt']) ? CRM_Utils_Array::value('receive_date', $params) : 'null';
         $contributionParams['contact_id'] = $this->_contactID;
-        $contributionParams['receive_date'] = CRM_Utils_Array::value('receive_date', $params, 'null');
+        $contributionParams['receive_date'] = $params['receive_date'] ?? 'null';
 
         $recordContribution = [
           'financial_type_id',
@@ -1519,7 +1519,7 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
               }
               $lineItem[$this->_priceSetId][$lineKey] = $line;
             }
-            CRM_Price_BAO_LineItem::processPriceSet($participants[$num]->id, $lineItem, CRM_Utils_Array::value($num, $contributions, NULL), 'civicrm_participant');
+            CRM_Price_BAO_LineItem::processPriceSet($participants[$num]->id, $lineItem, $contributions[$num] ?? NULL, 'civicrm_participant');
             CRM_Contribute_BAO_Contribution::addPayments($contributions);
           }
         }

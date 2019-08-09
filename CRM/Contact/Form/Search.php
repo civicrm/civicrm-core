@@ -584,15 +584,15 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       $this->_returnProperties = &$this->returnProperties();
 
       // also get the uf group id directly from the post value
-      $this->_ufGroupID = CRM_Utils_Array::value('uf_group_id', $_POST, $this->_ufGroupID);
+      $this->_ufGroupID = $_POST['uf_group_id'] ?? $this->_ufGroupID;
       $this->_formValues['uf_group_id'] = $this->_ufGroupID;
       $this->set('id', $this->_ufGroupID);
 
       // also get the object mode directly from the post value
-      $this->_componentMode = CRM_Utils_Array::value('component_mode', $_POST, $this->_componentMode);
+      $this->_componentMode = $_POST['component_mode'] ?? $this->_componentMode;
 
       // also get the operator from the post value if set
-      $this->_operator = CRM_Utils_Array::value('operator', $_POST, $this->_operator);
+      $this->_operator = $_POST['operator'] ?? $this->_operator;
       $this->_formValues['operator'] = $this->_operator;
       $this->set('operator', $this->_operator);
     }
@@ -672,7 +672,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $this->assign('id',
       CRM_Utils_Array::value('uf_group_id', $this->_formValues)
     );
-    $operator = CRM_Utils_Array::value('operator', $this->_formValues, CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND);
+    $operator = $this->_formValues['operator'] ?? CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND;
     $this->set('queryOperator', $operator);
     if ($operator == CRM_Contact_BAO_Query::SEARCH_OPERATOR_OR) {
       $this->assign('operator', ts('OR'));
@@ -684,8 +684,8 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     // show the context menu only when we’re not searching for deleted contacts; CRM-5673
     if (empty($this->_formValues['deleted_contacts'])) {
       $menuItems = CRM_Contact_BAO_Contact::contextMenu();
-      $primaryActions = CRM_Utils_Array::value('primaryActions', $menuItems, []);
-      $this->_contextMenu = CRM_Utils_Array::value('moreActions', $menuItems, []);
+      $primaryActions = $menuItems['primaryActions'] ?? [];
+      $this->_contextMenu = $menuItems['moreActions'] ?? [];
       $this->assign('contextMenu', $primaryActions + $this->_contextMenu);
     }
 

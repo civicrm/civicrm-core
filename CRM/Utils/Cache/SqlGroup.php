@@ -106,7 +106,7 @@ class CRM_Utils_Cache_SqlGroup implements CRM_Utils_Cache_Interface {
       $this->componentID = NULL;
     }
     $this->valueCache = [];
-    if (CRM_Utils_Array::value('prefetch', $config, TRUE)) {
+    if (!empty($config['prefetch'])) {
       $this->prefetch();
     }
   }

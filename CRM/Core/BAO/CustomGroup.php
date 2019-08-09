@@ -61,7 +61,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
       $group->title = $params['title'];
     }
 
-    $extends = CRM_Utils_Array::value('extends', $params, []);
+    $extends = $params['extends'] ?? [];
     $extendsEntity = CRM_Utils_Array::value(0, $extends);
 
     $participantEntities = [
@@ -113,7 +113,7 @@ class CRM_Core_BAO_CustomGroup extends CRM_Core_DAO_CustomGroup {
     else {
       $oldWeight = 0;
     }
-    $group->weight = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_CustomGroup', $oldWeight, CRM_Utils_Array::value('weight', $params, FALSE));
+    $group->weight = CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_CustomGroup', $oldWeight, $params['weight'] ?? FALSE);
     $fields = [
       'style',
       'collapse_display',

@@ -95,7 +95,7 @@ class CRM_Contact_Form_Task_AlterPreferences extends CRM_Contact_Form_Task {
     //get the submitted values in an array
     $params = $this->controller->exportValues($this->_name);
 
-    $actionTypeOption = CRM_Utils_Array::value('actionTypeOption', $params, NULL);
+    $actionTypeOption = $params['actionTypeOption'] ?? NULL;
     // If remove option has been selected set new privacy value to "false"
     $privacyValueNew = empty($actionTypeOption);
 

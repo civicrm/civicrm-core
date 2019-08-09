@@ -353,7 +353,7 @@ class CRM_Friend_BAO_Friend extends CRM_Friend_DAO_Friend {
   public static function addTellAFriend(&$params) {
     $friendDAO = new CRM_Friend_DAO_Friend();
     $friendDAO->copyValues($params);
-    $friendDAO->is_active = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $friendDAO->is_active = $params['is_active'] ?? FALSE;
     $friendDAO->save();
 
     return $friendDAO;

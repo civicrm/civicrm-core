@@ -435,7 +435,7 @@ function civicrm_api3_contribution_transact($params) {
   }
 
   // Some payment processors expect a unique invoice_id - generate one if not supplied
-  $params['invoice_id'] = CRM_Utils_Array::value('invoice_id', $params, md5(uniqid(rand(), TRUE)));
+  $params['invoice_id'] = $params['invoice_id'] ?? md5(uniqid(rand(), TRUE));
 
   $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($params['payment_processor'], $params['payment_processor_mode']);
   $paymentProcessor['object']->doPayment($params);
@@ -721,8 +721,8 @@ function _ipn_process_transaction(&$params, $contribution, $input, $ids, $firstC
     if (empty($domainFromEmail) && (empty($params['receipt_from_name']) || empty($params['receipt_from_email']))) {
       list($domainFromName, $domainFromEmail) = CRM_Core_BAO_Domain::getNameAndEmail(TRUE);
     }
-    $input['receipt_from_name'] = CRM_Utils_Array::value('receipt_from_name', $params, $domainFromName);
-    $input['receipt_from_email'] = CRM_Utils_Array::value('receipt_from_email', $params, $domainFromEmail);
+    $input['receipt_from_name'] = $params['receipt_from_name'] ?? $domainFromName;
+    $input['receipt_from_email'] = $params['receipt_from_email'] ?? $domainFromEmail;
   }
   $input['card_type_id'] = CRM_Utils_Array::value('card_type_id', $params);
   $input['pan_truncation'] = CRM_Utils_Array::value('pan_truncation', $params);

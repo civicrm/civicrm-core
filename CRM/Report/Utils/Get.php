@@ -105,7 +105,7 @@ class CRM_Report_Utils_Get {
    * @param $defaults
    */
   public static function stringParam($fieldName, &$field, &$defaults) {
-    $fieldOP = CRM_Utils_Array::value("{$fieldName}_op", $_GET, 'like');
+    $fieldOP = $_GET["{$fieldName}_op"] ?? 'like';
 
     switch ($fieldOP) {
       case 'has':
@@ -145,7 +145,7 @@ class CRM_Report_Utils_Get {
    * @param $defaults
    */
   public static function intParam($fieldName, &$field, &$defaults) {
-    $fieldOP = CRM_Utils_Array::value("{$fieldName}_op", $_GET, 'eq');
+    $fieldOP = $_GET["{$fieldName}_op"] ?? 'eq';
 
     switch ($fieldOP) {
       case 'lte':

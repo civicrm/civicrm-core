@@ -185,12 +185,12 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
     $params['entity_id'] = $this->_id;
 
     // Target
-    $params['target_entity_type'] = CRM_Utils_Array::value('target_entity_type', $params, 'event');
+    $params['target_entity_type'] = $params['target_entity_type'] ?? 'event';
     if ($params['target_entity_type'] == 'event') {
       $params['target_entity_id'] = $this->_id;
     }
     else {
-      $params['target_entity_id'] = CRM_Utils_Array::value('target_entity_id', $params, $this->_id);
+      $params['target_entity_id'] = $params['target_entity_id'] ?? $this->_id;
     }
 
     $dao = new CRM_PCP_DAO_PCPBlock();
@@ -198,9 +198,9 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
     $dao->entity_id = $this->_id;
     $dao->find(TRUE);
     $params['id'] = $dao->id;
-    $params['is_active'] = CRM_Utils_Array::value('pcp_active', $params, FALSE);
-    $params['is_approval_needed'] = CRM_Utils_Array::value('is_approval_needed', $params, FALSE);
-    $params['is_tellfriend_enabled'] = CRM_Utils_Array::value('is_tellfriend_enabled', $params, FALSE);
+    $params['is_active'] = $params['pcp_active'] ?? FALSE;
+    $params['is_approval_needed'] = $params['is_approval_needed'] ?? FALSE;
+    $params['is_tellfriend_enabled'] = $params['is_tellfriend_enabled'] ?? FALSE;
 
     CRM_PCP_BAO_PCPBlock::create($params);
 

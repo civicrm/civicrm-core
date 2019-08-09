@@ -197,8 +197,8 @@ trait CRM_Admin_Form_SettingTrait {
             $props['html_type'],
             $setting,
             $props['title'],
-            ($options !== NULL) ? $options : CRM_Utils_Array::value('html_attributes', $props, []),
-            ($options !== NULL) ? CRM_Utils_Array::value('html_attributes', $props, []) : NULL
+            ($options !== NULL) ? $options : $props['html_attributes'] ?? [],
+            ($options !== NULL) ? $props['html_attributes'] ?? [] : NULL
           );
         }
         elseif ($add == 'addSelect') {

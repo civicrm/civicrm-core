@@ -399,10 +399,10 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
       $savedSearch->form_values = NULL;
     }
 
-    $savedSearch->is_active = CRM_Utils_Array::value('is_active', $params, 1);
-    $savedSearch->mapping_id = CRM_Utils_Array::value('mapping_id', $params, 'null');
-    $savedSearch->custom_search_id = CRM_Utils_Array::value('custom_search_id', $params, 'null');
-    $savedSearch->id = CRM_Utils_Array::value('id', $params, NULL);
+    $savedSearch->is_active = $params['is_active'] ?? 1;
+    $savedSearch->mapping_id = $params['mapping_id'] ?? 'null';
+    $savedSearch->custom_search_id = $params['custom_search_id'] ?? 'null';
+    $savedSearch->id = $params['id'] ?? NULL;
 
     $savedSearch->save();
 

@@ -406,7 +406,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $attributes = ($attributes ? $attributes : []);
       $attributes['data-crm-datepicker'] = json_encode((array) $extra);
       if (!empty($attributes['aria-label']) || $label) {
-        $attributes['aria-label'] = CRM_Utils_Array::value('aria-label', $attributes, $label);
+        $attributes['aria-label'] = $attributes['aria-label'] ?? $label;
       }
       $type = "text";
     }
@@ -692,7 +692,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (in_array($button['type'], ['next', 'upload', 'done']) && $button['name'] === ts('Save')) {
           $attrs['accesskey'] = 'S';
         }
-        $icon = CRM_Utils_Array::value('icon', $button, $defaultIcon);
+        $icon = $button['icon'] ?? $defaultIcon;
         if ($icon) {
           $attrs['crm-icon'] = $icon;
         }
@@ -710,7 +710,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
 
       // hack - addGroup uses an array to express variable spacing, read from the last element
-      $spacing[] = CRM_Utils_Array::value('spacing', $button, self::ATTR_SPACING);
+      $spacing[] = $button['spacing'] ?? self::ATTR_SPACING;
     }
     $this->addGroup($prevnext, 'buttons', '', $spacing, FALSE);
   }
@@ -1438,7 +1438,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         if (
           $uniqueName === $props['field'] ||
           CRM_Utils_Array::value('name', $fieldSpec) === $props['field'] ||
-          in_array($props['field'], CRM_Utils_Array::value('api.aliases', $fieldSpec, []))
+          in_array($props['field'], $fieldSpec['api.aliases'] ?? [])
         ) {
           break;
         }
@@ -1509,7 +1509,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $fieldSpec = civicrm_api3($props['entity'], 'getfield', $props);
     $fieldSpec = $fieldSpec['values'];
     $fieldSpecLabel = isset($fieldSpec['html']['label']) ? $fieldSpec['html']['label'] : CRM_Utils_Array::value('title', $fieldSpec);
-    $label = CRM_Utils_Array::value('label', $props, $fieldSpecLabel);
+    $label = $props['label'] ?? $fieldSpecLabel;
 
     $widget = isset($props['type']) ? $props['type'] : $fieldSpec['html']['type'];
     if ($widget == 'TextArea' && $context == 'search') {
@@ -1534,7 +1534,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       }
       if ($context == 'search') {
         $widget = $widget == 'Select2' ? $widget : 'Select';
-        $props['multiple'] = CRM_Utils_Array::value('multiple', $props, TRUE);
+        $props['multiple'] = $props['multiple'] ?? TRUE;
       }
 
       // Add data for popup link.
@@ -1552,7 +1552,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $props['data-api-field'] = $props['name'];
       }
     }
-    $props += CRM_Utils_Array::value('html', $fieldSpec, []);
+    $props += $fieldSpec['html'] ?? [];
     CRM_Utils_Array::remove($props, 'entity', 'name', 'context', 'label', 'action', 'type', 'option_url', 'options');
 
     // TODO: refactor switch statement, to separate methods.
@@ -1610,7 +1610,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
       case 'Select':
       case 'Select2':
-        $props['class'] = CRM_Utils_Array::value('class', $props, 'big') . ' crm-select2';
+        $props['class'] = ($props['class'] ?? 'big') . ' crm-select2';
         if (!array_key_exists('placeholder', $props)) {
           $props['placeholder'] = $required ? ts('- select -') : ($context == 'search' ? ts('- any -') : ts('- none -'));
         }
@@ -1977,9 +1977,9 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    */
   public function addEntityRef($name, $label = '', $props = [], $required = FALSE) {
     // Default properties
-    $props['api'] = CRM_Utils_Array::value('api', $props, []);
-    $props['entity'] = CRM_Utils_String::convertStringToCamel(CRM_Utils_Array::value('entity', $props, 'Contact'));
-    $props['class'] = ltrim(CRM_Utils_Array::value('class', $props, '') . ' crm-form-entityref');
+    $props['api'] = $props['api'] ?? [];
+    $props['entity'] = CRM_Utils_String::convertStringToCamel($props['entity'] ?? 'Contact');
+    $props['class'] = ltrim(($props['class'] ?? '') . ' crm-form-entityref');
 
     if (array_key_exists('create', $props) && empty($props['create'])) {
       unset($props['create']);
@@ -1991,7 +1991,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     if (!empty($props['multiple'])) {
       $defaults['multiple'] = TRUE;
     }
-    $props['select'] = CRM_Utils_Array::value('select', $props, []) + $defaults;
+    $props['select'] = $props['select'] ?? [] + $defaults;
 
     $this->formatReferenceFieldAttributes($props, get_class($this));
     return $this->add('text', $name, $label, $props, $required);

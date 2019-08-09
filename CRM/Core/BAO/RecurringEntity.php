@@ -307,7 +307,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
             $linkedObj = CRM_Core_BAO_RecurringEntity::copyCreateEntity($linkedInfo['table'],
               $linkedInfo['findCriteria'],
               $newCriteria,
-              CRM_Utils_Array::value('isRecurringEntityRecord', $linkedInfo, TRUE)
+              $linkedInfo['isRecurringEntityRecord'] ?? TRUE
             );
 
             if (is_a($linkedObj, 'CRM_Core_DAO') && $linkedObj->id) {

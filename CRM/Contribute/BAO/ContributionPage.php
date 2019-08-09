@@ -513,9 +513,9 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
           }
           // suppress all file fields from display and formatting fields
           if (
-            CRM_Utils_Array::value('data_type', $v, '') == 'File' ||
-            CRM_Utils_Array::value('name', $v, '') == 'image_URL' ||
-            CRM_Utils_Array::value('field_type', $v) == 'Formatting'
+            ($v['data_type'] ?? '') == 'File' ||
+            ($v['name'] ?? '') == 'image_URL' ||
+            ($v['field_type'] ?? '') == 'Formatting'
           ) {
             unset($fields[$k]);
           }

@@ -153,7 +153,7 @@ class CRM_Core_OptionValue {
 
       $optionValue[$dao->id]['label'] = htmlspecialchars($optionValue[$dao->id]['label']);
       $optionValue[$dao->id]['order'] = $optionValue[$dao->id]['weight'];
-      $optionValue[$dao->id]['icon'] = CRM_Utils_Array::value('icon', $optionValue[$dao->id], '');
+      $optionValue[$dao->id]['icon'] = $optionValue[$dao->id]['icon'] ?? '';
       $optionValue[$dao->id]['action'] = CRM_Core_Action::formLink($links, $action,
         [
           'id' => $dao->id,
@@ -197,7 +197,7 @@ class CRM_Core_OptionValue {
    *
    */
   public static function addOptionValue(&$params, $optionGroupName, $action, $optionValueID) {
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $params['is_active'] = $params['is_active'] ?? FALSE;
     // checking if the group name with the given id or name (in $groupParams) exists
     $groupParams = ['name' => $optionGroupName, 'is_active' => 1];
     $optionGroup = CRM_Core_BAO_OptionGroup::retrieve($groupParams, $defaults);

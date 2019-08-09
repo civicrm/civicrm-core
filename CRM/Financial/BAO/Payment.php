@@ -69,13 +69,13 @@ class CRM_Financial_BAO_Payment {
       $balanceTrxnParams['from_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($contribution['financial_type_id'], 'Accounts Receivable Account is');
       $balanceTrxnParams['total_amount'] = $params['total_amount'];
       $balanceTrxnParams['contribution_id'] = $params['contribution_id'];
-      $balanceTrxnParams['trxn_date'] = CRM_Utils_Array::value('trxn_date', $params, CRM_Utils_Array::value('contribution_receive_date', $params, date('YmdHis')));
+      $balanceTrxnParams['trxn_date'] = $params['trxn_date'] ?? $params['contribution_receive_date'] ?? date('YmdHis');
       $balanceTrxnParams['fee_amount'] = CRM_Utils_Array::value('fee_amount', $params);
       $balanceTrxnParams['net_amount'] = CRM_Utils_Array::value('total_amount', $params);
       $balanceTrxnParams['currency'] = $contribution['currency'];
-      $balanceTrxnParams['trxn_id'] = CRM_Utils_Array::value('contribution_trxn_id', $params, NULL);
+      $balanceTrxnParams['trxn_id'] = $params['contribution_trxn_id'] ?? NULL;
       $balanceTrxnParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'status_id', 'Completed');
-      $balanceTrxnParams['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $params, $contribution['payment_instrument_id']);
+      $balanceTrxnParams['payment_instrument_id'] = $params['payment_instrument_id'] ?? $contribution['payment_instrument_id'];
       $balanceTrxnParams['check_number'] = CRM_Utils_Array::value('check_number', $params);
       $balanceTrxnParams['is_payment'] = 1;
 

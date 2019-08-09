@@ -110,7 +110,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
     foreach ($this->_varNames as $groupName => $settings) {
       CRM_Core_Error::deprecatedFunctionWarning('deprecated use of preferences form. This will be removed from core soon');
       foreach ($settings as $settingName => $settingDetails) {
-        $this->_defaults[$settingName] = isset($this->_config->$settingName) ? $this->_config->$settingName : CRM_Utils_Array::value('default', $settingDetails, NULL);
+        $this->_defaults[$settingName] = $this->_config->$settingName ?? $settingDetails['default'] ?? NULL;
       }
     }
 
@@ -218,7 +218,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
               break;
 
             case 'entity_reference':
-              $this->addEntityRef($fieldName, $fieldValue['title'], CRM_Utils_Array::value('options', $fieldValue, []));
+              $this->addEntityRef($fieldName, $fieldValue['title'], $fieldValue['options'] ?? []);
           }
         }
 

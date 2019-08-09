@@ -106,7 +106,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       if ($id) {
         $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $id, 'weight', 'id');
       }
-      $fieldValues = ['price_field_id' => CRM_Utils_Array::value('price_field_id', $params, 0)];
+      $fieldValues = ['price_field_id' => $params['price_field_id'] ?? 0];
       $params['weight'] = CRM_Utils_Weight::updateOtherWeights('CRM_Price_DAO_PriceFieldValue', $oldWeight, $params['weight'], $fieldValues);
     }
     else {
@@ -118,7 +118,7 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
       }
     }
 
-    $financialType = CRM_Utils_Array::value('financial_type_id', $params, NULL);
+    $financialType = $params['financial_type_id'] ?? NULL;
     if (!$financialType && $id) {
       $financialType = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $id, 'financial_type_id', 'id');
     }

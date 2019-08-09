@@ -69,7 +69,7 @@ class CRM_Contact_Import_Form_DataSource extends CRM_Core_Form {
     $errorFiles = ['sqlImport.errors', 'sqlImport.conflicts', 'sqlImport.duplicates', 'sqlImport.mismatch'];
 
     // check for post max size avoid when called twice
-    $snippet = CRM_Utils_Array::value('snippet', $_GET, 0);
+    $snippet = $_GET['snippet'] ?? 0;
     if (empty($snippet)) {
       CRM_Utils_Number::formatUnitSize(ini_get('post_max_size'), TRUE);
     }

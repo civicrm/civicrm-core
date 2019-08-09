@@ -576,7 +576,7 @@ AND       CEF.entity_id    = %2";
         $extraParams = [
           'description' => $formValues[$attachDesc],
           'tag' => $tagParams,
-          'attachment_taglist' => CRM_Utils_Array::value($attachFreeTags, $formValues, []),
+          'attachment_taglist' => $formValues[$attachFreeTags] ?? [],
         ];
 
         CRM_Utils_File::formatFile($formValues, $attachName, $extraParams);

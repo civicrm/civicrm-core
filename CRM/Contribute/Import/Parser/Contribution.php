@@ -99,9 +99,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       $fields = array_merge($fields, $pledgeFields);
     }
     foreach ($fields as $name => $field) {
-      $field['type'] = CRM_Utils_Array::value('type', $field, CRM_Utils_Type::T_INT);
-      $field['dataPattern'] = CRM_Utils_Array::value('dataPattern', $field, '//');
-      $field['headerPattern'] = CRM_Utils_Array::value('headerPattern', $field, '//');
+      $field['type'] = $field['type'] ?? CRM_Utils_Type::T_INT;
+      $field['dataPattern'] = $field['dataPattern'] ?? '//';
+      $field['headerPattern'] = $field['headerPattern'] ?? '//';
       $this->addField($name, $field['title'], $field['type'], $field['headerPattern'], $field['dataPattern']);
     }
 

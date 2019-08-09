@@ -251,7 +251,7 @@ END AS 'relType'
       if (!empty($membershipType['relationship_type_id']) && empty($values['owner_membership_id'])) {
         // display related contacts/membership block
         $this->assign('has_related', TRUE);
-        $this->assign('max_related', CRM_Utils_Array::value('max_related', $values, ts('Unlimited')));
+        $this->assign('max_related', $values['max_related'] ?? ts('Unlimited'));
         // split the relations in 2 arrays based on direction
         $relTypeId = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_type_id']);
         $relDirection = explode(CRM_Core_DAO::VALUE_SEPARATOR, $membershipType['relationship_direction']);
@@ -283,7 +283,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
         $query .= " ORDER BY is_current_member DESC";
         $dao = CRM_Core_DAO::executeQuery($query);
         $related = [];
-        $relatedRemaining = CRM_Utils_Array::value('max_related', $values, PHP_INT_MAX);
+        $relatedRemaining = $values['max_related'] ?? PHP_INT_MAX;
         $rowElememts = [
           'id',
           'cid',

@@ -197,7 +197,7 @@ class CRM_Member_Page_Tab extends CRM_Core_Page {
         'limit' => 0,
       ],
     ]);
-    $membershipTypes = CRM_Utils_Array::value('values', $membershipTypesResult, NULL);
+    $membershipTypes = $membershipTypesResult['values'] ?? NULL;
 
     foreach ($membershipTypes as $key => $value) {
       $membershipTypes[$key]['action'] = CRM_Core_Action::formLink(self::membershipTypeslinks(),

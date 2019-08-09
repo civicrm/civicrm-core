@@ -492,7 +492,7 @@ ORDER BY is_active desc, title asc
       }
 
       //build the configure links.
-      $sectionsInfo = CRM_Utils_Array::value($dao->id, $contriPageSectionInfo, array());
+      $sectionsInfo = $contriPageSectionInfo[$dao->id] ?? array();
       $contribution[$dao->id]['configureActionLinks'] = CRM_Core_Action::formLink(self::formatConfigureLinks($sectionsInfo),
         $action,
         array('id' => $dao->id),

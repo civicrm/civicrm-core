@@ -112,7 +112,7 @@ function civicrm_api3_membership_create($params) {
         CRM_Utils_Array::value('join_date', $params),
         CRM_Utils_Array::value('start_date', $params),
         CRM_Utils_Array::value('end_date', $params),
-        CRM_Utils_Array::value('num_terms', $params, 1)
+        $params['num_terms'] ?? 1
       );
     }
     else {
@@ -230,7 +230,7 @@ function civicrm_api3_membership_get($params) {
     $activeOnly = $params['filters']['is_current'];
     unset($params['filters']['is_current']);
   }
-  $activeOnly = CRM_Utils_Array::value('active_only', $params, $activeOnly);
+  $activeOnly = $params['active_only'] ?? $activeOnly;
   if ($activeOnly && empty($params['status_id'])) {
     $params['status_id'] = ['IN' => CRM_Member_BAO_MembershipStatus::getMembershipStatusCurrent()];
   }

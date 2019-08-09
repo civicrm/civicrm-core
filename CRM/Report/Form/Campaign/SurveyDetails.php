@@ -403,7 +403,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
         if (!empty($field['isSurveyResponseField'])) {
           $fldId = substr($name, 7);
           $fieldIds[$fldId] = $fldId;
-          $title = CRM_Utils_Array::value('label', $field, $field['title']);
+          $title = $field['label'] ?? $field['title'];
           $surveyResponseFields[$name] = array(
             'id' => $fldId,
             'title' => $title,
@@ -547,7 +547,7 @@ INNER JOIN  civicrm_survey survey ON ( survey.result_id = grp.id )
       if (!empty($row['civicrm_activity_survey_id'])) {
         $surveyId = $row['civicrm_activity_survey_id'];
       }
-      $result = CRM_Utils_Array::value($surveyId, $resultSet, array());
+      $result = $resultSet[$surveyId] ?? [];
       $resultLabel = CRM_Utils_Array::value('civicrm_activity_result', $row);
       if ($respondentStatus == 'Reserved') {
         $row['civicrm_activity_result'] = implode(' | ', array_keys($result));
@@ -672,7 +672,7 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
           in_array($this->_outputMode, array('print', 'pdf'))
         ) {
           $optGrpId = CRM_Utils_Array::value('option_group_id', $responseFields[$name]);
-          $options = CRM_Utils_Array::value($optGrpId, $fieldValueMap, array());
+          $options = $fieldValueMap[$optGrpId] ?? [];
           $value = implode(' | ', array_keys($options));
         }
         else {

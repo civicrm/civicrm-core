@@ -71,7 +71,7 @@ function civicrm_api3_payment_get($params) {
       }
     }
   }
-  return civicrm_api3_create_success(CRM_Utils_Array::value('values', $financialTrxn, []), $params, 'Payment', 'get');
+  return civicrm_api3_create_success($financialTrxn['values'] ?? [], $params, 'Payment', 'get');
 }
 
 /**
@@ -108,7 +108,7 @@ function civicrm_api3_payment_cancel($params) {
   $paymentParams = [
     'total_amount' => -$entity['amount'],
     'contribution_id' => $entity['entity_id'],
-    'trxn_date' => CRM_Utils_Array::value('trxn_date', $params, 'now'),
+    'trxn_date' => $params['trxn_date'] ?? 'now',
   ];
 
   foreach (['trxn_id', 'payment_instrument_id'] as $permittedParam) {

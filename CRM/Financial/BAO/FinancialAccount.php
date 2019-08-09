@@ -84,11 +84,11 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    */
   public static function add(&$params) {
     if (empty($params['id'])) {
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-      $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
-      $params['is_tax'] = CRM_Utils_Array::value('is_tax', $params, FALSE);
-      $params['is_header_account'] = CRM_Utils_Array::value('is_header_account', $params, FALSE);
-      $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
+      $params['is_active'] = $params['is_active'] ?? FALSE;
+      $params['is_deductible'] = $params['is_deductible'] ?? FALSE;
+      $params['is_tax'] = $params['is_tax'] ?? FALSE;
+      $params['is_header_account'] = $params['is_header_account'] ?? FALSE;
+      $params['is_default'] = $params['is_default'] ?? FALSE;
     }
     if (!empty($params['id'])
       && !empty($params['financial_account_type_id'])

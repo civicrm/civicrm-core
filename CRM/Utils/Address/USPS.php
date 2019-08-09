@@ -82,7 +82,7 @@ class CRM_Utils_Address_USPS {
 
     $address2 = str_replace(',', '', $values['street_address']);
 
-    $XMLQuery = '<AddressValidateRequest USERID="' . $userID . '"><Address ID="0"><Address1>' . CRM_Utils_Array::value('supplemental_address_1', $values, '') . '</Address1><Address2>' . $address2 . '</Address2><City>' . $values['city'] . '</City><State>' . $values['state_province'] . '</State><Zip5>' . $values['postal_code'] . '</Zip5><Zip4>' . CRM_Utils_Array::value('postal_code_suffix', $values, '') . '</Zip4></Address></AddressValidateRequest>';
+    $XMLQuery = '<AddressValidateRequest USERID="' . $userID . '"><Address ID="0"><Address1>' . ($values['supplemental_address_1'] ?? '') . '</Address1><Address2>' . $address2 . '</Address2><City>' . $values['city'] . '</City><State>' . $values['state_province'] . '</State><Zip5>' . $values['postal_code'] . '</Zip5><Zip4>' . ($values['postal_code_suffix'] ?? '') . '</Zip4></Address></AddressValidateRequest>';
 
     require_once 'HTTP/Request.php';
     $request = new HTTP_Request();

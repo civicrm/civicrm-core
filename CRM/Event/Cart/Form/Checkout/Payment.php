@@ -35,10 +35,10 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       'id' => $participant->id,
       'event_id' => $event->id,
       'register_date' => $registerDate,
-      'source' => CRM_Utils_Array::value('participant_source', $params, $this->description),
+      'source' => $params['participant_source'] ?? $this->description,
       //'fee_level'     => $participant->fee_level,
       'is_pay_later' => $this->is_pay_later,
-      'fee_amount' => CRM_Utils_Array::value('amount', $params, 0),
+      'fee_amount' => $params['amount'] ?? 0,
       //XXX why is this a ref to participant and not contact?:
       //'registered_by_id' => $this->payer_contact_id,
       'fee_currency' => CRM_Utils_Array::value('currencyID', $params),
@@ -47,7 +47,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     if ($participant->must_wait) {
       $participant_status = 'On waitlist';
     }
-    elseif (CRM_Utils_Array::value('is_pay_later', $params, FALSE)) {
+    elseif (!empty($params['is_pay_later'])) {
       $participant_status = 'Pending from pay later';
     }
     else {
@@ -445,7 +445,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    */
   public function preProcess() {
     $params = $this->_submitValues;
-    $this->is_pay_later = CRM_Utils_Array::value('is_pay_later', $params, FALSE) && !CRM_Utils_Array::value('payment_completed', $params);
+    $this->is_pay_later = !empty($params['is_pay_later']) && empty($params['payment_completed']);
 
     parent::preProcess();
   }
@@ -664,7 +664,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
       'trxn_id' => "{$params['trxn_id']}-{$this->sub_trxn_index}",
       'currency' => CRM_Utils_Array::value('currencyID', $params),
       'source' => $event->title,
-      'is_pay_later' => CRM_Utils_Array::value('is_pay_later', $params, 0),
+      'is_pay_later' => $params['is_pay_later'] ?? 0,
       'contribution_status_id' => $params['contribution_status_id'],
       'payment_instrument_id' => $params['payment_instrument_id'],
       'check_number' => CRM_Utils_Array::value('check_number', $params),

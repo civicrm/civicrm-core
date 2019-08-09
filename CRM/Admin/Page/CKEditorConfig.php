@@ -69,7 +69,7 @@ class CRM_Admin_Page_CKEditorConfig extends CRM_Core_Page {
    * @return string
    */
   public function run() {
-    $this->preset = CRM_Utils_Array::value('preset', $_REQUEST, 'default');
+    $this->preset = $_REQUEST['preset'] ?? 'default';
 
     // If the form was submitted, take appropriate action.
     if (!empty($_POST['revert'])) {

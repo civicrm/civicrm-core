@@ -214,7 +214,7 @@ class CRM_Contact_Selector extends CRM_Core_Selector_Base implements CRM_Core_Se
     }
 
     $displayRelationshipType = CRM_Utils_Array::value('display_relationship_type', $this->_formValues);
-    $operator = CRM_Utils_Array::value('operator', $this->_formValues, 'AND');
+    $operator = $this->_formValues['operator'] ?? 'AND';
 
     // rectify params to what proximity search expects if there is a value for prox_distance
     // CRM-7021

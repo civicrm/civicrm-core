@@ -43,7 +43,7 @@ function civicrm_api3($entity, $action, $params = []) {
   $params['version'] = 3;
   $result = \Civi::service('civi_api_kernel')->runSafe($entity, $action, $params);
   if (is_array($result) && !empty($result['is_error'])) {
-    throw new CiviCRM_API3_Exception($result['error_message'], CRM_Utils_Array::value('error_code', $result, 'undefined'), $result);
+    throw new CiviCRM_API3_Exception($result['error_message'], $result['error_code'] ?? 'undefined', $result);
   }
   return $result;
 }

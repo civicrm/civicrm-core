@@ -490,7 +490,7 @@ function getDBFields($daoName) {
       $_fieldsRetrieved[$daoName][$value['name']] = [
         'uniqueName' => $key,
         'type' => $value['type'],
-        'title' => CRM_Utils_Array::value('title', $value, NULL),
+        'title' => $value['title'] ?? NULL,
       ];
     }
   }

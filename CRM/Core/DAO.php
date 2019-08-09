@@ -248,7 +248,7 @@ class CRM_Core_DAO extends DB_DataObject {
     }
     else {
       //if it is required we need to generate the dependency object first
-      $depObject = CRM_Core_DAO::createTestObject($FKClassName, CRM_Utils_Array::value($dbName, $params, 1));
+      $depObject = CRM_Core_DAO::createTestObject($FKClassName, $params[$dbName] ?? 1);
       $this->$dbName = $depObject->id;
     }
   }
@@ -2254,7 +2254,7 @@ SELECT contact_id
           $className::getTableName(),
           $field['name'],
           'civicrm_option_value',
-          CRM_Utils_Array::value('keyColumn', $field['pseudoconstant'], 'value'),
+          $field['pseudoconstant']['keyColumn'] ?? 'value',
           $field['pseudoconstant']['optionGroupName']
         );
       }

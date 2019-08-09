@@ -441,7 +441,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           continue;
         }
         foreach ($pField['options'] as $opId => $opValues) {
-          $optionsMembershipTypes[$opId] = CRM_Utils_Array::value('membership_type_id', $opValues, 0);
+          $optionsMembershipTypes[$opId] = $opValues['membership_type_id'] ?? 0;
         }
       }
 
@@ -1223,7 +1223,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     $calcDates = [];
     foreach ($this->_memTypeSelected as $memType) {
       if (empty($memTypeNumTerms)) {
-        $memTypeNumTerms = CRM_Utils_Array::value($memType, $termsByType, 1);
+        $memTypeNumTerms = $termsByType[$memType] ?? 1;
       }
       $calcDates[$memType] = CRM_Member_BAO_MembershipType::getDatesForMembershipType($memType,
         $joinDate, $startDate, $endDate, $memTypeNumTerms
@@ -1329,7 +1329,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     }
     $createdMemberships = [];
     if ($this->_mode) {
-      $params['total_amount'] = CRM_Utils_Array::value('total_amount', $formValues, 0);
+      $params['total_amount'] = $formValues['total_amount'] ?? 0;
 
       //CRM-20264 : Store CC type and number (last 4 digit) during backoffice or online payment
       $params['card_type_id'] = CRM_Utils_Array::value('card_type_id', $this->_params);

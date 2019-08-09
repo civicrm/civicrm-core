@@ -300,7 +300,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
       return NULL;
     }
 
-    $key = CRM_Utils_Array::value('qfKey', $_REQUEST, NULL);
+    $key = $_REQUEST['qfKey'] ?? NULL;
     if (!$key && $_SERVER['REQUEST_METHOD'] === 'GET') {
       $key = CRM_Core_Key::get($name, $addSequence);
     }
@@ -432,7 +432,7 @@ class CRM_Core_Controller extends HTML_QuickForm_Controller {
   public function addPages(&$stateMachine, $action = CRM_Core_Action::NONE) {
     $pages = $stateMachine->getPages();
     foreach ($pages as $name => $value) {
-      $className = CRM_Utils_Array::value('className', $value, $name);
+      $className = $value['className'] ?? $name;
       $title = CRM_Utils_Array::value('title', $value);
       $options = CRM_Utils_Array::value('options', $value);
       $stateName = CRM_Utils_String::getClassName($className);

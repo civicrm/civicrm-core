@@ -58,7 +58,7 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     $addresses = [];
     $contactId = NULL;
 
-    $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
+    $updateBlankLocInfo = $params['updateBlankLocInfo'] ?? FALSE;
     if (!$entity) {
       $contactId = $params['contact_id'];
       //get all the addresses for this contact

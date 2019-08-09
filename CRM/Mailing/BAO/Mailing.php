@@ -1482,7 +1482,7 @@ ORDER BY   civicrm_email.is_bulkmail DESC
       $mailing->id = $id;
       $mailing->find(TRUE);
     }
-    $mailing->domain_id = CRM_Utils_Array::value('domain_id', $params, CRM_Core_Config::domainID());
+    $mailing->domain_id = $params['domain_id'] ?? CRM_Core_Config::domainID();
 
     if (((!$id && empty($params['replyto_email'])) || !isset($params['replyto_email'])) &&
       isset($params['from_email'])
@@ -2907,9 +2907,9 @@ ORDER BY civicrm_mailing.name";
       $mailing['start_date'] = CRM_Utils_Date::customFormat($values['start_date']);
       //CRM-12814
       $mailing['openstats'] = "Opens: " .
-        CRM_Utils_Array::value($values['mailing_id'], $openCounts, 0) .
+        $openCounts[$values['mailing_id']] ?? 0 .
         "<br />Clicks: " .
-        CRM_Utils_Array::value($values['mailing_id'], $clickCounts, 0);
+        $clickCounts[$values['mailing_id']] ?? 0;
 
       $actionLinks = [
         CRM_Core_Action::VIEW => [

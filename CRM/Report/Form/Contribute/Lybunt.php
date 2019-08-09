@@ -451,7 +451,7 @@ class CRM_Report_Form_Contribute_Lybunt extends CRM_Report_Form {
    * @return string
    */
   public function getYearFilterType() {
-    return CRM_Utils_Array::value('yid_op', $this->_params, 'calendar');
+    return $this->_params['yid_op'] ?? 'calendar';
   }
 
   /**

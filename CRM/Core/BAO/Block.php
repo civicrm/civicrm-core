@@ -241,8 +241,8 @@ class CRM_Core_BAO_Block {
       $contactId = $params['contact_id'];
     }
 
-    $updateBlankLocInfo = CRM_Utils_Array::value('updateBlankLocInfo', $params, FALSE);
-    $isIdSet = CRM_Utils_Array::value('isIdSet', $params[$blockName], FALSE);
+    $updateBlankLocInfo = $params['updateBlankLocInfo'] ?? FALSE;
+    $isIdSet = $params[$blockName]['isIdSet'] ?? FALSE;
 
     //get existing block ids.
     $blockIds = self::getBlockIds($blockName, $contactId, $entityElements);

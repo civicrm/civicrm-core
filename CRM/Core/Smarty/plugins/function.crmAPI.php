@@ -45,8 +45,8 @@ function smarty_function_crmAPI($params, &$smarty) {
   }
   $errorScope = CRM_Core_TemporaryErrorScope::create(['CRM_Utils_REST', 'fatal']);
   $entity = $params['entity'];
-  $action = CRM_Utils_Array::value('action', $params, 'get');
-  $params['sequential'] = CRM_Utils_Array::value('sequential', $params, 1);
+  $action = $params['action'] ?? 'get';
+  $params['sequential'] = $params['sequential'] ?? 1;
   $var = CRM_Utils_Array::value('var', $params);
   CRM_Utils_Array::remove($params, 'entity', 'action', 'var');
   $params['version'] = 3;

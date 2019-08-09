@@ -93,7 +93,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
     $wordReplacement->id = $id;
     $wordReplacement->copyValues($params);
     $wordReplacement->save();
-    if (!isset($params['options']) || CRM_Utils_Array::value('wp-rebuild', $params['options'], TRUE)) {
+    if (!isset($params['options']) || $params['options']['wp-rebuild'] ?? TRUE) {
       self::rebuild();
     }
     return $wordReplacement;
@@ -113,7 +113,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
     $wordReplacement = new CRM_Core_DAO_WordReplacement();
     $wordReplacement->copyValues($params);
     $wordReplacement->save();
-    if (!isset($params['options']) || CRM_Utils_Array::value('wp-rebuild', $params['options'], TRUE)) {
+    if (!isset($params['options']) || $params['options']['wp-rebuild'] ?? TRUE) {
       self::rebuild();
     }
     return $wordReplacement;
@@ -131,7 +131,7 @@ class CRM_Core_BAO_WordReplacement extends CRM_Core_DAO_WordReplacement {
     $dao = new CRM_Core_DAO_WordReplacement();
     $dao->id = $id;
     $dao->delete();
-    if (!isset($params['options']) || CRM_Utils_Array::value('wp-rebuild', $params['options'], TRUE)) {
+    if (!isset($params['options']) || $params['options']['wp-rebuild'] ?? TRUE) {
       self::rebuild();
     }
     return $dao;

@@ -197,7 +197,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       'id' => $recurID,
       'return' => ['payment_processor_id'],
     ]);
-    return (int) CRM_Utils_Array::value('payment_processor_id', $recur, 0);
+    return (int) $recur['payment_processor_id'] ?? 0;
   }
 
   /**
@@ -306,7 +306,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
           'source_contact_id' => $dao->contact_id,
           'source_record_id' => $dao->recur_id,
           'activity_type_id' => 'Cancel Recurring Contribution',
-          'subject' => CRM_Utils_Array::value('subject', $activityParams, ts('Recurring contribution cancelled')),
+          'subject' => $activityParams['subject'] ?? ts('Recurring contribution cancelled'),
           'details' => $details,
           'status_id' => 'Completed',
         ];

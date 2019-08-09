@@ -197,7 +197,7 @@ class WhitelistRule {
         // Kind'a silly we need to (re(re))parse here for each rule; would be more
         // performant if pre-parsed by Request::create().
         $options = _civicrm_api3_get_options_from_params($apiRequest['params'], TRUE, $apiRequest['entity'], 'get');
-        $return = \CRM_Utils_Array::value('return', $options, []);
+        $return = $options['return'] ?? [];
         $activatedFields = array_merge($activatedFields, array_keys($return));
       }
 

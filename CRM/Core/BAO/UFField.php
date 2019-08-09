@@ -98,7 +98,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     }
 
     //@todo why is this even optional? Surely weight should just be 'managed' ??
-    if (CRM_Utils_Array::value('option.autoweight', $params, TRUE)) {
+    if ($params['option.autoweight'] ?? TRUE) {
       $params['weight'] = CRM_Core_BAO_UFField::autoWeight($params);
     }
 
@@ -196,7 +196,7 @@ class CRM_Core_BAO_UFField extends CRM_Core_DAO_UFField {
     $ufField->field_type = CRM_Utils_Array::value('field_type', $params);
     $ufField->field_name = CRM_Utils_Array::value('field_name', $params);
     $ufField->website_type_id = CRM_Utils_Array::value('website_type_id', $params);
-    if (is_null(CRM_Utils_Array::value('location_type_id', $params, ''))) {
+    if (array_key_exists('location_type_id', $params) && is_null($params['location_type_id'])) {
       // primary location type have NULL value in DB
       $ufField->whereAdd("location_type_id IS NULL");
     }
@@ -273,7 +273,7 @@ WHERE cf.id IN (" . $customFieldIds . ") AND is_multiple = 1 LIMIT 0,1";
       $oldWeight = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFField', !empty($params['id']) ? $params['id'] : $params['field_id'], 'weight', 'id');
     }
     $fieldValues = ['uf_group_id' => !empty($params['uf_group_id']) ? $params['uf_group_id'] : $params['group_id']];
-    return CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_UFField', $oldWeight, CRM_Utils_Array::value('weight', $params, 0), $fieldValues);
+    return CRM_Utils_Weight::updateOtherWeights('CRM_Core_DAO_UFField', $oldWeight, $params['weight'] ?? 0, $fieldValues);
   }
 
   /**

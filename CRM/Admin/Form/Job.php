@@ -201,7 +201,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $dao->api_entity = $values['api_entity'];
     $dao->api_action = $values['api_action'];
     $dao->description = $values['description'];
-    $dao->is_active = CRM_Utils_Array::value('is_active', $values, 0);
+    $dao->is_active = $values['is_active'] ?? 0;
 
     // CRM-17686
     $ts = strtotime($values['scheduled_run_date']);

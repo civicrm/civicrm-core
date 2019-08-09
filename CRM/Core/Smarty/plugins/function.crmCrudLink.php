@@ -60,7 +60,7 @@ function smarty_function_crmCrudLink($params, &$smarty) {
   if ($link) {
     return sprintf('<a href="%s">%s</a>',
       htmlspecialchars($link['url']),
-      htmlspecialchars(CRM_Utils_Array::value('title', $params, $link['title']))
+      htmlspecialchars($params['title'] ?? $link['title'])
     );
   }
   else {

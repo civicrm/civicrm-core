@@ -378,7 +378,7 @@ function civicrm_api3_profile_apply($params) {
     CRM_Utils_Array::value('contact_id', $params),
     $params['profile_id'],
     CRM_Utils_Array::value('contact_type', $params),
-    CRM_Utils_Array::value('skip_custom', $params, FALSE)
+    $params['skip_custom'] ?? FALSE
   );
 
   if (empty($data)) {

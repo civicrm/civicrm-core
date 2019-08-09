@@ -136,7 +136,7 @@ function civicrm_api3_custom_value_get($params) {
 
   $getParams = [
     'entityID' => $params['entity_id'],
-    'entityType' => CRM_Utils_Array::value('entity_table', $params, ''),
+    'entityType' => $params['entity_table'] ?? '',
   ];
   if (strstr($getParams['entityType'], 'civicrm_')) {
     $getParams['entityType'] = ucfirst(substr($getParams['entityType'], 8));
@@ -356,7 +356,7 @@ function civicrm_api3_custom_value_gettree($params) {
       }
     }
   }
-  $tree = CRM_Core_BAO_CustomGroup::getTree($treeParams['entityType'], $toReturn, $params['entity_id'], NULL, $treeParams['subTypes'], $treeParams['subName'], TRUE, NULL, FALSE, CRM_Utils_Array::value('check_permissions', $params, TRUE));
+  $tree = CRM_Core_BAO_CustomGroup::getTree($treeParams['entityType'], $toReturn, $params['entity_id'], NULL, $treeParams['subTypes'], $treeParams['subName'], TRUE, NULL, FALSE, $params['check_permissions'] ?? TRUE);
   unset($tree['info']);
   $result = [];
   foreach ($tree as $group) {

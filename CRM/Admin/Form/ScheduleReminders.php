@@ -320,7 +320,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $errors['entity'] = ts('Please select appropriate value');
     }
 
-    $mode = CRM_Utils_Array::value('mode', $fields, FALSE);
+    $mode = $fields['mode'] ?? FALSE;
     if (!empty($fields['is_active']) &&
       CRM_Utils_System::isNull($fields['subject']) && (!$mode || $mode != 'SMS')
     ) {
@@ -508,7 +508,7 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
       $params[$key] = CRM_Utils_Array::value($key, $values);
     }
 
-    $params['is_repeat'] = CRM_Utils_Array::value('is_repeat', $values, 0);
+    $params['is_repeat'] = $values['is_repeat'] ?? 0;
 
     $moreKeys = [
       'start_action_offset',
@@ -569,13 +569,13 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
         $params['limit_to'] = 1;
       }
 
-      $entity_value = CRM_Utils_Array::value(1, $values['entity'], []);
-      $entity_status = CRM_Utils_Array::value(2, $values['entity'], []);
+      $entity_value = $values['entity'][1] ?? [];
+      $entity_status = $values['entity'][2] ?? [];
       $params['entity_value'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $entity_value);
       $params['entity_status'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $entity_status);
     }
 
-    $params['is_active'] = CRM_Utils_Array::value('is_active', $values, 0);
+    $params['is_active'] = $values['is_active'] ?? 0;
 
     if (CRM_Utils_Array::value('is_repeat', $values) == 0) {
       $params['repetition_frequency_unit'] = 'null';
@@ -587,9 +587,9 @@ class CRM_Admin_Form_ScheduleReminders extends CRM_Admin_Form {
     }
 
     // multilingual options
-    $params['filter_contact_language'] = CRM_Utils_Array::value('filter_contact_language', $values, []);
+    $params['filter_contact_language'] = $values['filter_contact_language'] ?? [];
     $params['filter_contact_language'] = implode(CRM_Core_DAO::VALUE_SEPARATOR, $params['filter_contact_language']);
-    $params['communication_language'] = CRM_Utils_Array::value('communication_language', $values, NULL);
+    $params['communication_language'] = $values['communication_language'] ?? NULL;
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       $params['id'] = $this->_id;

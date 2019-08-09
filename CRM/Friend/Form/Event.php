@@ -121,7 +121,7 @@ class CRM_Friend_Form_Event extends CRM_Event_Form_ManageEvent {
     $formValues['entity_table'] = 'civicrm_event';
     $formValues['entity_id'] = $this->_id;
     $formValues['title'] = $formValues['tf_title'];
-    $formValues['is_active'] = CRM_Utils_Array::value('tf_is_active', $formValues, FALSE);
+    $formValues['is_active'] = $formValues['tf_is_active'] ?? FALSE;
     $formValues['thankyou_title'] = CRM_Utils_Array::value('tf_thankyou_title', $formValues);
     $formValues['thankyou_text'] = CRM_Utils_Array::value('tf_thankyou_text', $formValues);
 

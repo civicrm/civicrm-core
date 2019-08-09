@@ -108,7 +108,7 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
     $params = $this->controller->exportValues($this->_name);
 
     $params['id'] = $this->_id;
-    $params['is_email_receipt'] = CRM_Utils_Array::value('is_email_receipt', $params, FALSE);
+    $params['is_email_receipt'] = $params['is_email_receipt'] ?? FALSE;
     if (!$params['is_email_receipt']) {
       $params['receipt_from_name'] = NULL;
       $params['receipt_from_email'] = NULL;

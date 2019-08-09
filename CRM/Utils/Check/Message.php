@@ -274,7 +274,7 @@ class CRM_Utils_Check_Message {
     ];
     // Check if there's a StatusPreference matching this name/domain.
     $statusPreference = civicrm_api3('StatusPreference', 'get', $statusPreferenceParams);
-    $prefs = CRM_Utils_Array::value('values', $statusPreference, []);
+    $prefs = $statusPreference['values'] ?? [];
     if ($prefs) {
       // If so, compare severity to StatusPreference->severity.
       if ($this->level <= $prefs[0]['ignore_severity']) {

@@ -54,7 +54,7 @@ function smarty_block_crmButton($params, $text, &$smarty) {
   // Always add class 'button' - fixme probably should be crm-button
   $params['class'] = empty($params['class']) ? 'button' : 'button ' . $params['class'];
   // Any FA icon works
-  $icon = CRM_Utils_Array::value('icon', $params, 'pencil');
+  $icon = $params['icon'] ?? 'pencil';
   // All other params are treated as html attributes
   CRM_Utils_Array::remove($params, 'icon', 'p', 'q', 'a', 'f', 'h', 'fb', 'fe');
   $attributes = CRM_Utils_String::htmlAttributes($params);

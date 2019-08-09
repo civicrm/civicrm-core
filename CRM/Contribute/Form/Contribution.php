@@ -576,7 +576,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $paneNames[ts('Premium Information')] = 'Premium';
     }
 
-    $this->payment_instrument_id = CRM_Utils_Array::value('payment_instrument_id', $defaults, $this->getDefaultPaymentInstrumentId());
+    $this->payment_instrument_id = $defaults['payment_instrument_id'] ?? $this->getDefaultPaymentInstrumentId();
     if (CRM_Core_Payment_Form::buildPaymentForm($this, $this->_paymentProcessor, FALSE, TRUE, $this->payment_instrument_id) == TRUE) {
       if (!empty($this->_recurPaymentProcessors)) {
         $buildRecurBlock = TRUE;
@@ -1518,7 +1518,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $submittedValues['total_amount'] = CRM_Utils_Array::value('total_amount', $this->_values);
       // Avoid tax amount deduction on edit form and keep it original, because this will lead to error described in CRM-20676
       if (!$this->_id) {
-        $submittedValues['total_amount'] -= CRM_Utils_Array::value('tax_amount', $this->_values, 0);
+        $submittedValues['total_amount'] -= $this->_values['tax_amount'] ?? 0;
       }
     }
     $this->assign('lineItem', !empty($lineItem) && !$isQuickConfig ? $lineItem : FALSE);

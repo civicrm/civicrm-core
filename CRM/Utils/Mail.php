@@ -216,7 +216,7 @@ class CRM_Utils_Mail {
     $headers['Content-Type'] = $htmlMessage ? 'multipart/mixed; charset=utf-8' : 'text/plain; charset=utf-8';
     $headers['Content-Disposition'] = 'inline';
     $headers['Content-Transfer-Encoding'] = '8bit';
-    $headers['Return-Path'] = CRM_Utils_Array::value('returnPath', $params, $defaultReturnPath);
+    $headers['Return-Path'] = $params['returnPath'] ?? $defaultReturnPath;
 
     // CRM-11295: Omit reply-to headers if empty; this avoids issues with overzealous mailservers
     $replyTo = CRM_Utils_Array::value('replyTo', $params, CRM_Utils_Array::value('from', $params));

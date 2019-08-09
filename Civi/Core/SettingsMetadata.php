@@ -170,7 +170,7 @@ class SettingsMetadata {
         $spec['options'] = Resolver::singleton()->call($spec['pseudoconstant']['callback'], []);
       }
       elseif (!empty($spec['pseudoconstant']['optionGroupName'])) {
-        $keyColumn = \CRM_Utils_Array::value('keyColumn', $spec['pseudoconstant'], 'value');
+        $keyColumn = $spec['pseudoconstant']['keyColumn'] ?? 'value';
         $spec['options'] = \CRM_Core_OptionGroup::values($spec['pseudoconstant']['optionGroupName'], FALSE, FALSE, TRUE, NULL, 'label', TRUE, FALSE, $keyColumn);
       }
     }

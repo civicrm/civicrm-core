@@ -413,7 +413,7 @@ INNER JOIN   civicrm_contact contact ON ( contact.id = contrib.contact_id )
     }
 
     if (($type == 'paypal') && (!isset($transaction['net_amount']))) {
-      $transaction['net_amount'] = $transaction['total_amount'] - CRM_Utils_Array::value('fee_amount', $transaction, 0);
+      $transaction['net_amount'] = $transaction['total_amount'] - ($transaction['fee_amount'] ?? 0);
     }
 
     if (!isset($transaction['invoice_id'])) {
@@ -649,7 +649,7 @@ LIMIT 1
    */
   public static function overrideDefaultCurrency($params) {
     $config = CRM_Core_Config::singleton();
-    $config->defaultCurrency = CRM_Utils_Array::value('currency', $params, $config->defaultCurrency);
+    $config->defaultCurrency = $params['currency'] ?? $config->defaultCurrency;
   }
 
 }

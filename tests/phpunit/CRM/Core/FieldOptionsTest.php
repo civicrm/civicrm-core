@@ -95,7 +95,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
       foreach ($baoFields as $field) {
         $message = "BAO name: '{$baoName}', field: '{$field['fieldName']}'";
 
-        $props = CRM_Utils_Array::value('props', $field, []);
+        $props = $field['props'] ?? [];
         $optionValues = $baoName::buildOptions($field['fieldName'], 'create', $props);
         $this->assertNotEmpty($optionValues, $message);
 
@@ -108,7 +108,7 @@ class CRM_Core_FieldOptionsTest extends CiviUnitTestCase {
         }
 
         // Ensure count of optionValues is not extraordinarily high.
-        $max = CRM_Utils_Array::value('max', $field, 10);
+        $max = $field['max'] ?? 10;
         $this->assertLessThanOrEqual($max, count($optionValues), $message);
       }
     }

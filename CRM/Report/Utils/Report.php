@@ -411,11 +411,11 @@ WHERE  inst.report_id = %1";
 
     // hack for now, CRM-8358
     $_REQUEST['instanceId'] = $instanceId;
-    $_REQUEST['sendmail'] = CRM_Utils_Array::value('sendmail', $params, 1);
+    $_REQUEST['sendmail'] = $params['sendmail'] ?? 1;
 
     // if cron is run from terminal --output is reserved, and therefore we would provide another name 'format'
-    $_REQUEST['output'] = CRM_Utils_Array::value('format', $params, CRM_Utils_Array::value('output', $params, 'pdf'));
-    $_REQUEST['reset'] = CRM_Utils_Array::value('reset', $params, 1);
+    $_REQUEST['output'] = $params['format'] ?? $params['output'] ?? 'pdf';
+    $_REQUEST['reset'] = $params['reset'] ?? 1;
 
     $optionVal = self::getValueFromUrl($instanceId);
     $messages = ["Report Mail Triggered..."];

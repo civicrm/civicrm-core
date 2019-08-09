@@ -114,7 +114,7 @@ class CRM_Utils_Money {
     $replacements = [
       '%a' => $amount,
       '%C' => $currency,
-      '%c' => CRM_Utils_Array::value($currency, self::$_currencySymbols, $currency),
+      '%c' => self::$_currencySymbols[$currency] ?? $currency,
     ];
     return strtr($format, $replacements);
   }

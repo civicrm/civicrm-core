@@ -67,7 +67,7 @@ class CRM_Upgrade_Page_Upgrade extends CRM_Core_Page {
       CRM_Utils_System::url('civicrm/dashboard', 'reset=1')
     );
 
-    $action = CRM_Utils_Array::value('action', $_REQUEST, 'intro');
+    $action = $_REQUEST['action'] ?? 'intro';
     switch ($action) {
       case 'intro':
         $this->runIntro();

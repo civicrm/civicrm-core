@@ -149,7 +149,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    */
   public function processStandardTimeline($activitySetXML, &$params) {
     if ('Change Case Type' == CRM_Utils_Array::value('activityTypeName', $params)
-      && CRM_Utils_Array::value('resetTimeline', $params, TRUE)
+      && !empty($params['resetTimeline'])
     ) {
       // delete all existing activities which are non-empty
       $this->deleteEmptyActivity($params);
