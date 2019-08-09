@@ -1162,6 +1162,26 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $lineItem = [$this->_priceSetId => []];
 
+    // BEGIN Fix for dev/core/issues/860
+    // Prepare $feeBlock for call to buildAmount hook - code based on
+    // CRM_Price_BAO_PriceSet::buildPriceSet().
+    $feeBlock = &$this->_priceSet['fields'];
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      foreach ($feeBlock as $key => $value) {
+        foreach ($value['options'] as $k => $options) {
+          if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
+            unset($feeBlock[$key]['options'][$k]);
+          }
+        }
+        if (empty($feeBlock[$key]['options'])) {
+          unset($feeBlock[$key]);
+        }
+      }
+    }
+    // Call buildAmount hook.
+    CRM_Utils_Hook::buildAmount('membership', $this, $feeBlock);
+    // END Fix for dev/core/issues/860
+
     CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
       $formValues, $lineItem[$this->_priceSetId], NULL, $this->_priceSetId);
 
