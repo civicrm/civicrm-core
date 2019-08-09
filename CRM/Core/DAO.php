@@ -1512,7 +1512,7 @@ FROM   civicrm_domain
    * @return string
    * @throws Exception
    */
-  public static function composeQuery($query, $params, $abort = TRUE) {
+  public static function composeQuery($query, $params = [], $abort = TRUE) {
     $tr = [];
     foreach ($params as $key => $item) {
       if (is_numeric($key)) {
