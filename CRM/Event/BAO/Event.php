@@ -1054,7 +1054,7 @@ WHERE civicrm_event.is_active = 1
    * @return array|null
    * @throws \CiviCRM_API3_Exception
    */
-  public static function sendMail($contactID, &$values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
+  public static function sendMail($contactID, $values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
 
     $template = CRM_Core_Smarty::singleton();
     $gIds = [
