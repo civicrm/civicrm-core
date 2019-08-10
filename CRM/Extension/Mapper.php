@@ -334,7 +334,12 @@ class CRM_Extension_Mapper {
     foreach ($this->getModules() as $module) {
       /** @var $module CRM_Core_Module */
       if ($module->is_active) {
-        $urls[$module->name] = $this->keyToUrl($module->name);
+        try {
+          $urls[$module->name] = $this->keyToUrl($module->name);
+        }
+        catch (Exception $ex) {
+          // Do nothing, we're being called by AJAX.
+        }
       }
     }
     return $urls;
