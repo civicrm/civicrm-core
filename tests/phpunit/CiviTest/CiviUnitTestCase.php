@@ -1015,6 +1015,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
       'is_monetary' => 0,
       'is_active' => 1,
       'is_show_location' => 0,
+      'is_email_confirm' => 1,
     ), $params);
 
     return $this->callAPISuccess('Event', 'create', $params);

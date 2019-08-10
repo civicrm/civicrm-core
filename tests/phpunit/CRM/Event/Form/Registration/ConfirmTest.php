@@ -22,6 +22,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    */
   public function testSubmit() {
     $event = $this->eventCreate();
+    $mut = new CiviMailUtils($this, TRUE);
     CRM_Event_Form_Registration_Confirm::testSubmit([
       'id' => $event['id'],
       'contributeMode' => 'direct',
@@ -77,7 +78,15 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
         ],
       ],
     ]);
-    $this->callAPISuccessGetSingle('Participant', []);
+    $participant = $this->callAPISuccessGetSingle('Participant', []);
+    $mut->checkMailLog([
+      'Dear Logged In,  Thank you for your participation.  This letter is a confirmation that your registration has been received and your status has been updated to Registered.',
+    ]);
+    $mut->stop();
+    $mut->clearMessages();
+    $tplVars = CRM_Core_Smarty::singleton()->get_template_vars();
+    $this->assertEquals($participant['id'], $tplVars['participantID']);
+
   }
 
   /**

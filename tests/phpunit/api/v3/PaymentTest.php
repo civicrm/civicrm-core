@@ -167,7 +167,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $payment = $this->callAPISuccess('payment', 'create', $params);
 
     $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
-    $mut->assertSubjects(['Payment Receipt - Annual CiviCRM meet']);
+    $mut->assertSubjects(['Payment Receipt - Annual CiviCRM meet', 'Registration Confirmation - Annual CiviCRM meet']);
     $mut->checkMailLog([
       'Dear Anthony,',
       'A payment has been received.',
