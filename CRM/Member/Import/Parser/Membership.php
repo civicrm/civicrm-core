@@ -29,12 +29,7 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
  */
-
-
-require_once 'api/api.php';
 
 /**
  * class to parse membership csv files
@@ -43,8 +38,6 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
 
   protected $_mapperKeys;
 
-  private $_contactIdIndex;
-  private $_totalAmountIndex;
   private $_membershipTypeIndex;
   private $_membershipStatusIndex;
 
@@ -93,16 +86,12 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
     $this->setActiveFields($this->_mapperKeys);
 
     // FIXME: we should do this in one place together with Form/MapField.php
-    $this->_contactIdIndex = -1;
     $this->_membershipTypeIndex = -1;
     $this->_membershipStatusIndex = -1;
 
     $index = 0;
     foreach ($this->_mapperKeys as $key) {
       switch ($key) {
-        case 'membership_contact_id':
-          $this->_contactIdIndex = $index;
-          break;
 
         case 'membership_type_id':
           $this->_membershipTypeIndex = $index;
@@ -425,7 +414,7 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
       $endDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('end_date', $formatted), '%Y-%m-%d');
       $joinDate = CRM_Utils_Date::customFormat(CRM_Utils_Array::value('join_date', $formatted), '%Y-%m-%d');
 
-      if ($this->_contactIdIndex < 0) {
+      if (!$this->isContactIDColumnPresent()) {
         $error = $this->checkContactDuplicate($formatValues);
 
         if (CRM_Core_Error::isAPIError($error, CRM_Core_ERROR::DUPLICATE_CONTACT)) {
@@ -747,6 +736,15 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
     }
 
     return NULL;
+  }
+
+  /**
+   * Is the contact ID mapped.
+   *
+   * @return bool
+   */
+  protected function isContactIDColumnPresent(): bool {
+    return in_array('membership_contact_id', $this->_mapperKeys, TRUE);
   }
 
 }
