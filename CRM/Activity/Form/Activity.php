@@ -483,6 +483,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     }
 
     // when custom data is included in this page
+    $this->assign('cid', $this->_currentlyViewedContactId);
     if (!empty($_POST['hidden_custom'])) {
       // We need to set it in the session for the code below to work.
       // CRM-3014
@@ -666,7 +667,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $element = &$this->add('select', 'activity_type_id', ts('Activity Type'),
       ['' => '- ' . ts('select') . ' -'] + $this->_fields['followup_activity_type_id']['attributes'],
       FALSE, [
-        'onchange' => "CRM.buildCustomData( 'Activity', this.value );",
+        'onchange' => "CRM.buildCustomData( 'Activity', this.value, false, false, false, false, false, false, {$this->_currentlyViewedContactId});",
         'class' => 'crm-select2 required',
       ]
     );
