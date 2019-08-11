@@ -205,16 +205,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     else {
       $savedMapping = $this->get('savedMapping');
 
-      list($mappingName, $mappingContactType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $mappingRelation, $mappingOperator, $mappingValue, $mappingWebsiteType) = CRM_Core_BAO_Mapping::getMappingFields($savedMapping, TRUE);
-
-      //get loaded Mapping Fields
-      $mappingName = CRM_Utils_Array::value(1, $mappingName);
-      $mappingLocation = CRM_Utils_Array::value(1, $mappingLocation);
-      $mappingPhoneType = CRM_Utils_Array::value(1, $mappingPhoneType);
-      $mappingImProvider = CRM_Utils_Array::value(1, $mappingImProvider);
-      $mappingRelation = CRM_Utils_Array::value(1, $mappingRelation);
-      $mappingWebsiteType = CRM_Utils_Array::value(1, $mappingWebsiteType);
-
       $this->assign('loadedMapping', $savedMapping);
       $this->set('loadedMapping', $savedMapping);
 
@@ -400,7 +390,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
 
       if ($this->get('savedMapping')) {
-        list($mappingName, $defaults, $js) = $this->loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
+        list($mappingName, $defaults, $js) = $this->loadSavedMapping($savedMapping, $i, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
@@ -849,13 +839,9 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
-   * @param $mappingName
+   * @param int $savedMapping
+   *   Id of the saved mapping
    * @param int $i
-   * @param $mappingRelation
-   * @param $mappingWebsiteType
-   * @param $mappingLocation
-   * @param $mappingPhoneType
-   * @param $mappingImProvider
    * @param array $defaults
    * @param string $formName
    * @param string $js
@@ -865,7 +851,15 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return array
    */
-  protected function loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns) {
+  protected function loadSavedMapping($savedMapping, $i, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns) {
+    list($mappingName, $mappingContactType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $mappingRelation, $mappingOperator, $mappingValue, $mappingWebsiteType) = CRM_Core_BAO_Mapping::getMappingFields($savedMapping, TRUE);
+    //get loaded Mapping Fields
+    $mappingName = CRM_Utils_Array::value(1, $mappingName);
+    $mappingLocation = CRM_Utils_Array::value(1, $mappingLocation);
+    $mappingPhoneType = CRM_Utils_Array::value(1, $mappingPhoneType);
+    $mappingImProvider = CRM_Utils_Array::value(1, $mappingImProvider);
+    $mappingRelation = CRM_Utils_Array::value(1, $mappingRelation);
+    $mappingWebsiteType = CRM_Utils_Array::value(1, $mappingWebsiteType);
     $jsSet = FALSE;
     if (isset($mappingName[$i])) {
       if ($mappingName[$i] != ts('- do not import -')) {
