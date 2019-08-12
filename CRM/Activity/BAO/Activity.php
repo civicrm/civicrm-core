@@ -902,6 +902,7 @@ class CRM_Activity_BAO_Activity extends CRM_Activity_DAO_Activity {
    */
   public function addSelectWhereClause() {
     $clauses = [];
+    // @todo - check if $permissedActivityTYpes === all activity types and do not add critieria if so.
     $permittedActivityTypeIDs = self::getPermittedActivityTypes();
     if (empty($permittedActivityTypeIDs)) {
       // This just prevents a mysql fail if they have no access - should be extremely edge case.
