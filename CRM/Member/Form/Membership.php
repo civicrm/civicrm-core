@@ -1165,7 +1165,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
       $formValues, $lineItem[$this->_priceSetId], NULL, $this->_priceSetId);
 
-    if (CRM_Utils_Array::value('tax_amount', $formValues)) {
+    if (!empty($formValues['tax_amount'])) {
       $params['tax_amount'] = $formValues['tax_amount'];
     }
     $params['total_amount'] = CRM_Utils_Array::value('amount', $formValues);
@@ -1739,7 +1739,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     // if selected membership doesn't match with earlier membership
       !in_array($this->_memType, $this->_memTypeSelected)
     ) {
-      if (CRM_Utils_Array::value('is_recur', $inputParams)) {
+      if (!empty($inputParams['is_recur'])) {
         CRM_Core_Session::setStatus(ts('Associated recurring contribution cannot be updated on membership type change.', ts('Error'), 'error'));
         return;
       }

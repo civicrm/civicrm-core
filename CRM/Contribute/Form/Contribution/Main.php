@@ -631,9 +631,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
   public static function formRule($fields, $files, $self) {
     $errors = [];
     $amount = self::computeAmount($fields, $self->_values);
-    if (CRM_Utils_Array::value('auto_renew', $fields) &&
-      CRM_Utils_Array::value('payment_processor_id', $fields) == 0
-    ) {
+    if (!empty($fields['auto_renew']) && empty($fields['payment_processor_id'])) {
       $errors['auto_renew'] = ts('You cannot have auto-renewal on if you are paying later.');
     }
 
@@ -876,15 +874,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     //CRM-16285 - Function to handle validation errors on form, for recurring contribution field.
     CRM_Contribute_BAO_ContributionRecur::validateRecurContribution($fields, $files, $self, $errors);
 
-    if (!empty($fields['is_recur']) &&
-      CRM_Utils_Array::value('payment_processor_id', $fields) == 0
-    ) {
+    if (!empty($fields['is_recur']) && empty($fields['payment_processor_id'])) {
       $errors['_qf_default'] = ts('You cannot set up a recurring contribution if you are not paying online by credit card.');
     }
 
     // validate PCP fields - if not anonymous, we need a nick name value
     if ($self->_pcpId && !empty($fields['pcp_display_in_roll']) &&
-      (CRM_Utils_Array::value('pcp_is_anonymous', $fields) == 0) &&
+      empty($fields['pcp_is_anonymous']) &&
       CRM_Utils_Array::value('pcp_roll_nickname', $fields) == ''
     ) {
       $errors['pcp_roll_nickname'] = ts('Please enter a name to include in the Honor Roll, or select \'contribute anonymously\'.');
@@ -915,13 +911,13 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           $errors['pledge_installments'] = ts('Please enter a valid number of pledge installments.');
         }
         else {
-          if (CRM_Utils_Array::value('pledge_installments', $fields) == NULL) {
+          if (!isset($fields['pledge_installments'])) {
             $errors['pledge_installments'] = ts('Pledge Installments is required field.');
           }
           elseif (CRM_Utils_Array::value('pledge_installments', $fields) == 1) {
             $errors['pledge_installments'] = ts('Pledges consist of multiple scheduled payments. Select one-time contribution if you want to make your gift in a single payment.');
           }
-          elseif (CRM_Utils_Array::value('pledge_installments', $fields) == 0) {
+          elseif (empty($fields['pledge_installments'])) {
             $errors['pledge_installments'] = ts('Pledge Installments field must be > 1.');
           }
         }
@@ -931,10 +927,10 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
           $errors['pledge_frequency_interval'] = ts('Please enter a valid Pledge Frequency Interval.');
         }
         else {
-          if (CRM_Utils_Array::value('pledge_frequency_interval', $fields) == NULL) {
+          if (!isset($fields['pledge_frequency_interval'])) {
             $errors['pledge_frequency_interval'] = ts('Pledge Frequency Interval. is required field.');
           }
-          elseif (CRM_Utils_Array::value('pledge_frequency_interval', $fields) == 0) {
+          elseif (empty($fields['pledge_frequency_interval'])) {
             $errors['pledge_frequency_interval'] = ts('Pledge frequency interval field must be > 0');
           }
         }
@@ -947,7 +943,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       return $errors;
     }
 
-    if (CRM_Utils_Array::value('payment_processor_id', $fields) === NULL) {
+    if (!isset($fields['payment_processor_id'])) {
       $errors['payment_processor_id'] = ts('Payment Method is a required field.');
     }
     else {
@@ -1192,7 +1188,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     if ($params['amount'] != 0 && (($this->_values['is_pay_later'] &&
           empty($this->_paymentProcessor) &&
           !array_key_exists('hidden_processor', $params)) ||
-        (CRM_Utils_Array::value('payment_processor_id', $params) == 0))
+        empty($params['payment_processor_id']))
     ) {
       $params['is_pay_later'] = 1;
     }

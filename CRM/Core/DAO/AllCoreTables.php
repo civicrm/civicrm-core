@@ -300,7 +300,7 @@ class CRM_Core_DAO_AllCoreTables {
       $fields = $dao::fields();
 
       foreach ($fields as $name => $field) {
-        if (CRM_Utils_Array::value('export', $field)) {
+        if (!empty($field['export'])) {
           if ($prefix) {
             $exports[$labelName] = & $fields[$name];
           }
@@ -340,7 +340,7 @@ class CRM_Core_DAO_AllCoreTables {
       $fields = $dao::fields();
 
       foreach ($fields as $name => $field) {
-        if (CRM_Utils_Array::value('import', $field)) {
+        if (!empty($field['import'])) {
           if ($prefix) {
             $imports[$labelName] = & $fields[$name];
           }

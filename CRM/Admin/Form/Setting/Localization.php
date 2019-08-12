@@ -220,7 +220,7 @@ class CRM_Admin_Form_Setting_Localization extends CRM_Admin_Form_Setting {
     }
 
     // add a new db locale if the requested language is not yet supported by the db
-    if (!CRM_Utils_Array::value('makeSinglelingual', $values) and CRM_Utils_Array::value('addLanguage', $values)) {
+    if (empty($values['makeSinglelingual']) && !empty($values['addLanguage'])) {
       $domain = new CRM_Core_DAO_Domain();
       $domain->find(TRUE);
       if (!substr_count($domain->locales, $values['addLanguage'])) {

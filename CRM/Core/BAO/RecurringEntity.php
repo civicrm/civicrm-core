@@ -917,7 +917,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         }
       }
       if ($formParams['repeats_by'] == 2) {
-        if (CRM_Utils_Array::value('entity_status_1', $formParams) && CRM_Utils_Array::value('entity_status_2', $formParams)) {
+        if (!empty($formParams['entity_status_1']) && !empty($formParams['entity_status_2'])) {
           $dbParams['entity_status'] = $formParams['entity_status_1'] . " " . $formParams['entity_status_2'];
         }
       }

@@ -88,7 +88,7 @@ class CRM_Financial_BAO_Payment {
       $trxn = CRM_Core_BAO_FinancialTrxn::create($balanceTrxnParams);
 
       // @todo - this is just weird & historical & inconsistent - why 2 tracks?
-      if (CRM_Utils_Array::value('line_item', $params) && !empty($trxn)) {
+      if (!empty($params['line_item']) && !empty($trxn)) {
         foreach ($params['line_item'] as $values) {
           foreach ($values as $id => $amount) {
             $p = ['id' => $id];

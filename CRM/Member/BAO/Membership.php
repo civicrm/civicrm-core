@@ -381,14 +381,14 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
       foreach ($params['line_item'] as $priceSetId => $lineItems) {
         foreach ($lineItems as $lineIndex => $lineItem) {
           $lineMembershipType = CRM_Utils_Array::value('membership_type_id', $lineItem);
-          if (CRM_Utils_Array::value('contribution', $params)) {
+          if (!empty($params['contribution'])) {
             $params['line_item'][$priceSetId][$lineIndex]['contribution_id'] = $params['contribution']->id;
           }
           if ($lineMembershipType && $lineMembershipType == CRM_Utils_Array::value('membership_type_id', $params)) {
             $params['line_item'][$priceSetId][$lineIndex]['entity_id'] = $membership->id;
             $params['line_item'][$priceSetId][$lineIndex]['entity_table'] = 'civicrm_membership';
           }
-          elseif (!$lineMembershipType && CRM_Utils_Array::value('contribution', $params)) {
+          elseif (!$lineMembershipType && !empty($params['contribution'])) {
             $params['line_item'][$priceSetId][$lineIndex]['entity_id'] = $params['contribution']->id;
             $params['line_item'][$priceSetId][$lineIndex]['entity_table'] = 'civicrm_contribution';
           }

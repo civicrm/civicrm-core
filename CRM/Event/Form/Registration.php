@@ -476,7 +476,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           $this->assign($v, $params[$v]);
         }
       }
-      elseif (CRM_Utils_Array::value('amount', $params) == 0) {
+      elseif (empty($params['amount'])) {
         $this->assign($v, CRM_Utils_Array::value($v, $params));
       }
     }

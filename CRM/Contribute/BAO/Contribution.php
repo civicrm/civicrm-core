@@ -2962,7 +2962,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         if (!empty($lineItems)) {
           $firstLineItem = reset($lineItems);
           $priceSet = [];
-          if (CRM_Utils_Array::value('price_set_id', $firstLineItem)) {
+          if (!empty($firstLineItem['price_set_id'])) {
             $priceSet = civicrm_api3('PriceSet', 'getsingle', [
               'id' => $firstLineItem['price_set_id'],
               'return' => 'is_quick_config, id',
@@ -4013,7 +4013,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
       $baseTrxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contributionId);
       $baseTrxnId = $baseTrxnId['financialTrxnId'];
     }
-    if (!CRM_Utils_Array::value('total_amount', $total) || $usingLineTotal) {
+    if (empty($total['total_amount']) || $usingLineTotal) {
       $total = CRM_Price_BAO_LineItem::getLineTotal($contributionId);
     }
     else {
@@ -4538,7 +4538,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $contributionResult = civicrm_api3('Contribution', 'create', $contributionParams);
 
     // Add new soft credit against current $contribution.
-    if (CRM_Utils_Array::value('contributionRecur', $objects) && $objects['contributionRecur']->id) {
+    if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id) {
       CRM_Contribute_BAO_ContributionRecur::addrecurSoftCredit($objects['contributionRecur']->id, $contribution->id);
     }
 
@@ -5046,7 +5046,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
   public static function checkContributeSettings($name = NULL, $checkInvoicing = FALSE) {
     $contributeSettings = Civi::settings()->get('contribution_invoice_settings');
 
-    if ($checkInvoicing && !CRM_Utils_Array::value('invoicing', $contributeSettings)) {
+    if ($checkInvoicing && empty($contributeSettings['invoicing'])) {
       return NULL;
     }
 

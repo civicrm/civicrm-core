@@ -45,7 +45,7 @@ function civicrm_api3_order_get($params) {
   $contributions = [];
   $params['api.line_item.get'] = ['qty' => ['<>' => 0]];
   $isSequential = FALSE;
-  if (CRM_Utils_Array::value('sequential', $params)) {
+  if (!empty($params['sequential'])) {
     $params['sequential'] = 0;
     $isSequential = TRUE;
   }
@@ -88,7 +88,7 @@ function civicrm_api3_order_create($params) {
 
   $entity = NULL;
   $entityIds = [];
-  if (CRM_Utils_Array::value('line_items', $params) && is_array($params['line_items'])) {
+  if (!empty($params['line_items']) && is_array($params['line_items'])) {
     $priceSetID = NULL;
     CRM_Contribute_BAO_Contribution::checkLineItems($params);
     foreach ($params['line_items'] as $lineItems) {
@@ -124,7 +124,7 @@ function civicrm_api3_order_create($params) {
   }
   $contribution = civicrm_api3('Contribution', 'create', $params);
   // add payments
-  if ($entity && CRM_Utils_Array::value('id', $contribution)) {
+  if ($entity && !empty($contribution['id'])) {
     foreach ($entityIds as $entityId) {
       $paymentParams = [
         'contribution_id' => $contribution['id'],

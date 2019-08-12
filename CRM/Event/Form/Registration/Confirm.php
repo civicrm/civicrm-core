@@ -457,7 +457,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $participantCount[$participantNum] = 'participant';
       }
       $totalTaxAmount += CRM_Utils_Array::value('tax_amount', $record, 0);
-      if (CRM_Utils_Array::value('is_primary', $record)) {
+      if (!empty($record['is_primary'])) {
         $taxAmount = &$params[$participantNum]['tax_amount'];
       }
       //lets get additional participant id to cancel.

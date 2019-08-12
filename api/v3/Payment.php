@@ -43,7 +43,7 @@
 function civicrm_api3_payment_get($params) {
   $financialTrxn = [];
   $limit = '';
-  if (isset($params['options']) && CRM_Utils_Array::value('limit', $params['options'])) {
+  if (isset($params['options']) && !empty($params['options']['limit'])) {
     $limit = CRM_Utils_Array::value('limit', $params['options']);
   }
   $params['options']['limit'] = 0;
@@ -132,7 +132,7 @@ function civicrm_api3_payment_cancel($params) {
  */
 function civicrm_api3_payment_create($params) {
   // Check if it is an update
-  if (CRM_Utils_Array::value('id', $params)) {
+  if (!empty($params['id'])) {
     $amount = $params['total_amount'];
     civicrm_api3('Payment', 'cancel', $params);
     $params['total_amount'] = $amount;

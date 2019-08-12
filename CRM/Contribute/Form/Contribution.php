@@ -665,10 +665,10 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     $componentDetails = [];
     if ($this->_id) {
       $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
-      if (CRM_Utils_Array::value('membership', $componentDetails)) {
+      if (!empty($componentDetails['membership'])) {
         $component = 'membership';
       }
-      elseif (CRM_Utils_Array::value('participant', $componentDetails)) {
+      elseif (!empty($componentDetails['participant'])) {
         $component = 'participant';
       }
     }
@@ -831,8 +831,8 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
       $componentDetails = CRM_Contribute_BAO_Contribution::getComponentDetails($this->_id);
       $isCancelledStatus = ($this->_values['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Cancelled'));
 
-      if (CRM_Utils_Array::value('membership', $componentDetails) ||
-        CRM_Utils_Array::value('participant', $componentDetails) ||
+      if (!empty($componentDetails['membership']) ||
+        !empty($componentDetails['participant']) ||
         // if status is Cancelled freeze Amount, Payment Instrument, Check #, Financial Type,
         // Net and Fee Amounts are frozen in AdditionalInfo::buildAdditionalDetail
         $isCancelledStatus
@@ -1710,7 +1710,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   protected function invoicingPostProcessHook($submittedValues, $action, $lineItem) {
 
     $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-    if (!CRM_Utils_Array::value('invoicing', $invoiceSettings)) {
+    if (empty($invoiceSettings['invoicing'])) {
       return;
     }
     $taxRate = [];

@@ -103,7 +103,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   protected static function isZeroAmount($fields, $form): bool {
     $isZeroAmount = FALSE;
     if (!empty($fields['priceSetId'])) {
-      if (CRM_Utils_Array::value('amount', $fields) == 0) {
+      if (empty($fields['amount'])) {
         $isZeroAmount = TRUE;
       }
     }
@@ -1155,7 +1155,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
           "_qf_Register_display=1&qfKey={$this->controller->_key}",
           TRUE, NULL, FALSE
         );
-        if (CRM_Utils_Array::value('additional_participants', $params, FALSE)) {
+        if (!empty($params['additional_participants'])) {
           $urlArgs = "_qf_Participant_1_display=1&rfp=1&qfKey={$this->controller->_key}";
         }
         else {
@@ -1194,7 +1194,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
     }
 
     // If registering > 1 participant, give status message
-    if (CRM_Utils_Array::value('additional_participants', $params, FALSE)) {
+    if (!empty($params['additional_participants'])) {
       $statusMsg = ts('Registration information for participant 1 has been saved.');
       CRM_Core_Session::setStatus($statusMsg, ts('Saved'), 'success');
     }
