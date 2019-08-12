@@ -143,7 +143,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
     $this->addElement('hidden', 'batch_id', $this->_batchId);
 
-    $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', ['flip' => 1], 'validate');
+    $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id', ['flip' => 1], 'validate');
     // get the profile information
     if ($this->_batchInfo['type_id'] == $batchTypes['Contribution']) {
       CRM_Utils_System::setTitle(ts('Batch Data Entry for Contributions'));
@@ -298,7 +298,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
    */
   public static function formRule($params, $files, $self) {
     $errors = [];
-    $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', ['flip' => 1], 'validate');
+    $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id', ['flip' => 1], 'validate');
     $fields = [
       'total_amount' => ts('Amount'),
       'financial_type' => ts('Financial Type'),
@@ -564,7 +564,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         $value['skipCleanMoney'] = TRUE;
         //finally call contribution create for all the magic
         $contribution = CRM_Contribute_BAO_Contribution::create($value);
-        $batchTypes = CRM_Core_Pseudoconstant::get('CRM_Batch_DAO_Batch', 'type_id', ['flip' => 1], 'validate');
+        $batchTypes = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'type_id', ['flip' => 1], 'validate');
         if (!empty($this->_batchInfo['type_id']) && ($this->_batchInfo['type_id'] == $batchTypes['Pledge Payment'])) {
           $adjustTotalAmount = FALSE;
           if (isset($params['option_type'][$key])) {

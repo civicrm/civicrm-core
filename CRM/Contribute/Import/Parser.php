@@ -114,7 +114,7 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
   /**
    * Whether the file has a column header or not
    *
-   * @var boolean
+   * @var bool
    */
   protected $_haveColumnHeader;
 

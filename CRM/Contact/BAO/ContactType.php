@@ -785,7 +785,6 @@ WHERE name = %1";
 
       $customDataCount = CRM_Core_DAO::singleValueQuery($sql);
       if (!empty($customDataCount)) {
-        $dao->free();
         return TRUE;
       }
     }

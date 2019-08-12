@@ -539,7 +539,7 @@ class CRM_Core_Session {
   /**
    * Retrieve contact id of the logged in user.
    *
-   * @return int|NULL
+   * @return int|null
    *   contact ID of logged in user
    */
   public static function getLoggedInContactID() {

@@ -75,7 +75,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
    * Is this contribution associated with an online.
    * financial transaction
    *
-   * @var boolean
+   * @var bool
    */
   public $_online = FALSE;
 
@@ -132,8 +132,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_fromEmails;
 
   /**
-   * ID of from email
-   * @var integer
+   * ID of from email.
+   *
+   * @var int
    */
   public $fromEmailId;
 
@@ -151,7 +152,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $_lineItem;
 
   /**
-   * @var array soft credit info
+   * Soft credit info.
+   *
+   * @var array
    */
   public $_softCreditInfo;
 
@@ -171,8 +174,9 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
   public $userEmail;
 
   /**
-   * Price set ID
-   * @var integer
+   * Price set ID.
+   *
+   * @var int
    */
   public $_priceSetId;
 
@@ -692,7 +696,7 @@ class CRM_Contribute_Form_Contribution extends CRM_Contribute_Form_AbstractEditP
     }
 
     // CRM-16189, add Revenue Recognition Date
-    if (CRM_Contribute_BAO_Contribution::checkContributeSettings('deferred_revenue_enabled')) {
+    if (Civi::settings()->get('deferred_revenue_enabled')) {
       $revenueDate = $this->add('date', 'revenue_recognition_date', ts('Revenue Recognition Date'), CRM_Core_SelectValues::date(NULL, 'M Y', NULL, 5));
       if ($this->_id && !CRM_Contribute_BAO_Contribution::allowUpdateRevenueRecognitionDate($this->_id)) {
         $revenueDate->freeze();

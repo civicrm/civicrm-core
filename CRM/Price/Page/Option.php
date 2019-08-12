@@ -62,7 +62,7 @@ class CRM_Price_Page_Option extends CRM_Core_Page {
   /**
    * The price set is reserved or not.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_isSetReserved = FALSE;
 

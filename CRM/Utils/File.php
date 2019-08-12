@@ -526,8 +526,16 @@ class CRM_Utils_File {
     if (!empty($dir) && is_dir($dir)) {
       $htaccess = <<<HTACCESS
 <Files "*">
-  Order allow,deny
-  Deny from all
+# Apache 2.2
+  <IfModule !authz_core_module>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+
+# Apache 2.4+
+  <IfModule authz_core_module>
+    Require all denied
+  </IfModule>
 </Files>
 
 HTACCESS;

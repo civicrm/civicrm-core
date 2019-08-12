@@ -81,10 +81,9 @@ class CRM_Contact_Page_DedupeException extends CRM_Core_Page {
   /**
    * Function to get the exceptions
    *
-   * @return array $exceptions
-   * @access protected
+   * @return array $exceptionsd
    */
-  protected function getExceptions() {
+  public function getExceptions() {
     list($offset, $limit) = $this->_pager->getOffsetAndRowCount();
     $contactOneQ = CRM_Utils_Request::retrieve('crmContact1Q', 'String');
 

@@ -1,10 +1,10 @@
 name = CiviCRM
 description = Constituent relationship management system. Allows sites to manage contacts, relationships and groups, and track contact activities, contributions, memberships and events. See the <a href="https://civicrm.org/">CiviCRM website</a> for more information.
-version = 7.x-5.13.4
+version = 7.x-5.15.2
 package = CiviCRM
 core = 7.x
 project = civicrm
-php = 5.3
+php = 5.6
 
 files[] = civicrm.module
 files[] = civicrm.install
@@ -60,6 +60,7 @@ files[] = modules/views/civicrm/civicrm_handler_filter_custom_option.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_datetime.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_encounter_medium.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_group_status.inc
+files[] = modules/views/civicrm/civicrm_handler_filter_group_name.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_custom_option.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_custom_single_option.inc
 files[] = modules/views/civicrm/civicrm_handler_filter_relationship_type.inc
@@ -97,6 +98,9 @@ files[] = modules/views/civicrm/civicrm_handler_relationship_im.inc
 files[] = modules/views/civicrm/civicrm_handler_relationship_website.inc
 files[] = modules/views/civicrm/civicrm_handler_relationship_address.inc
 files[] = modules/views/civicrm/civicrm_handler_relationship_participant.inc
+files[] = modules/views/civicrm/civicrm_handler_relationship_group.inc
+files[] = modules/views/civicrm/civicrm_handler_relationship_standard_group.inc
+files[] = modules/views/civicrm/civicrm_handler_relationship_standard_group_contact.inc
 
 ; views plugins
 files[] = modules/views/plugins/calendar_plugin_row_civicrm.inc

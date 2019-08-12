@@ -49,7 +49,7 @@ class CRM_PCP_Form_PCPAccount extends CRM_Core_Form {
   /**
    * Are we in single form mode or wizard mode?
    *
-   * @var boolean
+   * @var bool
    */
   public $_single;
 

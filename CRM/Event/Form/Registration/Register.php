@@ -69,12 +69,14 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
   /**
    * Show fee block or not.
    *
-   * @var boolean determines if fee block should be shown or hidden
+   * @var bool
    */
   public $_noFees;
 
   /**
-   * @var array Fee Block
+   * Fee Block.
+   *
+   * @var array
    */
   public $_feeBlock;
 

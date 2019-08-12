@@ -368,6 +368,19 @@ function civicrm_views_custom_data_cache(&$data, $entity_type, $group_id, $sub_t
           'field' => 'entity_id',
         );
       }
+
+      // Expose group custom data to group relationship.
+      if ($join_table == 'civicrm_group') {
+        $data[$current_group['table_name']]['table']['join']['civicrm_group'] = array(
+          'left_field' => 'id',
+          'field'      => 'entity_id',
+        );
+        $data[$current_group['table_name']]['table']['join']['civicrm_group_contact'] = array(
+          'left_table' => $join_table,
+          'left_field' => 'id',
+          'field'      => 'entity_id',
+        );
+      }
     }
 
     foreach ($current_group['fields'] as $key => $current_field) {

@@ -30,7 +30,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 {foreach from=$table.fields item=field}
     /**
 {if $field.comment}
-     * {$field.comment}
+     * {$field.comment|regex_replace:"/\n[ ]*/":"\n* "}
      *
 {/if}
      * @var {$field.phpType}
@@ -116,21 +116,21 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
 
 {if $field.import}
                       'import'    => {$field.import|strtoupper},
-                                                                      'where'     => '{$table.name}.{$field.name}',
-                                      'headerPattern' => '{$field.headerPattern}',
-                                      'dataPattern' => '{$field.dataPattern}',
+
 {/if} {* field.import *}
+  'where'     => '{$table.name}.{$field.name}',
+  {if $field.headerPattern}'headerPattern' => '{$field.headerPattern}',{/if}
+  {if $field.dataPattern}'dataPattern' => '{$field.dataPattern}',{/if}
 {if $field.export}
                       'export'    => {$field.export|strtoupper},
-                                      {if ! $field.import}
-                      'where'     => '{$table.name}.{$field.name}',
-                                      'headerPattern' => '{$field.headerPattern}',
-                                      'dataPattern' => '{$field.dataPattern}',
-              {/if}
 {/if} {* field.export *}
+
 {if $field.rule}
                       'rule'      => '{$field.rule}',
 {/if} {* field.rule *}
+{if $field.protected}
+                      'protected'      => '{$field.protected}',
+{/if}
 {if $field.default || $field.default === '0'}
                          'default'   => '{if ($field.default[0]=="'" or $field.default[0]=='"')}{$field.default|substring:1:-1}{else}{$field.default}{/if}',
 {/if} {* field.default *}
@@ -154,7 +154,7 @@ class {$table.className} extends CRM_Core_DAO {ldelim}
   ),
 {/if}
 {if $field.pseudoconstant}
-  'pseudoconstant' => {$field.pseudoconstant|@print_array}
+  'pseudoconstant' => {$field.pseudoconstant|@print_array},
 {/if} {* field.pseudoconstant *}                                                                    ),
 {/foreach} {* table.fields *}
                                       );

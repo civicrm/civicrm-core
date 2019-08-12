@@ -1,14 +1,14 @@
-@media (min-width: 768px) {
+@media (min-width: $breakMin) {
 
   body.crm-menubar-visible.crm-menubar-over-cms-menu #toolbar {
     display: none;
   }
 
   body.crm-menubar-visible.crm-menubar-over-cms-menu {
-    padding-top: 40px !important;
+    padding-top: $menubarHeight !important;
   }
   body.crm-menubar-visible.crm-menubar-over-cms-menu.crm-menubar-wrapped {
-    padding-top: 80px !important;
+    padding-top: calc($menubarHeight * 2) !important;
   }
 
   body.crm-menubar-visible.crm-menubar-over-cms-menu #toolbar .toolbar-drawer {
@@ -47,10 +47,10 @@
     min-height: 30px;
   }
   body.crm-menubar-visible.crm-menubar-below-cms-menu.admin-menu {
-    padding-top: 40px !important;
+    padding-top: $menubarHeight !important;
   }
   body.crm-menubar-visible.crm-menubar-below-cms-menu.crm-menubar-wrapped.admin-menu {
-    padding-top: 80px !important;
+    padding-top: calc($menubarHeight * 2) !important;
   }
   body.crm-menubar-visible.crm-menubar-over-cms-menu #admin-menu {
     display: none;
@@ -67,7 +67,7 @@
 }
 
 /* For adminimal_admin_menu */
-@media (min-width: 768px) and (max-width: 1024px) {
+@media (min-width: $breakMin) and (max-width: 1024px) {
 
   body.crm-menubar-visible.crm-menubar-over-cms-menu.admin-menu.adminimal-menu > .slicknav_menu {
     display: none;
@@ -80,7 +80,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: $breakMax) {
 
   body.toolbar.crm-menubar-visible #toolbar-home {
     visibility: hidden;

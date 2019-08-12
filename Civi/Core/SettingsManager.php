@@ -80,7 +80,7 @@ class SettingsManager {
   protected $bagsByContact = [];
 
   /**
-   * @var array|NULL
+   * @var array|null
    *   Array(string $entity => array(string $settingName => mixed $value)).
    *   Ex: $mandatory['domain']['uploadDir'].
    *   NULL means "autoload from $civicrm_setting".
@@ -156,7 +156,10 @@ class SettingsManager {
   }
 
   /**
-   * @param int|NULL $domainId
+   * Get Settings by domain.
+   *
+   * @param int|null $domainId
+   *
    * @return SettingsBag
    */
   public function getBagByDomain($domainId) {
@@ -177,10 +180,13 @@ class SettingsManager {
   }
 
   /**
-   * @param int|NULL $domainId
+   * Get Settings by contact.
+   *
+   * @param int|null $domainId
    *   For the default domain, leave $domainID as NULL.
-   * @param int|NULL $contactId
+   * @param int|null $contactId
    *   For the default/active user's contact, leave $domainID as NULL.
+   *
    * @return SettingsBag
    * @throws \CRM_Core_Exception
    *   If there is no contact, then there's no SettingsBag, and we'll throw

@@ -198,7 +198,7 @@ class CRM_Core_Page_AJAX {
   /**
    * Set headers appropriate for a js file.
    *
-   * @param int|NULL $ttl
+   * @param int|null $ttl
    *   Time-to-live (seconds).
    */
   public static function setJsHeaders($ttl = NULL) {

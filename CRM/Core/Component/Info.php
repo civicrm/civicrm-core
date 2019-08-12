@@ -31,8 +31,6 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
  */
 abstract class CRM_Core_Component_Info {
 
@@ -79,14 +77,16 @@ abstract class CRM_Core_Component_Info {
   const COMPONENT_MENU_XML = 'Menu';
 
   /**
-   * Stores component information.
-   * @var array component settings as key/value pairs
+   * Component settings as key/value pairs.
+   *
+   * @var array
    */
   public $info;
 
   /**
-   * Stores component keyword.
-   * @var string name of component keyword
+   * Component keyword.
+   *
+   * @var string
    */
   protected $keyword;
 

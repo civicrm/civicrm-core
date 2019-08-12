@@ -4836,6 +4836,7 @@ VALUES
    ('wysiwyg_presets'               , 'WYSIWYG Editor Presets'             , NULL, 1, 1, 0),
    ('relative_date_filters'         , 'Relative Date Filters'              , NULL, 1, 1, 0),
    ('pledge_status'                 , 'Pledge Status'                      , NULL, 1, 1, 1),
+   ('contribution_recur_status'     , 'Recurring Contribution Status'      , NULL, 1, 1, 1),
    ('environment'                   , 'Environment'                        , NULL, 1, 1, 0),
    ('activity_default_assignee'     , 'Activity default assignee'          , NULL, 1, 1, 0);
 
@@ -4918,6 +4919,7 @@ SELECT @option_group_id_contactDateMode := max(id) from civicrm_option_group whe
 SELECT @option_group_id_date_filter    := max(id) from civicrm_option_group where name = 'relative_date_filters';
 SELECT @option_group_id_wysiwyg_presets    := max(id) from civicrm_option_group where name = 'wysiwyg_presets';
 SELECT @option_group_id_ps    := max(id) from civicrm_option_group where name = 'pledge_status';
+SELECT @option_group_id_crs    := max(id) from civicrm_option_group where name = 'contribution_recur_status';
 SELECT @option_group_id_env    := max(id) from civicrm_option_group where name = 'environment';
 SELECT @option_group_id_default_assignee := max(id) from civicrm_option_group where name = 'activity_default_assignee';
 
@@ -5298,6 +5300,7 @@ VALUES
   (@option_group_id_sfe, 'docx', 12, 'docx',  NULL, 0, 0, 12, NULL, 0, 0, 1, NULL, NULL, NULL),
   (@option_group_id_sfe, 'xlsx', 13, 'xlsx',  NULL, 0, 0, 13, NULL, 0, 0, 1, NULL, NULL, NULL),
   (@option_group_id_sfe, 'odt',  14, 'odt',   NULL, 0, 0, 14, NULL, 0, 0, 1, NULL, NULL, NULL),
+  (@option_group_id_sfe, 'ics',  15, 'ics',   NULL, 0, 0, 15, NULL, 0, 0, 1, NULL, NULL, NULL),
 
   (@option_group_id_we, 'Textarea', 1, 'Textarea', NULL, 0, NULL, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_we, 'CKEditor', 2, 'CKEditor', NULL, 0, NULL, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
@@ -5666,6 +5669,17 @@ VALUES
   (@option_group_id_ps, 'Cancelled'  , 3, 'Cancelled'  , NULL, 0, NULL, 3, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_ps, 'In Progress', 5, 'In Progress', NULL, 0, NULL, 4, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_ps, 'Overdue'    , 6, 'Overdue'    , NULL, 0, NULL, 5, NULL, 0, 1, 1, NULL, NULL, NULL),
+
+
+-- Contribution Recur Status
+  (@option_group_id_crs, 'Completed'  , 1, 'Completed'  , NULL, 0, NULL, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
+  (@option_group_id_crs, 'Pending'    , 2, 'Pending'    , NULL, 0, NULL, 2, NULL, 0, 1, 1, NULL, NULL, NULL),
+  (@option_group_id_crs, 'Cancelled'  , 3, 'Cancelled'  , NULL, 0, NULL, 3, NULL, 0, 1, 1, NULL, NULL, NULL),
+  (@option_group_id_crs, 'Failed'     , 4, 'Failed'     , NULL, 0, NULL, 4, NULL, 0, 1, 1, NULL, NULL, NULL),
+  (@option_group_id_crs, 'In Progress', 5, 'In Progress', NULL, 0, NULL, 5, NULL, 0, 1, 1, NULL, NULL, NULL),
+  (@option_group_id_crs, 'Overdue'    , 6, 'Overdue'    , NULL, 0, NULL, 6, NULL, 0, 1, 1, NULL, NULL, NULL),
+  (@option_group_id_crs, 'Processing' , 7, 'Processing' , NULL, 0, NULL, 7, NULL, 0, 1, 1, NULL, NULL, NULL),
+  (@option_group_id_crs, 'Failing'    , 8, 'Failing'    , NULL, 0, NULL, 8, NULL, 0, 1, 1, NULL, NULL, NULL),
 
 -- CiviCase - Activity Assignee Default
 --  (`option_group_id`,             `label`,                                                `value`, `name`,                    `grouping`, `filter`, `is_default`, `weight`, `description`, `is_optgroup`, `is_reserved`, `is_active`, `component_id`, `visibility_id`, `icon`)
@@ -20942,9 +20956,9 @@ or want to inquire about reinstating your registration for this event.{/ts}</p>
       
       
       ('Pledges - Acknowledgement', '{ts}Thank you for your Pledge{/ts}
-', '{ts 1=$contact.display_name}Dear %1{/ts},
+', '{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
 
-{ts}Thank you for your generous pledge. Please print this acknowledgment for your records.{/ts}
+{ts}Thank you for your generous pledge.{/ts}
 
 ===========================================================
 {ts}Pledge Information{/ts}
@@ -21010,8 +21024,8 @@ or need to modify your payment schedule.{/ts}
 
   <tr>
    <td>
-    <p>{ts 1=$contact.display_name}dear %1{/ts},</p>
-    <p>{ts}thank you for your generous pledge. please print this acknowledgment for your records.{/ts}</p>
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+    <p>{ts}Thank you for your generous pledge.{/ts}</p>
    </td>
   </tr>
   <tr>
@@ -21106,9 +21120,9 @@ or need to modify your payment schedule.{/ts}</p>
 </html>
 ', @tpl_ovid_pledge_acknowledge, 1,          0),
       ('Pledges - Acknowledgement', '{ts}Thank you for your Pledge{/ts}
-', '{ts 1=$contact.display_name}Dear %1{/ts},
+', '{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
 
-{ts}Thank you for your generous pledge. Please print this acknowledgment for your records.{/ts}
+{ts}Thank you for your generous pledge.{/ts}
 
 ===========================================================
 {ts}Pledge Information{/ts}
@@ -21174,8 +21188,8 @@ or need to modify your payment schedule.{/ts}
 
   <tr>
    <td>
-    <p>{ts 1=$contact.display_name}dear %1{/ts},</p>
-    <p>{ts}thank you for your generous pledge. please print this acknowledgment for your records.{/ts}</p>
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+    <p>{ts}Thank you for your generous pledge.{/ts}</p>
    </td>
   </tr>
   <tr>
@@ -24035,4 +24049,4 @@ INSERT INTO `civicrm_report_instance`
     ( `domain_id`, `title`, `report_id`, `description`, `permission`, `form_values`)
 VALUES
     (  @domainID, 'Survey Details', 'survey/detail', 'Detailed report for canvassing, phone-banking, walk lists or other surveys.', 'access CiviReport', 'a:39:{s:6:"fields";a:2:{s:9:"sort_name";s:1:"1";s:6:"result";s:1:"1";}s:22:"assignee_contact_id_op";s:2:"eq";s:25:"assignee_contact_id_value";s:0:"";s:12:"sort_name_op";s:3:"has";s:15:"sort_name_value";s:0:"";s:17:"street_number_min";s:0:"";s:17:"street_number_max";s:0:"";s:16:"street_number_op";s:3:"lte";s:19:"street_number_value";s:0:"";s:14:"street_name_op";s:3:"has";s:17:"street_name_value";s:0:"";s:15:"postal_code_min";s:0:"";s:15:"postal_code_max";s:0:"";s:14:"postal_code_op";s:3:"lte";s:17:"postal_code_value";s:0:"";s:7:"city_op";s:3:"has";s:10:"city_value";s:0:"";s:20:"state_province_id_op";s:2:"in";s:23:"state_province_id_value";a:0:{}s:13:"country_id_op";s:2:"in";s:16:"country_id_value";a:0:{}s:12:"survey_id_op";s:2:"in";s:15:"survey_id_value";a:0:{}s:12:"status_id_op";s:2:"eq";s:15:"status_id_value";s:1:"1";s:11:"custom_1_op";s:2:"in";s:14:"custom_1_value";a:0:{}s:11:"custom_2_op";s:2:"in";s:14:"custom_2_value";a:0:{}s:17:"custom_3_relative";s:1:"0";s:13:"custom_3_from";s:0:"";s:11:"custom_3_to";s:0:"";s:11:"description";s:75:"Detailed report for canvassing, phone-banking, walk lists or other surveys.";s:13:"email_subject";s:0:"";s:8:"email_to";s:0:"";s:8:"email_cc";s:0:"";s:10:"permission";s:17:"access CiviReport";s:6:"groups";s:0:"";s:9:"domain_id";i:1;}');
-UPDATE civicrm_domain SET version = '5.13.4';
+UPDATE civicrm_domain SET version = '5.15.2';

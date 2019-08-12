@@ -35,7 +35,7 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
   const LIMIT = 10;
 
   /**
-   * @var array CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery
+   * @var CRM_Contact_Form_Search_Custom_FullText_AbstractPartialQuery[]
    */
   protected $_partialQueries = NULL;
 
@@ -54,23 +54,37 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
   protected $_tableFields = NULL;
 
   /**
-   * @var array|null NULL if no limit; or array(0 => $limit, 1 => $offset)
+   * Limit clause.
+   *
+   * NULL if no limit; or array(0 => $limit, 1 => $offset).
+   *
+   * @var array|null
    */
   protected $_limitClause = NULL;
 
   /**
-   * @var array|null NULL if no limit; or array(0 => $limit, 1 => $offset)
+   * Limit row clause.
+   *
+   * NULL if no limit; or array(0 => $limit, 1 => $offset)
+   *
+   * @var array|null
    */
   protected $_limitRowClause = NULL;
 
   /**
-   * @var array|null NULL if no limit; or array(0 => $limit, 1 => $offset)
+   * Limit detail clause.
+   *
+   * NULL if no limit; or array(0 => $limit, 1 => $offset).
+   *
+   * @var array|null
    */
   protected $_limitDetailClause = NULL;
 
   protected $_limitNumber = 10;
+
   /**
-   * this should be one more than self::LIMIT
+   * This should be one more than self::LIMIT.
+   *
    * @var int
    */
   protected $_limitNumberPlus1 = 11;
@@ -151,7 +165,7 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
   }
 
   public function buildTempTable() {
-    $table = CRM_Utils_SQL_TempTable::build()->setCategory('custom')->setMemory()->setUtf8();
+    $table = CRM_Utils_SQL_TempTable::build()->setCategory('custom')->setMemory();
     $this->_tableName = $table->getName();
 
     $this->_tableFields = [
@@ -216,7 +230,7 @@ class CRM_Contact_Form_Search_Custom_FullText extends CRM_Contact_Form_Search_Cu
 ";
     $table->createWithColumns($sql);
 
-    $entityIdTable = CRM_Utils_SQL_TempTable::build()->setCategory('custom')->setMemory()->setUtf8();
+    $entityIdTable = CRM_Utils_SQL_TempTable::build()->setCategory('custom')->setMemory();
     $this->_entityIDTableName = $entityIdTable->getName();
     $sql = "
   id int unsigned NOT NULL AUTO_INCREMENT,

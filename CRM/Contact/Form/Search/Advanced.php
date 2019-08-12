@@ -190,26 +190,26 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   /**
    * Set the default form values.
    *
-   *
    * @return array
    *   the default array reference
+   * @throws \Exception
    */
   public function setDefaultValues() {
+    $defaults = parent::setDefaultValues();
     // Set ssID for unit tests.
     if (empty($this->_ssID)) {
       $this->_ssID = $this->get('ssID');
     }
 
-    $defaults = array_merge($this->_formValues, array(
+    $defaults = array_merge($this->_formValues, [
       'privacy_toggle' => 1,
       'operator' => 'AND',
-    ));
+    ], $defaults);
     $this->normalizeDefaultValues($defaults);
 
     if ($this->_context === 'amtg') {
       $defaults['task'] = CRM_Contact_Task::GROUP_ADD;
     }
-
     return $defaults;
   }
 

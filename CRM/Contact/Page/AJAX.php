@@ -624,22 +624,7 @@ LIMIT {$offset}, {$rowCount}
       return;
     }
 
-    $exception = new CRM_Dedupe_DAO_Exception();
-    $exception->contact_id1 = $cid;
-    $exception->contact_id2 = $oid;
-    //make sure contact2 > contact1.
-    if ($cid > $oid) {
-      $exception->contact_id1 = $oid;
-      $exception->contact_id2 = $cid;
-    }
-    $exception->find(TRUE);
-    $status = NULL;
-    if ($oper == 'dupe-nondupe') {
-      $status = $exception->save();
-    }
-    if ($oper == 'nondupe-dupe') {
-      $status = $exception->delete();
-    }
+    $status = self::markNonDuplicates($cid, $oid, $oper);
 
     CRM_Utils_JSON::output(['status' => ($status) ? $oper : $status]);
   }
@@ -909,6 +894,48 @@ LIMIT {$offset}, {$rowCount}
   }
 
   /**
+   * Mark not duplicates.
+   *
+   * Note this function would sensibly be replaced by an api-call but extracting here to add a test first.
+   *
+   * I would have like to make it private but test class accesses it & it doesn't warrant being a BAO class
+   * as it should feel very endangered.
+   *
+   * @param int $cid
+   * @param int $oid
+   * @param "dupe-nondupe|nondupe-dupe" $oper
+   *
+   * @return \CRM_Core_DAO|mixed|null
+   */
+  public static function markNonDuplicates($cid, $oid, $oper) {
+    if ($oper == 'dupe-nondupe') {
+      try {
+        civicrm_api3('Exception', 'create', ['contact_id1' => $cid, 'contact_id2' => $oid]);
+        return TRUE;
+      }
+      catch (CiviCRM_API3_Exception $e) {
+        return FALSE;
+      }
+    }
+
+    $exception = new CRM_Dedupe_DAO_Exception();
+    $exception->contact_id1 = $cid;
+    $exception->contact_id2 = $oid;
+    //make sure contact2 > contact1.
+    if ($cid > $oid) {
+      $exception->contact_id1 = $oid;
+      $exception->contact_id2 = $cid;
+    }
+    $exception->find(TRUE);
+    $status = NULL;
+
+    if ($oper == 'nondupe-dupe') {
+      $status = $exception->delete();
+    }
+    return $status;
+  }
+
+  /**
    * Retrieve a PDF Page Format for the PDF Letter form.
    */
   public function pdfFormat() {
@@ -938,7 +965,10 @@ LIMIT {$offset}, {$rowCount}
   public static function flipDupePairs($prevNextId = NULL) {
     if (!$prevNextId) {
       // @todo figure out if this is always POST & specify that rather than inexact GET
-      $prevNextId = CRM_Utils_Request::retrieve('pnid', 'Integer');
+
+      // We cannot use CRM_Utils_Request::retrieve() because it might be an array.
+      // It later gets validated in escapeAll below.
+      $prevNextId = $_REQUEST['pnid'];
     }
 
     $onlySelected = FALSE;
@@ -1044,7 +1074,7 @@ LIMIT {$offset}, {$rowCount}
       $params[2]   = [$pnid, 'Integer'];
     }
 
-    $sql = "UPDATE civicrm_prevnext_cache SET is_selected = %1 WHERE {$whereClause} AND cacheKey LIKE %3";
+    $sql = "UPDATE civicrm_prevnext_cache SET is_selected = %1 WHERE {$whereClause} AND cachekey LIKE %3";
     CRM_Core_DAO::executeQuery($sql, $params);
 
     CRM_Utils_System::civiExit();

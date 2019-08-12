@@ -83,6 +83,14 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   public $relUrls = FALSE;
 
   /**
+   * @var array
+   *   Array(function(CRM_Extension_Info $info): bool)
+   *   List of callables which determine whether an extension is visible.
+   *   Each function returns TRUE if the extension should be visible.
+   */
+  protected $filters = [];
+
+  /**
    * @param string $baseDir
    *   Local path to the container.
    * @param string $baseUrl
@@ -216,7 +224,16 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
             CRM_Core_Error::debug_log_message("Parse error in extension: " . $e->getMessage());
             continue;
           }
-          $this->relPaths[$info->key] = $relPath;
+          $visible = TRUE;
+          foreach ($this->filters as $filter) {
+            if (!$filter($info)) {
+              $visible = FALSE;
+              break;
+            }
+          }
+          if ($visible) {
+            $this->relPaths[$info->key] = $relPath;
+          }
         }
         if ($this->cache) {
           $this->cache->set($this->cacheKey, $this->relPaths);
@@ -257,6 +274,20 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
       $this->relUrls = self::convertPathsToUrls(DIRECTORY_SEPARATOR, $this->getRelPaths());
     }
     return $this->relUrls;
+  }
+
+  /**
+   * Register a filter which determine whether a copy of an extension
+   * appears as available.
+   *
+   * @param callable $callable
+   *   function(CRM_Extension_Info $info): bool
+   *   Each function returns TRUE if the extension should be visible.
+   * @return $this
+   */
+  public function addFilter($callable) {
+    $this->filters[] = $callable;
+    return $this;
   }
 
   /**

@@ -149,8 +149,7 @@
     <import>true</import>
     <serialize>SEPARATOR_BOOKEND</serialize>
     <comment>Populate with the label (text) associated with a fee level for paid events with multiple levels. Note that
-      we store the label value and not the key
-    </comment>
+      we store the label value and not the key</comment>
     <add>1.7</add>
   </field>
   <field>

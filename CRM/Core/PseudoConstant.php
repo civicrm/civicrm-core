@@ -220,14 +220,12 @@ class CRM_Core_PseudoConstant {
       if ($options && $flip) {
         $options = array_flip($options);
       }
-      $customField->free();
       return $options;
     }
 
     // Core field: load schema
     $dao = new $daoName();
     $fieldSpec = $dao->getFieldSpec($fieldName);
-    $dao->free();
 
     // Ensure we have the canonical name for this field
     $fieldName = CRM_Utils_Array::value('name', $fieldSpec, $fieldName);
@@ -313,7 +311,6 @@ class CRM_Core_PseudoConstant {
           // Get list of fields for the option table
           $dao = new $daoName();
           $availableFields = array_keys($dao->fieldKeys());
-          $dao->free();
 
           $select = "SELECT %1 AS id, %2 AS label";
           $from = "FROM %3";
@@ -375,7 +372,6 @@ class CRM_Core_PseudoConstant {
           while ($dao->fetch()) {
             $output[$dao->id] = $dao->label;
           }
-          $dao->free();
           // Localize results
           if (!empty($params['localize']) || $pseudoconstant['table'] == 'civicrm_country' || $pseudoconstant['table'] == 'civicrm_state_province') {
             $I18nParams = [];
@@ -411,7 +407,7 @@ class CRM_Core_PseudoConstant {
    *
    * @param string $baoName
    * @param string $fieldName
-   * @param string|Int $key
+   * @param string|int $key
    *
    * TODO: Accept multivalued input?
    *
@@ -433,7 +429,7 @@ class CRM_Core_PseudoConstant {
    *
    * @param string $baoName
    * @param string $fieldName
-   * @param string|Int $key
+   * @param string|int $key
    *
    * @return bool|null|string
    *   FALSE if the given field has no associated option list
@@ -453,7 +449,7 @@ class CRM_Core_PseudoConstant {
    *
    * @param string $baoName
    * @param string $fieldName
-   * @param string|Int $value
+   * @param string|int $value
    *
    * @return bool|null|string|int
    *   FALSE if the given field has no associated option list

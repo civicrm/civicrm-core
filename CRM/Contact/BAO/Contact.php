@@ -272,6 +272,10 @@ class CRM_Contact_BAO_Contact extends CRM_Contact_DAO_Contact {
       return $contact;
     }
 
+    if (!empty($params['contact_id']) && empty($params['contact_type'])) {
+      $params['contact_type'] = self::getContactType($params['contact_id']);
+    }
+
     $isEdit = TRUE;
     if ($invokeHooks) {
       if (!empty($params['contact_id'])) {
@@ -578,9 +582,11 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * Alternatively we should choose from enabled countries, prioritising the default country.
    *
    * @param array $values
-   * @param int|NULL $countryID
+   * @param int|null $countryID
    *
    * @return int|null
+   *
+   * @throws \CRM_Core_Exception
    */
   protected static function resolveStateProvinceID($values, $countryID) {
 
@@ -1733,7 +1739,7 @@ WHERE     civicrm_contact.id = " . CRM_Utils_Type::escape($id, 'Integer');
    * @return array
    *   Contact details
    */
-  public static function getHierContactDetails($contactId, &$fields) {
+  public static function getHierContactDetails($contactId, $fields) {
     $params = array(array('contact_id', '=', $contactId, 0, 0));
     $options = array();
 
@@ -2070,7 +2076,7 @@ ORDER BY civicrm_email.is_primary DESC";
    */
   public static function formatProfileContactParams(
     &$params,
-    &$fields,
+    $fields,
     $contactID = NULL,
     $ufGroupId = NULL,
     $ctype = NULL,
@@ -2946,7 +2952,6 @@ AND       civicrm_openid.is_primary = 1";
       while ($blockDAO->fetch()) {
         $locBlockIds[$name][] = $blockDAO->id;
       }
-      $blockDAO->free();
     }
 
     return $locBlockIds;
@@ -3557,7 +3562,6 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
       }
     }
     CRM_Utils_Hook::post('delete', $type, $id, $obj);
-    $obj->free();
     return TRUE;
   }
 
@@ -3627,7 +3631,7 @@ LEFT JOIN civicrm_address ON ( civicrm_address.contact_id = civicrm_contact.id )
    * @param array $contextParams
    *   The context if relevant, eg. ['event_id' => X]
    *
-   * @return int|NULL
+   * @return int|null
    */
   public static function getFirstDuplicateContact($input, $contactType, $rule = 'Unsupervised', $excludedContactIDs = [], $checkPermissions = TRUE, $ruleGroupID = NULL, $contextParams = []) {
     $ids = self::getDuplicateContacts($input, $contactType, $rule, $excludedContactIDs, $checkPermissions, $ruleGroupID, $contextParams);

@@ -51,6 +51,7 @@ class CRM_Financial_BAO_Payment {
    *
    * @throws \API_Exception
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function create($params) {
     $contribution = civicrm_api3('Contribution', 'getsingle', ['id' => $params['contribution_id']]);
@@ -63,7 +64,7 @@ class CRM_Financial_BAO_Payment {
     // should be handled through Payment.create.
     $isSkipRecordingPaymentHereForLegacyHandlingReasons = ($contributionStatus == 'Pending' && $isPaymentCompletesContribution);
 
-    if (!$isSkipRecordingPaymentHereForLegacyHandlingReasons) {
+    if (!$isSkipRecordingPaymentHereForLegacyHandlingReasons && $params['total_amount'] > 0) {
       $trxn = CRM_Contribute_BAO_Contribution::recordPartialPayment($contribution, $params);
 
       if (CRM_Utils_Array::value('line_item', $params) && !empty($trxn)) {
@@ -99,13 +100,30 @@ class CRM_Financial_BAO_Payment {
         CRM_Contribute_BAO_Contribution::assignProportionalLineItems($params, $trxn->id, $contribution['total_amount']);
       }
     }
+    elseif ($params['total_amount'] < 0) {
+      $trxn = self::recordRefundPayment($params['contribution_id'], $params, FALSE);
+      CRM_Contribute_BAO_Contribution::recordPaymentActivity($params['contribution_id'], CRM_Utils_Array::value('participant_id', $params), $params['total_amount'], $trxn->currency, $trxn->trxn_date);
+    }
 
     if ($isPaymentCompletesContribution) {
-      civicrm_api3('Contribution', 'completetransaction', ['id' => $contribution['id']]);
-      // Get the trxn
-      $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
-      $ftParams = ['id' => $trxnId['financialTrxnId']];
-      $trxn = CRM_Core_BAO_FinancialTrxn::retrieve($ftParams, CRM_Core_DAO::$_nullArray);
+      if ($contributionStatus == 'Pending refund') {
+        // Ideally we could still call completetransaction as non-payment related actions should
+        // be outside this class. However, for now we just update the contribution here.
+        // Unit test cover in CRM_Event_BAO_AdditionalPaymentTest::testTransactionInfo.
+        civicrm_api3('Contribution', 'create',
+          [
+            'id' => $contribution['id'],
+            'contribution_status_id' => 'Completed',
+          ]
+        );
+      }
+      else {
+        civicrm_api3('Contribution', 'completetransaction', ['id' => $contribution['id']]);
+        // Get the trxn
+        $trxnId = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution['id'], 'DESC');
+        $ftParams = ['id' => $trxnId['financialTrxnId']];
+        $trxn = CRM_Core_BAO_FinancialTrxn::retrieve($ftParams, CRM_Core_DAO::$_nullArray);
+      }
     }
     elseif ($contributionStatus === 'Pending') {
       civicrm_api3('Contribution', 'create',
@@ -302,7 +320,7 @@ class CRM_Financial_BAO_Payment {
    *
    * @return CRM_Financial_DAO_FinancialTrxn
    */
-  public static function recordRefundPayment($contributionId, $trxnData, $updateStatus) {
+  protected static function recordRefundPayment($contributionId, $trxnData, $updateStatus) {
     list($contributionDAO, $params) = self::getContributionAndParamsInFormatForRecordFinancialTransaction($contributionId);
 
     $params['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $trxnData, CRM_Utils_Array::value('payment_instrument_id', $params));
@@ -311,7 +329,7 @@ class CRM_Financial_BAO_Payment {
     $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contributionDAO->financial_type_id, 'Accounts Receivable Account is');
     $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
 
-    $trxnData['total_amount'] = $trxnData['net_amount'] = -$trxnData['total_amount'];
+    $trxnData['total_amount'] = $trxnData['net_amount'] = $trxnData['total_amount'];
     $trxnData['from_financial_account_id'] = $arAccountId;
     $trxnData['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Refunded');
     // record the entry

@@ -336,7 +336,7 @@ WHERE     cpf.price_set_id = %1";
    *                      array may contain either option id or
    *                      price field id
    *
-   * @return int|NULL
+   * @return int|null
    *   price set id on success, null  otherwise
    */
   public static function getSetId(&$params) {
@@ -1559,7 +1559,7 @@ WHERE       ps.id = %1
         CRM_Price_BAO_PriceSet::addTo($baoName, $newId, $copyPriceSet->id);
       }
       else {
-        $copyPriceSet = &CRM_Core_DAO::copyGeneric('CRM_Price_DAO_PriceSetEntity',
+        $copyPriceSet = CRM_Core_DAO::copyGeneric('CRM_Price_DAO_PriceSetEntity',
           [
             'entity_id' => $id,
             'entity_table' => $baoName,

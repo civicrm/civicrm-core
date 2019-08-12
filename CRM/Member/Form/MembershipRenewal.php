@@ -129,6 +129,21 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
    *
    * @throws \Exception
    */
+
+  /**
+   * Set the renewal notification status message.
+   */
+  public function setRenewalMessage() {
+    $statusMsg = ts('%1 membership for %2 has been renewed.', array(1 => $this->membershipTypeName, 2 => $this->_memberDisplayName));
+
+    if ($this->isMailSent) {
+      $statusMsg .= ' ' . ts('A renewal confirmation and receipt has been sent to %1.', array(
+        1 => $this->_contributorEmail,
+      ));
+    }
+    CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
+  }
+
   public function preProcess() {
 
     // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
@@ -459,21 +474,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     try {
       $this->submit();
-      $statusMsg = ts('%1 membership for %2 has been renewed.', [1 => $this->membershipTypeName, 2 => $this->_memberDisplayName]);
-
-      if ($this->endDate) {
-        $statusMsg .= ' ' . ts('The new membership End Date is %1.', [
-          1 => CRM_Utils_Date::customFormat(substr($this->endDate, 0, 8)),
-        ]);
-      }
-
-      if ($this->isMailSent) {
-        $statusMsg .= ' ' . ts('A renewal confirmation and receipt has been sent to %1.', [
-          1 => $this->_contributorEmail,
-        ]);
-        return $statusMsg;
-      }
-      return $statusMsg;
+      $this->setRenewalMessage();
     }
     catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
       CRM_Core_Session::singleton()->setStatus($e->getMessage());
@@ -481,8 +482,6 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
         "reset=1&action=renew&cid={$this->_contactID}&id={$this->_id}&context=membership&mode={$this->_mode}"
       ));
     }
-
-    CRM_Core_Session::setStatus($statusMsg, ts('Complete'), 'success');
   }
 
   /**

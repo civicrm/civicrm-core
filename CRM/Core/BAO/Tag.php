@@ -185,7 +185,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
           $tags[$tag->id]['color'] = !empty($tag->color) ? $tag->color : NULL;
         }
       }
-      $tag->free();
     }
 
     return $tags;
@@ -270,7 +269,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
       }
     }
 
-    $dao->free();
     // While we have nodes left to build, shift the first (alphabetically)
     // node of the list, place it in our tags list and loop through the
     // list of unplaced nodes to find its children. We make a copy to
@@ -514,7 +512,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     while ($dao->fetch()) {
       $tagSets[$dao->id] = $dao->name;
     }
-    $dao->free();
     return $tagSets;
   }
 

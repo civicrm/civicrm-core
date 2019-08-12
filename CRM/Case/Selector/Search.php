@@ -72,14 +72,14 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @var boolean
+   * @var bool
    */
   protected $_single = FALSE;
 
   /**
    * Are we restricting ourselves to a single contact
    *
-   * @var boolean
+   * @var bool
    */
   protected $_limit = NULL;
 
@@ -322,7 +322,7 @@ class CRM_Case_Selector_Search extends CRM_Core_Selector_Base {
       $isDeleted = FALSE;
       if ($result->case_deleted) {
         $isDeleted = TRUE;
-        $row['case_status_id'] = empty($row['case_status_id']) ? "" : $row['case_status_id'] . '<br />(deleted)';
+        $row['case_status_id'] = empty($row['case_status_id']) ? "" : $row['case_status_id'] . '<br />' . ts('(deleted)');
       }
 
       $scheduledInfo['case_id'][] = $result->case_id;

@@ -394,10 +394,26 @@ function _civicrm_api3_system_get_whitelist($whitelistFile) {
  * This updates the engine type if defined in the hook and changes the field type
  * for log_conn_id to reflect CRM-18193.
  */
-function civicrm_api3_system_updatelogtables() {
+function civicrm_api3_system_updatelogtables($params) {
   $schema = new CRM_Logging_Schema();
-  $schema->updateLogTableSchema();
-  return civicrm_api3_create_success(1);
+  $updatedTablesCount = $schema->updateLogTableSchema($params);
+  return civicrm_api3_create_success($updatedTablesCount);
+}
+
+/**
+ * Adjust Metadata for Flush action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_system_updatelogtables_spec(&$params) {
+  $params['updateChangedEngineConfig'] = [
+    'title' => 'Update Engine Config if changed?',
+    'description' => 'By default, we only update if the ENGINE has changed, set this to TRUE to update if the ENGINE_CONFIG has changed.',
+    'type' => CRM_Utils_Type::T_BOOLEAN,
+  ];
 }
 
 /**

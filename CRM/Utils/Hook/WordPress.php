@@ -38,22 +38,22 @@ class CRM_Utils_Hook_WordPress extends CRM_Utils_Hook {
   private $isBuilt = FALSE;
 
   /**
-   * @var array(string)
+   * @var string[]
    */
   private $allModules = NULL;
 
   /**
-   * @var array(string)
+   * @var string[]
    */
   private $civiModules = NULL;
 
   /**
-   * @var array(string)
+   * @var string[]
    */
   private $wordpressModules = NULL;
 
   /**
-   * @var array(string)
+   * @var string[]
    */
   private $hooksThatReturn = [
     'civicrm_upgrade',

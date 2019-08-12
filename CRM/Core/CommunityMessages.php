@@ -50,7 +50,11 @@ class CRM_Core_CommunityMessages {
   protected $cache;
 
   /**
-   * @var FALSE|string
+   * Url to retrieve community messages from.
+   *
+   * False means a retrieval will not be attempted.
+   *
+   * @var false|string
    */
   protected $messagesUrl;
 
@@ -67,9 +71,11 @@ class CRM_Core_CommunityMessages {
   }
 
   /**
+   * Class constructor.
+   *
    * @param CRM_Utils_Cache_Interface $cache
    * @param CRM_Utils_HttpClient $client
-   * @param null $messagesUrl
+   * @param string|false $messagesUrl
    */
   public function __construct($cache, $client, $messagesUrl = NULL) {
     $this->cache = $cache;
@@ -86,7 +92,7 @@ class CRM_Core_CommunityMessages {
   }
 
   /**
-   * Get the messages document (either from the cache or by downloading)
+   * Get the messages document (either from the cache or by downloading).
    *
    * @return NULL|array
    */

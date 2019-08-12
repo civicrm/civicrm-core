@@ -39,7 +39,7 @@ class CRM_Financial_Form_FinancialAccount extends CRM_Contribute_Form {
   /**
    * Flag if its a AR account type.
    *
-   * @var boolean
+   * @var bool
    */
   protected $_isARFlag = FALSE;
 

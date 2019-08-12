@@ -37,11 +37,6 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
   protected $_fileName;
 
   /**
-   * #@+
-   * @var integer
-   */
-
-  /**
    * Imported file size
    * @var int
    */
@@ -62,7 +57,7 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
   /**
    * Whether the file has a column header or not
    *
-   * @var boolean
+   * @var bool
    */
   protected $_haveColumnHeader;
 

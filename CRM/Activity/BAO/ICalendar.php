@@ -67,8 +67,7 @@ class CRM_Activity_BAO_ICalendar {
   public function addAttachment(&$attachments, $contacts) {
     // Check preferences setting
     if (Civi::settings()->get('activity_assignee_notification_ics')) {
-      $config = &CRM_Core_Config::singleton();
-      $this->icsfile = tempnam($config->customFileUploadDir, 'ics');
+      $this->icsfile = tempnam(CRM_Core_Config::singleton()->customFileUploadDir, 'ics');
       if ($this->icsfile !== FALSE) {
         rename($this->icsfile, $this->icsfile . '.ics');
         $this->icsfile .= '.ics';

@@ -304,13 +304,23 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    * Note changing engine & adding hook-defined indexes, but not changing back
    * to ARCHIVE if engine has not been deliberately set (by hook) and not dropping
    * indexes. Sysadmin will need to manually intervene to revert to defaults.
+   *
+   * @param array $params
+   *     'updateChangedEngineConfig' - update if the engine config changes, default FALSE
+   *
+   * @return int $updateTablesCount
    */
-  public function updateLogTableSchema() {
+  public function updateLogTableSchema($params = []) {
+    isset($params['updateChangedEngineConfig']) ? NULL : $params['updateChangedEngineConfig'] = FALSE;
+
     $updateLogConn = FALSE;
+    $updatedTablesCount = 0;
     foreach ($this->logs as $mainTable => $logTable) {
       $alterSql = [];
       $tableSpec = $this->logTableSpec[$mainTable];
-      if (isset($tableSpec['engine']) && strtoupper($tableSpec['engine']) != $this->getEngineForLogTable($logTable)) {
+      $engineChanged = isset($tableSpec['engine']) && (strtoupper($tableSpec['engine']) != $this->getEngineForLogTable($logTable));
+      $engineConfigChanged = isset($tableSpec['engine_config']) && (strtoupper($tableSpec['engine_config']) != $this->getEngineConfigForLogTable($logTable));
+      if ($engineChanged || ($engineConfigChanged && $params['updateChangedEngineConfig'])) {
         $alterSql[] = "ENGINE=" . $tableSpec['engine'] . " " . CRM_Utils_Array::value('engine_config', $tableSpec);
       }
       if (!empty($tableSpec['indexes'])) {
@@ -334,11 +344,13 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       }
       if (!empty($alterSql)) {
         CRM_Core_DAO::executeQuery("ALTER TABLE {$this->db}.{$logTable} " . implode(', ', $alterSql), [], TRUE, NULL, FALSE, FALSE);
+        $updatedTablesCount++;
       }
     }
     if ($updateLogConn) {
       civicrm_api3('Setting', 'create', ['logging_uniqueid_date' => date('Y-m-d H:i:s')]);
     }
+    return $updatedTablesCount;
   }
 
   /**
@@ -351,6 +363,20 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
   public function getEngineForLogTable($table) {
     return strtoupper(CRM_Core_DAO::singleValueQuery("
       SELECT ENGINE FROM information_schema.tables WHERE TABLE_NAME = %1
+      AND table_schema = %2
+    ", [1 => [$table, 'String'], 2 => [$this->db, 'String']]));
+  }
+
+  /**
+   * Get the engine config for the given table.
+   *
+   * @param string $table
+   *
+   * @return string
+   */
+  public function getEngineConfigForLogTable($table) {
+    return strtoupper(CRM_Core_DAO::singleValueQuery("
+      SELECT CREATE_OPTIONS FROM information_schema.tables WHERE TABLE_NAME = %1
       AND table_schema = %2
     ", [1 => [$table, 'String'], 2 => [$this->db, 'String']]));
   }

@@ -621,7 +621,7 @@ class CRM_Core_Permission {
     }
 
     foreach ($components as $comp) {
-      $perm = $comp->getPermissions(FALSE, $descriptions);
+      $perm = $comp->getPermissions($all, $descriptions);
       if ($perm) {
         $info = $comp->getInfo();
         foreach ($perm as $p => $attr) {

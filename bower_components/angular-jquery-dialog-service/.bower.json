@@ -1,11 +1,11 @@
 {
   "name": "angular-jquery-dialog-service",
   "homepage": "https://github.com/totten/angular-jquery-dialog-service",
-  "_release": "8c5d302ce9",
+  "_release": "156e2f592f",
   "_resolution": {
     "type": "branch",
     "branch": "civicrm",
-    "commit": "8c5d302ce980e3e42410289f349a41f1608a08b5"
+    "commit": "156e2f592f8cadd83f89e4b4b84f13fe0c72d21b"
   },
   "_source": "https://github.com/totten/angular-jquery-dialog-service.git",
   "_target": "civicrm",

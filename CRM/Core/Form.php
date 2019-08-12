@@ -767,6 +767,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
+   * @return int
+   */
+  public function getPaymentProcessorID() {
+    return $this->_paymentProcessorID;
+  }
+
+  /**
    * This if a front end form function for setting the payment processor.
    *
    * It would be good to sync it with the back-end function on abstractEditPayment & use one everywhere.
@@ -878,9 +885,8 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       else {
         $this->_paymentProcessor = [];
       }
-      CRM_Financial_Form_Payment::addCreditCardJs($this->_paymentProcessorID);
     }
-    $this->assign('paymentProcessorID', $this->_paymentProcessorID);
+
     // We save the fact that the profile 'billing' is required on the payment form.
     // Currently pay-later is the only 'processor' that takes notice of this - but ideally
     // 1) it would be possible to select the minimum_billing_profile_id for the contribution form
@@ -1501,6 +1507,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $isSelect = (in_array($widget, [
       'Select',
+      'Select2',
       'CheckBoxGroup',
       'RadioGroup',
       'Radio',
@@ -1515,7 +1522,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $options = isset($fieldSpec['options']) ? $fieldSpec['options'] : NULL;
       }
       if ($context == 'search') {
-        $widget = 'Select';
+        $widget = $widget == 'Select2' ? $widget : 'Select';
         $props['multiple'] = CRM_Utils_Array::value('multiple', $props, TRUE);
       }
 
@@ -1591,12 +1598,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->addChainSelect($name, $props);
 
       case 'Select':
+      case 'Select2':
         $props['class'] = CRM_Utils_Array::value('class', $props, 'big') . ' crm-select2';
         if (!array_key_exists('placeholder', $props)) {
           $props['placeholder'] = $required ? ts('- select -') : ($context == 'search' ? ts('- any -') : ts('- none -'));
         }
         // TODO: Add and/or option for fields that store multiple values
-        return $this->add('select', $name, $label, $options, $required, $props);
+        return $this->add(strtolower($widget), $name, $label, $options, $required, $props);
 
       case 'CheckBoxGroup':
         return $this->addCheckBox($name, $label, array_flip($options), $required, $props);
@@ -2127,7 +2135,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   /**
    * Get the contact id that the form is being submitted for.
    *
-   * @return int|NULL
+   * @return int|null
    */
   public function getContactID() {
     return $this->setContactID();

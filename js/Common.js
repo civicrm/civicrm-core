@@ -879,6 +879,7 @@ if (!CRM.vars) CRM.vars = {};
           }
         })
         .find('input.select-row:checked').parents('tr').addClass('crm-row-selected');
+      $('.crm-sortable-list', e.target).sortable();
       $('table.crm-sortable', e.target).DataTable();
       $('table.crm-ajax-table', e.target).each(function() {
         var

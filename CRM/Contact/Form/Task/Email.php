@@ -41,7 +41,7 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
    *
    * Single mode means sending email to one specific contact.
    *
-   * @var boolean
+   * @var bool
    */
   public $_single = FALSE;
 
@@ -49,7 +49,7 @@ class CRM_Contact_Form_Task_Email extends CRM_Contact_Form_Task {
    * Are we operating in "single mode", i.e. sending email to one
    * specific contact?
    *
-   * @var boolean
+   * @var bool
    */
   public $_noEmails = FALSE;
 

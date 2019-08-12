@@ -58,7 +58,7 @@ class civicrm_handler_field_email extends civicrm_handler_field_location {
   }
 
   public function render($values) {
-    if ($this->options['link_to_user'] == 'mailto') {
+    if ($this->options['link_to_user'] == 'mailto' && !empty($values->{$this->field_alias})) {
       return l($values->{$this->field_alias}, "mailto:" . $values->{$this->field_alias});
     }
     return check_plain($values->{$this->field_alias});

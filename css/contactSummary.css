@@ -49,7 +49,7 @@ div#crm-contact-thumbnail {
   min-height: 2.5em;
 }
 
-#crm-container div.crm-inline-edit .crm-edit-help {
+#crm-container div.crm-summary-block .crm-edit-help {
   display: none;
   position: absolute;
   right: 0;

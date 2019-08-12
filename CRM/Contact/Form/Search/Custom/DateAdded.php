@@ -193,7 +193,7 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     $startDate = !empty($this->_formValues['start_date']) ? $this->_formValues['start_date'] : date('Y-m-d');
     $endDateFix = NULL;
     if (!empty($this->_formValues['end_date'])) {
-      # tack 11:59pm on to make search inclusive of the end date
+      // tack 11:59pm on to make search inclusive of the end date
       $endDateFix = "AND date_added <= '{$this->_formValues['end_date']} 23:59:00'";
     }
 

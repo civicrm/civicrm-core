@@ -54,7 +54,6 @@ class CRM_Contact_BAO_RelationshipType extends CRM_Contact_DAO_RelationshipType 
     $relationshipType->copyValues($params);
     if ($relationshipType->find(TRUE)) {
       CRM_Core_DAO::storeValues($relationshipType, $defaults);
-      $relationshipType->free();
       return $relationshipType;
     }
     return NULL;
