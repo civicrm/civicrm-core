@@ -334,6 +334,40 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test prefix & suffix work when you specify the label.
+   *
+   * There is an expectation that you can import by label here.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testPrefixLabel() {
+    $this->callAPISuccess('OptionValue', 'create', ['option_group_id' => 'individual_prefix', 'name' => 'new_one', 'label' => 'special', 'value' => 70]);
+    $mapping = [
+      ['name' => 'first_name', 'column_number' => 1],
+      ['name' => 'last_name', 'column_number' => 2],
+      ['name' => 'email', 'column_number' => 3, 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Email', 'location_type_id', 'Home')],
+      ['name' => 'prefix_id', 'column_number' => 5],
+      ['name' => 'suffix_id', 'column_number' => 4],
+    ];
+    $processor = new CRM_Import_ImportProcessor();
+    $processor->setMappingFields($mapping);
+    $processor->setContactType('Individual');
+    $importer = $processor->getImporterObject();
+
+    $contactValues = [
+      'Bill',
+      'Gates',
+      'bill.gates@microsoft.com',
+      'III',
+      'special',
+    ];
+    $importer->import(CRM_Import_Parser::DUPLICATE_NOCHECK, $contactValues);
+
+    $contact = $this->callAPISuccessGetSingle('Contact', ['first_name' => 'Bill', 'prefix_id' => 'new_one', 'suffix_id' => 'III']);
+  }
+
+  /**
    * Test that labels work for importing custom data.
    *
    * @throws \CRM_Core_Exception

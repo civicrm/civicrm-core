@@ -122,11 +122,11 @@ class CRM_Contact_Import_Parser_Contact extends CRM_Contact_Import_Parser {
    * @param array $mapperRelatedContactWebsiteType
    */
   public function __construct(
-    &$mapperKeys, $mapperLocType = [], $mapperPhoneType = [], $mapperImProvider = [], $mapperRelated = [], $mapperRelatedContactType = [], $mapperRelatedContactDetails = [], $mapperRelatedContactLocType = [], $mapperRelatedContactPhoneType = [], $mapperRelatedContactImProvider = [],
+    $mapperKeys, $mapperLocType = [], $mapperPhoneType = [], $mapperImProvider = [], $mapperRelated = [], $mapperRelatedContactType = [], $mapperRelatedContactDetails = [], $mapperRelatedContactLocType = [], $mapperRelatedContactPhoneType = [], $mapperRelatedContactImProvider = [],
     $mapperWebsiteType = [], $mapperRelatedContactWebsiteType = []
   ) {
     parent::__construct();
-    $this->_mapperKeys = &$mapperKeys;
+    $this->_mapperKeys = $mapperKeys;
     $this->_mapperLocType = &$mapperLocType;
     $this->_mapperPhoneType = &$mapperPhoneType;
     $this->_mapperWebsiteType = $mapperWebsiteType;
