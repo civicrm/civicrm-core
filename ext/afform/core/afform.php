@@ -14,7 +14,7 @@ function _afform_fields() {
  * @return array
  */
 function _afform_fields_filter($params) {
-  $result = array();
+  $result = [];
   foreach (_afform_fields() as $field) {
     if (isset($params[$field])) {
       $result[$field] = $params[$field];
@@ -33,12 +33,12 @@ function _afform_fields_filter($params) {
 }
 
 /**
- * @param ContainerBuilder $container
+ * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
  */
 function afform_civicrm_container($container) {
   $container->setDefinition('afform_scanner', new \Symfony\Component\DependencyInjection\Definition(
     'CRM_Afform_AfformScanner',
-    array()
+    []
   ));
 }
 

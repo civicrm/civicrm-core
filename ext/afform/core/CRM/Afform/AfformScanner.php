@@ -50,7 +50,7 @@ class CRM_Afform_AfformScanner {
       }
     }
 
-    $paths = array();
+    $paths = [];
 
     $mapper = CRM_Extension_System::singleton()->getMapper();
     foreach ($mapper->getModules() as $module) {
@@ -156,7 +156,7 @@ class CRM_Afform_AfformScanner {
    *   Ex: ['view-individual' => ['title' => 'View an individual contact', ...]]
    */
   public function getMetas() {
-    $result = array();
+    $result = [];
     foreach (array_keys($this->findFilePaths()) as $name) {
       $result[$name] = $this->getMeta($name);
     }
