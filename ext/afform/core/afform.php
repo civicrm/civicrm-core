@@ -296,7 +296,7 @@ function afform_civicrm_alterMenu(&$items) {
       $items[$meta['server_route']] = [
         'page_callback' => 'CRM_Afform_Page_AfformBase',
         'page_arguments' => 'afform=' . urlencode($name),
-        'title' => CRM_Utils_Array::value('title', $meta, ''),
+        'title' => $meta['title'] ?? '',
         'access_arguments' => [['access CiviCRM'], 'and'], // FIXME
         'is_public' => $meta['is_public'],
       ];
