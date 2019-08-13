@@ -75,7 +75,7 @@ class CRM_Afform_ArrayHtml {
     }
 
     $doc = new DOMDocument();
-    $doc->loadHTML("<html><body>$html</body></html>");
+    @$doc->loadHTML("<html><body>$html</body></html>");
 
     // FIXME: Validate expected number of child nodes
 
