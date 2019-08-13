@@ -72,7 +72,7 @@ trait CRMTraits_Custom_CustomDataTrait {
    * @throws \CRM_Core_Exception
    */
   public function createCustomGroupWithFieldOfType($groupParams = [], $customFieldType = 'text', $identifier = '') {
-    $supported = ['text', 'select'];
+    $supported = ['text', 'select', 'date'];
     if (!in_array($customFieldType, $supported)) {
       throw new CRM_Core_Exception('we have not yet extracted other custom field types from createCustomFieldsOfAllTypes, Use consistent syntax when you do');
     }
@@ -85,6 +85,10 @@ trait CRMTraits_Custom_CustomDataTrait {
 
       case 'select':
         $customField = $this->createSelectCustomField(['custom_group_id' => $this->ids['CustomGroup'][$groupParams['title']]]);
+        break;
+
+      case 'date':
+        $customField = $this->createDateCustomField(['custom_group_id' => $this->ids['CustomGroup'][$groupParams['title']]]);
         break;
     }
     $this->ids['CustomField'][$identifier . $customFieldType] = $customField['id'];
@@ -102,18 +106,7 @@ trait CRMTraits_Custom_CustomDataTrait {
     $customField = $this->createSelectCustomField(['custom_group_id' => $customGroupID]);
     $ids['select_string'] = $customField['id'];
 
-    $params = [
-      'custom_group_id' => $customGroupID,
-      'name' => 'test_date',
-      'label' => 'test_date',
-      'html_type' => 'Select Date',
-      'data_type' => 'Date',
-      'default_value' => '20090711',
-      'weight' => 3,
-      'time_format' => 1,
-    ];
-
-    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    $customField = $this->createDateCustomField(['custom_group_id' => $customGroupID]);
 
     $ids['select_date'] = $customField['id'];
     $params = [
@@ -246,6 +239,28 @@ trait CRMTraits_Custom_CustomDataTrait {
       'is_searchable' => 0,
       'is_active' => 1,
       'option_values' => $optionValue,
+    ], $params);
+
+    $customField = $this->callAPISuccess('custom_field', 'create', $params);
+    return $customField['values'][$customField['id']];
+  }
+
+  /**
+   * Create a custom field of  type date.
+   *
+   * @param array $params
+   *
+   * @return array
+   */
+  protected function createDateCustomField($params): array {
+    $params = array_merge([
+      'name' => 'test_date',
+      'label' => 'test_date',
+      'html_type' => 'Select Date',
+      'data_type' => 'Date',
+      'default_value' => '20090711',
+      'weight' => 3,
+      'time_format' => 1,
     ], $params);
 
     $customField = $this->callAPISuccess('custom_field', 'create', $params);

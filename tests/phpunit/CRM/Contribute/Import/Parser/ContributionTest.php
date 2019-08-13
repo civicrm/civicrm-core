@@ -11,6 +11,14 @@
  */
 class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
   protected $_tablesToTruncate = [];
+  use CRMTraits_Custom_CustomDataTrait;
+
+  /**
+   * Default entity for class.
+   *
+   * @var string
+   */
+  protected $entity = 'Contribution';
 
   /**
    * Setup function.
@@ -140,6 +148,29 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $values['contribution_status_id'] = 'just say no';
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::ERROR);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID], 2);
+  }
+
+  /**
+   * Test dates are parsed
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testParsedCustomDates() {
+    $this->createCustomGroupWithFieldOfType([], 'date');
+    $mapperKeys = [];
+    $form = new CRM_Contribute_Import_Parser_Contribution($mapperKeys);
+    $params = [$this->getCustomFieldName('date') => '20/10/2019'];
+    CRM_Core_Session::singleton()->set('dateTypes', 32);
+    $formatted = [];
+    $form->formatInput($params, $formatted);
+    // @todo I feel like we should work towards this actually parsing $params here -
+    // & dropping formatting but
+    // per https://github.com/civicrm/civicrm-core/pull/14986 for now $formatted is parsing
+    // The issue I hit was that when I tried to extend to checking they were correctly imported
+    // I was not actually sure what correct behaviour was for what dates were accepted since
+    // on one hand the custom fields have a date format & on the other there is an input format &
+    // it seems to ignore the latter in favour of the former - which seems wrong.
+    $this->assertEquals('20191020000000', $formatted[$this->getCustomFieldName('date')]);
   }
 
   /**
