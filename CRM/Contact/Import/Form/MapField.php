@@ -897,7 +897,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           $locationId = isset($mappingLocation[$i]) ? $mappingLocation[$i] : 0;
           $phoneType = isset($mappingPhoneType[$i]) ? $mappingPhoneType[$i] : NULL;
           //get provider id from saved mappings
-          $imProvider = isset($mappingImProvider[$i]) ? $mappingImProvider[$i] : NULL;
+          $imProvider = $processor->getIMProviderID($i);
 
           if ($websiteTypeId) {
             $defaults["mapper[$i]"] = [$relation, $contactDetails, $websiteTypeId];
@@ -906,15 +906,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
             }
           }
           else {
-            // default for IM/phone when mapping with relation is true
-            $typeId = NULL;
-            if (isset($phoneType)) {
-              $typeId = $phoneType;
-            }
-            elseif (isset($imProvider)) {
-              $typeId = $imProvider;
-            }
-            $defaults["mapper[$i]"] = [$relation, $contactDetails, $locationId, $typeId];
+            $defaults["mapper[$i]"] = [$relation, $contactDetails, $locationId, $processor->getPhoneOrIMTypeID($i)];
             if (!$locationId) {
               $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
             }
@@ -939,9 +931,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           $mappingHeader = array_keys((array) $this->_mapperFields, $mappingName[$i]);
           $websiteTypeId = isset($mappingWebsiteType[$i]) ? $mappingWebsiteType[$i] : NULL;
           $locationId = isset($mappingLocation[$i]) ? $mappingLocation[$i] : 0;
-          $phoneType = isset($mappingPhoneType[$i]) ? $mappingPhoneType[$i] : NULL;
-          // get IM service provider id
-          $imProvider = isset($mappingImProvider[$i]) ? $mappingImProvider[$i] : NULL;
 
           if ($websiteTypeId) {
             $defaults["mapper[$i]"] = [$fieldName, $websiteTypeId];
@@ -950,18 +939,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
             if (!$locationId) {
               $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
             }
-            //default for IM/phone without related contact
-            $typeId = NULL;
-            if (isset($phoneType)) {
-              $typeId = $phoneType;
-            }
-            elseif (isset($imProvider)) {
-              $typeId = $imProvider;
-            }
-            $defaults["mapper[$i]"] = [$fieldName ?? '', $locationId, $typeId];
+            $defaults["mapper[$i]"] = [$fieldName ?? '', $locationId, $processor->getPhoneOrIMTypeID($i)];
           }
 
-          if ((!$phoneType) && (!$imProvider)) {
+          if (!$processor->getPhoneOrIMTypeID($i)) {
             $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
           }
 
