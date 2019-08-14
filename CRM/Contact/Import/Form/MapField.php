@@ -408,8 +408,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
 
-      if ($this->get('savedMapping')) {
-        list($defaults, $js) = $this->loadSavedMapping($processor, $mappingName, $i, $defaults, $formName, $js, $hasColumnNames, $dataPatterns);
+      if ($this->get('savedMapping') && $processor->getFieldName($i)) {
+        list($defaults, $js) = $this->loadSavedMapping($processor, $mappingName, $i, $defaults, $formName, $js);
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
@@ -860,43 +860,30 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  public function loadSavedMapping($processor, $mappingName, $i, $defaults, $js, $hasColumnNames, $dataPatterns) {
+  public function loadSavedMapping($processor, $mappingName, $i, $defaults, $js) {
     $fieldName = $processor->getFieldName($i);
     $websiteTypeId = $processor->getWebsiteTypeID($i);
     $locationId = $processor->getLocationTypeID($i);
-    if ($fieldName) {
-      $js .= $processor->getQuickFormJSForField($i);
-      if ($fieldName != ts('- do not import -')) {
-        if ($processor->getRelationshipKey($i)) {
-          if ($websiteTypeId) {
-            $defaults["mapper[$i]"] = [$processor->getValidRelationshipKey($i), $fieldName, $websiteTypeId];
-          }
-          $jsSet = TRUE;
+    $js .= $processor->getQuickFormJSForField($i);
+    if ($fieldName != ts('- do not import -')) {
+      if ($processor->getRelationshipKey($i)) {
+        if ($websiteTypeId) {
+          $defaults["mapper[$i]"] = [$processor->getValidRelationshipKey($i), $fieldName, $websiteTypeId];
         }
-        else {
-          if ($websiteTypeId) {
-            $defaults["mapper[$i]"] = [$fieldName, $websiteTypeId];
-          }
-          else {
-            $defaults["mapper[$i]"] = [$fieldName ?? '', $locationId, $processor->getPhoneOrIMTypeID($i)];
-          }
-          $jsSet = TRUE;
-        }
+        $jsSet = TRUE;
       }
       else {
-        $defaults["mapper[$i]"] = [];
+        if ($websiteTypeId) {
+          $defaults["mapper[$i]"] = [$fieldName, $websiteTypeId];
+        }
+        else {
+          $defaults["mapper[$i]"] = [$fieldName ?? '', $locationId, $processor->getPhoneOrIMTypeID($i)];
+        }
+        $jsSet = TRUE;
       }
     }
     else {
-      // this load section to help mapping if we ran out of saved columns when doing Load Mapping
-      $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
-
-      if ($hasColumnNames) {
-        $defaults["mapper[$i]"] = [$this->defaultFromColumnName($this->_columnNames[$i], $columnPatterns)];
-      }
-      else {
-        $defaults["mapper[$i]"] = [$this->defaultFromData($dataPatterns, $i)];
-      }
+      $defaults["mapper[$i]"] = [];
     }
     return [$defaults, $js];
   }
