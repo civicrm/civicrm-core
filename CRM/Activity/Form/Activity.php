@@ -325,7 +325,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
 
     // Assigning Activity type name.
     if ($this->_activityTypeId) {
-      $activityTypeDisplayLabels = CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $this->_activityTypeId, 'label');
+      $activityTypeDisplayLabels = $this->getActivityTypeDisplayLabels();
       if ($activityTypeDisplayLabels[$this->_activityTypeId]) {
         $this->_activityTypeName = $activityTypeDisplayLabels[$this->_activityTypeId];
         // can't change this instance of activityTName yet - will come back to it dev/core#1116
@@ -1247,6 +1247,15 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $className = "CRM_{$this->_crmDir}_Form_Activity_{$this->_activityTypeFile}";
       $className::endPostProcess($this, $params, $activity);
     }
+  }
+
+  /**
+   * For the moment keeping this the same as the original pulled from preProcess(). Also note the "s" at the end of the function name - planning to change that but in baby steps.
+   *
+   * @return string[]
+   */
+  public function getActivityTypeDisplayLabels() {
+    return CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $this->_activityTypeId, 'label');
   }
 
 }
