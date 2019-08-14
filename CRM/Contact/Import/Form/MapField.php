@@ -871,19 +871,11 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       if ($fieldName != ts('- do not import -')) {
         $js .= $processor->getQuickFormJSForField($i);
         if ($processor->getRelationshipKey($i)) {
-
-          $contactDetails = strtolower(str_replace(" ", "_", $mappingName[$i]));
-
           if ($websiteTypeId) {
-            $defaults["mapper[$i]"] = [$processor->getValidRelationshipKey($i), $contactDetails, $websiteTypeId];
+            $defaults["mapper[$i]"] = [$processor->getValidRelationshipKey($i), $fieldName, $websiteTypeId];
           }
 
-          // fix for edge cases, CRM-4954
-          if ($contactDetails == 'image_url') {
-            $contactDetails = str_replace('url', 'URL', $contactDetails);
-          }
-
-          if (!$contactDetails) {
+          if (!$fieldName) {
             $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
           }
 
