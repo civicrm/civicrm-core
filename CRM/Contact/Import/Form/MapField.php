@@ -410,7 +410,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       if ($this->get('savedMapping') && $processor->getFieldName($i)) {
         $js .= $processor->getQuickFormJSForField($i);
-        list($defaults) = $this->loadSavedMapping($processor, $i, $defaults);
+        $defaults["mapper[$i]"] = $this->loadSavedMapping($processor, $i);
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
@@ -850,8 +850,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
    * @param \CRM_Import_ImportProcessor $processor
-   * @param $mappingName
    * @param int $i
+<<<<<<< HEAD
    * @param array $defaults
    * @param string $js
    * @param bool $hasColumnNames
@@ -861,15 +861,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-<<<<<<< HEAD
-<<<<<<< HEAD
-  public function loadSavedMapping($processor, $mappingName, $i, $defaults, $js) {
-=======
-  protected function loadSavedMapping($processor, $mappingName, $i, $defaults) {
->>>>>>> Remove js from load saved mapping
-=======
-  protected function loadSavedMapping($processor, $i, $defaults) {
->>>>>>> Stop passing mappingName
+  public function loadSavedMapping($processor, $i) {
     $fieldName = $processor->getFieldName($i);
     $websiteTypeId = $processor->getWebsiteTypeID($i);
     $locationId = $processor->getLocationTypeID($i);
@@ -877,30 +869,22 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     if ($fieldName != ts('- do not import -')) {
       if ($processor->getRelationshipKey($i)) {
         if ($websiteTypeId) {
-          $defaults["mapper[$i]"] = [$processor->getValidRelationshipKey($i), $fieldName, $websiteTypeId];
+          return [$processor->getValidRelationshipKey($i), $fieldName, $websiteTypeId];
         }
       }
       else {
         if ($websiteTypeId) {
-          $defaults["mapper[$i]"] = [$fieldName, $websiteTypeId];
+          return [$fieldName, $websiteTypeId];
         }
         else {
-          $defaults["mapper[$i]"] = [$fieldName ?? '', $locationId, $processor->getPhoneOrIMTypeID($i)];
+          return [$fieldName ?? '', $locationId, $processor->getPhoneOrIMTypeID($i)];
         }
       }
     }
     else {
-      $defaults["mapper[$i]"] = [];
+      return  [];
     }
-<<<<<<< HEAD
-<<<<<<< HEAD
-    return [$defaults, $js];
-=======
-    return [$mappingName, $defaults];
->>>>>>> Remove js from load saved mapping
-=======
     return [$defaults];
->>>>>>> Stop passing mappingName
   }
 
 }
