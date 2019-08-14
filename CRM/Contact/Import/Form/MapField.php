@@ -410,7 +410,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       if ($this->get('savedMapping') && $processor->getFieldName($i)) {
         $js .= $processor->getQuickFormJSForField($i);
-        $defaults["mapper[$i]"] = $this->loadSavedMapping($processor, $i);
+        $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
@@ -851,12 +851,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   /**
    * @param \CRM_Import_ImportProcessor $processor
    * @param int $i
-<<<<<<< HEAD
-   * @param array $defaults
-   * @param string $js
-   * @param bool $hasColumnNames
-   * @param array $dataPatterns
-   * @param array $columnPatterns
    *
    * @return array
    * @throws \CiviCRM_API3_Exception
@@ -887,4 +881,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     return [$defaults];
   }
 
+=======
+>>>>>>> Move defaults retrieval to Processor class
 }

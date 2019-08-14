@@ -522,4 +522,35 @@ class CRM_Import_ImportProcessor {
     return implode("\n ", $jsClauses);
   }
 
+  /**
+   * Get the defaults for the column from the saved mapping.
+   *
+   * @param int $i
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getSavedQuickformDefaultsForColumn($i) {
+    $fieldName = $this->getFieldName($i);
+    $websiteTypeId = $this->getWebsiteTypeID($i);
+    $locationId = $this->getLocationTypeID($i);
+
+    if ($fieldName != ts('- do not import -')) {
+      if ($this->getRelationshipKey($i)) {
+        if ($websiteTypeId) {
+          return [$this->getValidRelationshipKey($i), $fieldName, $websiteTypeId];
+        }
+      }
+      else {
+        if ($websiteTypeId) {
+          return [$fieldName, $websiteTypeId];
+        }
+        return [$fieldName ?? '', $locationId, $this->getPhoneOrIMTypeID($i)];
+      }
+    }
+    else {
+      return [];
+    }
+  }
+
 }
