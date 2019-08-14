@@ -487,13 +487,39 @@ class CRM_Import_ImportProcessor {
    * @throws \CiviCRM_API3_Exception
    */
   public function getQuickFormJSForField($column) {
-    if ($this->getValidRelationshipKey($column)
-      && !$this->getWebsiteTypeID($column)
-      && !$this->getLocationTypeID($column)
-    ) {
-      return $this->getFormName() . "['mapper[$column][2]'].style.display = 'none';\n";
+    $columnNumbersToHide = [];
+
+    if ($this->getFieldName($column) === '- do not import -') {
+      $columnNumbersToHide = [1, 2, 3];
     }
-    return '';
+    if ($this->getValidRelationshipKey($column)) {
+      if (!$this->getFieldName($column)) {
+        $columnNumbersToHide[] = 1;
+      }
+      if (!$this->getWebsiteTypeID($column)
+        && !$this->getLocationTypeID($column)
+      ) {
+        $columnNumbersToHide[] = 2;
+      }
+      if (!$this->getPhoneOrIMTypeID($column)) {
+        $columnNumbersToHide[] = 3;
+      }
+    }
+    else {
+      if (!$this->getLocationTypeID($column)) {
+        $columnNumbersToHide[] = 1;
+      }
+      if (!$this->getPhoneOrIMTypeID($column)) {
+        $columnNumbersToHide[] = 2;
+      }
+      $columnNumbersToHide[] = 3;
+    }
+
+    $jsClauses = [];
+    foreach ($columnNumbersToHide as $columnNumber) {
+      $jsClauses[] = $this->getFormName() . "['mapper[$column][" . $columnNumber . "]'].style.display = 'none';";
+    }
+    return implode("\n ", $jsClauses);
   }
 
 }

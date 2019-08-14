@@ -860,29 +860,17 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  public  function loadSavedMapping($processor, $mappingName, $i, $defaults, $js, $hasColumnNames, $dataPatterns) {
-    $jsSet = FALSE;
-    $formName = $processor->getFormName();
+  public function loadSavedMapping($processor, $mappingName, $i, $defaults, $js, $hasColumnNames, $dataPatterns) {
     $fieldName = $processor->getFieldName($i);
     $websiteTypeId = $processor->getWebsiteTypeID($i);
     $locationId = $processor->getLocationTypeID($i);
-
     if ($fieldName) {
+      $js .= $processor->getQuickFormJSForField($i);
       if ($fieldName != ts('- do not import -')) {
-        $js .= $processor->getQuickFormJSForField($i);
         if ($processor->getRelationshipKey($i)) {
           if ($websiteTypeId) {
             $defaults["mapper[$i]"] = [$processor->getValidRelationshipKey($i), $fieldName, $websiteTypeId];
           }
-
-          if (!$fieldName) {
-            $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
-          }
-
-          if (!$processor->getPhoneOrIMTypeID($i)) {
-            $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
-          }
-          //$js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
           $jsSet = TRUE;
         }
         else {
@@ -890,28 +878,13 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
             $defaults["mapper[$i]"] = [$fieldName, $websiteTypeId];
           }
           else {
-            if (!$locationId) {
-              $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
-            }
             $defaults["mapper[$i]"] = [$fieldName ?? '', $locationId, $processor->getPhoneOrIMTypeID($i)];
           }
-
-          if (!$processor->getPhoneOrIMTypeID($i)) {
-            $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
-          }
-
-          $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
-
           $jsSet = TRUE;
         }
       }
       else {
         $defaults["mapper[$i]"] = [];
-      }
-      if (!$jsSet) {
-        for ($k = 1; $k < 4; $k++) {
-          $js .= "{$formName}['mapper[$i][$k]'].style.display = 'none';\n";
-        }
       }
     }
     else {
