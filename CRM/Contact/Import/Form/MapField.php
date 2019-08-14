@@ -410,7 +410,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       if ($this->get('savedMapping') && $processor->getFieldName($i)) {
         $js .= $processor->getQuickFormJSForField($i);
-        list($defaults) = $this->loadSavedMapping($processor, $mappingName, $i, $defaults);
+        list($defaults) = $this->loadSavedMapping($processor, $i, $defaults);
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
@@ -862,10 +862,14 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CiviCRM_API3_Exception
    */
 <<<<<<< HEAD
+<<<<<<< HEAD
   public function loadSavedMapping($processor, $mappingName, $i, $defaults, $js) {
 =======
   protected function loadSavedMapping($processor, $mappingName, $i, $defaults) {
 >>>>>>> Remove js from load saved mapping
+=======
+  protected function loadSavedMapping($processor, $i, $defaults) {
+>>>>>>> Stop passing mappingName
     $fieldName = $processor->getFieldName($i);
     $websiteTypeId = $processor->getWebsiteTypeID($i);
     $locationId = $processor->getLocationTypeID($i);
@@ -889,10 +893,14 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $defaults["mapper[$i]"] = [];
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
     return [$defaults, $js];
 =======
     return [$mappingName, $defaults];
 >>>>>>> Remove js from load saved mapping
+=======
+    return [$defaults];
+>>>>>>> Stop passing mappingName
   }
 
 }
