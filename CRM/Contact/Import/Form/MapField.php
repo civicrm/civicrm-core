@@ -400,6 +400,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $processor->setFormName($formName);
     $processor->setMetadata($this->getContactImportMetadata());
     $processor->setContactTypeByConstant($this->get('contactType'));
+    $processor->setContactSubType($this->get('contactSubType'));
+    if ($this->get('contactSubType')) {
+      $this->_contactSubType = $this->get('contactSubType');
+    }
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
@@ -867,33 +871,17 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       if ($fieldName != ts('- do not import -')) {
 
         if ($processor->getRelationshipKey($i)) {
-          //CRM-5125
-          $contactSubType = NULL;
-          if ($this->get('contactSubType')) {
-            $contactSubType = $this->get('contactSubType');
-          }
-
-          $relations = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $processor->getContactType(),
-            FALSE, 'label', TRUE, $contactSubType
-          );
-
-          foreach ($relations as $key => $var) {
-            if ($key == $processor->getRelationshipKey($i)) {
-              $relation = $key;
-              break;
-            }
-          }
 
           $contactDetails = strtolower(str_replace(" ", "_", $mappingName[$i]));
 
           if ($websiteTypeId) {
-            $defaults["mapper[$i]"] = [$relation, $contactDetails, $websiteTypeId];
+            $defaults["mapper[$i]"] = [$processor->getValidRelationshipKey($i), $contactDetails, $websiteTypeId];
             if (!$websiteTypeId) {
               $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
             }
           }
           else {
-            $defaults["mapper[$i]"] = [$relation, $contactDetails, $locationId, $processor->getPhoneOrIMTypeID($i)];
+            $defaults["mapper[$i]"] = [$processor->getValidRelationshipKey($i), $contactDetails, $locationId, $processor->getPhoneOrIMTypeID($i)];
             if (!$locationId) {
               $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
             }
