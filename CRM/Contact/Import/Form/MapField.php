@@ -952,9 +952,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           $imProvider = isset($mappingImProvider[$i]) ? $mappingImProvider[$i] : NULL;
 
           if ($websiteTypeId) {
-            if (!$websiteTypeId) {
-              $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
-            }
             $defaults["mapper[$i]"] = [$mappingHeader[0], $websiteTypeId];
           }
           else {
