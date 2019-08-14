@@ -478,4 +478,22 @@ class CRM_Import_ImportProcessor {
     return !empty($this->getValidRelationships()[$key]) ? TRUE : FALSE;
   }
 
+  /**
+   * Get the relevant js for quickform.
+   *
+   * @param int $column
+   *
+   * @return string
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getQuickFormJSForField($column) {
+    if ($this->getValidRelationshipKey($column)
+      && !$this->getWebsiteTypeID($column)
+      && !$this->getLocationTypeID($column)
+    ) {
+      return $this->getFormName() . "['mapper[$column][2]'].style.display = 'none';\n";
+    }
+    return '';
+  }
+
 }
