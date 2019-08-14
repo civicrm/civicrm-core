@@ -404,6 +404,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $processor->setMappingID($savedMappingID);
     $processor->setFormName($formName);
     $processor->setMetadata($this->getContactImportMetadata());
+    $processor->setContactTypeByConstant($this->get('contactType'));
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
@@ -873,27 +874,14 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     if ($fieldName) {
       if ($fieldName != ts('- do not import -')) {
 
-        if (isset($mappingRelation[$i])) {
-          // relationship mapping
-          switch ($this->get('contactType')) {
-            case CRM_Import_Parser::CONTACT_INDIVIDUAL:
-              $contactType = 'Individual';
-              break;
-
-            case CRM_Import_Parser::CONTACT_HOUSEHOLD:
-              $contactType = 'Household';
-              break;
-
-            case CRM_Import_Parser::CONTACT_ORGANIZATION:
-              $contactType = 'Organization';
-          }
+        if ($processor->getRelationshipKey($i)) {
           //CRM-5125
           $contactSubType = NULL;
           if ($this->get('contactSubType')) {
             $contactSubType = $this->get('contactSubType');
           }
 
-          $relations = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $contactType,
+          $relations = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $processor->getContactType(),
             FALSE, 'label', TRUE, $contactSubType
           );
 
