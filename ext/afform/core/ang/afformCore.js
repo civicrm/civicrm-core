@@ -3,19 +3,21 @@
   angular.module('afformCore', CRM.angRequires('afformCore'));
 
   // Use `afformCoreDirective(string name)` to generate an AngularJS directive.
-  angular.module('afformCore').service('afformCoreDirective', function($routeParams, crmApi4, crmStatus, crmUiAlert){
-    return function(camelName, meta, d){
+  angular.module('afformCore').service('afformCoreDirective', function($routeParams, crmApi4, crmStatus, crmUiAlert) {
+    return function(camelName, meta, d) {
       d.restrict = 'AE';
       d.scope = {};
       d.scope.options = '=' + camelName;
-      d.link = function($scope, $el, $attr) {
-        $scope.ts = CRM.ts(camelName);
-        $scope.routeParams = $routeParams;
-        $scope.meta = meta;
-        $scope.crmApi4 = crmApi4;
-        $scope.crmStatus = crmStatus;
-        $scope.crmUiAlert = crmUiAlert;
-        $scope.crmUrl = CRM.url;
+      d.link = {
+        pre: function($scope, $el, $attr) {
+          $scope.ts = CRM.ts(camelName);
+          $scope.routeParams = $routeParams;
+          $scope.meta = meta;
+          $scope.crmApi4 = crmApi4;
+          $scope.crmStatus = crmStatus;
+          $scope.crmUiAlert = crmUiAlert;
+          $scope.crmUrl = CRM.url;
+        }
       };
       return d;
     };

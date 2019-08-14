@@ -9,9 +9,6 @@
         ctrl: '@'
       },
       link: {
-        pre: function($scope, $el, $attr) {
-
-        },
         post: function($scope, $el, $attr) {
           $scope.myCtrl.loadData();
         }
