@@ -247,8 +247,8 @@ class CRM_Contribute_Import_Form_MapField extends CRM_Import_Form_MapField {
             $defaults["mapper[$i]"] = [
               CRM_Utils_Array::value(0, $mappingHeader),
               ($softField) ? $softField : "",
-              (isset($locationId)) ? $locationId : "",
-              (isset($phoneType)) ? $phoneType : "",
+              "",
+              "",
             ];
             $jsSet = TRUE;
           }
