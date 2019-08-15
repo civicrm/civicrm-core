@@ -149,4 +149,77 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     return $form;
   }
 
+  /**
+   * Test the function that loads saved field mappings.
+   *
+   * @dataProvider mapFieldDataProvider
+   *
+   * @param array $fieldSpec
+   * @param string $expectedJS
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testLoadSavedMapping($fieldSpec, $expectedJS) {
+    $form = $this->getFormObject('CRM_Contact_Import_Form_MapField');
+    /* @var CRM_Contact_Import_Form_MapField $form */
+    $form->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
+
+    $mapping = $this->callAPISuccess('Mapping', 'create', ['name' => 'my test']);
+    $this->callAPISuccess('MappingField', 'create', array_merge(['mapping_id' => $mapping], $fieldSpec));
+    $result = $this->loadSavedMapping($form, $mapping['id'], 1);
+    $this->assertEquals($expectedJS, $result['js']);
+  }
+
+  /**
+   * Get data for map field tests.
+   */
+  public function mapFieldDataProvider() {
+    return [
+      [
+        ['name' => 'First Name', 'contact_type' => 'Individual', 'column_number' => 1],
+        'document.forms.MapField[\'mapper[1][1]\'].style.display = \'none\';
+document.forms.MapField[\'mapper[1][2]\'].style.display = \'none\';
+document.forms.MapField[\'mapper[1][3]\'].style.display = \'none\';
+',
+      ],
+    ];
+  }
+
+  /**
+   * Wrapper for loadSavedMapping.
+   *
+   * This signature of the function we are calling is funky as a new extraction & will be refined.
+   *
+   * @param \CRM_Contact_Import_Form_MapField $form
+   *
+   * @param int $mappingID
+   * @param int $columnNumber
+   *
+   * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function loadSavedMapping($form, $mappingID, $columnNumber) {
+    list($mappingName, $mappingContactType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $mappingRelation, $mappingOperator, $mappingValue, $mappingWebsiteType) = CRM_Core_BAO_Mapping::getMappingFields($mappingID, TRUE);
+
+    //get loaded Mapping Fields
+    $mappingName = CRM_Utils_Array::value(1, $mappingName);
+    $mappingLocation = CRM_Utils_Array::value(1, $mappingLocation);
+    $mappingPhoneType = CRM_Utils_Array::value(1, $mappingPhoneType);
+    $mappingImProvider = CRM_Utils_Array::value(1, $mappingImProvider);
+    $mappingRelation = CRM_Utils_Array::value(1, $mappingRelation);
+    $mappingWebsiteType = CRM_Utils_Array::value(1, $mappingWebsiteType);
+    $defaults = [];
+    $formName = 'document.forms.MapField';
+    $js = '';
+    $hasColumnNames = TRUE;
+    // @todo - can use metadata trait once https://github.com/civicrm/civicrm-core/pull/15018 is merged.
+    $dataPatterns = [];
+    $columnPatterns = [];
+
+    $return = $form->loadSavedMapping($mappingName, $columnNumber, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
+    return ['defaults' => $return[0], 'js' => $return[1]];
+  }
+
 }
