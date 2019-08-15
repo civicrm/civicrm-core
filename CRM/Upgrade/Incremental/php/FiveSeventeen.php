@@ -90,7 +90,7 @@ class CRM_Upgrade_Incremental_php_FiveSeventeen extends CRM_Upgrade_Incremental_
    * @param string $rev
    */
   public function upgrade_5_17_alpha1($rev) {
-    $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => $rev)), 'runSql', $rev);
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Update smart groups where jcalendar fields have been converted to datepicker', 'updateSmartGroups', [
       'datepickerConversion' => [
         'contribution_recur_start_date',
@@ -102,6 +102,18 @@ class CRM_Upgrade_Incremental_php_FiveSeventeen extends CRM_Upgrade_Incremental_
         'contribution_recur_failure_retry_date',
       ],
     ]);
+    $this->addTask(ts('Add pptx to accepted attachment file types'), 'updateFileTypes');
+  }
+
+  /**
+   * Update safe file types.
+   */
+  public function updateFileTypes() {
+    CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'safe_file_extension',
+      ['label' => 'pptx', 'name' => 'pptx'],
+    ]);
+    return TRUE;
   }
 
 }
