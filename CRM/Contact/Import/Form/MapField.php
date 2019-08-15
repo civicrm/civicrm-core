@@ -176,7 +176,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     $showColNames = TRUE;
-    if ($dataSource == 'CRM_Import_DataSource_CSV' && !$skipColumnHeader) {
+    if ($dataSource === 'CRM_Import_DataSource_CSV' && !$skipColumnHeader) {
       $showColNames = FALSE;
     }
     $this->assign('showColNames', $showColNames);
@@ -301,7 +301,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       else {
         $id = $first = $second = NULL;
       }
-      if (($first == 'a' && $second == 'b') || ($first == 'b' && $second == 'a')) {
+      if (($first === 'a' && $second === 'b') || ($first === 'b' && $second === 'a')) {
         $cType = $contactRelationCache[$id]["contact_type_{$second}"];
 
         //CRM-5125 for contact subtype specific relationshiptypes
@@ -322,7 +322,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           if (isset($hasLocationTypes[$name])) {
             $sel3[$key][$name] = $this->_location_types;
           }
-          elseif ($name == 'url') {
+          elseif ($name === 'url') {
             $sel3[$key][$name] = $websiteTypes;
           }
           else {
@@ -354,7 +354,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         }
 
         foreach ($highlightedFields as $k => $v) {
-          if ($v == $cType || $v == 'All') {
+          if ($v == $cType || $v === 'All') {
             $highlightedRelFields[$key][] = $k;
           }
         }
@@ -385,7 +385,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         if (!empty($hasLocationTypes[$key])) {
           $options = $this->_location_types;
         }
-        elseif ($key == 'url') {
+        elseif ($key === 'url') {
           $options = $websiteTypes;
         }
         $sel2[$key] = $options;
@@ -407,7 +407,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
         if ($hasColumnNames) {
           // do array search first to see if has mapped key
-          $columnKey = '';
           $columnKey = array_search($this->_columnNames[$i], $this->_mapperFields);
           if (isset($this->_fieldUsed[$columnKey])) {
             $defaults["mapper[$i]"] = $columnKey;
@@ -589,17 +588,17 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       //need to differentiate non location elements.
       if ($selOne && (is_numeric($selOne) || $selOne === 'Primary')) {
-        if ($fldName == 'url') {
+        if ($fldName === 'url') {
           $parserParameters['mapperWebsiteType'][$i] = $websiteTypes[$selOne];
         }
         else {
           $locations[$i] = $locationTypes[$selOne];
           $parserParameters['mapperLocType'][$i] = $selOne;
           if ($selTwo && is_numeric($selTwo)) {
-            if ($fldName == 'phone') {
+            if ($fldName === 'phone') {
               $parserParameters['mapperPhoneType'][$i] = $phoneTypes[$selTwo];
             }
-            elseif ($fldName == 'im') {
+            elseif ($fldName === 'im') {
               $parserParameters['mapperImProvider'][$i] = $imProviders[$selTwo];
             }
           }
@@ -608,21 +607,21 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
       //relationship contact mapper info.
       list($id, $first, $second) = CRM_Utils_System::explode('_', $fldName, 3);
-      if (($first == 'a' && $second == 'b') ||
-        ($first == 'b' && $second == 'a')
+      if (($first === 'a' && $second === 'b') ||
+        ($first === 'b' && $second === 'a')
       ) {
         $parserParameters['mapperRelated'][$i] = $this->_mapperFields[$fldName];
         if ($selOne) {
-          if ($selOne == 'url') {
+          if ($selOne === 'url') {
             $parserParameters['relatedContactWebsiteType'][$i] = $websiteTypes[$selTwo];
           }
           else {
             $parserParameters['relatedContactLocType'][$i] = CRM_Utils_Array::value($selTwo, $locationTypes);
             if ($selThree) {
-              if ($selOne == 'phone') {
+              if ($selOne === 'phone') {
                 $parserParameters['relatedContactPhoneType'][$i] = $phoneTypes[$selThree];
               }
-              elseif ($selOne == 'im') {
+              elseif ($selOne === 'im') {
                 $parserParameters['relatedContactImProvider'][$i] = $imProviders[$selThree];
               }
             }
