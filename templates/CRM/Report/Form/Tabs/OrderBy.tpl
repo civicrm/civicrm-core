@@ -82,7 +82,7 @@
       function hideRow(i) {
         showHideRow(i);
         // clear values on hidden field, so they're not saved
-        cj('select#order_bys_'+ i +'_column').val('');
+        cj('select#order_bys_'+ i +'_column').val('-');
         cj('select#order_bys_'+ i +'_order').val('ASC');
         cj('input#order_by_section_'+ i).prop('checked', false);
         cj('input#order_by_pagebreak_'+ i).prop('checked', false);
