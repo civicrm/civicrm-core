@@ -1207,6 +1207,27 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
   }
 
   /**
+   * It is possible to override the membership id that is updated from the payment processor.
+   *
+   * Historically Paypal does this & it still does if it determines data is messed up - see
+   * https://lab.civicrm.org/dev/membership/issues/13
+   *
+   * Read the comment block on repeattransaction for more information
+   * about how things should  work.
+   *
+   * @param int $contributionID
+   * @param array $input
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected static function handleMembershipIDOverride($contributionID, $input) {
+    if (!empty($input['membership_id'])) {
+      Civi::log()->debug('The related membership id has been overridden - this may impact data - see  https://github.com/civicrm/civicrm-core/pull/15053');
+      civicrm_api3('MembershipPayment', 'create', ['contribution_id' => $contributionID, 'membership_id' => $input['membership_id']]);
+    }
+  }
+
+  /**
    * @inheritDoc
    */
   public function addSelectWhereClause() {
@@ -2401,11 +2422,35 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
   /**
    * Repeat a transaction as part of a recurring series.
    *
-   * Only call this via the api as it is being refactored. The intention is that the repeatTransaction function
-   * (possibly living on the ContributionRecur BAO) would be called first to create a pending contribution with a
-   * subsequent call to the contribution.completetransaction api.
+   * The ideal flow is
+   * 1) Processor calls contribution.repeattransaction with contribution_status_id = Pending
+   * 2) The repeattransaction loads the 'template contribution' and calls a hook to allow altering of it .
+   * 3) Repeat transaction calls order.create to create the pending contribution with correct line items
+   *   and associated entities.
+   * 4) The  calling code calls Payment.create which in turn calls CompleteOrder (if completing)
+   *   which updates the various entities and sends appropriate emails.
    *
-   * The completeTransaction functionality has historically been overloaded to both complete and repeat payments.
+   * Gaps in the above (@todo)
+   *  1) many processors still call repeattransaction with contribution_status_id = Completed
+   *  2) repeattransaction code is current munged into completeTransaction code for historical bad coding reasons
+   *  3) Repeat transaction duplicates rather than calls Order.create
+   *  4) Use of payment.create still limited - completetransaction is more common.
+   *  5) the template transaction is tricky - historically we used the first contribution
+   *    linked to a recurring contribution. More recently that was changed to be the most recent.
+   *    Ideally it would be an actual template - not a contribution used as a template which
+   *    would give more appropriate flexibility. Note line_items have an entity so that table
+   *    could be used for the line item template - the difficulty is the custom fields...
+   * 6) the determination of the membership to be linked is tricksy. The prioritised method is
+   *   to load the membership(s) referred to via line items in the template transactions. Any other
+   *   method is likely to lead to incorrect line items & related entities being created (as the line_item
+   *   link is a required part of 'correct data'). However there are 3 other methods to determine it
+   *   - membership_payment record
+   *   - civicrm_membership.contribution_recur_id
+   *   - input override.
+   *   Passing in an input override WILL ensure the membership is extended to prevent regressions
+   *   of historical processors since this has been handled 'forever' - specifically for paypal.
+   *   albeit by an even nastier mechanism than the current input override.
+   *   The count is out on how correct related entities wind up in this case.
    *
    * @param CRM_Contribute_BAO_Contribution $contribution
    * @param array $input
@@ -2469,6 +2514,7 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       $createContribution = civicrm_api3('Contribution', 'create', $contributionParams);
       $contribution->id = $createContribution['id'];
       CRM_Contribute_BAO_ContributionRecur::copyCustomValues($contributionParams['contribution_recur_id'], $contribution->id);
+      self::handleMembershipIDOverride($contribution->id, $input);
       return TRUE;
     }
   }
