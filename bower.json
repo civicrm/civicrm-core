@@ -22,7 +22,7 @@
     "jquery-ui": "~1.12",
     "lodash-compat": "~3.0",
     "google-code-prettify": "~1.0",
-    "select2": "colemanw/select2#stable/3.5",
+    "select2": "colemanw/select2#v3.5-civicrm-1.0",
     "jquery-validation": "~1.13",
     "datatables": "~1.10",
     "jstree": "~3",
