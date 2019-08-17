@@ -675,4 +675,27 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
     $this->assertContains('KEY `INDEX_my_text` (`my_text`)', $dao->Create_Table);
   }
 
+  /**
+   * Check that outputting the display value for a file field with No description doesn't generate error
+   */
+  public function testFileDisplayValueNoDescription() {
+    $customGroup = $this->customGroupCreate([
+      'extends' => 'Individual',
+      'title' => 'Test Contact File Custom Group',
+    ]);
+    $fileField = $this->customFieldCreate([
+      'custom_group_id' => $customGroup['id'],
+      'data_type' => 'File',
+      'html_type' => 'File',
+      'default_value' => '',
+    ]);
+    $filePath = Civi::paths()->getPath('[civicrm.files]/custom/test_file.txt');
+    $file = $this->callAPISuccess('File', 'create', [
+      'uri' => $filePath,
+    ]);
+    $individual = $this->individualCreate(['custom_' . $fileField['id'] => $file['id']]);
+    $expectedDisplayValue = CRM_Core_BAO_File::paperIconAttachment('*', $file['id'])[$file['id']];
+    $this->assertEquals($expectedDisplayValue, CRM_Core_BAO_CustomField::displayValue($file['id'], $fileField['id']));
+  }
+
 }
