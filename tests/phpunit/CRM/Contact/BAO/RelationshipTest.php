@@ -46,6 +46,8 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
    * Tears down the fixture, for example, closes a network connection.
    *
    * This method is called after a test is executed.
+   *
+   * @throws \CRM_Core_Exception
    */
   protected function tearDown() {
     $this->quickCleanup([
@@ -57,10 +59,15 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
     parent::tearDown();
   }
 
+  /**
+   * Test Relationship Type Options Will Return Specified Type
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function testRelationshipTypeOptionsWillReturnSpecifiedType() {
     $orgToOrgType = 'A_B_relationship';
     $orgToOrgReverseType = 'B_A_relationship';
-    civicrm_api3('RelationshipType', 'create', [
+    $this->callAPISuccess('RelationshipType', 'create', [
       'name_a_b' => $orgToOrgType,
       'name_b_a' => $orgToOrgReverseType,
       'contact_type_a' => 'Organization',
@@ -251,19 +258,21 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
 
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $organisationID], 1);
-    // Disable the relationship & check the membership is removed.
+    // Disable the relationship & check the membership is not removed because the other relationship is still valid.
     $relationshipOne['is_active'] = 0;
     $this->callAPISuccess('Relationship', 'create', array_merge($relationshipOne, ['is_active' => 0]));
-    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 0);
-    /*
-     * @todo this section not yet working due to bug in would-be-tested code.
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+
     $relationshipTwo['is_active'] = 0;
     $this->callAPISuccess('Relationship', 'create', $relationshipTwo);
-    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+    $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 0);
 
     $relationshipOne['is_active'] = 1;
     $this->callAPISuccess('Relationship', 'create', $relationshipOne);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
+
+    /*
+     * @todo this section not yet working due to bug in would-be-tested code.
     $relationshipTwo['is_active'] = 1;
     $this->callAPISuccess('Relationship', 'create', $relationshipTwo);
     $this->callAPISuccessGetCount('Membership', ['contact_id' => $individualID], 1);
