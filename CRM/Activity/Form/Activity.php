@@ -747,7 +747,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
     $this->assign('surveyActivity', $this->_isSurveyActivity);
 
     // Add the "Activity Separation" field
-    $actionIsAdd = $this->_action != CRM_Core_Action::UPDATE;
+    $actionIsAdd = ($this->_action != CRM_Core_Action::UPDATE && $this->_action != CRM_Core_Action::VIEW);
     $separationIsPossible = $this->supportsActivitySeparation;
     if ($actionIsAdd && $separationIsPossible) {
       $this->addRadio(
