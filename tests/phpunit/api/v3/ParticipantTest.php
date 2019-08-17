@@ -573,6 +573,9 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals(2, $lineItem['qty']);
     $this->assertEquals(20, $lineItem['unit_price']);
     $this->assertEquals('pricefieldvalue1', $lineItem['label']);
+    $this->callAPISuccess('PriceFieldValue', 'create', ['id' => $pfv2['id'], 'label' => 'Price FIeld Value 2 Label']);
+    $participantGet = $this->callAPISuccess('Participant', 'get', ['id' => $participant['id']]);
+    $this->assertEquals(["pricefieldvalue1 - 2", "pricefieldvalue2 - 2"], $participantGet['values'][$participant['id']]['participant_fee_level']);
 
     // Cleanup
     $this->callAPISuccess('participant', 'delete', ['id' => $participant['id']]);
