@@ -2321,22 +2321,18 @@ AND cc.sort_name LIKE '%$name%'";
    * @param int $mainRelatedContactId
    *
    * @return array
+   * @throws \CiviCRM_API3_Exception
    */
   private static function isInheritedMembershipInvalidated($membershipValues, array $values, $cid, $mainRelatedContactId): array {
-    // Delete memberships of the related contacts only if relationship type exists for membership type
-    $query = "
-SELECT relationship_type_id, relationship_direction
-  FROM civicrm_membership_type
- WHERE id = {$membershipValues['membership_type_id']}";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      $relTypeId = $dao->relationship_type_id;
+    $membershipType = CRM_Member_BAO_MembershipType::getMembershipType($membershipValues['membership_type_id']);
+    $relTypeIds = $membershipType['relationship_type_id'];
+    $membshipInheritedFrom = $membershipValues['owner_membership_id'] ?? NULL;
+    if (!$membshipInheritedFrom || !in_array($values[$cid]['relationshipTypeId'], $relTypeIds)) {
+      return [implode(',', $relTypeIds), FALSE];
     }
-    $relTypeIds = explode(CRM_Core_DAO::VALUE_SEPARATOR, $relTypeId);
-    $isDeletable = in_array($values[$cid]['relationshipTypeId'], $relTypeIds
-      //CRM-16300 check if owner membership exist for related membership
-      ) && !empty($membershipValues['owner_membership_id']) && !empty($values[$mainRelatedContactId]['memberships'][$membershipValues['owner_membership_id']]);
-    return [$relTypeId, $isDeletable];
+    //CRM-16300 check if owner membership exist for related membership
+    $isDeletable = !empty($values[$mainRelatedContactId]['memberships'][$membshipInheritedFrom]);
+    return [implode(',', $relTypeIds), $isDeletable];
   }
 
 }
