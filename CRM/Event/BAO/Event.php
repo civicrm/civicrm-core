@@ -1358,6 +1358,15 @@ WHERE civicrm_event.is_active = 1
 
         CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params);
 
+        //dev/event#10
+        //If the event profile includes a note field and the submitted value of
+        //that field is "", then remove the old note returned by getValues.
+        if (isset($participantParams['note']) && empty($participantParams['note'])) {
+          $noteKeyPos = array_search('note', array_keys($fields));
+          $valuesKeys = array_keys($values);
+          $values[$valuesKeys[$noteKeyPos]] = "";
+        }
+
         if (isset($fields['participant_status_id']['title']) &&
           isset($values[$fields['participant_status_id']['title']]) &&
           is_numeric($values[$fields['participant_status_id']['title']])
