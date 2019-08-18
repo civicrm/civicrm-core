@@ -339,16 +339,13 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'participant_fee_id':
-        $val_regexp = [];
-        foreach ($value as $k => &$val) {
-          $val = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $val, 'label');
-          $val_regexp[$k] = CRM_Core_DAO::escapeString(preg_quote(trim($val)));
-          $val = CRM_Core_DAO::escapeString(trim($val));
+        $labels = [];
+        foreach ($value as $val) {
+          $labels[] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $val, 'label');
         }
-        $feeLabel = implode('|', $val_regexp);
-        $query->_where[$grouping][] = "civicrm_participant.fee_level REGEXP '{$feeLabel}'";
-        $query->_qill[$grouping][] = ts("Fee level") . " IN " . implode(', ', $value);
-        $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
+        $query->_where[$grouping][] = "civicrm_line_item.price_field_value_id IN (" . implode(', ', $value) . ")";
+        $query->_qill[$grouping][] = ts("Fee level") . " IN " . implode(', ', $labels);
+        $query->_tables['civicrm_participant'] = $query->_tables['civicrm_line_item'] = $query->_whereTables['civicrm_line_item'] = 1;
         return;
 
       case 'participant_fee_amount_high':
@@ -515,6 +512,10 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
       case 'participant_discount_name':
         $from = " $side JOIN civicrm_discount discount ON ( civicrm_participant.discount_id = discount.id )";
         $from .= " $side JOIN civicrm_option_group discount_name ON ( discount_name.id = discount.price_set_id ) ";
+        break;
+
+      case 'civicrm_line_item':
+        $from .= " $side JOIN civicrm_line_item ON civicrm_line_item.entity_id = civicrm_participant.id AND civicrm_line_item.entity_table = 'civicrm_participant'";
         break;
     }
     return $from;
