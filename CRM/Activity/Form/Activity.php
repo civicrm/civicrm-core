@@ -323,32 +323,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       );
     }
 
-    // Assigning Activity type name.
-    if ($this->_activityTypeId) {
-      $activityTypeDisplayLabels = $this->getActivityTypeDisplayLabels();
-      if ($activityTypeDisplayLabels[$this->_activityTypeId]) {
-        $this->_activityTypeName = $activityTypeDisplayLabels[$this->_activityTypeId];
-        // can't change this instance of activityTName yet - will come back to it dev/core#1116
-        $this->assign('activityTName', $activityTypeDisplayLabels[$this->_activityTypeId]);
-      }
-      // Set title.
-      if (isset($activityTypeDisplayLabels)) {
-        // FIXME - it's not clear why the if line just above is needed here and why we can't just set this once above and re-use. What is interesting, but can't possibly be the reason, is that the first if block will fail if the label is the string '0', whereas this one won't. But who would have an activity type called '0'?
-        $activityTypeDisplayLabel = CRM_Utils_Array::value($this->_activityTypeId, $activityTypeDisplayLabels);
-
-        if ($this->_currentlyViewedContactId) {
-          $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
-          // Check if this is default domain contact CRM-10482.
-          if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
-            $displayName .= ' (' . ts('default organization') . ')';
-          }
-          CRM_Utils_System::setTitle($displayName . ' - ' . $activityTypeDisplayLabel);
-        }
-        else {
-          CRM_Utils_System::setTitle(ts('%1 Activity', [1 => $activityTypeDisplayLabel]));
-        }
-      }
-    }
+    $this->assignActivityType();
 
     // Check the mode when this form is called either single or as
     // search task action.
@@ -1256,6 +1231,37 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
    */
   public function getActivityTypeDisplayLabels() {
     return CRM_Core_OptionGroup::values('activity_type', FALSE, FALSE, FALSE, 'AND v.value = ' . $this->_activityTypeId, 'label');
+  }
+
+  /**
+   * For the moment this is just pulled from preProcess
+   */
+  public function assignActivityType() {
+    if ($this->_activityTypeId) {
+      $activityTypeDisplayLabels = $this->getActivityTypeDisplayLabels();
+      if ($activityTypeDisplayLabels[$this->_activityTypeId]) {
+        $this->_activityTypeName = $activityTypeDisplayLabels[$this->_activityTypeId];
+        // can't change this instance of activityTName yet - will come back to it dev/core#1116
+        $this->assign('activityTName', $activityTypeDisplayLabels[$this->_activityTypeId]);
+      }
+      // Set title.
+      if (isset($activityTypeDisplayLabels)) {
+        // FIXME - it's not clear why the if line just above is needed here and why we can't just set this once above and re-use. What is interesting, but can't possibly be the reason, is that the first if block will fail if the label is the string '0', whereas this one won't. But who would have an activity type called '0'?
+        $activityTypeDisplayLabel = CRM_Utils_Array::value($this->_activityTypeId, $activityTypeDisplayLabels);
+
+        if ($this->_currentlyViewedContactId) {
+          $displayName = CRM_Contact_BAO_Contact::displayName($this->_currentlyViewedContactId);
+          // Check if this is default domain contact CRM-10482.
+          if (CRM_Contact_BAO_Contact::checkDomainContact($this->_currentlyViewedContactId)) {
+            $displayName .= ' (' . ts('default organization') . ')';
+          }
+          CRM_Utils_System::setTitle($displayName . ' - ' . $activityTypeDisplayLabel);
+        }
+        else {
+          CRM_Utils_System::setTitle(ts('%1 Activity', [1 => $activityTypeDisplayLabel]));
+        }
+      }
+    }
   }
 
 }
