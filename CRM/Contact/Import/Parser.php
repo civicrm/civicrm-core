@@ -185,7 +185,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     $result = CRM_Core_DAO::executeQuery($query);
 
     while ($result->fetch()) {
-      $values = $result->toArray();
+      $values = array_values($result->toArray());
       $this->_rowCount++;
 
       /* trim whitespace around the values */
