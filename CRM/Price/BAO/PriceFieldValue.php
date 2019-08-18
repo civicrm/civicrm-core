@@ -56,6 +56,9 @@ class CRM_Price_BAO_PriceFieldValue extends CRM_Price_DAO_PriceFieldValue {
 
     // CRM-16189
     $priceFieldID = CRM_Utils_Array::value('price_field_id', $params);
+
+    $id = CRM_Utils_Array::value('id', $ids, CRM_Utils_Array::value('id', $params));
+
     if (!$priceFieldID) {
       $priceFieldID = CRM_Core_DAO::getFieldValue('CRM_Price_BAO_PriceFieldValue', $id, 'price_field_id');
     }
