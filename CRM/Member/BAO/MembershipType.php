@@ -626,27 +626,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * @deprecated Please use the Membership API
-   * Retrieve all Membership Types associated with an Organization
-   *
-   * @param int $orgID
-   *   Id of Organization.
-   *
-   * @return array
-   *   array of the details of membership types
-   */
-  public static function getMembershipTypesByOrg($orgID) {
-    CRM_Core_Error::deprecatedFunctionWarning('membership_type api');
-    $memberTypesSameParentOrg = civicrm_api3('MembershipType', 'get', [
-      'member_of_contact_id' => $orgID,
-      'options' => [
-        'limit' => 0,
-      ],
-    ]);
-    return CRM_Utils_Array::value('values', $memberTypesSameParentOrg, []);
-  }
-
-  /**
    * Retrieve all Membership Types with Member of Contact id.
    *
    * @param array $membershipTypes
