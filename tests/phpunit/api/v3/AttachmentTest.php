@@ -332,7 +332,14 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
     ]);
     $this->assertEquals(1, $getResult['count']);
     foreach (['id', 'entity_table', 'entity_id', 'url'] as $field) {
-      $this->assertEquals($createResult['values'][$fileId][$field], $getResult['values'][$fileId][$field], "Expect field $field to match");
+      if ($field == 'url') {
+        $this->assertEquals(substr($createResult['values'][$fileId][$field], 0, -15), substr($getResult['values'][$fileId][$field], 0, -15));
+        $this->assertEquals(substr($createResult['values'][$fileId][$field], -3), substr($getResult['values'][$fileId][$field], -3));
+        $this->assertApproxEquals(substr($createResult['values'][$fileId][$field], -14, 10), substr($getResult['values'][$fileId][$field], -14, 10), 1);
+      }
+      else {
+        $this->assertEquals($createResult['values'][$fileId][$field], $getResult['values'][$fileId][$field], "Expect field $field to match");
+      }
     }
     $this->assertTrue(!isset($getResult['values'][$fileId]['content']));
 
