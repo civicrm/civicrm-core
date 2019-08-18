@@ -401,7 +401,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
 
       if ($this->get('savedMapping')) {
-        list($mappingName, $defaults, $js) = $this->loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
+        list($defaults, $js) = $this->loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
@@ -856,7 +856,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return array
    */
-  protected function loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns) {
+  public function loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns) {
     $jsSet = FALSE;
     if (isset($mappingName[$i])) {
       if ($mappingName[$i] != ts('- do not import -')) {
@@ -935,7 +935,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           $jsSet = TRUE;
         }
         else {
-          $mappingHeader = array_keys($this->_mapperFields, $mappingName[$i]);
+          $mappingHeader = array_keys((array) $this->_mapperFields, $mappingName[$i]);
           $websiteTypeId = isset($mappingWebsiteType[$i]) ? $mappingWebsiteType[$i] : NULL;
           $locationId = isset($mappingLocation[$i]) ? $mappingLocation[$i] : 0;
           $phoneType = isset($mappingPhoneType[$i]) ? $mappingPhoneType[$i] : NULL;
@@ -989,7 +989,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         $defaults["mapper[$i]"] = [$this->defaultFromData($dataPatterns, $i)];
       }
     }
-    return [$mappingName, $defaults, $js];
+    return [$defaults, $js];
   }
 
 }
