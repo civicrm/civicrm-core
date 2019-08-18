@@ -335,7 +335,7 @@ class api_v3_AttachmentTest extends CiviUnitTestCase {
       if ($field == 'url') {
         $this->assertEquals(substr($createResult['values'][$fileId][$field], 0, -15), substr($getResult['values'][$fileId][$field], 0, -15));
         $this->assertEquals(substr($createResult['values'][$fileId][$field], -3), substr($getResult['values'][$fileId][$field], -3));
-        $this->assertApproxEquals(substr($createResult['values'][$fileId][$field], -14, 10), substr($getResult['values'][$fileId][$field], -14, 10), 1);
+        $this->assertApproxEquals(substr($createResult['values'][$fileId][$field], -14, 10), substr($getResult['values'][$fileId][$field], -14, 10), 2);
       }
       else {
         $this->assertEquals($createResult['values'][$fileId][$field], $getResult['values'][$fileId][$field], "Expect field $field to match");
