@@ -241,7 +241,16 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     //add Account details
     $params['contribution'] = $contribution;
-    self::recordFinancialAccounts($params);
+    if (empty($params['is_post_payment_create'])) {
+      // If this is being called from the Payment.create api/ BAO then that Entity
+      // takes responsibility for the financial transactions. In fact calling Payment.create
+      // to add payments & having it call completetransaction and / or contribution.create
+      // to update related entities is the preferred flow.
+      // Note that leveraging this parameter for any other code flow is not supported and
+      // is likely to break in future and / or cause serious problems in your data.
+      // https://github.com/civicrm/civicrm-core/pull/14673
+      self::recordFinancialAccounts($params);
+    }
 
     if (self::isUpdateToRecurringContribution($params)) {
       CRM_Contribute_BAO_ContributionRecur::updateOnNewPayment(
@@ -946,19 +955,10 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    * @return int
    */
   public static function getToFinancialAccount($contribution, $params) {
-    $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $pendingStatus = [
-      array_search('Pending', $contributionStatuses),
-      array_search('In Progress', $contributionStatuses),
-    ];
-    if (in_array(CRM_Utils_Array::value('contribution_status_id', $contribution), $pendingStatus)) {
-      return CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contribution['financial_type_id'], 'Accounts Receivable Account is');
-    }
-    elseif (!empty($params['payment_processor'])) {
+    if (!empty($params['payment_processor'])) {
       return CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($contribution['payment_processor'], NULL, 'civicrm_payment_processor');
     }
-    elseif (!empty($params['payment_instrument_id'])) {
+    if (!empty($params['payment_instrument_id'])) {
       return CRM_Financial_BAO_FinancialTypeAccount::getInstrumentFinancialAccount($contribution['payment_instrument_id']);
     }
     else {
@@ -4408,10 +4408,16 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    * @param CRM_Core_Transaction $transaction
    * @param int $recur
    * @param CRM_Contribute_BAO_Contribution $contribution
+   * @param bool $isPostPaymentCreate
+   *   Is this being called from the payment.create api. If so the api has taken care of financial entities.
+   *   Note that our goal is that this would only ever be called from payment.create and never handle financials (only
+   *   transitioning related elements).
    *
    * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function completeOrder(&$input, &$ids, $objects, $transaction, $recur, $contribution) {
+  public static function completeOrder(&$input, &$ids, $objects, $transaction, $recur, $contribution, $isPostPaymentCreate = FALSE) {
     $primaryContributionID = isset($contribution->id) ? $contribution->id : $objects['first_contribution']->id;
     // The previous details are used when calculating line items so keep it before any code that 'does something'
     if (!empty($contribution->id)) {
@@ -4531,6 +4537,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     }
 
     $contributionParams['id'] = $contribution->id;
+    $contributionParams['is_post_payment_create'] = $isPostPaymentCreate;
 
     // CRM-19309 - if you update the contribution here with financial_type_id it can/will mess with $lineItem
     // unsetting it here does NOT cause any other contribution test to fail!
