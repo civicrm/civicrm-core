@@ -38,6 +38,16 @@
  */
 class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
 
+  use CRM_Contact_Import_MetadataTrait;
+  use CRMTraits_Custom_CustomDataTrait;
+
+  /**
+   * Map field form.
+   *
+   * @var CRM_Contact_Import_Form_MapField
+   */
+  protected $form;
+
   /**
    * Test the form loads without error / notice and mappings are assigned.
    *
@@ -161,14 +171,111 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    * @throws \CiviCRM_API3_Exception
    */
   public function testLoadSavedMapping($fieldSpec, $expectedJS) {
-    $form = $this->getFormObject('CRM_Contact_Import_Form_MapField');
-    /* @var CRM_Contact_Import_Form_MapField $form */
-    $form->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
+    $this->setUpMapFieldForm();
 
     $mapping = $this->callAPISuccess('Mapping', 'create', ['name' => 'my test']);
-    $this->callAPISuccess('MappingField', 'create', array_merge(['mapping_id' => $mapping], $fieldSpec));
-    $result = $this->loadSavedMapping($form, $mapping['id'], 1);
+    $this->callAPISuccess('MappingField', 'create', array_merge(['mapping_id' => $mapping['id']], $fieldSpec));
+    $result = $this->loadSavedMapping($this->form, $mapping['id'], $fieldSpec['column_number']);
     $this->assertEquals($expectedJS, $result['js']);
+  }
+
+  /**
+   * Tests the 'final' methods for loading  the direct mapping.
+   *
+   * In conjunction with testing our existing  function this  tests the methods we want to migrate to
+   * to  clean it up.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testLoadSavedMappingDirect() {
+    $this->entity = 'Contact';
+    $this->createCustomGroupWithFieldOfType(['title' => 'My Field']);
+    $this->setUpMapFieldForm();
+    $mapping = $this->callAPISuccess('Mapping', 'create', ['name' => 'my test', 'label' => 'Special custom']);
+    foreach ([
+      [
+        'name' => 'Addressee',
+        'column_number' => '0',
+      ],
+      [
+        'name' => 'Postal Greeting',
+        'column_number' => '1',
+      ],
+      [
+        'name' => 'Phone',
+        'column_number' => '2',
+        'location_type_id' => '1',
+        'phone_type_id' => '1',
+      ],
+      [
+        'name' => 'Street Address',
+        'column_number' => '3',
+      ],
+      [
+        'name' => 'Enter text here :: My Field',
+        'column_number' => '4',
+      ],
+      [
+        'name' => 'Street Address',
+        'column_number' => '5',
+        'location_type_id' => '1',
+      ],
+      [
+        'name' => 'City',
+        'column_number' => '6',
+        'location_type_id' => '1',
+      ],
+      [
+        'name' => 'State Province',
+        'column_number' => '7',
+        'relationship_type_id' => 4,
+        'relationship_direction' => 'a_b',
+        'location_type_id' => '1',
+      ],
+      [
+        'name' => 'Url',
+        'column_number' => '8',
+        'relationship_type_id' => 4,
+        'relationship_direction' => 'a_b',
+        'website_type_id' => 2,
+      ],
+      [
+        'name' => 'Phone',
+        'column_number' => '9',
+        'relationship_type_id' => 4,
+        'location_type_id' => '1',
+        'relationship_direction' => 'a_b',
+        'phone_type_id' => 2,
+      ],
+      [
+        'name' => 'Phone',
+        'column_number' => '10',
+        'location_type_id' => '1',
+        'phone_type_id' => '3',
+      ],
+    ] as $mappingField) {
+      $this->callAPISuccess('MappingField', 'create', array_merge([
+        'mapping_id' => $mapping['id'],
+        'grouping' => 1,
+        'contact_type' => 'Individual',
+      ], $mappingField));
+    }
+    $processor = new CRM_Import_ImportProcessor();
+    $processor->setMappingID($mapping['id']);
+    $processor->setMetadata($this->getContactImportMetadata());
+    $this->assertEquals(3, $processor->getPhoneOrIMTypeID(10));
+    $this->assertEquals(3, $processor->getPhoneTypeID(10));
+    $this->assertEquals(1, $processor->getLocationTypeID(10));
+    $this->assertEquals(2, $processor->getWebsiteTypeID(8));
+    $this->assertEquals('4_a_b', $processor->getRelationshipKey(9));
+    $this->assertEquals('addressee', $processor->getFieldName(0));
+    $this->assertEquals('street_address', $processor->getFieldName(3));
+    $this->assertEquals($this->getCustomFieldName('text'), $processor->getFieldName(4));
+    $this->assertEquals('url', $processor->getFieldName(8));
+
+    $processor->setContactTypeByConstant(CRM_Import_Parser::CONTACT_HOUSEHOLD);
+    $this->assertEquals('Household', $processor->getContactType());
   }
 
   /**
@@ -178,10 +285,13 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
     return [
       [
         ['name' => 'First Name', 'contact_type' => 'Individual', 'column_number' => 1],
-        'document.forms.MapField[\'mapper[1][1]\'].style.display = \'none\';
-document.forms.MapField[\'mapper[1][2]\'].style.display = \'none\';
-document.forms.MapField[\'mapper[1][3]\'].style.display = \'none\';
-',
+        "document.forms.MapField['mapper[1][1]'].style.display = 'none';
+document.forms.MapField['mapper[1][2]'].style.display = 'none';
+document.forms.MapField['mapper[1][3]'].style.display = 'none';\n",
+      ],
+      [
+        ['name' => 'Phone', 'contact_type' => 'Individual', 'column_number' => 8, 'phone_type_id' => 1, 'location_type_id' => 2],
+        "document.forms.MapField['mapper[8][3]'].style.display = 'none';\n",
       ],
     ];
   }
@@ -220,6 +330,16 @@ document.forms.MapField[\'mapper[1][3]\'].style.display = \'none\';
 
     $return = $form->loadSavedMapping($mappingName, $columnNumber, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
     return ['defaults' => $return[0], 'js' => $return[1]];
+  }
+
+  /**
+   * Set up the mapping form.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  private function setUpMapFieldForm() {
+    $this->form = $this->getFormObject('CRM_Contact_Import_Form_MapField');
+    $this->form->set('contactType', CRM_Import_Parser::CONTACT_INDIVIDUAL);
   }
 
 }
