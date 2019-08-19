@@ -85,6 +85,13 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page.'));
     }
 
+    $this->userDisplayName = $this->userEmail = NULL;
+    if ($this->_contactID) {
+      list($this->userDisplayName,
+        $this->userEmail
+        ) = CRM_Contact_BAO_Contact_Location::getEmailDetails($this->_contactID);
+      $this->assign('displayName', $this->userDisplayName);
+    }
     $this->setPageTitle(ts('Grant'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {

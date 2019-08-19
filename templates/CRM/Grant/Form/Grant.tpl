@@ -40,6 +40,11 @@
           <td class="label">{$form.contact_id.label}</td>
           <td>{$form.contact_id.html}</td>
         </tr>
+      {else}
+          <tr class="crm-grant-form-block-displayName">
+            <td class="font-size12pt right"><strong>{ts}Applicant{/ts}</strong></td>
+            <td class="font-size12pt"><strong>{$displayName}</strong></td>
+          </tr>
       {/if}
       <tr class="crm-grant-form-block-status_id">
          <td class="label">{$form.status_id.label}</td>
