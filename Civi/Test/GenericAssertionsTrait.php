@@ -12,8 +12,10 @@ namespace Civi\Test;
 trait GenericAssertionsTrait {
 
   /**
-   * @param $expected
+   * @param string $expected
+   *   Ex: 'array', 'object', 'int'
    * @param $actual
+   *   The variable/item to check.
    * @param string $message
    */
   public function assertType($expected, $actual, $message = '') {
@@ -21,8 +23,13 @@ trait GenericAssertionsTrait {
   }
 
   /**
-   * Assert that two array-trees are exactly equal, notwithstanding
-   * the sorting of keys
+   * Assert that two array-trees are exactly equal.
+   *
+   * The ordering of keys do not affect the outcome (within either the roots
+   * or in any child elements).
+   *
+   * Error messages will reveal a readable -path-, regardless of how many
+   * levels of nesting are present.
    *
    * @param array $expected
    * @param array $actual
@@ -39,25 +46,29 @@ trait GenericAssertionsTrait {
   }
 
   /**
-   * Assert that two numbers are approximately equal.
+   * Assert that two numbers are approximately equal,
+   * give or take some $tolerance.
    *
    * @param int|float $expected
    * @param int|float $actual
    * @param int|float $tolerance
+   *   Any differences <$tolerance are considered irrelevant.
+   *   Differences >=$tolerance are considered relevant.
    * @param string $message
    */
   public function assertApproxEquals($expected, $actual, $tolerance, $message = NULL) {
+    $diff = abs($actual - $expected);
     if ($message === NULL) {
-      $message = sprintf("approx-equals: expected=[%.3f] actual=[%.3f] tolerance=[%.3f]", $expected, $actual, $tolerance);
+      $message = sprintf("approx-equals: expected=[%.3f] actual=[%.3f] diff=[%.3f] tolerance=[%.3f]", $expected, $actual, $diff, $tolerance);
     }
-    $this->assertTrue(abs($actual - $expected) < $tolerance, $message);
+    $this->assertTrue($diff < $tolerance, $message);
   }
 
   /**
    * Assert attributes are equal.
    *
-   * @param $expectedValues
-   * @param $actualValues
+   * @param array $expectedValues
+   * @param array $actualValues
    * @param string $message
    *
    * @throws \PHPUnit_Framework_AssertionFailedError
@@ -74,33 +85,31 @@ trait GenericAssertionsTrait {
   }
 
   /**
-   * @param $key
-   * @param $list
+   * @param string|int $key
+   * @param array $list
    */
   public function assertArrayKeyExists($key, &$list) {
     $result = isset($list[$key]) ? TRUE : FALSE;
-    $this->assertTrue($result, ts("%1 element exists?",
-      array(1 => $key)
-    ));
+    $this->assertTrue($result, sprintf("%s element exists?", $key));
   }
 
   /**
-   * @param $key
-   * @param $list
+   * @param string|int $key
+   * @param array $list
    */
   public function assertArrayValueNotNull($key, &$list) {
     $this->assertArrayKeyExists($key, $list);
 
     $value = isset($list[$key]) ? $list[$key] : NULL;
     $this->assertTrue($value,
-      ts("%1 element not null?",
-        array(1 => $key)
-      )
+      sprintf("%s element not null?", $key)
     );
   }
 
   /**
    * Assert the 2 arrays have the same values.
+   *
+   * The order of arrays, and keys of the arrays, do not affect the outcome.
    *
    * @param array $array1
    * @param array $array2
