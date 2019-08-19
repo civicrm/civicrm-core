@@ -1592,7 +1592,7 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     if ($entityArg != '') {
       // Add checksum argument
       if ($contactID != 0 && $userId != $contactID) {
-        $checksumValue = '&cs=' . CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, NULL, 'inf');
+        $checksumValue = '&cid=' . $contactID . '&cs=' . CRM_Contact_BAO_Contact_Utils::generateChecksum($contactID, NULL, 'inf');
       }
       return CRM_Utils_System::url($url, "reset=1&{$entityArg}={$entityID}{$checksumValue}", TRUE, NULL, FALSE, TRUE);
     }
