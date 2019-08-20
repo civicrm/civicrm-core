@@ -283,10 +283,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Membership Status' => 'New',
       'Membership ID' => '2',
       'Primary Member ID' => '',
-      'max_related' => '',
-      'membership_recur_id' => 1,
+      'Max Related' => '',
+      'Membership Recurring Contribution' => 1,
       'Campaign ID' => '',
-      'member_is_override' => '',
+      'Status Override' => '',
       'Total Amount' => '200.00',
       'Contribution Status' => 'Pending',
       'Date Received' => '2019-07-25 07:34:23',
@@ -2362,10 +2362,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       88 => 'Membership Status',
       89 => 'Membership ID',
       90 => 'Primary Member ID',
-      91 => 'max_related',
-      92 => 'membership_recur_id',
+      91 => 'Max Related',
+      92 => 'Membership Recurring Contribution',
       93 => 'Campaign ID',
-      94 => 'member_is_override',
+      94 => 'Status Override',
     ];
   }
 
@@ -2766,10 +2766,10 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'membership_status' => 'membership_status varchar(255)',
       'membership_id' => 'membership_id varchar(16)',
       'owner_membership_id' => 'owner_membership_id varchar(16)',
-      'max_related' => 'max_related text',
-      'membership_recur_id' => 'membership_recur_id varchar(255)',
+      'max_related' => 'max_related varchar(16)',
+      'membership_recur_id' => 'membership_recur_id varchar(16)',
       'member_campaign_id' => 'member_campaign_id varchar(16)',
-      'member_is_override' => 'member_is_override text',
+      'member_is_override' => 'member_is_override varchar(16)',
     ];
   }
 
