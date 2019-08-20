@@ -50,10 +50,9 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
   /**
    * Minimum php version required to run (equal to or lower than the minimum install version)
    *
-   * Even though 5.6 is no longer supported, this value is left here for a while
-   * so as not to block stragglers from upgrading.
+   * As of Civi 5.16, using PHP 5.x will lead to a hard crash during bootstrap.
    */
-  const MINIMUM_PHP_VERSION = '5.6';
+  const MINIMUM_PHP_VERSION = '7.0.0';
 
   /**
    * @var \CRM_Core_Config
