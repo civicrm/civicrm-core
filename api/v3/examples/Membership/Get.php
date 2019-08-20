@@ -7,7 +7,7 @@
  */
 function membership_get_example() {
   $params = [
-    'membership_type_id' => 23,
+    'membership_type_id' => 1,
   ];
 
   try{
@@ -45,13 +45,13 @@ function membership_get_expectedresult() {
     'values' => [
       '1' => [
         'id' => '1',
-        'contact_id' => '38',
-        'membership_type_id' => '23',
+        'contact_id' => '3',
+        'membership_type_id' => '1',
         'join_date' => '2009-01-21',
         'start_date' => '2013-07-29 00:00:00',
         'end_date' => '2013-08-04 00:00:00',
         'source' => 'Payment',
-        'status_id' => '19',
+        'status_id' => '20',
         'is_override' => '1',
         'is_test' => 0,
         'is_pay_later' => 0,
@@ -73,17 +73,17 @@ function membership_get_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MembershipTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

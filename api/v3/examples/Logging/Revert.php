@@ -8,7 +8,7 @@
 function logging_revert_example() {
   $params = [
     'log_conn_id' => 'woot',
-    'log_date' => '2017-02-07 02:35:06',
+    'log_date' => '2019-08-20 19:22:48',
   ];
 
   try{
@@ -50,22 +50,22 @@ function logging_revert_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "/Users/emcnaughton/buildkit/build/dmaster/sites/all/modules/civicrm/tests/phpunit/api/v3/LoggingTest.php"
+* The test that created it is called "/home/seamus/buildkit/build/47-test/sites/all/modules/civicrm/tests/phpunit/api/v3/LoggingTest.php"
 * and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/Revert
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

@@ -46,7 +46,7 @@ function mailing_gettokens_expectedresult() {
   $expectedResult = [
     'is_error' => 0,
     'version' => 3,
-    'count' => 82,
+    'count' => 88,
     'values' => [
       '{action.unsubscribe}' => 'Unsubscribe via email',
       '{action.unsubscribeUrl}' => 'Unsubscribe via web page',
@@ -88,6 +88,9 @@ function mailing_gettokens_expectedresult() {
       '{contact.individual_suffix}' => 'Individual Suffix',
       '{contact.formal_title}' => 'Formal Title',
       '{contact.communication_style}' => 'Communication Style',
+      '{contact.email_greeting_id}' => 'Email Greeting ID',
+      '{contact.postal_greeting_id}' => 'Postal Greeting ID',
+      '{contact.addressee_id}' => 'Addressee ID',
       '{contact.job_title}' => 'Job Title',
       '{contact.gender}' => 'Gender',
       '{contact.birth_date}' => 'Birth Date',
@@ -113,6 +116,7 @@ function mailing_gettokens_expectedresult() {
       '{contact.postal_code}' => 'Postal Code',
       '{contact.geo_code_1}' => 'Latitude',
       '{contact.geo_code_2}' => 'Longitude',
+      '{contact.manual_geo_code}' => 'Is Manually Geocoded',
       '{contact.address_name}' => 'Address Name',
       '{contact.master_id}' => 'Master Address Belongs To',
       '{contact.county}' => 'County',
@@ -120,6 +124,7 @@ function mailing_gettokens_expectedresult() {
       '{contact.country}' => 'Country',
       '{contact.phone}' => 'Phone',
       '{contact.phone_ext}' => 'Phone Extension',
+      '{contact.phone_type_id}' => 'Phone Type',
       '{contact.email}' => 'Email',
       '{contact.on_hold}' => 'On Hold',
       '{contact.signature_text}' => 'Signature Text',
@@ -144,17 +149,17 @@ function mailing_gettokens_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailingTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

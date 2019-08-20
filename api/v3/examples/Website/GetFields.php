@@ -48,9 +48,12 @@ function website_getfields_expectedresult() {
         'title' => 'Website ID',
         'description' => 'Unique Website ID',
         'required' => TRUE,
+        'where' => 'civicrm_website.id',
         'table_name' => 'civicrm_website',
         'entity' => 'Website',
         'bao' => 'CRM_Core_BAO_Website',
+        'localizable' => 0,
+        'is_core_field' => TRUE,
         'api.aliases' => [
           '0' => 'website_id',
         ],
@@ -60,10 +63,13 @@ function website_getfields_expectedresult() {
         'type' => 1,
         'title' => 'Contact',
         'description' => 'FK to Contact ID',
+        'where' => 'civicrm_website.contact_id',
         'table_name' => 'civicrm_website',
         'entity' => 'Website',
         'bao' => 'CRM_Core_BAO_Website',
+        'localizable' => 0,
         'FKClassName' => 'CRM_Contact_DAO_Contact',
+        'is_core_field' => TRUE,
         'FKApiName' => 'Contact',
       ],
       'url' => [
@@ -81,20 +87,24 @@ function website_getfields_expectedresult() {
         'table_name' => 'civicrm_website',
         'entity' => 'Website',
         'bao' => 'CRM_Core_BAO_Website',
+        'localizable' => 0,
         'html' => [
           'type' => 'Text',
           'maxlength' => 128,
           'size' => 30,
         ],
+        'is_core_field' => TRUE,
       ],
       'website_type_id' => [
         'name' => 'website_type_id',
         'type' => 1,
         'title' => 'Website Type',
         'description' => 'Which Website type does this website belong to.',
+        'where' => 'civicrm_website.website_type_id',
         'table_name' => 'civicrm_website',
         'entity' => 'Website',
         'bao' => 'CRM_Core_BAO_Website',
+        'localizable' => 0,
         'html' => [
           'type' => 'Select',
           'size' => 6,
@@ -104,6 +114,7 @@ function website_getfields_expectedresult() {
           'optionGroupName' => 'website_type',
           'optionEditPath' => 'civicrm/admin/options/website_type',
         ],
+        'is_core_field' => TRUE,
       ],
     ],
   ];
@@ -118,17 +129,17 @@ function website_getfields_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/WebsiteTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

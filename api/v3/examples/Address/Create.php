@@ -7,8 +7,7 @@
  */
 function address_create_example() {
   $params = [
-    'contact_id' => 3,
-    'location_type_id' => 6,
+    'contact_id' => 4,
     'street_name' => 'Ambachtstraat',
     'street_number' => '23',
     'street_address' => 'Ambachtstraat 23',
@@ -49,12 +48,12 @@ function address_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 2,
+    'id' => 1,
     'values' => [
-      '2' => [
-        'id' => '2',
-        'contact_id' => '3',
-        'location_type_id' => '6',
+      '1' => [
+        'id' => '1',
+        'contact_id' => '4',
+        'location_type_id' => '1',
         'is_primary' => '1',
         'is_billing' => 0,
         'street_address' => 'Ambachtstraat 23',
@@ -73,22 +72,22 @@ function address_create_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "testCreateAddress"
+* The test that created it is called "testCreateAddressDefaultLocation"
 * and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/AddressTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

@@ -42,16 +42,16 @@ function tag_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 12,
+    'id' => 17,
     'values' => [
-      '12' => [
-        'id' => '12',
+      '17' => [
+        'id' => '17',
         'name' => 'Super Heros',
         'description' => 'Outside undie-wearers',
         'parent_id' => '',
-        'is_selectable' => '',
-        'is_reserved' => '',
-        'is_tagset' => '',
+        'is_selectable' => '1',
+        'is_reserved' => 0,
+        'is_tagset' => 0,
         'used_for' => 'civicrm_contact',
         'created_id' => '',
         'color' => '',
@@ -70,17 +70,17 @@ function tag_create_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/TagTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

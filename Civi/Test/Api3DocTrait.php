@@ -124,7 +124,9 @@ trait Api3DocTrait {
         mkdir($civicrm_root . "/api/v3/examples/$entity");
       }
       $f = fopen($civicrm_root . "/api/v3/examples/$entity/$exampleName.php", "w+b");
-      fwrite($f, $smarty->fetch($civicrm_root . '/tests/templates/documentFunction.tpl'));
+      $contents = $smarty->fetch($civicrm_root . '/tests/templates/documentFunction.tpl');
+      $contents = \CRM_Core_CodeGen_Util_ArraySyntaxConverter::convert($contents);
+      fwrite($f, $contents);
       fclose($f);
     }
   }

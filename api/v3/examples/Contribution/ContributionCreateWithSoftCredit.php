@@ -9,7 +9,7 @@
  */
 function contribution_create_example() {
   $params = [
-    'contact_id' => 24,
+    'contact_id' => 27,
     'receive_date' => '20120511',
     'total_amount' => '100',
     'financial_type_id' => 1,
@@ -20,7 +20,7 @@ function contribution_create_example() {
     'contribution_status_id' => 1,
     'soft_credit' => [
       '1' => [
-        'contact_id' => 25,
+        'contact_id' => 28,
         'amount' => 50,
         'soft_credit_type_id' => 3,
       ],
@@ -62,7 +62,7 @@ function contribution_create_expectedresult() {
     'values' => [
       '1' => [
         'id' => '1',
-        'contact_id' => '24',
+        'contact_id' => '27',
         'financial_type_id' => '1',
         'contribution_page_id' => '',
         'payment_instrument_id' => '4',
@@ -73,6 +73,7 @@ function contribution_create_expectedresult() {
         'net_amount' => '95',
         'trxn_id' => '',
         'invoice_id' => '',
+        'invoice_number' => '',
         'currency' => 'USD',
         'cancel_date' => '',
         'cancel_reason' => '',
@@ -105,17 +106,17 @@ function contribution_create_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContributionTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

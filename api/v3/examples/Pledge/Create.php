@@ -7,10 +7,10 @@
  */
 function pledge_create_example() {
   $params = [
-    'contact_id' => 11,
-    'pledge_create_date' => '20170207',
-    'start_date' => '20170207',
-    'scheduled_date' => '20170209',
+    'contact_id' => 12,
+    'pledge_create_date' => '20190820',
+    'start_date' => '20190820',
+    'scheduled_date' => '20190822',
     'amount' => '100',
     'pledge_status_id' => '2',
     'pledge_financial_type_id' => '1',
@@ -57,7 +57,7 @@ function pledge_create_expectedresult() {
     'values' => [
       '0' => [
         'id' => '1',
-        'contact_id' => '11',
+        'contact_id' => '12',
         'financial_type_id' => '1',
         'contribution_page_id' => '',
         'amount' => '100',
@@ -79,6 +79,7 @@ function pledge_create_expectedresult() {
         'status_id' => '2',
         'is_test' => '',
         'campaign_id' => '',
+        'contribution_type_id' => '1',
       ],
     ],
   ];
@@ -93,17 +94,17 @@ function pledge_create_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/PledgeTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

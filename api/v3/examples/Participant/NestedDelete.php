@@ -51,10 +51,11 @@ function participant_get_expectedresult() {
         'contact_sub_type' => '',
         'sort_name' => 'Anderson, Anthony',
         'display_name' => 'Mr. Anthony Anderson II',
-        'event_id' => '41',
+        'event_id' => '42',
         'event_title' => 'Annual CiviCRM meet',
         'event_start_date' => '2013-07-29 00:00:00',
         'event_end_date' => '2013-08-04 00:00:00',
+        'default_role_id' => '1',
         'participant_id' => '2',
         'participant_fee_level' => '',
         'participant_fee_amount' => '',
@@ -86,10 +87,11 @@ function participant_get_expectedresult() {
         'contact_sub_type' => '',
         'sort_name' => 'Anderson, Anthony',
         'display_name' => 'Mr. Anthony Anderson II',
-        'event_id' => '41',
+        'event_id' => '42',
         'event_title' => 'Annual CiviCRM meet',
         'event_start_date' => '2013-07-29 00:00:00',
         'event_end_date' => '2013-08-04 00:00:00',
+        'default_role_id' => '1',
         'participant_id' => '3',
         'participant_fee_level' => '',
         'participant_fee_amount' => '',
@@ -128,17 +130,17 @@ function participant_get_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ParticipantTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

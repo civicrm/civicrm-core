@@ -11,17 +11,17 @@ function mailing_create_example() {
     'body_text' => 'This is {contact.display_name}.
 https://civicrm.org
 {domain.address}{action.optOutUrl}',
-    'body_html' => '<p>This is {contact.display_name}.</p><p><a href=\'https://civicrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
+    'body_html' => '<link href=\'https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700\' rel=\'stylesheet\' type=\'text/css\'><p><a href=\"http://{action.forward}\">Forward this email</a><a href=\"{action.forward}\">Forward this email with no protocol</a></p<p>This is {contact.display_name}.</p><p><a href=\'https://civicrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
     'name' => 'mailing name',
-    'created_id' => 3,
+    'created_id' => 15,
     'header_id' => '',
     'footer_id' => '',
     'groups' => [
       'include' => [
-        '0' => 2,
+        '0' => 13,
       ],
       'exclude' => [
-        '0' => 3,
+        '0' => 14,
       ],
     ],
     'mailings' => [
@@ -31,7 +31,6 @@ https://civicrm.org
     'options' => [
       'force_rollback' => 1,
     ],
-    'api.mailing_job.create' => 1,
     'api.MailingRecipients.get' => [
       'mailing_id' => '$value.id',
       'api.contact.getvalue' => [
@@ -74,10 +73,10 @@ function mailing_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1,
+    'id' => 9,
     'values' => [
-      '1' => [
-        'id' => '1',
+      '9' => [
+        'id' => '9',
         'domain_id' => '1',
         'header_id' => '',
         'footer_id' => '',
@@ -90,69 +89,49 @@ function mailing_create_expectedresult() {
         'from_name' => 'FIXME',
         'from_email' => 'info@EXAMPLE.ORG',
         'replyto_email' => 'info@EXAMPLE.ORG',
-        'template_type' => '',
+        'template_type' => 'traditional',
         'template_options' => '',
         'subject' => 'Hello {contact.display_name}',
         'body_text' => 'This is {contact.display_name}.
 https://civicrm.org
 {domain.address}{action.optOutUrl}',
-        'body_html' => '<p>This is {contact.display_name}.</p><p><a href=\'https://civicrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
+        'body_html' => '<link href=\'https://fonts.googleapis.com/css?family=Roboto+Condensed:400,700|Zilla+Slab:500,700\' rel=\'stylesheet\' type=\'text/css\'><p><a href=\"http://{action.forward}\">Forward this email</a><a href=\"{action.forward}\">Forward this email with no protocol</a></p<p>This is {contact.display_name}.</p><p><a href=\'https://civicrm.org/\'>CiviCRM.org</a></p><p>{domain.address}{action.optOutUrl}</p>',
         'url_tracking' => '1',
-        'forward_replies' => '',
-        'auto_responder' => '',
+        'forward_replies' => 0,
+        'auto_responder' => 0,
         'open_tracking' => '1',
         'is_completed' => '',
         'msg_template_id' => '',
         'override_verp' => '1',
-        'created_id' => '3',
+        'created_id' => '15',
         'created_date' => '2013-07-28 08:49:19',
+        'modified_date' => '2012-11-14 16:02:35',
         'scheduled_id' => '',
         'scheduled_date' => '',
         'approver_id' => '',
         'approval_date' => '',
         'approval_status_id' => '',
         'approval_note' => '',
-        'is_archived' => '',
+        'is_archived' => 0,
         'visibility' => 'Public Pages',
         'campaign_id' => '',
         'dedupe_email' => '1',
         'sms_provider_id' => '',
         'hash' => '',
         'location_type_id' => '',
-        'email_selection_method' => '',
+        'email_selection_method' => 'automatic',
         'language' => '',
-        'api.mailing_job.create' => [
-          'is_error' => 0,
-          'version' => 3,
-          'count' => 1,
-          'id' => 1,
-          'values' => [
-            '0' => [
-              'id' => '1',
-              'mailing_id' => '1',
-              'scheduled_date' => '20130728085413',
-              'start_date' => '',
-              'end_date' => '',
-              'status' => 'Scheduled',
-              'is_test' => 0,
-              'job_type' => '',
-              'parent_id' => '',
-              'job_offset' => '',
-              'job_limit' => '',
-            ],
-          ],
-        ],
         'api.MailingRecipients.get' => [
           'is_error' => 0,
           'version' => 3,
           'count' => 1,
-          'id' => 1,
+          'id' => 4,
           'values' => [
             '0' => [
-              'id' => '1',
-              'mailing_id' => '1',
-              'contact_id' => '4',
-              'email_id' => '4',
+              'id' => '4',
+              'mailing_id' => '9',
+              'contact_id' => '16',
+              'email_id' => '16',
               'api.contact.getvalue' => 'Mr. Includer Person II',
               'api.email.getvalue' => 'include.me@example.org',
             ],
@@ -172,17 +151,17 @@ https://civicrm.org
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MailingTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

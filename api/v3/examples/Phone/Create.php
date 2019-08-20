@@ -7,8 +7,7 @@
  */
 function phone_create_example() {
   $params = [
-    'contact_id' => 3,
-    'location_type_id' => 6,
+    'contact_id' => 5,
     'phone' => '(123) 456-7890',
     'is_primary' => 1,
     'phone_type_id' => 1,
@@ -45,12 +44,12 @@ function phone_create_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 2,
+    'id' => 3,
     'values' => [
-      '2' => [
-        'id' => '2',
-        'contact_id' => '3',
-        'location_type_id' => '6',
+      '3' => [
+        'id' => '3',
+        'contact_id' => '5',
+        'location_type_id' => '1',
         'is_primary' => '1',
         'is_billing' => '',
         'mobile_provider_id' => '',
@@ -67,22 +66,22 @@ function phone_create_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "testCreatePhone"
+* The test that created it is called "testCreatePhoneDefaultLocation"
 * and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/PhoneTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

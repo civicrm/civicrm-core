@@ -11,7 +11,7 @@
  */
 function contact_getsingle_example() {
   $params = [
-    'id' => 17,
+    'id' => 3,
   ];
 
   try{
@@ -42,16 +42,16 @@ function contact_getsingle_example() {
 function contact_getsingle_expectedresult() {
 
   $expectedResult = [
-    'contact_id' => '17',
+    'contact_id' => '3',
     'contact_type' => 'Individual',
     'contact_sub_type' => '',
-    'sort_name' => '',
-    'display_name' => 'Test Contact',
-    'do_not_email' => '',
-    'do_not_phone' => '',
-    'do_not_mail' => '',
-    'do_not_sms' => '',
-    'do_not_trade' => '',
+    'sort_name' => 'Contact, Test',
+    'display_name' => 'Mr. Test Contact II',
+    'do_not_email' => 0,
+    'do_not_phone' => 0,
+    'do_not_mail' => 0,
+    'do_not_sms' => 0,
+    'do_not_trade' => 0,
     'is_opt_out' => 0,
     'legal_identifier' => '',
     'external_identifier' => '',
@@ -59,15 +59,15 @@ function contact_getsingle_expectedresult() {
     'legal_name' => '',
     'image_URL' => '',
     'preferred_communication_method' => '',
-    'preferred_language' => '',
-    'preferred_mail_format' => '',
+    'preferred_language' => 'en_US',
+    'preferred_mail_format' => 'Both',
     'first_name' => 'Test',
-    'middle_name' => '',
+    'middle_name' => 'J.',
     'last_name' => 'Contact',
-    'prefix_id' => '',
-    'suffix_id' => '',
+    'prefix_id' => '3',
+    'suffix_id' => '3',
     'formal_title' => '',
-    'communication_style_id' => '',
+    'communication_style_id' => '1',
     'job_title' => '',
     'gender_id' => '',
     'birth_date' => '',
@@ -93,23 +93,23 @@ function contact_getsingle_expectedresult() {
     'phone_id' => '',
     'phone_type_id' => '',
     'phone' => '',
-    'email_id' => '',
-    'email' => '',
-    'on_hold' => '',
+    'email_id' => '1',
+    'email' => 'anthony_anderson@civicrm.org',
+    'on_hold' => 0,
     'im_id' => '',
     'provider_id' => '',
     'im' => '',
     'worldregion_id' => '',
     'world_region' => '',
-    'languages' => '',
-    'individual_prefix' => '',
-    'individual_suffix' => '',
-    'communication_style' => '',
+    'languages' => 'English (United States)',
+    'individual_prefix' => 'Mr.',
+    'individual_suffix' => 'II',
+    'communication_style' => 'Formal',
     'gender' => '',
     'state_province_name' => '',
     'state_province' => '',
     'country' => '',
-    'id' => '17',
+    'id' => '3',
   ];
 
   return $expectedResult;
@@ -122,17 +122,17 @@ function contact_getsingle_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

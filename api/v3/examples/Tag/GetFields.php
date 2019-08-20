@@ -50,9 +50,12 @@ function tag_getfields_expectedresult() {
         'title' => 'Tag ID',
         'description' => 'Tag ID',
         'required' => TRUE,
+        'where' => 'civicrm_tag.id',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
+        'localizable' => 0,
+        'is_core_field' => TRUE,
         'api.aliases' => [
           '0' => 'tag',
         ],
@@ -65,9 +68,12 @@ function tag_getfields_expectedresult() {
         'required' => TRUE,
         'maxlength' => 64,
         'size' => 30,
+        'where' => 'civicrm_tag.name',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
+        'localizable' => 0,
+        'is_core_field' => TRUE,
         'api.required' => 1,
       ],
       'description' => [
@@ -77,20 +83,26 @@ function tag_getfields_expectedresult() {
         'description' => 'Optional verbose description of the tag.',
         'maxlength' => 255,
         'size' => 45,
+        'where' => 'civicrm_tag.description',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
+        'localizable' => 0,
+        'is_core_field' => TRUE,
       ],
       'parent_id' => [
         'name' => 'parent_id',
         'type' => 1,
         'title' => 'Parent Tag',
         'description' => 'Optional parent id for this tag.',
+        'where' => 'civicrm_tag.parent_id',
         'default' => 'NULL',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
+        'localizable' => 0,
         'FKClassName' => 'CRM_Core_DAO_Tag',
+        'is_core_field' => TRUE,
         'FKApiName' => 'Tag',
       ],
       'is_selectable' => [
@@ -98,26 +110,35 @@ function tag_getfields_expectedresult() {
         'type' => 16,
         'title' => 'Display Tag?',
         'description' => 'Is this tag selectable / displayed',
+        'where' => 'civicrm_tag.is_selectable',
         'default' => '1',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
+        'localizable' => 0,
+        'is_core_field' => TRUE,
       ],
       'is_reserved' => [
         'name' => 'is_reserved',
         'type' => 16,
         'title' => 'Reserved',
+        'where' => 'civicrm_tag.is_reserved',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
+        'localizable' => 0,
+        'is_core_field' => TRUE,
       ],
       'is_tagset' => [
         'name' => 'is_tagset',
         'type' => 16,
         'title' => 'Tagset',
+        'where' => 'civicrm_tag.is_tagset',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
+        'localizable' => 0,
+        'is_core_field' => TRUE,
       ],
       'used_for' => [
         'name' => 'used_for',
@@ -125,10 +146,13 @@ function tag_getfields_expectedresult() {
         'title' => 'Used For',
         'maxlength' => 64,
         'size' => 30,
+        'where' => 'civicrm_tag.used_for',
         'default' => 'NULL',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
+        'localizable' => 0,
+        'serialize' => 5,
         'html' => [
           'type' => 'Select',
           'maxlength' => 64,
@@ -138,6 +162,7 @@ function tag_getfields_expectedresult() {
           'optionGroupName' => 'tag_used_for',
           'optionEditPath' => 'civicrm/admin/options/tag_used_for',
         ],
+        'is_core_field' => TRUE,
         'api.default' => 'civicrm_contact',
       ],
       'created_id' => [
@@ -145,10 +170,13 @@ function tag_getfields_expectedresult() {
         'type' => 1,
         'title' => 'Tag Created By',
         'description' => 'FK to civicrm_contact, who created this tag',
+        'where' => 'civicrm_tag.created_id',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
+        'localizable' => 0,
         'FKClassName' => 'CRM_Contact_DAO_Contact',
+        'is_core_field' => TRUE,
         'FKApiName' => 'Contact',
       ],
       'color' => [
@@ -158,19 +186,25 @@ function tag_getfields_expectedresult() {
         'description' => 'Hex color value e.g. #ffffff',
         'maxlength' => 255,
         'size' => 45,
+        'where' => 'civicrm_tag.color',
         'default' => 'NULL',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
+        'localizable' => 0,
+        'is_core_field' => TRUE,
       ],
       'created_date' => [
         'name' => 'created_date',
         'type' => 12,
         'title' => 'Tag Created Date',
         'description' => 'Date and time that tag was created.',
+        'where' => 'civicrm_tag.created_date',
         'table_name' => 'civicrm_tag',
         'entity' => 'Tag',
         'bao' => 'CRM_Core_BAO_Tag',
+        'localizable' => 0,
+        'is_core_field' => TRUE,
       ],
     ],
   ];
@@ -185,17 +219,17 @@ function tag_getfields_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/TagTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

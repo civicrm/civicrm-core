@@ -69,7 +69,7 @@ function contact_get_expectedresult() {
         'prefix_id' => '',
         'suffix_id' => '',
         'formal_title' => '',
-        'communication_style_id' => '',
+        'communication_style_id' => '1',
         'job_title' => '',
         'gender_id' => '',
         'birth_date' => '',
@@ -106,7 +106,7 @@ function contact_get_expectedresult() {
         'languages' => 'English (United States)',
         'individual_prefix' => '',
         'individual_suffix' => '',
-        'communication_style' => '',
+        'communication_style' => 'Formal',
         'gender' => '',
         'state_province_name' => '',
         'state_province' => '',
@@ -126,17 +126,17 @@ function contact_get_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

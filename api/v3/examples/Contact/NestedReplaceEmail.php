@@ -9,31 +9,31 @@
  */
 function contact_get_example() {
   $params = [
-    'id' => 10,
+    'id' => 19,
     'api.email.replace' => [
       'values' => [
         '0' => [
-          'location_type_id' => 20,
+          'location_type_id' => 38,
           'email' => '1-1@example.com',
           'is_primary' => 1,
         ],
         '1' => [
-          'location_type_id' => 20,
+          'location_type_id' => 38,
           'email' => '1-2@example.com',
           'is_primary' => 0,
         ],
         '2' => [
-          'location_type_id' => 20,
+          'location_type_id' => 38,
           'email' => '1-3@example.com',
           'is_primary' => 0,
         ],
         '3' => [
-          'location_type_id' => 21,
+          'location_type_id' => 39,
           'email' => '2-1@example.com',
           'is_primary' => 0,
         ],
         '4' => [
-          'location_type_id' => 21,
+          'location_type_id' => 39,
           'email' => '2-2@example.com',
           'is_primary' => 0,
         ],
@@ -72,10 +72,10 @@ function contact_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 10,
+    'id' => 19,
     'values' => [
-      '10' => [
-        'contact_id' => '10',
+      '19' => [
+        'contact_id' => '19',
         'contact_type' => 'Organization',
         'contact_sub_type' => '',
         'sort_name' => 'Unit Test Organization',
@@ -100,7 +100,7 @@ function contact_get_expectedresult() {
         'prefix_id' => '',
         'suffix_id' => '',
         'formal_title' => '',
-        'communication_style_id' => '',
+        'communication_style_id' => '1',
         'job_title' => '',
         'gender_id' => '',
         'birth_date' => '',
@@ -134,27 +134,28 @@ function contact_get_expectedresult() {
         'im' => '',
         'worldregion_id' => '',
         'world_region' => '',
+        'languages' => 'English (United States)',
         'individual_prefix' => '',
         'individual_suffix' => '',
-        'communication_style' => '',
+        'communication_style' => 'Formal',
         'gender' => '',
         'state_province_name' => '',
         'state_province' => '',
         'country' => '',
-        'id' => '10',
+        'id' => '19',
         'api.email.replace' => [
           'is_error' => 0,
           'version' => 3,
           'count' => 5,
           'values' => [
             '0' => [
-              'id' => '18',
-              'contact_id' => '10',
-              'location_type_id' => '20',
+              'id' => '19',
+              'contact_id' => '19',
+              'location_type_id' => '38',
               'email' => '1-1@example.com',
               'is_primary' => '1',
               'is_billing' => '',
-              'on_hold' => '',
+              'on_hold' => 0,
               'is_bulkmail' => '',
               'hold_date' => '',
               'reset_date' => '',
@@ -162,13 +163,13 @@ function contact_get_expectedresult() {
               'signature_html' => '',
             ],
             '1' => [
-              'id' => '19',
-              'contact_id' => '10',
-              'location_type_id' => '20',
+              'id' => '20',
+              'contact_id' => '19',
+              'location_type_id' => '38',
               'email' => '1-2@example.com',
               'is_primary' => 0,
               'is_billing' => '',
-              'on_hold' => '',
+              'on_hold' => 0,
               'is_bulkmail' => '',
               'hold_date' => '',
               'reset_date' => '',
@@ -176,13 +177,13 @@ function contact_get_expectedresult() {
               'signature_html' => '',
             ],
             '2' => [
-              'id' => '20',
-              'contact_id' => '10',
-              'location_type_id' => '20',
+              'id' => '21',
+              'contact_id' => '19',
+              'location_type_id' => '38',
               'email' => '1-3@example.com',
               'is_primary' => 0,
               'is_billing' => '',
-              'on_hold' => '',
+              'on_hold' => 0,
               'is_bulkmail' => '',
               'hold_date' => '',
               'reset_date' => '',
@@ -190,13 +191,13 @@ function contact_get_expectedresult() {
               'signature_html' => '',
             ],
             '3' => [
-              'id' => '21',
-              'contact_id' => '10',
-              'location_type_id' => '21',
+              'id' => '22',
+              'contact_id' => '19',
+              'location_type_id' => '39',
               'email' => '2-1@example.com',
               'is_primary' => 0,
               'is_billing' => '',
-              'on_hold' => '',
+              'on_hold' => 0,
               'is_bulkmail' => '',
               'hold_date' => '',
               'reset_date' => '',
@@ -204,13 +205,13 @@ function contact_get_expectedresult() {
               'signature_html' => '',
             ],
             '4' => [
-              'id' => '22',
-              'contact_id' => '10',
-              'location_type_id' => '21',
+              'id' => '23',
+              'contact_id' => '19',
+              'location_type_id' => '39',
               'email' => '2-2@example.com',
               'is_primary' => 0,
               'is_billing' => '',
-              'on_hold' => '',
+              'on_hold' => 0,
               'is_bulkmail' => '',
               'hold_date' => '',
               'reset_date' => '',
@@ -233,17 +234,17 @@ function contact_get_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/EmailTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */
