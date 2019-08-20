@@ -82,9 +82,9 @@ function saved_search_create_expectedresult() {
               'saved_search_id' => '3',
               'is_active' => '1',
               'visibility' => 'User and User Admin Only',
-              'where_clause' => ' (  ( `civicrm_group_contact_cache_1`.group_id IN (\"1\") )  ) ',
-              'select_tables' => 'a:8:{s:15:\"civicrm_contact\";i:1;s:15:\"civicrm_address\";i:1;s:15:\"civicrm_country\";i:1;s:13:\"civicrm_email\";i:1;s:13:\"civicrm_phone\";i:1;s:10:\"civicrm_im\";i:1;s:19:\"civicrm_worldregion\";i:1;s:31:\"`civicrm_group_contact_cache_1`\";s:132:\" LEFT JOIN civicrm_group_contact_cache `civicrm_group_contact_cache_1` ON contact_a.id = `civicrm_group_contact_cache_1`.contact_id \";}',
-              'where_tables' => 'a:2:{s:15:\"civicrm_contact\";i:1;s:31:\"`civicrm_group_contact_cache_1`\";s:132:\" LEFT JOIN civicrm_group_contact_cache `civicrm_group_contact_cache_1` ON contact_a.id = `civicrm_group_contact_cache_1`.contact_id \";}',
+              'where_clause' => ' (  (  ( civicrm_group_contact_cache_5d5bbe284d3e9.group_id IN (\"1\") )  )  ) ',
+              'select_tables' => 'a:8:{s:15:\"civicrm_contact\";i:1;s:15:\"civicrm_address\";i:1;s:15:\"civicrm_country\";i:1;s:13:\"civicrm_email\";i:1;s:13:\"civicrm_phone\";i:1;s:10:\"civicrm_im\";i:1;s:19:\"civicrm_worldregion\";i:1;s:41:\"civicrm_group_contact_cache_5d5bbe284d3e9\";s:152:\" LEFT JOIN civicrm_group_contact_cache civicrm_group_contact_cache_5d5bbe284d3e9 ON contact_a.id = civicrm_group_contact_cache_5d5bbe284d3e9.contact_id \";}',
+              'where_tables' => 'a:2:{s:15:\"civicrm_contact\";i:1;s:41:\"civicrm_group_contact_cache_5d5bbe284d3e9\";s:152:\" LEFT JOIN civicrm_group_contact_cache civicrm_group_contact_cache_5d5bbe284d3e9 ON contact_a.id = civicrm_group_contact_cache_5d5bbe284d3e9.contact_id \";}',
               'group_type' => '',
               'cache_date' => '',
               'refresh_date' => '',
@@ -111,17 +111,17 @@ function saved_search_create_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/SavedSearchTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

@@ -7,11 +7,11 @@
  */
 function message_template_get_example() {
   $params = [
-    'msg_title' => 'msg_title_285',
-    'msg_subject' => 'msg_subject_285',
-    'msg_text' => 'msg_text_285',
-    'msg_html' => 'msg_html_285',
-    'workflow_id' => 285,
+    'msg_title' => 'msg_title_472',
+    'msg_subject' => 'msg_subject_472',
+    'msg_text' => 'msg_text_472',
+    'msg_html' => 'msg_html_472',
+    'workflow_id' => 472,
     'is_default' => '1',
     'is_reserved' => 1,
   ];
@@ -51,16 +51,16 @@ function message_template_get_expectedresult() {
     'values' => [
       '70' => [
         'id' => '70',
-        'msg_title' => 'msg_title_285',
-        'msg_subject' => 'msg_subject_285',
-        'msg_text' => 'msg_text_285',
-        'msg_html' => 'msg_html_285',
+        'msg_title' => 'msg_title_472',
+        'msg_subject' => 'msg_subject_472',
+        'msg_text' => 'msg_text_472',
+        'msg_html' => 'msg_html_472',
         'is_active' => '1',
-        'workflow_id' => '285',
+        'workflow_id' => '472',
         'is_default' => '1',
         'is_reserved' => '1',
-        'is_sms' => '1',
-        'pdf_format_id' => '285',
+        'is_sms' => 0,
+        'pdf_format_id' => '472',
       ],
     ],
   ];
@@ -75,17 +75,17 @@ function message_template_get_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MessageTemplateTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

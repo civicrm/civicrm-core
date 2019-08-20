@@ -43,7 +43,7 @@ function constant_get_expectedresult() {
   $expectedResult = [
     'is_error' => 0,
     'version' => 3,
-    'count' => 36,
+    'count' => 35,
     'values' => [
       '1' => 'Meeting',
       '2' => 'Phone Call',
@@ -79,8 +79,7 @@ function constant_get_expectedresult() {
       '50' => 'Emailed Invoice',
       '51' => 'Contact Merged',
       '52' => 'Contact Deleted by Merge',
-      '53' => 'Failed Payment',
-      '54' => 'Close Accounting Period',
+      '54' => 'Failed Payment',
     ],
     'deprecated' => 'The Constant api is deprecated as of CiviCRM 4.4. Please use the getoptions api action instead.',
   ];
@@ -95,17 +94,17 @@ function constant_get_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ConstantTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

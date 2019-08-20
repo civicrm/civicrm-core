@@ -10,7 +10,7 @@
 function profile_getfields_example() {
   $params = [
     'action' => 'submit',
-    'profile_id' => 27,
+    'profile_id' => 22,
   ];
 
   try{
@@ -46,9 +46,15 @@ function profile_getfields_expectedresult() {
     'count' => 9,
     'values' => [
       'custom_1' => [
+        'id' => '1',
         'label' => '_addCustomFieldToProfile',
-        'groupTitle' => '_addCustomFie',
+        'headerPattern' => '//',
+        'title' => 'first_name',
+        'custom_field_id' => '1',
+        'groupTitle' => '_addCustomFieldToProfile',
         'data_type' => 'String',
+        'name' => 'custom_1',
+        'type' => 2,
         'html_type' => 'Text',
         'default_value' => 'defaultValue',
         'text_length' => '',
@@ -66,9 +72,9 @@ function profile_getfields_expectedresult() {
         'is_required' => 0,
         'table_name' => 'civicrm_value__addcustomfie_1',
         'column_name' => '_addcustomfieldtoprofile_1',
-        'name' => 'custom_1',
-        'title' => 'first_name',
-        'type' => 2,
+        'where' => 'civicrm_value__addcustomfie_1._addcustomfieldtoprofile_1',
+        'extends_table' => 'civicrm_contact',
+        'search_table' => 'contact_a',
         'api.required' => '1',
         'help_pre' => '',
         'help_post' => '',
@@ -91,11 +97,13 @@ function profile_getfields_expectedresult() {
         'table_name' => 'civicrm_address',
         'entity' => 'address',
         'bao' => 'CRM_Core_BAO_Address',
+        'localizable' => 0,
         'html' => [
           'type' => 'Text',
           'maxlength' => 64,
           'size' => 6,
         ],
+        'is_core_field' => TRUE,
         'api.required' => 0,
         'help_pre' => '',
         'help_post' => '',
@@ -107,9 +115,12 @@ function profile_getfields_expectedresult() {
         'type' => 1,
         'title' => 'State Province',
         'description' => 'Which State_Province does this address belong to.',
+        'where' => 'civicrm_address.state_province_id',
         'table_name' => 'civicrm_address',
         'entity' => 'address',
         'bao' => 'CRM_Core_BAO_Address',
+        'localizable' => 0,
+        'localize_context' => 'province',
         'FKClassName' => 'CRM_Core_DAO_StateProvince',
         'html' => [
           'type' => 'ChainSelect',
@@ -121,6 +132,7 @@ function profile_getfields_expectedresult() {
           'keyColumn' => 'id',
           'labelColumn' => 'name',
         ],
+        'is_core_field' => TRUE,
         'FKApiName' => 'StateProvince',
         'api.required' => '1',
         'help_pre' => '',
@@ -133,9 +145,12 @@ function profile_getfields_expectedresult() {
         'type' => 1,
         'title' => 'Country',
         'description' => 'Which Country does this address belong to.',
+        'where' => 'civicrm_address.country_id',
         'table_name' => 'civicrm_address',
         'entity' => 'address',
         'bao' => 'CRM_Core_BAO_Address',
+        'localizable' => 0,
+        'localize_context' => 'country',
         'FKClassName' => 'CRM_Core_DAO_Country',
         'html' => [
           'type' => 'Select',
@@ -147,7 +162,9 @@ function profile_getfields_expectedresult() {
           'keyColumn' => 'id',
           'labelColumn' => 'name',
           'nameColumn' => 'iso_code',
+          'abbrColumn' => 'iso_code',
         ],
+        'is_core_field' => TRUE,
         'FKApiName' => 'Country',
         'api.required' => '1',
         'help_pre' => '',
@@ -170,11 +187,13 @@ function profile_getfields_expectedresult() {
         'table_name' => 'civicrm_phone',
         'entity' => 'phone',
         'bao' => 'CRM_Core_BAO_Phone',
+        'localizable' => 0,
         'html' => [
           'type' => 'Text',
           'maxlength' => 32,
           'size' => 20,
         ],
+        'is_core_field' => TRUE,
         'api.required' => '1',
         'help_pre' => '',
         'help_post' => '',
@@ -197,11 +216,13 @@ function profile_getfields_expectedresult() {
         'table_name' => 'civicrm_email',
         'entity' => 'email',
         'bao' => 'CRM_Core_BAO_Email',
+        'localizable' => 0,
         'html' => [
           'type' => 'Text',
           'maxlength' => 254,
           'size' => 30,
         ],
+        'is_core_field' => TRUE,
         'api.required' => '1',
         'help_pre' => '',
         'help_post' => '',
@@ -225,11 +246,13 @@ function profile_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'contact',
         'bao' => 'CRM_Contact_BAO_Contact',
+        'localizable' => 0,
         'html' => [
           'type' => 'Text',
           'maxlength' => 64,
           'size' => 30,
         ],
+        'is_core_field' => TRUE,
         'api.required' => '1',
         'help_pre' => '',
         'help_post' => '',
@@ -251,11 +274,13 @@ function profile_getfields_expectedresult() {
         'table_name' => 'civicrm_contact',
         'entity' => 'contact',
         'bao' => 'CRM_Contact_BAO_Contact',
+        'localizable' => 0,
         'html' => [
           'type' => 'Text',
           'maxlength' => 64,
           'size' => 30,
         ],
+        'is_core_field' => TRUE,
         'api.required' => '1',
         'help_pre' => '',
         'help_post' => '',
@@ -280,17 +305,17 @@ function profile_getfields_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ProfileTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

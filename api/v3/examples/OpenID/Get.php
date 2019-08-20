@@ -7,7 +7,7 @@
  */
 function open_i_d_get_example() {
   $params = [
-    'contact_id' => 4,
+    'contact_id' => 7,
     'openid' => 'My OpenID handle',
     'location_type_id' => 1,
   ];
@@ -43,11 +43,11 @@ function open_i_d_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 2,
+    'id' => 3,
     'values' => [
-      '2' => [
-        'id' => '2',
-        'contact_id' => '4',
+      '3' => [
+        'id' => '3',
+        'contact_id' => '7',
         'location_type_id' => '1',
         'openid' => 'My OpenID handle',
         'allowed_to_login' => 0,
@@ -66,17 +66,17 @@ function open_i_d_get_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/OpenIDTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

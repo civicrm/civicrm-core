@@ -65,9 +65,9 @@ function group_contact_get_expectedresult() {
               'description' => 'New Test Group Created',
               'is_active' => '1',
               'visibility' => 'Public Pages',
-              'where_clause' => ' ( `civicrm_group_contact-3`.group_id IN ( 3 )   ) ',
-              'select_tables' => 'a:8:{s:15:\"civicrm_contact\";i:1;s:15:\"civicrm_address\";i:1;s:15:\"civicrm_country\";i:1;s:13:\"civicrm_email\";i:1;s:13:\"civicrm_phone\";i:1;s:10:\"civicrm_im\";i:1;s:19:\"civicrm_worldregion\";i:1;s:25:\"`civicrm_group_contact-3`\";s:165:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-3` ON (contact_a.id = `civicrm_group_contact-3`.contact_id AND `civicrm_group_contact-3`.status IN (\'Added\'))\";}',
-              'where_tables' => 'a:2:{s:15:\"civicrm_contact\";i:1;s:25:\"`civicrm_group_contact-3`\";s:165:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-3` ON (contact_a.id = `civicrm_group_contact-3`.contact_id AND `civicrm_group_contact-3`.status IN (\'Added\'))\";}',
+              'where_clause' => ' (  ( ( `civicrm_group_contact-5d5bbabeb0cbd`.group_id IN (\"3\") ) )  ) ',
+              'select_tables' => 'a:8:{s:15:\"civicrm_contact\";i:1;s:15:\"civicrm_address\";i:1;s:15:\"civicrm_country\";i:1;s:13:\"civicrm_email\";i:1;s:13:\"civicrm_phone\";i:1;s:10:\"civicrm_im\";i:1;s:19:\"civicrm_worldregion\";i:1;s:37:\"`civicrm_group_contact-5d5bbabeb0cbd`\";s:201:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-5d5bbabeb0cbd` ON (contact_a.id = `civicrm_group_contact-5d5bbabeb0cbd`.contact_id AND `civicrm_group_contact-5d5bbabeb0cbd`.status IN (\'Added\'))\";}',
+              'where_tables' => 'a:2:{s:15:\"civicrm_contact\";i:1;s:37:\"`civicrm_group_contact-5d5bbabeb0cbd`\";s:201:\" LEFT JOIN civicrm_group_contact `civicrm_group_contact-5d5bbabeb0cbd` ON (contact_a.id = `civicrm_group_contact-5d5bbabeb0cbd`.contact_id AND `civicrm_group_contact-5d5bbabeb0cbd`.status IN (\'Added\'))\";}',
               'group_type' => [
                 '0' => '1',
                 '1' => '2',
@@ -91,17 +91,17 @@ function group_contact_get_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/GroupContactTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

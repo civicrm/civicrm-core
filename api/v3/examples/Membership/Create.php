@@ -7,14 +7,14 @@
  */
 function membership_create_example() {
   $params = [
-    'contact_id' => 79,
-    'membership_type_id' => 47,
+    'contact_id' => 3,
+    'membership_type_id' => 1,
     'join_date' => '2006-01-21',
     'start_date' => '2006-01-21',
     'end_date' => '2006-12-21',
     'source' => 'Payment',
     'is_override' => 1,
-    'status_id' => 30,
+    'status_id' => 31,
   ];
 
   try{
@@ -52,14 +52,15 @@ function membership_create_expectedresult() {
     'values' => [
       '1' => [
         'id' => '1',
-        'contact_id' => '79',
-        'membership_type_id' => '47',
+        'contact_id' => '3',
+        'membership_type_id' => '1',
         'join_date' => '20060121000000',
         'start_date' => '2013-07-29 00:00:00',
         'end_date' => '2013-08-04 00:00:00',
         'source' => 'Payment',
-        'status_id' => '30',
+        'status_id' => '31',
         'is_override' => '1',
+        'status_override_end_date' => '',
         'owner_membership_id' => '',
         'max_related' => '',
         'is_test' => 0,
@@ -80,17 +81,17 @@ function membership_create_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/MembershipTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

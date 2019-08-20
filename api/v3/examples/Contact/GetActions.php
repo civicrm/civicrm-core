@@ -40,28 +40,37 @@ function contact_getactions_expectedresult() {
   $expectedResult = [
     'is_error' => 0,
     'version' => 3,
-    'count' => 20,
+    'count' => 29,
     'values' => [
       '0' => 'create',
       '1' => 'delete',
       '2' => 'duplicatecheck',
-      '3' => 'get',
-      '4' => 'getactions',
-      '5' => 'getcount',
-      '6' => 'getfield',
-      '7' => 'getfields',
-      '8' => 'getlist',
-      '9' => 'getoptions',
-      '10' => 'getquick',
-      '11' => 'getrefcount',
-      '12' => 'getsingle',
-      '13' => 'getvalue',
-      '14' => 'merge',
-      '15' => 'proximity',
-      '16' => 'replace',
-      '17' => 'setvalue',
-      '18' => 'update',
-      '19' => 'validate',
+      '3' => 'example_action1',
+      '4' => 'example_action2',
+      '5' => 'get',
+      '6' => 'get_merge_conflicts',
+      '7' => 'getactions',
+      '8' => 'getcount',
+      '9' => 'getfield',
+      '10' => 'getfields',
+      '11' => 'getlist',
+      '12' => 'getmergedfrom',
+      '13' => 'getmergedto',
+      '14' => 'getoptions',
+      '15' => 'getquick',
+      '16' => 'getrefcount',
+      '17' => 'getsingle',
+      '18' => 'getunique',
+      '19' => 'getvalue',
+      '20' => 'merge',
+      '21' => 'proximity',
+      '22' => 'replace',
+      '23' => 'setvalue',
+      '24' => 'type_create',
+      '25' => 'type_delete',
+      '26' => 'type_get',
+      '27' => 'update',
+      '28' => 'validate',
     ],
     'deprecated' => [
       'getquick' => 'The "getquick" action is deprecated in favor of "getlist".',
@@ -80,17 +89,17 @@ function contact_getactions_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContactTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

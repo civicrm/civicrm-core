@@ -7,10 +7,9 @@
  */
 function activity_get_example() {
   $params = [
-    'contact_id' => 1,
-    'activity_type_id' => 9999,
-    'sequential' => 1,
-    'return.custom_1' => 1,
+    'case_id' => [
+      'IS NULL' => 1,
+    ],
   ];
 
   try{
@@ -44,28 +43,25 @@ function activity_get_expectedresult() {
     'is_error' => 0,
     'version' => 3,
     'count' => 1,
-    'id' => 1,
+    'id' => 9,
     'values' => [
-      '0' => [
-        'id' => '1',
-        'activity_type_id' => '9999',
-        'subject' => 'test activity type id',
-        'activity_date_time' => '2011-06-02 14:36:13',
-        'duration' => '120',
-        'location' => 'Pennsylvania',
-        'details' => 'a test activity',
+      '9' => [
+        'id' => '9',
+        'activity_type_id' => '2',
+        'subject' => 'Ask not what your API can do for you, but what you can do for your API.',
+        'activity_date_time' => '2019-08-20 19:10:43',
         'status_id' => '2',
-        'priority_id' => '1',
+        'priority_id' => '2',
         'is_test' => 0,
         'is_auto' => 0,
         'is_current_revision' => '1',
         'is_deleted' => 0,
         'is_star' => 0,
-        'custom_1' => 'custom string',
-        'source_contact_id' => '1',
-        'status' => 'Completed',
-        'activity_name' => 'Test activity type',
-        'custom_1_1' => 'custom string',
+        'created_date' => '2013-07-28 08:49:19',
+        'modified_date' => '2012-11-14 16:02:35',
+        'source_contact_id' => '19',
+        'source_contact_name' => 'Mr. Anthony Anderson II',
+        'source_contact_sort_name' => 'Anderson, Anthony',
       ],
     ],
   ];
@@ -75,22 +71,22 @@ function activity_get_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "testActivityGetContact_idCustom"
+* The test that created it is called "testGet"
 * and can be found at:
-* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityTest.php
+* https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ActivityCaseTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

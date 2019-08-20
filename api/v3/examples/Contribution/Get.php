@@ -51,6 +51,10 @@ function contribution_get_expectedresult() {
         'display_name' => 'Mr. Anthony Anderson II',
         'contribution_id' => '1',
         'currency' => 'USD',
+        'contribution_recur_id' => '',
+        'contribution_status_id' => '1',
+        'contribution_campaign_id' => '',
+        'payment_instrument_id' => '4',
         'receive_date' => '2010-01-20 00:00:00',
         'non_deductible_amount' => '10.00',
         'total_amount' => '100.00',
@@ -58,39 +62,30 @@ function contribution_get_expectedresult() {
         'net_amount' => '95.00',
         'trxn_id' => '23456',
         'invoice_id' => '78910',
-        'cancel_date' => '',
+        'invoice_number' => 'INV_1',
+        'contribution_cancel_date' => '',
         'cancel_reason' => '',
         'receipt_date' => '',
         'thankyou_date' => '',
         'contribution_source' => 'SSF',
         'amount_level' => '',
-        'contribution_recur_id' => '',
         'is_test' => 0,
         'is_pay_later' => 0,
-        'contribution_status_id' => '1',
         'contribution_check_number' => '',
-        'contribution_campaign_id' => '',
-        'financial_type_id' => '1',
-        'financial_type' => 'Donation',
-        'product_id' => '',
-        'product_name' => '',
-        'sku' => '',
-        'contribution_product_id' => '',
-        'product_option' => '',
-        'fulfilled_date' => '',
-        'contribution_start_date' => '',
-        'contribution_end_date' => '',
         'financial_account_id' => '1',
         'accounting_code' => '4200',
         'campaign_id' => '',
         'contribution_campaign_title' => '',
+        'financial_type_id' => '1',
+        'financial_type' => 'Donation',
         'contribution_note' => '',
         'contribution_batch' => '',
-        'contribution_status' => 'Completed',
+        'contribution_recur_status' => 'Completed',
         'payment_instrument' => 'Check',
-        'payment_instrument_id' => '4',
-        'instrument_id' => '4',
+        'contribution_status' => 'Completed',
         'check_number' => '',
+        'instrument_id' => '4',
+        'cancel_date' => '',
         'id' => '1',
         'contribution_type_id' => '1',
       ],
@@ -107,17 +102,17 @@ function contribution_get_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/ContributionTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

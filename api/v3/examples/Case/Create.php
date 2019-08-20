@@ -7,9 +7,10 @@
  */
 function case_create_example() {
   $params = [
+    'case_type_id' => 1,
     'subject' => 'Test case',
     'contact_id' => 17,
-    'case_type' => 'housing_support',
+    'custom_1' => 'custom string',
   ];
 
   try{
@@ -53,7 +54,9 @@ function case_create_expectedresult() {
         'end_date' => '',
         'details' => '',
         'status_id' => '1',
-        'is_deleted' => '',
+        'is_deleted' => 0,
+        'created_date' => '2013-07-28 08:49:19',
+        'modified_date' => '2012-11-14 16:02:35',
       ],
     ],
   ];
@@ -63,22 +66,22 @@ function case_create_expectedresult() {
 
 /*
 * This example has been generated from the API test suite.
-* The test that created it is called "testCaseCreate"
+* The test that created it is called "testCaseCreateCustom"
 * and can be found at:
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/CaseTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

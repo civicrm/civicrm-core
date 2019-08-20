@@ -49,7 +49,7 @@ function logging_get_expectedresult() {
         'from' => 'Anderson, Anthony',
         'to' => 'Dwarf, Dopey',
         'table' => 'civicrm_contact',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:24',
         'log_conn_id' => 'wooty wop wop',
       ],
       '1' => [
@@ -59,7 +59,7 @@ function logging_get_expectedresult() {
         'from' => 'Mr. Anthony Anderson II',
         'to' => 'Mr. Dopey Dwarf II',
         'table' => 'civicrm_contact',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:24',
         'log_conn_id' => 'wooty wop wop',
       ],
       '2' => [
@@ -69,7 +69,7 @@ function logging_get_expectedresult() {
         'from' => 'Anthony',
         'to' => 'Dopey',
         'table' => 'civicrm_contact',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:24',
         'log_conn_id' => 'wooty wop wop',
       ],
       '3' => [
@@ -79,17 +79,17 @@ function logging_get_expectedresult() {
         'from' => 'Anderson',
         'to' => 'Dwarf',
         'table' => 'civicrm_contact',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:24',
         'log_conn_id' => 'wooty wop wop',
       ],
       '4' => [
         'action' => 'Update',
         'id' => '3',
         'field' => 'modified_date',
-        'from' => '2017-02-07 02:36:28',
-        'to' => '2017-02-07 02:36:46',
+        'from' => '2019-08-20 19:23:20',
+        'to' => '2019-08-20 19:23:24',
         'table' => 'civicrm_contact',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:24',
         'log_conn_id' => 'wooty wop wop',
       ],
       '5' => [
@@ -99,7 +99,7 @@ function logging_get_expectedresult() {
         'from' => '',
         'to' => '2',
         'table' => 'civicrm_email',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:25',
         'log_conn_id' => 'wooty wop wop',
       ],
       '6' => [
@@ -109,7 +109,7 @@ function logging_get_expectedresult() {
         'from' => '',
         'to' => '3',
         'table' => 'civicrm_email',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:25',
         'log_conn_id' => 'wooty wop wop',
       ],
       '7' => [
@@ -117,9 +117,9 @@ function logging_get_expectedresult() {
         'id' => '2',
         'field' => 'location_type_id',
         'from' => '',
-        'to' => '',
+        'to' => '1',
         'table' => 'civicrm_email',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:25',
         'log_conn_id' => 'wooty wop wop',
       ],
       '8' => [
@@ -129,7 +129,7 @@ function logging_get_expectedresult() {
         'from' => '',
         'to' => 'dopey@mail.com',
         'table' => 'civicrm_email',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:25',
         'log_conn_id' => 'wooty wop wop',
       ],
       '9' => [
@@ -139,7 +139,7 @@ function logging_get_expectedresult() {
         'from' => '',
         'to' => 0,
         'table' => 'civicrm_email',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:25',
         'log_conn_id' => 'wooty wop wop',
       ],
       '10' => [
@@ -149,7 +149,7 @@ function logging_get_expectedresult() {
         'from' => '',
         'to' => 0,
         'table' => 'civicrm_email',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:25',
         'log_conn_id' => 'wooty wop wop',
       ],
       '11' => [
@@ -159,7 +159,7 @@ function logging_get_expectedresult() {
         'from' => '',
         'to' => 0,
         'table' => 'civicrm_email',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:25',
         'log_conn_id' => 'wooty wop wop',
       ],
       '12' => [
@@ -169,7 +169,7 @@ function logging_get_expectedresult() {
         'from' => '',
         'to' => 0,
         'table' => 'civicrm_email',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:25',
         'log_conn_id' => 'wooty wop wop',
       ],
       '13' => [
@@ -179,7 +179,7 @@ function logging_get_expectedresult() {
         'from' => '',
         'to' => '',
         'table' => 'civicrm_email',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:25',
         'log_conn_id' => 'wooty wop wop',
       ],
       '14' => [
@@ -189,7 +189,7 @@ function logging_get_expectedresult() {
         'from' => '',
         'to' => '',
         'table' => 'civicrm_email',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:25',
         'log_conn_id' => 'wooty wop wop',
       ],
       '15' => [
@@ -199,7 +199,7 @@ function logging_get_expectedresult() {
         'from' => '',
         'to' => '',
         'table' => 'civicrm_email',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:25',
         'log_conn_id' => 'wooty wop wop',
       ],
       '16' => [
@@ -209,7 +209,7 @@ function logging_get_expectedresult() {
         'from' => '',
         'to' => '',
         'table' => 'civicrm_email',
-        'log_date' => '2017-02-07 02:36:46',
+        'log_date' => '2019-08-20 19:23:25',
         'log_conn_id' => 'wooty wop wop',
       ],
     ],
@@ -225,17 +225,17 @@ function logging_get_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/LoggingTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

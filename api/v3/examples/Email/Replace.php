@@ -7,30 +7,30 @@
  */
 function email_replace_example() {
   $params = [
-    'contact_id' => 9,
+    'contact_id' => 17,
     'values' => [
       '0' => [
-        'location_type_id' => 18,
+        'location_type_id' => 34,
         'email' => '1-1@example.com',
         'is_primary' => 1,
       ],
       '1' => [
-        'location_type_id' => 18,
+        'location_type_id' => 34,
         'email' => '1-2@example.com',
         'is_primary' => 0,
       ],
       '2' => [
-        'location_type_id' => 18,
+        'location_type_id' => 34,
         'email' => '1-3@example.com',
         'is_primary' => 0,
       ],
       '3' => [
-        'location_type_id' => 19,
+        'location_type_id' => 35,
         'email' => '2-1@example.com',
         'is_primary' => 0,
       ],
       '4' => [
-        'location_type_id' => 19,
+        'location_type_id' => 35,
         'email' => '2-2@example.com',
         'is_primary' => 0,
       ],
@@ -69,28 +69,14 @@ function email_replace_expectedresult() {
     'version' => 3,
     'count' => 5,
     'values' => [
-      '12' => [
-        'id' => '12',
-        'contact_id' => '9',
-        'location_type_id' => '18',
+      '13' => [
+        'id' => '13',
+        'contact_id' => '17',
+        'location_type_id' => '34',
         'email' => '1-1@example.com',
         'is_primary' => '1',
         'is_billing' => '',
-        'on_hold' => '',
-        'is_bulkmail' => '',
-        'hold_date' => '',
-        'reset_date' => '',
-        'signature_text' => '',
-        'signature_html' => '',
-      ],
-      '13' => [
-        'id' => '13',
-        'contact_id' => '9',
-        'location_type_id' => '18',
-        'email' => '1-2@example.com',
-        'is_primary' => 0,
-        'is_billing' => '',
-        'on_hold' => '',
+        'on_hold' => 0,
         'is_bulkmail' => '',
         'hold_date' => '',
         'reset_date' => '',
@@ -99,12 +85,12 @@ function email_replace_expectedresult() {
       ],
       '14' => [
         'id' => '14',
-        'contact_id' => '9',
-        'location_type_id' => '18',
-        'email' => '1-3@example.com',
+        'contact_id' => '17',
+        'location_type_id' => '34',
+        'email' => '1-2@example.com',
         'is_primary' => 0,
         'is_billing' => '',
-        'on_hold' => '',
+        'on_hold' => 0,
         'is_bulkmail' => '',
         'hold_date' => '',
         'reset_date' => '',
@@ -113,12 +99,12 @@ function email_replace_expectedresult() {
       ],
       '15' => [
         'id' => '15',
-        'contact_id' => '9',
-        'location_type_id' => '19',
-        'email' => '2-1@example.com',
+        'contact_id' => '17',
+        'location_type_id' => '34',
+        'email' => '1-3@example.com',
         'is_primary' => 0,
         'is_billing' => '',
-        'on_hold' => '',
+        'on_hold' => 0,
         'is_bulkmail' => '',
         'hold_date' => '',
         'reset_date' => '',
@@ -127,12 +113,26 @@ function email_replace_expectedresult() {
       ],
       '16' => [
         'id' => '16',
-        'contact_id' => '9',
-        'location_type_id' => '19',
+        'contact_id' => '17',
+        'location_type_id' => '35',
+        'email' => '2-1@example.com',
+        'is_primary' => 0,
+        'is_billing' => '',
+        'on_hold' => 0,
+        'is_bulkmail' => '',
+        'hold_date' => '',
+        'reset_date' => '',
+        'signature_text' => '',
+        'signature_html' => '',
+      ],
+      '17' => [
+        'id' => '17',
+        'contact_id' => '17',
+        'location_type_id' => '35',
         'email' => '2-2@example.com',
         'is_primary' => 0,
         'is_billing' => '',
-        'on_hold' => '',
+        'on_hold' => 0,
         'is_bulkmail' => '',
         'hold_date' => '',
         'reset_date' => '',
@@ -152,17 +152,17 @@ function email_replace_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/EmailTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */

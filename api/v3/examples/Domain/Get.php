@@ -65,8 +65,8 @@ function domain_get_expectedresult() {
           'geo_code_1' => '',
           'geo_code_2' => '',
         ],
-        'from_email' => 'info@EXAMPLE.ORG',
         'from_name' => 'FIXME',
+        'from_email' => 'info@EXAMPLE.ORG',
         'domain_version' => '4.6.alpha1',
       ],
       '1' => [
@@ -91,8 +91,8 @@ function domain_get_expectedresult() {
           'geo_code_1' => '41.8328',
           'geo_code_2' => '-72.9253',
         ],
-        'from_email' => 'info@EXAMPLE.ORG',
         'from_name' => 'FIXME',
+        'from_email' => 'info@EXAMPLE.ORG',
         'domain_version' => '4.6.alpha1',
       ],
     ],
@@ -108,17 +108,17 @@ function domain_get_expectedresult() {
 * https://github.com/civicrm/civicrm-core/blob/master/tests/phpunit/api/v3/DomainTest.php
 *
 * You can see the outcome of the API tests at
-* https://test.civicrm.org/job/CiviCRM-master-git/
+* https://test.civicrm.org/job/CiviCRM-Core-Matrix/
 *
 * To Learn about the API read
-* http://wiki.civicrm.org/confluence/display/CRMDOC/Using+the+API
+* https://docs.civicrm.org/dev/en/latest/api/
 *
-* Browse the api on your own site with the api explorer
-* http://MYSITE.ORG/path/to/civicrm/api
+* Browse the API on your own site with the API Explorer. It is in the main
+* CiviCRM menu, under: Support > Development > API Explorer.
 *
 * Read more about testing here
-* http://wiki.civicrm.org/confluence/display/CRM/Testing
+* https://docs.civicrm.org/dev/en/latest/testing/
 *
 * API Standards documentation:
-* http://wiki.civicrm.org/confluence/display/CRM/API+Architecture+Standards
+* https://docs.civicrm.org/dev/en/latest/framework/api-architecture/
 */
