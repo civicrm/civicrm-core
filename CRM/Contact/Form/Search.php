@@ -612,26 +612,27 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           $this->_ssID = $ssId;
         }
       }
-
+      // set the uf group id if not already present
+      if (isset($this->_ufGroupID)) {
+        $this->_formValues['uf_group_id'] = $this->_ufGroupID;
+      }
       // fix for CRM-1907
       if (isset($this->_ssID) && $this->_context != 'smog') {
-        // we only retrieve the saved search values if out current values are null
-        $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
+        if (!isset($this->_ufGroupID)) {
+          // we only retrieve the saved search values if out current values are null
+          $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
 
-        //fix for CRM-1505
-        if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $this->_ssID, 'mapping_id')) {
-          $this->_params = CRM_Contact_BAO_SavedSearch::getSearchParams($this->_ssID);
-        }
-        else {
-          $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
+          //fix for CRM-1505
+          if (CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_SavedSearch', $this->_ssID, 'mapping_id')) {
+            $this->_params = CRM_Contact_BAO_SavedSearch::getSearchParams($this->_ssID);
+          }
+          else {
+            $this->_params = CRM_Contact_BAO_Query::convertFormValues($this->_formValues);
+          }
         }
         $this->_returnProperties = &$this->returnProperties();
       }
       else {
-        if (isset($this->_ufGroupID)) {
-          // also set the uf group id if not already present
-          $this->_formValues['uf_group_id'] = $this->_ufGroupID;
-        }
         if (isset($this->_componentMode)) {
           $this->_formValues['component_mode'] = $this->_componentMode;
         }
