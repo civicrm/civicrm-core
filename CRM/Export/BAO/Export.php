@@ -70,9 +70,6 @@ class CRM_Export_BAO_Export {
    * @param array $exportParams
    * @param string $queryOperator
    *
-   * @return array|null
-   *   An array can be requested from within a unit test.
-   *
    * @throws \CRM_Core_Exception
    */
   public static function exportComponents(
@@ -205,15 +202,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
         $processor->mergeSameAddress();
       }
 
-      // In order to be able to write a unit test against this function we need to suppress
-      // the csv writing. In future hopefully the csv writing & the main processing will be in separate functions.
-      if (empty($exportParams['suppress_csv_for_testing'])) {
-        $processor->writeCSVFromTable();
-      }
-      else {
-        // return tableName sqlColumns headerRows in test context
-        return [$processor->getTemporaryTable(), $sqlColumns, $processor->getHeaderRows(), $processor];
-      }
+      $processor->writeCSVFromTable();
 
       // delete the export temp table and component table
       $sql = "DROP TABLE IF EXISTS " . $processor->getTemporaryTable();

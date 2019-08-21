@@ -893,6 +893,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Export City against multiple location types.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function testExportAddressData() {
     $this->diversifyLocationTypes();
@@ -903,7 +906,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->contactIDs[] = $this->individualCreate();
     $this->contactIDs[] = $this->householdCreate();
     $this->contactIDs[] = $this->organizationCreate();
-    $fields = [['Individual', 'contact_id']];
+    $fields = [['name' => 'contact_id']];
     foreach ($this->contactIDs as $contactID) {
       foreach ($locationTypes as $locationName => $locationLabel) {
         $this->callAPISuccess('Address', 'create', [
@@ -913,9 +916,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
           'city' => $locationLabel . $contactID . 'city',
           'postal_code' => $locationLabel . $contactID . 'postal_code',
         ]);
-        $fields[] = ['Individual', 'city', CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $locationName)];
-        $fields[] = ['Individual', 'street_address', CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $locationName)];
-        $fields[] = ['Individual', 'postal_code', CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $locationName)];
+        $fields[] = ['contact_type' => 'Individual', 'name' => 'city', 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $locationName)];
+        $fields[] = ['contact_type' => 'Individual', 'name' => 'street_address', 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $locationName)];
+        $fields[] = ['contact_type' => 'Individual', 'name' => 'postal_code', 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Address', 'location_type_id', $locationName)];
       }
     }
 
@@ -940,25 +943,24 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     foreach (array_keys(array_merge($locationTypes, [' ' => ['Primary']])) as $locationType) {
       foreach ($relationships as $contactID => $relationship) {
         $fields[] = [
-          'Individual',
-          $relationship['relationship_type_id'] . '_a_b',
-          'city',
-          CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType),
+          'contact_type' => 'Individual',
+          'relationship_type_id' => $relationship['relationship_type_id'],
+          'relationship_direction' => 'a_b',
+          'name' => 'city',
+          'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_IM', 'location_type_id', $locationType),
         ];
       }
     }
-    list($tableName, $sqlColumns) = $this->doExport($fields, $this->contactIDs[0]);
 
-    $dao = CRM_Core_DAO::executeQuery('SELECT * FROM ' . $tableName);
-    while ($dao->fetch()) {
-      $id = $dao->contact_id;
-      $this->assertEquals('Méin' . $id . 'city', $dao->main_city);
-      $this->assertEquals('Billing' . $id . 'street_address', $dao->billing_street_address);
-      $this->assertEquals('Whare Kai' . $id . 'postal_code', $dao->whare_kai_postal_code);
+    $this->doExportTest(['fields' => $fields]);
+
+    foreach ($this->csv as $row) {
+      $this->assertEquals('Méin' . $row['contact_id'] . 'city', $row['Main-City']);
+      $this->assertEquals('Billing' . $row['contact_id'] . 'street_address', $row['Billing-Street Address']);
+      $this->assertEquals('Whare Kai' . $row['contact_id'] . 'postal_code', $row['Whare Kai-Postal Code']);
       foreach ($relationships as $relatedContactID => $relationship) {
-        $relationshipString = $field = $relationship['relationship_type_id'] . '_a_b';
-        $field = $relationshipString . '_main_city';
-        $this->assertEquals('Méin' . $relatedContactID . 'city', $dao->$field);
+        $value = ((int) $row['contact_id'] === $this->contactIDs[0]) ? 'Méin' . $relatedContactID . 'city' : '';
+        $this->assertEquals($value, $row[$relationship['label'] . '-Main-City'], 'checking ' . $relationship['label'] . '-Main-City');
       }
     }
 
@@ -997,7 +999,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       '5_a_b_other_city' => '5_a_b_other_city varchar(64)',
       '5_a_b_whare_kai_city' => '5_a_b_whare_kai_city varchar(64)',
       '5_a_b_city' => '5_a_b_city varchar(64)',
-    ], $sqlColumns);
+    ], $this->processor->getSQLColumns());
   }
 
   /**
@@ -1267,42 +1269,6 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'relationship_type_id' => $houseHoldTypeID,
     ]);
     return [$householdID, $houseHoldTypeID];
-  }
-
-  /**
-   * Do a CiviCRM export.
-   *
-   * @param array $selectedFields
-   * @param int $id
-   *
-   * @param int $exportMode
-   *
-   * @return array
-   * @throws \CRM_Core_Exception
-   */
-  protected function doExport($selectedFields, $id, $exportMode = CRM_Export_Form_Select::CONTACT_EXPORT) {
-    $ids = (array) $id;
-    $mappedFields = [];
-    foreach ((array) $selectedFields as $field) {
-      $mappedFields[] = CRM_Core_BAO_Mapping::getMappingParams([], $field);
-    }
-    list($tableName, $sqlColumns) = CRM_Export_BAO_Export::exportComponents(
-      TRUE,
-      $ids,
-      [],
-      NULL,
-      $mappedFields,
-      NULL,
-      $exportMode,
-      "contact_a.id IN (" . implode(',', $ids) . ")",
-      NULL,
-      FALSE,
-      FALSE,
-      [
-        'suppress_csv_for_testing' => TRUE,
-      ]
-    );
-    return [$tableName, $sqlColumns];
   }
 
   /**
@@ -1804,6 +1770,9 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
   /**
    * Test export fields when no payment fields to be exported.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
    */
   public function textExportParticipantSpecifyFieldsNoPayment() {
     $selectedFields = $this->getAllSpecifiableParticipantReturnFields();
@@ -1819,9 +1788,8 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
         unset($expected[$index]);
       }
     }
-
-    list($tableName, $sqlColumns) = $this->doExport($selectedFields, $this->contactIDs[1], CRM_Export_Form_Select::EVENT_EXPORT);
-    $this->assertEquals($expected, $sqlColumns);
+    $this->doExportTest(['fields' => $selectedFields, 'ids' => [$this->contactIDs[1]], 'exportMode' => CRM_Export_Form_Select::EVENT_EXPORT]);
+    $this->assertEquals($expected, $this->processor->getSQLColumns());
   }
 
   /**
