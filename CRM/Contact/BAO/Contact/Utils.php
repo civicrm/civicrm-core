@@ -243,33 +243,6 @@ WHERE  id IN ( $idString )
   }
 
   /**
-   * Get the count of  contact loctions.
-   *
-   * @param int $contactId
-   *   Contact id.
-   *
-   * @return int
-   *   max locations for the contact
-   */
-  public static function maxLocations($contactId) {
-    $contactLocations = [];
-
-    // find number of location blocks for this contact and adjust value accordinly
-    // get location type from email
-    $query = "
-( SELECT location_type_id FROM civicrm_email   WHERE contact_id = {$contactId} )
-UNION
-( SELECT location_type_id FROM civicrm_phone   WHERE contact_id = {$contactId} )
-UNION
-( SELECT location_type_id FROM civicrm_im      WHERE contact_id = {$contactId} )
-UNION
-( SELECT location_type_id FROM civicrm_address WHERE contact_id = {$contactId} )
-";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    return $dao->N;
-  }
-
-  /**
    * Create Current employer relationship for a individual.
    *
    * @param int $contactID
