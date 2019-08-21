@@ -34,6 +34,7 @@
   },
   "include-path": ["vendor/tecnickcom"],
   "require": {
+    "php": "~7.0",
     "dompdf/dompdf" : "0.8.*",
     "electrolinux/phpquery": "^0.9.6",
     "symfony/config": "^2.8.44 || ~3.0",
