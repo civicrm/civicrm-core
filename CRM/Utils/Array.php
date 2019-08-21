@@ -375,7 +375,7 @@ class CRM_Utils_Array {
   public static function crmInArray($value, $params, $caseInsensitive = TRUE) {
     foreach ($params as $item) {
       if (is_array($item)) {
-        $ret = crmInArray($value, $item, $caseInsensitive);
+        $ret = self::crmInArray($value, $item, $caseInsensitive);
       }
       else {
         $ret = ($caseInsensitive) ? strtolower($item) == strtolower($value) : $item == $value;
