@@ -555,6 +555,12 @@ function civicrm_api3_mailing_preview($params) {
 
   $mailing = new CRM_Mailing_BAO_Mailing();
   $mailingID = CRM_Utils_Array::value('id', $params);
+
+  //id may be a hash; need to lookup actual id
+  if ($mailingID && !is_int($mailingID)) {
+    $mailingID = CRM_Core_DAO::getFieldValue('CRM_Mailing_BAO_Mailing', $mailingID, 'id', 'hash');
+  }
+
   if ($mailingID) {
     $mailing->id = $mailingID;
     $mailing->find(TRUE);
