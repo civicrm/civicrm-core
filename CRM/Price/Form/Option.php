@@ -357,7 +357,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
       $params['visibility_id'] = CRM_Utils_Array::value('visibility_id', $params, FALSE);
       $ids = [];
       if ($this->_oid) {
-        $ids['id'] = $this->_oid;
+        $params['id'] = $this->_oid;
       }
       $optionValue = CRM_Price_BAO_PriceFieldValue::create($params, $ids);
 

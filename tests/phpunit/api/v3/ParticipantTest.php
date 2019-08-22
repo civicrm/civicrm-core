@@ -573,6 +573,33 @@ class api_v3_ParticipantTest extends CiviUnitTestCase {
     $this->assertEquals(2, $lineItem['qty']);
     $this->assertEquals(20, $lineItem['unit_price']);
     $this->assertEquals('pricefieldvalue1', $lineItem['label']);
+    $this->callAPISuccess('PriceFieldValue', 'create', ['id' => $pfv2['id'], 'label' => 'Price FIeld Value 2 Label']);
+    $participantGet = $this->callAPISuccess('Participant', 'get', ['id' => $participant['id']]);
+    $this->assertEquals(["pricefieldvalue1 - 2", "pricefieldvalue2 - 2"], $participantGet['values'][$participant['id']]['participant_fee_level']);
+    $conatactID4 = $this->individualCreate();
+    $myParams['contact_id'] = $conatactID4;
+    $myParams['participant_fee_level'] = CRM_Core_DAO::VALUE_SEPARATOR . "pricefieldvalue1 - 2" . CRM_Core_DAO::VALUE_SEPARATOR . "Price FIeld Value 2 Label - 2" . CRM_Core_DAO::VALUE_SEPARATOR;
+    $AdditionalParticipant = $this->callAPISuccess('Participant', 'create', $myParams);
+    $this->assertEquals(["pricefieldvalue1 - 2", "Price FIeld Value 2 Label - 2"], $AdditionalParticipant['values'][$AdditionalParticipant['id']]['fee_level']);
+    $lineItems = $this->callAPISuccess('LineItem', 'get', [
+      'entity_id' => $AdditionalParticipant['id'],
+      'entity_table' => 'civicrm_participant',
+    ]);
+    $this->assertEquals(2, $lineItems['count']);
+
+    // Check quantity, label and unit price of lines.
+    // TODO: These assertions depend on the order of the line items, which is
+    // technically incorrect.
+
+    $lineItem = array_pop($lineItems['values']);
+    $this->assertEquals(2, $lineItem['qty']);
+    $this->assertEquals(5, $lineItem['unit_price']);
+    $this->assertEquals('Price FIeld Value 2 Label', $lineItem['label']);
+
+    $lineItem = array_pop($lineItems['values']);
+    $this->assertEquals(2, $lineItem['qty']);
+    $this->assertEquals(20, $lineItem['unit_price']);
+    $this->assertEquals('pricefieldvalue1', $lineItem['label']);
 
     // Cleanup
     $this->callAPISuccess('participant', 'delete', ['id' => $participant['id']]);
