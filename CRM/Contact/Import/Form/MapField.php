@@ -36,6 +36,7 @@
  */
 class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
+  use CRM_Contact_Import_MetadataTrait;
 
   /**
    * An array of all contact fields with
@@ -193,10 +194,13 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
 
   /**
    * Build the form object.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function buildQuickForm() {
+    $savedMappingID = (int) $this->get('savedMapping');
     //to save the current mappings
-    if (!$this->get('savedMapping')) {
+    if (!$savedMappingID) {
       $saveDetailsName = ts('Save this field mapping');
       $this->applyFilter('saveMappingName', 'trim');
       $this->add('text', 'saveMappingName', ts('Name'));
@@ -396,12 +400,16 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $formName = 'document.forms.' . $this->_name;
     //used to warn for mismatch column count or mismatch mapping
     CRM_Core_Session::singleton()->setStatus(NULL);
+    $processor = new CRM_Import_ImportProcessor();
+    $processor->setMappingID($savedMappingID);
+    $processor->setFormName($formName);
+    $processor->setMetadata($this->getContactImportMetadata());
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
 
       if ($this->get('savedMapping')) {
-        list($defaults, $js) = $this->loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
+        list($defaults, $js) = $this->loadSavedMapping($processor, $mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
@@ -840,6 +848,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   }
 
   /**
+   * @param \CRM_Import_ImportProcessor $processor
    * @param $mappingName
    * @param int $i
    * @param $mappingRelation
@@ -848,7 +857,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param $mappingPhoneType
    * @param $mappingImProvider
    * @param array $defaults
-   * @param string $formName
    * @param string $js
    * @param bool $hasColumnNames
    * @param array $dataPatterns
@@ -856,8 +864,9 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @return array
    */
-  public function loadSavedMapping($mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $formName, $js, $hasColumnNames, $dataPatterns, $columnPatterns) {
+  public function loadSavedMapping($processor, $mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns) {
     $jsSet = FALSE;
+    $formName = $processor->getFormName();
     if (isset($mappingName[$i])) {
       if ($mappingName[$i] != ts('- do not import -')) {
 
