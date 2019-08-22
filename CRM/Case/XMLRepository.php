@@ -264,9 +264,8 @@ class CRM_Case_XMLRepository {
    */
   public function getAllDeclaredRelationshipTypes() {
     $result = [];
-
     $p = new CRM_Case_XMLProcessor_Process();
-       foreach ($this->getAllCaseTypes() as $caseTypeId => $caseTypeName) {
+    foreach ($this->getAllCaseTypes() as $caseTypeId => $caseTypeName) {
       $query = "SELECT is_active FROM civicrm_case_type WHERE id = %1";
       $isActive = (int) CRM_Core_DAO::singleValueQuery($query, [1 => [$caseTypeId, 'Integer']]);
       if ($isActive) {
@@ -274,7 +273,6 @@ class CRM_Case_XMLRepository {
         $result = array_merge($result, $p->getDeclaredRelationshipTypes($caseTypeXML));
       }
     }
-
     $result = array_unique($result);
     sort($result);
     return $result;
