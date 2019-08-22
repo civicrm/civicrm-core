@@ -91,6 +91,15 @@ else {
   errorDisplayPage($errorTitle, $errorMsg, FALSE);
 }
 
+$composerJsonPath = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'composer.json';
+if (file_exists($composerJsonPath)) {
+  $composerJson = json_decode(file_get_contents($composerJsonPath), 1);
+  $minPhpVer = preg_replace(';[~^];', '', $composerJson['require']['php']);
+  if (!version_compare(phpversion(), $minPhpVer, '>=')) {
+    errorDisplayPage('PHP Version Requirement', sprintf("CiviCRM requires PHP %s+. The web server is running PHP %s.", $minPhpVer, phpversion()), FALSE);
+  }
+}
+
 $pkgPath = $crmPath . DIRECTORY_SEPARATOR . 'packages';
 
 require_once $crmPath . '/CRM/Core/ClassLoader.php';
