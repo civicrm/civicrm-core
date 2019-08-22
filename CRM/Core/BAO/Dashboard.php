@@ -109,6 +109,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       'contact_id' => $contactID,
       'is_active' => 1,
       'dashboard_id.is_active' => 1,
+      'dashboard_id.domain_id' => CRM_Core_Config::domainID(),
       'options' => ['sort' => 'weight', 'limit' => 0],
       'return' => [
         'id',
@@ -143,7 +144,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     // If empty, then initialize default dashlets for this user.
     if (!$results['count']) {
       // They may just have disabled all their dashlets. Check if any records exist for this contact.
-      if (!civicrm_api3('DashboardContact', 'getcount', ['contact_id' => $contactID])) {
+      if (!civicrm_api3('DashboardContact', 'getcount', ['contact_id' => $contactID, 'dashboard_id.domain_id' => CRM_Core_Config::domainID()])) {
         $dashlets = self::initializeDashlets();
       }
     }
@@ -388,7 +389,13 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $dashlet = new CRM_Core_DAO_Dashboard();
 
     if (!$dashboardID) {
-      // check url is same as exiting entries, if yes just update existing
+
+      // Assign domain before search to allow identical dashlets in different domains.
+      if (empty($params['domain_id'])) {
+        $dashlet->domain_id = CRM_Core_Config::domainID();
+      }
+
+      // Try and find an existing dashlet - it will be updated if found.
       if (!empty($params['name'])) {
         $dashlet->name = CRM_Utils_Array::value('name', $params);
         $dashlet->find(TRUE);
@@ -397,9 +404,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         $dashlet->url = CRM_Utils_Array::value('url', $params);
         $dashlet->find(TRUE);
       }
-      if (empty($params['domain_id'])) {
-        $dashlet->domain_id = CRM_Core_Config::domainID();
-      }
+
     }
     else {
       $dashlet->id = $dashboardID;
