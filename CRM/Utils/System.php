@@ -1443,6 +1443,7 @@ class CRM_Utils_System {
       Civi::cache('navigation')->flush();
       Civi::cache('customData')->flush();
       Civi::cache('contactTypes')->clear();
+      Civi::cache('metadata')->clear();
       CRM_Extension_System::singleton()->getCache()->flush();
       CRM_Cxn_CiviCxnHttp::singleton()->getCache()->flush();
     }
