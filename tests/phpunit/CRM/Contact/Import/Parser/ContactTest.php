@@ -344,10 +344,10 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   public function testPrefixLabel() {
     $this->callAPISuccess('OptionValue', 'create', ['option_group_id' => 'individual_prefix', 'name' => 'new_one', 'label' => 'special', 'value' => 70]);
     $mapping = [
-      ['name' => 'first_name', 'column_number' => 1],
-      ['name' => 'last_name', 'column_number' => 2],
-      ['name' => 'email', 'column_number' => 3, 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Email', 'location_type_id', 'Home')],
-      ['name' => 'prefix_id', 'column_number' => 5],
+      ['name' => 'first_name', 'column_number' => 0],
+      ['name' => 'last_name', 'column_number' => 1],
+      ['name' => 'email', 'column_number' => 2, 'location_type_id' => CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_Email', 'location_type_id', 'Home')],
+      ['name' => 'prefix_id', 'column_number' => 3],
       ['name' => 'suffix_id', 'column_number' => 4],
     ];
     $processor = new CRM_Import_ImportProcessor();
@@ -359,12 +359,13 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
       'Bill',
       'Gates',
       'bill.gates@microsoft.com',
-      'III',
       'special',
+      'III',
     ];
     $importer->import(CRM_Import_Parser::DUPLICATE_NOCHECK, $contactValues);
 
     $contact = $this->callAPISuccessGetSingle('Contact', ['first_name' => 'Bill', 'prefix_id' => 'new_one', 'suffix_id' => 'III']);
+    $this->assertEquals('special Bill Gates III', $contact['display_name']);
   }
 
   /**
