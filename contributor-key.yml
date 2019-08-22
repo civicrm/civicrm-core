@@ -339,6 +339,10 @@
   organization: DevApp
   jira        : devmate
 
+- github      : Dawnthorn
+  name        : Peter Haight
+  organization: Giant Rabbit
+  
 - github      : dlobo
   name        : Donald Lobo
   jira        : lobo
@@ -1245,6 +1249,9 @@
   name        : Rubén Pineda
   organization: iXiam
 
+- github      : ryanlrobinson
+  name        : Ryan L. Robinson
+
 - github      : scoobird
   name        : Morgan Robinson
   organization: Palante Technology Cooperative
@@ -1260,6 +1267,10 @@
   name        : Samuel Vanhove
   organization: Coop SymbioTIC
   jira        : samuelsov
+
+- gitub       : sushant
+  organization: OSSeed Technologies LLP
+  name        : Sushant Paste
 
 - name        : Peter Petrik
   organization: Skvare
