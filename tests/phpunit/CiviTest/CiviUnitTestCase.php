@@ -1374,7 +1374,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     if (!isset($params['target_contact_id'])) {
       $params['target_contact_id'] = $this->individualCreate(array(
         'first_name' => 'Julia',
-        'Last_name' => 'Anderson',
+        'last_name' => 'Anderson',
         'prefix' => 'Ms.',
         'email' => 'julia_anderson@civicrm.org',
         'contact_type' => 'Individual',
