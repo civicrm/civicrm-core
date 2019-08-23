@@ -96,6 +96,18 @@ function civicrm_api3_membership_type_get($params) {
 }
 
 /**
+ * Adjust Metadata for Get action.
+ *
+ * The metadata is used for setting defaults, documentation & validation.
+ *
+ * @param array $params
+ *   Array of parameters determined by getfields.
+ */
+function _civicrm_api3_membership_type_get_spec(&$params) {
+  $params['domain_id']['api.default'] = CRM_Core_Config::domainID();
+}
+
+/**
  * Adjust input for getlist action.
  *
  * We want to only return active membership types for getlist. It's a bit
