@@ -293,6 +293,10 @@ document.forms.MapField['mapper[1][3]'].style.display = 'none';\n",
         ['name' => 'Phone', 'contact_type' => 'Individual', 'column_number' => 8, 'phone_type_id' => 1, 'location_type_id' => 2],
         "document.forms.MapField['mapper[8][3]'].style.display = 'none';\n",
       ],
+      [
+        ['name' => 'Phone', 'contact_type' => 'Individual', 'column_number' => 0, 'im_provider_id' => 1, 'location_type_id' => 2],
+        "document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+      ],
     ];
   }
 
@@ -332,7 +336,7 @@ document.forms.MapField['mapper[1][3]'].style.display = 'none';\n",
     $processor->setFormName('document.forms.MapField');
     $processor->setMetadata($this->getContactImportMetadata());
 
-    $return = $form->loadSavedMapping($processor, $mappingName, $columnNumber, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
+    $return = $form->loadSavedMapping($processor, $mappingName, $columnNumber, $mappingRelation, $mappingWebsiteType, $mappingLocation, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
     return ['defaults' => $return[0], 'js' => $return[1]];
   }
 

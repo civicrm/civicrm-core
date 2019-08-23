@@ -452,7 +452,7 @@ class CRM_Import_ImportProcessor {
   protected function rekeyBySortedColumnNumbers(array $mappingFields) {
     $this->mappingFields = CRM_Utils_Array::rekey($mappingFields, 'column_number');
     ksort($this->mappingFields);
-    return array_values($this->mappingFields);
+    return $this->mappingFields;
   }
 
   /**

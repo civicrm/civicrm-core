@@ -214,8 +214,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       //get loaded Mapping Fields
       $mappingName = CRM_Utils_Array::value(1, $mappingName);
       $mappingLocation = CRM_Utils_Array::value(1, $mappingLocation);
-      $mappingPhoneType = CRM_Utils_Array::value(1, $mappingPhoneType);
-      $mappingImProvider = CRM_Utils_Array::value(1, $mappingImProvider);
       $mappingRelation = CRM_Utils_Array::value(1, $mappingRelation);
       $mappingWebsiteType = CRM_Utils_Array::value(1, $mappingWebsiteType);
 
@@ -409,7 +407,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
 
       if ($this->get('savedMapping')) {
-        list($defaults, $js) = $this->loadSavedMapping($processor, $mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
+        list($defaults, $js) = $this->loadSavedMapping($processor, $mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
@@ -854,8 +852,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param $mappingRelation
    * @param $mappingWebsiteType
    * @param $mappingLocation
-   * @param $mappingPhoneType
-   * @param $mappingImProvider
    * @param array $defaults
    * @param string $js
    * @param bool $hasColumnNames
@@ -863,8 +859,9 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param array $columnPatterns
    *
    * @return array
+   * @throws \CiviCRM_API3_Exception
    */
-  public function loadSavedMapping($processor, $mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns) {
+  public function loadSavedMapping($processor, $mappingName, $i, $mappingRelation, $mappingWebsiteType, $mappingLocation, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns) {
     $jsSet = FALSE;
     $formName = $processor->getFormName();
     if (isset($mappingName[$i])) {
@@ -904,9 +901,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           $contactDetails = strtolower(str_replace(" ", "_", $mappingName[$i]));
           $websiteTypeId = isset($mappingWebsiteType[$i]) ? $mappingWebsiteType[$i] : NULL;
           $locationId = isset($mappingLocation[$i]) ? $mappingLocation[$i] : 0;
-          $phoneType = isset($mappingPhoneType[$i]) ? $mappingPhoneType[$i] : NULL;
-          //get provider id from saved mappings
-          $imProvider = isset($mappingImProvider[$i]) ? $mappingImProvider[$i] : NULL;
+          $phoneType = $processor->getPhoneTypeID($i);
+          $imProvider = $processor->getIMProviderID($i);
 
           if ($websiteTypeId) {
             $defaults["mapper[$i]"] = [$relation, $contactDetails, $websiteTypeId];
@@ -947,9 +943,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           $mappingHeader = array_keys((array) $this->_mapperFields, $mappingName[$i]);
           $websiteTypeId = isset($mappingWebsiteType[$i]) ? $mappingWebsiteType[$i] : NULL;
           $locationId = isset($mappingLocation[$i]) ? $mappingLocation[$i] : 0;
-          $phoneType = isset($mappingPhoneType[$i]) ? $mappingPhoneType[$i] : NULL;
-          // get IM service provider id
-          $imProvider = isset($mappingImProvider[$i]) ? $mappingImProvider[$i] : NULL;
+          $phoneType = $processor->getPhoneTypeID($i);
+          $imProvider = $processor->getIMProviderID($i);
 
           if ($websiteTypeId) {
             $defaults["mapper[$i]"] = [$mappingHeader[0], $websiteTypeId];
