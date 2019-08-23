@@ -181,6 +181,7 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
       $hook = 'edit';
     }
 
+    // @todo pre hook is called from add - remove it from here
     CRM_Utils_Hook::pre($hook, 'Relationship', $relationshipId, $params);
 
     if (!$relationshipId) {
@@ -295,33 +296,46 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
     if ($params['id']) {
       $hook = 'edit';
     }
-    //@todo hook are called from create and add - remove one
     CRM_Utils_Hook::pre($hook, 'Relationship', $params['id'], $params);
 
     $relationshipTypes = CRM_Utils_Array::value('relationship_type_id', $params);
-
     // explode the string with _ to get the relationship type id
     // and to know which contact has to be inserted in
     // contact_id_a and which one in contact_id_b
-    list($type) = explode('_', $relationshipTypes);
+    list($relationshipTypeID) = explode('_', $relationshipTypes);
+
+    $relationship = new CRM_Contact_BAO_Relationship();
+    if (!empty($params['id'])) {
+      $relationship->id = $params['id'];
+      // Only load the relationship if we're missing required params
+      $requiredParams = ['contact_id_a', 'contact_id_b', 'relationship_type_id'];
+      foreach ($requiredParams as $requiredKey) {
+        if (!isset($params[$requiredKey])) {
+          $relationship->find(TRUE);
+          break;
+        }
+      }
+
+    }
+    $relationship->copyValues($params);
+    // @todo we could probably set $params['relationship_type_id'] above but it's unclear
+    //   what that would do with the code below this. So for now be conservative and set it manually.
+    if (!empty($relationshipTypeID)) {
+      $relationship->relationship_type_id = $relationshipTypeID;
+    }
+
+    $params['contact_id_a'] = $relationship->contact_id_a;
+    $params['contact_id_b'] = $relationship->contact_id_b;
 
     // check if the relationship type is Head of Household then update the
     // household's primary contact with this contact.
-    if ($type == 6) {
-      CRM_Contact_BAO_Household::updatePrimaryContact($params['contact_id_b'], $params['contact_id_a']);
-    }
-    if (!empty($params['id']) && self::isCurrentEmployerNeedingToBeCleared($params, $params['id'], $type)) {
-      CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($params['contact_id_a']);
+    if ($relationshipTypeID == 6) {
+      CRM_Contact_BAO_Household::updatePrimaryContact($relationship->contact_id_b, $relationship->contact_id_a);
     }
 
-    $relationship = new CRM_Contact_BAO_Relationship();
-    //@todo this code needs to be updated for the possibility that not all fields are set
-    // by using $relationship->copyValues($params);
-    // (update)
-    $relationship->contact_id_b = $params['contact_id_b'];
-    $relationship->contact_id_a = $params['contact_id_a'];
-    $relationship->relationship_type_id = $type;
-    $relationship->id = $params['id'];
+    if (!empty($params['id']) && self::isCurrentEmployerNeedingToBeCleared($relationship->toArray(), $params['id'], $relationshipTypeID)) {
+      CRM_Contact_BAO_Contact_Utils::clearCurrentEmployer($relationship->contact_id_a);
+    }
 
     $dateFields = ['end_date', 'start_date'];
 
