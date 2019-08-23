@@ -334,9 +334,14 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
         $aid = CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Export Accounting Batch');
         $activityParams = ['source_record_id' => $values['id'], 'activity_type_id' => $aid];
         $exportActivity = CRM_Activity_BAO_Activity::retrieve($activityParams, $val);
-        $fid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $exportActivity->id, 'file_id', 'entity_id');
-        $fileHash = CRM_Core_BAO_File::generateFileHash($exportActivity->id, $fid);
-        $tokens = array_merge(['eid' => $exportActivity->id, 'fid' => $fid, 'fcs' => $fileHash], $tokens);
+        if ($exportActivity) {
+          $fid = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_EntityFile', $exportActivity->id, 'file_id', 'entity_id');
+          $fileHash = CRM_Core_BAO_File::generateFileHash($exportActivity->id, $fid);
+          $tokens = array_merge(['eid' => $exportActivity->id, 'fid' => $fid, 'fcs' => $fileHash], $tokens);
+        }
+        else {
+          CRM_Utils_Array::remove($newLinks, 'export', 'download');
+        }
       }
       $values['action'] = CRM_Core_Action::formLink(
         $newLinks,
