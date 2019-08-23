@@ -602,6 +602,7 @@ class CRM_Export_BAO_ExportProcessor {
     $queryFields['country']['context'] = 'country';
     $queryFields['world_region']['context'] = 'country';
     $queryFields['state_province']['context'] = 'province';
+    $queryFields['contact_id'] = ['title' => ts('Contact ID'), 'type' => CRM_Utils_Type::T_INT];
     $this->queryFields = $queryFields;
   }
 

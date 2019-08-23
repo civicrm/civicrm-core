@@ -780,7 +780,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->doExportTest(['fields' => $mappedFields, 'ids' => [$this->contactIDs[0]]]);
 
     foreach ($this->csv->getRecords() as $row) {
-      $id = $row['contact_id'];
+      $id = $row['Contact ID'];
       $this->assertEquals('AIM', $row['Billing-IM Provider']);
       $this->assertEquals('AIM', $row['Whare Kai-IM Provider']);
       $this->assertEquals('BillingJabber' . $id, $row['Billing-IM Screen Name-Jabber']);
@@ -955,17 +955,18 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->doExportTest(['fields' => $fields]);
 
     foreach ($this->csv as $row) {
-      $this->assertEquals('Méin' . $row['contact_id'] . 'city', $row['Main-City']);
-      $this->assertEquals('Billing' . $row['contact_id'] . 'street_address', $row['Billing-Street Address']);
-      $this->assertEquals('Whare Kai' . $row['contact_id'] . 'postal_code', $row['Whare Kai-Postal Code']);
+      $contactID = (int) $row['Contact ID'];
+      $this->assertEquals('Méin' . $contactID . 'city', $row['Main-City']);
+      $this->assertEquals('Billing' . $contactID . 'street_address', $row['Billing-Street Address']);
+      $this->assertEquals('Whare Kai' . $contactID . 'postal_code', $row['Whare Kai-Postal Code']);
       foreach ($relationships as $relatedContactID => $relationship) {
-        $value = ((int) $row['contact_id'] === $this->contactIDs[0]) ? 'Méin' . $relatedContactID . 'city' : '';
+        $value = ($contactID === $this->contactIDs[0]) ? 'Méin' . $relatedContactID . 'city' : '';
         $this->assertEquals($value, $row[$relationship['label'] . '-Main-City'], 'checking ' . $relationship['label'] . '-Main-City');
       }
     }
 
     $this->assertEquals([
-      'contact_id' => 'contact_id varchar(255)',
+      'contact_id' => 'contact_id varchar(16)',
       'billing_city' => 'billing_city varchar(64)',
       'billing_street_address' => 'billing_street_address varchar(96)',
       'billing_postal_code' => 'billing_postal_code varchar(64)',
@@ -2217,7 +2218,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
    */
   protected function getCaseHeaderDefinition() {
     return [
-      81 => 'contact_id',
+      81 => 'Contact ID',
       82 => 'Case ID',
       83 => 'case_activity_subject',
       84 => 'Case Subject',
@@ -2489,7 +2490,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'case_activity_medium_id' => 'case_activity_medium_id varchar(255)',
       'case_activity_details' => 'case_activity_details text',
       'case_activity_is_auto' => 'case_activity_is_auto text',
-      'contact_id' => 'contact_id varchar(255)',
+      'contact_id' => 'contact_id varchar(16)',
       'case_id' => 'case_id varchar(16)',
       'case_activity_subject' => 'case_activity_subject text',
       'case_status' => 'case_status text',
