@@ -342,7 +342,7 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
     $processor->setFormName('document.forms.MapField');
     $processor->setMetadata($this->getContactImportMetadata());
 
-    $return = $form->loadSavedMapping($processor, $mappingName, $columnNumber, $mappingRelation, $mappingWebsiteType, $mappingLocation, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
+    $return = $form->loadSavedMapping($processor, $mappingName, $columnNumber, $mappingRelation, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
     return ['defaults' => $return[0], 'js' => $return[1]];
   }
 
