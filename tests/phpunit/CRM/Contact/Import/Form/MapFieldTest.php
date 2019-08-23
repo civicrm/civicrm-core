@@ -297,6 +297,12 @@ document.forms.MapField['mapper[1][3]'].style.display = 'none';\n",
         ['name' => 'Phone', 'contact_type' => 'Individual', 'column_number' => 0, 'im_provider_id' => 1, 'location_type_id' => 2],
         "document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
       ],
+      [
+        ['name' => 'Website', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id'],
+        "document.forms.MapField['mapper[0][1]'].style.display = 'none';
+document.forms.MapField['mapper[0][2]'].style.display = 'none';
+document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+      ],
     ];
   }
 
