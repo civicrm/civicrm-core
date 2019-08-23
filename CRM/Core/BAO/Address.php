@@ -416,9 +416,9 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         if (substr($name, 0, 7) == 'country') {
           // make sure its different from the default country
           // iso code
-          $defaultCountry = $config->defaultContactCountry();
+          $defaultCountry = CRM_Core_BAO_Country::defaultContactCountry();
           // full name
-          $defaultCountryName = $config->defaultContactCountryName();
+          $defaultCountryName = CRM_Core_BAO_Country::defaultContactCountryName();
 
           if ($defaultCountry) {
             if ($value == $defaultCountry ||
