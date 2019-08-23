@@ -284,6 +284,7 @@ class CRM_Contribute_BAO_ContributionRecur extends CRM_Contribute_DAO_Contributi
       $recur->cancel_date = date('YmdHis');
       $recur->save();
 
+      // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
       $dao = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($recurId);
       if ($dao && $dao->recur_id) {
         $details = CRM_Utils_Array::value('details', $activityParams);
