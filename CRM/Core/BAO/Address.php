@@ -663,8 +663,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    *   Array of address sequence.
    */
   public static function addressSequence() {
-    $config = CRM_Core_Config::singleton();
-    $addressSequence = $config->addressSequence();
+    $addressSequence = CRM_Utils_Address::sequence(\Civi::settings()->get('address_format'));
 
     $countryState = $cityPostal = FALSE;
     foreach ($addressSequence as $key => $field) {

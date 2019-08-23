@@ -471,6 +471,7 @@ class CRM_Core_Config extends CRM_Core_Config_MagicMerge {
    * @deprecated
    */
   public function addressSequence() {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Utils_Address::sequence(Civi::settings()->get(\'address_format\')');
     return CRM_Utils_Address::sequence(Civi::settings()->get('address_format'));
   }
 
