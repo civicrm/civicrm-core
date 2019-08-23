@@ -666,6 +666,17 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
             }
           }
         }
+        if ($type == 'Autocomplete-Select') {
+          //  Get Custom data value
+          $membershipData = civicrm_api3('OptionValue', 'get', [
+            'label' => $value,
+            'return' => ["value"],
+          ]);
+          if (empty($membershipData['values'])) {
+            throw new Exception("Invalid option for $key : $value");
+          }
+          $values['custom_'.$customFieldID ] = $membershipData['values'][$membershipData['id']]['value'];
+        }
       }
 
       switch ($key) {
