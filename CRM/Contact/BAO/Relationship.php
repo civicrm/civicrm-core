@@ -1746,18 +1746,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
             if (!empty($membershipValues['status_id']) && $membershipValues['status_id'] == $pendingStatusId) {
               $membershipValues['skipStatusCal'] = TRUE;
             }
-
-            // check whether we have some related memberships still available
-            $query = "
-SELECT count(*)
-  FROM civicrm_membership
-    LEFT JOIN civicrm_membership_status ON (civicrm_membership_status.id = civicrm_membership.status_id)
- WHERE membership_type_id = {$membershipValues['membership_type_id']} AND owner_membership_id = {$membershipValues['owner_membership_id']}
-    AND is_current_member = 1";
-            $result = CRM_Core_DAO::singleValueQuery($query);
-            if ($result < CRM_Utils_Array::value('max_related', $membershipValues, PHP_INT_MAX)) {
-              CRM_Member_BAO_Membership::create($membershipValues);
-            }
+            $membershipValues = self::addInheritedMembership($membershipValues);
           }
         }
         elseif ($action & CRM_Core_Action::UPDATE) {
@@ -2333,6 +2322,29 @@ AND cc.sort_name LIKE '%$name%'";
     //CRM-16300 check if owner membership exist for related membership
     $isDeletable = !empty($values[$mainRelatedContactId]['memberships'][$membshipInheritedFrom]);
     return [implode(',', $relTypeIds), $isDeletable];
+  }
+
+  /**
+   * Add an inherited membership, provided max related not exceeded.
+   *
+   * @param array $membershipValues
+   *
+   * @return array
+   * @throws \CRM_Core_Exception
+   */
+  protected static function addInheritedMembership($membershipValues) {
+    $query = "
+SELECT count(*)
+  FROM civicrm_membership
+    LEFT JOIN civicrm_membership_status ON (civicrm_membership_status.id = civicrm_membership.status_id)
+ WHERE membership_type_id = {$membershipValues['membership_type_id']}
+           AND owner_membership_id = {$membershipValues['owner_membership_id']}
+    AND is_current_member = 1";
+    $result = CRM_Core_DAO::singleValueQuery($query);
+    if ($result < CRM_Utils_Array::value('max_related', $membershipValues, PHP_INT_MAX)) {
+      CRM_Member_BAO_Membership::create($membershipValues);
+    }
+    return $membershipValues;
   }
 
 }
