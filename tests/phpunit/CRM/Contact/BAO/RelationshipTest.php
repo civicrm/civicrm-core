@@ -274,4 +274,51 @@ class CRM_Contact_BAO_RelationshipTest extends CiviUnitTestCase {
      */
   }
 
+  /**
+   * Test CRM_Contact_BAO_Relationship::add() function directly.
+   *
+   * In general it's preferred to use the Relationship-create api since it does
+   * checks and such before calling add(). There are already some good tests
+   * for the api, but since it does some more business logic after too the
+   * tests might not be checking exactly the same thing.
+   */
+  public function testBAOAdd() {
+    // add a new type
+    $relationship_type_id_1 = $this->relationshipTypeCreate([
+      'name_a_b' => 'Food poison tester is',
+      'name_b_a' => 'Food poison tester for',
+      'contact_type_a' => 'Individual',
+      'contact_type_b' => 'Individual',
+    ]);
+
+    // add some people
+    $contact_id_1 = $this->individualCreate();
+    $contact_id_2 = $this->individualCreate([], 1);
+
+    // create new relationship (using BAO)
+    $params = [
+      'relationship_type_id' => $relationship_type_id_1,
+      'contact_id_a' => $contact_id_1,
+      'contact_id_b' => $contact_id_2,
+    ];
+    $relationshipObj = CRM_Contact_BAO_Relationship::add($params);
+    $this->assertEquals($relationshipObj->relationship_type_id, $relationship_type_id_1);
+    $this->assertEquals($relationshipObj->contact_id_a, $contact_id_1);
+    $this->assertEquals($relationshipObj->contact_id_b, $contact_id_2);
+    $this->assertEquals($relationshipObj->is_active, 1);
+
+    // demonstrate PR 15103 - should fail before the patch and pass after
+    $today = date('Ymd');
+    $params = [
+      'id' => $relationshipObj->id,
+      'end_date' => $today,
+    ];
+    $relationshipObj = CRM_Contact_BAO_Relationship::add($params);
+    $this->assertEquals($relationshipObj->relationship_type_id, $relationship_type_id_1);
+    $this->assertEquals($relationshipObj->contact_id_a, $contact_id_1);
+    $this->assertEquals($relationshipObj->contact_id_b, $contact_id_2);
+    $this->assertEquals($relationshipObj->is_active, 1);
+    $this->assertEquals($relationshipObj->end_date, $today);
+  }
+
 }
