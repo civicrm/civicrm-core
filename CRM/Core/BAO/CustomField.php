@@ -1261,7 +1261,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
         if (!$value) {
           $config = CRM_Core_Config::singleton();
           if ($config->defaultContactCountry) {
-            $value = $config->defaultContactCountry();
+            $value = CRM_Core_BAO_Country::defaultContactCountry();
           }
         }
       }
