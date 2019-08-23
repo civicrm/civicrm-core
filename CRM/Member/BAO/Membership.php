@@ -255,13 +255,13 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *   (reference ) an assoc array of name/value pairs.
    * @param array $ids
    *   Deprecated parameter The array that holds all the db ids.
-   * @param bool $skipRedirect
-   *
-   * @throws CRM_Core_Exception
    *
    * @return CRM_Member_BAO_Membership|CRM_Core_Error
+   * @throws \CiviCRM_API3_Exception
+   *
+   * @throws CRM_Core_Exception
    */
-  public static function create(&$params, &$ids = [], $skipRedirect = FALSE) {
+  public static function create(&$params, &$ids = []) {
     // always calculate status if is_override/skipStatusCal is not true.
     // giving respect to is_override during import.  CRM-4012
 
@@ -1874,7 +1874,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
           $memParams['contribution_recur_id'] = $contributionRecurID;
         }
         // @todo stop passing $ids - it is empty
-        $membership = self::create($memParams, $ids, FALSE);
+        $membership = self::create($memParams, $ids);
         return array($membership, $renewalMode, $dates);
       }
 
@@ -2048,7 +2048,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     // Relevant tests in api_v3_ContributionPageTest.
     $memParams['line_item'] = $lineItems;
     // @todo stop passing $ids (membership and userId may be set by this point)
-    $membership = self::create($memParams, $ids, FALSE);
+    $membership = self::create($memParams, $ids);
 
     // not sure why this statement is here, seems quite odd :( - Lobo: 12/26/2010
     // related to: http://forum.civicrm.org/index.php/topic,11416.msg49072.html#msg49072
