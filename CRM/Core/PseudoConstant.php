@@ -836,9 +836,9 @@ WHERE  id = %1";
       self::populate(self::$country, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active', $whereClause);
 
       // if default country is set, percolate it to the top
-      if ($config->defaultContactCountry()) {
+      if (CRM_Core_BAO_Country::defaultContactCountry()) {
         $countryIsoCodes = self::countryIsoCode();
-        $defaultID = array_search($config->defaultContactCountry(), $countryIsoCodes);
+        $defaultID = array_search(CRM_Core_BAO_Country::defaultContactCountry(), $countryIsoCodes);
         if ($defaultID !== FALSE) {
           $default[$defaultID] = CRM_Utils_Array::value($defaultID, self::$country);
           self::$country = $default + self::$country;

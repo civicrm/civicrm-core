@@ -714,7 +714,7 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
 
     $config = CRM_Core_Config::singleton();
     $default_country = new CRM_Core_DAO_Country();
-    $default_country->iso_code = $config->defaultContactCountry();
+    $default_country->iso_code = CRM_Core_BAO_Country::defaultContactCountry();
     $default_country->find(TRUE);
     $defaults["billing_country_id-{$this->_bltID}"] = $default_country->id;
 
