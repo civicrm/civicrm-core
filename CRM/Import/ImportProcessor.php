@@ -104,7 +104,7 @@ class CRM_Import_ImportProcessor {
    * @return string
    */
   public function getContactSubType(): string {
-    return $this->contactSubType;
+    return $this->contactSubType ?? '';
   }
 
   /**
