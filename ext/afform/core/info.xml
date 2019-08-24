@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension key="org.civicrm.afform" type="module">
   <file>afform</file>
-  <name>Afform</name>
+  <name>Afform: Core Runtime</name>
   <description>Afform is the Affable Administrative AngularJS Form Framework</description>
   <license>AGPL-3.0</license>
   <maintainer>

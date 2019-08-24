@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <extension key="org.civicrm.afform-html" type="module">
   <file>afform_html</file>
-  <name>FIXME</name>
-  <description>FIXME</description>
+  <name>Afform: HTML</name>
+  <description>Power-tool for editing Afform as HTML</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Tim Otten</author>

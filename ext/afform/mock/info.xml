@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <extension key="org.civicrm.afform-mock" type="module">
   <file>afform_mock</file>
-  <name>Afform Mocks</name>
+  <name>Afform: Mocks</name>
   <description>Mock extension used for testing the framework</description>
   <license>AGPL-3.0</license>
   <maintainer>

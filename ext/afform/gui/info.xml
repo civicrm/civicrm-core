@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <extension key="org.civicrm.afform-gui" type="module">
   <file>afform_gui</file>
-  <name>Civi Form Builder</name>
-  <description>FIXME</description>
+  <name>Afform: Form Builder</name>
+  <description>GUI for designing forms</description>
   <license>AGPL-3.0</license>
   <maintainer>
     <author>Tim Otten</author>
