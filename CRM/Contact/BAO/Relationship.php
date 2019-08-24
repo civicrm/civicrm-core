@@ -329,8 +329,17 @@ class CRM_Contact_BAO_Relationship extends CRM_Contact_DAO_Relationship {
 
     // check if the relationship type is Head of Household then update the
     // household's primary contact with this contact.
-    if ($relationshipTypeID == 6) {
-      CRM_Contact_BAO_Household::updatePrimaryContact($relationship->contact_id_b, $relationship->contact_id_a);
+    try {
+      $headOfHouseHoldID = civicrm_api3('RelationshipType', 'getvalue', [
+        'return' => "id",
+        'name_a_b' => "Head of Household for",
+      ]);
+      if ($relationshipTypeID == $headOfHouseHoldID) {
+        CRM_Contact_BAO_Household::updatePrimaryContact($relationship->contact_id_b, $relationship->contact_id_a);
+      }
+    }
+    catch (Exception $e) {
+      // No "Head of Household" relationship found so we skip specific processing
     }
 
     if (!empty($params['id']) && self::isCurrentEmployerNeedingToBeCleared($relationship->toArray(), $params['id'], $relationshipTypeID)) {
