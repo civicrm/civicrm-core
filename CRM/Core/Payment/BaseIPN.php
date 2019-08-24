@@ -213,6 +213,7 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $input
    *
    * @return bool
+   * @throws \CiviCRM_API3_Exception
    */
   public function failed(&$objects, &$transaction, $input = []) {
     $contribution = &$objects['contribution'];
@@ -235,10 +236,10 @@ class CRM_Core_Payment_BaseIPN {
       'labelColumn' => 'name',
       'flip' => 1,
     ]);
+    $contribution->contribution_status_id = $contributionStatuses['Failed'];
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
     $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
-    $contribution->contribution_status_id = $contributionStatuses['Failed'];
     $contribution->save();
 
     // Add line items for recurring payments.
@@ -260,6 +261,7 @@ class CRM_Core_Payment_BaseIPN {
           'labelColumn' => 'name',
           'flip' => 1,
         ]);
+        // @fixme Should we cancel only Pending memberships? per cancelled()
         foreach ($memberships as $membership) {
           if ($membership) {
             $membership->status_id = $membershipStatuses['Cancelled'];
@@ -280,8 +282,7 @@ class CRM_Core_Payment_BaseIPN {
     }
 
     $transaction->commit();
-    CRM_Core_Error::debug_log_message("Setting contribution status to failed");
-    //echo "Success: Setting contribution status to failed<p>";
+    Civi::log()->debug("Setting contribution status to Failed");
     return TRUE;
   }
 
@@ -295,7 +296,7 @@ class CRM_Core_Payment_BaseIPN {
    */
   public function pending(&$objects, &$transaction) {
     $transaction->commit();
-    CRM_Core_Error::debug_log_message("returning since contribution status is pending");
+    Civi::log()->debug("Returning since contribution status is Pending");
     echo "Success: Returning since contribution status is pending<p>";
     return TRUE;
   }
@@ -308,32 +309,38 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $input
    *
    * @return bool
+   * @throws \CiviCRM_API3_Exception
    */
   public function cancelled(&$objects, &$transaction, $input = []) {
     $contribution = &$objects['contribution'];
-    $memberships = &$objects['membership'];
-    if (is_numeric($memberships)) {
-      $memberships = [$objects['membership']];
+    $memberships = [];
+    if (!empty($objects['membership'])) {
+      $memberships = &$objects['membership'];
+      if (is_numeric($memberships)) {
+        $memberships = [$objects['membership']];
+      }
     }
 
-    $participant = &$objects['participant'];
     $addLineItems = FALSE;
     if (empty($contribution->id)) {
       $addLineItems = TRUE;
     }
+    $participant = &$objects['participant'];
+
+    // CRM-15546
     $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id', [
       'labelColumn' => 'name',
       'flip' => 1,
     ]);
     $contribution->contribution_status_id = $contributionStatuses['Cancelled'];
-    $contribution->cancel_date = self::$_now;
-    $contribution->cancel_reason = CRM_Utils_Array::value('reasonCode', $input);
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
     $contribution->thankyou_date = CRM_Utils_Date::isoToMysql($contribution->thankyou_date);
+    $contribution->cancel_date = self::$_now;
+    $contribution->cancel_reason = CRM_Utils_Array::value('reasonCode', $input);
     $contribution->save();
 
-    //add lineitems for recurring payments
+    // Add line items for recurring payments.
     if (!empty($objects['contributionRecur']) && $objects['contributionRecur']->id && $addLineItems) {
       CRM_Contribute_BAO_ContributionRecur::addRecurLineItems($objects['contributionRecur']->id, $contribution);
     }
@@ -347,6 +354,7 @@ class CRM_Core_Payment_BaseIPN {
 
     if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
       if (!empty($memberships)) {
+        // if transaction is failed then set "Cancelled" as membership status
         $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', [
           'labelColumn' => 'name',
           'flip' => 1,
@@ -373,8 +381,7 @@ class CRM_Core_Payment_BaseIPN {
       }
     }
     $transaction->commit();
-    CRM_Core_Error::debug_log_message("Setting contribution status to cancelled");
-    //echo "Success: Setting contribution status to cancelled<p>";
+    Civi::log()->debug("Setting contribution status to Cancelled");
     return TRUE;
   }
 
@@ -388,7 +395,7 @@ class CRM_Core_Payment_BaseIPN {
    */
   public function unhandled(&$objects, &$transaction) {
     $transaction->rollback();
-    CRM_Core_Error::debug_log_message("returning since contribution status: is not handled");
+    Civi::log()->debug("Returning since contribution status is not handled");
     echo "Failure: contribution status is not handled<p>";
     return FALSE;
   }
@@ -447,6 +454,9 @@ class CRM_Core_Payment_BaseIPN {
    * @param array $objects
    * @param CRM_Core_Transaction $transaction
    * @param bool $recur
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function completeTransaction(&$input, &$ids, &$objects, &$transaction, $recur = FALSE) {
     $contribution = &$objects['contribution'];
@@ -493,6 +503,8 @@ class CRM_Core_Payment_BaseIPN {
    *   is because the function is also used to generate pdfs
    *
    * @return array
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function sendMail(&$input, &$ids, &$objects, &$values, $recur = FALSE, $returnMessageText = FALSE) {
     return CRM_Contribute_BAO_Contribution::sendMail($input, $ids, $objects['contribution']->id, $values,
