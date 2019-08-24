@@ -63,6 +63,7 @@
     "cweagans/composer-patches": "~1.0",
     "pear/log": "1.13.1",
     "katzien/php-mime-type": "2.1.0",
+    "civicrm/composer-downloads-plugin": "^2.0",
     "league/csv": "^9.2"
   },
   "require-dev": {
@@ -87,6 +88,122 @@
     ]
   },
   "extra": {
+    "downloads": {
+      "*": {
+        "path": "bower_components/{$id}"
+      },
+      "angular": {
+        "url": "https://github.com/angular/bower-angular/archive/v1.5.11.zip"
+      },
+      "angular-bootstrap": {
+        "url": "https://github.com/angular-ui/bootstrap-bower/archive/2.5.0.zip"
+      },
+      "angular-file-upload": {
+        "url": "https://github.com/nervgh/angular-file-upload/archive/v1.1.6.zip",
+        "ignore": ["examples"]
+      },
+      "angular-jquery-dialog-service": {
+        "url": "https://github.com/totten/angular-jquery-dialog-service/archive/v0.8.0-civicrm-1.0.zip"
+      },
+      "angular-mocks": {
+        "url": "https://github.com/angular/bower-angular-mocks/archive/v1.5.11.zip"
+      },
+      "angular-route": {
+        "url": "https://github.com/angular/bower-angular-route/archive/v1.5.11.zip"
+      },
+      "angular-sanitize": {
+        "url": "https://github.com/angular/bower-angular-sanitize/archive/v1.5.11.zip"
+      },
+      "angular-ui-sortable": {
+        "url": "https://github.com/angular-ui/ui-sortable/archive/v0.12.11.zip"
+      },
+      "angular-ui-utils": {
+        "url": "https://github.com/angular-ui/ui-utils/archive/v0.1.1.zip"
+      },
+      "angular-unsavedChanges": {
+        "url": "https://github.com/facultymatt/angular-unsavedChanges/archive/v0.1.1.zip",
+        "ignore": [".*", "node_modules", "bower_components", "test", "tests"]
+      },
+      "angular-xeditable": {
+        "url": "https://github.com/vitalets/angular-xeditable/archive/0.9.0.zip",
+        "ignore": [".*", "node_modules", "bower_components", "playground", "test", "libs", "docs", "zip", "src", "starter", "Gruntfile.js", "index.html", "jsdoc.conf.json", "package.json"]
+      },
+      "checklist-model": {
+        "url": "https://github.com/vitalets/checklist-model/archive/1.0.0.zip",
+        "ignore": [".*", "node_modules", "docs", "Gruntfile.js", "index.html", "package.json", "test"]
+      },
+      "ckeditor": {
+        "url": "https://github.com/ckeditor/ckeditor-releases/archive/4.9.2.zip"
+      },
+      "crossfilter-1.3.x": {
+        "url": "https://github.com/crossfilter/crossfilter/archive/1.3.14.zip",
+        "ignore": [".*", "node_modules", "bower_components", "src", "lib", "test", "component.json", "package.json", "index.js", "Makefile"]
+      },
+      "crossfilter2": {
+        "url": "https://github.com/crossfilter/crossfilter/archive/1.4.7.zip",
+        "ignore": [".*", "node_modules", "bower_components", "package.json", "index.js", "src", "component.json", "media", "test", "tests"]
+      },
+      "css-color-names": {
+        "url": "https://github.com/bahamas10/css-color-names/archive/v1.0.1.zip"
+      },
+      "d3": {
+        "url": "https://github.com/mbostock-bower/d3-bower/archive/v3.4.11.zip",
+        "ignore": [".DS_Store", ".git", ".gitignore", ".npmignore", ".travis.yml", "Makefile", "bin", "component.json", "index.js", "lib", "node_modules", "package.json", "src", "test"]
+      },
+      "d3-3.5.x": {
+        "url": "https://github.com/mbostock-bower/d3-bower/archive/v3.5.17.zip"
+      },
+      "datatables": {
+        "url": "https://github.com/DataTables/DataTables/archive/1.10.19.zip",
+        "ignore": ["/.*", "examples", "media/unit_testing", "composer.json", "dataTables.jquery.json", "package.json"]
+      },
+      "dc-2.1.x": {
+        "url": "https://github.com/NickQiZhu/dc.js/archive/2.1.10.zip",
+        "ignore": [".*", "style", "web", "*.json", "regression", "scripts", "spec", "src", "docs", "grunt", "Gruntfile.js", "Changelog.md", "welcome.md", "class-hierarchy.dot", "index.js", "CONTRIBUTING.md", "LICENSE_BANNER", "AUTHORS"]
+      },
+      "es6-promise": {
+        "url": "https://github.com/components/es6-promise/archive/v4.2.4.zip"
+      },
+      "font-awesome": {
+        "url": "https://github.com/FortAwesome/Font-Awesome/archive/v4.7.0.zip",
+        "ignore": ["*/.*", "*.json", "src", "*.yml", "Gemfile", "Gemfile.lock", "*.md"]
+      },
+      "google-code-prettify": {
+        "url": "https://github.com/tcollard/google-code-prettify/archive/v1.0.5.zip",
+        "ignore": ["closure-compiler", "js-modules", "tests", "yui-compressor", "Makefile"]
+      },
+      "jquery": {
+        "url": "https://github.com/civicrm/jquery/archive/1.12.4-civicrm-1.2.zip"
+      },
+      "jquery-ui": {
+        "url": "https://github.com/components/jqueryui/archive/1.12.1.zip"
+      },
+      "jquery-validation": {
+        "url": "https://github.com/jquery-validation/jquery-validation/archive/1.13.1.zip",
+        "ignore": [".*", "node_modules", "bower_components", "test", "demo", "lib"]
+      },
+      "jstree": {
+        "url": "https://github.com/vakata/jstree/archive/3.3.8.zip",
+        "ignore": [".*", "docs", "demo", "libs", "node_modules", "test", "libs", "jstree.jquery.json", "gruntfile.js", "package.json", "bower.json", "component.json", "LICENCE-MIT", "README.md"]
+      },
+      "lodash-compat": {
+        "url": "https://github.com/lodash/lodash-compat/archive/3.0.1.zip",
+        "ignore": [".*", "*.log", "*.md", "component.json", "package.json", "node_modules"]
+      },
+      "phantomjs-polyfill": {
+        "url": "https://github.com/conversocial/phantomjs-polyfill/archive/v0.0.2.zip"
+      },
+      "qunit": {
+        "url": "https://github.com/jquery/qunit/archive/v1.10.0.zip"
+      },
+      "select2": {
+        "url": "https://github.com/colemanw/select2/archive/v3.5-civicrm-1.0.zip"
+      },
+      "smartmenus": {
+        "url": "https://github.com/vadikom/smartmenus/archive/1.1.0.zip",
+        "ignore": [".gitignore", "Gruntfile.js"]
+      }
+    },
     "patches": {
       "phpoffice/common": {
         "Fix handling of libxml_disable_entity_loader": "tools/scripts/composer/patches/phpoffice-common-xml-entity-fix.patch"
