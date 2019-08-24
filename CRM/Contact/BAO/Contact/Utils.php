@@ -442,9 +442,6 @@ WHERE id={$contactId}; ";
    *
    */
   public static function buildOnBehalfForm(&$form, $contactType, $countryID, $stateID, $title) {
-
-    $config = CRM_Core_Config::singleton();
-
     $form->assign('contact_type', $contactType);
     $form->assign('fieldSetTitle', $title);
     $form->assign('contactEditMode', TRUE);
@@ -482,7 +479,7 @@ WHERE id={$contactId}; ";
         );
     }
 
-    $addressSequence = $config->addressSequence();
+    $addressSequence = CRM_Utils_Address::sequence(\Civi::settings()->get('address_format'));
     $form->assign('addressSequence', array_fill_keys($addressSequence, 1));
 
     //Primary Phone
