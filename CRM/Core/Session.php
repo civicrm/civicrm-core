@@ -123,7 +123,8 @@ class CRM_Core_Session {
           }
           $_SESSION = array();
         }
-        else {
+        // Joomla will do its own session_start() so do not do it here
+        elseif ($config->userFramework !== 'Joomla') {
           session_start();
         }
       }
