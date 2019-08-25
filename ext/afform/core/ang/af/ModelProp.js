@@ -8,7 +8,8 @@
       scope: {
         afType: '@',
         afName: '@',
-        afLabel: '@'
+        afLabel: '@',
+        afAutofill: '@'
       },
       link: function($scope, $el, $attr, afModelListCtrl) {
         var ts = $scope.ts = CRM.ts('afform');
@@ -17,7 +18,8 @@
           type: $scope.afType,
           name: $scope.afName,
           label: $scope.afLabel,
-          fields: [],
+          autofill: $scope.afAutofill,
+          fields: []
         });
         // $scope.$watch('afModelProp', function(newValue){$scope.myOptions = newValue;});
       }

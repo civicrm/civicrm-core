@@ -30,6 +30,7 @@
         this.getEntity = function getEntity(name) {
           return schema[name];
         };
+        // Returns field values for a given entity
         this.getData = function getData(name) {
           return data[name];
         };
@@ -37,17 +38,19 @@
           return schema[name];
         };
         this.loadData = function() {
-          var apiCalls = {};
+          var toLoad = 0;
           _.each(schema, function(entity, entityName) {
-            if ($routeParams[entityName]) {
-              var id = $routeParams[entityName];
-              apiCalls[entityName] = [entity.type, 'get', {select: entity.fields, where: [['id', '=', id]]}, 0];
+            if ($routeParams[entityName] || entity.autofill) {
+              toLoad++;
             }
           });
-          if (!_.isEmpty(apiCalls)) {
-            crmApi4(apiCalls).then(function(resp) {
-              data = resp;
-            });
+          if (toLoad) {
+            crmApi4('Afform', 'prefill', {name: CRM.afform.open, args: $routeParams})
+              .then(function(result) {
+                _.each(result, function(item) {
+                  data[item.name] = item.values;
+                });
+              });
           }
         };
 

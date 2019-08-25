@@ -18,7 +18,7 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
     ]);
     $loader->load();
 
-    $afform = civicrm_api4('Afform', 'get', ['where' => [['name', '=', $pageArgs['afform']]], 'select' => ['title']]);
+    $afform = civicrm_api4('Afform', 'get', ['checkPermissions' => FALSE, 'where' => [['name', '=', $pageArgs['afform']]], 'select' => ['title']]);
 
     if (!empty($afform[0]['title'])) {
       CRM_Utils_System::setTitle(strip_tags($afform[0]['title']));
