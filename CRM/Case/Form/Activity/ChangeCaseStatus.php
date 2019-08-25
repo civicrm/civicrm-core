@@ -165,7 +165,6 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
    * @param CRM_Activity_BAO_Activity $activity
    */
   public static function endPostProcess(&$form, &$params, $activity) {
-
     $groupingValues = CRM_Core_OptionGroup::values('case_status', FALSE, TRUE, FALSE, NULL, 'value');
 
     // Set case end_date if we're closing the case. Clear end_date if we're (re)opening it.
@@ -175,14 +174,14 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
       // End case-specific relationships (roles)
       foreach ($params['target_contact_id'] as $cid) {
         $rels = CRM_Case_BAO_Case::getCaseRoles($cid, $params['case_id']);
-        // FIXME: Is there an existing function to close a relationship?
-        $query = 'UPDATE civicrm_relationship SET end_date=%2 WHERE id=%1';
         foreach ($rels as $relId => $relData) {
-          $relParams = [
-            1 => [$relId, 'Integer'],
-            2 => [$params['end_date'], 'Timestamp'],
+          $relationshipParams = [
+            'id' => $relId,
+            'end_date' => $params['end_date'],
           ];
-          CRM_Core_DAO::executeQuery($query, $relParams);
+          // @todo we can't switch directly to api because there is too much business logic and it breaks closing cases with organisations as client relationships
+          //civicrm_api3('Relationship', 'create', $relationshipParams);
+          CRM_Contact_BAO_Relationship::add($relationshipParams);
         }
       }
     }
@@ -192,11 +191,14 @@ class CRM_Case_Form_Activity_ChangeCaseStatus {
       // Reopen case-specific relationships (roles)
       foreach ($params['target_contact_id'] as $cid) {
         $rels = CRM_Case_BAO_Case::getCaseRoles($cid, $params['case_id'], NULL, FALSE);
-        // FIXME: Is there an existing function?
-        $query = 'UPDATE civicrm_relationship SET end_date=NULL WHERE id=%1';
         foreach ($rels as $relId => $relData) {
-          $relParams = [1 => [$relId, 'Integer']];
-          CRM_Core_DAO::executeQuery($query, $relParams);
+          $relationshipParams = [
+            'id' => $relId,
+            'end_date' => 'null',
+          ];
+          // @todo we can't switch directly to api because there is too much business logic and it breaks closing cases with organisations as client relationships
+          //civicrm_api3('Relationship', 'create', $relationshipParams);
+          CRM_Contact_BAO_Relationship::add($relationshipParams);
         }
       }
     }
