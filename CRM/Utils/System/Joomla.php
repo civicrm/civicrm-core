@@ -265,8 +265,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     if ($config->userFrameworkFrontend) {
       $script = 'index.php';
-      if (JRequest::getVar("Itemid") && (strpos($path, 'civicrm/payment/ipn') === FALSE)) {
-        $Itemid = "{$separator}Itemid=" . JRequest::getVar("Itemid");
+
+      // Get Itemid using JInput::get()
+      $input = Joomla\CMS\Factory::getApplication()->input;
+      $itemIdNum = $input->get("Itemid");
+      if ($itemIdNum && (strpos($path, 'civicrm/payment/ipn') === FALSE)) {
+        $Itemid = "{$separator}Itemid=" . $itemIdNum;
       }
     }
 
