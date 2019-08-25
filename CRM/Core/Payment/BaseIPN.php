@@ -256,28 +256,14 @@ class CRM_Core_Payment_BaseIPN {
 
     if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
       if (!empty($memberships)) {
-        // if transaction is failed then set "Cancelled" as membership status
-        $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', [
-          'labelColumn' => 'name',
-          'flip' => 1,
-        ]);
-        // @fixme Should we cancel only Pending memberships? per cancelled()
         foreach ($memberships as $membership) {
-          if ($membership) {
-            $membership->status_id = $membershipStatuses['Cancelled'];
-            $membership->save();
-
-            //update related Memberships.
-            $params = ['status_id' => $membershipStatuses['Cancelled']];
-            CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $params);
-          }
+          // @fixme Should we cancel only Pending memberships? per cancelled()
+          $this->cancelMembership($membership, $membership->status_id, FALSE);
         }
       }
 
       if ($participant) {
-        $participantParams['id'] = $participant->id;
-        $participantParams['status_id'] = 'Cancelled';
-        civicrm_api3('Participant', 'create', $participantParams);
+        $this->cancelParticipant($participant->id);
       }
     }
 
@@ -354,30 +340,15 @@ class CRM_Core_Payment_BaseIPN {
 
     if (empty($input['IAmAHorribleNastyBeyondExcusableHackInTheCRMEventFORMTaskClassThatNeedsToBERemoved'])) {
       if (!empty($memberships)) {
-        // if transaction is failed then set "Cancelled" as membership status
-        $membershipStatuses = CRM_Core_PseudoConstant::get('CRM_Member_DAO_Membership', 'status_id', [
-          'labelColumn' => 'name',
-          'flip' => 1,
-        ]);
-        // Cancel only Pending memberships
-        // CRM-18688
-        $pendingStatusId = $membershipStatuses['Pending'];
         foreach ($memberships as $membership) {
-          if ($membership && ($membership->status_id == $pendingStatusId)) {
-            $membership->status_id = $membershipStatuses['Cancelled'];
-            $membership->save();
-
-            //update related Memberships.
-            $params = ['status_id' => $membershipStatuses['Cancelled']];
-            CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $params);
+          if ($membership) {
+            $this->cancelMembership($membership, $membership->status_id);
           }
         }
       }
 
       if ($participant) {
-        $participantParams['id'] = $participant->id;
-        $participantParams['status_id'] = 'Cancelled';
-        civicrm_api3('Participant', 'create', $participantParams);
+        $this->cancelParticipant($participant->id);
       }
     }
     $transaction->commit();
@@ -398,6 +369,55 @@ class CRM_Core_Payment_BaseIPN {
     Civi::log()->debug("Returning since contribution status is not handled");
     echo "Failure: contribution status is not handled<p>";
     return FALSE;
+  }
+
+  /**
+   * Logic to cancel a participant record when the related contribution changes to failed/cancelled.
+   * @todo This is part of a bigger refactor for dev/core/issues/927 - "duplicate" functionality exists in CRM_Contribute_BAO_Contribution::cancel()
+   *
+   * @param $participantID
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function cancelParticipant($participantID) {
+    // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
+    $participantParams['id'] = $participantID;
+    $participantParams['status_id'] = 'Cancelled';
+    civicrm_api3('Participant', 'create', $participantParams);
+  }
+
+  /**
+   * Logic to cancel a membership record when the related contribution changes to failed/cancelled.
+   * @todo This is part of a bigger refactor for dev/core/issues/927 - "duplicate" functionality exists in CRM_Contribute_BAO_Contribution::cancel()
+   * @param \CRM_Member_BAO_Membership $membership
+   * @param int $membershipStatusID
+   * @param boolean $onlyCancelPendingMembership
+   *   Do we only cancel pending memberships? OR memberships in any status? (see CRM-18688)
+   * @fixme Historically failed() cancelled membership in any status, cancelled() cancelled only pending memberships so we retain that behaviour for now.
+   *
+   */
+  private function cancelMembership($membership, $membershipStatusID, $onlyCancelPendingMembership = TRUE) {
+    // @fixme https://lab.civicrm.org/dev/core/issues/927 Cancelling membership etc is not desirable for all use-cases and we should be able to disable it
+    // Cancel only Pending memberships
+    $pendingMembershipStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Pending');
+    if (($membershipStatusID == $pendingMembershipStatusId) || ($onlyCancelPendingMembership == FALSE)) {
+      $cancelledMembershipStatusId = CRM_Core_PseudoConstant::getKey('CRM_Member_BAO_Membership', 'status_id', 'Cancelled');
+
+      $membership->status_id = $cancelledMembershipStatusId;
+      $membership->save();
+
+      $params = ['status_id' => $cancelledMembershipStatusId];
+      CRM_Member_BAO_Membership::updateRelatedMemberships($membership->id, $params);
+
+      // @todo Convert the above to API
+      // $membershipParams = [
+      //   'id' => $membership->id,
+      //   'status_id' => $cancelledMembershipStatusId,
+      // ];
+      // civicrm_api3('Membership', 'create', $membershipParams);
+      // CRM_Member_BAO_Membership::updateRelatedMemberships($membershipParams['id'], ['status_id' => $cancelledMembershipStatusId]);
+    }
+
   }
 
   /**
