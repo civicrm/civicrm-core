@@ -83,7 +83,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @return CRM_Event_DAO_Event
    */
   public static function add(&$params) {
-    CRM_Utils_System::flushCache();
     $financialTypeId = NULL;
     if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Event', $params['id'], $params);
