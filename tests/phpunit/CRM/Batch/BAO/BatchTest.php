@@ -32,6 +32,16 @@
 class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
 
   /**
+   * Cleanup after test.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function tearDown() {
+    parent::tearDown();
+    $this->quickCleanup(['civicrm_batch']);
+  }
+
+  /**
    * This test checks that a batch search
    * by payment method works.
    * This function could later be expanded to include
@@ -42,6 +52,8 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
    * card and one with payment method check.  After performing a
    * search by payment method for checks, it makes sure that the
    * results are only contributions made by check.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testGetBatchFinancialItems() {
 
@@ -102,6 +114,17 @@ class CRM_Batch_BAO_BatchTest extends CiviUnitTestCase {
     ]);
     $result = CRM_Batch_BAO_Batch::getBatchFinancialItems($entityId, $returnvalues, $notPresent, $params, TRUE)->fetchAll();
     $this->assertEquals(count($result), 1, 'In line' . __LINE__);
+  }
+
+  /**
+   * Test testExportFinancialBatch.
+   */
+  public function testExportFinancialBatch() {
+    $this->createLoggedInUser();
+    $batchParams = ['title' => 'Test Batch'];
+    $batchParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Batch_BAO_Batch', 'status_id', 'Exported');
+    $batch = $this->callAPISuccess('Batch', 'create', $batchParams);
+    CRM_Batch_BAO_Batch::exportFinancialBatch([$batch['id']], 'CSV', NULL);
   }
 
 }
