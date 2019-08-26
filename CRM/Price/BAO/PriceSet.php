@@ -1014,19 +1014,9 @@ WHERE  id = %1";
     else {
       $feeBlock = &$form->_priceSet['fields'];
     }
-    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
-      foreach ($feeBlock as $key => $value) {
-        foreach ($value['options'] as $k => $options) {
-          if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
-            unset($feeBlock[$key]['options'][$k]);
-          }
-        }
-        if (empty($feeBlock[$key]['options'])) {
-          unset($feeBlock[$key]);
-        }
-      }
-    }
-    // call the hook.
+
+    self::applyACLFinancialTypeStatusToFeeBlock($feeBlock);
+    // Call the buildAmount hook.
     CRM_Utils_Hook::buildAmount($component, $form, $feeBlock);
 
     // CRM-14492 Admin price fields should show up on event registration if user has 'administer CiviCRM' permissions
@@ -1075,6 +1065,29 @@ WHERE  id = %1";
             NULL,
             $options
           );
+        }
+      }
+    }
+  }
+
+  /**
+   * Apply ACLs on Financial Type to the price options in a fee block.
+   *
+   * @param array $feeBlock
+   *   Fee block: array of price fields.
+   *
+   * @return void
+   */
+  public static function applyACLFinancialTypeStatusToFeeBlock(&$feeBlock) {
+    if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
+      foreach ($feeBlock as $key => $value) {
+        foreach ($value['options'] as $k => $options) {
+          if (!CRM_Core_Permission::check('add contributions of type ' . CRM_Contribute_PseudoConstant::financialType($options['financial_type_id']))) {
+            unset($feeBlock[$key]['options'][$k]);
+          }
+        }
+        if (empty($feeBlock[$key]['options'])) {
+          unset($feeBlock[$key]);
         }
       }
     }

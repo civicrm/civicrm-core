@@ -1086,6 +1086,57 @@ Expires: ',
   }
 
   /**
+   * dev/core/issues/860:
+   * Test creating two memberships via price set in the back end with a discount,
+   * checking that the line items have correct amounts.
+   */
+  public function testTwoMembershipsViaPriceSetInBackendWithDiscount() {
+    // Register buildAmount hook to apply discount.
+    $this->hookClass->setHook('civicrm_buildAmount', [$this, 'buildAmountMembershipDiscount']);
+
+    // Create two memberships for individual $this->_individualId, via a price set in the back end.
+    $this->createTwoMembershipsViaPriceSetInBackEnd($this->_individualId);
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contact_id' => $this->_individualId,
+    ]);
+    // Note: we can't check for the contribution total being discounted, because the total is set
+    // when the contribution is created via $form->testSubmit(), but buildAmount isn't called
+    // until testSubmit() runs. Fixing that might involve making testSubmit() more sophisticated,
+    // or just hacking total_amount for this case.
+
+    $lineItemResult = $this->callAPISuccess('LineItem', 'get', [
+      'contribution_id' => $contribution['id'],
+    ]);
+    $this->assertEquals(2, $lineItemResult['count']);
+    $discountedItems = 0;
+    foreach ($lineItemResult['values'] as $lineItem) {
+      if (CRM_Utils_String::startsWith($lineItem['label'], 'Long Haired Goat')) {
+        $this->assertEquals(15.0, $lineItem['line_total']);
+        $this->assertEquals('Long Haired Goat - one leg free!', $lineItem['label']);
+        $discountedItems++;
+      }
+    }
+    $this->assertEquals(1, $discountedItems);
+  }
+
+  /**
+   * Implements hook_civicrm_buildAmount() for testTwoMembershipsViaPriceSetInBackendWithDiscount().
+   */
+  public function buildAmountMembershipDiscount($pageType, &$form, &$amount) {
+    foreach ($amount as $id => $priceField) {
+      if (is_array($priceField['options'])) {
+        foreach ($priceField['options'] as $optionId => $option) {
+          if ($option['membership_type_id'] == 15) {
+            // Long Haired Goat membership discount.
+            $amount[$id]['options'][$optionId]['amount'] = $option['amount'] * 0.75;
+            $amount[$id]['options'][$optionId]['label'] = $option['label'] . ' - one leg free!';
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Get a membership form object.
    *
    * We need to instantiate the form to run preprocess, which means we have to trick it about the request method.
