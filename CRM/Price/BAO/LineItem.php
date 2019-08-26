@@ -90,6 +90,9 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
         'contribution_id' => $lineItemBAO->contribution_id,
       ];
       if (!civicrm_api3('MembershipPayment', 'getcount', $membershipPaymentParams)) {
+        // If we are creating the membership payment row from the line item then we
+        // should have correct line item & membership payment should not need to fix.
+        $membershipPaymentParams['isSkipLineItem'] = TRUE;
         civicrm_api3('MembershipPayment', 'create', $membershipPaymentParams);
       }
     }
@@ -444,22 +447,23 @@ WHERE li.contribution_id = %1";
         if (empty($line['entity_id'])) {
           $line['entity_id'] = $entityId;
         }
-        if (!empty($line['membership_type_id'])) {
+        if (!empty($line['membership_type_id']) && $line['entity_table'] !== 'civicrm_membership') {
           $line['entity_table'] = 'civicrm_membership';
+          // CRM-19094: entity_table is set to civicrm_membership then ensure
+          // the entityId is set to membership ID not contribution by default
+          if (!empty($contributionDetails->id) && !empty($line['entity_id']) && $line['entity_id'] == $contributionDetails->id) {
+            $membershipId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $contributionDetails->id, 'membership_id', 'contribution_id');
+            if ($membershipId && (int) $membershipId !== (int) $line['entity_id']) {
+              $line['entity_id'] = $membershipId;
+              Civi::log()
+                ->warning('Per https://lab.civicrm.org/dev/core/issues/15 this data fix should not be required. Please log a ticket at https://lab.civicrm.org/dev/core with steps to get this.', ['civi.tag' => 'deprecated']);
+            }
+          }
         }
         if (!empty($contributionDetails->id)) {
           $line['contribution_id'] = $contributionDetails->id;
           if ($line['entity_table'] == 'civicrm_contribution') {
             $line['entity_id'] = $contributionDetails->id;
-          }
-          // CRM-19094: entity_table is set to civicrm_membership then ensure
-          // the entityId is set to membership ID not contribution by default
-          elseif ($line['entity_table'] == 'civicrm_membership' && !empty($line['entity_id']) && $line['entity_id'] == $contributionDetails->id) {
-            $membershipId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $contributionDetails->id, 'membership_id', 'contribution_id');
-            if ($membershipId && (int) $membershipId !== (int) $line['entity_id']) {
-              $line['entity_id'] = $membershipId;
-              Civi::log()->warning('Per https://lab.civicrm.org/dev/core/issues/15 this data fix should not be required. Please log a ticket at https://lab.civicrm.org/dev/core with steps to get this.', ['civi.tag' => 'deprecated']);
-            }
           }
         }
 
