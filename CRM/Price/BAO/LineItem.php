@@ -444,7 +444,10 @@ WHERE li.contribution_id = %1";
         if (empty($line['entity_id'])) {
           $line['entity_id'] = $entityId;
         }
-        if (!empty($line['membership_type_id'])) {
+        if (!empty($line['membership_type_id']) && $line['entity_table'] !== 'civicrm_membership') {
+          // Per https://github.com/civicrm/civicrm-core/pull/8717  this is not ensuring the entity_id
+          // is correct & is specifically unreliable
+          CRM_Core_Error::deprecatedFunctionWarning('The calling function should set the entity & entity_id');
           $line['entity_table'] = 'civicrm_membership';
         }
         if (!empty($contributionDetails->id)) {
@@ -458,7 +461,7 @@ WHERE li.contribution_id = %1";
             $membershipId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipPayment', $contributionDetails->id, 'membership_id', 'contribution_id');
             if ($membershipId && (int) $membershipId !== (int) $line['entity_id']) {
               $line['entity_id'] = $membershipId;
-              Civi::log()->warning('Per https://lab.civicrm.org/dev/core/issues/15 this data fix should not be required. Please log a ticket at https://lab.civicrm.org/dev/core with steps to get this.', ['civi.tag' => 'deprecated']);
+              CRM_Core_Error::deprecatedFunctionWarning('Per https://lab.civicrm.org/dev/core/issues/15 this data fix should not be required. Please log a ticket at https://lab.civicrm.org/dev/core with steps to get this.', ['civi.tag' => 'deprecated']);
             }
           }
         }
