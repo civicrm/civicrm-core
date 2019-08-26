@@ -90,6 +90,9 @@ class CRM_Price_BAO_LineItem extends CRM_Price_DAO_LineItem {
         'contribution_id' => $lineItemBAO->contribution_id,
       ];
       if (!civicrm_api3('MembershipPayment', 'getcount', $membershipPaymentParams)) {
+        // If we are creating the membership payment row from the line item then we
+        // should have correct line item & membership payment should not need to fix.
+        $membershipPaymentParams['isSkipLineItem'] = TRUE;
         civicrm_api3('MembershipPayment', 'create', $membershipPaymentParams);
       }
     }
