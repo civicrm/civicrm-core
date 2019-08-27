@@ -212,6 +212,44 @@ class CRM_Activity_Form_ActivityTest extends CiviUnitTestCase {
     $form->assignActivityType();
 
     $this->assertEquals('Water Plants', $form->_activityTypeName);
+
+    // cleanup
+    $this->callAPISuccess('option_value', 'delete', ['id' => $result['id']]);
+  }
+
+  /**
+   * Test that the machineName and displayLabel are assigned correctly to the
+   * smarty template.
+   *
+   * See also testActivityTypeNameIsReallyLabel()
+   */
+  public function testActivityTypeAssignment() {
+    $form = new CRM_Activity_Form_Activity();
+
+    $form->_currentlyViewedContactId = $this->source;
+
+    // Let's make a new activity type that has a different name from its label just to be sure.
+    $actParams = [
+      'option_group_id' => 'activity_type',
+      'name' => '47395hc',
+      'label' => 'Hide Cookies',
+      'is_active' => 1,
+      'is_default' => 0,
+    ];
+    $result = $this->callAPISuccess('option_value', 'create', $actParams);
+
+    $form->_activityTypeId = $result['values'][$result['id']]['value'];
+
+    // Do the thing we want to test
+    $form->assignActivityType();
+
+    // Check the smarty template has the correct values assigned.
+    $keyValuePair = $form->getTemplate()->get_template_vars('activityType');
+    $this->assertEquals('47395hc', $keyValuePair['machineName']);
+    $this->assertEquals('Hide Cookies', $keyValuePair['displayLabel']);
+
+    // cleanup
+    $this->callAPISuccess('option_value', 'delete', ['id' => $result['id']]);
   }
 
 }
