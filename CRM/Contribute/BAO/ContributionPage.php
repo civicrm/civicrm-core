@@ -666,9 +666,15 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @return CRM_Contribute_DAO_ContributionPage
    */
   public static function copy($id) {
+    $session = CRM_Core_Session::singleton();
+
     $fieldsFix = [
       'prefix' => [
         'title' => ts('Copy of') . ' ',
+      ],
+      'replace' => [
+        'created_id' => $session->get('userID'),
+        'created_date' => date('YmdHis'),
       ],
     ];
     $copy = CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_ContributionPage', [
