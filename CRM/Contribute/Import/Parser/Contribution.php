@@ -664,46 +664,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
       }
 
       // Handling Custom Data
-      if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        $values[$key] = $value;
-        $type = $customFields[$customFieldID]['html_type'];
-        if ($type == 'CheckBox' || $type == 'Multi-Select') {
-          $mulValues = explode(',', $value);
-          $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-          $values[$key] = [];
-          foreach ($mulValues as $v1) {
-            foreach ($customOption as $customValueID => $customLabel) {
-              $customValue = $customLabel['value'];
-              if ((strtolower($customLabel['label']) == strtolower(trim($v1))) ||
-                (strtolower($customValue) == strtolower(trim($v1)))
-              ) {
-                if ($type == 'CheckBox') {
-                  $values[$key][$customValue] = 1;
-                }
-                else {
-                  $values[$key][] = $customValue;
-                }
-              }
-            }
-          }
-        }
-        elseif ($type == 'Select' || $type == 'Radio' ||
-          ($type == 'Autocomplete-Select' &&
-            $customFields[$customFieldID]['data_type'] == 'String'
-          )
-        ) {
-          $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-          foreach ($customOption as $customFldID => $customValue) {
-            $val = CRM_Utils_Array::value('value', $customValue);
-            $label = CRM_Utils_Array::value('label', $customValue);
-            $label = strtolower($label);
-            $value = strtolower(trim($value));
-            if (($value == $label) || ($value == strtolower($val))) {
-              $values[$key] = $val;
-            }
-          }
-        }
-      }
+      $values = CRM_Import_Parser::formatCustomData($values, $key, $customFields, $value);
 
       switch ($key) {
         case 'contribution_contact_id':

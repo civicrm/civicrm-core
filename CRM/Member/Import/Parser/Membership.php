@@ -642,42 +642,8 @@ class CRM_Member_Import_Parser_Membership extends CRM_Member_Import_Parser {
         continue;
       }
 
-      //Handling Custom Data
-      if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
-        $values[$key] = $value;
-        $type = $customFields[$customFieldID]['html_type'];
-        if ($type == 'CheckBox' || $type == 'Multi-Select') {
-          $mulValues = explode(',', $value);
-          $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
-          $values[$key] = [];
-          foreach ($mulValues as $v1) {
-            foreach ($customOption as $customValueID => $customLabel) {
-              $customValue = $customLabel['value'];
-              if ((strtolower($customLabel['label']) == strtolower(trim($v1))) ||
-                (strtolower($customValue) == strtolower(trim($v1)))
-              ) {
-                if ($type == 'CheckBox') {
-                  $values[$key][$customValue] = 1;
-                }
-                else {
-                  $values[$key][] = $customValue;
-                }
-              }
-            }
-          }
-        }
-        if ($type == 'Autocomplete-Select') {
-          //  Get Custom data value
-          $membershipData = civicrm_api3('OptionValue', 'get', [
-            'label' => $value,
-            'return' => ["value"],
-          ]);
-          if (empty($membershipData['values'])) {
-            throw new Exception("Invalid option for $key : $value");
-          }
-          $values['custom_'.$customFieldID ] = $membershipData['values'][$membershipData['id']]['value'];
-        }
-      }
+      // Handling Custom Data
+      $values = CRM_Import_Parser::formatCustomData($values, $key, $customFields, $value);
 
       switch ($key) {
         case 'membership_contact_id':

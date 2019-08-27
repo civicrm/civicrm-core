@@ -572,4 +572,61 @@ abstract class CRM_Import_Parser {
     return '';
   }
 
+   /**
+   * format custom data for while doing impor for components membership,contribution,participants.
+   *
+   * @param $values
+   *   import custom values.
+   * @param  $key
+   *   custom field id.
+   * @param $customFields
+   *   custom fields array.
+   * @param $value
+   *   custom field value.
+   *
+   * @return  formatted values array.
+   */
+  public function formatCustomData($values, $key, $customFields, $value) {
+    //Handling Custom Data
+    if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
+      $values[$key] = $value;
+      $type = $customFields[$customFieldID]['html_type'];
+      if ($type == 'CheckBox' || $type == 'Multi-Select') {
+        $mulValues = explode(',', $value);
+        $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
+        $values[$key] = [];
+        foreach ($mulValues as $v1) {
+          foreach ($customOption as $customValueID => $customLabel) {
+            $customValue = $customLabel['value'];
+            if ((strtolower($customLabel['label']) == strtolower(trim($v1))) ||
+              (strtolower($customValue) == strtolower(trim($v1)))
+            ) {
+              if ($type == 'CheckBox') {
+                $values[$key][$customValue] = 1;
+              }
+              else {
+                $values[$key][] = $customValue;
+              }
+            }
+          }
+        }
+      }
+      elseif ($type == 'Select' || $type == 'Radio' ||
+      ($type == 'Autocomplete-Select' &&
+        $customFields[$customFieldID]['data_type'] == 'String'
+      )) {
+        $customOption = CRM_Core_BAO_CustomOption::getCustomOption($customFieldID, TRUE);
+        foreach ($customOption as $customFldID => $customValue) {
+          $val = CRM_Utils_Array::value('value', $customValue);
+          $label = CRM_Utils_Array::value('label', $customValue);
+          $label = strtolower($label);
+          $value = strtolower(trim($value));
+          if (($value == $label) || ($value == strtolower($val))) {
+            $values[$key] = $val;
+          }
+        }
+      }
+    }
+    return $values;
+  }
 }
