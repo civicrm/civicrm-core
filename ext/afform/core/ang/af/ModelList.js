@@ -21,8 +21,8 @@
         $scope.myCtrl = this;
 
         this.registerEntity = function registerEntity(entity) {
-          schema[entity.name] = entity;
-          data[entity.name] = data[entity.name] || {};
+          schema[entity.afName] = entity;
+          data[entity.afName] = data[entity.afName] || {};
         };
         this.registerField = function(entityName, fieldName) {
           schema[entityName].fields.push(fieldName);
@@ -40,7 +40,7 @@
         this.loadData = function() {
           var toLoad = 0;
           _.each(schema, function(entity, entityName) {
-            if ($routeParams[entityName] || entity.autofill) {
+            if ($routeParams[entityName] || entity.afAutofill) {
               toLoad++;
             }
           });

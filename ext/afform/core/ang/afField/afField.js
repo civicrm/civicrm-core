@@ -13,7 +13,7 @@
         var ts = $scope.ts = CRM.ts('afform');
         $scope.afModel = ctrls[0];
         var modelList = ctrls[1];
-        $scope.fieldId = $scope.afModel.getDefn().name + '-' + $scope.fieldName;
+        $scope.fieldId = $scope.afModel.getDefn().afName + '-' + $scope.fieldName;
         $scope.getData = $scope.afModel.getData;
 
         $scope.getOptions = function() {
