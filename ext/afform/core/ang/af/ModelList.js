@@ -22,7 +22,7 @@
 
         this.registerEntity = function registerEntity(entity) {
           schema[entity.afName] = entity;
-          data[entity.afName] = data[entity.afName] || {};
+          data[entity.afName] = entity.afData || {};
         };
         this.registerField = function(entityName, fieldName) {
           schema[entityName].fields.push(fieldName);
@@ -48,7 +48,7 @@
             crmApi4('Afform', 'prefill', {name: CRM.afform.open, args: $routeParams})
               .then(function(result) {
                 _.each(result, function(item) {
-                  data[item.name] = item.values;
+                  data[item.name] = _.extend(item.values, schema[item.name].afData || {});
                 });
               });
           }
