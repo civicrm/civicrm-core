@@ -235,13 +235,10 @@ if [ -d "$DM_SOURCEDIR/drupal" ]; then
   GENCODE_CMS=Drupal
 fi
 
-## Get latest dependencies
+## Get fresh dependencies
+[ -d "$DM_SOURCEDIR/vendor" ] && rm -rf $DM_SOURCEDIR/vendor
+[ -d "$DM_SOURCEDIR/bower_components" ] && rm -rf $DM_SOURCEDIR/bower_components
 dm_generate_vendor "$DM_SOURCEDIR"
-## if we already have a bower_compoents dir empty it.
-if [ -d "$DM_SOURCEDIR/bower_components" ]; then
-  rm -rf $DM_SOURCEDIR/bower_components/* 
-fi
-dm_generate_bower "$DM_SOURCEDIR"
 
 # Before anything - regenerate DAOs
 
