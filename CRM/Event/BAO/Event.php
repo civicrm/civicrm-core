@@ -926,6 +926,7 @@ WHERE civicrm_event.is_active = 1
    * @throws \CRM_Core_Exception
    */
   public static function copy($id, $params = []) {
+    $session = CRM_Core_Session::singleton();
     $eventValues = [];
 
     //get the required event values.
@@ -940,7 +941,15 @@ WHERE civicrm_event.is_active = 1
 
     CRM_Core_DAO::commonRetrieve('CRM_Event_DAO_Event', $eventParams, $eventValues, $returnProperties);
 
-    $fieldsFix = ['prefix' => ['title' => ts('Copy of') . ' ']];
+    $fieldsFix = [
+      'prefix' => [
+        'title' => ts('Copy of') . ' ',
+      ],
+      'replace' => [
+        'created_id' => $session->get('userID'),
+        'created_date' => date('YmdHis'),
+      ],
+    ];
     if (empty($eventValues['is_show_location'])) {
       $fieldsFix['prefix']['is_show_location'] = 0;
     }
