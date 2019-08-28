@@ -178,6 +178,12 @@ function _civicrm_api3_payment_create_spec(&$params) {
       'title' => ts('Cancel Date'),
       'type' => CRM_Utils_Type::T_DATE + CRM_Utils_Type::T_TIME,
     ],
+    'is_send_contribution_notification' => [
+      'title' => ts('Send out notifications based on contribution status change?'),
+      'description' => ts('Most commonly this equates to emails relating to the contribution, event, etcwhen a payment completes a contribution'),
+      'type' => CRM_Utils_Type::T_BOOLEAN,
+      'api.default' => TRUE,
+    ],
   ];
 }
 
