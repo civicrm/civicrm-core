@@ -973,6 +973,10 @@ class CRM_Core_Permission {
       ],
     ];
 
+    $permissions['dedupe'] = [
+      'getduplicates' => ['access CiviCRM'],
+    ];
+
     // CRM-16963 - Permissions for country.
     $permissions['country'] = [
       'get' => [
