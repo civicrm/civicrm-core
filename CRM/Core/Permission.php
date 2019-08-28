@@ -118,6 +118,8 @@ class CRM_Core_Permission {
    */
   public static function check($permissions, $contactId = NULL) {
     $permissions = (array) $permissions;
+    // If the logged in contact id is being overridden, use the substitute contactId
+    $contactId = $contactId ?? CRM_Core_Session::getOverriddenUser();
     $userId = CRM_Core_BAO_UFMatch::getUFId($contactId);
     // If contact has no associated user, set to 0 for anonymous (logged-out)
     if ($contactId === 0 || ($contactId && !$userId)) {

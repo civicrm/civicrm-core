@@ -66,6 +66,13 @@ class CRM_Core_Session {
   static private $_singleton = NULL;
 
   /**
+   * Stack of contact ids when overriding current user
+   *
+   * @var array
+   */
+  static private $userOverride = [];
+
+  /**
    * Constructor.
    *
    * The CMS takes care of initiating the php session handler session_start().
@@ -249,6 +256,11 @@ class CRM_Core_Session {
   public function get($name, $prefix = NULL) {
     // create session scope
     $this->createScope($prefix, TRUE);
+
+    if (!$prefix && $name == 'userID' && self::$userOverride) {
+      end(self::$userOverride);
+      return current(self::$userOverride);
+    }
 
     if (empty($this->_session) || empty($this->_session[$this->_key])) {
       return NULL;
@@ -571,6 +583,62 @@ class CRM_Core_Session {
    */
   public function isEmpty() {
     return empty($_SESSION);
+  }
+
+  /**
+   * Temporarily masquerade as a different user.
+   *
+   * Note: the override is stored in a static variable so does not persist past this page request.
+   *
+   * Returns a handle to identify this override so you can revert it later.
+   *
+   * @param int $contactId
+   *   Contact id to spoof as current user.
+   * @param string|int $handle
+   *   Specify your own handle if you wish.
+   * @return bool|string|int
+   *   Handle if anything was done, FALSE otherwise
+   */
+  public function overrideCurrentUser($contactId, $handle = NULL) {
+    if ($contactId == $this->get('userID')) {
+      // Current user is already $contactId; nothing to do
+      return FALSE;
+    }
+    $handle = $handle ?? uniqid();
+    self::$userOverride[$handle] = $contactId;
+    return $handle;
+  }
+
+  /**
+   * Reverts $this->overrideCurrentUser
+   *
+   * @param string|int $handle
+   *   Optionally specify the override to revert, else it will just
+   *   pop the latest override off the stack.
+   *
+   * @return bool
+   *   Whether or not anything was done.
+   */
+  public function restoreCurrentUser($handle = NULL) {
+    if (self::$userOverride) {
+      $handle = $handle ?? array_reverse(array_keys(self::$userOverride))[0];
+      if (array_key_exists($handle, self::$userOverride)) {
+        unset(self::$userOverride[$handle]);
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
+
+  /**
+   * If the contact id of the logged-in user has been overridden, return it.
+   *
+   * Otherwise return null to indicate the current user is not being overridden.
+   *
+   * @return int|null
+   */
+  public static function getOverriddenUser() {
+    return self::$userOverride ? self::getLoggedInContactID() : NULL;
   }
 
 }

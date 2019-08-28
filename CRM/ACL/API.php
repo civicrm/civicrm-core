@@ -113,17 +113,17 @@ class CRM_ACL_API {
       }
     }
 
-    if (!$contactID) {
-      $contactID = CRM_Core_Session::getLoggedInContactID();
-    }
-    $contactID = (int) $contactID;
-
     // first see if the contact has edit / view all permission
     if (CRM_Core_Permission::check('edit all contacts', $contactID) ||
       ($type == self::VIEW && CRM_Core_Permission::check('view all contacts', $contactID))
     ) {
       return $deleteClause;
     }
+
+    if (is_null($contactID)) {
+      $contactID = CRM_Core_Session::getLoggedInContactID();
+    }
+    $contactID = (int) $contactID;
 
     $whereClause = CRM_ACL_BAO_ACL::whereClause($type,
       $tables,
