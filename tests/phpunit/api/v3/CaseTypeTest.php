@@ -241,7 +241,6 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
    * @throws \Exception
    */
   public function testCaseStatusByCaseType() {
-    $this->markTestIncomplete('Cannot figure out why this passes locally but fails on Jenkins.');
     $statusName = md5(mt_rand());
     $template = $this->callAPISuccess('CaseType', 'getsingle', ['id' => $this->caseTypeId]);
     unset($template['id']);
