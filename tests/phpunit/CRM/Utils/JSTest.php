@@ -203,6 +203,7 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     return [
       ['{a: \'Apple\', \'b\': "Banana", c: [1, 2, 3]}', ['a' => 'Apple', 'b' => 'Banana', 'c' => [1, 2, 3]]],
       ['true', TRUE],
+      [' ', NULL],
       ['false', FALSE],
       ['null', NULL],
       ['"true"', 'true'],
@@ -212,6 +213,10 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
       ["{  }", []],
       [" [   ]", []],
       [" [ 2   ]", [2]],
+      [
+        '{a: "parse error no closing bracket"',
+        NULL,
+      ],
       [
         '{a: ["foo", \'bar\'], "b": {a: [\'foo\', "bar"], b: {\'a\': ["foo", "bar"], b: {}}}}',
         ['a' => ['foo', 'bar'], 'b' => ['a' => ['foo', 'bar'], 'b' => ['a' => ['foo', 'bar'], 'b' => []]]],

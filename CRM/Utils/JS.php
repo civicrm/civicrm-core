@@ -143,11 +143,13 @@ class CRM_Utils_JS {
    */
   public static function decode($js) {
     $js = trim($js);
-    if ($js[0] === "'" || $js[0] === '"') {
+    $first = substr($js, 0, 1);
+    $last = substr($js, -1);
+    if ($last === $first && ($first === "'" || $first === '"')) {
       // Use a temp placeholder for escaped backslashes
       return str_replace(['\\\\', "\\'", '\\"', '\\&', '\\/', '**backslash**'], ['**backslash**', "'", '"', '&', '/', '\\'], substr($js, 1, -1));
     }
-    if ($js[0] === '{' || $js[0] === '[') {
+    if (($first === '{' && $last === '}') || ($first === '[' && $last === ']')) {
       $obj = self::getRawProps($js);
       foreach ($obj as $idx => $item) {
         $obj[$idx] = self::decode($item);
