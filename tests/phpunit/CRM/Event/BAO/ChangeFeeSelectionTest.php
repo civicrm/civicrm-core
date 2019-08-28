@@ -547,6 +547,7 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
     CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
     $actualResults = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['sequential' => 1, 'entity_table' => 'civicrm_financial_item'])['values'];
+    $this->assertCount(3, $actualResults);
     $expectedResults = [
       [
         'id' => 2,
