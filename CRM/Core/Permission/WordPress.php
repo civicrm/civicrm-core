@@ -44,9 +44,9 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
    * @param string $str
    *   The permission to check.
    * @param int $userId
+   *   NULL = current user; 0 = anonymous (logged-out)
    *
    * @return bool
-   *   true if yes, else false
    */
   public function check($str, $userId = NULL) {
     // Generic cms 'administer users' role tranlates to users with the 'edit_users' capability' in WordPress
@@ -72,20 +72,19 @@ class CRM_Core_Permission_WordPress extends CRM_Core_Permission_Base {
     require_once ABSPATH . WPINC . '/pluggable.php';
 
     // for administrators give them all permissions
-    if (!function_exists('current_user_can')) {
+    if (!function_exists('current_user_can') && !is_numeric($userId)) {
       return TRUE;
     }
 
-    $user = $userId ? get_userdata($userId) : wp_get_current_user();
-
-    if ($user->has_cap('super admin') || $user->has_cap('administrator')) {
-      return TRUE;
-    }
+    $user = is_numeric($userId) ? get_userdata((int) $userId) : wp_get_current_user();
 
     // Make string lowercase and convert spaces into underscore
     $str = CRM_Utils_String::munge(strtolower($str));
 
-    if ($user->exists()) {
+    if ($user && $user->exists()) {
+      if ($user->has_cap('super admin') || $user->has_cap('administrator')) {
+        return TRUE;
+      }
       // Check whether the logged in user has the capabilitity
       if ($user->has_cap($str)) {
         return TRUE;

@@ -66,11 +66,10 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
    *
    * @param string $str
    *   The permission to check.
-   *
    * @param int $userId
+   *   NULL = current user; 0 = anonymous (logged-out)
    *
    * @return bool
-   *   true if yes, else false
    */
   public function check($str, $userId = NULL) {
     $str = $this->translatePermission($str, 'Drupal', [
@@ -84,10 +83,7 @@ class CRM_Core_Permission_Drupal extends CRM_Core_Permission_DrupalBase {
       return TRUE;
     }
     if (function_exists('user_access')) {
-      $account = NULL;
-      if ($userId) {
-        $account = user_load($userId);
-      }
+      $account = is_numeric($userId) ? user_load($userId) : NULL;
       return user_access($str, $account);
     }
     return TRUE;

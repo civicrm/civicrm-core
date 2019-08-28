@@ -43,8 +43,8 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
    *
    * @param string $str
    *   The permission to check.
-   *
    * @param int $userId
+   *   NULL = current user; 0 = anonymous (logged-out)
    *
    * @return bool
    */
@@ -59,7 +59,7 @@ class CRM_Core_Permission_Drupal8 extends CRM_Core_Permission_DrupalBase {
     if ($str == CRM_Core_Permission::ALWAYS_ALLOW_PERMISSION) {
       return TRUE;
     }
-    $acct = $userId ? \Drupal\user\Entity\User::load($userId) : \Drupal::currentUser();
+    $acct = is_numeric($userId) ? \Drupal\user\Entity\User::load((int) $userId) : \Drupal::currentUser();
     return $acct->hasPermission($str);
   }
 

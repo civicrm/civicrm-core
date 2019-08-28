@@ -111,6 +111,7 @@ class CRM_Core_Permission {
    *
    * @param int $contactId
    *   Contact id to check permissions for. Defaults to current logged-in user.
+   *   Pass 0 for no user (anonymous)
    *
    * @return bool
    *   true if contact has permission(s), else false
@@ -118,6 +119,10 @@ class CRM_Core_Permission {
   public static function check($permissions, $contactId = NULL) {
     $permissions = (array) $permissions;
     $userId = CRM_Core_BAO_UFMatch::getUFId($contactId);
+    // If contact has no associated user, set to 0 for anonymous (logged-out)
+    if ($contactId === 0 || ($contactId && !$userId)) {
+      $userId = 0;
+    }
 
     /** @var CRM_Core_Permission_Temp $tempPerm */
     $tempPerm = CRM_Core_Config::singleton()->userPermissionTemp;

@@ -44,16 +44,14 @@ class CRM_Core_Permission_Joomla extends CRM_Core_Permission_Base {
    * @param string $str
    *   The permission to check.
    * @param int $userId
+   *   NULL = current user; 0 = anonymous (logged-out)
    *
    * @return bool
-   *   true if yes, else false
    */
   public function check($str, $userId = NULL) {
     $config = CRM_Core_Config::singleton();
-    // JFactory::getUser does strict type checking, so convert falesy values to NULL
-    if (!$userId) {
-      $userId = NULL;
-    }
+    // JFactory::getUser does strict type checking, so convert non-numeric values to NULL
+    $userId = is_numeric($userId) ? (int) $userId : NULL;
 
     $translated = $this->translateJoomlaPermission($str);
     if ($translated === CRM_Core_Permission::ALWAYS_DENY_PERMISSION) {
