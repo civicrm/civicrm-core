@@ -2,7 +2,7 @@
 
 ![Screenshot](/images/screenshot.png)
 
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
+This extension provides a UI for overriding the html in a flexible form. The UI  is accessible at the url civicrm/admin/afform-html
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
