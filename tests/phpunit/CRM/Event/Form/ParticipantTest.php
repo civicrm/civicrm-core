@@ -82,6 +82,7 @@ class CRM_Event_Form_ParticipantTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'contribution_status_id' => 2,
       'payment_instrument_id' => 1,
+      'receive_date' => date('Y-m-d'),
     ]);
     $participants = $this->callAPISuccess('Participant', 'get', []);
     $this->assertEquals(1, $participants['count']);

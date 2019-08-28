@@ -538,4 +538,75 @@ class CRM_Event_BAO_ChangeFeeSelectionTest extends CiviUnitTestCase {
     }
   }
 
+  /**
+   * dev-financial-40: Test that partial payment entries in entity-financial-trxn table to ensure that reverse transaction is entered
+   */
+  public function testPartialPaymentEntries() {
+    $this->registerParticipantAndPay($this->_expensiveFee);
+    $priceSetParams['price_' . $this->priceSetFieldID] = $this->veryExpensiveFeeValueID;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
+    $actualResults = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['sequential' => 1, 'entity_table' => 'civicrm_financial_item'])['values'];
+    $this->assertCount(3, $actualResults);
+    $expectedResults = [
+      [
+        'id' => 2,
+        'amount' => 100.0,
+        'entity_id' => 1,
+        'financial_trxn_id' => 1,
+        'entity_table' => 'civicrm_financial_item',
+      ],
+      [
+        'id' => 4,
+        // ensure that reverse entry is entered in the EntityFinancialTrxn table on fee change to greater amount
+        'amount' => -100.0,
+        'entity_id' => 2,
+        'financial_trxn_id' => 2,
+        'entity_table' => 'civicrm_financial_item',
+      ],
+      [
+        'id' => 5,
+        'amount' => 120.00,
+        'entity_id' => 3,
+        'financial_trxn_id' => 2,
+        'entity_table' => 'civicrm_financial_item',
+      ],
+    ];
+    foreach ($expectedResults as $key => $expectedResult) {
+      $this->checkArrayEquals($expectedResult, $actualResults[$key]);
+    }
+  }
+
+  /**
+   * dev-financial-40: Test that refund payment entries in entity-financial-trxn table to ensure that reverse transaction is entered on fee change to lesser amount
+   */
+  public function testRefundPaymentEntries() {
+    $this->registerParticipantAndPay($this->_expensiveFee);
+    $priceSetParams['price_' . $this->priceSetFieldID] = $this->cheapFeeValueID;
+    $lineItem = CRM_Price_BAO_LineItem::getLineItems($this->participantID, 'participant');
+    CRM_Price_BAO_LineItem::changeFeeSelections($priceSetParams, $this->_participantId, 'participant', $this->_contributionId, $this->_feeBlock, $lineItem);
+    $actualResults = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['sequential' => 1, 'entity_table' => 'civicrm_financial_item', 'return' => ['amount', 'entity_id']])['values'];
+    $expectedResults = [
+      [
+        'id' => 2,
+        'amount' => 100.00,
+        'entity_id' => 1,
+      ],
+      [
+        'id' => 4,
+        // ensure that reverse entry is entered in the EntityFinancialTrxn table
+        'amount' => -100.00,
+        'entity_id' => 2,
+      ],
+      [
+        'id' => 5,
+        'amount' => 80.00,
+        'entity_id' => 3,
+      ],
+    ];
+    foreach ($expectedResults as $key => $expectedResult) {
+      $this->checkArrayEquals($expectedResult, $actualResults[$key]);
+    }
+  }
+
 }
