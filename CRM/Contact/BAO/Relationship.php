@@ -1535,6 +1535,7 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
    * @param bool $active
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function relatedMemberships($contactId, &$params, $ids, $action = CRM_Core_Action::ADD, $active = TRUE) {
     // Check the end date and set the status of the relationship
@@ -1691,6 +1692,12 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       $mainRelatedContactId = reset($relatedContacts);
 
       foreach ($details['memberships'] as $membershipId => $membershipValues) {
+        $membershipInherittedFromContactID = NULL;
+        if (!empty($membershipValues['owner_membership_id'])) {
+          // Use get not getsingle so that we get e-notice noise but not a fatal is the membership has already been deleted.
+          $inheritedFromMembership = civicrm_api3('Membership', 'get', ['id' => $membershipValues['owner_membership_id'], 'sequential' => 1])['values'][0];
+          $membershipInherittedFromContactID = (int) $inheritedFromMembership['contact_id'];
+        }
         $relTypeIds = [];
         if ($action & CRM_Core_Action::DELETE) {
           // @todo don't return relTypeId here - but it seems to be used later in a cryptic way (hint cryptic is not a complement).
@@ -1769,7 +1776,11 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
             if (!empty($membershipValues['status_id']) && $membershipValues['status_id'] == $pendingStatusId) {
               $membershipValues['skipStatusCal'] = TRUE;
             }
-            $membershipValues = self::addInheritedMembership($membershipValues);
+            // As long as the membership itself was not created by inheritance from the same contact
+            // that stands to inherit the membership we add an inherited membership.
+            if ($membershipInherittedFromContactID !== (int) $membershipValues['contact_id']) {
+              $membershipValues = self::addInheritedMembership($membershipValues);
+            }
           }
         }
         elseif ($action & CRM_Core_Action::UPDATE) {
