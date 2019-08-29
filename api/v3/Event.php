@@ -57,13 +57,6 @@ function civicrm_api3_event_create($params) {
     ]);
   }
 
-  // Clone event from template
-  if (!empty($params['template_id']) && empty($params['id'])) {
-    $copy = CRM_Event_BAO_Event::copy($params['template_id']);
-    $params['id'] = $copy->id;
-    unset($params['template_id']);
-  }
-
   _civicrm_api3_event_create_legacy_support_42($params);
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Event');
 }
