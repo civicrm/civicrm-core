@@ -105,8 +105,8 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
         list($domainEmailName, $domainEmailAddress) = CRM_Core_BAO_Domain::getNameAndEmail();
 
         if (!$domainEmailAddress || $domainEmailAddress == 'info@EXAMPLE.ORG') {
-          $fixUrl = CRM_Utils_System::url("civicrm/admin/domain", 'action=update&reset=1');
-          CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid email address in <a href="%1">Administer CiviCRM &raquo; Communications &raquo; Organization Address and Contact Info</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
+          $fixUrl = CRM_Utils_System::url("civicrm/admin/options/from_email_address", 'action=update&reset=1');
+          CRM_Core_Error::statusBounce(ts('The site administrator needs to enter a valid \'FROM Email Address\' in <a href="%1">Administer CiviCRM &raquo; System Settings &raquo; Option Groups &raquo; From Email Address</a>. The email address used may need to be a valid mail account with your email service provider.', [1 => $fixUrl]));
         }
         if (!$toEmail) {
           CRM_Core_Error::statusBounce(ts('Cannot send a test email because your user record does not have a valid email address.'));
