@@ -1181,7 +1181,11 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
             $locations[$moniker][$blockName][$cnt] = $value;
             // Fix address display
             if ($blockName == 'address') {
+              // For performance avoid geocoding while merging https://issues.civicrm.org/jira/browse/CRM-21786
+              // we can expect existing geocode values to be retained.
+              $value['skip_geocode'] = TRUE;
               CRM_Core_BAO_Address::fixAddress($value);
+              unset($value['skip_geocode']);
               $locations[$moniker][$blockName][$cnt]['display'] = CRM_Utils_Address::format($value);
             }
             // Fix email display
