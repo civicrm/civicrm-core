@@ -12,6 +12,15 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   protected $_contactIds = [];
 
   /**
+   * Contacts created for the test.
+   *
+   * Overlaps contactIds....
+   *
+   * @var array
+   */
+  protected $contacts = [];
+
+  /**
    * Tear down.
    *
    * @throws \Exception
@@ -21,6 +30,7 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
       'civicrm_contact',
       'civicrm_group_contact',
       'civicrm_group',
+      'civicrm_prevnext_cache',
     ]);
     parent::tearDown();
   }
@@ -319,6 +329,79 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         'canMerge' => TRUE,
       ],
     ], $pairs);
+  }
+
+  /**
+   * Test results are returned when criteria are passed in.
+   */
+  public function testGetMatchesCriteriaMatched() {
+    $this->setupMatchData();
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'criteria' => ['contact' => ['id' => ['>' => 1]]],
+    ])['values'];
+    $this->assertCount(2, $pairs);
+  }
+
+  /**
+   * Test results are returned when criteria are passed in & limit is  respected.
+   */
+  public function testGetMatchesCriteriaMatchedWithLimit() {
+    $this->setupMatchData();
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'criteria' => ['contact' => ['id' => ['>' => 1]]],
+      'options' => ['limit' => 1],
+    ])['values'];
+    $this->assertCount(1, $pairs);
+  }
+
+  /**
+   * Test results are returned when criteria are passed in & limit is  respected.
+   */
+  public function testGetMatchesCriteriaMatchedWithSearchLimit() {
+    $this->setupMatchData();
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'criteria' => ['contact' => ['id' => ['>' => 1]]],
+      'search_limit' => 1,
+    ])['values'];
+    $this->assertCount(1, $pairs);
+  }
+
+  /**
+   * Test getting matches where there are  no criteria.
+   */
+  public function testGetMatchesNoCriteria() {
+    $this->setupMatchData();
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+    ])['values'];
+    $this->assertCount(2, $pairs);
+  }
+
+  /**
+   * Test getting matches with a limit in play.
+   */
+  public function testGetMatchesNoCriteriaButLimit() {
+    $this->setupMatchData();
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'options' => ['limit' => 1],
+    ])['values'];
+    $this->assertCount(1, $pairs);
+  }
+
+  /**
+   * Test that if criteria are passed and there are no matching contacts no matches are returned.
+   */
+  public function testGetMatchesCriteriaNotMatched() {
+    $this->setupMatchData();
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'criteria' => ['contact' => ['id' => ['>' => 100000]]],
+    ])['values'];
+    $this->assertCount(0, $pairs);
   }
 
   /**
