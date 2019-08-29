@@ -457,6 +457,11 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
           'check_permissions' => TRUE,
         ], array_intersect_key($criteria['contact'], $validFieldsForRetrieval)));
         $contactIDs = array_keys($contacts['values']);
+        if (empty($contactIDs)) {
+          // If there is criteria but no contacts were found then we should return now
+          // since we have no contacts to match.
+          return [];
+        }
       }
       $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs, $checkPermissions, $searchLimit);
     }

@@ -12,6 +12,15 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
   protected $_contactIds = [];
 
   /**
+   * Contacts created for the test.
+   *
+   * Overlaps contactIds....
+   *
+   * @var array
+   */
+  protected $contacts = [];
+
+  /**
    * Tear down.
    *
    * @throws \Exception
@@ -319,6 +328,27 @@ class CRM_Dedupe_MergerTest extends CiviUnitTestCase {
         'canMerge' => TRUE,
       ],
     ], $pairs);
+  }
+
+  /**
+   * Test that if criteria are passed and there are no matching contacts no matches are returned.
+   */
+  public function testGetMatchesCriteriaNotMatched() {
+    $this->setupMatchData();
+
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'criteria' => ['contact' => ['id' => ['>' => 1]]],
+    ])['values'];
+
+    $this->assertCount(2, $pairs);
+
+    $pairs = $this->callAPISuccess('Dedupe', 'getduplicates', [
+      'rule_group_id' => 1,
+      'criteria' => ['contact' => ['id' => ['>' => 100000]]],
+    ])['values'];
+
+    $this->assertCount(0, $pairs);
   }
 
   /**
