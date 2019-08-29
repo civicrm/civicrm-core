@@ -67,7 +67,7 @@ class CRM_Dedupe_Finder {
     $rgBao->id = $rgid;
     $rgBao->contactIds = $cids;
     if (!$rgBao->find(TRUE)) {
-      CRM_Core_Error::fatal("Dedupe rule not found for selected contacts");
+      throw new CRM_Core_Exception('Dedupe rule not found for selected contacts');
     }
     if (empty($rgBao->contactIds) && !empty($searchLimit)) {
       $limitedContacts = civicrm_api3('Contact', 'get', [
@@ -113,6 +113,7 @@ class CRM_Dedupe_Finder {
    *
    * @return array
    *   matching contact ids
+   * @throws \CRM_Core_Exception
    */
   public static function dupesByParams(
     $params,
@@ -144,7 +145,7 @@ class CRM_Dedupe_Finder {
       $rgBao->contact_type = $ctype;
       $rgBao->used = $used;
       if (!$rgBao->find(TRUE)) {
-        CRM_Core_Error::fatal("$used rule for $ctype does not exist");
+        throw new CRM_Core_Exception("$used rule for $ctype does not exist");
       }
     }
 
@@ -181,6 +182,7 @@ class CRM_Dedupe_Finder {
    *
    * @return array
    *   array of (cid1, cid2, weight) dupe triples
+   * @throws \CiviCRM_API3_Exception
    */
   public static function dupesInGroup($rgid, $gid, $searchLimit = 0) {
     $cids = array_keys(CRM_Contact_BAO_Group::getMember($gid, TRUE, $searchLimit));
@@ -201,6 +203,7 @@ class CRM_Dedupe_Finder {
    *
    * @return array
    *   valid $params array for dedupe
+   * @throws \CRM_Core_Exception
    */
   public static function formatParams($fields, $ctype) {
     $flat = [];
@@ -306,7 +309,7 @@ class CRM_Dedupe_Finder {
             }
           }
         }
-        if ($table == 'civicrm_phone') {
+        if ($table === 'civicrm_phone') {
           $fixes = [
             'phone' => 'phone_numeric',
           ];
@@ -340,8 +343,6 @@ class CRM_Dedupe_Finder {
    *   -dstName
    *   -weight
    *   -canMerge
-   *
-   * @throws CRM_Core_Exception
    */
   public static function parseAndStoreDupePairs($foundDupes, $cacheKeyString) {
     $cids = [];
