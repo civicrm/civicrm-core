@@ -437,7 +437,7 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     // This is required only until all fields are converted to datepicker fields as the new format is truer to the
     // form format and simply saves (e.g) custom_3_relative => "this.year"
     $relativeDates = ['relative_dates' => []];
-    $specialDateFields = ['event_relative', 'case_from_relative', 'case_to_relative', 'participant_relative'];
+    $specialDateFields = ['event_relative', 'case_from_relative', 'case_to_relative', 'participant_relative', 'log_date_relative'];
     foreach ($formValues as $id => $value) {
       if ((preg_match('/_date$/', $id) || in_array($id, $specialDateFields)) && !empty($value)) {
         $entityName = strstr($id, '_date', TRUE);
