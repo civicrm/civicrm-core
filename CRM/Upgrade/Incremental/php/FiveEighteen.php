@@ -79,6 +79,25 @@ class CRM_Upgrade_Incremental_php_FiveEighteen extends CRM_Upgrade_Incremental_B
         ['old' => 'is_override', 'new' => 'member_is_override'],
       ],
     ]);
+    $this->addTask('Remove Foreign Key from civicrm_dashboard on domain_id if exists', 'removeDomainIDFK');
+    $this->addTask('Remove Index on domain_id that might have been randomly added in the same format as FK', 'dropIndex', 'civicrm_dashboard', 'FK_civicrm_dashboard_domain_id');
+    $this->addTask('Re-Create Foreign key between civicrm_dashboard and civicrm_domain correctly', 'recreateDashboardFK');
+  }
+
+  public static function removeDomainIDFK() {
+    CRM_Core_BAO_SchemaHandler::safeRemoveFK('civicrm_dashboard', 'FK_civicrm_dashboard_domain_id');
+    return TRUE;
+  }
+
+  public static function recreateDashboardFK() {
+    $sql = CRM_Core_BAO_SchemaHandler::buildForeignKeySQL([
+      'fk_table_name' => 'civicrm_domain',
+      'fk_field_name' => 'id',
+      'name' => 'domain_id',
+      'fk_attributes' => ' ON DELETE CASCADE',
+    ], "\n", " ADD ", 'civicrm_dashboard');
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_dashboard " . $sql, [], TRUE, NULL, FALSE, FALSE);
+    return TRUE;
   }
 
   // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
