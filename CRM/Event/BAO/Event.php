@@ -132,6 +132,13 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
         $params['created_id'] = $session->get('userID');
       }
       $params['created_date'] = date('YmdHis');
+
+      // Clone from template
+      if (!empty($params['template_id'])) {
+        $copy = self::copy($params['template_id']);
+        $params['id'] = $copy->id;
+        unset($params['template_id']);
+      }
     }
 
     $event = self::add($params);
