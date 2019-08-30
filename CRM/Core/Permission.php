@@ -1178,6 +1178,10 @@ class CRM_Core_Permission {
         'edit all events',
       ],
     ];
+    // Exception refers to dedupe_exception.
+    $permissions['exception'] = [
+      'default' => ['merge duplicate contacts'],
+    ];
     // Loc block is only used for events
     $permissions['loc_block'] = $permissions['event'];
 
