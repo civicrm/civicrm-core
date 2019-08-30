@@ -971,6 +971,7 @@ class CRM_Core_Permission {
       'duplicatecheck' => [
         'access CiviCRM',
       ],
+      'merge' => ['merge duplicate contacts'],
     ];
 
     $permissions['dedupe'] = [
