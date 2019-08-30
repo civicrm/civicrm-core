@@ -548,6 +548,13 @@ class CRM_Member_BAO_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Renew membership with change in membership type.
+   *
+   * @fixme Note that this test fails when today is August 29 2019 (and maybe other years?):
+   *   Verify correct end date is calculated after membership renewal
+   *   Failed asserting that two strings are equal.
+   *   Expected-'2021-03-01'
+   *   Actual+'2021-02-28'
+   *   /home/jenkins/bknix-dfl/build/core-15165-73etc/web/sites/all/modules/civicrm/tests/phpunit/CRM/Member/BAO/MembershipTest.php:609
    */
   public function testRenewMembership() {
     $contactId = $this->individualCreate();
