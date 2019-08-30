@@ -537,8 +537,24 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
   public static function getSearchFieldMetadata() {
     $fields = [
       'pledge_status_id',
+      'pledge_start_date',
+      'pledge_end_date',
+      'pledge_create_date',
     ];
     $metadata = civicrm_api3('Pledge', 'getfields', [])['values'];
+    return array_intersect_key($metadata, array_flip($fields));
+  }
+
+  /**
+   * Get the metadata for fields to be included on the grant search form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getPledgePaymentSearchFieldMetadata() {
+    $fields = [
+      'pledge_payment_scheduled_date',
+    ];
+    $metadata = civicrm_api3('PledgePayment', 'getfields', [])['values'];
     return array_intersect_key($metadata, array_flip($fields));
   }
 
@@ -553,13 +569,8 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
   public static function buildSearchForm(&$form) {
     // pledge related dates
     $form->addSearchFieldMetadata(['Pledge' => self::getSearchFieldMetadata()]);
+    $form->addSearchFieldMetadata(['PledgePayment' => self::getPledgePaymentSearchFieldMetadata()]);
     $form->addFormFieldsFromMetadata();
-    CRM_Core_Form_Date::buildDateRange($form, 'pledge_start_date', 1, '_low', '_high', ts('From'), FALSE);
-    CRM_Core_Form_Date::buildDateRange($form, 'pledge_end_date', 1, '_low', '_high', ts('From'), FALSE);
-    CRM_Core_Form_Date::buildDateRange($form, 'pledge_create_date', 1, '_low', '_high', ts('From'), FALSE);
-
-    // pledge payment related dates
-    CRM_Core_Form_Date::buildDateRange($form, 'pledge_payment_date', 1, '_low', '_high', ts('From'), FALSE);
 
     $form->addYesNo('pledge_test', ts('Pledge is a Test?'), TRUE);
     $form->add('text', 'pledge_amount_low', ts('From'), ['size' => 8, 'maxlength' => 8]);

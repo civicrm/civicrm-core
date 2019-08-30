@@ -107,6 +107,7 @@
       <type>Select Date</type>
       <formatType>activityDate</formatType>
     </html>
+    <uniqueTitle>Payment Scheduled</uniqueTitle>
   </field>
   <field>
     <name>reminder_date</name>
