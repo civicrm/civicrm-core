@@ -1,0 +1,9 @@
+name: CiviCRM WebTest Fixtures
+description:  Configuration data for CiviCRM WebTest
+version: 4.3
+dependencies:
+  - civicrm:civicrm
+package: CiviCRM
+type: module
+core: 8.x
+php = 5.3
