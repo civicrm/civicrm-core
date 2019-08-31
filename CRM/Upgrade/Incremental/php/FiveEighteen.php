@@ -84,7 +84,18 @@ class CRM_Upgrade_Incremental_php_FiveEighteen extends CRM_Upgrade_Incremental_B
     $this->addTask('Re-Create Foreign key between civicrm_dashboard and civicrm_domain correctly', 'recreateDashboardFK');
     $this->addTask('Update smart groups to rename filters on pledge_payment_date to pledge_payment_scheduled_date', 'updateSmartGroups', [
       'renameField' => [
-        ['old' => 'pledge_payment_date', 'new' => 'pledge_payment_scheduled_date'],
+        ['old' => 'pledge_payment_date_relative', 'new' => 'pledge_payment_scheduled_date_relative'],
+        ['old' => 'pledge_payment_date_high', 'new' => 'pledge_payment_scheduled_date_high'],
+        ['old' => 'pledge_payment_date_low', 'new' => 'pledge_payment_scheduled_date_low'],
+        ['old' => 'member_join_date_relative', 'new' => 'membership_join_date_relative'],
+        ['old' => 'member_join_date_high', 'new' => 'membership_join_date_high'],
+        ['old' => 'member_join_date_low', 'new' => 'membership_join_date_low'],
+        ['old' => 'member_start_date_relative', 'new' => 'membership_start_date_relative'],
+        ['old' => 'member_start_date_high', 'new' => 'membership_start_date_high'],
+        ['old' => 'member_start_date_low', 'new' => 'membership_start_date_low'],
+        ['old' => 'member_end_date_relative', 'new' => 'membership_end_date_relative'],
+        ['old' => 'member_end_date_high', 'new' => 'membership_end_date_high'],
+        ['old' => 'member_end_date_low', 'new' => 'membership_end_date_low'],
       ],
     ]);
     $this->addTask('Update smart groups where jcalendar fields have been converted to datepicker', 'updateSmartGroups', [
@@ -93,6 +104,9 @@ class CRM_Upgrade_Incremental_php_FiveEighteen extends CRM_Upgrade_Incremental_B
         'pledge_create_date',
         'pledge_end_date',
         'pledge_start_date',
+        'membership_join_date',
+        'membership_end_date',
+        'membership_start_date',
       ],
     ]);
     $this->addTask('Update civicrm_mapping_field and civicrm_uf_field for change in join_date name', 'updateJoinDateMappingUF');

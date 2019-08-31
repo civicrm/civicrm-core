@@ -161,12 +161,22 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
    * @param CRM_Contact_BAO_Query $query
    */
   public static function whereClauseSingle(&$values, &$query) {
+    if ($query->buildDateRangeQuery($values)) {
+      // @todo - move this to Contact_Query in or near the call to
+      // $this->buildRelativeDateQuery($values);
+      return;
+    }
     list($name, $op, $value, $grouping) = $values;
     switch ($name) {
       case 'member_join_date_low':
       case 'member_join_date_high':
+        Civi::log()->warning(
+          'member_join_date field is deprecated please use membership_join_date field instead',
+          ['civi.tag' => 'deprecated']
+        );
+        $fldName = str_replace(['_low', '_high'], '', $name);
         $query->dateQueryBuilder($values,
-          'civicrm_membership', 'member_join_date', 'join_date',
+          'civicrm_membership', $fldName, 'join_date',
           'Member Since'
         );
         return;
@@ -174,6 +184,10 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
       case 'membership_start_date':
       case 'member_start_date_low':
       case 'member_start_date_high':
+        Civi::log()->warning(
+          'member_start_date field is deprecated please use membership_start_date field instead',
+          ['civi.tag' => 'deprecated']
+        );
         $fldName = str_replace(['_low', '_high'], '', $name);
         $query->dateQueryBuilder($values,
           'civicrm_membership', $fldName, 'start_date',
@@ -184,6 +198,10 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
       case 'membership_end_date':
       case 'member_end_date_low':
       case 'member_end_date_high':
+        Civi::log()->warning(
+          'member_end_date field is deprecated please use membership_end_date field instead',
+          ['civi.tag' => 'deprecated']
+        );
         $fldName = str_replace(['_low', '_high'], '', $name);
         $query->dateQueryBuilder($values,
           'civicrm_membership', $fldName, 'end_date',
@@ -376,6 +394,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         $query->_qill[$grouping][] = $value ? ts("Membership Status Is Overriden") : ts("Membership Status Is NOT Overriden");
         $query->_tables['civicrm_membership'] = $query->_whereTables['civicrm_membership'] = 1;
         return;
+
     }
   }
 
@@ -471,11 +490,28 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
+   * Get the metadata for fields to be included on the grant search form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = [
+      'membership_join_date',
+      'membership_start_date',
+      'membership_end_date',
+    ];
+    $metadata = civicrm_api3('Membership', 'getfields', [])['values'];
+    return array_intersect_key($metadata, array_flip($fields));
+  }
+
+  /**
    * Build the search form.
    *
    * @param CRM_Core_Form $form
    */
   public static function buildSearchForm(&$form) {
+    $form->addSearchFieldMetadata(['Membership' => self::getSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
     $membershipStatus = CRM_Member_PseudoConstant::membershipStatus(NULL, NULL, 'label', FALSE, FALSE);
     $form->add('select', 'membership_status_id', ts('Membership Status'), $membershipStatus, FALSE, [
       'id' => 'membership_status_id',
@@ -492,17 +528,6 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
 
     $form->addElement('text', 'member_source', ts('Source'));
     $form->add('number', 'membership_id', ts('Membership ID'), ['class' => 'four', 'min' => 1]);
-
-    CRM_Core_Form_Date::buildDateRange($form, 'member_join_date', 1, '_low', '_high', ts('From'), FALSE);
-    $form->addElement('hidden', 'member_join_date_range_error');
-
-    CRM_Core_Form_Date::buildDateRange($form, 'member_start_date', 1, '_low', '_high', ts('From'), FALSE);
-    $form->addElement('hidden', 'member_start_date_range_error');
-
-    CRM_Core_Form_Date::buildDateRange($form, 'member_end_date', 1, '_low', '_high', ts('From'), FALSE);
-    $form->addElement('hidden', 'member_end_date_range_error');
-
-    $form->addFormRule(['CRM_Member_BAO_Query', 'formRule'], $form);
 
     $form->addYesNo('membership_is_current_member', ts('Current Member?'), TRUE);
     $form->addYesNo('member_is_primary', ts('Primary Member?'), TRUE);
@@ -541,29 +566,6 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
     if (!empty($tables['civicrm_membership_log']) || !empty($tables['civicrm_membership_status']) || CRM_Utils_Array::value('civicrm_membership_type', $tables)) {
       $tables = array_merge(['civicrm_membership' => 1], $tables);
     }
-  }
-
-  /**
-   * Custom form rules.
-   *
-   * @param array $fields
-   * @param array $files
-   * @param CRM_Core_Form $form
-   *
-   * @return bool|array
-   */
-  public static function formRule($fields, $files, $form) {
-    $errors = [];
-
-    if ((empty($fields['member_join_date_low']) || empty($fields['member_join_date_high'])) && (empty($fields['member_start_date_low']) || empty($fields['member_start_date_high'])) && (empty($fields['member_end_date_low']) || empty($fields['member_end_date_high']))) {
-      return TRUE;
-    }
-
-    CRM_Utils_Rule::validDateRange($fields, 'member_join_date', $errors, ts('Member Since'));
-    CRM_Utils_Rule::validDateRange($fields, 'member_start_date', $errors, ts('Start Date'));
-    CRM_Utils_Rule::validDateRange($fields, 'member_end_date', $errors, ts('End Date'));
-
-    return empty($errors) ? TRUE : $errors;
   }
 
 }

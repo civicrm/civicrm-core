@@ -1591,6 +1591,9 @@ class CRM_Contact_BAO_Query {
       'pledge_create_date_relative',
       'pledge_start_date_relative',
       'pledge_payment_scheduled_date_relative',
+      'membership_join_date_relative',
+      'membership_start_date_relative',
+      'membership_end_date_relative',
     ];
     // Handle relative dates first
     foreach (array_keys($formValues) as $id) {
