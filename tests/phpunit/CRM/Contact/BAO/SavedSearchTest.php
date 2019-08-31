@@ -203,6 +203,30 @@ class CRM_Contact_BAO_SavedSearchTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test if change log relative dates are stored correctly
+   * in civicrm_saved_search table.
+   */
+  public function testRelativeDateChangeLog() {
+    $savedSearch = new CRM_Contact_BAO_SavedSearch();
+    $formValues = [
+      'operator' => 'AND',
+      'log_date_relative' => 'this.month',
+      'radio_ts' => 'ts_all',
+    ];
+    $queryParams = [];
+    CRM_Contact_BAO_SavedSearch::saveRelativeDates($queryParams, $formValues);
+    CRM_Contact_BAO_SavedSearch::saveSkippedElement($queryParams, $formValues);
+    $savedSearch->form_values = serialize($queryParams);
+    $savedSearch->save();
+
+    $result = CRM_Contact_BAO_SavedSearch::getFormValues(CRM_Core_DAO::singleValueQuery('SELECT LAST_INSERT_ID()'));
+    $expectedResult = [
+      'log' => 'this.month',
+    ];
+    $this->checkArrayEquals($result['relative_dates'], $expectedResult);
+  }
+
+  /**
    * Test relative dates
    *
    * This is a slightly odd test because it was originally created to test that we DO create a
