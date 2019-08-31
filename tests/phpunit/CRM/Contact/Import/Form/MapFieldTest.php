@@ -303,6 +303,12 @@ document.forms.MapField['mapper[1][3]'].style.display = 'none';\n",
 document.forms.MapField['mapper[0][2]'].style.display = 'none';
 document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
       ],
+      [
+        // Yes, the relationship mapping really does use url whereas non relationship uses website because... legacy
+        ['name' => 'Url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id', 'relationship_type_id' => 1, 'relationship_direction' => 'a_b'],
+        "document.forms.MapField['mapper[0][2]'].style.display = 'none';
+document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+      ],
     ];
   }
 
@@ -321,15 +327,10 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
    * @throws \CiviCRM_API3_Exception
    */
   protected function loadSavedMapping($form, $mappingID, $columnNumber) {
-    list($mappingName, $mappingContactType, $mappingLocation, $mappingPhoneType, $mappingImProvider, $mappingRelation, $mappingOperator, $mappingValue, $mappingWebsiteType) = CRM_Core_BAO_Mapping::getMappingFields($mappingID, TRUE);
+    list($mappingName) = CRM_Core_BAO_Mapping::getMappingFields($mappingID, TRUE);
 
     //get loaded Mapping Fields
     $mappingName = CRM_Utils_Array::value(1, $mappingName);
-    $mappingLocation = CRM_Utils_Array::value(1, $mappingLocation);
-    $mappingPhoneType = CRM_Utils_Array::value(1, $mappingPhoneType);
-    $mappingImProvider = CRM_Utils_Array::value(1, $mappingImProvider);
-    $mappingRelation = CRM_Utils_Array::value(1, $mappingRelation);
-    $mappingWebsiteType = CRM_Utils_Array::value(1, $mappingWebsiteType);
     $defaults = [];
 
     $js = '';
@@ -341,8 +342,9 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
     $processor->setMappingID($mappingID);
     $processor->setFormName('document.forms.MapField');
     $processor->setMetadata($this->getContactImportMetadata());
+    $processor->setContactTypeByConstant(CRM_Import_Parser::CONTACT_INDIVIDUAL);
 
-    $return = $form->loadSavedMapping($processor, $mappingName, $columnNumber, $mappingRelation, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
+    $return = $form->loadSavedMapping($processor, $mappingName, $columnNumber, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
     return ['defaults' => $return[0], 'js' => $return[1]];
   }
 
