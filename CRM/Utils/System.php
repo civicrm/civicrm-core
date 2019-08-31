@@ -53,7 +53,6 @@
  * @method static array synchronizeUsers() Create CRM contacts for all existing CMS users.
  * @method static appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_coreResourceList.
  * @method static alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_getAssetUrl.
- * @method static sendResponse(\Psr\Http\Message\ResponseInterface $response) function to handle RepsoseInterface for delivering HTTP Responses.
  */
 class CRM_Utils_System {
 
