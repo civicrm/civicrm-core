@@ -98,6 +98,7 @@
     <uniqueName>pledge_payment_scheduled_date</uniqueName>
     <title>Scheduled Date</title>
     <import>true</import>
+    <export>true</export>
     <type>datetime</type>
     <required>true</required>
     <comment>The date the pledge payment is supposed to happen.</comment>
