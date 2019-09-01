@@ -60,6 +60,7 @@
     <uniqueName>pledge_payment_scheduled_amount</uniqueName>
     <title>Scheduled Amount</title>
     <import>true</import>
+    <export>true</export>
     <type>decimal</type>
     <required>true</required>
     <comment>Pledged amount for this payment (the actual contribution amount might be different).</comment>

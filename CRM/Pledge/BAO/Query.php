@@ -282,6 +282,14 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
         );
         return;
 
+      case 'pledge_payment_scheduled_date_low':
+      case 'pledge_payment_scheduled_date_high':
+        // process to / from date
+        $query->dateQueryBuilder($values,
+          'civicrm_pledge_payment', 'pledge_payment_scheduled_date', 'scheduled_date', 'Payment Scheduled'
+        );
+        return;
+
       case 'pledge_amount':
       case 'pledge_amount_low':
       case 'pledge_amount_high':
