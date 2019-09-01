@@ -478,4 +478,30 @@ class CRM_Import_ImportProcessor {
     return !empty($this->getValidRelationships()[$key]) ? TRUE : FALSE;
   }
 
+  /**
+   * Get the relevant js for quickform.
+   *
+   * @param int $column
+   *
+   * @return string
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getQuickFormJSForField($column) {
+    $columnNumbersToHide = [];
+
+    if (!$this->getLocationTypeID($column) && !$this->getWebsiteTypeID($column)) {
+      $columnNumbersToHide[] = 1;
+    }
+    if (!$this->getPhoneOrIMTypeID($column)) {
+      $columnNumbersToHide[] = 2;
+    }
+    $columnNumbersToHide[] = 3;
+
+    $jsClauses = [];
+    foreach ($columnNumbersToHide as $columnNumber) {
+      $jsClauses[] = $this->getFormName() . "['mapper[$column][" . $columnNumber . "]'].style.display = 'none';";
+    }
+    return implode("\n", $jsClauses) . "\n";
+  }
+
 }

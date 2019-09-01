@@ -917,26 +917,17 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           $mappingHeader = $processor->getFieldName($i);
           $websiteTypeId = $processor->getWebsiteTypeID($i);
           $locationId = $processor->getLocationTypeID($i);
-          $phoneType = $processor->getPhoneTypeID($i);
-          $imProvider = $processor->getIMProviderID($i);
           $typeId = $processor->getPhoneOrIMTypeID($i);
 
           if ($websiteTypeId) {
             $defaults["mapper[$i]"] = [$mappingHeader, $websiteTypeId];
           }
           else {
-            if (!$locationId) {
-              $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
-            }
             //default for IM/phone without related contact
             $defaults["mapper[$i]"] = [$mappingHeader ?? '', $locationId, $typeId];
           }
 
-          if ((!$phoneType) && (!$imProvider)) {
-            $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
-          }
-
-          $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
+          $js .= $processor->getQuickFormJSForField($i);
 
           $jsSet = TRUE;
         }
