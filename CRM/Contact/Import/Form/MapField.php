@@ -914,7 +914,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           $jsSet = TRUE;
         }
         else {
-          $mappingHeader = array_keys((array) $this->_mapperFields, $mappingName[$i]);
+          $mappingHeader = $processor->getFieldName($i);
           $websiteTypeId = $processor->getWebsiteTypeID($i);
           $locationId = $processor->getLocationTypeID($i);
           $phoneType = $processor->getPhoneTypeID($i);
@@ -922,14 +922,14 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           $typeId = $processor->getPhoneOrIMTypeID($i);
 
           if ($websiteTypeId) {
-            $defaults["mapper[$i]"] = [$mappingHeader[0], $websiteTypeId];
+            $defaults["mapper[$i]"] = [$mappingHeader, $websiteTypeId];
           }
           else {
             if (!$locationId) {
               $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
             }
             //default for IM/phone without related contact
-            $defaults["mapper[$i]"] = [$mappingHeader[0] ?? '', $locationId, $typeId];
+            $defaults["mapper[$i]"] = [$mappingHeader ?? '', $locationId, $typeId];
           }
 
           if ((!$phoneType) && (!$imProvider)) {

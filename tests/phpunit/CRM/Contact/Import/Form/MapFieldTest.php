@@ -166,17 +166,19 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
    *
    * @param array $fieldSpec
    * @param string $expectedJS
+   * @param array $expectedDefaults
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public function testLoadSavedMapping($fieldSpec, $expectedJS) {
+  public function testLoadSavedMapping($fieldSpec, $expectedJS, $expectedDefaults) {
     $this->setUpMapFieldForm();
 
     $mapping = $this->callAPISuccess('Mapping', 'create', ['name' => 'my test']);
     $this->callAPISuccess('MappingField', 'create', array_merge(['mapping_id' => $mapping['id']], $fieldSpec));
     $result = $this->loadSavedMapping($this->form, $mapping['id'], $fieldSpec['column_number']);
     $this->assertEquals($expectedJS, $result['js']);
+    $this->assertEquals($expectedDefaults, $result['defaults']);
   }
 
   /**
@@ -288,26 +290,30 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
         "document.forms.MapField['mapper[1][1]'].style.display = 'none';
 document.forms.MapField['mapper[1][2]'].style.display = 'none';
 document.forms.MapField['mapper[1][3]'].style.display = 'none';\n",
+        ['mapper[1]' => ['first_name', 0, NULL]],
       ],
       [
         ['name' => 'Phone', 'contact_type' => 'Individual', 'column_number' => 8, 'phone_type_id' => 1, 'location_type_id' => 2],
         "document.forms.MapField['mapper[8][3]'].style.display = 'none';\n",
+        ['mapper[8]' => ['phone', 2, 1]],
       ],
       [
-        ['name' => 'Phone', 'contact_type' => 'Individual', 'column_number' => 0, 'im_provider_id' => 1, 'location_type_id' => 2],
+        ['name' => 'IM Screen Name', 'contact_type' => 'Individual', 'column_number' => 0, 'im_provider_id' => 1, 'location_type_id' => 2],
         "document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        ['mapper[0]' => ['im', 2, 1]],
       ],
       [
-        ['name' => 'Website', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id'],
-        "document.forms.MapField['mapper[0][1]'].style.display = 'none';
-document.forms.MapField['mapper[0][2]'].style.display = 'none';
+        ['name' => 'Website', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1],
+        "document.forms.MapField['mapper[0][2]'].style.display = 'none';
 document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        ['mapper[0]' => ['url', 1]],
       ],
       [
         // Yes, the relationship mapping really does use url whereas non relationship uses website because... legacy
         ['name' => 'Url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id', 'relationship_type_id' => 1, 'relationship_direction' => 'a_b'],
         "document.forms.MapField['mapper[0][2]'].style.display = 'none';
 document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        ['mapper[0]' => ['1_a_b', 'url', 0, NULL]],
       ],
     ];
   }
