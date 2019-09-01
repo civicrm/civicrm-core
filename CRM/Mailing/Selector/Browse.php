@@ -522,7 +522,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
     }
 
     $dateClause1 = $dateClause2 = [];
-    $from = $this->_parent->get('mailing_from');
+    $from = $this->_parent->get('mailing_low');
     if (!CRM_Utils_System::isNull($from)) {
       if ($this->_parent->get('unscheduled')) {
         $dateClause1[] = 'civicrm_mailing.created_date >= %2';
@@ -534,7 +534,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       $params[2] = [$from, 'String'];
     }
 
-    $to = $this->_parent->get('mailing_to');
+    $to = $this->_parent->get('mailing_high');
     if (!CRM_Utils_System::isNull($to)) {
       if ($this->_parent->get('unscheduled')) {
         $dateClause1[] = ' civicrm_mailing.created_date <= %3 ';
