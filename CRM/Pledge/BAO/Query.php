@@ -82,6 +82,12 @@ class CRM_Pledge_BAO_Query extends CRM_Core_BAO_Query {
       $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
     }
 
+    if (!empty($query->_returnProperties['pledge_end_date'])) {
+      $query->_select['pledge_end_date'] = 'civicrm_pledge.end_date as pledge_end_date';
+      $query->_element['pledge_end_date'] = 1;
+      $query->_tables['civicrm_pledge'] = $query->_whereTables['civicrm_pledge'] = 1;
+    }
+
     if (!empty($query->_returnProperties['pledge_start_date'])) {
       $query->_select['pledge_start_date'] = 'civicrm_pledge.start_date as pledge_start_date';
       $query->_element['pledge_start_date'] = 1;
