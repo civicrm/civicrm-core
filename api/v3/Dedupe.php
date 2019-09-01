@@ -107,7 +107,8 @@ function civicrm_api3_dedupe_getstatistics($params) {
     $params['rule_group_id'],
     CRM_Utils_Array::value('group_id', $params),
     CRM_Utils_Array::value('criteria', $params, []),
-    CRM_Utils_Array::value('check_permissions', $params, [])
+    !empty($params['check_permissions']),
+    CRM_Utils_Array::value('search_limit', $params, 0)
   ));
   return civicrm_api3_create_success($stats);
 }
@@ -134,6 +135,11 @@ function _civicrm_api3_dedupe_getstatistics_spec(&$params) {
   $params['criteria'] = [
     'title' => ts('Criteria'),
     'description' => ts('Dedupe search criteria, as parsable by v3 Contact.get api'),
+  ];
+  $spec['search_limit'] = [
+    'title' => ts('Number of contacts to look for matches for.'),
+    'type' => CRM_Utils_Type::T_INT,
+    'api.default' => (int) Civi::settings()->get('dedupe_default_limit'),
   ];
 
 }

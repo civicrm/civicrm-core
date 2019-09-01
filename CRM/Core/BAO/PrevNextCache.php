@@ -429,7 +429,7 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
    * @throws \CiviCRM_API3_Exception
    */
   public static function refillCache($rgid, $gid, $criteria, $checkPermissions, $searchLimit = 0) {
-    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions);
+    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions, $searchLimit);
 
     // 1. Clear cache if any
     $sql = "DELETE FROM civicrm_prevnext_cache WHERE  cachekey LIKE %1";
