@@ -867,12 +867,13 @@ AND        a.is_deleted = 0
      * the number 0 - use machineName (but can't really have number 0 in simplexml unless cast to number)
      * the word 'null' - use machineName and best not to think about it
      */
-    if (empty($xml->machineName)) {
-      if (!isset($xml->machineName) || ((string) $xml->machineName) !== '0') {
-        return (string) $xml->name;
+    if (isset($xml->machineName)) {
+      $machineName = (string) $xml->machineName;
+      if ($machineName !== '') {
+        return $machineName;
       }
     }
-    return (string) $xml->machineName;
+    return (string) $xml->name;
   }
 
 }
