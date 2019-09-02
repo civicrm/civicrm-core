@@ -44,11 +44,13 @@
   <CaseRoles>
     <RelationshipType>
       <name>First role</name>
+      <machineName>First role</machineName>
       <creator>1</creator>
       <manager>1</manager>
     </RelationshipType>
     <RelationshipType>
       <name>Second role</name>
+      <machineName>Second role</machineName>
     </RelationshipType>
   </CaseRoles>
 </CaseType>

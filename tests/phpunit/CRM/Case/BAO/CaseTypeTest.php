@@ -47,7 +47,7 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
           ['name' => 'Open Case', 'status' => 'Completed'],
         ],
         'caseRoles' => [
-          ['name' => 'First role', 'creator' => 1, 'manager' => 1],
+          ['name' => 'First role', 'machineName' => 'First role', 'creator' => 1, 'manager' => 1],
         ],
       ]),
       'xml' => file_get_contents(__DIR__ . '/xml/one-item-in-each.xml'),
@@ -94,8 +94,8 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
           ],
         ],
         'caseRoles' => [
-          ['name' => 'First role', 'creator' => 1, 'manager' => 1],
-          ['name' => 'Second role'],
+          ['name' => 'First role', 'machineName' => 'First role', 'creator' => 1, 'manager' => 1],
+          ['name' => 'Second role', 'machineName' => 'Second role'],
         ],
       ]),
       'xml' => file_get_contents(__DIR__ . '/xml/two-items-in-each.xml'),

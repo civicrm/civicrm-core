@@ -184,6 +184,10 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
         $xmlFile .= "<RelationshipType>\n";
         foreach ($values as $key => $value) {
           $xmlFile .= "<{$key}>" . self::encodeXmlString($value) . "</{$key}>\n";
+          // This will be changing, but for now to avoid errors machineName has to be the same value as label (which itself is called name because of an old mixup) - dev/core#1046
+          if ($key == 'name' && !isset($values['machineName'])) {
+            $xmlFile .= '<machineName>' . self::encodeXmlString($value) . "</machineName>\n";
+          }
         }
         $xmlFile .= "</RelationshipType>\n";
       }

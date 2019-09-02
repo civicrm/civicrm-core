@@ -22,6 +22,7 @@
   <CaseRoles>
     <RelationshipType>
       <name>First role</name>
+      <machineName>First role</machineName>
       <creator>1</creator>
       <manager>1</manager>
     </RelationshipType>
