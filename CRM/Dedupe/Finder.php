@@ -51,31 +51,17 @@ class CRM_Dedupe_Finder {
    * @param bool $checkPermissions
    *   Respect logged in user permissions.
    *
-   * @param int $searchLimit
-   *  Limit for the number of contacts to be used for comparison.
-   *  The search methodology finds all matches for the searchedContacts so this limits
-   *  the number of searched contacts, not the matches found.
-   *
    * @return array
    *   Array of (cid1, cid2, weight) dupe triples
    *
-   * @throws CiviCRM_API3_Exception
    * @throws Exception
    */
-  public static function dupes($rgid, $cids = [], $checkPermissions = TRUE, $searchLimit = 0) {
+  public static function dupes($rgid, $cids = [], $checkPermissions = TRUE) {
     $rgBao = new CRM_Dedupe_BAO_RuleGroup();
     $rgBao->id = $rgid;
     $rgBao->contactIds = $cids;
     if (!$rgBao->find(TRUE)) {
       CRM_Core_Error::fatal("Dedupe rule not found for selected contacts");
-    }
-    if (empty($rgBao->contactIds) && !empty($searchLimit)) {
-      $limitedContacts = civicrm_api3('Contact', 'get', [
-        'return' => 'id',
-        'contact_type' => $rgBao->contact_type,
-        'options' => ['limit' => $searchLimit],
-      ]);
-      $rgBao->contactIds = array_keys($limitedContacts['values']);
     }
 
     $rgBao->fillTable();
