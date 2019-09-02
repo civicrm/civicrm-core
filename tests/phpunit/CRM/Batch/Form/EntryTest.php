@@ -289,7 +289,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       'field' => [
         1 => [
           'membership_type' => [0 => $this->_orgContactID, 1 => $this->_membershipTypeID],
-          'join_date' => '2013-07-22',
+          'membership_join_date' => '2013-07-22',
           'membership_start_date' => NULL,
           'membership_end_date' => NULL,
           'membership_source' => NULL,
@@ -304,7 +304,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
         ],
         2 => [
           'membership_type' => [0 => $this->_orgContactID, 1 => $this->_membershipTypeID],
-          'join_date' => '2013-07-03',
+          'membership_join_date' => '2013-07-03',
           'membership_start_date' => '2013-02-03',
           'membership_end_date' => NULL,
           'membership_source' => NULL,
@@ -320,7 +320,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
         // no join date, coded end date
         3 => [
           'membership_type' => [0 => $this->_orgContactID, 1 => $this->_membershipTypeID],
-          'join_date' => NULL,
+          'membership_join_date' => NULL,
           'membership_start_date' => NULL,
           'membership_end_date' => '2013-12-01',
           'membership_source' => NULL,

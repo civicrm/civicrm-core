@@ -311,7 +311,7 @@ class CRM_Report_Form_Member_ContributionDetail extends CRM_Report_Form {
           'source' => ['title' => ts('Membership Source')],
         ],
         'filters' => [
-          'join_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
+          'membership_join_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'membership_start_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'membership_end_date' => ['operatorType' => CRM_Report_Form::OP_DATE],
           'owner_membership_id' => [
