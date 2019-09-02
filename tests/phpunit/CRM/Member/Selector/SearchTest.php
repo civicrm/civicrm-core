@@ -54,7 +54,7 @@ class CRM_Member_Selector_SearchTest extends CiviUnitTestCase {
       'contact_type' => '<a href="/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=' . $this->_contactID . '&amp;snippet=4" class="crm-summary-link"><div class="icon crm-icon Individual-icon"></div></a>',
       'sort_name' => 'Anderson, Anthony',
       'membership_type' => 'General',
-      'join_date' => date('Y-m-d'),
+      'membership_join_date' => date('Y-m-d'),
       'membership_start_date' => date('Y-m-d'),
       'membership_end_date' => $membership['end_date'],
       'membership_source' => 'Payment',
