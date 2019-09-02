@@ -254,7 +254,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
       'start_date' => '2010-12-20',
       'end_date' => '',
       'membership_end_date' => '0',
-      'join_date' => '2010-12-20',
+      'membership_join_date' => '2010-12-20',
       'membership_start_date' => '2010-12-20',
     ];
     $fields = civicrm_api3('Membership', 'getfields', ['action' => 'get']);
@@ -262,7 +262,7 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
     $this->assertEquals('2010-12-20', $params['start_date']);
     $this->assertEquals('20101220000000', $params['membership_start_date']);
     $this->assertEquals('', $params['end_date']);
-    $this->assertEquals('20101220000000', $params['join_date'], 'join_date not set in line ' . __LINE__);
+    $this->assertEquals('20101220000000', $params['membership_join_date'], 'join_date not set in line ' . __LINE__);
   }
 
   public function test_civicrm_api3_validate_fields_event() {
@@ -283,14 +283,14 @@ class api_v3_UtilsTest extends CiviUnitTestCase {
 
   public function test_civicrm_api3_validate_fields_exception() {
     $params = [
-      'join_date' => 'abc',
+      'membership_join_date' => 'abc',
     ];
     try {
       $fields = civicrm_api3('Membership', 'getfields', ['action' => 'get']);
       _civicrm_api3_validate_fields('Membership', 'get', $params, $fields['values']);
     }
     catch (Exception$expected) {
-      $this->assertEquals('join_date is not a valid date: abc', $expected->getMessage());
+      $this->assertEquals('membership_join_date is not a valid date: abc', $expected->getMessage());
     }
   }
 

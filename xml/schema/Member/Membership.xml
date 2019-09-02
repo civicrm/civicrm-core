@@ -84,6 +84,7 @@
       <type>Select Date</type>
       <formatType>activityDate</formatType>
     </html>
+    <uniqueName>membership_join_date</uniqueName>
   </field>
   <field>
     <name>start_date</name>

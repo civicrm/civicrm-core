@@ -67,9 +67,9 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
       }
 
       //add join date
-      if (!empty($query->_returnProperties['join_date'])) {
-        $query->_select['join_date'] = "civicrm_membership.join_date as join_date";
-        $query->_element['join_date'] = 1;
+      if (!empty($query->_returnProperties['membership_join_date'])) {
+        $query->_select['membership_join_date'] = "civicrm_membership.join_date as membership_join_date";
+        $query->_element['membership_join_date'] = 1;
       }
 
       //add source
@@ -443,7 +443,7 @@ class CRM_Member_BAO_Query extends CRM_Core_BAO_Query {
         'membership_type' => 1,
         'member_is_test' => 1,
         'member_is_pay_later' => 1,
-        'join_date' => 1,
+        'membership_join_date' => 1,
         'membership_start_date' => 1,
         'membership_end_date' => 1,
         'membership_source' => 1,

@@ -95,6 +95,7 @@ class CRM_Upgrade_Incremental_php_FiveEighteen extends CRM_Upgrade_Incremental_B
         'pledge_start_date',
       ],
     ]);
+    $this->addTask('Update civicrm_mapping_field and civicrm_uf_field for change in join_date name', 'updateJoinDateMappingUF');
   }
 
   public static function removeDomainIDFK() {
@@ -110,6 +111,12 @@ class CRM_Upgrade_Incremental_php_FiveEighteen extends CRM_Upgrade_Incremental_B
       'fk_attributes' => ' ON DELETE CASCADE',
     ], "\n", " ADD ", 'civicrm_dashboard');
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_dashboard " . $sql, [], TRUE, NULL, FALSE, FALSE);
+    return TRUE;
+  }
+
+  public static function updateJoinDateMappingUF() {
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_mapping_field SET name = 'membership_join_date' WHERE name = 'join_date' AND contact_type = 'Membership'");
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_uf_field SET field_name = 'membership_join_date' WHERE field_name = 'join_date' AND field_type = 'Membership'");
     return TRUE;
   }
 
