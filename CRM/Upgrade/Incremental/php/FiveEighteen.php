@@ -82,6 +82,19 @@ class CRM_Upgrade_Incremental_php_FiveEighteen extends CRM_Upgrade_Incremental_B
     $this->addTask('Remove Foreign Key from civicrm_dashboard on domain_id if exists', 'removeDomainIDFK');
     $this->addTask('Remove Index on domain_id that might have been randomly added in the same format as FK', 'dropIndex', 'civicrm_dashboard', 'FK_civicrm_dashboard_domain_id');
     $this->addTask('Re-Create Foreign key between civicrm_dashboard and civicrm_domain correctly', 'recreateDashboardFK');
+    $this->addTask('Update smart groups to rename filters on pledge_payment_date to pledge_payment_scheduled_date', 'updateSmartGroups', [
+      'renameField' => [
+        ['old' => 'pledge_payment_date', 'new' => 'pledge_payment_scheduled_date'],
+      ],
+    ]);
+    $this->addTask('Update smart groups where jcalendar fields have been converted to datepicker', 'updateSmartGroups', [
+      'datepickerConversion' => [
+        'pledge_payment_scheduled_date',
+        'pledge_create_date',
+        'pledge_end_date',
+        'pledge_start_date',
+      ],
+    ]);
   }
 
   public static function removeDomainIDFK() {
