@@ -464,6 +464,32 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test importing 2 phones of different types.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testImportTwoPhonesDifferentTypes() {
+    $processor = new CRM_Import_ImportProcessor();
+    $processor->setContactType('Individual');
+    $processor->setMappingFields(
+      [
+        ['name' => 'first_name'],
+        ['name' => 'last_name'],
+        ['name' => 'email'],
+        ['name' => 'phone', 'location_type_id' => 1, 'phone_type_id' => 2],
+        ['name' => 'phone', 'location_type_id' => 1, 'phone_type_id' => 1],
+      ]
+    );
+    $importer = $processor->getImporterObject();
+    $fields = ['First Name', 'new last name', 'bob@example.com', '1234', '5678'];
+    $importer->import(CRM_Import_Parser::DUPLICATE_UPDATE, $fields);
+    $contact = $this->callAPISuccessGetSingle('Contact', ['last_name' => 'new last name']);
+    $phones = $this->callAPISuccess('Phone', 'get', ['contact_id' => $contact['id']])['values'];
+    $this->assertCount(2, $phones);
+  }
+
+  /**
    * Test that the import parser adds the address to the primary location.
    *
    * @throws \Exception

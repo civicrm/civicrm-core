@@ -170,6 +170,8 @@ class CRM_Import_ImportProcessor {
   }
 
   /**
+   * Get the contact type for the import.
+   *
    * @return string
    */
   public function getContactType(): string {
@@ -212,9 +214,27 @@ class CRM_Import_ImportProcessor {
   }
 
   /**
+   * Set mapping fields.
+   *
+   * We do a little cleanup here too.
+   *
+   * We ensure that column numbers are set and that the fields are ordered by them.
+   *
+   * This would mean the fields could be loaded unsorted.
+   *
    * @param array $mappingFields
    */
   public function setMappingFields(array $mappingFields) {
+    $i = 0;
+    foreach ($mappingFields as &$mappingField) {
+      if (!isset($mappingField['column_number'])) {
+        $mappingField['column_number'] = $i;
+      }
+      if ($mappingField['column_number'] > $i) {
+        $i = $mappingField['column_number'];
+      }
+      $i++;
+    }
     $this->mappingFields = $this->rekeyBySortedColumnNumbers($mappingFields);
   }
 
