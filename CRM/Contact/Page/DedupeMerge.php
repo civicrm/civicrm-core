@@ -70,7 +70,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
     ];
 
     $criteria = json_decode($criteria, TRUE);
-    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria);
+    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, TRUE, $limit);
 
     if ($mode == 'aggressive' && !CRM_Core_Permission::check('force merge duplicate contacts')) {
       CRM_Core_Session::setStatus(ts('You do not have permission to force merge duplicate contact records'), ts('Permission Denied'), 'error');
@@ -98,7 +98,7 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
     for ($i = 1; $i <= ceil($total / self::BATCHLIMIT); $i++) {
       $task = new CRM_Queue_Task(
         ['CRM_Contact_Page_DedupeMerge', 'callBatchMerge'],
-        [$rgid, $gid, $mode, self::BATCHLIMIT, $onlyProcessSelected, $criteria],
+        [$rgid, $gid, $mode, self::BATCHLIMIT, $onlyProcessSelected, $criteria, $limit],
         "Processed " . $i * self::BATCHLIMIT . " pair of duplicates out of " . $total
       );
 
@@ -132,11 +132,15 @@ class CRM_Contact_Page_DedupeMerge extends CRM_Core_Page {
    * @param int $batchLimit
    * @param int $isSelected
    * @param array $criteria
+   * @param int $searchLimit
    *
    * @return int
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function callBatchMerge(CRM_Queue_TaskContext $ctx, $rgid, $gid, $mode = 'safe', $batchLimit, $isSelected, $criteria) {
-    CRM_Dedupe_Merger::batchMerge($rgid, $gid, $mode, $batchLimit, $isSelected, $criteria, TRUE, FALSE);
+  public static function callBatchMerge(CRM_Queue_TaskContext $ctx, $rgid, $gid, $mode = 'safe', $batchLimit, $isSelected, $criteria, $searchLimit) {
+    CRM_Dedupe_Merger::batchMerge($rgid, $gid, $mode, $batchLimit, $isSelected, $criteria, TRUE, FALSE, $searchLimit);
     return CRM_Queue_Task::TASK_SUCCESS;
   }
 
