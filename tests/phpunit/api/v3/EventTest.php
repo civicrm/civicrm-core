@@ -945,7 +945,7 @@ class api_v3_EventTest extends CiviUnitTestCase {
     ]);
     $eventResult = $this->callAPISuccess('Event', 'getsingle', ['id' => $eventResult['id']]);
     foreach ($templateParams as $param => $value) {
-      $this->assertEquals($value, $eventResult[$param]);
+      $this->assertEquals($value, $eventResult[$param], print_r($eventResult, 1));
     }
   }
 
