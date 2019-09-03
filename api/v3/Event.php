@@ -40,6 +40,8 @@
  *
  * @return array
  *   API result Array.
+ * @throws \CRM_Core_Exception
+ * @throws \API_Exception
  */
 function civicrm_api3_event_create($params) {
   // Required fields for creating an event

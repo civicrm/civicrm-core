@@ -954,6 +954,7 @@ WHERE civicrm_event.is_active = 1
 
     $blockCopyOfCustomValue = (!empty($params['custom']));
 
+    /** @var \CRM_Event_DAO_Event $copyEvent */
     $copyEvent = CRM_Core_DAO::copyGeneric('CRM_Event_DAO_Event',
       ['id' => $id],
       // since the location is sharable, lets use the same loc_block_id.
