@@ -95,6 +95,8 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     }
 
     if ($this->_force) {
+      $this->addSearchFieldMetadata(['Membership' => CRM_Member_BAO_Query::getSearchFieldMetadata()]);
+      $this->addFormFieldsFromMetadata();
       $this->postProcess();
       $this->set('force', 0);
     }
@@ -227,8 +229,7 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
     }
 
     $this->_done = TRUE;
-
-    $this->_formValues = $this->controller->exportValues($this->_name);
+    $this->setFormValues();
 
     $this->fixFormValues();
 
@@ -290,17 +291,6 @@ class CRM_Member_Form_Search extends CRM_Core_Form_Search {
 
     $query = &$selector->getQuery();
     $controller->run();
-  }
-
-  /**
-   * Set default values.
-   *
-   * @todo - can this function override be removed?
-   *
-   * @return array
-   */
-  public function setDefaultValues() {
-    return $this->_defaults;
   }
 
   /**

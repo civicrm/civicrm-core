@@ -595,7 +595,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
             implode(",", $this->_params['status_id_value']);
         }
         $url = CRM_Report_Utils_Report::getNextUrl('member/detail',
-          "reset=1&force=1&join_date_from={$dateStart}&join_date_to={$dateEnd}{$typeUrl}{$statusUrl}",
+          "reset=1&force=1&membership_join_date_from={$dateStart}&membership_join_date_to={$dateEnd}{$typeUrl}{$statusUrl}",
           $this->_absoluteUrl, $this->_id, $this->_drilldownReport
         );
         $row['civicrm_membership_join_date_start'] = CRM_Utils_Date::format($row['civicrm_membership_join_date_start']);
