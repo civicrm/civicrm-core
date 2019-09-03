@@ -2407,7 +2407,11 @@ WHERE      civicrm_membership.is_test = 0
 
     if ($onlyLifeTime) {
       $dao->whereAdd('end_date IS NULL');
+      // Membership#14 - a canceled membership that was only ever pending can have no end date, but will also have no join date.
+      $dao->whereAdd('join_date IS NOT NULL');
     }
+    //CRM-4297
+    $dao->orderBy('end_date DESC');
 
     $dao->find();
     while ($dao->fetch()) {

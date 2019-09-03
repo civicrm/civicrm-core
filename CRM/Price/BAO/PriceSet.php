@@ -1095,6 +1095,7 @@ WHERE  id = %1";
 
   /**
    * Check the current Membership having end date null.
+   * FIXME: This function isn't buggy but should be consolidated with other functions that check for lifetime memberships.
    *
    * @param array $options
    * @param int $userid

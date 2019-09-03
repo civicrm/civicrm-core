@@ -1196,6 +1196,7 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
             }
           }
         }
+        $currentMemberships = CRM_Member_BAO_Membership::getAllContactMembership($cid, $isTest);
         foreach ($membershipTypeIds as $value) {
           $memType = $membershipTypeValues[$value];
           if ($selectedMembershipTypeID != NULL) {
@@ -1234,30 +1235,16 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
               $memType['id'], $javascriptMethod
             );
             if ($cid) {
-              $membership = new CRM_Member_DAO_Membership();
-              $membership->contact_id = $cid;
-              $membership->membership_type_id = $memType['id'];
-
-              //show current membership, skip pending and cancelled membership records,
-              //because we take first membership record id for renewal
-              $membership->whereAdd('status_id != 5 AND status_id !=6');
-
-              if (!is_null($isTest)) {
-                $membership->is_test = $isTest;
-              }
-
-              //CRM-4297
-              $membership->orderBy('end_date DESC');
-
-              if ($membership->find(TRUE)) {
-                if (!$membership->end_date) {
+              if (isset($currentMemberships[$memType['id']])) {
+                $membership = $currentMemberships[$memType['id']];
+                if ($membership['join_date'] && !$membership['end_date']) {
                   unset($radio[$memType['id']]);
                   $this->assign('islifetime', TRUE);
                   continue;
                 }
                 $this->assign('renewal_mode', TRUE);
-                $this->_currentMemberships[$membership->membership_type_id] = $membership->membership_type_id;
-                $memType['current_membership'] = $membership->end_date;
+                $this->_currentMemberships[$membership['membership_type_id']] = $membership['membership_type_id'];
+                $memType['current_membership'] = $membership['end_date'];
                 if (!$endDate) {
                   $endDate = $memType['current_membership'];
                   $this->_defaultMemTypeId = $memType['id'];
