@@ -457,6 +457,13 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
       'relation_start_date_relative',
       'relation_end_date_relative',
       'relation_action_date_relative',
+      'contribution_recur_start_date_relative',
+      'contribution_recur_next_sched_contribution_date_relative',
+      'contribution_recur_cancel_date_relative',
+      'contribution_recur_end_date_relative',
+      'contribution_recur_create_date_relative',
+      'contribution_recur_modified_date_relative',
+      'contribution_recur_failure_retry_date_relative',
     ];
     foreach ($formValues as $id => $value) {
       if (in_array($id, $specialDateFields) && !empty($value)) {
