@@ -612,7 +612,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
           $this->_ssID = $ssId;
         }
       }
-      // set the uf group id if not already present
+      // set the uf group id for smart group search default profile view.
       if (isset($this->_ufGroupID)) {
         $this->_formValues['uf_group_id'] = $this->_ufGroupID;
       }
