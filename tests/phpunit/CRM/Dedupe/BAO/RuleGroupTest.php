@@ -68,6 +68,7 @@ class CRM_Dedupe_BAO_RuleGroupTest extends CiviUnitTestCase {
           'sic_code' => 'Sic Code',
           'user_unique_id' => 'Unique ID (OpenID)',
           'sort_name' => 'Sort Name',
+          'communication_style_id' => 'Communication Style',
         ],
       'civicrm_email' =>
         [

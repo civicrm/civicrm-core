@@ -496,6 +496,8 @@
       <optionGroupName>communication_style</optionGroupName>
     </pseudoconstant>
     <export>true</export>
+    <import>true</import>
+    <headerPattern>/style/i</headerPattern>
     <comment>Communication style (e.g. formal vs. familiar) to use with this contact. FK to communication styles in civicrm_option_value.</comment>
     <add>4.4</add>
     <html>
