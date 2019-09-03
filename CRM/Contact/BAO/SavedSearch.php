@@ -437,9 +437,36 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     // This is required only until all fields are converted to datepicker fields as the new format is truer to the
     // form format and simply saves (e.g) custom_3_relative => "this.year"
     $relativeDates = ['relative_dates' => []];
-    $specialDateFields = ['event_relative', 'case_from_relative', 'case_to_relative', 'participant_relative'];
+    $specialDateFields = [
+      'event_relative',
+      'case_from_relative',
+      'case_to_relative',
+      'participant_relative',
+      'log_date_relative',
+      'pledge_payment_date_relative',
+      'pledge_start_date_relative',
+      'pledge_end_date_relative',
+      'pledge_create_date_relative',
+      'member_join_date_relative',
+      'member_start_date_relative',
+      'member_end_date_relative',
+      'birth_date_relative',
+      'deceased_date_relative',
+      'mailing_date_relative',
+      'relation_date_relative',
+      'relation_start_date_relative',
+      'relation_end_date_relative',
+      'relation_action_date_relative',
+      'contribution_recur_start_date_relative',
+      'contribution_recur_next_sched_contribution_date_relative',
+      'contribution_recur_cancel_date_relative',
+      'contribution_recur_end_date_relative',
+      'contribution_recur_create_date_relative',
+      'contribution_recur_modified_date_relative',
+      'contribution_recur_failure_retry_date_relative',
+    ];
     foreach ($formValues as $id => $value) {
-      if ((preg_match('/_date$/', $id) || in_array($id, $specialDateFields)) && !empty($value)) {
+      if (in_array($id, $specialDateFields) && !empty($value)) {
         $entityName = strstr($id, '_date', TRUE);
         if (empty($entityName)) {
           $entityName = strstr($id, '_relative', TRUE);
