@@ -156,7 +156,7 @@ function _civicrm_api3_dedupe_getstatistics_spec(&$params) {
  */
 function civicrm_api3_dedupe_getduplicates($params) {
   $options = _civicrm_api3_get_options_from_params($params);
-  $dupePairs = CRM_Dedupe_Merger::getDuplicatePairs($params['rule_group_id'], NULL, TRUE, $options['limit'], FALSE, TRUE, $params['criteria'], CRM_Utils_Array::value('check_permissions', $params), CRM_Utils_Array::value('search_limit', $params, 0));
+  $dupePairs = CRM_Dedupe_Merger::getDuplicatePairs($params['rule_group_id'], NULL, TRUE, $options['limit'], FALSE, TRUE, $params['criteria'], CRM_Utils_Array::value('check_permissions', $params), CRM_Utils_Array::value('search_limit', $params, 0), CRM_Utils_Array::value('is_force_new_search', $params));
   return civicrm_api3_create_success($dupePairs);
 }
 
@@ -183,6 +183,10 @@ function _civicrm_api3_dedupe_getduplicates_spec(&$params) {
     'title' => ts('Number of contacts to look for matches for.'),
     'type' => CRM_Utils_Type::T_INT,
     'api.default' => (int) Civi::settings()->get('dedupe_default_limit'),
+  ];
+  $spec['is_force_new_search'] = [
+    'title' => ts('Force a new search, refreshing any cached search'),
+    'type' => CRM_Utils_Type::T_BOOLEAN,
   ];
 
 }

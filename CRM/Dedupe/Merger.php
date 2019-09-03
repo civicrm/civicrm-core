@@ -1841,14 +1841,17 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    * @param int $searchLimit
    *   Limit to searching for matches against this many contacts.
    *
+   * @param int $isForceNewSearch
+   *   Should a new search be forced, bypassing any cache retrieval.
+   *
    * @return array
    *   Array of matches meeting the criteria.
    *
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $includeConflicts = TRUE, $criteria = [], $checkPermissions = TRUE, $searchLimit = 0) {
-    $dupePairs = self::getCachedDuplicateMatches($rule_group_id, $group_id, $batchLimit, $isSelected, $includeConflicts, $criteria, $checkPermissions, $searchLimit);
+  public static function getDuplicatePairs($rule_group_id, $group_id, $reloadCacheIfEmpty, $batchLimit, $isSelected, $includeConflicts = TRUE, $criteria = [], $checkPermissions = TRUE, $searchLimit = 0, $isForceNewSearch = 0) {
+    $dupePairs = $isForceNewSearch ? [] : self::getCachedDuplicateMatches($rule_group_id, $group_id, $batchLimit, $isSelected, $includeConflicts, $criteria, $checkPermissions, $searchLimit);
     if (empty($dupePairs) && $reloadCacheIfEmpty) {
       // If we haven't found any dupes, probably cache is empty.
       // Try filling cache and give another try. We don't need to specify include conflicts here are there will not be any
