@@ -513,6 +513,12 @@ class CRM_Import_ImportProcessor {
    * @throws \CiviCRM_API3_Exception
    */
   public function getSavedQuickformDefaultsForColumn($column) {
+    if ($this->getValidRelationshipKey($column)) {
+      if ($this->getWebsiteTypeID($column)) {
+        return [$this->getValidRelationshipKey($column), $this->getFieldName($column), $this->getWebsiteTypeID($column)];
+      }
+      return [$this->getValidRelationshipKey($column), $this->getFieldName($column), $this->getLocationTypeID($column), $this->getPhoneOrIMTypeID($column)];
+    }
     if ($this->getWebsiteTypeID($column)) {
       return [$this->getFieldName($column), $this->getWebsiteTypeID($column)];
     }

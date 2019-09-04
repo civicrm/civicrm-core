@@ -400,6 +400,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $processor->setFormName($formName);
     $processor->setMetadata($this->getContactImportMetadata());
     $processor->setContactTypeByConstant($this->get('contactType'));
+    $processor->setContactSubType($this->get('contactSubType'));
 
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
@@ -863,37 +864,15 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       if ($mappingName[$i] != ts('- do not import -')) {
 
         if ($processor->getRelationshipKey($i)) {
-          $contactType = $processor->getContactType();
-          //CRM-5125
-          $contactSubType = NULL;
-          if ($this->get('contactSubType')) {
-            $contactSubType = $this->get('contactSubType');
-          }
-
-          $relations = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $contactType,
-            FALSE, 'label', TRUE, $contactSubType
-          );
-
-          foreach ($relations as $key => $var) {
-            if ($processor->getValidRelationshipKey($i)) {
-              $relation = $processor->getValidRelationshipKey($i);
-              break;
-            }
-          }
 
           $contactDetails = strtolower(str_replace(" ", "_", $mappingName[$i]));
           $websiteTypeId = $processor->getWebsiteTypeID($i);
           $locationId = $processor->getLocationTypeID($i);
           $phoneType = $processor->getPhoneTypeID($i);
           $imProvider = $processor->getIMProviderID($i);
-          $typeId = $processor->getPhoneOrIMTypeID($i);
 
-          if ($websiteTypeId) {
-            $defaults["mapper[$i]"] = [$relation, $contactDetails, $websiteTypeId];
-          }
-          else {
-
-            $defaults["mapper[$i]"] = [$relation, $contactDetails, $locationId, $typeId];
+          $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
+          if (!$websiteTypeId) {
             if (!$locationId) {
               $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
             }
