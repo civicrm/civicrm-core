@@ -864,23 +864,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       if ($mappingName[$i] != ts('- do not import -')) {
 
         if ($processor->getRelationshipKey($i)) {
-          $contactType = $processor->getContactType();
-          //CRM-5125
-          $contactSubType = NULL;
-          if ($this->get('contactSubType')) {
-            $contactSubType = $this->get('contactSubType');
-          }
-
-          $relations = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, $contactType,
-            FALSE, 'label', TRUE, $contactSubType
-          );
-
-          foreach ($relations as $key => $var) {
-            if ($processor->getValidRelationshipKey($i)) {
-              $relation = $processor->getValidRelationshipKey($i);
-              break;
-            }
-          }
 
           $contactDetails = strtolower(str_replace(" ", "_", $mappingName[$i]));
           $websiteTypeId = $processor->getWebsiteTypeID($i);
