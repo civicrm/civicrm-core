@@ -310,10 +310,14 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
       ],
       [
         // Yes, the relationship mapping really does use url whereas non relationship uses website because... legacy
-        ['name' => 'Url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id', 'relationship_type_id' => 1, 'relationship_direction' => 'a_b'],
-        "document.forms.MapField['mapper[0][2]'].style.display = 'none';
-document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
-        ['mapper[0]' => ['1_a_b', 'url', 0, NULL]],
+        ['name' => 'Url', 'contact_type' => 'Individual', 'column_number' => 0, 'website_type_id' => 1, 'relationship_type_id' => 1, 'relationship_direction' => 'a_b'],
+        "document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        ['mapper[0]' => ['1_a_b', 'url', 1]],
+      ],
+      [
+        ['name' => 'Phone', 'contact_type' => 'Individual', 'column_number' => 0, 'phone_type_id' => 1, 'relationship_type_id' => 1, 'relationship_direction' => 'b_a'],
+        '',
+        ['mapper[0]' => ['1_b_a', 'phone', 'Primary', 1]],
       ],
     ];
   }
