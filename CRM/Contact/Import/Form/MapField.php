@@ -886,14 +886,9 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           $locationId = $processor->getLocationTypeID($i);
           $phoneType = $processor->getPhoneTypeID($i);
           $imProvider = $processor->getIMProviderID($i);
-          $typeId = $processor->getPhoneOrIMTypeID($i);
 
-          if ($websiteTypeId) {
-            $defaults["mapper[$i]"] = [$relation, $contactDetails, $websiteTypeId];
-          }
-          else {
-
-            $defaults["mapper[$i]"] = [$relation, $contactDetails, $locationId, $typeId];
+          $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
+          if (!$websiteTypeId) {
             if (!$locationId) {
               $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
             }
