@@ -504,4 +504,19 @@ class CRM_Import_ImportProcessor {
     return implode("\n", $jsClauses) . "\n";
   }
 
+  /**
+   * Get the defaults for the column from the saved mapping.
+   *
+   * @param int $column
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getSavedQuickformDefaultsForColumn($column) {
+    if ($this->getWebsiteTypeID($column)) {
+      return [$this->getFieldName($column), $this->getWebsiteTypeID($column)];
+    }
+    return [(string) $this->getFieldName($column), $this->getLocationTypeID($column), $this->getPhoneOrIMTypeID($column)];
+  }
+
 }

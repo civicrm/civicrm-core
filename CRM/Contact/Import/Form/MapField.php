@@ -914,19 +914,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           $jsSet = TRUE;
         }
         else {
-          $mappingHeader = $processor->getFieldName($i);
-          $websiteTypeId = $processor->getWebsiteTypeID($i);
-          $locationId = $processor->getLocationTypeID($i);
-          $typeId = $processor->getPhoneOrIMTypeID($i);
-
-          if ($websiteTypeId) {
-            $defaults["mapper[$i]"] = [$mappingHeader, $websiteTypeId];
-          }
-          else {
-            //default for IM/phone without related contact
-            $defaults["mapper[$i]"] = [$mappingHeader ?? '', $locationId, $typeId];
-          }
-
+          $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
           $js .= $processor->getQuickFormJSForField($i);
 
           $jsSet = TRUE;
