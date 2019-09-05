@@ -852,13 +852,12 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function loadSavedMapping($processor, $mappingName, $i, $defaults, $js, $hasColumnNames) {
     $formName = $processor->getFormName();
-    if (isset($mappingName[$i])) {
+    if ($processor->getFieldName($i)) {
+      $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
       if ($mappingName[$i] != ts('- do not import -')) {
-        $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
         $js .= $processor->getQuickFormJSForField($i);
       }
       else {
-        $defaults["mapper[$i]"] = [];
         for ($k = 1; $k < 4; $k++) {
           $js .= "{$formName}['mapper[$i][$k]'].style.display = 'none';\n";
         }
