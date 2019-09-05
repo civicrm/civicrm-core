@@ -123,6 +123,8 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
         'mailing_job_start_date',
         'relationship_start_date',
         'relationship_end_date',
+        'event_start_date',
+        'event_end_date',
       ],
     ]);
   }

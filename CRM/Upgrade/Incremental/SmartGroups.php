@@ -73,6 +73,7 @@ class CRM_Upgrade_Incremental_SmartGroups {
       'mailing_job_start_date' => 'mailing_date',
       'relationship_start_date' => 'relation_start',
       'relationship_end_date' => 'relation_end',
+      'event_start_date' => 'event',
     ];
 
     foreach ($fields as $field) {

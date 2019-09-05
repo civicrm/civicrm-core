@@ -627,8 +627,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
        $obj->getPriceLevels(),
        FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -')]
     );
-
-    CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
+    $form->addDatePickerRange('event', ts('Event Dates'), FALSE, FALSE, 'From', 'To', 'event_start_date_low', 'event_end_date_high');
 
     $form->addElement('hidden', 'event_date_range_error');
     $form->addFormRule(['CRM_Event_BAO_Query', 'formRule'], $form);

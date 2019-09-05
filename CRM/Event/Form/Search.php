@@ -103,8 +103,8 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     $this->_done = FALSE;
 
     $this->loadStandardSearchOptionsFromUrl();
-    $this->loadFormValues();
-
+    $this->setFormValues();
+    $this->loadEventDatesFromUrl();
     if ($this->_force) {
       $this->postProcess();
       $this->set('force', 0);
@@ -315,6 +315,12 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
 
     $this->_queryParams = CRM_Contact_BAO_Query::convertFormValues($this->_formValues, 0, FALSE, NULL, ['event_id']);
 
+    // If we have a relative date then we don't need to store the low and high fields in the database
+    if (!empty($this->_formValues['event_relative'])) {
+      unset($this->_formValues['event_start_date_low']);
+      unset($this->_formValues['event_end_date_high']);
+    }
+
     $this->set('formValues', $this->_formValues);
     $this->set('queryParams', $this->_queryParams);
 
@@ -403,9 +409,8 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
     }
 
     if (empty($formValues)) {
-      $formValues = $this->controller->exportValues($this->_name);
+      $formValues = $this->_formValues;
     }
-
     $this->submit($formValues);
   }
 
@@ -494,6 +499,27 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    */
   public function getTitle() {
     return ts('Find Participants');
+  }
+
+  public function loadEventDatesFromUrl() {
+    $defaults = $this->_formValues;
+    if (empty($defaults['event_relative']) || (empty($defaults['event_start_date_low']) && empty($defaults['event_end_date_high']))) {
+      $low = CRM_Utils_Request::retrieveValue('event_start_date_low', 'Timestamp', NULL, NULL, 'GET');
+      $high = CRM_Utils_Request::retrieveValue('event_end_date_high', 'Timestamp', NULL, NULL, 'GET');
+      if ($low !== NULL || $high !== NULL) {
+        $defaults['event_relative'] = 0;
+        $defaults['event_start_date_low'] = $low ? date('Y-m-d H:i:s', strtotime($low)) : NULL;
+        $defaults['event_end_date_high'] = $high ? date('Y-m-d H:i:s', strtotime($high)) : NULL;
+      }
+      else {
+        $relative = CRM_Utils_Request::retrieveValue('event_relative', 'String', NULL, NULL, 'GET');
+        if (!empty($relative) && isset(CRM_Core_OptionGroup::values('relative_date_filters')[$relative])) {
+          $defaults['event_relative'] = $relative;
+        }
+      }
+    }
+    $this->_formValues = $defaults;
+    $this->_defaults = $defaults;
   }
 
 }

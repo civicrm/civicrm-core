@@ -1608,27 +1608,21 @@ class CRM_Contact_BAO_Query {
       'mailing_job_start_date_relative',
       'birth_date_relative',
       'deceased_date_relative',
+      'event_relative',
     ];
     // Handle relative dates first
     foreach (array_keys($formValues) as $id) {
-      if (
-        !in_array($id, $nonLegacyDateFields) && (
-        preg_match('/_date_relative$/', $id) ||
-        $id == 'event_relative')
-      ) {
-        if ($id == 'event_relative') {
-          $fromRange = 'event_start_date_low';
-          $toRange = 'event_end_date_high';
-        }
-        else {
-          $dateComponent = explode('_date_relative', $id);
-          $fromRange = "{$dateComponent[0]}_date_low";
-          $toRange = "{$dateComponent[0]}_date_high";
-        }
+      if (!in_array($id, $nonLegacyDateFields) && preg_match('/_date_relative$/', $id)) {
+        $dateComponent = explode('_date_relative', $id);
+        $fromRange = "{$dateComponent[0]}_date_low";
+        $toRange = "{$dateComponent[0]}_date_high";
 
         if (array_key_exists($fromRange, $formValues) && array_key_exists($toRange, $formValues)) {
           CRM_Contact_BAO_Query::fixDateValues($formValues[$id], $formValues[$fromRange], $formValues[$toRange]);
         }
+      }
+      if ($id === 'event_relative') {
+        list($formValues['event_start_date_low'], $formValues['event_end_date_high']) = CRM_Utils_Date::getFromTo($formValues['event_relative'], NULL, NULL);
       }
     }
 
@@ -1808,6 +1802,12 @@ class CRM_Contact_BAO_Query {
       (!empty($values) && is_array($values) && !in_array(key($values), CRM_Core_DAO::acceptedSQLOperators(), TRUE))
     ) {
       $result = [$id, 'IN', $values, 0, $wildcard];
+    }
+    elseif (strpos($id, '_high')) {
+      $result = [$id, '<=', $values, 0, $wildcard];
+    }
+    elseif (strpos($id, '_low')) {
+      $result = [$id, '>=', $values, 0, $wildcard];
     }
     else {
       $result = [$id, '=', $values, 0, $wildcard];
