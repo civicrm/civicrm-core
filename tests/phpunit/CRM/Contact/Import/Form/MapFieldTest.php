@@ -323,6 +323,37 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
   }
 
   /**
+   * Test the MapField function getting defaults from column names.
+   *
+   * @dataProvider getHeaderMatchDataProvider
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
+   */
+  public function testDefaultFromColumnNames($columnHeader, $mapsTo) {
+    $this->setUpMapFieldForm();
+    $this->assertEquals($mapsTo, $this->form->defaultFromColumnName($columnHeader, $this->getHeaderPatterns()));
+  }
+
+  /**
+   * Get data to use for default from column names.
+   *
+   * @return array
+   */
+  public function getHeaderMatchDataProvider() {
+    return [
+      ['Contact Id', 'id'],
+      ['Contact ID', 'id'],
+      ['contact id', 'id'],
+      ['contact_id', 'id'],
+      // Yes, really... id wins the day here.
+      ['external id', 'id'],
+      ['external ident', 'external_identifier'],
+      ['external idg', 'external_identifier'],
+    ];
+  }
+
+  /**
    * Wrapper for loadSavedMapping.
    *
    * This signature of the function we are calling is funky as a new extraction & will be refined.

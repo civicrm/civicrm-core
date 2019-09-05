@@ -578,6 +578,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    * @return array
    */
   public function getColumnPatterns() {
+    CRM_Core_Error::deprecatedFunctionWarning('no  longer used- use   CRM_Contact_Import_MetadataTrait');
     $values = [];
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_columnPattern;
@@ -616,7 +617,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     $store->set('fields', $this->getSelectValues());
     $store->set('fieldTypes', $this->getSelectTypes());
 
-    $store->set('columnPatterns', $this->getColumnPatterns());
     $store->set('dataPatterns', $this->getDataPatterns());
     $store->set('columnCount', $this->_activeFieldCount);
 
