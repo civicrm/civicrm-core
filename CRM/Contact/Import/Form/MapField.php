@@ -63,11 +63,10 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * FIXME: This is essentially the same function as parent::defaultFromHeader
    *
    * @param string $columnName name of column header
-   * @param array $patterns pattern to match for the column
    *
    * @return string
    */
-  public function defaultFromColumnName($columnName, $patterns) {
+  public function defaultFromColumnName($columnName) {
 
     if (!preg_match('/^[a-z0-9 ]$/i', $columnName)) {
       if ($columnKey = array_search($columnName, $this->getFieldTitles())) {
@@ -76,7 +75,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
 
-    foreach ($patterns as $key => $re) {
+    foreach ($this->getHeaderPatterns() as $key => $re) {
       // Skip empty key/patterns
       if (!$key || !$re || strlen("$re") < 5) {
         continue;
@@ -240,7 +239,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $defaults = [];
     $mapperKeys = array_keys($this->_mapperFields);
     $hasColumnNames = !empty($this->_columnNames);
-    $columnPatterns = $this->get('columnPatterns');
     $dataPatterns = $this->get('dataPatterns');
     $hasLocationTypes = $this->get('fieldTypes');
 
@@ -406,13 +404,13 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
 
       if ($this->get('savedMapping')) {
-        list($defaults, $js) = $this->loadSavedMapping($processor, $mappingName, $i, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
+        list($defaults, $js) = $this->loadSavedMapping($processor, $mappingName, $i, $defaults, $js, $hasColumnNames, $dataPatterns);
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
         if ($hasColumnNames) {
           // do array search first to see if has mapped key
-          $columnKey = array_search($this->_columnNames[$i], $this->_mapperFields);
+          $columnKey = array_search($this->_columnNames[$i], $this->getFieldTitles());
           if (isset($this->_fieldUsed[$columnKey])) {
             $defaults["mapper[$i]"] = $columnKey;
             $this->_fieldUsed[$key] = TRUE;
@@ -420,9 +418,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
           else {
             // Infer the default from the column names if we have them
             $defaults["mapper[$i]"] = [
-              $this->defaultFromColumnName($this->_columnNames[$i],
-                $columnPatterns
-              ),
+              $this->defaultFromColumnName($this->_columnNames[$i]),
               0,
             ];
           }
@@ -852,12 +848,11 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param string $js
    * @param bool $hasColumnNames
    * @param array $dataPatterns
-   * @param array $columnPatterns
    *
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  public function loadSavedMapping($processor, $mappingName, $i, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns) {
+  public function loadSavedMapping($processor, $mappingName, $i, $defaults, $js, $hasColumnNames, $dataPatterns) {
     $formName = $processor->getFormName();
     if (isset($mappingName[$i])) {
       if ($mappingName[$i] != ts('- do not import -')) {
@@ -876,7 +871,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
 
       if ($hasColumnNames) {
-        $defaults["mapper[$i]"] = [$this->defaultFromColumnName($this->_columnNames[$i], $columnPatterns)];
+        $defaults["mapper[$i]"] = [$this->defaultFromColumnName($this->_columnNames[$i])];
       }
       else {
         $defaults["mapper[$i]"] = [$this->defaultFromData($dataPatterns, $i)];
