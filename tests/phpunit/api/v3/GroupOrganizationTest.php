@@ -51,6 +51,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_group_organization_get with valid params.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGroupOrganizationGet() {
 
@@ -67,6 +69,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_group_organization_get with group_id.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGroupOrganizationGetWithGroupId() {
     $createParams = [
@@ -85,6 +89,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_group_organization_get with empty params.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGroupOrganizationGetWithEmptyParams() {
     $params = [];
@@ -95,6 +101,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_group_organization_get with wrong params.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGroupOrganizationGetWithWrongParams() {
     $params = 'groupOrg';
@@ -104,6 +112,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_group_organization_get invalid keys.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGroupOrganizationGetWithInvalidKeys() {
     $params = [
@@ -118,6 +128,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
   /**
    * Check with valid params.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGroupOrganizationCreate() {
     $params = [
@@ -129,6 +141,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
   /**
    * CRM-13841 - Load Group Org before save
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGroupOrganizationCreateTwice() {
     $params = [
@@ -142,6 +156,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
   /**
    * Check with empty params array.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGroupOrganizationCreateWithEmptyParams() {
     $params = [];
@@ -151,6 +167,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
   /**
    * Check with invalid params.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGroupOrganizationCreateParamsNotArray() {
     $params = 'group_org';
@@ -160,6 +178,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
   /**
    * Check with invalid params keys.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGroupOrganizationCreateWithInvalidKeys() {
     $params = [
@@ -173,6 +193,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_group_organization_remove with params not an array.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGroupOrganizationDeleteParamsNotArray() {
     $params = 'delete';
@@ -182,6 +204,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_group_organization_remove with empty params.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGroupOrganizationDeleteWithEmptyParams() {
     $params = [];
@@ -191,6 +215,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_group_organization_remove with valid params.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGroupOrganizationDelete() {
     $paramsC = [
@@ -207,6 +233,8 @@ class api_v3_GroupOrganizationTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_group_organization_remove with invalid params key.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGroupOrganizationDeleteWithInvalidKey() {
     $paramsDelete = [
