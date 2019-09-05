@@ -313,7 +313,9 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $input['component'] = $component;
 
     $ids['contact'] = $this->retrieve('contactID', 'Integer', TRUE);
-    $ids['contribution'] = $this->retrieve('contributionID', 'Integer', TRUE);
+    $contributionID = $ids['contribution'] = $this->retrieve('contributionID', 'Integer', TRUE);
+    $membershipID = $this->retrieve('membershipID', 'Integer', FALSE);
+    $contributionRecurID = $this->retrieve('contributionRecurID', 'Integer', FALSE);
 
     $this->getInput($input, $ids);
 
@@ -323,17 +325,48 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     }
     else {
       // get the optional ids
-      $ids['membership'] = $this->retrieve('membershipID', 'Integer', FALSE);
-      $ids['contributionRecur'] = $this->retrieve('contributionRecurID', 'Integer', FALSE);
+      $ids['membership'] = $membershipID;
+      $ids['contributionRecur'] = $contributionRecurID;
       $ids['contributionPage'] = $this->retrieve('contributionPageID', 'Integer', FALSE);
       $ids['related_contact'] = $this->retrieve('relatedContactID', 'Integer', FALSE);
       $ids['onbehalf_dupe_alert'] = $this->retrieve('onBehalfDupeAlert', 'Integer', FALSE);
     }
 
-    $paymentProcessorID = self::getPayPalPaymentProcessorID($input, $ids);
+    $paymentProcessorID = $this->getPayPalPaymentProcessorID($input, $ids);
 
     Civi::log()->debug('PayPalIPN: Received (ContactID: ' . $ids['contact'] . '; trxn_id: ' . $input['trxn_id'] . ').');
 
+    if ($this->retrieve('membershipID', 'Integer', FALSE)) {
+      $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecurID);
+      $membershipPayment = civicrm_api3('MembershipPayment', 'get', [
+        'contribution_id' => $templateContribution['id'],
+        'membership_id' => $membershipID,
+      ]);
+      $lineItems  = civicrm_api3('LineItem', 'get', [
+        'contribution_id' => $templateContribution['id'],
+        'entity_id' => $membershipID,
+        'entity_table' => 'civicrm_membership',
+      ]);
+      Civi::log()->debug('PayPalIPN: Received payment for membership ' . (int) $membershipID
+        . '. Original contribution was ' . (int) $contributionID . '. The template for this contribution is '
+        . $templateContribution['id'] . ' it is linked to ' . $membershipPayment['count']
+        . 'payments for this membership. It has ' . $lineItems['count'] . ' line items linked to  this membership.'
+        . '  it is  expected the original contribution will be linked by both entities to the membership.'
+      );
+      if (empty($membershipPayment['count']) && empty($lineItems['count'])) {
+        Civi::log()->debug('PayPalIPN: Will attempt to compensate');
+        $input['membership_id'] = $this->retrieve('membershipID', 'Integer', FALSE);
+      }
+      if ($contributionRecurID) {
+        $recurLinks = civicrm_api3('ContributionRecur', 'get', [
+          'membership_id' => $membershipID,
+          'contribution_recur_id' => $contributionRecurID,
+        ]);
+        Civi::log()->debug('PayPalIPN: Membership should be  linked to  contribution recur  record ' . $contributionRecurID
+          . ' ' . $recurLinks['count'] . 'links found'
+        );
+      }
+    }
     if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
       return;
     }
