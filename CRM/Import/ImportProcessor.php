@@ -488,20 +488,32 @@ class CRM_Import_ImportProcessor {
    */
   public function getQuickFormJSForField($column) {
     $columnNumbersToHide = [];
-
-    if (!$this->getLocationTypeID($column) && !$this->getWebsiteTypeID($column)) {
-      $columnNumbersToHide[] = 1;
+    if ($this->getRelationshipKey($column)) {
+      if (!$this->getWebsiteTypeID($column) && !$this->getLocationTypeID($column)) {
+        $columnNumbersToHide[] = 2;
+      }
+      if (!$this->getFieldName($column)) {
+        $columnNumbersToHide[] = 1;
+      }
+      if (!$this->getPhoneOrIMTypeID($column)) {
+        $columnNumbersToHide[] = 3;
+      }
     }
-    if (!$this->getPhoneOrIMTypeID($column)) {
-      $columnNumbersToHide[] = 2;
+    else {
+      if (!$this->getLocationTypeID($column) && !$this->getWebsiteTypeID($column)) {
+        $columnNumbersToHide[] = 1;
+      }
+      if (!$this->getPhoneOrIMTypeID($column)) {
+        $columnNumbersToHide[] = 2;
+      }
+      $columnNumbersToHide[] = 3;
     }
-    $columnNumbersToHide[] = 3;
 
     $jsClauses = [];
     foreach ($columnNumbersToHide as $columnNumber) {
       $jsClauses[] = $this->getFormName() . "['mapper[$column][" . $columnNumber . "]'].style.display = 'none';";
     }
-    return implode("\n", $jsClauses) . "\n";
+    return empty($jsClauses) ? '' : implode("\n", $jsClauses) . "\n";
   }
 
   /**
