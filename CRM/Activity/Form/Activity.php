@@ -1241,8 +1241,10 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
       $activityTypeDisplayLabels = $this->getActivityTypeDisplayLabels();
       if ($activityTypeDisplayLabels[$this->_activityTypeId]) {
         $this->_activityTypeName = $activityTypeDisplayLabels[$this->_activityTypeId];
-        // can't change this instance of activityTName yet - will come back to it dev/core#1116
-        $this->assign('activityTName', $activityTypeDisplayLabels[$this->_activityTypeId]);
+
+        // At the moment this is duplicating other code in this section, but refactoring in small steps.
+        $activityTypeObj = new CRM_Activity_BAO_ActivityType($this->_activityTypeId);
+        $this->assign('activityType', $activityTypeObj->getActivityType());
       }
       // Set title.
       if (isset($activityTypeDisplayLabels)) {
