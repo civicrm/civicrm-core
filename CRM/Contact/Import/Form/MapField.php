@@ -858,27 +858,14 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @throws \CiviCRM_API3_Exception
    */
   public function loadSavedMapping($processor, $mappingName, $i, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns) {
-    $jsSet = FALSE;
     $formName = $processor->getFormName();
     if (isset($mappingName[$i])) {
       if ($mappingName[$i] != ts('- do not import -')) {
-
-        if ($processor->getRelationshipKey($i)) {
-          $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
-          $js = $processor->getQuickFormJSForField($i);
-          $jsSet = TRUE;
-        }
-        else {
-          $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
-          $js .= $processor->getQuickFormJSForField($i);
-
-          $jsSet = TRUE;
-        }
+        $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
+        $js .= $processor->getQuickFormJSForField($i);
       }
       else {
         $defaults["mapper[$i]"] = [];
-      }
-      if (!$jsSet) {
         for ($k = 1; $k < 4; $k++) {
           $js .= "{$formName}['mapper[$i][$k]'].style.display = 'none';\n";
         }
