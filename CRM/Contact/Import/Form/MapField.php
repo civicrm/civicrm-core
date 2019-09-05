@@ -699,7 +699,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
             elseif (CRM_Utils_Array::value('1', $mapperKeys[$i]) == 'im') {
               $updateMappingFields->im_provider_id = isset($mapperKeys[$i][3]) ? $mapperKeys[$i][3] : NULL;
             }
-            $updateMappingFields->location_type_id = isset($mapperKeys[$i][2]) ? $mapperKeys[$i][2] : NULL;
+            $updateMappingFields->location_type_id = isset($mapperKeys[$i][2]) && is_numeric($mapperKeys[$i][2]) ? $mapperKeys[$i][2] : NULL;
           }
         }
         else {
