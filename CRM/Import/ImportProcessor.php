@@ -545,6 +545,9 @@ class CRM_Import_ImportProcessor {
    * @throws \CiviCRM_API3_Exception
    */
   public function getSavedQuickformDefaultsForColumn($column) {
+    if ($this->getFieldName($column) === ts('- do not import -')) {
+      return [];
+    }
     if ($this->getValidRelationshipKey($column)) {
       if ($this->getWebsiteTypeID($column)) {
         return [$this->getValidRelationshipKey($column), $this->getFieldName($column), $this->getWebsiteTypeID($column)];
