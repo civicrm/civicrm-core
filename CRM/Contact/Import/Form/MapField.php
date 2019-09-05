@@ -864,32 +864,8 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       if ($mappingName[$i] != ts('- do not import -')) {
 
         if ($processor->getRelationshipKey($i)) {
-
-          $contactDetails = strtolower(str_replace(" ", "_", $mappingName[$i]));
-          $websiteTypeId = $processor->getWebsiteTypeID($i);
-          $locationId = $processor->getLocationTypeID($i);
-          $phoneType = $processor->getPhoneTypeID($i);
-          $imProvider = $processor->getIMProviderID($i);
-
           $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
-          if (!$websiteTypeId) {
-            if (!$locationId) {
-              $js .= "{$formName}['mapper[$i][2]'].style.display = 'none';\n";
-            }
-          }
-          // fix for edge cases, CRM-4954
-          if ($contactDetails == 'image_url') {
-            $contactDetails = str_replace('url', 'URL', $contactDetails);
-          }
-
-          if (!$contactDetails) {
-            $js .= "{$formName}['mapper[$i][1]'].style.display = 'none';\n";
-          }
-
-          if ((!$phoneType) && (!$imProvider)) {
-            $js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
-          }
-          //$js .= "{$formName}['mapper[$i][3]'].style.display = 'none';\n";
+          $js = $processor->getQuickFormJSForField($i);
           $jsSet = TRUE;
         }
         else {
