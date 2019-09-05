@@ -617,7 +617,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     $store->set('fields', $this->getSelectValues());
     $store->set('fieldTypes', $this->getSelectTypes());
 
-    $store->set('dataPatterns', $this->getDataPatterns());
     $store->set('columnCount', $this->_activeFieldCount);
 
     $store->set('totalRowCount', $this->_totalCount);

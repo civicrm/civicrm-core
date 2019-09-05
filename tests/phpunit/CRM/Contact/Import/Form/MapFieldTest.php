@@ -376,16 +376,13 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
 
     $js = '';
     $hasColumnNames = TRUE;
-    // @todo - can use metadata trait once https://github.com/civicrm/civicrm-core/pull/15018 is merged.
-    $dataPatterns = [];
-    $columnPatterns = [];
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingID($mappingID);
     $processor->setFormName('document.forms.MapField');
     $processor->setMetadata($this->getContactImportMetadata());
     $processor->setContactTypeByConstant(CRM_Import_Parser::CONTACT_INDIVIDUAL);
 
-    $return = $form->loadSavedMapping($processor, $mappingName, $columnNumber, $defaults, $js, $hasColumnNames, $dataPatterns, $columnPatterns);
+    $return = $form->loadSavedMapping($processor, $mappingName, $columnNumber, $defaults, $js, $hasColumnNames);
     return ['defaults' => $return[0], 'js' => $return[1]];
   }
 
