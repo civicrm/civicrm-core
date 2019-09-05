@@ -703,7 +703,9 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    */
   public static function batchMerge($rgid, $gid = NULL, $mode = 'safe', $batchLimit = 1, $isSelected = 2, $criteria = [], $checkPermissions = TRUE, $reloadCacheIfEmpty = NULL, $searchLimit = 0) {
     $redirectForPerformance = ($batchLimit > 1) ? TRUE : FALSE;
-
+    if ($mode === 'aggressive' && $checkPermissions && !CRM_Core_Permission::check('force merge duplicate contacts')) {
+      throw new CRM_Core_Exception(ts('Insufficient permissions for aggressive mode batch merge'));
+    }
     if (!isset($reloadCacheIfEmpty)) {
       $reloadCacheIfEmpty = (!$redirectForPerformance && $isSelected == 2);
     }
