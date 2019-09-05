@@ -70,7 +70,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
   public function defaultFromColumnName($columnName, $patterns) {
 
     if (!preg_match('/^[a-z0-9 ]$/i', $columnName)) {
-      if ($columnKey = array_search($columnName, $this->_mapperFields)) {
+      if ($columnKey = array_search($columnName, $this->getFieldTitles())) {
         $this->_fieldUsed[$columnKey] = TRUE;
         return $columnKey;
       }
