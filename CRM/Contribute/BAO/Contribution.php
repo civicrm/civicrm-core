@@ -4701,14 +4701,32 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
    *   Credit Note Id.
    */
   public static function createCreditNoteId() {
-    $prefixValue = Civi::settings()->get('contribution_invoice_settings');
+    $prefixSetting = Civi::settings()->get('contribution_invoice_settings');
+    $prefix = CRM_Utils_Array::value('credit_notes_prefix', $prefixSetting);
+    $prefixLength = strlen($prefix);
 
-    $creditNoteNum = CRM_Core_DAO::singleValueQuery("SELECT count(creditnote_id) as creditnote_number FROM civicrm_contribution WHERE creditnote_id IS NOT NULL");
+    // Since the creditnote_id has a prefix, we can't just find the highest
+    // existing number with max(creditnote_id) since it'll sort alphabetically
+    // and CN_9999 will come after CN_10000. So we first find the longest
+    // existing id and then find the maximum value with that length.
+    $creditNoteLength = (int) CRM_Core_DAO::singleValueQuery("SELECT coalesce(max(length(creditnote_id)), 0) as creditnote_length FROM civicrm_contribution WHERE creditnote_id IS NOT NULL");
+    if ($creditNoteLength < $prefixLength) {
+      // Either no credit notes exist, or the longest is shorter than the
+      // current prefix.
+      $creditNoteNum = 0;
+    }
+    else {
+      // "WHERE creditnote_id LIKE 'CN______'" is much faster than
+      // "WHERE length(creditnote_id) = 8"
+      $creditNotePattern = $prefix . str_repeat('_', ($creditNoteLength - $prefixLength));
+      $maxCreditNote = CRM_Core_DAO::singleValueQuery("SELECT max(creditnote_id) as creditnote_max FROM civicrm_contribution WHERE creditnote_id LIKE '$creditNotePattern'");
+      $creditNoteNum = (int) substr($maxCreditNote, $prefixLength);
+    }
     $creditNoteId = NULL;
 
     do {
       $creditNoteNum++;
-      $creditNoteId = CRM_Utils_Array::value('credit_notes_prefix', $prefixValue) . "" . $creditNoteNum;
+      $creditNoteId = $prefix . "" . $creditNoteNum;
       $result = civicrm_api3('Contribution', 'getcount', [
         'sequential' => 1,
         'creditnote_id' => $creditNoteId,
