@@ -1184,9 +1184,11 @@ class CRM_Core_Permission {
     $permissions['exception'] = [
       'default' => ['merge duplicate contacts'],
     ];
+
     $permissions['job'] = [
       'process_batch_merge' => ['merge duplicate contacts'],
     ];
+    $permissions['rule_group']['get'] = [['merge duplicate contacts', 'administer CiviCRM']];
     // Loc block is only used for events
     $permissions['loc_block'] = $permissions['event'];
 
