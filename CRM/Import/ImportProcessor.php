@@ -438,6 +438,10 @@ class CRM_Import_ImportProcessor {
       }
       else {
         // Honour legacy chaos factor.
+        if ($field['name'] === ts('- do not import -')) {
+          // This is why we save names not labels people....
+          $field['name'] = 'do_not_import';
+        }
         $fields[$index]['name'] = strtolower(str_replace(" ", "_", $field['name']));
         // fix for edge cases, CRM-4954
         if ($fields[$index]['name'] === 'image_url') {
@@ -508,7 +512,10 @@ class CRM_Import_ImportProcessor {
    */
   public function getQuickFormJSForField($column) {
     $columnNumbersToHide = [];
-    if ($this->getRelationshipKey($column)) {
+    if ($this->getFieldName($column) === 'do_not_import') {
+      $columnNumbersToHide = [1, 2, 3];
+    }
+    elseif ($this->getRelationshipKey($column)) {
       if (!$this->getWebsiteTypeID($column) && !$this->getLocationTypeID($column)) {
         $columnNumbersToHide[] = 2;
       }
@@ -545,6 +552,9 @@ class CRM_Import_ImportProcessor {
    * @throws \CiviCRM_API3_Exception
    */
   public function getSavedQuickformDefaultsForColumn($column) {
+    if ($this->getFieldName($column) === 'do_not_import') {
+      return [];
+    }
     if ($this->getValidRelationshipKey($column)) {
       if ($this->getWebsiteTypeID($column)) {
         return [$this->getValidRelationshipKey($column), $this->getFieldName($column), $this->getWebsiteTypeID($column)];
