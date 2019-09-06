@@ -143,7 +143,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       }
     }
     else {
-      if ($this->_context != 'standalone' & $this->_contactID) {
+      if ($this->_contactID) {
         $defaults['contact_id'] = $this->_contactID;
       }
     }
