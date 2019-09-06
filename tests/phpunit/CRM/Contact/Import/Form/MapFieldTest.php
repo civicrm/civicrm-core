@@ -319,6 +319,13 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
         '',
         ['mapper[0]' => ['1_b_a', 'phone', 'Primary', 1]],
       ],
+      [
+        ['name' => '- do not import -', 'contact_type' => 'Individual', 'column_number' => 0],
+        "document.forms.MapField['mapper[0][1]'].style.display = 'none';
+document.forms.MapField['mapper[0][2]'].style.display = 'none';
+document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
+        ['mapper[0]' => []],
+      ],
     ];
   }
 
@@ -368,10 +375,6 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
    * @throws \CiviCRM_API3_Exception
    */
   protected function loadSavedMapping($form, $mappingID, $columnNumber) {
-    list($mappingName) = CRM_Core_BAO_Mapping::getMappingFields($mappingID, TRUE);
-
-    //get loaded Mapping Fields
-    $mappingName = CRM_Utils_Array::value(1, $mappingName);
     $defaults = [];
 
     $js = '';
@@ -382,7 +385,7 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
     $processor->setMetadata($this->getContactImportMetadata());
     $processor->setContactTypeByConstant(CRM_Import_Parser::CONTACT_INDIVIDUAL);
 
-    $return = $form->loadSavedMapping($processor, $mappingName, $columnNumber, $defaults, $js, $hasColumnNames);
+    $return = $form->loadSavedMapping($processor, $columnNumber, $defaults, $js, $hasColumnNames);
     return ['defaults' => $return[0], 'js' => $return[1]];
   }
 
