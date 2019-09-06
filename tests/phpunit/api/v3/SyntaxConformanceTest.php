@@ -583,6 +583,15 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       //a bit of a pseudoapi - keys by domain
       'Setting',
     ];
+
+    // The testSqlOperators fails sporadically on MySQL 5.5, which is deprecated anyway.
+    // Test data providers should be able to run in pre-boot environment, so we connect directly to SQL server.
+    require_once 'DB.php';
+    $db = DB::connect(CIVICRM_DSN);
+    if ($db->connection instanceof mysqli && $db->connection->server_version < 50600) {
+      $entitiesWithout[] = 'Dedupe';
+    }
+
     return $entitiesWithout;
   }
 
