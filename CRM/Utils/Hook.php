@@ -2498,6 +2498,7 @@ abstract class CRM_Utils_Hook {
    * @see CRM_Core_Resources::entityRefFilters
    *
    * @param array $filters
+   * @param array $links
    */
   public static function entityRefFilters(&$filters, &$links = NULL) {
     self::singleton()->invoke(['filters', 'links'], $filters, $links, self::$_nullObject,
