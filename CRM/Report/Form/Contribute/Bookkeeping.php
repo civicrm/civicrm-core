@@ -689,28 +689,12 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
         $rows[$rowNum]['civicrm_entity_financial_trxn_amount'] = CRM_Utils_Money::format($rows[$rowNum]['civicrm_entity_financial_trxn_amount'], $rows[$rowNum]['civicrm_financial_trxn_currency']);
       }
 
-      //handle gender
-      if (array_key_exists('civicrm_contact_gender_id', $row)) {
-        if ($value = $row['civicrm_contact_gender_id']) {
-          $gender = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-          $rows[$rowNum]['civicrm_contact_gender_id'] = $gender[$value];
-        }
-        $entryFound = TRUE;
-      }
-
       if (!empty($row['civicrm_financial_trxn_card_type_id'])) {
         $rows[$rowNum]['civicrm_financial_trxn_card_type_id'] = CRM_Utils_Array::value($row['civicrm_financial_trxn_card_type_id'], $creditCardTypes);
         $entryFound = TRUE;
       }
 
-      // display birthday in the configured custom format
-      if (array_key_exists('civicrm_contact_birth_date', $row)) {
-        $birthDate = $row['civicrm_contact_birth_date'];
-        if ($birthDate) {
-          $rows[$rowNum]['civicrm_contact_birth_date'] = CRM_Utils_Date::customFormat($birthDate, '%Y%m%d');
-        }
-        $entryFound = TRUE;
-      }
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
 
     }
   }
