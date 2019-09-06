@@ -2499,8 +2499,8 @@ abstract class CRM_Utils_Hook {
    *
    * @param array $filters
    */
-  public static function entityRefFilters(&$filters) {
-    self::singleton()->invoke(['filters'], $filters, self::$_nullObject, self::$_nullObject,
+  public static function entityRefFilters(&$filters, &$links = NULL) {
+    self::singleton()->invoke(['filters', 'links'], $filters, $links, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_entityRefFilters'
     );
