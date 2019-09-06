@@ -239,7 +239,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     $defaults = [];
     $mapperKeys = array_keys($this->_mapperFields);
     $hasColumnNames = !empty($this->_columnNames);
-    $dataPatterns = $this->get('dataPatterns');
     $hasLocationTypes = $this->get('fieldTypes');
 
     $this->_location_types = ['Primary' => ts('Primary')] + CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
@@ -404,7 +403,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
 
       if ($this->get('savedMapping')) {
-        list($defaults, $js) = $this->loadSavedMapping($processor, $mappingName, $i, $defaults, $js, $hasColumnNames, $dataPatterns);
+        list($defaults, $js) = $this->loadSavedMapping($processor, $mappingName, $i, $defaults, $js, $hasColumnNames);
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
@@ -426,7 +425,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         else {
           // Otherwise guess the default from the form of the data
           $defaults["mapper[$i]"] = [
-            $this->defaultFromData($dataPatterns, $i),
+            $this->defaultFromData($this->getDataPatterns(), $i),
             //                     $defaultLocationType->id
             0,
           ];
@@ -847,12 +846,11 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    * @param array $defaults
    * @param string $js
    * @param bool $hasColumnNames
-   * @param array $dataPatterns
    *
    * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  public function loadSavedMapping($processor, $mappingName, $i, $defaults, $js, $hasColumnNames, $dataPatterns) {
+  public function loadSavedMapping($processor, $mappingName, $i, $defaults, $js, $hasColumnNames) {
     $formName = $processor->getFormName();
     if (isset($mappingName[$i])) {
       if ($mappingName[$i] != ts('- do not import -')) {
@@ -874,7 +872,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
         $defaults["mapper[$i]"] = [$this->defaultFromColumnName($this->_columnNames[$i])];
       }
       else {
-        $defaults["mapper[$i]"] = [$this->defaultFromData($dataPatterns, $i)];
+        $defaults["mapper[$i]"] = [$this->defaultFromData($this->getDataPatterns(), $i)];
       }
     }
     return [$defaults, $js];
