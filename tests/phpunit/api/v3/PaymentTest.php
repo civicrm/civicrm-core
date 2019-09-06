@@ -489,7 +489,28 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test update payment api
+   * Test update payment api.
+   *
+   * 1) create a contribution for $300 with a partial payment of $150
+   * - this results in 2 financial transactions. The accounts receivable transaction is linked
+   *   via entity_financial_trxns to the 2 line items. The $150 payment is not linked to the line items
+   *   so the line items are fully allocated even though they are only half paid.
+   *
+   * 2) add a payment of $50 -
+   *  This payment transaction IS linked to the line items so $350 of the $300 in line items is allocated
+   *  but $200 is paid
+   *
+   * 3) update that payment to be $100
+   *  This results in a negative and a positive payment ($50 & $100) - the negative payment results in
+   *  financial_items but the positive payment does not.
+   *
+   * The final result is we have
+   * - 1 partly paid contribution of $300
+   * -  payment financial_trxns totalling $250
+   * - 1 Accounts receivable financial_trxn totalling $300
+   * - 2 financial items totalling $300 linked to the Accounts receivable financial_trxn
+   * - 6 entries in the civicrm_entity_financial_trxn linked to line items - totalling $450.
+   * - 5 entries in the civicrm_entity_financial_trxn linked to contributions - totalling $550.
    */
   public function testUpdatePayment() {
     CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute', 'edit contributions'];
@@ -522,7 +543,6 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     foreach ($eft['values'] as $value) {
       $this->assertEquals($value['amount'], array_pop($amounts));
     }
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute'];
 
     // update the amount for payment
     $params = [
@@ -531,9 +551,11 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
       'id' => $payment['id'],
       'check_permissions' => TRUE,
     ];
-    $payment = $this->callAPIFailure('payment', 'create', $params, 'API permission check failed for Payment/create call; insufficient permission: require access CiviCRM and access CiviContribute and edit contributions');
+    // @todo - move this permissions test to it's own test - it just confuses here.
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute'];
+    $this->callAPIFailure('payment', 'create', $params, 'API permission check failed for Payment/create call; insufficient permission: require access CiviCRM and access CiviContribute and edit contributions');
 
-    array_push(CRM_Core_Config::singleton()->userPermissionClass->permissions, 'access CiviCRM', 'edit contributions');
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['administer CiviCRM', 'access CiviContribute', 'access CiviCRM', 'edit contributions'];
     $payment = $this->callAPIAndDocument('payment', 'create', $params, __FUNCTION__, __FILE__, 'Update Payment', 'UpdatePayment');
 
     // Check for proportional cancelled payment against lineitems.
@@ -559,6 +581,14 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     foreach ($eft['values'] as $value) {
       $this->assertEquals($value['amount'], array_pop($amounts));
     }
+    $items = $this->callAPISuccess('FinancialItem', 'get', [])['values'];
+    $this->assertCount(2, $items);
+    $itemSum = 0;
+    foreach ($items as $item) {
+      $this->assertEquals('civicrm_line_item', $item['entity_table']);
+      $itemSum += $item['amount'];
+    }
+    $this->assertEquals(300, $itemSum);
 
     $params = [
       'contribution_id' => $contribution['id'],
