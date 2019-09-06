@@ -365,8 +365,6 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
    *
    * This signature of the function we are calling is funky as a new extraction & will be refined.
    *
-   * @param \CRM_Contact_Import_Form_MapField $form
-   *
    * @param int $mappingID
    * @param int $columnNumber
    *

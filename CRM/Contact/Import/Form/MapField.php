@@ -198,39 +198,7 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
    */
   public function buildQuickForm() {
     $savedMappingID = (int) $this->get('savedMapping');
-    //to save the current mappings
-    if (!$savedMappingID) {
-      $saveDetailsName = ts('Save this field mapping');
-      $this->applyFilter('saveMappingName', 'trim');
-      $this->add('text', 'saveMappingName', ts('Name'));
-      $this->add('text', 'saveMappingDesc', ts('Description'));
-    }
-    else {
-      $savedMapping = $this->get('savedMapping');
-
-      list($mappingName) = CRM_Core_BAO_Mapping::getMappingFields($savedMapping, TRUE);
-
-      //get loaded Mapping Fields
-      $mappingName = CRM_Utils_Array::value(1, $mappingName);
-
-      $this->assign('loadedMapping', $savedMapping);
-      $this->set('loadedMapping', $savedMapping);
-
-      $params = ['id' => $savedMapping];
-      $temp = [];
-      $mappingDetails = CRM_Core_BAO_Mapping::retrieve($params, $temp);
-
-      $this->assign('savedName', $mappingDetails->name);
-
-      $this->add('hidden', 'mappingId', $savedMapping);
-
-      $this->addElement('checkbox', 'updateMapping', ts('Update this field mapping'), NULL);
-      $saveDetailsName = ts('Save as a new field mapping');
-      $this->add('text', 'saveMappingName', ts('Name'));
-      $this->add('text', 'saveMappingDesc', ts('Description'));
-    }
-
-    $this->addElement('checkbox', 'saveMapping', $saveDetailsName, NULL, ['onclick' => "showSaveDetails(this)"]);
+    $this->buildSavedMappingFields($savedMappingID);
 
     $this->addFormRule(['CRM_Contact_Import_Form_MapField', 'formRule']);
 
