@@ -176,7 +176,7 @@ class CRM_Contact_Import_Form_MapFieldTest extends CiviUnitTestCase {
 
     $mapping = $this->callAPISuccess('Mapping', 'create', ['name' => 'my test']);
     $this->callAPISuccess('MappingField', 'create', array_merge(['mapping_id' => $mapping['id']], $fieldSpec));
-    $result = $this->loadSavedMapping($this->form, $mapping['id'], $fieldSpec['column_number']);
+    $result = $this->loadSavedMapping($mapping['id'], $fieldSpec['column_number']);
     $this->assertEquals($expectedJS, $result['js']);
     $this->assertEquals($expectedDefaults, $result['defaults']);
   }
@@ -374,19 +374,18 @@ document.forms.MapField['mapper[0][3]'].style.display = 'none';\n",
    *
    * @throws \CiviCRM_API3_Exception
    */
-  protected function loadSavedMapping($form, $mappingID, $columnNumber) {
-    $defaults = [];
-
-    $js = '';
-    $hasColumnNames = TRUE;
+  protected function loadSavedMapping($mappingID, $columnNumber) {
     $processor = new CRM_Import_ImportProcessor();
     $processor->setMappingID($mappingID);
     $processor->setFormName('document.forms.MapField');
     $processor->setMetadata($this->getContactImportMetadata());
     $processor->setContactTypeByConstant(CRM_Import_Parser::CONTACT_INDIVIDUAL);
 
-    $return = $form->loadSavedMapping($processor, $columnNumber, $defaults, $js, $hasColumnNames);
-    return ['defaults' => $return[0], 'js' => $return[1]];
+    $defaults = [];
+    $defaults["mapper[$columnNumber]"] = $processor->getSavedQuickformDefaultsForColumn($columnNumber);
+    $js = $processor->getQuickFormJSForField($columnNumber);
+
+    return ['defaults' => $defaults, 'js' => $js];
   }
 
   /**

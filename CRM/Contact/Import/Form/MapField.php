@@ -402,8 +402,9 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     for ($i = 0; $i < $this->_columnCount; $i++) {
       $sel = &$this->addElement('hierselect', "mapper[$i]", ts('Mapper for Field %1', [1 => $i]), NULL);
 
-      if ($this->get('savedMapping')) {
-        list($defaults, $js) = $this->loadSavedMapping($processor, $i, $defaults, $js, $hasColumnNames);
+      if ($this->get('savedMapping') && $processor->getFieldName($i)) {
+        $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
+        $js .= $processor->getQuickFormJSForField($i);
       }
       else {
         $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
@@ -837,37 +838,6 @@ class CRM_Contact_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
     $saveMappingFields->save();
     return $saveMappingFields->mapping_id;
-  }
-
-  /**
-   * @param \CRM_Import_ImportProcessor $processor
-   * @param $mappingName
-   * @param int $i
-   * @param array $defaults
-   * @param string $js
-   * @param bool $hasColumnNames
-   *
-   * @return array
-   * @throws \CiviCRM_API3_Exception
-   */
-  public function loadSavedMapping($processor, $i, $defaults, $js, $hasColumnNames) {
-    $formName = $processor->getFormName();
-    if ($processor->getFieldName($i)) {
-      $defaults["mapper[$i]"] = $processor->getSavedQuickformDefaultsForColumn($i);
-      $js .= $processor->getQuickFormJSForField($i);
-    }
-    else {
-      // this load section to help mapping if we ran out of saved columns when doing Load Mapping
-      $js .= "swapOptions($formName, 'mapper[$i]', 0, 3, 'hs_mapper_0_');\n";
-
-      if ($hasColumnNames) {
-        $defaults["mapper[$i]"] = [$this->defaultFromColumnName($this->_columnNames[$i])];
-      }
-      else {
-        $defaults["mapper[$i]"] = [$this->defaultFromData($this->getDataPatterns(), $i)];
-      }
-    }
-    return [$defaults, $js];
   }
 
 }
