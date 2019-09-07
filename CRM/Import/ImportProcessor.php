@@ -112,8 +112,8 @@ class CRM_Import_ImportProcessor {
    *
    * @param string $contactSubType
    */
-  public function setContactSubType(string $contactSubType) {
-    $this->contactSubType = $contactSubType;
+  public function setContactSubType($contactSubType) {
+    $this->contactSubType = (string) $contactSubType;
   }
 
   /**
