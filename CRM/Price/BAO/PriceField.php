@@ -177,10 +177,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
         if ($opIds = CRM_Utils_Array::value('option_id', $params)) {
           if ($opId = CRM_Utils_Array::value($index, $opIds)) {
-            $optionsIds['id'] = $opId;
+            $options['id'] = $opId;
           }
           else {
-            $optionsIds['id'] = NULL;
+            $options['id'] = NULL;
           }
         }
         try {
