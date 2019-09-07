@@ -106,12 +106,23 @@ class CRM_Upgrade_Incremental_php_FiveSeventeen extends CRM_Upgrade_Incremental_
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_17_1($rev) {
+    // Need to do this again because the alpha1 version had a typo and so didn't do anything.
+    $this->addTask(ts('Add pptx to accepted attachment file types'), 'updateFileTypes');
+  }
+
+  /**
    * Update safe file types.
    */
   public function updateFileTypes() {
     CRM_Core_BAO_OptionValue::ensureOptionValueExists([
-      'safe_file_extension',
-      ['label' => 'pptx', 'name' => 'pptx'],
+      'option_group_id' => 'safe_file_extension',
+      'label' => 'pptx',
+      'name' => 'pptx',
     ]);
     return TRUE;
   }
