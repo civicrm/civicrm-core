@@ -73,7 +73,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
           ],
         ],
         'filters' => [
-          'join_date' => [
+          'membership_join_date' => [
             'title' => ts('Member Since'),
             'type' => CRM_Utils_Type::T_DATE,
             'operatorType' => CRM_Report_Form::OP_DATE,
