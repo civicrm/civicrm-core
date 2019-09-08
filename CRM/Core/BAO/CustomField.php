@@ -264,34 +264,35 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     if (!$this->id) {
       return FALSE;
     }
-    if (!$this->data_type || !$this->custom_group_id) {
-      $this->find(TRUE);
-    }
+    $cacheKey = "CRM_Core_BAO_CustomField_getOptions_{$this->id}";
+    $cache = CRM_Utils_Cache::singleton();
+    $options = $cache->get($cacheKey);
+    if (!isset($options)) {
+      if (!$this->data_type || !$this->custom_group_id) {
+        $this->find(TRUE);
+      }
 
-    // This will hold the list of options in format key => label
-    $options = [];
+      // This will hold the list of options in format key => label
+      $options = [];
 
-    if (!empty($this->option_group_id)) {
-      $options = CRM_Core_OptionGroup::valuesByID(
-        $this->option_group_id,
-        FALSE,
-        FALSE,
-        FALSE,
-        'label',
-        !($context == 'validate' || $context == 'get')
-      );
+      if (!empty($this->option_group_id)) {
+        $options = CRM_Core_OptionGroup::valuesByID(
+        $this->option_group_id, FALSE, FALSE, FALSE, 'label', !($context == 'validate' || $context == 'get')
+        );
+      }
+      elseif ($this->data_type === 'StateProvince') {
+        $options = CRM_Core_PseudoConstant::stateProvince();
+      }
+      elseif ($this->data_type === 'Country') {
+        $options = $context == 'validate' ? CRM_Core_PseudoConstant::countryIsoCode() : CRM_Core_PseudoConstant::country();
+      }
+      elseif ($this->data_type === 'Boolean') {
+        $options = $context == 'validate' ? array(0, 1) : CRM_Core_SelectValues::boolean();
+      }
+      CRM_Utils_Hook::customFieldOptions($this->id, $options, FALSE);
+      CRM_Utils_Hook::fieldOptions($this->getEntity(), "custom_{$this->id}", $options, array('context' => $context));
+      $cache->set($cacheKey, $options);
     }
-    elseif ($this->data_type === 'StateProvince') {
-      $options = CRM_Core_PseudoConstant::stateProvince();
-    }
-    elseif ($this->data_type === 'Country') {
-      $options = $context == 'validate' ? CRM_Core_PseudoConstant::countryIsoCode() : CRM_Core_PseudoConstant::country();
-    }
-    elseif ($this->data_type === 'Boolean') {
-      $options = $context == 'validate' ? array(0, 1) : CRM_Core_SelectValues::boolean();
-    }
-    CRM_Utils_Hook::customFieldOptions($this->id, $options, FALSE);
-    CRM_Utils_Hook::fieldOptions($this->getEntity(), "custom_{$this->id}", $options, array('context' => $context));
     return $options;
   }
 
