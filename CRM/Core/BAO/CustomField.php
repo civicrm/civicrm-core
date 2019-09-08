@@ -264,7 +264,7 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
     if (!$this->id) {
       return FALSE;
     }
-    $cacheKey = "CRM_Core_BAO_CustomField_getOptions_{$this->id}";
+    $cacheKey = "CRM_Core_BAO_CustomField_getOptions_{$this->id}_$context";
     $cache = CRM_Utils_Cache::singleton();
     $options = $cache->get($cacheKey);
     if (!isset($options)) {
