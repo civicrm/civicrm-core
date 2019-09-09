@@ -290,7 +290,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->_lineItem = $this->get('lineItem');
     $this->_ccid = $this->get('ccid');
 
-    $this->_params = $this->controller->exportValues('Main');
+    $this->_params = $this->get('params');
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();
     $this->_params['amount'] = $this->get('amount');
     if (isset($this->_params['amount'])) {
