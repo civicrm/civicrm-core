@@ -283,7 +283,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
    * Set variables up before form is built.
    */
   public function preProcess() {
-    $config = CRM_Core_Config::singleton();
     parent::preProcess();
 
     // lineItem isn't set until Register postProcess
@@ -305,7 +304,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
     }
 
-    $this->_params['currencyID'] = $config->defaultCurrency;
+    $this->_params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
     if (!empty($this->_membershipBlock)) {
       $this->_params['selectMembership'] = $this->get('selectMembership');
