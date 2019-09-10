@@ -673,9 +673,7 @@ abstract class CRM_Utils_System_DrupalBase extends CRM_Utils_System_Base {
    * @return bool
    */
   public function isFrontEndPage() {
-    // Get the menu items.
-    $args = explode('?', $_GET['q']);
-    $path = $args[0];
+    $path = CRM_Utils_System::getUrlPath();
 
     // Get the menu for above URL.
     $item = CRM_Core_Menu::get($path);
