@@ -67,18 +67,23 @@ class CRM_Upgrade_Incremental_php_FiveNineteen extends CRM_Upgrade_Incremental_B
    * (change the x in the function name):
    */
 
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_19_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Ensure that default value of is_email_receipt on civicrm_contribution_recur is 1', 'fixContributionRecurEmailDefault');
+  }
+
+  public static function fixContributionRecurEmailDefault() {
+    $currentDefault = CRM_Core_DAO::singleValueQuery("SELECT column_default FROM information_schema.columns WHERE table_name = 'civicrm_contribution_recur' AND column_name = 'is_email_receipt'");
+    if (!$currentDefault) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_contribution_recur CHANGE COLUMN is_email_receipt is_email_receipt TINYINT (4) COMMENT 'if true, receipt is automatically emailed to contact on each successful payment' DEFAULT 1");
+    }
+    return TRUE;
+  }
 
   // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
   //   return TRUE;
