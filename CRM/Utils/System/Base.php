@@ -291,6 +291,19 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Path of the current page e.g. 'civicrm/contact/view'
+   *
+   * @return string|null
+   */
+  public function getUrlPath() {
+    $config = CRM_Core_Config::singleton();
+    if (isset($_GET[$config->userFrameworkURLVar])) {
+      return $_GET[$config->userFrameworkURLVar];
+    }
+    return NULL;
+  }
+
+  /**
    * Get the absolute path to the site's base url.
    *
    * @return bool|mixed|string

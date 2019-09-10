@@ -37,6 +37,7 @@
  * @method static array synchronizeUsers() Create CRM contacts for all existing CMS users.
  * @method static appendCoreResources(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_coreResourceList.
  * @method static alterAssetUrl(\Civi\Core\Event\GenericHookEvent $e) Callback for hook_civicrm_getAssetUrl.
+ * @method static string|NULL getUrlPath() Path of the current page e.g. 'civicrm/contact/view'
  */
 class CRM_Utils_System {
 
@@ -319,24 +320,6 @@ class CRM_Utils_System {
     ]);
     Civi::service('dispatcher')->dispatch('hook_civicrm_alterExternUrl', $event);
     return urldecode(CRM_Utils_Url::unparseUrl($event->url));
-  }
-
-  /**
-   * Path of the current page e.g. 'civicrm/contact/view'
-   *
-   * @return string|null
-   */
-  public static function getUrlPath() {
-    $config = CRM_Core_Config::singleton();
-
-    if (method_exists($config->userSystem, 'getUrlPath')) {
-      return $config->userSystem->getUrlPath();
-    }
-
-    if (isset($_GET[$config->userFrameworkURLVar])) {
-      return $_GET[$config->userFrameworkURLVar];
-    }
-    return NULL;
   }
 
   /**

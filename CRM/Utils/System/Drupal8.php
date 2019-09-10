@@ -803,7 +803,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return user_role_names();
   }
 
-  /*
+  /**
    * @inheritDoc
    */
   public function getUrlPath() {
