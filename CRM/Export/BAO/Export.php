@@ -115,6 +115,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     }
     $processor->setComponentTable($componentTable);
     $processor->setComponentClause($componentClause);
+    $processor->setIds($ids);
 
     list($query, $queryString) = $processor->runQuery($params, $order);
 
