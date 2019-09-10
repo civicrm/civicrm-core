@@ -2326,7 +2326,12 @@ WHERE  id IN ( $deleteIDString )
     // call export hook
     $headerRows = $this->getHeaderRows();
     $exportTempTable = $this->getTemporaryTable();
+    $exportMode = $this->getExportMode();
+    $sqlColumns = $this->getSQLColumns();
+    $componentTable = $this->getComponentTable();
     CRM_Utils_Hook::export($exportTempTable, $headerRows, $sqlColumns, $exportMode, $componentTable, $ids);
+    $this->setExportMode($exportMode);
+    $this->setComponentTable($componentTable);
     if ($exportTempTable !== $this->getTemporaryTable()) {
       CRM_Core_Error::deprecatedFunctionWarning('altering the export table in the hook is deprecated (in some flows the table itself will be)');
       $this->setTemporaryTable($exportTempTable);
@@ -2355,7 +2360,7 @@ LIMIT $offset, $limit
       while ($dao->fetch()) {
         $row = [];
 
-        foreach (array_keys($this->getSQLColumns()) as $column) {
+        foreach (array_keys($sqlColumns) as $column) {
           $row[$column] = $dao->$column;
         }
         $componentDetails[] = $row;
