@@ -939,6 +939,17 @@ class api_v3_ContactTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test the like operator works for Contact.get
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testGetEmailLike() {
+    $this->individualCreate();
+    $this->callAPISuccessGetCount('Contact', ['email' => ['LIKE' => 'an%']], 1);
+    $this->callAPISuccessGetCount('Contact', ['email' => ['LIKE' => 'ab%']], 0);
+  }
+
+  /**
    * Test that we can retrieve contacts using array syntax.
    *
    * I.e 'id' => array('IN' => array('3,4')).

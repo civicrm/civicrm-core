@@ -566,7 +566,8 @@ class CRM_Contact_BAO_Query {
     $this->_whereTables = $this->_tables;
 
     $this->selectClause($apiEntity);
-    $this->_whereClause = $this->whereClause($apiEntity);
+    $isForcePrimaryOnly = !empty($apiEntity);
+    $this->_whereClause = $this->whereClause($isForcePrimaryOnly);
     if (array_key_exists('civicrm_contribution', $this->_whereTables)) {
       $component = 'contribution';
     }
@@ -1808,9 +1809,11 @@ class CRM_Contact_BAO_Query {
    * Get the where clause for a single field.
    *
    * @param array $values
-   * @param string $apiEntity
+   * @param bool $isForcePrimaryOnly
+   *
+   * @throws \CRM_Core_Exception
    */
-  public function whereClauseSingle(&$values, $apiEntity = NULL) {
+  public function whereClauseSingle(&$values, $isForcePrimaryOnly = FALSE) {
     if ($this->isARelativeDateField($values[0])) {
       $this->buildRelativeDateQuery($values);
       return;
@@ -1886,7 +1889,7 @@ class CRM_Contact_BAO_Query {
 
       case 'email':
       case 'email_id':
-        $this->email($values, $apiEntity);
+        $this->email($values, $isForcePrimaryOnly);
         return;
 
       case 'phone_numeric':
@@ -2055,11 +2058,12 @@ class CRM_Contact_BAO_Query {
   /**
    * Given a list of conditions in params generate the required where clause.
    *
-   * @param string $apiEntity
+   * @param bool $isForcePrimaryEmailOnly
    *
    * @return string
+   * @throws \CRM_Core_Exception
    */
-  public function whereClause($apiEntity = NULL) {
+  public function whereClause($isForcePrimaryEmailOnly = NULL) {
     $this->_where[0] = [];
     $this->_qill[0] = [];
 
@@ -2086,7 +2090,7 @@ class CRM_Contact_BAO_Query {
           ]);
         }
         else {
-          $this->whereClauseSingle($this->_params[$id], $apiEntity);
+          $this->whereClauseSingle($this->_params[$id], $isForcePrimaryEmailOnly);
         }
       }
 
@@ -3558,26 +3562,29 @@ WHERE  $smartGroupClause
    * Where / qill clause for email
    *
    * @param array $values
-   * @param string $apiEntity
+   * @param string $isForcePrimaryOnly
+   *
+   * @throws \CRM_Core_Exception
    */
-  protected function email(&$values, $apiEntity) {
+  protected function email(&$values, $isForcePrimaryOnly) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
     $this->_tables['civicrm_email'] = $this->_whereTables['civicrm_email'] = 1;
 
     // CRM-18147: for Contact's GET API, email fieldname got appended with its entity as in {$apiEntiy}_{$name}
     // so following code is use build whereClause for contact's primart email id
-    if (!empty($apiEntity)) {
-      $dataType = 'String';
-      if ($name == 'email_id') {
-        $dataType = 'Integer';
-        $name = 'id';
-      }
-
+    if (!empty($isForcePrimaryOnly)) {
       $this->_where[$grouping][] = self::buildClause('civicrm_email.is_primary', '=', 1, 'Integer');
-      $this->_where[$grouping][] = self::buildClause("civicrm_email.$name", $op, $value, $dataType);
+    }
+    // @todo - this should come from the $this->_fields array
+    $dbName = $name === 'email_id' ? 'id' : $name;
+
+    if (is_array($value) || $name === 'email_id') {
+      $this->_qill[$grouping][] = $this->getQillForField($name, $value, $op);
+      $this->_where[$grouping][] = self::buildClause('civicrm_email.' . $dbName, $op, $value, 'String');
       return;
     }
 
+    // Is this ever hit now? Ideally ensure always an array & handle above.
     $n = trim($value);
     if ($n) {
       if (substr($n, 0, 1) == '"' &&
@@ -7047,6 +7054,24 @@ AND   displayRelType.is_active = 1
       $statuses[] = "'Added'";
     }
     return $statuses;
+  }
+
+  /**
+   * Get the qill value for the field.
+   *
+   * @param $name
+   * @param array|int|string $value
+   * @param $op
+   *
+   * @return string
+   */
+  protected function getQillForField($name, $value, $op): string {
+    list($qillop, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $name, $value, $op);
+    return (string) ts("%1 %2 %3", [
+      1 => ts('Email'),
+      2 => $qillop,
+      3 => $qillVal,
+    ]);
   }
 
 }
