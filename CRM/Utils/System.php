@@ -327,8 +327,14 @@ class CRM_Utils_System {
    * @return string|null
    */
   public static function getUrlPath() {
-    if (isset($_GET[CRM_Core_Config::singleton()->userFrameworkURLVar])) {
-      return $_GET[CRM_Core_Config::singleton()->userFrameworkURLVar];
+    $config = CRM_Core_Config::singleton();
+
+    if (method_exists($config->userSystem, 'getUrlPath')) {
+      return $config->userSystem->getUrlPath();
+    }
+
+    if (isset($_GET[$config->userFrameworkURLVar])) {
+      return $_GET[$config->userFrameworkURLVar];
     }
     return NULL;
   }

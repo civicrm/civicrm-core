@@ -803,4 +803,29 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return user_role_names();
   }
 
+  /*
+   * @inheritDoc
+   */
+  public function getUrlPath() {
+    if (!class_exists('Drupal') || !\Drupal::hasContainer()) {
+      return NULL;
+    }
+
+    $path = \Drupal::service('path.current')->getPath();
+
+    // Remove '/' prefix for compatibility with CiviCRM d7-style assumptions
+    // Ex: '/civicrm/contribute' becomes 'civicrm/contribute'
+    if ($path) {
+      $path = substr($path, 1);
+
+      // Remove the language prefix, if present
+      // The URL returned by Drupal randomly includes the language prefix, sometimes not.
+      if (preg_match('/^\w\w\//', $path)) {
+        $path = substr($path, 3);
+      }
+    }
+
+    return $path;
+  }
+
 }
