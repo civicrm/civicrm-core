@@ -63,34 +63,16 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
   public function getFormatExamples() {
     $es = [];
 
-    $asHtml = '<div><strong>New text!</strong><af-field field-name="do_not_sms" field-defn="{label: \'Do not do any of the emailing\'}"></af-field></div>';
-    $asShallow = [
-      '#tag' => 'div',
-      '#children' => [
-        ['#tag' => 'strong', '#children' => ['New text!']],
-        ['#tag' => 'af-field', 'field-name' => 'do_not_sms', 'field-defn' => "{label: 'Do not do any of the emailing'}"],
-      ],
-    ];
-    $asDeep = [
-      '#tag' => 'div',
-      '#children' => [
-        ['#tag' => 'strong', '#children' => ['New text!']],
-        ['#tag' => 'af-field', 'field-name' => 'do_not_sms', 'field-defn' => ['label' => 'Do not do any of the emailing']],
-      ],
-    ];
-
-    $es[] = ['fakelibBareFile', 'html', $asHtml, 'html', $asHtml];
-
-    $es[] = ['fakelibBareFile', 'html', $asHtml, 'shallow', $asShallow];
-    $es[] = ['fakelibBareFile', 'shallow', $asShallow, 'html', $asHtml];
-    $es[] = ['fakelibBareFile', 'shallow', $asShallow, 'shallow', $asShallow];
-
-    $es[] = ['fakelibBareFile', 'html', $asHtml, 'deep', $asDeep];
-    $es[] = ['fakelibBareFile', 'deep', $asDeep, 'html', $asHtml];
-    $es[] = ['fakelibBareFile', 'deep', $asDeep, 'deep', $asDeep];
-
-    $es[] = ['fakelibBareFile', 'shallow', $asShallow, 'deep', $asDeep];
-    $es[] = ['fakelibBareFile', 'deep', $asDeep, 'shallow', $asShallow];
+    foreach (['apple', 'banana'] as $exampleName) {
+      $exampleFile = '/formatExamples/' . $exampleName . '.php';
+      $example = require __DIR__ . $exampleFile;
+      $formats = ['html', 'shallow', 'deep'];
+      foreach ($formats as $updateFormat) {
+        foreach ($formats as $readFormat) {
+          $es[] = ['fakelibBareFile', $updateFormat, $example[$updateFormat], $readFormat, $example[$readFormat], $exampleFile];
+        }
+      }
+    }
 
     return $es;
   }
@@ -110,9 +92,11 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
    *   'html' or 'array'
    * @param mixed $readLayout
    *   The value that we expect to read.
+   * @param string $exampleName
+   *   (For debug messages) A symbolic name of the example data-set being tested.
    * @dataProvider getFormatExamples
    */
-  public function testUpdateAndGetFormat($directiveName, $updateFormat, $updateLayout, $readFormat, $readLayout) {
+  public function testUpdateAndGetFormat($directiveName, $updateFormat, $updateLayout, $readFormat, $readLayout, $exampleName) {
     Civi\Api4\Afform::revert()->addWhere('name', '=', $directiveName)->execute();
 
     Civi\Api4\Afform::update()
@@ -126,7 +110,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
       ->setLayoutFormat($readFormat)
       ->execute();
 
-    $this->assertEquals($readLayout, $result[0]['layout']);
+    $this->assertEquals($readLayout, $result[0]['layout'], "Based on \"$exampleName\", writing content as \"$updateFormat\" and reading back as \"$readFormat\".");
 
     Civi\Api4\Afform::revert()->addWhere('name', '=', $directiveName)->execute();
   }
