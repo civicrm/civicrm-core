@@ -229,11 +229,45 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test Creating a check contribution with original check_number field
+   */
+  public function testCreateCheckContribution() {
+    $params = $this->_params;
+    $params['contribution_check_number'] = 'bouncer';
+    $params['payment_instrument_id'] = 'Check';
+    $params['cancel_date'] = 'yesterday';
+    $params['receipt_date'] = 'yesterday';
+    $params['thankyou_date'] = 'yesterday';
+    $params['revenue_recognition_date'] = 'yesterday';
+    $params['amount_level'] = 'Unreasonable';
+    $params['cancel_reason'] = 'You lose sucker';
+    $params['creditnote_id'] = 'sudo rm -rf';
+    $params['tax_amount'] = '1';
+    $address = $this->callAPISuccess('Address', 'create', [
+      'street_address' => 'Knockturn Alley',
+      'contact_id' => $this->_individualId,
+      'location_type_id' => 'Home',
+    ]);
+    $params['address_id'] = $address['id'];
+    $contributionPage = $this->contributionPageCreate();
+    $params['contribution_page_id'] = $contributionPage['id'];
+    $params['campaign_id'] = $this->campaignCreate();
+    $contributionID = $this->contributionCreate($params);
+    $getResult = $this->callAPISuccess('Contribution', 'get', ['id' => $contributionID]);
+    $this->assertEquals('bouncer', $getResult['values'][$contributionID]['check_number']);
+    $entityFinancialTrxn = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_id' => $contributionID, 'entity_table' => 'civicrm_contribution']);
+    foreach ($entityFinancialTrxn['values'] as $eft) {
+      $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'get', ['id' => $eft['financial_trxn_id']]);
+      $this->assertEquals('bouncer', $financialTrxn['values'][$financialTrxn['id']]['check_number']);
+    }
+  }
+
+  /**
    * Test the 'return' param works for all fields.
    */
   public function testGetContributionReturnFunctionality() {
     $params = $this->_params;
-    $params['check_number'] = 'bouncer';
+    $params['contribution_check_number'] = 'bouncer';
     $params['payment_instrument_id'] = 'Check';
     $params['cancel_date'] = 'yesterday';
     $params['receipt_date'] = 'yesterday';
@@ -300,6 +334,11 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         $returnField = 'contact_id';
       }
       $this->assertTrue((!empty($contribution[$returnField]) || $contribution[$returnField] === "0"), $returnField);
+    }
+    $entityFinancialTrxn = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_id' => $contributionID, 'entity_table' => 'civicrm_contribution']);
+    foreach ($entityFinancialTrxn['values'] as $eft) {
+      $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'get', ['id' => $eft['financial_trxn_id']]);
+      $this->assertEquals('bouncer', $financialTrxn['values'][$financialTrxn['id']]['check_number']);
     }
   }
 
