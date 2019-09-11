@@ -373,6 +373,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       );
     }
 
+    $contactTypes = CRM_Contact_BAO_ContactType::basicTypes();
     $fields = self::getBasicFields($mappingType);
 
     // Unset groups, tags, notes for component export
@@ -383,14 +384,21 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
     }
 
     if ($mappingType == 'Search Builder') {
-      //build the common contact fields array.
+      // Build the common contact fields array.
       $fields['Contact'] = [];
-      foreach ($fields['Individual'] as $key => $value) {
-        if (!empty($fields['Household'][$key]) && !empty($fields['Organization'][$key])) {
+      foreach ($fields[$contactTypes[0]] as $key => $value) {
+        // If a field exists across all contact types, move it to the "Contact" selector
+        $ubiquitious = TRUE;
+        foreach ($contactTypes as $type) {
+          if (!isset($fields[$type][$key])) {
+            $ubiquitious = FALSE;
+          }
+        }
+        if ($ubiquitious) {
           $fields['Contact'][$key] = $value;
-          unset($fields['Organization'][$key],
-            $fields['Household'][$key],
-            $fields['Individual'][$key]);
+          foreach ($contactTypes as $type) {
+            unset($fields[$type][$key]);
+          }
         }
       }
       if (array_key_exists('note', $fields['Contact'])) {
@@ -429,7 +437,7 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
         }
       }
 
-      if (array_key_exists('related', $relatedMapperFields[$key])) {
+      if (isset($relatedMapperFields[$key]['related'])) {
         unset($relatedMapperFields[$key]['related']);
       }
     }
@@ -451,18 +459,18 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
 
     // since we need a hierarchical list to display contact types & subtypes,
     // this is what we going to display in first selector
-    $contactTypes = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, FALSE);
+    $contactTypeSelect = CRM_Contact_BAO_ContactType::getSelectElements(FALSE, FALSE);
     if ($mappingType == 'Search Builder') {
-      $contactTypes = ['Contact' => ts('Contacts')] + $contactTypes;
+      $contactTypeSelect = ['Contact' => ts('Contacts')] + $contactTypeSelect;
     }
 
-    $sel1 = ['' => ts('- select record type -')] + $contactTypes + $compArray;
+    $sel1 = ['' => ts('- select record type -')] + $contactTypeSelect + $compArray;
 
     foreach ($sel1 as $key => $sel) {
       if ($key) {
         // sort everything BUT the contactType which is sorted separately by
         // an initial commit of CRM-13278 (check ksort above)
-        if (!in_array($key, ['Individual', 'Household', 'Organization'])) {
+        if (!in_array($key, $contactTypes)) {
           asort($mapperFields[$key]);
         }
         $sel2[$key] = ['' => ts('- select field -')] + $mapperFields[$key];
