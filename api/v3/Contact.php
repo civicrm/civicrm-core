@@ -163,6 +163,8 @@ function _civicrm_api3_contact_create_spec(&$params) {
  *
  * @return array
  *   API Result Array
+ *
+ * @throws \API_Exception
  */
 function civicrm_api3_contact_get($params) {
   $options = [];
@@ -382,6 +384,11 @@ function _civicrm_api3_contact_get_spec(&$params) {
  *   Array of options (so we can modify the filter).
  */
 function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
+  if (!empty($params['email']) && !is_array($params['email'])) {
+    // Fix this to be in array format so the query object does not add LIKE
+    // I think there is a better fix that I will do for master.
+    $params['email'] = ['=' => $params['email']];
+  }
   if (isset($params['showAll'])) {
     if (strtolower($params['showAll']) == "active") {
       $params['contact_is_deleted'] = 0;
