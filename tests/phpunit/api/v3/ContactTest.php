@@ -367,6 +367,8 @@ class api_v3_ContactTest extends CiviUnitTestCase {
 
   /**
    * Verify that attempt to create individual contact with only an email succeeds.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateEmailIndividual() {
     $primaryEmail = 'man3@yahoo.com';
@@ -397,9 +399,11 @@ class api_v3_ContactTest extends CiviUnitTestCase {
     $this->assertEquals($primaryEmail, $email1['values'][$email1['id']]['email']);
 
     // Case 3: Check with email_id='primary email id'
-    $result = $this->callAPISuccess('contact', 'get', ['email_id' => $email1['id']]);
-    $this->assertEquals(1, $result['count']);
+    $result = $this->callAPISuccessGetSingle('contact', ['email_id' => $email1['id']]);
     $this->assertEquals($contact1['id'], $result['id']);
+
+    // Check no wildcard is appended
+    $this->callAPISuccessGetCount('Contact', ['email' => 'man3@yahoo.co'], 0);
 
     $this->callAPISuccess('contact', 'delete', $contact1);
   }
