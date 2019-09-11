@@ -840,9 +840,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
         }
       }
 
-      CRM_Price_BAO_PriceSet::processAmount($self->_values['fee'],
-        $fields, $lineItem
-      );
+      CRM_Price_BAO_PriceSet::processAmount($self->_values['fee'], $fields, $lineItem);
 
       $minAmt = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $fields['priceSetId'], 'min_amount');
       if ($fields['amount'] < 0) {
