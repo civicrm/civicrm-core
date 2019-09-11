@@ -12,9 +12,9 @@ trait AfformFormatTrait {
 
   /**
    * @var string
-   *   Either 'array' or 'html'.
+   * @options html,shallow,deep
    */
-  protected $layoutFormat = 'array';
+  protected $layoutFormat = 'shallow';
 
   /**
    * @param string $html
@@ -22,18 +22,11 @@ trait AfformFormatTrait {
    * @throws \API_Exception
    */
   protected function convertHtmlToOutput($html) {
-    switch ($this->layoutFormat) {
-      case 'html':
-        return $html;
-
-      case 'array':
-      case NULL:
-        $converter = new \CRM_Afform_ArrayHtml();
-        return $converter->convertHtmlToArray($html);
-
-      default:
-        throw new \API_Exception("Requested format is unrecognized");
+    if ($this->layoutFormat === 'html') {
+      return $html;
     }
+    $converter = new \CRM_Afform_ArrayHtml();
+    return $converter->convertHtmlToArray($html, $this->layoutFormat);
   }
 
   /**
@@ -42,18 +35,11 @@ trait AfformFormatTrait {
    * @throws \API_Exception
    */
   protected function convertInputToHtml($mixed) {
-    switch ($this->layoutFormat) {
-      case 'html':
-        return $mixed;
-
-      case 'array':
-      case NULL:
-        $converter = new \CRM_Afform_ArrayHtml();
-        return $converter->convertArrayToHtml($mixed);
-
-      default:
-        throw new \API_Exception("Requested format is unrecognized");
+    if ($this->layoutFormat === 'html') {
+      return $mixed;
     }
+    $converter = new \CRM_Afform_ArrayHtml();
+    return $converter->convertArrayToHtml($mixed, $this->layoutFormat);
   }
 
 }

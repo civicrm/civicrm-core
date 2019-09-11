@@ -13,10 +13,11 @@ class CRM_Afform_ArrayHtml {
   /**
    * @param array $array
    *   Ex: ['#tag' => 'div', 'class' => 'greeting', '#children' => ['Hello world']]
+   * @param string $format
    * @return string
    *   Ex: '<div class="greeting">Hello world</div>'
    */
-  public function convertArrayToHtml($array) {
+  public function convertArrayToHtml(array $array, $format = 'shallow') {
     if ($array === []) {
       return '';
     }
@@ -66,10 +67,11 @@ class CRM_Afform_ArrayHtml {
   /**
    * @param string $html
    *   Ex: '<div class="greeting">Hello world</div>'
+   * @param string $format
    * @return array
    *   Ex: ['#tag' => 'div', 'class' => 'greeting', '#children' => ['Hello world']]
    */
-  public function convertHtmlToArray($html) {
+  public function convertHtmlToArray($html, $format = 'shallow') {
     if ($html === '') {
       return [];
     }
