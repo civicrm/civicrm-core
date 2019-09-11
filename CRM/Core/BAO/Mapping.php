@@ -386,7 +386,12 @@ class CRM_Core_BAO_Mapping extends CRM_Core_DAO_Mapping {
       //build the common contact fields array.
       $fields['Contact'] = [];
       foreach ($fields['Individual'] as $key => $value) {
-        if (!empty($fields['Household'][$key]) && !empty($fields['Organization'][$key])) {
+        // Per https://lab.civicrm.org/dev/core/issues/1246 it's not clear it's supported
+        // to disable a core contact type - but it seems OK to provide a check here
+        // to stop an obvious experienced error. I don't see this as 'agreeing it's supported'
+        if ((isset($fields['Household']) && !empty($fields['Household'][$key]))
+            && (isset($fields['Organization']) && !empty($fields['Organization'][$key]))
+          ) {
           $fields['Contact'][$key] = $value;
           unset($fields['Organization'][$key],
             $fields['Household'][$key],
