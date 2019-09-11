@@ -345,18 +345,14 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
       $count = 1;
       try {
+        $this->recursion->RFC5545_COMPLIANT = When::IGNORE;
         $this->recursion->generateOccurrences();
       }
       catch (Exception $e) {
-        CRM_Core_Error::statusBounce($e->getMessage());
+        CRM_Core_Session::setStatus(ts($e->getMessage()));
         return $recursionDates;
       }
       foreach ($this->recursion->occurrences as $result) {
-        $skip = FALSE;
-        if ($result == $this->recursion_start_date) {
-          // skip the recursion-start-date from the list we going to generate
-          $skip = TRUE;
-        }
         $baseDate = $result->format('YmdHis');
 
         foreach ($this->dateColumns as $col) {
@@ -390,15 +386,6 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
           }
         }
 
-        if ($skip) {
-          unset($recursionDates[$count]);
-          if ($initialCount && ($initialCount > 0)) {
-            // lets increase the counter, so we get correct number of occurrences
-            $initialCount++;
-            $this->recursion->count($initialCount);
-          }
-          continue;
-        }
         $count++;
       }
     }
@@ -1018,6 +1005,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         }
         $repetition_frequency_unit = $repetition_frequency_unit . 'ly';
         $r->startDate($start)
+          ->exclusions([$start])
           ->freq($repetition_frequency_unit);
       }
 
