@@ -14,7 +14,7 @@ trait AfformFormatTrait {
    * @var string
    * @options html,shallow,deep
    */
-  protected $layoutFormat = 'shallow';
+  protected $layoutFormat = 'deep';
 
   /**
    * @param string $html
@@ -25,7 +25,7 @@ trait AfformFormatTrait {
     if ($this->layoutFormat === 'html') {
       return $html;
     }
-    $converter = new \CRM_Afform_ArrayHtml($this->layoutFormat === 'deep');
+    $converter = new \CRM_Afform_ArrayHtml($this->layoutFormat !== 'shallow');
     return $converter->convertHtmlToArray($html);
   }
 
@@ -38,7 +38,7 @@ trait AfformFormatTrait {
     if ($this->layoutFormat === 'html') {
       return $mixed;
     }
-    $converter = new \CRM_Afform_ArrayHtml($this->layoutFormat === 'deep');
+    $converter = new \CRM_Afform_ArrayHtml($this->layoutFormat !== 'shallow');
     return $converter->convertArrayToHtml($mixed);
   }
 
