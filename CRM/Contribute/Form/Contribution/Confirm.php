@@ -2269,11 +2269,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
     $this->_useForMember = $this->get('useForMember');
 
     // store the fact that this is a membership and membership type is selected
-    if ((!empty($membershipParams['selectMembership']) &&
-        $membershipParams['selectMembership'] != 'no_thanks'
-      ) ||
-      $this->_useForMember
-    ) {
+    if ($this->isMembershipSelected($membershipParams)) {
       if (!$this->_useForMember) {
         $this->assign('membership_assign', TRUE);
         $this->set('membershipTypeID', $this->_params['selectMembership']);
@@ -2339,6 +2335,53 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
   }
 
   /**
+   * Return True/False if we have a membership selected on the contribution page
+   * @param array $membershipParams
+   *
+   * @return bool
+   */
+  private function isMembershipSelected($membershipParams) {
+    $priceFieldIds = $this->get('memberPriceFieldIDS');
+    if ((!empty($membershipParams['selectMembership']) && $membershipParams['selectMembership'] != 'no_thanks')
+        && empty($priceFieldIds)) {
+      return TRUE;
+    }
+    else {
+      $membershipParams = $this->getMembershipParamsFromPriceSet($membershipParams);
+    }
+    return !empty($membershipParams['selectMembership']);
+  }
+
+  /**
+   * Extract the selected memberships from a priceSet
+   *
+   * @param array $membershipParams
+   *
+   * @return array
+   */
+  private function getMembershipParamsFromPriceSet($membershipParams) {
+    $priceFieldIds = $this->get('memberPriceFieldIDS');
+    if (empty($priceFieldIds)) {
+      return $membershipParams;
+    }
+    $membershipParams['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
+    unset($priceFieldIds['id']);
+    $membershipTypeIds = [];
+    $membershipTypeTerms = [];
+    foreach ($priceFieldIds as $priceFieldId) {
+      $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id');
+      if ($membershipTypeId) {
+        $membershipTypeIds[] = $membershipTypeId;
+        $term = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_num_terms') ?: 1;
+        $membershipTypeTerms[$membershipTypeId] = ($term > 1) ? $term : 1;
+      }
+    }
+    $membershipParams['selectMembership'] = $membershipTypeIds;
+    $membershipParams['types_terms'] = $membershipTypeTerms;
+    return $membershipParams;
+  }
+
+  /**
    * Membership processing section.
    *
    * This is in a separate function as part of a move towards refactoring.
@@ -2387,24 +2430,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       $fieldTypes = ['Contact', 'Organization', 'Membership'];
     }
 
-    $priceFieldIds = $this->get('memberPriceFieldIDS');
-
-    if (!empty($priceFieldIds)) {
-      $membershipParams['financial_type_id'] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', $priceFieldIds['id'], 'financial_type_id');
-      unset($priceFieldIds['id']);
-      $membershipTypeIds = [];
-      $membershipTypeTerms = [];
-      foreach ($priceFieldIds as $priceFieldId) {
-        $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_type_id');
-        if ($membershipTypeId) {
-          $membershipTypeIds[] = $membershipTypeId;
-          $term = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $priceFieldId, 'membership_num_terms') ?: 1;
-          $membershipTypeTerms[$membershipTypeId] = ($term > 1) ? $term : 1;
-        }
-      }
-      $membershipParams['selectMembership'] = $membershipTypeIds;
-      $membershipParams['types_terms'] = $membershipTypeTerms;
-    }
+    $membershipParams = $this->getMembershipParamsFromPriceSet($membershipParams);
     if (!empty($membershipParams['selectMembership'])) {
       // CRM-12233
       $membershipLineItems = $formLineItems;
