@@ -1976,6 +1976,10 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
 
+    if (!empty($params['useForMember'])) {
+      $form->set('useForMember', 1);
+      $form->_useForMember = 1;
+    }
     $priceFields = $priceFields[$priceSetID]['fields'];
     $lineItems = [];
     CRM_Price_BAO_PriceSet::processAmount($priceFields, $paramsProcessedForForm, $lineItems, 'civicrm_contribution', $priceSetID);
