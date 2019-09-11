@@ -1,8 +1,5 @@
 <?php
 
-use Civi\Test\HeadlessInterface;
-use Civi\Test\TransactionalInterface;
-
 /**
  * Afform.Get API Test Case
  * This is a generic test class implemented with PHPUnit.
@@ -66,13 +63,34 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
   public function getFormatExamples() {
     $es = [];
 
-    $asHtml = '<strong>New text!</strong>';
-    $asArray = ['#tag' => 'strong', '#children' => ['New text!']];
+    $asHtml = '<div><strong>New text!</strong><af-field field-name="do_not_sms" field-defn="{label: \'Do not do any of the emailing\'}"></af-field></div>';
+    $asShallow = [
+      '#tag' => 'div',
+      '#children' => [
+        ['#tag' => 'strong', '#children' => ['New text!']],
+        ['#tag' => 'af-field', 'field-name' => 'do_not_sms', 'field-defn' => "{label: 'Do not do any of the emailing'}"],
+      ],
+    ];
+    $asDeep = [
+      '#tag' => 'div',
+      '#children' => [
+        ['#tag' => 'strong', '#children' => ['New text!']],
+        ['#tag' => 'af-field', 'field-name' => 'do_not_sms', 'field-defn' => ['label' => 'Do not do any of the emailing']],
+      ],
+    ];
 
-    $es[] = ['fakelibBareFile', 'html', $asHtml, 'array', $asArray];
-    $es[] = ['fakelibBareFile', 'array', $asArray, 'html', $asHtml];
     $es[] = ['fakelibBareFile', 'html', $asHtml, 'html', $asHtml];
-    $es[] = ['fakelibBareFile', 'array', $asArray, 'array', $asArray];
+
+    $es[] = ['fakelibBareFile', 'html', $asHtml, 'shallow', $asShallow];
+    $es[] = ['fakelibBareFile', 'shallow', $asShallow, 'html', $asHtml];
+    $es[] = ['fakelibBareFile', 'shallow', $asShallow, 'shallow', $asShallow];
+
+    $es[] = ['fakelibBareFile', 'html', $asHtml, 'deep', $asDeep];
+    $es[] = ['fakelibBareFile', 'deep', $asDeep, 'html', $asHtml];
+    $es[] = ['fakelibBareFile', 'deep', $asDeep, 'deep', $asDeep];
+
+    $es[] = ['fakelibBareFile', 'shallow', $asShallow, 'deep', $asDeep];
+    $es[] = ['fakelibBareFile', 'deep', $asDeep, 'shallow', $asShallow];
 
     return $es;
   }

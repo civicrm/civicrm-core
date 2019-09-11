@@ -25,8 +25,8 @@ trait AfformFormatTrait {
     if ($this->layoutFormat === 'html') {
       return $html;
     }
-    $converter = new \CRM_Afform_ArrayHtml();
-    return $converter->convertHtmlToArray($html, $this->layoutFormat);
+    $converter = new \CRM_Afform_ArrayHtml($this->layoutFormat === 'deep');
+    return $converter->convertHtmlToArray($html);
   }
 
   /**
@@ -38,8 +38,8 @@ trait AfformFormatTrait {
     if ($this->layoutFormat === 'html') {
       return $mixed;
     }
-    $converter = new \CRM_Afform_ArrayHtml();
-    return $converter->convertArrayToHtml($mixed, $this->layoutFormat);
+    $converter = new \CRM_Afform_ArrayHtml($this->layoutFormat === 'deep');
+    return $converter->convertArrayToHtml($mixed);
   }
 
 }
