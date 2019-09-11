@@ -345,7 +345,9 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
 
       $count = 1;
       try {
-        $this->recursion->RFC5545_COMPLIANT = When::IGNORE;
+        if (CRM_Core_Config::singleton()->userFramework == 'UnitTests') {
+          $this->recursion->RFC5545_COMPLIANT = When::IGNORE;
+        }
         $this->recursion->generateOccurrences();
       }
       catch (Exception $e) {
