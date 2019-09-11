@@ -525,7 +525,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           'payment_instrument' => 'payment_instrument_id',
           'contribution_source' => 'source',
           'contribution_note' => 'note',
-
+          'contribution_check_number' => 'check_number',
         ];
         foreach ($fieldTranslations as $formField => $baoField) {
           if (isset($value[$formField])) {
