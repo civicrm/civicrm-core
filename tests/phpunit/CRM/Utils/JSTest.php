@@ -237,6 +237,36 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     $this->assertEquals($expectedOutput, CRM_Utils_JS::decode($input));
   }
 
+  public static function encodeExamples() {
+    return [
+      [
+        ['a' => 'Apple', 'b' => 'Banana', 'c' => [1, 2, 3]],
+        "{a: 'Apple', b: 'Banana', c: [1, 2, 3]}",
+      ],
+      [
+        ['a' => ['foo', 'bar'], 'b' => ["'a'" => ['foo/bar', 'bar(foo)'], 'b' => ['a' => ["fo'oo", 'bar'], 'b' => []]]],
+        "{a: ['foo', 'bar'], b: {\"'a'\": ['foo/bar', 'bar(foo)'], b: {a: [\"fo'oo\", 'bar'], b: {}}}}",
+      ],
+      [TRUE, 'true'],
+      [' ', "' '"],
+      [FALSE, 'false'],
+      [NULL, 'null'],
+      ['true', "'true'"],
+      ['0.5', "'0.5'"],
+      [0.5, '0.5'],
+      [[], "{}"],
+    ];
+  }
+
+  /**
+   * @param string $input
+   * @param string $expectedOutput
+   * @dataProvider encodeExamples
+   */
+  public function testEncode($input, $expectedOutput) {
+    $this->assertEquals($expectedOutput, CRM_Utils_JS::encode($input));
+  }
+
   /**
    * @return array
    */

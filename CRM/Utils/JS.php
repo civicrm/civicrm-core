@@ -160,6 +160,26 @@ class CRM_Utils_JS {
   }
 
   /**
+   * Encodes a variable to js notation (not strict json).
+   *
+   * Like json_encode but the output is more suitable for an html attribute.
+   *
+   * @param $value
+   * @return string
+   */
+  public static function encode($value) {
+    if (is_array($value)) {
+      return self::writeObject($value, TRUE);
+    }
+    $result = json_encode($value, JSON_UNESCAPED_SLASHES);
+    // Prefer single quotes
+    if (is_string($value) && strpos($result, "'") === FALSE) {
+      return "'" . substr($result, 1, -1) . "'";
+    }
+    return $result;
+  }
+
+  /**
    * Gets the properties of a javascript object/array WITHOUT decoding them.
    *
    * Useful when the object might contain js functions, expressions, etc. which cannot be decoded.
@@ -258,7 +278,7 @@ class CRM_Utils_JS {
     $brackets = isset($obj[0]) && array_keys($obj) === range(0, count($obj) - 1) ? ['[', ']'] : ['{', '}'];
     foreach ($obj as $key => $val) {
       if ($encodeValues) {
-        $val = json_encode($val, JSON_UNESCAPED_SLASHES);
+        $val = self::encode($val);
       }
       if ($brackets[0] == '{') {
         // Enclose the key in quotes unless it is purely alphanumeric
