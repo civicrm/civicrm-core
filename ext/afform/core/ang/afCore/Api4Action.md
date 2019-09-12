@@ -17,10 +17,10 @@ trigger further actions on failure or success.
 ```html
 <button
   af-api4-action="['Contact','delete',{where:['id','=','100]}}]"
-  msg-start="ts('Deleting...')"
-  msg-success="ts('Deleted')"
-  on-success="crmUiAlert({text:'Received ' + response.length + ' items'})"
-  on-error="crmUiAlert({text:'Failure: ' + error})"
+  af-api4-start-msg="ts('Deleting...')"
+  af-api4-success-msg="ts('Deleted')"
+  af-api4-success="crmUiAlert({text:'Received ' + response.length + ' items'})"
+  af-api4-error="crmUiAlert({text:'Failure: ' + error})"
 >Delete</button>
 <!-- Automated flag with af-api4-action-{running -->
 ```

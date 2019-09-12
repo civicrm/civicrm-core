@@ -27,8 +27,8 @@
       <td>
         <!--<a ng-click="crmStatus({start: ts('Reverting...'), success: ts('Reverted')}, crmApi4('Afform', 'revert', {where: [['name', '=', availForm.name]]}))">{{ts('Revert')}}</a>-->
         <a af-api4-action="['Afform', 'revert', {where: [['name','=', availForm.name]]}]"
-           msg-start="ts('Reverting...')"
-           msg-success="ts('Reverted')"
+           af-api4-start-msg="ts('Reverting...')"
+           af-api4-success-msg="ts('Reverted')"
           >{{ts('Revert')}}</a>
       </td>
     </tr>

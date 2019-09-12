@@ -5,10 +5,10 @@
       restrict: 'A',
       scope: {
         afApi4Action: '@',
-        msgStart: '=',
-        msgError: '=',
-        msgSuccess: '=',
-        onSuccess: '@',
+        afApi4StartMsg: '=',
+        afApi4ErrorMsg: '=',
+        afApi4SuccessMsg: '=',
+        afApi4Success: '@',
         onError: '@'
       },
       link: function($scope, $el, $attr) {
@@ -17,11 +17,11 @@
         running(false);
         $el.click(function(){
           var parts = $parse($scope.afApi4Action)($scope.$parent);
-          var msgs = {start: $scope.msgStart || ts('Submitting...'), success: $scope.msgSuccess, error: $scope.msgError};
+          var msgs = {start: $scope.afApi4StartMsg || ts('Submitting...'), success: $scope.afApi4SuccessMsg, error: $scope.afApi4ErrorMsg};
           running(true);
           crmStatus(msgs, crmApi4(parts[0], parts[1], parts[2]))
             .finally(function(){running(false);})
-            .then(function(response){$scope.$parent.$eval($scope.onSuccess, {response: response});})
+            .then(function(response){$scope.$parent.$eval($scope.afApi4Success, {response: response});})
             .catch(function(error){$scope.$parent.$eval($scope.onError, {error: error});});
         });
       }
