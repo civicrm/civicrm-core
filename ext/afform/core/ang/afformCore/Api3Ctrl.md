@@ -1,4 +1,4 @@
-# afform-api3-ctrl
+# af-api3-ctrl
 
 This directive is designed for querying and displaying data from APIv3. Each API call is represented with an object like this:
 
@@ -16,12 +16,12 @@ This directive is designed for querying and displaying data from APIv3. Each API
 }
 ```
 
-You can initialize this object using `<afform-api3-ctrl>` and `<afform-api3>`, as in:
+You can initialize this object using `<af-api3-ctrl>` and `<af-api3>`, as in:
 
 ```html
 <div
-  afform-api3-ctrl="apiData"
-  afform-api3="['Contact','get', {display_name: ''}]">
+  af-api3-ctrl="apiData"
+  af-api3="['Contact','get', {display_name: ''}]">
 
     <div crm-ui-debug="apiData"></div>
 
@@ -37,13 +37,13 @@ You can initialize this object using `<afform-api3-ctrl>` and `<afform-api3>`, a
 
 By default, the API call will refresh its results automatically - as soon as the filter parameters change.
 
-If you'd rather wait and trigger the refresh another way, then set the `afform-api3-refresh` policy to `init` or `manual`. Don't forget to fire the refresh some other way, such as `ng-click`:
+If you'd rather wait and trigger the refresh another way, then set the `af-api3-refresh` policy to `init` or `manual`. Don't forget to fire the refresh some other way, such as `ng-click`:
 
 ```html
 <div
-  afform-api3-ctrl="apiData"
-  afform-api3="['Contact','get', {display_name: ''}]"
-  afform-api3-refresh="init">
+  af-api3-ctrl="apiData"
+  af-api3="['Contact','get', {display_name: ''}]"
+  af-api3-refresh="init">
 
     <div crm-ui-debug="apiData"></div>
 
@@ -65,8 +65,8 @@ properties of the API object (`entity`, `action`, `params`, `result`).
 
 ```html
 <div
-  afform-api3-ctrl="apiData"
-  afform-api3="['Contact','get', {display_name: ''}]"
+  af-api3-ctrl="apiData"
+  af-api3="['Contact','get', {display_name: ''}]"
   on-refresh="doSomething(result)">
   ...
 </div>

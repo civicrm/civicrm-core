@@ -1,20 +1,20 @@
 (function(angular, $, _) {
 
-  angular.module('afformCore').directive('afformApi3Ctrl', function() {
+  angular.module('afformCore').directive('afApi3Ctrl', function() {
     return {
       restrict: 'EA',
       scope: {
-        afformApi3Ctrl: '=',
-        afformApi3: '@',
-        afformApi3Refresh: '@',
+        afApi3Ctrl: '=',
+        afApi3: '@',
+        afApi3Refresh: '@',
         onRefresh: '@'
       },
-      controllerAs: 'afformApi3Ctrl',
+      controllerAs: 'afApi3Ctrl',
       controller: function($scope, $parse, crmThrottle, crmApi) {
         var ctrl = this;
 
         // CONSIDER: Trade-offs of upfront vs ongoing evaluation.
-        var parts = $parse($scope.afformApi3)($scope.$parent);
+        var parts = $parse($scope.afApi3)($scope.$parent);
         ctrl.entity = parts[0];
         ctrl.action = parts[1];
         ctrl.params = parts[2];
@@ -35,11 +35,11 @@
           });
         };
 
-        $scope.afformApi3Ctrl = this;
+        $scope.afApi3Ctrl = this;
 
-        var mode = $scope.afformApi3Refresh ? $scope.afformApi3Refresh : 'auto';
+        var mode = $scope.afApi3Refresh ? $scope.afApi3Refresh : 'auto';
         switch (mode) {
-          case 'auto': $scope.$watchCollection('afformApi3Ctrl.params', ctrl.refresh); break;
+          case 'auto': $scope.$watchCollection('afApi3Ctrl.params', ctrl.refresh); break;
           case 'init': ctrl.refresh(); break;
           case 'manual': break;
           default: throw 'Unrecognized refresh mode: '+ mode;
