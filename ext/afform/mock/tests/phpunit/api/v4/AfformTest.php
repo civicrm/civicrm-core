@@ -9,14 +9,14 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
 
   public function getBasicDirectives() {
     return [
-      ['afformExamplepage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/example-page']],
+      ['afExamplePage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/example-page']],
       ['fakelibBareFile', ['title' => '', 'description' => '']],
       ['fakelibFoo', ['title' => '', 'description' => '']],
     ];
   }
 
   /**
-   * This takes the bundled `examplepage` and performs some API calls on it.
+   * This takes the bundled `example-page` and performs some API calls on it.
    * @dataProvider getBasicDirectives
    */
   public function testGetUpdateRevert($directiveName, $originalMetadata) {
