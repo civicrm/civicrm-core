@@ -597,21 +597,12 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
    * @throws Exception
    */
   public function make_payment(&$params) {
-    $config = CRM_Core_Config::singleton();
-    if (isset($params["billing_state_province_id-{$this->_bltID}"]) && $params["billing_state_province_id-{$this->_bltID}"]) {
-      $params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($params["billing_state_province_id-{$this->_bltID}"]);
-    }
-
-    if (isset($params["billing_country_id-{$this->_bltID}"]) && $params["billing_country_id-{$this->_bltID}"]) {
-      $params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($params["billing_country_id-{$this->_bltID}"]);
-    }
-    $params['ip_address'] = CRM_Utils_System::ipAddress();
-    $params['currencyID'] = $config->defaultCurrency;
+    $params = $this->prepareParamsForPaymentProcessor($params);
+    $params['currencyID'] = CRM_Core_Config::singleton()->defaultCurrency;
 
     $payment = Civi\Payment\System::singleton()->getByProcessor($this->_paymentProcessor);
     CRM_Core_Payment_Form::mapParams($this->_bltID, $params, $params, TRUE);
-    $params['month'] = $params['credit_card_exp_date']['M'];
-    $params['year'] = $params['credit_card_exp_date']['Y'];
+
     try {
       $result = $payment->doPayment($params);
     }

@@ -1107,12 +1107,7 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       // This code is duplicated multiple places and should be consolidated.
       $params = $this->prepareParamsForPaymentProcessor($params);
 
-      if (isset($params['credit_card_exp_date'])) {
-        $params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($params);
-        $params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($params);
-      }
       if ($this->_values['event']['is_monetary']) {
-        $params['ip_address'] = CRM_Utils_System::ipAddress();
         $params['currencyID'] = $config->defaultCurrency;
         $params['invoiceID'] = $invoiceID;
       }
