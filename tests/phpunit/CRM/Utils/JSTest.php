@@ -168,8 +168,8 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
   public function stripCommentsExamples() {
     $cases = [];
     $cases[] = [
-      "a();\n//# sourceMappingURL=../foo/bar/baz.js\nb();",
-      "a();\n\nb();",
+      "a();\n//# sourceMappingURL=../foo/bar/baz.js\n\n\nb();",
+      "a();\nb();",
     ];
     $cases[] = [
       "// foo\na();",
@@ -181,11 +181,11 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     ];
     $cases[] = [
       "/// foo\na();\n\t \t//bar\nb();\n// whiz",
-      "\na();\n\nb();\n",
+      "\na();\nb();\n",
     ];
     $cases[] = [
       "alert('//# sourceMappingURL=../foo/bar/baz.js');\n//zoop\na();",
-      "alert('//# sourceMappingURL=../foo/bar/baz.js');\n\na();",
+      "alert('//# sourceMappingURL=../foo/bar/baz.js');\na();",
     ];
     return $cases;
   }
