@@ -5,13 +5,13 @@
 
 return [
   'js' => [
-    'ang/afformCore.js',
-    'ang/afformCore/*.js',
-    'ang/afformCore/*/*.js',
+    'ang/afCore.js',
+    'ang/afCore/*.js',
+    'ang/afCore/*/*.js',
   ],
-  'css' => ['ang/afformCore.css'],
+  'css' => ['ang/afCore.css'],
   'requires' => ['crmUi', 'crmUtil', 'api4', 'checklist-model'],
-  'partials' => ['ang/afformCore'],
+  'partials' => ['ang/afCore'],
   'settings' => [],
   'basePages' => [],
 ];

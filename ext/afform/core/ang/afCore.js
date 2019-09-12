@@ -1,9 +1,9 @@
 (function(angular, $, _) {
   // Declare a list of dependencies.
-  angular.module('afformCore', CRM.angRequires('afformCore'));
+  angular.module('afCore', CRM.angRequires('afCore'));
 
-  // Use `afformCoreDirective(string name)` to generate an AngularJS directive.
-  angular.module('afformCore').service('afformCoreDirective', function($routeParams, crmApi4, crmStatus, crmUiAlert) {
+  // Use `afCoreDirective(string name)` to generate an AngularJS directive.
+  angular.module('afCore').service('afCoreDirective', function($routeParams, crmApi4, crmStatus, crmUiAlert) {
     return function(camelName, meta, d) {
       d.restrict = 'AE';
       d.scope = {};

@@ -16,7 +16,7 @@ class CRM_Afform_AfformScanner {
 
   const FILE_REGEXP = '/\.aff\.(json|html)$/';
 
-  const DEFAULT_REQUIRES = 'afformCore';
+  const DEFAULT_REQUIRES = 'afCore';
 
   /**
    * @var CRM_Utils_Cache_Interface

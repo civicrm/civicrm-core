@@ -1,4 +1,4 @@
 {
   "title": "Afform HTML Editor",
-  "requires":["afformCore", "afMoncao"]
+  "requires":["afCore", "afMoncao"]
 }

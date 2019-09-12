@@ -1,6 +1,6 @@
 (function(angular, $, _) {
 
-  angular.module('afformCore').directive('afApi4Action', function($parse, crmStatus, crmApi4) {
+  angular.module('afCore').directive('afApi4Action', function($parse, crmStatus, crmApi4) {
     return {
       restrict: 'A',
       scope: {

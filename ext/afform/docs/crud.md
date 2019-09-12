@@ -9,7 +9,7 @@ $ cv api4 afform.get +w name=helloWorld
     "0": {
         "name": "helloWorld",
         "requires": [
-            "afformCore"
+            "afCore"
         ],
         "title": "",
         "description": "",

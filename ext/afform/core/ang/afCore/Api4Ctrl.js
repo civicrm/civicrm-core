@@ -1,6 +1,6 @@
 (function(angular, $, _) {
 
-  angular.module('afformCore').directive('afApi4Ctrl', function() {
+  angular.module('afCore').directive('afApi4Ctrl', function() {
     return {
       restrict: 'EA',
       scope: {
