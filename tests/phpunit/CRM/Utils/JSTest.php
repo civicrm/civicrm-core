@@ -240,18 +240,19 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
   public static function encodeExamples() {
     return [
       [
-        ['a' => 'Apple', 'b' => 'Banana', 'c' => [1, 2, 3]],
-        "{a: 'Apple', b: 'Banana', c: [1, 2, 3]}",
+        ['a' => 'Apple', 'b' => 'Banana', 'c' => [0, -2, 3.15]],
+        "{a: 'Apple', b: 'Banana', c: [0, -2, 3.15]}",
       ],
       [
-        ['a' => ['foo', 'bar'], 'b' => ["'a'" => ['foo/bar', 'bar(foo)'], 'b' => ['a' => ["fo'oo", 'bar'], 'b' => []]]],
-        "{a: ['foo', 'bar'], b: {\"'a'\": ['foo/bar', 'bar(foo)'], b: {a: [\"fo'oo\", 'bar'], b: {}}}}",
+        ['a' => ['foo', 'bar'], 'b' => ["'a'" => ['foo/bar&', 'bar(foo)'], 'b' => ['a' => ["fo'oo", '"bar"'], 'b' => []]]],
+        "{a: ['foo', 'bar'], b: {\"'a'\": ['foo/bar&', 'bar(foo)'], b: {a: ['fo\\'oo', '\"bar\"'], b: {}}}}",
       ],
       [TRUE, 'true'],
       [' ', "' '"],
       [FALSE, 'false'],
       [NULL, 'null'],
       ['true', "'true'"],
+      ['"false"', "'\"false\"'"],
       ['0.5', "'0.5'"],
       [0.5, '0.5'],
       [[], "{}"],
@@ -264,7 +265,9 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
    * @dataProvider encodeExamples
    */
   public function testEncode($input, $expectedOutput) {
-    $this->assertEquals($expectedOutput, CRM_Utils_JS::encode($input));
+    $result = CRM_Utils_JS::encode($input);
+    $this->assertEquals($expectedOutput, $result);
+    $this->assertEquals($input, CRM_Utils_JS::decode($result));
   }
 
   /**

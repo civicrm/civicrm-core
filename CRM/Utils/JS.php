@@ -160,11 +160,19 @@ class CRM_Utils_JS {
   }
 
   /**
-   * Encodes a variable to js notation (not strict json).
+   * Encodes a variable to js notation (not strict json) suitable for e.g. an angular attribute.
    *
-   * Like json_encode but the output is more suitable for an html attribute.
+   * Like json_encode() but the output looks more like native javascript,
+   * with single quotes around strings and no unnecessary quotes around object keys.
    *
-   * @param $value
+   * Ex input: [
+   *   'a' => 'Apple',
+   *   'b' => 'Banana',
+   *   'c' => [1, 2, 3],
+   * ]
+   * Ex output: {a: 'Apple', b: 'Banana', c: [1, 2, 3]}
+   *
+   * @param mixed $value
    * @return string
    */
   public static function encode($value) {
@@ -172,9 +180,9 @@ class CRM_Utils_JS {
       return self::writeObject($value, TRUE);
     }
     $result = json_encode($value, JSON_UNESCAPED_SLASHES);
-    // Prefer single quotes
-    if (is_string($value) && strpos($result, "'") === FALSE) {
-      return "'" . substr($result, 1, -1) . "'";
+    // Convert double-quotes around string to single quotes
+    if (is_string($value) && substr($result, 0, 1) === '"' && substr($result, -1) === '"') {
+      return "'" . str_replace(['\\\\', '\\"', "'", '**backslash**'], ['**backslash**', '"', "\\'", '\\'], substr($result, 1, -1)) . "'";
     }
     return $result;
   }
