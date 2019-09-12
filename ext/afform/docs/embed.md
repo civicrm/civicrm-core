@@ -29,35 +29,35 @@ Is this useful? Let's suppose you're building a contact record page.
 
 First, we should make a few building-blocks:
 
-1. `ang/afformContactName.aff.html` displays a sub-form for editing first name, lastname, prefix, suffix, etc.
-2. `ang/afformContactAddresses.aff.html` displays a sub-form for editing street addresses.
-3. `ang/afformContactEmails.aff.html` displays a sub-form for editing email addresses.
+1. `ang/myContactName.aff.html` displays a sub-form for editing first name, lastname, prefix, suffix, etc.
+2. `ang/myContactAddresses.aff.html` displays a sub-form for editing street addresses.
+3. `ang/myContactEmails.aff.html` displays a sub-form for editing email addresses.
 
-Next, we should create an overall `ang/afformContact.aff.html` which uses these building-blocks:
+Next, we should create an overall `ang/myContact.aff.html` which uses these building-blocks:
 
 ```html
 <div ng-form="contactForm">
   <div crm-ui-accordion="{title: ts('Name')}">
-    <div afform-contact-name="{cid: routeParams.cid}"></div>
+    <div my-contact-name="{cid: routeParams.cid}"></div>
   </div>
   <div crm-ui-accordion="{title: ts('Street Addresses')}">
-    <div afform-contact-addresses="{cid: routeParams.cid}"></div>
+    <div my-contact-addresses="{cid: routeParams.cid}"></div>
   </div>
   <div crm-ui-accordion="{title: ts('Emails')}">
-    <div afform-contact-emails="{cid: routeParams.cid}"></div>
+    <div my-contact-emails="{cid: routeParams.cid}"></div>
   </div>
 </div>
 ```
 
-And we should create a `ang/afformContact.aff.json` looking like
+And we should create a `ang/myContact.aff.json` looking like
 
 ```json
 {
   "server_route": "civicrm/contact", 
-  "requires" : ["afformContactName", "afformContactEmails", "afformContactAddresses"]
+  "requires" : ["myContactName", "myContactEmails", "myContactAddresses"]
 }
 ```
-> *(FIXME: In the parent form's `*.aff.json`, we need to manually add `afformContactName`, `afformContactAddresses`, `afformContactEmails` to the `requires` list. We should autodetect these instead.)*
+> *(FIXME: In the parent form's `*.aff.json`, we need to manually add `myContactName`, `myContactAddresses`, `myContactEmails` to the `requires` list. We should autodetect these instead.)*
 
 We've created new files, so we'll need to flush the file-index
 
@@ -71,6 +71,6 @@ and now we can open the page
 cv open 'civicrm/contact?cid=100'
 ```
 
-What does this buy us?  It means that a downstream admin (using APIs/GUIs) can fork `ang/afformContactName.aff.html` --
+What does this buy us?  It means that a downstream admin (using APIs/GUIs) can fork `ang/myContactName.aff.html` --
 but all the other components can cleanly track the canonical release. This significantly reduces the costs and risks
 of manging upgrades and changes.
