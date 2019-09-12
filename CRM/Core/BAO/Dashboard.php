@@ -394,6 +394,9 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       if (empty($params['domain_id'])) {
         $dashlet->domain_id = CRM_Core_Config::domainID();
       }
+      else {
+        $dashlet->domain_id = CRM_Utils_Array::value('domain_id', $params);
+      }
 
       // Try and find an existing dashlet - it will be updated if found.
       if (!empty($params['name'])) {
