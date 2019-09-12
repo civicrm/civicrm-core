@@ -1,4 +1,4 @@
-<div aff-api4-ctrl="apiData" aff-api4="['Afform', 'get', {layoutFormat: 'html', where: [['name', '=', options.name]]}]">
+<div af-api4-ctrl="apiData" af-api4="['Afform', 'get', {layoutFormat: 'html', where: [['name', '=', options.name]]}]">
 
   <div ng-if="apiData.result.length == 0">
     {{ts('Failed to find requested form.')}}
@@ -10,7 +10,7 @@
     <div>
       <a ng-href="#/">{{ts('Back')}}</a>
       |
-      <a aff-api4-action="['Afform', 'update', {layoutFormat: 'html', where: [['name', '=', resultForm.name]], values:resultForm}]">{{ts('Save')}}</a>
+      <a af-api4-action="['Afform', 'update', {layoutFormat: 'html', where: [['name', '=', resultForm.name]], values:resultForm}]">{{ts('Save')}}</a>
       <span ng-if="resultForm.server_route">
         | <a target="_blank" ng-href="{{crmUrl(resultForm.server_route)}}">Open</a>
       </span>

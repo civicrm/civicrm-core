@@ -29,7 +29,7 @@ This extension is expected to be the base for a suite of related extensions:
 
 Within this extension, there are things which need updating/addressing:
 
-* Test coverage for key Angular directives (e.g. `aff-api4-ctrl`, `aff-api4-action`)
+* Test coverage for key Angular directives (e.g. `af-api4-ctrl`, `af-api4-action`)
 * There are several `FIXME`/`TODO` declarations in the code for checking pre-conditions, reporting errors, handling edge-cases, etc.
 * Although afforms can be used in AngularJS, they don't fully support tooling like `cv ang:html:list`
   and `hook_civicrm_alterAngular` changesets. We'll need a core patch to allow that. (Ex: Define partials via callback.)

@@ -1,6 +1,6 @@
 <div
-  aff-api4="['Afform', 'get', {select: ['name','title','is_public','server_route'], orderBy: {name:'ASC'}}]"
-  aff-api4-ctrl="listCtrl">
+  af-api4="['Afform', 'get', {select: ['name','title','is_public','server_route'], orderBy: {name:'ASC'}}]"
+  af-api4-ctrl="listCtrl">
 
   <div ng-if="apiData.result.length == 0">
     {{ts('There are no forms! Tell Aristotle!')}}
@@ -26,7 +26,7 @@
       <td>{{availForm.is_public ? ts('Frontend') : ts('Backend')}}</td>
       <td>
         <!--<a ng-click="crmStatus({start: ts('Reverting...'), success: ts('Reverted')}, crmApi4('Afform', 'revert', {where: [['name', '=', availForm.name]]}))">{{ts('Revert')}}</a>-->
-        <a aff-api4-action="['Afform', 'revert', {where: [['name','=', availForm.name]]}]"
+        <a af-api4-action="['Afform', 'revert', {where: [['name','=', availForm.name]]}]"
            msg-start="ts('Reverting...')"
            msg-success="ts('Reverted')"
           >{{ts('Revert')}}</a>
