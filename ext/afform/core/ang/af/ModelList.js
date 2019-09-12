@@ -55,7 +55,7 @@
         };
 
         this.submit = function submit() {
-          CRM.alert('TODO: Submit');
+          crmApi4('Afform', 'submit', {name: CRM.afform.open, args: $routeParams, values: data});
         };
       }
     };
