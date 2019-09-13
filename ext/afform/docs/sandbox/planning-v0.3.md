@@ -42,17 +42,17 @@
 ```html
 <div afform-entity-ctrl="myEntities">
 
-  <af-entity af-type="Individual" af-name="parent" af-label="Parent">
+  <af-entity type="Individual" af-name="parent" af-label="Parent">
     <af-name af-label="Name" />
     <af-email af-label="Email" />
   </af-entity>
   
-  <af-entity af-type="Individual" af-name="spouse" af-title="Spouse">
+  <af-entity type="Individual" af-name="spouse" af-title="Spouse">
     <af-name af-label="Spouse Name" />
     <af-email af-label="Spouse Email" />
   </af-entity>
 
-  <af-entity af-type="Individual" af-name="parent" af-title="Parent">
+  <af-entity type="Individual" af-name="parent" af-title="Parent">
     <af-address af-label="Address" />
   </af-entity>
 
@@ -65,17 +65,17 @@
 <!-- 1. s/entity/model-->
 <af-form>
 
-  <af-fieldset af-type="Individual" af-name="parent" af-label="Parent">
+  <af-fieldset type="Individual" af-name="parent" af-label="Parent">
     <af-name af-label="Name" />
     <af-email af-label="Email" />
   </af-fieldset>
 
-  <af-fieldset af-type="Individual" af-name="spouse" af-title="Spouse">
+  <af-fieldset type="Individual" af-name="spouse" af-title="Spouse">
     <af-name af-label="Spouse Name" />
     <af-email af-label="Spouse Email" />
   </af-fieldset>
 
-  <af-fieldset af-type="Individual" af-name="parent" af-title="Parent">
+  <af-fieldset type="Individual" af-name="parent" af-title="Parent">
     <af-address af-label="Address" />
   </af-fieldset>
 
@@ -87,13 +87,13 @@
 ```html
 <af-form ctrl="modelListCtrl">
   <af-model
-    af-type="Individual"
+    type="Individual"
     af-name="parent"
     af-label="Parent"
     af-api4-params="{where: ['id','=', routeParams.cid]}"
   />
   <af-model
-    af-type="Individual"
+    type="Individual"
     af-name="spouse"
     af-label="Spouse"
     af-contact-relationship="['Spouse of', 'parent']"
@@ -132,7 +132,7 @@
 <!-- Decision: These blocks are written in straight AngularJS rather than Afform -->
 <!--<af-form>-->
   <!--<af-model -->
-    <!--af-type="Email"-->
+    <!--type="Email"-->
     <!--af-name="email"-->
     <!--af-label="Emails"-->
     <!--af-api4-params="{where: ['contact_id', '=', options.parent.id]}"-->
@@ -149,13 +149,13 @@
 ```html
 <af-form ctrl="modelListCtrl">
   <af-model
-    af-type="Individual"
+    type="Individual"
     af-name="parent"
     af-label="Parent"
     af-api4-params="{where: ['id','=', routeParams.cid]}"
   />
   <af-model
-    af-type="Individual"
+    type="Individual"
     af-name="spouse"
     af-label="Spouse"
     af-contact-relationship="['Spouse of', 'parent']"
