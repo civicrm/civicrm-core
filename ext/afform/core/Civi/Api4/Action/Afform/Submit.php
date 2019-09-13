@@ -23,7 +23,7 @@ class Submit extends AbstractProcessor {
   protected function processForm() {
     foreach ($this->_afformEntities as $entityName => $entity) {
       // Predetermined values override submitted values
-      $this->_submission[$entity['af-type']][$entityName] = ($entity['af-values'] ?? []) + ($this->values[$entityName] ?? []);
+      $this->_submission[$entity['type']][$entityName] = ($entity['af-values'] ?? []) + ($this->values[$entityName] ?? []);
     }
     // Determines the order in which to process entities. Contacts go first.
     $entitiesToProcess = [

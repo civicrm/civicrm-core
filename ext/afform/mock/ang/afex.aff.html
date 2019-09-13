@@ -1,8 +1,8 @@
 <af-model-list ctrl="modelListCtrl">
   <!-- FIXME: Distinguish "Individual"s from "Household"s -->
-  <af-model-prop af-type="Contact" af-name="parent" af-label="Parent" af-api4-params="{where: ['id','=', routeParams.cid]}"></af-model-prop>
-  <af-model-prop af-type="Contact" af-name="spouse" af-label="Spouse" af-contact-relationship="['Spouse of', 'parent']"></af-model-prop>
-  <af-model-prop af-type="Contact" af-name="home" af-label="Home"></af-model-prop>
+  <af-model-prop type="Contact" af-name="parent" af-label="Parent" af-api4-params="{where: ['id','=', routeParams.cid]}"></af-model-prop>
+  <af-model-prop type="Contact" af-name="spouse" af-label="Spouse" af-contact-relationship="['Spouse of', 'parent']"></af-model-prop>
+  <af-model-prop type="Contact" af-name="home" af-label="Home"></af-model-prop>
 
   <!-- "parent" and "spouse" should be exported as variables in this scope -->
 

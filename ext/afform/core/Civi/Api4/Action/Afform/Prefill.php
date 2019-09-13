@@ -37,14 +37,14 @@ class Prefill extends AbstractProcessor {
    */
   private function loadEntity($entity, $id) {
     $checkPermissions = TRUE;
-    if ($entity['af-type'] == 'Contact' && !empty($this->args[$entity['af-name'] . '-cs'])) {
+    if ($entity['type'] == 'Contact' && !empty($this->args[$entity['af-name'] . '-cs'])) {
       $checkSum = civicrm_api4('Contact', 'validateChecksum', [
         'checksum' => $this->args[$entity['af-name'] . '-cs'],
         'contactId' => $id,
       ]);
       $checkPermissions = empty($checkSum[0]['valid']);
     }
-    $result = civicrm_api4($entity['af-type'], 'get', [
+    $result = civicrm_api4($entity['type'], 'get', [
       'where' => [['id', '=', $id]],
       'select' => array_column($entity['fields'], 'field-name'),
       'checkPermissions' => $checkPermissions,
@@ -62,7 +62,7 @@ class Prefill extends AbstractProcessor {
    */
   private function autoFillEntity($entity, $mode) {
     $id = NULL;
-    if ($entity['af-type'] == 'Contact') {
+    if ($entity['type'] == 'Contact') {
       if ($mode == 'user') {
         $id = \CRM_Core_Session::getLoggedInContactID();
       }

@@ -182,7 +182,7 @@ function afform_civicrm_alterAngular($angular) {
       foreach (pq('af-field', $doc) as $afField) {
         /** @var DOMElement $afField */
         $fieldName = $afField->getAttribute('field-name');
-        $entityName = pq($afField)->parent('[af-name]')->attr('af-name');
+        $entityName = pq($afField)->parent('af-model[af-name]')->attr('af-name'); // TEST ME
         if (!preg_match(';^[a-zA-Z0-9\_\-\. ]+$;', $entityName)) {
           throw new \CRM_Core_Exception("Cannot process $path: malformed entity name ($entityName)");
         }
@@ -216,7 +216,7 @@ function _afform_getMetadata(phpQueryObject $doc) {
   $entities = [];
   foreach ($doc->find('af-model-prop') as $afmModelProp) {
     $entities[$afmModelProp->getAttribute('af-name')] = [
-      'type' => $afmModelProp->getAttribute('af-type'),
+      'type' => $afmModelProp->getAttribute('type'),
     ];
   }
   return $entities;
