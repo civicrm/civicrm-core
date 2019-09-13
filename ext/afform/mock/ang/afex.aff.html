@@ -1,29 +1,29 @@
 <af-form ctrl="modelListCtrl">
   <!-- FIXME: Distinguish "Individual"s from "Household"s -->
-  <af-model type="Contact" af-name="parent" af-label="Parent" af-api4-params="{where: ['id','=', routeParams.cid]}"></af-model>
-  <af-model type="Contact" af-name="spouse" af-label="Spouse" af-contact-relationship="['Spouse of', 'parent']"></af-model>
-  <af-model type="Contact" af-name="home" af-label="Home"></af-model>
+  <af-model type="Contact" af-name="parent" label="Parent" af-api4-params="{where: ['id','=', routeParams.cid]}"></af-model>
+  <af-model type="Contact" af-name="spouse" label="Spouse" af-contact-relationship="['Spouse of', 'parent']"></af-model>
+  <af-model type="Contact" af-name="home" label="Home"></af-model>
 
   <!-- "parent" and "spouse" should be exported as variables in this scope -->
 
   <af-fieldset af-name="parent">
-    <af-block-contact-name af-label="My Name" />
-    <af-block-contact-email af-label="My Email" />
+    <af-block-contact-name label="My Name" />
+    <af-block-contact-email label="My Email" />
     <af-field field-name="do_not_email" />
   </af-fieldset>
 
   <af-fieldset af-name="spouse">
-    <af-block-contact-name af-label="Spouse Name" />
-    <af-block-contact-email af-label="Spouse Email" only-primary="true" />
+    <af-block-contact-name label="Spouse Name" />
+    <af-block-contact-email label="Spouse Email" only-primary="true" />
     <af-field field-name="do_not_email" field-type="checkbox" field-default="1" />
   </af-fieldset>
 
   <af-fieldset af-name="home">
-    <af-block-contact-name af-label="Home Name" />
+    <af-block-contact-name label="Home Name" />
   </af-fieldset>
 
   <af-fieldset af-name="parent">
-    <af-block-contact-address af-label="My Address" />
+    <af-block-contact-address label="My Address" />
   </af-fieldset>
 
   <!-- General elements: FIELDSET, UL, BUTTON, P, H1 should work anywhere -->

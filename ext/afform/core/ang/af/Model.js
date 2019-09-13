@@ -8,7 +8,7 @@
       type: '@',
       afData: '=',
       afName: '@',
-      afLabel: '@',
+      label: '@',
       afAutofill: '@'
     };
     return {
