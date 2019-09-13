@@ -40,7 +40,7 @@
         this.loadData = function() {
           var toLoad = 0;
           _.each(schema, function(entity, entityName) {
-            if ($routeParams[entityName] || entity.afAutofill) {
+            if ($routeParams[entityName] || entity.autofill) {
               toLoad++;
             }
           });

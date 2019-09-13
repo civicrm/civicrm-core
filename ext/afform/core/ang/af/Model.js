@@ -9,7 +9,7 @@
       afData: '=',
       afName: '@',
       label: '@',
-      afAutofill: '@'
+      autofill: '@'
     };
     return {
       restrict: 'AE',

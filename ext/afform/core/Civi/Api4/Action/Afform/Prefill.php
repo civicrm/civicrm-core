@@ -17,8 +17,8 @@ class Prefill extends AbstractProcessor {
         $this->loadEntity($entity, $this->args[$entityName]);
       }
       // Load entities from autofill settings
-      elseif (!empty($entity['af-autofill'])) {
-        $this->autofillEntity($entity, $entity['af-autofill']);
+      elseif (!empty($entity['autofill'])) {
+        $this->autofillEntity($entity, $entity['autofill']);
       }
     }
     $data = [];
