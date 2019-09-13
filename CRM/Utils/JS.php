@@ -147,7 +147,8 @@ class CRM_Utils_JS {
     $last = substr($js, -1);
     if ($last === $first && ($first === "'" || $first === '"')) {
       // Use a temp placeholder for escaped backslashes
-      return str_replace(['\\\\', "\\'", '\\"', '\\&', '\\/', '**backslash**'], ['**backslash**', "'", '"', '&', '/', '\\'], substr($js, 1, -1));
+      $backslash = chr(0) . 'backslash' . chr(0);
+      return str_replace(['\\\\', "\\'", '\\"', '\\&', '\\/', $backslash], [$backslash, "'", '"', '&', '/', '\\'], substr($js, 1, -1));
     }
     if (($first === '{' && $last === '}') || ($first === '[' && $last === ']')) {
       $obj = self::getRawProps($js);
@@ -182,7 +183,8 @@ class CRM_Utils_JS {
     $result = json_encode($value, JSON_UNESCAPED_SLASHES);
     // Convert double-quotes around string to single quotes
     if (is_string($value) && substr($result, 0, 1) === '"' && substr($result, -1) === '"') {
-      return "'" . str_replace(['\\\\', '\\"', "'", '**backslash**'], ['**backslash**', '"', "\\'", '\\'], substr($result, 1, -1)) . "'";
+      $backslash = chr(0) . 'backslash' . chr(0);
+      return "'" . str_replace(['\\\\', '\\"', "'", $backslash], [$backslash, '"', "\\'", '\\\\'], substr($result, 1, -1)) . "'";
     }
     return $result;
   }
