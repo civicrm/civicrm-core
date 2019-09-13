@@ -21,7 +21,7 @@ class CRM_Afform_ArrayHtml {
     '*' => [
       '*' => 'text',
     ],
-    'af-will-be-model' => [
+    'af-model' => [
       'af-name' => 'text',
       'af-entity' => 'text',
       'af-data' => 'js',
@@ -158,7 +158,7 @@ class CRM_Afform_ArrayHtml {
    * Determine the type of data that is stored in an attribute.
    *
    * @param string $tag
-   *   Ex: 'af-will-be-model'
+   *   Ex: 'af-model'
    * @param string $attrName
    *   Ex: 'af-name'
    * @return string

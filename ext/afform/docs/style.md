@@ -4,10 +4,10 @@
 
 The following naming conventions apply to directives defined within `afform.git`:
 
-* Standalone directives (e.g. `afWillBeModel` or `afField`), including forms (e.g. `afHtmlEditor`)
+* Standalone directives (e.g. `afModel` or `afField`), including forms (e.g. `afHtmlEditor`)
     * The directive name must begin with the `af` prefix.
     * Supplemental attributes SHOULD NOT begin with the `af` prefix.
-    * Example: `<af-will-be-model type="Activity" name="myPhoneCall">`
+    * Example: `<af-model type="Activity" name="myPhoneCall">`
 
 * Mix-in directives (e.g. `afMonaco` or `afApi4Action`)
     * The directive name must begin with the `af` prefix.
@@ -18,7 +18,7 @@ __Discussion__: These differ in two ways:
 
 * Namespacing
     * Standalone directives form an implicit namespace.
-      (*Anything passed to `<af-will-be-model>` is implicitly about `af-will-be-model`.)
+      (*Anything passed to `<af-model>` is implicitly about `af-model`.)
     * Mix-in directives must share a namespace with other potential mix-ins.
       (*The *)
 * Directive arguments

@@ -86,13 +86,13 @@
 
 ```html
 <af-form ctrl="modelListCtrl">
-  <af-will-be-model
+  <af-model
     af-type="Individual"
     af-name="parent"
     af-label="Parent"
     af-api4-params="{where: ['id','=', routeParams.cid]}"
   />
-  <af-will-be-model
+  <af-model
     af-type="Individual"
     af-name="spouse"
     af-label="Spouse"
@@ -131,7 +131,7 @@
 <!-- input: options.parent.id -->
 <!-- Decision: These blocks are written in straight AngularJS rather than Afform -->
 <!--<af-form>-->
-  <!--<af-will-be-model -->
+  <!--<af-model -->
     <!--af-type="Email"-->
     <!--af-name="email"-->
     <!--af-label="Emails"-->
@@ -148,13 +148,13 @@
 
 ```html
 <af-form ctrl="modelListCtrl">
-  <af-will-be-model
+  <af-model
     af-type="Individual"
     af-name="parent"
     af-label="Parent"
     af-api4-params="{where: ['id','=', routeParams.cid]}"
   />
-  <af-will-be-model
+  <af-model
     af-type="Individual"
     af-name="spouse"
     af-label="Spouse"
