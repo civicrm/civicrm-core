@@ -1,6 +1,6 @@
 <ul class="crm-checkbox-list" id="{{ fieldId }}" ng-if="defn.options">
   <li ng-repeat="(key, val) in defn.options" >
-    <input type="checkbox" checklist-model="getData()[fieldName]" id="{{ fieldId + key }}" checklist-value="key" />
+    <input type="checkbox" checklist-model="getData()[name]" id="{{ fieldId + key }}" checklist-value="key" />
     <label for="{{ fieldId + key }}">{{ val }}</label>
   </li>
 </ul>

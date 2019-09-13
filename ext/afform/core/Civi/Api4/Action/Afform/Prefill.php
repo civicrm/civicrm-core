@@ -46,7 +46,7 @@ class Prefill extends AbstractProcessor {
     }
     $result = civicrm_api4($entity['type'], 'get', [
       'where' => [['id', '=', $id]],
-      'select' => array_column($entity['fields'], 'field-name'),
+      'select' => array_column($entity['fields'], 'name'),
       'checkPermissions' => $checkPermissions,
     ]);
     if ($result->first()) {

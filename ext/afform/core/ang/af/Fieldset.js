@@ -12,7 +12,7 @@
         $scope.afFormCtrl = afFormCtrl;
         // This is faster than waiting for each field directive to register itself
         $('af-field', $el).each(function() {
-          afFormCtrl.registerField($scope.afName, $(this).attr('field-name'))
+          afFormCtrl.registerField($scope.afName, $(this).attr('name'))
         });
       },
       controller: function($scope){

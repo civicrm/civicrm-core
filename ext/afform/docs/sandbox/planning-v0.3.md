@@ -167,14 +167,14 @@
       <af-fieldset af-name="parent">
         <af-std-contact-name label="Name" />
         <af-std-contact-email label="Email" />
-        <af-field field-name="do_not_email" field-type="checkbox" field-default="1" />
+        <af-field name="do_not_email" field-type="checkbox" field-default="1" />
       </af-fieldset>
     </crm-ui-tab>
     <crm-ui-tab title="Spouse">
       <af-fieldset af-name="spouse">
         <af-std-contact-name label="Spouse Name" />
         <af-std-contact-email label="Spouse Email" only-primary="true" />
-        <af-field field-name="do_not_email" field-type="checkbox" field-default="1" />
+        <af-field name="do_not_email" field-type="checkbox" field-default="1" />
       </af-fieldset>
     </crm-ui-tab>
   </crm-ui-tab-set>
