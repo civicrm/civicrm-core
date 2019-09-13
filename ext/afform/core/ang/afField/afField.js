@@ -7,7 +7,7 @@
       templateUrl: '~/afField/afField.html',
       scope: {
         fieldName: '@',
-        fieldDefn: '='
+        defn: '='
       },
       link: function($scope, $el, $attr, ctrls) {
         var ts = $scope.ts = CRM.ts('afform');
@@ -17,12 +17,12 @@
         $scope.getData = $scope.afFieldset.getData;
 
         $scope.getOptions = function() {
-          return _.transform($scope.fieldDefn.options, function(result, val, key) {
+          return _.transform($scope.defn.options, function(result, val, key) {
             result.push({id: key, text: val});
           }, []);
         };
 
-        $el.addClass('af-field-type-' + _.kebabCase($scope.fieldDefn.input_type));
+        $el.addClass('af-field-type-' + _.kebabCase($scope.defn.input_type));
       }
     };
   });

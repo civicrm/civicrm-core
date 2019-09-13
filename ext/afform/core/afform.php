@@ -194,7 +194,7 @@ function afform_civicrm_alterAngular($angular) {
         ]);
         // Merge field definition data with whatever's already in the markup
         foreach ($getFields as $field) {
-          $existingFieldDefn = trim(pq($afField)->attr('field-defn') ?: '');
+          $existingFieldDefn = trim(pq($afField)->attr('defn') ?: '');
           if ($existingFieldDefn && $existingFieldDefn[0] != '{') {
             // If it's not an object, don't mess with it.
             continue;
@@ -205,7 +205,7 @@ function afform_civicrm_alterAngular($angular) {
           if ($existingFieldDefn) {
             $field = array_merge($field, CRM_Utils_JS::getRawProps($existingFieldDefn));
           }
-          pq($afField)->attr('field-defn', CRM_Utils_JS::writeObject($field));
+          pq($afField)->attr('defn', CRM_Utils_JS::writeObject($field));
         }
       }
     });
