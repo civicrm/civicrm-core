@@ -3,12 +3,12 @@
   angular.module('afBlock').directive('afBlockContactEmail', function() {
     return {
       restrict: 'AE',
-      require: ['^afModel'],
+      require: ['^afFieldset'],
       templateUrl: '~/afBlock/ContactEmail.html',
       scope: {},
       link: function($scope, $el, $attr, ctrls) {
         var ts = $scope.ts = CRM.ts('afform');
-        $scope.afModel = ctrls[0];
+        $scope.afFieldset = ctrls[0];
       }
     };
   });

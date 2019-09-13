@@ -65,19 +65,19 @@
 <!-- 1. s/entity/model-->
 <af-form>
 
-  <af-model af-type="Individual" af-name="parent" af-label="Parent">
+  <af-fieldset af-type="Individual" af-name="parent" af-label="Parent">
     <af-name af-label="Name" />
     <af-email af-label="Email" />
-  </af-model>
+  </af-fieldset>
 
-  <af-model af-type="Individual" af-name="spouse" af-title="Spouse">
+  <af-fieldset af-type="Individual" af-name="spouse" af-title="Spouse">
     <af-name af-label="Spouse Name" />
     <af-email af-label="Spouse Email" />
-  </af-model>
+  </af-fieldset>
 
-  <af-model af-type="Individual" af-name="parent" af-title="Parent">
+  <af-fieldset af-type="Individual" af-name="parent" af-title="Parent">
     <af-address af-label="Address" />
-  </af-model>
+  </af-fieldset>
 
 </af-form>
 ```
@@ -100,23 +100,23 @@
   />
   <!-- "parent" and "spouse" should be exported as variables in this scope -->
 
-  <af-model af-name="parent">
+  <af-fieldset af-name="parent">
     <af-name af-label="Name" />
     <af-email af-label="Email" />
-  </af-model>
+  </af-fieldset>
 
-  <af-model af-name="spouse">
+  <af-fieldset af-name="spouse">
     <af-name af-label="Spouse Name" />
     <af-email af-label="Spouse Email" only-primary="true" />
-  </af-model>
+  </af-fieldset>
 
   <p ng-if="spouse.display_name.contains('Thor')">
     Your spouse should go to the gym.
   </p>
 
-  <af-model af-name="parent">
+  <af-fieldset af-name="parent">
     <af-address af-label="Address" />
-  </af-model>
+  </af-fieldset>
 
   <!-- General elements: FIELDSET, UL, BUTTON, P, H1 should work anywhere -->
   <button ng-model="modelListCtrl.submit()">Submit</button>
@@ -137,9 +137,9 @@
     <!--af-label="Emails"-->
     <!--af-api4-params="{where: ['contact_id', '=', options.parent.id]}"-->
   <!--/>-->
-  <!--<af-model af-name="email">-->
+  <!--<af-fieldset af-name="email">-->
     <!---->
-  <!--</af-model>-->
+  <!--</af-fieldset>-->
 <!--</af-form>-->
 
 ```
@@ -164,18 +164,18 @@
 
   <crm-ui-tab-set>
     <crm-ui-tab title="About You">
-      <af-model af-name="parent">
+      <af-fieldset af-name="parent">
         <af-std-contact-name af-label="Name" />
         <af-std-contact-email af-label="Email" />
         <af-field field-name="do_not_email" field-type="checkbox" field-default="1" />
-      </af-model>
+      </af-fieldset>
     </crm-ui-tab>
     <crm-ui-tab title="Spouse">
-      <af-model af-name="spouse">
+      <af-fieldset af-name="spouse">
         <af-std-contact-name af-label="Spouse Name" />
         <af-std-contact-email af-label="Spouse Email" only-primary="true" />
         <af-field field-name="do_not_email" field-type="checkbox" field-default="1" />
-      </af-model>
+      </af-fieldset>
     </crm-ui-tab>
   </crm-ui-tab-set>
 
@@ -183,9 +183,9 @@
     Your spouse should go to the gym.
   </p>
 
-  <af-model af-name="parent">
+  <af-fieldset af-name="parent">
     <af-block-contact-address af-label="Address" />
-  </af-model>
+  </af-fieldset>
 
   <!-- General elements: FIELDSET, UL, BUTTON, P, H1 should work anywhere -->
   <button ng-model="modelListCtrl.submit()">Submit</button>

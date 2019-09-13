@@ -1,7 +1,7 @@
 (function(angular, $, _) {
-  // "afModel" is a basic skeletal directive.
-  // Example usage: <af-form>... <af-model af-name="myModel">...</af-model> ...</af-form>
-  angular.module('af').directive('afModel', function() {
+  // "afFieldset" is a basic skeletal directive.
+  // Example usage: <af-form>... <af-fieldset af-name="myModel">...</af-fieldset> ...</af-form>
+  angular.module('af').directive('afFieldset', function() {
     return {
       restrict: 'AE',
       require: '^afForm',

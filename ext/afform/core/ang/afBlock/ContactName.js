@@ -1,14 +1,14 @@
 (function(angular, $, _) {
-  // Example usage: <af-model af-name="myModel"><af-block-contact-name /></af-model>
+  // Example usage: <af-fieldset af-name="myModel"><af-block-contact-name /></af-fieldset>
   angular.module('afBlock').directive('afBlockContactName', function() {
     return {
       restrict: 'AE',
-      require: ['^afModel'],
+      require: ['^afFieldset'],
       templateUrl: '~/afBlock/ContactName.html',
       scope: {},
       link: function($scope, $el, $attr, ctrls) {
         var ts = $scope.ts = CRM.ts('afform');
-        $scope.afModel = ctrls[0];
+        $scope.afFieldset = ctrls[0];
       }
     };
   });

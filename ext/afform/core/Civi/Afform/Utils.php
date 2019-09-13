@@ -40,7 +40,7 @@ class Utils {
    */
   protected static function getFields($layout, &$entities) {
     foreach ($layout['#children'] as $child) {
-      if ($child['#tag'] == 'af-model' && !empty($child['#children'])) {
+      if ($child['#tag'] == 'af-fieldset' && !empty($child['#children'])) {
         $entities[$child['af-name']]['fields'] = array_merge($entities[$child['af-name']]['fields'] ?? [], self::getTags($child, 'af-field'));
       }
       elseif (!empty($child['#children'])) {
