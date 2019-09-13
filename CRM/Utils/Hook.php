@@ -1368,7 +1368,7 @@ abstract class CRM_Utils_Hook {
    *
    * @return mixed
    */
-  public static function export(&$exportTempTable, &$headerRows, &$sqlColumns, &$exportMode, $componentTable, $ids) {
+  public static function export(&$exportTempTable, &$headerRows, &$sqlColumns, $exportMode, $componentTable, $ids) {
     return self::singleton()->invoke(['exportTempTable', 'headerRows', 'sqlColumns', 'exportMode', 'componentTable', 'ids'],
       $exportTempTable, $headerRows, $sqlColumns,
       $exportMode, $componentTable, $ids,
