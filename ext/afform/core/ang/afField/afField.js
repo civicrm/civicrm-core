@@ -3,7 +3,7 @@
   angular.module('afField').directive('afField', function() {
     return {
       restrict: 'E',
-      require: ['^afModel', '^afModelList'],
+      require: ['^afModel', '^afForm'],
       templateUrl: '~/afField/afField.html',
       scope: {
         fieldName: '@',

@@ -1,6 +1,6 @@
 (function(angular, $, _) {
   // "afModelProp" is a basic skeletal directive.
-  // Example usage: <af-model-list>... <af-model-prop af-name="myModel" type="Individual" /> ...</af-model-list>
+  // Example usage: <af-form>... <af-model-prop af-name="myModel" type="Individual" /> ...</af-form>
   angular.module('af').directive('afModelProp', function() {
     // Whitelist of all allowed properties of an af-model
     // (at least the ones we care about client-side - other's can be added for server-side processing and we'll just ignore them)
@@ -13,14 +13,14 @@
     };
     return {
       restrict: 'AE',
-      require: '^afModelList',
+      require: '^afForm',
       scope: modelProps,
-      link: function($scope, $el, $attr, afModelListCtrl) {
+      link: function($scope, $el, $attr, afFormCtrl) {
         var ts = $scope.ts = CRM.ts('afform'),
           entity = _.pick($scope, _.keys(modelProps));
         entity.id = null;
         entity.fields = [];
-        afModelListCtrl.registerEntity(entity);
+        afFormCtrl.registerEntity(entity);
         // $scope.$watch('afModelProp', function(newValue){$scope.myOptions = newValue;});
       }
     };

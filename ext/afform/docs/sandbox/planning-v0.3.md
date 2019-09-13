@@ -63,7 +63,7 @@
 
 ```html
 <!-- 1. s/entity/model-->
-<af-model-list>
+<af-form>
 
   <af-model af-type="Individual" af-name="parent" af-label="Parent">
     <af-name af-label="Name" />
@@ -79,13 +79,13 @@
     <af-address af-label="Address" />
   </af-model>
 
-</af-model-list>
+</af-form>
 ```
 
 --------------
 
 ```html
-<af-model-list ctrl="modelListCtrl">
+<af-form ctrl="modelListCtrl">
   <af-model-prop
     af-type="Individual"
     af-name="parent"
@@ -121,7 +121,7 @@
   <!-- General elements: FIELDSET, UL, BUTTON, P, H1 should work anywhere -->
   <button ng-model="modelListCtrl.submit()">Submit</button>
 
-</af-model-list>
+</af-form>
 ```
 
 ------
@@ -130,7 +130,7 @@
 <!-- afform/Blocks/Email.html -->
 <!-- input: options.parent.id -->
 <!-- Decision: These blocks are written in straight AngularJS rather than Afform -->
-<!--<af-model-list>-->
+<!--<af-form>-->
   <!--<af-model-prop -->
     <!--af-type="Email"-->
     <!--af-name="email"-->
@@ -140,14 +140,14 @@
   <!--<af-model af-name="email">-->
     <!---->
   <!--</af-model>-->
-<!--</af-model-list>-->
+<!--</af-form>-->
 
 ```
 
 ------
 
 ```html
-<af-model-list ctrl="modelListCtrl">
+<af-form ctrl="modelListCtrl">
   <af-model-prop
     af-type="Individual"
     af-name="parent"
@@ -190,5 +190,5 @@
   <!-- General elements: FIELDSET, UL, BUTTON, P, H1 should work anywhere -->
   <button ng-model="modelListCtrl.submit()">Submit</button>
 
-</af-model-list>
+</af-form>
 ```

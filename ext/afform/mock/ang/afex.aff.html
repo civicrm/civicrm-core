@@ -1,4 +1,4 @@
-<af-model-list ctrl="modelListCtrl">
+<af-form ctrl="modelListCtrl">
   <!-- FIXME: Distinguish "Individual"s from "Household"s -->
   <af-model-prop type="Contact" af-name="parent" af-label="Parent" af-api4-params="{where: ['id','=', routeParams.cid]}"></af-model-prop>
   <af-model-prop type="Contact" af-name="spouse" af-label="Spouse" af-contact-relationship="['Spouse of', 'parent']"></af-model-prop>
@@ -29,4 +29,4 @@
   <!-- General elements: FIELDSET, UL, BUTTON, P, H1 should work anywhere -->
   <button ng-click="modelListCtrl.submit()">Submit</button>
 
-</af-model-list>
+</af-form>
