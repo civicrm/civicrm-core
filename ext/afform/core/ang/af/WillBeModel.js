@@ -1,7 +1,7 @@
 (function(angular, $, _) {
-  // "afModelProp" is a basic skeletal directive.
-  // Example usage: <af-form>... <af-model-prop af-name="myModel" type="Individual" /> ...</af-form>
-  angular.module('af').directive('afModelProp', function() {
+  // "afWillBeModel" is a basic skeletal directive.
+  // Example usage: <af-form>... <af-will-be-model af-name="myModel" type="Individual" /> ...</af-form>
+  angular.module('af').directive('afWillBeModel', function() {
     // Whitelist of all allowed properties of an af-model
     // (at least the ones we care about client-side - other's can be added for server-side processing and we'll just ignore them)
     var modelProps = {
@@ -21,7 +21,7 @@
         entity.id = null;
         entity.fields = [];
         afFormCtrl.registerEntity(entity);
-        // $scope.$watch('afModelProp', function(newValue){$scope.myOptions = newValue;});
+        // $scope.$watch('afWillBeModel', function(newValue){$scope.myOptions = newValue;});
       }
     };
   });

@@ -214,7 +214,7 @@ function afform_civicrm_alterAngular($angular) {
 
 function _afform_getMetadata(phpQueryObject $doc) {
   $entities = [];
-  foreach ($doc->find('af-model-prop') as $afmModelProp) {
+  foreach ($doc->find('af-will-be-model') as $afmModelProp) {
     $entities[$afmModelProp->getAttribute('af-name')] = [
       'type' => $afmModelProp->getAttribute('type'),
     ];

@@ -11,13 +11,13 @@ class Utils {
    * @return array
    */
   public static function getEntities($layout) {
-    $entities = array_column(self::getTags($layout, 'af-model-prop'), NULL, 'af-name');
+    $entities = array_column(self::getTags($layout, 'af-will-be-model'), NULL, 'af-name');
     self::getFields($layout, $entities);
     return $entities;
   }
 
   /**
-   * Returns all tags with a certain tag name, e.g. 'af-model-prop'
+   * Returns all tags with a certain tag name, e.g. 'af-will-be-model'
    *
    * @param array $collection
    * @param string $tagName
