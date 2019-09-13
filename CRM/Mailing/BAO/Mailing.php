@@ -713,6 +713,7 @@ class CRM_Mailing_BAO_Mailing extends CRM_Mailing_DAO_Mailing {
         $this->templates['subject'] = implode("\n", $template);
       }
 
+      $this->templates['mailingID'] = $this->id;
       CRM_Utils_Hook::alterMailContent($this->templates);
     }
     return $this->templates;
