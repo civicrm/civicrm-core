@@ -24,7 +24,7 @@ class CRM_Afform_ArrayHtml {
     'af-model' => [
       'af-name' => 'text',
       'af-entity' => 'text',
-      'af-data' => 'js',
+      'data' => 'js',
     ],
     'af-field' => [
       'field-name' => 'text',

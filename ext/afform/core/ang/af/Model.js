@@ -6,7 +6,7 @@
     // (at least the ones we care about client-side - other's can be added for server-side processing and we'll just ignore them)
     var modelProps = {
       type: '@',
-      afData: '=',
+      data: '=',
       afName: '@',
       label: '@',
       autofill: '@'
