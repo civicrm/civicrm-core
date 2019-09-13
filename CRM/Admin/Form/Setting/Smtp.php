@@ -54,14 +54,23 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     ];
     $this->addRadio('outBound_option', ts('Select Mailer'), $outBoundOption);
 
+    $props = array();
+    $settings = Civi::settings()->getMandatory('mailing_backend');
+    //Load input as readonly whose values are overridden in civicrm.settings.php.
+    foreach ($settings as $setting => $value) {
+      if (isset($value)) {
+	$props[$setting]['readonly'] = TRUE;
+      }
+    }
+
     CRM_Utils_System::setTitle(ts('Settings - Outbound Mail'));
     $this->add('text', 'sendmail_path', ts('Sendmail Path'));
     $this->add('text', 'sendmail_args', ts('Sendmail Argument'));
-    $this->add('text', 'smtpServer', ts('SMTP Server'));
-    $this->add('text', 'smtpPort', ts('SMTP Port'));
-    $this->addYesNo('smtpAuth', ts('Authentication?'));
-    $this->addElement('text', 'smtpUsername', ts('SMTP Username'));
-    $this->addElement('password', 'smtpPassword', ts('SMTP Password'));
+    $this->add('text', 'smtpServer', ts('SMTP Server'), CRM_Utils_Array::value('smtpServer', $props));
+    $this->add('text', 'smtpPort', ts('SMTP Port'), CRM_Utils_Array::value('smtpPort', $props));
+    $this->addYesNo('smtpAuth', ts('Authentication?'), CRM_Utils_Array::value('smtpAuth', $props));
+    $this->addElement('text', 'smtpUsername', ts('SMTP Username'), CRM_Utils_Array::value('smtpUsername', $props));
+    $this->addElement('password', 'smtpPassword', ts('SMTP Password'), CRM_Utils_Array::value('smtpPassword', $props));
 
     $this->_testButtonName = $this->getButtonName('refresh', 'test');
 
