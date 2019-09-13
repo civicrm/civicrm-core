@@ -37,9 +37,9 @@ class Prefill extends AbstractProcessor {
    */
   private function loadEntity($entity, $id) {
     $checkPermissions = TRUE;
-    if ($entity['type'] == 'Contact' && !empty($this->args[$entity['af-name'] . '-cs'])) {
+    if ($entity['type'] == 'Contact' && !empty($this->args[$entity['name'] . '-cs'])) {
       $checkSum = civicrm_api4('Contact', 'validateChecksum', [
-        'checksum' => $this->args[$entity['af-name'] . '-cs'],
+        'checksum' => $this->args[$entity['name'] . '-cs'],
         'contactId' => $id,
       ]);
       $checkPermissions = empty($checkSum[0]['valid']);
@@ -50,7 +50,7 @@ class Prefill extends AbstractProcessor {
       'checkPermissions' => $checkPermissions,
     ]);
     if ($result->first()) {
-      $this->_data[$entity['af-name']] = $result->first();
+      $this->_data[$entity['name']] = $result->first();
     }
   }
 

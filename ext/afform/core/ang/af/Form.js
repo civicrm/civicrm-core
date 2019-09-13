@@ -21,8 +21,8 @@
         $scope.myCtrl = this;
 
         this.registerEntity = function registerEntity(entity) {
-          schema[entity.afName] = entity;
-          data[entity.afName] = entity.data || {};
+          schema[entity.modelName] = entity;
+          data[entity.modelName] = entity.data || {};
         };
         this.registerField = function(entityName, fieldName) {
           schema[entityName].fields.push(fieldName);

@@ -1,28 +1,28 @@
 <af-form ctrl="modelListCtrl">
   <!-- FIXME: Distinguish "Individual"s from "Household"s -->
-  <af-model type="Contact" af-name="parent" label="Parent" api4-params="{where: ['id','=', routeParams.cid]}"></af-model>
-  <af-model type="Contact" af-name="spouse" label="Spouse" contact-relationship="['Spouse of', 'parent']"></af-model>
-  <af-model type="Contact" af-name="home" label="Home"></af-model>
+  <af-model type="Contact" name="parent" label="Parent" api4-params="{where: ['id','=', routeParams.cid]}"></af-model>
+  <af-model type="Contact" name="spouse" label="Spouse" contact-relationship="['Spouse of', 'parent']"></af-model>
+  <af-model type="Contact" name="home" label="Home"></af-model>
 
   <!-- "parent" and "spouse" should be exported as variables in this scope -->
 
-  <af-fieldset af-name="parent">
+  <af-fieldset model="parent">
     <af-block-contact-name label="My Name" />
     <af-block-contact-email label="My Email" />
     <af-field name="do_not_email" />
   </af-fieldset>
 
-  <af-fieldset af-name="spouse">
+  <af-fieldset model="spouse">
     <af-block-contact-name label="Spouse Name" />
     <af-block-contact-email label="Spouse Email" only-primary="true" />
     <af-field name="do_not_email" field-type="checkbox" field-default="1" />
   </af-fieldset>
 
-  <af-fieldset af-name="home">
+  <af-fieldset model="home">
     <af-block-contact-name label="Home Name" />
   </af-fieldset>
 
-  <af-fieldset af-name="parent">
+  <af-fieldset model="parent">
     <af-block-contact-address label="My Address" />
   </af-fieldset>
 

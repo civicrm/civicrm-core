@@ -11,7 +11,7 @@ class Utils {
    * @return array
    */
   public static function getEntities($layout) {
-    $entities = array_column(self::getTags($layout, 'af-model'), NULL, 'af-name');
+    $entities = array_column(self::getTags($layout, 'af-model'), NULL, 'name');
     self::getFields($layout, $entities);
     return $entities;
   }
@@ -41,7 +41,7 @@ class Utils {
   protected static function getFields($layout, &$entities) {
     foreach ($layout['#children'] as $child) {
       if ($child['#tag'] == 'af-fieldset' && !empty($child['#children'])) {
-        $entities[$child['af-name']]['fields'] = array_merge($entities[$child['af-name']]['fields'] ?? [], self::getTags($child, 'af-field'));
+        $entities[$child['model']]['fields'] = array_merge($entities[$child['model']]['fields'] ?? [], self::getTags($child, 'af-field'));
       }
       elseif (!empty($child['#children'])) {
         self::getFields($child['#children'], $entities);

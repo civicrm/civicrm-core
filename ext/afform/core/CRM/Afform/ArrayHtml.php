@@ -22,7 +22,7 @@ class CRM_Afform_ArrayHtml {
       '*' => 'text',
     ],
     'af-model' => [
-      'af-name' => 'text',
+      'name' => 'text',
       'af-entity' => 'text',
       'data' => 'js',
     ],
@@ -31,7 +31,7 @@ class CRM_Afform_ArrayHtml {
       'defn' => 'js',
     ],
     'af-fieldset' => [
-      'af-name' => 'text',
+      'model' => 'text',
     ],
   ];
 
@@ -160,7 +160,7 @@ class CRM_Afform_ArrayHtml {
    * @param string $tag
    *   Ex: 'af-model'
    * @param string $attrName
-   *   Ex: 'af-name'
+   *   Ex: 'label'
    * @return string
    *   Ex: 'text' or 'js'
    */

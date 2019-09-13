@@ -1,13 +1,13 @@
 (function(angular, $, _) {
   // "afModel" is a basic skeletal directive.
-  // Example usage: <af-form>... <af-model af-name="myModel" type="Individual" /> ...</af-form>
+  // Example usage: <af-form>... <af-model name="myModel" type="Individual" /> ...</af-form>
   angular.module('af').directive('afModel', function() {
     // Whitelist of all allowed properties of an af-fieldset
     // (at least the ones we care about client-side - other's can be added for server-side processing and we'll just ignore them)
     var modelProps = {
       type: '@',
       data: '=',
-      afName: '@',
+      modelName: '@name',
       label: '@',
       autofill: '@'
     };

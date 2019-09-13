@@ -42,17 +42,17 @@
 ```html
 <div afform-entity-ctrl="myEntities">
 
-  <af-entity type="Individual" af-name="parent" label="Parent">
+  <af-entity type="Individual" name="parent" label="Parent">
     <af-name label="Name" />
     <af-email label="Email" />
   </af-entity>
   
-  <af-entity type="Individual" af-name="spouse" af-title="Spouse">
+  <af-entity type="Individual" name="spouse" af-title="Spouse">
     <af-name label="Spouse Name" />
     <af-email label="Spouse Email" />
   </af-entity>
 
-  <af-entity type="Individual" af-name="parent" af-title="Parent">
+  <af-entity type="Individual" name="parent" af-title="Parent">
     <af-address label="Address" />
   </af-entity>
 
@@ -65,17 +65,17 @@
 <!-- 1. s/entity/model-->
 <af-form>
 
-  <af-fieldset type="Individual" af-name="parent" label="Parent">
+  <af-fieldset type="Individual" model="parent" label="Parent">
     <af-name label="Name" />
     <af-email label="Email" />
   </af-fieldset>
 
-  <af-fieldset type="Individual" af-name="spouse" af-title="Spouse">
+  <af-fieldset type="Individual" model="spouse" af-title="Spouse">
     <af-name label="Spouse Name" />
     <af-email label="Spouse Email" />
   </af-fieldset>
 
-  <af-fieldset type="Individual" af-name="parent" af-title="Parent">
+  <af-fieldset type="Individual" model="parent" af-title="Parent">
     <af-address label="Address" />
   </af-fieldset>
 
@@ -88,24 +88,24 @@
 <af-form ctrl="modelListCtrl">
   <af-model
     type="Individual"
-    af-name="parent"
+    name="parent"
     label="Parent"
     api4-params="{where: ['id','=', routeParams.cid]}"
   />
   <af-model
     type="Individual"
-    af-name="spouse"
+    name="spouse"
     label="Spouse"
     contact-relationship="['Spouse of', 'parent']"
   />
   <!-- "parent" and "spouse" should be exported as variables in this scope -->
 
-  <af-fieldset af-name="parent">
+  <af-fieldset model="parent">
     <af-name label="Name" />
     <af-email label="Email" />
   </af-fieldset>
 
-  <af-fieldset af-name="spouse">
+  <af-fieldset model="spouse">
     <af-name label="Spouse Name" />
     <af-email label="Spouse Email" only-primary="true" />
   </af-fieldset>
@@ -114,7 +114,7 @@
     Your spouse should go to the gym.
   </p>
 
-  <af-fieldset af-name="parent">
+  <af-fieldset model="parent">
     <af-address label="Address" />
   </af-fieldset>
 
@@ -133,11 +133,11 @@
 <!--<af-form>-->
   <!--<af-model -->
     <!--type="Email"-->
-    <!--af-name="email"-->
+    <!--name="email"-->
     <!--label="Emails"-->
     <!--api4-params="{where: ['contact_id', '=', options.parent.id]}"-->
   <!--/>-->
-  <!--<af-fieldset af-name="email">-->
+  <!--<af-fieldset model="email">-->
     <!---->
   <!--</af-fieldset>-->
 <!--</af-form>-->
@@ -150,13 +150,13 @@
 <af-form ctrl="modelListCtrl">
   <af-model
     type="Individual"
-    af-name="parent"
+    name="parent"
     label="Parent"
     api4-params="{where: ['id','=', routeParams.cid]}"
   />
   <af-model
     type="Individual"
-    af-name="spouse"
+    name="spouse"
     label="Spouse"
     contact-relationship="['Spouse of', 'parent']"
   />
@@ -164,14 +164,14 @@
 
   <crm-ui-tab-set>
     <crm-ui-tab title="About You">
-      <af-fieldset af-name="parent">
+      <af-fieldset model="parent">
         <af-std-contact-name label="Name" />
         <af-std-contact-email label="Email" />
         <af-field name="do_not_email" field-type="checkbox" field-default="1" />
       </af-fieldset>
     </crm-ui-tab>
     <crm-ui-tab title="Spouse">
-      <af-fieldset af-name="spouse">
+      <af-fieldset model="spouse">
         <af-std-contact-name label="Spouse Name" />
         <af-std-contact-email label="Spouse Email" only-primary="true" />
         <af-field name="do_not_email" field-type="checkbox" field-default="1" />
@@ -183,7 +183,7 @@
     Your spouse should go to the gym.
   </p>
 
-  <af-fieldset af-name="parent">
+  <af-fieldset model="parent">
     <af-block-contact-address label="Address" />
   </af-fieldset>
 
