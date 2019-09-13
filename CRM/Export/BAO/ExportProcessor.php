@@ -101,6 +101,13 @@ class CRM_Export_BAO_ExportProcessor {
   protected $contactGreetingFields = [];
 
   /**
+   * An array of primary IDs of the entity being exported.
+   *
+   * @var array
+   */
+  protected $ids = [];
+
+  /**
    * Get additional non-visible fields for address merge purposes.
    *
    * @return array
@@ -583,6 +590,20 @@ class CRM_Export_BAO_ExportProcessor {
    */
   public function setQueryOperator($queryOperator) {
     $this->queryOperator = $queryOperator;
+  }
+
+  /**
+   * @return array
+   */
+  public function getIds() {
+    return $this->ids;
+  }
+
+  /**
+   * @param array $ids
+   */
+  public function setIds($ids) {
+    $this->ids = $ids;
   }
 
   /**
@@ -2326,7 +2347,14 @@ WHERE  id IN ( $deleteIDString )
     // call export hook
     $headerRows = $this->getHeaderRows();
     $exportTempTable = $this->getTemporaryTable();
+    $exportMode = $this->getExportMode();
+    $sqlColumns = $this->getSQLColumns();
+    $componentTable = $this->getComponentTable();
+    $ids = $this->getIds();
     CRM_Utils_Hook::export($exportTempTable, $headerRows, $sqlColumns, $exportMode, $componentTable, $ids);
+    if ($exportMode !== $this->getExportMode() || $componentTable !== $this->getComponentTable()) {
+      CRM_Core_Error::deprecatedFunctionWarning('altering the export mode and/or component table in the hook is no longer supported.');
+    }
     if ($exportTempTable !== $this->getTemporaryTable()) {
       CRM_Core_Error::deprecatedFunctionWarning('altering the export table in the hook is deprecated (in some flows the table itself will be)');
       $this->setTemporaryTable($exportTempTable);
@@ -2355,7 +2383,7 @@ LIMIT $offset, $limit
       while ($dao->fetch()) {
         $row = [];
 
-        foreach (array_keys($this->getSQLColumns()) as $column) {
+        foreach (array_keys($sqlColumns) as $column) {
           $row[$column] = $dao->$column;
         }
         $componentDetails[] = $row;
