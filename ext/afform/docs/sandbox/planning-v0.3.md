@@ -90,13 +90,13 @@
     type="Individual"
     af-name="parent"
     label="Parent"
-    af-api4-params="{where: ['id','=', routeParams.cid]}"
+    api4-params="{where: ['id','=', routeParams.cid]}"
   />
   <af-model
     type="Individual"
     af-name="spouse"
     label="Spouse"
-    af-contact-relationship="['Spouse of', 'parent']"
+    contact-relationship="['Spouse of', 'parent']"
   />
   <!-- "parent" and "spouse" should be exported as variables in this scope -->
 
@@ -135,7 +135,7 @@
     <!--type="Email"-->
     <!--af-name="email"-->
     <!--label="Emails"-->
-    <!--af-api4-params="{where: ['contact_id', '=', options.parent.id]}"-->
+    <!--api4-params="{where: ['contact_id', '=', options.parent.id]}"-->
   <!--/>-->
   <!--<af-fieldset af-name="email">-->
     <!---->
@@ -152,13 +152,13 @@
     type="Individual"
     af-name="parent"
     label="Parent"
-    af-api4-params="{where: ['id','=', routeParams.cid]}"
+    api4-params="{where: ['id','=', routeParams.cid]}"
   />
   <af-model
     type="Individual"
     af-name="spouse"
     label="Spouse"
-    af-contact-relationship="['Spouse of', 'parent']"
+    contact-relationship="['Spouse of', 'parent']"
   />
   <!-- "parent" and "spouse" should be exported as variables in this scope -->
 
