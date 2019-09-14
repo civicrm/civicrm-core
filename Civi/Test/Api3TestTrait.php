@@ -572,13 +572,11 @@ trait Api3TestTrait {
       }
       // Resolve custom field names
       foreach ($custom as $group => $fields) {
-        if (isset($row[$group])) {
-          foreach ($fields as $field => $v3FieldName) {
-            if (isset($row[$group][$field])) {
-              $result[$index][$v3FieldName] = $row[$group][$field];
-            }
+        foreach ($fields as $field => $v3FieldName) {
+          if (isset($row["$group.$field"])) {
+            $result[$index][$v3FieldName] = $row["$group.$field"];
+            unset($result[$index]["$group.$field"]);
           }
-          unset($result[$index][$group]);
         }
       }
     }
