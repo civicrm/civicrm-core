@@ -5,7 +5,7 @@
 
 return array(
   'js' => [
-    'node_modules/monaco-editor/min/vs/loader.js',
+    AFFORM_HTML_MONACO . '/loader.js',
     'ang/afMoncao.js',
     //    'ang/afMoncao/*.js',
     //    'ang/afMoncao/*/*.js',
@@ -15,7 +15,7 @@ return array(
   'requires' => ['crmUi', 'crmUtil'],
   'settings' => [
     'paths' => [
-      'vs' => CRM_AfformHtml_ExtensionUtil::url('node_modules/monaco-editor/min/vs'),
+      'vs' => CRM_AfformHtml_ExtensionUtil::url(AFFORM_HTML_MONACO),
     ],
   ],
   'basePages' => [],
