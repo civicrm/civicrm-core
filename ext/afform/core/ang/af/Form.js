@@ -13,7 +13,7 @@
           $scope.myCtrl.loadData();
         }
       },
-      controller: function($scope, $routeParams, crmApi4) {
+      controller: function($scope, $routeParams, crmApi4, crmStatus) {
         var schema = {}, data = {};
 
         $scope.$parent[$scope.ctrl] = this;
@@ -59,7 +59,8 @@
         };
 
         this.submit = function submit() {
-          crmApi4('Afform', 'submit', {name: this.getFormMeta().name, args: $routeParams, values: data});
+          var submission = crmApi4('Afform', 'submit', {name: this.getFormMeta().name, args: $routeParams, values: data});
+          return crmStatus({start: ts('Saving'), success: ts('Saved')}, submission);
         };
       }
     };
