@@ -13,7 +13,6 @@ class CRM_Afform_Page_AfformBase extends CRM_Core_Page {
     $loader->setPageName(implode('/', $pagePath));
     $loader->getRes()->addSetting([
       'afform' => [
-        'name' => $pageArgs['afform'],
         'open' => _afform_angular_module_name($pageArgs['afform'], 'dash'),
       ],
     ]);
