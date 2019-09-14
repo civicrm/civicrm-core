@@ -2,6 +2,7 @@
 
 require_once 'afform.civix.php';
 use CRM_Afform_ExtensionUtil as E;
+use Civi\Api4\Action\Afform\Submit;
 
 function _afform_fields() {
   return ['name', 'title', 'description', 'requires', 'layout', 'server_route', 'client_route', 'is_public'];
@@ -49,6 +50,8 @@ function afform_civicrm_container($container) {
  */
 function afform_civicrm_config(&$config) {
   _afform_civix_civicrm_config($config);
+  // Civi::dispatcher()->addListener(Submit::EVENT_NAME, [Submit::class, 'processContacts'], -500);
+  Civi::dispatcher()->addListener(Submit::EVENT_NAME, [Submit::class, 'processGenericEntity'], -1000);
 }
 
 /**

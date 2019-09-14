@@ -25,7 +25,11 @@ abstract class AbstractProcessor extends \Civi\Api4\Generic\AbstractAction {
   protected $args;
 
   protected $_afform;
-  
+
+  /**
+   * @var array
+   *   List of entities declared by this form.
+   */
   protected $_afformEntities;
 
   public function _run(Result $result) {

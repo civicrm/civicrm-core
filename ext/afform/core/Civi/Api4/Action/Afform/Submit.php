@@ -2,11 +2,15 @@
 
 namespace Civi\Api4\Action\Afform;
 
+use Civi\Afform\Event\AfformSubmitEvent;
+
 /**
  * Class Submit
  * @package Civi\Api4\Action\Afform
  */
 class Submit extends AbstractProcessor {
+
+  const EVENT_NAME = 'civi.afform.submit';
 
   /**
    * Submitted values
@@ -15,40 +19,49 @@ class Submit extends AbstractProcessor {
    */
   protected $values;
 
-  /**
-   * @var array
-   */
-  protected $_submission = [];
-
   protected function processForm() {
+    $entityValues = [];
     foreach ($this->_afformEntities as $entityName => $entity) {
       // Predetermined values override submitted values
-      $this->_submission[$entity['type']][$entityName] = ($entity['af-values'] ?? []) + ($this->values[$entityName] ?? []);
+      $entityValues[$entity['type']][$entityName] = ($entity['af-values'] ?? []) + ($this->values[$entityName] ?? []);
     }
-    // Determines the order in which to process entities. Contacts go first.
-    $entitiesToProcess = [
-      'Contact' => 'processContacts',
-      'Activity' => 'processActivities',
-    ];
-    foreach ($entitiesToProcess as $entityType => $callback) {
-      if (!empty($this->_submission[$entityType])) {
-        $this->$callback($this->_submission[$entityType]);
+
+    $event = new AfformSubmitEvent($this->_afformEntities, $entityValues);
+    \Civi::dispatcher()->dispatch(self::EVENT_NAME, $event);
+    foreach ($event->entityValues as $entityType => $entities) {
+      if (!empty($entities)) {
+        throw new \API_Exception(sprintf("Failed to process entities (type=%s; name=%s)", $entityType, implode(',', array_keys($entities))));
       }
     }
-    foreach (array_diff_key($this->_submission, $entitiesToProcess) as $entityType) {
 
-    }
+    // What should I return?
+    return [];
   }
 
-  protected function processGenericEntity($entityType, $items) {
-    foreach ($items as $name => $item) {
-      civicrm_api4($entityType, 'save', $items);
-    }
-  }
+  ///**
+  // * @param \Civi\Afform\Event\AfformSubmitEvent $event
+  // * @see afform_civicrm_config
+  // */
+  //public function processContacts(AfformSubmitEvent $event) {
+  //  if (empty($event->entityValues['Contact'])) {
+  //    return;
+  //  }
+  //  foreach ($event->entityValues['Contact'] as $entityName => $contact) {
+  //    // Do something
+  //    unset($event->entityValues['Contact'][$entityName]);
+  //  }
+  //}
 
-  protected function processContacts($contacts) {
-    foreach ($contacts as $name => $contact) {
-
+  /**
+   * @param \Civi\Afform\Event\AfformSubmitEvent $event
+   * @see afform_civicrm_config
+   */
+  public static function processGenericEntity(AfformSubmitEvent $event) {
+    foreach ($event->entityValues as $entityType => $records) {
+      civicrm_api4($entityType, 'save', [
+        'records' => $records,
+      ]);
+      unset($event->entityValues[$entityType]);
     }
   }
 
