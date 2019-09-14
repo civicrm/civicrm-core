@@ -1,0 +1,7 @@
+{
+  "server_route": "civicrm/test-afform",
+  "title": "This is a test",
+  "requires": [
+    "af", "afBlock", "afField", "afCore"
+  ]
+}

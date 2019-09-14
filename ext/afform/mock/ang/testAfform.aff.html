@@ -1,0 +1,27 @@
+<af-form ctrl="modelListCtrl" >
+  <div crm-ui-debug="modelListCtrl.getEntity('parent')" />
+  <div crm-ui-debug="modelListCtrl.getData('parent')" />
+  <af-model type="Contact" data="{contact_type: 'Individual'}" name="parent" label="Parent" url-autofill="1" autofill="user" />
+  <af-model type="Contact" name="spouse" label="Spouse" url-autofill="1" />
+  <af-model type="Contact" name="home" label="Home" />
+
+  <af-fieldset model="parent">
+
+    <af-field name="first_name" defn='{title: ts("Your First Name")}' />
+    <af-field name="last_name" />
+    <af-field name="contact_sub_type" defn="{widget: hidden}" value="Student" />
+    <af-field name="gender_id" />
+    <af-field name="constituent_information.Marital_Status" />
+    <af-field name="constituent_information.Marriage_Date" />
+    <af-field name="constituent_information.Most_Important_Issue" />
+  </af-fieldset>
+
+  <af-fieldset model="spouse">
+    <af-field name="first_name" defn='{title: ts("Spouse First Name")}' />
+    <af-field name="last_name" />
+  </af-fieldset>
+
+  <!-- General elements: FIELDSET, UL, BUTTON, P, H1 should work anywhere -->
+  <button ng-click="modelListCtrl.submit()">Submit</button>
+
+</af-form>
