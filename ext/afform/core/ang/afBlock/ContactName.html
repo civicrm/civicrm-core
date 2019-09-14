@@ -1,1 +1,8 @@
-<div>{{ts('Contact name block for a model of type %1 named %2', {1: afFieldset.getDefn().type, 2: afFieldset.getDefn().modelName})}}</div>
+<af-form>
+  <af-entity name="$parent.model" type="Contact" label="Target Contact" />
+  <af-fieldset model="$parent.model">
+    <af-field name="prefix" />
+    <af-field name="first_name" />
+    <af-field name="last_name" />
+  </af-fieldset>
+</af-form>

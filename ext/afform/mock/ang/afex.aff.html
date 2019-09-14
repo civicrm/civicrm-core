@@ -1,8 +1,8 @@
 <af-form ctrl="modelListCtrl">
   <!-- FIXME: Distinguish "Individual"s from "Household"s -->
-  <af-model type="Contact" name="parent" label="Parent" api4-params="{where: ['id','=', routeParams.cid]}" />
-  <af-model type="Contact" name="spouse" label="Spouse" contact-relationship="['Spouse of', 'parent']" />
-  <af-model type="Contact" name="home" label="Home" />
+  <af-entity type="Contact" name="parent" label="Parent" api4-params="{where: ['id','=', routeParams.cid]}" />
+  <af-entity type="Contact" name="spouse" label="Spouse" contact-relationship="['Spouse of', 'parent']" />
+  <af-entity type="Contact" name="home" label="Home" />
 
   <!-- "parent" and "spouse" should be exported as variables in this scope -->
 

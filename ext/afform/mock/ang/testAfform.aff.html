@@ -1,9 +1,9 @@
 <af-form ctrl="modelListCtrl" >
   <div crm-ui-debug="modelListCtrl.getEntity('parent')" />
   <div crm-ui-debug="modelListCtrl.getData('parent')" />
-  <af-model type="Contact" data="{contact_type: 'Individual'}" name="parent" label="Parent" url-autofill="1" autofill="user" />
-  <af-model type="Contact" name="spouse" label="Spouse" url-autofill="1" />
-  <af-model type="Contact" name="home" label="Home" />
+  <af-entity type="Contact" data="{contact_type: 'Individual'}" name="parent" label="Parent" url-autofill="1" autofill="user" />
+  <af-entity type="Contact" name="spouse" label="Spouse" url-autofill="1" />
+  <af-entity type="Contact" name="home" label="Home" />
 
   <af-fieldset model="parent">
 
