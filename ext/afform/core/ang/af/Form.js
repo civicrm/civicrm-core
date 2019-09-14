@@ -45,7 +45,7 @@
             }
           });
           if (toLoad) {
-            crmApi4('Afform', 'prefill', {name: CRM.afform.open, args: $routeParams})
+            crmApi4('Afform', 'prefill', {name: CRM.afform.name, args: $routeParams})
               .then(function(result) {
                 _.each(result, function(item) {
                   data[item.name] = _.extend(item.values, schema[item.name].data || {});
@@ -55,7 +55,7 @@
         };
 
         this.submit = function submit() {
-          crmApi4('Afform', 'submit', {name: CRM.afform.open, args: $routeParams, values: data});
+          crmApi4('Afform', 'submit', {name: CRM.afform.name, args: $routeParams, values: data});
         };
       }
     };
