@@ -62,6 +62,7 @@ class CRM_Api4_Services {
     );
     foreach ($locations as $location) {
       $path = \CRM_Utils_File::addTrailingSlash(dirname($location)) . str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
+      $container->addResource(new \Symfony\Component\Config\Resource\DirectoryResource($path, ';\.php$;'));
       foreach (glob("$path*.php") as $file) {
         $matches = [];
         preg_match('/(\w*).php/', $file, $matches);
