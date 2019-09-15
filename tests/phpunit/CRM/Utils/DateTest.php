@@ -254,4 +254,53 @@ class CRM_Utils_DateTest extends CiviUnitTestCase {
     $this->assertEquals(CRM_Utils_Date::customFormatTs($ts, "%Y"), "2018");
   }
 
+  /**
+   * Test for hook_civicrm_relativeToAbsolute().
+   */
+  public function testRelativeToAbsoluteHook() {
+    CRM_Utils_Hook_UnitTests::singleton()->setHook('civicrm_relativeToAbsolute', [$this, 'relativeToAbsolute']);
+    $dateRange = CRM_Utils_Date::getFromTo('this_next.quarter', NULL, NULL);
+    $dateRangeThisQuater = CRM_Utils_Date::getFromTo('this.quarter', NULL, NULL);
+    $dateRangeNextQuater = CRM_Utils_Date::getFromTo('next.quarter', NULL, NULL);
+    $this->assertEquals($dateRange['0'], $dateRangeThisQuater['0']);
+    $this->assertEquals($dateRange['1'], $dateRangeNextQuater['1']);
+  }
+
+  /**
+   * @param array $from
+   * @param array $to
+   * @param string $relativeTerm
+   * @param string $unit
+   */
+  public function relativeToAbsolute(&$from, &$to, $relativeTerm, $unit) {
+    // get current quarter to next quarter.
+    if ($unit == 'quarter' && $relativeTerm == 'this_next') {
+      $now = getdate();
+      // this quarter
+      $quarter = ceil($now['mon'] / 3);
+      $from['d'] = 1;
+      $from['M'] = (3 * $quarter) - 2;
+      $from['Y'] = $now['year'];
+
+      // next quarter
+      $difference = -1;
+      $subtractYear = 0;
+      $quarter = $quarter - $difference;
+      if ($quarter > 4) {
+        $now['year'] = $now['year'] + 1;
+        $quarter = 1;
+      }
+      if ($quarter <= 0) {
+        $subtractYear = 1;
+        $quarter += 4;
+      }
+
+      $to['M'] = 3 * $quarter;
+      $to['Y'] = $now['year'] - $subtractYear;
+      $to['d'] = date('t', mktime(0, 0, 0, $to['M'], 1, $to['Y']));
+      $to['H'] = 23;
+      $to['i'] = $to['s'] = 59;
+    }
+  }
+
 }
