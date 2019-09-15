@@ -5,13 +5,13 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
   public function run() {
     $vars = [
       'operators' => \CRM_Core_DAO::acceptedSQLOperators(),
-      'basePath' => Civi::resources()->getUrl('org.civicrm.api4'),
+      'basePath' => Civi::resources()->getUrl('civicrm'),
       'schema' => (array) \Civi\Api4\Entity::get()->setChain(['fields' => ['$name', 'getFields']])->execute(),
       'links' => (array) \Civi\Api4\Entity::getLinks()->execute(),
     ];
     Civi::resources()
       ->addVars('api4', $vars)
-      ->addScriptFile('org.civicrm.api4', 'js/load-bootstrap.js')
+      ->addScriptFile('civicrm', 'js/load-bootstrap.js')
       ->addScriptFile('civicrm', 'bower_components/google-code-prettify/bin/prettify.min.js')
       ->addStyleFile('civicrm', 'bower_components/google-code-prettify/bin/prettify.min.css');
 
