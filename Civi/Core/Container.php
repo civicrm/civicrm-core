@@ -313,6 +313,7 @@ class Container {
     if (\CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_SERVICES')) {
       \Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_SERVICES, [$container]);
     }
+    \CRM_Api4_Services::hook_container($container);
 
     \CRM_Utils_Hook::container($container);
 
