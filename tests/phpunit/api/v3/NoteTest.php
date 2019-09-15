@@ -320,7 +320,7 @@ class api_v3_NoteTest extends CiviUnitTestCase {
  * Test civicrm note create() using example code.
  */
 function testNoteCreateExample() {
-  require_once 'api/v3/examples/Note/Create.php';
+  require_once 'api/v3/examples/Note/Create.ex.php';
   $result = Note_get_example();
   $expectedResult = Note_get_expectedresult();
   $this->assertEquals($result, $expectedResult);
