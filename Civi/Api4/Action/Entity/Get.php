@@ -25,8 +25,11 @@ class Get extends \Civi\Api4\Generic\BasicGetAction {
    */
   protected function getRecords() {
     $entities = [];
-    foreach (\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles() as $ext) {
-      $dir = \CRM_Utils_File::addTrailingSlash(dirname($ext['filePath'])) . 'Civi/Api4';
+    $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/.')],
+      array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
+    );
+    foreach ($locations as $location) {
+      $dir = \CRM_Utils_File::addTrailingSlash(dirname($location)) . 'Civi/Api4';
       if (is_dir($dir)) {
         foreach (glob("$dir/*.php") as $file) {
           $matches = [];

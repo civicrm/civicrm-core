@@ -57,8 +57,11 @@ class CRM_Api4_Services {
    */
   public static function loadServices($namespace, $tag, $container) {
     $namespace = \CRM_Utils_File::addTrailingSlash($namespace, '\\');
-    foreach (\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles() as $ext) {
-      $path = \CRM_Utils_File::addTrailingSlash(dirname($ext['filePath'])) . str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
+    $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/.')],
+      array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
+    );
+    foreach ($locations as $location) {
+      $path = \CRM_Utils_File::addTrailingSlash(dirname($location)) . str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
       foreach (glob("$path*.php") as $file) {
         $matches = [];
         preg_match('/(\w*).php/', $file, $matches);
