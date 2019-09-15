@@ -162,7 +162,7 @@ class api_v3_TaxContributionPageTest extends CiviUnitTestCase {
     ];
     $result = $this->callAPISuccess('payment_processor', 'create', $paymentProceParams);
     $this->_ids['paymentProcessID'] = $result['id'];
-    require_once 'api/v3/examples/PaymentProcessor/Create.php';
+    require_once 'api/v3/examples/PaymentProcessor/Create.ex.php';
     $this->assertAPISuccess($result);
   }
 

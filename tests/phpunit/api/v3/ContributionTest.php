@@ -962,7 +962,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
   public function testContributionCreateExample() {
     //make sure at least on page exists since there is a truncate in tear down
     $this->callAPISuccess('contribution_page', 'create', $this->_pageParams);
-    require_once 'api/v3/examples/Contribution/Create.php';
+    require_once 'api/v3/examples/Contribution/Create.ex.php';
     $result = contribution_create_example();
     $id = $result['id'];
     $expectedResult = contribution_create_expectedresult();
