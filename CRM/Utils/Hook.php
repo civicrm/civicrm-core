@@ -2578,6 +2578,21 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is called to alter the from and to of relative date.
+   *
+   * @param array $from
+   * @param array $to
+   * @param string $relativeTerm
+   * @param string $unit
+   */
+  public static function relativeToAbsolute(&$from, &$to, $relativeTerm, $unit) {
+    return self::singleton()->invoke(['from', 'to', 'relativeTerm', 'unit'],
+      $from, $to, $relativeTerm, $unit, self::$_nullObject, self::$_nullObject,
+      'civicrm_relativeToAbsolute'
+    );
+  }
+
+  /**
    * This hook is called after a scheduled job is executed
    *
    * @param CRM_Core_DAO_Job $job

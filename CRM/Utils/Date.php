@@ -1856,6 +1856,9 @@ class CRM_Utils_Date {
         break;
     }
 
+    // call hook to over-ride $from and $to
+    CRM_Utils_Hook::relativeToAbsolute($from, $to, $relativeTerm, $unit);
+
     foreach ([
       'from',
       'to',
