@@ -26,7 +26,7 @@ class UnitTestCase extends \PHPUnit_Framework_TestCase implements HeadlessInterf
   }
 
   public function setUpHeadless() {
-    return \Civi\Test::headless()->installMe(__DIR__)->apply();
+    return \Civi\Test::headless()->apply();
   }
 
   /**
