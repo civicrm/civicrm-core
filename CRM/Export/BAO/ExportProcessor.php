@@ -2359,6 +2359,9 @@ WHERE  id IN ( $deleteIDString )
     if ($exportMode !== $this->getExportMode() || $componentTable !== $this->getComponentTable()) {
       CRM_Core_Error::deprecatedFunctionWarning('altering the export mode and/or component table in the hook is no longer supported.');
     }
+    if ($ids !== $this->getIds()) {
+      CRM_Core_Error::deprecatedFunctionWarning('altering the ids in the hook is no longer supported.');
+    }
     if ($exportTempTable !== $this->getTemporaryTable()) {
       CRM_Core_Error::deprecatedFunctionWarning('altering the export table in the hook is deprecated (in some flows the table itself will be)');
       $this->setTemporaryTable($exportTempTable);
