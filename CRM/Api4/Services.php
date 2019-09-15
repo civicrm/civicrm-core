@@ -57,7 +57,7 @@ class CRM_Api4_Services {
    */
   public static function loadServices($namespace, $tag, $container) {
     $namespace = \CRM_Utils_File::addTrailingSlash($namespace, '\\');
-    $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/.')],
+    $locations = array_merge([\Civi::paths()->getPath('[civicrm.root]/Civi.php')],
       array_column(\CRM_Extension_System::singleton()->getMapper()->getActiveModuleFiles(), 'filePath')
     );
     foreach ($locations as $location) {
