@@ -530,7 +530,7 @@ GROUP BY {$this->_aliases['civicrm_contribution']}.currency";
       $this->noDisplayContributionOrSoftColumn = TRUE;
     }
 
-    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params) == 'contributions_only') {
+    if (CRM_Utils_Array::value('contribution_or_soft_value', $this->_params, 'contributions_only') == 'contributions_only') {
       $this->isContributionBaseMode = TRUE;
     }
     if ($this->isContributionBaseMode &&
