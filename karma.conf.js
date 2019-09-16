@@ -21,6 +21,7 @@ module.exports = function(config) {
     autoWatch: true,
     browsers: ['PhantomJS'],
     exclude: [
+      'ang/api4Explorer/Explorer.js'
     ],
     files: [
       'bower_components/phantomjs-polyfill/bind-polyfill.js',
