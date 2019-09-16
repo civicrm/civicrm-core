@@ -577,9 +577,16 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
     }
     $this->assignPaymentFields();
 
-    $this->assign('email',
-      $this->controller->exportValue('Main', "email-{$this->_bltID}")
-    );
+    if ($this->_emailExists && empty($this->_params["email-{$this->_bltID}"])) {
+      foreach ($this->_params as $key => $val) {
+        if (substr($key, 0, 6) == 'email-') {
+          $this->assign('email', $this->_params[$key]);
+        }
+      }
+    }
+    else {
+      $this->assign('email', CRM_Utils_Array::value("email-{$this->_bltID}", $this->_params));
+    }
 
     // also assign the receipt_text
     if (isset($this->_values['receipt_text'])) {
