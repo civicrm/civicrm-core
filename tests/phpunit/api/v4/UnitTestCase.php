@@ -9,7 +9,7 @@ use Civi\Test\TransactionalInterface;
 /**
  * @group headless
  */
-class UnitTestCase extends \PHPUnit_Framework_TestCase implements HeadlessInterface, TransactionalInterface {
+class UnitTestCase extends \PHPUnit\Framework\TestCase implements HeadlessInterface, TransactionalInterface {
 
   use TestDataLoaderTrait;
 
