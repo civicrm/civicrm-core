@@ -367,9 +367,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     // Get the array of IDs.
     $domainDashletIDs = [];
     if ($domainDashlets['is_error'] == 0) {
-      foreach ($domainDashlets['values'] as $domainDashlet) {
-        $domainDashletIDs[] = $domainDashlet['id'];
-      }
+      $domainDashletIDs = CRM_Utils_Array::collect('id', $domainDashlets['values']);
     }
 
     // Restrict query to Dashlets in this domain.
