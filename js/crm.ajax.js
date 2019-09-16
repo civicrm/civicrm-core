@@ -3,7 +3,7 @@
  * @see https://wiki.civicrm.org/confluence/display/CRMDOC/AJAX+Interface
  * @see https://wiki.civicrm.org/confluence/display/CRMDOC/Ajax+Pages+and+Forms
  */
-(function($, CRM, undefined) {
+(function($, CRM, _, undefined) {
   /**
    * @param string path
    * @param string|object query
@@ -629,4 +629,4 @@
       });
   });
 
-}(jQuery, CRM));
+}(jQuery, CRM, _));

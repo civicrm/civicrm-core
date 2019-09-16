@@ -12,6 +12,7 @@ class CRM_Api4_Page_Api4Explorer extends CRM_Core_Page {
     Civi::resources()
       ->addVars('api4', $vars)
       ->addScriptFile('civicrm', 'js/load-bootstrap.js')
+      ->addScriptFile('civicrm', 'bower_components/js-yaml/dist/js-yaml.min.js')
       ->addScriptFile('civicrm', 'bower_components/google-code-prettify/bin/prettify.min.js')
       ->addStyleFile('civicrm', 'bower_components/google-code-prettify/bin/prettify.min.css');
 
