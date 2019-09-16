@@ -361,6 +361,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $domainDashlets = civicrm_api3('Dashboard', 'get', [
       'return' => array('id'),
       'domain_id' => CRM_Core_Config::domainID(),
+      'options' => ['limit' => 0],
     ]);
 
     // Get the array of IDs.
