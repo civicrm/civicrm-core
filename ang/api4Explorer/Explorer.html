@@ -126,7 +126,7 @@
         <div class="panel-body">
           <table>
             <tr ng-repeat="(type, item) in code">
-              <td>{{ type }}</td>
+              <td>{{ codeLabel[type] }}</td>
               <td><pre class="prettyprint" ng-bind-html="item"></pre></td>
             </tr>
           </table>

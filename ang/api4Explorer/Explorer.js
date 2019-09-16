@@ -40,11 +40,19 @@
     $scope.status = 'default';
     $scope.loading = false;
     $scope.controls = {};
-    $scope.code = {
-      php: '',
-      javascript: '',
-      cli: ''
+    $scope.codeLabel = {
+      oop: ts('PHP (oop style)'),
+      php: ts('PHP (traditional)'),
+      js: ts('Javascript'),
+      cli: ts('Command Line')
     };
+    $scope.code = codeDefaults();
+
+    function codeDefaults() {
+      return _.mapValues($scope.codeLabel, function(val, key) {
+        return key === 'oop' ? ts('Select an entity and action') : '';
+      });
+    }
 
     if (!entities.length) {
       formatForSelect2(schema, entities, 'name', ['description']);
@@ -209,7 +217,17 @@
         if (params[key]) {
           var newParam = {};
           _.each(params[key], function(item) {
-            newParam[item[0]] = parseYaml(_.cloneDeep(item[1]));
+            var val = _.cloneDeep(item[1]);
+            // Remove blank items from "chain" array
+            if (_.isArray(val)) {
+              _.eachRight(item[1], function(v, k) {
+                if (v) {
+                  return false;
+                }
+                val.length--;
+              });
+            }
+            newParam[item[0]] = parseYaml(val);
           });
           params[key] = newParam;
         }
@@ -334,11 +352,7 @@
     }
 
     function writeCode() {
-      var code = {
-        php: ts('Select an entity and action'),
-        javascript: '',
-        cli: ''
-      },
+      var code = codeDefaults(),
         entity = $scope.entity,
         action = $scope.action,
         params = getParams(),
@@ -359,58 +373,69 @@
         }
 
         // Write javascript
-        code.javascript = "CRM.api4('" + entity + "', '" + action + "', {";
+        code.js = "CRM.api4('" + entity + "', '" + action + "', {";
         _.each(params, function(param, key) {
-          code.javascript += "\n  " + key + ': ' + stringify(param) +
+          code.js += "\n  " + key + ': ' + stringify(param) +
             (++i < paramCount ? ',' : '');
           if (key === 'checkPermissions') {
-            code.javascript += ' // IGNORED: permissions are always enforced from client-side requests';
+            code.js += ' // IGNORED: permissions are always enforced from client-side requests';
           }
         });
-        code.javascript += "\n}";
+        code.js += "\n}";
         if (index || index === 0) {
-          code.javascript += ', ' + JSON.stringify(index);
+          code.js += ', ' + JSON.stringify(index);
         }
-        code.javascript += ").then(function(" + results + ") {\n  // do something with " + results + " array\n}, function(failure) {\n  // handle failure\n});";
+        code.js += ").then(function(" + results + ") {\n  // do something with " + results + " array\n}, function(failure) {\n  // handle failure\n});";
 
         // Write php code
+        code.php = '$' + results + " = civicrm_api4('" + entity + "', '" + action + "', [";
+        _.each(params, function(param, key) {
+          code.php += "\n  '" + key + "' => " + phpFormat(param, 4) + ',';
+        });
+        code.php += "\n]";
+        if (index || index === 0) {
+          code.php += ', ' + phpFormat(index);
+        }
+        code.php += ");";
+        
+        // Write oop code
         if (entity.substr(0, 7) !== 'Custom_') {
-          code.php = '$' + results + " = \\Civi\\Api4\\" + entity + '::' + action + '()';
+          code.oop = '$' + results + " = \\Civi\\Api4\\" + entity + '::' + action + '()';
         } else {
-          code.php = '$' + results + " = \\Civi\\Api4\\CustomValue::" + action + "('" + entity.substr(7) + "')";
+          code.oop = '$' + results + " = \\Civi\\Api4\\CustomValue::" + action + "('" + entity.substr(7) + "')";
         }
         _.each(params, function(param, key) {
           var val = '';
           if (typeof objectParams[key] !== 'undefined' && key !== 'chain') {
             _.each(param, function(item, index) {
               val = phpFormat(index) + ', ' + phpFormat(item, 4);
-              code.php += "\n  ->add" + ucfirst(key).replace(/s$/, '') + '(' + val + ')';
+              code.oop += "\n  ->add" + ucfirst(key).replace(/s$/, '') + '(' + val + ')';
             });
           } else if (key === 'where') {
             _.each(param, function (clause) {
               if (clause[0] === 'AND' || clause[0] === 'OR' || clause[0] === 'NOT') {
-                code.php += "\n  ->addClause(" + phpFormat(clause[0]) + ", " + phpFormat(clause[1]).slice(1, -1) + ')';
+                code.oop += "\n  ->addClause(" + phpFormat(clause[0]) + ", " + phpFormat(clause[1]).slice(1, -1) + ')';
               } else {
-                code.php += "\n  ->addWhere(" + phpFormat(clause).slice(1, -1) + ")";
+                code.oop += "\n  ->addWhere(" + phpFormat(clause).slice(1, -1) + ")";
               }
             });
           } else if (key === 'select' && isSelectRowCount) {
-            code.php += "\n  ->selectRowCount()";
+            code.oop += "\n  ->selectRowCount()";
           } else {
-            code.php += "\n  ->set" + ucfirst(key) + '(' + phpFormat(param, 4) + ')';
+            code.oop += "\n  ->set" + ucfirst(key) + '(' + phpFormat(param, 4) + ')';
           }
         });
-        code.php += "\n  ->execute()";
+        code.oop += "\n  ->execute()";
         if (_.isNumber(index)) {
-          code.php += !index ? '\n  ->first()' : (index === -1 ? '\n  ->last()' : '\n  ->itemAt(' + index + ')');
+          code.oop += !index ? '\n  ->first()' : (index === -1 ? '\n  ->last()' : '\n  ->itemAt(' + index + ')');
         } else if (index) {
-          code.php += "\n  ->indexBy('" + index + "')";
+          code.oop += "\n  ->indexBy('" + index + "')";
         } else if (isSelectRowCount) {
-          code.php += "\n  ->count()";
+          code.oop += "\n  ->count()";
         }
-        code.php += ";\n";
+        code.oop += ";\n";
         if (!_.isNumber(index) && !isSelectRowCount) {
-          code.php += "foreach ($" + results + ' as $' + ((_.isString(index) && index) ? index + ' => $' : '') + result + ') {\n  // do something\n}';
+          code.oop += "foreach ($" + results + ' as $' + ((_.isString(index) && index) ? index + ' => $' : '') + result + ') {\n  // do something\n}';
         }
 
         // Write cli code
@@ -468,18 +493,19 @@
       indent = (typeof indent === 'number') ? _.repeat(' ', indent) : (indent || '');
       var ret = '',
         baseLine = indent ? indent.slice(0, -2) : '',
-        newLine = indent ? '\n' : '';
+        newLine = indent ? '\n' : '',
+        trailingComma = indent ? ',' : '';
       if ($.isPlainObject(val)) {
         $.each(val, function(k, v) {
           ret += (ret ? ', ' : '') + newLine + indent + "'" + k + "' => " + phpFormat(v);
         });
-        return '[' + ret + newLine + baseLine + ']';
+        return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
       if ($.isArray(val)) {
         $.each(val, function(k, v) {
           ret += (ret ? ', ' : '') + newLine + indent + phpFormat(v);
         });
-        return '[' + ret + newLine + baseLine + ']';
+        return '[' + ret + trailingComma + newLine + baseLine + ']';
       }
       if (_.isString(val) && !_.contains(val, "'")) {
         return "'" + val + "'";
@@ -790,6 +816,9 @@
             }
             else if (link && _.contains(['create'], newAction)) {
               scope.chain[1][2] = '{values: {' + link[0] + ': ' + link[1] + '}}';
+            }
+            else if (link && _.contains(['save'], newAction)) {
+              scope.chain[1][2] = '{records: [{' + link[0] + ': ' + link[1] + '}]}';
             } else {
               scope.chain[1][2] = '{}';
             }
