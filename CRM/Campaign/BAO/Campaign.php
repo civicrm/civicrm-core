@@ -399,6 +399,7 @@ INNER JOIN civicrm_option_group grp ON ( campaign_type.option_group_id = grp.id 
       if ($orderOnCampaignTable) {
         $orderByClause = "ORDER BY campaign.{$sortParams['sort']} {$sortParams['sortOrder']}";
       }
+      $orderByClause .= ", campaign.id {$sortParams['sortOrder']}";
       $limitClause = "LIMIT {$sortParams['offset']}, {$sortParams['rowCount']}";
     }
 
