@@ -61,27 +61,51 @@ class CRM_Upgrade_Incremental_php_FiveNineteen extends CRM_Upgrade_Incremental_B
     // }
   }
 
-  /*
-   * Important! All upgrade functions MUST add a 'runSql' task.
-   * Uncomment and use the following template for a new upgrade version
-   * (change the x in the function name):
+  /**
+   * Upgrade function.
+   *
+   * @param string $rev
    */
+  public function upgrade_5_19_alpha1($rev) {
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add api4 menu', 'api4Menu');
+  }
 
-  //  /**
-  //   * Upgrade function.
-  //   *
-  //   * @param string $rev
-  //   */
-  //  public function upgrade_5_0_x($rev) {
-  //    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
-  //    $this->addTask('Do the foo change', 'taskFoo', ...);
-  //    // Additional tasks here...
-  //    // Note: do not use ts() in the addTask description because it adds unnecessary strings to transifex.
-  //    // The above is an exception because 'Upgrade DB to %1: SQL' is generic & reusable.
-  //  }
-
-  // public static function taskFoo(CRM_Queue_TaskContext $ctx, ...) {
-  //   return TRUE;
-  // }
+  /**
+   * Add menu item for api4 explorer; rename v3 explorer menu item.
+   *
+   * @param \CRM_Queue_TaskContext $ctx
+   * @return bool
+   */
+  public static function api4Menu(CRM_Queue_TaskContext $ctx) {
+    try {
+      $v3Item = civicrm_api3('Navigation', 'get', [
+        'name' => 'API Explorer',
+        'return' => ['id', 'parent_id', 'weight'],
+        'sequential' => 1,
+        'domain_id' => CRM_Core_Config::domainID(),
+        'api.Navigation.create' => ['label' => ts("Api Explorer v3")],
+      ]);
+      $existing = civicrm_api3('Navigation', 'getcount', [
+        'name' => "Api Explorer v4",
+        'domain_id' => CRM_Core_Config::domainID(),
+      ]);
+      if (!$existing) {
+        civicrm_api3('Navigation', 'create', [
+          'parent_id' => $v3Item['values'][0]['parent_id'] ?? 'Developer',
+          'label' => ts("Api Explorer v4"),
+          'weight' => $v3Item['values'][0]['weight'] ?? 2,
+          'name' => "Api Explorer v4",
+          'permission' => "administer CiviCRM",
+          'url' => "civicrm/api4#/explorer",
+          'is_active' => 1,
+        ]);
+      }
+    }
+    catch (Exception $e) {
+      // Couldn't create menu item.
+    }
+    return TRUE;
+  }
 
 }

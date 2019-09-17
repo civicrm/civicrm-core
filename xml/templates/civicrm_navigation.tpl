@@ -574,7 +574,8 @@ SET @devellastID:=LAST_INSERT_ID();
 INSERT INTO civicrm_navigation
 ( domain_id, url, label, name, permission, permission_operator, parent_id, is_active, has_separator, weight )
 VALUES
-( @domainID, 'civicrm/api', '{ts escape="sql" skip="true"}API Explorer{/ts}','API Explorer', 'administer CiviCRM', '', @devellastID, '1', NULL, 1 ),
+( @domainID, 'civicrm/api', '{ts escape="sql" skip="true"}Api Explorer v3{/ts}', 'API Explorer', 'administer CiviCRM', '', @devellastID, '1', NULL, 1 ),
+( @domainID, 'civicrm/api4#/explorer', '{ts escape="sql" skip="true"}Api Explorer v4{/ts}', 'Api Explorer v4', 'administer CiviCRM', '', @devellastID, '1', NULL, 2 ),
 ( @domainID, 'https://civicrm.org/developer-documentation?src=iam', '{ts escape="sql" skip="true"}Developer Docs{/ts}', 'Developer Docs', 'administer CiviCRM', '', @devellastID, '1', NULL, 3 );
 
 INSERT INTO civicrm_navigation
