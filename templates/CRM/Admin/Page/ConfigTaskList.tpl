@@ -105,13 +105,15 @@
             {else}
                 <td class="tasklist"><a href="{$config->userFrameworkBaseURL}?q=admin/user/permissions&civicrmDestination=civicrm/admin/configtask">{ts}Permissions for Anonymous Users{/ts}</a></td>
             {/if}
-            <td>{ts}You will also need to change Drupal permissions so anonymous users can make contributions, register for events and / or use profiles to enter contact information.{/ts} {docURL page="Default Permissions and Roles" resource="wiki"}</td>
+            <td>{ts}You will also need to change Drupal permissions so anonymous users can make contributions, register for events and / or use profiles to enter contact information.{/ts} {docURL page="user/en/latest/initial-set-up/permissions-and-access-control" text="(learn more...)"}</td>
         </tr>
     {/if}
-    <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/messageTemplates" q="selectedChild=workflow&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}System Workflow Templates{/ts}</a></td>
-        <td>{ts}Review and modify the templates used for system-generated emails, including contribution receipts and event registration confirmations.{/ts}</td>
-    </tr>
+    {if $enabledComponents.CiviContribute eq 1}
+      <tr class="even">
+          <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/preferences/contribute" q="selectedChild=workflow&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}CiviContribute Component Settings{/ts}</a></td>
+          <td>{ts}Review and modify the CiviContribute Component settings such as Taxes and Invoicing, Deferred Revenue, and Access Control by Financial Type{/ts}</td>
+      </tr>
+    {/if}
 </table>
 <br />
 
