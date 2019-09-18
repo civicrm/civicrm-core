@@ -190,10 +190,11 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     $result = [];
     foreach ($caseRolesXML as $caseRoleXML) {
       foreach ($caseRoleXML->RelationshipType as $relationshipTypeXML) {
-        $relationshipTypeName = (string ) $relationshipTypeXML->name;
-        $relationshipTypeID = array_search($relationshipTypeName,
-          $relationshipTypes
-        );
+        $relationshipTypeName = $this->locateNameOrLabel($relationshipTypeXML);
+        // TODO: This is maybe silly. Retrieving and storing all at once is
+        // maybe more performant, but my implementation is currently awkward.
+        // Either simplify, or just make two db calls.
+        $relationshipTypeID = $this->findMachineNameInNestedArray($relationshipTypeName, $relationshipTypes);
         if ($relationshipTypeID === FALSE) {
           continue;
         }
@@ -221,7 +222,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     // `TRUE`
     $relationshipTypes = &$this->allRelationshipTypes(TRUE);
     // get the relationship
-    $relationshipType = array_search($relationshipTypeName, $relationshipTypes);
+    $relationshipType = $this->findMachineNameInNestedArray($relationshipTypeName, $relationshipTypes);
 
     if ($relationshipType === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
@@ -367,7 +368,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
     if (!empty($caseTypeXML->CaseRoles) && $caseTypeXML->CaseRoles->RelationshipType) {
       foreach ($caseTypeXML->CaseRoles->RelationshipType as $relTypeXML) {
-        $result[] = (string) $relTypeXML->name;
+        $result[] = $this->locateNameOrLabel($relTypeXML->name);
       }
     }
 
@@ -874,6 +875,45 @@ AND        a.is_deleted = 0
       }
     }
     return (string) $xml->name;
+  }
+
+  /**
+   * Given a machine name, find the id (top level array key) in a nested array
+   * comparing against a subkey named 'machineName'.
+   *
+   * Note this is very specific in that what we're expecting as input came
+   * from the xml, so we need to compare against the _a_b variation.
+   *
+   * e.g. given 'findme' and
+   * array(
+   *   1 => array('machineName_a_b' => 'abc', 'somethingelse' => 'foo'),
+   *   2 => array('machineName_a_b' => 'findme', 'somethingelse' => 'faa'),
+   * )
+   * it should return 2_a_b. Or FALSE if can't find.
+   *
+   * @param $relationshipTypeMachineName string
+   * @param $relationshipTypes array
+   *
+   * @return string|bool
+   */
+  public function findMachineNameInNestedArray($relationshipTypeMachineName, $relationshipTypes) {
+    foreach ($relationshipTypes as $relationshipTypeID => $typeInfo) {
+
+      /**
+       * Note the order and way this search works is convoluted here because the way the return value is used by the caller we want the b_a index returned, so check that first, but note for bidirectional only the b_a index exists in the top level indexes for relationshipTypes, so if the two directions happen to have different machineName's then we need the extra empty check.
+       */
+      if (!empty($typeInfo['machineName_b_a'])) {
+        if ($typeInfo['machineName_b_a'] == $relationshipTypeMachineName) {
+          return "{$relationshipTypeID}_b_a";
+        }
+      }
+      if (!empty($typeInfo['machineName_a_b'])) {
+        if ($typeInfo['machineName_a_b'] == $relationshipTypeMachineName && !empty($relationshipTypes["{$relationshipTypeID}_a_b"])) {
+          return "{$relationshipTypeID}_a_b";
+        }
+      }
+    }
+    return FALSE;
   }
 
 }

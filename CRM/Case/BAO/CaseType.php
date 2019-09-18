@@ -184,6 +184,24 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
         $xmlFile .= "<RelationshipType>\n";
         foreach ($values as $key => $value) {
           $xmlFile .= "<{$key}>" . self::encodeXmlString($value) . "</{$key}>\n";
+          /**
+           * dev/core#1046 - In order to accommodate xml files, machineName may
+           * or may not be present. Going forward it will always be present
+           * when coming from the UI so this if block doesn't need to do
+           * anything. And there will be an upgrade script to add machineName
+           * to existing db definitions. But in the meantime, it might not be
+           * present, which can happen on a test site with existing entries
+           * before this patch. For those we know name and label are the same
+           * because otherwise there are errors, so for now set machineName to
+           * be the same value as label (which itself has key=='name' because
+           * of an old mixup, but note that going forward in db definitions,
+           * as opposed to files, name will be name).
+           *
+           * Hoping this comment will still make sense to me later.
+           */
+          if ($key == 'name' && !isset($values['machineName'])) {
+            $xmlFile .= '<machineName>' . self::encodeXmlString($value) . "</machineName>\n";
+          }
         }
         $xmlFile .= "</RelationshipType>\n";
       }

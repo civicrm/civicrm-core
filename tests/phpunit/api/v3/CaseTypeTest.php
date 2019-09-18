@@ -58,7 +58,7 @@ class api_v3_CaseTypeTest extends CiviCaseTestCase {
           ['name' => 'Open Case', 'status' => 'Completed'],
         ],
         'caseRoles' => [
-          ['name' => 'First role', 'creator' => 1, 'manager' => 1],
+          ['machineName' => 'First role', 'name' => 'First role', 'creator' => 1, 'manager' => 1],
         ],
       ],
     ];

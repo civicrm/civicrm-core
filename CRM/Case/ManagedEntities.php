@@ -111,7 +111,7 @@ class CRM_Case_ManagedEntities {
     $result = [];
 
     if (!isset(Civi::$statics[__CLASS__]['reltypes'])) {
-      $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE, NULL);
+      $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('name', TRUE, NULL);
       foreach ($relationshipInfo as $id => $relTypeDetails) {
         Civi::$statics[__CLASS__]['reltypes']["{$id}_a_b"] = $relTypeDetails['label_a_b'];
         if ($relTypeDetails['label_a_b'] != $relTypeDetails['label_b_a']) {
