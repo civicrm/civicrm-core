@@ -794,4 +794,13 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     return $url;
   }
 
+  /**
+   * Get role names
+   *
+   * @return array|null
+   */
+  public function getRoleNames() {
+    return user_role_names();
+  }
+
 }
