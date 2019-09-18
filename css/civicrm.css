@@ -1812,16 +1812,6 @@ input.crm-form-entityref {
 
 /* Set/alter ICONS */
 
-#crm-container div#printer-friendly {
-  float: right;
-  position: relative;
-  margin: -2em 0.5em 0 0;
-}
-/* For Joomla, margin 0 works correctly */
-#crm-container table#crm-content div#printer-friendly {
-  margin: 0;
-}
-
 #crm-container .order-icon {
   height: 15px;
   width: 10px;

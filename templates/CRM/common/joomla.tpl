@@ -49,14 +49,6 @@
     </div>
     {/if}
 
-{if $browserPrint}
-{* Javascript window.print link. Used for public pages where we can't do printer-friendly view. *}
-<div id="printer-friendly"><a href="#" onclick="window.print(); return false;" title="{ts}Print this page.{/ts}"><i class="crm-i fa-print"></i></a></div>
-{else}
-{* Printer friendly link/icon. *}
-<div id="printer-friendly"><a href="{$printerFriendly}" target='_blank' title="{ts}Printer-friendly view of this page.{/ts}"><i class="crm-i fa-print"></i></a></div>
-{/if}
-
 {if $pageTitle}
   <div class="crm-title">
     <h1 class="title">{if $isDeleted}<del>{/if}{$pageTitle}{if $isDeleted}</del>{/if}</h1>
