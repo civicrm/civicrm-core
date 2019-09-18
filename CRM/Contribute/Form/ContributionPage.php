@@ -412,6 +412,11 @@ class CRM_Contribute_Form_ContributionPage extends CRM_Core_Form {
           $nextPage = 'thankyou';
           break;
 
+        case 'Widget':
+          $subPage = 'widget';
+          $nextPage = 'pcp';
+          break;
+
         default:
           $subPage = strtolower($className);
           $nextPage = strtolower($nextPage);
