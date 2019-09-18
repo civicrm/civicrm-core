@@ -23,7 +23,6 @@ dm_install_packages "$SRC/packages" "$TRG/civicrm/civicrm/packages"
 dm_install_vendor "$SRC/vendor" "$TRG/civicrm/civicrm/vendor"
 dm_install_bower "$SRC/bower_components" "$TRG/civicrm/civicrm/bower_components"
 dm_install_wordpress "$SRC/WordPress" "$TRG/civicrm"
-dm_install_cvext org.civicrm.api4 "$TRG/civicrm/civicrm/ext/api4"
 dm_install_cvext com.iatspayments.civicrm "$TRG/civicrm/civicrm/ext/iatspayments"
 
 # gen tarball
