@@ -63,7 +63,7 @@
             <div crm-attachments="abtest.attachments.a"></div>
           </div>
           -->
-          <div crm-ui-tab id="tab-header" crm-title="ts('Header and Footer')">
+          <div crm-ui-tab id="tab-header" crm-title="ts('Header and Footer')" ng-if="mailingFields.header_id.options.length > 0 || mailingFields.footer_id.options.length > 0">
             <div crm-mailing-block-header-footer crm-mailing="abtest.mailings.a"></div>
           </div>
           <div crm-ui-tab id="tab-pub" crm-title="ts('Publication')">
@@ -101,7 +101,7 @@
           <div crm-ui-tab id="tab-attachmentA" crm-title="ts('Attachments')">
             <div crm-attachments="abtest.attachments.a"></div>
           </div>
-          <div crm-ui-tab id="tab-headerA" crm-title="ts('Header and Footer')">
+          <div crm-ui-tab id="tab-headerA" crm-title="ts('Header and Footer')" ng-if="mailingFields.header_id.options.length > 0 || mailingFields.footer_id.options.length > 0">
             <div crm-mailing-block-header-footer crm-mailing="abtest.mailings.a"></div>
           </div>
           <div crm-ui-tab id="tab-pubA" crm-title="ts('Publication')">
@@ -136,7 +136,7 @@
           <div crm-ui-tab id="tab-attachmentB" crm-title="ts('Attachments')">
             <div crm-attachments="abtest.attachments.b"></div>
           </div>
-          <div crm-ui-tab id="tab-headerB" crm-title="ts('Header and Footer')">
+          <div crm-ui-tab id="tab-headerB" crm-title="ts('Header and Footer')" ng-if="mailingFields.header_id.options.length > 0 || mailingFields.footer_id.options.length > 0">
             <div crm-mailing-block-header-footer crm-mailing="abtest.mailings.b"></div>
           </div>
           <div crm-ui-tab id="tab-pubB" crm-title="ts('Publication')">
