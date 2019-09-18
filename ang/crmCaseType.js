@@ -57,7 +57,10 @@
             reqs.caseStatuses = ['OptionValue', 'get', {
               option_group_id: 'case_status',
               sequential: 1,
-              options: {limit: 0}
+              options: {
+                sort: 'weight',
+                limit: 0
+              }
             }];
             reqs.actTypes = ['OptionValue', 'get', {
               option_group_id: 'activity_type',
