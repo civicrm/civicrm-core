@@ -24,6 +24,30 @@ CRM.$(function($) {
     );
   }
 
+  //toggle image inputs based on whether and where participant image is used
+  toggleImages();
+  $('#show_participant_image').change( function(){
+    toggleImages();
+  });
+  $('#alignment_participant_image').change( function(){
+    toggleImages();
+  } );
+
+  function toggleImages() {
+    var align = $('#alignment_participant_image').val();
+
+    $('.crm-badge-layout-form-block-image_1').show();
+    $('.crm-badge-layout-form-block-image_2').show();
+    if( $('#show_participant_image').is(':checked') ) {
+      if (align == "L") {
+        $('.crm-badge-layout-form-block-image_1').hide();
+      }
+      else if (align == "R") {
+        $('.crm-badge-layout-form-block-image_2').hide();
+      }
+    }
+  }
+
   $('input[id^="image_"]')
     .click(openKCFinder)
     .change(function() {
