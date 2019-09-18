@@ -4690,7 +4690,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     // if we are still empty see if we can use anything from a contribution page.
     if (!empty($pageValues['receipt_from_email'])) {
       return [
-        $pageValues['receipt_from_name'],
+        CRM_Utils_Array::value('receipt_from_name', $pageValues),
         $pageValues['receipt_from_email'],
       ];
     }
