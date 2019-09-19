@@ -15,6 +15,17 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
 
+# CiviCRM 5.18.0
+
+Released October 2, 2019
+
+- **[Synopsis](release-notes/5.18.0.md#synopsis)**
+- **[Features](release-notes/5.18.0.md#features)**
+- **[Bugs resolved](release-notes/5.18.0.md#bugs)**
+- **[Miscellany](release-notes/5.18.0.md#misc)**
+- **[Credits](release-notes/5.18.0.md#credits)**
+- **[Feedback](release-notes/5.18.0.md#feedback)**
+
 ## CiviCRM 5.17.4
 
 Released September 12, 2019
