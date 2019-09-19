@@ -22,7 +22,12 @@ trait Api3TestTrait {
    * @return array
    */
   public function versionThreeAndFour() {
-    return [[3], [4]];
+    $r = [[3]];
+    global $civicrm_root;
+    if (file_exists("$civicrm_root/Civi/Api4") || file_exists("$civicrm_root/ext/api4")) {
+      $r[] = [4];
+    }
+    return $r;
   }
 
   /**
