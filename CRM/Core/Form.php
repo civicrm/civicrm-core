@@ -776,10 +776,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @throws \CRM_Core_Exception
    */
   protected function assignPaymentProcessor($isPayLaterEnabled) {
-    $this->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(
-      [ucfirst($this->_mode) . 'Mode'],
-      $this->_paymentProcessorIDs
-    );
+    $this->_paymentProcessors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors([ucfirst($this->_mode) . 'Mode'], $this->_paymentProcessorIDs);
     if ($isPayLaterEnabled) {
       $this->_paymentProcessors[0] = CRM_Financial_BAO_PaymentProcessor::getPayment(0);
     }
