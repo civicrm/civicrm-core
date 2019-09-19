@@ -214,7 +214,7 @@ class CRM_Pledge_Form_Pledge extends CRM_Core_Form {
     }
 
     $contactField = $this->addEntityRef('contact_id', ts('Contact'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
-    if ($this->_context == 'standalone') {
+    if ($this->_context != 'standalone') {
       $contactField->freeze();
     }
 
