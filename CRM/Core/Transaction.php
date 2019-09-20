@@ -252,4 +252,24 @@ class CRM_Core_Transaction {
     $frame->addCallback($phase, $callback, $params, $id);
   }
 
+  /**
+   * Whenever hook_civicrm_post fires, schedule an equivalent
+   * call to hook_civicrm_postCommit.
+   *
+   * @param \Civi\Core\Event\PostEvent $e
+   * @see CRM_Utils_Hook::post
+   */
+  public static function addPostCommit($e) {
+    // Do we want to dedupe post-commit hooks for the same txn? Setting an ID
+    // would allow this.
+    // $id = $e->entity . chr(0) . $e->action . chr(0) . $e->id;
+    $frame = \Civi\Core\Transaction\Manager::singleton()->getBaseFrame();
+    if ($frame) {
+      $frame->addCallback(self::PHASE_POST_COMMIT, ['CRM_Utils_Hook', 'postCommit'], [$e->action, $e->entity, $e->id, $e->object]);
+    }
+    else {
+      \CRM_Utils_Hook::postCommit($e->action, $e->entity, $e->id, $e->object);
+    }
+  }
+
 }

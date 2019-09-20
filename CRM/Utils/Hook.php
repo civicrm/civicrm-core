@@ -394,6 +394,36 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * This hook is equivalent to post(), except that it is guaranteed to run
+   * outside of any SQL transaction. The objectRef is not modifiable.
+   *
+   * This hook is defined for two cases:
+   *
+   * 1. If the original action runs within a transaction, then the hook fires
+   *    after the transaction commits.
+   * 2. If the original action runs outside a transaction, then the data was
+   *    committed immediately, and we can run the hook immediately.
+   *
+   * @param string $op
+   *   The type of operation being performed.
+   * @param string $objectName
+   *   The name of the object.
+   * @param int $objectId
+   *   The unique identifier for the object.
+   * @param object $objectRef
+   *   The reference to the object if available.
+   *
+   * @return mixed
+   *   based on op. pre-hooks return a boolean or
+   *                           an error message which aborts the operation
+   */
+  public static function postCommit($op, $objectName, $objectId, $objectRef = NULL) {
+    $event = new \Civi\Core\Event\PostEvent($op, $objectName, $objectId, $objectRef);
+    \Civi::dispatcher()->dispatch('hook_civicrm_postCommit', $event);
+    return $event->getReturnValues();
+  }
+
+  /**
    * This hook retrieves links from other modules and injects it into.
    * the view contact tabs
    *
