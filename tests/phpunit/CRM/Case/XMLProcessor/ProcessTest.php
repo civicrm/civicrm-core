@@ -15,9 +15,16 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->setupContacts();
     $this->setupDefaultAssigneeOptions();
     $this->setupRelationships();
+    $this->setupMoreRelationshipTypes();
     $this->setupActivityDefinitions();
 
     $this->process = new CRM_Case_XMLProcessor_Process();
+  }
+
+  public function tearDown() {
+    $this->deleteMoreRelationshipTypes();
+
+    parent::tearDown();
   }
 
   /**
@@ -98,6 +105,67 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
           'relationship_type_id' => $relationship['type_id'],
         ]);
       }
+    }
+  }
+
+  /**
+   * Set up some additional relationship types for some specific tests.
+   */
+  protected function setupMoreRelationshipTypes() {
+    $this->moreRelationshipTypes = [
+      'unidirectional_name_label_different' => [
+        'type_id' => NULL,
+        'name_a_b' => 'jm7ab',
+        'label_a_b' => 'Jedi Master is',
+        'name_b_a' => 'jm7ba',
+        'label_b_a' => 'Jedi Master for',
+        'description' => 'Jedi Master',
+      ],
+      'unidirectional_name_label_same' => [
+        'type_id' => NULL,
+        'name_a_b' => 'Quilt Maker is',
+        'label_a_b' => 'Quilt Maker is',
+        'name_b_a' => 'Quilt Maker for',
+        'label_b_a' => 'Quilt Maker for',
+        'description' => 'Quilt Maker',
+      ],
+      'bidirectional_name_label_different' => [
+        'type_id' => NULL,
+        'name_a_b' => 'f12',
+        'label_a_b' => 'Friend of',
+        'name_b_a' => 'f12',
+        'label_b_a' => 'Friend of',
+        'description' => 'Friend',
+      ],
+      'bidirectional_name_label_same' => [
+        'type_id' => NULL,
+        'name_a_b' => 'Enemy of',
+        'label_a_b' => 'Enemy of',
+        'name_b_a' => 'Enemy of',
+        'label_b_a' => 'Enemy of',
+        'description' => 'Enemy',
+      ],
+    ];
+
+    foreach ($this->moreRelationshipTypes as &$relationship) {
+      $relationship['type_id'] = $this->relationshipTypeCreate([
+        'contact_type_a' => 'Individual',
+        'contact_type_b' => 'Individual',
+        'name_a_b' => $relationship['name_a_b'],
+        'label_a_b' => $relationship['label_a_b'],
+        'name_b_a' => $relationship['name_b_a'],
+        'label_b_a' => $relationship['label_b_a'],
+        'description' => $relationship['description'],
+      ]);
+    }
+  }
+
+  /**
+   * Clean up additional relationship types (tearDown).
+   */
+  protected function deleteMoreRelationshipTypes() {
+    foreach ($this->moreRelationshipTypes as $relationship) {
+      $this->callAPISuccess('relationship_type', 'delete', ['id' => $relationship['type_id']]);
     }
   }
 
@@ -264,6 +332,87 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
       ['<RelationshipType><machineName></machineName><name>Banana Peeler</name></RelationshipType>', 'Banana Peeler'],
       // hopefully nobody would do this
       ['<RelationshipType><machineName>null</machineName><name>Annulled Relationship</name></RelationshipType>', 'null'],
+    ];
+  }
+
+  /**
+   * Test that caseRole() doesn't have name and label mixed up
+   *
+   * @dataProvider xmlCaseRoleDataProvider
+   */
+  public function testCaseRole($key, $xmlString, $expected) {
+    $xmlObj = new SimpleXMLElement($xmlString);
+
+    // element 0 is direction (a_b), 1 is the text we want
+    $expectedArray = empty($expected) ? [] : ["{$this->moreRelationshipTypes[$key]['type_id']}_{$expected[0]}" => $expected[1]];
+
+    $this->assertEquals($expectedArray, $this->process->caseRoles($xmlObj->CaseRoles, FALSE));
+  }
+
+  /**
+   * Data provider for testCaseRole
+   * @return array
+   */
+  public function xmlCaseRoleDataProvider() {
+    return [
+      // Simulate one that has been converted to the format it should be going
+      // forward, where name is the actual name, i.e. same as machineName.
+      [
+        'unidirectional_name_label_different',
+        '<CaseType><CaseRoles><RelationshipType><machineName>jm7ba</machineName><name>jm7ba</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
+        ['a_b', 'Jedi Master is'],
+      ],
+      // Simulate one that is in some intermediate format for some reason. It
+      // should still work anyway, but the <name> should be fixed in the xml at
+      // that site to be the actual 'name', i.e. same as 'machineName'.
+      [
+        'unidirectional_name_label_different',
+        '<CaseType><CaseRoles><RelationshipType><machineName>jm7ba</machineName><name>Jedi Master of</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
+        ['a_b', 'Jedi Master is'],
+      ],
+      // Simulate one that is still in old format, i.e. one that is still in
+      // xml files that haven't been updated, or in the db but upgrade script
+      // not run yet.
+      // In this set name and label are the same in the
+      // civicrm_relationship_type table.
+      [
+        'unidirectional_name_label_same',
+        '<CaseType><CaseRoles><RelationshipType><name>Quilt Maker for</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
+        ['a_b', 'Quilt Maker is'],
+      ],
+      // Simulate one that is still in old format, i.e. one that is still in
+      // xml files that haven't been updated, or in the db but upgrade script
+      // not run yet.
+      // In this set name and label are different in the
+      // civicrm_relationship_type table.
+      // NOTE: If name and label are different in the civicrm_relationship_type
+      // table, this SHOULD fail (empty array). The person needs to either run
+      // the upgrade script or change their xml file.
+      [
+        'unidirectional_name_label_different',
+        '<CaseType><CaseRoles><RelationshipType><name>Jedi Master of</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
+        NULL,
+      ],
+      // Bidirectional relationship.
+      [
+        'bidirectional_name_label_different',
+        '<CaseType><CaseRoles><RelationshipType><machineName>f12</machineName><name>Friend of</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
+        ['b_a', 'Friend of'],
+      ],
+      // Bidirectional relationship, without machineName.
+      // Name and label the same.
+      [
+        'bidirectional_name_label_same',
+        '<CaseType><CaseRoles><RelationshipType><name>Enemy of</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
+        ['b_a', 'Enemy of'],
+      ],
+      // Bidirectional relationship, without machineName.
+      // Name and label different. Should FAIL (empty array).
+      [
+        'bidirectional_name_label_different',
+        '<CaseType><CaseRoles><RelationshipType><name>Friend of</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
+        NULL,
+      ],
     ];
   }
 

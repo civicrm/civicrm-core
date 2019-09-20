@@ -106,13 +106,40 @@ class CRM_Case_XMLProcessor {
    */
   public function &allRelationshipTypes($fromXML = FALSE) {
     if (!isset(Civi::$statics[__CLASS__]['reltypes'][$fromXML])) {
-      $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE);
+      // Note this now includes disabled types too, which we sometimes need,
+      // but we include that info in the return value at the end, so consumer
+      // can decide.
+      $relationshipInfo = civicrm_api3('RelationshipType', 'get');
 
       Civi::$statics[__CLASS__]['reltypes'][$fromXML] = [];
-      foreach ($relationshipInfo as $id => $info) {
+      foreach ($relationshipInfo['values'] as $id => $info) {
         Civi::$statics[__CLASS__]['reltypes'][$fromXML][$id . '_b_a'] = ($fromXML) ? $info['label_a_b'] : $info['label_b_a'];
+        /**
+         * Exclude if bidirectional since otherwise it looks like there's
+         * duplicates in dropdowns, and since bidirectional it doesn't matter
+         * which is A or B.
+         *
+         * Unless possibly if they have different machineNames - to think about
+         * more if that would matter - if it's say a custom relationship type
+         * and it goes through some edits over time, with cases created in
+         * between - or maybe it didn't used to be bidirectional and now it is
+         * - or if it can be assigned outside of case and used in case (but the
+         * latter I don't think can in core). Maybe too much of an edge case.
+         */
         if ($info['label_b_a'] !== $info['label_a_b']) {
           Civi::$statics[__CLASS__]['reltypes'][$fromXML][$id . '_a_b'] = ($fromXML) ? $info['label_b_a'] : $info['label_a_b'];
+        }
+        // Want to include other data since it's useful later, but then the
+        // structure of the top-level array messes up some places where it's not
+        // expecting it, so for now only return it if fromXML is true.
+        if ($fromXML) {
+          Civi::$statics[__CLASS__]['reltypes'][$fromXML][$id] = [
+            'machineName_a_b' => $info['name_b_a'],
+            'machineName_b_a' => $info['name_a_b'],
+            'displayLabel_a_b' => $info['label_b_a'],
+            'displayLabel_b_a' => $info['label_a_b'],
+            'is_active' => $info['is_active'],
+          ];
         }
       }
     }
