@@ -620,4 +620,35 @@ class api_v3_CustomValueTest extends CiviUnitTestCase {
     $this->assertEquals(count($customFieldValues), $result['count']);
   }
 
+  /**
+   * Test getdisplayvalue api and verify if it returns
+   * the custom text for display.
+   */
+  public function testGetDisplayValue() {
+    list($cid, $customFieldValues) = $this->_testGetCustomValueMultiple();
+    foreach ($customFieldValues as $field => $value) {
+      list(, $customFieldID) = explode("_", $field);
+      $result = $this->callAPISuccess('CustomValue', 'getdisplayvalue', [
+        'entity_id' => $cid,
+        'custom_field_id' => $customFieldID,
+      ]);
+      $expectedValue = [
+        'display' => $value,
+        'raw' => $value,
+      ];
+      $this->checkArrayEquals($result['values'][$customFieldID], $expectedValue);
+
+      $customDisplayValue = $this->callAPISuccess('CustomValue', 'getdisplayvalue', [
+        'entity_id' => $cid,
+        'custom_field_id' => $customFieldID,
+        'custom_field_value' => "Test Custom Display - {$value}",
+      ]);
+      $expectedValue = [
+        'display' => "Test Custom Display - {$value}",
+        'raw' => "Test Custom Display - {$value}",
+      ];
+      $this->checkArrayEquals($customDisplayValue['values'][$customFieldID], $expectedValue);
+    }
+  }
+
 }
