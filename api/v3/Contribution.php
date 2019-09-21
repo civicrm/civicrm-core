@@ -417,32 +417,36 @@ function _civicrm_api3_contribution_transact_spec(&$params) {
  *   Input parameters.
  *
  * @return array
- *   contribution of created or updated record (or a civicrm error)
+ *   contribution of created or updated record
  */
 function civicrm_api3_contribution_transact($params) {
   // Set some params specific to payment processing
-  // @todo - fix this function - none of the results checked by civicrm_error would ever be an array with
-  // 'is_error' set
-  // also trxn_id is not saved.
-  // but since there is no test it's not desirable to jump in & make the obvious changes.
   $params['payment_processor_mode'] = empty($params['is_test']) ? 'live' : 'test';
+
+  // Set amount fields
   $params['amount'] = $params['total_amount'];
-  if (!isset($params['net_amount'])) {
-    $params['net_amount'] = $params['amount'];
-  }
+
+  // Set invoice ID
   if (!isset($params['invoiceID']) && isset($params['invoice_id'])) {
     $params['invoiceID'] = $params['invoice_id'];
   }
-
   // Some payment processors expect a unique invoice_id - generate one if not supplied
   $params['invoice_id'] = CRM_Utils_Array::value('invoice_id', $params, md5(uniqid(rand(), TRUE)));
 
+  // This is a nasty way of making sure we pass the live or test processor - we should just pass the right ID in the first place!
+  // Perhaps, historically, some callers did not (eg. webform_civicrm)?
   $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($params['payment_processor'], $params['payment_processor_mode']);
-  $paymentProcessor['object']->doPayment($params);
-
   $params['payment_instrument_id'] = $paymentProcessor['object']->getPaymentInstrumentID();
 
-  return civicrm_api('Contribution', 'create', $params);
+  // First, we create the contribution.  Normally created in pending state
+  $contribution = civicrm_api3('Contribution', 'create', $params);
+
+  $params['contributionID'] = $contribution['id'];
+  $params = $paymentProcessor['object']->doPayment($params);
+
+  // Finally we update the contribution with the result of doPayment - normally setting completed, and maybe setting trxn_id etc.
+  $params['id'] = $contribution['id'];
+  return civicrm_api3('Contribution', 'create', $params);
 }
 
 /**
