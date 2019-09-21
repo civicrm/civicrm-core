@@ -79,7 +79,6 @@
             }];
             reqs.relTypes = ['RelationshipType', 'get', {
               sequential: 1,
-              is_active: 1,
               options: {
                 sort: 'label_a_b',
                 limit: 0
@@ -264,8 +263,9 @@
       $scope.activityTypes = _.indexBy(apiCalls.actTypes.values, 'name');
       $scope.activityTypeOptions = _.map(apiCalls.actTypes.values, formatActivityTypeOption);
       $scope.defaultAssigneeTypes = apiCalls.defaultAssigneeTypes.values;
-      $scope.relationshipTypeOptions = getRelationshipTypeOptions(false);
-      $scope.defaultRelationshipTypeOptions = getRelationshipTypeOptions(true);
+      $scope.relationshipTypeOptions = getRelationshipTypeOptions(false, true);
+      $scope.relationshipTypeOptionsAll = getRelationshipTypeOptions(false, false);
+      $scope.defaultRelationshipTypeOptions = getRelationshipTypeOptions(true, true);
       // stores the default assignee values indexed by their option name:
       $scope.defaultAssigneeTypeValues = _.chain($scope.defaultAssigneeTypes)
         .indexBy('name').mapValues('value').value();
@@ -284,8 +284,16 @@
     // describing case roles from the perspective of the client, while the
     // values must follow the convention in the XML of describing case roles
     // from the perspective of the non-client.
-    function getRelationshipTypeOptions($isDefault) {
-      return _.transform(apiCalls.relTypes.values, function(result, relType) {
+    function getRelationshipTypeOptions($isDefault, onlyActive) {
+      // TODO: why does isDefault have a dollar sign? Or was it just
+      // php-on-the-brain at the time?
+      var relationshipTypesToUse;
+      if (onlyActive) {
+        relationshipTypesToUse = _.filter(apiCalls.relTypes.values, {is_active: "1"});
+      } else {
+        relationshipTypesToUse = apiCalls.relTypes.values;
+      }
+      return _.transform(relationshipTypesToUse, function(result, relType) {
         var isBidirectionalRelationship = relType.label_a_b === relType.label_b_a;
         if ($isDefault) {
           result.push({
@@ -301,15 +309,21 @@
           }
         }
         // TODO The ids below really should use names not labels see
+        // I think the comment above is using the word "ids" more generically
+        // and is not referring to the "id" field below, given that id is
+        // used elsewhere to set displaylabel, so I've added machineName
+        // instead. Can maybe cleanup.
         //  https://lab.civicrm.org/dev/core/issues/774
         else {
           result.push({
+            machineName: relType.name_b_a,
             text: relType.label_b_a,
             id: relType.label_a_b
           });
 
           if (!isBidirectionalRelationship) {
             result.push({
+              machineName: relType.name_a_b,
               text: relType.label_a_b,
               id: relType.label_b_a
             });
@@ -354,9 +368,11 @@
 
       // go lookup and add client-perspective labels for $scope.caseType.definition.caseRoles
       _.each($scope.caseType.definition.caseRoles, function (set) {
-        _.each($scope.relationshipTypeOptions, function (relTypes) {
-          if (relTypes.text == set.name) {
+        _.each($scope.relationshipTypeOptionsAll, function (relTypes) {
+          if (relTypes.machineName == set.name) {
             set.displaylabel = relTypes.id;
+            // break out of inner `each` loop
+            return false;
           }
         });
       });
@@ -460,9 +476,8 @@
       activity.default_assignee_contact = null;
     };
 
-    // TODO roleName passed to addRole is a misnomer, its passed as the
-    // label HOWEVER it should be saved to xml as the name see
-    // https://lab.civicrm.org/dev/core/issues/774
+    // Note that roleName passed to addRole is a misnomer, it's passed as the
+    // label, but we want to pass on as machineName.
 
     /// Add a new role
     $scope.addRole = function(roles, roleName) {
@@ -471,16 +486,16 @@
         var matchingRoles = _.filter($scope.relationshipTypeOptions, {id: roleName});
         if (matchingRoles.length) {
           var matchingRole = matchingRoles.shift();
-          roles.push({name: roleName, displaylabel: matchingRole.text});
+          roles.push({name: matchingRole.machineName, displaylabel: matchingRole.text});
         } else {
            CRM.loadForm(CRM.url('civicrm/admin/reltype', {action: 'add', reset: 1, label_a_b: roleName}))
             .on('crmFormSuccess', function(e, data) {
               var newType = _.values(data.relationshipType)[0];
-              roles.push({name: newType.label_b_a, displaylabel: newType.label_a_b});
+              roles.push({name: newType.name_b_a, displaylabel: newType.label_a_b});
               // Assume that the case role should be A-B but add both directions as options.
-              $scope.relationshipTypeOptions.push({id: newType.label_a_b, text: newType.label_a_b});
+              $scope.relationshipTypeOptions.push({id: newType.name_a_b, text: newType.label_a_b});
               if (newType.label_a_b != newType.label_b_a) {
-                $scope.relationshipTypeOptions.push({id: newType.label_b_a, text: newType.label_b_a});
+                $scope.relationshipTypeOptions.push({id: newType.name_b_a, text: newType.label_b_a});
               }
               $scope.$digest();
             });

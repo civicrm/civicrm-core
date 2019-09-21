@@ -510,4 +510,66 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     $this->assertNotEmpty($bounceMessage);
   }
 
+  /**
+   * Test changing the label for the case manager role and then creating
+   * a case.
+   * At the time this test was written this test would fail, demonstrating
+   * one problem with name vs label.
+   */
+  public function testCreateCaseWithChangedManagerLabel() {
+    // We could just assume the relationship that gets created has
+    // relationship_type_id = 1, but let's create a case, see what the
+    // id is, then do our actual test.
+    $loggedInUser = $this->createLoggedInUser();
+    $client_id = $this->individualCreate();
+    $caseObj = $this->createCase($client_id, $loggedInUser);
+    $case_id = $caseObj->id;
+
+    // Going to assume the stock case type has what it currently has at the
+    // time of writing, which is the autocreated case manager relationship for
+    // the logged in user.
+    $getParams = [
+      'contact_id_b' => $loggedInUser,
+      'case_id' => $case_id,
+    ];
+    $result = $this->callAPISuccess('Relationship', 'get', $getParams);
+    // as noted above assume this is the only one
+    $relationship_type_id = $result['values'][$result['id']]['relationship_type_id'];
+
+    // Save the old labels first so we can put back at end of test.
+    $oldParams = [
+      'id' => $relationship_type_id,
+    ];
+    $oldValues = $this->callAPISuccess('RelationshipType', 'get', $oldParams);
+    // Now change the label of the relationship type.
+    $changeParams = [
+      'id' => $relationship_type_id,
+      'label_a_b' => 'Best ' . $oldValues['values'][$relationship_type_id]['label_a_b'],
+      'label_b_a' => 'Best ' . $oldValues['values'][$relationship_type_id]['label_b_a'],
+    ];
+    $this->callAPISuccess('RelationshipType', 'create', $changeParams);
+
+    // Now try creating another case.
+    $caseObj2 = $this->createCase($client_id, $loggedInUser);
+    $case_id2 = $caseObj2->id;
+
+    $checkParams = [
+      'contact_id_b' => $loggedInUser,
+      'case_id' => $case_id2,
+    ];
+    $result = $this->callAPISuccess('Relationship', 'get', $checkParams);
+    // Main thing is the above createCase call doesn't fail, but let's check
+    // the relationship type id is what we expect too while we're here.
+    // See note above about assuming this is the only relationship autocreated.
+    $this->assertEquals($relationship_type_id, $result['values'][$result['id']]['relationship_type_id']);
+
+    // Now put relationship type back to the way it was.
+    $changeParams = [
+      'id' => $relationship_type_id,
+      'label_a_b' => $oldValues['values'][$relationship_type_id]['label_a_b'],
+      'label_b_a' => $oldValues['values'][$relationship_type_id]['label_b_a'],
+    ];
+    $this->callAPISuccess('RelationshipType', 'create', $changeParams);
+  }
+
 }
