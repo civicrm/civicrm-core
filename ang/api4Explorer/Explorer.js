@@ -641,7 +641,7 @@
       require: 'ngModel',
       link: function (scope, element, attrs, ctrl) {
         var ts = scope.ts = CRM.ts('api4'),
-          multi = _.includes(['IN', 'NOT IN'], scope.data.op),
+          multi = _.includes(['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'], scope.data.op),
           entity = $routeParams.api4entity,
           action = $routeParams.api4action;
 
@@ -663,7 +663,7 @@
           if (!op) {
             op = field.serialize || dataType === 'Array' ? 'IN' : '=';
           }
-          multi = _.includes(['IN', 'NOT IN'], op);
+          multi = _.includes(['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'], op);
           if (op === 'IS NULL' || op === 'IS NOT NULL') {
             $el.hide();
             return;
@@ -690,7 +690,7 @@
                 {id: '0', text: ts('No')}
               ]});
             }
-          } else if (dataType === 'Integer') {
+          } else if (dataType === 'Integer' && !multi) {
             $el.attr('type', 'number');
           }
         }
