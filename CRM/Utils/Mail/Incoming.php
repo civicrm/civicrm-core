@@ -384,7 +384,8 @@ class CRM_Utils_Mail_Incoming {
     if (!empty($attachments)) {
       $date = date('YmdHis');
       $config = CRM_Core_Config::singleton();
-      for ($i = 0; $i < count($attachments); $i++) {
+      $params['num_attachments'] = count($attachments);
+      for ($i = 0; $i < $params['num_attachments']; $i++) {
         $attachNum = $i + 1;
         $fileName = basename($attachments[$i]['fullName']);
         $newName = CRM_Utils_File::makeFileName($fileName);

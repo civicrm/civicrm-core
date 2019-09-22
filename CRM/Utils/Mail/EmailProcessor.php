@@ -252,7 +252,20 @@ class CRM_Utils_Mail_EmailProcessor {
           if (!empty($dao->activity_status)) {
             $params['status_id'] = $dao->activity_status;
           }
+
+          // Up the limit on attachments so it doesn't drop any when creating
+          // activity.
+          if (!empty($params['num_attachments'])) {
+            $old_limit = Civi::settings()->get('max_attachments');
+            Civi::settings()->set('max_attachments', max($old_limit, $params['num_attachments']));
+          }
+
           $result = civicrm_api('activity', 'create', $params);
+
+          // reset the attachments limit
+          if (!empty($params['num_attachments'])) {
+            Civi::settings()->set('max_attachments', $old_limit);
+          }
 
           if ($result['is_error']) {
             $matches = FALSE;

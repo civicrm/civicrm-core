@@ -879,10 +879,13 @@ function _civicrm_api3_deprecated_activity_buildmailparams($result, $activityTyp
   $params['activity_date_time'] = $result['date'];
   $params['details'] = $result['body'];
 
-  for ($i = 1; $i <= 5; $i++) {
-    if (isset($result["attachFile_$i"])) {
-      $params["attachFile_$i"] = $result["attachFile_$i"];
+  if (!empty($result['num_attachments'])) {
+    for ($i = 1; $i <= $result['num_attachments']; $i++) {
+      if (isset($result["attachFile_$i"])) {
+        $params["attachFile_$i"] = $result["attachFile_$i"];
+      }
     }
+    $params['num_attachments'] = $result['num_attachments'];
   }
 
   return $params;
