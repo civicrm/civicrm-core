@@ -648,7 +648,7 @@ SET    version = '$version'
     $disabled = [];
     $manager = CRM_Extension_System::singleton()->getManager();
     foreach ($compatInfo as $key => $ext) {
-      if (!empty($ext['obsolete']) && $manager->getStatus($key) == $manager::STATUS_INSTALLED) {
+      if (!empty($ext['obsolete']) && in_array($manager->getStatus($key), [$manager::STATUS_INSTALLED, $manager::STATUS_INSTALLED_MISSING])) {
         $disabled[$key] = sprintf("<li>%s</li>", ts('The extension %1 is now obsolete and has been disabled.', [1 => $key]));
       }
     }
