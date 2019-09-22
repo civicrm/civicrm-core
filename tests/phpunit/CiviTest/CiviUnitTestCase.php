@@ -334,12 +334,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     // disable any left-over test extensions
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_extension WHERE full_name LIKE "test.%"');
 
-    $extensions = \CRM_Extension_System::singleton()->getManager();
-    $api4Status = $extensions->getStatus('org.civicrm.api4');
-    if ($api4Status != $extensions::STATUS_INSTALLED && $api4Status != $extensions::STATUS_UNKNOWN) {
-      $extensions->enable(['org.civicrm.api4']);
-    }
-
     // reset all the caches
     CRM_Utils_System::flushCache();
 

@@ -1,0 +1,42 @@
+{
+  "Contact": [
+    {
+      "first_name": "Janice",
+      "last_name": "Voss",
+      "contact_type": "Individual",
+      "@ref": "test_contact_1"
+    }
+  ],
+  "CustomGroup": [
+    {
+      "name": "MyFavoriteThings",
+      "extends": "Contact"
+    }
+  ],
+  "Event": [
+    {
+      "start_date": "20401010000000",
+      "title": "The Singularity",
+      "event_type_id": "major_historical_event"
+    }
+  ],
+  "Group": [
+    {
+      "name": "the_group",
+      "title": "The Group"
+    }
+  ],
+  "Mapping": [
+    {
+      "name": "the_mapping",
+      "mapping_type_id": "1"
+    }
+  ],
+  "Activity": [
+    {
+      "subject": "Test A Phone Activity",
+      "activity_type": "Phone Call",
+      "source_contact_id": "@ref test_contact_1.id"
+    }
+  ]
+}

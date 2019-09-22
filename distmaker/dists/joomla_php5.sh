@@ -22,7 +22,6 @@ dm_install_core "$SRC" "$TRG"
 dm_install_packages "$SRC/packages" "$TRG/packages"
 dm_install_vendor "$SRC/vendor" "$TRG/vendor"
 dm_install_bower "$SRC/bower_components" "$TRG/bower_components"
-dm_install_cvext org.civicrm.api4 "$TRG/ext/api4"
 dm_install_cvext com.iatspayments.civicrm "$TRG/ext/iatspayments"
 
 ## WTF: It's so good we'll install it twice!

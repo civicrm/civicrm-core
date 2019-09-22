@@ -1,4 +1,7 @@
 {
+  "org.civicrm.api4": {
+    "obsolete": "5.19"
+  },
   "uk.squiffle.kam": {
     "obsolete": "5.12"
   },

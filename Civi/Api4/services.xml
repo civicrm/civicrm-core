@@ -1,0 +1,26 @@
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="spec_gatherer" class="Civi\Api4\Service\Spec\SpecGatherer"/>
+
+        <service id="schema_map_builder" class="Civi\Api4\Service\Schema\SchemaMapBuilder" public="false">
+            <argument type="service" id="dispatcher" />
+        </service>
+
+        <service id="schema_map" class="Civi\Api4\Service\Schema\SchemaMap">
+          <factory service="schema_map_builder" method="build"/>
+        </service>
+
+        <service id="joiner" class="Civi\Api4\Service\Schema\Joiner">
+            <argument type="service" id="schema_map"/>
+        </service>
+
+        <service id="action_object_provider" class="Civi\Api4\Provider\ActionObjectProvider">
+            <tag name="event_subscriber"/>
+        </service>
+
+    </services>
+</container>
