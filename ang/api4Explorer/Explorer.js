@@ -21,7 +21,7 @@
   });
 
   angular.module('api4Explorer').controller('Api4Explorer', function($scope, $routeParams, $location, $timeout, $http, crmUiHelp, crmApi4) {
-    var ts = $scope.ts = CRM.ts('api4');
+    var ts = $scope.ts = CRM.ts();
     $scope.entities = entities;
     $scope.actions = actions;
     $scope.fields = [];
@@ -585,7 +585,7 @@
       },
       templateUrl: '~/api4Explorer/WhereClause.html',
       link: function (scope, element, attrs) {
-        var ts = scope.ts = CRM.ts('api4');
+        var ts = scope.ts = CRM.ts();
         scope.newClause = '';
         scope.conjunctions = ['AND', 'OR', 'NOT'];
         scope.operators = CRM.vars.api4.operators;
@@ -640,7 +640,7 @@
       },
       require: 'ngModel',
       link: function (scope, element, attrs, ctrl) {
-        var ts = scope.ts = CRM.ts('api4'),
+        var ts = scope.ts = CRM.ts(),
           multi = _.includes(['IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN'], scope.data.op),
           entity = $routeParams.api4entity,
           action = $routeParams.api4action;
@@ -759,7 +759,7 @@
       },
       templateUrl: '~/api4Explorer/Chain.html',
       link: function (scope, element, attrs) {
-        var ts = scope.ts = CRM.ts('api4');
+        var ts = scope.ts = CRM.ts();
 
         function changeEntity(newEntity, oldEntity) {
           // When clearing entity remove this chain
