@@ -193,7 +193,7 @@ class CRM_Core_ClassLoader {
     // we do this to prevent a autoloader errors with joomla / 3rd party packages
     // Use absolute path, since we don't know the content of include_path yet.
     // CRM-11304
-    $file = dirname(__FILE__) . '/../../packages/IDS/vendors/htmlpurifer/HTMLPurifier/Bootstrap.php';
+    $file = dirname(__FILE__) . '/../../packages/IDS/vendors/htmlpurifier/HTMLPurifier/Bootstrap.php';
     if (file_exists($file)) {
       return $file;
     }
