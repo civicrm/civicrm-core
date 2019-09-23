@@ -32,6 +32,10 @@
   name        : Francis Whittle
   organization: Agileware
 
+- github      : agileware-pengyi
+  name        : Pengyi Zhang
+  organization: Agileware
+
 - github      : ajdavis
   name        : A. Jesse Jiryu Davis
   organization: MongoDB
@@ -342,7 +346,7 @@
 - github      : Dawnthorn
   name        : Peter Haight
   organization: Giant Rabbit
-  
+
 - github      : dlobo
   name        : Donald Lobo
   jira        : lobo
@@ -350,6 +354,8 @@
 - github      : dkguru
   organization: Jesper Angelo
   jira        : dkguru
+
+- github      : don-alejandro-z
 
 - name        : Samuel Haskell
   jira        : dotsam
@@ -472,6 +478,9 @@
 - name        : Fernando Rodríguez
   organization: Amnistía Internacional España
   jira        : Fernando
+
+- github      : fkohrt
+  name        : Florian Kohrt
 
 - github      : fliespl
   name        : Arkadiusz Rzadkowolski
