@@ -55,7 +55,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
     $this->addRadio('outBound_option', ts('Select Mailer'), $outBoundOption);
 
     $props = array();
-    $settings = Civi::settings()->getMandatory('mailing_backend');
+    $settings = Civi::settings()->getMandatory('mailing_backend') ?? [];
     //Load input as readonly whose values are overridden in civicrm.settings.php.
     foreach ($settings as $setting => $value) {
       if (isset($value)) {
