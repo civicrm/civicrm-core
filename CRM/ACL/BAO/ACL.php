@@ -852,7 +852,7 @@ SELECT g.*
       $aclKeys = array_keys($acls);
       $aclKeys = implode(',', $aclKeys);
 
-      $cacheKey = CRM_Utils_Cache::cleanKey("$tableName-$aclKeys");
+      $cacheKey = CRM_Utils_Cache::cleanKey("{$tableName}-{$type}-{$aclKeys}");
       $cache = CRM_Utils_Cache::singleton();
       $ids = $cache->get($cacheKey);
       if (!$ids) {

@@ -310,6 +310,11 @@ class CRM_Contact_Page_AJAX {
     $customValueID = CRM_Utils_Type::escape($_REQUEST['valueID'], 'Positive');
     $customGroupID = CRM_Utils_Type::escape($_REQUEST['groupID'], 'Positive');
     $contactId = CRM_Utils_Request::retrieve('contactId', 'Positive');
+    if (!CRM_Core_BAO_CustomGroup::isCustomGroupAllowed(
+      $customGroupID, $contactId, CRM_Core_Permission::EDIT
+    )) {
+      CRM_Utils_System::permissionDenied();
+    }
     CRM_Core_BAO_CustomValue::deleteCustomValue($customValueID, $customGroupID);
     if ($contactId) {
       echo CRM_Contact_BAO_Contact::getCountComponent('custom_' . $customGroupID, $contactId);

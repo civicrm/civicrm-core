@@ -2233,4 +2233,23 @@ SELECT  civicrm_custom_group.id as groupID, civicrm_custom_group.title as groupT
     return [$multipleFieldGroups, $groupTree];
   }
 
+  /**
+   * Check if user has permission for CRUD operation on custom data.
+   *
+   * @param int $customGroupId
+   * @param int $contactId
+   * @param int $permissionType
+   *
+   * @return bool
+   */
+  public static function isCustomGroupAllowed($customGroupId, $contactId, $permissionType) {
+    if (CRM_Contact_BAO_Contact_Permission::allow($contactId, CRM_Core_Permission::EDIT)
+      && $customGroupId && in_array($customGroupId,
+      CRM_Core_Permission::customGroup($permissionType)
+    )) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }

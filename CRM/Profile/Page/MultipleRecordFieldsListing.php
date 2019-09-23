@@ -260,6 +260,12 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
     }
 
     if (!empty($fieldIDs) && $this->_contactId) {
+      // Do not show Edit, Delete, Copy options if user don't have permission.
+      if (!CRM_Core_BAO_CustomGroup::isCustomGroupAllowed(
+        $customGroupId, $this->_contactId, CRM_Core_Permission::EDIT
+      )) {
+        $linkAction -= (CRM_Core_Action::COPY + CRM_Core_Action::UPDATE + CRM_Core_Action::DELETE);
+      }
       $DTparams = !empty($this->_DTparams) ? $this->_DTparams : NULL;
       // commonly used for both views i.e profile listing view (profileDataView) and custom data listing view (customDataView)
       $result = CRM_Core_BAO_CustomValueTable::getEntityValues($this->_contactId, NULL, $fieldIDs, TRUE, $DTparams);
@@ -449,6 +455,13 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
         }
       }
     }
+
+    if (!CRM_Core_BAO_CustomGroup::isCustomGroupAllowed(
+      $customGroupId, $this->_contactId, CRM_Core_Permission::EDIT
+    )) {
+      $this->assign('showAddButton', TRUE);
+    }
+
     $this->assign('dateFields', $dateFields);
     $this->assign('dateFieldsVals', $dateFieldsVals);
     $this->assign('cgcount', $cgcount);
