@@ -341,7 +341,7 @@
 - github      : Dawnthorn
   name        : Peter Haight
   organization: Giant Rabbit
-  
+
 - github      : dlobo
   name        : Donald Lobo
   jira        : lobo
@@ -349,6 +349,8 @@
 - github      : dkguru
   organization: Jesper Angelo
   jira        : dkguru
+
+- github      : don-alejandro-z
 
 - name        : Samuel Haskell
   jira        : dotsam
@@ -471,6 +473,9 @@
 - name        : Fernando Rodríguez
   organization: Amnistía Internacional España
   jira        : Fernando
+
+- github      : fkohrt
+  name        : Florian Kohrt
 
 - github      : fliespl
   name        : Arkadiusz Rzadkowolski
