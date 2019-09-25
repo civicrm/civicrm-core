@@ -896,7 +896,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
           // giving respect to pledge_payment flag.
           if (empty($params['pledge_payment'])) {
-            continue;
+            break;
           }
 
           // get total amount of from import fields
