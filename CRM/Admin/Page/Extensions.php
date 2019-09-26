@@ -175,16 +175,21 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
 
       $row = self::createExtendedInfo($obj);
       $row['id'] = $obj->key;
+      $row['action'] = '';
 
       // assign actions
       $action = 0;
       switch ($row['status']) {
         case CRM_Extension_Manager::STATUS_UNINSTALLED:
-          $action += CRM_Core_Action::ADD;
+          if (!$manager->isIncompatible($row['id'])) {
+            $action += CRM_Core_Action::ADD;
+          }
           break;
 
         case CRM_Extension_Manager::STATUS_DISABLED:
-          $action += CRM_Core_Action::ENABLE;
+          if (!$manager->isIncompatible($row['id'])) {
+            $action += CRM_Core_Action::ENABLE;
+          }
           $action += CRM_Core_Action::DELETE;
           break;
 
@@ -201,18 +206,17 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
       }
       // TODO if extbrowser is enabled and extbrowser has newer version than extcontainer,
       // then $action += CRM_Core_Action::UPDATE
-      $row['action'] = CRM_Core_Action::formLink(self::links(),
-        $action,
-        [
-          'id' => $row['id'],
-          'key' => $obj->key,
-        ],
-        ts('more'),
-        FALSE,
-        'extension.local.action',
-        'Extension',
-        $row['id']
-      );
+      if ($action) {
+        $row['action'] = CRM_Core_Action::formLink(self::links(),
+          $action,
+          ['id' => $row['id'], 'key' => $obj->key],
+          ts('more'),
+          FALSE,
+          'extension.local.action',
+          'Extension',
+          $row['id']
+        );
+      }
       // Key would be better to send, but it's not an integer.  Moreover, sending the
       // values to hook_civicrm_links means that you can still get at the key
 

@@ -362,6 +362,9 @@ class CRM_Extension_System {
       default:
         $extensionRow['statusLabel'] = '(' . $extensionRow['status'] . ')';
     }
+    if ($manager->isIncompatible($obj->key)) {
+      $extensionRow['statusLabel'] = ts('Obsolete') . ($extensionRow['statusLabel'] ? (' - ' . $extensionRow['statusLabel']) : '');
+    }
     return $extensionRow;
   }
 

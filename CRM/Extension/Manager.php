@@ -54,12 +54,12 @@ class CRM_Extension_Manager {
   const STATUS_UNKNOWN = 'unknown';
 
   /**
-   * The extension is fully installed and enabled
+   * The extension is installed but the code is not accessible
    */
   const STATUS_INSTALLED_MISSING = 'installed-missing';
 
   /**
-   * The extension is fully installed and enabled
+   * The extension was installed and is now disabled; the code is not accessible
    */
   const STATUS_DISABLED_MISSING = 'disabled-missing';
 
@@ -225,8 +225,20 @@ class CRM_Extension_Manager {
     // TODO: to mitigate the risk of crashing during installation, scan
     // keys/statuses/types before doing anything
 
+    // Check compatibility
+    $incompatible = [];
     foreach ($keys as $key) {
-      // throws Exception
+      if ($this->isIncompatible($key)) {
+        $incompatible[] = $key;
+      }
+    }
+    if ($incompatible) {
+      throw new CRM_Extension_Exception('Cannot install incompatible extension: ' . implode(', ', $incompatible));
+    }
+
+    foreach ($keys as $key) {
+      /** @var CRM_Extension_Info $info */
+      /** @var CRM_Extension_Manager_Base $typeManager */
       list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
 
       switch ($origStatuses[$key]) {
@@ -308,7 +320,7 @@ class CRM_Extension_Manager {
   }
 
   /**
-   * Add records of the extension to the database -- and enable it
+   * Disable extension without removing record from db.
    *
    * @param array $keys
    *   List of extension keys.
@@ -366,8 +378,6 @@ class CRM_Extension_Manager {
   /**
    * Remove all database references to an extension.
    *
-   * Add records of the extension to the database -- and enable it
-   *
    * @param array $keys
    *   List of extension keys.
    * @throws CRM_Extension_Exception
@@ -421,7 +431,7 @@ class CRM_Extension_Manager {
    * @param $key
    *
    * @return string
-   *   constant (STATUS_INSTALLED, STATUS_DISABLED, STATUS_UNINSTALLED, STATUS_UNKNOWN)
+   *   constant self::STATUS_*
    */
   public function getStatus($key) {
     $statuses = $this->getStatuses();
@@ -431,6 +441,17 @@ class CRM_Extension_Manager {
     else {
       return self::STATUS_UNKNOWN;
     }
+  }
+
+  /**
+   * Check if a given extension is incompatible with this version of CiviCRM
+   *
+   * @param $key
+   * @return bool|array
+   */
+  public function isIncompatible($key) {
+    $info = CRM_Extension_System::getCompatibilityInfo();
+    return $info[$key] ?? FALSE;
   }
 
   /**
@@ -487,7 +508,7 @@ class CRM_Extension_Manager {
    *
    * @throws CRM_Extension_Exception
    * @return array
-   *   (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
+   *   [CRM_Extension_Info, CRM_Extension_Manager_Interface]
    */
   private function _getInfoTypeHandler($key) {
     // throws Exception
@@ -507,7 +528,7 @@ class CRM_Extension_Manager {
    *
    * @throws CRM_Extension_Exception
    * @return array
-   *   (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
+   *   [CRM_Extension_Info, CRM_Extension_Manager_Interface]
    */
   private function _getMissingInfoTypeHandler($key) {
     $info = $this->createInfoFromDB($key);
