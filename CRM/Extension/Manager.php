@@ -215,11 +215,12 @@ class CRM_Extension_Manager {
   /**
    * Add records of the extension to the database -- and enable it
    *
-   * @param array $keys
-   *   List of extension keys.
+   * @param string|array $keys
+   *   One or more extension keys.
    * @throws CRM_Extension_Exception
    */
   public function install($keys) {
+    $keys = (array) $keys;
     $origStatuses = $this->getStatuses();
 
     // TODO: to mitigate the risk of crashing during installation, scan
@@ -322,11 +323,12 @@ class CRM_Extension_Manager {
   /**
    * Disable extension without removing record from db.
    *
-   * @param array $keys
-   *   List of extension keys.
+   * @param string|array $keys
+   *   One or more extension keys.
    * @throws CRM_Extension_Exception
    */
   public function disable($keys) {
+    $keys = (array) $keys;
     $origStatuses = $this->getStatuses();
 
     // TODO: to mitigate the risk of crashing during installation, scan
@@ -378,11 +380,12 @@ class CRM_Extension_Manager {
   /**
    * Remove all database references to an extension.
    *
-   * @param array $keys
-   *   List of extension keys.
+   * @param string|array $keys
+   *   One or more extension keys.
    * @throws CRM_Extension_Exception
    */
   public function uninstall($keys) {
+    $keys = (array) $keys;
     $origStatuses = $this->getStatuses();
 
     // TODO: to mitigate the risk of crashing during installation, scan
