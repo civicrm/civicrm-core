@@ -456,7 +456,7 @@ class CRM_Profile_Page_MultipleRecordFieldsListing extends CRM_Core_Page_Basic {
       }
     }
 
-    if (!CRM_Core_BAO_CustomGroup::isCustomGroupAllowed(
+    if (CRM_Core_BAO_CustomGroup::isCustomGroupAllowed(
       $customGroupId, $this->_contactId, CRM_Core_Permission::EDIT
     )) {
       $this->assign('showAddButton', TRUE);
