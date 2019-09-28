@@ -548,6 +548,44 @@ class CRM_Contact_BAO_QueryTest extends CiviUnitTestCase {
 
   }
 
+  public function testRelationshipDescription() {
+    $relType = $this->callAPISuccess('RelationshipType', 'create', [
+      'name_a_b' => uniqid('a'),
+      'name_b_a' => uniqid('b'),
+    ]);
+    $contactID_a = $this->individualCreate([], 1);
+    $contactID_b = $this->individualCreate([], 2);
+    $contactID_c = $this->individualCreate([], 3);
+    $contactID_d = $this->individualCreate([], 4);
+    $desc = uniqid('rel', TRUE);
+    $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $contactID_a,
+      'contact_id_b' => $contactID_b,
+      'relationship_type_id' => $relType['id'],
+      'is_active' => 1,
+      'description' => $desc,
+    ]);
+    $this->callAPISuccess('Relationship', 'create', [
+      'contact_id_a' => $contactID_c,
+      'contact_id_b' => $contactID_d,
+      'relationship_type_id' => $relType['id'],
+      'is_active' => 1,
+      'description' => 'nothing of interest',
+    ]);
+    $params = [
+      ['relation_description', '=', substr($desc, 3, 18), 0, 0],
+    ];
+
+    $query = new CRM_Contact_BAO_Query($params);
+    $dao = $query->searchQuery();
+    // This is a little weird but seems consistent with the behavior of the search form in general.
+    // Technically there are 2 contacts who share a relationship with the description searched for,
+    // so one might expect the search form to return both of them instead of just Contact A... but it doesn't.
+    $this->assertEquals('1', $dao->N, "Search query returns exactly 1 result?");
+    $this->assertTrue($dao->fetch(), "Search query returns success?");
+    $this->assertEquals($contactID_a, $dao->contact_id, "Search query returns contact A?");
+  }
+
   public function testNonReciprocalRelationshipTargetGroupIsCorrectResults() {
     $contactID_a = $this->individualCreate();
     $contactID_b = $this->individualCreate();
