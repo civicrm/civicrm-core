@@ -392,6 +392,11 @@
       <size>9</size>
     </html>
   </field>
+  <index>
+    <name>index_geo_code_1_geo_code_2</name>
+    <fieldName>geo_code_1</fieldName>
+    <fieldName>geo_code_2</fieldName>
+  </index>
   <field>
     <name>manual_geo_code</name>
     <title>Is Manually Geocoded</title>
