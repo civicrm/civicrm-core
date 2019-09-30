@@ -1737,10 +1737,17 @@ FROM   civicrm_domain
     }
 
     $IDs = implode(',', $componentIDs);
+    
+    $order_array = 'ORDER BY ';
+    foreach ($componentIDs as $item) {
+      $order_array .= $idField. ' = ' . $item . ' DESC,';
+    }
+    $order_array = trim($order_array, ',');
+    
     $query = "
 SELECT contact_id
   FROM $tableName
- WHERE $idField IN ( $IDs )
+ WHERE $idField IN ( $IDs ) $order_array
 ";
 
     $dao = CRM_Core_DAO::executeQuery($query);
