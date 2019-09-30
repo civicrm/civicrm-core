@@ -83,14 +83,10 @@
     </div>
     {else}
       <table class="form-layout-compressed">
-        {if $context neq 'standalone'}
-          <tr>
-            <td class="font-size12pt label"><strong>{ts}Member{/ts}</strong></td><td class="font-size12pt"><strong>{$displayName}</strong></td>
-          </tr>
-        {else}
-          <td class="label">{$form.contact_id.label}</td>
-          <td>{$form.contact_id.html}</td>
-        {/if}
+        <tr class="crm-membership-form-contact-id">
+           <td class="label">{$form.contact_id.label}</td>
+           <td>{$form.contact_id.html}</td>
+        </tr>
         <tr class="crm-membership-form-block-membership_type_id">
           <td class="label">{$form.membership_type_id.label}</td>
           <td><span id='mem_type_id'>{$form.membership_type_id.html}</span>

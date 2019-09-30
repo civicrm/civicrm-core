@@ -337,6 +337,11 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         }
       }
     }
+    else {
+      if ($this->_contactID) {
+        $defaults['contact_id'] = $this->_contactID;
+      }
+    }
 
     //set Soft Credit Type to Gift by default
     $scTypes = CRM_Core_OptionGroup::values("soft_credit_type");
@@ -493,11 +498,9 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
       return;
     }
 
-    if ($this->_context == 'standalone') {
-      $this->addEntityRef('contact_id', ts('Contact'), [
-        'create' => TRUE,
-        'api' => ['extra' => ['email']],
-      ], TRUE);
+    $contactField = $this->addEntityRef('contact_id', ts('Contact'), ['create' => TRUE, 'api' => ['extra' => ['email']]], TRUE);
+    if ($this->_context != 'standalone') {
+      $contactField->freeze();
     }
 
     $selOrgMemType[0][0] = $selMemTypeOrg[0] = ts('- select -');
