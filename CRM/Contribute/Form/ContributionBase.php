@@ -558,6 +558,11 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
         if ($v == "amount" && $this->_params[$v] === 0) {
           $this->_params[$v] = CRM_Utils_Money::format($this->_params[$v], NULL, NULL, TRUE);
         }
+        if ($v == 'frequency_unit' || $v == 'pledge_frequency_unit') {
+          // This is an incorrect, but required use of 'ts', because of upstream confusion
+          // exposing machine-names as end-user strings.
+          $this->_params[$v] = ts($this->_params[$v]);
+        }
         $this->assign($v, $this->_params[$v]);
       }
     }
