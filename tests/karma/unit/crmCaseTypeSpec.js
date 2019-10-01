@@ -487,8 +487,8 @@ describe('crmCaseType', function() {
       }));
 
       it('updates the case roles', function() {
-        console.debug(scope.caseType.definition.caseRoles);
-        console.debug(scope.relationshipTypeOptions);
+        // console.debug(scope.caseType.definition.caseRoles);
+        // console.debug(scope.relationshipTypeOptions);
 
         // This line sort of simulates selecting a relationship type from the
         // dropdown. It doesn't test that clicking picks the right value to
@@ -496,7 +496,7 @@ describe('crmCaseType', function() {
         // the right thing with it.
         scope.addRole(scope.caseType.definition.caseRoles, 'Case Coordinator');
 
-        console.debug(scope.caseType.definition.caseRoles);
+        // console.debug(scope.caseType.definition.caseRoles);
         expect(scope.caseType.definition.caseRoles).toEqual(
           [
             {
@@ -549,7 +549,7 @@ describe('crmCaseType', function() {
         scope.addRole(scope.caseType.definition.caseRoles, 'Guardian Angel for');
         // We already tested the above in another test, so just add again now
         scope.addRole(scope.caseType.definition.caseRoles, 'Guardian Angel for');
-        console.debug(scope.caseType.definition.caseRoles);
+        // console.debug(scope.caseType.definition.caseRoles);
         expect(scope.caseType.definition.caseRoles).toEqual(
           [
             {
