@@ -27,32 +27,27 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
 
   public function preProcess() {
     parent::preProcess();
+    $this->loadStandardSearchOptionsFromUrl();
+    if ($this->_force) {
+      $this->_formValues = $this->getEntityDefaults($this->getDefaultEntity());
+      $this->postProcess();
+    }
   }
 
   public function buildQuickForm() {
     $parent = $this->controller->getParent();
     $nameTextLabel = ($parent->_sms) ? ts('SMS Name') : ts('Mailing Name');
 
-    $this->add('text', 'mailing_name', $nameTextLabel,
-      CRM_Core_DAO::getAttribute('CRM_Mailing_DAO_Mailing', 'title')
-    );
-
     $dateFieldLabel = ($parent->_sms) ? ts('SMS Date') : ts('Mailing Date');
     $this->addDatePickerRange('mailing', $dateFieldLabel);
 
-    $this->add('text', 'sort_name', ts('Created or Sent by'),
-      CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name')
-    );
+    $this->addSortNameField();
+
+    CRM_Mailing_BAO_Query::buildSearchForm($this);
 
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($this);
 
-    // CRM-15434 - Fix mailing search by status in non-English languages
-    $statusVals = CRM_Core_SelectValues::getMailingJobStatus();
-    foreach ($statusVals as $statusId => $statusName) {
-      $this->addElement('checkbox', "mailing_status[$statusId]", NULL, $statusName);
-    }
     $this->addElement('checkbox', 'status_unscheduled', NULL, ts('Draft / Unscheduled'));
-    $this->addYesNo('is_archived', ts('Mailing is Archived'), TRUE);
 
     // Search by language, if multi-lingual
     $enabledLanguages = CRM_Core_I18n::languages(TRUE);
@@ -82,28 +77,37 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
     $defaults = $statusVals = [];
     $parent = $this->controller->getParent();
 
-    if ($parent->get('unscheduled')) {
-      $defaults['status_unscheduled'] = 1;
+    if ($this->_force) {
+      $this->_formValues = $defaults = $this->getEntityDefaults($this->getDefaultEntity());
     }
-    if ($parent->get('scheduled')) {
-      $statusVals = array_keys(CRM_Core_SelectValues::getMailingJobStatus());
-      $defaults['is_archived'] = 0;
-    }
-    if ($parent->get('archived')) {
-      $defaults['is_archived'] = 1;
-    }
-    foreach ($statusVals as $status) {
-      $defaults['mailing_status'][$status] = 1;
+    else {
+      if ($parent->get('unscheduled')) {
+        $defaults['status_unscheduled'] = 1;
+      }
+      if ($parent->get('scheduled')) {
+        $statusVals = array_keys(CRM_Core_SelectValues::getMailingJobStatus());
+        $defaults['is_archived'] = 0;
+      }
+      if ($parent->get('archived')) {
+        $defaults['is_archived'] = 1;
+      }
+      $defaults['status'] = $statusVals;
+
+      if ($parent->_sms) {
+        $defaults['sms'] = 1;
+      }
     }
 
-    if ($parent->_sms) {
-      $defaults['sms'] = 1;
-    }
     return $defaults;
   }
 
   public function postProcess() {
-    $params = $this->controller->exportValues($this->_name);
+    if (!empty($this->_force)) {
+      $params = $this->getEntityDefaults($this->getDefaultEntity());
+    }
+    else {
+      $params = $this->controller->exportValues($this->_name);
+    }
 
     if (!empty($params['mailing_relative'])) {
       list($params['mailing_low'], $params['mailing_high']) = CRM_Utils_Date::getFromTo($params['mailing_relative'], $params['mailing_low'], $params['mailing_high']);
@@ -112,6 +116,13 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form_Search {
     elseif (!empty($params['mailing_high'])) {
       $params['mailing_high'] .= ' ' . '23:59:59';
     }
+
+    $specialParams = ['name', 'status'];
+    $changeNames = [
+      'name' => 'mailing_name',
+      'status' => 'mailing_job_status',
+    ];
+    CRM_Contact_BAO_Query::processSpecialFormValue($params, $specialParams, $changeNames);
 
     $parent = $this->controller->getParent();
     if (!empty($params)) {

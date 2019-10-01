@@ -10,8 +10,8 @@
 <div class="crm-block crm-form-block crm-search-form-block">
   <table class="form-layout">
     <tr>
-       <td>{$form.mailing_name.label} {help id="id-mailing_name"}<br />
-        {$form.mailing_name.html|crmAddClass:big}
+       <td>{$form.name.label} {help id="id-mailing_name"}<br />
+        {$form.name.html|crmAddClass:big}
       </td>
     </tr>
     <tr>
@@ -26,18 +26,9 @@
           {$form.is_archived.html}
         </div>
       </td>
-      {if $form.mailing_status}
+      {if $form.status}
          <td width="100%"><label>{if $sms eq 1}{ts}SMS Status{/ts}{else}{ts}Mailing Status{/ts}{/if}</label><br />
-           <div class="listing-box" style="height: auto">
-             {foreach from=$form.mailing_status item="mailing_status_val"}
-               <div class="{cycle values="odd-row,even-row"}">
-                 {$mailing_status_val.html}
-               </div>
-            {/foreach}
-            <div class="{cycle values="odd-row,even-row"}">
-              {$form.status_unscheduled.html}
-            </div>
-          </div><br />
+           {$form.status.html|crmAddClass:big}
         </td>
       {/if}
     </tr>

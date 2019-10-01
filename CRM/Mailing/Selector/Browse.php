@@ -497,7 +497,12 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
     $title = $this->_parent->get('mailing_name');
     if ($title) {
       $clauses[] = 'name LIKE %1';
-      if (strpos($title, '%') !== FALSE) {
+      if (is_array($title) && in_array(key($title), CRM_Core_DAO::acceptedSQLOperators(), TRUE)) {
+        $op = key($title);
+        $value = $title[$op];
+        $params[1] = [$value, 'String', FALSE];
+      }
+      elseif (strpos($title, '%') !== FALSE) {
         $params[1] = [$title, 'String', FALSE];
       }
       else {

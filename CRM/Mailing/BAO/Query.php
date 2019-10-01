@@ -122,7 +122,7 @@ class CRM_Mailing_BAO_Query {
    * rather than a static function.
    */
   public static function getSearchFieldMetadata() {
-    $fields = ['mailing_job_start_date'];
+    $fields = ['name', 'mailing_job_start_date', 'status', 'is_archived'];
     $metadata = civicrm_api3('Mailing', 'getfields', [])['values'];
     $metadata = array_merge($metadata, civicrm_api3('MailingJob', 'getfields', [])['values']);
     return array_intersect_key($metadata, array_flip($fields));
@@ -258,13 +258,16 @@ class CRM_Mailing_BAO_Query {
 
       case 'mailing_name':
         $value = addslashes($value);
-        if ($wildcard) {
-          $value = "%$value%";
-          $op = 'LIKE';
-        }
 
-        $query->_where[$grouping][] = "civicrm_mailing.name $op '$value'";
-        $query->_qill[$grouping][] = "Mailing Namename $op \"$value\"";
+        $name = 'name';
+        $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause("civicrm_mailing.$name", $op, $value, 'String');
+        list($op, $value) = CRM_Contact_BAO_Query::buildQillForFieldValue('CRM_Mailing_DAO_Mailing', $name, $value, $op);
+
+        $query->_qill[$grouping][] = ts('%1 %2 %3', [
+          1 => ts('Mailing Name'),
+          2 => $op,
+          3 => $value,
+        ]);
         $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
         $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
         return;
@@ -399,7 +402,6 @@ class CRM_Mailing_BAO_Query {
 
     // mailing selectors
     $mailings = CRM_Mailing_BAO_Mailing::getMailingsList();
-
     if (!empty($mailings)) {
       $form->add('select', 'mailing_id', ts('Mailing Name(s)'), $mailings, FALSE,
         ['id' => 'mailing_id', 'multiple' => 'multiple', 'class' => 'crm-select2']

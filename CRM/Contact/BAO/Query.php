@@ -6315,10 +6315,6 @@ AND   displayRelType.is_active = 1
       $value = CRM_Utils_Array::value($element, $formValues);
       if ($value) {
         if (is_array($value)) {
-          if (in_array($element, array_keys($changeNames))) {
-            unset($formValues[$element]);
-            $element = $changeNames[$element];
-          }
           $formValues[$element] = ['IN' => $value];
         }
         elseif (in_array($value, ['IS NULL', 'IS NOT NULL', 'IS EMPTY', 'IS NOT EMPTY'])) {
@@ -6328,7 +6324,13 @@ AND   displayRelType.is_active = 1
           // if wildcard is already present return searchString as it is OR append and/or prepend with wildcard
           $isWilcard = strstr($value, '%') ? FALSE : CRM_Core_Config::singleton()->includeWildCardInName;
           $formValues[$element] = ['LIKE' => self::getWildCardedValue($isWilcard, 'LIKE', $value)];
+
         }
+      }
+      if (in_array($element, array_keys($changeNames))) {
+        $newName = $changeNames[$element];
+        $formValues[$newName] = $formValues[$element];
+        unset($formValues[$element]);
       }
     }
   }
