@@ -107,7 +107,10 @@ describe('crmMailingRadioDate', function() {
       var datenow = [year, month, day].join('-');
       var time = [hours, minutes, "00"].join(':');
       var currentDate = datenow + ' ' + time;
-      var ndate = new Date(datenow);
+      // Using datenow in the constructor here converts to local time. If not
+      // running on GMT (or east) then comparison to toDateString below fails.
+      // Also use month-1 because...javascript.
+      var ndate = new Date(year, month-1, day, 0, 0, 0);
       model.the_date = currentDate;
 
       $rootScope.$digest();
