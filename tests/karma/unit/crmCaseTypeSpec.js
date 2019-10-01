@@ -186,6 +186,18 @@ describe('crmCaseType', function() {
               "is_active": "1"
             },
             {
+              "id": "10",
+              "name_a_b": "Homeless Services Coordinator is",
+              "label_a_b": "Homeless Services Coordinator is",
+              "name_b_a": "Homeless Services Coordinator",
+              "label_b_a": "Homeless Services Coordinator",
+              "description": "Homeless Services Coordinator",
+              "contact_type_a": "Individual",
+              "contact_type_b": "Individual",
+              "is_reserved": "0",
+              "is_active": "1"
+            },
+            {
               "id": "2",
               "name_a_b": "Spouse of",
               "label_a_b": "Spouse of",
@@ -196,9 +208,24 @@ describe('crmCaseType', function() {
               "contact_type_b": "Individual",
               "is_reserved": "0",
               "is_active": "1"
+            },
+            // include one where name is different from label
+            {
+              "id": "27",
+              "name_a_b": "GA123ab",
+              "label_a_b": "Guardian Angel is",
+              "name_b_a": "GA123ba",
+              "label_b_a": "Guardian Angel for",
+              "description": "Guardian Angel.",
+              "contact_type_a": "Individual",
+              "contact_type_b": "Individual",
+              "is_reserved": "0",
+              "is_active": "1"
             }
           ]
         },
+        // Where is this used?
+        // It seems the format for the activity assignee.
         relTypesForm: {
           values: [
             {
@@ -451,6 +478,92 @@ describe('crmCaseType', function() {
           status: 'Completed',
           default_assignee_type: defaultAssigneeDefaultValue.value
         }]);
+      });
+    });
+
+    describe('when adding a role', function() {
+      beforeEach(inject(function ($controller) {
+        ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
+      }));
+
+      it('updates the case roles', function() {
+        console.debug(scope.caseType.definition.caseRoles);
+        console.debug(scope.relationshipTypeOptions);
+
+        // This line sort of simulates selecting a relationship type from the
+        // dropdown. It doesn't test that clicking picks the right value to
+        // add, just that if it did then the function that gets called does
+        // the right thing with it.
+        scope.addRole(scope.caseType.definition.caseRoles, 'Case Coordinator');
+
+        console.debug(scope.caseType.definition.caseRoles);
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displaylabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'Case Coordinator',
+              displaylabel: 'Case Coordinator is'
+            }
+          ]
+        );
+      });
+
+      it('updates case roles when name and label are different', function() {
+        scope.addRole(scope.caseType.definition.caseRoles, 'Guardian Angel for');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displaylabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'GA123ba',
+              displaylabel: 'Guardian Angel is'
+            }
+          ]
+        );
+      });
+
+      it("doesn't add the same role twice", function() {
+        // This is in the mock casetype to start, so check if can add twice.
+        scope.addRole(scope.caseType.definition.caseRoles, 'Homeless Services Coordinator');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displaylabel: 'Homeless Services Coordinator is'
+            }
+          ]
+        );
+
+        // Try with name and label different
+        scope.addRole(scope.caseType.definition.caseRoles, 'Guardian Angel for');
+        // We already tested the above in another test, so just add again now
+        scope.addRole(scope.caseType.definition.caseRoles, 'Guardian Angel for');
+        console.debug(scope.caseType.definition.caseRoles);
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displaylabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'GA123ba',
+              displaylabel: 'Guardian Angel is'
+            }
+          ]
+        );
       });
     });
   });
