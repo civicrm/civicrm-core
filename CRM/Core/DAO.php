@@ -1737,13 +1737,11 @@ FROM   civicrm_domain
     }
 
     $IDs = implode(',', $componentIDs);
-    
     $order_array = 'ORDER BY ';
     foreach ($componentIDs as $item) {
-      $order_array .= $idField. ' = ' . $item . ' DESC,';
+      $order_array .= $idField . ' = ' . $item . ' DESC,';
     }
     $order_array = trim($order_array, ',');
-    
     $query = "
 SELECT contact_id
   FROM $tableName
