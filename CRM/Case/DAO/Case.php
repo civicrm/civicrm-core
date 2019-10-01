@@ -140,6 +140,9 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'entity' => 'Case',
           'bao' => 'CRM_Case_BAO_Case',
           'localizable' => 0,
+          'html' => [
+            'type' => 'Text',
+          ],
         ],
         'case_type_id' => [
           'name' => 'case_type_id',
@@ -265,6 +268,9 @@ class CRM_Case_DAO_Case extends CRM_Core_DAO {
           'entity' => 'Case',
           'bao' => 'CRM_Case_BAO_Case',
           'localizable' => 0,
+          'html' => [
+            'type' => 'CheckBox',
+          ],
         ],
         'case_created_date' => [
           'name' => 'created_date',

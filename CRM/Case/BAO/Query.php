@@ -678,6 +678,34 @@ case_relation_type.id = case_relationship.relationship_type_id )";
   }
 
   /**
+   * Get the metadata for fields to be included on the case search form.
+   *
+   * @todo ideally this would be a trait included on the case search & advanced search
+   * rather than a static function.
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = ['case_type_id', 'case_status_id', 'case_start_date', 'case_end_date', 'case_subject', 'case_id', 'case_deleted'];
+    $metadata = civicrm_api3('Case', 'getfields', [])['values'];
+    $metadata = array_intersect_key($metadata, array_flip($fields));
+    $metadata['case_tags'] = [
+      'title' => ts('Case Tag(s)'),
+      'type' => CRM_Utils_Type::T_INT,
+      'is_pseudofield' => TRUE,
+    ];
+    if (CRM_Core_Permission::check('access all cases and activities')) {
+      $metadata['case_owner'] = [
+        'title' => ts('Cases'),
+        'type' => CRM_Utils_Type::T_INT,
+        'is_pseudofield' => TRUE,
+      ];
+    }
+    if (!CRM_Core_Permission::check('administer CiviCase')) {
+      unset($metadata['case_deleted']);
+    }
+    return $metadata;
+  }
+
+  /**
    * Add all the elements shared between case search and advanced search.
    *
    * @param CRM_Core_Form $form
@@ -687,8 +715,8 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     $configured = CRM_Case_BAO_Case::isCaseConfigured();
     $form->assign('notConfigured', !$configured['configured']);
 
-    $form->addField('case_type_id', ['context' => 'search', 'entity' => 'Case']);
-    $form->addField('case_status_id', ['context' => 'search', 'entity' => 'Case']);
+    $form->addSearchFieldMetadata(['Case' => self::getSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
 
     CRM_Core_Form_Date::buildDateRange($form, 'case_from', 1, '_start_date_low', '_start_date_high', ts('From'), FALSE);
     CRM_Core_Form_Date::buildDateRange($form, 'case_to', 1, '_end_date_low', '_end_date_high', ts('From'), FALSE);
@@ -718,20 +746,6 @@ case_relation_type.id = case_relationship.relationship_type_id )";
 
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_case');
     CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_case', NULL, TRUE, FALSE);
-
-    if (CRM_Core_Permission::check('administer CiviCase')) {
-      $form->addElement('checkbox', 'case_deleted', ts('Deleted Cases'));
-    }
-
-    $form->addElement('text',
-      'case_subject',
-      ts('Case Subject'),
-      ['class' => 'huge']
-    );
-    $form->addElement('text',
-      'case_id',
-      ts('Case ID')
-    );
 
     self::addCustomFormFields($form, ['Case']);
 
