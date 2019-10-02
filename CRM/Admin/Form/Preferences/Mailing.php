@@ -59,7 +59,9 @@ class CRM_Admin_Form_Preferences_Mailing extends CRM_Admin_Form_Preferences {
       // see logging setting for eg.
       $existingViewOptions = Civi::settings()->get('contact_view_options');
 
-      $displayValue = CRM_Core_OptionGroup::getValue('contact_view_options', 'CiviMail', 'name');
+      $displayViewOptions = CRM_Core_OptionGroup::values('contact_view_options', TRUE, FALSE, FALSE, NULL, 'name');
+      $displayValue = $displayViewOptions['CiviMail'];
+
       $viewOptions = explode(CRM_Core_DAO::VALUE_SEPARATOR, $existingViewOptions);
 
       if (!in_array($displayValue, $viewOptions)) {
