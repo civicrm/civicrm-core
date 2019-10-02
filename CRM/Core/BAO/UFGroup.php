@@ -2508,7 +2508,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                             $defaults[$fldName] = $value[substr($fieldName, 8)];
                             break;
                         }
-                      } 
+                      }
                       else {
                         $defaults[$fldName] = $value[substr($fieldName, 8)];
                       }
