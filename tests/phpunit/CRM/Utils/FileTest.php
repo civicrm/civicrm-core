@@ -10,12 +10,12 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
    * Test is child path.
    */
   public function testIsChildPath() {
-    $testCases = array();
-    $testCases[] = array('/ab/cd/ef', '/ab/cd', FALSE);
-    $testCases[] = array('/ab/cd', '/ab/cd/ef', TRUE);
-    $testCases[] = array('/ab/cde', '/ab/cd/ef', FALSE);
-    $testCases[] = array('/ab/cde', '/ab/cd', FALSE);
-    $testCases[] = array('/ab/cd', 'ab/cd/ef', FALSE);
+    $testCases = [];
+    $testCases[] = ['/ab/cd/ef', '/ab/cd', FALSE];
+    $testCases[] = ['/ab/cd', '/ab/cd/ef', TRUE];
+    $testCases[] = ['/ab/cde', '/ab/cd/ef', FALSE];
+    $testCases[] = ['/ab/cde', '/ab/cd', FALSE];
+    $testCases[] = ['/ab/cd', 'ab/cd/ef', FALSE];
     foreach ($testCases as $testCase) {
       $actual = CRM_Utils_File::isChildPath($testCase[0], $testCase[1], FALSE);
       $this->assertEquals($testCase[2], $actual, sprintf("parent=[%s] child=[%s] expected=[%s] actual=[%s]",
@@ -25,7 +25,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
   }
 
   public function testStripComment() {
-    $strings = array(
+    $strings = [
       "\nab\n-- cd\nef" => "\nab\nef",
       "ab\n-- cd\nef" => "ab\nef",
       "ab\n-- cd\nef\ngh" => "ab\nef\ngh",
@@ -38,7 +38,7 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
       "ab\r\n--cd\r\nef" => "ab\r\nef",
       "ab\r\n#cd\r\nef" => "ab\r\nef",
       "ab\r\nfoo#cd\r\nef" => "ab\r\nfoo#cd\r\nef",
-    );
+    ];
     foreach ($strings as $string => $check) {
       $test = CRM_Utils_File::stripComments($string);
       $this->assertEquals($test,
@@ -53,10 +53,10 @@ class CRM_Utils_FileTest extends CiviUnitTestCase {
   }
 
   public function fileExtensions() {
-    return array(
-      array('txt'),
-      array('danger'),
-    );
+    return [
+      ['txt'],
+      ['danger'],
+    ];
   }
 
   /**

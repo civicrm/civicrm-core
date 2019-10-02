@@ -133,7 +133,6 @@ SELECT $selectString, $whereField as contact_id
     }
     appendValue($values, $dao->contact_id, 'contact', $contact, $flat);
   }
-  $dao->free();
 }
 
 /**
@@ -187,7 +186,6 @@ AND   entity_table = 'civicrm_contact'
 
     appendValue($values, $dao->id, 'note', $note);
   }
-  $dao->free();
 }
 
 /**
@@ -225,7 +223,6 @@ AND        p.phone IS NOT NULL
 
     appendValue($values, $dao->id, 'phone', $phone);
   }
-  $dao->free();
 }
 
 /**
@@ -258,7 +255,6 @@ AND        e.email IS NOT NULL
     ];
     appendValue($values, $dao->id, 'email', $email);
   }
-  $dao->free();
 }
 
 /**
@@ -309,7 +305,6 @@ WHERE c.id IN ( $ids )
     }
     appendValue($values, $dao->id, 'address', $address);
   }
-  $dao->free();
 }
 
 /**
@@ -362,7 +357,6 @@ function getRelationshipInfo(&$contactIDs, &$values, &$allContactIDs, &$addition
       $allContactIDs, $additionalContacts
     );
   }
-  $dao->free();
 }
 
 /**
@@ -418,7 +412,6 @@ function getActivityInfo(&$contactIDs, &$values, &$allContactIDs, &$additionalCo
       $allContactIDs, $additionalContacts
     );
   }
-  $dao->free();
 
   if (empty($activityIDs)) {
     return;
@@ -439,7 +432,6 @@ function getActivityInfo(&$contactIDs, &$values, &$allContactIDs, &$additionalCo
     appendValue($values, $aaDAO->id, 'activity_assignment', $activityAssignee);
     $activityContacts[] = $aaDAO->assignee_contact_id;
   }
-  $aaDAO->free();
 
   $sql = "SELECT * FROM civicrm_activity_target WHERE activity_id IN ($activityIDString)";
   $atDAO = &CRM_Core_DAO::executeQuery($sql);
@@ -452,7 +444,6 @@ function getActivityInfo(&$contactIDs, &$values, &$allContactIDs, &$additionalCo
     appendValue($values, $atDAO->id, 'activity_target', $activityTarget);
     $activityContacts[] = $atDAO->target_contact_id;
   }
-  $atDAO->free();
 
   addAdditionalContacts($activityContacts, $allContactIDs, $additionalContacts);
 }

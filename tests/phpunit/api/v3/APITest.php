@@ -37,7 +37,7 @@ class api_v3_APITest extends CiviUnitTestCase {
   protected $_apiversion = 3;
 
   public function testAPIReplaceVariables() {
-    $result = array();
+    $result = [];
     $result['testfield'] = 6;
     $result['api.tag.get'] = 999;
     $result['api.tag.create']['id'] = 8;
@@ -46,7 +46,7 @@ class api_v3_APITest extends CiviUnitTestCase {
     $result['api.tag.create']['values']['0']['display'] = 'batman';
     $result['api.tag.create.api.tag.create']['values']['0']['display'] = 'krypton';
     $result['api.tag.create']['values']['0']['api_tag_get'] = 'darth vader';
-    $params = array(
+    $params = [
       'activity_type_id' => '$value.testfield',
       'tag_id' => '$value.api.tag.create.id',
       'tag1_id' => '$value.api.entity.create.0.id',
@@ -55,7 +55,7 @@ class api_v3_APITest extends CiviUnitTestCase {
       'number' => '$value.api.tag.get',
       'big_rock' => '$value.api.tag.create.api.tag.create.values.0.display',
       'villain' => '$value.api.tag.create.values.0.api_tag_get.display',
-    );
+    ];
     _civicrm_api_replace_variables($params, $result);
     $this->assertEquals(999, $params['number']);
     $this->assertEquals(8, $params['tag_id']);
@@ -73,17 +73,17 @@ class api_v3_APITest extends CiviUnitTestCase {
     $this->callAPIFailure(
       'RandomFile',
       'get',
-      array(),
+      [],
       'API (RandomFile, get) does not exist (join the API team and implement it!)'
     );
   }
 
   public function testAPIWrapperCamelCaseFunction() {
-    $this->callAPISuccess('OptionGroup', 'Get', array());
+    $this->callAPISuccess('OptionGroup', 'Get', []);
   }
 
   public function testAPIWrapperLcaseFunction() {
-    $this->callAPISuccess('OptionGroup', 'get', array());
+    $this->callAPISuccess('OptionGroup', 'get', []);
   }
 
   /**
@@ -93,18 +93,18 @@ class api_v3_APITest extends CiviUnitTestCase {
     $oldPath = get_include_path();
     set_include_path($oldPath . PATH_SEPARATOR . dirname(__FILE__) . '/dataset/resolver');
 
-    $result = $this->callAPISuccess('contact', 'example_action1', array());
+    $result = $this->callAPISuccess('contact', 'example_action1', []);
     $this->assertEquals($result['values'][0], 'civicrm_api3_generic_example_action1 is ok');
-    $result = $this->callAPISuccess('contact', 'example_action2', array());
+    $result = $this->callAPISuccess('contact', 'example_action2', []);
     $this->assertEquals($result['values'][0], 'civicrm_api3_contact_example_action2 is ok');
-    $result = $this->callAPISuccess('test_entity', 'example_action3', array());
+    $result = $this->callAPISuccess('test_entity', 'example_action3', []);
     $this->assertEquals($result['values'][0], 'civicrm_api3_test_entity_example_action3 is ok');
 
     set_include_path($oldPath);
   }
 
   public function testFromCamel() {
-    $cases = array(
+    $cases = [
       'Contribution' => 'contribution',
       'contribution' => 'contribution',
       'OptionValue' => 'option_value',
@@ -113,7 +113,7 @@ class api_v3_APITest extends CiviUnitTestCase {
       'UFJoin' => 'uf_join',
       'ufJoin' => 'uf_join',
       'uf_join' => 'uf_join',
-    );
+    ];
     foreach ($cases as $input => $expected) {
       $actual = _civicrm_api_get_entity_name_from_camel($input);
       $this->assertEquals($expected, $actual, sprintf('input=%s expected=%s actual=%s', $input, $expected, $actual));
@@ -121,7 +121,7 @@ class api_v3_APITest extends CiviUnitTestCase {
   }
 
   public function testToCamel() {
-    $cases = array(
+    $cases = [
       'Contribution' => 'Contribution',
       'contribution' => 'Contribution',
       'OptionValue' => 'OptionValue',
@@ -129,7 +129,7 @@ class api_v3_APITest extends CiviUnitTestCase {
       'option_value' => 'OptionValue',
       'UFJoin' => 'UFJoin',
       'uf_join' => 'UFJoin',
-    );
+    ];
     foreach ($cases as $input => $expected) {
       $actual = _civicrm_api_get_camel_name($input);
       $this->assertEquals($expected, $actual, sprintf('input=%s expected=%s actual=%s', $input, $expected, $actual));
@@ -141,7 +141,7 @@ class api_v3_APITest extends CiviUnitTestCase {
    */
   public function testv3Wrapper() {
     try {
-      $result = civicrm_api3('contact', 'get', array());
+      $result = civicrm_api3('contact', 'get', []);
     }
     catch (CRM_Exception $e) {
       $this->fail("This should have been a success test");
@@ -155,7 +155,7 @@ class api_v3_APITest extends CiviUnitTestCase {
    */
   public function testV3WrapperException() {
     try {
-      civicrm_api3('contact', 'create', array('debug' => 1));
+      civicrm_api3('contact', 'create', ['debug' => 1]);
     }
     catch (CiviCRM_API3_Exception $e) {
       $this->assertEquals('mandatory_missing', $e->getErrorCode());
@@ -173,12 +173,12 @@ class api_v3_APITest extends CiviUnitTestCase {
   public function testCreateNoStringNullResult() {
     // create an example contact
     // $contact = CRM_Core_DAO::createTestObject('CRM_Contribute_DAO_ContributionPage')->toArray();
-    $result = $this->callAPISuccess('ContributionPage', 'create', array(
+    $result = $this->callAPISuccess('ContributionPage', 'create', [
       'title' => "Test Contribution Page",
       'financial_type_id' => 1,
       'currency' => 'USD',
       'goal_amount' => 100,
-    ));
+    ]);
     $contact = array_shift($result['values']);
 
     $this->assertTrue(is_numeric($contact['id']));
@@ -188,11 +188,11 @@ class api_v3_APITest extends CiviUnitTestCase {
     $this->assertNotEmpty($contact['currency']);
 
     // update the contact
-    $result = $this->callAPISuccess('ContributionPage', 'create', array(
+    $result = $this->callAPISuccess('ContributionPage', 'create', [
       'id' => $contact['id'],
       'title' => 'New title',
       'currency' => '',
-    ));
+    ]);
 
     // Check return format.
     $this->assertEquals(1, $result['count']);

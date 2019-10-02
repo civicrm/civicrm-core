@@ -82,10 +82,13 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
         'civicrm_uf_match',
       ]
     );
+    parent::tearDown();
   }
 
   /**
    * Test civicrm_group_nesting_get.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGet() {
     $params = [
@@ -107,6 +110,8 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_group_nesting_get with just one param (child_group_id).
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGetWithChildGroupId() {
     $params = [
@@ -134,6 +139,8 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_group_nesting_get with just one param (parent_group_id).
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGetWithParentGroupId() {
     $params = [
@@ -168,7 +175,9 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    * Test civicrm_group_nesting_get for no records results.
    *
    * Success expected. (these tests are of marginal value as are in syntax conformance,
-   * don't copy & paste
+   * don't copy & paste.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testGetEmptyResults() {
     $params = [
@@ -182,6 +191,8 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    * Test civicrm_group_nesting_create.
    *
    * @throws \Exception
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testCreate() {
     $params = [
@@ -195,6 +206,8 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_group_nesting_remove.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testDelete() {
     $params = [
@@ -212,6 +225,8 @@ class api_v3_GroupNestingTest extends CiviUnitTestCase {
    * Test civicrm_group_nesting_remove with empty parameter array.
    *
    * Error expected.
+   *
+   * @dataProvider versionThreeAndFour
    */
   public function testDeleteWithEmptyParams() {
     $this->callAPIFailure('group_nesting', 'delete', []);

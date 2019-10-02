@@ -52,10 +52,10 @@ class CRM_Core_BAO_DashboardTest extends CiviUnitTestCase {
   }
 
   public function parseUrlTestData() {
-    return array(
-      array('https://foo.bar', 'https://foo.bar'),
-      array('civicrm/path?reset=1&unit=test', CRM_Utils_System::url('civicrm/path', 'reset=1&unit=test', FALSE, NULL, FALSE)),
-    );
+    return [
+      ['https://foo.bar', 'https://foo.bar'],
+      ['civicrm/path?reset=1&unit=test', CRM_Utils_System::url('civicrm/path', 'reset=1&unit=test', FALSE, NULL, FALSE)],
+    ];
   }
 
 }

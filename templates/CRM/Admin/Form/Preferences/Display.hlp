@@ -44,3 +44,48 @@
   {capture assign=invoiceURL}{crmURL p='civicrm/admin/setting/preferences/contribute' q="reset=1"}{/capture} 
   {ts 1=$invoiceURL}In order to enable logged in users to download invoices and credit notes from the dashboard, please first enable CiviCRM invoicing functionality <a href='%1'>Administer > CiviContribute > CiviContribute Component Settings</a>{/ts}
 {/htxt}
+
+{* ***** Theme options ***** *}
+
+{capture assign=themeDefn}
+  <p>
+    {ts}The theme system allows you to change CiviCRM's appearance by replacing important CSS files.{/ts}
+  </p>
+{/capture}
+{capture assign=themeAdv}
+  {* TODO: Update when there is a page to link to:
+  <p>
+    {ts 1='http://fixme.example.com'}For more advanced theming options, consult the <a href="%1">theme documentation</a>.{/ts}
+  </p>
+  *}
+{/capture}
+
+{htxt id="theme-title"}
+  {ts}Theme{/ts}
+{/htxt}
+{htxt id="theme"}
+  {$themeDefn}
+  {$themeAdv}
+{/htxt}
+
+{htxt id="theme_backend-title"}
+  {ts}Backend Theme{/ts}
+{/htxt}
+{htxt id="theme_backend"}
+  {$themeDefn}
+  <p>
+    {ts}The backend theme determines the appearance on administrative screens, such as the "Manage Event" screen.{/ts}
+  </p>
+  {$themeAdv}
+{/htxt}
+
+{htxt id="theme_frontend-title"}
+  {ts}Frontend Theme{/ts}
+{/htxt}
+{htxt id="theme_frontend"}
+  {$themeDefn}
+  <p>
+    {ts}On WordPress, Joomla, or a similar CMS, the frontend theme determines the appearance on user-facing screens, such as the "Event Registration" screen.{/ts}
+  </p>
+  {$themeAdv}
+{/htxt}

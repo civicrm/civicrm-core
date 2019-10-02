@@ -290,7 +290,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     // check if contribution is already completed, if so we ignore this ipn
-    $completedStatusId = CRM_Core_Pseudoconstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+    $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
     if ($contribution->contribution_status_id == $completedStatusId) {
       $transaction->commit();
       Civi::log()->debug('PayPalIPN: Returning since contribution has already been handled. (ID: ' . $contribution->id . ').');
@@ -313,7 +313,9 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     $input['component'] = $component;
 
     $ids['contact'] = $this->retrieve('contactID', 'Integer', TRUE);
-    $ids['contribution'] = $this->retrieve('contributionID', 'Integer', TRUE);
+    $contributionID = $ids['contribution'] = $this->retrieve('contributionID', 'Integer', TRUE);
+    $membershipID = $this->retrieve('membershipID', 'Integer', FALSE);
+    $contributionRecurID = $this->retrieve('contributionRecurID', 'Integer', FALSE);
 
     $this->getInput($input, $ids);
 
@@ -323,17 +325,48 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     }
     else {
       // get the optional ids
-      $ids['membership'] = $this->retrieve('membershipID', 'Integer', FALSE);
-      $ids['contributionRecur'] = $this->retrieve('contributionRecurID', 'Integer', FALSE);
+      $ids['membership'] = $membershipID;
+      $ids['contributionRecur'] = $contributionRecurID;
       $ids['contributionPage'] = $this->retrieve('contributionPageID', 'Integer', FALSE);
       $ids['related_contact'] = $this->retrieve('relatedContactID', 'Integer', FALSE);
       $ids['onbehalf_dupe_alert'] = $this->retrieve('onBehalfDupeAlert', 'Integer', FALSE);
     }
 
-    $paymentProcessorID = self::getPayPalPaymentProcessorID($input, $ids);
+    $paymentProcessorID = $this->getPayPalPaymentProcessorID($input, $ids);
 
     Civi::log()->debug('PayPalIPN: Received (ContactID: ' . $ids['contact'] . '; trxn_id: ' . $input['trxn_id'] . ').');
 
+    if ($this->retrieve('membershipID', 'Integer', FALSE)) {
+      $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecurID);
+      $membershipPayment = civicrm_api3('MembershipPayment', 'get', [
+        'contribution_id' => $templateContribution['id'],
+        'membership_id' => $membershipID,
+      ]);
+      $lineItems  = civicrm_api3('LineItem', 'get', [
+        'contribution_id' => $templateContribution['id'],
+        'entity_id' => $membershipID,
+        'entity_table' => 'civicrm_membership',
+      ]);
+      Civi::log()->debug('PayPalIPN: Received payment for membership ' . (int) $membershipID
+        . '. Original contribution was ' . (int) $contributionID . '. The template for this contribution is '
+        . $templateContribution['id'] . ' it is linked to ' . $membershipPayment['count']
+        . 'payments for this membership. It has ' . $lineItems['count'] . ' line items linked to  this membership.'
+        . '  it is  expected the original contribution will be linked by both entities to the membership.'
+      );
+      if (empty($membershipPayment['count']) && empty($lineItems['count'])) {
+        Civi::log()->debug('PayPalIPN: Will attempt to compensate');
+        $input['membership_id'] = $this->retrieve('membershipID', 'Integer', FALSE);
+      }
+      if ($contributionRecurID) {
+        $recurLinks = civicrm_api3('ContributionRecur', 'get', [
+          'membership_id' => $membershipID,
+          'contribution_recur_id' => $contributionRecurID,
+        ]);
+        Civi::log()->debug('PayPalIPN: Membership should be  linked to  contribution recur  record ' . $contributionRecurID
+          . ' ' . $recurLinks['count'] . 'links found'
+        );
+      }
+    }
     if (!$this->validateData($input, $ids, $objects, TRUE, $paymentProcessorID)) {
       return;
     }
@@ -343,7 +376,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       if ($ids['contributionRecur']) {
         // check if first contribution is completed, else complete first contribution
         $first = TRUE;
-        $completedStatusId = CRM_Core_Pseudoconstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
+        $completedStatusId = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
         if ($objects['contribution']->contribution_status_id == $completedStatusId) {
           $first = FALSE;
         }
@@ -398,9 +431,7 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
        * The `payment_date` that Paypal sends back is in their timezone. Example return: 08:23:05 Jan 11, 2019 PST
        * Subsequently, we need to account for that, otherwise the recieve time will be incorrect for the local system
        */
-      $systemTimeZone = new DateTimeZone(CRM_Core_Config::singleton()->userSystem->getTimeZoneString());
-      $receiveDateTime->setTimezone($systemTimeZone);
-      $input['receive_date'] = $receiveDateTime->format('YmdHis');
+      $input['receive_date'] = CRM_Utils_Date::convertDateToLocalTime($receiveDateTime);
     }
   }
 

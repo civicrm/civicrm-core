@@ -35,91 +35,91 @@ class CRM_Utils_HTMLTest extends CiviUnitTestCase {
    * @return array
    */
   public function translateExamples() {
-    $cases = array();
-    $cases[] = array(
+    $cases = [];
+    $cases[] = [
       '',
-      array(),
-    );
+      [],
+    ];
     // missing ts
-    $cases[] = array(
+    $cases[] = [
       '<div>Hello world</div>',
-      array(),
-    );
+      [],
+    ];
     // text, no arg
-    $cases[] = array(
+    $cases[] = [
       '<div>{{ts("Hello world")}}</div>',
-      array('Hello world'),
-    );
+      ['Hello world'],
+    ];
     // text, no arg, alternate text
-    $cases[] = array(
+    $cases[] = [
       '<div>{{ts("Good morning, Dave")}}</div>',
-      array('Good morning, Dave'),
-    );
+      ['Good morning, Dave'],
+    ];
     // text, with arg
-    $cases[] = array(
+    $cases[] = [
       '<div>{{ts("Hello world", {1: "whiz"})}}</div>',
-      array('Hello world'),
-    );
+      ['Hello world'],
+    ];
     // text, not really ts(), no arg
-    $cases[] = array(
+    $cases[] = [
       '<div>{{clients("Hello world")}}</div>',
-      array(),
-    );
+      [],
+    ];
     // text, not really ts(), with arg
-    $cases[] = array(
+    $cases[] = [
       '<div>{{clients("Hello world", {1: "whiz"})}}</div>',
-      array(),
-    );
+      [],
+    ];
     // two strings, duplicate
-    $cases[] = array(
+    $cases[] = [
       '<div>{{ts("Hello world")}}</div> <p>{{ts("Hello world")}}</p>',
-      array('Hello world'),
-    );
+      ['Hello world'],
+    ];
     // two strings, addition
-    $cases[] = array(
+    $cases[] = [
       '<div>{{ts("Hello world") + "-" + ts("How do you do?")}}</p>',
-      array('Hello world', 'How do you do?'),
-    );
+      ['Hello world', 'How do you do?'],
+    ];
     // two strings, separate calls
-    $cases[] = array(
+    $cases[] = [
       '<div>{{ts("Hello world")}}</div> <p>{{ts("How do you do?")}}</p>',
-      array('Hello world', 'How do you do?'),
-    );
+      ['Hello world', 'How do you do?'],
+    ];
     // single quoted
-    $cases[] = array(
+    $cases[] = [
       '<div>{{ts(\'Hello world\')}}</div>',
-      array('Hello world'),
-    );
+      ['Hello world'],
+    ];
     // unclear string
-    $cases[] = array(
+    $cases[] = [
       '<div>{{ts(message)}}</div>',
-      array(),
-    );
+      [],
+    ];
     // ts() within a string
-    $cases[] = array(
+    $cases[] = [
       '<div>{{ts("Does the ts(\'example\') notation work?")}}</div>',
-      array('Does the ts(\'example\') notation work?'),
-    );
+      ['Does the ts(\'example\') notation work?'],
+    ];
     // attribute, no arg
-    $cases[] = array(
+    $cases[] = [
       '<div crm-title="ts("Hello world")"></div>',
-      array('Hello world'),
-    );
+      ['Hello world'],
+    ];
     // attribute, with arg
-    $cases[] = array(
+    $cases[] = [
       '<div crm-title="ts("Hello world", {1: "whiz"})"></div>',
-      array('Hello world'),
-    );
+      ['Hello world'],
+    ];
     // attribute, two strings, with arg
-    $cases[] = array(
+    $cases[] = [
       '<div crm-title="ts("Hello world", {1: "whiz"}) + ts("How do you do, %1?", {2: "funky"})"></div>',
-      array('Hello world', 'How do you do, %1?'),
-    );
+      ['Hello world', 'How do you do, %1?'],
+    ];
     // trick question! Not used on Smarty templates.
-    $cases[] = array(
+    $cases[] = [
       '<div>{ts}Hello world{/ts}</div>',
-      array(),
-    );
+      [],
+    ];
 
     return $cases;
   }

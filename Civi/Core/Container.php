@@ -46,7 +46,6 @@ class Container {
    *   - CIVICRM_CONTAINER_CACHE -- 'always' [default], 'never', 'auto'
    *   - CIVICRM_DSN
    *   - CIVICRM_DOMAIN_ID
-   *   - CIVICRM_TEMPLATE_COMPILEDIR
    *
    * @return \Symfony\Component\DependencyInjection\ContainerInterface
    */
@@ -58,14 +57,14 @@ class Container {
     $cacheMode = defined('CIVICRM_CONTAINER_CACHE') ? CIVICRM_CONTAINER_CACHE : 'auto';
 
     // In pre-installation environments, don't bother with caching.
-    if (!defined('CIVICRM_TEMPLATE_COMPILEDIR') || !defined('CIVICRM_DSN') || $cacheMode === 'never' || \CRM_Utils_System::isInUpgradeMode()) {
+    if (!defined('CIVICRM_DSN') || $cacheMode === 'never' || \CRM_Utils_System::isInUpgradeMode()) {
       $containerBuilder = $this->createContainer();
       $containerBuilder->compile();
       return $containerBuilder;
     }
 
     $envId = \CRM_Core_Config_Runtime::getId();
-    $file = CIVICRM_TEMPLATE_COMPILEDIR . "/CachedCiviContainer.{$envId}.php";
+    $file = \Civi::paths()->getPath("[civicrm.compile]/CachedCiviContainer.{$envId}.php");
     $containerConfigCache = new ConfigCache($file, $cacheMode === 'auto');
     if (!$containerConfigCache->isFresh()) {
       $containerBuilder = $this->createContainer();
@@ -156,18 +155,42 @@ class Container {
       'checks' => 'checks',
       'session' => 'CiviCRM Session',
       'long' => 'long',
+      'groups' => 'contact groups',
+      'navigation' => 'navigation',
+      'customData' => 'custom data',
+      'fields' => 'contact fields',
+      'contactTypes' => 'contactTypes',
+      'metadata' => 'metadata',
     ];
     foreach ($basicCaches as $cacheSvc => $cacheGrp) {
+      $definitionParams = [
+        'name' => $cacheGrp,
+        'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
+      ];
+      // For Caches that we don't really care about the ttl for and/or maybe accessed
+      // fairly often we use the fastArrayDecorator which improves reads and writes, these
+      // caches should also not have concurrency risk.
+      $fastArrayCaches = ['groups', 'navigation', 'customData', 'fields', 'contactTypes', 'metadata'];
+      if (in_array($cacheSvc, $fastArrayCaches)) {
+        $definitionParams['withArray'] = 'fast';
+      }
       $container->setDefinition("cache.{$cacheSvc}", new Definition(
         'CRM_Utils_Cache_Interface',
-        [
-          [
-            'name' => $cacheGrp,
-            'type' => ['*memory*', 'SqlGroup', 'ArrayCache'],
-          ],
-        ]
+        [$definitionParams]
       ))->setFactory('CRM_Utils_Cache::create');
     }
+
+    // PrevNextCache cannot use memory or array cache at the moment because the
+    // Code in CRM_Core_BAO_PrevNextCache assumes that this cache is sql backed.
+    $container->setDefinition("cache.prevNextCache", new Definition(
+      'CRM_Utils_Cache_Interface',
+      [
+        [
+          'name' => 'CiviCRM Search PrevNextCache',
+          'type' => ['SqlGroup'],
+        ],
+      ]
+    ))->setFactory('CRM_Utils_Cache::create');
 
     $container->setDefinition('sql_triggers', new Definition(
       'Civi\Core\SqlTriggers',
@@ -176,6 +199,11 @@ class Container {
 
     $container->setDefinition('asset_builder', new Definition(
       'Civi\Core\AssetBuilder',
+      []
+    ));
+
+    $container->setDefinition('themes', new Definition(
+      'Civi\Core\Themes',
       []
     ));
 
@@ -285,6 +313,7 @@ class Container {
     if (\CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_SERVICES')) {
       \Civi\Core\Resolver::singleton()->call(CIVICRM_FLEXMAILER_HACK_SERVICES, [$container]);
     }
+    \CRM_Api4_Services::hook_container($container);
 
     \CRM_Utils_Hook::container($container);
 

@@ -160,8 +160,7 @@ class CRM_Core_BAO_Country extends CRM_Core_DAO_Country {
    * @return string
    */
   public static function getDefaultCurrencySymbol($k = NULL) {
-    $config = CRM_Core_Config::singleton();
-    return $config->defaultCurrencySymbol(Civi::settings()->get('defaultCurrency'));
+    return CRM_Core_BAO_Country::defaultCurrencySymbol(\Civi::settings()->get('defaultCurrency'));
   }
 
 }

@@ -67,18 +67,6 @@ function civicrm_api3_contact_create($params) {
     return $values;
   }
 
-  if (array_key_exists('api_key', $params) && !empty($params['check_permissions'])) {
-    if (CRM_Core_Permission::check('edit api keys') || CRM_Core_Permission::check('administer CiviCRM')) {
-      // OK
-    }
-    elseif ($contactID && CRM_Core_Permission::check('edit own api keys') && CRM_Core_Session::singleton()->get('userID') == $contactID) {
-      // OK
-    }
-    else {
-      throw new \Civi\API\Exception\UnauthorizedException('Permission denied to modify api key');
-    }
-  }
-
   if (!$contactID) {
     // If we get here, we're ready to create a new contact
     if (($email = CRM_Utils_Array::value('email', $params)) && !is_array($params['email'])) {
@@ -129,8 +117,6 @@ function civicrm_api3_contact_create($params) {
     _civicrm_api3_object_to_array_unique_fields($contact, $values[$contact->id]);
   }
 
-  $values = _civicrm_api3_contact_formatResult($params, $values);
-
   return civicrm_api3_create_success($values, $params, 'Contact', 'create');
 }
 
@@ -177,42 +163,17 @@ function _civicrm_api3_contact_create_spec(&$params) {
  *
  * @return array
  *   API Result Array
+ *
+ * @throws \API_Exception
  */
 function civicrm_api3_contact_get($params) {
   $options = [];
   _civicrm_api3_contact_get_supportanomalies($params, $options);
   $contacts = _civicrm_api3_get_using_query_object('Contact', $params, $options);
-  $contacts = _civicrm_api3_contact_formatResult($params, $contacts);
-  return civicrm_api3_create_success($contacts, $params, 'Contact');
-}
-
-/**
- * Filter the result.
- *
- * @param array $result
- *
- * @return array
- * @throws \CRM_Core_Exception
- */
-function _civicrm_api3_contact_formatResult($params, $result) {
-  $apiKeyPerms = ['edit api keys', 'administer CiviCRM'];
-  $allowApiKey = empty($params['check_permissions']) || CRM_Core_Permission::check([$apiKeyPerms]);
-  if (!$allowApiKey) {
-    if (is_array($result)) {
-      // Single-value $result
-      if (isset($result['api_key'])) {
-        unset($result['api_key']);
-      }
-
-      // Multi-value $result
-      foreach ($result as $key => $row) {
-        if (is_array($row)) {
-          unset($result[$key]['api_key']);
-        }
-      }
-    }
+  if (!empty($params['check_permissions'])) {
+    CRM_Contact_BAO_Contact::unsetProtectedFields($contacts);
   }
-  return $result;
+  return civicrm_api3_create_success($contacts, $params, 'Contact');
 }
 
 /**
@@ -423,6 +384,11 @@ function _civicrm_api3_contact_get_spec(&$params) {
  *   Array of options (so we can modify the filter).
  */
 function _civicrm_api3_contact_get_supportanomalies(&$params, &$options) {
+  if (!empty($params['email']) && !is_array($params['email'])) {
+    // Fix this to be in array format so the query object does not add LIKE
+    // I think there is a better fix that I will do for master.
+    $params['email'] = ['=' => $params['email']];
+  }
   if (isset($params['showAll'])) {
     if (strtolower($params['showAll']) == "active") {
       $params['contact_is_deleted'] = 0;
@@ -1213,22 +1179,75 @@ function civicrm_api3_contact_merge($params) {
  */
 function _civicrm_api3_contact_merge_spec(&$params) {
   $params['to_remove_id'] = [
-    'title' => 'ID of the contact to merge & remove',
-    'description' => ts('Wow - these 2 params are the logical reverse of what I expect - but what to do?'),
+    'title' => ts('ID of the contact to merge & remove'),
+    'description' => ts('Wow - these 2 aliased params are the logical reverse of what I expect - but what to do?'),
     'api.required' => 1,
     'type' => CRM_Utils_Type::T_INT,
     'api.aliases' => ['main_id'],
   ];
   $params['to_keep_id'] = [
-    'title' => 'ID of the contact to keep',
-    'description' => ts('Wow - these 2 params are the logical reverse of what I expect - but what to do?'),
+    'title' => ts('ID of the contact to keep'),
+    'description' => ts('Wow - these 2 aliased params are the logical reverse of what I expect - but what to do?'),
     'api.required' => 1,
     'type' => CRM_Utils_Type::T_INT,
     'api.aliases' => ['other_id'],
   ];
   $params['mode'] = [
-    // @todo need more detail on what this means.
-    'title' => 'Dedupe mode',
+    'title' => ts('Dedupe mode'),
+    'description' => ts("In 'safe' mode conflicts will result in no merge. In 'aggressive' mode the merge will still proceed (hook dependent)"),
+    'api.default' => ['safe', 'aggressive'],
+    'options' => ['safe' => ts('Abort on unhandled conflict'), 'aggressive' => ts('Proceed on unhandled conflict. Note hooks may change handling here.')],
+  ];
+}
+
+/**
+ * Determines if given pair of contaacts have conflicts that would affect merging them.
+ *
+ * @param array $params
+ *   Allowed array keys are:
+ *   -int main_id: main contact id with whom merge has to happen
+ *   -int other_id: duplicate contact which would be deleted after merge operation
+ *   -string mode: "safe" skips the merge if there are no conflicts. Does a force merge otherwise.
+ *
+ * @return array
+ *   API Result Array
+ *
+ * @throws \CRM_Core_Exception
+ * @throws \CiviCRM_API3_Exception
+ * @throws \API_Exception
+ */
+function civicrm_api3_contact_get_merge_conflicts($params) {
+  $migrationInfo = [];
+  $result = [];
+  foreach ((array) $params['mode'] as $mode) {
+    $result[$mode]['conflicts'] = CRM_Dedupe_Merger::getConflicts(
+      $migrationInfo,
+      $params['to_remove_id'], $params['to_keep_id'],
+      $mode
+    );
+  }
+  return civicrm_api3_create_success($result, $params);
+}
+
+/**
+ * Adjust metadata for contact_merge api function.
+ *
+ * @param array $params
+ */
+function _civicrm_api3_contact_get_merge_conflicts_spec(&$params) {
+  $params['to_remove_id'] = [
+    'title' => ts('ID of the contact to merge & remove'),
+    'api.required' => 1,
+    'type' => CRM_Utils_Type::T_INT,
+  ];
+  $params['to_keep_id'] = [
+    'title' => ts('ID of the contact to keep'),
+    'api.required' => 1,
+    'type' => CRM_Utils_Type::T_INT,
+  ];
+  $params['mode'] = [
+    'title' => ts('Dedupe mode'),
+    'description' => ts("'safe' or 'aggressive'  - these modes map to the merge actions & may affect resolution done by hooks "),
     'api.default' => 'safe',
   ];
 }

@@ -50,7 +50,7 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       'trxn_id',
       'invoice_id',
       'currency',
-      'cancel_date',
+      'contribution_cancel_date',
       'receipt_date',
       'thankyou_date',
       'tax_amount',
@@ -69,6 +69,7 @@ class CRM_Contribute_Tokens extends \Civi\Token\AbstractTokenSubscriber {
       'source' => 'contribution_source',
       'status' => 'contribution_status_id',
       'type' => 'financial_type_id',
+      'cancel_date' => 'contribution_cancel_date',
     ];
   }
 

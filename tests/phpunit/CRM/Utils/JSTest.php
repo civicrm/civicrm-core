@@ -35,38 +35,38 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
    * @return array
    */
   public function translateExamples() {
-    $cases = array();
-    $cases[] = array(
+    $cases = [];
+    $cases[] = [
       '',
-      array(),
-    );
+      [],
+    ];
     // missing ts
-    $cases[] = array(
+    $cases[] = [
       'alert("Hello world")',
-      array(),
-    );
+      [],
+    ];
     // basic function call
-    $cases[] = array(
+    $cases[] = [
       'alert(ts("Hello world"));',
-      array('Hello world'),
-    );
+      ['Hello world'],
+    ];
     // with arg
-    $cases[] = array(
+    $cases[] = [
       'alert(ts("Hello world", {1: "whiz"}));',
-      array('Hello world'),
-    );
+      ['Hello world'],
+    ];
     // not really ts()
-    $cases[] = array(
+    $cases[] = [
       'alert(clients("Hello world"));',
-      array(),
-    );
+      [],
+    ];
     // not really ts()
-    $cases[] = array(
+    $cases[] = [
       'alert(clients("Hello world", {1: "whiz"}));',
-      array(),
-    );
+      [],
+    ];
     // with arg
-    $cases[] = array(
+    $cases[] = [
       "\n" .
       "public function whits() {\n" .
       "  for (a in b) {\n" .
@@ -75,37 +75,37 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
       "    });\n" .
       "  }\n" .
       "}\n",
-      array('Hello'),
-    );
+      ['Hello'],
+    ];
     // duplicate
-    $cases[] = array(
+    $cases[] = [
       'alert(ts("Hello world") + "-" + ts("Hello world"));',
-      array('Hello world'),
-    );
+      ['Hello world'],
+    ];
     // two strings, addition
-    $cases[] = array(
+    $cases[] = [
       'alert(ts("Hello world") + "-" + ts("How do you do?"));',
-      array('Hello world', 'How do you do?'),
-    );
+      ['Hello world', 'How do you do?'],
+    ];
     // two strings, separate calls
-    $cases[] = array(
+    $cases[] = [
       'alert(ts("Hello world");\nalert(ts("How do you do?"));',
-      array('Hello world', 'How do you do?'),
-    );
-    $cases[] = array(
+      ['Hello world', 'How do you do?'],
+    ];
+    $cases[] = [
       'alert(ts(\'Single quoted\'));',
-      array('Single quoted'),
-    );
+      ['Single quoted'],
+    ];
     // unclear string
-    $cases[] = array(
+    $cases[] = [
       'alert(ts(message));',
-      array(),
-    );
+      [],
+    ];
     // ts() within a string
-    $cases[] = array(
+    $cases[] = [
       'alert(ts("Does the ts(\'example\') notation work?"));',
-      array('Does the ts(\'example\') notation work?'),
-    );
+      ['Does the ts(\'example\') notation work?'],
+    ];
     return $cases;
   }
 
@@ -136,18 +136,18 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
     $abc = "(function (angular, $, _) {\na();\n\nb();\n\nc();\n})(angular,CRM.$, CRM._);";
     $cb = "(function( angular, $,_) {\nc();\n\nb();\n})(angular,CRM.$,CRM._);";
 
-    $cases = array();
-    $cases[] = array(array($a), "$a");
-    $cases[] = array(array($b), "$b");
-    $cases[] = array(array($c), "$c");
-    $cases[] = array(array($d), "$d");
-    $cases[] = array(array($m), "$m");
-    $cases[] = array(array($a, $b), "$ab");
-    $cases[] = array(array($a, $m, $b), "$a$m$b");
-    $cases[] = array(array($a, $d), "$a$d");
-    $cases[] = array(array($a, $d, $b), "$a$d$b");
-    $cases[] = array(array($a, $b, $c), "$abc");
-    $cases[] = array(array($a, $b, $d, $c, $b), "$ab$d$cb");
+    $cases = [];
+    $cases[] = [[$a], "$a"];
+    $cases[] = [[$b], "$b"];
+    $cases[] = [[$c], "$c"];
+    $cases[] = [[$d], "$d"];
+    $cases[] = [[$m], "$m"];
+    $cases[] = [[$a, $b], "$ab"];
+    $cases[] = [[$a, $m, $b], "$a$m$b"];
+    $cases[] = [[$a, $d], "$a$d"];
+    $cases[] = [[$a, $d, $b], "$a$d$b"];
+    $cases[] = [[$a, $b, $c], "$abc"];
+    $cases[] = [[$a, $b, $d, $c, $b], "$ab$d$cb"];
     return $cases;
   }
 
@@ -159,34 +159,34 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
   public function testDedupeClosure($scripts, $expectedOutput) {
     $actualOutput = CRM_Utils_JS::dedupeClosures(
       $scripts,
-      array('angular', '$', '_'),
-      array('angular', 'CRM.$', 'CRM._')
+      ['angular', '$', '_'],
+      ['angular', 'CRM.$', 'CRM._']
     );
     $this->assertEquals($expectedOutput, implode("", $actualOutput));
   }
 
   public function stripCommentsExamples() {
-    $cases = array();
-    $cases[] = array(
+    $cases = [];
+    $cases[] = [
       "a();\n//# sourceMappingURL=../foo/bar/baz.js\nb();",
       "a();\n\nb();",
-    );
-    $cases[] = array(
+    ];
+    $cases[] = [
       "// foo\na();",
       "\na();",
-    );
-    $cases[] = array(
+    ];
+    $cases[] = [
       "b();\n  // foo",
       "b();\n",
-    );
-    $cases[] = array(
+    ];
+    $cases[] = [
       "/// foo\na();\n\t \t//bar\nb();\n// whiz",
       "\na();\n\nb();\n",
-    );
-    $cases[] = array(
+    ];
+    $cases[] = [
       "alert('//# sourceMappingURL=../foo/bar/baz.js');\n//zoop\na();",
       "alert('//# sourceMappingURL=../foo/bar/baz.js');\n\na();",
-    );
+    ];
     return $cases;
   }
 
@@ -197,6 +197,144 @@ class CRM_Utils_JSTest extends CiviUnitTestCase {
    */
   public function testStripComments($input, $expectedOutput) {
     $this->assertEquals($expectedOutput, CRM_Utils_JS::stripComments($input));
+  }
+
+  public static function decodeExamples() {
+    return [
+      ['{a: \'Apple\', \'b\': "Banana", c: [1, 2, 3]}', ['a' => 'Apple', 'b' => 'Banana', 'c' => [1, 2, 3]]],
+      ['true', TRUE],
+      [' ', NULL],
+      ['false', FALSE],
+      ['null', NULL],
+      ['"true"', 'true'],
+      ['0.5', 0.5],
+      [" {}", []],
+      ["[]", []],
+      ["{  }", []],
+      [" [   ]", []],
+      [" [ 2   ]", [2]],
+      [
+        '{a: "parse error no closing bracket"',
+        NULL,
+      ],
+      [
+        '{a: ["foo", \'bar\'], "b": {a: [\'foo\', "bar"], b: {\'a\': ["foo", "bar"], b: {}}}}',
+        ['a' => ['foo', 'bar'], 'b' => ['a' => ['foo', 'bar'], 'b' => ['a' => ['foo', 'bar'], 'b' => []]]],
+      ],
+      [
+        ' [{a: {aa: true}, b: [false, null, {x: 1, y: 2, z: 3}] , "c": -1}, ["fee", "fie", \'foe\']]',
+        [['a' => ['aa' => TRUE], 'b' => [FALSE, NULL, ['x' => 1, 'y' => 2, 'z' => 3]], "c" => -1], ["fee", "fie", "foe"]],
+      ],
+    ];
+  }
+
+  /**
+   * @param string $input
+   * @param string $expectedOutput
+   * @dataProvider decodeExamples
+   */
+  public function testDecode($input, $expectedOutput) {
+    $this->assertEquals($expectedOutput, CRM_Utils_JS::decode($input));
+  }
+
+  public static function encodeExamples() {
+    return [
+      [
+        ['a' => 'Apple', 'b' => 'Banana', 'c' => [0, -2, 3.15]],
+        "{a: 'Apple', b: 'Banana', c: [0, -2, 3.15]}",
+      ],
+      [
+        ['a' => ['foo', 'bar'], 'b' => ["'a'" => ['foo/bar&', 'bar(foo)'], 'b' => ['a' => ["fo\\\\'oo", '"bar"'], 'b' => []]]],
+        "{a: ['foo', 'bar'], b: {\"'a'\": ['foo/bar&', 'bar(foo)'], b: {a: ['fo\\\\\\\\\\'oo', '\"bar\"'], b: {}}}}",
+      ],
+      [TRUE, 'true'],
+      [' ', "' '"],
+      [FALSE, 'false'],
+      [NULL, 'null'],
+      ['true', "'true'"],
+      ['"false"', "'\"false\"'"],
+      ['0.5', "'0.5'"],
+      [0.5, '0.5'],
+      [[], "{}"],
+    ];
+  }
+
+  /**
+   * @param string $input
+   * @param string $expectedOutput
+   * @dataProvider encodeExamples
+   */
+  public function testEncode($input, $expectedOutput) {
+    $result = CRM_Utils_JS::encode($input);
+    $this->assertEquals($expectedOutput, $result);
+    $this->assertEquals($input, CRM_Utils_JS::decode($result));
+  }
+
+  /**
+   * @return array
+   */
+  public static function objectExamples() {
+    return [
+      [
+        '{a: \'Apple\', \'b\': "Banana", "c ": [1,2,3]}',
+        ['a' => "'Apple'", 'b' => '"Banana"', 'c ' => '[1,2,3]'],
+        '{a: \'Apple\', b: "Banana", \'c \': [1,2,3]}',
+      ],
+      [
+        " {}",
+        [],
+        "{}",
+      ],
+      [
+        " [ ] ",
+        [],
+        "{}",
+      ],
+      [
+        "  {'fn' : function (foo, bar, baz) { return \"One, two, three\"; }, esc: /[1-9]\\\\/.test('5\\\\') , number  :  55.5/2 }   ",
+        ['fn' => 'function (foo, bar, baz) { return "One, two, three"; }', 'esc' => "/[1-9]\\\\/.test('5\\\\')", 'number' => '55.5/2'],
+        "{fn: function (foo, bar, baz) { return \"One, two, three\"; }, esc: /[1-9]\\\\/.test('5\\\\'), number: 55.5/2}",
+      ],
+      [
+        "{ string :
+          'this, has(some : weird, \\'stuff [{}!' ,
+           expr: sum(1, 2, 3) / 2 + 1, ' notes ' : [Do, re mi],
+        }",
+        ['string' => "'this, has(some : weird, \\'stuff [{}!'", 'expr' => 'sum(1, 2, 3) / 2 + 1', ' notes ' => "[Do, re mi]"],
+        "{string: 'this, has(some : weird, \\'stuff [{}!', expr: sum(1, 2, 3) / 2 + 1, ' notes ': [Do, re mi]}",
+      ],
+      [
+        '{status: /^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\' , \'foo\&\': getFoo("Some \"quoted\" thing"), "ba\'[(r": function() {return "bar"}}',
+        ['status' => '/^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\'', 'foo&' => 'getFoo("Some \"quoted\" thing")', "ba'[(r" => 'function() {return "bar"}'],
+        '{status: /^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\', "foo&": getFoo("Some \"quoted\" thing"), "ba\'[(r": function() {return "bar"}}',
+      ],
+      [
+        '{"some\"key": typeof foo === \'number\' ? true : false , "O\'Really?": ",((,", \'A"quote"\': 1 + 1 , "\\\\\\&\\/" : 0}',
+        ['some"key' => 'typeof foo === \'number\' ? true : false', "O'Really?" => '",((,"', 'A"quote"' => '1 + 1', '\\&/' => '0'],
+        '{\'some"key\': typeof foo === \'number\' ? true : false, "O\'Really?": ",((,", \'A"quote"\': 1 + 1, "\\\\&/": 0}',
+      ],
+      [
+        '[foo ? 1 : 2 , 3 ,  function() {return 1 + 1;}, /^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\' , 3.14   ]',
+        ['foo ? 1 : 2', '3', 'function() {return 1 + 1;}', '/^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\'', '3.14'],
+        '[foo ? 1 : 2, 3, function() {return 1 + 1;}, /^http:\/\/civicrm\.com/.test(url) ? \'good\' : \'bad\', 3.14]',
+      ],
+    ];
+  }
+
+  /**
+   * Test converting a js string to a php array and back again.
+   *
+   * @param string $input
+   * @param string $expectedPHP
+   * @param $expectedJS
+   * @dataProvider objectExamples
+   */
+  public function testObjectToAndFromString($input, $expectedPHP, $expectedJS) {
+    $objectProps = CRM_Utils_JS::getRawProps($input);
+    $this->assertEquals($expectedPHP, $objectProps);
+    $reformattedJS = CRM_Utils_JS::writeObject($objectProps);
+    $this->assertEquals($expectedJS, $reformattedJS);
+    $this->assertEquals($expectedPHP, CRM_Utils_JS::getRawProps($reformattedJS));
   }
 
 }

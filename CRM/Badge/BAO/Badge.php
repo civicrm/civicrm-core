@@ -225,8 +225,8 @@ class CRM_Badge_BAO_Badge {
           break;
       }
       $this->pdf->Image($formattedRow['participant_image'], $x + $imageAlign, $y + $startOffset, CRM_Utils_Array::value('width_participant_image', $formattedRow), CRM_Utils_Array::value('height_participant_image', $formattedRow));
-      if ($startOffset == NULL && CRM_Utils_Array::value('height_participant_image', $formattedRow)) {
-        $startOffset = CRM_Utils_Array::value('height_participant_image', $formattedRow);
+      if ($startOffset == NULL && !empty($formattedRow['height_participant_image'])) {
+        $startOffset = $formattedRow['height_participant_image'];
       }
     }
 

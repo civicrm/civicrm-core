@@ -76,6 +76,11 @@ class CRM_Upgrade_Incremental_php_FiveFifteen extends CRM_Upgrade_Incremental_Ba
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Fix errant deferred revenue settings', 'updateContributeSettings');
     $this->addTask('Fix cache key column name in prev next cache', 'fixCacheKeyColumnNamePrevNext');
+    $this->addTask('Update smart groups where jcalendar fields have been converted to datepicker', 'updateSmartGroups', [
+      'datepickerConversion' => [
+        'participant_register_date',
+      ],
+    ]);
   }
 
   public static function fixCacheKeyColumnNamePrevNext() {

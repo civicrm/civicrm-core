@@ -95,7 +95,7 @@ class CRM_Admin_Page_AJAX {
   }
 
   public static function getSearchOptions() {
-    $searchOptions = array_merge(['sort_name'], Civi::settings()->get('quicksearch_options'));
+    $searchOptions = Civi::settings()->get('quicksearch_options');
     $labels = CRM_Core_SelectValues::quicksearchOptions();
     $result = [];
     foreach ($searchOptions as $key) {

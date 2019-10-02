@@ -67,8 +67,7 @@ class CRM_Core_Page_AJAX_Location {
     $entityBlock = ['contact_id' => $cid];
     $location = CRM_Core_BAO_Location::getValues($entityBlock);
 
-    $config = CRM_Core_Config::singleton();
-    $addressSequence = array_flip($config->addressSequence());
+    $addressSequence = array_flip(CRM_Utils_Address::sequence(\Civi::settings()->get('address_format')));
 
     $profileFields = CRM_Core_BAO_UFGroup::getFields($ufId, FALSE, CRM_Core_Action::VIEW, NULL, NULL, FALSE,
       NULL, FALSE, NULL, CRM_Core_Permission::CREATE, NULL

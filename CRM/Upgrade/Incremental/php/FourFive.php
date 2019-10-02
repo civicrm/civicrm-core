@@ -84,7 +84,7 @@ AND TABLE_SCHEMA = %1
         $sqlDropFK = "ALTER TABLE `civicrm_msg_template`
 DROP FOREIGN KEY `{$dao->CONSTRAINT_NAME}`,
 DROP KEY `{$dao->CONSTRAINT_NAME}`";
-        CRM_Core_DAO::executeQuery($sqlDropFK, CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
+        CRM_Core_DAO::executeQuery($sqlDropFK, [], TRUE, NULL, FALSE, FALSE);
       }
     }
 

@@ -32,7 +32,7 @@
 class CRM_Core_BAO_ConfigSettingTest extends CiviUnitTestCase {
 
   public function testToggleComponent() {
-    $origNames = array();
+    $origNames = [];
     foreach (CRM_Core_Component::getEnabledComponents() as $c) {
       $origNames[] = $c->name;
     }
@@ -41,7 +41,7 @@ class CRM_Core_BAO_ConfigSettingTest extends CiviUnitTestCase {
     $enableResult = CRM_Core_BAO_ConfigSetting::enableComponent('CiviCase');
     $this->assertTrue($enableResult, 'Cannot enable CiviCase in line ' . __LINE__);
 
-    $newNames = array();
+    $newNames = [];
     foreach (CRM_Core_Component::getEnabledComponents() as $c) {
       $newNames[] = $c->name;
     }

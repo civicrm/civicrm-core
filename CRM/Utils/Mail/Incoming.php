@@ -254,8 +254,8 @@ class CRM_Utils_Mail_Incoming {
    * @return string
    */
   public function formatUnrecognisedPart($part) {
-    CRM_Core_Error::debug_log_message(ts('CRM_Utils_Mail_Incoming: Unable to handle message part of type "%1".', ['%1' => get_class($part)]));
-    return ts('Unrecognised message part of type "%1".', ['%1' => get_class($part)]);
+    CRM_Core_Error::debug_log_message(ts('CRM_Utils_Mail_Incoming: Unable to handle message part of type "%1".', [1 => get_class($part)]));
+    return ts('Unrecognised message part of type "%1".', [1 => get_class($part)]);
   }
 
   /**
@@ -497,9 +497,7 @@ class CRM_Utils_Mail_Incoming {
 
     CRM_Utils_String::extractName($name, $params);
 
-    return CRM_Contact_BAO_Contact::createProfileContact($params,
-      CRM_Core_DAO::$_nullArray
-    );
+    return CRM_Contact_BAO_Contact::createProfileContact($params);
   }
 
 }

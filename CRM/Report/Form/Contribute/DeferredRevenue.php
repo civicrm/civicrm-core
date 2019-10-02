@@ -95,6 +95,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
             'type' => CRM_Utils_Type::T_DATE,
           ],
           'cancel_date' => [
+            'name' => 'contribution_cancel_date',
             'title' => ts('Cancel Date'),
             'type' => CRM_Utils_Type::T_DATE,
           ],
@@ -113,6 +114,7 @@ class CRM_Report_Form_Contribute_DeferredRevenue extends CRM_Report_Form {
             'title' => ts('Cancel Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
             'type' => CRM_Utils_Type::T_DATE,
+            'name' => 'contribution_cancel_date',
           ],
           'revenue_recognition_date' => [
             'title' => ts('Revenue Recognition Date'),

@@ -47,7 +47,7 @@ class CRM_Event_Form_ManageEvent_ScheduleReminders extends CRM_Event_Form_Manage
    */
   public function preProcess() {
     parent::preProcess();
-    $this->assign('selectedChild', 'reminder');
+    $this->setSelectedChild('reminder');
     $setTab = CRM_Utils_Request::retrieve('setTab', 'Int', $this, FALSE, 0);
 
     $mapping = CRM_Utils_Array::first(CRM_Core_BAO_ActionSchedule::getMappings([

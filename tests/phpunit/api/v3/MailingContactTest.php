@@ -72,9 +72,9 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
   }
 
   public function testMailingContactGetFields() {
-    $result = $this->callAPISuccess('MailingContact', 'getfields', array(
+    $result = $this->callAPISuccess('MailingContact', 'getfields', [
       'action' => 'get',
-    ));
+    ]);
     $this->assertEquals('Delivered', $result['values']['type']['api.default']);
   }
 
@@ -106,10 +106,10 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
    * Test that invalid types are returned with appropriate errors.
    */
   public function testMailingContactInvalidType() {
-    $params = array(
+    $params = [
       'contact_id' => 23,
       'type' => 'invalid',
-    );
+    ];
     $this->callAPIFailure('MailingContact', 'get', $params);
   }
 
@@ -117,9 +117,9 @@ class api_v3_MailingContactTest extends CiviUnitTestCase {
    * Test for success result when there are no mailings for a the given contact.
    */
   public function testMailingContactNoMailings() {
-    $params = array(
+    $params = [
       'contact_id' => $this->_contact['id'],
-    );
+    ];
     $result = $this->callAPISuccess('MailingContact', 'get', $params);
     $this->assertEquals($result['count'], 0);
     $this->assertTrue(empty($result['values']));

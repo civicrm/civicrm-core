@@ -114,7 +114,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
         $dir = \CRM_Utils_File::addTrailingSlash($path) . 'api' . DIRECTORY_SEPARATOR . 'v3' . DIRECTORY_SEPARATOR . 'examples' . DIRECTORY_SEPARATOR . $_GET['entity'];
         if (is_dir($dir)) {
           foreach (scandir($dir) as $item) {
-            $item = str_replace('.php', '', $item);
+            $item = str_replace('.ex.php', '', $item);
             if ($item && strpos($item, '.') === FALSE) {
               $examples[] = ['key' => $item, 'value' => $item];
             }
@@ -127,7 +127,7 @@ class CRM_Admin_Page_APIExplorer extends CRM_Core_Page {
       $paths = self::uniquePaths();
       $fileFound = FALSE;
       foreach ($paths as $path) {
-        $fileName = \CRM_Utils_File::addTrailingSlash($path) . 'api' . DIRECTORY_SEPARATOR . 'v3' . DIRECTORY_SEPARATOR . 'examples' . DIRECTORY_SEPARATOR . $_GET['file'] . '.php';
+        $fileName = \CRM_Utils_File::addTrailingSlash($path) . 'api' . DIRECTORY_SEPARATOR . 'v3' . DIRECTORY_SEPARATOR . 'examples' . DIRECTORY_SEPARATOR . $_GET['file'] . '.ex.php';
         if (!$fileFound && file_exists($fileName)) {
           $fileFound = TRUE;
           echo file_get_contents($fileName);

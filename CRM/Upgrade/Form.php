@@ -49,8 +49,10 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
 
   /**
    * Minimum php version required to run (equal to or lower than the minimum install version)
+   *
+   * As of Civi 5.16, using PHP 5.x will lead to a hard crash during bootstrap.
    */
-  const MINIMUM_PHP_VERSION = '5.6';
+  const MINIMUM_PHP_VERSION = '7.0.0';
 
   /**
    * @var \CRM_Core_Config
@@ -269,9 +271,7 @@ class CRM_Upgrade_Form extends CRM_Core_Form {
    * @return Object
    */
   public function runQuery($query) {
-    return CRM_Core_DAO::executeQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    return CRM_Core_DAO::executeQuery($query);
   }
 
   /**
@@ -648,7 +648,7 @@ SET    version = '$version'
     $disabled = [];
     $manager = CRM_Extension_System::singleton()->getManager();
     foreach ($compatInfo as $key => $ext) {
-      if (!empty($ext['obsolete']) && $manager->getStatus($key) == $manager::STATUS_INSTALLED) {
+      if (!empty($ext['obsolete']) && in_array($manager->getStatus($key), [$manager::STATUS_INSTALLED, $manager::STATUS_INSTALLED_MISSING])) {
         $disabled[$key] = sprintf("<li>%s</li>", ts('The extension %1 is now obsolete and has been disabled.', [1 => $key]));
       }
     }

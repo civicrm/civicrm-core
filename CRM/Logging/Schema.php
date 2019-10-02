@@ -31,6 +31,14 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 class CRM_Logging_Schema {
+
+  /**
+   * Default storage engine for log tables
+   *
+   * @var string
+   */
+  const ENGINE = 'InnoDB';
+
   private $logs = [];
   private $tables = [];
 
@@ -58,7 +66,7 @@ class CRM_Logging_Schema {
 
   /**
    * Specifications of all log table including
-   *  - engine (default is archive, if not set.)
+   *  - engine (default is InnoDB, if not set.)
    *  - engine_config, a string appended to the engine type.
    *    For INNODB  space can be saved with 'ROW_FORMAT=COMPRESSED KEY_BLOCK_SIZE=4'
    *  - indexes (default is none and they cannot be added unless engine is innodb. If they are added and
@@ -302,15 +310,33 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    * and also implements the engine change defined by the hook (i.e. INNODB).
    *
    * Note changing engine & adding hook-defined indexes, but not changing back
-   * to ARCHIVE if engine has not been deliberately set (by hook) and not dropping
-   * indexes. Sysadmin will need to manually intervene to revert to defaults.
+   * to INNODB if engine has not been deliberately set (by hook) and not
+   * dropping indexes. Sysadmin will need to manually intervene to revert to
+   * defaults.
+   *
+   * @param array $params
+   *     'updateChangedEngineConfig' - update if the engine config changes?
+   *     'forceEngineMigration' - force engine upgrade from ARCHIVE to InnoDB?
+   *
+   * @return int $updateTablesCount
+   * @throws \CiviCRM_API3_Exception
    */
-  public function updateLogTableSchema() {
+  public function updateLogTableSchema($params) {
     $updateLogConn = FALSE;
+    $updatedTablesCount = 0;
     foreach ($this->logs as $mainTable => $logTable) {
       $alterSql = [];
       $tableSpec = $this->logTableSpec[$mainTable];
-      if (isset($tableSpec['engine']) && strtoupper($tableSpec['engine']) != $this->getEngineForLogTable($logTable)) {
+      $currentEngine = strtoupper($this->getEngineForLogTable($logTable));
+      if (!isset($tableSpec['engine']) && $currentEngine == 'ARCHIVE' && $params['forceEngineMigration']) {
+        // table uses ARCHIVE engine (the previous default) and no one set an
+        // alternative engine via hook_civicrm_alterLogTables => force change to
+        // new default
+        $tableSpec['engine'] = self::ENGINE;
+      }
+      $engineChanged = isset($tableSpec['engine']) && (strtoupper($tableSpec['engine']) != $currentEngine);
+      $engineConfigChanged = isset($tableSpec['engine_config']) && (strtoupper($tableSpec['engine_config']) != $this->getEngineConfigForLogTable($logTable));
+      if ($engineChanged || ($engineConfigChanged && $params['updateChangedEngineConfig'])) {
         $alterSql[] = "ENGINE=" . $tableSpec['engine'] . " " . CRM_Utils_Array::value('engine_config', $tableSpec);
       }
       if (!empty($tableSpec['indexes'])) {
@@ -334,11 +360,13 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       }
       if (!empty($alterSql)) {
         CRM_Core_DAO::executeQuery("ALTER TABLE {$this->db}.{$logTable} " . implode(', ', $alterSql), [], TRUE, NULL, FALSE, FALSE);
+        $updatedTablesCount++;
       }
     }
     if ($updateLogConn) {
       civicrm_api3('Setting', 'create', ['logging_uniqueid_date' => date('Y-m-d H:i:s')]);
     }
+    return $updatedTablesCount;
   }
 
   /**
@@ -351,6 +379,20 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
   public function getEngineForLogTable($table) {
     return strtoupper(CRM_Core_DAO::singleValueQuery("
       SELECT ENGINE FROM information_schema.tables WHERE TABLE_NAME = %1
+      AND table_schema = %2
+    ", [1 => [$table, 'String'], 2 => [$this->db, 'String']]));
+  }
+
+  /**
+   * Get the engine config for the given table.
+   *
+   * @param string $table
+   *
+   * @return string
+   */
+  public function getEngineConfigForLogTable($table) {
+    return strtoupper(CRM_Core_DAO::singleValueQuery("
+      SELECT CREATE_OPTIONS FROM information_schema.tables WHERE TABLE_NAME = %1
       AND table_schema = %2
     ", [1 => [$table, 'String'], 2 => [$this->db, 'String']]));
   }
@@ -388,12 +430,10 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
    *   name of the relevant table.
    * @param array $cols
    *   Mixed array of columns to add or null (to check for the missing columns).
-   * @param bool $rebuildTrigger
-   *   should we rebuild the triggers.
    *
    * @return bool
    */
-  public function fixSchemaDifferencesFor($table, $cols = [], $rebuildTrigger = FALSE) {
+  public function fixSchemaDifferencesFor($table, $cols = []) {
     if (empty($table)) {
       return FALSE;
     }
@@ -427,10 +467,6 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
       }
     }
 
-    if ($rebuildTrigger) {
-      // invoke the meta trigger creation call
-      CRM_Core_DAO::triggerRebuild($table);
-    }
     return TRUE;
   }
 
@@ -481,7 +517,7 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
     }
 
     foreach ($diffs as $table => $cols) {
-      $this->fixSchemaDifferencesFor($table, $cols, FALSE);
+      $this->fixSchemaDifferencesFor($table, $cols);
     }
     if ($rebuildTrigger) {
       // invoke the meta trigger creation call
@@ -555,13 +591,13 @@ AND    (TABLE_NAME LIKE 'log_civicrm_%' $nonStandardTableNameString )
     if ($force || !isset(\Civi::$statics[__CLASS__]['columnsOf'][$table])) {
       $from = (substr($table, 0, 4) == 'log_') ? "`{$this->db}`.$table" : $table;
       CRM_Core_TemporaryErrorScope::ignoreException();
-      $dao = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $from", CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
+      $dao = CRM_Core_DAO::executeQuery("SHOW COLUMNS FROM $from", [], TRUE, NULL, FALSE, FALSE);
       if (is_a($dao, 'DB_Error')) {
         return [];
       }
       \Civi::$statics[__CLASS__]['columnsOf'][$table] = [];
       while ($dao->fetch()) {
-        \Civi::$statics[__CLASS__]['columnsOf'][$table][] = CRM_Utils_type::escape($dao->Field, 'MysqlColumnNameOrAlias');
+        \Civi::$statics[__CLASS__]['columnsOf'][$table][] = CRM_Utils_Type::escape($dao->Field, 'MysqlColumnNameOrAlias');
       }
     }
     return \Civi::$statics[__CLASS__]['columnsOf'][$table];
@@ -711,7 +747,7 @@ WHERE  table_schema IN ('{$this->db}', '{$civiDB}')";
    * @param string $table
    */
   private function createLogTableFor($table) {
-    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE $table", CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
+    $dao = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE $table", [], TRUE, NULL, FALSE, FALSE);
     $dao->fetch();
     $query = $dao->Create_Table;
 
@@ -736,7 +772,7 @@ COLS;
     // - prepend the name with log_
     // - drop AUTO_INCREMENT columns
     // - drop non-column rows of the query (keys, constraints, etc.)
-    // - set the ENGINE to the specified engine (default is archive or if archive is disabled or nor installed INNODB)
+    // - set the ENGINE to the specified engine (default is INNODB)
     // - add log-specific columns (at the end of the table)
     $mysqlEngines = [];
     $engines = CRM_Core_DAO::executeQuery("SHOW ENGINES");
@@ -745,11 +781,10 @@ COLS;
         $mysqlEngines[] = $engines->Engine;
       }
     }
-    $logEngine = in_array('ARCHIVE', $mysqlEngines) ? 'ARCHIVE' : 'INNODB';
     $query = preg_replace("/^CREATE TABLE `$table`/i", "CREATE TABLE `{$this->db}`.log_$table", $query);
     $query = preg_replace("/ AUTO_INCREMENT/i", '', $query);
     $query = preg_replace("/^  [^`].*$/m", '', $query);
-    $engine = strtoupper(CRM_Utils_Array::value('engine', $this->logTableSpec[$table], $logEngine));
+    $engine = strtoupper(CRM_Utils_Array::value('engine', $this->logTableSpec[$table], self::ENGINE));
     $engine .= " " . CRM_Utils_Array::value('engine_config', $this->logTableSpec[$table]);
     $query = preg_replace("/^\) ENGINE=[^ ]+ /im", ') ENGINE=' . $engine . ' ', $query);
 
@@ -759,10 +794,10 @@ COLS;
     $query = self::fixTimeStampAndNotNullSQL($query);
     $query = preg_replace("/(,*\n*\) )ENGINE/m", "$cols\n) ENGINE", $query);
 
-    CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
+    CRM_Core_DAO::executeQuery($query, [], TRUE, NULL, FALSE, FALSE);
 
     $columns = implode(', ', $this->columnsOf($table));
-    CRM_Core_DAO::executeQuery("INSERT INTO `{$this->db}`.log_$table ($columns, log_conn_id, log_user_id, log_action) SELECT $columns, @uniqueID, @civicrm_user_id, 'Initialization' FROM {$table}", CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
+    CRM_Core_DAO::executeQuery("INSERT INTO `{$this->db}`.log_$table ($columns, log_conn_id, log_user_id, log_action) SELECT $columns, @uniqueID, @civicrm_user_id, 'Initialization' FROM {$table}", [], TRUE, NULL, FALSE, FALSE);
 
     $this->tables[] = $table;
     if (empty($this->logs)) {
@@ -878,6 +913,13 @@ COLS;
 
     // logging is enabled, so now lets create the trigger info tables
     foreach ($tableNames as $table) {
+      if (!isset($this->logTableSpec[$table])) {
+        // Per testIgnoreCustomTableByHook this would be unset if a hook had
+        // intervened to prevent logging / triggers on this table.
+        // This could go to the extent of blocking the updates to 'modified_date'
+        // which makes sense, in particular, for calculated fields.
+        continue;
+      }
       $columns = $this->columnsOf($table, $force);
 
       // only do the change if any data has changed

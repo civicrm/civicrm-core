@@ -1,0 +1,81 @@
+{
+  "Contact": [
+    {
+      "first_name": "Single",
+      "last_name": "Contact",
+      "contact_type": "Individual",
+      "preferred_communication_method": "1",
+      "@ref": "test_contact_1"
+    }
+  ],
+  "Activity": [
+    {
+      "subject": "Won A Nobel Prize",
+      "activity_type": "Meeting",
+      "source_contact_id": "@ref test_contact_1.id",
+      "@ref": "test_activity_1"
+    },
+    {
+      "subject": "Cleaned The House",
+      "activity_type": "Meeting",
+      "source_contact_id": "@ref test_contact_1.id",
+      "assignee_contact_id": [
+        "@ref test_contact_1.id"
+      ],
+      "@ref": "test_activity_2"
+    }
+  ],
+  "Phone": [
+    {
+      "contact_id": "@ref test_contact_1.id",
+      "phone": "+1111111111111",
+      "location_type_id": 1
+    },
+    {
+      "contact_id": "@ref test_contact_1.id",
+      "phone": "+2222222222222",
+      "location_type_id": 2
+    }
+  ],
+  "Email": [
+    {
+      "contact_id": "@ref test_contact_1.id",
+      "email": "test_contact_home@fakedomain.com",
+      "location_type_id": 1
+    },
+    {
+      "contact_id": "@ref test_contact_1.id",
+      "email": "test_contact_work@fakedomain.com",
+      "location_type_id": 2
+    }
+  ],
+  "Address": [
+    {
+      "contact_id": "@ref test_contact_1.id",
+      "street_address": "123 Sesame St.",
+      "location_type_id": 1
+    }
+  ],
+  "Website": [
+    {
+      "contact_id": "@ref test_contact_1.id",
+      "url": "http://test.com",
+      "website_id": 1
+    }
+  ],
+  "OpenID": [
+    {
+      "contact_id": "@ref test_contact_1.id",
+      "openid": "123",
+      "allowed_to_login": 1,
+      "location_type_id": 1
+    }
+  ],
+  "IM": [
+    {
+      "contact_id": "@ref test_contact_1.id",
+      "name": "123",
+      "location_type_id": 1
+    }
+  ]
+}

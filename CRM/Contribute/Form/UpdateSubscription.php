@@ -41,8 +41,6 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
 
   protected $_subscriptionDetails = NULL;
 
-  protected $_selfService = FALSE;
-
   public $_paymentProcessor = NULL;
 
   public $_paymentProcessorObj = NULL;
@@ -71,15 +69,10 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     parent::preProcess();
     $this->setAction(CRM_Core_Action::UPDATE);
 
-    if ($this->contributionRecurID) {
-      $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->contributionRecurID);
-    }
-
     if ($this->_coid) {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'info');
       // @todo test & replace with $this->_paymentProcessorObj =  Civi\Payment\System::singleton()->getById($this->_paymentProcessor['id']);
       $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
-      $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
       $this->contributionRecurID = $this->_subscriptionDetails->recur_id;
     }
     elseif ($this->contributionRecurID) {
@@ -104,13 +97,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
       $this->assign('contactId', $this->_subscriptionDetails->contact_id);
     }
 
-    if (!CRM_Core_Permission::check('edit contributions')) {
-      if ($this->_subscriptionDetails->contact_id != $this->getContactID()) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to update subscription.'));
-      }
-      $this->_selfService = TRUE;
-    }
-    $this->assign('self_service', $this->_selfService);
+    $this->assign('self_service', $this->isSelfService());
 
     $this->editableScheduleFields = $this->_paymentProcessorObj->getEditableRecurringScheduleFields();
 
@@ -130,7 +117,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     }
 
     // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
+    if (!empty($_POST['hidden_custom']) && !$this->isSelfService()) {
       CRM_Custom_Form_CustomData::preProcess($this, NULL, NULL, 1, 'ContributionRecur', $this->contributionRecurID);
       CRM_Custom_Form_CustomData::buildQuickForm($this);
       CRM_Custom_Form_CustomData::setDefaultValues($this);
@@ -192,7 +179,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     }
 
     if (CRM_Contribute_BAO_ContributionRecur::supportsFinancialTypeChange($this->contributionRecurID)) {
-      $this->addEntityRef('financial_type_id', ts('Financial Type'), ['entity' => 'FinancialType'], !$this->_selfService);
+      $this->addEntityRef('financial_type_id', ts('Financial Type'), ['entity' => 'FinancialType'], !$this->isSelfService());
     }
 
     // Add custom data
@@ -200,7 +187,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     $this->assign('entityID', $this->contributionRecurID);
 
     $type = 'next';
-    if ($this->_selfService) {
+    if ($this->isSelfService()) {
       $type = 'submit';
     }
 
@@ -225,7 +212,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Contribute_Form_Contrib
     // store the submitted values in an array
     $params = $this->exportValues();
 
-    if ($this->_selfService && $this->_donorEmail) {
+    if ($this->isSelfService() && $this->_donorEmail) {
       // for self service force notify
       $params['is_notify'] = 1;
     }

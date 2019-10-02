@@ -296,7 +296,7 @@ AND    domain_id = %2
           }
         }
 
-        $contactId = CRM_Contact_BAO_Contact::createProfileContact($params, CRM_Core_DAO::$_nullArray);
+        $contactId = CRM_Contact_BAO_Contact::createProfileContact($params);
         $ufmatch->contact_id = $contactId;
         $ufmatch->uf_name = $uniqId;
       }
@@ -323,7 +323,6 @@ AND    domain_id    = %4
 
       if (!$conflict) {
         $ufmatch = CRM_Core_BAO_UFMatch::create((array) $ufmatch);
-        $ufmatch->free();
         $newContact = TRUE;
         $transaction->commit();
       }
@@ -431,25 +430,23 @@ AND    domain_id    = %4
       $contactDetails = CRM_Contact_BAO_Contact_Location::getEmailDetails($contactId);
 
       if (trim($contactDetails[1])) {
+        //update if record is found but different
         $emailID = $contactDetails[3];
-        //update if record is found
-        $query = "UPDATE  civicrm_email
-                     SET email = %1
-                     WHERE id =  %2";
-        $p = [
-          1 => [$emailAddress, 'String'],
-          2 => [$emailID, 'Integer'],
-        ];
-        $dao = CRM_Core_DAO::executeQuery($query, $p);
+        if (trim($contactDetails[1]) != $emailAddress) {
+          civicrm_api3('Email', 'create', [
+            'id' => $emailID,
+            'email' => $emailAddress,
+          ]);
+        }
       }
       else {
         //else insert a new email record
-        $email = new CRM_Core_DAO_Email();
-        $email->contact_id = $contactId;
-        $email->is_primary = 1;
-        $email->email = $emailAddress;
-        $email->save();
-        $emailID = $email->id;
+        $result = civicrm_api3('Email', 'create', [
+          'contact_id' => $contactId,
+          'email' => $emailAddress,
+          'is_primary' => 1,
+        ]);
+        $emailID = $result->id;
       }
 
       CRM_Core_BAO_Log::register($contactId,

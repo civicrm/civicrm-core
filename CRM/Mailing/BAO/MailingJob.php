@@ -72,7 +72,7 @@ class CRM_Mailing_BAO_MailingJob extends CRM_Mailing_DAO_MailingJob {
     $jobDAO = new CRM_Mailing_BAO_MailingJob();
     $jobDAO->copyValues($params, TRUE);
     $jobDAO->save();
-    if (!empty($params['mailing_id'])) {
+    if (!empty($params['mailing_id']) && empty('is_calling_function_updated_to_reflect_deprecation')) {
       CRM_Mailing_BAO_Mailing::getRecipients($params['mailing_id']);
     }
     CRM_Utils_Hook::post($op, 'MailingJob', $jobDAO->id, $jobDAO);
@@ -501,7 +501,6 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
     $mailing = new CRM_Mailing_BAO_Mailing();
     $mailing->id = $this->mailing_id;
     $mailing->find(TRUE);
-    $mailing->free();
 
     $config = NULL;
 
@@ -542,7 +541,6 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
         if (!empty($fields)) {
           $this->deliverGroup($fields, $mailing, $mailer, $job_date, $attachments);
         }
-        $eq->free();
         return FALSE;
       }
       self::$mailsProcessed++;
@@ -557,14 +555,11 @@ VALUES (%1, %2, %3, %4, %5, %6, %7)
       if (count($fields) == self::MAX_CONTACTS_TO_PROCESS) {
         $isDelivered = $this->deliverGroup($fields, $mailing, $mailer, $job_date, $attachments);
         if (!$isDelivered) {
-          $eq->free();
           return $isDelivered;
         }
         $fields = [];
       }
     }
-
-    $eq->free();
 
     if (!empty($fields)) {
       $isDelivered = $this->deliverGroup($fields, $mailing, $mailer, $job_date, $attachments);
@@ -1006,7 +1001,7 @@ AND    status IN ( 'Scheduled', 'Running', 'Paused' )
         'source_record_id' => $this->mailing_id,
         'activity_date_time' => $job_date,
         'subject' => $mailing->subject,
-        'status_id' => 2,
+        'status_id' => 'Completed',
         'deleteActivityTarget' => FALSE,
         'campaign_id' => $mailing->campaign_id,
       ];
@@ -1053,7 +1048,10 @@ AND    record_type_id = $targetRecordID
         }
       }
 
-      if (is_a(CRM_Activity_BAO_Activity::create($activity), 'CRM_Core_Error')) {
+      try {
+        civicrm_api3('Activity', 'create', $activity);
+      }
+      catch (Exception $e) {
         $result = FALSE;
       }
 

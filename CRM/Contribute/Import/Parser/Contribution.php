@@ -56,11 +56,11 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * Class constructor.
    *
    * @param $mapperKeys
-   * @param null $mapperSoftCredit
+   * @param array $mapperSoftCredit
    * @param null $mapperPhoneType
-   * @param null $mapperSoftCreditType
+   * @param array $mapperSoftCreditType
    */
-  public function __construct(&$mapperKeys, $mapperSoftCredit = NULL, $mapperPhoneType = NULL, $mapperSoftCreditType = NULL) {
+  public function __construct(&$mapperKeys, $mapperSoftCredit = [], $mapperPhoneType = NULL, $mapperSoftCreditType = []) {
     parent::__construct();
     $this->_mapperKeys = &$mapperKeys;
     $this->_mapperSoftCredit = &$mapperSoftCredit;
@@ -220,7 +220,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     if (isset($params['total_amount']) && $params['total_amount'] == 0) {
       $params['total_amount'] = '0.00';
     }
-    $this->formatInput($params);
+    $this->formatInput($params, $formatted);
 
     static $indieFields = NULL;
     if ($indieFields == NULL) {
@@ -593,8 +593,9 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
    * CRM_Contribute_Import_Parser_ContributionTest.
    *
    * @param array $params
+   * @param array $formatted
    */
-  public function formatInput(&$params) {
+  public function formatInput(&$params, &$formatted = []) {
     $dateType = CRM_Core_Session::singleton()->get('dateTypes');
     $customDataType = !empty($params['contact_type']) ? $params['contact_type'] : 'Contribution';
     $customFields = CRM_Core_BAO_CustomField::getFields($customDataType);
@@ -619,7 +620,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         }
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($key)) {
           if ($customFields[$customFieldID]['data_type'] == 'Date') {
-            CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $params, $dateType, $key);
+            CRM_Contact_Import_Parser_Contact::formatCustomDate($params, $formatted, $dateType, $key);
             unset($params[$key]);
           }
           elseif ($customFields[$customFieldID]['data_type'] == 'Boolean') {
@@ -650,11 +651,10 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
     require_once 'CRM/Utils/DeprecatedUtils.php';
     // copy all the contribution fields as is
     require_once 'api/v3/utils.php';
-    $fields = CRM_Contribute_DAO_Contribution::fields();
+    $fields = CRM_Core_DAO::getExportableFieldsWithPseudoConstants('CRM_Contribute_BAO_Contribution');
 
     _civicrm_api3_store_values($fields, $params, $values);
 
-    require_once 'CRM/Core/OptionGroup.php';
     $customFields = CRM_Core_BAO_CustomField::getFields('Contribution', FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE);
 
     foreach ($params as $key => $value) {
@@ -807,6 +807,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
         case 'total_amount':
         case 'fee_amount':
         case 'net_amount':
+          // @todo add test like testPaymentTypeLabel & remove these lines as we can anticipate error will still be caught & handled.
           if (!CRM_Utils_Rule::money($value)) {
             return civicrm_api3_create_error("$key not a valid amount: $value");
           }
@@ -819,6 +820,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           break;
 
         case 'financial_type':
+          // @todo add test like testPaymentTypeLabel & remove these lines in favour of 'default' part of switch.
           require_once 'CRM/Contribute/PseudoConstant.php';
           $contriTypes = CRM_Contribute_PseudoConstant::financialType();
           foreach ($contriTypes as $val => $type) {
@@ -829,21 +831,6 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           }
           if (empty($values['financial_type_id'])) {
             return civicrm_api3_create_error("Financial Type is not valid: $value");
-          }
-          break;
-
-        case 'payment_instrument':
-          require_once 'CRM/Core/PseudoConstant.php';
-          $values['payment_instrument_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'payment_instrument_id', $value);
-          if (empty($values['payment_instrument_id'])) {
-            return civicrm_api3_create_error("Payment Instrument is not valid: $value");
-          }
-          break;
-
-        case 'contribution_status_id':
-          require_once 'CRM/Core/PseudoConstant.php';
-          if (!$values['contribution_status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $value)) {
-            return civicrm_api3_create_error("Contribution Status is not valid: $value");
           }
           break;
 
@@ -909,7 +896,7 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
 
           // giving respect to pledge_payment flag.
           if (empty($params['pledge_payment'])) {
-            continue;
+            break;
           }
 
           // get total amount of from import fields
@@ -1017,6 +1004,16 @@ class CRM_Contribute_Import_Parser_Contribution extends CRM_Contribute_Import_Pa
           break;
 
         default:
+          // Hande name or label for fields with options.
+          if (isset($fields[$key]) &&
+            // Yay - just for a surprise we are inconsistent on whether we pass the pseudofield (payment_instrument)
+            // or the field name (contribution_status_id)
+            (!empty($fields[$key]['is_pseudofield_for']) || !empty($fields[$key]['pseudoconstant']))
+          ) {
+            $realField = $fields[$key]['is_pseudofield_for'] ?? $key;
+            $realFieldSpec = $fields[$realField];
+            $values[$key] = $this->parsePseudoConstantField($value, $realFieldSpec);
+          }
           break;
       }
     }

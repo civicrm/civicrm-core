@@ -54,19 +54,13 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
   }
 
   /**
-   * Is the from being accessed by a front end user to update their own recurring.
-   *
-   * @var bool
-   */
-  protected $selfService;
-
-  /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     parent::preProcess();
     if ($this->_crid) {
-      $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_crid);
       $this->assign('frequency_unit', $this->_subscriptionDetails->frequency_unit);
       $this->assign('frequency_interval', $this->_subscriptionDetails->frequency_interval);
       $this->assign('amount', $this->_subscriptionDetails->amount);
@@ -82,10 +76,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
       $this->_mode = 'auto_renew';
       // CRM-18468: crid is more accurate than mid for getting
       // subscriptionDetails, so don't get them again.
-      if (!$this->_crid) {
-        $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_mid, 'membership', 'obj');
-        $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_mid, 'membership');
-      }
 
       $membershipTypes = CRM_Member_PseudoConstant::membershipType();
       $membershipTypeId = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_Membership', $this->_mid, 'membership_type_id');
@@ -97,7 +87,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         CRM_Core_Error::fatal(ts('The recurring contribution looks to have been cancelled already.'));
       }
       $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
-      $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
 
       $this->assign('frequency_unit', $this->_subscriptionDetails->frequency_unit);
       $this->assign('frequency_interval', $this->_subscriptionDetails->frequency_interval);
@@ -136,7 +125,7 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
       'cancel_reason' => ['name' => 'cancel_reason'],
     ];
     $this->entityFields['send_cancel_request'] = [
-      'title' => ts('Send cancellation request to %1 ?', [1 => $this->_paymentProcessorObj->_processorName]),
+      'title' => ts('Send cancellation request?'),
       'name' => 'send_cancel_request',
       'not-auto-addable' => TRUE,
     ];
@@ -341,25 +330,6 @@ class CRM_Contribute_Form_CancelSubscription extends CRM_Contribute_Form_Contrib
         "reset=1&task=cancel&result=1"));
       }
     }
-  }
-
-  /**
-   * Is this being used by a front end user to update their own recurring.
-   *
-   * @return bool
-   */
-  protected function isSelfService() {
-    if (!is_null($this->selfService)) {
-      return $this->selfService;
-    }
-    $this->selfService = FALSE;
-    if (!CRM_Core_Permission::check('edit contributions')) {
-      if ($this->_subscriptionDetails->contact_id != $this->getContactID()) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to cancel this recurring contribution.'));
-      }
-      $this->selfService = TRUE;
-    }
-    return $this->selfService;
   }
 
 }

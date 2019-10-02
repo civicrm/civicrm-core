@@ -1,0 +1,42 @@
+{
+  "Contact": [
+    {
+      "first_name": "First",
+      "last_name": "Contact",
+      "contact_type": "Individual",
+      "@ref": "test_contact_1"
+    },
+    {
+      "first_name": "Second",
+      "last_name": "Contact",
+      "contact_type": "Individual",
+      "@ref": "test_contact_2"
+    }
+  ],
+  "Email": [
+    {
+      "contact_id": "@ref test_contact_1.id",
+      "email": "test_contact_one_home@fakedomain.com",
+      "location_type_id": 1,
+      "@ref": "test_email_1"
+    },
+    {
+      "contact_id": "@ref test_contact_1.id",
+      "email": "test_contact_one_work@fakedomain.com",
+      "location_type_id": 2,
+      "@ref": "test_email_2"
+    },
+    {
+      "contact_id": "@ref test_contact_2.id",
+      "email": "test_contact_two_home@fakedomain.com",
+      "location_type_id": 1,
+      "@ref": "test_email_3"
+    },
+    {
+      "contact_id": "@ref test_contact_2.id",
+      "email": "test_contact_two_work@fakedomain.com",
+      "location_type_id": 2,
+      "@ref": "test_email_4"
+    }
+  ]
+}

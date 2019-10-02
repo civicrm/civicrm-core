@@ -91,6 +91,15 @@ else {
   errorDisplayPage($errorTitle, $errorMsg, FALSE);
 }
 
+$composerJsonPath = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'composer.json';
+if (file_exists($composerJsonPath)) {
+  $composerJson = json_decode(file_get_contents($composerJsonPath), 1);
+  $minPhpVer = preg_replace(';[~^];', '', $composerJson['require']['php']);
+  if (!version_compare(phpversion(), $minPhpVer, '>=')) {
+    errorDisplayPage('PHP Version Requirement', sprintf("CiviCRM requires PHP %s+. The web server is running PHP %s.", $minPhpVer, phpversion()), FALSE);
+  }
+}
+
 $pkgPath = $crmPath . DIRECTORY_SEPARATOR . 'packages';
 
 require_once $crmPath . '/CRM/Core/ClassLoader.php';
@@ -623,7 +632,7 @@ class InstallRequirements {
 
     $this->requirePHPVersion(array(
       ts("PHP Configuration"),
-      ts("PHP5 installed"),
+      ts("PHP7 installed"),
     ));
 
     // Check that we can identify the root folder successfully
@@ -701,16 +710,6 @@ class InstallRequirements {
         NULL,
       );
       $this->requireWriteable($dirName, $testDetails, TRUE);
-    }
-
-    //check for Config.IDS.ini, file may exist in re-install
-    $configIDSiniDir = array($cmsPath, 'sites', $siteDir, 'files', 'civicrm', 'upload', 'Config.IDS.ini');
-
-    if (is_array($configIDSiniDir) && !empty($configIDSiniDir)) {
-      $configIDSiniFile = implode(CIVICRM_DIRECTORY_SEPARATOR, $configIDSiniDir);
-      if (file_exists($configIDSiniFile)) {
-        unlink($configIDSiniFile);
-      }
     }
 
     // Check for rewriting
@@ -1421,7 +1420,7 @@ class InstallRequirements {
     $result = mysqli_query($conn, 'DROP TABLE civicrm_utf8mb4_test');
 
     // Ensure that the MySQL driver supports utf8mb4 encoding.
-    $version = mysqli_get_client_info($conn);
+    $version = mysqli_get_client_info();
     if (strpos($version, 'mysqlnd') !== FALSE) {
       // The mysqlnd driver supports utf8mb4 starting at version 5.0.9.
       $version = preg_replace('/^\D+([\d.]+).*/', '$1', $version);

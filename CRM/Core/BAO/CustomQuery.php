@@ -94,6 +94,13 @@ class CRM_Core_BAO_CustomQuery {
   public $_fields;
 
   /**
+   * @return array
+   */
+  public function getFields() {
+    return $this->_fields;
+  }
+
+  /**
    * Searching for contacts?
    *
    * @var bool
@@ -152,8 +159,8 @@ class CRM_Core_BAO_CustomQuery {
     $this->_qill = [];
     $this->_options = [];
 
-    $this->_fields = [];
     $this->_contactSearch = $contactSearch;
+    $this->_fields = CRM_Core_BAO_CustomField::getFields('ANY', FALSE, FALSE, NULL, NULL, FALSE, FALSE, FALSE);
 
     if (empty($this->_ids)) {
       return;
@@ -177,28 +184,6 @@ SELECT f.id, f.label, f.data_type,
 
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
-      // get the group dao to figure which class this custom field extends
-      $extends = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_CustomGroup', $dao->custom_group_id, 'extends');
-      $extendsTable = '';
-      if (array_key_exists($extends, self::$extendsMap)) {
-        $extendsTable = self::$extendsMap[$extends];
-      }
-      elseif (in_array($extends, CRM_Contact_BAO_ContactType::subTypes())) {
-        // if $extends is a subtype, refer contact table
-        $extendsTable = self::$extendsMap['Contact'];
-      }
-      $this->_fields[$dao->id] = [
-        'id' => $dao->id,
-        'label' => $dao->label,
-        'extends' => $extendsTable,
-        'data_type' => $dao->data_type,
-        'html_type' => $dao->html_type,
-        'is_search_range' => $dao->is_search_range,
-        'column_name' => $dao->column_name,
-        'table_name' => $dao->table_name,
-        'option_group_id' => $dao->option_group_id,
-      ];
-
       // Deprecated (and poorly named) cache of field attributes
       $this->_options[$dao->id] = [
         'attributes' => [
@@ -228,36 +213,21 @@ SELECT f.id, f.label, f.data_type,
       return;
     }
 
-    foreach ($this->_fields as $id => $field) {
+    foreach (array_keys($this->_ids) as $id) {
+      $field = $this->_fields[$id];
       $name = $field['table_name'];
       $fieldName = 'custom_' . $field['id'];
       $this->_select["{$name}_id"] = "{$name}.id as {$name}_id";
       $this->_element["{$name}_id"] = 1;
       $this->_select[$fieldName] = "{$field['table_name']}.{$field['column_name']} as $fieldName";
       $this->_element[$fieldName] = 1;
-      $joinTable = NULL;
+      $joinTable = $field['search_table'];
       // CRM-14265
-      if ($field['extends'] == 'civicrm_group') {
-        return;
-      }
-      elseif ($field['extends'] == 'civicrm_contact') {
-        $joinTable = 'contact_a';
-      }
-      elseif ($field['extends'] == 'civicrm_contribution') {
-        $joinTable = $field['extends'];
-      }
-      elseif (in_array($field['extends'], self::$extendsMap)) {
-        $joinTable = $field['extends'];
-      }
-      else {
+      if ($joinTable == 'civicrm_group' || empty($joinTable)) {
         return;
       }
 
-      $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = $joinTable.id";
-
-      if ($this->_ids[$id]) {
-        $this->_whereTables[$name] = $this->_tables[$name];
-      }
+      $this->joinCustomTableForField($field);
 
       if ($joinTable) {
         $joinClause = 1;
@@ -269,7 +239,7 @@ SELECT f.id, f.label, f.data_type,
           $joinClause = "\nLEFT JOIN $joinTable `$locationType-address` ON (`$locationType-address`.contact_id = contact_a.id AND `$locationType-address`.location_type_id = $locationTypeId)";
         }
         $this->_tables[$name] = "\nLEFT JOIN $name ON $name.entity_id = `$joinTableAlias`.id";
-        if ($this->_ids[$id]) {
+        if (!empty($this->_ids[$id])) {
           $this->_whereTables[$name] = $this->_tables[$name];
         }
         if ($joinTable != 'contact_a') {
@@ -321,6 +291,8 @@ SELECT f.id, f.label, f.data_type,
 
         $qillOp = CRM_Utils_Array::value($op, CRM_Core_SelectValues::getSearchBuilderOperators(), $op);
 
+        // Ensure the table is joined in (eg if in where but not select).
+        $this->joinCustomTableForField($field);
         switch ($field['data_type']) {
           case 'String':
           case 'StateProvince':
@@ -443,9 +415,12 @@ SELECT f.id, f.label, f.data_type,
             break;
 
           case 'Date':
-            $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Date');
-            list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, [], CRM_Utils_Type::T_DATE);
-            $this->_qill[$grouping][] = "{$field['label']} $qillOp '$qillVal'";
+            if (substr($name, -9, 9) !== '_relative') {
+              // Relative dates are handled in the buildRelativeDateQuery function.
+              $this->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause($fieldName, $op, $value, 'Date');
+              list($qillOp, $qillVal) = CRM_Contact_BAO_Query::buildQillForFieldValue(NULL, $field['label'], $value, $op, [], CRM_Utils_Type::T_DATE);
+              $this->_qill[$grouping][] = "{$field['label']} $qillOp '$qillVal'";
+            }
             break;
 
           case 'File':
@@ -498,6 +473,18 @@ SELECT f.id, f.label, f.data_type,
       implode(' ', $this->_tables),
       $whereStr,
     ];
+  }
+
+  /**
+   * Join the custom table for the field in (if not already in the query).
+   *
+   * @param array $field
+   */
+  protected function joinCustomTableForField($field) {
+    $name = $field['table_name'];
+    $join = "\nLEFT JOIN $name ON $name.entity_id = {$field['search_table']}.id";
+    $this->_tables[$name] = $this->_tables[$name] ?? $join;
+    $this->_whereTables[$name] = $this->_whereTables[$name] ?? $join;
   }
 
 }

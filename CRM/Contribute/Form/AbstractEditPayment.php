@@ -338,9 +338,7 @@ SELECT *
 FROM   civicrm_contribution_product
 WHERE  contribution_id = {$id}
 ";
-    $dao = CRM_Core_DAO::executeQuery($sql,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($sql);
     if ($dao->fetch()) {
       $this->_premiumID = $dao->id;
       $this->_productDAO = $dao;
@@ -393,9 +391,9 @@ WHERE  contribution_id = {$id}
       // for some reason there was a need to filter here per commit history - but this indicates a problem
       // somewhere else.
       if ($processor['is_test'] == ($this->_mode == 'test')) {
-        $this->_processors[$id] = ts($processor['name']);
+        $this->_processors[$id] = $processor['name'];
         if (!empty($processor['description'])) {
-          $this->_processors[$id] .= ' : ' . ts($processor['description']);
+          $this->_processors[$id] .= ' : ' . $processor['description'];
         }
         if ($processor['is_recur']) {
           $this->_recurPaymentProcessors[$id] = $this->_processors[$id];
@@ -610,7 +608,7 @@ WHERE  contribution_id = {$id}
    * @return void
    */
   public static function formatCreditCardDetails(&$params) {
-    if (in_array('credit_card_type', array_keys($params))) {
+    if (!empty($params['credit_card_type'])) {
       $params['card_type_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'card_type_id', $params['credit_card_type']);
     }
     if (!empty($params['credit_card_number']) && empty($params['pan_truncation'])) {

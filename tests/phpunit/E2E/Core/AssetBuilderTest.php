@@ -162,9 +162,16 @@ class AssetBuilderTest extends \CiviEndToEndTestCase {
   public function testInvalid() {
     \Civi::service('asset_builder')->setCacheEnabled(FALSE);
     $url = \Civi::service('asset_builder')->getUrl('invalid.json');
-    $this->assertEmpty(file_get_contents($url));
-    $this->assertNotEmpty(preg_grep(';HTTP/1.1 404;', $http_response_header),
-      'Expect to find HTTP 404. Found: ' . json_encode(preg_grep(';^HTTP;', $http_response_header)));
+    try {
+      $guzzleClient = new \GuzzleHttp\Client();
+      $guzzleResponse = $guzzleClient->request('GET', $url, array('timeout' => 1));
+      $this->fail('Expecting ClientException... but it was not thrown!');
+    }
+    catch (\GuzzleHttp\Exception\ClientException $e) {
+      $this->assertNotEmpty(preg_match(';404;', $e->getMessage()),
+        'Expect to find HTTP 404. Found: ' . json_encode(preg_match(';^HTTP;', $e->getMessage())));
+      $this->assertEquals('Unrecognized asset name: invalid.json', $e->getResponse()->getBody());
+    }
   }
 
 }

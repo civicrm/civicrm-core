@@ -114,7 +114,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         CRM_Core_Session::singleton()->pushUserContext($browseUrl);
       }
 
-      $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $gid, json_decode($this->criteria, TRUE));
+      $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $gid, json_decode($this->criteria, TRUE), TRUE, $this->limit);
 
       $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
       $where = "de.id IS NULL";
@@ -245,7 +245,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
         ->readUserContext());
     }
     catch (CRM_Core_Exception $e) {
-      CRM_Core_Error::statusBounce(ts($e->getMessage()));
+      CRM_Core_Error::statusBounce($e->getMessage());
     }
   }
 
@@ -331,7 +331,7 @@ class CRM_Contact_Form_Merge extends CRM_Core_Form {
     }
 
     if ($this->next && $this->_mergeId) {
-      $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $this->_gid, json_decode($this->criteria, TRUE));
+      $cacheKey = CRM_Dedupe_Merger::getMergeCacheKeyString($this->_rgid, $this->_gid, json_decode($this->criteria, TRUE), TRUE, $this->limit);
 
       $join = CRM_Dedupe_Merger::getJoinOnDedupeTable();
       $where = "de.id IS NULL";

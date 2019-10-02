@@ -81,48 +81,43 @@ class CRM_Core_Permission {
 
   /**
    * Given a permission string or array, check for access requirements
+   *
+   * Ex 1: Must have 'access CiviCRM'
+   * (string) 'access CiviCRM'
+   *
+   *  Ex 2: Must have 'access CiviCRM' and 'access Ajax API'
+   *    ['access CiviCRM', 'access Ajax API']
+   *
+   * Ex 3: Must have 'access CiviCRM' or 'access Ajax API'
+   *   [
+   *     ['access CiviCRM', 'access Ajax API'],
+   *   ],
+   *
+   * Ex 4: Must have 'access CiviCRM' or 'access Ajax API' AND 'access CiviEvent'
+   *   [
+   *     ['access CiviCRM', 'access Ajax API'],
+   *     'access CiviEvent',
+   *   ],
+   *
+   * Note that in permissions.php this is keyed by the action eg.
+   *   (access Civi || access AJAX) && (access CiviEvent || access CiviContribute)
+   *   'myaction' => [
+   *     ['access CiviCRM', 'access Ajax API'],
+   *     ['access CiviEvent', 'access CiviContribute']
+   *   ],
+   *
    * @param string|array $permissions
    *   The permission to check as an array or string -see examples.
    *
    * @param int $contactId
    *   Contact id to check permissions for. Defaults to current logged-in user.
    *
-   *  Ex 1
-   *
-   *  Must have 'access CiviCRM'
-   *  (string) 'access CiviCRM'
-   *
-   *
-   *  Ex 2 Must have 'access CiviCRM' and 'access Ajax API'
-   *   array('access CiviCRM', 'access Ajax API')
-   *
-   *  Ex 3 Must have 'access CiviCRM' or 'access Ajax API'
-   *   array(
-   *      array('access CiviCRM', 'access Ajax API'),
-   *   ),
-   *
-   *  Ex 4 Must have 'access CiviCRM' or 'access Ajax API' AND 'access CiviEvent'
-   *  array(
-   *    array('access CiviCRM', 'access Ajax API'),
-   *    'access CiviEvent',
-   *   ),
-   *
-   *  Note that in permissions.php this is keyed by the action eg.
-   *  (access Civi || access AJAX) && (access CiviEvent || access CiviContribute)
-   *  'myaction' => array(
-   *    array('access CiviCRM', 'access Ajax API'),
-   *    array('access CiviEvent', 'access CiviContribute')
-   *  ),
-   *
    * @return bool
-   *   true if yes, else false
+   *   true if contact has permission(s), else false
    */
   public static function check($permissions, $contactId = NULL) {
     $permissions = (array) $permissions;
-    $userId = NULL;
-    if ($contactId) {
-      $userId = CRM_Core_BAO_UFMatch::getUFId($contactId);
-    }
+    $userId = CRM_Core_BAO_UFMatch::getUFId($contactId);
 
     /** @var CRM_Core_Permission_Temp $tempPerm */
     $tempPerm = CRM_Core_Config::singleton()->userPermissionTemp;
@@ -621,7 +616,7 @@ class CRM_Core_Permission {
     }
 
     foreach ($components as $comp) {
-      $perm = $comp->getPermissions(FALSE, $descriptions);
+      $perm = $comp->getPermissions($all, $descriptions);
       if ($perm) {
         $info = $comp->getInfo();
         foreach ($perm as $p => $attr) {
@@ -976,6 +971,12 @@ class CRM_Core_Permission {
       'duplicatecheck' => [
         'access CiviCRM',
       ],
+      'merge' => ['merge duplicate contacts'],
+    ];
+
+    $permissions['dedupe'] = [
+      'getduplicates' => ['access CiviCRM'],
+      'getstatistics' => ['access CiviCRM'],
     ];
 
     // CRM-16963 - Permissions for country.
@@ -1179,6 +1180,15 @@ class CRM_Core_Permission {
         'edit all events',
       ],
     ];
+    // Exception refers to dedupe_exception.
+    $permissions['exception'] = [
+      'default' => ['merge duplicate contacts'],
+    ];
+
+    $permissions['job'] = [
+      'process_batch_merge' => ['merge duplicate contacts'],
+    ];
+    $permissions['rule_group']['get'] = [['merge duplicate contacts', 'administer CiviCRM']];
     // Loc block is only used for events
     $permissions['loc_block'] = $permissions['event'];
 

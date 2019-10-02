@@ -41,7 +41,7 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
    *
    * Format is [$name => CRM_Extension_Container_Interface]
    *
-   * @var [string => CRM_Extension_Container_Interface]
+   * @var array
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */
@@ -55,7 +55,9 @@ class CRM_Extension_Container_Collection implements CRM_Extension_Container_Inte
   public $cache;
 
   /**
-   * @var string the cache key used for any data stored by this container
+   * The cache key used for any data stored by this container.
+   *
+   * @var string
    *
    * Note: Treat as private. This is only public to facilitate debugging.
    */

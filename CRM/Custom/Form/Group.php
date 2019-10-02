@@ -457,7 +457,9 @@ class CRM_Custom_Form_Group extends CRM_Core_Form {
     $group = CRM_Core_BAO_CustomGroup::create($params);
 
     // reset the cache
-    CRM_Core_BAO_Cache::deleteGroup('contact fields');
+    Civi::cache('fields')->flush();
+    // reset ACL and system caches.
+    CRM_Core_BAO_Cache::resetCaches();
 
     if ($this->_action & CRM_Core_Action::UPDATE) {
       CRM_Core_Session::setStatus(ts('Your custom field set \'%1 \' has been saved.', [1 => $group->title]), ts('Saved'), 'success');

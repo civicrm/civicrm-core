@@ -21,8 +21,8 @@
 
   <tr>
    <td>
-    <p>{ts 1=$contact.display_name}dear %1{/ts},</p>
-    <p>{ts}thank you for your generous pledge. please print this acknowledgment for your records.{/ts}</p>
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+    <p>{ts}Thank you for your generous pledge.{/ts}</p>
    </td>
   </tr>
   <tr>

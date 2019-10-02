@@ -44,13 +44,13 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
-    $this->quickCleanup(array('civicrm_pledge', 'civicrm_pledge_payment'));
+    $this->quickCleanup(['civicrm_pledge', 'civicrm_pledge_payment']);
     //need to set scheduled payment in advance we are running test @ midnight & it becomes unexpectedly overdue
     //due to timezone issues
     $this->scheduled_date = date('Ymd', mktime(0, 0, 0, date("m"), date("d") + 2, date("y")));
     $this->_entity = 'Pledge';
     $this->_individualId = $this->individualCreate();
-    $this->_params = array(
+    $this->_params = [
       'contact_id' => $this->_individualId,
       'pledge_create_date' => date('Ymd'),
       'start_date' => date('Ymd'),
@@ -64,7 +64,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
       'frequency_day' => 15,
       'installments' => 5,
       'sequential' => 1,
-    );
+    ];
   }
 
   public function tearDown() {
@@ -87,9 +87,9 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
     $this->assertAPISuccess($result, " testCreateWithCustom ");
     $this->assertAPISuccess($result);
-    $getParams = array('id' => $result['id'], 'return.custom_' . $ids['custom_field_id'] => 1);
+    $getParams = ['id' => $result['id'], 'return.custom_' . $ids['custom_field_id'] => 1];
     $check = $this->callAPISuccess($this->_entity, 'get', $getParams);
-    $this->callAPISuccess('pledge', 'delete', array('id' => $check['id']));
+    $this->callAPISuccess('pledge', 'delete', ['id' => $check['id']]);
     $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']]);
 
     $this->customFieldDelete($ids['custom_field_id']);
@@ -100,7 +100,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
    * Test getfields function for pledge.
    */
   public function testGetfieldsPledge() {
-    $result = $this->callAPISuccess('pledge', 'getfields', array('action' => 'get'));
+    $result = $this->callAPISuccess('pledge', 'getfields', ['action' => 'get']);
     $this->assertEquals(1, $result['values']['next_pay_date']['api.return']);
   }
 
@@ -110,9 +110,9 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   public function testGetPledge() {
 
     $this->_pledge = $this->callAPISuccess('pledge', 'create', $this->_params);
-    $params = array(
+    $params = [
       'pledge_id' => $this->_pledge['id'],
-    );
+    ];
     $result = $this->callAPIAndDocument('pledge', 'get', $params, __FUNCTION__, __FILE__);
     $pledge = $result['values'][$this->_pledge['id']];
     $this->assertEquals($this->_individualId, $pledge['contact_id']);
@@ -125,9 +125,9 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals(date('Y-m-d', strtotime($this->scheduled_date)) . ' 00:00:00', $pledge['pledge_next_pay_date']);
     $this->assertEquals($pledge['pledge_next_pay_amount'], 20.00);
 
-    $params2 = array(
+    $params2 = [
       'pledge_id' => $this->_pledge['id'],
-    );
+    ];
     $pledge = $this->callAPISuccess('pledge', 'delete', $params2);
   }
 
@@ -137,10 +137,10 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   public function testGetPledgeWithReturn() {
 
     $this->_pledge = $this->callAPISuccess('pledge', 'create', $this->_params);
-    $params = array(
+    $params = [
       'pledge_id' => $this->_pledge['id'],
       'return.pledge_financial_type' => 1,
-    );
+    ];
     $result = $this->callAPISuccess('pledge', 'get', $params);
     $pledge = $result['values'][$this->_pledge['id']];
     $this->callAPISuccess('pledge', 'delete', $pledge);
@@ -155,10 +155,10 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   public function testGetPledgeWithReturnLegacy() {
 
     $this->_pledge = $this->callAPISuccess('pledge', 'create', $this->_params);
-    $params = array(
+    $params = [
       'pledge_id' => $this->_pledge['id'],
       'return.pledge_financial_type' => 1,
-    );
+    ];
     $result = $this->callAPISuccess('pledge', 'get', $params);
     $pledge = $result['values'][$this->_pledge['id']];
     $this->callAPISuccess('pledge', 'delete', $pledge);
@@ -171,13 +171,13 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
   public function testPledgeGetReturnFilters() {
     $this->callAPISuccess('pledge', 'create', $this->_params);
 
-    $overdueParams = array(
+    $overdueParams = [
       'scheduled_date' => 'first saturday of march last year',
       'start_date' => 'first saturday of march last year',
-    );
+    ];
     $oldPledge = $this->callAPISuccess('pledge', 'create', array_merge($this->_params, $overdueParams));
 
-    $pledgeGetParams = array();
+    $pledgeGetParams = [];
     $allPledges = $this->callAPISuccess('pledge', 'getcount', $pledgeGetParams);
 
     $this->assertEquals(2, $allPledges, 'Check we have 2 pledges to place with in line ' . __LINE__);
@@ -191,16 +191,16 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
    * Create 2 pledges - see if we can get by status id.
    */
   public function testGetOverduePledge() {
-    $overdueParams = array(
+    $overdueParams = [
       'scheduled_date' => 'first saturday of march last year',
       'start_date' => 'first saturday of march last year',
-    );
+    ];
     $this->_pledge = $this->callAPISuccess('pledge', 'create', array_merge($this->_params, $overdueParams));
 
-    $result = $this->callAPISuccess('pledge', 'get', array('status_id' => 'Overdue'));
-    $emptyResult = $this->callAPISuccess('pledge', 'get', array(
+    $result = $this->callAPISuccess('pledge', 'get', ['status_id' => 'Overdue']);
+    $emptyResult = $this->callAPISuccess('pledge', 'get', [
       'pledge_status_id' => '1',
-    ));
+    ]);
     $pledge = $result['values'][$this->_pledge['id']];
     $this->callAPISuccess('pledge', 'delete', $pledge);
     $this->assertEquals(1, $result['count']);
@@ -211,18 +211,18 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
    * Test pledge_status option group
    */
   public function testOptionGroupForPledgeStatus() {
-    $pledgeOg = $this->callAPISuccess('OptionGroup', 'get', array(
+    $pledgeOg = $this->callAPISuccess('OptionGroup', 'get', [
       'name' => "pledge_status",
-    ));
+    ]);
     $this->assertEquals(1, $pledgeOg['count']);
 
-    $pledgeOv = $this->callAPISuccess('OptionValue', 'get', array(
+    $pledgeOv = $this->callAPISuccess('OptionValue', 'get', [
       'sequential' => 1,
       'option_group_id' => "pledge_status",
-    ));
+    ]);
     $this->assertEquals(5, $pledgeOv['count']);
     $pledgeStatus = CRM_Utils_Array::collect('name', $pledgeOv['values']);
-    $expected = array('Completed', 'Pending', 'Cancelled', 'In Progress', 'Overdue');
+    $expected = ['Completed', 'Pending', 'Cancelled', 'In Progress', 'Overdue'];
     $this->assertEquals($expected, $pledgeStatus);
   }
 
@@ -231,32 +231,32 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
    */
   public function testSortParamPledge() {
     $pledge1 = $this->callAPISuccess('pledge', 'create', $this->_params);
-    $overdueParams = array(
+    $overdueParams = [
       'scheduled_date' => 'first saturday of march last year',
       'start_date' => 'first saturday of march last year',
       'create_date' => 'first saturday of march last year',
-    );
+    ];
     $pledge2 = $this->callAPISuccess('pledge', 'create', array_merge($this->_params, $overdueParams));
-    $params = array(
+    $params = [
       'pledge_is_test' => 0,
       'rowCount' => 1,
-    );
+    ];
     $result = $this->callAPISuccess('pledge', 'get', $params);
 
-    $resultSortedAsc = $this->callAPISuccess('pledge', 'get', array(
+    $resultSortedAsc = $this->callAPISuccess('pledge', 'get', [
       'rowCount' => 1,
       'sort' => 'start_date ASC',
-    ));
-    $resultSortedDesc = $this->callAPISuccess('pledge', 'get', array(
+    ]);
+    $resultSortedDesc = $this->callAPISuccess('pledge', 'get', [
       'rowCount' => 1,
       'sort' => 'start_date DESC',
-    ));
+    ]);
 
     $this->assertEquals($pledge1['id'], $result['id'], 'pledge get gets first created pledge in line ' . __LINE__);
     $this->assertEquals($pledge2['id'], $resultSortedAsc['id'], 'Ascending pledge sort works');
     $this->assertEquals($pledge1['id'], $resultSortedDesc['id'], 'Decending pledge sort works');
-    $this->callAPISuccess('pledge', 'delete', array('id' => $pledge1['id']));
-    $this->callAPISuccess('pledge', 'delete', array('id' => $pledge2['id']));
+    $this->callAPISuccess('pledge', 'delete', ['id' => $pledge1['id']]);
+    $this->callAPISuccess('pledge', 'delete', ['id' => $pledge2['id']]);
   }
 
   public function testCreatePledge() {
@@ -272,13 +272,13 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals($result['values'][0]['create_date'], date('Ymd') . '000000');
     $this->assertEquals($result['values'][0]['start_date'], date('Ymd') . '000000');
     $this->assertAPISuccess($result);
-    $payments = $this->callAPISuccess('PledgePayment', 'Get', array('pledge_id' => $result['id'], 'sequential' => 1));
+    $payments = $this->callAPISuccess('PledgePayment', 'Get', ['pledge_id' => $result['id'], 'sequential' => 1]);
     $this->assertAPISuccess($payments);
     $this->assertEquals($payments['count'], 5);
     $shouldBeDate = CRM_Utils_Date::format(CRM_Utils_Date::intervalAdd('year', 5 * 4, $this->scheduled_date), "-");
     $this->assertEquals(substr($shouldBeDate, 0, 10), substr($payments['values'][4]['scheduled_date'], 0, 10));
 
-    $pledgeID = array('id' => $result['id']);
+    $pledgeID = ['id' => $result['id']];
     $pledge = $this->callAPISuccess('pledge', 'delete', $pledgeID);
   }
 
@@ -286,35 +286,35 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
    * Test that pledge with weekly schedule calculates dates correctly.
    */
   public function testCreatePledgeWeeklySchedule() {
-    $params = array(
+    $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'week',
       'frequency_day' => 3,
       'frequency_interval' => 2,
-    );
+    ];
     $params = array_merge($this->_params, $params);
     $pledge = $this->callAPISuccess('Pledge', 'Create', $params);
     //ensure that correct number of payments created & last payment has the right date
-    $payments = $this->callAPISuccess('PledgePayment', 'Get', array(
+    $payments = $this->callAPISuccess('PledgePayment', 'Get', [
       'pledge_id' => $pledge['id'],
       'sequential' => 1,
-    ));
+    ]);
     $this->assertEquals($payments['count'], 5);
     $this->assertEquals('2011-07-06 00:00:00', $payments['values'][4]['scheduled_date']);
 
-    $this->callAPISuccess('pledge', 'delete', array('pledge_id' => $pledge['id']));
+    $this->callAPISuccess('pledge', 'delete', ['pledge_id' => $pledge['id']]);
   }
 
   /**
    * Test that pledge with weekly schedule calculates dates correctly.
    */
   public function testCreatePledgeMontlySchedule() {
-    $params = array(
+    $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'Month',
       'frequency_day' => 3,
       'frequency_interval' => 2,
-    );
+    ];
     $params = array_merge($this->_params, $params);
     $apiResult = $this->callAPISuccess('pledge', 'create', $params);
   }
@@ -326,25 +326,25 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
    * http://issues.civicrm.org/jira/browse/CRM-8551
    */
   public function testCreatePledgeSinglePayment() {
-    $params = array(
+    $params = [
       'scheduled_date' => '20110510',
       'frequency_unit' => 'week',
       'frequency_day' => 3,
       'frequency_interval' => 2,
       'installments' => 1,
-    );
+    ];
 
     $params = array_merge($this->_params, $params);
     unset($params['pledge_status_id']);
     $pledge = $this->callAPISuccess('Pledge', 'Create', $params);
     //ensure that correct number of payments created & last payment has the right date
-    $payments = $this->callAPISuccess('PledgePayment', 'Get', array(
+    $payments = $this->callAPISuccess('PledgePayment', 'Get', [
       'pledge_id' => $pledge['id'],
       'sequential' => 1,
-    ));
+    ]);
     $this->assertEquals(1, $payments['count']);
     $this->assertEquals(2, $payments['values'][0]['status_id']);
-    $pledgeID = array('id' => $pledge['id']);
+    $pledgeID = ['id' => $pledge['id']];
     $pledge = $this->callAPISuccess('pledge', 'delete', $pledgeID);
   }
 
@@ -359,14 +359,14 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
 
     unset($params['pledge_original_installment_amount']);
     $result = $this->callAPISuccess('pledge', 'create', $params);
-    $pledgeDetails = $this->callAPISuccess('Pledge', 'Get', array('id' => $result['id'], 'sequential' => 1));
+    $pledgeDetails = $this->callAPISuccess('Pledge', 'Get', ['id' => $result['id'], 'sequential' => 1]);
     $pledge = $pledgeDetails['values'][0];
     $this->assertEquals(100.00, $pledge['pledge_amount']);
     $this->assertEquals('year', $pledge['pledge_frequency_unit']);
     $this->assertEquals(5, $pledge['pledge_frequency_interval']);
     $this->assertEquals(20, $pledge['pledge_next_pay_amount']);
 
-    $pledgeID = array('id' => $result['id']);
+    $pledgeID = ['id' => $result['id']];
     $pledge = $this->callAPISuccess('pledge', 'delete', $pledgeID);
   }
 
@@ -377,14 +377,14 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess('pledge', 'create', $this->_params);
     $this->assertEquals(2, $result['values'][0]['status_id']);
-    $cancelParams = array(
+    $cancelParams = [
       'sequential' => 1,
       'id' => $result['id'],
       'pledge_status_id' => 3,
-    );
+    ];
     $result = $this->callAPISuccess('pledge', 'create', $cancelParams);
     $this->assertEquals(3, $result['values'][0]['status_id']);
-    $pledgeID = array('id' => $result['id']);
+    $pledgeID = ['id' => $result['id']];
     $this->callAPISuccess('pledge', 'delete', $pledgeID);
   }
 
@@ -399,7 +399,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $result = $this->callAPISuccess('pledge', 'create', $params);
     $this->assertAPISuccess($result);
     $this->assertEquals(2, $result['values'][0]['status_id']);
-    $pledgeID = array('pledge_id' => $result['id']);
+    $pledgeID = ['pledge_id' => $result['id']];
     $pledge = $this->callAPISuccess('pledge', 'delete', $pledgeID);
   }
 
@@ -408,11 +408,11 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
    */
   public function testCreateUpdatePledge() {
     // we test 'sequential' param here too
-    $pledgeID = $this->pledgeCreate(array('contact_id' => $this->_individualId));
-    $old_params = array(
+    $pledgeID = $this->pledgeCreate(['contact_id' => $this->_individualId]);
+    $old_params = [
       'id' => $pledgeID,
       'sequential' => 1,
-    );
+    ];
     $original = $this->callAPISuccess('pledge', 'get', $old_params);
     //Make sure it came back
     $this->assertEquals($original['values'][0]['pledge_id'], $pledgeID);
@@ -427,7 +427,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals($old_frequency_unit, 'year');
     $this->assertEquals($old_frequency_interval, 5);
     $this->assertEquals($old_status_id, 'Pending');
-    $params = array(
+    $params = [
       'id' => $pledgeID,
       'contact_id' => $this->_individualId,
       'pledge_status_id' => 3,
@@ -435,12 +435,12 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
       'financial_type_id' => 1,
       'start_date' => date('Ymd'),
       'installments' => 10,
-    );
+    ];
 
     $pledge = $this->callAPISuccess('pledge', 'create', $params);
-    $new_params = array(
+    $new_params = [
       'id' => $pledge['id'],
-    );
+    ];
     $pledge = $this->callAPISuccess('pledge', 'get', $new_params);
     $this->assertEquals($pledge['values'][$pledgeID]['contact_id'], $this->_individualId);
     $this->assertEquals($pledge['values'][$pledgeID]['pledge_status'], 'Cancelled');
@@ -455,11 +455,11 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
    * We test 'sequential' param here too.
    */
   public function testCreateUpdatePledgeLegacy() {
-    $pledgeID = $this->pledgeCreate(array('contact_id' => $this->_individualId));
-    $old_params = array(
+    $pledgeID = $this->pledgeCreate(['contact_id' => $this->_individualId]);
+    $old_params = [
       'id' => $pledgeID,
       'sequential' => 1,
-    );
+    ];
     $original = $this->callAPISuccess('pledge', 'get', $old_params);
     // Make sure it came back.
     $this->assertEquals($original['values'][0]['pledge_id'], $pledgeID);
@@ -474,7 +474,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals($old_frequency_unit, 'year');
     $this->assertEquals($old_frequency_interval, 5);
     $this->assertEquals($old_status_id, 'Pending');
-    $params = array(
+    $params = [
       'id' => $pledgeID,
       'contact_id' => $this->_individualId,
       'pledge_status_id' => 3,
@@ -482,12 +482,12 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
       'contribution_type_id' => 1,
       'start_date' => date('Ymd'),
       'installments' => 10,
-    );
+    ];
 
     $pledge = $this->callAPISuccess('pledge', 'create', $params);
-    $new_params = array(
+    $new_params = [
       'id' => $pledge['id'],
-    );
+    ];
     $pledge = $this->callAPISuccess('pledge', 'get', $new_params);
     $this->assertEquals($pledge['values'][$pledgeID]['contact_id'], $this->_individualId);
     $this->assertEquals($pledge['values'][$pledgeID]['pledge_status'], 'Cancelled');
@@ -498,16 +498,16 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
    * Failure test for delete without id.
    */
   public function testDeleteEmptyParamsPledge() {
-    $this->callAPIFailure('pledge', 'delete', array(), 'Mandatory key(s) missing from params array: id');
+    $this->callAPIFailure('pledge', 'delete', [], 'Mandatory key(s) missing from params array: id');
   }
 
   /**
    * Failure test for invalid pledge id.
    */
   public function testDeleteWrongParamPledge() {
-    $params = array(
+    $params = [
       'pledge_source' => 'SSF',
-    );
+    ];
     $this->callAPIFailure('pledge', 'delete', $params, 'Mandatory key(s) missing from params array: id');
   }
 
@@ -516,10 +516,10 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
    */
   public function testDeletePledge() {
 
-    $pledgeID = $this->pledgeCreate(array('contact_id' => $this->_individualId));
-    $params = array(
+    $pledgeID = $this->pledgeCreate(['contact_id' => $this->_individualId]);
+    $params = [
       'pledge_id' => $pledgeID,
-    );
+    ];
     $this->callAPIAndDocument('pledge', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
@@ -528,10 +528,10 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
    */
   public function testDeletePledgeUseID() {
 
-    $pledgeID = $this->pledgeCreate(array('contact_id' => $this->_individualId));
-    $params = array(
+    $pledgeID = $this->pledgeCreate(['contact_id' => $this->_individualId]);
+    $params = [
       'id' => $pledgeID,
-    );
+    ];
     $this->callAPIAndDocument('pledge', 'delete', $params, __FUNCTION__, __FILE__);
   }
 
@@ -543,10 +543,10 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
    */
   public function testGetEmpty() {
     $this->callAPISuccess('pledge', 'create', $this->_params);
-    $result = $this->callAPISuccess('pledge', 'get', array());
+    $result = $this->callAPISuccess('pledge', 'get', []);
     $this->assertAPISuccess($result, "This test is failing because it's acting like a contact get when no params set. Not sure the fix");
     $this->assertEquals(1, $result['count']);
-    $pledgeID = array('id' => $result['id']);
+    $pledgeID = ['id' => $result['id']];
     $this->callAPISuccess('pledge', 'delete', $pledgeID);
   }
 

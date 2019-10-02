@@ -70,11 +70,16 @@ class CRM_Queue_Service {
   }
 
   /**
-   * @var array (string $queueName => CRM_Queue_Queue)
+   * Queues.
+   *
+   * Format is (string $queueName => CRM_Queue_Queue).
+   *
+   * @var array
    */
   public $queues;
 
   /**
+   * Class constructor.
    */
   public function __construct() {
     $this->queues = [];

@@ -168,8 +168,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   public $_lineItemParticipantsCount;
   public $_availableRegistrations;
 
-  public $_forcePayement;
-
   /**
    * @var bool
    * @deprecated
@@ -233,8 +231,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     // check for waitlisting.
     $this->_allowWaitlist = $this->get('allowWaitlist');
 
-    $this->_forcePayement = $this->get('forcePayement');
-
     //get the additional participant ids.
     $this->_additionalParticipantIds = $this->get('additionalParticipantIds');
     $config = CRM_Core_Config::singleton();
@@ -252,7 +248,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
       // get all the values from the dao object
       $this->_values = $this->_fields = array();
-      $this->_forcePayement = FALSE;
 
       //retrieve event information
       $params = array('id' => $this->_eventId);
@@ -419,10 +414,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $this->assign('bltID', $this->_bltID);
     $isShowLocation = CRM_Utils_Array::value('is_show_location', $this->_values['event']);
     $this->assign('isShowLocation', $isShowLocation);
-    //CRM-6907
-    $config->defaultCurrency = CRM_Utils_Array::value('currency', $this->_values['event'],
-      $config->defaultCurrency
-    );
+    CRM_Contribute_BAO_Contribution_Utils::overrideDefaultCurrency($this->_values['event']);
 
     //lets allow user to override campaign.
     $campID = CRM_Utils_Request::retrieve('campID', 'Positive', $this);
@@ -484,7 +476,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
           $this->assign($v, $params[$v]);
         }
       }
-      elseif (CRM_Utils_Array::value('amount', $params) == 0) {
+      elseif (empty($params['amount'])) {
         $this->assign($v, CRM_Utils_Array::value($v, $params));
       }
     }
@@ -519,9 +511,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     // also assign all participantIDs to the template
     // useful in generating confirmation numbers if needed
-    $this->assign('participantIDs',
-      $this->_participantIDS
-    );
+    $this->assign('participantIDs', $this->_participantIDS);
   }
 
   /**
@@ -618,9 +608,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       }
 
       if ($addCaptcha && !$viewOnly) {
-        $captcha = CRM_Utils_ReCAPTCHA::singleton();
-        $captcha->add($this);
-        $this->assign('isCaptcha', TRUE);
+        CRM_Utils_ReCAPTCHA::enableCaptchaOnForm($this);
       }
     }
   }
@@ -820,23 +808,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     $params = $form->_params;
     $transaction = new CRM_Core_Transaction();
 
-    $groupName = 'participant_role';
-    $query = "
-SELECT  v.label as label ,v.value as value
-FROM   civicrm_option_value v,
-       civicrm_option_group g
-WHERE  v.option_group_id = g.id
-  AND  g.name            = %1
-  AND  v.is_active       = 1
-  AND  g.is_active       = 1
-";
-    $p = array(1 => array($groupName, 'String'));
-
-    $dao = CRM_Core_DAO::executeQuery($query, $p);
-    if ($dao->fetch()) {
-      $roleID = $dao->value;
-    }
-
     // handle register date CRM-4320
     $registerDate = NULL;
     if (!empty($form->_allowConfirmation) && $form->_participantId) {
@@ -857,9 +828,7 @@ WHERE  v.option_group_id = g.id
       'status_id' => CRM_Utils_Array::value('participant_status',
         $params, 1
       ),
-      'role_id' => CRM_Utils_Array::value('participant_role_id',
-        $params, $roleID
-      ),
+      'role_id' => CRM_Utils_Array::value('participant_role_id', $params) ?: self::getDefaultRoleID(),
       'register_date' => ($registerDate) ? $registerDate : date('YmdHis'),
       'source' => CRM_Utils_String::ellipsify(
         isset($params['participant_source']) ? CRM_Utils_Array::value('participant_source', $params) : CRM_Utils_Array::value('description', $params),
@@ -909,6 +878,21 @@ WHERE  v.option_group_id = g.id
     $transaction->commit();
 
     return $participant;
+  }
+
+  /**
+   * Get the ID of the default (first) participant role
+   *
+   * @return int
+   * @throws \CiviCRM_API3_Exception
+   */
+  private static function getDefaultRoleID() {
+    return (int) civicrm_api3('OptionValue', 'getvalue', [
+      'return' => "value",
+      'option_group_id' => "participant_role",
+      'is_active' => 1,
+      'options' => ['limit' => 1, 'sort' => "is_default DESC"],
+    ]);
   }
 
   /**
@@ -1247,7 +1231,7 @@ WHERE  v.option_group_id = g.id
    *
    * @param string $elementName
    * @param array $optionIds
-   * @param CRM_Core_form $form
+   * @param CRM_Core_Form $form
    */
   public static function resetSubmittedValue($elementName, $optionIds = array(), &$form) {
     if (empty($elementName) ||

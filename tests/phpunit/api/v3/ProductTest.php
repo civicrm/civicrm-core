@@ -38,18 +38,18 @@ class api_v3_ProductTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->useTransaction();
-    $this->_params = array(
+    $this->_params = [
       'name' => 'my product',
-    );
+    ];
   }
 
   public function testGetFields() {
-    $fields = $this->callAPISuccess($this->_entity, 'getfields', array('action' => 'create'));
+    $fields = $this->callAPISuccess($this->_entity, 'getfields', ['action' => 'create']);
     $this->assertArrayHasKey('period_type', $fields['values']);
   }
 
   public function testGetOptions() {
-    $options = $this->callAPISuccess($this->_entity, 'getoptions', array('field' => 'period_type'));
+    $options = $this->callAPISuccess($this->_entity, 'getoptions', ['field' => 'period_type']);
     $this->assertArrayHasKey('rolling', $options['values']);
   }
 

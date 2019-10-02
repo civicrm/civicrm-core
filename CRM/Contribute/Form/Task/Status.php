@@ -70,9 +70,7 @@ SELECT count(*)
 FROM   civicrm_contribution
 WHERE  contribution_status_id != 2
 AND    {$this->_componentClause}";
-    $count = CRM_Core_DAO::singleValueQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    $count = CRM_Core_DAO::singleValueQuery($query);
     if ($count != 0) {
       CRM_Core_Error::statusBounce(ts('Please select only online contributions with Pending status.'));
     }
@@ -110,9 +108,7 @@ FROM   civicrm_contact c,
        civicrm_contribution co
 WHERE  co.contact_id = c.id
 AND    co.id IN ( $contribIDs )";
-    $dao = CRM_Core_DAO::executeQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     // build a row for each contribution id
     $this->_rows = [];
@@ -323,9 +319,7 @@ LEFT JOIN civicrm_participant         p  ON pp.participant_id  = p.id
 WHERE     c.id IN ( $contributionIDs )";
 
     $rows = [];
-    $dao = CRM_Core_DAO::executeQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    $dao = CRM_Core_DAO::executeQuery($query);
 
     while ($dao->fetch()) {
       $rows[$dao->contribution_id]['component'] = $dao->participant_id ? 'event' : 'contribute';

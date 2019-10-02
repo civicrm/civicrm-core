@@ -56,6 +56,28 @@ class Paths {
       ->register('civicrm.files', function () {
         return \CRM_Core_Config::singleton()->userSystem->getDefaultFileStorage();
       })
+      ->register('civicrm.private', function () {
+        return [
+          // For backward compatibility with existing deployments, this
+          // effectively returns `dirname(CIVICRM_TEMPLATE_COMPILEDIR)`.
+          // That's confusing. Future installers should probably set `civicrm.private`
+          // explicitly instead of setting `CIVICRM_TEMPLATE_COMPILEDIR`.
+          'path' => \CRM_Utils_File::baseFilePath(),
+        ];
+      })
+      ->register('civicrm.log', function () {
+        return [
+          'path' => \Civi::paths()->getPath('[civicrm.private]/ConfigAndLog'),
+        ];
+      })
+      ->register('civicrm.compile', function () {
+        return [
+          // These two formulations are equivalent in typical deployments; however,
+          // for existing systems which previously customized CIVICRM_TEMPLATE_COMPILEDIR,
+          // using the constant should be more backward-compatibility.
+          'path' => defined('CIVICRM_TEMPLATE_COMPILEDIR') ? CIVICRM_TEMPLATE_COMPILEDIR : \Civi::paths()->getPath('[civicrm.private]/templates_c'),
+        ];
+      })
       ->register('wp.frontend.base', function () {
         return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/'];
       })

@@ -14,7 +14,7 @@ class CRM_UF_Page_ProfileEditorTest extends CiviUnitTestCase {
    * Spot check a few fields that should appear in schema.
    */
   public function testGetSchema() {
-    $schema = CRM_UF_Page_ProfileEditor::getSchema(array('IndividualModel', 'ActivityModel'));
+    $schema = CRM_UF_Page_ProfileEditor::getSchema(['IndividualModel', 'ActivityModel']);
     foreach ($schema as $entityName => $entityDef) {
       foreach ($entityDef['schema'] as $fieldName => $fieldDef) {
         $this->assertNotEmpty($fieldDef['type']);

@@ -190,6 +190,11 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   protected $context;
 
   /**
+   * @var bool
+   */
+  public $submitOnce = FALSE;
+
+  /**
    * @return string
    */
   public function getContext() {
@@ -627,6 +632,10 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     ) {
       $this->setAttribute('data-warn-changes', 'true');
     }
+
+    if ($this->submitOnce) {
+      $this->setAttribute('data-submit-once', 'true');
+    }
   }
 
   /**
@@ -642,7 +651,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
     $prevnext = $spacing = [];
     foreach ($params as $button) {
       if (!empty($button['submitOnce'])) {
-        $button['js']['onclick'] = "return submitOnce(this,'{$this->_name}','" . ts('Processing') . "');";
+        $this->submitOnce = TRUE;
       }
 
       $attrs = ['class' => 'crm-form-submit'] + (array) CRM_Utils_Array::value('js', $button);
@@ -811,7 +820,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
   }
 
   /**
-   * Format the fields for the payment processor.
+   * Format the fields in $this->_params for the payment processor.
    *
    * In order to pass fields to the payment processor in a consistent way we add some renamed
    * parameters.
@@ -821,31 +830,48 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @return array
    */
   protected function formatParamsForPaymentProcessor($fields) {
+    $this->_params = $this->prepareParamsForPaymentProcessor($this->_params);
+    $fields = array_merge($fields, ['first_name' => 1, 'middle_name' => 1, 'last_name' => 1]);
+    return $fields;
+  }
+
+  /**
+   * Format the fields in $params for the payment processor.
+   *
+   * In order to pass fields to the payment processor in a consistent way we add some renamed
+   * parameters.
+   *
+   * @param array $params Payment processor params
+   *
+   * @return array $params
+   */
+  protected function prepareParamsForPaymentProcessor($params) {
     // also add location name to the array
-    $this->_params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $this->_params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $this->_params) . ' ' . CRM_Utils_Array::value('billing_last_name', $this->_params);
-    $this->_params["address_name-{$this->_bltID}"] = trim($this->_params["address_name-{$this->_bltID}"]);
+    $params["address_name-{$this->_bltID}"] = CRM_Utils_Array::value('billing_first_name', $params) . ' ' . CRM_Utils_Array::value('billing_middle_name', $params) . ' ' . CRM_Utils_Array::value('billing_last_name', $params);
+    $params["address_name-{$this->_bltID}"] = trim($params["address_name-{$this->_bltID}"]);
     // Add additional parameters that the payment processors are used to receiving.
-    if (!empty($this->_params["billing_state_province_id-{$this->_bltID}"])) {
-      $this->_params['state_province'] = $this->_params["state_province-{$this->_bltID}"] = $this->_params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($this->_params["billing_state_province_id-{$this->_bltID}"]);
+    if (!empty($params["billing_state_province_id-{$this->_bltID}"])) {
+      $params['state_province'] = $params["state_province-{$this->_bltID}"] = $params["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($params["billing_state_province_id-{$this->_bltID}"]);
     }
-    if (!empty($this->_params["billing_country_id-{$this->_bltID}"])) {
-      $this->_params['country'] = $this->_params["country-{$this->_bltID}"] = $this->_params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($this->_params["billing_country_id-{$this->_bltID}"]);
+    if (!empty($params["billing_country_id-{$this->_bltID}"])) {
+      $params['country'] = $params["country-{$this->_bltID}"] = $params["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($params["billing_country_id-{$this->_bltID}"]);
     }
 
-    list($hasAddressField, $addressParams) = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($this->_params, $this->_bltID);
+    list($hasAddressField, $addressParams) = CRM_Contribute_BAO_Contribution::getPaymentProcessorReadyAddressParams($params, $this->_bltID);
     if ($hasAddressField) {
-      $this->_params = array_merge($this->_params, $addressParams);
+      $params = array_merge($params, $addressParams);
     }
 
+    // @fixme it would be really nice to have a comment here so I had a clue why we are setting $fields[$name] = 1
+    // Also how does relate to similar code in CRM_Contact_BAO_Contact::addBillingNameFieldsIfOtherwiseNotSet()
     $nameFields = ['first_name', 'middle_name', 'last_name'];
     foreach ($nameFields as $name) {
-      $fields[$name] = 1;
-      if (array_key_exists("billing_$name", $this->_params)) {
-        $this->_params[$name] = $this->_params["billing_{$name}"];
-        $this->_params['preserveDBName'] = TRUE;
+      if (array_key_exists("billing_$name", $params)) {
+        $params[$name] = $params["billing_{$name}"];
+        $params['preserveDBName'] = TRUE;
       }
     }
-    return $fields;
+    return $params;
   }
 
   /**
@@ -1253,7 +1279,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
    * @param string $nextType
    *   Button type for the form after processing.
    * @param string $backType
-   * @param bool|string $submitOnce If true, add javascript to next button submit which prevents it from being clicked more than once
+   * @param bool|string $submitOnce
    */
   public function addDefaultButtons($title, $nextType = 'next', $backType = 'back', $submitOnce = FALSE) {
     $buttons = [];
@@ -1270,7 +1296,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         'isDefault' => TRUE,
       ];
       if ($submitOnce) {
-        $nextButton['js'] = ['onclick' => "return submitOnce(this,'{$this->_name}','" . ts('Processing') . "');"];
+        $this->submitOnce = TRUE;
       }
       $buttons[] = $nextButton;
     }
@@ -1507,6 +1533,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
 
     $isSelect = (in_array($widget, [
       'Select',
+      'Select2',
       'CheckBoxGroup',
       'RadioGroup',
       'Radio',
@@ -1521,7 +1548,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $options = isset($fieldSpec['options']) ? $fieldSpec['options'] : NULL;
       }
       if ($context == 'search') {
-        $widget = 'Select';
+        $widget = $widget == 'Select2' ? $widget : 'Select';
         $props['multiple'] = CRM_Utils_Array::value('multiple', $props, TRUE);
       }
 
@@ -1597,12 +1624,13 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         return $this->addChainSelect($name, $props);
 
       case 'Select':
+      case 'Select2':
         $props['class'] = CRM_Utils_Array::value('class', $props, 'big') . ' crm-select2';
         if (!array_key_exists('placeholder', $props)) {
           $props['placeholder'] = $required ? ts('- select -') : ($context == 'search' ? ts('- any -') : ts('- none -'));
         }
         // TODO: Add and/or option for fields that store multiple values
-        return $this->add('select', $name, $label, $options, $required, $props);
+        return $this->add(strtolower($widget), $name, $label, $options, $required, $props);
 
       case 'CheckBoxGroup':
         return $this->addCheckBox($name, $label, array_flip($options), $required, $props);

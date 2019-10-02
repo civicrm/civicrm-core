@@ -131,6 +131,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
             'title' => ts('Case Type'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
             'options' => CRM_Case_BAO_Case::buildOptions('case_type_id', 'search'),
+            'type' => CRM_Utils_Type::T_INT,
           ],
           'status_id' => [
             'title' => ts('Status'),
@@ -229,6 +230,9 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
             if ($fieldName == 'duration') {
               $select[] = "IF({$table['fields']['end_date']['dbAlias']} Is Null, '', DATEDIFF({$table['fields']['end_date']['dbAlias']}, {$table['fields']['start_date']['dbAlias']})) as {$tableName}_{$fieldName}";
             }
+            elseif ($tableName == 'civicrm_relationship_type') {
+              $select[] = "  IF(contact_civireport.id = relationship_civireport.contact_id_a, relationship_type_civireport.label_b_a, relationship_type_civireport.label_a_b) as civicrm_relationship_type_label_b_a";
+            }
             else {
               $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
             }
@@ -290,7 +294,7 @@ class CRM_Report_Form_Case_Summary extends CRM_Report_Form {
     if ($this->_relField) {
       $this->_from = "
             FROM civicrm_contact $c
-inner join civicrm_relationship $cr on {$c}.id = ${cr}.contact_id_b
+inner join civicrm_relationship $cr on {$c}.id = ${cr}.contact_id_b OR {$c}.id = ${cr}.contact_id_a
 inner join civicrm_case $cc on ${cc}.id = ${cr}.case_id
 inner join civicrm_relationship_type $crt on ${crt}.id=${cr}.relationship_type_id
 inner join civicrm_case_contact $ccc on ${ccc}.case_id = ${cc}.id
@@ -306,63 +310,11 @@ inner join civicrm_contact $c2 on ${c2}.id=${ccc}.contact_id
     }
   }
 
-  public function where() {
-    $clauses = [];
-    $this->_having = '';
-    foreach ($this->_columns as $tableName => $table) {
-      if (array_key_exists('filters', $table)) {
-        foreach ($table['filters'] as $fieldName => $field) {
-          $clause = NULL;
-          if (CRM_Utils_Array::value("operatorType", $field) & CRM_Report_Form::OP_DATE
-          ) {
-            $relative = CRM_Utils_Array::value("{$fieldName}_relative", $this->_params);
-            $from = CRM_Utils_Array::value("{$fieldName}_from", $this->_params);
-            $to = CRM_Utils_Array::value("{$fieldName}_to", $this->_params);
-
-            $clause = $this->dateClause($field['dbAlias'], $relative, $from, $to,
-              CRM_Utils_Array::value('type', $field)
-            );
-          }
-          else {
-
-            $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
-            if ($fieldName == 'case_type_id') {
-              $value = CRM_Utils_Array::value("{$fieldName}_value", $this->_params);
-              if (!empty($value)) {
-                $operator = '';
-                if ($op == 'notin') {
-                  $operator = 'NOT';
-                }
-
-                $regexp = "[[:cntrl:]]*" . implode('[[:>:]]*|[[:<:]]*', $value) . "[[:cntrl:]]*";
-                $clause = "{$field['dbAlias']} {$operator} REGEXP '{$regexp}'";
-              }
-              $op = NULL;
-            }
-
-            if ($op) {
-              $clause = $this->whereClause($field,
-                $op,
-                CRM_Utils_Array::value("{$fieldName}_value", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_min", $this->_params),
-                CRM_Utils_Array::value("{$fieldName}_max", $this->_params)
-              );
-            }
-          }
-
-          if (!empty($clause)) {
-            $clauses[] = $clause;
-          }
-        }
-      }
+  public function storeWhereHavingClauseArray() {
+    if (!empty($this->_params['fields']['label_b_a']) && $this->_params['fields']['label_b_a'] == 1) {
+      $this->_whereClauses[] = '(contact_civireport.sort_name != c2_civireport.sort_name)';
     }
-
-    if (empty($clauses)) {
-      $this->_where = "WHERE ( 1 ) ";
-    }
-    else {
-      $this->_where = "WHERE " . implode(' AND ', $clauses);
-    }
+    parent::storeWhereHavingClauseArray();
   }
 
   public function groupBy() {

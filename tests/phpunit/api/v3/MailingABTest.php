@@ -56,7 +56,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     ]);
     $this->_groupID = $this->groupCreate();
 
-    $this->_params = array(
+    $this->_params = [
       'mailing_id_a' => $this->_mailingID_A,
       'mailing_id_b' => $this->_mailingID_B,
       'mailing_id_c' => $this->_mailingID_C,
@@ -64,7 +64,7 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
       'winner_criteria' => 'open',
       'declare_winning_time' => '+2 days',
       'group_percentage' => 10,
-    );
+    ];
   }
 
   /**
@@ -82,25 +82,25 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
   public function testMailerDeleteSuccess() {
     $result = $this->callAPISuccess($this->_entity, 'create', $this->_params);
 
-    $this->assertDBQuery(1, "SELECT count(*) FROM civicrm_mailing_abtest WHERE id = %1", array(
-      1 => array($result['id'], 'Integer'),
-    ));
-    $this->assertDBQuery(3, "SELECT count(*) FROM civicrm_mailing WHERE id IN (%1,%2,%3)", array(
-      1 => array($this->_mailingID_A, 'Integer'),
-      2 => array($this->_mailingID_B, 'Integer'),
-      3 => array($this->_mailingID_C, 'Integer'),
-    ));
+    $this->assertDBQuery(1, "SELECT count(*) FROM civicrm_mailing_abtest WHERE id = %1", [
+      1 => [$result['id'], 'Integer'],
+    ]);
+    $this->assertDBQuery(3, "SELECT count(*) FROM civicrm_mailing WHERE id IN (%1,%2,%3)", [
+      1 => [$this->_mailingID_A, 'Integer'],
+      2 => [$this->_mailingID_B, 'Integer'],
+      3 => [$this->_mailingID_C, 'Integer'],
+    ]);
 
-    $this->callAPISuccess($this->_entity, 'delete', array('id' => $result['id']));
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
 
-    $this->assertDBQuery(0, "SELECT count(*) FROM civicrm_mailing_abtest WHERE id = %1", array(
-      1 => array($result['id'], 'Integer'),
-    ));
-    $this->assertDBQuery(0, "SELECT count(*) FROM civicrm_mailing WHERE id IN (%1,%2,%3)", array(
-      1 => array($this->_mailingID_A, 'Integer'),
-      2 => array($this->_mailingID_B, 'Integer'),
-      3 => array($this->_mailingID_C, 'Integer'),
-    ));
+    $this->assertDBQuery(0, "SELECT count(*) FROM civicrm_mailing_abtest WHERE id = %1", [
+      1 => [$result['id'], 'Integer'],
+    ]);
+    $this->assertDBQuery(0, "SELECT count(*) FROM civicrm_mailing WHERE id IN (%1,%2,%3)", [
+      1 => [$this->_mailingID_A, 'Integer'],
+      2 => [$this->_mailingID_B, 'Integer'],
+      3 => [$this->_mailingID_C, 'Integer'],
+    ]);
   }
 
   /**
@@ -108,14 +108,14 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
    */
   public function groupPctProvider() {
     // array(int $totalSize, int $groupPct, int $expectedCountA, $expectedCountB, $expectedCountC)
-    $cases = array();
-    $cases[] = array(400, 7, 28, 28, 344);
-    $cases[] = array(100, 10, 10, 10, 80);
-    $cases[] = array(50, 20, 10, 10, 30);
-    $cases[] = array(50, 10, 5, 5, 40);
-    $cases[] = array(3, 10, 1, 1, 1);
-    $cases[] = array(2, 10, 1, 1, 0);
-    $cases[] = array(1, 10, 1, 0, 0);
+    $cases = [];
+    $cases[] = [400, 7, 28, 28, 344];
+    $cases[] = [100, 10, 10, 10, 80];
+    $cases[] = [50, 20, 10, 10, 30];
+    $cases[] = [50, 10, 5, 5, 40];
+    $cases[] = [3, 10, 1, 1, 1];
+    $cases[] = [2, 10, 1, 1, 0];
+    $cases[] = [1, 10, 1, 0, 0];
     return $cases;
   }
 
@@ -138,27 +138,27 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
     $params['group_percentage'] = $groupPct;
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
 
-    $this->callAPISuccess('Mailing', 'create', array(
+    $this->callAPISuccess('Mailing', 'create', [
       'id' => $this->_mailingID_A,
-      'groups' => array('include' => array($this->_groupID)),
-    ));
+      'groups' => ['include' => [$this->_groupID]],
+    ]);
     $this->assertJobCounts(0, 0, 0);
 
-    $this->callAPISuccess('MailingAB', 'submit', array(
+    $this->callAPISuccess('MailingAB', 'submit', [
       'id' => $result['id'],
       'status' => 'Testing',
       'scheduled_date' => date('YmdHis'),
       'approval_date' => date('YmdHis'),
-    ));
+    ]);
     $this->assertRecipientCounts($expectedCountA, $expectedCountB, $expectedCountC);
     $this->assertJobCounts(1, 1, 0);
 
-    $this->callAPISuccess('MailingAB', 'submit', array(
+    $this->callAPISuccess('MailingAB', 'submit', [
       'id' => $result['id'],
       'status' => 'Final',
       'scheduled_date' => date('YmdHis'),
       'approval_date' => date('YmdHis'),
-    ));
+    ]);
     $this->assertRecipientCounts($expectedCountA, $expectedCountB, $expectedCountC);
     $this->assertJobCounts(1, 1, 1);
   }
@@ -228,9 +228,9 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
    * @param $expectedCountC
    */
   protected function assertRecipientCounts($expectedCountA, $expectedCountB, $expectedCountC) {
-    $countA = $this->callAPISuccess('MailingRecipients', 'getcount', array('mailing_id' => $this->_mailingID_A));
-    $countB = $this->callAPISuccess('MailingRecipients', 'getcount', array('mailing_id' => $this->_mailingID_B));
-    $countC = $this->callAPISuccess('MailingRecipients', 'getcount', array('mailing_id' => $this->_mailingID_C));
+    $countA = $this->callAPISuccess('MailingRecipients', 'getcount', ['mailing_id' => $this->_mailingID_A]);
+    $countB = $this->callAPISuccess('MailingRecipients', 'getcount', ['mailing_id' => $this->_mailingID_B]);
+    $countC = $this->callAPISuccess('MailingRecipients', 'getcount', ['mailing_id' => $this->_mailingID_C]);
     $this->assertEquals($expectedCountA, $countA, "check mailing recipients A in line " . __LINE__);
     $this->assertEquals($expectedCountB, $countB, "check mailing recipients B in line " . __LINE__);
     $this->assertEquals($expectedCountC, $countC, "check mailing recipients C in line " . __LINE__);
@@ -242,24 +242,24 @@ class api_v3_MailingABTest extends CiviUnitTestCase {
    * @param $expectedC
    */
   protected function assertJobCounts($expectedA, $expectedB, $expectedC) {
-    $this->assertDBQuery($expectedA, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
-      1 => array(
+    $this->assertDBQuery($expectedA, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', [
+      1 => [
         $this->_mailingID_A,
         'Integer',
-      ),
-    ));
-    $this->assertDBQuery($expectedB, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
-      1 => array(
+      ],
+    ]);
+    $this->assertDBQuery($expectedB, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', [
+      1 => [
         $this->_mailingID_B,
         'Integer',
-      ),
-    ));
-    $this->assertDBQuery($expectedC, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', array(
-      1 => array(
+      ],
+    ]);
+    $this->assertDBQuery($expectedC, 'SELECT count(*) FROM civicrm_mailing_job WHERE mailing_id = %1', [
+      1 => [
         $this->_mailingID_C,
         'Integer',
-      ),
-    ));
+      ],
+    ]);
   }
 
 }

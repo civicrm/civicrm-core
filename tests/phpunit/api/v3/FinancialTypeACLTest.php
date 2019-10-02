@@ -42,15 +42,15 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
   protected $_entity = 'Contribution';
   public $debug = 0;
   protected $_params;
-  protected $_ids = array();
-  protected $_pageParams = array();
+  protected $_ids = [];
+  protected $_pageParams = [];
 
   /**
    * Parameters to create payment processor.
    *
    * @var array
    */
-  protected $_processorParams = array();
+  protected $_processorParams = [];
 
   /**
    * ID of created event.
@@ -67,7 +67,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
 
     $this->_apiversion = 3;
     $this->_individualId = $this->individualCreate();
-    $this->_params = array(
+    $this->_params = [
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
       'total_amount' => 100.00,
@@ -77,8 +77,8 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'net_amount' => 95.00,
       'source' => 'SSF',
       'contribution_status_id' => 1,
-    );
-    $this->_processorParams = array(
+    ];
+    $this->_processorParams = [
       'domain_id' => 1,
       'name' => 'Dummy',
       'payment_processor_type_id' => 10,
@@ -88,8 +88,8 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'url_site' => 'http://dummy.com',
       'url_recur' => 'http://dummy.com',
       'billing_mode' => 1,
-    );
-    $this->_pageParams = array(
+    ];
+    $this->_pageParams = [
       'title' => 'Test Contribution Page',
       'financial_type_id' => 1,
       'currency' => 'USD',
@@ -99,16 +99,19 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'is_allow_other_amount' => 1,
       'min_amount' => 10,
       'max_amount' => 1000,
-    );
+    ];
   }
 
   /**
    * Clean up after each test.
+   *
+   * @throws \Exception
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
-    $this->quickCleanup(array('civicrm_uf_match'));
+    $this->quickCleanup(['civicrm_uf_match']);
     $this->disableFinancialACLs();
+    parent::tearDown();
   }
 
   /**
@@ -116,7 +119,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
    */
   public function testCreateACLContribution() {
     $this->enableFinancialACLs();
-    $p = array(
+    $p = [
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
       'total_amount' => 100.00,
@@ -129,7 +132,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'source' => 'SSF',
       'contribution_status_id' => 1,
       'check_permissions' => TRUE,
-    );
+    ];
 
     $this->setPermissions([
       'access CiviCRM',
@@ -142,9 +145,9 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
 
     $contribution = $this->callAPISuccess('contribution', 'create', $p);
 
-    $params = array(
+    $params = [
       'contribution_id' => $contribution['id'],
-    );
+    ];
 
     $this->setPermissions([
       'access CiviCRM',
@@ -167,9 +170,9 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['values'][$contribution['id']]['invoice_id'], 78910);
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_source'], 'SSF');
     $this->assertEquals($contribution['values'][$contribution['id']]['contribution_status'], 'Completed');
-    $this->callAPISuccess('Contribution', 'Delete', array(
+    $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $contribution['id'],
-    ));
+    ]);
   }
 
   /**
@@ -187,10 +190,10 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
     $this->callAPISuccess('Contribution', 'create', array_merge($this->_params, ['financial_type_id' => 'Member Dues']));
 
-    $params = array(
+    $params = [
       'id' => $contribution['id'],
       'check_permissions' => TRUE,
-    );
+    ];
     $contribution = $this->callAPISuccess('contribution', 'get', $params);
     $this->assertEquals($contribution['count'], 0);
 
@@ -205,7 +208,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
    */
   public function testCreateACLContributionChainedLineItems() {
     $this->enableFinancialACLs();
-    $params = array(
+    $params = [
       'contact_id' => $this->_individualId,
       'receive_date' => '20120511',
       'total_amount' => 100.00,
@@ -217,23 +220,23 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
       'source' => 'SSF',
       'contribution_status_id' => 1,
       'check_permissions' => TRUE,
-      'api.line_item.create' => array(
-        array(
+      'api.line_item.create' => [
+        [
           'price_field_id' => 1,
           'qty' => 2,
           'line_total' => '20',
           'unit_price' => '10',
           'financial_type_id' => 1,
-        ),
-        array(
+        ],
+        [
           'price_field_id' => 1,
           'qty' => 1,
           'line_total' => '80',
           'unit_price' => '80',
           'financial_type_id' => 2,
-        ),
-      ),
-    );
+        ],
+      ],
+    ];
 
     $this->setPermissions([
       'access CiviCRM',
@@ -246,7 +249,7 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->callAPIFailure('contribution', 'create', $params, 'Error in call to LineItem_create : You do not have permission to create this line item');
 
     // Check that the entire contribution has rolled back.
-    $contribution = $this->callAPISuccess('contribution', 'get', array());
+    $contribution = $this->callAPISuccess('contribution', 'get', []);
     $this->assertEquals(0, $contribution['count']);
 
     $this->addFinancialAclPermissions([
@@ -257,10 +260,10 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     ]);
     $contribution = $this->callAPISuccess('contribution', 'create', $params);
 
-    $lineItemParams = array(
+    $lineItemParams = [
       'contribution_id' => $contribution['id'],
       'entity_table' => 'civicrm_contribution',
-    );
+    ];
     $lineItems = $this->callAPISuccess('LineItem', 'get', $lineItemParams);
     $this->assertEquals(3, $lineItems['count']);
     $this->assertEquals(100.00, $lineItems['values'][3]['line_total']);
@@ -270,9 +273,9 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->assertEquals(1, $lineItems['values'][4]['financial_type_id']);
     $this->assertEquals(2, $lineItems['values'][5]['financial_type_id']);
 
-    $this->callAPISuccess('Contribution', 'Delete', array(
+    $this->callAPISuccess('Contribution', 'Delete', [
       'id' => $contribution['id'],
-    ));
+    ]);
   }
 
   /**
@@ -282,11 +285,11 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     $this->enableFinancialACLs();
     $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
 
-    $params = array(
+    $params = [
       'id' => $contribution['id'],
       'check_permissions' => TRUE,
       'total_amount' => 200.00,
-    );
+    ];
 
     $this->setPermissions([
       'access CiviCRM',
@@ -316,10 +319,10 @@ class api_v3_FinancialTypeACLTest extends CiviUnitTestCase {
     ]);
     $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
 
-    $params = array(
+    $params = [
       'contribution_id' => $contribution['id'],
       'check_permissions' => TRUE,
-    );
+    ];
     $this->addPermissions(['delete in CiviContribute']);
     $this->callAPIFailure('Contribution', 'delete', $params);
 

@@ -343,7 +343,7 @@ class CRM_Core_Form_RecurringEntity {
       $params['entity_id'] = self::$_entityId;
     }
     //Process this function only when you get this variable
-    if ($params['allowRepeatConfigToSubmit'] == 1) {
+    if (CRM_Utils_Array::value('allowRepeatConfigToSubmit', $params) == 1) {
       if (!empty($params['entity_table']) && !empty($params['entity_id']) && $type) {
         $params['used_for'] = $type;
         if (empty($params['parent_entity_id'])) {
@@ -369,7 +369,7 @@ class CRM_Core_Form_RecurringEntity {
 
         //exclude dates
         $excludeDateList = [];
-        if (CRM_Utils_Array::value('exclude_date_list', $params) && CRM_Utils_Array::value('parent_entity_id', $params) && $actionScheduleObj->entity_value) {
+        if (!empty($params['exclude_date_list']) && !empty($params['parent_entity_id']) && $actionScheduleObj->entity_value) {
           //Since we get comma separated values lets get them in array
           $excludeDates = explode(",", $params['exclude_date_list']);
 

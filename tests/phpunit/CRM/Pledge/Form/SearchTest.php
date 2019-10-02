@@ -9,16 +9,16 @@ class CRM_Pledge_Form_SearchTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
     $this->individualID = $this->individualCreate();
-    $this->pledgeCreate(array('contact_id' => $this->individualID));
+    $this->pledgeCreate(['contact_id' => $this->individualID]);
   }
 
   public function tearDown() {
     parent::tearDown();
-    $tablesToTruncate = array(
+    $tablesToTruncate = [
       'civicrm_activity',
       'civicrm_activity_contact',
       'civicrm_pledge',
-    );
+    ];
     $this->quickCleanup($tablesToTruncate);
   }
 
@@ -34,7 +34,7 @@ class CRM_Pledge_Form_SearchTest extends CiviUnitTestCase {
     $qfKey = $form->controller->_key;
     $date = date('Y-m-d') . ' 00:00:00';
     $rows = $form->controller->get('rows');
-    $this->assertEquals(array(
+    $this->assertEquals([
       'contact_id' => '3',
       'sort_name' => 'Anderson, Anthony',
       'display_name' => 'Mr. Anthony Anderson II',
@@ -54,7 +54,7 @@ class CRM_Pledge_Form_SearchTest extends CiviUnitTestCase {
       'checkbox' => 'mark_x_1',
       'action' => '<span><a href="/index.php?q=civicrm/contact/view/pledge&amp;reset=1&amp;id=1&amp;cid=3&amp;action=view&amp;context=search&amp;selectedChild=pledge&amp;key=' . $qfKey . '" class="action-item crm-hover-button" title=' . "'" . 'View Pledge' . "'" . ' >View</a><a href="/index.php?q=civicrm/contact/view/pledge&amp;reset=1&amp;action=update&amp;id=1&amp;cid=3&amp;context=search&amp;key=' . $qfKey . '" class="action-item crm-hover-button" title=' . "'" . 'Edit Pledge' . "'" . ' >Edit</a></span><span class=' . "'" . 'btn-slide crm-hover-button' . "'" . '>more<ul class=' . "'" . 'panel' . "'" . '><li><a href="/index.php?q=civicrm/contact/view/pledge&amp;reset=1&amp;action=detach&amp;id=1&amp;cid=3&amp;context=search&amp;key=' . $qfKey . '" class="action-item crm-hover-button" title=' . "'" . 'Cancel Pledge' . "'" . ' onclick = "return confirm(' . "'" . 'Cancelling this pledge will also cancel any scheduled (and not completed) pledge payments. This action cannot be undone. Do you want to continue?' . "'" . ');">Cancel</a></li><li><a href="/index.php?q=civicrm/contact/view/pledge&amp;reset=1&amp;action=delete&amp;id=1&amp;cid=3&amp;context=search&amp;key=' . $qfKey . '" class="action-item crm-hover-button small-popup" title=' . "'" . 'Delete Pledge' . "'" . ' >Delete</a></li></ul></span>',
       'contact_type' => '<a href="/index.php?q=civicrm/profile/view&amp;reset=1&amp;gid=7&amp;id=3&amp;snippet=4" class="crm-summary-link"><div class="icon crm-icon Individual-icon"></div></a>',
-    ), $rows[0]);
+    ], $rows[0]);
   }
 
 }

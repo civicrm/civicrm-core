@@ -62,7 +62,7 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
    */
   public function preProcess() {
     parent::preProcess();
-    $this->assign('selectedChild', 'fee');
+    $this->setSelectedChild('fee');
   }
 
   /**
@@ -290,12 +290,12 @@ class CRM_Event_Form_ManageEvent_Fee extends CRM_Event_Form_ManageEvent {
     else {
       $this->assign('price', TRUE);
     }
-    $this->add('select', 'price_set_id', ts('Price Set'),
-      [
-        '' => ts('- none -'),
-      ] + $price,
-      NULL, ['onchange' => "return showHideByValue('price_set_id', '', 'map-field', 'block', 'select', false);"]
-    );
+    $this->addField('price_set_id', [
+      'entity' => 'PriceSet',
+      'options' => $price,
+      'onchange' => "return showHideByValue('price_set_id', '', 'map-field', 'block', 'select', false);",
+    ]);
+
     $default = [$this->createElement('radio', NULL, NULL, NULL, 0)];
     $this->add('hidden', 'price_field_id', '', ['id' => 'price_field_id']);
     for ($i = 1; $i <= self::NUM_OPTION; $i++) {

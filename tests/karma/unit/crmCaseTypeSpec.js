@@ -18,10 +18,6 @@ describe('crmCaseType', function() {
     CRM.resourceUrls = {
       'civicrm': ''
     };
-    // CRM_Case_XMLProcessor::REL_TYPE_CNAME
-    CRM.crmCaseType = {
-      'REL_TYPE_CNAME': 'label_b_a'
-    };
     module('crmCaseType');
     module('crmJsonComparator');
     inject(function(crmJsonComparator) {
@@ -203,6 +199,30 @@ describe('crmCaseType', function() {
             }
           ]
         },
+        relTypesForm: {
+          values: [
+            {
+                "key": "14_b_a",
+                "value": "Benefits Specialist"
+            },
+            {
+                "key": "14_a_b",
+                "value": "Benefits Specialist is"
+            },
+            {
+                "key": "9_b_a",
+                "value": "Case Coordinator"
+            },
+            {
+                "key": "9_a_b",
+                "value": "Case Coordinator is"
+            },
+            {
+                "key": "2_b_a",
+                "value": "Spouse of"
+            }
+          ]
+        },
         caseType: {
           "id": "1",
           "name": "housing_support",
@@ -332,13 +352,13 @@ describe('crmCaseType', function() {
 
         result.push({
           label: relType.label_b_a,
-          value: relType.id + '_b_a'
+          value: relType.id + '_a_b'
         });
 
         if (!isBidirectionalRelationship) {
           result.push({
             label: relType.label_a_b,
-            value: relType.id + '_a_b'
+            value: relType.id + '_b_a'
           });
         }
       }, []);

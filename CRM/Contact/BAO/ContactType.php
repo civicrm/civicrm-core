@@ -149,65 +149,45 @@ WHERE  parent_id IS NULL
    *   ..
    * @param bool $all
    * @param bool $ignoreCache
-   * @param bool $reset
    *
    * @return array
    *   Array of sub type information
    */
-  public static function subTypeInfo($contactType = NULL, $all = FALSE, $ignoreCache = FALSE, $reset = FALSE) {
-    static $_cache = NULL;
-
-    if ($reset === TRUE) {
-      $_cache = NULL;
-    }
-
-    if ($_cache === NULL) {
-      $_cache = [];
-    }
-    if ($contactType && !is_array($contactType)) {
-      $contactType = [$contactType];
-    }
-
+  public static function subTypeInfo($contactType = NULL, $all = FALSE, $ignoreCache = FALSE) {
     $argString = $all ? 'CRM_CT_STI_1_' : 'CRM_CT_STI_0_';
     if (!empty($contactType)) {
+      $contactType = (array) $contactType;
       $argString .= implode('_', $contactType);
     }
+    if (!Civi::cache('contactTypes')->has($argString) || $ignoreCache) {
+      $ctWHERE = '';
+      if (!empty($contactType)) {
+        $ctWHERE = " AND parent.name IN ('" . implode("','", $contactType) . "')";
+      }
 
-    if ((!array_key_exists($argString, $_cache)) || $ignoreCache) {
-      $cache = CRM_Utils_Cache::singleton();
-      $_cache[$argString] = $cache->get($argString);
-      if (!$_cache[$argString] || $ignoreCache) {
-        $_cache[$argString] = [];
-
-        $ctWHERE = '';
-        if (!empty($contactType)) {
-          $ctWHERE = " AND parent.name IN ('" . implode("','", $contactType) . "')";
-        }
-
-        $sql = "
+      $sql = "
 SELECT subtype.*, parent.name as parent, parent.label as parent_label
 FROM   civicrm_contact_type subtype
 INNER JOIN civicrm_contact_type parent ON subtype.parent_id = parent.id
 WHERE  subtype.name IS NOT NULL AND subtype.parent_id IS NOT NULL {$ctWHERE}
 ";
-        if ($all === FALSE) {
-          $sql .= " AND subtype.is_active = 1 AND parent.is_active = 1 ORDER BY parent.id";
-        }
-        $dao = CRM_Core_DAO::executeQuery($sql, [],
-          FALSE, 'CRM_Contact_DAO_ContactType'
-        );
-        while ($dao->fetch()) {
-          $value = [];
-          CRM_Core_DAO::storeValues($dao, $value);
-          $value['parent'] = $dao->parent;
-          $value['parent_label'] = $dao->parent_label;
-          $_cache[$argString][$dao->name] = $value;
-        }
-
-        $cache->set($argString, $_cache[$argString]);
+      if ($all === FALSE) {
+        $sql .= " AND subtype.is_active = 1 AND parent.is_active = 1 ORDER BY parent.id";
       }
+      $dao = CRM_Core_DAO::executeQuery($sql, [],
+        FALSE, 'CRM_Contact_DAO_ContactType'
+      );
+      $values = [];
+      while ($dao->fetch()) {
+        $value = [];
+        CRM_Core_DAO::storeValues($dao, $value);
+        $value['parent'] = $dao->parent;
+        $value['parent_label'] = $dao->parent_label;
+        $values[$dao->name] = $value;
+      }
+      Civi::cache('contactTypes')->set($argString, $values);
     }
-    return $_cache[$argString];
+    return Civi::cache('contactTypes')->get($argString);
   }
 
   /**
@@ -378,6 +358,7 @@ WHERE  type.name IS NOT NULL
     $isSeparator = TRUE,
     $separator = '__'
   ) {
+    // @todo - use Cache class - ie like Civi::cache('contactTypes')
     static $_cache = NULL;
 
     if ($_cache === NULL) {
@@ -387,7 +368,7 @@ WHERE  type.name IS NOT NULL
     $argString = $all ? 'CRM_CT_GSE_1' : 'CRM_CT_GSE_0';
     $argString .= $isSeparator ? '_1' : '_0';
     $argString .= $separator;
-    $argString = CRM_Core_BAO_Cache::cleanKey($argString);
+    $argString = CRM_Utils_Cache::cleanKey($argString);
     if (!array_key_exists($argString, $_cache)) {
       $cache = CRM_Utils_Cache::singleton();
       $_cache[$argString] = $cache->get($argString);
@@ -467,6 +448,7 @@ AND   ( p.is_active = 1 OR p.id IS NULL )
    *   basicTypes.
    */
   public static function getBasicType($subType) {
+    // @todo - use Cache class - ie like Civi::cache('contactTypes')
     static $_cache = NULL;
     if ($_cache === NULL) {
       $_cache = [];
@@ -617,8 +599,9 @@ DELETE
 FROM civicrm_navigation
 WHERE name = %1";
       $params = [1 => ["New $name", 'String']];
-      $dao = CRM_Core_DAO::executeQuery($sql, $params);
+      CRM_Core_DAO::executeQuery($sql, $params);
       CRM_Core_BAO_Navigation::resetNavigation();
+      Civi::cache('contactTypes')->clear();
     }
     return TRUE;
   }
@@ -680,9 +663,7 @@ WHERE name = %1";
       CRM_Core_BAO_Navigation::add($navigation);
     }
     CRM_Core_BAO_Navigation::resetNavigation();
-
-    // reset the cache after adding
-    self::subTypeInfo(NULL, FALSE, FALSE, TRUE);
+    Civi::cache('contactTypes')->clear();
 
     return $contactType;
   }

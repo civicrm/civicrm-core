@@ -45,30 +45,30 @@ class CRM_Contribute_Form_TaskTest extends CiviUnitTestCase {
    * executes without any error after sorting the search result.
    */
   public function testPreProcessCommonAfterSorting() {
-    $fields = array(
+    $fields = [
       'source' => 'contribution_source',
       'status' => 'contribution_status',
       'financialTypes' => 'financial_type',
-    );
-    $financialTypes = array('Member Dues', 'Event Fee', 'Donation');
-    $status = array('Completed', 'Partially paid', 'Pending');
-    $source = array('test source text', 'check source text', 'source text');
+    ];
+    $financialTypes = ['Member Dues', 'Event Fee', 'Donation'];
+    $status = ['Completed', 'Partially paid', 'Pending'];
+    $source = ['test source text', 'check source text', 'source text'];
     $this->_individualId = $this->individualCreate();
 
     for ($i = 0; $i < 3; $i++) {
-      $contributionParams = array(
+      $contributionParams = [
         'contact_id' => $this->_individualId,
         'total_amount' => 100,
         'source' => $source[$i],
         'financial_type_id' => $financialTypes[$i],
         'contribution_status_id' => $status[$i],
-      );
+      ];
       $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
       $contributionIds[] = $contribution['id'];
     }
 
     // Generate expected sorted array.
-    $expectedValues = array();
+    $expectedValues = [];
     foreach ($fields as $key => $fld) {
       $sortedFields = array_combine($$key, $contributionIds);
       ksort($sortedFields);

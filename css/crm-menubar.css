@@ -143,16 +143,16 @@ a.highlighted #crm-qsearch-input,
   width: 130px;
 }
 input#crm-qsearch-input:-ms-input-placeholder {
-  font-family: 'FontAwesome';
+  font-family: 'FontAwesome', sans-serif;
 }
 input#crm-qsearch-input::-webkit-input-placeholder {
-  font-family: 'FontAwesome';
+  font-family: 'FontAwesome', sans-serif;
 }
 input#crm-qsearch-input::-moz-placeholder {
-  font-family: 'FontAwesome';
+  font-family: 'FontAwesome', sans-serif;
 }
 input#crm-qsearch-input::placeholder {
-  font-family: 'FontAwesome';
+  font-family: 'FontAwesome', sans-serif;
 }
 
 ul.crm-quickSearch-results {
@@ -203,7 +203,7 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   /* hide the button in desktop view */
   #civicrm-menu-nav .crm-menubar-toggle-btn {
     position: absolute;
-    top: -99999px;
+    top: -99999px; /* do not edit this without updating the isMobile() function in crm.menubar.js */
   }
 
   #civicrm-menu {
@@ -233,7 +233,7 @@ body.crm-menubar-over-cms-menu #crm-menubar-toggle-position a i {
   }
 
   /* Pseudo-element to ensure vertical alignment */
-  #civicrm-menu > li > a:after {
+  #civicrm-menu > li:not(#crm-qsearch) > a:after {
     content: '';
     display: inline-block;
     height: 100%;

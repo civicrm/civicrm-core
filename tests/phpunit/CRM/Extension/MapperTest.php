@@ -104,23 +104,23 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
   }
 
   public function testGetKeysByPath() {
-    $mappers = array(
+    $mappers = [
       $this->basedir => $this->mapper,
       $this->basedir2 => $this->mapperWithSlash,
-    );
+    ];
     foreach ($mappers as $basedir => $mapper) {
       /** @var CRM_Extension_Mapper $mapper */
-      $this->assertEquals(array(), $mapper->getKeysByPath($basedir));
-      $this->assertEquals(array(), $mapper->getKeysByPath($basedir . '/weird'));
-      $this->assertEquals(array(), $mapper->getKeysByPath($basedir . '/weird/'));
-      $this->assertEquals(array(), $mapper->getKeysByPath($basedir . '/weird//'));
-      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/*'));
-      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '//*'));
-      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/weird/*'));
-      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/weird/foobar'));
-      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/weird/foobar/'));
-      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/weird/foobar//'));
-      $this->assertEquals(array('test.foo.bar'), $mapper->getKeysByPath($basedir . '/weird/foobar/*'));
+      $this->assertEquals([], $mapper->getKeysByPath($basedir));
+      $this->assertEquals([], $mapper->getKeysByPath($basedir . '/weird'));
+      $this->assertEquals([], $mapper->getKeysByPath($basedir . '/weird/'));
+      $this->assertEquals([], $mapper->getKeysByPath($basedir . '/weird//'));
+      $this->assertEquals(['test.foo.bar'], $mapper->getKeysByPath($basedir . '/*'));
+      $this->assertEquals(['test.foo.bar'], $mapper->getKeysByPath($basedir . '//*'));
+      $this->assertEquals(['test.foo.bar'], $mapper->getKeysByPath($basedir . '/weird/*'));
+      $this->assertEquals(['test.foo.bar'], $mapper->getKeysByPath($basedir . '/weird/foobar'));
+      $this->assertEquals(['test.foo.bar'], $mapper->getKeysByPath($basedir . '/weird/foobar/'));
+      $this->assertEquals(['test.foo.bar'], $mapper->getKeysByPath($basedir . '/weird/foobar//'));
+      $this->assertEquals(['test.foo.bar'], $mapper->getKeysByPath($basedir . '/weird/foobar/*'));
     }
   }
 
@@ -146,7 +146,7 @@ class CRM_Extension_MapperTest extends CiviUnitTestCase {
     file_put_contents("$basedir/weird/foobar/info.xml", "<extension key='test.foo.bar' type='report'><file>oddball</file></extension>");
     // not needed for now // file_put_contents("$basedir/weird/bar/oddball.php", "<?php\n");
     $c = new CRM_Extension_Container_Basic($basedir . $appendPathGarbage, 'http://example/basedir' . $appendPathGarbage, $cache, $cacheKey);
-    return array($basedir, $c);
+    return [$basedir, $c];
   }
 
 }

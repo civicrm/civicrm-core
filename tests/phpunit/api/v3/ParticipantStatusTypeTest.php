@@ -38,7 +38,7 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
 
   public function setUp() {
     $this->_apiversion = 3;
-    $this->params = array(
+    $this->params = [
       'name' => 'test status',
       'label' => 'I am a test',
       'class' => 'Positive',
@@ -47,7 +47,7 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
       'is_counted' => 1,
       'visibility_id' => 1,
       'weight' => 10,
-    );
+    ];
     parent::setUp();
     $this->useTransaction(TRUE);
   }
@@ -71,10 +71,10 @@ class api_v3_ParticipantStatusTypeTest extends CiviUnitTestCase {
   public function testDeleteParticipantStatusType() {
 
     $ParticipantStatusType = $this->callAPISuccess('ParticipantStatusType', 'Create', $this->params);
-    $entity = $this->callAPISuccess('participant_status_type', 'get', array());
-    $result = $this->callAPIAndDocument('participant_status_type', 'delete', array('id' => $ParticipantStatusType['id']), __FUNCTION__, __FILE__);
-    $getCheck = $this->callAPISuccess('ParticipantStatusType', 'GET', array('id' => $ParticipantStatusType['id']));
-    $checkDeleted = $this->callAPISuccess('ParticipantStatusType', 'Get', array());
+    $entity = $this->callAPISuccess('participant_status_type', 'get', []);
+    $result = $this->callAPIAndDocument('participant_status_type', 'delete', ['id' => $ParticipantStatusType['id']], __FUNCTION__, __FILE__);
+    $getCheck = $this->callAPISuccess('ParticipantStatusType', 'GET', ['id' => $ParticipantStatusType['id']]);
+    $checkDeleted = $this->callAPISuccess('ParticipantStatusType', 'Get', []);
     $this->assertEquals($entity['count'] - 1, $checkDeleted['count']);
   }
 

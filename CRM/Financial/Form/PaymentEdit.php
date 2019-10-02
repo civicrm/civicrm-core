@@ -181,7 +181,12 @@ class CRM_Financial_Form_PaymentEdit extends CRM_Core_Form {
 
     $this->submit($params);
 
-    CRM_Core_Session::singleton()->pushUserContext(CRM_Utils_System::url(CRM_Utils_System::currentPath()));
+    $contactId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionID, 'contact_id');
+    $url = CRM_Utils_System::url(
+      "civicrm/contact/view/contribution",
+      "reset=1&action=update&id={$this->_contributionID}&cid={$contactId}&context=contribution"
+    );
+    CRM_Core_Session::singleton()->pushUserContext($url);
   }
 
   /**

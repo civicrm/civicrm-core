@@ -190,26 +190,26 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   /**
    * Set the default form values.
    *
-   *
    * @return array
    *   the default array reference
+   * @throws \Exception
    */
   public function setDefaultValues() {
+    $defaults = parent::setDefaultValues();
     // Set ssID for unit tests.
     if (empty($this->_ssID)) {
       $this->_ssID = $this->get('ssID');
     }
 
-    $defaults = array_merge($this->_formValues, array(
+    $defaults = array_merge($this->_formValues, [
       'privacy_toggle' => 1,
       'operator' => 'AND',
-    ));
+    ], $defaults);
     $this->normalizeDefaultValues($defaults);
 
     if ($this->_context === 'amtg') {
       $defaults['task'] = CRM_Contact_Task::GROUP_ADD;
     }
-
     return $defaults;
   }
 
@@ -228,10 +228,10 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
   public function postProcess() {
     $this->set('isAdvanced', '1');
 
+    $this->setFormValues();
     // get user submitted values
     // get it from controller only if form has been submitted, else preProcess has set this
     if (!empty($_POST)) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
       $this->normalizeFormValues();
       // FIXME: couldn't figure out a good place to do this,
       // FIXME: so leaving this as a dependency for now
@@ -349,8 +349,6 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
       'activity_type_id',
       'status_id',
       'priority_id',
-      'activity_subject',
-      'activity_details',
       'contribution_page_id',
       'contribution_product_id',
       'payment_instrument_id',
@@ -404,7 +402,7 @@ class CRM_Contact_Form_Search_Advanced extends CRM_Contact_Form_Search {
      * id of the tagset.
      */
     if (isset($defaults['contact_tags'])) {
-      foreach ($defaults['contact_tags'] as $key => $tagId) {
+      foreach ((array) $defaults['contact_tags'] as $key => $tagId) {
         if (!is_array($tagId)) {
           $parentId = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $tagId, 'parent_id');
           $element = "contact_taglist[$parentId]";

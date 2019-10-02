@@ -95,8 +95,6 @@ class CRM_Contact_BAO_SavedSearch extends CRM_Contact_DAO_SavedSearch {
     $specialDateFields = [
       'event_start_date_low' => 'event_date_low',
       'event_end_date_high' => 'event_date_high',
-      'participant_register_date_low' => 'participant_date_low',
-      'participant_register_date_high' => 'participant_date_high',
       'case_from_start_date_low' => 'case_from_date_low',
       'case_from_start_date_high' => 'case_from_date_high',
       'case_to_end_date_low' => 'case_to_date_low',
@@ -436,10 +434,25 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
    * @param array $formValues
    */
   public static function saveRelativeDates(&$queryParams, $formValues) {
+    // This is required only until all fields are converted to datepicker fields as the new format is truer to the
+    // form format and simply saves (e.g) custom_3_relative => "this.year"
     $relativeDates = ['relative_dates' => []];
-    $specialDateFields = ['event_relative', 'case_from_relative', 'case_to_relative', 'participant_relative'];
+    $specialDateFields = [
+      'event_relative',
+      'case_from_relative',
+      'case_to_relative',
+      'participant_relative',
+      'log_date_relative',
+      'birth_date_relative',
+      'deceased_date_relative',
+      'mailing_date_relative',
+      'relation_date_relative',
+      'relation_start_date_relative',
+      'relation_end_date_relative',
+      'relation_action_date_relative',
+    ];
     foreach ($formValues as $id => $value) {
-      if ((preg_match('/(_date|custom_[0-9]+)_relative$/', $id) || in_array($id, $specialDateFields)) && !empty($value)) {
+      if (in_array($id, $specialDateFields) && !empty($value)) {
         $entityName = strstr($id, '_date', TRUE);
         if (empty($entityName)) {
           $entityName = strstr($id, '_relative', TRUE);

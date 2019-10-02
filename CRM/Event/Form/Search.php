@@ -32,10 +32,6 @@
  */
 
 /**
- * Files required
- */
-
-/**
  * This file is for civievent search
  */
 class CRM_Event_Form_Search extends CRM_Core_Form_Search {
@@ -73,6 +69,22 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * @var int
    */
   protected $_ssID;
+
+  /**
+   * Metadata of all fields to include on the form.
+   *
+   * @var array
+   */
+  protected $searchFieldMetadata = [];
+
+  /**
+   * Get the default entity for the form.
+   *
+   * @return string
+   */
+  public function getDefaultEntity() {
+    return 'Participant';
+  }
 
   /**
    * Processing needed for buildForm and later.
@@ -138,8 +150,9 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
   /**
    * Build the form object.
    *
-   *
    * @return void
+   *
+   * @throws \CRM_Core_Exception
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
@@ -404,19 +417,6 @@ class CRM_Event_Form_Search extends CRM_Core_Form_Search {
    * @see valid_date
    */
   public function addRules() {
-  }
-
-  /**
-   * Set the default form values.
-   *
-   *
-   * @return array
-   *   the default array reference
-   */
-  public function setDefaultValues() {
-    $defaults = [];
-    $defaults = $this->_formValues;
-    return $defaults;
   }
 
   public function fixFormValues() {

@@ -119,7 +119,7 @@ class CRM_Core_BAO_FinancialTrxn extends CRM_Financial_DAO_FinancialTrxn {
    *
    * @return \CRM_Financial_DAO_FinancialTrxn
    */
-  public static function retrieve(&$params, &$defaults) {
+  public static function retrieve(&$params, &$defaults = []) {
     $financialItem = new CRM_Financial_DAO_FinancialTrxn();
     $financialItem->copyValues($params);
     if ($financialItem->find(TRUE)) {
@@ -429,7 +429,7 @@ WHERE ceft.entity_id = %1";
         'transaction_date' => date('YmdHis'),
         'amount' => $amount,
         'description' => 'Fee',
-        'status_id' => CRM_Core_Pseudoconstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
+        'status_id' => CRM_Core_PseudoConstant::getKey('CRM_Financial_BAO_FinancialItem', 'status_id', 'Paid'),
         'entity_table' => 'civicrm_financial_trxn',
         'entity_id' => $params['entity_id'],
         'currency' => $params['trxnParams']['currency'],

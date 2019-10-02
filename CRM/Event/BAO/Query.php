@@ -126,10 +126,10 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
       }
 
       if (!empty($query->_returnProperties['event_type_id'])) {
-        $query->_select['event_type_id'] = "event_type.id as event_type_id";
+        $query->_select['event_type_id'] = "civicrm_event.event_type_id as event_type_id";
         $query->_element['event_type_id'] = 1;
-        $query->_tables['event_type'] = 1;
-        $query->_whereTables['event_type'] = 1;
+        $query->_tables['civicrm_event'] = 1;
+        $query->_whereTables['civicrm_event'] = 1;
       }
 
       //add status_id
@@ -238,7 +238,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
       if (substr($query->_params[$id][0], 0, 6) == 'event_' ||
         substr($query->_params[$id][0], 0, 12) == 'participant_'
       ) {
-        if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
+        if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
         $grouping = $query->_params[$id][3];
@@ -339,16 +339,13 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         return;
 
       case 'participant_fee_id':
-        $val_regexp = [];
-        foreach ($value as $k => &$val) {
-          $val = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $val, 'label');
-          $val_regexp[$k] = CRM_Core_DAO::escapeString(preg_quote(trim($val)));
-          $val = CRM_Core_DAO::escapeString(trim($val));
+        $labels = [];
+        foreach ($value as $val) {
+          $labels[] = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceFieldValue', $val, 'label');
         }
-        $feeLabel = implode('|', $val_regexp);
-        $query->_where[$grouping][] = "civicrm_participant.fee_level REGEXP '{$feeLabel}'";
-        $query->_qill[$grouping][] = ts("Fee level") . " IN " . implode(', ', $value);
-        $query->_tables['civicrm_participant'] = $query->_whereTables['civicrm_participant'] = 1;
+        $query->_where[$grouping][] = "civicrm_line_item.price_field_value_id IN (" . implode(', ', $value) . ")";
+        $query->_qill[$grouping][] = ts("Fee level") . " IN " . implode(', ', $labels);
+        $query->_tables['civicrm_participant'] = $query->_tables['civicrm_line_item'] = $query->_whereTables['civicrm_line_item'] = 1;
         return;
 
       case 'participant_fee_amount_high':
@@ -516,6 +513,10 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
         $from = " $side JOIN civicrm_discount discount ON ( civicrm_participant.discount_id = discount.id )";
         $from .= " $side JOIN civicrm_option_group discount_name ON ( discount_name.id = discount.price_set_id ) ";
         break;
+
+      case 'civicrm_line_item':
+        $from .= " $side JOIN civicrm_line_item ON civicrm_line_item.entity_id = civicrm_participant.id AND civicrm_line_item.entity_table = 'civicrm_participant'";
+        break;
     }
     return $from;
   }
@@ -575,9 +576,30 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
-   * @param CRM_Core_Form $form
+   * Get the metadata for fields to be included on the grant search form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getSearchFieldMetadata() {
+    $fields = [
+      'participant_status_id',
+      'participant_register_date',
+    ];
+    $metadata = civicrm_api3('Participant', 'getfields', [])['values'];
+    return array_intersect_key($metadata, array_flip($fields));
+  }
+
+  /**
+   * Build the event search form.
+   *
+   * @param \CRM_Event_Form_Search $form
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function buildSearchForm(&$form) {
+    $form->addSearchFieldMetadata(['Participant' => self::getSearchFieldMetadata()]);
+    $form->addFormFieldsFromMetadata();
     $dataURLEventFee = CRM_Utils_System::url('civicrm/ajax/eventFee',
       "reset=1",
       FALSE, NULL, FALSE
@@ -608,23 +630,10 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
 
     CRM_Core_Form_Date::buildDateRange($form, 'event', 1, '_start_date_low', '_end_date_high', ts('From'), FALSE);
 
-    CRM_Core_Form_Date::buildDateRange($form, 'participant', 1, '_register_date_low', '_register_date_high', ts('From'), FALSE);
-
     $form->addElement('hidden', 'event_date_range_error');
-    $form->addElement('hidden', 'participant_date_range_error');
     $form->addFormRule(['CRM_Event_BAO_Query', 'formRule'], $form);
 
     $form->addElement('checkbox', "event_include_repeating_events", NULL, ts('Include participants from all events in the %1 series', [1 => '<em>%1</em>']));
-
-    $form->addSelect('participant_status_id',
-      [
-        'entity' => 'participant',
-        'label' => ts('Participant Status'),
-        'multiple' => 'multiple',
-        'option_url' => NULL,
-        'placeholder' => ts('- any -'),
-      ]
-    );
 
     $form->addSelect('participant_role_id',
       [
@@ -676,7 +685,7 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
   public static function formRule($fields, $files, $form) {
     $errors = [];
 
-    if ((empty($fields['event_start_date_low']) || empty($fields['event_end_date_high'])) && (empty($fields['participant_register_date_low']) || empty($fields['participant_register_date_high']))) {
+    if ((empty($fields['event_start_date_low']) || empty($fields['event_end_date_high']))) {
       return TRUE;
     }
     $lowDate = strtotime($fields['event_start_date_low']);
@@ -686,12 +695,6 @@ class CRM_Event_BAO_Query extends CRM_Core_BAO_Query {
       $errors['event_date_range_error'] = ts('Please check that your Event Date Range is in correct chronological order.');
     }
 
-    $lowDate1 = strtotime($fields['participant_register_date_low']);
-    $highDate1 = strtotime($fields['participant_register_date_high']);
-
-    if ($lowDate1 > $highDate1) {
-      $errors['participant_date_range_error'] = ts('Please check that your Registration Date Range is in correct chronological order.');
-    }
     return empty($errors) ? TRUE : $errors;
   }
 

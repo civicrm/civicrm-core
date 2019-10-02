@@ -83,7 +83,6 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
    * @return CRM_Event_DAO_Event
    */
   public static function add(&$params) {
-    CRM_Utils_System::flushCache();
     $financialTypeId = NULL;
     if (!empty($params['id'])) {
       CRM_Utils_Hook::pre('edit', 'Event', $params['id'], $params);
@@ -133,6 +132,13 @@ class CRM_Event_BAO_Event extends CRM_Event_DAO_Event {
         $params['created_id'] = $session->get('userID');
       }
       $params['created_date'] = date('YmdHis');
+
+      // Clone from template
+      if (!empty($params['template_id'])) {
+        $copy = self::copy($params['template_id']);
+        $params['id'] = $copy->id;
+        unset($params['template_id']);
+      }
     }
 
     $event = self::add($params);
@@ -921,15 +927,15 @@ WHERE civicrm_event.is_active = 1
    *
    * @param int $id
    *   The event id to copy.
-   *        boolean $afterCreate call to copy after the create function
    * @param array $params
+   *
    * @return CRM_Event_DAO_Event
    * @throws \CRM_Core_Exception
    */
   public static function copy($id, $params = []) {
     $eventValues = [];
 
-    //get the require event values.
+    //get the required event values.
     $eventParams = ['id' => $id];
     $returnProperties = [
       'loc_block_id',
@@ -946,11 +952,16 @@ WHERE civicrm_event.is_active = 1
       $fieldsFix['prefix']['is_show_location'] = 0;
     }
 
+    $blockCopyOfCustomValue = (!empty($params['custom']));
+
+    /** @var \CRM_Event_DAO_Event $copyEvent */
     $copyEvent = CRM_Core_DAO::copyGeneric('CRM_Event_DAO_Event',
       ['id' => $id],
       // since the location is sharable, lets use the same loc_block_id.
       ['loc_block_id' => CRM_Utils_Array::value('loc_block_id', $eventValues)] + $params,
-      $fieldsFix
+      $fieldsFix,
+      NULL,
+      $blockCopyOfCustomValue
     );
     CRM_Price_BAO_PriceSet::copyPriceSet('civicrm_event', $id, $copyEvent->id);
     CRM_Core_DAO::copyGeneric('CRM_Core_DAO_UFJoin',
@@ -990,6 +1001,10 @@ WHERE civicrm_event.is_active = 1
     );
 
     $copyEvent->save();
+
+    if ($blockCopyOfCustomValue) {
+      CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_event', $copyEvent->id);
+    }
 
     CRM_Utils_System::flushCache();
     CRM_Utils_Hook::copy('Event', $copyEvent);
@@ -1042,9 +1057,11 @@ WHERE civicrm_event.is_active = 1
    * @param int $participantId
    * @param bool $isTest
    * @param bool $returnMessageText
+   *
    * @return array|null
+   * @throws \CiviCRM_API3_Exception
    */
-  public static function sendMail($contactID, &$values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
+  public static function sendMail($contactID, $values, $participantId, $isTest = FALSE, $returnMessageText = FALSE) {
 
     $template = CRM_Core_Smarty::singleton();
     $gIds = [
@@ -1102,43 +1119,44 @@ WHERE civicrm_event.is_active = 1
           $postProfileID = CRM_Utils_Array::value('additional_custom_post_id', $values, $postProfileID);
         }
 
-        self::buildCustomDisplay($preProfileID,
+        $profilePre = self::buildCustomDisplay($preProfileID,
           'customPre',
           $contactID,
           $template,
           $participantId,
           $isTest,
-          NULL,
+          TRUE,
           $participantParams
         );
 
-        self::buildCustomDisplay($postProfileID,
+        $profilePost = self::buildCustomDisplay($postProfileID,
           'customPost',
           $contactID,
           $template,
           $participantId,
           $isTest,
-          NULL,
+          TRUE,
           $participantParams
         );
 
         $sessions = CRM_Event_Cart_BAO_Conference::get_participant_sessions($participantId);
 
+        // @todo - the goal is that all params available to the message template are explicitly defined here rather than
+        // 'in a smattering of places'. Note that leakage can happen between mailings when not explicitly defined.
         $tplParams = array_merge($values, $participantParams, [
           'email' => $email,
           'confirm_email_text' => CRM_Utils_Array::value('confirm_email_text', $values['event']),
           'isShowLocation' => CRM_Utils_Array::value('is_show_location', $values['event']),
           // The concept of contributeMode is deprecated.
           'contributeMode' => CRM_Utils_Array::value('contributeMode', $template->_tpl_vars),
+          'customPre' => $profilePre[0],
+          'customPre_grouptitle' => empty($profilePre[1]) ? NULL : [CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $preProfileID)],
+          'customPost' => $profilePost[0],
+          'customPost_grouptitle' => empty($profilePost[1]) ? NULL : [CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $postProfileID)],
           'participantID' => $participantId,
           'conference_sessions' => $sessions,
-          'credit_card_number' =>
-          CRM_Utils_System::mungeCreditCard(
-              CRM_Utils_Array::value('credit_card_number', $participantParams)),
-          'credit_card_exp_date' =>
-          CRM_Utils_Date::mysqlToIso(
-              CRM_Utils_Date::format(
-                CRM_Utils_Array::value('credit_card_exp_date', $participantParams))),
+          'credit_card_number' => CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $participantParams)),
+          'credit_card_exp_date' => CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $participantParams))),
         ]);
 
         // CRM-13890 : NOTE wait list condition need to be given so that
@@ -1234,10 +1252,11 @@ WHERE civicrm_event.is_active = 1
    * @param string $template
    * @param int $participantId
    * @param bool $isTest
-   * @param bool $isCustomProfile
+   * @param bool $returnResults
    * @param array $participantParams
    *
    * @return array|null
+   * @throws \CRM_Core_Exception
    */
   public static function buildCustomDisplay(
     $id,
@@ -1246,7 +1265,7 @@ WHERE civicrm_event.is_active = 1
     &$template,
     $participantId,
     $isTest,
-    $isCustomProfile = FALSE,
+    $returnResults = FALSE,
     $participantParams = []
   ) {
     if (!$id) {
@@ -1346,6 +1365,15 @@ WHERE civicrm_event.is_active = 1
 
         CRM_Core_BAO_UFGroup::getValues($cid, $fields, $values, FALSE, $params);
 
+        //dev/event#10
+        //If the event profile includes a note field and the submitted value of
+        //that field is "", then remove the old note returned by getValues.
+        if (isset($participantParams['note']) && empty($participantParams['note'])) {
+          $noteKeyPos = array_search('note', array_keys($fields));
+          $valuesKeys = array_keys($values);
+          $values[$valuesKeys[$noteKeyPos]] = "";
+        }
+
         if (isset($fields['participant_status_id']['title']) &&
           isset($values[$fields['participant_status_id']['title']]) &&
           is_numeric($values[$fields['participant_status_id']['title']])
@@ -1400,7 +1428,7 @@ WHERE civicrm_event.is_active = 1
     }
 
     //return if we only require array of participant's info.
-    if ($isCustomProfile) {
+    if ($returnResults) {
       if (count($val)) {
         return [$val, $groupTitles];
       }
@@ -1423,6 +1451,10 @@ WHERE civicrm_event.is_active = 1
    *   Formatted array of key value.
    *
    * @param array $profileFields
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \API_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function displayProfile(&$params, $gid, &$groupTitle, &$values, &$profileFields = []) {
     if ($gid) {
@@ -1438,11 +1470,8 @@ WHERE civicrm_event.is_active = 1
         $fields = CRM_Core_BAO_UFGroup::getFields($gid, FALSE, CRM_Core_Action::ADD);
       }
 
-      foreach ($fields as $v) {
-        if (!empty($v['groupTitle'])) {
-          $groupTitle['groupTitle'] = $v['groupTitle'];
-          break;
-        }
+      if (!empty($fields)) {
+        $groupTitle['groupTitle'] = CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $gid);
       }
 
       $imProviders = CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id');
@@ -1637,6 +1666,10 @@ WHERE  id = $cfID
                       $config->dateformatDatetime);
                   }
                   $skip = TRUE;
+                }
+                // for checkboxes, change array of [key => bool] to array of [idx => key]
+                elseif ($dao->html_type == 'CheckBox') {
+                  $customVal = array_keys(array_filter($params[$name]));
                 }
                 else {
                   $customVal = $params[$name];

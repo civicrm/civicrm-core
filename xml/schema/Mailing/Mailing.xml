@@ -39,6 +39,12 @@
     <name>header_id</name>
     <title>Mailing Header</title>
     <type>int unsigned</type>
+    <pseudoconstant>
+      <table>civicrm_mailing_component</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+      <condition>component_type = "Header"</condition>
+    </pseudoconstant>
     <comment>FK to the header component.</comment>
   </field>
   <foreignKey>
@@ -51,6 +57,12 @@
     <name>footer_id</name>
     <title>Mailing Footer</title>
     <type>int unsigned</type>
+    <pseudoconstant>
+      <table>civicrm_mailing_component</table>
+      <keyColumn>id</keyColumn>
+      <labelColumn>name</labelColumn>
+      <condition>component_type = "Footer"</condition>
+    </pseudoconstant>
     <comment>FK to the footer component.</comment>
   </field>
   <foreignKey>

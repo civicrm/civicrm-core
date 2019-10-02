@@ -6,7 +6,7 @@ starting with CiviCRM 4.7.14.
 Other resources for identifying changes are:
 
 * The CiviCRM GitLab project management system at https://lab.civicrm.org/groups/dev/-/issues
-* The Jira project management system at https://issues.civicrm.org
+* The former Jira project management system archived at https://issues.civicrm.org
 * The following GitHub projects:
     * https://github.com/civicrm/civicrm-core
     * https://github.com/civicrm/civicrm-packages
@@ -14,6 +14,180 @@ Other resources for identifying changes are:
     * https://github.com/civicrm/civicrm-drupal
     * https://github.com/civicrm/civicrm-joomla
     * https://github.com/civicrm/civicrm-wordpress
+
+# CiviCRM 5.18.0
+
+Released October 2, 2019
+
+- **[Synopsis](release-notes/5.18.0.md#synopsis)**
+- **[Features](release-notes/5.18.0.md#features)**
+- **[Bugs resolved](release-notes/5.18.0.md#bugs)**
+- **[Miscellany](release-notes/5.18.0.md#misc)**
+- **[Credits](release-notes/5.18.0.md#credits)**
+- **[Feedback](release-notes/5.18.0.md#feedback)**
+
+## CiviCRM 5.17.5
+
+Released September 26, 2019
+
+- **[Synopsis](release-notes/5.17.5.md#synopsis)**
+- **[Bugs resolved](release-notes/5.17.5.md#bugs)**
+- **[Credits](release-notes/5.17.5.md#credits)**
+- **[Feedback](release-notes/5.17.5.md#feedback)**
+
+## CiviCRM 5.17.4
+
+Released September 12, 2019
+
+- **[Synopsis](release-notes/5.17.4.md#synopsis)**
+- **[Bugs resolved](release-notes/5.17.4.md#bugs)**
+- **[Credits](release-notes/5.17.4.md#credits)**
+- **[Feedback](release-notes/5.17.4.md#feedback)**
+
+## CiviCRM 5.17.3
+
+Released September 10, 2019
+
+- **[Synopsis](release-notes/5.17.3.md#synopsis)**
+- **[Bugs resolved](release-notes/5.17.3.md#bugs)**
+- **[Credits](release-notes/5.17.3.md#credits)**
+- **[Feedback](release-notes/5.17.3.md#feedback)**
+
+## CiviCRM 5.17.2
+
+Released September 9, 2019
+
+- **[Synopsis](release-notes/5.17.2.md#synopsis)**
+- **[Bugs resolved](release-notes/5.17.2.md#bugs)**
+- **[Credits](release-notes/5.17.2.md#credits)**
+- **[Feedback](release-notes/5.17.2.md#feedback)**
+
+## CiviCRM 5.17.1
+
+Released September 9, 2019
+
+- **[Synopsis](release-notes/5.17.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.17.1.md#bugs)**
+- **[Credits](release-notes/5.17.1.md#credits)**
+- **[Feedback](release-notes/5.17.1.md#feedback)**
+
+## CiviCRM 5.17.0
+
+Released September 4, 2019
+
+- **[Synopsis](release-notes/5.17.0.md#synopsis)**
+- **[Features](release-notes/5.17.0.md#features)**
+- **[Bugs resolved](release-notes/5.17.0.md#bugs)**
+- **[Miscellany](release-notes/5.17.0.md#misc)**
+- **[Credits](release-notes/5.17.0.md#credits)**
+- **[Feedback](release-notes/5.17.0.md#feedback)**
+
+## CiviCRM 5.16.4
+
+Released September 3, 2019
+
+- **[Synopsis](release-notes/5.16.4.md#synopsis)**
+- **[Bugs resolved](release-notes/5.16.4.md#bugs)**
+- **[Credits](release-notes/5.16.4.md#credits)**
+- **[Feedback](release-notes/5.16.4.md#feedback)**
+
+## CiviCRM 5.16.3
+
+Released August 22, 2019
+
+- **[Synopsis](release-notes/5.16.3.md#synopsis)**
+- **[Bugs resolved](release-notes/5.16.3.md#bugs)**
+- **[Credits](release-notes/5.16.3.md#credits)**
+- **[Feedback](release-notes/5.16.3.md#feedback)**
+
+## CiviCRM 5.16.2
+
+Released August 14, 2019
+
+- **[Synopsis](release-notes/5.16.2.md#synopsis)**
+- **[Bugs resolved](release-notes/5.16.2.md#bugs)**
+- **[Credits](release-notes/5.16.2.md#credits)**
+- **[Feedback](release-notes/5.16.2.md#feedback)**
+
+## CiviCRM 5.16.1
+
+Released August 12, 2019
+
+- **[Synopsis](release-notes/5.16.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.16.1.md#bugs)**
+- **[Credits](release-notes/5.16.1.md#credits)**
+- **[Feedback](release-notes/5.16.1.md#feedback)**
+
+## CiviCRM 5.16.0
+
+Released August 7, 2019
+
+- **[Synopsis](release-notes/5.16.0.md#synopsis)**
+- **[Features](release-notes/5.16.0.md#features)**
+- **[Bugs resolved](release-notes/5.16.0.md#bugs)**
+- **[Miscellany](release-notes/5.16.0.md#misc)**
+- **[Credits](release-notes/5.16.0.md#credits)**
+- **[Feedback](release-notes/5.16.0.md#feedback)**
+
+## CiviCRM 5.15.2
+
+Released July 30, 2019
+
+- **[Synopsis](release-notes/5.15.2.md#synopsis)**
+- **[Bugs resolved](release-notes/5.15.2.md#bugs)**
+- **[Credits](release-notes/5.15.2.md#credits)**
+- **[Feedback](release-notes/5.15.2.md#feedback)**
+
+## CiviCRM 5.15.1
+
+Released July 10, 2019
+
+- **[Synopsis](release-notes/5.15.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.15.1.md#bugs)**
+- **[Credits](release-notes/5.15.1.md#credits)**
+- **[Feedback](release-notes/5.15.1.md#feedback)**
+
+## CiviCRM 5.15.0
+
+Released July 3, 2019
+
+- **[Synopsis](release-notes/5.15.0.md#synopsis)**
+- **[Features](release-notes/5.15.0.md#features)**
+- **[Bugs resolved](release-notes/5.15.0.md#bugs)**
+- **[Miscellany](release-notes/5.15.0.md#misc)**
+- **[Credits](release-notes/5.15.0.md#credits)**
+- **[Feedback](release-notes/5.15.0.md#feedback)**
+
+## CiviCRM 5.14.1
+
+Released June 17, 2019
+
+- **[Synopsis](release-notes/5.14.1.md#synopsis)**
+- **[Bugs resolved](release-notes/5.14.1.md#bugs)**
+- **[Credits](release-notes/5.14.1.md#credits)**
+- **[Feedback](release-notes/5.14.1.md#feedback)**
+
+## CiviCRM 5.14.0
+
+Released June 5, 2019
+
+- **[Synopsis](release-notes/5.14.0.md#synopsis)**
+- **[Features](release-notes/5.14.0.md#features)**
+- **[Bugs resolved](release-notes/5.14.0.md#bugs)**
+- **[Miscellany](release-notes/5.14.0.md#misc)**
+- **[Credits](release-notes/5.14.0.md#credits)**
+- **[Feedback](release-notes/5.14.0.md#feedback)**
+
+## CiviCRM 5.13.5
+
+Released May 29, 2019
+
+- **[Synopsis](release-notes/5.13.5.md#synopsis)**
+- **[Features](release-notes/5.13.5.md#features)**
+- **[Bugs resolved](release-notes/5.13.5.md#bugs)**
+- **[Miscellany](release-notes/5.13.5.md#misc)**
+- **[Credits](release-notes/5.13.5.md#credits)**
+- **[Feedback](release-notes/5.13.5.md#feedback)**
 
 ## CiviCRM 5.13.4
 

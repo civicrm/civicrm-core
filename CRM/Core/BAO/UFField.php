@@ -827,7 +827,7 @@ SELECT  id
       if (in_array($field['field_name'], $validBillingFields)) {
         $validProfileFields[] = $field['field_name'];
       }
-      if (CRM_Utils_Array::value('is_required', $field)) {
+      if (!empty($field['is_required'])) {
         $requiredProfileFields[] = $field['field_name'];
       }
     }
@@ -970,6 +970,7 @@ SELECT  id
         'membership_type_id',
         'member_is_test',
         'is_override',
+        'member_is_override',
         'status_override_end_date',
         'status_id',
         'member_is_pay_later'

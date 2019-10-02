@@ -175,7 +175,7 @@ class CRM_Activity_BAO_Query {
   public static function where(&$query) {
     foreach (array_keys($query->_params) as $id) {
       if (substr($query->_params[$id][0], 0, 9) == 'activity_') {
-        if ($query->_mode == CRM_Contact_BAO_QUERY::MODE_CONTACTS) {
+        if ($query->_mode == CRM_Contact_BAO_Query::MODE_CONTACTS) {
           $query->_useDistinct = TRUE;
         }
         $query->_params[$id][3];
@@ -325,15 +325,17 @@ class CRM_Activity_BAO_Query {
         }
 
       case 'activity_tags':
-        $value = array_keys($value);
         $activityTags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
 
-        $names = [];
-        if (is_array($value)) {
-          foreach ($value as $k => $v) {
-            $names[] = $activityTags[$v];
-          }
+        if (!is_array($value)) {
+          $value = explode(',', $value);
         }
+
+        $names = [];
+        foreach ($value as $k => $v) {
+          $names[] = $activityTags[$v];
+        }
+
         $query->_where[$grouping][] = "civicrm_activity_tag.tag_id IN (" . implode(",", $value) . ")";
         $query->_qill[$grouping][] = ts('Activity Tag %1', [1 => $op]) . ' ' . implode(' ' . ts('OR') . ' ', $names);
         $query->_tables['civicrm_activity_tag'] = $query->_whereTables['civicrm_activity_tag'] = 1;
@@ -461,9 +463,15 @@ class CRM_Activity_BAO_Query {
    * rather than a static function.
    */
   public static function getSearchFieldMetadata() {
-    $fields = ['activity_type_id', 'activity_date_time'];
+    $fields = ['activity_type_id', 'activity_date_time', 'priority_id', 'activity_location'];
     $metadata = civicrm_api3('Activity', 'getfields', [])['values'];
-    return array_intersect_key($metadata, array_flip($fields));
+    $metadata = array_intersect_key($metadata, array_flip($fields));
+    $metadata['activity_text'] = [
+      'title' => ts('Activity Text'),
+      'type' => CRM_Utils_Type::T_STRING,
+      'is_pseudofield' => TRUE,
+    ];
+    return $metadata;
   }
 
   /**
@@ -513,25 +521,19 @@ class CRM_Activity_BAO_Query {
     $form->addRadio('activity_option', '', CRM_Core_SelectValues::activityTextOptions());
     $form->setDefaults(['activity_option' => 'both']);
 
-    $priority = CRM_Core_PseudoConstant::get('CRM_Activity_DAO_Activity', 'priority_id');
-    $form->addSelect('priority_id',
-      [
-        'entity' => 'activity',
-        'label' => ts('Priority'),
-        'multiple' => 'multiple',
-        'option_url' => NULL,
-        'placeholder' => ts('- any -'),
-      ]
-    );
-
     $form->addYesNo('activity_test', ts('Activity is a Test?'));
-    $activity_tags = CRM_Core_BAO_Tag::getTags('civicrm_activity');
+    $activity_tags = CRM_Core_BAO_Tag::getColorTags('civicrm_activity');
+
     if ($activity_tags) {
-      foreach ($activity_tags as $tagID => $tagName) {
-        $form->_tagElement = &$form->addElement('checkbox', "activity_tags[$tagID]",
-          NULL, $tagName
-        );
-      }
+      $form->add('select2', 'activity_tags', ts('Activity Tag(s)'),
+        $activity_tags, FALSE, [
+          'id' => 'activity_tags',
+          'multiple' =>
+          'multiple',
+          'class' => 'crm-select2',
+          'placeholder' => ts('- select -'),
+        ]
+      );
     }
 
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_activity');
@@ -673,7 +675,9 @@ class CRM_Activity_BAO_Query {
    * Where/qill clause for notes
    *
    * @param array $values
-   * @param object $query
+   * @param CRM_Contact_BAO_Query $query
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function whereClauseSingleActivityText(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;

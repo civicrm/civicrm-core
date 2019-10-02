@@ -199,7 +199,6 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
    */
   public function deleteItem($dao) {
     $dao->delete();
-    $dao->free();
   }
 
   /**
@@ -214,7 +213,6 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
       1 => [$dao->id, 'Integer'],
     ];
     CRM_Core_DAO::executeQuery($sql, $params);
-    $dao->free();
   }
 
 }

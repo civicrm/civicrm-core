@@ -138,6 +138,33 @@ abstract class CRM_Import_Parser {
   protected $_fields;
 
   /**
+   * Metadata for all available fields, keyed by unique name.
+   *
+   * This is intended to supercede $_fields which uses a special sauce format which
+   * importableFieldsMetadata uses the standard getfields type format.
+   *
+   * @var array
+   */
+  protected $importableFieldsMetadata = [];
+
+  /**
+   * Get metadata for all importable fields in std getfields style format.
+   *
+   * @return array
+   */
+  public function getImportableFieldsMetadata(): array {
+    return $this->importableFieldsMetadata;
+  }
+
+  /**
+   * Set metadata for all importable fields in std getfields style format.
+   * @param array $importableFieldsMetadata
+   */
+  public function setImportableFieldsMetadata(array $importableFieldsMetadata) {
+    $this->importableFieldsMetadata = $importableFieldsMetadata;
+  }
+
+  /**
    * Array of the fields that are actually part of the import process
    * the position in the array also dictates their position in the import
    * file
@@ -518,6 +545,31 @@ abstract class CRM_Import_Parser {
     require_once 'CRM/Utils/DeprecatedUtils.php';
     $error = _civicrm_api3_deprecated_check_contact_dedupe($formatValues);
     return $error;
+  }
+
+  /**
+   * Parse a field which could be represented by a label or name value rather than the DB value.
+   *
+   * We will try to match name first but if not available then see if we have a label that can be converted to a name.
+   *
+   * @param string|int|null $submittedValue
+   * @param array $fieldSpec
+   *   Metadata for the field
+   *
+   * @return mixed
+   */
+  protected function parsePseudoConstantField($submittedValue, $fieldSpec) {
+    /* @var \CRM_Core_DAO $bao */
+    $bao = $fieldSpec['bao'];
+    // For historical reasons use validate as context - ie disabled name matches ARE permitted.
+    $nameOptions = $bao::buildOptions($fieldSpec['name'], 'validate');
+    if (!isset($nameOptions[$submittedValue])) {
+      $labelOptions = array_flip($bao::buildOptions($fieldSpec['name'], 'match'));
+      if (isset($labelOptions[$submittedValue])) {
+        return array_search($labelOptions[$submittedValue], $nameOptions, TRUE);
+      }
+    }
+    return '';
   }
 
 }

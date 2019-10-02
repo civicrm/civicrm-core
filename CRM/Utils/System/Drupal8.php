@@ -303,7 +303,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     $config = CRM_Core_Config::singleton();
     $base = $absolute ? $config->userFrameworkBaseURL : 'internal:/';
 
-    $url = \Drupal\civicrm\CivicrmHelper::parseURL("{$path}?{$query}");
+    $url = $this->parseURL("{$path}?{$query}");
 
     // Not all links that CiviCRM generates are Drupal routes, so we use the weaker ::fromUri method.
     try {
@@ -315,14 +315,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     }
     catch (Exception $e) {
       \Drupal::logger('civicrm')->error($e->getMessage());
-    }
-
-    // Special case: CiviCRM passes us "*path*?*query*" as a skeleton, but asterisks
-    // are invalid and Drupal will attempt to escape them. We unescape them here:
-    if ($path == '*path*') {
-      // First remove trailing equals sign that has been added since the key '?*query*' has no value.
-      $url = rtrim($url, '=');
-      $url = urldecode($url);
     }
 
     return $url;
@@ -624,9 +616,6 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       else {
         $contactMatching++;
       }
-      if (is_object($match)) {
-        $match->free();
-      }
     }
 
     return [
@@ -634,6 +623,16 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       'contactMatching' => $contactMatching,
       'contactCreated' => $contactCreated,
     ];
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public function setMessage($message) {
+    // CiviCRM sometimes includes markup in messages (ex: Event Cart)
+    // it needs to be rendered before being displayed.
+    $message = \Drupal\Core\Render\Markup::create($message);
+    \Drupal::messenger()->addMessage($message);
   }
 
   /**
@@ -664,6 +663,50 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
     }
 
     return \Drupal::languageManager()->getCurrentLanguage()->getId();
+  }
+
+  /**
+   * Helper function to extract path, query and route name from Civicrm URLs.
+   *
+   * For example, 'civicrm/contact/view?reset=1&cid=66' will be returned as:
+   *
+   * @code
+   * array(
+   *   'path' => 'civicrm/contact/view',
+   *   'route' => 'civicrm.civicrm_contact_view',
+   *   'query' => array('reset' => '1', 'cid' => '66'),
+   * );
+   * @endcode
+   *
+   * @param string $url
+   *   The url to parse.
+   *
+   * @return string[]
+   *   The parsed url parts, containing 'path', 'route' and 'query'.
+   */
+  public function parseUrl($url) {
+    $processed = ['path' => '', 'route_name' => '', 'query' => []];
+
+    // Remove leading '/' if it exists.
+    $url = ltrim($url, '/');
+
+    // Separate out the url into its path and query components.
+    $url = parse_url($url);
+    if (empty($url['path'])) {
+      return $processed;
+    }
+    $processed['path'] = $url['path'];
+
+    // Create a route name by replacing the forward slashes in the path with
+    // underscores, civicrm/contact/search => civicrm.civicrm_contact_search.
+    $processed['route_name'] = 'civicrm.' . implode('_', explode('/', $url['path']));
+
+    // Turn the query string (if it exists) into an associative array.
+    if (!empty($url['query'])) {
+      parse_str($url['query'], $processed['query']);
+    }
+
+    return $processed;
   }
 
   /**
@@ -707,7 +750,7 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
 
     // Drupal might not be bootstrapped if being called by the REST API.
     if (!class_exists('Drupal') || !\Drupal::hasContainer()) {
-      return NULL;
+      return $url;
     }
 
     $language = $this->getCurrentLanguage();

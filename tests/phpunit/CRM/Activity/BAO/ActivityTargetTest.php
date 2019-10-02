@@ -52,7 +52,7 @@ class CRM_Activity_BAO_ActivityTargetTest extends CiviUnitTestCase {
   public function testRetrieveTargetIdsByActivityIdZeroID() {
     $this->activityCreate();
     $target = CRM_Activity_BAO_ActivityTarget::retrieveTargetIdsByActivityId(0);
-    $this->assertSame($target, array(), 'No targets returned');
+    $this->assertSame($target, [], 'No targets returned');
   }
 
   public function testRetrieveTargetIdsByActivityIdOneID() {

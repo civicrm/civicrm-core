@@ -307,8 +307,8 @@ class CRM_Core_Payment_PaymentExpressIPN extends CRM_Core_Payment_BaseIPN {
       if ($response = curl_exec($curl)) {
         $info = curl_getinfo($curl);
         if ($info['http_code'] < 200 || $info['http_code'] > 299) {
-          $log_message = "DPS error: HTTP %1 retrieving %2.";
-          CRM_Core_Error::fatal(ts($log_message, [1 => $info['http_code'], 2 => $info['url']]));
+          $log_message = "DPS error: HTTP {$info['http_code']} retrieving {$info['url']}.";
+          CRM_Core_Error::fatal($log_message);
         }
         else {
           fwrite($message_log, sprintf("\n\r%s:- %s\n", date("D M j G:i:s T Y"), $response));

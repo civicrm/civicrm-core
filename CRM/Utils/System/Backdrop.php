@@ -133,7 +133,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
 
     if (!empty($params['mail'])) {
       if (!valid_email_address($params['mail'])) {
-        $errors[$emailName] = ts('The e-mail address %1 is not valid.', ['%1' => $params['mail']]);
+        $errors[$emailName] = ts('The e-mail address %1 is not valid.', [1 => $params['mail']]);
       }
       else {
         $uid = db_query("SELECT uid FROM {users} WHERE mail = :mail", [':mail' => $params['mail']])->fetchField();
@@ -152,7 +152,7 @@ class CRM_Utils_System_Backdrop extends CRM_Utils_System_DrupalBase {
    */
   public function getLoginURL($destination = '') {
     $query = $destination ? ['destination' => $destination] : [];
-    return url('user', ['query' => $query, 'absolute' => TRUE]);
+    return url('user/login', ['query' => $query, 'absolute' => TRUE]);
   }
 
   /**
@@ -879,9 +879,6 @@ AND    u.status = 1
       }
       else {
         $contactMatching++;
-      }
-      if (is_object($match)) {
-        $match->free();
       }
     }
 

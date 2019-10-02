@@ -125,6 +125,8 @@ WHERE  email = %2
    *
    * @return array|null
    *   $groups    Array of all groups from which the contact was removed, or null if the queue event could not be found.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function &unsub_from_mailing($job_id, $queue_id, $hash, $return = FALSE) {
     // First make sure there's a matching queue event.
@@ -152,12 +154,7 @@ WHERE  email = %2
     $abObject = new CRM_Mailing_DAO_MailingAB();
     $ab = $abObject->getTableName();
 
-    //We Need the mailing Id for the hook...
-    $do->query("SELECT $job.mailing_id as mailing_id
-                     FROM   $job
-                     WHERE $job.id = " . CRM_Utils_Type::escape($job_id, 'Integer'));
-    $do->fetch();
-    $mailing_id = $do->mailing_id;
+    $mailing_id = civicrm_api3('MailingJob', 'getvalue', ['id' => $job_id, 'return' => 'mailing_id']);
     $mailing_type = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_Mailing', $mailing_id, 'mailing_type', 'id');
     $entity = CRM_Core_DAO::getFieldValue('CRM_Mailing_DAO_MailingGroup', $mailing_id, 'entity_table', 'mailing_id');
 
@@ -220,10 +217,10 @@ WHERE  email = %2
     // list.
 
     while (!empty($mailings)) {
-      $do->query("
+      $do = CRM_Core_DAO::executeQuery("
                 SELECT      $mg.entity_table as entity_table,
                             $mg.entity_id as entity_id
-                FROM        $mg
+                FROM        civicrm_mailing_group $mg
                 WHERE       $mg.mailing_id IN (" . implode(', ', $mailings) . ")
                     AND     $mg.group_type = 'Include'");
 
@@ -258,12 +255,12 @@ WHERE  email = %2
     if ($groupIds || $baseGroupIds) {
       $groupIdClause = "AND $group.id IN (" . implode(', ', array_merge($groupIds, $baseGroupIds)) . ")";
     }
-    $do->query("
+    $do = CRM_Core_DAO::executeQuery("
             SELECT      $group.id as group_id,
                         $group.title as title,
                         $group.description as description
-            FROM        $group
-            LEFT JOIN   $gc
+            FROM        civicrm_group $group
+            LEFT JOIN   civicrm_group_contact $gc
                 ON      $gc.group_id = $group.id
             WHERE       $group.is_hidden = 0
                         $groupIdClause
@@ -532,7 +529,7 @@ WHERE  email = %2
     $org_unsubscribe = NULL
   ) {
 
-    $dao = new CRM_Core_Dao();
+    $dao = new CRM_Core_DAO();
 
     $unsub = self::$_tableName;
     $queueObject = new CRM_Mailing_Event_BAO_Queue();

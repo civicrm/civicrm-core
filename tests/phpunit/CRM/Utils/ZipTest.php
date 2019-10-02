@@ -45,104 +45,104 @@ class CRM_Utils_ZipTest extends CiviUnitTestCase {
 
   public function testFindBaseDirName_normal() {
     $this->_doFindBaseDirName('author-com.example.foo-random/',
-      array('author-com.example.foo-random'),
-      array('author-com.example.foo-random/README.txt' => 'hello')
+      ['author-com.example.foo-random'],
+      ['author-com.example.foo-random/README.txt' => 'hello']
     );
   }
 
   public function testFindBaseDirName_0() {
     $this->_doFindBaseDirName('0/',
-      array('0'),
-      array()
+      ['0'],
+      []
     );
   }
 
   public function testFindBaseDirName_plainfile() {
     $this->_doFindBaseDirName(FALSE,
-      array(),
-      array('README.txt' => 'hello')
+      [],
+      ['README.txt' => 'hello']
     );
   }
 
   public function testFindBaseDirName_twodir() {
     $this->_doFindBaseDirName(FALSE,
-      array('dir-1', 'dir-2'),
-      array('dir-1/README.txt' => 'hello')
+      ['dir-1', 'dir-2'],
+      ['dir-1/README.txt' => 'hello']
     );
   }
 
   public function testFindBaseDirName_dirfile() {
     $this->_doFindBaseDirName(FALSE,
-      array('dir-1'),
-      array('dir-1/README.txt' => 'hello', 'MANIFEST.MF' => 'extra')
+      ['dir-1'],
+      ['dir-1/README.txt' => 'hello', 'MANIFEST.MF' => 'extra']
     );
   }
 
   public function testFindBaseDirName_dot() {
     $this->_doFindBaseDirName(FALSE,
-      array('.'),
-      array('./README.txt' => 'hello')
+      ['.'],
+      ['./README.txt' => 'hello']
     );
   }
 
   public function testFindBaseDirName_dots() {
     $this->_doFindBaseDirName(FALSE,
-      array('..'),
-      array('../README.txt' => 'hello')
+      ['..'],
+      ['../README.txt' => 'hello']
     );
   }
 
   public function testFindBaseDirName_weird() {
     $this->_doFindBaseDirName(FALSE,
-      array('foo/../'),
-      array('foo/../README.txt' => 'hello')
+      ['foo/../'],
+      ['foo/../README.txt' => 'hello']
     );
   }
 
   public function testGuessBaseDir_normal() {
     $this->_doGuessBaseDir('author-com.example.foo-random',
-      array('author-com.example.foo-random'),
-      array('author-com.example.foo-random/README.txt' => 'hello'),
+      ['author-com.example.foo-random'],
+      ['author-com.example.foo-random/README.txt' => 'hello'],
       'com.example.foo'
     );
   }
 
   public function testGuessBaseDir_MACOSX() {
     $this->_doGuessBaseDir('com.example.foo',
-      array('com.example.foo', '__MACOSX'),
-      array('author-com.example.foo-random/README.txt' => 'hello', '__MACOSX/foo' => 'bar'),
+      ['com.example.foo', '__MACOSX'],
+      ['author-com.example.foo-random/README.txt' => 'hello', '__MACOSX/foo' => 'bar'],
       'com.example.foo'
     );
   }
 
   public function testGuessBaseDir_0() {
     $this->_doGuessBaseDir('0',
-      array('0'),
-      array(),
+      ['0'],
+      [],
       'com.example.foo'
     );
   }
 
   public function testGuessBaseDir_plainfile() {
     $this->_doGuessBaseDir(FALSE,
-      array(),
-      array('README.txt' => 'hello'),
+      [],
+      ['README.txt' => 'hello'],
       'com.example.foo'
     );
   }
 
   public function testGuessBaseDirTwoDir() {
     $this->_doGuessBaseDir(FALSE,
-      array('dir-1', 'dir-2'),
-      array('dir-1/README.txt' => 'hello'),
+      ['dir-1', 'dir-2'],
+      ['dir-1/README.txt' => 'hello'],
       'com.example.foo'
     );
   }
 
   public function testGuessBaseDirWeird() {
     $this->_doGuessBaseDir(FALSE,
-      array('foo/../'),
-      array('foo/../README.txt' => 'hello'),
+      ['foo/../'],
+      ['foo/../README.txt' => 'hello'],
       'com.example.foo'
     );
   }

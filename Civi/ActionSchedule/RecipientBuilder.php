@@ -82,7 +82,6 @@ namespace Civi\ActionSchedule;
  * Some parameters are optional:
  *  - casContactTableAlias: string, SQL table alias
  *  - casAnniversaryMode: bool
- *  - casUseReferenceDate: bool
  *
  * Additionally, some parameters are automatically predefined:
  *  - casNow
@@ -169,7 +168,9 @@ class RecipientBuilder {
   }
 
   /**
-   * Generate action_log's for new, first-time alerts to related contacts.
+   * Generate action_log's for new, first-time alerts to related contacts,
+   * and contacts who are again eligible to receive the alert e.g. membership
+   * renewal reminders.
    *
    * @throws \Exception
    */
@@ -177,59 +178,15 @@ class RecipientBuilder {
     $query = $this->prepareQuery(self::PHASE_RELATION_FIRST);
 
     $startDateClauses = $this->prepareStartDateClauses();
-
-    // In some cases reference_date got outdated due to many reason e.g. In Membership renewal end_date got extended
-    // which means reference date mismatches with the end_date where end_date may be used as the start_action_date
-    // criteria  for some schedule reminder so in order to send new reminder we INSERT new reminder with new reference_date
-    // value via UNION operation
-    $referenceReminderIDs = [];
-    $referenceDate = NULL;
-    if (!empty($query['casUseReferenceDate'])) {
-      // First retrieve all the action log's ids which are outdated or in other words reference_date now don't match with entity date.
-      // And the retrieve the updated entity date which will later used below to update all other outdated action log records
-      $sql = $query->copy()
-        ->select('reminder.id as id')
-        ->select($query['casDateField'] . ' as reference_date')
-        ->merge($this->joinReminder('INNER JOIN', 'rel', $query))
-        ->where("reminder.id IS NOT NULL AND reminder.reference_date IS NOT NULL AND reminder.reference_date <> !casDateField")
-        ->where($startDateClauses)
-        ->orderBy("reminder.id desc")
-        ->strict()
-        ->toSQL();
-      $dao = \CRM_Core_DAO::executeQuery($sql);
-
-      while ($dao->fetch()) {
-        $referenceReminderIDs[] = $dao->id;
-        $referenceDate = $dao->reference_date;
-      }
-    }
-
-    if (empty($referenceReminderIDs)) {
-      $firstQuery = $query->copy()
-        ->merge($this->selectIntoActionLog(self::PHASE_RELATION_FIRST, $query))
-        ->merge($this->joinReminder('LEFT JOIN', 'rel', $query))
-        ->where("reminder.id IS NULL")
-        ->where($startDateClauses)
-        ->strict()
-        ->toSQL();
-      \CRM_Core_DAO::executeQuery($firstQuery);
-    }
-    else {
-      // INSERT new log to send reminder as desired entity date got updated
-      $referenceQuery = $query->copy()
-        ->merge($this->selectIntoActionLog(self::PHASE_RELATION_FIRST, $query))
-        ->merge($this->joinReminder('LEFT JOIN', 'rel', $query))
-        ->where("reminder.id = !reminderID")
-        ->where($startDateClauses)
-        ->param('reminderID', $referenceReminderIDs[0])
-        ->strict()
-        ->toSQL();
-      \CRM_Core_DAO::executeQuery($referenceQuery);
-
-      // Update all the previous outdated reference date valued, action_log rows to the latest changed entity date
-      $updateQuery = "UPDATE civicrm_action_log SET reference_date = '" . $referenceDate . "' WHERE id IN (" . implode(', ', $referenceReminderIDs) . ")";
-      \CRM_Core_DAO::executeQuery($updateQuery);
-    }
+    // Send reminder to all contacts who have never received this scheduled reminder
+    $firstInstanceQuery = $query->copy()
+      ->merge($this->selectIntoActionLog(self::PHASE_RELATION_FIRST, $query))
+      ->merge($this->joinReminder('LEFT JOIN', 'rel', $query))
+      ->where("reminder.id IS NULL")
+      ->where($startDateClauses)
+      ->strict()
+      ->toSQL();
+    \CRM_Core_DAO::executeQuery($firstInstanceQuery);
   }
 
   /**
@@ -276,31 +233,18 @@ class RecipientBuilder {
     // @todo - this only handles events that get moved later. Potentially they might get moved earlier
     $repeatInsert = $query
       ->merge($this->joinReminder('INNER JOIN', 'rel', $query))
-      ->merge($this->selectActionLogFields(self::PHASE_RELATION_REPEAT, $query))
-      ->select("MAX(reminder.action_date_time) as latest_log_time")
+      ->merge($this->selectIntoActionLog(self::PHASE_RELATION_REPEAT, $query))
       ->merge($this->prepareRepetitionEndFilter($query['casDateField']))
       ->where($this->actionSchedule->start_action_date ? $startDateClauses[0] : [])
       ->groupBy("reminder.contact_id, reminder.entity_id, reminder.entity_table")
-      // @todo replace use of timestampdiff with a direct comparison as TIMESTAMPDIFF cannot use an index.
-      ->having("TIMESTAMPDIFF(HOUR, latest_log_time, CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, latest_log_time, DATE_ADD(latest_log_time, INTERVAL !casRepetitionInterval))")
+      ->having("TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), DATE_ADD(MAX(reminder.action_date_time), INTERVAL !casRepetitionInterval))")
       ->param([
         'casRepetitionInterval' => $this->parseRepetitionInterval(),
       ])
       ->strict()
       ->toSQL();
 
-    // For unknown reasons, we manually insert each row. Why not change
-    // selectActionLogFields() to selectIntoActionLog() above?
-
-    $arrValues = \CRM_Core_DAO::executeQuery($repeatInsert)->fetchAll();
-    if ($arrValues) {
-      \CRM_Core_DAO::executeQuery(
-        \CRM_Utils_SQL_Insert::into('civicrm_action_log')
-          ->columns(['contact_id', 'entity_id', 'entity_table', 'action_schedule_id'])
-          ->rows($arrValues)
-          ->toSQL()
-      );
-    }
+    \CRM_Core_DAO::executeQuery($repeatInsert);
   }
 
   /**
@@ -323,32 +267,19 @@ class RecipientBuilder {
     $daoCheck = \CRM_Core_DAO::executeQuery($addlCheck);
     if ($daoCheck->fetch()) {
       $repeatInsertAddl = \CRM_Utils_SQL_Select::from('civicrm_contact c')
-        ->merge($this->selectActionLogFields(self::PHASE_ADDITION_REPEAT, $query))
+        ->merge($this->selectIntoActionLog(self::PHASE_ADDITION_REPEAT, $query))
         ->merge($this->joinReminder('INNER JOIN', 'addl', $query))
-        ->select("MAX(reminder.action_date_time) as latest_log_time")
         ->merge($this->prepareAddlFilter('c.id'), ['params'])
         ->where("c.is_deleted = 0 AND c.is_deceased = 0")
         ->groupBy("reminder.contact_id")
-        // @todo replace use of timestampdiff with a direct comparison as TIMESTAMPDIFF cannot use an index.
-        ->having("TIMESTAMPDIFF(HOUR, latest_log_time, CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, latest_log_time, DATE_ADD(latest_log_time, INTERVAL !casRepetitionInterval))")
+        ->having("TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), CAST(!casNow AS datetime)) >= TIMESTAMPDIFF(HOUR, MAX(reminder.action_date_time), DATE_ADD(MAX(reminder.action_date_time), INTERVAL !casRepetitionInterval))")
         ->param([
           'casRepetitionInterval' => $this->parseRepetitionInterval(),
         ])
         ->strict()
         ->toSQL();
 
-      // For unknown reasons, we manually insert each row. Why not change
-      // selectActionLogFields() to selectIntoActionLog() above?
-
-      $addValues = \CRM_Core_DAO::executeQuery($repeatInsertAddl)->fetchAll();
-      if ($addValues) {
-        \CRM_Core_DAO::executeQuery(
-          \CRM_Utils_SQL_Insert::into('civicrm_action_log')
-            ->columns(['contact_id', 'entity_id', 'entity_table', 'action_schedule_id'])
-            ->rows($addValues)
-            ->toSQL()
-        );
-      }
+      \CRM_Core_DAO::executeQuery($repeatInsertAddl);
     }
   }
 
@@ -565,22 +496,20 @@ WHERE      $group.id = {$groupId}
    * @throws \CRM_Core_Exception
    */
   protected function selectActionLogFields($phase, $query) {
+    $selectArray = [];
     switch ($phase) {
       case self::PHASE_RELATION_FIRST:
       case self::PHASE_RELATION_REPEAT:
         $fragment = \CRM_Utils_SQL_Select::fragment();
-        // CRM-15376: We are not tracking the reference date for 'repeated' schedule reminders.
-        if (!empty($query['casUseReferenceDate'])) {
-          $fragment->select($query['casDateField']);
+        $selectArray = [
+          "!casContactIdField as contact_id",
+          "!casEntityIdField as entity_id",
+          "@casMappingEntity as entity_table",
+          "#casActionScheduleId as action_schedule_id",
+        ];
+        if ($this->resetOnTriggerDateChange()) {
+          $selectArray[] = "!casDateField as reference_date";
         }
-        $fragment->select(
-          [
-            "!casContactIdField as contact_id",
-            "!casEntityIdField as entity_id",
-            "@casMappingEntity as entity_table",
-            "#casActionScheduleId as action_schedule_id",
-          ]
-        );
         break;
 
       case self::PHASE_ADDITION_FIRST:
@@ -591,19 +520,18 @@ WHERE      $group.id = {$groupId}
           'casNow' => $this->now,
         ];
         $fragment = \CRM_Utils_SQL_Select::fragment()->param($params);
-        $fragment->select(
-          [
-            "c.id as contact_id",
-            "c.id as entity_id",
-            "'civicrm_contact' as entity_table",
-            "#casActionScheduleId as action_schedule_id",
-          ]
-        );
+        $selectArray = [
+          "c.id as contact_id",
+          "c.id as entity_id",
+          "'civicrm_contact' as entity_table",
+          "#casActionScheduleId as action_schedule_id",
+        ];
         break;
 
       default:
         throw new \CRM_Core_Exception("Unrecognized phase: $phase");
     }
+    $fragment->select($selectArray);
     return $fragment;
   }
 
@@ -625,10 +553,9 @@ WHERE      $group.id = {$groupId}
       "entity_table",
       "action_schedule_id",
     ];
-    if ($phase === self::PHASE_RELATION_FIRST || $phase === self::PHASE_RELATION_REPEAT) {
-      if (!empty($query['casUseReferenceDate'])) {
-        array_unshift($actionLogColumns, 'reference_date');
-      }
+
+    if ($this->resetOnTriggerDateChange() && ($phase == self::PHASE_RELATION_FIRST || $phase == self::PHASE_RELATION_REPEAT)) {
+      $actionLogColumns[] = "reference_date";
     }
 
     return $this->selectActionLogFields($phase, $query)
@@ -669,6 +596,10 @@ reminder.entity_id          = {$entityIdField} AND
 reminder.entity_table       = '{$entityName}' AND
 reminder.action_schedule_id = {$this->actionSchedule->id}";
 
+    if ($for == 'rel' && $this->resetOnTriggerDateChange()) {
+      $joinClause .= " AND\nreminder.reference_date = !casDateField";
+    }
+
     // Why do we only include anniversary clause for 'rel' queries?
     if ($for === 'rel' && !empty($query['casAnniversaryMode'])) {
       // only consider reminders less than 11 months ago
@@ -676,6 +607,16 @@ reminder.action_schedule_id = {$this->actionSchedule->id}";
     }
 
     return \CRM_Utils_SQL_Select::fragment()->join("reminder", "$joinType $joinClause");
+  }
+
+  /**
+   * Should we use the reference date when checking to see if we already
+   * sent reminders.
+   *
+   * @return bool
+   */
+  protected function resetOnTriggerDateChange() {
+    return $this->mapping->resetOnTriggerDateChange($this->actionSchedule);
   }
 
 }

@@ -9,7 +9,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   public function setUp() {
     parent::setUp();
 
-    $this->tablesToTruncate = array(
+    $this->tablesToTruncate = [
       'civicrm_activity',
       'civicrm_contact',
       'civicrm_custom_group',
@@ -22,7 +22,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'civicrm_managed',
       'civicrm_relationship',
       'civicrm_relationship_type',
-    );
+    ];
 
     $this->quickCleanup($this->tablesToTruncate);
 
@@ -59,10 +59,10 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
   }
 
   public function testAddCaseToContact() {
-    $params = array(
+    $params = [
       'case_id' => 1,
       'contact_id' => 17,
-    );
+    ];
     CRM_Case_BAO_CaseContact::create($params);
 
     $recent = CRM_Utils_Recent::get();
@@ -80,7 +80,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       // backwards compatibility - but it's more typical that the creator is a different person than the client
       $loggedInUser = $clientId;
     }
-    $caseParams = array(
+    $caseParams = [
       'activity_subject' => 'Case Subject',
       'client_id'        => $clientId,
       'case_type_id'     => 1,
@@ -91,7 +91,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'start_date_time'  => date("YmdHis"),
       'medium_id'        => 2,
       'activity_details' => '',
-    );
+    ];
     $form = new CRM_Case_Form_Case();
     $caseObj = $form->testSubmit($caseParams, "OpenCase", $loggedInUser, "standalone");
     return $caseObj;
@@ -110,13 +110,13 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'contact_type_b' => 'Individual',
     ]);
 
-    $this->callAPISuccess('Relationship', 'create', array(
+    $this->callAPISuccess('Relationship', 'create', [
       'contact_id_a'         => $contactIdA,
       'contact_id_b'         => $contactIdB,
       'relationship_type_id' => $relationshipType,
       'case_id'              => $caseId,
       'is_active'            => $isActive,
-    ));
+    ]);
   }
 
   /**
@@ -128,7 +128,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    */
   private function assertCasesOfUser($loggedInUser, $caseId, $caseCount) {
     $summary = CRM_Case_BAO_Case::getCasesSummary(FALSE);
-    $upcomingCases = CRM_Case_BAO_Case::getCases(FALSE, array(), 'dashboard', TRUE);
+    $upcomingCases = CRM_Case_BAO_Case::getCases(FALSE, [], 'dashboard', TRUE);
     $caseRoles = CRM_Case_BAO_Case::getCaseRoles($loggedInUser, $caseId);
 
     $this->assertEquals($caseCount, $upcomingCases, 'Upcoming case count must be ' . $caseCount);
@@ -167,7 +167,69 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
   public function testRetrieveCaseIdsByContactId() {
     $caseIds = CRM_Case_BAO_Case::retrieveCaseIdsByContactId(3, FALSE, 'housing_support');
-    $this->assertEquals(array(1), $caseIds);
+    $this->assertEquals([1], $caseIds);
+  }
+
+  /**
+   * Test that all custom files are migrated to new case when case is assigned to new client.
+   */
+  public function testCaseReassignForCustomFiles() {
+    $individual = $this->individualCreate();
+    $customGroup = $this->customGroupCreate(array(
+      'extends' => 'Case',
+    ));
+    $customGroup = $customGroup['values'][$customGroup['id']];
+
+    $customFileFieldA = $this->customFieldCreate(array(
+      'custom_group_id' => $customGroup['id'],
+      'html_type'       => 'File',
+      'is_active'       => 1,
+      'default_value'   => 'null',
+      'label'           => 'Custom File A',
+      'data_type'       => 'File',
+    ));
+
+    $customFileFieldB = $this->customFieldCreate(array(
+      'custom_group_id' => $customGroup['id'],
+      'html_type'       => 'File',
+      'is_active'       => 1,
+      'default_value'   => 'null',
+      'label'           => 'Custom File B',
+      'data_type'       => 'File',
+    ));
+
+    // Create two files to attach to the new case
+    $filepath = Civi::paths()->getPath('[civicrm.files]/custom');
+
+    CRM_Utils_File::createFakeFile($filepath, 'Bananas do not bend themselves without a little help.', 'i_bend_bananas.txt');
+    $fileA = $this->callAPISuccess('File', 'create', ['uri' => "$filepath/i_bend_bananas.txt"]);
+
+    CRM_Utils_File::createFakeFile($filepath, 'Wombats will bite your ankles if you run from them.', 'wombats_bite_your_ankles.txt');
+    $fileB = $this->callAPISuccess('File', 'create', ['uri' => "$filepath/wombats_bite_your_ankles.txt"]);
+
+    $caseObj = $this->createCase($individual);
+
+    $this->callAPISuccess('Case', 'create', array(
+      'id'                                => $caseObj->id,
+      'custom_' . $customFileFieldA['id'] => $fileA['id'],
+      'custom_' . $customFileFieldB['id'] => $fileB['id'],
+    ));
+
+    $reassignIndividual = $this->individualCreate();
+    $this->createLoggedInUser();
+    $newCase = CRM_Case_BAO_Case::mergeCases($reassignIndividual, $caseObj->id, $individual, NULL, TRUE);
+
+    $entityFiles = new CRM_Core_DAO_EntityFile();
+    $entityFiles->entity_id = $newCase[0];
+    $entityFiles->entity_table = $customGroup['table_name'];
+    $entityFiles->find();
+
+    $totalEntityFiles = 0;
+    while ($entityFiles->fetch()) {
+      $totalEntityFiles++;
+    }
+
+    $this->assertEquals(2, $totalEntityFiles, 'Two files should be attached with new case.');
   }
 
   /**
@@ -261,7 +323,8 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
       'activity_date_time' => $now_date,
       'target_contact_id' => $client_id,
       'source_contact_id' => $loggedInUser,
-      'subject' => 'null', // yeah this is extra weird, but without it you get the wrong subject
+      // yeah this is extra weird, but without it you get the wrong subject
+      'subject' => 'null',
     ];
 
     $form->postProcess($actParams);
@@ -301,6 +364,150 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
     }
     $_GET = $oldGET;
     $_REQUEST = $oldREQUEST;
+  }
+
+  /**
+   * Test max_instances
+   */
+  public function testMaxInstances() {
+    $loggedInUser = $this->createLoggedInUser();
+    $client_id = $this->individualCreate();
+    $caseObj = $this->createCase($client_id, $loggedInUser);
+    $case_id = $caseObj->id;
+
+    // Sanity check to make sure we'll be testing what we think we're testing.
+    $this->assertEquals($caseObj->case_type_id, 1);
+
+    // Get the case type
+    $result = $this->callAPISuccess('CaseType', 'get', [
+      'sequential' => 1,
+      'id' => 1,
+    ]);
+    $caseType = array_shift($result['values']);
+    $activityTypeName = $caseType['definition']['activityTypes'][1]['name'];
+    // Sanity check to make sure we'll be testing what we think we're testing.
+    $this->assertEquals($activityTypeName, "Medical evaluation");
+
+    // Look up the activity type label - we need it later
+    $result = $this->callAPISuccess('OptionValue', 'get', [
+      'sequential' => 1,
+      'option_group_id' => 'activity_type',
+      'name' => $activityTypeName,
+    ]);
+    $optionValue = array_shift($result['values']);
+    $activityTypeLabel = $optionValue['label'];
+    $this->assertNotEmpty($activityTypeLabel);
+
+    // Locate the existing activity independently so we can check it
+    $result = $this->callAPISuccess('Activity', 'get', [
+      'sequential' => 1,
+      // this sometimes confuses me - pass in the name for the id
+      'activity_type_id' => $activityTypeName,
+    ]);
+    // There should be only one in the database at this point so this should be the id.
+    $activity_id = $result['id'];
+    $this->assertNotEmpty($activity_id);
+    $this->assertGreaterThan(0, $activity_id);
+    $activityArr = array_shift($result['values']);
+
+    // At the moment everything should be happy, although there's nothing to test because if max_instances has no value then nothing gets called, which is correct since it means unlimited. But we don't have a way to test that right now. For fun we could test max_instances=0 but that isn't the same as "not set". 0 would actually mean 0 are allowed, which is pointless, since then why would you even add the activity type to the config.
+
+    // Update max instances for the activity type
+    // We're not really checking that the tested code has retrieved the new case type definition, just that given some numbers as input it returns the right thing as output, so these lines are mostly symbolic at the moment.
+    $caseType['definition']['activityTypes'][1]['max_instances'] = 1;
+    $this->callAPISuccess('CaseType', 'create', $caseType);
+
+    // Now we should get a link back
+    $editUrl = CRM_Case_Form_Activity::checkMaxInstances(
+      $case_id,
+      $activityArr['activity_type_id'],
+      // max instances
+      1,
+      $loggedInUser,
+      $client_id,
+      // existing activity count
+      1
+    );
+    $this->assertNotNull($editUrl);
+
+    $expectedUrl = CRM_Utils_System::url(
+      'civicrm/case/activity',
+      "reset=1&cid={$client_id}&caseid={$case_id}&action=update&id={$activity_id}"
+    );
+    $this->assertEquals($editUrl, $expectedUrl);
+
+    // And also a bounce message is expected
+    $bounceMessage = CRM_Case_Form_Activity::getMaxInstancesBounceMessage(
+      $editUrl,
+      $activityTypeLabel,
+      // max instances,
+      1,
+      // existing activity count
+      1
+    );
+    $this->assertNotEmpty($bounceMessage);
+
+    // Now check with max_instances = 2
+    $caseType['definition']['activityTypes'][1]['max_instances'] = 2;
+    $this->callAPISuccess('CaseType', 'create', $caseType);
+
+    // So it should now be back to being happy
+    $editUrl = CRM_Case_Form_Activity::checkMaxInstances(
+      $case_id,
+      $activityArr['activity_type_id'],
+      // max instances
+      2,
+      $loggedInUser,
+      $client_id,
+      // existing activity count
+      1
+    );
+    $this->assertNull($editUrl);
+    $bounceMessage = CRM_Case_Form_Activity::getMaxInstancesBounceMessage(
+      $editUrl,
+      $activityTypeLabel,
+      // max instances,
+      2,
+      // existing activity count
+      1
+    );
+    $this->assertEmpty($bounceMessage);
+
+    // Add new activity check again
+    $newActivity = [
+      'case_id' => $case_id,
+      'activity_type_id' => $activityArr['activity_type_id'],
+      'status_id' => $activityArr['status_id'],
+      'subject' => "A different subject",
+      'activity_date_time' => date('Y-m-d H:i:s'),
+      'source_contact_id' => $loggedInUser,
+      'target_id' => $client_id,
+    ];
+    $this->callAPISuccess('Activity', 'create', $newActivity);
+
+    $editUrl = CRM_Case_Form_Activity::checkMaxInstances(
+      $case_id,
+      $activityArr['activity_type_id'],
+      // max instances
+      2,
+      $loggedInUser,
+      $client_id,
+      // existing activity count
+      2
+    );
+    // There should be no url here.
+    $this->assertNull($editUrl);
+
+    // But there should be a warning message still.
+    $bounceMessage = CRM_Case_Form_Activity::getMaxInstancesBounceMessage(
+      $editUrl,
+      $activityTypeLabel,
+      // max instances,
+      2,
+      // existing activity count
+      2
+    );
+    $this->assertNotEmpty($bounceMessage);
   }
 
 }

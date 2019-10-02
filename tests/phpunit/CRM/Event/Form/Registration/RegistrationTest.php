@@ -51,11 +51,11 @@ class CRM_Event_Form_Registration_RegistrationTest extends CiviUnitTestCase {
     $form->_values['event'] = $event['values'][$event['id']];
     $form->_skipDupeRegistrationCheck = 1;
 
-    $priceField = $this->callAPISuccess('PriceField', 'get', array('price_set_id' => $priceSetId));
-    $params = array(
+    $priceField = $this->callAPISuccess('PriceField', 'get', ['price_set_id' => $priceSetId]);
+    $params = [
       'email-Primary' => 'someone@example.com',
       'priceSetId' => $priceSetId,
-    );
+    ];
     // Check empty values for price fields.
     foreach (array_keys($priceField['values']) as $fieldId) {
       $params['price_' . $fieldId] = 0;
@@ -63,13 +63,13 @@ class CRM_Event_Form_Registration_RegistrationTest extends CiviUnitTestCase {
     $form->set('priceSetId', $priceSetId);
     $form->set('priceSet', $priceSet);
     $form->set('name', 'CRM_Event_Form_Registration_Register');
-    $files = array();
+    $files = [];
     $errors = CRM_Event_Form_Registration_Register::formRule($params, $files, $form);
 
     //Assert the validation Error.
-    $expectedResult = array(
-      '_qf_default' => ts('A minimum amount of %1 should be selected from Event Fee(s).', array(1 => CRM_Utils_Money::format($minAmt))),
-    );
+    $expectedResult = [
+      '_qf_default' => ts('A minimum amount of %1 should be selected from Event Fee(s).', [1 => CRM_Utils_Money::format($minAmt)]),
+    ];
     $this->checkArrayEquals($expectedResult, $errors);
   }
 

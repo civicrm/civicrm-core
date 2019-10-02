@@ -300,15 +300,17 @@ class CRM_Core_SelectValues {
   /**
    * Compose the parameters for a date select object.
    *
-   * @param string|NULL $type
+   * @param string|null $type
    *   the type of date
-   * @param string|NULL $format
+   * @param string|null $format
    *   date format (QF format)
    * @param null $minOffset
    * @param null $maxOffset
    * @param string $context
+   *
    * @return array
    *   the date array
+   * @throws \Exception
    */
   public static function date($type = NULL, $format = NULL, $minOffset = NULL, $maxOffset = NULL, $context = 'display') {
     // These options are deprecated. Definitely not used in datepicker. Possibly not even in jcalendar+addDateTime.
@@ -728,7 +730,7 @@ class CRM_Core_SelectValues {
    * @return array
    */
   public static function getDatePluginInputFormats() {
-    $dateInputFormats = [
+    return [
       "mm/dd/yy" => ts('mm/dd/yyyy (12/31/2009)'),
       "dd/mm/yy" => ts('dd/mm/yyyy (31/12/2009)'),
       "yy-mm-dd" => ts('yyyy-mm-dd (2009-12-31)'),
@@ -745,21 +747,6 @@ class CRM_Core_SelectValues {
       'M yy' => ts('M yyyy (Dec 2009)'),
       "yy" => ts('yyyy (2009)'),
     ];
-
-    /*
-    Year greater than 2000 get wrong result for following format
-    echo date( 'Y-m-d', strtotime( '7 Nov, 2001') );
-    echo date( 'Y-m-d', strtotime( '7 November, 2001') );
-    Return current year
-    expected :: 2001-11-07
-    output   :: 2009-11-07
-    However
-    echo date( 'Y-m-d', strtotime( 'Nov 7, 2001') );
-    echo date( 'Y-m-d', strtotime( 'November 7, 2001') );
-    gives proper result
-     */
-
-    return $dateInputFormats;
   }
 
   /**
@@ -1156,6 +1143,23 @@ class CRM_Core_SelectValues {
       $options['custom_' . $field['name']] = $field['custom_group_id.title'] . ': ' . $field['label'];
     }
     return $options;
+  }
+
+  /**
+   * Get components (translated for display.
+   *
+   * @return array
+   *
+   * @throws \Exception
+   */
+  public static function getComponentSelectValues() {
+    $ret = [];
+    $components = CRM_Core_Component::getComponents();
+    foreach ($components as $name => $object) {
+      $ret[$name] = $object->info['translatedName'];
+    }
+
+    return $ret;
   }
 
 }

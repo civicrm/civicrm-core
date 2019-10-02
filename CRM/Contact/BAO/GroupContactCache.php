@@ -760,4 +760,16 @@ ORDER BY   gc.contact_id, g.children
     return date('YmdHis', strtotime("+ " . self::smartGroupCacheTimeout() . " Minutes"));
   }
 
+  /**
+   * Invalidates the smart group cache for a particular group
+   * @param int $groupID - Group to invalidate
+   */
+  public static function invalidateGroupContactCache($groupID) {
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_group
+      SET cache_date = NULL, refresh_date = NULL
+      WHERE id = %1", [
+        1 => [$groupID, 'Positive'],
+      ]);
+  }
+
 }

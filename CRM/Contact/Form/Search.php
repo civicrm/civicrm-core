@@ -531,14 +531,17 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
      * driven by the wizard framework
      */
 
+    $this->_reset = CRM_Utils_Request::retrieve('reset', 'Boolean');
+
+    $this->_force = CRM_Utils_Request::retrieve('force', 'Boolean');
     $this->_groupID = CRM_Utils_Request::retrieve('gid', 'Positive', $this);
     $this->_amtgID = CRM_Utils_Request::retrieve('amtgID', 'Positive', $this);
+    $this->_ssID = CRM_Utils_Request::retrieve('ssID', 'Positive', $this);
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter', 'String', $this);
     $this->_ufGroupID = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     $this->_componentMode = CRM_Utils_Request::retrieve('component_mode', 'Positive', $this, FALSE, CRM_Contact_BAO_Query::MODE_CONTACTS, $_REQUEST);
     $this->_operator = CRM_Utils_Request::retrieve('operator', 'String', $this, FALSE, CRM_Contact_BAO_Query::SEARCH_OPERATOR_AND, 'REQUEST');
 
-    $this->loadStandardSearchOptionsFromUrl();
     /**
      * set the button names
      */
@@ -556,6 +559,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     }
 
     // assign context to drive the template display, make sure context is valid
+    $this->_context = CRM_Utils_Request::retrieve('context', 'Alphanumeric', $this, FALSE, 'search');
     if (!CRM_Utils_Array::value($this->_context, self::validContext())) {
       $this->_context = 'search';
     }
@@ -727,7 +731,7 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     $controller->setDynamicAction($setDynamic);
 
     if ($this->_force) {
-
+      $this->loadMetadata();
       $this->postProcess();
 
       /*
@@ -777,14 +781,6 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
     //for prev/next pagination
     $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer');
 
-    if (array_key_exists($this->_searchButtonName, $_POST) ||
-      ($this->_force && !$crmPID)
-    ) {
-      //reset the cache table for new search
-      $cacheKey = "civicrm search {$this->controller->_key}";
-      Civi::service('prevnext')->deleteItem(NULL, $cacheKey);
-    }
-
     //get the button name
     $buttonName = $this->controller->getButtonName();
 
@@ -822,6 +818,13 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
       return;
     }
     else {
+      if (array_key_exists($this->_searchButtonName, $_POST) ||
+        ($this->_force && !$crmPID)
+      ) {
+        //reset the cache table for new search
+        $cacheKey = "civicrm search {$this->controller->_key}";
+        Civi::service('prevnext')->deleteItem(NULL, $cacheKey);
+      }
       $output = CRM_Core_Selector_Controller::SESSION;
 
       // create the selector, controller and run - store results in session
@@ -904,6 +907,18 @@ class CRM_Contact_Form_Search extends CRM_Core_Form_Search {
    */
   public function getTitle() {
     return ts('Search');
+  }
+
+  /**
+   * Load metadata for fields on the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function loadMetadata() {
+    // @todo - check what happens if the person does not have 'access civicontribute' - make sure they
+    // can't by pass acls by passing search criteria in the url.
+    $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
+    $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
   }
 
 }

@@ -19,17 +19,16 @@
   organization: Agileware
   jira        : agileware
 
-- github      : agilewarealok
-  name        : Alok Patel
-  organization: Agileware
-  jira        : agilewarealok
-
 - github      : agileware-dev
   name        : Agileware Team
   organization: Agileware
 
 - github      : agileware-fj
   name        : Francis Whittle
+  organization: Agileware
+
+- github      : agileware-pengyi
+  name        : Pengyi Zhang
   organization: Agileware
 
 - github      : ajdavis
@@ -68,6 +67,9 @@
   name        : Amal Sharma
   organization: Abhikalak Consultants
 
+- github      : mecachisenros
+  name        : Andrei Mondoc
+
 - github      : andrew-cormick-dockery
   name        : Andrew Cormick-Dockery
   jira        : andrew_dockery
@@ -85,7 +87,6 @@
   jira        : andrimont
 
 - name        : Andrew Walker
-  organization: Circle Interactive
   jira        : andyw
 
 - github      : aniesshsethh
@@ -178,6 +179,9 @@
 - name        : Brian McFee
   jira        : brian
 
+  github      : brianPHM
+  name        : Brian Matemachani
+
 - github      : brucew2013
   name        : Bruce Wolfe
   organization: Alcohol Justice
@@ -224,9 +228,6 @@
 - name        : Christophe Golle
   jira        : christophe.golle@gmail.com
 
-- github      : marsh-circle
-  name        : Clare Marsh
-
 - github      : clnlf
   name        : Carlos Loeza
   organization: Noah's Light Foundation
@@ -254,6 +255,10 @@
 - github      : coolbit
   name        : Chandana Bandara
   organization: CompuCorp
+
+- github      : CsarRamos
+  name        : César Ramos
+  organization: iXiam
 
 - github      : chrisfromredfin
   name        : Chris Wells
@@ -333,6 +338,10 @@
   organization: DevApp
   jira        : devmate
 
+- github      : Dawnthorn
+  name        : Peter Haight
+  organization: Giant Rabbit
+
 - github      : dlobo
   name        : Donald Lobo
   jira        : lobo
@@ -340,6 +349,8 @@
 - github      : dkguru
   organization: Jesper Angelo
   jira        : dkguru
+
+- github      : don-alejandro-z
 
 - name        : Samuel Haskell
   jira        : dotsam
@@ -385,6 +396,10 @@
   name        : Edsel Lopez
   organization: JMA Consulting
   jira        : edsel
+
+- github      : edvanleeuwen
+  name        : Ed van Leeuwen
+  organization: Centrale Organisatie van Voetbal Scheidsrechters (COVS)
 
 - github      : eileenmcnaughton
   name        : Eileen McNaughton
@@ -459,6 +474,9 @@
   organization: Amnistía Internacional España
   jira        : Fernando
 
+- github      : fkohrt
+  name        : Florian Kohrt
+
 - github      : fliespl
   name        : Arkadiusz Rzadkowolski
   jira        : flies
@@ -480,6 +498,10 @@
 - github      : galgeek
   name        : Barbara Miller
   jira        : galgeek
+
+- github      : gareth-circle
+  name        : Gareth Hodgkinson
+  organization: Circle Interactive
 
 - github      : garethdylan361
   name        : Gareth Small
@@ -515,6 +537,9 @@
 - name        : Graham Smith
   organization: Edinburgh College
   jira        : grahamsmith
+
+- name        : Guillaume Rischard
+  github      : grischard
 
 - github      : guanhuan
   name        : Guanhuan Chen
@@ -743,9 +768,9 @@
 - github      : kerasai
   name        : Will Long
 
-- github      : kirk-jackson
+- github      : kirk-circle
   name        : Kirk Jackson
-  organization: Campaign Against Arms Trade
+  organization: Circle Interactive
   jira        : kirk
 
 - github      : kngs
@@ -849,6 +874,10 @@
   name        : Lionel Smith-Gordon
   jira        : lsmithgo
 
+- github      : ltaliano
+  name        : Lisa Taliano
+  organization: National Urban League
+
 - github      : lyyana
   name        : Yuliyana Liyana
   organization: Oxfam Germany
@@ -875,8 +904,7 @@
   jira        : manish
 
 - github      : marsh-circle
-
-- name        : Martin Castle
+  name        : Martin Castle
   organization: Circle Interactive
   jira        : marshCircle
 
@@ -1145,6 +1173,7 @@
 - github      : pradpnayak
   name        : Pradeep Nayak
   jira        : pradeep.nayak
+  organization: Circle Interactive
 
 - github      : pratik-joshi
   name        : Pratik Joshi
@@ -1224,6 +1253,13 @@
   name        : Rubén Pineda
   organization: iXiam
 
+- github      : ryanlrobinson
+  name        : Ryan L. Robinson
+
+- github      : scoobird
+  name        : Morgan Robinson
+  organization: Palante Technology Cooperative
+
 - name        : Steve Binkowski
   jira        : s.bink
 
@@ -1235,6 +1271,10 @@
   name        : Samuel Vanhove
   organization: Coop SymbioTIC
   jira        : samuelsov
+
+- gitub       : sushant
+  organization: OSSeed Technologies LLP
+  name        : Sushant Paste
 
 - name        : Peter Petrik
   organization: Skvare
@@ -1493,6 +1533,10 @@
   organization: Debre-Genet Holy Trinity Ethiopian Orthodox Tewahedo Church
   jira        : 'website@dght.uk'
 
+- github      : wadelson
+  organization: Webstanz
+  name        : Adelson
+
 - github      : wdecraene
   organization: Wim De Craene
   jira        : wdecraene
@@ -1531,3 +1575,7 @@
 - github      : hosseinamin
   name        : Hossein Amin
   jira        : hosseinamin
+
+- github      : reecebenson
+  name        : Reece Benson
+  organization: Circle Interactive

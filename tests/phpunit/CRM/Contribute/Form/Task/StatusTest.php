@@ -48,30 +48,30 @@ class CRM_Contribute_Form_Task_StatusTest extends CiviUnitTestCase {
     $form = new CRM_Contribute_Form_Task_Status();
 
     // create a pending contribution
-    $contributionParams = array(
+    $contributionParams = [
       'contact_id' => $this->_individualId,
       'total_amount' => 100,
       'financial_type_id' => 'Donation',
       'contribution_status_id' => 2,
-    );
+    ];
     $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
     $contributionId = $contribution['id'];
-    $form->setContributionIds(array($contributionId));
+    $form->setContributionIds([$contributionId]);
 
     $form->buildQuickForm();
 
-    $params = array(
+    $params = [
       "contribution_status_id" => 1,
       "trxn_id_{$contributionId}" => NULL,
       "check_number_{$contributionId}" => NULL,
       "fee_amount_{$contributionId}" => 0,
       "trxn_date_{$contributionId}" => date('m/d/Y'),
       "payment_instrument_id_{$contributionId}" => 4,
-    );
+    ];
 
     CRM_Contribute_Form_Task_Status::processForm($form, $params);
 
-    $contribution = $this->callAPISuccess('Contribution', 'get', array('id' => $contributionId));
+    $contribution = $this->callAPISuccess('Contribution', 'get', ['id' => $contributionId]);
     $updatedContribution = $contribution['values'][1];
 
     $this->assertEquals('', $updatedContribution['contribution_source']);

@@ -39,8 +39,11 @@
  * @group headless
  */
 class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
+
   protected $_contactID;
+
   protected $_params;
+
   protected $test_activity_type_value;
 
   /**
@@ -55,14 +58,14 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
 
     $this->_contactID = $this->individualCreate();
     //create activity types
-    $activityTypes = $this->callAPISuccess('option_value', 'create', array(
+    $activityTypes = $this->callAPISuccess('option_value', 'create', [
       'option_group_id' => 2,
       'name' => 'Test activity type',
       'label' => 'Test activity type',
       'sequential' => 1,
-    ));
+    ]);
     $this->test_activity_type_id = $activityTypes['id'];
-    $this->_params = array(
+    $this->_params = [
       'source_contact_id' => $this->_contactID,
       'activity_type_id' => $activityTypes['values'][0]['value'],
       'subject' => 'test activity type id',
@@ -72,7 +75,7 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
       'duration' => 120,
       'location' => 'Pennsylvania',
       'details' => 'a test activity',
-    );
+    ];
     // create a logged in USER since the code references it for source_contact_id
     $this->createLoggedInUser();
   }
@@ -83,16 +86,16 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
    * This method is called after a test is executed.
    */
   public function tearDown() {
-    $tablesToTruncate = array(
+    $tablesToTruncate = [
       'civicrm_contact',
       'civicrm_activity',
       'civicrm_activity_contact',
       'civicrm_uf_match',
-    );
+    ];
     $this->quickCleanup($tablesToTruncate, TRUE);
-    $type = $this->callAPISuccess('optionValue', 'get', array('id' => $this->test_activity_type_id));
+    $type = $this->callAPISuccess('optionValue', 'get', ['id' => $this->test_activity_type_id]);
     if (!empty($type['count'])) {
-      $this->callAPISuccess('option_value', 'delete', array('id' => $this->test_activity_type_id));
+      $this->callAPISuccess('option_value', 'delete', ['id' => $this->test_activity_type_id]);
     }
   }
 
@@ -105,14 +108,14 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
     $params['subject'] = $subject;
     $this->callAPISuccess('Activity', 'Create', $params);
 
-    $case = array(
-      'form_value' => array(
+    $case = [
+      'form_value' => [
         'activity_text' => $subject,
         'activity_option' => 3,
-      ),
+      ],
       'expected_count' => 1,
-      'expected_contact' => array($this->_contactID),
-    );
+      'expected_contact' => [$this->_contactID],
+    ];
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
     list($select, $from, $where, $having) = $query->query();
     $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where")->fetchAll();
@@ -132,14 +135,14 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
     $params['subject'] = $subject;
     $activity = $this->callAPISuccess('Activity', 'Create', $params);
 
-    $case = array(
-      'form_value' => array(
+    $case = [
+      'form_value' => [
         'activity_text' => $subject,
         'activity_option' => 6,
-      ),
+      ],
       'expected_count' => 1,
-      'expected_contact' => array($this->_contactID),
-    );
+      'expected_contact' => [$this->_contactID],
+    ];
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
     list($select, $from, $where, $having) = $query->query();
     $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where")->fetchAll();
@@ -159,14 +162,14 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
     $params['details'] = $details;
     $activity = $this->callAPISuccess('Activity', 'Create', $params);
 
-    $case = array(
-      'form_value' => array(
+    $case = [
+      'form_value' => [
         'activity_text' => $details,
         'activity_option' => 2,
-      ),
+      ],
       'expected_count' => 1,
-      'expected_contact' => array($this->_contactID),
-    );
+      'expected_contact' => [$this->_contactID],
+    ];
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
     list($select, $from, $where, $having) = $query->query();
     $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where")->fetchAll();
@@ -186,14 +189,14 @@ class CRM_Contact_BAO_ActivitySearchTest extends CiviUnitTestCase {
     $params['details'] = $details;
     $activity = $this->callAPISuccess('Activity', 'Create', $params);
 
-    $case = array(
-      'form_value' => array(
+    $case = [
+      'form_value' => [
         'activity_text' => $details,
         'activity_option' => 6,
-      ),
+      ],
       'expected_count' => 1,
-      'expected_contact' => array($this->_contactID),
-    );
+      'expected_contact' => [$this->_contactID],
+    ];
     $query = new CRM_Contact_BAO_Query(CRM_Contact_BAO_Query::convertFormValues($case['form_value']));
     list($select, $from, $where, $having) = $query->query();
     $groupContacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT contact_a.id $from $where")->fetchAll();

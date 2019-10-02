@@ -155,7 +155,6 @@ Alternatively you can get a version of CiviCRM that matches your PHP version
     if (!$this->database || !$this->tables) {
       $specification = new CRM_Core_CodeGen_Specification();
       $specification->parse($this->schemaPath, $this->buildVersion);
-      # cheese:
       $this->database = $specification->database;
       $this->tables = $specification->tables;
     }

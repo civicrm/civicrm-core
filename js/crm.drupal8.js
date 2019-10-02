@@ -17,13 +17,16 @@ localStorage.setItem('Drupal.toolbar.activeTabID', JSON.stringify('toolbar-item-
 
   // Wait for document.ready so Drupal's jQuery is available to this script
   $(function($) {
-    // Need Drupal's jQuery to listen to this event
-    jQuery(document).on('drupalToolbarTabChange', function(event, tab) {
-      if (CRM.menubar && CRM.menubar.position === 'below-cms-menu') {
-        var action = jQuery(tab).is('#toolbar-item-civicrm') ? 'show' : 'hide';
-        CRM.menubar[action]();
-      }
-    });
+    // If Drupal's jQuery isn't loaded (e.g. on a stripped-down front-end page), we don't need to worry about the toolbar
+    if (window.jQuery) {
+      // This event is only triggered by Drupal's copy of jQuery. CRM.$ won't pick it up.
+      jQuery(document).on('drupalToolbarTabChange', function (event, tab) {
+        if (CRM.menubar && CRM.menubar.position === 'below-cms-menu') {
+          var action = jQuery(tab).is('#toolbar-item-civicrm') ? 'show' : 'hide';
+          CRM.menubar[action]();
+        }
+      });
+    }
   });
 
 })(CRM.$);

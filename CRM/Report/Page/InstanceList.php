@@ -282,6 +282,11 @@ class CRM_Report_Page_InstanceList extends CRM_Core_Page {
         'confirm_message' => ts('Are you sure you want delete this report? This action cannot be undone.'),
       ];
     }
+    CRM_Utils_Hook::links('view.report.links',
+      $className,
+      $instanceID,
+      $actions
+    );
 
     return $actions;
   }

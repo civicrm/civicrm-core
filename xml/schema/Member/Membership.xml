@@ -84,6 +84,7 @@
       <type>Select Date</type>
       <formatType>activityDate</formatType>
     </html>
+    <uniqueName>membership_join_date</uniqueName>
   </field>
   <field>
     <name>start_date</name>
@@ -156,8 +157,10 @@
   </foreignKey>
   <field>
     <name>is_override</name>
+    <uniqueName>member_is_override</uniqueName>
     <title>Status Override</title>
     <import>true</import>
+    <export>true</export>
     <headerPattern>/override$/i</headerPattern>
     <type>boolean</type>
     <comment>Admin users may set a manual status which overrides the calculated status. When this flag is true, automated status update scripts should NOT modify status for the record.</comment>
@@ -203,6 +206,7 @@
     <type>int</type>
     <comment>Maximum number of related memberships (membership_type override).</comment>
     <add>4.3</add>
+    <export>true</export>
     <html>
       <type>Text</type>
     </html>
@@ -234,8 +238,10 @@
   </field>
   <field>
     <name>contribution_recur_id</name>
+    <uniqueName>membership_recur_id</uniqueName>
     <title>Membership Recurring Contribution</title>
     <type>int unsigned</type>
+    <export>true</export>
     <comment>Conditional foreign key to civicrm_contribution_recur id. Each membership in connection with a recurring contribution carries a foreign key to the recurring contribution record. This assumes we can track these processor initiated events.</comment>
     <add>3.3</add>
   </field>

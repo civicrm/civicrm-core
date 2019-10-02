@@ -15,6 +15,7 @@ $params = [
   'clientID' => 104,
   'creatorID' => 108,
   'standardTimeline' => 1,
+  // activityTypeName means name here not label, and that is correct here (dev/core#1116-ok-name)
   'activityTypeName' => 'Open Case',
   'dueDateTime' => time(),
   'caseID' => 1,

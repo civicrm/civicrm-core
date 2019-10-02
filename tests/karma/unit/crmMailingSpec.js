@@ -17,7 +17,7 @@ describe('crmMailing', function() {
         $provide.value('crmNavigator', navigator);
       });
       inject(['crmLegacy', function(crmLegacy) {
-        crmLegacy.url({back: '/*path*?*query*', front: '/*path*?*query*'});
+        crmLegacy.url({back: '/civicrm-placeholder-url-path?civicrm-placeholder-url-query=1', front: '/civicrm-placeholder-url-path?civicrm-placeholder-url-query=1'});
       }]);
       inject(['$controller', function($controller) {
         ctrl = $controller('ListMailingsCtrl', {});

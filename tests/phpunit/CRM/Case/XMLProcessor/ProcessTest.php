@@ -239,4 +239,32 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->assertEquals($expectedContact, $activity['assignee_contact_id'], 'Activity is not assigned to expected contact');
   }
 
+  /**
+   * Test that locateNameOrLabel does the right things.
+   *
+   * @dataProvider xmlDataProvider
+   */
+  public function testLocateNameOrLabel($xmlString, $expected) {
+    $xmlObj = new SimpleXMLElement($xmlString);
+    $this->assertEquals($expected, $this->process->locateNameOrLabel($xmlObj));
+  }
+
+  /**
+   * Data provider for testLocateNameOrLabel
+   * @return array
+   */
+  public function xmlDataProvider() {
+    return [
+      ['<RelationshipType><name>Senior Services Coordinator</name><creator>1</creator><manager>1</manager></RelationshipType>', 'Senior Services Coordinator'],
+      ['<RelationshipType><name>Senior Services Coordinator</name></RelationshipType>', 'Senior Services Coordinator'],
+      ['<RelationshipType><name>Lion Tamer&#39;s Obituary Writer</name></RelationshipType>', "Lion Tamer's Obituary Writer"],
+      ['<RelationshipType><machineName>BP1234</machineName><name>Banana Peeler</name></RelationshipType>', 'BP1234'],
+      ['<RelationshipType><machineName>BP1234</machineName><name>Banana Peeler</name><creator>1</creator><manager>1</manager></RelationshipType>', 'BP1234'],
+      ['<RelationshipType><machineName>0</machineName><name>Assistant Level 0</name></RelationshipType>', '0'],
+      ['<RelationshipType><machineName></machineName><name>Banana Peeler</name></RelationshipType>', 'Banana Peeler'],
+      // hopefully nobody would do this
+      ['<RelationshipType><machineName>null</machineName><name>Annulled Relationship</name></RelationshipType>', 'null'],
+    ];
+  }
+
 }

@@ -253,20 +253,6 @@ class CRM_Core_PseudoConstant {
         'labelColumn' => CRM_Utils_Array::value('labelColumn', $pseudoconstant),
       ];
 
-      if ($context == 'abbreviate') {
-        switch ($fieldName) {
-          case 'state_province_id':
-            $params['labelColumn'] = 'abbreviation';
-            break;
-
-          case 'country_id':
-            $params['labelColumn'] = 'iso_code';
-            break;
-
-          default:
-        }
-      }
-
       // Fetch option group from option_value table
       if (!empty($pseudoconstant['optionGroupName'])) {
         if ($context == 'validate') {
@@ -300,8 +286,8 @@ class CRM_Core_PseudoConstant {
         $cacheKey = $daoName . $fieldName . serialize($params);
 
         // Retrieve cached options
-        if (isset(self::$cache[$cacheKey]) && empty($params['fresh'])) {
-          $output = self::$cache[$cacheKey];
+        if (isset(\Civi::$statics[__CLASS__][$cacheKey]) && empty($params['fresh'])) {
+          $output = \Civi::$statics[__CLASS__][$cacheKey];
         }
         else {
           $daoName = CRM_Core_DAO_AllCoreTables::getClassForTable($pseudoconstant['table']);
@@ -327,6 +313,12 @@ class CRM_Core_PseudoConstant {
               $params[$nameField] = 'name';
             }
           }
+
+          // Use abbrColum if context is abbreviate
+          if ($context == 'abbreviate' && (in_array('abbreviation', $availableFields) || !empty($pseudoconstant['abbrColumn']))) {
+            $params['labelColumn'] = $pseudoconstant['abbrColumn'] ?? 'abbreviation';
+          }
+
           // Condition param can be passed as an sql clause string or an array of clauses
           if (!empty($params['condition'])) {
             $wheres[] = implode(' AND ', (array) $params['condition']);
@@ -386,7 +378,7 @@ class CRM_Core_PseudoConstant {
             }
           }
           CRM_Utils_Hook::fieldOptions($entity, $fieldName, $output, $params);
-          self::$cache[$cacheKey] = $output;
+          \Civi::$statics[__CLASS__][$cacheKey] = $output;
         }
         return $flip ? array_flip($output) : $output;
       }
@@ -486,7 +478,7 @@ class CRM_Core_PseudoConstant {
         WHERE page_callback LIKE '%CRM_Admin_Page_$child%' OR page_callback LIKE '%CRM_{$parent}_Page_$child%'
         ORDER BY page_callback
         LIMIT 1";
-      return CRM_Core_Dao::singleValueQuery($sql);
+      return CRM_Core_DAO::singleValueQuery($sql);
     }
     return NULL;
   }
@@ -530,7 +522,7 @@ class CRM_Core_PseudoConstant {
     $key = 'id',
     $force = NULL
   ) {
-    $cacheKey = CRM_Core_BAO_Cache::cleanKey("CRM_PC_{$name}_{$all}_{$key}_{$retrieve}_{$filter}_{$condition}_{$orderby}");
+    $cacheKey = CRM_Utils_Cache::cleanKey("CRM_PC_{$name}_{$all}_{$key}_{$retrieve}_{$filter}_{$condition}_{$orderby}");
     $cache = CRM_Utils_Cache::singleton();
     $var = $cache->get($cacheKey);
     if ($var !== NULL && empty($force)) {
@@ -844,9 +836,9 @@ WHERE  id = %1";
       self::populate(self::$country, 'CRM_Core_DAO_Country', TRUE, 'name', 'is_active', $whereClause);
 
       // if default country is set, percolate it to the top
-      if ($config->defaultContactCountry()) {
+      if (CRM_Core_BAO_Country::defaultContactCountry()) {
         $countryIsoCodes = self::countryIsoCode();
-        $defaultID = array_search($config->defaultContactCountry(), $countryIsoCodes);
+        $defaultID = array_search(CRM_Core_BAO_Country::defaultContactCountry(), $countryIsoCodes);
         if ($defaultID !== FALSE) {
           $default[$defaultID] = CRM_Utils_Array::value($defaultID, self::$country);
           self::$country = $default + self::$country;

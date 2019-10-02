@@ -156,6 +156,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     CRM_Member_PseudoConstant::membershipType(NULL, TRUE);
     civicrm_api3('membership', 'getfields', ['cache_clear' => 1, 'fieldname' => 'membership_type_id']);
     civicrm_api3('profile', 'getfields', ['action' => 'submit', 'cache_clear' => 1]);
+    Civi::cache('metadata')->clear();
   }
 
   /**
@@ -266,6 +267,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   /**
    * Get membership Types.
    *
+   * @deprecated  use getAllMembershipTypes.
+   *
    * @param bool $public
    *
    * @return array
@@ -287,6 +290,8 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
   /**
    * Get membership Type Details.
+   *
+   * @deprecated use getMembershipType.
    *
    * @param int $membershipTypeId
    *
@@ -626,27 +631,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
   /**
-   * @deprecated Please use the Membership API
-   * Retrieve all Membership Types associated with an Organization
-   *
-   * @param int $orgID
-   *   Id of Organization.
-   *
-   * @return array
-   *   array of the details of membership types
-   */
-  public static function getMembershipTypesByOrg($orgID) {
-    CRM_Core_Error::deprecatedFunctionWarning('membership_type api');
-    $memberTypesSameParentOrg = civicrm_api3('MembershipType', 'get', [
-      'member_of_contact_id' => $orgID,
-      'options' => [
-        'limit' => 0,
-      ],
-    ]);
-    return CRM_Utils_Array::value('values', $memberTypesSameParentOrg, []);
-  }
-
-  /**
    * Retrieve all Membership Types with Member of Contact id.
    *
    * @param array $membershipTypes
@@ -839,6 +823,32 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         CRM_Price_BAO_PriceFieldValue::add($updateParams);
       }
     }
+  }
+
+  /**
+   * Cached wrapper for membership types.
+   *
+   * Since this is used from the batched script caching helps.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getAllMembershipTypes() {
+    if (!Civi::cache('metadata')->has(__CLASS__ . __FUNCTION__)) {
+      Civi::cache('metadata')->set(__CLASS__ . __FUNCTION__, civicrm_api3('MembershipType', 'get', ['options' => ['limit' => 0, 'sort' => 'weight']])['values']);
+    }
+    return Civi::cache('metadata')->get(__CLASS__ . __FUNCTION__);
+  }
+
+  /**
+   * Get a specific membership type (leveraging the cache).
+   *
+   * @param int $id
+   *
+   * @return mixed
+   * @throws \CiviCRM_API3_Exception
+   */
+  public static function getMembershipType($id) {
+    return self::getAllMembershipTypes()[$id];
   }
 
 }

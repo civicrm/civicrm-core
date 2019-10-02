@@ -42,7 +42,7 @@
   CRM.config.entityRef = $.extend({ldelim}{rdelim}, {$entityRef|@json_encode}, CRM.config.entityRef || {ldelim}{rdelim});
 
   // Initialize CRM.url and CRM.formatMoney
-  CRM.url({ldelim}back: '{crmURL p="*path*" q="*query*" h=0 fb=1}', front: '{crmURL p="*path*" q="*query*" h=0 fe=1}'{rdelim});
+  CRM.url({ldelim}back: '{crmURL p="civicrm-placeholder-url-path" q="civicrm-placeholder-url-query=1" h=0 fb=1}', front: '{crmURL p="civicrm-placeholder-url-path" q="civicrm-placeholder-url-query=1" h=0 fe=1}'{rdelim});
   CRM.formatMoney('init', false, {$moneyFormat});
 
   // Localize select2
@@ -114,12 +114,12 @@
 
   // use civicrm notifications when there are errors
   params.invalidHandler = function(form, validator) {
+    // If there is no container for display then red text will still show next to the invalid fields
+    // but there will be no overall message. Currently the container is only available on backoffice pages.
     if ($('#crm-notification-container').length) {
       $.each(validator.errorList, function(k, error) {
         $(error.element).crmError(error.message);
       });
-    } else {
-      alert({/literal}"{ts escape='js'}Please review and correct the highlighted fields before continuing.{/ts}"{literal});
     }
   };
 

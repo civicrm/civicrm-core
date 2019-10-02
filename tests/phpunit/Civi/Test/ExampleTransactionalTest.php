@@ -9,13 +9,13 @@ namespace Civi\Test;
  *
  * @group headless
  */
-class ExampleTransactionalTest extends \PHPUnit_Framework_TestCase implements HeadlessInterface, TransactionalInterface {
+class ExampleTransactionalTest extends \PHPUnit\Framework\TestCase implements HeadlessInterface, TransactionalInterface {
 
   /**
    * @var array
    *   Array(int $id).
    */
-  protected static $contactIds = array();
+  protected static $contactIds = [];
 
   public function setUpHeadless() {
     return \Civi\Test::headless()->apply();
@@ -23,9 +23,9 @@ class ExampleTransactionalTest extends \PHPUnit_Framework_TestCase implements He
 
   protected function setUp() {
     /** @var \CRM_Contact_DAO_Contact $contact */
-    $contact = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact', array(
+    $contact = \CRM_Core_DAO::createTestObject('CRM_Contact_DAO_Contact', [
       'contact_type' => 'Individual',
-    ));
+    ]);
     self::$contactIds[$this->getName()] = $contact->id;
   }
 

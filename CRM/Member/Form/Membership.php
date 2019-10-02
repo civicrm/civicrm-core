@@ -418,7 +418,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
   public function buildQuickForm() {
 
     $this->buildQuickEntityForm();
-    $this->assign('currency', CRM_Core_Config::singleton()->defaultCurrencySymbol);
+    $this->assign('currency', CRM_Core_BAO_Country::defaultCurrencySymbol());
     $isUpdateToExistingRecurringMembership = $this->isUpdateToExistingRecurringMembership();
     // build price set form.
     $buildPriceSet = FALSE;
@@ -1162,10 +1162,16 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
 
     $lineItem = [$this->_priceSetId => []];
 
+    // BEGIN Fix for dev/core/issues/860
+    // Prepare fee block and call buildAmount hook - based on CRM_Price_BAO_PriceSet::buildPriceSet().
+    CRM_Price_BAO_PriceSet::applyACLFinancialTypeStatusToFeeBlock($this->_priceSet['fields']);
+    CRM_Utils_Hook::buildAmount('membership', $this, $this->_priceSet['fields']);
+    // END Fix for dev/core/issues/860
+
     CRM_Price_BAO_PriceSet::processAmount($this->_priceSet['fields'],
       $formValues, $lineItem[$this->_priceSetId], NULL, $this->_priceSetId);
 
-    if (CRM_Utils_Array::value('tax_amount', $formValues)) {
+    if (!empty($formValues['tax_amount'])) {
       $params['tax_amount'] = $formValues['tax_amount'];
     }
     $params['total_amount'] = CRM_Utils_Array::value('amount', $formValues);
@@ -1418,7 +1424,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
         $paymentParams['contributionTypeID'] = $contribution->financial_type_id;
         $paymentParams['contributionPageID'] = $contribution->contribution_page_id;
         $paymentParams['contributionRecurID'] = $contribution->contribution_recur_id;
-        $ids['contribution'] = $contribution->id;
+        $params['contribution_id'] = $paymentParams['contributionID'];
         $params['contribution_recur_id'] = $paymentParams['contributionRecurID'];
       }
       $paymentStatus = NULL;
@@ -1522,6 +1528,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           unset($membershipParams['lineItems']);
         }
         $membershipParams['payment_instrument_id'] = $paymentInstrumentID;
+        // @todo stop passing $ids (membership and userId only are set above)
         $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
         $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
         unset($params['lineItems']);
@@ -1618,7 +1625,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
           if (!empty($softParams)) {
             $membershipParams['soft_credit'] = $softParams;
           }
-
+          // @todo stop passing $ids (membership and userId only are set above)
           $membership = CRM_Member_BAO_Membership::create($membershipParams, $ids);
           $params['contribution'] = CRM_Utils_Array::value('contribution', $membershipParams);
           unset($params['lineItems']);
@@ -1738,7 +1745,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     // if selected membership doesn't match with earlier membership
       !in_array($this->_memType, $this->_memTypeSelected)
     ) {
-      if (CRM_Utils_Array::value('is_recur', $inputParams)) {
+      if (!empty($inputParams['is_recur'])) {
         CRM_Core_Session::setStatus(ts('Associated recurring contribution cannot be updated on membership type change.', ts('Error'), 'error'));
         return;
       }

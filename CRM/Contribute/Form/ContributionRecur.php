@@ -101,6 +101,20 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
   protected $entityFields = [];
 
   /**
+   * Details of the subscription (recurring contribution) to be altered.
+   *
+   * @var array
+   */
+  protected $subscriptionDetails = [];
+
+  /**
+   * Is the form being accessed by a front end user to update their own recurring.
+   *
+   * @var bool
+   */
+  protected $selfService;
+
+  /**
    * Explicitly declare the entity api name.
    */
   public function getDefaultEntity() {
@@ -125,6 +139,8 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     $this->setAction(CRM_Core_Action::UPDATE);
@@ -132,7 +148,11 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
     $this->_crid = CRM_Utils_Request::retrieve('crid', 'Integer', $this, FALSE);
     $this->contributionRecurID = $this->_crid;
     $this->_coid = CRM_Utils_Request::retrieve('coid', 'Integer', $this, FALSE);
+    $this->setSubscriptionDetails();
     $this->setPaymentProcessor();
+    if ($this->getSubscriptionContactID()) {
+      $this->set('cid', $this->getSubscriptionContactID());
+    }
   }
 
   /**
@@ -149,6 +169,65 @@ class CRM_Contribute_Form_ContributionRecur extends CRM_Core_Form {
       }
       $this->_paymentProcessorObj = $this->_paymentProcessor['object'];
     }
+    elseif ($this->_mid) {
+      $this->_paymentProcessorObj = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_mid, 'membership', 'obj');
+      $this->_paymentProcessor = $this->_paymentProcessorObj->getPaymentProcessor();
+    }
+  }
+
+  /**
+   * Set the subscription details on the form.
+   */
+  protected function setSubscriptionDetails() {
+    if ($this->contributionRecurID) {
+      $this->subscriptionDetails = $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_crid);
+    }
+    elseif ($this->_coid) {
+      $this->subscriptionDetails = $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
+    }
+    elseif ($this->_mid) {
+      $this->subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_mid, 'membership');
+    }
+    // This is being set temporarily - we should eventually just use the getter fn.
+    $this->_subscriptionDetails = $this->subscriptionDetails;
+  }
+
+  /**
+   * Get details for the recurring contribution being altered.
+   *
+   * @return array
+   */
+  public function getSubscriptionDetails() {
+    return $this->subscriptionDetails;
+  }
+
+  /**
+   * Get the contact ID for the subscription.
+   *
+   * @return int|false
+   */
+  protected function getSubscriptionContactID() {
+    $sub = $this->getSubscriptionDetails();
+    return isset($sub->contact_id) ? $sub->contact_id : FALSE;
+  }
+
+  /**
+   * Is this being used by a front end user to update their own recurring.
+   *
+   * @return bool
+   */
+  protected function isSelfService() {
+    if (!is_null($this->selfService)) {
+      return $this->selfService;
+    }
+    $this->selfService = FALSE;
+    if (!CRM_Core_Permission::check('edit contributions')) {
+      if ($this->_subscriptionDetails->contact_id != $this->getContactID()) {
+        CRM_Core_Error::statusBounce(ts('You do not have permission to cancel this recurring contribution.'));
+      }
+      $this->selfService = TRUE;
+    }
+    return $this->selfService;
   }
 
 }

@@ -39,11 +39,11 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
    * Check method create()
    */
   public function testCreate() {
-    $params = array(
+    $params = [
       'name' => 'Test_Payment_Processor',
       'title' => 'Test Payment Processor',
       'billing_mode' => 1,
-    );
+    ];
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessorType::create($params);
     $result = $this->assertDBNotNull(
       'CRM_Financial_DAO_PaymentProcessorType',
@@ -59,12 +59,12 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
    * Check method retrieve()
    */
   public function testRetrieve() {
-    $params = array(
+    $params = [
       'name' => 'Test_Retrieve_Payment_Processor',
       'title' => 'Test Retrieve Payment Processor',
       'billing_mode' => 1,
-    );
-    $defaults = array();
+    ];
+    $defaults = [];
     CRM_Financial_BAO_PaymentProcessorType::create($params);
     $result = CRM_Financial_BAO_PaymentProcessorType::retrieve($params, $defaults);
     $this->assertEquals($result->name, 'Test_Retrieve_Payment_Processor', 'Verify Payment Processor Type');
@@ -74,12 +74,12 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
    * Check method setIsActive()
    */
   public function testSetIsActive() {
-    $params = array(
+    $params = [
       'name' => 'Test_Set_Payment_Processor',
       'title' => 'Test Set Payment Processor',
       'billing_mode' => 1,
       'is_active' => 1,
-    );
+    ];
 
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessorType::create($params);
     $result = CRM_Financial_BAO_PaymentProcessorType::setIsActive($paymentProcessor->id, 0);
@@ -99,8 +99,8 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
    * Check method getDefault()
    */
   public function testGetDefault() {
-    $params = array('is_default' => 1);
-    $defaults = array();
+    $params = ['is_default' => 1];
+    $defaults = [];
     $result = CRM_Financial_BAO_PaymentProcessorType::retrieve($params, $defaults);
 
     $default = CRM_Financial_BAO_PaymentProcessorType::getDefault();
@@ -111,18 +111,18 @@ class CRM_Financial_BAO_PaymentProcessorTypeTest extends CiviUnitTestCase {
    * Check method del()
    */
   public function testDel() {
-    $params = array(
+    $params = [
       'name' => 'Test_Del_Payment_Processor',
       'title' => 'Test Del Payment Processor',
       'billing_mode' => 1,
       'is_active' => 1,
-    );
+    ];
 
-    $defaults = array();
+    $defaults = [];
     $paymentProcessor = CRM_Financial_BAO_PaymentProcessorType::create($params);
     CRM_Financial_BAO_PaymentProcessorType::del($paymentProcessor->id);
 
-    $params = array('id' => $paymentProcessor->id);
+    $params = ['id' => $paymentProcessor->id];
     $result = CRM_Financial_BAO_PaymentProcessorType::retrieve($params, $defaults);
     $this->assertEquals(empty($result), TRUE, 'Verify financial types record deletion.');
   }

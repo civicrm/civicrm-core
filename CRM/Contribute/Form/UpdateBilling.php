@@ -39,18 +39,16 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
 
   protected $_subscriptionDetails = NULL;
 
-  protected $_selfService = FALSE;
-
   public $_bltID = NULL;
 
   /**
    * Set variables up before form is built.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function preProcess() {
     parent::preProcess();
     if ($this->_crid) {
-      $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_crid);
-
       // Are we cancelling a recurring contribution that is linked to an auto-renew membership?
       if ($this->_subscriptionDetails->membership_id) {
         $this->_mid = $this->_subscriptionDetails->membership_id;
@@ -60,7 +58,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
     if ($this->_coid) {
       $this->_paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'info');
       $this->_paymentProcessor['object'] = CRM_Financial_BAO_PaymentProcessor::getProcessorForEntity($this->_coid, 'contribute', 'obj');
-      $this->_subscriptionDetails = CRM_Contribute_BAO_ContributionRecur::getSubscriptionDetails($this->_coid, 'contribution');
     }
 
     if ($this->_mid) {
@@ -75,12 +72,6 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
 
     if ((!$this->_crid && !$this->_coid && !$this->_mid) || (!$this->_subscriptionDetails)) {
       CRM_Core_Error::fatal('Required information missing.');
-    }
-    if (!CRM_Core_Permission::check('edit contributions')) {
-      if ($this->_subscriptionDetails->contact_id != $this->getContactID()) {
-        CRM_Core_Error::statusBounce(ts('You do not have permission to cancel subscription.'));
-      }
-      $this->_selfService = TRUE;
     }
 
     if (!$this->_paymentProcessor['object']->supports('updateSubscriptionBillingInfo')) {
@@ -161,7 +152,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Contribute_Form_Contribution
    */
   public function buildQuickForm() {
     $type = 'next';
-    if ($this->_selfService) {
+    if ($this->isSelfService()) {
       $type = 'submit';
     }
 

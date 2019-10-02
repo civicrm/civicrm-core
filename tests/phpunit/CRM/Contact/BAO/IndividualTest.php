@@ -12,11 +12,11 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
    * See CRM-19123: Merging contacts: blank date fields write as 1970
    */
   public function testFormatNullDates() {
-    $params = array(
+    $params = [
       'contact_type' => 'Individual',
       'birth_date' => 'null',
       'deceased_date' => 'null',
-    );
+    ];
     $contact = new CRM_Contact_DAO_Contact();
 
     CRM_Contact_BAO_Individual::format($params, $contact);
@@ -31,13 +31,13 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
    */
   public function testFormatDisplayName() {
 
-    $params = array(
+    $params = [
       'contact_type' => 'Individual',
       'first_name' => 'Ben',
       'last_name' => 'Lee',
       'individual_prefix' => 'Mr.',
       'individual_suffix' => 'Jr.',
-    );
+    ];
 
     $contact = new CRM_Contact_DAO_Contact();
 
@@ -54,7 +54,7 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
    */
   public function testFormatDisplayNamePrefixesById() {
 
-    $params = array(
+    $params = [
       'contact_type' => 'Individual',
       'first_name' => 'Ben',
       'last_name' => 'Lee',
@@ -62,7 +62,7 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
       'prefix_id' => 4,
       // and the doctor is a senior
       'suffix_id' => 2,
-    );
+    ];
 
     $contact = new CRM_Contact_DAO_Contact();
 
@@ -78,11 +78,11 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
    */
   public function testFormatDisplayNameNoIndividual() {
 
-    $params = array(
+    $params = [
       'contact_type' => 'Organization',
       'first_name' => 'Ben',
       'last_name' => 'Lee',
-    );
+    ];
 
     $contact = new CRM_Contact_DAO_Contact();
 
@@ -96,14 +96,14 @@ class CRM_Contact_BAO_IndividualTest extends CiviUnitTestCase {
    */
   public function testFormatDisplayNameOnlyEmail() {
 
-    $email['1'] = array('email' => "bleu01@example.com");
-    $email['2'] = array('email' => "bleu02@example.com", 'is_primary' => 1);
-    $email['3'] = array('email' => "bleu03@example.com");
+    $email['1'] = ['email' => "bleu01@example.com"];
+    $email['2'] = ['email' => "bleu02@example.com", 'is_primary' => 1];
+    $email['3'] = ['email' => "bleu03@example.com"];
 
-    $params = array(
+    $params = [
       'contact_type' => 'Individual',
       'email' => $email ,
-    );
+    ];
 
     $contact = new CRM_Contact_DAO_Contact();
 

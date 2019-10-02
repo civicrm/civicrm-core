@@ -73,7 +73,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
           ],
         ],
         'filters' => [
-          'join_date' => [
+          'membership_join_date' => [
             'title' => ts('Member Since'),
             'type' => CRM_Utils_Type::T_DATE,
             'operatorType' => CRM_Report_Form::OP_DATE,
@@ -91,7 +91,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
             'operatorType' => CRM_Report_Form::OP_DATE,
           ],
           'owner_membership_id' => [
-            'title' => ts('Membership Owner ID'),
+            'title' => ts('Primary Membership'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' => CRM_Report_Form::OP_INT,
           ],
@@ -436,6 +436,25 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
     parent::postProcess();
   }
 
+  public function getOperationPair($type = "string", $fieldName = NULL) {
+    //re-name IS NULL/IS NOT NULL for clarity
+    if ($fieldName == 'owner_membership_id') {
+      $result = [];
+      $result['nll'] = ts('Primary members only');
+      $result['nnll'] = ts('Non-primary members only');
+      $options = parent::getOperationPair($type, $fieldName);
+      foreach ($options as $key => $label) {
+        if (!array_key_exists($key, $result)) {
+          $result[$key] = $label;
+        }
+      }
+    }
+    else {
+      $result = parent::getOperationPair($type, $fieldName);
+    }
+    return $result;
+  }
+
   /**
    * @param $rows
    */
@@ -576,7 +595,7 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
             implode(",", $this->_params['status_id_value']);
         }
         $url = CRM_Report_Utils_Report::getNextUrl('member/detail',
-          "reset=1&force=1&join_date_from={$dateStart}&join_date_to={$dateEnd}{$typeUrl}{$statusUrl}",
+          "reset=1&force=1&membership_join_date_from={$dateStart}&membership_join_date_to={$dateEnd}{$typeUrl}{$statusUrl}",
           $this->_absoluteUrl, $this->_id, $this->_drilldownReport
         );
         $row['civicrm_membership_join_date_start'] = CRM_Utils_Date::format($row['civicrm_membership_join_date_start']);

@@ -1195,7 +1195,8 @@ class CRM_GCD {
     //In this function when we add groups that time we are cache the contact fields
     //But at the end of setup we are appending sample custom data, so for consistency
     //reset the cache.
-    CRM_Core_BAO_Cache::deleteGroup('contact fields');
+    Civi::cache('fields')->flush();
+    CRM_Core_BAO_Cache::resetCaches();
   }
 
   /**
@@ -1274,7 +1275,6 @@ class CRM_GCD {
         $this->stateMap[$dao->abbreviation] = $dao->id;
         $this->states[$dao->id] = $dao->name;
       }
-      $dao->free();
     }
 
     $offset = mt_rand(1, 43000);

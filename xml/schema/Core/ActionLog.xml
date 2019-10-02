@@ -99,9 +99,10 @@
   <field>
     <name>reference_date</name>
     <title>Reference Date</title>
-    <type>date</type>
+    <type>datetime</type>
     <default>NULL</default>
     <comment>Stores the date from the entity which triggered this reminder action (e.g. membership.end_date for most membership renewal reminders)</comment>
     <add>4.6</add>
+    <change>5.17</change>
   </field>
 </table>

@@ -31,7 +31,7 @@
  *
  * @package   CiviCRM
  */
-class CiviTestSuite extends PHPUnit_Framework_TestSuite {
+class CiviTestSuite extends PHPUnit\Framework\TestSuite {
 
   /**
    * Simple name based constructor.
@@ -89,7 +89,7 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
     // also split AllTests to All Tests
     $name = str_replace('AllTests', 'All Tests', $name);
 
-    $suite = new PHPUnit_Framework_TestSuite($name);
+    $suite = new PHPUnit\Framework\TestSuite($name);
     $this->addAllTests($suite, $myfile,
       new SplFileInfo(dirname($myfile))
     );
@@ -99,7 +99,7 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
   /**
    *  Add all test classes *Test and all test suites *Tests in subdirectories
    *
-   * @param PHPUnit_Framework_TestSuite $suite
+   * @param PHPUnit\Framework\TestSuite $suite
    *   Test suite object to add tests to
    * @param $myfile
    * @param SplFileInfo $dirInfo
@@ -108,7 +108,7 @@ class CiviTestSuite extends PHPUnit_Framework_TestSuite {
    * @return void
    */
   protected function addAllTests(
-    PHPUnit_Framework_TestSuite &$suite,
+    PHPUnit\Framework\TestSuite &$suite,
     $myfile, SplFileInfo $dirInfo
   ) {
     //echo get_class($this)."::addAllTests($myfile,".$dirInfo->getRealPath().")\n";

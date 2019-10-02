@@ -7,7 +7,7 @@ Code Contributors for 5.x
 CiviCRM - Coleman Watts, Tim Otten
 
 AGH Strategies - Alice Frumin, Andrew Hunt, Eli Lisseck
-Agileware - Alok Patel, Francis Whittle, Justin Freeman
+Agileware - Francis Whittle, Justin Freeman, Pengyi Zhang
 Andrew Thompson
 applicado
 Australian Greens - Seamus Lee

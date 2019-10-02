@@ -364,7 +364,7 @@
     });
     // load panes function calls for snippet based on id of crm-accordion-header
     function loadPanes( id ) {
-      var url = "{/literal}{crmURL p='civicrm/contact/view/contribution' q='snippet=4&formType=' h=0}{literal}" + id;
+      var url = "{/literal}{crmURL p='civicrm/contact/view/contribution' q="snippet=4&id=`$entityID`&formType=" h=0}{literal}" + id;
       {/literal}
       {if $contributionMode}
         url = url + "&mode={$contributionMode}";

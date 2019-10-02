@@ -59,8 +59,8 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
 
     // Load the recipients as a list of contact IDs
     CRM_Mailing_BAO_Mailing::getRecipients($mailingID);
-    $recipients = $this->callAPISuccess('MailingRecipients', 'get', array('mailing_id' => $mailingID));
-    $contactIDs = array();
+    $recipients = $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailingID]);
+    $contactIDs = [];
     foreach ($recipients['values'] as $recipient) {
       $contactIDs[] = $recipient['contact_id'];
     }
@@ -78,12 +78,12 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    * @return array|int
    */
   private function createMailingGroup($mailingID, $groupID, $type = 'Include') {
-    return $this->callAPISuccess('MailingGroup', 'create', array(
+    return $this->callAPISuccess('MailingGroup', 'create', [
       'mailing_id' => $mailingID,
       'group_type' => $type,
       'entity_table' => CRM_Contact_BAO_Group::getTableName(),
       'entity_id' => $groupID,
-    ));
+    ]);
   }
 
   /**
@@ -93,8 +93,8 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     $this->prepareForACLs();
     $this->createLoggedInUser();
     // create hook to build ACL where clause which choses $this->allowedContactId as the only contact to be considered as mail recipient
-    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereAllowedOnlyOne'));
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'view my contact');
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereAllowedOnlyOne']);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'view my contact'];
 
     // Create dummy group and assign 2 contacts
     $name = 'Test static group ' . substr(sha1(rand()), 0, 7);
@@ -104,19 +104,19 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       'is_active' => 1,
     ]);
     // Create 2 contacts where one of them identified as $this->allowedContactId will be used in ACL where clause
-    $contactID1 = $this->individualCreate(array(), 0);
-    $this->allowedContactId = $this->individualCreate(array(), 1);
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    $contactID1 = $this->individualCreate([], 0);
+    $this->allowedContactId = $this->individualCreate([], 1);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $groupID,
       'contact_id' => $contactID1,
-    ));
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $groupID,
       'contact_id' => $this->allowedContactId,
-    ));
+    ]);
 
     // Create dummy mailing
-    $mailingID = $this->callAPISuccess('Mailing', 'create', array())['id'];
+    $mailingID = $this->callAPISuccess('Mailing', 'create', [])['id'];
     $this->createMailingGroup($mailingID, $groupID);
 
     // Check that the desired contact (identified as Contact ID - $this->allowedContactId) is the only
@@ -146,33 +146,33 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       'title' => $groupName2,
       'is_active' => 1,
     ]);
-    $contactID = $this->individualCreate(array(), 0);
-    $contactID2 = $this->individualCreate(array(), 2);
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    $contactID = $this->individualCreate([], 0);
+    $contactID2 = $this->individualCreate([], 2);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $groupID,
       'contact_id' => $contactID,
-    ));
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $groupID,
       'contact_id' => $contactID2,
-    ));
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $groupID2,
       'contact_id' => $contactID2,
-    ));
+    ]);
     // Create dummy mailing
-    $mailingID = $this->callAPISuccess('Mailing', 'create', array())['id'];
+    $mailingID = $this->callAPISuccess('Mailing', 'create', [])['id'];
     $this->createMailingGroup($mailingID, $groupID);
     $expectedContactIDs = [$contactID, $contactID2];
     $this->assertRecipientsCorrect($mailingID, $expectedContactIDs);
-    $mailingID2 = $this->callAPISuccess('Mailing', 'create', array())['id'];
+    $mailingID2 = $this->callAPISuccess('Mailing', 'create', [])['id'];
     $this->createMailingGroup($mailingID2, $groupID2, 'Exclude');
-    $this->callAPISuccess('MailingGroup', 'create', array(
+    $this->callAPISuccess('MailingGroup', 'create', [
       'mailing_id' => $mailingID2,
       'group_type' => 'Include',
       'entity_table' => CRM_Mailing_BAO_Mailing::getTableName(),
       'entity_id' => $mailingID,
-    ));
+    ]);
     $expectedContactIDs = [$contactID];
     $this->assertRecipientsCorrect($mailingID2, $expectedContactIDs);
     $this->callAPISuccess('mailing', 'delete', ['id' => $mailingID2]);
@@ -190,9 +190,9 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     $this->prepareForACLs();
     $this->createLoggedInUser();
     // create hook to build ACL where clause which choses $this->allowedContactId as the only contact to be considered as mail recipient
-    $this->hookClass->setHook('civicrm_aclWhereClause', array($this, 'aclWhereAllowedOnlyOne'));
-    $this->hookClass->setHook('civicrm_aclGroup', array($this, 'hook_civicrm_aclGroup'));
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = array('access CiviCRM', 'edit groups');
+    $this->hookClass->setHook('civicrm_aclWhereClause', [$this, 'aclWhereAllowedOnlyOne']);
+    $this->hookClass->setHook('civicrm_aclGroup', [$this, 'hook_civicrm_aclGroup']);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'edit groups'];
     // Create dummy group and assign 2 contacts
     $name = 'Test static group ' . substr(sha1(rand()), 0, 7);
     $groupID = $this->groupCreate([
@@ -200,14 +200,14 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       'title' => $name,
       'is_active' => 1,
     ]);
-    $contactID = $this->individualCreate(array(), 0);
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    $contactID = $this->individualCreate([], 0);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $groupID,
       'contact_id' => $contactID,
-    ));
+    ]);
 
     // Create dummy mailing
-    $mailingID = $this->callAPISuccess('Mailing', 'create', array())['id'];
+    $mailingID = $this->callAPISuccess('Mailing', 'create', [])['id'];
     $this->createMailingGroup($mailingID, $groupID);
     // Now disable the group.
     $this->callAPISuccess('group', 'create', [
@@ -250,7 +250,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
   public function hook_civicrm_aclGroup($type, $contactID, $tableName, &$allGroups, &$currentGroups) {
     //don't use api - you will get a loop
     $sql = " SELECT * FROM civicrm_group";
-    $groups = array();
+    $groups = [];
     $dao = CRM_Core_DAO::executeQuery($sql);
     while ($dao->fetch()) {
       $groups[] = $dao->id;
@@ -294,57 +294,57 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    */
   public function testgetRecipientsEmailGroupIncludeExclude() {
     // Set up groups; 3 standard, 4 smart
-    $groupIDs = array();
+    $groupIDs = [];
     for ($i = 0; $i < 7; $i++) {
-      $params = array(
+      $params = [
         'name' => 'Test static group ' . $i,
         'title' => 'Test static group ' . $i,
         'is_active' => 1,
-      );
+      ];
       if ($i < 3) {
         $groupIDs[$i] = $this->groupCreate($params);
       }
       else {
-        $groupIDs[$i] = $this->smartGroupCreate(array(
+        $groupIDs[$i] = $this->smartGroupCreate([
           'formValues' => ['last_name' => (($i == 6) ? 'smart5' : 'smart' . $i)],
-        ), $params);
+        ], $params);
       }
     }
 
     // Create contacts
-    $contactIDs = array(
-      $this->individualCreate(array('last_name' => 'smart5'), 0),
-      $this->individualCreate(array(), 1),
-      $this->individualCreate(array(), 2),
-      $this->individualCreate(array(), 3),
-      $this->individualCreate(array('last_name' => 'smart3'), 4),
-      $this->individualCreate(array('last_name' => 'smart3'), 5),
-      $this->individualCreate(array('last_name' => 'smart4'), 6),
-      $this->individualCreate(array('last_name' => 'smart4'), 7),
-      $this->individualCreate(array('last_name' => 'smart5'), 8),
-    );
+    $contactIDs = [
+      $this->individualCreate(['last_name' => 'smart5'], 0),
+      $this->individualCreate([], 1),
+      $this->individualCreate([], 2),
+      $this->individualCreate([], 3),
+      $this->individualCreate(['last_name' => 'smart3'], 4),
+      $this->individualCreate(['last_name' => 'smart3'], 5),
+      $this->individualCreate(['last_name' => 'smart4'], 6),
+      $this->individualCreate(['last_name' => 'smart4'], 7),
+      $this->individualCreate(['last_name' => 'smart5'], 8),
+    ];
 
     // Add contacts to static groups
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $groupIDs[0],
       'contact_id' => $contactIDs[0],
-    ));
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $groupIDs[0],
       'contact_id' => $contactIDs[1],
-    ));
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $groupIDs[1],
       'contact_id' => $contactIDs[2],
-    ));
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $groupIDs[1],
       'contact_id' => $contactIDs[3],
-    ));
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $groupIDs[2],
       'contact_id' => $contactIDs[4],
-    ));
+    ]);
 
     // Force rebuild the smart groups
     for ($i = 3; $i < 7; $i++) {
@@ -356,7 +356,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
 
     // Check that we can include static groups in the mailing.
     // Expected: Contacts [0-3] should be included.
-    $mailing = $this->callAPISuccess('Mailing', 'create', array());
+    $mailing = $this->callAPISuccess('Mailing', 'create', []);
     $this->createMailingGroup($mailing['id'], $groupIDs[0]);
     $this->createMailingGroup($mailing['id'], $groupIDs[1]);
     $this->createMailingGroup($mailing['id'], $groupIDs[6], 'Base');
@@ -403,15 +403,58 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     // In this case groupIDs6 will only pick up contacts[0] amd contacts[8] with it's
     // criteria. However we are deliberly going to remove contactIds[8] from the group
     // Which should mean the mainling only finds 1 contact that is contactIds[0]
-    $mailing = $this->callAPISuccess('Mailing', 'create', array());
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    $mailing = $this->callAPISuccess('Mailing', 'create', []);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $groupIDs[6],
       'contact_id' => $contactIDs[8],
       'status' => 'Removed',
-    ));
+    ]);
     $this->createMailingGroup($mailing['id'], $groupIDs[6]);
     $this->assertRecipientsCorrect($mailing['id'], [$contactIDs[0]]);
     // Tear down: delete mailing, groups, contacts
+    $this->deleteMailing($mailing['id']);
+    foreach ($groupIDs as $groupID) {
+      $this->groupDelete($groupID);
+    }
+    foreach ($contactIDs as $contactID) {
+      $this->contactDelete($contactID);
+    }
+  }
+
+  /**
+   * Test That No BUlk Emails User Optt Out is resepected when constructing a mailing
+   */
+  public function testGetReceipientNoBulkEmails() {
+    // Set up groups; 3 standard, 4 smart
+    $groupIDs = [];
+    $params = [
+      'name' => 'Test static group 1',
+      'title' => 'Test static group 1',
+      'is_active' => 1,
+    ];
+    $groupIDs[] = $this->groupCreate($params);
+
+    // Create contacts
+    $contactIDs = [
+      $this->individualCreate(['last_name' => 'test_contact1'], 0),
+      $this->individualCreate(['last_name' => 'test_contact2', 'is_opt_out' => 1], 1),
+    ];
+
+    // Add contacts to static groups
+    $this->callAPISuccess('GroupContact', 'Create', [
+      'group_id' => $groupIDs[0],
+      'contact_id' => $contactIDs[0],
+    ]);
+    $this->callAPISuccess('GroupContact', 'Create', [
+      'group_id' => $groupIDs[0],
+      'contact_id' => $contactIDs[1],
+    ]);
+
+    // Check that we can include static groups in the mailing.
+    // Expected: Contacts [0-3] should be included.
+    $mailing = $this->callAPISuccess('Mailing', 'create', []);
+    $this->createMailingGroup($mailing['id'], $groupIDs[0]);
+    $this->assertRecipientsCorrect($mailing['id'], [$contactIDs[0]]);
     $this->deleteMailing($mailing['id']);
     foreach ($groupIDs as $groupID) {
       $this->groupDelete($groupID);
@@ -430,11 +473,11 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
     // +core/384 Ensure that a secondary mobile number is selected if the primary can not receive SMS
 
     // Setup
-    $smartGroupParams = array(
-      'formValues' => array('contact_type' => array('IN' => array('Individual'))),
-    );
+    $smartGroupParams = [
+      'formValues' => ['contact_type' => ['IN' => ['Individual']]],
+    ];
     $group = $this->smartGroupCreate($smartGroupParams);
-    $sms_provider = $this->callAPISuccess('SmsProvider', 'create', array(
+    $sms_provider = $this->callAPISuccess('SmsProvider', 'create', [
       'sequential' => 1,
       'name' => 1,
       'title' => "Test",
@@ -442,96 +485,96 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
       'password' => "Test",
       'api_type' => 1,
       'is_active' => 1,
-    ));
+    ]);
 
     // Create Contact 1 and add in group
-    $contactID1 = $this->individualCreate(array(), 0);
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    $contactID1 = $this->individualCreate([], 0);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $group,
       'contact_id' => $contactID1,
-    ));
+    ]);
 
     // Create contact 2 and add in group
-    $contactID2 = $this->individualCreate(array(), 1);
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    $contactID2 = $this->individualCreate([], 1);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $group,
       'contact_id' => $contactID2,
-    ));
+    ]);
 
     // Create contact 3 and add in group
-    $contactID3 = $this->individualCreate(array(), 2);
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    $contactID3 = $this->individualCreate([], 2);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $group,
       'contact_id' => $contactID3,
-    ));
+    ]);
 
-    $contactIDPhoneRecords = array(
-      $contactID1 => array(
-        'primary_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
+    $contactIDPhoneRecords = [
+      $contactID1 => [
+        'primary_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', [
           'contact_id' => $contactID1,
           'phone' => "01 01",
           'location_type_id' => "Home",
           'phone_type_id' => "Mobile",
           'is_primary' => 1,
-        ))),
-        'other_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
+        ])),
+        'other_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', [
           'contact_id' => $contactID1,
           'phone' => "01 02",
           'location_type_id' => "Work",
           'phone_type_id' => "Mobile",
           'is_primary' => 0,
-        ))),
-      ),
+        ])),
+      ],
       // Create the non-primary with a lower ID than the primary, to test CRM-21320
-      $contactID2 => array(
-        'other_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
+      $contactID2 => [
+        'other_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', [
           'contact_id' => $contactID2,
           'phone' => "02 01",
           'location_type_id' => "Home",
           'phone_type_id' => "Mobile",
           'is_primary' => 0,
-        ))),
-        'primary_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
+        ])),
+        'primary_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', [
           'contact_id' => $contactID2,
           'phone' => "02 02",
           'location_type_id' => "Work",
           'phone_type_id' => "Mobile",
           'is_primary' => 1,
-        ))),
-      ),
+        ])),
+      ],
       // Create primary that cant recieve SMS but a secondary that can, to test core/384
-      $contactID3 => array(
-        'other_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
+      $contactID3 => [
+        'other_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', [
           'contact_id' => $contactID3,
           'phone' => "03 01",
           'location_type_id' => "Home",
           'phone_type_id' => "Mobile",
           'is_primary' => 0,
-        ))),
-        'primary_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', array(
+        ])),
+        'primary_phone_id' => CRM_Utils_Array::value('id', $this->callAPISuccess('Phone', 'create', [
           'contact_id' => $contactID3,
           'phone' => "03 02",
           'location_type_id' => "Work",
           'phone_type_id' => "Phone",
           'is_primary' => 1,
-        ))),
-      ),
-    );
+        ])),
+      ],
+    ];
 
     // Prepare expected results
-    $checkPhoneIDs = array(
+    $checkPhoneIDs = [
       $contactID1 => $contactIDPhoneRecords[$contactID1]['primary_phone_id'],
       $contactID2 => $contactIDPhoneRecords[$contactID2]['primary_phone_id'],
       $contactID3 => $contactIDPhoneRecords[$contactID3]['other_phone_id'],
-    );
+    ];
 
     // Create mailing
-    $mailing = $this->callAPISuccess('Mailing', 'create', array('sms_provider_id' => $sms_provider['id']));
+    $mailing = $this->callAPISuccess('Mailing', 'create', ['sms_provider_id' => $sms_provider['id']]);
     $mailingInclude = $this->createMailingGroup($mailing['id'], $group);
 
     // Get recipients
     CRM_Mailing_BAO_Mailing::getRecipients($mailing['id']);
-    $recipients = $this->callAPISuccess('MailingRecipients', 'get', array('mailing_id' => $mailing['id']));
+    $recipients = $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailing['id']]);
 
     // Check the count is correct
     $this->assertEquals(3, $recipients['count'], 'Check recipient count');
@@ -543,7 +586,7 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
 
     // Tidy up
     $this->deleteMailing($mailing['id']);
-    $this->callAPISuccess('SmsProvider', 'Delete', array('id' => $sms_provider['id']));
+    $this->callAPISuccess('SmsProvider', 'Delete', ['id' => $sms_provider['id']]);
     $this->groupDelete($group);
     $this->contactDelete($contactID1);
     $this->contactDelete($contactID2);
@@ -557,43 +600,43 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
    */
   public function testAlterMailingRecipientsHook() {
     $groupID = $this->groupCreate();
-    $this->tagCreate(array('name' => 'Tagged'));
+    $this->tagCreate(['name' => 'Tagged']);
 
     // Create deseased Contact 1 and add in group
-    $contactID1 = $this->individualCreate(array('email' => 'abc@test.com', 'is_deceased' => 1), 0);
+    $contactID1 = $this->individualCreate(['email' => 'abc@test.com', 'is_deceased' => 1], 0);
     // Create deseased Contact 2 and add in group
-    $contactID2 = $this->individualCreate(array('email' => 'def@test.com'), 1);
+    $contactID2 = $this->individualCreate(['email' => 'def@test.com'], 1);
     // Create deseased Contact 3 and add in group
-    $contactID3 = $this->individualCreate(array('email' => 'ghi@test.com', 'is_deceased' => 1), 2);
+    $contactID3 = $this->individualCreate(['email' => 'ghi@test.com', 'is_deceased' => 1], 2);
 
     // Add both the created contacts in group
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $groupID,
       'contact_id' => $contactID1,
-    ));
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $groupID,
       'contact_id' => $contactID2,
-    ));
-    $this->callAPISuccess('GroupContact', 'Create', array(
+    ]);
+    $this->callAPISuccess('GroupContact', 'Create', [
       'group_id' => $groupID,
       'contact_id' => $contactID3,
-    ));
-    $this->entityTagAdd(array('contact_id' => $contactID3, 'tag_id' => 'Tagged'));
+    ]);
+    $this->entityTagAdd(['contact_id' => $contactID3, 'tag_id' => 'Tagged']);
 
     // trigger the alterMailingRecipients hook
-    $this->hookClass->setHook('civicrm_alterMailingRecipients', array($this, 'alterMailingRecipients'));
+    $this->hookClass->setHook('civicrm_alterMailingRecipients', [$this, 'alterMailingRecipients']);
 
     // create mailing that will trigger alterMailingRecipients hook
-    $params = array(
+    $params = [
       'name' => 'mailing name',
       'subject' => 'Test Subject',
       'body_html' => '<p>HTML Body</p>',
       'text_html' => 'Text Body',
       'created_id' => 1,
-      'groups' => array('include' => array($groupID)),
+      'groups' => ['include' => [$groupID]],
       'scheduled_date' => 'now',
-    );
+    ];
     $this->callAPISuccess('Mailing', 'create', $params);
   }
 
@@ -614,13 +657,13 @@ class CRM_Mailing_BAO_MailingTest extends CiviUnitTestCase {
         ->where("t.name = 'Tagged'");
     }
     else {
-      $mailingRecipients = $this->callAPISuccess('MailingRecipients', 'get', array(
+      $mailingRecipients = $this->callAPISuccess('MailingRecipients', 'get', [
         'mailing_id' => $mailingObject->id,
-        'api.Email.getvalue' => array(
+        'api.Email.getvalue' => [
           'id' => '$value.email_id',
           'return' => 'email',
-        ),
-      ));
+        ],
+      ]);
       $this->assertEquals(1, $mailingRecipients['count'], 'Check recipient count');
       $this->assertEquals('ghi@test.com', $mailingRecipients['values'][$mailingRecipients['id']]['api.Email.getvalue'], 'Check if recipient email belong to deceased contact');
     }

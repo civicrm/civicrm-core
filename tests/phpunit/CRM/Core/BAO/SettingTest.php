@@ -129,15 +129,15 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
    */
   public function testOnChange() {
     global $_testOnChange_hookCalls;
-    $this->setMockSettingsMetaData(array(
-      'onChangeExample' => array(
+    $this->setMockSettingsMetaData([
+      'onChangeExample' => [
         'group_name' => 'CiviCRM Preferences',
         'group' => 'core',
         'name' => 'onChangeExample',
         'type' => 'Array',
         'quick_form_type' => 'Element',
         'html_type' => 'advmultiselect',
-        'default' => array('CiviEvent', 'CiviContribute'),
+        'default' => ['CiviEvent', 'CiviContribute'],
         'add' => '4.4',
         'title' => 'List of Components',
         'is_domain' => '1',
@@ -145,25 +145,25 @@ class CRM_Core_BAO_SettingTest extends CiviUnitTestCase {
         'description' => NULL,
         'help_text' => NULL,
         // list of callbacks
-        'on_change' => array(
-          array(__CLASS__, '_testOnChange_onChangeExample'),
-        ),
-      ),
-    ));
+        'on_change' => [
+          [__CLASS__, '_testOnChange_onChangeExample'],
+        ],
+      ],
+    ]);
 
     // set initial value
-    $_testOnChange_hookCalls = array('count' => 0);
-    Civi::settings()->set('onChangeExample', array('First', 'Value'));
+    $_testOnChange_hookCalls = ['count' => 0];
+    Civi::settings()->set('onChangeExample', ['First', 'Value']);
     $this->assertEquals(1, $_testOnChange_hookCalls['count']);
-    $this->assertEquals(array('First', 'Value'), $_testOnChange_hookCalls['newValue']);
+    $this->assertEquals(['First', 'Value'], $_testOnChange_hookCalls['newValue']);
     $this->assertEquals('List of Components', $_testOnChange_hookCalls['metadata']['title']);
 
     // change value
-    $_testOnChange_hookCalls = array('count' => 0);
-    Civi::settings()->set('onChangeExample', array('Second', 'Value'));
+    $_testOnChange_hookCalls = ['count' => 0];
+    Civi::settings()->set('onChangeExample', ['Second', 'Value']);
     $this->assertEquals(1, $_testOnChange_hookCalls['count']);
-    $this->assertEquals(array('First', 'Value'), $_testOnChange_hookCalls['oldValue']);
-    $this->assertEquals(array('Second', 'Value'), $_testOnChange_hookCalls['newValue']);
+    $this->assertEquals(['First', 'Value'], $_testOnChange_hookCalls['oldValue']);
+    $this->assertEquals(['Second', 'Value'], $_testOnChange_hookCalls['newValue']);
     $this->assertEquals('List of Components', $_testOnChange_hookCalls['metadata']['title']);
   }
 

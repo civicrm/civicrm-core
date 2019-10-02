@@ -44,10 +44,10 @@ class CRM_Contact_Import_Form_DataSourceTest extends CiviUnitTestCase {
    * (Added in conjunction with fixed noting on mapping assignment).
    */
   public function testBuildForm() {
-    $this->callAPISuccess('Mapping', 'create', array('name' => 'Well dressed ducks', 'mapping_type_id' => 'Import Contact'));
+    $this->callAPISuccess('Mapping', 'create', ['name' => 'Well dressed ducks', 'mapping_type_id' => 'Import Contact']);
     $form = $this->getFormObject('CRM_Contact_Import_Form_DataSource');
     $form->buildQuickForm();
-    $this->assertEquals(array(1 => 'Well dressed ducks'), CRM_Core_Smarty::singleton()->get_template_vars('savedMapping'));
+    $this->assertEquals([1 => 'Well dressed ducks'], CRM_Core_Smarty::singleton()->get_template_vars('savedMapping'));
   }
 
 }

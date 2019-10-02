@@ -37,6 +37,8 @@
  * @param array $params
  *
  * @return array
+ * @throws \API_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_batch_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Batch');
@@ -56,8 +58,10 @@ function _civicrm_api3_batch_create_spec(&$params) {
   $params['entity_table']['api.default'] = "civicrm_batch";
   $params['entity_table']['type'] = CRM_Utils_Type::T_STRING;
   $params['entity_table']['title'] = 'Batch Entity Table - remove?';
-
-  $params['modified_date']['api.default'] = "now";
+  $params['created_id']['api.default'] = 'user_contact_id';
+  $params['created_date']['api.default'] = 'now';
+  $params['modified_id']['api.default'] = 'user_contact_id';
+  $params['modified_date']['api.default'] = 'now';
   $params['status_id']['api.required'] = 1;
   $params['title']['api.required'] = 1;
   $params['status_id']['api.required'] = 1;
@@ -82,6 +86,8 @@ function civicrm_api3_batch_get($params) {
  *
  * @return array
  *   Array of deleted values.
+ * @throws \API_Exception
+ * @throws \Civi\API\Exception\UnauthorizedException
  */
 function civicrm_api3_batch_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

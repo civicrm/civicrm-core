@@ -43,13 +43,18 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   /**
    * When store session/form state, how long should the data be retained?
    *
+   * Default is Two days: 2*24*60*60
+   *
    * @var int, number of second
    */
-  // Two days: 2*24*60*60
   const DEFAULT_SESSION_TTL = 172800;
 
   /**
-   * @var array ($cacheKey => $cacheValue)
+   * Cache.
+   *
+   * Format is ($cacheKey => $cacheValue)
+   *
+   * @var array
    */
   public static $_cache = NULL;
 
@@ -68,6 +73,9 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @deprecated
    */
   public static function &getItem($group, $path, $componentID = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning(
+      'CRM_Core_BAO_Cache::getItem is deprecated and will be removed from core soon, use Civi::cache() facade or define cache group using hook_civicrm_container'
+    );
     if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
       $value = $adapter::getItem($group, $path, $componentID);
       return $value;
@@ -111,6 +119,9 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @deprecated
    */
   public static function &getItems($group, $componentID = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning(
+      'CRM_Core_BAO_Cache::getItems is deprecated and will be removed from core soon, use Civi::cache() facade or define cache group using hook_civicrm_container'
+    );
     if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
       return $adapter::getItems($group, $componentID);
     }
@@ -156,6 +167,9 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @deprecated
    */
   public static function setItem(&$data, $group, $path, $componentID = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning(
+      'CRM_Core_BAO_Cache::setItem is deprecated and will be removed from core soon, use Civi::cache() facade or define cache group using hook_civicrm_container'
+    );
     if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
       return $adapter::setItem($data, $group, $path, $componentID);
     }
@@ -227,6 +241,9 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @deprecated
    */
   public static function deleteGroup($group = NULL, $path = NULL, $clearAll = TRUE) {
+    CRM_Core_Error::deprecatedFunctionWarning(
+      'CRM_Core_BAO_Cache::deleteGroup is deprecated and will be removed from core soon, use Civi::cache() facade or define cache group using hook_civicrm_container'
+    );
     if (($adapter = CRM_Utils_Constant::value('CIVICRM_BAO_CACHE_ADAPTER')) !== NULL) {
       return $adapter::deleteGroup($group, $path);
     }
@@ -237,12 +254,20 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
     }
 
     if ($clearAll) {
-      // also reset ACL Cache
-      CRM_ACL_BAO_Cache::resetCache();
-
-      // also reset memory cache if any
-      CRM_Utils_System::flushCache();
+      self::resetCaches();
     }
+  }
+
+  /**
+   * Cleanup ACL and System Level caches
+   */
+  public static function resetCaches() {
+    // also reset ACL Cache
+    // @todo why is this called when CRM_Utils_System::flushCache() does it as well.
+    CRM_ACL_BAO_Cache::resetCache();
+
+    // also reset memory cache if any
+    CRM_Utils_System::flushCache();
   }
 
   /**
@@ -462,24 +487,11 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * @return string
    *   Ex: '_abcd1234abcd1234' or 'ab_xx/cd_xxef'.
    *   A similar key, but suitable for use with PSR-16-compliant cache providers.
+   * @deprecated
+   * @see CRM_Utils_Cache::cleanKey()
    */
   public static function cleanKey($key) {
-    if (!is_string($key) && !is_int($key)) {
-      throw new \RuntimeException("Malformed cache key");
-    }
-
-    $maxLen = 64;
-    $escape = '-';
-
-    if (strlen($key) >= $maxLen) {
-      return $escape . md5($key);
-    }
-
-    $r = preg_replace_callback(';[^A-Za-z0-9_\.];', function($m) use ($escape) {
-      return $escape . dechex(ord($m[0]));
-    }, $key);
-
-    return strlen($r) >= $maxLen ? $escape . md5($key) : $r;
+    return CRM_Utils_Cache::cleanKey($key);
   }
 
 }

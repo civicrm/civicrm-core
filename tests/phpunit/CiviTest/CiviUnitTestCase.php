@@ -27,7 +27,7 @@
  */
 
 use Civi\Payment\System;
-use Symfony\Component\Yaml\Yaml;
+use League\Csv\Reader;
 
 /**
  *  Include class definitions
@@ -52,7 +52,7 @@ define('API_LATEST_VERSION', 3);
  *  Common functions for unit tests
  * @package CiviCRM
  */
-class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
+class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
 
   use \Civi\Test\Api3DocTrait;
   use \Civi\Test\GenericAssertionsTrait;
@@ -195,7 +195,10 @@ class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
       // FIXME: loosen coupling
       _civix_phpunit_setUp();
     }
-    if (version_compare(PHPUnit_Runner_Version::id(), '5', '>=')) {
+    if (class_exists('PHPUnit_Runner_Version') && version_compare(\PHPUnit_Runner_Version::id(), '5', '>=')) {
+      $this->mockMethod = 'createMock';
+    }
+    elseif (class_exists('PHPUnit\Runner\Version') && version_compare(PHPUnit\Runner\Version::id(), '6', '>=')) {
       $this->mockMethod = 'createMock';
     }
   }
@@ -305,6 +308,8 @@ class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
     $session = CRM_Core_Session::singleton();
     $session->set('userID', NULL);
 
+    $this->_apiversion = 3;
+
     // REVERT
     $this->errorScope = CRM_Core_TemporaryErrorScope::useException();
     //  Use a temporary file for STDIN
@@ -329,17 +334,11 @@ class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
     // disable any left-over test extensions
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_extension WHERE full_name LIKE "test.%"');
 
-    $extensions = \CRM_Extension_System::singleton()->getManager();
-    $api4Status = $extensions->getStatus('org.civicrm.api4');
-    if ($api4Status != $extensions::STATUS_INSTALLED && $api4Status != $extensions::STATUS_UNKNOWN) {
-      $extensions->enable(['org.civicrm.api4']);
-    }
-
     // reset all the caches
     CRM_Utils_System::flushCache();
 
     // initialize the object once db is loaded
-    \Civi::reset();
+    \Civi::$statics = array();
     // ugh, performance
     $config = CRM_Core_Config::singleton(TRUE, TRUE);
 
@@ -371,10 +370,10 @@ class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
 
     CRM_Core_DAO::executeQuery("SET FOREIGN_KEY_CHECKS = 0;");
 
-    $yamlFiles = glob($fixturesDir . '/*.yaml');
-    foreach ($yamlFiles as $yamlFixture) {
-      $yaml = Yaml::parse(file_get_contents($yamlFixture));
-      foreach ($yaml as $tableName => $vars) {
+    $jsonFiles = glob($fixturesDir . '/*.json');
+    foreach ($jsonFiles as $jsonFixture) {
+      $json = json_decode(file_get_contents($jsonFixture));
+      foreach ($json as $tableName => $vars) {
         if ($tableName === 'civicrm_contact') {
           CRM_Core_DAO::executeQuery('DELETE c FROM civicrm_contact c LEFT JOIN civicrm_domain d ON d.contact_id = c.id WHERE d.id IS NULL');
         }
@@ -451,6 +450,8 @@ class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
    *  Common teardown functions for all unit tests.
    */
   protected function tearDown() {
+    $this->_apiversion = 3;
+
     error_reporting(E_ALL & ~E_NOTICE);
     CRM_Utils_Hook::singleton()->reset();
     if ($this->hookClass) {
@@ -476,6 +477,8 @@ class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
 
     $this->cleanTempDirs();
     $this->unsetExtensionSystem();
+    $this->assertEquals([], CRM_Core_DAO::$_nullArray);
+    $this->assertEquals(NULL, CRM_Core_DAO::$_nullObject);
   }
 
   /**
@@ -1006,6 +1009,7 @@ class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
       'is_monetary' => 0,
       'is_active' => 1,
       'is_show_location' => 0,
+      'is_email_confirm' => 1,
     ), $params);
 
     return $this->callAPISuccess('Event', 'create', $params);
@@ -1239,13 +1243,15 @@ class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
    *
    * @param array $smartGroupParams
    * @param array $groupParams
+   * @param string $contactType
+   *
    * @return int
    */
-  public function smartGroupCreate($smartGroupParams = array(), $groupParams = array()) {
-    $smartGroupParams = array_merge(array(
-      'formValues' => array('contact_type' => array('IN' => array('Household'))),
-    ),
-    $smartGroupParams);
+  public function smartGroupCreate($smartGroupParams = [], $groupParams = [], $contactType = 'Household') {
+    $smartGroupParams = array_merge([
+      'formValues' => ['contact_type' => ['IN' => [$contactType]]],
+    ],
+      $smartGroupParams);
     $savedSearch = CRM_Contact_BAO_SavedSearch::create($smartGroupParams);
 
     $groupParams['saved_search_id'] = $savedSearch->id;
@@ -1362,7 +1368,7 @@ class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
     if (!isset($params['target_contact_id'])) {
       $params['target_contact_id'] = $this->individualCreate(array(
         'first_name' => 'Julia',
-        'Last_name' => 'Anderson',
+        'last_name' => 'Anderson',
         'prefix' => 'Ms.',
         'email' => 'julia_anderson@civicrm.org',
         'contact_type' => 'Individual',
@@ -1372,7 +1378,7 @@ class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
       $params['assignee_contact_id'] = $params['target_contact_id'];
     }
 
-    $result = $this->callAPISuccess('Activity', 'create', $params);
+    $result = civicrm_api3('Activity', 'create', $params);
 
     $result['target_contact_id'] = $params['target_contact_id'];
     $result['assignee_contact_id'] = $params['assignee_contact_id'];
@@ -1673,7 +1679,7 @@ class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
       'option_value' => array('value1', 'value2'),
       'option_name' => array($name . '_1', $name . '_2'),
       'option_weight' => array(1, 2),
-      'option_status' => 1,
+      'option_status' => array(1, 1),
     );
 
     $params = array_merge($fieldParams, $optionGroup, $optionValue, $extraParams);
@@ -1703,11 +1709,11 @@ class CiviUnitTestCase extends PHPUnit_Framework_TestCase {
    *
    * @param array $tablesToTruncate
    * @param bool $dropCustomValueTables
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function quickCleanup($tablesToTruncate, $dropCustomValueTables = FALSE) {
     if ($this->tx) {
-      throw new Exception("CiviUnitTestCase: quickCleanup() is not compatible with useTransaction()");
+      throw new \CRM_Core_Exception("CiviUnitTestCase: quickCleanup() is not compatible with useTransaction()");
     }
     if ($dropCustomValueTables) {
       $optionGroupResult = CRM_Core_DAO::executeQuery('SELECT option_group_id FROM civicrm_custom_field');
@@ -1772,6 +1778,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'civicrm_participant',
       'civicrm_participant_payment',
       'civicrm_pledge',
+      'civicrm_pledge_block',
       'civicrm_pledge_payment',
       'civicrm_price_set_entity',
       'civicrm_price_field_value',
@@ -1786,6 +1793,9 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     $this->setCurrencySeparators(',');
     CRM_Core_PseudoConstant::flush('taxRates');
     System::singleton()->flushProcessors();
+    // @fixme this parameter is leaking - it should not be defined as a class static
+    // but for now we just handle in tear down.
+    CRM_Contribute_BAO_Query::$_contribOrSoftCredit = 'only contribs';
   }
 
   public function restoreDefaultPriceSetConfig() {
@@ -1890,7 +1900,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   public function checkArrayEquals(&$actual, &$expected) {
     self::unsetId($actual);
     self::unsetId($expected);
-    $this->assertEquals($actual, $expected);
+    $this->assertEquals($expected, $actual);
   }
 
   /**
@@ -2381,6 +2391,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'contribution_page_id' => $this->_contributionPageID,
       'payment_processor_id' => $this->_paymentProcessorID,
       'is_test' => 0,
+      'receive_date' => '2019-07-25 07:34:23',
       'skipCleanMoney' => TRUE,
     ], $contributionParams);
     $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', array_merge(array(
@@ -2424,6 +2435,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
         'financial_type_id' => 1,
         'invoice_id' => 'abcd',
         'trxn_id' => 345,
+        'receive_date' => '2019-07-25 07:34:23',
       ));
     }
     $this->setupRecurringPaymentProcessorTransaction($recurParams);
@@ -2433,6 +2445,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       'membership_type_id' => $this->ids['membership_type'],
       'contribution_recur_id' => $this->_contributionRecurID,
       'format.only_id' => TRUE,
+      'source' => 'Payment',
     ));
     //CRM-15055 creates line items we don't want so get rid of them so we can set up our own line items
     CRM_Core_DAO::executeQuery("TRUNCATE civicrm_line_item");
@@ -2514,6 +2527,19 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
   }
 
   /**
+   * Assert 2 sql strings are the same, ignoring double spaces.
+   *
+   * @param string $expectedSQL
+   * @param string $actualSQL
+   * @param string $message
+   */
+  protected function assertLike($expectedSQL, $actualSQL, $message = 'different sql') {
+    $expected = trim((preg_replace('/[ \r\n\t]+/', ' ', $expectedSQL)));
+    $actual = trim((preg_replace('/[ \r\n\t]+/', ' ', $actualSQL)));
+    $this->assertEquals($expected, $actual, $message);
+  }
+
+  /**
    * Create a price set for an event.
    *
    * @param int $feeTotal
@@ -2522,6 +2548,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    *
    * @return int
    *   Price Set ID.
+   * @throws \CRM_Core_Exception
    */
   protected function eventPriceSetCreate($feeTotal, $minAmt = 0, $type = 'Text') {
     // creating price set, price field
@@ -2557,7 +2584,7 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
       $paramsField['option_value'][2] = $paramsField['option_weight'][2] = $paramsField['option_amount'][2] = 100;
       $paramsField['option_label'][2] = $paramsField['option_name'][2] = 'hundy';
     }
-    CRM_Price_BAO_PriceField::create($paramsField);
+    $this->callAPISuccess('PriceField', 'create', $paramsField);
     $fields = $this->callAPISuccess('PriceField', 'get', array('price_set_id' => $this->_ids['price_set']));
     $this->_ids['price_field'] = array_keys($fields['values']);
     $fieldValues = $this->callAPISuccess('PriceFieldValue', 'get', array('price_field_id' => $this->_ids['price_field'][0]));
@@ -3141,12 +3168,19 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * @param string $class
    *   Name of form class.
    *
+   * @param array $formValues
+   *
+   * @param string $pageName
+   *
    * @return \CRM_Core_Form
+   * @throws \CRM_Core_Exception
    */
-  public function getFormObject($class) {
+  public function getFormObject($class, $formValues = [], $pageName = '') {
     $form = new $class();
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $form->controller = new CRM_Core_Controller();
+    $form->controller->setStateMachine(new CRM_Core_StateMachine($form->controller));
+    $_SESSION['_' . $form->controller->_name . '_container']['values'][$pageName] = $formValues;
     return $form;
   }
 
@@ -3157,6 +3191,15 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    */
   public function getThousandSeparators() {
     return array(array('.'), array(','));
+  }
+
+  /**
+   * Get the boolean options as a provider.
+   *
+   * @return array
+   */
+  public function getBooleanDataProvider() {
+    return [[TRUE], [FALSE]];
   }
 
   /**
@@ -3243,6 +3286,38 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     // Create an SMS provider "CiviTestSMSProvider". Civi handles "CiviTestSMSProvider" as a special case and allows it to be instantiated
     //  in CRM/Sms/Provider.php even though it is not an extension.
     return civicrm_api3('option_value', 'create', $params);
+  }
+
+  /**
+   * Start capturing browser output.
+   *
+   * The starts the process of browser output being captured, setting any variables needed for e-notice prevention.
+   */
+  protected function startCapturingOutput() {
+    ob_start();
+    $_SERVER['HTTP_USER_AGENT'] = 'unittest';
+  }
+
+  /**
+   * Stop capturing browser output and return as a csv.
+   *
+   * @param bool $isFirstRowHeaders
+   *
+   * @return \League\Csv\Reader
+   *
+   * @throws \League\Csv\Exception
+   */
+  protected function captureOutputToCSV($isFirstRowHeaders = TRUE) {
+    $output = ob_get_flush();
+    $stream = fopen('php://memory', 'r+');
+    fwrite($stream, $output);
+    rewind($stream);
+    $csv = Reader::createFromString($output);
+    if ($isFirstRowHeaders) {
+      $csv->setHeaderOffset(0);
+    }
+    ob_clean();
+    return $csv;
   }
 
 }

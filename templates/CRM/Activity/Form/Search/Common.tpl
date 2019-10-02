@@ -74,19 +74,16 @@
       </td></tr>
     </table>
   </td>
-  {if $form.activity_tags}
-    <td><label>{ts}Activity Tag(s){/ts}</label>
-      <div id="Tags" class="listing-box">
-        {foreach from=$form.activity_tags item="tag_val"}
-          <div class="{cycle values='odd-row,even-row'}">
-            {$tag_val.html}
-          </div>
-        {/foreach}
-    </td>
-  {else}
-    <td>&nbsp;</td>
-  {/if}
 </tr>
+
+{if $form.activity_tags}
+  <tr>
+    <td><label>{$form.activity_tags.label}</label>
+      <br/>
+      {$form.activity_tags.html}
+    </td>
+  </tr>
+{/if}
 
 <tr>
   {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="activity_date_time" colspan="2"}
@@ -112,6 +109,11 @@
     {$form.activity_test.label} {help id="is-test" file="CRM/Contact/Form/Search/Advanced"}
     &nbsp; {$form.activity_test.html}
   </td>
+</tr>
+<tr>
+<td>{$form.activity_location.label}<br />
+  {$form.activity_location.html}</td>
+<td></td>
 </tr>
 {if $buildSurveyResult }
   <tr>

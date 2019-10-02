@@ -45,11 +45,11 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
    * Test that the membership is set to recurring if the membership type is always autorenew.
    */
   public function testSetRecurFunction() {
-    $membershipTypeID = $this->membershipTypeCreate(array('auto_renew' => 2, 'minimum_fee' => 80));
+    $membershipTypeID = $this->membershipTypeCreate(['auto_renew' => 2, 'minimum_fee' => 80]);
     $form = $this->getContributionForm();
-    $form->testSubmit(array(
+    $form->testSubmit([
       'selectMembership' => $membershipTypeID,
-    ));
+    ]);
     $this->assertEquals(1, $form->_params['is_recur']);
   }
 
@@ -57,12 +57,12 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
    * Test that the membership is set to recurring if the membership type is always autorenew.
    */
   public function testSetRecurFunctionOptionalYes() {
-    $membershipTypeID = $this->membershipTypeCreate(array('auto_renew' => 1, 'minimum_fee' => 80));
+    $membershipTypeID = $this->membershipTypeCreate(['auto_renew' => 1, 'minimum_fee' => 80]);
     $form = $this->getContributionForm();
-    $form->testSubmit(array(
+    $form->testSubmit([
       'selectMembership' => $membershipTypeID,
       'is_recur' => 1,
-    ));
+    ]);
     $this->assertEquals(1, $form->_params['is_recur']);
   }
 
@@ -70,12 +70,12 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
    * Test that the membership is set to recurring if the membership type is always autorenew.
    */
   public function testSetRecurFunctionOptionalNo() {
-    $membershipTypeID = $this->membershipTypeCreate(array('auto_renew' => 1, 'minimum_fee' => 80));
+    $membershipTypeID = $this->membershipTypeCreate(['auto_renew' => 1, 'minimum_fee' => 80]);
     $form = $this->getContributionForm();
-    $form->testSubmit(array(
+    $form->testSubmit([
       'selectMembership' => $membershipTypeID,
       'is_recur' => 0,
-    ));
+    ]);
     $this->assertEquals(0, $form->_params['is_recur']);
   }
 
@@ -83,11 +83,11 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
    * Test that the membership is set to recurring if the membership type is always autorenew.
    */
   public function testSetRecurFunctionNotAvailable() {
-    $membershipTypeID = $this->membershipTypeCreate(array('auto_renew' => 0, 'minimum_fee' => 80));
+    $membershipTypeID = $this->membershipTypeCreate(['auto_renew' => 0, 'minimum_fee' => 80]);
     $form = $this->getContributionForm();
-    $form->testSubmit(array(
+    $form->testSubmit([
       'selectMembership' => $membershipTypeID,
-    ));
+    ]);
     $this->assertArrayNotHasKey('is_recur', $form->_params);
   }
 
@@ -100,19 +100,19 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
     $form = new CRM_Contribute_Form_Contribution_Main();
     $form->_values['is_monetary'] = 1;
     $form->_values['is_pay_later'] = 0;
-    $form->_priceSetId = $this->callAPISuccessGetValue('PriceSet', array(
+    $form->_priceSetId = $this->callAPISuccessGetValue('PriceSet', [
       'name' => 'default_membership_type_amount',
       'return' => 'id',
-    ));
-    $priceFields = $this->callAPISuccess('PriceField', 'get', array('id' => $form->_priceSetId));
+    ]);
+    $priceFields = $this->callAPISuccess('PriceField', 'get', ['id' => $form->_priceSetId]);
     $form->_priceSet['fields'] = $priceFields['values'];
-    $paymentProcessorID = $this->paymentProcessorCreate(array('payment_processor_type_id' => 'Dummy'));
-    $form->_paymentProcessor = array(
+    $paymentProcessorID = $this->paymentProcessorCreate(['payment_processor_type_id' => 'Dummy']);
+    $form->_paymentProcessor = [
       'billing_mode' => CRM_Core_Payment::BILLING_MODE_FORM,
       'object' => Civi\Payment\System::singleton()->getById($paymentProcessorID),
       'is_recur' => TRUE,
-    );
-    $form->_values = array(
+    ];
+    $form->_values = [
       'title' => "Test Contribution Page",
       'financial_type_id' => 1,
       'currency' => 'NZD',
@@ -121,7 +121,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
       'is_monetary' => TRUE,
       'pay_later_text' => 'Front up',
       'pay_later_receipt' => 'Ta',
-    );
+    ];
     return $form;
   }
 
@@ -130,7 +130,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
    */
   public function testExpiredPriceSet() {
     $form = $this->getContributionForm();
-    $priceSetParams1 = array(
+    $priceSetParams1 = [
       'name' => 'priceset',
       'title' => 'Priceset with Multiple Terms',
       'is_active' => 1,
@@ -138,24 +138,24 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
       'financial_type_id' => 2,
       'is_quick_config' => 1,
       'is_reserved' => 1,
-    );
+    ];
     $priceSet = $this->callAPISuccess('price_set', 'create', $priceSetParams1);
     $form->_priceSetId = $priceSet['id'];
 
     $form->controller = new CRM_Core_Controller();
     $form->set('priceSetId', $form->_priceSetId);
-    $params = array(
+    $params = [
       'price_set_id' => $form->_priceSetId,
       'name' => 'testvalidpf',
       'label' => 'test valid pf',
       'html_type' => 'Radio',
       'is_enter_qty' => 1,
       'is_active' => 1,
-    );
+    ];
     $priceField1 = $this->callAPISuccess('PriceField', 'create', $params);
 
     //Create expired price field.
-    $params = array(
+    $params = [
       'price_set_id' => $form->_priceSetId,
       'name' => 'testexpiredpf',
       'label' => 'test expired pf',
@@ -163,14 +163,14 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
       'is_enter_qty' => 1,
       'is_active' => 1,
       'expire_on' => date('Y-m-d', strtotime("-1 days")),
-    );
+    ];
     $priceField2 = $this->callAPISuccess('PriceField', 'create', $params);
 
     //Create price options.
     $membershipOrgId = $this->organizationCreate(NULL);
-    $memtype = $this->membershipTypeCreate(array('member_of_contact_id' => $membershipOrgId));
-    foreach (array($priceField1, $priceField2) as $priceField) {
-      $priceFieldValueParams = array(
+    $memtype = $this->membershipTypeCreate(['member_of_contact_id' => $membershipOrgId]);
+    foreach ([$priceField1, $priceField2] as $priceField) {
+      $priceFieldValueParams = [
         'price_field_id' => $priceField['id'],
         'name' => 'rye grass',
         'membership_type_id' => $memtype,
@@ -178,7 +178,7 @@ class CRM_Contribute_Form_Contribution_MainTest extends CiviUnitTestCase {
         'amount' => 1,
         'membership_num_terms' => 2,
         'financial_type_id' => 1,
-      );
+      ];
       $this->callAPISuccess('PriceFieldValue', 'create', $priceFieldValueParams);
     }
 

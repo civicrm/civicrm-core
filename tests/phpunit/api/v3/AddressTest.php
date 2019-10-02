@@ -37,7 +37,6 @@
  * @group headless
  */
 class api_v3_AddressTest extends CiviUnitTestCase {
-  protected $_apiversion = 3;
   protected $_contactID;
   protected $_locationType;
   protected $_params;
@@ -52,7 +51,7 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->_locationType = $this->locationTypeCreate();
     CRM_Core_PseudoConstant::flush();
 
-    $this->_params = array(
+    $this->_params = [
       'contact_id' => $this->_contactID,
       'location_type_id' => $this->_locationType->id,
       'street_name' => 'Ambachtstraat',
@@ -62,29 +61,40 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'country_id' => '1152',
       'city' => 'Brummen',
       'is_primary' => 1,
-    );
+    ];
   }
 
   public function tearDown() {
     $this->locationTypeDelete($this->_locationType->id);
     $this->contactDelete($this->_contactID);
-    $this->quickCleanup(array('civicrm_address', 'civicrm_relationship'));
+    $this->quickCleanup(['civicrm_address', 'civicrm_relationship']);
+    parent::tearDown();
   }
 
-  public function testCreateAddress() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateAddress($version) {
+    $this->_apiversion = $version;
     $result = $this->callAPIAndDocument('address', 'create', $this->_params, __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
     $this->getAndCheck($this->_params, $result['id'], 'address');
   }
 
-  public function testCreateAddressParsing() {
-    $params = array(
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateAddressParsing($version) {
+    $this->_apiversion = $version;
+    $params = [
       'street_parsing' => 1,
       'street_address' => '54A Excelsior Ave. Apt 1C',
       'location_type_id' => $this->_locationType->id,
       'contact_id' => $this->_contactID,
-    );
+    ];
     $subfile = "AddressParse";
     $description = "Demonstrates Use of address parsing param.";
     $result = $this->callAPIAndDocument('address', 'create', $params, __FUNCTION__, __FILE__, $description, $subfile);
@@ -92,14 +102,17 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->assertEquals('A', $result['values'][$result['id']]['street_number_suffix']);
     $this->assertEquals('Excelsior Ave.', $result['values'][$result['id']]['street_name']);
     $this->assertEquals('Apt 1C', $result['values'][$result['id']]['street_unit']);
-    $this->callAPISuccess('address', 'delete', array('id' => $result['id']));
+    $this->callAPISuccess('address', 'delete', ['id' => $result['id']]);
 
   }
 
   /**
    * Is_primary should be set as a default.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressTestDefaults() {
+  public function testCreateAddressTestDefaults($version) {
+    $this->_apiversion = $version;
     $params = $this->_params;
     unset($params['is_primary']);
     $result = $this->callAPISuccess('address', 'create', $params);
@@ -108,6 +121,25 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->getAndCheck($this->_params, $result['id'], 'address');
   }
 
+  /**
+   * If no location is specified when creating a new address, it should default to
+   * the LocationType default
+   *
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testCreateAddressDefaultLocation($version) {
+    $this->_apiversion = $version;
+    $params = $this->_params;
+    unset($params['location_type_id']);
+    $result = $this->callAPIAndDocument($this->_entity, 'create', $params, __FUNCTION__, __FILE__);
+    $this->assertEquals(CRM_Core_BAO_LocationType::getDefault()->id, $result['values'][$result['id']]['location_type_id']);
+    $this->callAPISuccess($this->_entity, 'delete', ['id' => $result['id']]);
+  }
+
+  /**
+   * FIXME: Api4
+   */
   public function testCreateAddressTooLongSuffix() {
     $params = $this->_params;
     $params['street_number_suffix'] = 'really long string';
@@ -116,81 +148,93 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * Create an address with a master ID and ensure that a relationship is created.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressWithMasterRelationshipHousehold() {
+  public function testCreateAddressWithMasterRelationshipHousehold($version) {
+    $this->_apiversion = $version;
     $householdID = $this->householdCreate();
-    $address = $this->callAPISuccess('address', 'create', array_merge($this->_params, $this->_params, array('contact_id' => $householdID)));
+    $address = $this->callAPISuccess('address', 'create', array_merge($this->_params, $this->_params, ['contact_id' => $householdID]));
     $individualID = $this->individualCreate();
-    $individualParams = array(
+    $individualParams = [
       'contact_id' => $individualID,
       'master_id' => $address['id'],
-    );
+    ];
     $this->callAPISuccess('address', 'create', array_merge($this->_params, $individualParams));
-    $this->callAPISuccess('relationship', 'getcount', array(
+    $this->callAPISuccess('relationship', 'getcount', [
       'contact_id_a' => $individualID,
       'contact_id_b' => $this->_contactID,
-    ));
+    ]);
   }
 
   /**
    * Create an address with a master ID and ensure that a relationship is created.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressWithMasterRelationshipOrganization() {
+  public function testCreateAddressWithMasterRelationshipOrganization($version) {
+    $this->_apiversion = $version;
     $address = $this->callAPISuccess('address', 'create', $this->_params);
     $individualID = $this->individualCreate();
-    $individualParams = array(
+    $individualParams = [
       'contact_id' => $individualID,
       'master_id' => $address['id'],
-    );
+    ];
     $this->callAPISuccess('address', 'create', array_merge($this->_params, $individualParams));
-    $this->callAPISuccess('relationship', 'getcount', array(
+    $this->callAPISuccess('relationship', 'getcount', [
       'contact_id_a' => $individualID,
       'contact_id_b' => $this->_contactID,
-    ), 1);
+    ], 1);
   }
 
   /**
    * Create an address with a master ID and relationship creation disabled.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressWithoutMasterRelationshipOrganization() {
+  public function testCreateAddressWithoutMasterRelationshipOrganization($version) {
+    $this->_apiversion = $version;
     $address = $this->callAPISuccess('address', 'create', $this->_params);
     $individualID = $this->individualCreate();
-    $individualParams = array(
+    $individualParams = [
       'contact_id' => $individualID,
       'master_id' => $address['id'],
       'update_current_employer' => 0,
-    );
+    ];
     $this->callAPISuccess('address', 'create', array_merge($this->_params, $individualParams));
-    $this->callAPISuccess('relationship', 'getcount', array(
+    $this->callAPISuccess('relationship', 'getcount', [
       'contact_id_a' => $individualID,
       'contact_id_b' => $this->_contactID,
-    ), 0);
+    ], 0);
   }
 
   /**
    * Create an address with a master ID and ensure that a relationship is created.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressWithMasterRelationshipChangingOrganization() {
+  public function testCreateAddressWithMasterRelationshipChangingOrganization($version) {
+    $this->_apiversion = $version;
     $address = $this->callAPISuccess('address', 'create', $this->_params);
     $organisation2ID = $this->organizationCreate();
-    $address2 = $this->callAPISuccess('address', 'create', array_merge($this->_params, array('contact_id' => $organisation2ID)));
+    $address2 = $this->callAPISuccess('address', 'create', array_merge($this->_params, ['contact_id' => $organisation2ID]));
     $individualID = $this->individualCreate();
-    $individualParams = array_merge($this->_params, array(
+    $individualParams = array_merge($this->_params, [
       'contact_id' => $individualID,
       'master_id' => $address['id'],
-    ));
+    ]);
     $individualAddress = $this->callAPISuccess('address', 'create', $individualParams);
     $individualParams['master_id'] = $address2['id'];
     $individualParams['id'] = $individualAddress['id'];
     $this->callAPISuccess('address', 'create', $individualParams);
-    $this->callAPISuccessGetCount('relationship', array('contact_id_a' => $individualID), 2);
+    $this->callAPISuccessGetCount('relationship', ['contact_id_a' => $individualID], 2);
     $this->markTestIncomplete('Remainder of test checks that employer relationship is disabled when new one is created but turns out to be not happening - by design?');
-    $this->callAPISuccessGetCount('relationship', array('contact_id_a' => $individualID, 'is_active' => FALSE), 1);
-    $this->callAPISuccessGetCount('relationship', array(
+    $this->callAPISuccessGetCount('relationship', ['contact_id_a' => $individualID, 'is_active' => FALSE], 1);
+    $this->callAPISuccessGetCount('relationship', [
       'contact_id_a' => $individualID,
       'is_active' => TRUE,
       'contact_id_b' => $organisation2ID,
-    ), 1);
+    ], 1);
 
   }
 
@@ -200,15 +244,18 @@ class api_v3_AddressTest extends CiviUnitTestCase {
    * ie. create the address, unset the params & recreate.
    * is_primary should be 0 before & after the update. ie - having no other address
    * is_primary is invalid.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressTestDefaultWithID() {
+  public function testCreateAddressTestDefaultWithID($version) {
+    $this->_apiversion = $version;
     $params = $this->_params;
     $params['is_primary'] = 0;
     $result = $this->callAPISuccess('address', 'create', $params);
     unset($params['is_primary']);
     $params['id'] = $result['id'];
-    $result = $this->callAPISuccess('address', 'create', $params);
-    $this->callAPISuccess('address', 'get', array('contact_id' => $params['contact_id']));
+    $this->callAPISuccess('address', 'create', $params);
+    $result = $this->callAPISuccess('address', 'get', ['contact_id' => $params['contact_id']]);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals(1, $result['values'][$result['id']]['is_primary']);
     $this->getAndCheck($params, $result['id'], 'address', __FUNCTION__);
@@ -216,37 +263,43 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * test address deletion.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testDeleteAddress() {
+  public function testDeleteAddress($version) {
+    $this->_apiversion = $version;
     //check there are no address to start with
-    $get = $this->callAPISuccess('address', 'get', array(
+    $get = $this->callAPISuccess('address', 'get', [
       'location_type_id' => $this->_locationType->id,
-    ));
+    ]);
     $this->assertEquals(0, $get['count'], 'Contact already exists ');
 
     //create one
     $create = $this->callAPISuccess('address', 'create', $this->_params);
 
-    $result = $this->callAPIAndDocument('address', 'delete', array('id' => $create['id']), __FUNCTION__, __FILE__);
+    $result = $this->callAPIAndDocument('address', 'delete', ['id' => $create['id']], __FUNCTION__, __FILE__);
     $this->assertEquals(1, $result['count']);
-    $get = $this->callAPISuccess('address', 'get', array(
+    $get = $this->callAPISuccess('address', 'get', [
       'location_type_id' => $this->_locationType->id,
-    ));
+    ]);
     $this->assertEquals(0, $get['count'], 'Contact not successfully deleted In line ' . __LINE__);
   }
 
   /**
    * Test civicrm_address_get - success expected.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetAddress() {
+  public function testGetAddress($version) {
+    $this->_apiversion = $version;
     $address = $this->callAPISuccess('address', 'create', $this->_params);
 
-    $params = array(
+    $params = [
       'contact_id' => $this->_contactID,
       'street_name' => $address['values'][$address['id']]['street_name'],
-    );
+    ];
     $result = $this->callAPIAndDocument('Address', 'Get', $params, __FUNCTION__, __FILE__);
-    $this->callAPISuccess('Address', 'delete', array('id' => $result['id']));
+    $this->callAPISuccess('Address', 'delete', ['id' => $result['id']]);
     $this->assertEquals($address['values'][$address['id']]['location_type_id'], $result['values'][$address['id']]['location_type_id']);
     $this->assertEquals($address['values'][$address['id']]['is_primary'], $result['values'][$address['id']]['is_primary']);
     $this->assertEquals($address['values'][$address['id']]['street_address'], $result['values'][$address['id']]['street_address']);
@@ -254,70 +307,83 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
   /**
    * Test civicrm_address_get - success expected.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetSingleAddress() {
+  public function testGetSingleAddress($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess('address', 'create', $this->_params);
-    $params = array(
+    $params = [
       'contact_id' => $this->_contactID,
-    );
+    ];
     $address = $this->callAPISuccess('Address', 'getsingle', ($params));
     $this->assertEquals($address['location_type_id'], $this->_params['location_type_id']);
-    $this->callAPISuccess('address', 'delete', array('id' => $address['id']));
+    $this->callAPISuccess('address', 'delete', ['id' => $address['id']]);
   }
 
   /**
    * Test civicrm_address_get with sort option- success expected.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetAddressSort() {
+  public function testGetAddressSort($version) {
+    $this->_apiversion = $version;
     $create = $this->callAPISuccess('address', 'create', $this->_params);
-    $this->callAPISuccess('address', 'create', array_merge($this->_params, array('street_address' => 'yzy')));
+    $this->callAPISuccess('address', 'create', array_merge($this->_params, ['street_address' => 'yzy']));
     $subfile = "AddressSort";
     $description = "Demonstrates Use of sort filter.";
-    $params = array(
-      'options' => array(
+    $params = [
+      'options' => [
         'sort' => 'street_address DESC',
         'limit' => 2,
-      ),
+      ],
       'sequential' => 1,
-    );
+    ];
     $result = $this->callAPIAndDocument('Address', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals(2, $result['count']);
     $this->assertEquals('Ambachtstraat 23', $result['values'][1]['street_address']);
-    $this->callAPISuccess('address', 'delete', array('id' => $create['id']));
+    $this->callAPISuccess('address', 'delete', ['id' => $create['id']]);
   }
 
   /**
    * Test civicrm_address_get with sort option- success expected.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetAddressLikeSuccess() {
+  public function testGetAddressLikeSuccess($version) {
+    $this->_apiversion = $version;
     $this->callAPISuccess('address', 'create', $this->_params);
     $subfile = "AddressLike";
     $description = "Demonstrates Use of Like.";
-    $params = array(
-      'street_address' => array('LIKE' => '%mb%'),
+    $params = [
+      'street_address' => ['LIKE' => '%mb%'],
       'sequential' => 1,
-    );
+    ];
     $result = $this->callAPIAndDocument('Address', 'Get', $params, __FUNCTION__, __FILE__, $description, $subfile);
     $this->assertEquals(1, $result['count']);
     $this->assertEquals('Ambachtstraat 23', $result['values'][0]['street_address']);
-    $this->callAPISuccess('address', 'delete', array('id' => $result['id']));
+    $this->callAPISuccess('address', 'delete', ['id' => $result['id']]);
   }
 
   /**
    * Test civicrm_address_get with sort option- success expected.
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testGetAddressLikeFail() {
+  public function testGetAddressLikeFail($version) {
+    $this->_apiversion = $version;
     $create = $this->callAPISuccess('address', 'create', $this->_params);
-    $params = array(
-      'street_address' => array('LIKE' => "'%xy%'"),
+    $params = [
+      'street_address' => ['LIKE' => "'%xy%'"],
       'sequential' => 1,
-    );
+    ];
     $result = $this->callAPISuccess('Address', 'Get', ($params));
     $this->assertEquals(0, $result['count']);
-    $this->callAPISuccess('address', 'delete', array('id' => $create['id']));
+    $this->callAPISuccess('address', 'delete', ['id' => $create['id']]);
   }
 
   /**
+   * FIXME: Api4 custom address fields broken?
    */
   public function testGetWithCustom() {
     $ids = $this->entityCustomGroupWithSingleFieldCreate(__FUNCTION__, __FILE__);
@@ -327,43 +393,49 @@ class api_v3_AddressTest extends CiviUnitTestCase {
 
     $result = $this->callAPISuccess($this->_entity, 'create', $params);
 
-    $getParams = array('id' => $result['id'], 'return' => array('custom'));
+    $getParams = ['id' => $result['id'], 'return' => ['custom']];
     $check = $this->callAPISuccess($this->_entity, 'get', $getParams);
 
     $this->assertEquals("custom string", $check['values'][$check['id']]['custom_' . $ids['custom_field_id']], ' in line ' . __LINE__);
 
     $this->customFieldDelete($ids['custom_field_id']);
     $this->customGroupDelete($ids['custom_group_id']);
-    $this->callAPISuccess('address', 'delete', array('id' => $result['id']));
+    $this->callAPISuccess('address', 'delete', ['id' => $result['id']]);
   }
 
   /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressPrimaryHandlingChangeToPrimary() {
+  public function testCreateAddressPrimaryHandlingChangeToPrimary($version) {
+    $this->_apiversion = $version;
     $params = $this->_params;
     unset($params['is_primary']);
     $address1 = $this->callAPISuccess('address', 'create', $params);
     $this->assertApiSuccess($address1);
     //now we check & make sure it has been set to primary
-    $check = $this->callAPISuccess('address', 'getcount', array(
+    $check = $this->callAPISuccess('address', 'getcount', [
       'is_primary' => 1,
       'id' => $address1['id'],
-    ));
+    ]);
     $this->assertEquals(1, $check);
-    $this->callAPISuccess('address', 'delete', array('id' => $address1['id']));
+    $this->callAPISuccess('address', 'delete', ['id' => $address1['id']]);
   }
 
   /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
    */
-  public function testCreateAddressPrimaryHandlingChangeExisting() {
+  public function testCreateAddressPrimaryHandlingChangeExisting($version) {
+    $this->_apiversion = $version;
     $address1 = $this->callAPISuccess('address', 'create', $this->_params);
     $this->callAPISuccess('address', 'create', $this->_params);
-    $check = $this->callAPISuccess('address', 'getcount', array(
+    $check = $this->callAPISuccess('address', 'getcount', [
       'is_primary' => 1,
       'contact_id' => $this->_contactID,
-    ));
+    ]);
     $this->assertEquals(1, $check);
-    $this->callAPISuccess('address', 'delete', array('id' => $address1['id']));
+    $this->callAPISuccess('address', 'delete', ['id' => $address1['id']]);
   }
 
   /**
@@ -371,40 +443,40 @@ class api_v3_AddressTest extends CiviUnitTestCase {
    * This is legacy API v3 behaviour and not correct behaviour
    * however we are too far down the path wiwth v3 to fix this
    * @link https://chat.civicrm.org/civicrm/pl/zcq3jkg69jdt5g4aqze6bbe9pc
-   * @todo vis this in v4 api
+   * FIXME: Api4
    */
   public function testCreateDuplicateLocationTypes() {
     $address1 = $this->callAPISuccess('address', 'create', $this->_params);
-    $address2 = $this->callAPISuccess('address', 'create', array(
+    $address2 = $this->callAPISuccess('address', 'create', [
       'location_type_id' => $this->_locationType->id,
       'street_address' => '1600 Pensilvania Avenue',
       'city' => 'Washington DC',
       'is_primary' => 0,
       'is_billing' => 0,
       'contact_id' => $this->_contactID,
-    ));
-    $check = $this->callAPISuccess('address', 'getcount', array(
+    ]);
+    $check = $this->callAPISuccess('address', 'getcount', [
       'contact_id' => $this->_contactID,
       'location_type_id' => $this->_locationType->id,
-    ));
+    ]);
     $this->assertEquals(2, $check);
-    $this->callAPISuccess('address', 'delete', array('id' => $address1['id']));
-    $this->callAPISuccess('address', 'delete', array('id' => $address2['id']));
+    $this->callAPISuccess('address', 'delete', ['id' => $address1['id']]);
+    $this->callAPISuccess('address', 'delete', ['id' => $address2['id']]);
   }
 
   public function testGetWithJoin() {
-    $cid = $this->individualCreate(array(
-      'api.Address.create' => array(
+    $cid = $this->individualCreate([
+      'api.Address.create' => [
         'street_address' => __FUNCTION__,
         'location_type_id' => $this->_locationType->id,
-      ),
-    ));
-    $result = $this->callAPISuccess('address', 'getsingle', array(
+      ],
+    ]);
+    $result = $this->callAPISuccess('address', 'getsingle', [
       'check_permissions' => TRUE,
       'contact_id' => $cid,
       'street_address' => __FUNCTION__,
       'return' => 'contact_id.contact_type',
-    ));
+    ]);
     $this->assertEquals('Individual', $result['contact_id.contact_type']);
   }
 
@@ -479,31 +551,41 @@ class api_v3_AddressTest extends CiviUnitTestCase {
     $this->assertEquals($expectState, $created['state_province_id']);
   }
 
-  public function testBuildStateProvinceOptionsWithDodgyProvinceLimit() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testBuildStateProvinceOptionsWithDodgyProvinceLimit($version) {
+    $this->_apiversion = $version;
     $provinceLimit = [1228, "abcd;ef"];
     $this->callAPISuccess('setting', 'create', [
-     'provinceLimit' => $provinceLimit,
+      'provinceLimit' => $provinceLimit,
     ]);
     $result = $this->callAPIFailure('address', 'getoptions', ['field' => 'state_province_id']);
     // confirm that we hit our error not a SQLI.
     $this->assertEquals('Province limit or default country setting is incorrect', $result['error_message']);
     $this->callAPISuccess('setting', 'create', [
-     'provinceLimit' => [1228],
+      'provinceLimit' => [1228],
     ]);
     // Now confirm with a correct province setting it works fine
     $this->callAPISuccess('address', 'getoptions', ['field' => 'state_province_id']);
   }
 
-  public function testBuildCountryWithDodgyCountryLimitSetting() {
+  /**
+   * @param int $version
+   * @dataProvider versionThreeAndFour
+   */
+  public function testBuildCountryWithDodgyCountryLimitSetting($version) {
+    $this->_apiversion = $version;
     $countryLimit = [1228, "abcd;ef"];
     $this->callAPISuccess('setting', 'create', [
-     'countryLimit' => $countryLimit,
+      'countryLimit' => $countryLimit,
     ]);
     $result = $this->callAPIFailure('address', 'getoptions', ['field' => 'country_id']);
     // confirm that we hit our error not a SQLI.
     $this->assertEquals('Available Country setting is incorrect', $result['error_message']);
     $this->callAPISuccess('setting', 'create', [
-     'countryLimit' => [1228],
+      'countryLimit' => [1228],
     ]);
     // Now confirm with a correct province setting it works fine
     $this->callAPISuccess('address', 'getoptions', ['field' => 'country_id']);
@@ -520,6 +602,21 @@ class api_v3_AddressTest extends CiviUnitTestCase {
       'state_province_id' => 1004,
     ]);
     $this->assertEquals('San Francisco', $goodResult['values'][4]);
+  }
+
+  public function testGetOptionsAbbr() {
+    $result = $this->callAPISuccess('Address', 'getoptions', [
+      'field' => 'country_id',
+      'context' => "abbreviate",
+    ]);
+    $this->assertContains('US', $result['values']);
+    $this->assertNotContains('United States', $result['values']);
+    $result = $this->callAPISuccess('Address', 'getoptions', [
+      'field' => 'state_province_id',
+      'context' => "abbreviate",
+    ]);
+    $this->assertContains('AL', $result['values']);
+    $this->assertNotContains('Alabama', $result['values']);
   }
 
 }

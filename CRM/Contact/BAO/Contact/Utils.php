@@ -132,9 +132,7 @@ SELECT count( DISTINCT contact_type )
 FROM   civicrm_contact
 WHERE  id IN ( $idString )
 ";
-    $count = CRM_Core_DAO::singleValueQuery($query,
-      CRM_Core_DAO::$_nullArray
-    );
+    $count = CRM_Core_DAO::singleValueQuery($query);
     return $count > 1 ? TRUE : FALSE;
   }
 
@@ -242,33 +240,6 @@ WHERE  id IN ( $idString )
     // checksum matches so now check timestamp
     $now = time();
     return ($inputTS + ($inputLF * 60 * 60) >= $now);
-  }
-
-  /**
-   * Get the count of  contact loctions.
-   *
-   * @param int $contactId
-   *   Contact id.
-   *
-   * @return int
-   *   max locations for the contact
-   */
-  public static function maxLocations($contactId) {
-    $contactLocations = [];
-
-    // find number of location blocks for this contact and adjust value accordinly
-    // get location type from email
-    $query = "
-( SELECT location_type_id FROM civicrm_email   WHERE contact_id = {$contactId} )
-UNION
-( SELECT location_type_id FROM civicrm_phone   WHERE contact_id = {$contactId} )
-UNION
-( SELECT location_type_id FROM civicrm_im      WHERE contact_id = {$contactId} )
-UNION
-( SELECT location_type_id FROM civicrm_address WHERE contact_id = {$contactId} )
-";
-    $dao = CRM_Core_DAO::executeQuery($query);
-    return $dao->N;
   }
 
   /**
@@ -394,10 +365,7 @@ UNION
       $query = "UPDATE civicrm_contact contact_a,civicrm_contact contact_b
 SET contact_a.employer_id=contact_b.id, contact_a.organization_name=contact_b.organization_name
 WHERE contact_a.id ={$contactId} AND contact_b.id={$orgId}; ";
-
-      //FIXME : currently civicrm mysql_query support only single statement
-      //execution, though mysql 5.0 support multiple statement execution.
-      $dao = CRM_Core_DAO::executeQuery($query);
+      CRM_Core_DAO::executeQuery($query);
     }
   }
 
@@ -474,9 +442,6 @@ WHERE id={$contactId}; ";
    *
    */
   public static function buildOnBehalfForm(&$form, $contactType, $countryID, $stateID, $title) {
-
-    $config = CRM_Core_Config::singleton();
-
     $form->assign('contact_type', $contactType);
     $form->assign('fieldSetTitle', $title);
     $form->assign('contactEditMode', TRUE);
@@ -514,7 +479,7 @@ WHERE id={$contactId}; ";
         );
     }
 
-    $addressSequence = $config->addressSequence();
+    $addressSequence = CRM_Utils_Address::sequence(\Civi::settings()->get('address_format'));
     $form->assign('addressSequence', array_fill_keys($addressSequence, 1));
 
     //Primary Phone

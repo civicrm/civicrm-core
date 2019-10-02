@@ -310,8 +310,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $result = CRM_Utils_Mail::send($mailParams);
     }
 
-    $messageTemplates->free();
-
     return $result;
   }
 
@@ -442,7 +440,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       'valueName' => $params['valueName'],
       'messageTemplateID' => $params['messageTemplateID'],
     ];
-    $dao->free();
 
     CRM_Utils_Hook::alterMailContent($mailContent);
 
@@ -459,7 +456,6 @@ class CRM_Core_BAO_MessageTemplate extends CRM_Core_DAO_MessageTemplate {
       $mailContent['subject'] = $testDao->subject . $mailContent['subject'];
       $mailContent['text'] = $testDao->text . $mailContent['text'];
       $mailContent['html'] = preg_replace('/<body(.*)$/im', "<body\\1\n{$testDao->html}", $mailContent['html']);
-      $testDao->free();
     }
 
     // replace tokens in the three elements (in subject as if it was the text body)

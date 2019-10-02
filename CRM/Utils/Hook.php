@@ -603,6 +603,63 @@ abstract class CRM_Utils_Hook {
   }
 
   /**
+   * A theme is a set of CSS files which are loaded on CiviCRM pages. To register a new
+   * theme, add it to the $themes array. Use these properties:
+   *
+   *  - ext: string (required)
+   *         The full name of the extension which defines the theme.
+   *         Ex: "org.civicrm.themes.greenwich".
+   *  - title: string (required)
+   *         Visible title.
+   *  - help: string (optional)
+   *         Description of the theme's appearance.
+   *  - url_callback: mixed (optional)
+   *         A function ($themes, $themeKey, $cssExt, $cssFile) which returns the URL(s) for a CSS resource.
+   *         Returns either an array of URLs or PASSTHRU.
+   *         Ex: \Civi\Core\Themes\Resolvers::simple (default)
+   *         Ex: \Civi\Core\Themes\Resolvers::none
+   *  - prefix: string (optional)
+   *         A prefix within the extension folder to prepend to the file name.
+   *  - search_order: array (optional)
+   *         A list of themes to search.
+   *         Generally, the last theme should be "*fallback*" (Civi\Core\Themes::FALLBACK).
+   *  - excludes: array (optional)
+   *         A list of files (eg "civicrm:css/bootstrap.css" or "$ext:$file") which should never
+   *         be returned (they are excluded from display).
+   *
+   * @param array $themes
+   *   List of themes, keyed by name.
+   * @return null
+   *   the return value is ignored
+   */
+  public static function themes(&$themes) {
+    return self::singleton()->invoke(1, $themes,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_themes'
+    );
+  }
+
+  /**
+   * The activeTheme hook determines which theme is active.
+   *
+   * @param string $theme
+   *   The identifier for the theme. Alterable.
+   *   Ex: 'greenwich'.
+   * @param array $context
+   *   Information about the current page-request. Includes some mix of:
+   *   - page: the relative path of the current Civi page (Ex: 'civicrm/dashboard').
+   *   - themes: an instance of the Civi\Core\Themes service.
+   * @return null
+   *   the return value is ignored
+   */
+  public static function activeTheme(&$theme, $context) {
+    return self::singleton()->invoke(array('theme', 'context'), $theme, $context,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_activeTheme'
+    );
+  }
+
+  /**
    * This hook is called for declaring managed entities via API.
    *
    * @param array $entities
@@ -775,6 +832,21 @@ abstract class CRM_Utils_Hook {
   public static function tokens(&$tokens) {
     return self::singleton()->invoke(['tokens'], $tokens,
       self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_tokens'
+    );
+  }
+
+  /**
+   * This hook allows modification of the admin panels
+   *
+   * @param array $panels
+   *   Associated array of admin panels
+   *
+   * @return mixed
+   */
+  public static function alterAdminPanel(&$panels) {
+    return self::singleton()->invoke(array('panels'), $panels,
+      self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject, self::$_nullObject,
+      'civicrm_alterAdminPanel'
     );
   }
 
@@ -1296,7 +1368,7 @@ abstract class CRM_Utils_Hook {
    *
    * @return mixed
    */
-  public static function export(&$exportTempTable, &$headerRows, &$sqlColumns, &$exportMode, &$componentTable, &$ids) {
+  public static function export(&$exportTempTable, &$headerRows, &$sqlColumns, $exportMode, $componentTable, $ids) {
     return self::singleton()->invoke(['exportTempTable', 'headerRows', 'sqlColumns', 'exportMode', 'componentTable', 'ids'],
       $exportTempTable, $headerRows, $sqlColumns,
       $exportMode, $componentTable, $ids,
@@ -2426,9 +2498,10 @@ abstract class CRM_Utils_Hook {
    * @see CRM_Core_Resources::entityRefFilters
    *
    * @param array $filters
+   * @param array $links
    */
-  public static function entityRefFilters(&$filters) {
-    self::singleton()->invoke(['filters'], $filters, self::$_nullObject, self::$_nullObject,
+  public static function entityRefFilters(&$filters, &$links = NULL) {
+    self::singleton()->invoke(['filters', 'links'], $filters, $links, self::$_nullObject,
       self::$_nullObject, self::$_nullObject, self::$_nullObject,
       'civicrm_entityRefFilters'
     );

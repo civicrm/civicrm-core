@@ -34,7 +34,7 @@
 /**
  * This class generates form components for Financial Type
  */
-class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
+class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form_Search {
   public static $_links = NULL;
   public static $_entityID;
 
@@ -107,30 +107,6 @@ class CRM_Financial_Form_BatchTransaction extends CRM_Contribute_Form {
       }
     }
 
-    // text for sort_name
-    $this->addElement('text',
-      'sort_name',
-      ts('Contributor Name or Email'),
-      CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact',
-        'sort_name'
-      )
-    );
-
-    $this->_group = CRM_Core_PseudoConstant::nestedGroup();
-
-    // multiselect for groups
-    if ($this->_group) {
-      $this->add('select', 'group', ts('Groups'), $this->_group, FALSE,
-        ['id' => 'group', 'multiple' => 'multiple', 'class' => 'crm-select2']
-      );
-    }
-    $contactTags = CRM_Core_BAO_Tag::getTags();
-
-    if ($contactTags) {
-      $this->add('select', 'contact_tags', ts('Tags'), $contactTags, FALSE,
-        ['id' => 'contact_tags', 'multiple' => 'multiple', 'class' => 'crm-select2']
-      );
-    }
     CRM_Contribute_BAO_Query::buildSearchForm($this);
     $this->addElement('checkbox', 'toggleSelects', NULL, NULL);
 

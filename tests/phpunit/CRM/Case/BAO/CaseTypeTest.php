@@ -13,118 +13,118 @@ class CRM_Case_BAO_CaseTypeTest extends CiviUnitTestCase {
    * @return array
    */
   public function definitionProvider() {
-    $fixtures['empty-defn'] = array(
-      'json' => json_encode(array()),
+    $fixtures['empty-defn'] = [
+      'json' => json_encode([]),
       'xml' => file_get_contents(__DIR__ . '/xml/empty-defn.xml'),
-    );
+    ];
 
-    $fixtures['empty-lists'] = array(
-      'json' => json_encode(array(
-        'activitySets' => array(),
-        'activityTypes' => array(),
-        'caseRoles' => array(),
-        'timelineActivityTypes' => array(),
-      )),
+    $fixtures['empty-lists'] = [
+      'json' => json_encode([
+        'activitySets' => [],
+        'activityTypes' => [],
+        'caseRoles' => [],
+        'timelineActivityTypes' => [],
+      ]),
       'xml' => file_get_contents(__DIR__ . '/xml/empty-lists.xml'),
-    );
+    ];
 
-    $fixtures['one-item-in-each'] = array(
-      'json' => json_encode(array(
-        'activityTypes' => array(
-          array('name' => 'First act (foréign éxamplé, &c)'),
-        ),
-        'activitySets' => array(
-          array(
+    $fixtures['one-item-in-each'] = [
+      'json' => json_encode([
+        'activityTypes' => [
+          ['name' => 'First act (foréign éxamplé, &c)'],
+        ],
+        'activitySets' => [
+          [
             'name' => 'set1',
             'label' => 'Label 1',
             'timeline' => 1,
-            'activityTypes' => array(
-              array('name' => 'Open Case', 'status' => 'Completed'),
-            ),
-          ),
-        ),
-        'timelineActivityTypes' => array(
-          array('name' => 'Open Case', 'status' => 'Completed'),
-        ),
-        'caseRoles' => array(
-          array('name' => 'First role', 'creator' => 1, 'manager' => 1),
-        ),
-      )),
+            'activityTypes' => [
+              ['name' => 'Open Case', 'status' => 'Completed'],
+            ],
+          ],
+        ],
+        'timelineActivityTypes' => [
+          ['name' => 'Open Case', 'status' => 'Completed'],
+        ],
+        'caseRoles' => [
+          ['name' => 'First role', 'creator' => 1, 'manager' => 1],
+        ],
+      ]),
       'xml' => file_get_contents(__DIR__ . '/xml/one-item-in-each.xml'),
-    );
+    ];
 
-    $fixtures['two-items-in-each'] = array(
-      'json' => json_encode(array(
-        'activityTypes' => array(
-          array('name' => 'First act'),
-          array('name' => 'Second act'),
-        ),
-        'activitySets' => array(
-          array(
+    $fixtures['two-items-in-each'] = [
+      'json' => json_encode([
+        'activityTypes' => [
+          ['name' => 'First act'],
+          ['name' => 'Second act'],
+        ],
+        'activitySets' => [
+          [
             'name' => 'set1',
             'label' => 'Label 1',
             'timeline' => 1,
-            'activityTypes' => array(
-              array('name' => 'Open Case', 'status' => 'Completed'),
-              array(
+            'activityTypes' => [
+              ['name' => 'Open Case', 'status' => 'Completed'],
+              [
                 'name' => 'Meeting',
                 'reference_activity' => 'Open Case',
                 'reference_offset' => 1,
                 'reference_select' => 'newest',
-              ),
-            ),
-          ),
-          array(
+              ],
+            ],
+          ],
+          [
             'name' => 'set2',
             'label' => 'Label 2',
             'sequence' => 1,
-            'activityTypes' => array(
-              array('name' => 'First act'),
-              array('name' => 'Second act'),
-            ),
-          ),
-        ),
-        'timelineActivityTypes' => array(
-          array('name' => 'Open Case', 'status' => 'Completed'),
-          array(
+            'activityTypes' => [
+              ['name' => 'First act'],
+              ['name' => 'Second act'],
+            ],
+          ],
+        ],
+        'timelineActivityTypes' => [
+          ['name' => 'Open Case', 'status' => 'Completed'],
+          [
             'name' => 'Meeting',
             'reference_activity' => 'Open Case',
             'reference_offset' => 1,
             'reference_select' => 'newest',
-          ),
-        ),
-        'caseRoles' => array(
-          array('name' => 'First role', 'creator' => 1, 'manager' => 1),
-          array('name' => 'Second role'),
-        ),
-      )),
+          ],
+        ],
+        'caseRoles' => [
+          ['name' => 'First role', 'creator' => 1, 'manager' => 1],
+          ['name' => 'Second role'],
+        ],
+      ]),
       'xml' => file_get_contents(__DIR__ . '/xml/two-items-in-each.xml'),
-    );
+    ];
 
-    $fixtures['forkable-0'] = array(
-      'json' => json_encode(array(
+    $fixtures['forkable-0'] = [
+      'json' => json_encode([
         'forkable' => 0,
-      )),
+      ]),
       'xml' => file_get_contents(__DIR__ . '/xml/forkable-0.xml'),
-    );
+    ];
 
-    $fixtures['forkable-1'] = array(
-      'json' => json_encode(array(
+    $fixtures['forkable-1'] = [
+      'json' => json_encode([
         'forkable' => 1,
-      )),
+      ]),
       'xml' => file_get_contents(__DIR__ . '/xml/forkable-1.xml'),
-    );
+    ];
 
-    $cases = array();
-    foreach (array(
+    $cases = [];
+    foreach ([
       'empty-defn',
       'empty-lists',
       'one-item-in-each',
       'two-items-in-each',
       'forkable-0',
       'forkable-1',
-    ) as $key) {
-      $cases[] = array($key, $fixtures[$key]['json'], $fixtures[$key]['xml']);
+    ] as $key) {
+      $cases[] = [$key, $fixtures[$key]['json'], $fixtures[$key]['xml']];
     }
     return $cases;
   }

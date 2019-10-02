@@ -48,8 +48,10 @@ class CRM_Utils_Check_Component_OptionGroups extends CRM_Utils_Check_Component {
         $values = CRM_Core_BAO_OptionValue::getOptionValuesArray($optionGroup['id']);
         if (count($values) > 0) {
           foreach ($values as $value) {
-            $validate = CRM_Utils_Type::validate($value['value'], $optionGroup['data_type'], FALSE);
-            if (is_null($validate)) {
+            try {
+              CRM_Utils_Type::validate($value['value'], $optionGroup['data_type'], FALSE, '', TRUE);
+            }
+            catch (Exception $e) {
               $problemValues[] = [
                 'group_name' => $optionGroup['title'],
                 'value_name' => $value['label'],

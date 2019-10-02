@@ -24,9 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 
-<tr><td><label>{ts}Date Received{/ts}</label></td></tr>
 <tr>
-{include file="CRM/Core/DateRange.tpl" fieldName="contribution_date" from='_low' to='_high'}
+{include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="receive_date" colspan="2"}
 </tr>
 <tr>
   <td><label>{ts}Contribution Amounts{/ts}</label> <br />
@@ -157,27 +156,21 @@
     {$form.contribution_pcp_made_through_id.html}
     {include file="CRM/Contribute/Form/PCP.js.tpl"}
   </td>
-  <td>
-    {$form.cancel_reason.label}<br />
-    {$form.cancel_reason.html}
-  </td>
+  <td>&nbsp;</td>
 </tr>
 <tr>
   <td>
     {$form.contribution_pcp_display_in_roll.label}
     {$form.contribution_pcp_display_in_roll.html}
   </td>
+</tr>
+<tr>
+  {include file="CRM/Core/DatePickerRangeWrapper.tpl" fieldName="contribution_cancel_date" colspan="2"}
+</tr>
+<tr>
   <td>
-    <table style="width:auto">
-      <tr>
-        <td>
-          <label>{ts}Cancelled / Refunded Date{/ts}</label>
-        </td>
-      </tr>
-      <tr>
-        {include file="CRM/Core/DateRange.tpl" fieldName="contribution_cancel_date" from='_low' to='_high'}
-      </tr>
-    </table>
+    {$form.cancel_reason.label}<br />
+    {$form.cancel_reason.html}
   </td>
 </tr>
 

@@ -415,6 +415,19 @@ abstract class CRM_Utils_System_Base {
   }
 
   /**
+   * Is a front end page being accessed.
+   *
+   * Generally this would be a contribution form or other public page as opposed to a backoffice page (like contact edit).
+   *
+   * @todo Drupal uses the is_public setting - clarify & rationalise. See https://github.com/civicrm/civicrm-drupal/pull/546/files
+   *
+   * @return bool
+   */
+  public function isFrontEndPage() {
+    return CRM_Core_Config::singleton()->userFrameworkFrontend;
+  }
+
+  /**
    * Get user login URL for hosting CMS (method declared in each CMS system class)
    *
    * @param string $destination
@@ -680,7 +693,7 @@ abstract class CRM_Utils_System_Base {
     }
 
     return [
-      'url' => CRM_Utils_File::addTrailingSlash($userFrameworkResourceURL),
+      'url' => CRM_Utils_File::addTrailingSlash($userFrameworkResourceURL, '/'),
       'path' => CRM_Utils_File::addTrailingSlash($civicrm_root),
     ];
   }
@@ -943,6 +956,20 @@ abstract class CRM_Utils_System_Base {
   public function synchronizeUsers() {
     throw new Exception('CMS user creation not supported for this framework');
     return [];
+  }
+
+  /**
+   * Send an HTTP Response base on PSR HTTP RespnseInterface response.
+   *
+   * @param \Psr\Http\Message\ResponseInterface $response
+   */
+  public function sendResponse(\Psr\Http\Message\ResponseInterface $response) {
+    http_response_code($response->getStatusCode());
+    foreach ($response->getHeaders() as $name => $values) {
+      CRM_Utils_System::setHttpHeader($name, implode(', ', (array) $values));
+    }
+    echo $response->getBody();
+    CRM_Utils_System::civiExit();
   }
 
 }

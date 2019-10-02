@@ -41,12 +41,12 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
     $this->useTransaction(TRUE);
     parent::setUp();
     $contactID = $this->individualCreate();
-    $this->params = array(
+    $this->params = [
       'token' => "fancy-token-xxxx",
       'contact_id' => $contactID,
       'created_id' => $contactID,
       'payment_processor_id' => $this->processorCreate(),
-    );
+    ];
   }
 
   public function testCreatePaymentToken() {
@@ -55,7 +55,7 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
     $result = $this->callAPIAndDocument('payment_token', 'create', $this->params, __FUNCTION__, __FILE__, $description);
     $this->assertEquals(1, $result['count']);
     $this->assertNotNull($result['values'][$result['id']]['id']);
-    $this->getAndCheck(array_merge($this->params, array($this->params)), $result['id'], 'payment_token', TRUE);
+    $this->getAndCheck(array_merge($this->params, [$this->params]), $result['id'], 'payment_token', TRUE);
   }
 
   public function testGetPaymentToken() {
@@ -68,10 +68,10 @@ class api_v3_PaymentTokenTest extends CiviUnitTestCase {
   public function testDeletePaymentToken() {
     $this->callAPISuccess('payment_token', 'create', $this->params);
     $entity = $this->callAPISuccess('payment_token', 'get', ($this->params));
-    $delete = array('id' => $entity['id']);
+    $delete = ['id' => $entity['id']];
     $result = $this->callAPIAndDocument('payment_token', 'delete', $delete, __FUNCTION__, __FILE__);
 
-    $checkDeleted = $this->callAPISuccess('payment_token', 'get', array());
+    $checkDeleted = $this->callAPISuccess('payment_token', 'get', []);
     $this->assertEquals(0, $checkDeleted['count']);
   }
 

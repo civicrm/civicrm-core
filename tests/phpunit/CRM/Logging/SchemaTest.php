@@ -10,10 +10,16 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     parent::setUp();
   }
 
+  /**
+   * Clean up after test.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function tearDown() {
-    parent::tearDown();
     $schema = new CRM_Logging_Schema();
     $schema->disableLogging();
+    parent::tearDown();
+    $this->quickCleanup(['civicrm_contact'], TRUE);
     $schema->dropAllLogTables();
     CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS civicrm_test_table");
     CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS civicrm_test_column_info");
@@ -21,6 +27,11 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     CRM_Core_DAO::executeQuery("DROP TABLE IF EXISTS civicrm_test_enum_change");
   }
 
+  /**
+   * Data provider for testing query re-writing.
+   *
+   * @return array
+   */
   public function queryExamples() {
     $examples = [];
     $examples[] = ["`modified_date` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp() COMMENT 'When the mailing (or closely related entity) was created or modified or deleted.'", "`modified_date` timestamp NULL  COMMENT 'When the mailing (or closely related entity) was created or modified or deleted.'"];
@@ -37,12 +48,90 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertEquals($expectedQuery, CRM_Logging_Schema::fixTimeStampAndNotNullSQL($query));
   }
 
+  /**
+   * Test log tables are created as InnoDB by default
+   */
   public function testLogEngine() {
     $schema = new CRM_Logging_Schema();
     $schema->enableLogging();
     $log_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_acl");
     while ($log_table->fetch()) {
+      $this->assertRegexp('/ENGINE=InnoDB/', $log_table->Create_Table);
+    }
+  }
+
+  /**
+   * Test that the log table engine can be changed via hook to e.g. MyISAM
+   */
+  public function testHookLogEngine() {
+    $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'alterLogTables']);
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+    $log_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_acl");
+    while ($log_table->fetch()) {
+      $this->assertRegexp('/ENGINE=MyISAM/', $log_table->Create_Table);
+    }
+  }
+
+  /**
+   * Tests that choosing to ignore a custom table does not result in e-notices.
+   */
+  public function testIgnoreCustomTableByHook() {
+    $group = $this->customGroupCreate();
+    Civi::settings()->set('logging', TRUE);
+    $this->hookClass->setHook('civicrm_alterLogTables', [$this, 'noCustomTables']);
+    $this->customFieldCreate(['custom_group_id' => $group['id']]);
+  }
+
+  /**
+   * Remove all custom tables from tables to be logged.
+   *
+   * @param array $logTableSpec
+   */
+  public function noCustomTables(&$logTableSpec) {
+    foreach (array_keys($logTableSpec) as $index) {
+      if (substr($index, 0, 14) === 'civicrm_value_') {
+        unset($logTableSpec[$index]);
+      }
+    }
+  }
+
+  /**
+   * Test that existing log tables with ARCHIVE engine are converted to InnoDB
+   *
+   * @throws \Exception
+   */
+  public function testArchiveEngineConversion() {
+    $schema = new CRM_Logging_Schema();
+    $schema->enableLogging();
+    // change table to ARCHIVE
+    CRM_Core_DAO::executeQuery("ALTER TABLE log_civicrm_acl ENGINE ARCHIVE");
+    $log_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_acl");
+    while ($log_table->fetch()) {
       $this->assertRegexp('/ENGINE=ARCHIVE/', $log_table->Create_Table);
+    }
+    // engine should not change by default
+    $schema->updateLogTableSchema(['updateChangedEngineConfig' => FALSE, 'forceEngineMigration' => FALSE]);
+    $log_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_acl");
+    while ($log_table->fetch()) {
+      $this->assertRegExp('/ENGINE=ARCHIVE/', $log_table->Create_Table);
+    }
+    // update with forceEngineMigration should convert to InnoDB
+    $schema->updateLogTableSchema(['updateChangedEngineConfig' => FALSE, 'forceEngineMigration' => TRUE]);
+    $log_table = CRM_Core_DAO::executeQuery("SHOW CREATE TABLE log_civicrm_acl");
+    while ($log_table->fetch()) {
+      $this->assertRegExp('/ENGINE=InnoDB/', $log_table->Create_Table);
+    }
+  }
+
+  /**
+   * Alter the engine on the log tables.
+   *
+   * @param $logTableSpec
+   */
+  public function alterLogTables(&$logTableSpec) {
+    foreach (array_keys($logTableSpec) as $tableName) {
+      $logTableSpec[$tableName]['engine'] = 'MyISAM';
     }
   }
 
@@ -79,7 +168,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $this->assertTrue(empty($diffs['ADD']));
     $this->assertTrue(empty($diffs['OBSOLETE']));
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_test_table ADD COLUMN test_varchar varchar(255) DEFAULT NULL");
-    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = array();
+    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
     // Check that it still picks up new columns added.
     $diffs = $schema->columnsWithDiffSpecs("civicrm_test_table", "log_civicrm_test_table");
     $this->assertTrue(!empty($diffs['ADD']));
@@ -88,7 +177,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $schema->fixSchemaDifferences();
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_test_table CHANGE COLUMN test_varchar test_varchar varchar(400) DEFAULT NULL");
     // Check that it properly picks up modifications to columns.
-    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = array();
+    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
     $diffs = $schema->columnsWithDiffSpecs("civicrm_test_table", "log_civicrm_test_table");
     $this->assertTrue(!empty($diffs['MODIFY']));
     $this->assertTrue(empty($diffs['ADD']));
@@ -96,7 +185,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     $schema->fixSchemaDifferences();
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_test_table CHANGE COLUMN test_varchar test_varchar varchar(300) DEFAULT NULL");
     // Check that when we reduce the size of column that the log table doesn't shrink as well.
-    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = array();
+    \Civi::$statics['CRM_Logging_Schema']['columnSpecs'] = [];
     $diffs = $schema->columnsWithDiffSpecs("civicrm_test_table", "log_civicrm_test_table");
     $this->assertTrue(empty($diffs['MODIFY']));
     $this->assertTrue(empty($diffs['ADD']));
@@ -139,7 +228,7 @@ class CRM_Logging_SchemaTest extends CiviUnitTestCase {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
     $schema = new CRM_Logging_Schema();
     $schema->enableLogging();
-    $schema->updateLogTableSchema();
+    $schema->updateLogTableSchema(['updateChangedEngineConfig' => FALSE, 'forceEngineMigration' => FALSE]);
     $ci = \Civi::$statics['CRM_Logging_Schema']['columnSpecs']['civicrm_test_column_info'];
 
     $this->assertEquals('test_id', $ci['test_id']['COLUMN_NAME']);

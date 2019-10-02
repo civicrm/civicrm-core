@@ -162,15 +162,20 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
     $address->save();
 
     if ($address->id) {
-      $customFields = CRM_Core_BAO_CustomField::getFields('Address', FALSE, TRUE, NULL, NULL, FALSE, FALSE, $checkPermissions);
+      if (isset($params['custom'])) {
+        $addressCustom = $params['custom'];
+      }
+      else {
+        $customFields = CRM_Core_BAO_CustomField::getFields('Address', FALSE, TRUE, NULL, NULL, FALSE, FALSE, $checkPermissions);
 
-      if (!empty($customFields)) {
-        $addressCustom = CRM_Core_BAO_CustomField::postProcess($params,
-          $address->id,
-          'Address',
-          FALSE,
-          $checkPermissions
-        );
+        if (!empty($customFields)) {
+          $addressCustom = CRM_Core_BAO_CustomField::postProcess($params,
+            $address->id,
+            'Address',
+            FALSE,
+            $checkPermissions
+          );
+        }
       }
       if (!empty($addressCustom)) {
         CRM_Core_BAO_CustomValueTable::store($addressCustom, 'civicrm_address', $address->id);
@@ -411,9 +416,9 @@ class CRM_Core_BAO_Address extends CRM_Core_DAO_Address {
         if (substr($name, 0, 7) == 'country') {
           // make sure its different from the default country
           // iso code
-          $defaultCountry = $config->defaultContactCountry();
+          $defaultCountry = CRM_Core_BAO_Country::defaultContactCountry();
           // full name
-          $defaultCountryName = $config->defaultContactCountryName();
+          $defaultCountryName = CRM_Core_BAO_Country::defaultContactCountryName();
 
           if ($defaultCountry) {
             if ($value == $defaultCountry ||
@@ -658,8 +663,7 @@ ORDER BY civicrm_address.is_primary DESC, civicrm_address.location_type_id DESC,
    *   Array of address sequence.
    */
   public static function addressSequence() {
-    $config = CRM_Core_Config::singleton();
-    $addressSequence = $config->addressSequence();
+    $addressSequence = CRM_Utils_Address::sequence(\Civi::settings()->get('address_format'));
 
     $countryState = $cityPostal = FALSE;
     foreach ($addressSequence as $key => $field) {

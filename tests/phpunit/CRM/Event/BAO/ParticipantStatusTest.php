@@ -54,13 +54,13 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
   public function testCreateAndDelete() {
 
     // create using required params
-    $params = array(
+    $params = [
       'name' => 'testStatus',
       'label' => 'testParticipant',
       'class' => 'Positive',
       'weight' => 13,
       'visibility_id' => 1,
-    );
+    ];
 
     $statusType = CRM_Event_BAO_ParticipantStatusType::create($params);
     // Checking for participant status type id in db.
@@ -80,7 +80,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
    */
   public function testAddStatusType() {
 
-    $params = array(
+    $params = [
       'name' => 'testStatus',
       'label' => 'testParticipant',
       'class' => 'Positive',
@@ -88,7 +88,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       'is_counted' => 1,
       'weight' => 13,
       'visibility_id' => 1,
-    );
+    ];
 
     // check for add participant status type
     $statusType = CRM_Event_BAO_ParticipantStatusType::add($params);
@@ -96,7 +96,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       $this->assertEquals($value, $statusType->$param);
     }
 
-    $params = array(
+    $params = [
       'id' => $statusType->id,
       'name' => 'testStatus',
       'label' => 'testAlterParticipant',
@@ -105,7 +105,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       'is_counted' => 0,
       'weight' => 14,
       'visibility_id' => 2,
-    );
+    ];
 
     // check for add participant status type
     $statusType = CRM_Event_BAO_ParticipantStatusType::add($params);
@@ -119,7 +119,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
    */
   public function testRetrieveStatusType() {
 
-    $params = array(
+    $params = [
       'name' => 'testStatus',
       'label' => 'testParticipant',
       'class' => 'Positive',
@@ -127,13 +127,13 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       'is_counted' => 1,
       'weight' => 13,
       'visibility_id' => 1,
-    );
+    ];
 
     $statusType = CRM_Event_BAO_ParticipantStatusType::create($params);
 
     // retrieve status type
-    $retrieveParams = array('id' => $statusType->id);
-    $default = array();
+    $retrieveParams = ['id' => $statusType->id];
+    $default = [];
     $retrieveStatusType = CRM_Event_BAO_ParticipantStatusType::retrieve($retrieveParams, $default);
 
     // check on retrieve values
@@ -147,7 +147,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
    */
   public function testSetIsActiveStatusType() {
 
-    $params = array(
+    $params = [
       'name' => 'testStatus',
       'label' => 'testParticipant',
       'class' => 'Positive',
@@ -155,7 +155,7 @@ class CRM_Event_BAO_ParticipantStatusTest extends CiviUnitTestCase {
       'is_counted' => 1,
       'weight' => 15,
       'visibility_id' => 1,
-    );
+    ];
 
     $statusType = CRM_Event_BAO_ParticipantStatusType::create($params);
     $isActive = 1;

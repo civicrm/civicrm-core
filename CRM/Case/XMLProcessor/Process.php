@@ -105,7 +105,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
       foreach ($xml->CaseRoles as $caseRoleXML) {
         foreach ($caseRoleXML->RelationshipType as $relationshipTypeXML) {
           if ((int ) $relationshipTypeXML->creator == 1) {
-            if (!$this->createRelationships((string ) $relationshipTypeXML->name,
+            if (!$this->createRelationships($this->locateNameOrLabel($relationshipTypeXML),
               $params
             )
             ) {
@@ -181,7 +181,11 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @return array|mixed
    */
   public function &caseRoles($caseRolesXML, $isCaseManager = FALSE) {
-    $relationshipTypes = &$this->allRelationshipTypes();
+    // Look up relationship types according to the XML convention (described
+    // from perspective of non-client) but return the labels according to the UI
+    // convention (described from perspective of client)
+    $relationshipTypes = &$this->allRelationshipTypes(TRUE);
+    $relationshipTypesToReturn = &$this->allRelationshipTypes(FALSE);
 
     $result = [];
     foreach ($caseRolesXML as $caseRoleXML) {
@@ -195,7 +199,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
         }
 
         if (!$isCaseManager) {
-          $result[$relationshipTypeID] = $relationshipTypeName;
+          $result[$relationshipTypeID] = $relationshipTypesToReturn[$relationshipTypeID];
         }
         elseif ($relationshipTypeXML->manager == 1) {
           return $relationshipTypeID;
@@ -213,11 +217,13 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
    * @throws Exception
    */
   public function createRelationships($relationshipTypeName, &$params) {
-    $relationshipTypes = &$this->allRelationshipTypes();
-    // get the relationship id
-    $relationshipTypeID = array_search($relationshipTypeName, $relationshipTypes);
+    // The relationshipTypeName is coming from XML, so the argument should be
+    // `TRUE`
+    $relationshipTypes = &$this->allRelationshipTypes(TRUE);
+    // get the relationship
+    $relationshipType = array_search($relationshipTypeName, $relationshipTypes);
 
-    if ($relationshipTypeID === FALSE) {
+    if ($relationshipType === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
       CRM_Core_Error::fatal(ts('Relationship type %1, found in case configuration file, is not present in the database %2',
         [1 => $relationshipTypeName, 2 => $docLink]
@@ -232,14 +238,21 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
     foreach ($client as $key => $clientId) {
       $relationshipParams = [
-        'relationship_type_id' => $relationshipTypeID,
-        'contact_id_a' => $clientId,
-        'contact_id_b' => $params['creatorID'],
+        'relationship_type_id' => substr($relationshipType, 0, -4),
         'is_active' => 1,
         'case_id' => $params['caseID'],
         'start_date' => date("Ymd"),
         'end_date' => CRM_Utils_Array::value('relationship_end_date', $params),
       ];
+
+      if (substr($relationshipType, -4) == '_b_a') {
+        $relationshipParams['contact_id_b'] = $clientId;
+        $relationshipParams['contact_id_a'] = $params['creatorID'];
+      }
+      if (substr($relationshipType, -4) == '_a_b') {
+        $relationshipParams['contact_id_a'] = $clientId;
+        $relationshipParams['contact_id_b'] = $params['creatorID'];
+      }
 
       if (!$this->createRelationship($relationshipParams)) {
         CRM_Core_Error::fatal();
@@ -343,6 +356,8 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   }
 
   /**
+   * Relationships are straight from XML, described from perspective of non-client
+   *
    * @param SimpleXMLElement $caseTypeXML
    *
    * @return array<string> symbolic relationship-type names
@@ -829,6 +844,36 @@ AND        a.is_deleted = 0
       return (string) $xml->{$xmlTag} ? 1 : 0;
     }
     return $default;
+  }
+
+  /**
+   * At some point name and label got mixed up for case roles.
+   * Check for higher priority tag <machineName> first which represents name, then fall back to the <name> tag which somehow became label.
+   * We do this to avoid requiring people to update their xml files which can be stored in external files.
+   *
+   * Note this is different than doing something like comparing the <name> tag against name in the database and then falling back to comparing label in the database, which is subject to an edge case where you would get the wrong one (where the label of one relationship type is the same as the name of another). Here there are two tags with explicit single meanings.
+   *
+   * @param SimpleXMLElement $xml
+   *
+   * @return string
+   */
+  public function locateNameOrLabel($xml) {
+    /* While it's unlikely, it's possible somebody is using '0' as their machineName, so we should let them.
+     * Specifically if machineName is:
+     * missing - use name
+     * null - use name
+     * blank - use name
+     * the string '0' - use machineName
+     * the number 0 - use machineName (but can't really have number 0 in simplexml unless cast to number)
+     * the word 'null' - use machineName and best not to think about it
+     */
+    if (isset($xml->machineName)) {
+      $machineName = (string) $xml->machineName;
+      if ($machineName !== '') {
+        return $machineName;
+      }
+    }
+    return (string) $xml->name;
   }
 
 }

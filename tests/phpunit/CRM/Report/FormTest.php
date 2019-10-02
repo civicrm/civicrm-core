@@ -53,20 +53,20 @@ class CRM_Report_FormTest extends CiviUnitTestCase {
   }
 
   public function fromToData() {
-    $cases = array();
+    $cases = [];
     // Absolute dates
-    $cases[] = array('20170901000000', '20170913235959', 0, '09/01/2017', '09/13/2017');
+    $cases[] = ['20170901000000', '20170913235959', 0, '09/01/2017', '09/13/2017'];
     // "Today" relative date filter
     $date = new DateTime();
     $expectedFrom = $date->format('Ymd') . '000000';
     $expectedTo = $date->format('Ymd') . '235959';
-    $cases[] = array($expectedFrom, $expectedTo, 'this.day', '', '');
+    $cases[] = [$expectedFrom, $expectedTo, 'this.day', '', ''];
     // "yesterday" relative date filter
     $date = new DateTime();
     $date->sub(new DateInterval('P1D'));
     $expectedFrom = $date->format('Ymd') . '000000';
     $expectedTo = $date->format('Ymd') . '235959';
-    $cases[] = array($expectedFrom, $expectedTo, 'previous.day', '', '');
+    $cases[] = [$expectedFrom, $expectedTo, 'previous.day', '', ''];
     return $cases;
   }
 
@@ -74,14 +74,18 @@ class CRM_Report_FormTest extends CiviUnitTestCase {
    * Test that getFromTo returns the correct dates.
    *
    * @dataProvider fromToData
-   * @param $expectedFrom
-   * @param $expectedTo
-   * @param $relative
-   * @param $from
-   * @param $to
+   *
+   * @param string $expectedFrom
+   * @param string $expectedTo
+   * @param string $relative
+   * @param string $from
+   * @param string $to
    */
   public function testGetFromTo($expectedFrom, $expectedTo, $relative, $from, $to) {
     $obj = new CRM_Report_Form();
+    if (date('H-i') === '00:00') {
+      $this->markTestIncomplete('The date might have changed since the dataprovider was called. Skip to avoid flakiness');
+    }
     list($calculatedFrom, $calculatedTo) = $obj->getFromTo($relative, $from, $to);
     $this->assertEquals([$expectedFrom, $expectedTo], [$calculatedFrom, $calculatedTo], "fail on data set [ $relative , $from , $to ]. Local php time is " . date('Y-m-d H:i:s') . ' and mysql time is ' . CRM_Core_DAO::singleValueQuery('SELECT NOW()'));
   }

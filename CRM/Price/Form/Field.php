@@ -422,7 +422,7 @@ class CRM_Price_Form_Field extends CRM_Core_Form {
     }
 
     if ((is_numeric(CRM_Utils_Array::value('count', $fields)) &&
-        CRM_Utils_Array::value('count', $fields) == 0
+        empty($fields['count'])
       ) &&
       (CRM_Utils_Array::value('html_type', $fields) == 'Text')
     ) {

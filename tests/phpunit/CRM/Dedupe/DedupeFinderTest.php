@@ -11,7 +11,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
    *
    * @var array
    */
-  protected $contactIDs = array();
+  protected $contactIDs = [];
 
   /**
    * ID of the group holding the contacts.
@@ -29,7 +29,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
       $this->contactDelete($contactId);
     }
     if ($this->groupID) {
-      $this->callAPISuccess('group', 'delete', array('id' => $this->groupID));
+      $this->callAPISuccess('group', 'delete', ['id' => $this->groupID]);
     }
     parent::tearDown();
   }
@@ -40,7 +40,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
    * @throws \Exception
    */
   public function testUnsupervisedDupes() {
-    // make dupe checks based on based on following contact sets:
+    // make dupe checks based on following contact sets:
     // FIRST - LAST - EMAIL
     // ---------------------------------
     // robin  - hood - robin@example.com
@@ -52,10 +52,32 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     // will   - dale - will@example.com
     $this->setupForGroupDedupe();
 
-    $ruleGroup = $this->callAPISuccessGetSingle('RuleGroup', array('is_reserved' => 1, 'contact_type' => 'Individual', 'used' => 'Unsupervised'));
+    $ruleGroup = $this->callAPISuccessGetSingle('RuleGroup', ['is_reserved' => 1, 'contact_type' => 'Individual', 'used' => 'Unsupervised']);
 
     $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
     $this->assertEquals(count($foundDupes), 3, 'Check Individual-Fuzzy dupe rule for dupesInGroup().');
+  }
+
+  /**
+   * Test duplicate contact retrieval with 2 email fields.
+   */
+  public function testUnsupervisedWithTwoEmailFields() {
+    $this->setupForGroupDedupe();
+    $emails = [
+      ['hood@example.com', ''],
+      ['', 'hood@example.com'],
+    ];
+    for ($i = 0; $i < 2; $i++) {
+      $fields = [
+        'first_name' => 'robin',
+        'last_name' => 'hood',
+        'email-1' => $emails[$i][0],
+        'email-2' => $emails[$i][1],
+      ];
+      $dedupeParams = CRM_Dedupe_Finder::formatParams($fields, 'Individual');
+      $dedupeResults = CRM_Dedupe_Finder::dupesByParams($dedupeParams, 'Individual');
+      $this->assertEquals(count($dedupeResults), 1);
+    }
   }
 
   /**
@@ -66,16 +88,16 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   public function testCustomRule() {
     $this->setupForGroupDedupe();
 
-    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', array(
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
       'contact_type' => 'Individual',
       'threshold' => 8,
       'used' => 'General',
       'name' => 'TestRule',
       'title' => 'TestRule',
       'is_reserved' => 0,
-    ));
+    ]);
     $rules = [];
-    foreach (array('birth_date', 'first_name', 'last_name') as $field) {
+    foreach (['birth_date', 'first_name', 'last_name'] as $field) {
       $rules[$field] = $this->callAPISuccess('Rule', 'create', [
         'dedupe_rule_group_id' => $ruleGroup['id'],
         'rule_table' => 'civicrm_contact',
@@ -95,16 +117,16 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
   public function testCustomRuleWithAddress() {
     $this->setupForGroupDedupe();
 
-    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', array(
+    $ruleGroup = $this->callAPISuccess('RuleGroup', 'create', [
       'contact_type' => 'Individual',
       'threshold' => 10,
       'used' => 'General',
       'name' => 'TestRule',
       'title' => 'TestRule',
       'is_reserved' => 0,
-    ));
+    ]);
     $rules = [];
-    foreach (array('postal_code') as $field) {
+    foreach (['postal_code'] as $field) {
       $rules[$field] = $this->callAPISuccess('Rule', 'create', [
         'dedupe_rule_group_id' => $ruleGroup['id'],
         'rule_table' => 'civicrm_address',
@@ -125,7 +147,7 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
    */
   public function testSupervisedDupes() {
     $this->setupForGroupDedupe();
-    $ruleGroup = $this->callAPISuccessGetSingle('RuleGroup', array('is_reserved' => 1, 'contact_type' => 'Individual', 'used' => 'Supervised'));
+    $ruleGroup = $this->callAPISuccessGetSingle('RuleGroup', ['is_reserved' => 1, 'contact_type' => 'Individual', 'used' => 'Supervised']);
     $foundDupes = CRM_Dedupe_Finder::dupesInGroup($ruleGroup['id'], $this->groupID);
     // -------------------------------------------------------------------------
     // default dedupe rule: threshold = 20 => (First + Last + Email) Matches ( 1 pair )
@@ -153,62 +175,62 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
 
     // contact data set
     // FIXME: move create params to separate function
-    $params = array(
-      array(
+    $params = [
+      [
         'first_name' => 'robin',
         'last_name' => 'hood',
         'email' => 'robin@example.com',
         'contact_type' => 'Individual',
-      ),
-      array(
+      ],
+      [
         'first_name' => 'robin',
         'last_name' => 'hood',
         'email' => 'hood@example.com',
         'contact_type' => 'Individual',
-      ),
-      array(
+      ],
+      [
         'first_name' => 'robin',
         'last_name' => 'dale',
         'email' => 'robin@example.com',
         'contact_type' => 'Individual',
-      ),
-      array(
+      ],
+      [
         'first_name' => 'little',
         'last_name' => 'dale',
         'email' => 'dale@example.com',
         'contact_type' => 'Individual',
-      ),
-      array(
+      ],
+      [
         'first_name' => 'will',
         'last_name' => 'dale',
         'email' => 'dale@example.com',
         'contact_type' => 'Individual',
-      ),
-      array(
+      ],
+      [
         'first_name' => 'will',
         'last_name' => 'dale',
         'email' => 'will@example.com',
         'contact_type' => 'Individual',
-      ),
-      array(
+      ],
+      [
         'first_name' => 'will',
         'last_name' => 'dale',
         'email' => 'will@example.com',
         'contact_type' => 'Individual',
-      ),
-    );
+      ],
+    ];
 
-    $this->hookClass->setHook('civicrm_findDuplicates', array($this, 'hook_civicrm_findDuplicates'));
+    $this->hookClass->setHook('civicrm_findDuplicates', [$this, 'hook_civicrm_findDuplicates']);
 
     $count = 1;
 
     foreach ($params as $param) {
       $contact = $this->callAPISuccess('contact', 'create', $param);
-      $params = array(
+      $params = [
         'contact_id' => $contact['id'],
         'street_address' => 'Ambachtstraat 23',
         'location_type_id' => 1,
-      );
+      ];
       $this->callAPISuccess('address', 'create', $params);
       $contactIds[$count++] = $contact['id'];
     }
@@ -216,12 +238,12 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
     // verify that all contacts have been created separately
     $this->assertEquals(count($contactIds), 7, 'Check for number of contacts.');
 
-    $fields = array(
+    $fields = [
       'first_name' => 'robin',
       'last_name' => 'hood',
       'email' => 'hood@example.com',
       'street_address' => 'Ambachtstraat 23',
-    );
+    ];
     CRM_Core_TemporaryErrorScope::useException();
     $ids = CRM_Contact_BAO_Contact::getDuplicateContacts($fields, 'Individual', 'General', [], TRUE, NULL, ['event_id' => 1]);
 
@@ -271,75 +293,75 @@ class CRM_Dedupe_DedupeFinderTest extends CiviUnitTestCase {
    * Set up a group of dedupable contacts.
    */
   protected function setupForGroupDedupe() {
-    $params = array(
+    $params = [
       'name' => 'Dupe Group',
       'title' => 'New Test Dupe Group',
       'domain_id' => 1,
       'is_active' => 1,
       'visibility' => 'Public Pages',
-    );
+    ];
 
     $result = $this->callAPISuccess('group', 'create', $params);
     $this->groupID = $result['id'];
 
-    $params = array(
-      array(
+    $params = [
+      [
         'first_name' => 'robin',
         'last_name' => 'hood',
         'email' => 'robin@example.com',
         'contact_type' => 'Individual',
         'birth_date' => '2016-01-01',
         'api.Address.create' => ['location_type_id' => 'Billing', 'postal_code' => '99999'],
-      ),
-      array(
+      ],
+      [
         'first_name' => 'robin',
         'last_name' => 'hood',
         'email' => 'hood@example.com',
         'contact_type' => 'Individual',
         'birth_date' => '2016-01-01',
         'api.Address.create' => ['location_type_id' => 'Billing', 'postal_code' => '99999'],
-      ),
-      array(
+      ],
+      [
         'first_name' => 'robin',
         'last_name' => 'dale',
         'email' => 'robin@example.com',
         'contact_type' => 'Individual',
-      ),
-      array(
+      ],
+      [
         'first_name' => 'little',
         'last_name' => 'dale',
         'email' => 'dale@example.com',
         'contact_type' => 'Individual',
-      ),
-      array(
+      ],
+      [
         'first_name' => 'will',
         'last_name' => 'dale',
         'email' => 'dale@example.com',
         'contact_type' => 'Individual',
-      ),
-      array(
+      ],
+      [
         'first_name' => 'will',
         'last_name' => 'dale',
         'email' => 'will@example.com',
         'contact_type' => 'Individual',
-      ),
-      array(
+      ],
+      [
         'first_name' => 'will',
         'last_name' => 'dale',
         'email' => 'will@example.com',
         'contact_type' => 'Individual',
-      ),
-    );
+      ],
+    ];
 
     $count = 1;
     foreach ($params as $param) {
       $contact = $this->callAPISuccess('contact', 'create', $param);
       $this->contactIDs[$count++] = $contact['id'];
 
-      $grpParams = array(
+      $grpParams = [
         'contact_id' => $contact['id'],
         'group_id' => $this->groupID,
-      );
+      ];
       $this->callAPISuccess('group_contact', 'create', $grpParams);
     }
 

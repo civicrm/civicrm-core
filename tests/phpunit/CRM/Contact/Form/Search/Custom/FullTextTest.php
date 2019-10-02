@@ -29,9 +29,9 @@ class CRM_Contact_Form_Search_Custom_FullTextTest extends CiviUnitTestCase {
   /**
    * @var array
    */
-  protected $_tablesToTruncate = array(
+  protected $_tablesToTruncate = [
     'civicrm_acl_contact_cache',
-  );
+  ];
 
   /**
    * Test ACL contacts are filtered properly.
@@ -42,26 +42,26 @@ class CRM_Contact_Form_Search_Custom_FullTextTest extends CiviUnitTestCase {
     $userId = $this->createLoggedInUser();
     // remove all permissions
     $config = CRM_Core_Config::singleton();
-    $config->userPermissionClass->permissions = array();
+    $config->userPermissionClass->permissions = [];
 
     for ($i = 1; $i <= 10; $i++) {
-      $contactId = $this->individualCreate(array(), $i);
+      $contactId = $this->individualCreate([], $i);
       if ($i <= 5) {
-        $queryParams = array(
-          1 => array($userId, 'Integer'),
-          2 => array($contactId, 'Integer'),
-        );
+        $queryParams = [
+          1 => [$userId, 'Integer'],
+          2 => [$contactId, 'Integer'],
+        ];
         CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation ) VALUES(%1, %2, 'View')", $queryParams);
       }
       $contactIDs[$i] = $contactId;
     }
 
-    $formValues = array('component_mode' => 1, 'operator' => 1, 'is_unit_test' => 1);
+    $formValues = ['component_mode' => 1, 'operator' => 1, 'is_unit_test' => 1];
     $fullText = new CRM_Contact_Form_Search_Custom_FullText($formValues);
     $fullText->initialize();
 
     //Assert that ACL contacts are filtered.
-    $queryParams = array(1 => array($userId, 'Integer'));
+    $queryParams = [1 => [$userId, 'Integer']];
     $whereClause = "WHERE NOT EXISTS (SELECT c.contact_id
       FROM civicrm_acl_contact_cache c
       WHERE c.user_id = %1 AND t.contact_id = c.contact_id )";

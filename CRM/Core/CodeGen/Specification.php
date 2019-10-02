@@ -32,7 +32,7 @@ class CRM_Core_CodeGen_Specification {
 
     $this->classNames = [];
 
-    # TODO: peel DAO-specific stuff out of getTables, and spec reading into its own class
+    // TODO: peel DAO-specific stuff out of getTables, and spec reading into its own class
     if ($verbose) {
       echo "Extracting table information\n";
     }
@@ -368,9 +368,16 @@ class CRM_Core_CodeGen_Specification {
     $field['headerPattern'] = $this->value('headerPattern', $fieldXML);
     $field['dataPattern'] = $this->value('dataPattern', $fieldXML);
     $field['uniqueName'] = $this->value('uniqueName', $fieldXML);
+    $field['uniqueTitle'] = $this->value('uniqueTitle', $fieldXML);
     $field['serialize'] = $this->value('serialize', $fieldXML);
     $field['html'] = $this->value('html', $fieldXML);
-    $field['protected'] = $this->value('protected', $fieldXML);
+    if (isset($fieldXML->permission)) {
+      $field['permission'] = trim($this->value('permission', $fieldXML));
+      $field['permission'] = $field['permission'] ? array_filter(array_map('trim', explode(',', $field['permission']))) : [];
+      if (isset($fieldXML->permission->or)) {
+        $field['permission'][] = array_filter(array_map('trim', explode(',', $fieldXML->permission->or)));
+      }
+    }
     if (!empty($field['html'])) {
       $validOptions = [
         'type',
@@ -423,6 +430,8 @@ class CRM_Core_CodeGen_Specification {
         'labelColumn',
         // Non-translated machine name for programmatic lookup. Defaults to 'name' if that column exists
         'nameColumn',
+        // Column to fetch in "abbreviate" context
+        'abbrColumn',
         // Where clause snippet (will be joined to the rest of the query with AND operator)
         'condition',
         // callback function incase of static arrays
