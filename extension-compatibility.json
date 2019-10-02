@@ -1,8 +1,7 @@
 {
   "org.civicrm.api4": {
     "obsolete": "5.19",
-    "disable": true,
-    "uninstall": true
+    "force-uninstall": true
   },
   "uk.squiffle.kam": {
     "obsolete": "5.12",

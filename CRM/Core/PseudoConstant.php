@@ -1454,6 +1454,7 @@ WHERE  id = %1
    */
   public static function &getExtensions() {
     if (!self::$extensions) {
+      $compat = CRM_Extension_System::getCompatibilityInfo();
       self::$extensions = [];
       $sql = '
         SELECT full_name, label
@@ -1462,6 +1463,9 @@ WHERE  id = %1
       ';
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
+        if (!empty($compat[$dao->full_name]['force-uninstall'])) {
+          continue;
+        }
         self::$extensions[$dao->full_name] = $dao->label;
       }
     }

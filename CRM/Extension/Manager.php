@@ -465,6 +465,8 @@ class CRM_Extension_Manager {
    */
   public function getStatuses() {
     if (!is_array($this->statuses)) {
+      $compat = CRM_Extension_System::getCompatibilityInfo();
+
       $this->statuses = [];
 
       foreach ($this->fullContainer->getKeys() as $key) {
@@ -484,7 +486,10 @@ class CRM_Extension_Manager {
         catch (CRM_Extension_Exception $e) {
           $codeExists = FALSE;
         }
-        if ($dao->is_active) {
+        if (!empty($compat[$dao->full_name]['force-uninstall'])) {
+          $this->statuses[$dao->full_name] = self::STATUS_UNINSTALLED;
+        }
+        elseif ($dao->is_active) {
           $this->statuses[$dao->full_name] = $codeExists ? self::STATUS_INSTALLED : self::STATUS_INSTALLED_MISSING;
         }
         else {
