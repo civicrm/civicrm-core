@@ -2479,7 +2479,39 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
                     elseif (substr($fieldName, 0, 14) === 'address_custom' &&
                       CRM_Utils_Array::value(substr($fieldName, 8), $value)
                     ) {
-                      $defaults[$fldName] = $value[substr($fieldName, 8)];
+                      if (isset($fields[$name]['html_type'])) {
+                        switch ($fields[$name]['html_type']) {
+                          case 'Multi-Select State/Province':
+                          case 'Multi-Select Country':
+                          case 'Multi-Select':
+                            $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value[substr($fieldName, 8)]);
+                            foreach ($v as $item) {
+                              if ($item) {
+                                $defaults[$fldName][$item] = $item;
+                              }
+                            }
+                            break;
+
+                          case 'CheckBox':
+                            $v = explode(CRM_Core_DAO::VALUE_SEPARATOR, $value[substr($fieldName, 8)]);
+                            foreach ($v as $item) {
+                              if ($item) {
+                                $defaults[$fldName][$item] = 1;
+                                // seems like we need this for QF style checkboxes in profile where its multiindexed
+                                // CRM-2969
+                                $defaults["{$fldName}[{$item}]"] = 1;
+                              }
+                            }
+                            break;
+
+                          default:
+                            $defaults[$fldName] = $value[substr($fieldName, 8)];
+                            break;
+                        }
+                      } 
+                      else {
+                        $defaults[$fldName] = $value[substr($fieldName, 8)];
+                      }
                     }
                   }
                 }
