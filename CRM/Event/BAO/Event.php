@@ -1143,6 +1143,10 @@ WHERE civicrm_event.is_active = 1
 
         // @todo - the goal is that all params available to the message template are explicitly defined here rather than
         // 'in a smattering of places'. Note that leakage can happen between mailings when not explicitly defined.
+        $customPostTitles = empty($profilePost[1]) ? NULL : [];
+        foreach ($postProfileID as $id) {
+          $customPostTitles[$id] = CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $postProfileID);
+        }
         $tplParams = array_merge($values, $participantParams, [
           'email' => $email,
           'confirm_email_text' => CRM_Utils_Array::value('confirm_email_text', $values['event']),
@@ -1152,7 +1156,7 @@ WHERE civicrm_event.is_active = 1
           'customPre' => $profilePre[0],
           'customPre_grouptitle' => empty($profilePre[1]) ? NULL : [CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $preProfileID)],
           'customPost' => $profilePost[0],
-          'customPost_grouptitle' => empty($profilePost[1]) ? NULL : [CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $postProfileID)],
+          'customPost_grouptitle' => $customPostTitles,
           'participantID' => $participantId,
           'conference_sessions' => $sessions,
           'credit_card_number' => CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $participantParams)),
