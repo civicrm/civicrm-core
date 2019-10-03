@@ -935,6 +935,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($membership['contact_id'], $contribution['contact_id']);
     $this->assertEquals($expectedMembershipStatus, $membership['status_id']);
     $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $contribution['contribution_recur_id']]);
+    $this->assertEquals($contribution['contribution_recur_id'], $membership['contribution_recur_id']);
 
     $this->callAPISuccess('line_item', 'getsingle', ['contribution_id' => $contribution['id'], 'entity_id' => $membership['id']]);
     //renew it with processor setting completed - should extend membership

@@ -1575,8 +1575,6 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         }
 
         if (!empty($membershipContribution)) {
-          // update recurring id for membership record
-          CRM_Member_BAO_Membership::updateRecurMembership($membership, $membershipContribution);
           // Next line is probably redundant. Checks prevent it happening twice.
           $membershipPaymentParams = [
             'membership_id' => $membership->id,
