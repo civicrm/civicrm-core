@@ -1145,7 +1145,7 @@ WHERE civicrm_event.is_active = 1
         // 'in a smattering of places'. Note that leakage can happen between mailings when not explicitly defined.
         $customPostTitles = empty($profilePost[1]) ? NULL : [];
         foreach ($postProfileID as $id) {
-          $customPostTitles[$id] = CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $postProfileID);
+          $customPostTitles[$id] = CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $id);
         }
         $tplParams = array_merge($values, $participantParams, [
           'email' => $email,
