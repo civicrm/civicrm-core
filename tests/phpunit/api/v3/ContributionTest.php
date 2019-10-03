@@ -117,13 +117,15 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_uf_match']);
     $financialAccounts = $this->callAPISuccess('FinancialAccount', 'get', []);
     foreach ($financialAccounts['values'] as $financialAccount) {
-      if ($financialAccount['name'] == 'Test Tax financial account ' || $financialAccount['name'] == 'Test taxable financial Type') {
+      if ($financialAccount['name'] === 'Test Tax financial account ' || $financialAccount['name'] === 'Test taxable financial Type') {
         $entityFinancialTypes = $this->callAPISuccess('EntityFinancialAccount', 'get', [
           'financial_account_id' => $financialAccount['id'],
         ]);
@@ -133,6 +135,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         $this->callAPISuccess('FinancialAccount', 'delete', ['id' => $financialAccount['id']]);
       }
     }
+    $this->restoreUFGroupOne();
   }
 
   /**
@@ -3058,6 +3061,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_individualId = $this->createLoggedInUser();
     $contributionID = $this->createPendingParticipantContribution();
     $this->createJoinedProfile(['entity_id' => $this->_ids['event']['test'], 'entity_table' => 'civicrm_event']);
+    $this->createJoinedProfile(['entity_id' => $this->_ids['event']['test'], 'entity_table' => 'civicrm_event', 'weight' => 2], ['name' => 'post_1', 'title' => 'title_post_2', 'frontend_title' => 'public 2']);
+    $this->createJoinedProfile(['entity_id' => $this->_ids['event']['test'], 'entity_table' => 'civicrm_event', 'weight' => 3], ['name' => 'post_2', 'title' => 'title_post_3', 'frontend_title' => 'public 3']);
+    $this->eliminateUFGroupOne();
 
     $this->callAPISuccess('contribution', 'completetransaction', [
       'id' => $contributionID,
@@ -3074,7 +3080,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
     ])['values'];
 
-    $this->assertEquals(3, count($activities));
+    $this->assertCount(3, $activities);
     $activityNames = array_count_values(CRM_Utils_Array::collect('activity_name', $activities));
     // record two activities before and after completing payment for Event registration
     $this->assertEquals(2, $activityNames['Event Registration']);
@@ -3087,7 +3093,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'This letter is a confirmation that your registration has been received and your status has been updated to Registered.',
       'First Name: Logged In',
       'Public title',
-    ], ['Back end title']);
+      'public 2',
+      'public 3',
+    ], ['Back end title', 'title_post_2', 'title_post_3']);
     $mut->stop();
   }
 
