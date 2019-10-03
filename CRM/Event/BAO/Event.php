@@ -1144,8 +1144,8 @@ WHERE civicrm_event.is_active = 1
         // @todo - the goal is that all params available to the message template are explicitly defined here rather than
         // 'in a smattering of places'. Note that leakage can happen between mailings when not explicitly defined.
         $customPostTitles = empty($profilePost[1]) ? NULL : [];
-        foreach ($postProfileID as $id) {
-          $customPostTitles[$id] = CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $id);
+        foreach ($postProfileID as $offset => $id) {
+          $customPostTitles[$offset] = CRM_Core_BAO_UFGroup::getFrontEndTitle((int) $id);
         }
         $tplParams = array_merge($values, $participantParams, [
           'email' => $email,
