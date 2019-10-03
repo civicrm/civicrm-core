@@ -129,7 +129,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    *
    * @return array|NULL
    *   reference to the array of default values
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
     $defaults = (array) $this->_formValues;
@@ -145,12 +145,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * @throws \Exception
    */
   protected function setFormValues() {
-    if (!empty($_POST) && !$this->_force) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-    }
-    elseif ($this->_force) {
-      $this->_formValues = $this->setDefaultValues();
-    }
+    $this->_formValues = $this->getFormValues();
     $this->convertTextStringsToUseLikeOperator();
   }
 
@@ -475,6 +470,25 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
         $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
       }
     }
+  }
+
+  /**
+   * Get the form values.
+   *
+   * @todo consolidate with loadFormValues()
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getFormValues() {
+    if (!empty($_POST) && !$this->_force) {
+      return $this->controller->exportValues($this->_name);
+    }
+    if ($this->_force) {
+      return $this->setDefaultValues();
+    }
+    return (array) $this->get('formValues');
   }
 
 }
