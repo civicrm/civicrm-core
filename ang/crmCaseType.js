@@ -354,9 +354,10 @@
 
       // go lookup and add client-perspective labels for $scope.caseType.definition.caseRoles
       _.each($scope.caseType.definition.caseRoles, function (set) {
-        _.each($scope.relationshipTypeOptions, function (relTypes) {
-          if (relTypes.text == set.name) {
-            set.displaylabel = relTypes.id;
+        _.each($scope.relationshipTypeOptions, function (relationshipTypeOption) {
+          if (relationshipTypeOption.text == set.name) {
+            // relationshipTypeOption.id here corresponds to one of the civicrm_relationship_type.label database fields, not civicrm_relationship_type.id
+            set.displaylabel = relationshipTypeOption.id;
           }
         });
       });
