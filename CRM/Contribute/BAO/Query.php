@@ -160,24 +160,14 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $quoteValue = "\"$value\"";
     }
 
-    // These are legacy names.
-    // @todo enotices when these are hit so we can start to elimnate them.
-    $fieldAliases = [
-      'financial_type' => 'financial_type_id',
-      'contribution_page' => 'contribution_page_id',
-      'payment_instrument' => 'payment_instrument_id',
-      // or payment_instrument_id?
-      'contribution_payment_instrument' => 'contribution_payment_instrument_id',
-      'contribution_status' => 'contribution_status_id',
-    ];
+    $fieldAliases = self::getLegacySupportedFields();
 
-    $name = isset($fieldAliases[$name]) ? $fieldAliases[$name] : $name;
+    $fieldName = $name = self::getFieldName($values);
     $qillName = $name;
     if (in_array($name, $fieldAliases)) {
       $qillName = array_search($name, $fieldAliases);
     }
     $pseudoExtraParam = [];
-    $fieldName = str_replace(['_high', '_low'], '', $name);
     $fieldSpec = CRM_Utils_Array::value($fieldName, $fields, []);
     $tableName = CRM_Utils_Array::value('table_name', $fieldSpec, 'civicrm_contribution');
     $dataType = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $fieldSpec));
