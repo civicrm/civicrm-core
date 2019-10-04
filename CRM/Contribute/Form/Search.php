@@ -86,14 +86,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     $this->loadStandardSearchOptionsFromUrl();
 
-    // get user submitted values
-    // get it from controller only if form has been submitted, else preProcess has set this
-    if (!empty($_POST)) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-    }
-    else {
-      $this->_formValues = $this->get('formValues');
-    }
+    $this->_formValues = $this->getFormValues();
 
     //membership ID
     $memberShipId = CRM_Utils_Request::retrieve('memberId', 'Positive', $this);
