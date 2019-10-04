@@ -153,27 +153,27 @@ class CRM_Utils_System_Drupal8 extends CRM_Utils_System_DrupalBase {
       // This checks for both username uniqueness and validity.
       $violations = iterator_to_array($user->validate());
       // We only care about violations on the username field; discard the rest.
-      $violations = array_filter($violations, function ($v) {
+      $violations = array_values(array_filter($violations, function ($v) {
         return $v->getPropertyPath() == 'name';
-      });
+      }));
       if (count($violations) > 0) {
         $errors['cms_name'] = (string) $violations[0]->getMessage();
       }
     }
 
     // And if we are given an email address, let's check to see if it already exists.
-    if (!empty($params[$emailName])) {
-      $mail = $params[$emailName];
+    if (!empty($params[$emailName]) || !empty($params['mail'])) {
+      $key = (!empty($params[$emailName])) ? $emailName : 'mail';
 
       $user = entity_create('user');
-      $user->setEmail($mail);
+      $user->setEmail($params[$key]);
 
       // This checks for both email uniqueness.
       $violations = iterator_to_array($user->validate());
       // We only care about violations on the email field; discard the rest.
-      $violations = array_filter($violations, function ($v) {
+      $violations = array_values(array_filter($violations, function ($v) {
         return $v->getPropertyPath() == 'mail';
-      });
+      }));
       if (count($violations) > 0) {
         $errors[$emailName] = (string) $violations[0]->getMessage();
       }
