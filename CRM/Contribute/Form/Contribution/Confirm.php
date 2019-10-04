@@ -1554,7 +1554,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
 
         // @todo Move this into CRM_Member_BAO_Membership::processMembership
         if (!empty($membershipContribution)) {
-          $pending = ($membershipContribution->contribution_status_id == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus())) ? TRUE : FALSE;
+          $pendingStatus = CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending');
+          $pending = ($membershipContribution->contribution_status_id == $pendingStatus) ? TRUE : FALSE;
         }
         else {
           $pending = $this->getIsPending();
