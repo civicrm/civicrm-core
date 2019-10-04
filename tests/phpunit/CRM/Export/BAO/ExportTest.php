@@ -121,6 +121,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ['contact_type' => 'Individual', 'name' => 'email', 1],
       ['name' => 'trxn_id'],
     ];
+    $this->hookClass->setHook('civicrm_export', array($this, 'confirmHookWasCalled'));
 
     $this->doExportTest([
       'ids' => $this->contributionIDs,
@@ -129,6 +130,20 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'exportMode' => CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
       'componentClause' => 'civicrm_contribution.id IN ( ' . implode(',', $this->contributionIDs) . ')',
     ]);
+    $this->assertContains('display', array_values($this->csv->getHeader()));
+    $row = $this->csv->fetchOne(0);
+    $this->assertEquals('This is a test', $row['display']);
+  }
+
+  /**
+   * Implements hook_civicrm_export().
+   *
+   */
+  public function confirmHookWasCalled(&$exportTempTable, &$headerRows, &$sqlColumns, $exportMode, $componentTable, $ids) {
+    $sqlColumns['display'] = 'display varchar(255)';
+    $headerRows[] = 'display';
+    CRM_Core_DAO::executeQuery("ALTER TABLE $exportTempTable ADD COLUMN display varchar(255)");
+    CRM_Core_DAO::executeQuery("UPDATE $exportTempTable SET display = 'This is a test'");
   }
 
   /**
