@@ -55,8 +55,13 @@ class CRM_Afform_AfformScanner {
     $mapper = CRM_Extension_System::singleton()->getMapper();
     foreach ($mapper->getModules() as $module) {
       /** @var $module CRM_Core_Module */
-      if ($module->is_active) {
-        $this->appendFilePaths($paths, dirname($mapper->keyToPath($module->name)) . DIRECTORY_SEPARATOR . 'ang', 20);
+      try {
+        if ($module->is_active) {
+          $this->appendFilePaths($paths, dirname($mapper->keyToPath($module->name)) . DIRECTORY_SEPARATOR . 'ang', 20);
+        }
+      }
+      catch (CRM_Extension_Exception_MissingException $e) {
+        // If the extension is missing skip & continue.
       }
     }
 
