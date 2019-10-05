@@ -290,7 +290,7 @@ WHERE lt.log_conn_id = %1
         // FIXME: Use *_BAO:buildOptions() method rather than pseudoconstants & fetch programmatically
         $values[$table] = [
           'contribution_page_id' => CRM_Contribute_PseudoConstant::contributionPage(),
-          'contribution_status_id' => CRM_Contribute_PseudoConstant::contributionStatus(),
+          'contribution_status_id' => CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'),
           'financial_type_id' => CRM_Contribute_PseudoConstant::financialType(),
           'country_id' => CRM_Core_PseudoConstant::country(),
           'gender_id' => CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id'),

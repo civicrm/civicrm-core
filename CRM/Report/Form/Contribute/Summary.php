@@ -156,7 +156,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'),
             'default' => array(1),
             'type' => CRM_Utils_Type::T_INT,
           ),
@@ -220,7 +220,7 @@ class CRM_Report_Form_Contribute_Summary extends CRM_Report_Form {
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'),
             'default' => array(1),
             'type' => CRM_Utils_Type::T_INT,
           ),
@@ -866,7 +866,7 @@ ROUND(AVG({$this->_aliases['civicrm_contribution_soft']}.amount), 2) as civicrm_
    */
   public function alterDisplay(&$rows) {
     $entryFound = FALSE;
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
     $contributionPages = CRM_Contribute_PseudoConstant::contributionPage();
 
     foreach ($rows as $rowNum => $row) {
