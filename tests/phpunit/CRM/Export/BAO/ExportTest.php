@@ -303,7 +303,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Campaign ID' => '',
       'Status Override' => '',
       'Total Amount' => '200.00',
-      'Contribution Status' => 'Pending',
+      'Contribution Status' => 'Pending Label**',
       'Date Received' => '2019-07-25 07:34:23',
       'Payment Method' => 'Check',
       'Transaction ID' => '',

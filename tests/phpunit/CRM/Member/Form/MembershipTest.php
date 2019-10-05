@@ -44,7 +44,6 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   protected $_individualId;
   protected $_contribution;
   protected $_financialTypeId = 1;
-  protected $_apiversion;
   protected $_entity = 'Membership';
   protected $_params;
   protected $_ids = [];
@@ -88,6 +87,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
    *
    * Connect to the database, truncate the tables that will be used
    * and redirect stdin to a temporary file.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUp() {
     $this->_apiversion = 3;
@@ -140,6 +141,8 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
   /**
    *  Test CRM_Member_Form_Membership::formRule() with a parameter
    *  that has an empty contact_select_id value
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function testFormRuleEmptyContact() {
     $params = [
@@ -712,13 +715,15 @@ class CRM_Member_Form_MembershipTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of the membership form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitRecur() {
     CRM_Core_Session::singleton()->getStatus(TRUE);
     $pendingVal = $this->callAPISuccessGetValue('OptionValue', [
       'return' => "id",
       'option_group_id' => "contribution_status",
-      'label' => "Pending",
+      'label' => "Pending Label**",
     ]);
     //Update label for Pending contribution status.
     $this->callAPISuccess('OptionValue', 'create', [

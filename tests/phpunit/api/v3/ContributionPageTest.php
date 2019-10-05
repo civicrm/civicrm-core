@@ -541,7 +541,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $contributions = $this->callAPISuccess('contribution', 'get', ['contribution_page_id' => $this->_ids['contribution_page']]);
     $this->assertCount(2, $contributions['values']);
     foreach ($contributions['values'] as $val) {
-      $this->assertEquals('Pending', $val['contribution_status']);
+      $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'), $val['contribution_status_id']);
     }
 
     //Membership should be in Pending state.

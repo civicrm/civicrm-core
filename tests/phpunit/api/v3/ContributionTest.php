@@ -1861,8 +1861,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($p2['fee_amount'], $res['fee_amount']);
     $this->assertEquals($p2['trxn_id'], $res['trxn_id']);
     $this->assertEquals($p2['invoice_id'], $res['invoice_id']);
-    // contribution_status_id = 2 => Pending
-    $this->assertEquals('Pending', $res['contribution_status']);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'), $res['contribution_status_id']);
 
     $this->contributionDelete($contribution1['id']);
     $this->contributionDelete($contribution2['id']);
