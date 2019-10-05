@@ -173,7 +173,7 @@ class CRM_Export_BAO_ExportProcessor {
       $fields = ['is_deceased', 'do_not_mail', 'street_address', 'supplemental_address_1'];
       foreach ($fields as $index => $field) {
         if (!empty($this->getReturnProperties()[$field])) {
-          unset($field[$index]);
+          unset($fields[$index]);
         }
       }
       $this->additionalFieldsForPostalExport = array_fill_keys($fields, 1);
