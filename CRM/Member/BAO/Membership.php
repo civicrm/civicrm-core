@@ -1128,7 +1128,7 @@ AND civicrm_membership.is_test = %2";
     if (empty($contribution->contribution_recur_id)) {
       return;
     }
-
+    CRM_Core_Error::deprecatedFunctionWarning('test if any tests hit this');
     $params = array(
       1 => array($contribution->contribution_recur_id, 'Integer'),
       2 => array($membership->id, 'Integer'),
