@@ -63,6 +63,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
    *   The array that holds all the db ids.
    *
    * @return CRM_Member_BAO_Membership
+   * @throws \CiviCRM_API3_Exception
    */
   public static function add(&$params, $ids = []) {
     $oldStatus = $oldType = NULL;
@@ -541,10 +542,7 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
 
       //get the membership status and type values.
       $statusANDType = self::getStatusANDTypeValues($membership->id);
-      foreach ([
-                 'status',
-                 'membership_type',
-               ] as $fld) {
+      foreach (['status', 'membership_type'] as $fld) {
         $defaults[$fld] = CRM_Utils_Array::value($fld, $statusANDType[$membership->id]);
       }
       if (!empty($statusANDType[$membership->id]['is_current_member'])) {
@@ -795,6 +793,7 @@ INNER JOIN  civicrm_membership_type type ON ( type.id = membership.membership_ty
    *   True if only Memberships with same parent org as the $memType wanted, false otherwise.
    *
    * @return array|bool
+   * @throws \CiviCRM_API3_Exception
    */
   public static function getContactMembership($contactID, $memType, $isTest, $membershipId = NULL, $onlySameParentOrg = FALSE) {
     //check for owner membership id, if it exists update that membership instead: CRM-15992
@@ -1152,6 +1151,8 @@ AND civicrm_membership.is_test = %2";
    * @param string $changeToday
    *   In case today needs
    *   to be customised, null otherwise
+   *
+   * @throws \CRM_Core_Exception
    */
   public static function fixMembershipStatusBeforeRenew(&$currentMembership, $changeToday) {
     $today = NULL;
@@ -1343,6 +1344,7 @@ WHERE  civicrm_membership.contact_id = civicrm_contact.id
    *   Membership details, if created.
    *
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function createRelatedMemberships(&$params, &$dao, $reset = FALSE) {
     // CRM-4213 check for loops, using static variable to record contacts already processed.
@@ -1832,6 +1834,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @return array
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function processMembership($contactID, $membershipTypeID, $is_test, $changeToday, $modifiedID, $customFieldsFormatted, $numRenewTerms, $membershipID, $pending, $contributionRecurID, $membershipSource, $isPayLater, $campaignId, $formDates = [], $contribution = NULL, $lineItems = []) {
     $renewalMode = $updateStatusId = FALSE;
@@ -1853,10 +1856,10 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
       //1. membership with status : PENDING/CANCELLED (CRM-2395)
       //2. Paylater/IPN renew. CRM-4556.
       if ($pending || in_array($currentMembership['status_id'], [
-          array_search('Pending', $allStatus),
-          // CRM-15475
-          array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)),
-        ])) {
+        array_search('Pending', $allStatus),
+        // CRM-15475
+        array_search('Cancelled', CRM_Member_PseudoConstant::membershipStatus(NULL, " name = 'Cancelled' ", 'name', FALSE, TRUE)),
+      ])) {
 
         $memParams = [
           'id' => $currentMembership['id'],
@@ -2110,6 +2113,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @return int
    *   Count of updated contacts.
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   protected static function updateDeceasedMembersStatuses() {
     $count = 0;
@@ -2163,6 +2169,8 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    *
    * @param int $membershipId
    * @param array $lineItem
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function processPriceSet($membershipId, $lineItem) {
     //FIXME : need to move this too
@@ -2224,6 +2232,9 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
    * Sending renewal reminders has been migrated from this job to the Scheduled Reminders function as of 4.3.
    *
    * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function updateAllMembershipStatus() {
     // Tests for this function are in api_v3_JobTest. Please add tests for all updates.
@@ -2354,6 +2365,8 @@ WHERE      civicrm_membership.is_test = 0
    *
    * @param CRM_Core_DAO $membership
    *   The membership to be processed
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   private static function processOverriddenUntilDateMembership($membership) {
     $isOverriddenUntilDate = !empty($membership->is_override) && !empty($membership->status_override_end_date);
@@ -2428,8 +2441,8 @@ WHERE      civicrm_membership.is_test = 0
    * @param array $ids
    *   (@return CRM_Contribute_BAO_Contribution
    *
-   * @deprecated) array of ids.
-   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public static function recordMembershipContribution(&$params, $ids = []) {
     if (!empty($ids)) {
