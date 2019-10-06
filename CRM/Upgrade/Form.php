@@ -673,6 +673,11 @@ SET    version = '$version'
             $messages[] = ts('The obsolete extension %1 could not be removed due to an error. It is recommended to remove this extension manually.', [1 => $key]);
           }
         }
+        if (!empty($obsolete['force-uninstall'])) {
+          CRM_Core_DAO::executeQuery('UPDATE civicrm_extension SET is_active = 0 WHERE full_name = %1', [
+            1 => [$key, 'String'],
+          ]);
+        }
       }
     }
     if ($messages) {
