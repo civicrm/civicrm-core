@@ -304,7 +304,7 @@ class CRM_Extension_Mapper {
         try {
           $moduleExtensions[] = [
             'prefix' => $dao->file,
-            'filePath' => $this->keyToPath($dao->full_name),
+            'filePath' => $dao->full_name,
           ];
         }
         catch (CRM_Extension_Exception $e) {
@@ -323,6 +323,12 @@ class CRM_Extension_Mapper {
         $this->cache->set($this->cacheKey . '_moduleFiles', $moduleExtensions);
       }
     }
+
+    // Since we're not caching the full path we add it now.
+    array_walk($moduleExtensions, function(&$value, $key) {
+      $value['filePath'] = $this->keyToPath($value['filePath']);
+    });
+
     return $moduleExtensions;
   }
 
