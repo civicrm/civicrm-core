@@ -768,7 +768,7 @@ class CRM_Core_I18n {
  *   the translated string
  */
 function ts($text, $params = []) {
-  static $areSettingsAvailable = FALSE;
+  static $bootstrapReady = FALSE;
   static $lastLocale = NULL;
   static $i18n = NULL;
   static $function = NULL;
@@ -778,13 +778,18 @@ function ts($text, $params = []) {
   }
 
   // When the settings become available, lookup customTranslateFunction.
-  if (!$areSettingsAvailable) {
-    $areSettingsAvailable = (bool) \Civi\Core\Container::getBootService('settings_manager');
-    if ($areSettingsAvailable) {
+  if (!$bootstrapReady) {
+    $bootstrapReady = (bool) \Civi\Core\Container::isContainerBooted();
+    if ($bootstrapReady) {
+      // just got ready: determine whether there is a working custom translation function
       $config = CRM_Core_Config::singleton();
       if (isset($config->customTranslateFunction) and function_exists($config->customTranslateFunction)) {
         $function = $config->customTranslateFunction;
       }
+    }
+    else {
+      // don't translate anything until bootstrap has progressed enough
+      return $text;
     }
   }
 
