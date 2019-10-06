@@ -120,6 +120,30 @@ class api_v3_JobProcessMailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test what happens when a contact is set to decesaed
+   */
+  public function testDecesasedRecepient() {
+    $contactID = $this->individualCreate(['first_name' => 'test dead recipeint', 'email' => 'mailtestdead@civicrm.org']);
+    $this->callAPISuccess('group_contact', 'create', [
+      'contact_id' => $contactID,
+      'group_id' => $this->_groupID,
+      'status' => 'Added',
+    ]);
+    $this->createContactsInGroup(2, $this->_groupID);
+    Civi::settings()->add([
+      'mailerBatchLimit' => 2,
+    ]);
+    $mailing = $this->callAPISuccess('mailing', 'create', $this->_params);
+    $this->assertEquals(3, $this->callAPISuccess('MailingRecipients', 'get', ['mailing_id' => $mailing['id']])['count']);
+    $this->_mut->assertRecipients([]);
+    $this->callAPISuccess('Contact', 'create', ['id' => $contactID, 'is_deceased' => 1, 'contact_type' => 'Individual']);
+    $this->callAPISuccess('job', 'process_mailing', []);
+    // Check that the deceased contact is not found in the mailing.
+    $this->_mut->assertRecipients($this->getRecipients(1, 2));
+
+  }
+
+  /**
    * Test pause and resume on Mailing.
    */
   public function testPauseAndResumeMailing() {
