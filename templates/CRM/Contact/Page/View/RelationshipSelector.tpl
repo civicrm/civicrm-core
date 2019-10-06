@@ -23,24 +23,25 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* relationship selector *}
+{* entity selector *}
 {crmRegion name="crm-contact-relationshipselector-pre"}
 {/crmRegion}
-<div class="crm-contact-relationship-{$context}">
+<div class="crm-contact-{$entityInClassFormat}-{$context}">
   <table
-    class="crm-contact-relationship-selector-{$context} crm-ajax-table"
-    data-ajax="{crmURL p="civicrm/ajax/contactrelationships" q="context=$context&cid=$contactId"}" style="width: 100%;">
+    class="crm-contact-{$entityInClassFormat}-selector-{$context} crm-ajax-table"
+    data-ajax="{crmURL p="civicrm/ajax/contactrelationships" q="context=$context&cid=$contactId"}"
+    data-order='[[0,"asc"],[1,"asc"]]'
+    style="width: 100%;">
     <thead>
     <tr>
-      <th data-data="relation" class='crm-contact-relationship-type'>{ts}Relationship{/ts}</th>
-      <th data-data="sort_name" class='crm-contact-relationship-contact_name'>&nbsp;</th>
-      <th data-data="start_date" class='crm-contact-relationship-start_date'>{ts}Start{/ts}</th>
-      <th data-data="end_date" class='crm-contact-relationship-end_date'>{ts}End{/ts}</th>
-      <th data-data="city" class='crm-contact-relationship-city'>{ts}City{/ts}</th>
-      <th data-data="state" class='crm-contact-relationship-state'>{ts}State/Prov{/ts}</th>
-      <th data-data="email" class='crm-contact-relationship-email'>{ts}Email{/ts}</th>
-      <th data-data="phone" class='crm-contact-relationship-phone'>{ts}Phone{/ts}</th>
-      <th data-data="links" data-orderable="false" class='crm-contact-relationship-links'></th>
+      {foreach from=$columnHeaders key=headerkey item=header}
+        {if $header.sort}
+          <th data-data="{$header.sort}" class="crm-contact-{$entityInClassFormat}-{$header.sort}">{$header.name}</th>
+        {else}
+          <th data-data="{$headerkey}" data-orderable="false" class="crm-contact-{$entityInClassFormat}-{$headerkey}">{$header.name}</th>
+        {/if}
+
+      {/foreach}
     </tr>
     </thead>
   </table>
