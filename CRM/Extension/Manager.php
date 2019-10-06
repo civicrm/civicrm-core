@@ -54,12 +54,12 @@ class CRM_Extension_Manager {
   const STATUS_UNKNOWN = 'unknown';
 
   /**
-   * The extension is fully installed and enabled
+   * The extension is installed but the code is not accessible
    */
   const STATUS_INSTALLED_MISSING = 'installed-missing';
 
   /**
-   * The extension is fully installed and enabled
+   * The extension was installed and is now disabled; the code is not accessible
    */
   const STATUS_DISABLED_MISSING = 'disabled-missing';
 
@@ -215,18 +215,31 @@ class CRM_Extension_Manager {
   /**
    * Add records of the extension to the database -- and enable it
    *
-   * @param array $keys
-   *   List of extension keys.
+   * @param string|array $keys
+   *   One or more extension keys.
    * @throws CRM_Extension_Exception
    */
   public function install($keys) {
+    $keys = (array) $keys;
     $origStatuses = $this->getStatuses();
 
     // TODO: to mitigate the risk of crashing during installation, scan
     // keys/statuses/types before doing anything
 
+    // Check compatibility
+    $incompatible = [];
     foreach ($keys as $key) {
-      // throws Exception
+      if ($this->isIncompatible($key)) {
+        $incompatible[] = $key;
+      }
+    }
+    if ($incompatible) {
+      throw new CRM_Extension_Exception('Cannot install incompatible extension: ' . implode(', ', $incompatible));
+    }
+
+    foreach ($keys as $key) {
+      /** @var CRM_Extension_Info $info */
+      /** @var CRM_Extension_Manager_Base $typeManager */
       list ($info, $typeManager) = $this->_getInfoTypeHandler($key);
 
       switch ($origStatuses[$key]) {
@@ -308,13 +321,14 @@ class CRM_Extension_Manager {
   }
 
   /**
-   * Add records of the extension to the database -- and enable it
+   * Disable extension without removing record from db.
    *
-   * @param array $keys
-   *   List of extension keys.
+   * @param string|array $keys
+   *   One or more extension keys.
    * @throws CRM_Extension_Exception
    */
   public function disable($keys) {
+    $keys = (array) $keys;
     $origStatuses = $this->getStatuses();
 
     // TODO: to mitigate the risk of crashing during installation, scan
@@ -366,13 +380,12 @@ class CRM_Extension_Manager {
   /**
    * Remove all database references to an extension.
    *
-   * Add records of the extension to the database -- and enable it
-   *
-   * @param array $keys
-   *   List of extension keys.
+   * @param string|array $keys
+   *   One or more extension keys.
    * @throws CRM_Extension_Exception
    */
   public function uninstall($keys) {
+    $keys = (array) $keys;
     $origStatuses = $this->getStatuses();
 
     // TODO: to mitigate the risk of crashing during installation, scan
@@ -421,7 +434,7 @@ class CRM_Extension_Manager {
    * @param $key
    *
    * @return string
-   *   constant (STATUS_INSTALLED, STATUS_DISABLED, STATUS_UNINSTALLED, STATUS_UNKNOWN)
+   *   constant self::STATUS_*
    */
   public function getStatus($key) {
     $statuses = $this->getStatuses();
@@ -434,6 +447,17 @@ class CRM_Extension_Manager {
   }
 
   /**
+   * Check if a given extension is incompatible with this version of CiviCRM
+   *
+   * @param $key
+   * @return bool|array
+   */
+  public function isIncompatible($key) {
+    $info = CRM_Extension_System::getCompatibilityInfo();
+    return $info[$key] ?? FALSE;
+  }
+
+  /**
    * Determine the status of all extensions.
    *
    * @return array
@@ -441,6 +465,8 @@ class CRM_Extension_Manager {
    */
   public function getStatuses() {
     if (!is_array($this->statuses)) {
+      $compat = CRM_Extension_System::getCompatibilityInfo();
+
       $this->statuses = [];
 
       foreach ($this->fullContainer->getKeys() as $key) {
@@ -460,7 +486,10 @@ class CRM_Extension_Manager {
         catch (CRM_Extension_Exception $e) {
           $codeExists = FALSE;
         }
-        if ($dao->is_active) {
+        if (!empty($compat[$dao->full_name]['force-uninstall'])) {
+          $this->statuses[$dao->full_name] = self::STATUS_UNINSTALLED;
+        }
+        elseif ($dao->is_active) {
           $this->statuses[$dao->full_name] = $codeExists ? self::STATUS_INSTALLED : self::STATUS_INSTALLED_MISSING;
         }
         else {
@@ -487,7 +516,7 @@ class CRM_Extension_Manager {
    *
    * @throws CRM_Extension_Exception
    * @return array
-   *   (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
+   *   [CRM_Extension_Info, CRM_Extension_Manager_Interface]
    */
   private function _getInfoTypeHandler($key) {
     // throws Exception
@@ -507,7 +536,7 @@ class CRM_Extension_Manager {
    *
    * @throws CRM_Extension_Exception
    * @return array
-   *   (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
+   *   [CRM_Extension_Info, CRM_Extension_Manager_Interface]
    */
   private function _getMissingInfoTypeHandler($key) {
     $info = $this->createInfoFromDB($key);
