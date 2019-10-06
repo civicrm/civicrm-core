@@ -360,10 +360,20 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
     }
     $params['skipLineItem'] = TRUE;
 
-    //record contribution for this membership
+    // Record contribution for this membership and create a MembershipPayment
     if (!empty($params['contribution_status_id']) && empty($params['relate_contribution_id'])) {
       $memInfo = array_merge($params, ['membership_id' => $membership->id]);
       $params['contribution'] = self::recordMembershipContribution($memInfo);
+    }
+
+    // Add/update MembershipPayment record for this membership if it is a related contribution
+    if (!empty($params['relate_contribution_id'])) {
+      $membershipPaymentParams = [
+        'membership_id' => $membership->id,
+        'membership_type_id' => $membership->membership_type_id,
+        'contribution_id' => $params['relate_contribution_id'],
+      ];
+      civicrm_api3('MembershipPayment', 'create', $membershipPaymentParams);
     }
 
     if (!empty($params['lineItems'])) {
@@ -400,16 +410,6 @@ class CRM_Member_BAO_Membership extends CRM_Member_DAO_Membership {
         $params['line_item'],
         CRM_Utils_Array::value('contribution', $params)
       );
-    }
-
-    //insert payment record for this membership
-    if (!empty($params['relate_contribution_id'])) {
-      $membershipPaymentParams = [
-        'membership_id' => $membership->id,
-        'membership_type_id' => $membership->membership_type_id,
-        'contribution_id' => $params['relate_contribution_id'],
-      ];
-      civicrm_api3('MembershipPayment', 'create', $membershipPaymentParams);
     }
 
     $transaction->commit();
@@ -2438,14 +2438,17 @@ WHERE      civicrm_membership.is_test = 0
 
   /**
    * Record contribution record associated with membership.
+   * This will update an existing contribution if $params['contribution_id'] is passed in.
+   * This will create a MembershipPayment to link the contribution and membership
    *
    * @param array $params
    *   Array of submitted params.
    * @param array $ids
    *   (@return CRM_Contribute_BAO_Contribution
    *
-   * @throws \CiviCRM_API3_Exception
+   * @return CRM_Contribute_BAO_Contribution
    * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function recordMembershipContribution(&$params, $ids = []) {
     if (!empty($ids)) {
