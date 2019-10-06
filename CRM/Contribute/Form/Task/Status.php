@@ -84,7 +84,7 @@ AND    {$this->_componentClause}";
    * Build the form object.
    */
   public function buildQuickForm() {
-    $status = CRM_Contribute_PseudoConstant::contributionStatus();
+    $status = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
     unset($status[2]);
     unset($status[5]);
     unset($status[6]);

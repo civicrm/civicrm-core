@@ -2123,7 +2123,7 @@ AND    ( entity_id IS NULL OR entity_id <= 0 )
       );
     }
     elseif ($fieldName === 'contribution_status_id') {
-      $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus();
+      $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
       $statusName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
       foreach (['In Progress', 'Overdue', 'Refunded'] as $suppress) {
         unset($contributionStatuses[CRM_Utils_Array::key($suppress, $statusName)]);

@@ -225,7 +225,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'),
             'type' => CRM_Utils_Type::T_INT,
           ],
           'total_amount' => ['title' => ts('Contribution Amount')],
@@ -317,7 +317,7 @@ class CRM_Report_Form_Member_Detail extends CRM_Report_Form {
     $checkList = [];
 
     $contributionTypes = CRM_Contribute_PseudoConstant::financialType();
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
 
     $repeatFound = FALSE;
