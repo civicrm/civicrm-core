@@ -1117,12 +1117,14 @@ AND civicrm_membership.is_test = %2";
   }
 
   /**
+   * @deprecated This is not used anywhere and should be removed soon!
    * Function for updating a membership record's contribution_recur_id.
    *
    * @param CRM_Member_DAO_Membership $membership
    * @param \CRM_Contribute_BAO_Contribution|\CRM_Contribute_DAO_Contribution $contribution
    */
   public static function updateRecurMembership(CRM_Member_DAO_Membership $membership, CRM_Contribute_BAO_Contribution $contribution) {
+    CRM_Core_Error::deprecatedFunctionWarning('Use the API instead');
 
     if (empty($contribution->contribution_recur_id)) {
       return;
@@ -1844,6 +1846,7 @@ INNER JOIN  civicrm_contact contact ON ( contact.id = membership.contact_id AND 
     $membershipTypeDetails = CRM_Member_BAO_MembershipType::getMembershipTypeDetails($membershipTypeID);
     $dates = [];
     $ids = [];
+
     // CRM-7297 - allow membership type to be be changed during renewal so long as the parent org of new membershipType
     // is the same as the parent org of an existing membership of the contact
     $currentMembership = CRM_Member_BAO_Membership::getContactMembership($contactID, $membershipTypeID,
