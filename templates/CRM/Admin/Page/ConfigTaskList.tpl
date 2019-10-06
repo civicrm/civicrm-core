@@ -64,7 +64,7 @@
     </tr>
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/mapping" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Mapping and Geocoding{/ts}</a></td>
-        <td>{ts}Configure a mapping provider (e.g. Google or Yahoo) to display maps for contact addresses and event locations.{/ts}</td>
+        <td>{ts}Configure a mapping provider (e.g. OpenStreetMap or Google) to display maps for contact addresses and event locations.{/ts}</td>
     </tr>
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/search" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Search Settings{/ts}</a></td>
