@@ -3348,7 +3348,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         WHERE con.id = %1 LIMIT 1";
     $params = [1 => [$contributionId, 'Integer']];
     $statusId = CRM_Core_DAO::singleValueQuery($sql, $params);
-    $status = CRM_Contribute_PseudoConstant::contributionStatus($statusId);
+    $status = CRM_Contribute_PseudoConstant::contributionStatus($statusId, 'name');
     if ($status == 'Cancelled') {
       return TRUE;
     }
