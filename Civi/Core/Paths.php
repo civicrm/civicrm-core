@@ -78,6 +78,12 @@ class Paths {
           'path' => defined('CIVICRM_TEMPLATE_COMPILEDIR') ? CIVICRM_TEMPLATE_COMPILEDIR : \Civi::paths()->getPath('[civicrm.private]/templates_c'),
         ];
       })
+      ->register('civicrm.l10n', function () {
+        $dir = defined('CIVICRM_L10N_BASEDIR') ? CIVICRM_L10N_BASEDIR : \Civi::paths()->getPath('[civicrm.private]/l10n');
+        return [
+          'path' => is_dir($dir) ? $dir : \Civi::paths()->getPath('[civicrm.root]/l10n'),
+        ];
+      })
       ->register('wp.frontend.base', function () {
         return ['url' => rtrim(CIVICRM_UF_BASEURL, '/') . '/'];
       })

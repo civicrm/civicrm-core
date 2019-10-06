@@ -282,11 +282,7 @@ class CRM_Core_I18n {
    * @return string
    */
   public static function getResourceDir() {
-    static $dir = NULL;
-    if ($dir === NULL) {
-      $dir = dirname(dirname(__DIR__)) . DIRECTORY_SEPARATOR . 'l10n' . DIRECTORY_SEPARATOR;
-    }
-    return $dir;
+    return \Civi::paths()->getPath('[civicrm.l10n]/.');
   }
 
   /**
