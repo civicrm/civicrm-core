@@ -46,6 +46,8 @@ class CRM_Contact_Form_Edit_Address {
    *   False, if we want to skip the address sharing features.
    * @param bool $inlineEdit
    *   True when edit used in inline edit.
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public static function buildQuickForm(&$form, $addressBlockCount = NULL, $sharing = TRUE, $inlineEdit = FALSE) {
     // passing this via the session is AWFUL. we need to fix this
@@ -130,13 +132,13 @@ class CRM_Contact_Form_Edit_Address {
           continue;
         }
       }
-      if ($name == 'address_name') {
+      if ($name === 'address_name') {
         $name = 'name';
       }
 
       $params = ['entity' => 'address'];
 
-      if ($name == 'postal_code_suffix') {
+      if ($name === 'postal_code_suffix') {
         $params['label'] = ts('Suffix');
       }
 
@@ -366,7 +368,7 @@ class CRM_Contact_Form_Edit_Address {
       $requireOmission = NULL;
       foreach ($groupTree as $csId => $csVal) {
         // only process Address entity fields
-        if ($csVal['extends'] != 'Address') {
+        if ($csVal['extends'] !== 'Address') {
           continue;
         }
 
@@ -391,6 +393,9 @@ class CRM_Contact_Form_Edit_Address {
    * @param CRM_Core_Form $form
    * @param int $entityId
    * @param int $blockId
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   protected static function addCustomDataToForm(&$form, $entityId, $blockId) {
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Address', NULL, $entityId);
@@ -417,7 +422,7 @@ class CRM_Contact_Form_Edit_Address {
           continue;
         }
 
-        // inorder to set correct defaults for checkbox custom data, we need to converted flat key to array
+        // in order to set correct defaults for checkbox custom data, we need to converted flat key to array
         // this works for all types custom data
         $keyValues = explode('[', str_replace(']', '', $key));
         $addressDefaults[$keyValues[0]][$keyValues[1]][$keyValues[2]] = $val;
