@@ -734,6 +734,11 @@ class CRM_Contact_Import_Parser_ContactTest extends CiviUnitTestCase {
     if (!$fields) {
       $fields = array_keys($originalValues);
     }
+    if (empty($mapperLocType)) {
+      foreach (array_keys($originalValues) as $key) {
+        $mapperLocType[] = in_array($key, ['email', 'phone']) ? 1 : NULL;
+      }
+    }
     $values = array_values($originalValues);
     $parser = new CRM_Contact_Import_Parser_Contact($fields, $mapperLocType);
     $parser->_contactType = 'Individual';

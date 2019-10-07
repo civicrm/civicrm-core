@@ -219,6 +219,7 @@ class CRM_Core_BAO_Block {
    *
    * @return object
    *   CRM_Core_BAO_Block object on success, null otherwise
+   * @throws \CiviCRM_API3_Exception
    */
   public static function create($blockName, &$params, $entity = NULL, $contactId = NULL) {
     if (!self::blockExists($blockName, $params)) {
@@ -345,12 +346,14 @@ class CRM_Core_BAO_Block {
 
       $blockFields = array_merge($value, $contactFields);
       if ($name === 'Email') {
-        // @todo ideally all would call the api which is our main tested function,
-        // and towards that call the create rather than add which is preferred by the
-        // api. In order to be careful with change only email is swapped over here because it
-        // is specifically tested in testImportParserWithUpdateWithContactID
-        // and the primary handling is otherwise bypassed on importing an email update.
-        $blocks[] = CRM_Core_BAO_Email::create($blockFields);
+        $emails = civicrm_api3('Email', 'create', $blockFields)['values'];
+        // Only contact::create even slightly cares about this return - let it be happy for now.
+        // Note that for testing of this go to testImportParserWithUpdateWithContactID
+        foreach ($emails as $email) {
+          $emailObject = new CRM_Core_BAO_Email();
+          $emailObject->copyValues($email);
+          $blocks[] = $emailObject;
+        }
       }
       else {
         $baoString = 'CRM_Core_BAO_' . $name;
