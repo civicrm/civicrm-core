@@ -541,4 +541,15 @@
     </html>
     <add>4.7</add>
   </field>
+   <field>
+    <name>is_template</name>
+    <title>Is a Contribution Template</title>
+    <type>boolean</type>
+    <default>0</default>
+    <import>true</import>
+    <html>
+      <type>CheckBox</type>
+    </html>
+    <add>5.20</add>
+  </field>
 </table>
