@@ -84,6 +84,18 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
     $this->addTask('Add order_reference field to civicrm_financial_trxn', 'addColumn', 'civicrm_financial_trxn', 'order_reference',
       "varchar(255) COMMENT 'Payment Processor external order reference'", FALSE, '5.20.alpha1');
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add "Template" contribution status', 'templateStatus');
+  }
+
+  public static function templateStatus(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'option_group_id' => 'contribution_status',
+      'name' => 'Template',
+      'label' => ts('Template'),
+      'is_active' => TRUE,
+      'component_id' => 'CiviContribute',
+    ]);
+    return TRUE;
   }
 
 }
