@@ -488,9 +488,9 @@
     $scope.addRoleOnTheFly = function(roles, newType) {
       roles.push({name: newType.label_b_a, displaylabel: newType.label_a_b});
       // Assume that the case role should be A-B but add both directions as options.
-      $scope.relationshipTypeOptions.push({id: newType.label_a_b, text: newType.label_a_b});
+      $scope.relationshipTypeOptions.push({id: newType.label_a_b, text: newType.label_b_a});
       if (newType.label_a_b != newType.label_b_a) {
-        $scope.relationshipTypeOptions.push({id: newType.label_b_a, text: newType.label_b_a});
+        $scope.relationshipTypeOptions.push({id: newType.label_b_a, text: newType.label_a_b});
       }
     };
 
