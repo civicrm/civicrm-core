@@ -126,13 +126,19 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
    *   With key 'data' that matches the inputted data.
    */
   public function claimItem($lease_time = 3600) {
+
+    $result = NULL;
+    $dao = CRM_Core_DAO::executeQuery('LOCK TABLES civicrm_queue_item WRITE;');
     $sql = "
-      SELECT id, queue_name, submit_time, release_time, data
-      FROM civicrm_queue_item
-      WHERE queue_name = %1
-      ORDER BY weight ASC, id ASC
-      LIMIT 1
-    ";
+        SELECT first_in_queue.* FROM (
+          SELECT id, queue_name, submit_time, release_time, data
+          FROM civicrm_queue_item
+          WHERE queue_name = %1
+          ORDER BY weight ASC, id ASC
+          LIMIT 1
+        ) first_in_queue
+        WHERE release_time IS NULL OR release_time < NOW()
+      ";
     $params = [
       1 => [$this->getName(), 'String'],
     ];
@@ -144,19 +150,22 @@ class CRM_Queue_Queue_Sql extends CRM_Queue_Queue {
 
     if ($dao->fetch()) {
       $nowEpoch = CRM_Utils_Time::getTimeRaw();
-      if ($dao->release_time === NULL || strtotime($dao->release_time) < $nowEpoch) {
-        CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", [
-          '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
-          '2' => [$dao->id, 'Integer'],
-        ]);
-        // work-around: inconsistent date-formatting causes unintentional breakage
-        #        $dao->submit_time = date('YmdHis', strtotime($dao->submit_time));
-        #        $dao->release_time = date('YmdHis', $nowEpoch + $lease_time);
-        #        $dao->save();
-        $dao->data = unserialize($dao->data);
-        return $dao;
-      }
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_queue_item SET release_time = %1 WHERE id = %2", [
+        '1' => [date('YmdHis', $nowEpoch + $lease_time), 'String'],
+        '2' => [$dao->id, 'Integer'],
+      ]);
+      // (Comment by artfulrobot Sep 2019: Not sure what the below comment means, should be removed/clarified?)
+      // work-around: inconsistent date-formatting causes unintentional breakage
+      #        $dao->submit_time = date('YmdHis', strtotime($dao->submit_time));
+      #        $dao->release_time = date('YmdHis', $nowEpoch + $lease_time);
+      #        $dao->save();
+      $dao->data = unserialize($dao->data);
+      $result = $dao;
     }
+
+    $dao = CRM_Core_DAO::executeQuery('UNLOCK TABLES;');
+
+    return $result;
   }
 
   /**
