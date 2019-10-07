@@ -30,44 +30,24 @@
  *
  * @package CRM
  * @copyright CiviCRM LLC (c) 2004-2019
- * $Id$
- *
  */
 
+use Civi\Api4\Event;
 
-namespace Civi\Api4\Service\Spec\Provider;
-
-use Civi\Api4\Service\Spec\RequestSpec;
-
-class GetActionDefaultsProvider implements Generic\SpecProviderInterface {
-
-  /**
-   * @inheritDoc
-   */
-  public function modifySpec(RequestSpec $spec) {
-    // Exclude deleted records from api Get by default
-    $isDeletedField = $spec->getFieldByName('is_deleted');
-    if ($isDeletedField) {
-      $isDeletedField->setDefaultValue('0');
-    }
-
-    // Exclude test records from api Get by default
-    $isTestField = $spec->getFieldByName('is_test');
-    if ($isTestField) {
-      $isTestField->setDefaultValue('0');
-    }
-
-    $isTemplateField = $spec->getFieldByName('is_template');
-    if ($isTemplateField) {
-      $isTemplateField->setDefaultValue('0');
-    }
-  }
+/**
+ * @group headless
+ */
+class EventTest extends \api\v4\UnitTestCase {
 
   /**
-   * @inheritDoc
+   * Test that the event api filters out templates by default.
+   *
+   * @throws \Civi\API\Exception\UnauthorizedException
    */
-  public function applies($entity, $action) {
-    return $action === 'get';
+  public function testTemplateFilterByDefault() {
+    Event::create()->setValues(['template_title' => 'Big Event', 'is_template' => 1, 'start_date' => 'now', 'event_type_id' => 'Meeting'])->execute();
+    Event::create()->setValues(['title' => 'Bigger Event', 'start_date' => 'now', 'event_type_id' => 'Meeting'])->execute();
+    $this->assertEquals(1, Event::get()->selectRowCount()->execute()->count());
   }
 
 }
