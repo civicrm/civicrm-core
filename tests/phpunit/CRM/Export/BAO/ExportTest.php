@@ -682,9 +682,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->setUpContactExportData();
     $this->entity = 'Contact';
     $this->createCustomGroupWithFieldsOfAllTypes();
+    $longString = 'Blah';
+    for ($i = 0; $i < 70; $i++) {
+      $longString .= 'Blah';
+    }
+
     $this->callAPISuccess('Contact', 'create', [
       'id' => $this->contactIDs[1],
-      $this->getCustomFieldName('text') => 'BlahdeBlah',
+      $this->getCustomFieldName('text') => $longString,
       $this->getCustomFieldName('country') => 'LA',
       'api.Address.create' => ['location_type_id' => 'Billing', 'city' => 'Waipu'],
     ]);
@@ -699,7 +704,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'ids' => [$this->contactIDs[1]],
     ]);
     $row = $this->csv->fetchOne();
-    $this->assertEquals('BlahdeBlah', $row['Enter text here']);
+    $this->assertEquals($longString, $row['Enter text here']);
     $this->assertEquals('Waipu', $row['Billing-City']);
     $this->assertEquals("Lao People's Democratic Republic", $row['Country']);
   }

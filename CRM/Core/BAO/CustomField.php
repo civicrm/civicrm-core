@@ -596,6 +596,9 @@ class CRM_Core_BAO_CustomField extends CRM_Core_DAO_CustomField {
       ) {
         continue;
       }
+      if (!empty($values['text_length'])) {
+        $values['maxlength'] = (int) $values['text_length'];
+      }
 
       /* generate the key for the fields array */
 
