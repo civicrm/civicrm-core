@@ -326,6 +326,7 @@ class CRM_Core_I18n {
    *   The params of the translation (if any).
    *   - domain: string|array a list of translation domains to search (in order)
    *   - context: string
+   *   - skip_translation: boolean (do only escape/replacement, skip the actual translation)
    *
    * @return string
    *   the translated string
@@ -378,23 +379,25 @@ class CRM_Core_I18n {
     $raw = !empty($params['raw']);
     unset($params['raw']);
 
-    if (!empty($domain)) {
-      // It might be prettier to cast to an array, but this is high-traffic stuff.
-      if (is_array($domain)) {
-        foreach ($domain as $d) {
-          $candidate = $this->crm_translate_raw($text, $d, $count, $plural, $context);
-          if ($candidate != $text) {
-            $text = $candidate;
-            break;
+    if (empty($params['skip_translation'])) {
+      if (!empty($domain)) {
+        // It might be prettier to cast to an array, but this is high-traffic stuff.
+        if (is_array($domain)) {
+          foreach ($domain as $d) {
+            $candidate = $this->crm_translate_raw($text, $d, $count, $plural, $context);
+            if ($candidate != $text) {
+              $text = $candidate;
+              break;
+            }
           }
+        }
+        else {
+          $text = $this->crm_translate_raw($text, $domain, $count, $plural, $context);
         }
       }
       else {
-        $text = $this->crm_translate_raw($text, $domain, $count, $plural, $context);
+        $text = $this->crm_translate_raw($text, NULL, $count, $plural, $context);
       }
-    }
-    else {
-      $text = $this->crm_translate_raw($text, NULL, $count, $plural, $context);
     }
 
     // replace the numbered %1, %2, etc. params if present
@@ -788,7 +791,18 @@ function ts($text, $params = []) {
       }
     }
     else {
-      // don't translate anything until bootstrap has progressed enough
+      // don't _translate_ anything until bootstrap has progressed enough
+      $params['skip_translation'] = 1;
+
+      // temporarily set locale to en_US to prevent spinning up gettext,
+      //   which would be a waste if we have custom translate function
+      global $tsLocale;
+      $current_locale = $tsLocale;
+      $tsLocale = 'en_US'; // fixme:: use variable?
+
+      // run translation purely for escape/param replacement/etc.
+      $text = CRM_Core_I18n::singleton()->crm_translate($text, $params);
+      $tsLocale = $current_locale;
       return $text;
     }
   }
