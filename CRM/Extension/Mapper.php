@@ -301,22 +301,11 @@ class CRM_Extension_Mapper {
         if (!empty($compat[$dao->full_name]['force-uninstall'])) {
           continue;
         }
-        try {
-          $moduleExtensions[] = [
-            'prefix' => $dao->file,
-            'filePath' => $dao->full_name,
-          ];
-        }
-        catch (CRM_Extension_Exception $e) {
-          // Putting a stub here provides more consistency
-          // in how getActiveModuleFiles when racing between
-          // dirty file-removals and cache-clears.
-          CRM_Core_Session::setStatus($e->getMessage(), '', 'error');
-          $moduleExtensions[] = [
-            'prefix' => $dao->file,
-            'filePath' => NULL,
-          ];
-        }
+        $moduleExtensions[] = [
+          'prefix' => $dao->file,
+          'fullName' => $dao->full_name,
+          'filePath' => NULL,
+        ];
       }
 
       if ($this->cache) {
@@ -326,7 +315,16 @@ class CRM_Extension_Mapper {
 
     // Since we're not caching the full path we add it now.
     array_walk($moduleExtensions, function(&$value, $key) {
-      $value['filePath'] = $this->keyToPath($value['filePath']);
+      try {
+        $value['filePath'] = $this->keyToPath($value['fullName']);
+      }
+      catch (CRM_Extension_Exception $e) {
+        // Putting a stub here provides more consistency
+        // in how getActiveModuleFiles when racing between
+        // dirty file-removals and cache-clears.
+        CRM_Core_Session::setStatus($e->getMessage(), '', 'error');
+        $value['filePath'] = NULL;
+      }
     });
 
     return $moduleExtensions;
