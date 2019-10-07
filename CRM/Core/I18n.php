@@ -326,7 +326,7 @@ class CRM_Core_I18n {
    *   The params of the translation (if any).
    *   - domain: string|array a list of translation domains to search (in order)
    *   - context: string
-   *   - skip_translation: boolean (do only escape/replacement, skip the actual translation)
+   *   - skip_translation: flag (do only escape/replacement, skip the actual translation)
    *
    * @return string
    *   the translated string
@@ -379,7 +379,7 @@ class CRM_Core_I18n {
     $raw = !empty($params['raw']);
     unset($params['raw']);
 
-    if (empty($params['skip_translation'])) {
+    if (!isset($params['skip_translation'])) {
       if (!empty($domain)) {
         // It might be prettier to cast to an array, but this is high-traffic stuff.
         if (is_array($domain)) {
@@ -793,18 +793,6 @@ function ts($text, $params = []) {
     else {
       // don't _translate_ anything until bootstrap has progressed enough
       $params['skip_translation'] = 1;
-
-      // temporarily set locale to en_US to prevent spinning up gettext,
-      //   which would be a waste if we have custom translate function
-      global $tsLocale;
-      $current_locale = $tsLocale;
-      // fixme:: use variable?
-      $tsLocale = 'en_US';
-
-      // run translation purely for escape/param replacement/etc.
-      $text = CRM_Core_I18n::singleton()->crm_translate($text, $params);
-      $tsLocale = $current_locale;
-      return $text;
     }
   }
 
