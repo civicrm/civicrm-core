@@ -634,7 +634,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
     $mut->checkMailLog([
-      'Thank you for your support',
+      'Below you will find a receipt for this contribution.',
       '<testloggedin@example.com>',
     ]);
     $mut->stop();

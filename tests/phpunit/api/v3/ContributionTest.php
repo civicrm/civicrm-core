@@ -3097,7 +3097,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'Annual CiviCRM meet',
       'Event',
-      'This letter is a confirmation that your registration has been received and your status has been updated to Registered.',
+      'This is a confirmation that your registration has been received and your status has been updated to Registered.',
       'First Name: Logged In',
       'Public title',
       'public 2',

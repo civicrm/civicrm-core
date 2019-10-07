@@ -4,7 +4,7 @@
 {$formValues.receipt_text_signup}
 {elseif $formValues.receipt_text_renewal}
 {$formValues.receipt_text_renewal}
-{else}{ts}Thank you for your support.{/ts}{/if}
+{else}{ts}Thank you for this contribution.{/ts}{/if}
 
 {if !$lineItem}
 ===========================================================

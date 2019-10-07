@@ -80,7 +80,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     ]);
     $participant = $this->callAPISuccessGetSingle('Participant', []);
     $mut->checkMailLog([
-      'Dear Logged In,  Thank you for your participation.  This letter is a confirmation that your registration has been received and your status has been updated to Registered.',
+      'Dear Logged In,  Thank you for your registration.  This is a confirmation that your registration has been received and your status has been updated to Registered.',
     ]);
     $mut->stop();
     $mut->clearMessages();
@@ -212,7 +212,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'Expires: January 2019',
       'Visa',
       '************1111',
-      'This letter is a confirmation that your registration has been received and your status has been updated to <strong> Registered</strong>',
+      'This is a confirmation that your registration has been received and your status has been updated to <strong> Registered</strong>',
     ]);
     $mut->clearMessages();
   }

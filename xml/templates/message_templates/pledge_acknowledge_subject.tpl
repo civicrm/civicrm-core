@@ -1,1 +1,1 @@
-{ts}Thank you for your Pledge{/ts}
+{ts}Thank you for this pledge{/ts}

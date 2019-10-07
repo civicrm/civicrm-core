@@ -22,6 +22,7 @@
   <tr>
    <td>
     {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
+    <p>{ts}This is an invitation to complete your registration that was initially waitlisted.{/ts}</p>
    </td>
   </tr>
   {if !$isAdditional and $participant.id}

@@ -49,7 +49,7 @@
 {ts}Your recurring contribution term has ended.{/ts}
 
 
-{ts 1=$recur_installments}You have successfully completed %1 recurring contributions. Thank you for your support.{/ts}
+{ts 1=$recur_installments}You have successfully completed %1 recurring contributions. Thank you.{/ts}
 
 
 ==================================================
