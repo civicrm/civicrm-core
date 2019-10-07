@@ -103,15 +103,7 @@ class CRM_Core_Payment_BaseIPN {
    */
   public function validateData(&$input, &$ids, &$objects, $required = TRUE, $paymentProcessorID = NULL) {
 
-    // make sure contact exists and is valid
-    $contact = new CRM_Contact_BAO_Contact();
-    $contact->id = $ids['contact'];
-    if (!$contact->find(TRUE)) {
-      CRM_Core_Error::debug_log_message("Could not find contact record: {$ids['contact']} in IPN request: " . print_r($input, TRUE));
-      echo "Failure: Could not find contact record: {$ids['contact']}<p>";
-      return FALSE;
-    }
-
+    // Check if the contribution exists
     // make sure contribution exists and is valid
     $contribution = new CRM_Contribute_BAO_Contribution();
     $contribution->id = $ids['contribution'];
@@ -120,6 +112,40 @@ class CRM_Core_Payment_BaseIPN {
       echo "Failure: Could not find contribution record for {$contribution->id}<p>";
       return FALSE;
     }
+
+    // make sure contact exists and is valid
+    // use the contact id from the contribution record as the id in the IPN may not be valid anymore.
+    $contact = new CRM_Contact_BAO_Contact();
+    $contact->id = $contribution->contact_id;
+    if (!$contact->find(TRUE)) {
+      if ($contact->id == $ids['contact']) {
+        CRM_Core_Error::debug_log_message("Could not find contact record: {$ids['contact']} in IPN request: " . print_r($input, TRUE));
+        echo "Failure: Could not find contact record: {$ids['contact']}<p>";
+      }
+      else {
+        // If the ids do not match then it is possible the contact id in the IPN has been merged into another contact which is why we use the contact_id from the contribution
+        CRM_Core_Error::debug_log_message("Could not find contact record: {$contribution->contact_id} in Contribution record forud for IPN request: " . print_r($input, TRUE));
+        echo "Failure: Could not find contact record: {$contribution->contact_id}<p>";
+      }
+      return FALSE;
+    }
+
+    // If the ids do not match then it is possible the contact id in the IPN has been merged into another contact which is why we use the contact_id from the contribution
+    if ($ids['contact'] != $contribution->contact_id) {
+      CRM_Core_Error::debug_log_message("Contact ID in IPN {$ids['contact']} not found but contact_id found in contribution {$contribution->contact_id} used instead");
+      $ids['contact'] = $contribution->contact_id;
+    }
+
+    if (!empty($ids['contributionRecur'])) {
+      $contributionRecur = new CRM_Contribute_BAO_ContributionRecur();
+      $contributionRecur->id = $ids['contributionRecur'];
+      if (!$contributionRecur->find(TRUE)) {
+        CRM_Core_Error::debug_log_message("Could not find contribution recur record: {$ids['ContributionRecur']} in IPN request: " . print_r($input, TRUE));
+        echo "Failure: Could not find contribution recur record: {$ids['ContributionRecur']}<p>";
+        return FALSE;
+      }
+    }
+
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
 
