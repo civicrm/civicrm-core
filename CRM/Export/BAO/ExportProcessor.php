@@ -793,7 +793,7 @@ class CRM_Export_BAO_ExportProcessor {
 
     if ($this->isPostalableOnly) {
       if (array_key_exists('street_address', $returnProperties)) {
-        $addressWhere = " civicrm_address.street_address <> ''";
+        $addressWhere = " ( civicrm_address.street_address <> ''";
         if (array_key_exists('supplemental_address_1', $returnProperties)) {
           // We need this to be an OR rather than AND on the street_address so, hack it in.
           $addressOptions = CRM_Core_BAO_Setting::valueOptions(CRM_Core_BAO_Setting::SYSTEM_PREFERENCES_NAME,
@@ -803,6 +803,7 @@ class CRM_Export_BAO_ExportProcessor {
             $addressWhere .= " OR civicrm_address.supplemental_address_1 <> ''";
           }
         }
+        $addressWhere .= ' )';
         $whereClauses['address'] = $addressWhere;
       }
     }
