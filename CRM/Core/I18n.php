@@ -798,7 +798,8 @@ function ts($text, $params = []) {
       //   which would be a waste if we have custom translate function
       global $tsLocale;
       $current_locale = $tsLocale;
-      $tsLocale = 'en_US'; // fixme:: use variable?
+      // fixme:: use variable?
+      $tsLocale = 'en_US';
 
       // run translation purely for escape/param replacement/etc.
       $text = CRM_Core_I18n::singleton()->crm_translate($text, $params);
