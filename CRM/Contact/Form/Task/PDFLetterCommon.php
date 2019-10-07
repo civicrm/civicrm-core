@@ -180,7 +180,7 @@ class CRM_Contact_Form_Task_PDFLetterCommon extends CRM_Core_Form_Task_PDFLetter
     }
 
     $tee = NULL;
-    if ($isLiveMode && Civi::settings()->get('recordGeneratedLetters') === 'combined-attached') {
+    if (self::isLiveMode($form) && Civi::settings()->get('recordGeneratedLetters') === 'combined-attached') {
       if (count($activityIds) !== 1) {
         throw new CRM_Core_Exception("When recordGeneratedLetters=combined-attached, there should only be one activity.");
       }
