@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {include file="CRM/common/dashboard.tpl"}
-{include file="CRM/common/openFlashChart.tpl"}
+{include file="CRM/common/chart.tpl"}
 {* Alerts for critical configuration settings. *}
 {$communityMessages}
 <div class="crm-submit-buttons crm-dashboard-controls">

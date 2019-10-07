@@ -524,10 +524,10 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
           'xname' => ts('Member Since / Member Type'),
           'yname' => ts('Fees'),
         ];
-        CRM_Utils_OpenFlashChart::reportChart($graphRows, $this->_params['charts'], $interval, $chartInfo);
+        CRM_Utils_Chart::reportChart($graphRows, $this->_params['charts'], $interval, $chartInfo);
       }
       else {
-        CRM_Utils_OpenFlashChart::chart($graphRows, $this->_params['charts'], $this->_interval);
+        CRM_Utils_Chart::chart($graphRows, $this->_params['charts'], $this->_interval);
       }
     }
     $this->assign('chartType', $this->_params['charts']);
