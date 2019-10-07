@@ -280,7 +280,7 @@ class CRM_Extension_Mapper {
       return [];
     }
 
-    $moduleExtensions = NULL;
+    static $moduleExtensions = NULL;
     if ($this->cache && !$fresh) {
       $moduleExtensions = $this->cache->get($this->cacheKey . '_moduleFiles');
     }
