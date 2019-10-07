@@ -646,6 +646,12 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
       $params[6] = [$language, 'String'];
     }
 
+    $tags = $this->_parent->get('tags');
+    if (!CRM_Utils_System::isNull($tags)) {
+      $clauses[] = "(civicrm_mailing.id IN (SELECT entity_id FROM civicrm_entity_tag WHERE entity_table = 'civicrm_mailing' AND tag_id IN (%7)))";
+      $params[7] = [$tags, 'CommaSeparatedIntegers'];
+    }
+
     if (empty($clauses)) {
       return 1;
     }

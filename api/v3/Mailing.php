@@ -78,6 +78,25 @@ function civicrm_api3_mailing_create($params) {
   // FlexMailer is a refactoring of CiviMail which provides new hooks/APIs/docs. If the sysadmin has opted to enable it, then use that instead of CiviMail.
   $safeParams['_evil_bao_validator_'] = \CRM_Utils_Constant::value('CIVICRM_FLEXMAILER_HACK_SENDABLE', 'CRM_Mailing_BAO_Mailing::checkSendable');
   $result = _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $safeParams, 'Mailing');
+  $entityTags = civicrm_api3('EntityTag', 'get', [
+    'entity_table' => 'civicrm_mailing',
+    'entity_id' => $result['id'],
+  ]);
+  if (!empty($entityTags['values'])) {
+    foreach ($entityTags['values'] as $tag) {
+      civicrm_api3('EntityTag', 'delete', ['entity_table' => 'civicrm_mailing', 'entity_id' => $tag['entity_id'], 'tag_id' => $tag['tag_id']]);
+    }
+  }
+  if (!empty($params['tags'])) {
+    $tags = explode(',', $params['tags']);
+    foreach ($tags as $tag_id) {
+      civicrm_api3('EntityTag', 'create', [
+        'entity_id' => $result['id'],
+        'tag_id' => $tag_id,
+        'entity_table' => 'civicrm_mailing',
+      ]);
+    }
+  }
   return _civicrm_api3_mailing_get_formatResult($result);
 }
 
@@ -252,6 +271,24 @@ function civicrm_api3_mailing_delete($params) {
  */
 function civicrm_api3_mailing_get($params) {
   $result = _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Mailing');
+  if (!empty($result['values']) && is_array($result['values'])) {
+    foreach ($result['values'] as $key => $mailingResult) {
+      $mailing_tags = '';
+      $tags = civicrm_api3('EntityTag', 'get', [
+        'entity_table' => 'civicrm_mailing',
+        'entity_id' => $mailingResult['id'],
+      ]);
+      if (!empty($tags['values'])) {
+        foreach ($tags['values'] as $tag) {
+          if (!empty($mailing_tags)) {
+            $mailing_tags .= ',';
+          }
+          $mailing_tags .= $tag['tag_id'];
+        }
+      }
+    }
+    $result['values'][$key]['tags'] = $mailing_tags;
+  }
   return _civicrm_api3_mailing_get_formatResult($result);
 }
 

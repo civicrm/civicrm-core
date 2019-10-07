@@ -163,7 +163,8 @@
           replyto_email: "",
           subject: "",
           body_html: "",
-          body_text: ""
+          body_text: "",
+          tags: "",
         };
         return angular.extend({}, defaults, params);
       },

@@ -193,8 +193,12 @@ class CRM_Mailing_BAO_Query {
       case 'civicrm_campaign':
         $from = " $side JOIN civicrm_campaign ON civicrm_campaign.id = civicrm_mailing.campaign_id";
         break;
-    }
 
+      case 'civicrm_mailing_entity_tag':
+        $from = " $side JOIN civicrm_entity_tag ON civicrm_entity_tag.entity_id = civicrm_mailing.id AND civicrm_entity_tag.entity_table = 'civicrm_mailing'";
+        break;
+
+    }
     return $from;
   }
 
@@ -389,6 +393,19 @@ class CRM_Mailing_BAO_Query {
         $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
         $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
         return;
+
+      case 'mailing_tag_id':
+        $names = [];
+        foreach ($value as $tag_id) {
+          $names[] = civicrm_api3('Tag', 'getsingle', ['id' => $tag_id])['name'];
+        }
+        $query->_where[$grouping][] = " civicrm_entity_tag.tag_id IN (" . implode(',', $value) . " )";
+        $query->_qill[$grouping][] = ts('Mailing Tags %1', [1 => $op]) . ' ' . implode(' ' . ts('or') . ' ', $names);
+        $query->_tables['civicrm_mailing'] = $query->_whereTables['civicrm_mailing'] = 1;
+        $query->_tables['civicrm_mailing_entity_tag'] = $query->_whereTables['civicrm_mailing_entity_tag'] = 1;
+        $query->_tables['civicrm_mailing_recipients'] = $query->_whereTables['civicrm_mailing_recipients'] = 1;
+        return;
+
     }
   }
 
@@ -438,6 +455,14 @@ class CRM_Mailing_BAO_Query {
     $form->add('checkbox', 'mailing_unsubscribe', ts('Unsubscribe Requests'));
     $form->add('checkbox', 'mailing_optout', ts('Opt-out Requests'));
     $form->add('checkbox', 'mailing_forward', ts('Forwards'));
+
+    $tags = [];
+    $allTags = civicrm_api3('Tag', 'get', ['used_for' => 'civicrm_mailing'])['values'];
+    foreach ($allTags as $tag) {
+      $tags[$tag['id']] = $tag['name'];
+    }
+    $form->addElement('Select', 'mailing_tag_id', ts('Mailing Tags'), $tags, ['class' => 'crm-select2', 'multiple' => TRUE]);
+
     // Campaign select field
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($form, 'mailing_campaign_id');
 

@@ -51,6 +51,13 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
       CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name')
     );
 
+    $tags = [];
+    $allTags = civicrm_api3('Tag', 'get', ['used_for' => 'civicrm_mailing'])['values'];
+    foreach ($allTags as $tag) {
+      $tags[$tag['id']] = $tag['name'];
+    }
+    $this->addElement('Select', 'tags', ts('Mailing Tags'), ['' => ts('None')] + $tags, ['class' => 'crm-select2']);
+
     CRM_Campaign_BAO_Campaign::addCampaignInComponentSearch($this);
 
     // CRM-15434 - Fix mailing search by status in non-English languages
@@ -134,6 +141,7 @@ class CRM_Mailing_Form_Search extends CRM_Core_Form {
         'is_archived',
         'language',
         'hidden_find_mailings',
+        'tags',
       ];
       foreach ($fields as $field) {
         if (isset($params[$field]) &&

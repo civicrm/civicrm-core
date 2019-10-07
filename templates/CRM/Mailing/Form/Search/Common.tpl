@@ -62,6 +62,11 @@
         {$form.mailing_forward.label}
         </td>
       </tr>
+      <tr>
+        <td>{$form.mailing_tag_id.label}<br />
+          {$form.mailing_tag_id.html}
+        </td>
+      </tr>
     </table>
   </td>
 </tr>

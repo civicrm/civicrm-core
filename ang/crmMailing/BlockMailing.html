@@ -64,6 +64,7 @@ It could perhaps be thinned by 30-60% by making more directives.
         placeholder="Subject"
         name="subject" />
     </div>
+    <div crm-mailing-block-tags="{name: 'tags', id: 'subform.tags'}" crm-mailing="mailing"></div>
     <div ng-if="crmMailingConst.isMultiLingual">
       <div crm-ui-field="{name: 'subform.language', title: ts('Language')}">
         <select

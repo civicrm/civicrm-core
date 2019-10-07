@@ -1,0 +1,9 @@
+<div class="crm-mailing-tags-row">
+    <div crm-ui-field="{name: 'subform.tags', title: ts('Tags')}">
+      <input
+        crm-entityref="{entity: 'Tag', api: {params: {used_for: 'Mailings', is_active: 1}}, select: {allowClear:true, minimumInputLength: 0, multiple: true, placeholder: ts('Tags')}}"
+        ng-model="mailing.tags"
+        class="crm-action-menu fa-envelope-o"
+        />
+    </div>
+</div>

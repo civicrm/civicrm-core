@@ -57,6 +57,11 @@
         </td>
       {/if}
     </tr>
+    <tr>
+      <td colspan="2">{$form.tags.label}<br />
+        {$form.tags.html}
+      </td>
+     </tr>
 
     {* language *}
     {if $form.language}
