@@ -547,6 +547,114 @@ describe('crmCaseType', function() {
         );
       });
     });
+
+    describe('when adding a role on-the-fly', function() {
+      beforeEach(inject(function ($controller) {
+        ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
+      }));
+
+      it('updates the case roles for unidirectional', function() {
+        // first simulate the ajax popup to create a new relationship type
+        var newType = {
+          "id": "33",
+          "name_a_b": "Some New Type is",
+          "label_a_b": "Some New Type is",
+          "name_b_a": "Some New Type for",
+          "label_b_a": "Some New Type for",
+          "description": "Some New Type",
+          "contact_type_a": "Individual",
+          "contact_type_b": "Individual",
+          "is_reserved": "0",
+          "is_active": "1"
+        };
+        apiCalls.relTypes.values.push(newType);
+
+        // now let the real code do what it does with the new type
+        scope.addRoleOnTheFly(scope.caseType.definition.caseRoles, newType);
+
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displaylabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'Some New Type for',
+              displaylabel: 'Some New Type is'
+            }
+          ]
+        );
+
+        expect(scope.relationshipTypeOptions.slice(-2)).toEqual(
+          [
+            {
+              id: 'Some New Type is',
+              text: 'Some New Type for'
+            },
+            {
+              id: 'Some New Type for',
+              text: 'Some New Type is'
+            }
+          ]
+        );
+      });
+
+      it('updates the case roles for bidirectional', function() {
+        // first simulate the ajax popup to create a new relationship type
+        var newType = {
+          "id": "34",
+          "name_a_b": "Friend of",
+          "label_a_b": "Friend of",
+          "name_b_a": "Friend of",
+          "label_b_a": "Friend of",
+          "description": "Friend",
+          "contact_type_a": "Individual",
+          "contact_type_b": "Individual",
+          "is_reserved": "0",
+          "is_active": "1"
+        };
+        apiCalls.relTypes.values.push(newType);
+
+        // now let the real code do what it does with the new type
+        scope.addRoleOnTheFly(scope.caseType.definition.caseRoles, newType);
+
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displaylabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'Friend of',
+              displaylabel: 'Friend of'
+            }
+          ]
+        );
+
+        expect(scope.relationshipTypeOptions.slice(-1)).toEqual(
+          [
+            {
+              id: 'Friend of',
+              text: 'Friend of'
+            }
+          ]
+        );
+
+        // Check that it did NOT add two entries for this bidirectional type
+        expect(scope.relationshipTypeOptions.slice(-2,-1)).not.toEqual(
+          [
+            {
+              id: 'Friend of',
+              text: 'Friend of'
+            }
+          ]
+        );
+      });
+    });
   });
 
   describe('crmAddName', function () {
