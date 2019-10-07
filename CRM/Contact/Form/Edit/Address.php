@@ -371,7 +371,7 @@ class CRM_Contact_Form_Edit_Address {
         }
 
         foreach ($csVal['fields'] as $cdId => $cdVal) {
-          if ($cdVal['is_required']) {
+          if (!empty($cdVal['is_required'])) {
             $elementName = $cdVal['element_name'];
             if (in_array($elementName, $form->_required)) {
               // store the omitted rule for a element, to be used later on
