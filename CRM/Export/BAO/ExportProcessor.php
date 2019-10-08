@@ -2376,6 +2376,7 @@ WHERE  id IN ( $deleteIDString )
 
     $query = "SELECT * FROM $exportTempTable";
 
+    $this->instantiateTempTable($headerRows);
     while (1) {
       $limitQuery = $query . "
 LIMIT $offset, $limit
@@ -2395,16 +2396,38 @@ LIMIT $offset, $limit
         }
         $componentDetails[] = $row;
       }
-      CRM_Core_Report_Excel::writeCSVFile($this->getExportFileName(),
-        $headerRows,
-        $componentDetails,
-        NULL,
-        $writeHeader
-      );
+      $this->writeRows($headerRows, $componentDetails);
 
-      $writeHeader = FALSE;
       $offset += $limit;
     }
+  }
+
+  /**
+   * Set up the temp table.
+   *
+   * @param array $headerRows
+   */
+  protected function instantiateTempTable(array $headerRows) {
+    CRM_Utils_System::download(CRM_Utils_String::munge($this->getExportFileName()),
+      'text/x-csv',
+      CRM_Core_DAO::$_nullObject,
+      'csv',
+      FALSE
+    );
+    CRM_Core_Report_Excel::makeCSVTable($headerRows, [], NULL, TRUE, TRUE);
+  }
+
+  /**
+   * @param array $headerRows
+   * @param array $componentDetails
+   */
+  protected function writeRows(array $headerRows, array $componentDetails) {
+    CRM_Core_Report_Excel::writeCSVFile($this->getExportFileName(),
+      $headerRows,
+      $componentDetails,
+      NULL,
+      FALSE
+    );
   }
 
 }
