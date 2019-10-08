@@ -168,6 +168,7 @@ class CRM_Core_Config_MagicMerge {
       'maxFileSize' => ['setting'],
       // renamed.
       'maxAttachments' => ['setting', 'max_attachments'],
+      'maxAttachmentsBackend' => ['setting', 'max_attachments_backend'],
       'monetaryDecimalPoint' => ['setting'],
       'monetaryThousandSeparator' => ['setting'],
       'moneyformat' => ['setting'],
