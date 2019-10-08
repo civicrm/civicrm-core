@@ -1159,6 +1159,31 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test exporting when no rows are retrieved.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
+   */
+  public function testExportNoRows() {
+    $contactA = $this->callAPISuccess('contact', 'create', [
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'contact_type' => 'Individual',
+    ]);
+    $this->doExportTest([
+      'selectAll' => TRUE,
+      'ids' => [$contactA['id']],
+      'exportParams' => [
+        'postal_mailing_export' => [
+          'postal_mailing_export' => TRUE,
+        ],
+        'mergeSameAddress' => TRUE,
+      ],
+    ]);
+    $this->assertEquals('Contact ID', $this->csv->getHeader()[0]);
+  }
+
+  /**
    * Test that deceased and do not mail contacts are removed from contacts before
    *
    * @dataProvider getReasonsNotToMail
