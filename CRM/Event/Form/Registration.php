@@ -729,24 +729,19 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       'Participant'
     );
 
-    $createPayment = (CRM_Utils_Array::value('amount', $this->_params, 0) != 0) ? TRUE : FALSE;
-
-    // force to create zero amount payment, CRM-5095
-    // we know the amout is zero since createPayment is false
-    if (!$createPayment &&
-      (isset($contribution) && $contribution->id) &&
-      $this->_priceSetId &&
-      $this->_lineItem
-    ) {
-      $createPayment = TRUE;
+    if ($contribution) {
+      $contributionID = $contribution->id;
+    }
+    elseif (CRM_Utils_Array::value('contributionID', $this->_params)) {
+      $contributionID = $this->_params['contributionID'];
     }
 
-    if ($createPayment && $this->_values['event']['is_monetary'] && !empty($this->_params['contributionID'])) {
-      $paymentParams = [
+    if (!empty($contributionID)) {
+      $participantPaymentParams = [
         'participant_id' => $participant->id,
-        'contribution_id' => $contribution->id,
+        'contribution_id' => $contributionID,
       ];
-      civicrm_api3('ParticipantPayment', 'create', $paymentParams);
+      civicrm_api3('ParticipantPayment', 'create', $participantPaymentParams);
     }
 
     //set only primary participant's params for transfer checkout.
