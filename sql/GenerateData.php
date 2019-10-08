@@ -1119,8 +1119,6 @@ class CRM_GCD {
       $group->visibility = 'Public Pages';
       $group->is_active = 1;
       $group->save();
-      $group->buildClause();
-      $group->save();
     }
 
     // 60 are for newsletter
