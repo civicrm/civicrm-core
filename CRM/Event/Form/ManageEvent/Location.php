@@ -262,8 +262,7 @@ class CRM_Event_Form_ManageEvent_Location extends CRM_Event_Form_ManageEvent {
     }
 
     // create/update event location
-    $location = CRM_Core_BAO_Location::create($params, TRUE, 'event');
-    $params['loc_block_id'] = $location['id'];
+    $params['loc_block_id'] = CRM_Core_BAO_Location::create($params, TRUE, 'event')['id'];
 
     // finally update event params
     $params['id'] = $this->_id;
