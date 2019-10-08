@@ -1316,13 +1316,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         $participants[0]->id,
         'Participant'
       );
-      //add participant payment
-      $paymentParticipant = [
+
+      // Add participant payment
+      $participantPaymentParams = [
         'participant_id' => $participants[0]->id,
         'contribution_id' => $contribution->id,
       ];
+      civicrm_api3('ParticipantPayment', 'create', $participantPaymentParams);
 
-      CRM_Event_BAO_ParticipantPayment::create($paymentParticipant);
       $this->_contactIds[] = $this->_contactId;
     }
     else {
@@ -1472,13 +1473,14 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
           }
         }
 
-        //insert payment record for this participation
+        // Insert payment record for this participant
         if (empty($ids['contribution'])) {
           foreach ($this->_contactIds as $num => $contactID) {
-            $ppDAO = new CRM_Event_DAO_ParticipantPayment();
-            $ppDAO->participant_id = $participants[$num]->id;
-            $ppDAO->contribution_id = $contributions[$num]->id;
-            $ppDAO->save();
+            $participantPaymentParams = [
+              'participant_id' => $participants[$num]->id,
+              'contribution_id' => $contributions[$num]->id,
+            ];
+            civicrm_api3('ParticipantPayment', 'create', $participantPaymentParams);
           }
         }
 

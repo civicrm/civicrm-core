@@ -695,6 +695,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    *
    * @param int $contactID
    * @param \CRM_Contribute_BAO_Contribution $contribution
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function confirmPostProcess($contactID = NULL, $contribution = NULL) {
     // add/update contact information
@@ -740,11 +742,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     if ($createPayment && $this->_values['event']['is_monetary'] && !empty($this->_params['contributionID'])) {
-      $paymentParams = array(
+      $paymentParams = [
         'participant_id' => $participant->id,
         'contribution_id' => $contribution->id,
-      );
-      $paymentPartcipant = CRM_Event_BAO_ParticipantPayment::create($paymentParams);
+      ];
+      civicrm_api3('ParticipantPayment', 'create', $paymentParams);
     }
 
     //set only primary participant's params for transfer checkout.
@@ -791,10 +793,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
   /**
    * Process the participant.
    *
-   * @param CRM_Core_Form $form
+   * @param \CRM_Core_Form $form
    * @param int $contactID
    *
    * @return \CRM_Event_BAO_Participant
+   * @throws \CiviCRM_API3_Exception
    */
   public static function addParticipant(&$form, $contactID) {
     if (empty($form->_params)) {
