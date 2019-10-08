@@ -1182,6 +1182,21 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'contact_type' => 'Individual',
     ], $reason));
 
+    // Create another contact not included in the exporrt set.
+    $this->callAPISuccess('contact', 'create', array_merge([
+      'first_name' => 'Janet',
+      'last_name' => 'Doe',
+      'contact_type' => 'Individual',
+      'api.address.create' => ['supplemental_address_1' => 'An address'],
+    ], $reason));
+
+    // Create another contact not included in the exporrt set.
+    $this->callAPISuccess('contact', 'create', array_merge([
+      'first_name' => 'Janice',
+      'last_name' => 'Doe',
+      'contact_type' => 'Individual',
+    ], $reason));
+
     //create address for contact A
     $this->callAPISuccess('address', 'create', [
       'contact_id' => $contactA['id'],

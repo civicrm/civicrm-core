@@ -800,7 +800,7 @@ class CRM_Export_BAO_ExportProcessor {
             $addressWhere .= " OR civicrm_address.supplemental_address_1 <> ''";
           }
         }
-        $whereClauses['address'] = $addressWhere;
+        $whereClauses['address'] = '(' . $addressWhere . ')';
       }
     }
 
