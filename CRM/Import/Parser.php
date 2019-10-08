@@ -559,6 +559,10 @@ abstract class CRM_Import_Parser {
    * @return mixed
    */
   protected function parsePseudoConstantField($submittedValue, $fieldSpec) {
+    // dev/core#1289 Somehow we have wound up here but the BAO has not been specified in the fieldspec so we need to check this but future us problem, for now lets just return the submittedValue
+    if (!isset($fieldSpec['bao'])) {
+      return $submittedValue;
+    }
     /* @var \CRM_Core_DAO $bao */
     $bao = $fieldSpec['bao'];
     // For historical reasons use validate as context - ie disabled name matches ARE permitted.
