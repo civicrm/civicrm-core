@@ -1105,17 +1105,8 @@ class CRM_Event_Form_Registration_Register extends CRM_Event_Form_Registration {
       $this->set('contributeMode', 'direct');
 
       // This code is duplicated multiple places and should be consolidated.
-      if (isset($params["state_province_id-{$this->_bltID}"]) &&
-        $params["state_province_id-{$this->_bltID}"]
-      ) {
-        $params["state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($params["state_province_id-{$this->_bltID}"]);
-      }
+      $params = $this->prepareParamsForPaymentProcessor($params);
 
-      if (isset($params["country_id-{$this->_bltID}"]) &&
-        $params["country_id-{$this->_bltID}"]
-      ) {
-        $params["country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($params["country_id-{$this->_bltID}"]);
-      }
       if (isset($params['credit_card_exp_date'])) {
         $params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($params);
         $params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($params);

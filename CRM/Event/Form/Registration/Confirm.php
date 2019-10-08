@@ -90,15 +90,8 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     if (!$this->preProcessExpress()) {
       //process only primary participant params.
       $registerParams = $this->_params[0];
-      if (isset($registerParams["billing_state_province_id-{$this->_bltID}"])
-        && $registerParams["billing_state_province_id-{$this->_bltID}"]
-      ) {
-        $registerParams["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($registerParams["billing_state_province_id-{$this->_bltID}"]);
-      }
+      $registerParams = $this->prepareParamsForPaymentProcessor($registerParams);
 
-      if (isset($registerParams["billing_country_id-{$this->_bltID}"]) && $registerParams["billing_country_id-{$this->_bltID}"]) {
-        $registerParams["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($registerParams["billing_country_id-{$this->_bltID}"]);
-      }
       if (isset($registerParams['credit_card_exp_date'])) {
         $registerParams['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($registerParams);
         $registerParams['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($registerParams);
