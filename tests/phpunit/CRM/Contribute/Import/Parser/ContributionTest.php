@@ -148,6 +148,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $values['contribution_status_id'] = 'just say no';
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::ERROR);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID], 2);
+
+    // Per https://lab.civicrm.org/dev/core/issues/1285 it's a bit arguable but Ok we can support id...
+    $values['contribution_status_id'] = 3;
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID, 'contribution_status_id' => 3], 1);
+
   }
 
   /**
