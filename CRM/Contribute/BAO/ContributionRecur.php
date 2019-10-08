@@ -428,14 +428,15 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @throws \CiviCRM_API3_Exception
    */
   public static function getTemplateContribution($id, $overrides = []) {
-    $templateContribution = civicrm_api3('Contribution', 'get', [
-      'contribution_recur_id' => $id,
-      'options' => ['limit' => 1, 'sort' => ['id DESC']],
-      'sequential' => 1,
-      'contribution_test' => '',
-    ]);
-    if ($templateContribution['count']) {
-      $result = array_merge($templateContribution['values'][0], $overrides);
+    $templateContributions = \Civi\Api4\Contribution::get()
+      ->addWhere('contribution_recur_id', '=', $id)
+      ->addWhere('is_test', 'IN', [0, 1])
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute();
+    if ($templateContributions->count()) {
+      $templateContribution = $templateContributions->first();
+      $result = array_merge($templateContribution, $overrides);
       $result['line_item'] = CRM_Contribute_BAO_ContributionRecur::calculateRecurLineItems($id, $result['total_amount'], $result['financial_type_id']);
       return $result;
     }
