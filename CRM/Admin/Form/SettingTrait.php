@@ -250,6 +250,10 @@ trait CRM_Admin_Form_SettingTrait {
           //temp hack @todo fix to get from metadata
           $this->addRule('max_attachments', ts('Value should be a positive number'), 'positiveInteger');
         }
+        if ($setting == 'max_attachments_backend') {
+          //temp hack @todo fix to get from metadata
+          $this->addRule('max_attachments_backend', ts('Value should be a positive number'), 'positiveInteger');
+        }
         if ($setting == 'maxFileSize') {
           //temp hack
           $this->addRule('maxFileSize', ts('Value should be a positive number'), 'positiveInteger');
