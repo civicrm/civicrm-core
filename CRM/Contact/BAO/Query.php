@@ -6419,6 +6419,10 @@ AND   displayRelType.is_active = 1
         if (!empty($pseudoConstantMetadata['optionGroupName'])
           || $this->isPseudoFieldAnFK($fieldSpec)
         ) {
+          // dev/core#1305 @todo this is not the right thing to do but for now avoid fatal error
+          if (empty($fieldSpec['bao'])) {
+            continue;
+          }
           $sortedOptions = $fieldSpec['bao']::buildOptions($fieldSpec['name'], NULL, [
             'orderColumn' => CRM_Utils_Array::value('labelColumn', $pseudoConstantMetadata, 'label'),
           ]);
