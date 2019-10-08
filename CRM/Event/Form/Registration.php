@@ -697,10 +697,9 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Handle process after the confirmation of payment by User.
    *
    * @param int $contactID
-   * @param null $contribution
-   * @param null $payment
+   * @param \CRM_Contribute_BAO_Contribution $contribution
    */
-  public function confirmPostProcess($contactID = NULL, $contribution = NULL, $payment = NULL) {
+  public function confirmPostProcess($contactID = NULL, $contribution = NULL) {
     // add/update contact information
     $fields = array();
     unset($this->_params['note']);
@@ -1598,7 +1597,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         }
 
         $this->set('value', $value);
-        $this->confirmPostProcess($contactID, NULL, NULL);
+        $this->confirmPostProcess($contactID, NULL);
 
         //lets get additional participant id to cancel.
         if ($this->_allowConfirmation && is_array($cancelledIds)) {
