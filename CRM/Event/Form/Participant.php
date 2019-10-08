@@ -1399,14 +1399,12 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
         }
 
         // Insert payment record for this participant
-        if (empty($contributionParams['id'])) {
-          foreach ($this->_contactIds as $num => $contactID) {
-            $participantPaymentParams = [
-              'participant_id' => $participants[$num]->id,
-              'contribution_id' => $contributions[$num]->id,
-            ];
-            civicrm_api3('ParticipantPayment', 'create', $participantPaymentParams);
-          }
+        foreach ($this->_contactIds as $num => $contactID) {
+          $participantPaymentParams = [
+            'participant_id' => $participants[$num]->id,
+            'contribution_id' => $contributions[$num]->id,
+          ];
+          civicrm_api3('ParticipantPayment', 'create', $participantPaymentParams);
         }
 
         // CRM-11124
