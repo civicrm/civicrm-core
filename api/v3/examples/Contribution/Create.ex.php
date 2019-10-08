@@ -7,7 +7,7 @@
  */
 function contribution_create_example() {
   $params = [
-    'contact_id' => 39,
+    'contact_id' => 1,
     'receive_date' => '20120511',
     'total_amount' => '100',
     'financial_type_id' => 1,
@@ -54,7 +54,7 @@ function contribution_create_expectedresult() {
     'values' => [
       '1' => [
         'id' => '1',
-        'contact_id' => '39',
+        'contact_id' => '1',
         'financial_type_id' => '1',
         'contribution_page_id' => '1',
         'payment_instrument_id' => '4',
