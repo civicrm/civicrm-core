@@ -1045,6 +1045,17 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test merging same address when specifying fields.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
+   */
+  public function testMergeSameAddressSpecifyFields() {
+    $this->setUpContactSameAddressExportData();
+    $this->doExportTest(['mergeSameAddress' => TRUE, 'fields' => [['contact_type' => 'Individual', 'name' => 'master_id', 'location_type_id' => 1]]]);
+  }
+
+  /**
    * Test the merge same address option.
    *
    * @throws \CRM_Core_Exception
