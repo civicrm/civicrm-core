@@ -3663,7 +3663,7 @@ span.crm-status-icon {
   box-sizing: content-box;
 }
 .crm-container.crm-public .select2-container .select2-choice {
-  padding: 0 5px 0 8px;
+  padding: 5px 5px 5px 8px;
 }
 .crm-container.crm-public .select2-container-multi .select2-choices {
   padding: 4px;
