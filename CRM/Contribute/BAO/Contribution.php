@@ -1101,13 +1101,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
    *
    * @param array $params
    * @param string $context
-   * @param array $previousContributionStatus
-   * @param string $currentContributionStatus
    *
    * @return bool[]
    *   Return indicates whether the updateFinancialAccounts function should continue & whether this is a refund.
    */
-  private static function updateFinancialAccountsOnContributionStatusChange(&$params, $context, $previousContributionStatus, $currentContributionStatus) {
+  private static function updateFinancialAccountsOnContributionStatusChange(&$params, $context) {
+    $previousContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($params['prevContribution']->contribution_status_id, 'name');
+    $currentContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution']->contribution_status_id);
+
     $isARefund = FALSE;
     if ((($previousContributionStatus == 'Partially paid' && $currentContributionStatus == 'Completed')
         || ($previousContributionStatus == 'Pending refund' && $currentContributionStatus == 'Completed')
@@ -3717,11 +3718,9 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
     $trxnID = NULL;
     $inputParams = $params;
     $isARefund = FALSE;
-    $currentContributionStatus = CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $params['contribution']->contribution_status_id);
-    $previousContributionStatus = CRM_Contribute_PseudoConstant::contributionStatus($params['prevContribution']->contribution_status_id, 'name');
 
     if ($context == 'changedStatus') {
-      list($continue, $isARefund) = self::updateFinancialAccountsOnContributionStatusChange($params, $context, $previousContributionStatus, $currentContributionStatus);
+      list($continue, $isARefund) = self::updateFinancialAccountsOnContributionStatusChange($params, $context);
       // @todo - it may be that this is always false & the parent function is just a confusing wrapper for the child fn.
       if (!$continue) {
         return;
