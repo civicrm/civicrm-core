@@ -200,4 +200,38 @@ class CRM_Contribute_BAO_ContributionRecurTest extends CiviUnitTestCase {
     $this->assertEquals($firstContrib['id'], $fetchedTemplate['id']);
   }
 
+  /**
+   * Test that is_template contribution is used where available
+   *
+   */
+  public function testGetTemplateContributionNewTemplate() {
+    $contributionRecur = $this->callAPISuccess('contribution_recur', 'create', $this->_params);
+    // Create the template
+    $templateContrib = $this->callAPISuccess('Contribution', 'create', [
+      'contribution_recur_id' => $contributionRecur['id'],
+      'total_amount' => '3.00',
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'currency' => 'USD',
+      'contact_id' => $this->individualCreate(),
+      'contribution_status_id' => 1,
+      'receive_date' => 'yesterday',
+      'is_template' => 1,
+    ]);
+    // Create another normal contrib
+    $this->callAPISuccess('Contribution', 'create', [
+      'contribution_recur_id' => $contributionRecur['id'],
+      'total_amount' => '3.00',
+      'financial_type_id' => 1,
+      'payment_instrument_id' => 1,
+      'currency' => 'USD',
+      'contact_id' => $this->individualCreate(),
+      'contribution_status_id' => 1,
+      'receive_date' => 'yesterday',
+    ]);
+    $fetchedTemplate = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecur['id']);
+    // Fetched template should be the is_template, not the latest contrib
+    $this->assertEquals($fetchedTemplate['id'], $templateContrib['id']);
+  }
+
 }

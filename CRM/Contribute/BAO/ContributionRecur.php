@@ -433,12 +433,23 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
       'return' => "is_test",
       'id' => $id,
     ]);
+    // First look for new-style template contribution with is_template=1
     $templateContributions = \Civi\Api4\Contribution::get()
       ->addWhere('contribution_recur_id', '=', $id)
+      ->addWhere('is_template', '=', 1)
       ->addWhere('is_test', '=', $is_test)
       ->addOrderBy('id', 'DESC')
       ->setLimit(1)
       ->execute();
+    if (!$templateContributions->count()) {
+      // Fall back to old style template contributions
+      $templateContributions = \Civi\Api4\Contribution::get()
+        ->addWhere('contribution_recur_id', '=', $id)
+        ->addWhere('is_test', '=', $is_test)
+        ->addOrderBy('id', 'DESC')
+        ->setLimit(1)
+        ->execute();
+    }
     if ($templateContributions->count()) {
       $templateContribution = $templateContributions->first();
       $result = array_merge($templateContribution, $overrides);
