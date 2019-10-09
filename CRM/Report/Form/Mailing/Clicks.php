@@ -349,7 +349,7 @@ class CRM_Report_Form_Mailing_Clicks extends CRM_Report_Form {
     }
 
     // build the chart.
-    CRM_Utils_OpenFlashChart::buildChart($chartInfo, $this->_params['charts']);
+    CRM_Utils_Chart::buildChart($chartInfo, $this->_params['charts']);
     $this->assign('chartType', $this->_params['charts']);
   }
 

@@ -54,33 +54,31 @@
  </div>
 {/if}
 
-{if $hasOpenFlashChart}
-{include file="CRM/common/openFlashChart.tpl" contriChart=true}
+{if $hasChart}
+{include file="CRM/common/chart.tpl" contriChart=true}
 
 {literal}
 <script type="text/javascript">
 
+ var allData = {/literal}{$chartData}{literal};
+
   CRM.$(function($) {
-    var chartData = {/literal}{$openFlashChartData}{literal};
-    $.each(chartData, function(chartID, chartValues) {
-      createSWFObject(chartID, chartValues.divName, chartValues.size.xSize, chartValues.size.ySize, 'loadData');
+    $.each(allData, function(chartID, chartValues) {
+      createChart(chartID, chartValues.divName, chartValues.size.xSize, chartValues.size.ySize, 'loadData');
     });
   });
 
   function loadData( chartID ) {
-     var allData = {/literal}{$openFlashChartData}{literal};
-     return JSON.stringify(allData[chartID].object);
+     return allData[chartID].object;
   }
 
   function byMonthOnClick( barIndex ) {
-     var allData = {/literal}{$openFlashChartData}{literal};
-     var url     = eval( "allData.by_month.on_click_urls.url_" + barIndex );
+     var url = allData.by_month.on_click_urls['url_' + barIndex];
      if ( url ) window.location.href = url;
   }
 
   function byYearOnClick( barIndex ) {
-     var allData = {/literal}{$openFlashChartData}{literal};
-     var url     = eval( "allData.by_year.on_click_urls.url_" + barIndex );
+     var url = allData.by_year.on_click_urls['url_' + barIndex];
      if ( url ) window.location.href = url;
   }
 
