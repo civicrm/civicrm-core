@@ -247,9 +247,9 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
   }
 
   /**
-   * Test getPartialPaymentWithType function.
+   * Test testGetContributionBalance function.
    */
-  public function testGetPartialPaymentWithType() {
+  public function testGetContributionBalance() {
     //create the contribution that isn't paid yet
     $contactId = $this->individualCreate();
     $params = [
@@ -270,7 +270,7 @@ class CRM_Core_BAO_FinancialTrxnTest extends CiviUnitTestCase {
     ];
     $this->callAPISuccess('Payment', 'create', $params);
     //amount owed should be one cent
-    $amountOwed = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($contribution['id'], 'contribution')['amount_owed'];
+    $amountOwed = CRM_Contribute_BAO_Contribution::getContributionBalance($contribution['id']);
     $this->assertTrue(0.01 == $amountOwed, 'Amount does not match');
   }
 

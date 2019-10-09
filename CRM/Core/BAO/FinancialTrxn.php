@@ -454,6 +454,7 @@ WHERE ceft.entity_id = %1";
    * @return array
    */
   public static function getPartialPaymentWithType($entityId, $entityName = 'participant', $lineItemTotal = NULL) {
+    CRM_Core_Error::deprecatedFunctionWarning('CRM_Contribute_BAO_Contribution::getContributionBalance');
     $value = NULL;
     if (empty($entityName)) {
       return $value;
