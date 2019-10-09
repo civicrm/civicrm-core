@@ -92,12 +92,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $registerParams = $this->_params[0];
       $registerParams = $this->prepareParamsForPaymentProcessor($registerParams);
 
-      if (isset($registerParams['credit_card_exp_date'])) {
-        $registerParams['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($registerParams);
-        $registerParams['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($registerParams);
-      }
       if ($this->_values['event']['is_monetary']) {
-        $registerParams['ip_address'] = CRM_Utils_System::ipAddress();
         $registerParams['currencyID'] = $this->_params[0]['currencyID'];
       }
       //assign back primary participant params.
