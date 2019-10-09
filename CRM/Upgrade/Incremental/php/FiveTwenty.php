@@ -81,6 +81,8 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
       'frontend_title', "varchar(255) DEFAULT NULL COMMENT 'Contribution Page Public title'", TRUE, '5.20.alpha1');
     $this->addTask('Add is_template field to civicrm_contribution', 'addColumn', 'civicrm_contribution', 'is_template',
       "tinyint(4) DEFAULT '0' COMMENT 'Shows this is a template for recurring contributions.'", FALSE, '5.20.alpha1');
+    $this->addTask('Add order_reference field to civicrm_financial_trxn', 'addColumn', 'civicrm_financial_trxn', 'order_reference',
+      "varchar(255) COMMENT 'Payment Processor external order reference'", FALSE, '5.20.alpha1');
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
   }
 
