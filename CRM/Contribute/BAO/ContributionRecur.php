@@ -428,9 +428,14 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @throws \CiviCRM_API3_Exception
    */
   public static function getTemplateContribution($id, $overrides = []) {
+    // use api3 because api4 doesn't handle ContributionRecur yet...
+    $is_test = civicrm_api3('ContributionRecur', 'getvalue', [
+      'return' => "is_test",
+      'id' => $id,
+    ]);
     $templateContributions = \Civi\Api4\Contribution::get()
       ->addWhere('contribution_recur_id', '=', $id)
-      ->addWhere('is_test', 'IN', [0, 1])
+      ->addWhere('is_test', '=', $is_test)
       ->addOrderBy('id', 'DESC')
       ->setLimit(1)
       ->execute();
