@@ -2441,7 +2441,7 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         $membershipLineItems = [];
         foreach ($this->_values['fee'] as $key => $feeValues) {
           if ($feeValues['name'] == 'membership_amount') {
-            $fieldId = $this->_params['price_' . $key];
+            $fieldId = $this->_submitValues['price_' . $key];
             $membershipLineItems[$this->_priceSetId][$fieldId] = $this->_lineItem[$this->_priceSetId][$fieldId];
             unset($this->_lineItem[$this->_priceSetId][$fieldId]);
             break;
