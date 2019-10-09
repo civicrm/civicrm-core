@@ -923,7 +923,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
-   * Add all the elements shared between contribute search and advnaced search.
+   * Add all the elements shared between contribute search and advanced search.
    *
    * @param \CRM_Contribute_Form_Search $form
    *
@@ -976,7 +976,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       ts('Personal Campaign Page'),
       CRM_Contribute_PseudoConstant::pcPage(), FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -')]);
 
-    $statusValues = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id');
+    $statusValues = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search');
     $form->add('select', 'contribution_status_id',
       ts('Contribution Status'), $statusValues,
       FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple']

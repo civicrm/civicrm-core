@@ -326,7 +326,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
             'default' => [1],
           ],
         ],
@@ -386,7 +386,7 @@ class CRM_Report_Form_Contribute_Bookkeeping extends CRM_Report_Form {
           'status_id' => [
             'title' => ts('Financial Transaction Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
             'default' => [1],
           ],
           'card_type_id' => [
