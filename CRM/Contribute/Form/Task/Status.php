@@ -84,10 +84,16 @@ AND    {$this->_componentClause}";
    * Build the form object.
    */
   public function buildQuickForm() {
-    $status = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
-    unset($status[2]);
-    unset($status[5]);
-    unset($status[6]);
+    $status = CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses(
+      'contribution', $this->_contributionIds[0]
+    );
+    $byName = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
+    // FIXME: if it's invalid to transition from Pending to
+    // In Progress or Overdue, we should move that logic to
+    // CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses.
+    foreach (['Pending', 'In Progress', 'Overdue'] as $suppress) {
+      unset($status[CRM_Utils_Array::key($suppress, $byName)]);
+    }
     $this->add('select', 'contribution_status_id',
       ts('Contribution Status'),
       $status,
