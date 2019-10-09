@@ -28,8 +28,6 @@
      <p>{ts}Thank you for your support.{/ts}</p>
     {/if}
 
-    <p>{ts}Please print this receipt for your records.{/ts}</p>
-
    </td>
   </tr>
   <tr>

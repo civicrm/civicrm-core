@@ -2847,7 +2847,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'is_email_receipt' => 1,
     ]);
     $mut->checkMailLog([
-      'Please print this receipt for your records.',
+      'Contribution Information',
     ]);
     $mut->stop();
   }
@@ -3342,7 +3342,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       '$ 100.00',
       'Contribution Information',
-      'Please print this confirmation for your records',
     ], [
       'Event',
     ]);
@@ -4102,7 +4101,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'From: CiviCRM LLC <api@civicrm.org>',
       'Contribution Information',
-      'Please print this confirmation for your records',
     ], [
       'Event',
     ]);
@@ -4123,7 +4121,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'From: ' . $domain['from_name'] . ' <' . $domain['from_email'] . '>',
       'Contribution Information',
-      'Please print this confirmation for your records',
     ], [
       'Event',
     ]);
@@ -4146,7 +4143,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'From: ' . $domain['from_name'] . ' <' . $domain['from_email'] . '>',
       'Contribution Information',
-      'Please print this confirmation for your records',
     ], [
       'Event',
     ]
@@ -4188,7 +4184,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'From: CiviCRM LLC <contributionpage@civicrm.org>',
       'Contribution Information',
-      'Please print this confirmation for your records',
     ], [
       'Event',
     ]);
@@ -4214,7 +4209,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'From: ' . $domain['name'] . ' <' . $domain['domain_email'] . '>',
       'Contribution Information',
-      'Please print this confirmation for your records',
     ], [
       'Event',
     ]);

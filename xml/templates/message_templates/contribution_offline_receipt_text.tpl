@@ -2,8 +2,6 @@
 {$formValues.receipt_text}
 {else}{ts}Thank you for your support.{/ts}{/if}
 
-{ts}Please print this receipt for your records.{/ts}
-
 
 ===========================================================
 {ts}Contribution Information{/ts}

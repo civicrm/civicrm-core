@@ -9,7 +9,7 @@ Dear {contact.display_name},
   {$pay_later_receipt}
 {/if}
 
-  Your order number is #{$transaction_id}. Please print this confirmation for your records.{if $line_items && !$is_refund} Information about the workshops will be sent separately to each participant.{/if}
+  Your order number is #{$transaction_id}. {if $line_items && !$is_refund} Information about the workshops will be sent separately to each participant.{/if}
  Here's a summary of your transaction placed on {$transaction_date|date_format:"%D %I:%M %p %Z"}:
 
 {if $billing_name}
