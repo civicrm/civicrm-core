@@ -884,6 +884,10 @@ function _civicrm_api3_deprecated_activity_buildmailparams($result, $activityTyp
     if (isset($result["attachFile_$i"])) {
       $params["attachFile_$i"] = $result["attachFile_$i"];
     }
+    else {
+      // No point looping 100 times if there's only one attachment
+      break;
+    }
   }
 
   return $params;
