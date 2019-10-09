@@ -17,7 +17,7 @@ Other resources for identifying changes are:
 
 ## CiviCRM 5.18.2
 
-Released October 8, 2019
+Released October 9, 2019
 
 - **[Synopsis](release-notes/5.18.2.md#synopsis)**
 - **[Bugs resolved](release-notes/5.18.2.md#bugs)**
