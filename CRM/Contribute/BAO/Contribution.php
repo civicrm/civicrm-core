@@ -155,7 +155,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       if (($params['contribution_status_id'] == array_search('Refunded', $contributionStatus)
         || $params['contribution_status_id'] == array_search('Cancelled', $contributionStatus))
       ) {
-        if (empty($params['creditnote_id']) || $params['creditnote_id'] == "null") {
+        if (empty($params['creditnote_id'])) {
           $params['creditnote_id'] = self::createCreditNoteId();
         }
       }
@@ -1126,7 +1126,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         $isARefund = TRUE;
         // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
         $params['trxnParams']['total_amount'] = -$params['total_amount'];
-        if (empty($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
+        if (empty($params['contribution']->creditnote_id)) {
           $creditNoteId = self::createCreditNoteId();
           CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
         }
@@ -1141,7 +1141,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
           // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
           $params['trxnParams']['to_financial_account_id'] = $arAccountId;
           $params['trxnParams']['total_amount'] = -$params['total_amount'];
-          if (is_null($params['contribution']->creditnote_id) || $params['contribution']->creditnote_id == "null") {
+          if (empty($params['contribution']->creditnote_id)) {
             $creditNoteId = self::createCreditNoteId();
             CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
           }
