@@ -316,7 +316,9 @@ class CRM_Extension_Mapper {
     // Since we're not caching the full path we add it now.
     array_walk($moduleExtensions, function(&$value, $key) {
       try {
-        $value['filePath'] = $this->keyToPath($value['fullName']);
+        if (!$value['filePath']) {
+          $value['filePath'] = $this->keyToPath($value['fullName']);
+        }
       }
       catch (CRM_Extension_Exception $e) {
         // Putting a stub here provides more consistency
