@@ -701,7 +701,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    */
   public function confirmPostProcess($contactID = NULL, $contribution = NULL) {
     // add/update contact information
-    $fields = array();
     unset($this->_params['note']);
 
     //to avoid conflict overwrite $this->_params
