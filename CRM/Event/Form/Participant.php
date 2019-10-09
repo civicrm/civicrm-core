@@ -1481,8 +1481,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
             $ppDAO->save();
           }
         }
-        // next create the transaction record
-        $transaction = new CRM_Core_Transaction();
 
         // CRM-11124
         if ($this->_params['discount_id']) {
@@ -1493,7 +1491,6 @@ class CRM_Event_Form_Participant extends CRM_Contribute_Form_AbstractEditPayment
             CRM_Price_BAO_PriceSet::parseFirstPriceSetValueIDFromParams($this->_params)
           );
         }
-        $transaction->commit();
       }
     }
 
