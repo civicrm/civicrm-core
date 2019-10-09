@@ -737,6 +737,15 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $isTest = TRUE;
     }
 
+    $primaryParticipant = $this->get('primaryParticipant');
+
+    if (empty($primaryParticipant['participantID'])) {
+      CRM_Core_Error::deprecatedFunctionWarning('This line is not logically reachable.');
+      $primaryParticipant['participantID'] = $registerByID;
+    }
+    //otherwise send mail Confirmation/Receipt
+    $primaryContactId = $this->get('primaryContactId');
+
     // for Transfer checkout.
     // The concept of contributeMode is deprecated.
     if (($this->_contributeMode == 'checkout' ||
@@ -745,12 +754,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       !$this->_allowWaitlist && !$this->_requireApproval &&
       $this->_totalAmount > 0
     ) {
-
-      $primaryParticipant = $this->get('primaryParticipant');
-
-      if (empty($primaryParticipant['participantID'])) {
-        $primaryParticipant['participantID'] = $registerByID;
-      }
 
       //build an array of custom profile and assigning it to template
       $customProfile = CRM_Event_BAO_Event::buildCustomProfile($registerByID, $this->_values, NULL, $isTest);
@@ -826,8 +829,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
     else {
-      //otherwise send mail Confirmation/Receipt
-      $primaryContactId = $this->get('primaryContactId');
 
       //build an array of cId/pId of participants
       $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID,

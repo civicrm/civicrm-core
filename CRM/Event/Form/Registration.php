@@ -725,6 +725,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       // CRM-10032
       $this->processFirstParticipant($participant->id);
     }
+    $this->_params['participantID'] = $participant->id;
+    $this->set('primaryParticipant', $this->_params);
 
     CRM_Core_BAO_CustomValueTable::postProcess($this->_params,
       'civicrm_participant',
@@ -750,13 +752,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         'contribution_id' => $contribution->id,
       );
       $paymentPartcipant = CRM_Event_BAO_ParticipantPayment::create($paymentParams);
-    }
-
-    //set only primary participant's params for transfer checkout.
-    // The concept of contributeMode is deprecated.
-    if (($this->_contributeMode == 'checkout' || $this->_contributeMode == 'notify') && !empty($this->_params['is_primary'])) {
-      $this->_params['participantID'] = $participant->id;
-      $this->set('primaryParticipant', $this->_params);
     }
 
     $this->assign('action', $this->_action);
