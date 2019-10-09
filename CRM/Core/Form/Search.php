@@ -491,4 +491,25 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
     return (array) $this->get('formValues');
   }
 
+  /**
+   * Set the metadata for the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function setSearchMetadata() {}
+
+  /**
+   * Handle force=1 in the url.
+   *
+   * Search field metadata is normally added in buildForm but we are bypassing that in this flow
+   * (I've always found the flow kinda confusing & perhaps that is the problem but this mitigates)
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function handleForcedSearch() {
+    $this->setSearchMetadata();
+    $this->postProcess();
+    $this->set('force', 0);
+  }
+
 }
