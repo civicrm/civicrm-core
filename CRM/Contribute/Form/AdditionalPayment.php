@@ -108,18 +108,18 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->_fromEmails['from_email_id'] = CRM_Core_BAO_Email::getFromEmail();
     }
 
-    $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_id, $entityType);
     $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, FALSE, TRUE);
+    $paymentAmt = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_id);
 
     $this->_amtPaid = $paymentDetails['paid'];
     $this->_amtTotal = $paymentDetails['total'];
 
-    if (!empty($paymentInfo['refund_due'])) {
-      $paymentAmt = $this->_refund = $paymentInfo['refund_due'];
+    if ($paymentAmt < 0) {
+      $this->_refund = $paymentAmt;
       $this->_paymentType = 'refund';
     }
-    elseif (!empty($paymentInfo['amount_owed'])) {
-      $paymentAmt = $this->_owed = $paymentInfo['amount_owed'];
+    elseif ($paymentAmt > 0) {
+      $this->_owed = $paymentAmt;
       $this->_paymentType = 'owed';
     }
     else {
@@ -520,18 +520,18 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if (!empty($params['contribution_id'])) {
       $this->_contributionId = $params['contribution_id'];
 
-      $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_contributionId, $entityType);
       $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_contributionId, $entityType, FALSE, TRUE);
 
+      $paymentAmount = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId);
       $this->_amtPaid = $paymentDetails['paid'];
       $this->_amtTotal = $paymentDetails['total'];
 
-      if (!empty($paymentInfo['refund_due'])) {
-        $this->_refund = $paymentInfo['refund_due'];
+      if ($paymentAmount < 0) {
+        $this->_refund = $paymentAmount;
         $this->_paymentType = 'refund';
       }
-      elseif (!empty($paymentInfo['amount_owed'])) {
-        $this->_owed = $paymentInfo['amount_owed'];
+      elseif ($paymentAmount > 0) {
+        $this->_owed = $paymentAmount;
         $this->_paymentType = 'owed';
       }
     }
