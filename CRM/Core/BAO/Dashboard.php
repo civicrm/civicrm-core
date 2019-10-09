@@ -373,15 +373,23 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     // Restrict query to Dashlets in this domain.
     $domainDashletClause = !empty($domainDashletIDs) ? "dashboard_id IN (" . implode(',', $domainDashletIDs) . ")" : '(1)';
 
-    // Disable inactive widgets.
-    $dashletClause = $dashletIDs ? "dashboard_id NOT IN  (" . implode(',', $dashletIDs) . ")" : '(1)';
+    // Target only those Dashlets which are inactive.
+    $dashletClause = $dashletIDs ? "dashboard_id NOT IN (" . implode(',', $dashletIDs) . ")" : '(1)';
+
+    // Build params.
+    $params = [
+      1 => [$contactID, 'Integer'],
+    ];
+
+    // Build query.
     $updateQuery = "UPDATE civicrm_dashboard_contact
                     SET is_active = 0
                     WHERE $domainDashletClause
                     AND $dashletClause
-                    AND contact_id = {$contactID}";
+                    AND contact_id = %1";
 
-    CRM_Core_DAO::executeQuery($updateQuery);
+    // Disable inactive widgets.
+    CRM_Core_DAO::executeQuery($updateQuery, $params);
   }
 
   /**
