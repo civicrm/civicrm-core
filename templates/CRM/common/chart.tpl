@@ -43,13 +43,9 @@ function createChart( chartID, divName, xSize, ySize, data ) {
     return;
   }
 
-  // Figure out width.
-  var w=800;
-  var h=400;
-  if (div) {
-    w = Math.min(div.clientWidth - 32, 800);
-    h = Math.min(400, parseInt(w / 2));
-  }
+  // Figure out suitable size based on container size.
+  var w = Math.min(div.clientWidth - 32, 800);
+  var h = Math.min(400, parseInt(w / 2));
 
   var chartNode = document.createElement('div');
   var heading = document.createElement('h2');
@@ -61,6 +57,8 @@ function createChart( chartID, divName, xSize, ySize, data ) {
   div.style.marginRight = 'auto';
 
   var links = document.createElement('div');
+  links.style.textAlign = 'center';
+  links.style.marginBottom = '1rem';
   var linkSVG = document.createElement('a');
   linkSVG.href = '#';
   linkSVG.textContent = 'Download chart (SVG)';
@@ -116,11 +114,6 @@ function createChart( chartID, divName, xSize, ySize, data ) {
   links.appendChild(linkSVG);
   links.appendChild(document.createTextNode(' | '));
   links.appendChild(linkPNG);
-  //dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
-
-  div.appendChild(heading);
-  div.appendChild(chartNode);
-  div.appendChild(links);
 
   var crossfilterData, ndx, dataDimension, dataGroup, chart;
   ndx = crossfilter(data.values[0]);
@@ -161,7 +154,13 @@ function createChart( chartID, divName, xSize, ySize, data ) {
       .renderTitle(true);
   }
   // Delay rendering so that animation looks good.
-  window.setTimeout(() => dc.renderAll(), 1500);
+  window.setTimeout(() => {
+    div.appendChild(heading);
+    div.appendChild(chartNode);
+    div.appendChild(links);
+
+    dc.renderAll();
+  }, 1500);
 }
 </script>
 {/literal}

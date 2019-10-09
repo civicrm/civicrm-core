@@ -39,29 +39,28 @@
   {if !$section}
     {include file="CRM/common/chart.tpl" divId="chart_$uniqueId"}
   {/if}
+  {if $chartData}
+    {literal}
+    <script type="text/javascript">
+       CRM.$(function($) {
+         // Build all charts.
+         var allData = {/literal}{$chartData}{literal};
 
-  {literal}
-  <script type="text/javascript">
-     CRM.$(function($) {
-      var allData = {/literal}{$chartData}{literal};
-       buildChart( );
-
-       $("input[id$='submit_print'],input[id$='submit_pdf']").bind('click', function(e){
-         // image creator php file path and append image name
-         var url = CRM.url('civicrm/report/chart', 'name=' + '{/literal}{$chartId}{literal}' + '.png');
-
-         //fetch object and 'POST' image
-         swfobject.getObjectById("chart_{/literal}{$uniqueId}{literal}").post_image(url, true, false);
-       });
-
-       function buildChart( ) {
          $.each( allData, function( chartID, chartValues ) {
            var divName = {/literal}"chart_{$uniqueId}"{literal};
            createChart( chartID, divName, chartValues.size.xSize, chartValues.size.ySize, allData[chartID].object );
          });
-       }
-     });
 
-  </script>
-  {/literal}
+         $("input[id$='submit_print'],input[id$='submit_pdf']").bind('click', function(e){
+           // image creator php file path and append image name
+           var url = CRM.url('civicrm/report/chart', 'name=' + '{/literal}{$chartId}{literal}' + '.png');
+
+           //fetch object and 'POST' image
+           swfobject.getObjectById("chart_{/literal}{$uniqueId}{literal}").post_image(url, true, false);
+         });
+       });
+
+    </script>
+    {/literal}
+  {/if}
 {/if}
