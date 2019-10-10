@@ -168,7 +168,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    * @param array $params
    *   Assoc array of input parameters for this transaction.
    */
-  public function doRefund(&$params) {}
+  public function doRefund($params) {}
 
   /**
    * Generate error object.
