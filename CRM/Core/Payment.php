@@ -1280,8 +1280,20 @@ abstract class CRM_Core_Payment {
    * @return array
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function doRefund(&$params) {
-    return [];
+  public function doRefund($params) {
+    // Mandatory Params:
+    // trxn_id: The transaction ID that the payment processor uses to identify the payment to refund.
+    // amount: The amount to refund (eg. 12.05). This should always be specified in "dot" notation with no currency symbol.
+    return [
+      // refund_status_id would normally return the contribution_status_id Completed or Failed
+      'refund_status_id' => CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed'),
+      // The refund trxn_id may be different from the trxn_id of the original payment.
+      // If it is the same then trxn_id should be copied to refund_trxn_id
+      'refund_trxn_id' => NULL,
+      // Array of params returned by the payment processor. The contents of this will vary by processor and should not be relied on.
+      // However, they can be very useful for logging or providing specific feedback.
+      'processor_result' => [],
+    ];
   }
 
   /**
