@@ -189,7 +189,7 @@ abstract class CRM_Utils_Hook {
     }
     else {
       // We need to ensure tht we will still run known bootstrap related hooks even if the container is not booted.
-      $prebootContainerHooks = $upgradeFriendlyHooks + ['civicrm_entityTypes', 'civicrm_config'];
+      $prebootContainerHooks = array_merge($upgradeFriendlyHooks, ['civicrm_entityTypes', 'civicrm_config']);
       if (!\Civi\Core\Container::isContainerBooted() && !in_array($fnSuffix, $prebootContainerHooks)) {
         return;
       }
