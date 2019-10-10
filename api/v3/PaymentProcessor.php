@@ -126,6 +126,7 @@ function _civicrm_api3_payment_processor_getlist_defaults(&$request) {
  * @throws \API_Exception
  */
 function civicrm_api3_payment_processor_pay($params) {
+  civicrm_api3_verify_mandatory($params, NULL, ['payment_processor_id', 'amount', 'contribution_id']);
   $processor = Civi\Payment\System::singleton()->getById($params['payment_processor_id']);
   $processor->setPaymentProcessor(civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $params['payment_processor_id']]));
   try {
@@ -154,9 +155,14 @@ function _civicrm_api3_payment_processor_pay_spec(&$params) {
     'type' => CRM_Utils_Type::T_INT,
   ];
   $params['amount'] = [
-    'api.required' => TRUE,
+    'api.required' => 1,
     'title' => ts('Amount to pay'),
     'type' => CRM_Utils_Type::T_MONEY,
+  ];
+  $params['contribution_id'] = [
+    'api.required' => 1,
+    'title' => ts('Contribution ID'),
+    'type' => CRM_Utils_Type::T_INT,
   ];
 }
 
