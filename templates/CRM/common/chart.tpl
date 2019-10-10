@@ -44,7 +44,8 @@ function createChart( chartID, divName, xSize, ySize, data ) {
   }
 
   // Figure out suitable size based on container size.
-  var w = Math.min(div.clientWidth - 32, 800);
+  // In some cases the containing element has no size. We should insist on a minimum size.
+  var w = Math.max(Math.min(div.clientWidth - 32, 800), 316);
   var h = Math.min(400, parseInt(w / 2));
 
   var chartNode = document.createElement('div');
