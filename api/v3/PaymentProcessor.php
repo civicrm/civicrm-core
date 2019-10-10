@@ -128,6 +128,14 @@ function _civicrm_api3_payment_processor_getlist_defaults(&$request) {
 function civicrm_api3_payment_processor_pay($params) {
   $processor = Civi\Payment\System::singleton()->getById($params['payment_processor_id']);
   $processor->setPaymentProcessor(civicrm_api3('PaymentProcessor', 'getsingle', ['id' => $params['payment_processor_id']]));
+
+  // Set parameters for doPayment
+  $processor->setContributionID($params['contribution_id']);
+
+  // Add some aliases that doPayment expects. These should go away once we've got getters for them in CiviCRM core.
+  // Historically doPayment has normally been passed 'contributionID'
+  $params['contributionID'] = $params['contribution_id'];
+
   try {
     $result = $processor->doPayment($params);
   }
@@ -149,7 +157,7 @@ function civicrm_api3_payment_processor_pay($params) {
  */
 function _civicrm_api3_payment_processor_pay_spec(&$params) {
   $params['payment_processor_id'] = [
-    'api.required' => 1,
+    'api.required' => TRUE,
     'title' => ts('Payment processor'),
     'type' => CRM_Utils_Type::T_INT,
   ];
@@ -157,6 +165,11 @@ function _civicrm_api3_payment_processor_pay_spec(&$params) {
     'api.required' => TRUE,
     'title' => ts('Amount to pay'),
     'type' => CRM_Utils_Type::T_MONEY,
+  ];
+  $params['contribution_id'] = [
+    'api.required' => TRUE,
+    'title' => ts('Contribution ID'),
+    'type' => CRM_Utils_Type::T_INT,
   ];
 }
 
