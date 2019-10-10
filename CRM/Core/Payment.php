@@ -1277,9 +1277,12 @@ abstract class CRM_Core_Payment {
    *
    * @param array $params
    *
+   * @return array
    * @throws \Civi\Payment\Exception\PaymentProcessorException
    */
-  public function doRefund(&$params) {}
+  public function doRefund(&$params) {
+    return [];
+  }
 
   /**
    * Query payment processor for details about a transaction.
