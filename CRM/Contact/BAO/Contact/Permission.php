@@ -242,14 +242,18 @@ AND    $operationClause
     $permission = CRM_ACL_API::whereClause($type, $tables, $whereTables, $userID, FALSE, FALSE, TRUE);
 
     $from = CRM_Contact_BAO_Query::fromClause($whereTables);
-    CRM_Core_DAO::executeQuery("
-INSERT INTO civicrm_acl_contact_cache ( user_id, contact_id, operation )
-SELECT DISTINCT $userID as user_id, contact_a.id as contact_id, '{$operation}' as operation
+    $contacts = CRM_Core_DAO::executeQuery("SELECT DISTINCT $userID as user_id, contact_a.id as contact_id
          $from
          LEFT JOIN civicrm_acl_contact_cache ac ON ac.user_id = $userID AND ac.contact_id = contact_a.id AND ac.operation = '{$operation}'
 WHERE    $permission
-AND ac.user_id IS NULL
-");
+AND ac.user_id IS NULL");
+    while ($contacts->fetch()) {
+      CRM_Core_DAO::executeQuery("INSERT INTO civicrm_acl_contact_cache (user_id, contact_id, operation) VALUES (%1, %2, %3)", [
+        1 => [$contacts->user_id, 'Positive'],
+        2 => [$contacts->contact_id, 'Positive'],
+        3 => [$operation, 'String'],
+      ]);
+    }
 
     // Add in a row for the logged in contact. Do not try to combine with the above query or an ugly OR will appear in
     // the permission clause.
