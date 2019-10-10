@@ -1130,8 +1130,7 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
       }
     }
-    elseif (($previousContributionStatus == 'Pending'
-        && $params['prevContribution']->is_pay_later) || $previousContributionStatus == 'In Progress'
+    elseif (self::isPayLaterWithNoPayments($params['prevContribution'])
     ) {
       $financialTypeID = CRM_Utils_Array::value('financial_type_id', $params) ? $params['financial_type_id'] : $params['prevContribution']->financial_type_id;
       $arAccountId = CRM_Contribute_PseudoConstant::getRelationalFinancialAccount($financialTypeID, 'Accounts Receivable Account is');
@@ -1224,6 +1223,20 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       Civi::log()->debug('The related membership id has been overridden - this may impact data - see  https://github.com/civicrm/civicrm-core/pull/15053');
       civicrm_api3('MembershipPayment', 'create', ['contribution_id' => $contributionID, 'membership_id' => $input['membership_id']]);
     }
+  }
+
+  /**
+   * Is this a pay later contribution with no payments.
+   *
+   * @param \CRM_Contribute_BAO_Contribution $contribution
+   *
+   * @return bool
+   */
+  private static function isPayLaterWithNoPayments($contribution) {
+    if (!in_array(CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution->contribution_status_id), ['Pending', 'In Progress'], TRUE)) {
+      return FALSE;
+    }
+    return (bool) $contribution->is_pay_later;
   }
 
   /**
