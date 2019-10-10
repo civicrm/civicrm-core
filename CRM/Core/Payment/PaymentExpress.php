@@ -121,7 +121,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
       CRM_Core_Error::fatal(ts('Component is invalid'));
     }
 
-    $url = $config->userFrameworkResourceURL . "extern/pxIPN.php";
+    $url = CRM_Utils_System::externUrl('extern/pxIPN');
 
     if ($component == 'event') {
       $cancelURL = CRM_Utils_System::url('civicrm/event/register',

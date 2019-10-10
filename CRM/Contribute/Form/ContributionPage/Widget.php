@@ -55,6 +55,8 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
 
     $this->assign('cpageId', $this->_id);
 
+    $this->assign('widgetExternUrl', CRM_Utils_System::externUrl('extern/widget', "cpageId={$this->_id}&widgetId={$this->_widget->id}&format=3"));
+
     $config = CRM_Core_Config::singleton();
     $title = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage',
       $this->_id,

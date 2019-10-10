@@ -115,6 +115,76 @@ class CRM_Utils_SystemTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test extern url.
+   */
+  public function testExternUrl() {
+    $siteKey = mt_rand();
+    $apiKey = mt_rand();
+    $restUrl = CRM_Utils_System::externUrl('extern/rest', "entity=Contact&action=get&key=$siteKey&api_key=$apiKey");
+    $this->assertContains('extern/rest.php', $restUrl);
+    $this->assertContains('?', $restUrl);
+    $this->assertContains('entity=Contact', $restUrl);
+    $this->assertContains('action=get', $restUrl);
+    $this->assertContains("key=$siteKey", $restUrl);
+    $this->assertContains("api_key=$apiKey", $restUrl);
+  }
+
+  /**
+   * Test the alterExternUrl hook.
+   *
+   * @param string $path
+   * @param array $expected
+   *
+   * @dataProvider getExternURLs
+   */
+  public function testAlterExternUrlHook($path, $expected) {
+    Civi::service('dispatcher')->addListener('hook_civicrm_alterExternUrl', [$this, 'hook_civicrm_alterExternUrl']);
+    $externUrl = CRM_Utils_System::externUrl($path, $expected['query']);
+    $this->assertContains($path, $externUrl);
+    $this->assertContains($expected['query'], $externUrl);
+  }
+
+  /**
+   * Hook for alterExternUrl.
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $event
+   * @param string $hookName
+   */
+  public function hook_civicrm_alterExternUrl(\Civi\Core\Event\GenericHookEvent $event, $hookName) {
+    $this->assertEquals('hook_civicrm_alterExternUrl', $hookName);
+    $this->assertTrue($event->hasField('url'));
+    $this->assertTrue($event->hasField('path'));
+    $this->assertTrue($event->hasField('query'));
+    $this->assertTrue($event->hasField('fragment'));
+    $this->assertTrue($event->hasField('absolute'));
+    $this->assertTrue($event->hasField('isSSL'));
+  }
+
+  /**
+   * Get extern url params for testing.
+   *
+   * @return array
+   */
+  public function getExternURLs() {
+    return [
+      [
+        'extern/url',
+        [
+          'path' => 'extern/url',
+          'query' => 'u=1&qid=1',
+        ],
+      ],
+      [
+        'extern/open',
+        [
+          'path' => 'extern/open',
+          'query' => 'q=1',
+        ],
+      ],
+    ];
+  }
+
+  /**
    * Demonstrate the, um, "flexibility" of isNull
    */
   public function testIsNull() {

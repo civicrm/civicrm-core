@@ -45,22 +45,7 @@ class CRM_Cxn_BAO_Cxn extends CRM_Cxn_DAO_Cxn {
    * @return string
    */
   public static function getSiteCallbackUrl() {
-    $config = CRM_Core_Config::singleton();
-
-    if (preg_match('/^(http|https):/', $config->resourceBase)) {
-      $civiUrl = $config->resourceBase;
-    }
-    else {
-      $civiUrl = rtrim(CRM_Utils_System::baseURL(), '/') . '/' . ltrim($config->resourceBase, '/');
-    }
-
-    // In practice, this may not be necessary, but we want to prevent
-    // edge-cases that downgrade security-level below system policy.
-    if (Civi::settings()->get('enableSSL')) {
-      $civiUrl = preg_replace('/^http:/', 'https:', $civiUrl);
-    }
-
-    return rtrim($civiUrl, '/') . '/extern/cxn.php';
+    return CRM_Utils_System::externUrl('extern/cxn', NULL, NULL, TRUE, TRUE);
   }
 
   /**
