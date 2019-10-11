@@ -357,7 +357,7 @@
         _.each($scope.relationshipTypeOptions, function (relationshipTypeOption) {
           if (relationshipTypeOption.text == set.name) {
             // relationshipTypeOption.id here corresponds to one of the civicrm_relationship_type.label database fields, not civicrm_relationship_type.id
-            set.displaylabel = relationshipTypeOption.id;
+            set.displayLabel = relationshipTypeOption.id;
           }
         });
       });
@@ -472,7 +472,7 @@
         var matchingRoles = _.filter($scope.relationshipTypeOptions, {id: roleName});
         if (matchingRoles.length) {
           var matchingRole = matchingRoles.shift();
-          roles.push({name: roleName, displaylabel: matchingRole.text});
+          roles.push({name: roleName, displayLabel: matchingRole.text});
         } else {
            CRM.loadForm(CRM.url('civicrm/admin/reltype', {action: 'add', reset: 1, label_a_b: roleName}))
             .on('crmFormSuccess', function(e, data) {
@@ -486,7 +486,7 @@
     };
 
     $scope.addRoleOnTheFly = function(roles, newType) {
-      roles.push({name: newType.label_b_a, displaylabel: newType.label_a_b});
+      roles.push({name: newType.label_b_a, displayLabel: newType.label_a_b});
       // Assume that the case role should be A-B but add both directions as options.
       $scope.relationshipTypeOptions.push({id: newType.label_a_b, text: newType.label_b_a});
       if (newType.label_a_b != newType.label_b_a) {
@@ -584,7 +584,7 @@
       }
 
       function dropDisplaylabel (v) {
-        delete v.displaylabel;
+        delete v.displayLabel;
       }
 
       // strip out labels from $scope.caseType.definition.caseRoles
