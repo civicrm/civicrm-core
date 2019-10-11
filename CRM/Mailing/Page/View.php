@@ -105,7 +105,13 @@ class CRM_Mailing_Page_View extends CRM_Core_Page {
       $this->_contactID = $contactID;
     }
     else {
-      $this->_contactID = CRM_Core_Session::getLoggedInContactID();
+      $urlContactID = CRM_Utils_Request::retrieve('cid', 'String');
+      if (!empty($urlContactID) && (CRM_Contact_BAO_Contact_Permission::allow($urlContactID, CRM_Core_Permission::VIEW))) {
+        $this->_contactID = $urlContactID;
+      }
+      else {
+        $this->_contactID = CRM_Core_Session::getLoggedInContactID();
+      }
     }
 
     // mailing key check

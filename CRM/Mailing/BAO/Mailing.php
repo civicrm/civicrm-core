@@ -2915,7 +2915,7 @@ ORDER BY civicrm_mailing.name";
         CRM_Core_Action::VIEW => [
           'name' => ts('View'),
           'url' => 'civicrm/mailing/view',
-          'qs' => "reset=1&id=%%mkey%%",
+          'qs' => "reset=1&id=%%mkey%%&cid=%%cid%%",
           'title' => ts('View Mailing'),
           'class' => 'crm-popup',
         ],

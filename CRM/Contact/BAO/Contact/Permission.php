@@ -129,8 +129,9 @@ WHERE contact_id IN ({$contact_id_list})
    * Check if the logged in user has permissions for the operation type.
    *
    * @param int $id
-   *   Contact id.
-   * @param int|string $type the type of operation (view|edit)
+   *   Contact id to check if logged contact has permission to view.
+   * @param int $type
+   *   The type of permission that the logged in contact must have (view|edit)
    *
    * @return bool
    *   true if the user has permission, false otherwise
