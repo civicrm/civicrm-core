@@ -73,7 +73,6 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
     else {
 
       $hrefExists = FALSE;
-      $config = CRM_Core_Config::singleton();
 
       $tracker = new CRM_Mailing_BAO_TrackableURL();
       if (preg_match('/^href/i', $url)) {
@@ -89,7 +88,7 @@ class CRM_Mailing_BAO_TrackableURL extends CRM_Mailing_DAO_TrackableURL {
       }
       $id = $tracker->id;
 
-      $redirect = $config->userFrameworkResourceURL . "extern/url.php?u=$id";
+      $redirect = CRM_Utils_System::externUrl('extern/url', "u=$id");
       $urlCache[$mailing_id . $url] = $redirect;
     }
 
