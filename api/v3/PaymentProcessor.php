@@ -155,7 +155,7 @@ function _civicrm_api3_payment_processor_pay_spec(&$params) {
   ];
   $params['amount'] = [
     'api.required' => TRUE,
-    'title' => ts('Amount to refund'),
+    'title' => ts('Amount to pay'),
     'type' => CRM_Utils_Type::T_MONEY,
   ];
 }
