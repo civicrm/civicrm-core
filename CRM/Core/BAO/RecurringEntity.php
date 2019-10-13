@@ -31,7 +31,7 @@
  * @copyright CiviCRM LLC (c) 2004-2019
  */
 
-require_once 'packages/When/When.php';
+use When\When;
 
 /**
  * Class CRM_Core_BAO_RecurringEntity.
@@ -240,7 +240,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
    */
   public function generateRecursion() {
     // return if already generated
-    if (is_a($this->recursion, 'When')) {
+    if (is_a($this->recursion, 'When\When')) {
       return $this->recursion;
     }
 
@@ -334,7 +334,7 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     $this->generateRecursion();
 
     $recursionDates = [];
-    if (is_a($this->recursion, 'When')) {
+    if (is_a($this->recursion, 'When\When')) {
       $initialCount = CRM_Utils_Array::value('start_action_offset', $this->schedule);
 
       $exRangeStart = $exRangeEnd = NULL;
@@ -343,8 +343,12 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
         $exRangeEnd = $this->excludeDateRangeColumns[1];
       }
 
+      if (CRM_Core_Config::singleton()->userFramework == 'UnitTests') {
+        $this->recursion->RFC5545_COMPLIANT = When::IGNORE;
+      }
       $count = 1;
-      while ($result = $this->recursion->next()) {
+      $result = $this->recursion_start_date;
+      while ($result = $this->getNextOccurrence($result)) {
         $skip = FALSE;
         if ($result == $this->recursion_start_date) {
           // skip the recursion-start-date from the list we going to generate
@@ -1004,14 +1008,14 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
       }
       $start = new DateTime($currDate);
       $this->recursion_start_date = $start;
-      if ($scheduleReminderDetails['repetition_frequency_unit']) {
-        $repetition_frequency_unit = $scheduleReminderDetails['repetition_frequency_unit'];
-        if ($repetition_frequency_unit == "day") {
-          $repetition_frequency_unit = "dai";
-        }
-        $repetition_frequency_unit = $repetition_frequency_unit . 'ly';
-        $r->recur($start, $repetition_frequency_unit);
+      $repetition_frequency_unit = $scheduleReminderDetails['repetition_frequency_unit'];
+      if ($repetition_frequency_unit == "day") {
+        $repetition_frequency_unit = "dai";
       }
+      $repetition_frequency_unit = $repetition_frequency_unit . 'ly';
+      $r->startDate($start)
+        ->exclusions([$start])
+        ->freq($repetition_frequency_unit);
 
       if ($scheduleReminderDetails['repetition_frequency_interval']) {
         $r->interval($scheduleReminderDetails['repetition_frequency_interval']);
@@ -1256,6 +1260,24 @@ class CRM_Core_BAO_RecurringEntity extends CRM_Core_DAO_RecurringEntity {
     }
 
     return $finalResult;
+  }
+
+  /**
+   * Get next occurrence for the given date
+   *
+   * @param \DateTime $occurDate
+   * @param bool $strictly_after
+   *
+   * @return bool
+   */
+  private function getNextOccurrence($occurDate, $strictly_after = TRUE) {
+    try {
+      return $this->recursion->getNextOccurrence($occurDate, $strictly_after);
+    }
+    catch (Exception $exception) {
+      CRM_Core_Session::setStatus(ts($exception->getMessage()));
+    }
+    return FALSE;
   }
 
 }
