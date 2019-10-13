@@ -3376,7 +3376,7 @@ WHERE cg.extends IN ('" . implode("','", $this->_customGroupExtends) . "') AND
             if ($value && empty($field['no_display'])) {
               $statistics['filters'][] = [
                 'title' => CRM_Utils_Array::value('title', $field),
-                'value' => $value,
+                'value' => CRM_Utils_String::htmlToText($value),
               ];
             }
           }
