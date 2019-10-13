@@ -62,7 +62,7 @@ class CRM_Utils_Chart {
    *   Assoc array of name/value pairs.
    *
    * @return object
-   *   $chart   object of open flash chart.
+   *   $chart   object data used for client-side chart rendering (currently with dc chart library).
    */
   public static function barChart($params) {
     $output = static::commonParamsManipulation($params);
