@@ -286,4 +286,17 @@
     <comment>Last 4 digits of credit card</comment>
     <add>4.7</add>
   </field>
+  <field>
+    <name>order_reference</name>
+    <uniqueName>financial_trxn_order_reference</uniqueName>
+    <title>Order Reference</title>
+    <type>varchar</type>
+    <length>255</length>
+    <html>
+      <type>Text</type>
+      <size>25</size>
+    </html>
+    <comment>Payment Processor external order reference</comment>
+    <add>5.20</add>
+  </field>
 </table>
