@@ -3770,8 +3770,6 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $params['line_item'][$fieldId][$fieldValueId]['financial_item_id'] = $financialItem->id;
 
         if (($lineItemDetails['tax_amount'] && $lineItemDetails['tax_amount'] !== 'null') || ($context == 'changeFinancialType')) {
-          $invoiceSettings = Civi::settings()->get('contribution_invoice_settings');
-          $taxTerm = CRM_Utils_Array::value('tax_term', $invoiceSettings);
           $taxAmount = (float) $lineItemDetails['tax_amount'];
           if ($context == 'changeFinancialType' && $lineItemDetails['tax_amount'] === 'null') {
             // reverse the Sale Tax amount if there is no tax rate associated with new Financial Type
@@ -3782,7 +3780,7 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
           }
           if ($taxAmount != 0) {
             $itemParams['amount'] = self::getMultiplier($params['contribution']->contribution_status_id, $context) * $taxAmount;
-            $itemParams['description'] = $taxTerm;
+            $itemParams['description'] = CRM_Invoicing_Utils::getTaxTerm();
             if ($lineItemDetails['financial_type_id']) {
               $itemParams['financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getSalesTaxFinancialAccount($lineItemDetails['financial_type_id']);
             }
