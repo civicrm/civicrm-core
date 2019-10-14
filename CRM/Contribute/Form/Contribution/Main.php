@@ -1217,7 +1217,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
     $invoiceID = md5(uniqid(rand(), TRUE));
     $this->set('invoiceID', $invoiceID);
     $params['invoiceID'] = $invoiceID;
-    $params['description'] = ts('Online Contribution') . ': ' . ((!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']));
+    $title = !empty($this->_values['frontend_title']) ? $this->_values['frontend_title'] : $this->_values['title'];
+    $params['description'] = ts('Online Contribution') . ': ' . ((!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $title));
     $params['button'] = $this->controller->getButtonName();
     // required only if is_monetary and valid positive amount
     // @todo it seems impossible for $memFee to be greater than 0 & $params['amount'] not to

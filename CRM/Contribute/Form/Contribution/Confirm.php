@@ -1537,8 +1537,9 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
         if (!empty($form->_params['membership_source'])) {
           $membershipSource = $form->_params['membership_source'];
         }
-        elseif (isset($form->_values['title']) && !empty($form->_values['title'])) {
-          $membershipSource = ts('Online Contribution:') . ' ' . $form->_values['title'];
+        elseif ((isset($form->_values['title']) && !empty($form->_values['title'])) || (isset($form->_values['frontend_title']) && !empty($form->_values['frontend_title']))) {
+          $title = !empty($form->_values['frontend_title']) ? $form->_values['frontend_title'] : $form->_values['title'];
+          $membershipSource = ts('Online Contribution:') . ' ' . $title;
         }
         $isPayLater = NULL;
         if (isset($form->_params)) {
@@ -2056,7 +2057,8 @@ class CRM_Contribute_Form_Contribution_Confirm extends CRM_Contribute_Form_Contr
       }
     }
     // add a description field at the very beginning
-    $this->_params['description'] = ts('Online Contribution') . ': ' . (($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $this->_values['title']);
+    $title = !empty($this->_values['frontend_title']) ? $this->_values['frontend_title'] : $this->_values['title'];
+    $this->_params['description'] = ts('Online Contribution') . ': ' . (!empty($this->_pcpInfo['title']) ? $this->_pcpInfo['title'] : $title);
 
     $this->_params['accountingCode'] = CRM_Utils_Array::value('accountingCode', $this->_values);
 

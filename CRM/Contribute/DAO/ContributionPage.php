@@ -344,6 +344,13 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
   public $is_billing_required;
 
   /**
+   * Contribution Page Public title
+   *
+   * @var string
+   */
+  public $frontend_title;
+
+  /**
    * Class constructor.
    */
   public function __construct() {
@@ -992,6 +999,23 @@ class CRM_Contribute_DAO_ContributionPage extends CRM_Core_DAO {
           'entity' => 'ContributionPage',
           'bao' => 'CRM_Contribute_BAO_ContributionPage',
           'localizable' => 0,
+        ],
+        'contribution_page_frontend_title' => [
+          'name' => 'frontend_title',
+          'type' => CRM_Utils_Type::T_STRING,
+          'title' => ts('Public Title'),
+          'description' => ts('Contribution Page Public title'),
+          'maxlength' => 255,
+          'size' => CRM_Utils_Type::HUGE,
+          'where' => 'civicrm_contribution_page.frontend_title',
+          'default' => 'NULL',
+          'table_name' => 'civicrm_contribution_page',
+          'entity' => 'ContributionPage',
+          'bao' => 'CRM_Contribute_BAO_ContributionPage',
+          'localizable' => 1,
+          'html' => [
+            'type' => 'Text',
+          ],
         ],
       ];
       CRM_Core_DAO_AllCoreTables::invoke(__CLASS__, 'fields_callback', Civi::$statics[__CLASS__]['fields']);

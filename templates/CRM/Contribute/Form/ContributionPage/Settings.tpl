@@ -38,6 +38,9 @@
     <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
   <table class="form-layout-compressed">
   <tr class="crm-contribution-contributionpage-settings-form-block-title"><td class="label">{$form.title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='title' id=$contributionPageID}{/if}</td><td>{$form.title.html}<br/>
+            <span class="description">{ts}This title will be displayed at the top of the page unless the frontend title field is filled out.<br />Please use only alphanumeric, spaces, hyphens and dashes for Title.{/ts}</td>
+  </tr>
+  <tr class="crm-contribution-contributionpage-settings-form-block-frontend-title"><td class="label">{$form.contribution_page_frontend_title.label} {if $action == 2}{include file='CRM/Core/I18n/Dialog.tpl' table='civicrm_contribution_page' field='frontend_title' id=$contributionPageID}{/if}</td><td>{$form.contribution_page_frontend_title.html}<br/>
             <span class="description">{ts}This title will be displayed at the top of the page.<br />Please use only alphanumeric, spaces, hyphens and dashes for Title.{/ts}</td>
   </tr>
   <tr class="crm-contribution-contributionpage-settings-form-block-financial_type_id"><td class="label">{$form.financial_type_id.label}</td><td>{$form.financial_type_id.html}<br />

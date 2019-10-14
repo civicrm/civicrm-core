@@ -74,6 +74,17 @@ class CRM_Upgrade_Incremental_php_FiveNineteen extends CRM_Upgrade_Incremental_B
   }
 
   /**
+   * Upgrade function.
+   *
+   * @param string $rev
+   */
+  public function upgrade_5_19_beta1($rev) {
+    $this->addTask('Add frontend title column to contribution page table', 'addColumn', 'civicrm_contribution_page',
+      'frontend_title', "varchar(255) DEFAULT NULL COMMENT 'Contribution Page Public title'", TRUE, '5.19.beta1');
+    $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+  }
+
+  /**
    * Add menu item for api4 explorer; rename v3 explorer menu item.
    *
    * @param \CRM_Queue_TaskContext $ctx

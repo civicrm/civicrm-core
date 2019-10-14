@@ -460,4 +460,18 @@
     <comment>if true - billing block is required for online contribution page</comment>
     <add>4.6</add>
   </field>
+  <field>
+    <name>frontend_title</name>
+    <title>Public Title</title>
+    <type>varchar</type>
+    <length>255</length>
+    <localizable>true</localizable>
+    <default>NULL</default>
+    <comment>Contribution Page Public title</comment>
+    <html>
+      <type>Text</type>
+    </html>
+    <add>5.20</add>
+    <uniqueName>contribution_page_frontend_title</uniqueName>
+  </field>
 </table>
