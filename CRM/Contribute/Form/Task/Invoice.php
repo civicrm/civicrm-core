@@ -285,6 +285,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       if ($contribution->contribution_status_id == $refundedStatusId || $contribution->contribution_status_id == $cancelledStatusId) {
         if (is_null($contribution->creditnote_id)) {
+          CRM_Core_Error::deprecatedFunctionWarning('This it the wrong place to add a credit note id since the id is added when the status is changed in the Contribution::Create function- hopefully it is never hit');
           $creditNoteId = CRM_Contribute_BAO_Contribution::createCreditNoteId();
           CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'creditnote_id', $creditNoteId);
         }

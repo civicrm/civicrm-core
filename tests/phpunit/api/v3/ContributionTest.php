@@ -1328,6 +1328,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * CRM-17951 the contra account is a financial account with a relationship to a
    * financial type. It is not always configured but should be reflected
    * in the financial_trxn & financial_item table if it is.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateChargebackContributionDefaultAccount() {
     $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
@@ -1552,6 +1554,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Function tests that financial records are added when Pending Contribution is Canceled.
    */
   public function testCreateUpdateContributionCancelPending() {
+    // Enable & disable invoicing just to standardise the credit note id setting.
+    // Longer term we want to separate that setting from 'taxAndInvoicing'.
+    // and / or remove from core.
+    $this->enableTaxAndInvoicing();
     $contribParams = [
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
@@ -1575,6 +1581,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->_checkFinancialTrxn($contribution, 'cancelPending', NULL, $checkTrxnDate);
     $this->_checkFinancialItem($contribution['id'], 'cancelPending');
+    $this->assertEquals('CN_1', $contribution['values'][$contribution['id']]['creditnote_id']);
+    $this->disableTaxAndInvoicing();
   }
 
   /**

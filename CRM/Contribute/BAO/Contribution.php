@@ -150,17 +150,14 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
 
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     //if contribution is created with cancelled or refunded status, add credit note id
-    if (!empty($params['contribution_status_id'])) {
-      // @todo - should we include Chargeback? If so use self::isContributionStatusNegative($params['contribution_status_id'])
-      if (($params['contribution_status_id'] == array_search('Refunded', $contributionStatus)
-        || $params['contribution_status_id'] == array_search('Cancelled', $contributionStatus))
-      ) {
-        if (empty($params['creditnote_id'])) {
-          $params['creditnote_id'] = self::createCreditNoteId();
-        }
+    // do the same for chargeback - this entered the code 'accidentally' but moving it to here
+    // as part of cleanup maintains consistency.
+    if (self::isContributionStatusNegative(CRM_Utils_Array::value('contribution_status_id', $params))) {
+      if (empty($params['creditnote_id'])) {
+        $params['creditnote_id'] = self::createCreditNoteId();
       }
     }
-    else {
+    if (empty($params['contribution_status_id'])) {
       // Since the fee amount is expecting this (later on) ensure it is always set.
       // It would only not be set for an update where it is unchanged.
       $params['contribution_status_id'] = civicrm_api3('Contribution', 'getvalue', [
@@ -1126,6 +1123,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
       // @todo we should stop passing $params by reference - splitting this out would be a step towards that.
       $params['trxnParams']['total_amount'] = -$params['total_amount'];
       if (empty($params['contribution']->creditnote_id)) {
+        // This is always set in the Contribution::create function.
+        CRM_Core_Error::deprecatedFunctionWarning('Logic says this line is never reached & can be removed');
         $creditNoteId = self::createCreditNoteId();
         CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
       }
@@ -1141,6 +1140,8 @@ class CRM_Contribute_BAO_Contribution extends CRM_Contribute_DAO_Contribution {
         $params['trxnParams']['to_financial_account_id'] = $arAccountId;
         $params['trxnParams']['total_amount'] = -$params['total_amount'];
         if (empty($params['contribution']->creditnote_id)) {
+          // This is always set in the Contribution::create function.
+          CRM_Core_Error::deprecatedFunctionWarning('Logic says this line is never reached & can be removed');
           $creditNoteId = self::createCreditNoteId();
           CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $params['contribution']->id, 'creditnote_id', $creditNoteId);
         }
