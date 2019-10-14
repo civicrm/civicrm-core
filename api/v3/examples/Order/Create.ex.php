@@ -9,7 +9,6 @@ function order_create_example() {
   $params = [
     'contact_id' => 8,
     'receive_date' => '2010-01-20',
-    'total_amount' => 200,
     'financial_type_id' => 'Event Fee',
     'contribution_status_id' => 1,
     'line_items' => [
@@ -106,6 +105,7 @@ function order_create_expectedresult() {
         'creditnote_id' => '',
         'tax_amount' => '',
         'revenue_recognition_date' => '',
+        'is_template' => '',
         'contribution_type_id' => '4',
       ],
     ],

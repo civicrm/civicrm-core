@@ -36,11 +36,12 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
   protected $_individualId;
   protected $_financialTypeId = 1;
-  protected $_apiversion;
   public $debug = 0;
 
   /**
    * Setup function.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function setUp() {
     parent::setUp();
@@ -51,6 +52,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
@@ -199,6 +202,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
   /**
    * Test create order api for membership
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testAddOrderForMembership() {
     $membershipType = $this->membershipTypeCreate();
@@ -207,7 +212,6 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $p = [
       'contact_id' => $this->_individualId,
       'receive_date' => '2010-01-20',
-      'total_amount' => 200,
       'financial_type_id' => 'Event Fee',
       'contribution_status_id' => 1,
     ];
@@ -292,6 +296,8 @@ class api_v3_OrderTest extends CiviUnitTestCase {
 
   /**
    * Test create order api for participant
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testAddOrderForParticipant() {
     $event = $this->eventCreate();
@@ -530,8 +536,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
   }
 
   /**
-   * @expectedException CiviCRM_API3_Exception
-   * @expectedExceptionMessage Line item total doesn't match with total amount.
+   * Test an exception is thrown if line items do not add up to total_amount, no tax.
    */
   public function testCreateOrderIfTotalAmountDoesNotMatchLineItemsAmountsIfNoTaxSupplied() {
     $params = [
@@ -559,12 +564,11 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ],
     ];
 
-    civicrm_api3('Order', 'create', $params);
+    $this->callAPIFailure('Order', 'create', $params, 'Line item total doesn\'t match with total amount');
   }
 
   /**
-   * @expectedException CiviCRM_API3_Exception
-   * @expectedExceptionMessage Line item total doesn't match with total amount.
+   * Test an exception is thrown if line items do not add up to total_amount, with tax.
    */
   public function testCreateOrderIfTotalAmountDoesNotMatchLineItemsAmountsIfTaxSupplied() {
     $params = [
@@ -594,7 +598,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ],
     ];
 
-    civicrm_api3('Order', 'create', $params);
+    $this->callAPIFailure('Order', 'create', $params, 'Line item total doesn\'t match with total amount.');
   }
 
   public function testCreateOrderIfTotalAmountDoesMatchLineItemsAmountsAndTaxSupplied() {
@@ -625,7 +629,7 @@ class api_v3_OrderTest extends CiviUnitTestCase {
       ],
     ];
 
-    $order = civicrm_api3('Order', 'create', $params);
+    $order = $this->callAPISuccess('Order', 'create', $params);
     $this->assertEquals(1, $order['count']);
   }
 
