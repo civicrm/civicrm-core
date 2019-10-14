@@ -82,11 +82,11 @@ class CRM_Event_Cart_Form_Checkout_Payment extends CRM_Event_Cart_Form_Cart {
     $participant->save();
 
     if (!empty($params['contributionID'])) {
-      $payment_params = [
+      $participantPaymentParams = [
         'participant_id' => $participant->id,
         'contribution_id' => $params['contributionID'],
       ];
-      CRM_Event_BAO_ParticipantPayment::create($payment_params);
+      civicrm_api3('ParticipantPayment', 'create', $participantPaymentParams);
     }
 
     $transaction->commit();
