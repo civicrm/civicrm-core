@@ -644,11 +644,23 @@ class CRM_Extension_Manager {
    *
    * @param array $keys
    *   List of extensions to install.
+   * @param \CRM_Extension_Info $info
+   *   An extension info object that we should use instead of our local versions (eg. when checking for upgradeability).
+   *
    * @return array
    *   List of extension keys, including dependencies, in order of installation.
+   * @throws \CRM_Extension_Exception
+   * @throws \MJS\TopSort\CircularDependencyException
+   * @throws \MJS\TopSort\ElementNotFoundException
    */
-  public function findInstallRequirements($keys) {
-    $infos = $this->mapper->getAllInfos();
+  public function findInstallRequirements($keys, $info = NULL) {
+    // Use our passed in info, or get the local versions
+    if ($info) {
+      $infos[$info->key] = $info;
+    }
+    else {
+      $infos = $this->mapper->getAllInfos();
+    }
     // array(string $key).
     $todoKeys = array_unique($keys);
     // array(string $key => 1);
@@ -665,10 +677,7 @@ class CRM_Extension_Manager {
       /** @var CRM_Extension_Info $info */
       $info = @$infos[$key];
 
-      if ($this->getStatus($key) === self::STATUS_INSTALLED) {
-        $sorter->add($key, []);
-      }
-      elseif ($info && $info->requires) {
+      if ($info && $info->requires) {
         $sorter->add($key, $info->requires);
         $todoKeys = array_merge($todoKeys, $info->requires);
       }

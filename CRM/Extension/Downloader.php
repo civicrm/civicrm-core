@@ -57,10 +57,12 @@ class CRM_Extension_Downloader {
   /**
    * Determine whether downloading is supported.
    *
+   * @param \CRM_EXtension_Info $extensionInfo Optional info for (updated) extension
+   *
    * @return array
    *   list of error messages; empty if OK
    */
-  public function checkRequirements() {
+  public function checkRequirements($extensionInfo = NULL) {
     $errors = array();
 
     if (!$this->containerDir || !is_dir($this->containerDir) || !is_writable($this->containerDir)) {
@@ -86,6 +88,18 @@ class CRM_Extension_Downloader {
     if (empty($errors) && !CRM_Utils_HttpClient::singleton()->isRedirectSupported()) {
       CRM_Core_Session::setStatus(ts('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.'));
       CRM_Core_Error::debug_log_message('WARNING: The downloader may be unable to download files which require HTTP redirection. This may be a configuration issue with PHP\'s open_basedir or safe_mode.');
+    }
+
+    if ($extensionInfo) {
+      $requiredExtensions = CRM_Extension_System::singleton()->getManager()->findInstallRequirements([$extensionInfo->key], $extensionInfo);
+      foreach ($requiredExtensions as $extension) {
+        if (CRM_Extension_System::singleton()->getManager()->getStatus($extension) !== CRM_Extension_Manager::STATUS_INSTALLED) {
+          $errors[] = [
+            'title' => ts('Missing Requirement: %1', [1 => $extension]),
+            'message' => ts('You will not be able to install/upgrade %1 until you have installed the %2 extension.', [1 => $extensionInfo->key, 2 => $extension]),
+          ];
+        }
+      }
     }
 
     return $errors;
