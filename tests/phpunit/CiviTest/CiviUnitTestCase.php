@@ -806,9 +806,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @return \CRM_Core_Payment_Dummy
    *   Instance of Dummy Payment Processor
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public function dummyProcessorCreate($processorParams = array()) {
+  public function dummyProcessorCreate($processorParams = []) {
     $paymentProcessorID = $this->processorCreate($processorParams);
+    // For the tests we don't need a live processor, but as core ALWAYS creates a processor in live mode and one in test mode we do need to create both
+    //   Otherwise we are testing a scenario that only exists in tests (and some tests fail because the live processor has not been defined).
+    $processorParams['is_test'] = FALSE;
+    $this->processorCreate($processorParams);
     return System::singleton()->getById($paymentProcessorID);
   }
 

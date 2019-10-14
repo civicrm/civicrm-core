@@ -175,6 +175,15 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * Getter for the id.
+   *
+   * @return int
+   */
+  public function getID() {
+    return (int) $this->_paymentProcessor['id'];
+  }
+
+  /**
    * Set payment Instrument id.
    *
    * By default we actually ignore the form value. The manual processor takes it more seriously.
