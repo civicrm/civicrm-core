@@ -208,6 +208,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of the membership form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitRecur() {
     $form = $this->getForm();
@@ -408,6 +410,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of the membership form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitPayLater() {
     $form = $this->getForm(NULL);
@@ -459,6 +463,8 @@ class CRM_Member_Form_MembershipRenewalTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function of the membership form.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testSubmitPayLaterWithBilling() {
     $form = $this->getForm(NULL);

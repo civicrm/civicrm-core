@@ -138,6 +138,8 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
 
   /**
    * Test that Case count is exactly one for logged in user for user's active role.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testActiveCaseRole() {
     $individual = $this->individualCreate();
@@ -241,7 +243,7 @@ class CRM_Case_BAO_CaseTest extends CiviUnitTestCase {
    * }
    */
   public function testGetCasesSummary() {
-    $cases = CRM_Case_BAO_Case::getCasesSummary(TRUE, 3);
+    $cases = CRM_Case_BAO_Case::getCasesSummary();
     $this->assertEquals(1, $cases['rows']['Housing Support']['Ongoing']['count']);
   }
 

@@ -132,7 +132,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
-    $this->assertEquals('Pending', $contribution['contribution_status']);
+    $this->assertEquals('Pending Label**', $contribution['contribution_status']);
 
     $this->callAPISuccess('OptionValue', 'create', [
       'option_group_id' => 'contribution_status',

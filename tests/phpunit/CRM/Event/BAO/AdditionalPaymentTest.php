@@ -53,7 +53,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
    * @param array $contributionParams
    *
    * @return array
-   * @throws Exception
+   * @throws \CRM_Core_Exception
    */
   protected function addParticipantWithPayment($feeTotal, $actualPaidAmt, $participantParams = [], $contributionParams = []) {
     $priceSetId = $this->eventPriceSetCreate($feeTotal);
@@ -134,6 +134,9 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
 
   /**
    * See https://lab.civicrm.org/dev/core/issues/153
+   *
+   * @throws \CiviCRM_API3_Exception
+   * @throws \CRM_Core_Exception
    */
   public function testPaymentWithCustomPaymentInstrument() {
     $feeAmt = 100;
@@ -159,7 +162,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->assertEquals(round($paymentInfo['total']), $feeAmt, 'Total amount recorded is not proper');
     $this->assertEquals(round($paymentInfo['paid']), $amtPaid, 'Amount paid is not proper');
     $this->assertEquals(round($paymentInfo['balance']), $feeAmt, 'Balance amount is not proper');
-    $this->assertEquals($paymentInfo['contribution_status'], 'Pending', 'Contribution status is not proper');
+    $this->assertEquals($paymentInfo['contribution_status'], 'Pending Label**', 'Contribution status is not correct');
 
     // make additional payment via 'Record Payment' form
     $form = new CRM_Contribute_Form_AdditionalPayment();
@@ -244,7 +247,7 @@ class CRM_Event_BAO_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->assertEquals($transaction[1]['status'], 'Completed');
 
     $this->assertEquals($transaction[2]['total_amount'], -50.00);
-    $this->assertEquals($transaction[2]['status'], 'Refunded');
+    $this->assertEquals($transaction[2]['status'], 'Refunded Label**');
   }
 
 }

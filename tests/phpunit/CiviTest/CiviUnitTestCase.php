@@ -359,6 +359,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $_REQUEST = $_GET = $_POST = [];
     error_reporting(E_ALL);
 
+    $this->renameLabels();
     $this->_sethtmlGlobals();
   }
 
@@ -451,6 +452,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   protected function tearDown() {
     $this->_apiversion = 3;
+    $this->resetLabels();
 
     error_reporting(E_ALL & ~E_NOTICE);
     CRM_Utils_Hook::singleton()->reset();
@@ -3318,6 +3320,26 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     }
     ob_clean();
     return $csv;
+  }
+
+  /**
+   * Rename various labels to not match the names.
+   *
+   * Doing these mimics the fact the name != the label in international installs & triggers failures in
+   * code that expects it to.
+   */
+  protected function renameLabels() {
+    $replacements = ['Pending', 'Refunded'];
+    foreach ($replacements as $name) {
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value SET label = '{$name} Label**' where label = '{$name}' AND name = '{$name}'");
+    }
+  }
+
+  /**
+   * Undo any label renaming.
+   */
+  protected function resetLabels() {
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value SET label = REPLACE(name, ' Label**', '') WHERE label LIKE '% Label**'");
   }
 
 }
