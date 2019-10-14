@@ -80,12 +80,14 @@ function _civicrm_api3_order_get_spec(&$params) {
  * @param array $params
  *   Input parameters.
  *
- * @throws API_Exception
  * @return array
  *   Api result array
+ *
+ * @throws \CiviCRM_API3_Exception
+ * @throws API_Exception
  */
 function civicrm_api3_order_create($params) {
-
+  civicrm_api3_verify_one_mandatory($params, NULL, ['line_items', 'total_amount']);
   $entity = NULL;
   $entityIds = [];
   if (!empty($params['line_items']) && is_array($params['line_items'])) {
@@ -213,7 +215,6 @@ function _civicrm_api3_order_create_spec(&$params) {
   $params['total_amount'] = [
     'name' => 'total_amount',
     'title' => 'Total Amount',
-    'api.required' => TRUE,
   ];
   $params['financial_type_id'] = [
     'name' => 'financial_type_id',
