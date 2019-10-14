@@ -421,6 +421,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPISuccess('membership_payment', 'getsingle', ['contribution_id' => $contribution['id']]);
     $mut->checkMailLog([
       'Membership Type: General',
+      'Test Frontend title',
     ]);
     $mut->stop();
     $mut->clearMessages();
@@ -1496,6 +1497,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       $this->params['is_recur'] = 1;
       $this->params['recur_frequency_unit'] = 'month';
     }
+    $this->params['frontend_title'] = 'Test Frontend title';
     $contributionPageResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
     if (empty($this->_ids['price_set'])) {
       $priceSet = $this->callAPISuccess('price_set', 'create', $this->_priceSetParams);
