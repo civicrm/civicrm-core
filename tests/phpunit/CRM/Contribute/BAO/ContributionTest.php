@@ -1002,6 +1002,8 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
 
   /**
    * Test allowUpdateRevenueRecognitionDate.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testAllowUpdateRevenueRecognitionDate() {
     $contactId = $this->individualCreate();
@@ -1010,8 +1012,9 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'receive_date' => '2010-01-20',
       'total_amount' => 100,
       'financial_type_id' => 4,
+      'contribution_status_id' => 'Pending',
     ];
-    $order = $this->callAPISuccess('order', 'create', $params);
+    $order = $this->callAPISuccess('Order', 'create', $params);
     $allowUpdate = CRM_Contribute_BAO_Contribution::allowUpdateRevenueRecognitionDate($order['id']);
     $this->assertTrue($allowUpdate);
 
@@ -1021,7 +1024,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'receive_date' => '2010-01-20',
       'total_amount' => 300,
       'financial_type_id' => $this->getFinancialTypeId('Event Fee'),
-      'contribution_status_id' => 'Completed',
+      'contribution_status_id' => 'Pending',
     ];
     $priceFields = $this->createPriceSet('event', $event['id']);
     foreach ($priceFields['values'] as $key => $priceField) {
@@ -1048,7 +1051,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
         'source' => 'Online Event Registration: API Testing',
       ],
     ];
-    $order = $this->callAPISuccess('order', 'create', $params);
+    $order = $this->callAPISuccess('Order', 'create', $params);
     $allowUpdate = CRM_Contribute_BAO_Contribution::allowUpdateRevenueRecognitionDate($order['id']);
     $this->assertFalse($allowUpdate);
 
@@ -1057,7 +1060,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
       'receive_date' => '2010-01-20',
       'total_amount' => 200,
       'financial_type_id' => $this->getFinancialTypeId('Member Dues'),
-      'contribution_status_id' => 'Completed',
+      'contribution_status_id' => 'Pending',
     ];
     $membershipType = $this->membershipTypeCreate();
     $priceFields = $this->createPriceSet();
@@ -1089,7 +1092,7 @@ WHERE eft.entity_id = %1 AND ft.to_financial_account_id <> %2";
         'status_id' => 1,
       ],
     ];
-    $order = $this->callAPISuccess('order', 'create', $params);
+    $order = $this->callAPISuccess('Order', 'create', $params);
     $allowUpdate = CRM_Contribute_BAO_Contribution::allowUpdateRevenueRecognitionDate($order['id']);
     $this->assertFalse($allowUpdate);
   }

@@ -7,10 +7,10 @@
  */
 function order_create_example() {
   $params = [
-    'contact_id' => 8,
+    'contact_id' => 3,
     'receive_date' => '2010-01-20',
     'financial_type_id' => 'Event Fee',
-    'contribution_status_id' => 1,
+    'contribution_status_id' => 'Pending',
     'line_items' => [
       '0' => [
         'line_item' => [
@@ -28,14 +28,13 @@ function order_create_example() {
           ],
         ],
         'params' => [
-          'contact_id' => 8,
+          'contact_id' => 3,
           'membership_type_id' => 2,
           'join_date' => '2006-01-21',
           'start_date' => '2006-01-21',
           'end_date' => '2006-12-21',
           'source' => 'Payment',
           'is_override' => 1,
-          'status_id' => 1,
         ],
       ],
     ],
@@ -76,7 +75,7 @@ function order_create_expectedresult() {
     'values' => [
       '1' => [
         'id' => '1',
-        'contact_id' => '8',
+        'contact_id' => '3',
         'financial_type_id' => '4',
         'contribution_page_id' => '',
         'payment_instrument_id' => '4',
@@ -98,7 +97,7 @@ function order_create_expectedresult() {
         'contribution_recur_id' => '',
         'is_test' => '',
         'is_pay_later' => '',
-        'contribution_status_id' => '1',
+        'contribution_status_id' => '2',
         'address_id' => '',
         'check_number' => '',
         'campaign_id' => '',
