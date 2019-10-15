@@ -22,13 +22,16 @@
         <a ng-href="#/?name={{availForm.name}}">{{availForm.name}}</a>
       </td>
       <td>{{availForm.title}}</td>
-      <td><code>{{availForm.server_route}}</code></td>
+      <td>
+        <a ng-href="{{crmUrl(availForm.server_route)}}" target="_blank"><code>{{availForm.server_route}}</code></a>
+      </td>
       <td>{{availForm.is_public ? ts('Frontend') : ts('Backend')}}</td>
       <td>
         <!--<a ng-click="crmStatus({start: ts('Reverting...'), success: ts('Reverted')}, crmApi4('Afform', 'revert', {where: [['name', '=', availForm.name]]}))">{{ts('Revert')}}</a>-->
         <a af-api4-action="['Afform', 'revert', {where: [['name','=', availForm.name]]}]"
            af-api4-start-msg="ts('Reverting...')"
            af-api4-success-msg="ts('Reverted')"
+           class="btn btn-xs btn-default"
           >{{ts('Revert')}}</a>
       </td>
     </tr>
