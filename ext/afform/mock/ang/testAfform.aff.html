@@ -3,10 +3,8 @@
   <div crm-ui-debug="modelListCtrl.getData('parent')" />
   <af-entity type="Contact" data="{contact_type: 'Individual'}" name="parent" label="Parent" url-autofill="1" autofill="user" />
   <af-entity type="Contact" name="spouse" label="Spouse" url-autofill="1" />
-  <af-entity type="Contact" name="home" label="Home" />
 
   <af-fieldset model="parent">
-
     <af-field name="first_name" defn='{title: ts("Your First Name")}' />
     <af-field name="last_name" />
     <af-field name="contact_sub_type" defn="{widget: hidden}" value="Student" />
