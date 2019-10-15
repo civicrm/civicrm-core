@@ -136,7 +136,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     // pay additional amount by using Credit Card
     $this->submitPayment(70, 'live', TRUE);
     $this->checkResults([30, 70], 2);
-    $mut->assertSubjects(['Payment Receipt -']);
+    $mut->assertSubjects(['Payment Receipt - Mr. Anthony Anderson II']);
     $mut->checkMailLog([
       'From: site@something.com',
       'Dear Anthony,',
@@ -220,7 +220,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     // pay additional amount by using credit card
     $this->submitPayment(20, 'live');
     $this->checkResults([30, 50, 20], 3);
-    $mut->assertSubjects(['Payment Receipt -']);
+    $mut->assertSubjects(['Payment Receipt - Mr. Anthony Anderson II']);
     $mut->checkMailLog([
       'Dear Anthony,',
       'A payment has been received',
