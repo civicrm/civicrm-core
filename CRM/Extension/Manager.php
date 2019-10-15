@@ -339,7 +339,7 @@ class CRM_Extension_Manager {
     // This munges order, but makes it comparable.
     sort($disableRequirements);
     if ($keys !== $disableRequirements) {
-      throw new CRM_Extension_Exception_DependencyException("Cannot disable extension due dependencies. Consider disabling all these: " . implode(',', $disableRequirements));
+      throw new CRM_Extension_Exception_DependencyException("Cannot disable extension due to dependencies. Consider disabling all these: " . implode(',', $disableRequirements));
     }
 
     foreach ($keys as $key) {
