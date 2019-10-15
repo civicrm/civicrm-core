@@ -180,32 +180,6 @@ class CRM_Event_Form_Registration_AdditionalParticipant extends CRM_Event_Form_R
     if ($this->_values['event']['is_monetary']) {
       CRM_Event_Form_Registration_Register::buildAmount($this);
     }
-    $first_name = $last_name = NULL;
-    $pre = $post = [];
-    foreach ([
-      'pre',
-      'post',
-    ] as $keys) {
-      if (isset($this->_values['additional_custom_' . $keys . '_id'])) {
-        $this->buildCustom($this->_values['additional_custom_' . $keys . '_id'], 'additionalCustom' . ucfirst($keys));
-        $$keys = CRM_Core_BAO_UFGroup::getFields($this->_values['additional_custom_' . $keys . '_id']);
-      }
-      foreach ([
-        'first_name',
-        'last_name',
-      ] as $name) {
-        if (array_key_exists($name, $$keys) &&
-          CRM_Utils_Array::value('is_required', CRM_Utils_Array::value($name, $$keys))
-        ) {
-          $$name = 1;
-        }
-      }
-    }
-
-    $required = ($button == 'skip' ||
-      $this->_values['event']['allow_same_participant_emails'] == 1 &&
-      ($first_name && $last_name)
-    ) ? FALSE : TRUE;
 
     //add buttons
     $js = NULL;
