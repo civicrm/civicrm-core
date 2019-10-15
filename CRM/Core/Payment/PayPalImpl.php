@@ -432,6 +432,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       "&m=" .
       "&c={$params['contactID']}" .
       "&r={$params['contributionRecurID']}" .
+      // @todo use $this->getContributionID();
       "&b={$params['contributionID']}" .
       "&p={$params['contributionPageID']}";
 
@@ -569,6 +570,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
       $args['PROFILEREFERENCE'] = "" .
         "i=" . $params['invoiceID'] . "&m=" . $component .
         "&c=" . $params['contactID'] . "&r=" . $params['contributionRecurID'] .
+        // @todo use $this->getContributionID();
         "&b=" . $params['contributionID'] . "&p=" . $params['contributionPageID'];
     }
 
@@ -880,6 +882,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
     $notifyParameters = ['module' => $component];
     $notifyParameterMap = [
       'contactID' => 'contactID',
+      // @todo use $this->getContributionID();
       'contributionID' => 'contributionID',
       'eventID' => 'eventID',
       'participantID' => 'participantID',
@@ -903,6 +906,7 @@ class CRM_Core_Payment_PayPalImpl extends CRM_Core_Payment {
 
     $cancelUrlString = "$cancel=1&cancel=1&qfKey={$params['qfKey']}";
     if (!empty($params['is_recur'])) {
+      // @todo use $this->getContributionID();
       $cancelUrlString .= "&isRecur=1&recurId={$params['contributionRecurID']}&contribId={$params['contributionID']}";
     }
 
