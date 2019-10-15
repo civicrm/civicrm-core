@@ -171,12 +171,7 @@ class CRM_Financial_BAO_Payment {
       }
     }
     elseif ($contributionStatus === 'Pending') {
-      civicrm_api3('Contribution', 'create',
-        [
-          'id' => $contribution['id'],
-          'contribution_status_id' => 'Partially paid',
-        ]
-      );
+      self::updateContributionStatus($contribution['id'], 'Partially Paid');
     }
     CRM_Contribute_BAO_Contribution::recordPaymentActivity($params['contribution_id'], CRM_Utils_Array::value('participant_id', $params), $params['total_amount'], $trxn->currency, $trxn->trxn_date);
     return $trxn;
@@ -532,6 +527,26 @@ WHERE eft.financial_trxn_id IN ({$trxnId}, {$baseTrxnId['financialTrxnId']})
     $outstandingBalance = CRM_Contribute_BAO_Contribution::getContributionBalance($contributionID);
     $cmp = bccomp($paymentAmount, $outstandingBalance, 5);
     return ($cmp == 0 || $cmp == 1);
+  }
+
+  /**
+   * Update the status of the contribution.
+   *
+   * We pass the is_post_payment_create as we have already created the line items
+   *
+   * @param int $contributionID
+   * @param string $status
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  private static function updateContributionStatus(int $contributionID, string $status) {
+    civicrm_api3('Contribution', 'create',
+      [
+        'id' => $contributionID,
+        'is_post_payment_create' => TRUE,
+        'contribution_status_id' => $status,
+      ]
+    );
   }
 
 }
