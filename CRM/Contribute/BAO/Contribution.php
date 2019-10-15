@@ -2510,6 +2510,9 @@ LEFT JOIN  civicrm_contribution contribution ON ( componentPayment.contribution_
       if (isset($contribution->contribution_page_id) && is_numeric($contribution->contribution_page_id)) {
         $contributionParams['contribution_page_id'] = $contribution->contribution_page_id;
       }
+      if (!empty($contribution->tax_amount)) {
+        $contributionParams['tax_amount'] = $contribution->tax_amount;
+      }
 
       $createContribution = civicrm_api3('Contribution', 'create', $contributionParams);
       $contribution->id = $createContribution['id'];
