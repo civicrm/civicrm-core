@@ -9,9 +9,9 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
 
   public function getBasicDirectives() {
     return [
-      ['afExamplePage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/example-page']],
-      ['fakelibBareFile', ['title' => '', 'description' => '']],
-      ['fakelibFoo', ['title' => '', 'description' => '']],
+      ['mockPage', ['title' => '', 'description' => '', 'server_route' => 'civicrm/mock-page']],
+      ['mockBareFile', ['title' => '', 'description' => '']],
+      ['mockFoo', ['title' => '', 'description' => '']],
     ];
   }
 
@@ -69,7 +69,7 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
       $formats = ['html', 'shallow', 'deep'];
       foreach ($formats as $updateFormat) {
         foreach ($formats as $readFormat) {
-          $es[] = ['fakelibBareFile', $updateFormat, $example[$updateFormat], $readFormat, $example[$readFormat], $exampleFile];
+          $es[] = ['mockBareFile', $updateFormat, $example[$updateFormat], $readFormat, $example[$readFormat], $exampleFile];
         }
       }
     }
