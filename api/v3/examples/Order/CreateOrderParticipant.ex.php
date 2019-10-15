@@ -11,9 +11,8 @@ function order_create_example() {
   $params = [
     'contact_id' => 11,
     'receive_date' => '2010-01-20',
-    'total_amount' => 300,
     'financial_type_id' => 1,
-    'contribution_status_id' => 1,
+    'contribution_status_id' => 'Pending',
     'line_items' => [
       '0' => [
         'line_item' => [
@@ -43,7 +42,6 @@ function order_create_example() {
         'params' => [
           'contact_id' => 11,
           'event_id' => 1,
-          'status_id' => 1,
           'role_id' => 1,
           'register_date' => '2007-07-21 00:00:00',
           'source' => 'Online Event Registration: API Testing',
@@ -109,7 +107,7 @@ function order_create_expectedresult() {
         'contribution_recur_id' => '',
         'is_test' => '',
         'is_pay_later' => '',
-        'contribution_status_id' => '1',
+        'contribution_status_id' => '2',
         'address_id' => '',
         'check_number' => '',
         'campaign_id' => '',
