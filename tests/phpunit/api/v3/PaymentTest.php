@@ -716,7 +716,28 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   /**
    * Test create payment api for pay later contribution with partial payment.
    *
-   * @throws \Exception
+   * https://lab.civicrm.org/dev/financial/issues/69
+   */
+  public function testCreatePaymentIncompletePaymentPartialPayment() {
+    $contributionParams = [
+      'total_amount' => 100,
+      'currency' => 'USD',
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => 1,
+      'contribution_status_id' => 2,
+    ];
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 50,
+      'payment_instrument_id' => 'Cash',
+    ]);
+    $payments = $this->callAPISuccess('Payment', 'get', ['contribution_id' => $contribution['id']])['values'];
+    $this->assertCount(1, $payments);
+  }
+
+  /**
+   * Test create payment api for pay later contribution with partial payment.
    */
   public function testCreatePaymentPayLaterPartialPayment() {
     $this->createLoggedInUser();
