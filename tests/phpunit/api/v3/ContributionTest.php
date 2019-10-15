@@ -4353,6 +4353,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 'Completed',
       'trxn_id' => uniqid(),
     ]);
+    $payments = $this->callAPISuccess('Contribution', 'get', ['sequential' => 1])['values'];
+    //Assert if first payment and repeated payment has the same contribution amount.
+    $this->assertEquals($payments[0]['total_amount'], $payments[1]['total_amount']);
     $this->callAPISuccessGetCount('Contribution', [], 2);
   }
 
