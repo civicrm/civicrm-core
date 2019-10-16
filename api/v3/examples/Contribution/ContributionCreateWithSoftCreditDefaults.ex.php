@@ -9,7 +9,7 @@
  */
 function contribution_create_example() {
   $params = [
-    'contact_id' => 29,
+    'contact_id' => 30,
     'receive_date' => '20120511',
     'total_amount' => '100',
     'financial_type_id' => 1,
@@ -18,7 +18,7 @@ function contribution_create_example() {
     'net_amount' => '95',
     'source' => 'SSF',
     'contribution_status_id' => 1,
-    'soft_credit_to' => 30,
+    'soft_credit_to' => 31,
   ];
 
   try{
@@ -56,7 +56,7 @@ function contribution_create_expectedresult() {
     'values' => [
       '1' => [
         'id' => '1',
-        'contact_id' => '29',
+        'contact_id' => '30',
         'financial_type_id' => '1',
         'contribution_page_id' => '',
         'payment_instrument_id' => '4',
@@ -85,6 +85,7 @@ function contribution_create_expectedresult() {
         'creditnote_id' => '',
         'tax_amount' => '',
         'revenue_recognition_date' => '',
+        'is_template' => '',
         'contribution_type_id' => '1',
       ],
     ],

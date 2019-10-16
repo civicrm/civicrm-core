@@ -165,7 +165,7 @@ class CRM_Report_Form_Member_Summary extends CRM_Report_Form {
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
           ],
         ],
         'grouping' => 'member-fields',
@@ -524,10 +524,10 @@ GROUP BY    {$this->_aliases['civicrm_contribution']}.currency
           'xname' => ts('Member Since / Member Type'),
           'yname' => ts('Fees'),
         ];
-        CRM_Utils_OpenFlashChart::reportChart($graphRows, $this->_params['charts'], $interval, $chartInfo);
+        CRM_Utils_Chart::reportChart($graphRows, $this->_params['charts'], $interval, $chartInfo);
       }
       else {
-        CRM_Utils_OpenFlashChart::chart($graphRows, $this->_params['charts'], $this->_interval);
+        CRM_Utils_Chart::chart($graphRows, $this->_params['charts'], $this->_interval);
       }
     }
     $this->assign('chartType', $this->_params['charts']);

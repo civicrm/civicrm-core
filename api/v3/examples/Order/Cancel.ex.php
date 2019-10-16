@@ -74,6 +74,7 @@ function order_cancel_expectedresult() {
         'creditnote_id' => '1',
         'tax_amount' => '',
         'revenue_recognition_date' => '',
+        'is_template' => 0,
         'contribution_type_id' => '1',
       ],
     ],

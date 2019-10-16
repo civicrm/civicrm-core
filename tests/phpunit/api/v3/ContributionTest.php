@@ -117,13 +117,15 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Clean up after each test.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function tearDown() {
     $this->quickCleanUpFinancialEntities();
     $this->quickCleanup(['civicrm_uf_match']);
     $financialAccounts = $this->callAPISuccess('FinancialAccount', 'get', []);
     foreach ($financialAccounts['values'] as $financialAccount) {
-      if ($financialAccount['name'] == 'Test Tax financial account ' || $financialAccount['name'] == 'Test taxable financial Type') {
+      if ($financialAccount['name'] === 'Test Tax financial account ' || $financialAccount['name'] === 'Test taxable financial Type') {
         $entityFinancialTypes = $this->callAPISuccess('EntityFinancialAccount', 'get', [
           'financial_account_id' => $financialAccount['id'],
         ]);
@@ -133,6 +135,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
         $this->callAPISuccess('FinancialAccount', 'delete', ['id' => $financialAccount['id']]);
       }
     }
+    $this->restoreUFGroupOne();
   }
 
   /**
@@ -1325,6 +1328,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * CRM-17951 the contra account is a financial account with a relationship to a
    * financial type. It is not always configured but should be reflected
    * in the financial_trxn & financial_item table if it is.
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testCreateUpdateChargebackContributionDefaultAccount() {
     $contribution = $this->callAPISuccess('Contribution', 'create', $this->_params);
@@ -1549,6 +1554,10 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
    * Function tests that financial records are added when Pending Contribution is Canceled.
    */
   public function testCreateUpdateContributionCancelPending() {
+    // Enable & disable invoicing just to standardise the credit note id setting.
+    // Longer term we want to separate that setting from 'taxAndInvoicing'.
+    // and / or remove from core.
+    $this->enableTaxAndInvoicing();
     $contribParams = [
       'contact_id' => $this->_individualId,
       'receive_date' => '2012-01-01',
@@ -1572,6 +1581,8 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('contribution', 'create', $newParams);
     $this->_checkFinancialTrxn($contribution, 'cancelPending', NULL, $checkTrxnDate);
     $this->_checkFinancialItem($contribution['id'], 'cancelPending');
+    $this->assertEquals('CN_1', $contribution['values'][$contribution['id']]['creditnote_id']);
+    $this->disableTaxAndInvoicing();
   }
 
   /**
@@ -1858,8 +1869,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->assertEquals($p2['fee_amount'], $res['fee_amount']);
     $this->assertEquals($p2['trxn_id'], $res['trxn_id']);
     $this->assertEquals($p2['invoice_id'], $res['invoice_id']);
-    // contribution_status_id = 2 => Pending
-    $this->assertEquals('Pending', $res['contribution_status']);
+    $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'), $res['contribution_status_id']);
 
     $this->contributionDelete($contribution1['id']);
     $this->contributionDelete($contribution2['id']);
@@ -2844,7 +2854,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'is_email_receipt' => 1,
     ]);
     $mut->checkMailLog([
-      'Please print this receipt for your records.',
+      'Contribution Information',
     ]);
     $mut->stop();
   }
@@ -3058,6 +3068,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $this->_individualId = $this->createLoggedInUser();
     $contributionID = $this->createPendingParticipantContribution();
     $this->createJoinedProfile(['entity_id' => $this->_ids['event']['test'], 'entity_table' => 'civicrm_event']);
+    $this->createJoinedProfile(['entity_id' => $this->_ids['event']['test'], 'entity_table' => 'civicrm_event', 'weight' => 2], ['name' => 'post_1', 'title' => 'title_post_2', 'frontend_title' => 'public 2']);
+    $this->createJoinedProfile(['entity_id' => $this->_ids['event']['test'], 'entity_table' => 'civicrm_event', 'weight' => 3], ['name' => 'post_2', 'title' => 'title_post_3', 'frontend_title' => 'public 3']);
+    $this->eliminateUFGroupOne();
 
     $this->callAPISuccess('contribution', 'completetransaction', [
       'id' => $contributionID,
@@ -3074,7 +3087,7 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contact_id' => $this->_individualId,
     ])['values'];
 
-    $this->assertEquals(3, count($activities));
+    $this->assertCount(3, $activities);
     $activityNames = array_count_values(CRM_Utils_Array::collect('activity_name', $activities));
     // record two activities before and after completing payment for Event registration
     $this->assertEquals(2, $activityNames['Event Registration']);
@@ -3087,7 +3100,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'This letter is a confirmation that your registration has been received and your status has been updated to Registered.',
       'First Name: Logged In',
       'Public title',
-    ], ['Back end title']);
+      'public 2',
+      'public 3',
+    ], ['Back end title', 'title_post_2', 'title_post_3']);
     $mut->stop();
   }
 
@@ -3334,7 +3349,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       '$ 100.00',
       'Contribution Information',
-      'Please print this confirmation for your records',
     ], [
       'Event',
     ]);
@@ -4094,7 +4108,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'From: CiviCRM LLC <api@civicrm.org>',
       'Contribution Information',
-      'Please print this confirmation for your records',
     ], [
       'Event',
     ]);
@@ -4115,7 +4128,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'From: ' . $domain['from_name'] . ' <' . $domain['from_email'] . '>',
       'Contribution Information',
-      'Please print this confirmation for your records',
     ], [
       'Event',
     ]);
@@ -4138,7 +4150,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'From: ' . $domain['from_name'] . ' <' . $domain['from_email'] . '>',
       'Contribution Information',
-      'Please print this confirmation for your records',
     ], [
       'Event',
     ]
@@ -4180,7 +4191,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'From: CiviCRM LLC <contributionpage@civicrm.org>',
       'Contribution Information',
-      'Please print this confirmation for your records',
     ], [
       'Event',
     ]);
@@ -4206,7 +4216,6 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
     $mut->checkMailLog([
       'From: ' . $domain['name'] . ' <' . $domain['domain_email'] . '>',
       'Contribution Information',
-      'Please print this confirmation for your records',
     ], [
       'Event',
     ]);
@@ -4344,6 +4353,9 @@ class api_v3_ContributionTest extends CiviUnitTestCase {
       'contribution_status_id' => 'Completed',
       'trxn_id' => uniqid(),
     ]);
+    $payments = $this->callAPISuccess('Contribution', 'get', ['sequential' => 1])['values'];
+    //Assert if first payment and repeated payment has the same contribution amount.
+    $this->assertEquals($payments[0]['total_amount'], $payments[1]['total_amount']);
     $this->callAPISuccessGetCount('Contribution', [], 2);
   }
 

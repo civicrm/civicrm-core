@@ -40,9 +40,9 @@ trait CRMTraits_Profile_ProfileTrait {
    * @param array $ufGroupParams
    */
   protected function createJoinedProfile($joinParams, $ufGroupParams = []) {
-    $this->createProfile($ufGroupParams);
+    $profileID = $this->createProfile($ufGroupParams);
     $joinParams = array_merge([
-      'uf_group_id' => 'our profile',
+      'uf_group_id' => $profileID,
       'entity_table' => 'civicrm_contribution_page',
       'weight' => 1,
     ], $joinParams);
@@ -59,6 +59,8 @@ trait CRMTraits_Profile_ProfileTrait {
    * Create a profile.
    *
    * @param $ufGroupParams
+   *
+   * @return int
    */
   protected function createProfile($ufGroupParams) {
     $profile = $this->callAPISuccess('UFGroup', 'create', array_merge([
@@ -74,6 +76,31 @@ trait CRMTraits_Profile_ProfileTrait {
       'uf_group_id' => $profile['id'],
       'field_name' => 'first_name',
     ]);
+    return $profile['id'];
+  }
+
+  /**
+   * Ensure we don't have a profile with the id or one to ensure that we are not casting an array to it.
+   */
+  protected function eliminateUFGroupOne() {
+    $profileID = $this->createProfile(['name' => 'dummy_for_removing']);
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_uf_join SET uf_group_id = $profileID WHERE uf_group_id = 1");
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_uf_field SET uf_group_id = $profileID WHERE uf_group_id = 1");
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_uf_group SET id = 900 WHERE id = 1');
+    $this->ids['UFGroup']['dummy'] = $profileID;
+  }
+
+  /**
+   * Bring back UF group one.
+   */
+  protected function restoreUFGroupOne() {
+    if (!isset($this->ids['UFGroup']['dummy'])) {
+      return;
+    }
+    $profileID = $this->ids['UFGroup']['dummy'];
+    CRM_Core_DAO::executeQuery('UPDATE civicrm_uf_group SET id = 1 WHERE id = 900');
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_uf_join SET uf_group_id = 1 WHERE uf_group_id = $profileID");
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_uf_field SET uf_group_id = 1 WHERE uf_group_id = $profileID");
   }
 
 }

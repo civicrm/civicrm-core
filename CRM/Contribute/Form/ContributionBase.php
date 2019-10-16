@@ -286,9 +286,6 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
 
     // we do not want to display recently viewed items, so turn off
     $this->assign('displayRecent', FALSE);
-    // Contribution page values are cleared from session, so can't use normal Printer Friendly view.
-    // Use Browser Print instead.
-    $this->assign('browserPrint', TRUE);
 
     // action
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'add');
@@ -471,7 +468,9 @@ class CRM_Contribute_Form_ContributionBase extends CRM_Core_Form {
       CRM_Utils_Array::value('cancelSubscriptionUrl', $this->_values)
     );
 
-    $this->setTitle(($this->_pcpId ? $this->_pcpInfo['title'] : $this->_values['title']));
+    $title = !empty($this->_values['frontend_title']) ? $this->_values['frontend_title'] : $this->_values['title'];
+
+    $this->setTitle(($this->_pcpId ? $this->_pcpInfo['title'] : $title));
     $this->_defaults = [];
 
     $this->_amount = $this->get('amount');

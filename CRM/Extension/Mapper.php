@@ -286,6 +286,8 @@ class CRM_Extension_Mapper {
     }
 
     if (!is_array($moduleExtensions)) {
+      $compat = CRM_Extension_System::getCompatibilityInfo();
+
       // Check canonical module list
       $moduleExtensions = [];
       $sql = '
@@ -296,6 +298,9 @@ class CRM_Extension_Mapper {
       ';
       $dao = CRM_Core_DAO::executeQuery($sql);
       while ($dao->fetch()) {
+        if (!empty($compat[$dao->full_name]['force-uninstall'])) {
+          continue;
+        }
         try {
           $moduleExtensions[] = [
             'prefix' => $dao->file,

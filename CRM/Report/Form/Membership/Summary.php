@@ -342,7 +342,7 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
       }
 
       // build chart.
-      CRM_Utils_OpenFlashChart::chart($graphRows, $this->_params['charts'], $this->_interval);
+      CRM_Utils_Chart::chart($graphRows, $this->_params['charts'], $this->_interval);
     }
     parent::endPostProcess();
   }

@@ -2032,6 +2032,7 @@ class CRM_Contact_BAO_Query {
       case 'relation_active_period_date_low':
       case 'relation_target_name':
       case 'relation_status':
+      case 'relation_description':
       case 'relation_date_low':
       case 'relation_date_high':
         $this->relationship($values);
@@ -4160,6 +4161,7 @@ WHERE  $smartGroupClause
     // also get values array for relation_target_name
     // for relationship search we always do wildcard
     $relationType = $this->getWhereValues('relation_type_id', $grouping);
+    $description = $this->getWhereValues('relation_description', $grouping);
     $targetName = $this->getWhereValues('relation_target_name', $grouping);
     $relStatus = $this->getWhereValues('relation_status', $grouping);
     $targetGroup = $this->getWhereValues('relation_target_group', $grouping);
@@ -4274,6 +4276,13 @@ WHERE  $smartGroupClause
       else {
         $this->_qill[$grouping][] = implode(", ", $qillNames);
       }
+    }
+
+    // Description
+    if (!empty($description[2]) && trim($description[2])) {
+      $this->_qill[$grouping][] = ts('Relationship description - ' . $description[2]);
+      $description = CRM_Core_DAO::escapeString(trim($description[2]));
+      $where[$grouping][] = "civicrm_relationship.description LIKE '%{$description}%'";
     }
 
     // Note we do not currently set mySql to handle timezones, so doing this the old-fashioned way
@@ -6419,6 +6428,10 @@ AND   displayRelType.is_active = 1
         if (!empty($pseudoConstantMetadata['optionGroupName'])
           || $this->isPseudoFieldAnFK($fieldSpec)
         ) {
+          // dev/core#1305 @todo this is not the right thing to do but for now avoid fatal error
+          if (empty($fieldSpec['bao'])) {
+            continue;
+          }
           $sortedOptions = $fieldSpec['bao']::buildOptions($fieldSpec['name'], NULL, [
             'orderColumn' => CRM_Utils_Array::value('labelColumn', $pseudoConstantMetadata, 'label'),
           ]);

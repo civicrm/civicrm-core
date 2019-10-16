@@ -69,6 +69,8 @@ class CRM_Upgrade_Incremental_php_FiveNineteen extends CRM_Upgrade_Incremental_B
   public function upgrade_5_19_alpha1($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
     $this->addTask('Add api4 menu', 'api4Menu');
+    $this->addTask('Add is_active field to civicrm_status_pref', 'addColumn', 'civicrm_status_pref', 'is_active',
+      "tinyint(4) DEFAULT '1' COMMENT 'Is this status check active'", FALSE, '5.19.0');
   }
 
   /**

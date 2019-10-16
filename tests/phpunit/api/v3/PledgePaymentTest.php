@@ -35,12 +35,15 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
 
   protected $_individualId;
   protected $_pledgeID;
-  protected $_apiversion = 3;
   protected $_contributionID;
   protected $_financialTypeId = 1;
   protected $_entity = 'PledgePayment';
-  public $DBResetRequired = TRUE;
 
+  /**
+   * Setup for tests.
+   *
+   * @throws \CRM_Core_Exception
+   */
   public function setUp() {
     parent::setUp();
     $this->_individualId = $this->individualCreate();
@@ -48,6 +51,10 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
     $this->_contributionID = $this->contributionCreate(['contact_id' => $this->_individualId]);
   }
 
+  /**
+   * Clean up after function.
+   * @throws \CRM_Core_Exception
+   */
   public function tearDown() {
     $tablesToTruncate = [
       'civicrm_contribution',
@@ -106,7 +113,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'id' => $this->_pledgeID,
       'return' => 'pledge_status',
     ]);
-    $this->assertEquals('Pending', $checkStatus['pledge_status']);
+    $this->assertEquals('Pending Label**', $checkStatus['pledge_status']);
 
     //Execute process_pledge job log.
     $result = $this->callAPISuccess('Job', 'process_pledge', []);
@@ -129,7 +136,7 @@ class api_v3_PledgePaymentTest extends CiviUnitTestCase {
       'id' => $this->_pledgeID,
       'return' => 'pledge_status',
     ]);
-    $this->assertEquals('Pending', $checkStatus['pledge_status']);
+    $this->assertEquals('Pending Label**', $checkStatus['pledge_status']);
 
     //Make first payment.
     $paymentParams = [

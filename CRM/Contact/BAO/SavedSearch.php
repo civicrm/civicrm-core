@@ -325,43 +325,6 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   }
 
   /**
-   * Given a saved search compute the clause and the tables and store it for future use.
-   */
-  public function buildClause() {
-    $fv = unserialize($this->form_values);
-
-    if ($this->mapping_id) {
-      $params = CRM_Core_BAO_Mapping::formattedFields($fv);
-    }
-    else {
-      $params = CRM_Contact_BAO_Query::convertFormValues($fv);
-    }
-
-    if (!empty($params)) {
-      $tables = $whereTables = [];
-      $this->where_clause = CRM_Contact_BAO_Query::getWhereClause($params, NULL, $tables, $whereTables);
-      if (!empty($tables)) {
-        $this->select_tables = serialize($tables);
-      }
-      if (!empty($whereTables)) {
-        $this->where_tables = serialize($whereTables);
-      }
-    }
-  }
-
-  /**
-   * Save the search.
-   *
-   * @param bool $hook
-   */
-  public function save($hook = TRUE) {
-    // first build the computed fields
-    $this->buildClause();
-
-    parent::save($hook);
-  }
-
-  /**
    * Given an id, get the name of the saved search.
    *
    * @param int $id

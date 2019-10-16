@@ -97,6 +97,8 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
   /**
    * PR 13477 - Fix incorrect display of Line Items created via API
    * when printing invoice (for Participants).
+   *
+   * @throws \CRM_Core_Exception
    */
   public function testInvoiceForLineItems() {
 
@@ -150,7 +152,7 @@ class CRM_Contribute_Form_Task_InvoiceTest extends CiviUnitTestCase {
         return $total;
       }),
       'financial_type_id' => $priceFieldValues['values'][0]['financial_type_id'],
-      'contribution_status_id' => 'Completed',
+      'contribution_status_id' => 'Pending',
       'currency' => 'USD',
       'line_items' => $lineItemParams,
     ];

@@ -487,12 +487,12 @@ class CRM_Contact_Form_Search_Criteria {
   }
 
   /**
-   * @param $form
+   * @param CRM_Core_Form_Search $form
    */
   public static function relationship(&$form) {
     $form->add('hidden', 'hidden_relationship', 1);
 
-    $allRelationshipType = [];
+    $form->add('text', 'relation_description', ts('Description'), ['class' => 'twenty']);
     $allRelationshipType = CRM_Contact_BAO_Relationship::getContactRelationshipType(NULL, NULL, NULL, NULL, TRUE);
     $form->add('select', 'relation_type_id', ts('Relationship Type'), ['' => ts('- select -')] + $allRelationshipType, FALSE, ['multiple' => TRUE, 'class' => 'crm-select2']);
     $form->addElement('text', 'relation_target_name', ts('Target Contact'), CRM_Core_DAO::getAttribute('CRM_Contact_DAO_Contact', 'sort_name'));

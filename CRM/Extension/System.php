@@ -264,7 +264,7 @@ class CRM_Extension_System {
    */
   public function getCache() {
     if ($this->cache === NULL) {
-      $cacheGroup = md5(serialize(['ext', $this->parameters]));
+      $cacheGroup = md5(serialize(['ext', $this->parameters, CRM_Utils_System::version()]));
       // Extension system starts before container. Manage our own cache.
       $this->cache = CRM_Utils_Cache::create([
         'name' => $cacheGroup,
@@ -361,6 +361,9 @@ class CRM_Extension_System {
 
       default:
         $extensionRow['statusLabel'] = '(' . $extensionRow['status'] . ')';
+    }
+    if ($manager->isIncompatible($obj->key)) {
+      $extensionRow['statusLabel'] = ts('Obsolete') . ($extensionRow['statusLabel'] ? (' - ' . $extensionRow['statusLabel']) : '');
     }
     return $extensionRow;
   }

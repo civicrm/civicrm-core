@@ -94,9 +94,9 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
       parent::preProcess();
     }
 
-    // check that all the contribution ids have status Completed, Pending, Refunded.
+    // check that all the contribution ids have status Completed, Pending, Refunded, or Partially Paid.
     $this->_contributionStatusId = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
-    $status = ['Completed', 'Pending', 'Refunded'];
+    $status = ['Completed', 'Pending', 'Refunded', 'Partially paid'];
     $statusId = [];
     foreach ($this->_contributionStatusId as $key => $value) {
       if (in_array($value, $status)) {
@@ -107,7 +107,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
     $query = "SELECT count(*) FROM civicrm_contribution WHERE contribution_status_id NOT IN ($Id) AND {$this->_componentClause}";
     $count = CRM_Core_DAO::singleValueQuery($query);
     if ($count != 0) {
-      CRM_Core_Error::statusBounce(ts('Please select only contributions with Completed, Pending, Refunded status.'));
+      CRM_Core_Error::statusBounce(ts('Please select only contributions with Completed, Pending, Refunded, or Partially Paid status.'));
     }
 
     // we have all the contribution ids, so now we get the contact ids
@@ -285,6 +285,7 @@ class CRM_Contribute_Form_Task_Invoice extends CRM_Contribute_Form_Task {
 
       if ($contribution->contribution_status_id == $refundedStatusId || $contribution->contribution_status_id == $cancelledStatusId) {
         if (is_null($contribution->creditnote_id)) {
+          CRM_Core_Error::deprecatedFunctionWarning('This it the wrong place to add a credit note id since the id is added when the status is changed in the Contribution::Create function- hopefully it is never hit');
           $creditNoteId = CRM_Contribute_BAO_Contribution::createCreditNoteId();
           CRM_Core_DAO::setFieldValue('CRM_Contribute_DAO_Contribution', $contribution->id, 'creditnote_id', $creditNoteId);
         }

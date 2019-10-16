@@ -121,6 +121,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       ['contact_type' => 'Individual', 'name' => 'email', 1],
       ['name' => 'trxn_id'],
     ];
+    $this->hookClass->setHook('civicrm_export', array($this, 'confirmHookWasCalled'));
 
     $this->doExportTest([
       'ids' => $this->contributionIDs,
@@ -129,6 +130,20 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'exportMode' => CRM_Export_Form_Select::CONTRIBUTE_EXPORT,
       'componentClause' => 'civicrm_contribution.id IN ( ' . implode(',', $this->contributionIDs) . ')',
     ]);
+    $this->assertContains('display', array_values($this->csv->getHeader()));
+    $row = $this->csv->fetchOne(0);
+    $this->assertEquals('This is a test', $row['display']);
+  }
+
+  /**
+   * Implements hook_civicrm_export().
+   *
+   */
+  public function confirmHookWasCalled(&$exportTempTable, &$headerRows, &$sqlColumns, $exportMode, $componentTable, $ids) {
+    $sqlColumns['display'] = 'display varchar(255)';
+    $headerRows[] = 'display';
+    CRM_Core_DAO::executeQuery("ALTER TABLE $exportTempTable ADD COLUMN display varchar(255)");
+    CRM_Core_DAO::executeQuery("UPDATE $exportTempTable SET display = 'This is a test'");
   }
 
   /**
@@ -288,7 +303,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'Campaign ID' => '',
       'Status Override' => '',
       'Total Amount' => '200.00',
-      'Contribution Status' => 'Pending',
+      'Contribution Status' => 'Pending Label**',
       'Date Received' => '2019-07-25 07:34:23',
       'Payment Method' => 'Check',
       'Transaction ID' => '',
@@ -667,9 +682,14 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
     $this->setUpContactExportData();
     $this->entity = 'Contact';
     $this->createCustomGroupWithFieldsOfAllTypes();
+    $longString = 'Blah';
+    for ($i = 0; $i < 70; $i++) {
+      $longString .= 'Blah';
+    }
+
     $this->callAPISuccess('Contact', 'create', [
       'id' => $this->contactIDs[1],
-      $this->getCustomFieldName('text') => 'BlahdeBlah',
+      $this->getCustomFieldName('text') => $longString,
       $this->getCustomFieldName('country') => 'LA',
       'api.Address.create' => ['location_type_id' => 'Billing', 'city' => 'Waipu'],
     ]);
@@ -684,7 +704,7 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
       'ids' => [$this->contactIDs[1]],
     ]);
     $row = $this->csv->fetchOne();
-    $this->assertEquals('BlahdeBlah', $row['Enter text here']);
+    $this->assertEquals($longString, $row['Enter text here']);
     $this->assertEquals('Waipu', $row['Billing-City']);
     $this->assertEquals("Lao People's Democratic Republic", $row['Country']);
   }
@@ -1025,6 +1045,17 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test merging same address when specifying fields.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
+   */
+  public function testMergeSameAddressSpecifyFields() {
+    $this->setUpContactSameAddressExportData();
+    $this->doExportTest(['mergeSameAddress' => TRUE, 'fields' => [['contact_type' => 'Individual', 'name' => 'master_id', 'location_type_id' => 1]]]);
+  }
+
+  /**
    * Test the merge same address option.
    *
    * @throws \CRM_Core_Exception
@@ -1159,6 +1190,31 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test exporting when no rows are retrieved.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \League\Csv\Exception
+   */
+  public function testExportNoRows() {
+    $contactA = $this->callAPISuccess('contact', 'create', [
+      'first_name' => 'John',
+      'last_name' => 'Doe',
+      'contact_type' => 'Individual',
+    ]);
+    $this->doExportTest([
+      'selectAll' => TRUE,
+      'ids' => [$contactA['id']],
+      'exportParams' => [
+        'postal_mailing_export' => [
+          'postal_mailing_export' => TRUE,
+        ],
+        'mergeSameAddress' => TRUE,
+      ],
+    ]);
+    $this->assertEquals('Contact ID', $this->csv->getHeader()[0]);
+  }
+
+  /**
    * Test that deceased and do not mail contacts are removed from contacts before
    *
    * @dataProvider getReasonsNotToMail
@@ -1178,6 +1234,21 @@ class CRM_Export_BAO_ExportTest extends CiviUnitTestCase {
 
     $contactB = $this->callAPISuccess('contact', 'create', array_merge([
       'first_name' => 'Jane',
+      'last_name' => 'Doe',
+      'contact_type' => 'Individual',
+    ], $reason));
+
+    // Create another contact not included in the exporrt set.
+    $this->callAPISuccess('contact', 'create', array_merge([
+      'first_name' => 'Janet',
+      'last_name' => 'Doe',
+      'contact_type' => 'Individual',
+      'api.address.create' => ['supplemental_address_1' => 'An address'],
+    ], $reason));
+
+    // Create another contact not included in the exporrt set.
+    $this->callAPISuccess('contact', 'create', array_merge([
+      'first_name' => 'Janice',
       'last_name' => 'Doe',
       'contact_type' => 'Individual',
     ], $reason));

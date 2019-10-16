@@ -576,7 +576,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
 
     //if contribution status is pending then set pay later
     $this->_params['is_pay_later'] = FALSE;
-    if ($this->_params['contribution_status_id'] == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus())) {
+    if ($this->_params['contribution_status_id'] == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label'))) {
       $this->_params['is_pay_later'] = 1;
     }
 
@@ -588,7 +588,7 @@ class CRM_Member_Form_MembershipRenewal extends CRM_Member_Form {
     }
 
     // @todo Move this into CRM_Member_BAO_Membership::processMembership
-    $pending = ($this->_params['contribution_status_id'] == array_search('Pending', CRM_Contribute_PseudoConstant::contributionStatus())) ? TRUE : FALSE;
+    $pending = ($this->_params['contribution_status_id'] == CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'));
     list($membership) = CRM_Member_BAO_Membership::processMembership(
       $this->_contactID, $this->_params['membership_type_id'][1], $isTestMembership,
       $renewalDate, NULL, $customFieldsFormatted, $numRenewTerms, $this->_membershipId,

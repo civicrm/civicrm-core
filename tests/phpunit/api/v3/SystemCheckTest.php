@@ -88,9 +88,33 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
   }
 
   /**
-   * Items hushed through tomorrow shouldn't show up.
+   * Disabled items should never show up.
+   *
    * @param int $version
+   *
    * @dataProvider versionThreeAndFour
+   */
+  public function testIsInactive($version) {
+    $this->_apiversion = $version;
+    $this->callAPISuccess('StatusPreference', 'create', [
+      'name' => 'checkDefaultMailbox',
+      'is_active' => 0,
+    ]);
+    $result = $this->callAPISuccess('System', 'check', [])['values'];
+    foreach ($result as $check) {
+      if ($check['name'] === 'checkDefaultMailbox') {
+        $this->fail('Check should have been skipped');
+      }
+    }
+  }
+
+  /**
+   * Items hushed through tomorrow shouldn't show up.
+   *
+   * @param int $version
+   *
+   * @dataProvider versionThreeAndFour
+   * @throws \Exception
    */
   public function testSystemCheckHushFuture($version) {
     $this->_apiversion = $version;
@@ -103,7 +127,7 @@ class api_v3_SystemCheckTest extends CiviUnitTestCase {
     $statusPreference = $this->callAPISuccess('StatusPreference', 'create', $this->_params);
     $result = $this->callAPISuccess('System', 'check', []);
     foreach ($result['values'] as $check) {
-      if ($check['name'] == 'checkDefaultMailbox') {
+      if ($check['name'] === 'checkDefaultMailbox') {
         $testedCheck = $check;
         break;
       }

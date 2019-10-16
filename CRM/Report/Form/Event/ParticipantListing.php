@@ -353,7 +353,7 @@ class CRM_Report_Form_Event_ParticipantListing extends CRM_Report_Form {
           'contribution_status_id' => array(
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
             'default' => NULL,
           ),
         ),
@@ -651,7 +651,7 @@ ORDER BY  cv.label
     $entryFound = FALSE;
     $eventType = CRM_Core_OptionGroup::values('event_type');
     $financialTypes = CRM_Contribute_PseudoConstant::financialType();
-    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus();
+    $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'label');
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
 
     foreach ($rows as $rowNum => $row) {

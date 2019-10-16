@@ -42,7 +42,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
 
   protected $_charts = [
     '' => 'Tabular',
-    'bar_3dChart' => 'Bar Chart',
+    'barchart' => 'Bar Chart',
   ];
 
   /**
@@ -625,7 +625,7 @@ class CRM_Report_Form_Mailing_Summary extends CRM_Report_Form {
     $chartInfo['xSize'] = ((count($rows) * 125) + (count($rows) * count($criteria) * 40));
 
     // build the chart.
-    CRM_Utils_OpenFlashChart::buildChart($chartInfo, $this->_params['charts']);
+    CRM_Utils_Chart::buildChart($chartInfo, $this->_params['charts']);
     $this->assign('chartType', $this->_params['charts']);
   }
 

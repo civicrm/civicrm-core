@@ -592,6 +592,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function on the contribution page.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitEmailReceipt() {
     $form = new CRM_Contribute_Form_Contribution();
@@ -606,7 +609,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
     $mut->checkMailLog([
-      '<p>Please print this receipt for your records.</p>',
+      'Contribution Information',
     ]);
     $mut->stop();
   }
@@ -631,7 +634,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
     $mut->checkMailLog([
-      '<p>Please print this receipt for your records.</p>',
+      'Thank you for your support',
       '<testloggedin@example.com>',
     ]);
     $mut->stop();

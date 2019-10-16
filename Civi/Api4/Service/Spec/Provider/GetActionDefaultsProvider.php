@@ -56,6 +56,11 @@ class GetActionDefaultsProvider implements Generic\SpecProviderInterface {
     if ($isTestField) {
       $isTestField->setDefaultValue('0');
     }
+
+    $isTemplateField = $spec->getFieldByName('is_template');
+    if ($isTemplateField) {
+      $isTemplateField->setDefaultValue('0');
+    }
   }
 
   /**

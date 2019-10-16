@@ -866,6 +866,10 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
    *   Respect logged in user permissions.
    *
    * @return array|bool
+   *
+   * @throws \API_Exception
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function merge($dupePairs = [], $cacheParams = [], $mode = 'safe',
                                $redirectForPerformance = FALSE, $checkPermissions = TRUE
@@ -883,16 +887,17 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
           unset($dupePairs[$index]);
           continue;
         }
-        CRM_Utils_Hook::merge('flip', $dupes, $dupes['dstID'], $dupes['srcID']);
-        $mainId = $dupes['dstID'];
-        $otherId = $dupes['srcID'];
-
-        if (!$mainId || !$otherId) {
-          // return error
-          return FALSE;
+        if (($result = self::dedupePair($dupes, $mode, $checkPermissions, $cacheKeyString)) === FALSE) {
+          unset($dupePairs[$index]);
+          continue;
         }
-
-        self::dedupePair($resultStats, $deletedContacts, $mode, $checkPermissions, $mainId, $otherId, $cacheKeyString);
+        if (!empty($result['merged'])) {
+          $deletedContacts[] = $result['merged'][0]['other_id'];
+          $resultStats['merged'][] = ($result['merged'][0]);
+        }
+        else {
+          $resultStats['skipped'][] = ($result['skipped'][0]);
+        }
       }
 
       if ($cacheKeyString && !$redirectForPerformance) {
@@ -1087,43 +1092,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         continue;
       }
       foreach (['main' => $main, 'other' => $other] as $moniker => $contact) {
-        $value = $label = CRM_Utils_Array::value($field, $contact);
-        $fieldSpec = $fields[$field];
-        if (!empty($fieldSpec['serialize']) && is_array($value)) {
-          // In practice this only applies to preferred_communication_method as the sub types are skipped above
-          // and no others are serialized.
-          $labels = [];
-          foreach ($value as $individualValue) {
-            $labels[] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $field, $individualValue);
-          }
-          $label = implode(', ', $labels);
-          // We serialize this due to historic handling but it's likely that if we just left it as an
-          // array all would be well & we would have less code.
-          $value = CRM_Core_DAO::serializeField($value, $fieldSpec['serialize']);
-        }
-        elseif (!empty($fieldSpec['type']) && $fieldSpec['type'] == CRM_Utils_Type::T_DATE) {
-          if ($value) {
-            $value = str_replace('-', '', $value);
-            $label = CRM_Utils_Date::customFormat($label);
-          }
-          else {
-            $value = "null";
-          }
-        }
-        elseif (!empty($fields[$field]['type']) && $fields[$field]['type'] == CRM_Utils_Type::T_BOOLEAN) {
-          if ($label === '0') {
-            $label = ts('[ ]');
-          }
-          if ($label === '1') {
-            $label = ts('[x]');
-          }
-        }
-        elseif (!empty($fieldSpec['pseudoconstant'])) {
-          $label = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $field, $value);
-        }
-        elseif ($field == 'current_employer_id' && !empty($value)) {
-          $label = "$value (" . CRM_Contact_BAO_Contact::displayName($value) . ")";
-        }
+        list($label, $value) = self::getFieldValueAndLabel($field, $contact);
         $rows["move_$field"][$moniker] = $label;
         if ($moniker == 'other') {
           //CRM-14334
@@ -2111,20 +2080,26 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
   /**
    * Dedupe a pair of contacts.
    *
-   * @param array $resultStats
-   * @param array $deletedContacts
+   * @param array $dupes
    * @param string $mode
    * @param bool $checkPermissions
-   * @param int $mainId
-   * @param int $otherId
    * @param string $cacheKeyString
    *
+   * @return bool|array
    * @throws \CRM_Core_Exception
    * @throws \CiviCRM_API3_Exception
    * @throws \API_Exception
    */
-  protected static function dedupePair(&$resultStats, &$deletedContacts, $mode, $checkPermissions, $mainId, $otherId, $cacheKeyString) {
+  protected static function dedupePair($dupes, $mode = 'safe', $checkPermissions = TRUE, $cacheKeyString = NULL) {
+    CRM_Utils_Hook::merge('flip', $dupes, $dupes['dstID'], $dupes['srcID']);
+    $mainId = $dupes['dstID'];
+    $otherId = $dupes['srcID'];
+    $resultStats = [];
 
+    if (!$mainId || !$otherId) {
+      // return error
+      return FALSE;
+    }
     $migrationInfo = [];
     $conflicts = [];
     if (!CRM_Dedupe_Merger::skipMerge($mainId, $otherId, $migrationInfo, $mode, $conflicts)) {
@@ -2133,7 +2108,6 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         'main_id' => $mainId,
         'other_id' => $otherId,
       ];
-      $deletedContacts[] = $otherId;
     }
     else {
       $resultStats['skipped'][] = [
@@ -2149,6 +2123,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     else {
       CRM_Core_BAO_PrevNextCache::deletePair($mainId, $otherId, $cacheKeyString);
     }
+    return $resultStats;
   }
 
   /**
@@ -2537,6 +2512,57 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'hold_date',
     ];
     return $keysToIgnore;
+  }
+
+  /**
+   * Get the field value & label for the given field.
+   *
+   * @param $field
+   * @param $contact
+   *
+   * @return array
+   * @throws \Exception
+   */
+  private static function getFieldValueAndLabel($field, $contact): array {
+    $fields = self::getMergeFieldsMetadata();
+    $value = $label = CRM_Utils_Array::value($field, $contact);
+    $fieldSpec = $fields[$field];
+    if (!empty($fieldSpec['serialize']) && is_array($value)) {
+      // In practice this only applies to preferred_communication_method as the sub types are skipped above
+      // and no others are serialized.
+      $labels = [];
+      foreach ($value as $individualValue) {
+        $labels[] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $field, $individualValue);
+      }
+      $label = implode(', ', $labels);
+      // We serialize this due to historic handling but it's likely that if we just left it as an
+      // array all would be well & we would have less code.
+      $value = CRM_Core_DAO::serializeField($value, $fieldSpec['serialize']);
+    }
+    elseif (!empty($fieldSpec['type']) && $fieldSpec['type'] == CRM_Utils_Type::T_DATE) {
+      if ($value) {
+        $value = str_replace('-', '', $value);
+        $label = CRM_Utils_Date::customFormat($label);
+      }
+      else {
+        $value = "null";
+      }
+    }
+    elseif (!empty($fields[$field]['type']) && $fields[$field]['type'] == CRM_Utils_Type::T_BOOLEAN) {
+      if ($label === '0') {
+        $label = ts('[ ]');
+      }
+      if ($label === '1') {
+        $label = ts('[x]');
+      }
+    }
+    elseif (!empty($fieldSpec['pseudoconstant'])) {
+      $label = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $field, $value);
+    }
+    elseif ($field == 'current_employer_id' && !empty($value)) {
+      $label = "$value (" . CRM_Contact_BAO_Contact::displayName($value) . ")";
+    }
+    return [$label, $value];
   }
 
 }

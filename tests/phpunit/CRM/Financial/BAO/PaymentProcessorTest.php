@@ -63,4 +63,32 @@ class CRM_Financial_BAO_PaymentProcessorTest extends CiviUnitTestCase {
     $this->assertEquals($cards, $expectedCards, 'Verify correct credit card types are returned');
   }
 
+  /**
+   * Test the processor retrieval function.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function testGetProcessors() {
+    $testProcessor = $this->dummyProcessorCreate();
+    $testProcessorID = $testProcessor->getID();
+    $liveProcessorID = $testProcessorID + 1;
+
+    $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(['BackOffice', 'TestMode']);
+    $this->markTestIncomplete('Not working yet :-(');
+    $this->assertEquals([$testProcessorID, 0], array_keys($processors), 'Only the test processor and the manual processor should be returned');
+
+    $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(['BackOffice', 'TestMode'], [$liveProcessorID]);
+    $this->assertEquals([$testProcessorID], array_keys($processors), 'Only the test processor should be returned');
+
+    $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(['BackOffice', 'TestMode'], [$testProcessorID]);
+    $this->assertEquals([$testProcessorID], array_keys($processors), 'Only the test processor should be returned');
+
+    $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(['BackOffice', 'LiveMode']);
+    $this->assertEquals([$liveProcessorID, 0], array_keys($processors), 'Only the Live processor and the manual processor should be returned');
+
+    $processors = CRM_Financial_BAO_PaymentProcessor::getPaymentProcessors(['BackOffice', 'LiveMode'], [$liveProcessorID]);
+    $this->assertEquals([$liveProcessorID], array_keys($processors), 'Only the Live processor should be returned');
+
+  }
+
 }

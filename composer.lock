@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f0b735ec69179cc1b69b87e335db9c7b",
+    "content-hash": "0ac00e2168797fa522d7a6f036a5e296",
     "packages": [
         {
             "name": "civicrm/civicrm-cxn-rpc",
@@ -2229,6 +2229,53 @@
             "time": "2017-05-10T20:08:17+00:00"
         },
         {
+            "name": "tplaner/when",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tplaner/When.git",
+                "reference": "c1ec099f421bff354cc5c929f83b94031423fc80"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tplaner/When/zipball/c1ec099f421bff354cc5c929f83b94031423fc80",
+                "reference": "c1ec099f421bff354cc5c929f83b94031423fc80",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "When\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Tom Planer",
+                    "email": "tplaner@gmail.com"
+                }
+            ],
+            "description": "Date/Calendar recursion library.",
+            "homepage": "https://github.com/tplaner/When",
+            "keywords": [
+                "date",
+                "datetime",
+                "recurrence",
+                "repeat",
+                "time"
+            ],
+            "time": "2019-01-11T21:59:13+00:00"
+        },
+        {
             "name": "zendframework/zend-escaper",
             "version": "2.4.13",
             "source": {
@@ -2708,6 +2755,7 @@
     "stability-flags": {
         "zetacomponents/mail": 20,
         "pear/validate_finance_creditcard": 20,
+        "tplaner/when": 20,
         "cache/integration-tests": 20
     },
     "prefer-stable": false,

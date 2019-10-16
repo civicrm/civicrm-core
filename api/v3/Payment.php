@@ -47,6 +47,9 @@ function civicrm_api3_payment_get($params) {
     $limit = CRM_Utils_Array::value('limit', $params['options']);
   }
   $params['options']['limit'] = 0;
+  if (isset($params['trxn_id'])) {
+    $params['financial_trxn_id.trxn_id'] = $params['trxn_id'];
+  }
   $eft = civicrm_api3('EntityFinancialTrxn', 'get', $params);
   if (!empty($eft['values'])) {
     $eftIds = [];
@@ -209,6 +212,10 @@ function _civicrm_api3_payment_get_spec(&$params) {
       'title' => 'Entity ID',
       'type' => CRM_Utils_Type::T_INT,
       'api.aliases' => ['contribution_id'],
+    ],
+    'trxn_id' => [
+      'title' => 'Transaction ID',
+      'type' => CRM_Utils_Type::T_STRING,
     ],
   ];
 }

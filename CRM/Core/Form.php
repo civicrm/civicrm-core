@@ -862,8 +862,7 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
       $params = array_merge($params, $addressParams);
     }
 
-    // @fixme it would be really nice to have a comment here so I had a clue why we are setting $fields[$name] = 1
-    // Also how does relate to similar code in CRM_Contact_BAO_Contact::addBillingNameFieldsIfOtherwiseNotSet()
+    // How does this relate to similar code in CRM_Contact_BAO_Contact::addBillingNameFieldsIfOtherwiseNotSet()?
     $nameFields = ['first_name', 'middle_name', 'last_name'];
     foreach ($nameFields as $name) {
       if (array_key_exists("billing_$name", $params)) {
@@ -871,6 +870,16 @@ class CRM_Core_Form extends HTML_QuickForm_Page {
         $params['preserveDBName'] = TRUE;
       }
     }
+
+    // For legacy reasons we set these creditcard expiry fields if present
+    if (isset($params['credit_card_exp_date'])) {
+      $params['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($params);
+      $params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($params);
+    }
+
+    // Assign IP address parameter
+    $params['ip_address'] = CRM_Utils_System::ipAddress();
+
     return $params;
   }
 

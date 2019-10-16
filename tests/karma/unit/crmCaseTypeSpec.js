@@ -186,6 +186,18 @@ describe('crmCaseType', function() {
               "is_active": "1"
             },
             {
+              "id": "10",
+              "name_a_b": "Homeless Services Coordinator is",
+              "label_a_b": "Homeless Services Coordinator is",
+              "name_b_a": "Homeless Services Coordinator",
+              "label_b_a": "Homeless Services Coordinator",
+              "description": "Homeless Services Coordinator",
+              "contact_type_a": "Individual",
+              "contact_type_b": "Individual",
+              "is_reserved": "0",
+              "is_active": "1"
+            },
+            {
               "id": "2",
               "name_a_b": "Spouse of",
               "label_a_b": "Spouse of",
@@ -196,9 +208,24 @@ describe('crmCaseType', function() {
               "contact_type_b": "Individual",
               "is_reserved": "0",
               "is_active": "1"
+            },
+            // include one where name is different from label
+            {
+              "id": "27",
+              "name_a_b": "GA123ab",
+              "label_a_b": "Guardian Angel is",
+              "name_b_a": "GA123ba",
+              "label_b_a": "Guardian Angel for",
+              "description": "Guardian Angel.",
+              "contact_type_a": "Individual",
+              "contact_type_b": "Individual",
+              "is_reserved": "0",
+              "is_active": "1"
             }
           ]
         },
+        // Where is this used in the tests?
+        // It seems to be in the format for the activity assignee.
         relTypesForm: {
           values: [
             {
@@ -451,6 +478,181 @@ describe('crmCaseType', function() {
           status: 'Completed',
           default_assignee_type: defaultAssigneeDefaultValue.value
         }]);
+      });
+    });
+
+    describe('when adding a role', function() {
+      beforeEach(inject(function ($controller) {
+        ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
+      }));
+
+      it('updates the case roles', function() {
+
+        // This line sort of simulates selecting a relationship type from the
+        // dropdown. It doesn't test that clicking picks the right value to
+        // add, just that if it did then the function that gets called does
+        // the right thing with it.
+        // Note the value returned by the dropdown is "backwards", e.g.
+        // for the client perspective direction the dropdown returns the other
+        // direction, which is also what's stored in the xml.
+        scope.addRole(scope.caseType.definition.caseRoles, 'Case Coordinator');
+
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'Case Coordinator',
+              displayLabel: 'Case Coordinator is'
+            }
+          ]
+        );
+      });
+
+      it('updates case roles if choose non-client-perspective direction', function() {
+        // again, the dropdown returns the opposite direction
+        scope.addRole(scope.caseType.definition.caseRoles, 'Homeless Services Coordinator is');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'Homeless Services Coordinator is',
+              displayLabel: 'Homeless Services Coordinator'
+            }
+          ]
+        );
+      });
+
+      it("doesn't add the same role twice", function() {
+        // This is in the mock casetype to start, so check if can add twice.
+        scope.addRole(scope.caseType.definition.caseRoles, 'Homeless Services Coordinator');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            }
+          ]
+        );
+      });
+    });
+
+    describe('when adding a role on-the-fly', function() {
+      beforeEach(inject(function ($controller) {
+        ctrl = $controller('CaseTypeCtrl', {$scope: scope, apiCalls: apiCalls});
+      }));
+
+      it('updates the case roles for unidirectional', function() {
+        // first simulate the ajax popup to create a new relationship type
+        var newType = {
+          "id": "33",
+          "name_a_b": "Some New Type is",
+          "label_a_b": "Some New Type is",
+          "name_b_a": "Some New Type for",
+          "label_b_a": "Some New Type for",
+          "description": "Some New Type",
+          "contact_type_a": "Individual",
+          "contact_type_b": "Individual",
+          "is_reserved": "0",
+          "is_active": "1"
+        };
+        apiCalls.relTypes.values.push(newType);
+
+        // now let the real code do what it does with the new type
+        scope.addRoleOnTheFly(scope.caseType.definition.caseRoles, newType);
+
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'Some New Type for',
+              displayLabel: 'Some New Type is'
+            }
+          ]
+        );
+
+        expect(scope.relationshipTypeOptions.slice(-2)).toEqual(
+          [
+            {
+              id: 'Some New Type is',
+              text: 'Some New Type for'
+            },
+            {
+              id: 'Some New Type for',
+              text: 'Some New Type is'
+            }
+          ]
+        );
+      });
+
+      it('updates the case roles for bidirectional', function() {
+        // first simulate the ajax popup to create a new relationship type
+        var newType = {
+          "id": "34",
+          "name_a_b": "Friend of",
+          "label_a_b": "Friend of",
+          "name_b_a": "Friend of",
+          "label_b_a": "Friend of",
+          "description": "Friend",
+          "contact_type_a": "Individual",
+          "contact_type_b": "Individual",
+          "is_reserved": "0",
+          "is_active": "1"
+        };
+        apiCalls.relTypes.values.push(newType);
+
+        // now let the real code do what it does with the new type
+        scope.addRoleOnTheFly(scope.caseType.definition.caseRoles, newType);
+
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'Friend of',
+              displayLabel: 'Friend of'
+            }
+          ]
+        );
+
+        expect(scope.relationshipTypeOptions.slice(-1)).toEqual(
+          [
+            {
+              id: 'Friend of',
+              text: 'Friend of'
+            }
+          ]
+        );
+
+        // Check that it did NOT add two entries for this bidirectional type
+        expect(scope.relationshipTypeOptions.slice(-2,-1)).not.toEqual(
+          [
+            {
+              id: 'Friend of',
+              text: 'Friend of'
+            }
+          ]
+        );
       });
     });
   });

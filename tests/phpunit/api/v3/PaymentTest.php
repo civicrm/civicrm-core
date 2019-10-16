@@ -108,6 +108,52 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   }
 
   /**
+   * Retrieve Payment using trxn_id.
+   */
+  public function testGetPaymentWithTrxnID() {
+    $this->_individualId2 = $this->individualCreate();
+    $params1 = [
+      'contact_id' => $this->_individualId,
+      'trxn_id' => 111111,
+      'total_amount' => 10,
+    ];
+    $contributionID1 = $this->contributionCreate($params1);
+
+    $params2 = [
+      'contact_id' => $this->_individualId2,
+      'trxn_id' => 222222,
+      'total_amount' => 20,
+    ];
+    $contributionID2 = $this->contributionCreate($params2);
+
+    $paymentParams = ['trxn_id' => 111111];
+    $payment = $this->callAPISuccess('payment', 'get', $paymentParams);
+    $expectedResult = [
+      $payment['id'] => [
+        'total_amount' => 10,
+        'trxn_id' => 111111,
+        'status_id' => 1,
+        'is_payment' => 1,
+        'contribution_id' => $contributionID1,
+      ],
+    ];
+    $this->checkPaymentResult($payment, $expectedResult);
+
+    $paymentParams = ['trxn_id' => 222222];
+    $payment = $this->callAPISuccess('payment', 'get', $paymentParams);
+    $expectedResult = [
+      $payment['id'] => [
+        'total_amount' => 20,
+        'trxn_id' => 222222,
+        'status_id' => 1,
+        'is_payment' => 1,
+        'contribution_id' => $contributionID2,
+      ],
+    ];
+    $this->checkPaymentResult($payment, $expectedResult);
+  }
+
+  /**
    * Test email receipt for partial payment.
    */
   public function testPaymentEmailReceipt() {
@@ -670,7 +716,28 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
   /**
    * Test create payment api for pay later contribution with partial payment.
    *
-   * @throws \Exception
+   * https://lab.civicrm.org/dev/financial/issues/69
+   */
+  public function testCreatePaymentIncompletePaymentPartialPayment() {
+    $contributionParams = [
+      'total_amount' => 100,
+      'currency' => 'USD',
+      'contact_id' => $this->_individualId,
+      'financial_type_id' => 1,
+      'contribution_status_id' => 2,
+    ];
+    $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
+    $this->callAPISuccess('Payment', 'create', [
+      'contribution_id' => $contribution['id'],
+      'total_amount' => 50,
+      'payment_instrument_id' => 'Cash',
+    ]);
+    $payments = $this->callAPISuccess('Payment', 'get', ['contribution_id' => $contribution['id']])['values'];
+    $this->assertCount(1, $payments);
+  }
+
+  /**
+   * Test create payment api for pay later contribution with partial payment.
    */
   public function testCreatePaymentPayLaterPartialPayment() {
     $this->createLoggedInUser();

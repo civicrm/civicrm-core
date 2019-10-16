@@ -54,6 +54,12 @@
       </td>
     </tr>
     <tr>
+      <td colspan="2">
+        {$form.relation_description.label}<br />
+        {$form.relation_description.html}
+      </td>
+    </tr>
+    <tr>
       <td colspan="2"><label>{ts}Start Date{/ts}</label></td>
     </tr>
     <tr>

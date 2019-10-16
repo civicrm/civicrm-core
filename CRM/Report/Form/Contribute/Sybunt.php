@@ -231,7 +231,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           'contribution_status_id' => [
             'title' => ts('Contribution Status'),
             'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-            'options' => CRM_Contribute_PseudoConstant::contributionStatus(),
+            'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search'),
             'default' => ['1'],
           ],
         ],
@@ -544,7 +544,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     ];
     if ($this->_params['charts']) {
       // build the chart.
-      CRM_Utils_OpenFlashChart::reportChart($graphRows, $this->_params['charts'], $interval, $chartInfo);
+      CRM_Utils_Chart::reportChart($graphRows, $this->_params['charts'], $interval, $chartInfo);
       $this->assign('chartType', $this->_params['charts']);
     }
   }

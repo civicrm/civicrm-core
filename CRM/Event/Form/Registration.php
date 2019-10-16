@@ -394,9 +394,6 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
 
     // we do not want to display recently viewed items on Registration pages
     $this->assign('displayRecent', FALSE);
-    // Registration page values are cleared from session, so can't use normal Printer Friendly view.
-    // Use Browser Print instead.
-    $this->assign('browserPrint', TRUE);
 
     $isShowLocation = CRM_Utils_Array::value('is_show_location', $this->_values['event']);
     $this->assign('isShowLocation', $isShowLocation);
@@ -697,12 +694,12 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * Handle process after the confirmation of payment by User.
    *
    * @param int $contactID
-   * @param null $contribution
-   * @param null $payment
+   * @param \CRM_Contribute_BAO_Contribution $contribution
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public function confirmPostProcess($contactID = NULL, $contribution = NULL, $payment = NULL) {
+  public function confirmPostProcess($contactID = NULL, $contribution = NULL) {
     // add/update contact information
-    $fields = array();
     unset($this->_params['note']);
 
     //to avoid conflict overwrite $this->_params
@@ -725,6 +722,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
       // CRM-10032
       $this->processFirstParticipant($participant->id);
     }
+    $this->_params['participantID'] = $participant->id;
+    $this->set('primaryParticipant', $this->_params);
 
     CRM_Core_BAO_CustomValueTable::postProcess($this->_params,
       'civicrm_participant',
@@ -745,18 +744,11 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     }
 
     if ($createPayment && $this->_values['event']['is_monetary'] && !empty($this->_params['contributionID'])) {
-      $paymentParams = array(
+      $paymentParams = [
         'participant_id' => $participant->id,
         'contribution_id' => $contribution->id,
-      );
-      $paymentPartcipant = CRM_Event_BAO_ParticipantPayment::create($paymentParams);
-    }
-
-    //set only primary participant's params for transfer checkout.
-    // The concept of contributeMode is deprecated.
-    if (($this->_contributeMode == 'checkout' || $this->_contributeMode == 'notify') && !empty($this->_params['is_primary'])) {
-      $this->_params['participantID'] = $participant->id;
-      $this->set('primaryParticipant', $this->_params);
+      ];
+      civicrm_api3('ParticipantPayment', 'create', $paymentParams);
     }
 
     $this->assign('action', $this->_action);
@@ -800,6 +792,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param int $contactID
    *
    * @return \CRM_Event_BAO_Participant
+   * @throws \CiviCRM_API3_Exception
    */
   public static function addParticipant(&$form, $contactID) {
     if (empty($form->_params)) {
@@ -1518,6 +1511,8 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
    * @param array $params
    *   Form values.
    * @param int $contactID
+   *
+   * @throws \CiviCRM_API3_Exception
    */
   public function processRegistration($params, $contactID = NULL) {
     $session = CRM_Core_Session::singleton();
@@ -1598,7 +1593,7 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
         }
 
         $this->set('value', $value);
-        $this->confirmPostProcess($contactID, NULL, NULL);
+        $this->confirmPostProcess($contactID, NULL);
 
         //lets get additional participant id to cancel.
         if ($this->_allowConfirmation && is_array($cancelledIds)) {
@@ -1627,66 +1622,79 @@ class CRM_Event_Form_Registration extends CRM_Core_Form {
     if ($this->_contributeMode != 'checkout' ||
       $this->_contributeMode != 'notify'
     ) {
-      $isTest = FALSE;
-      if ($this->_action & CRM_Core_Action::PREVIEW) {
-        $isTest = TRUE;
+      $this->sendMails($params, $registerByID, $participantCount);
+    }
+  }
+
+  /**
+   * Send Mail to participants.
+   *
+   * @param $params
+   * @param $registerByID
+   * @param array $participantCount
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function sendMails($params, $registerByID, array $participantCount) {
+    $isTest = FALSE;
+    if ($this->_action & CRM_Core_Action::PREVIEW) {
+      $isTest = TRUE;
+    }
+
+    //handle if no additional participant.
+    if (!$registerByID) {
+      $registerByID = $this->get('registerByID');
+    }
+    $primaryContactId = $this->get('primaryContactId');
+
+    //build an array of custom profile and assigning it to template.
+    $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID, NULL,
+      $primaryContactId, $isTest, TRUE
+    );
+
+    //lets carry all participant params w/ values.
+    foreach ($additionalIDs as $participantID => $contactId) {
+      $participantNum = NULL;
+      if ($participantID == $registerByID) {
+        $participantNum = 0;
+      }
+      else {
+        if ($participantNum = array_search('participant', $participantCount)) {
+          unset($participantCount[$participantNum]);
+        }
       }
 
-      //handle if no additional participant.
-      if (!$registerByID) {
-        $registerByID = $this->get('registerByID');
-      }
-      $primaryContactId = $this->get('primaryContactId');
-
-      //build an array of custom profile and assigning it to template.
-      $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID, NULL,
-        $primaryContactId, $isTest, TRUE
-      );
-
-      //lets carry all participant params w/ values.
-      foreach ($additionalIDs as $participantID => $contactId) {
-        $participantNum = NULL;
-        if ($participantID == $registerByID) {
-          $participantNum = 0;
-        }
-        else {
-          if ($participantNum = array_search('participant', $participantCount)) {
-            unset($participantCount[$participantNum]);
-          }
-        }
-
-        if ($participantNum === NULL) {
-          break;
-        }
-
-        //carry the participant submitted values.
-        $this->_values['params'][$participantID] = $params[$participantNum];
+      if ($participantNum === NULL) {
+        break;
       }
 
-      //lets send  mails to all with meanigful text, CRM-4320.
-      $this->assign('isOnWaitlist', $this->_allowWaitlist);
-      $this->assign('isRequireApproval', $this->_requireApproval);
+      //carry the participant submitted values.
+      $this->_values['params'][$participantID] = $params[$participantNum];
+    }
 
-      foreach ($additionalIDs as $participantID => $contactId) {
-        if ($participantID == $registerByID) {
-          //set as Primary Participant
-          $this->assign('isPrimary', 1);
+    //lets send  mails to all with meanigful text, CRM-4320.
+    $this->assign('isOnWaitlist', $this->_allowWaitlist);
+    $this->assign('isRequireApproval', $this->_requireApproval);
 
-          $customProfile = CRM_Event_BAO_Event::buildCustomProfile($participantID, $this->_values, NULL, $isTest);
+    foreach ($additionalIDs as $participantID => $contactId) {
+      if ($participantID == $registerByID) {
+        //set as Primary Participant
+        $this->assign('isPrimary', 1);
 
-          if (count($customProfile)) {
-            $this->assign('customProfile', $customProfile);
-            $this->set('customProfile', $customProfile);
-          }
+        $customProfile = CRM_Event_BAO_Event::buildCustomProfile($participantID, $this->_values, NULL, $isTest);
+
+        if (count($customProfile)) {
+          $this->assign('customProfile', $customProfile);
+          $this->set('customProfile', $customProfile);
         }
-        else {
-          $this->assign('isPrimary', 0);
-          $this->assign('customProfile', NULL);
-        }
-
-        //send Confirmation mail to Primary & additional Participants if exists
-        CRM_Event_BAO_Event::sendMail($contactId, $this->_values, $participantID, $isTest);
       }
+      else {
+        $this->assign('isPrimary', 0);
+        $this->assign('customProfile', NULL);
+      }
+
+      //send Confirmation mail to Primary & additional Participants if exists
+      CRM_Event_BAO_Event::sendMail($contactId, $this->_values, $participantID, $isTest);
     }
   }
 

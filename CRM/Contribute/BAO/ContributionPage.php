@@ -356,7 +356,7 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
         );
       }
 
-      $title = isset($values['title']) ? $values['title'] : CRM_Contribute_PseudoConstant::contributionPage($values['contribution_page_id']);
+      $title = isset($values['title']) ? $values['title'] : CRM_Contribute_BAO_Contribution_Utils::getContributionPageTitle($values['contribution_page_id']);
 
       // Set email variables explicitly to avoid leaky smarty variables.
       // All of these will be assigned to the template, replacing any that might be assigned elsewhere.
@@ -666,9 +666,15 @@ class CRM_Contribute_BAO_ContributionPage extends CRM_Contribute_DAO_Contributio
    * @return CRM_Contribute_DAO_ContributionPage
    */
   public static function copy($id) {
+    $session = CRM_Core_Session::singleton();
+
     $fieldsFix = [
       'prefix' => [
         'title' => ts('Copy of') . ' ',
+      ],
+      'replace' => [
+        'created_id' => $session->get('userID'),
+        'created_date' => date('YmdHis'),
       ],
     ];
     $copy = CRM_Core_DAO::copyGeneric('CRM_Contribute_DAO_ContributionPage', [
