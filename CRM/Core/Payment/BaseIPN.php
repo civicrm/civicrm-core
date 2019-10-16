@@ -134,16 +134,6 @@ class CRM_Core_Payment_BaseIPN {
       }
     }
 
-    if (!empty($ids['contributionRecur'])) {
-      $contributionRecur = new CRM_Contribute_BAO_ContributionRecur();
-      $contributionRecur->id = $ids['contributionRecur'];
-      if (!$contributionRecur->find(TRUE)) {
-        CRM_Core_Error::debug_log_message("Could not find contribution recur record: {$ids['ContributionRecur']} in IPN request: " . print_r($input, TRUE));
-        echo "Failure: Could not find contribution recur record: {$ids['ContributionRecur']}<p>";
-        return FALSE;
-      }
-    }
-
     $contribution->receive_date = CRM_Utils_Date::isoToMysql($contribution->receive_date);
     $contribution->receipt_date = CRM_Utils_Date::isoToMysql($contribution->receipt_date);
 
