@@ -215,11 +215,13 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    * Test for Tax amount for multiple participant.
    *
    * @throws \CRM_Core_Exception
+   * @throws \Exception
    */
   public function testTaxMultipleParticipant() {
     $mut = new CiviMailUtils($this);
     $params = ['is_monetary' => 1, 'financial_type_id' => 1];
     $event = $this->eventCreate($params);
+    $this->swapMessageTemplateForTestTemplate('event_online_receipt', 'text');
     CRM_Event_Form_Registration_Confirm::testSubmit([
       'id' => $event['id'],
       'contributeMode' => 'direct',
@@ -236,7 +238,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'additional_participants' => 2,
           'payment_processor_id' => 0,
           'bypass_payment' => '',
-          'MAX_FILE_SIZE' => '33554432',
           'is_primary' => 1,
           'is_pay_later' => 1,
           'campaign_id' => NULL,
@@ -297,13 +298,27 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     $this->assertEquals($contribution['total_amount'], 440, 'Invalid Tax amount.');
     $mailSent = $mut->getAllMessages();
     $this->assertCount(3, $mailSent, 'Three mails should have been sent to the 3 participants.');
+    $this->assertContains('contactID:::' . $contribution['contact_id'], $mailSent[0]);
+    $this->assertContains('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[1]);
+
+    $this->callAPISuccess('Payment', 'create', ['total_amount' => 100, 'payment_type_id' => 'Cash', 'contribution_id' => $contribution['id']]);
+    $mailSent = $mut->getAllMessages();
+    $this->assertCount(6, $mailSent);
+
+    $this->assertContains('participant_status:::Registered', $mailSent[3]);
+    $this->assertContains('Dear Participant2', $mailSent[3]);
+
+    $this->assertContains('contactID:::' . ($contribution['contact_id'] + 1), $mailSent[3]);
+    $this->assertContains('contactID:::' . ($contribution['contact_id'] + 2), $mailSent[4]);
+    $this->assertContains('contactID:::' . $contribution['contact_id'], $mailSent[5]);
+    $this->revertTemplateToReservedTemplate('event_online_receipt', 'text');
   }
 
   /**
    * Test online registration for event with no price options selected as per CRM-19964.
    */
   public function testOnlineRegNoPrice() {
-    $paymentProcessorID = $this->processorCreate(['is_default' => TRUE, 'user_name' => 'Test', 'is_test' => FALSE]);
+    $this->processorCreate(['is_default' => TRUE, 'user_name' => 'Test', 'is_test' => FALSE]);
     $paymentProcessorID = $this->processorCreate(['is_default' => TRUE, 'user_name' => 'Test', 'is_test' => TRUE]);
     $params = [
       'start_date' => date('YmdHis', strtotime('+ 1 week')),

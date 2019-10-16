@@ -2731,17 +2731,18 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * Replace the template with a test-oriented template designed to show all the variables.
    *
    * @param string $templateName
+   * @param string $type
    */
-  protected function swapMessageTemplateForTestTemplate($templateName = 'contribution_online_receipt') {
-    $testTemplate = file_get_contents(__DIR__ . '/../../templates/message_templates/' . $templateName . '_html.tpl');
+  protected function swapMessageTemplateForTestTemplate($templateName = 'contribution_online_receipt', $type = 'html') {
+    $testTemplate = file_get_contents(__DIR__ . '/../../templates/message_templates/' . $templateName . '_' . $type . '.tpl');
     CRM_Core_DAO::executeQuery(
       "UPDATE civicrm_option_group og
       LEFT JOIN civicrm_option_value ov ON ov.option_group_id = og.id
       LEFT JOIN civicrm_msg_template m ON m.workflow_id = ov.id
-      SET m.msg_html = '{$testTemplate}'
-      WHERE og.name = 'msg_tpl_workflow_contribution'
+      SET m.msg_{$type} = %1
+      WHERE og.name LIKE 'msg_tpl_workflow_%'
       AND ov.name = '{$templateName}'
-      AND m.is_default = 1"
+      AND m.is_default = 1", [1 => [$testTemplate, 'String']]
     );
   }
 
@@ -2749,14 +2750,15 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * Reinstate the default template.
    *
    * @param string $templateName
+   * @param string $type
    */
-  protected function revertTemplateToReservedTemplate($templateName = 'contribution_online_receipt') {
+  protected function revertTemplateToReservedTemplate($templateName = 'contribution_online_receipt', $type = 'html') {
     CRM_Core_DAO::executeQuery(
       "UPDATE civicrm_option_group og
       LEFT JOIN civicrm_option_value ov ON ov.option_group_id = og.id
       LEFT JOIN civicrm_msg_template m ON m.workflow_id = ov.id
       LEFT JOIN civicrm_msg_template m2 ON m2.workflow_id = ov.id AND m2.is_reserved = 1
-      SET m.msg_html = m2.msg_html
+      SET m.msg_{$type} = m2.msg_{$type}
       WHERE og.name = 'msg_tpl_workflow_contribution'
       AND ov.name = '{$templateName}'
       AND m.is_default = 1"
