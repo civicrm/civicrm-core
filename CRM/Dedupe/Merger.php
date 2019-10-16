@@ -1092,43 +1092,7 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
         continue;
       }
       foreach (['main' => $main, 'other' => $other] as $moniker => $contact) {
-        $value = $label = CRM_Utils_Array::value($field, $contact);
-        $fieldSpec = $fields[$field];
-        if (!empty($fieldSpec['serialize']) && is_array($value)) {
-          // In practice this only applies to preferred_communication_method as the sub types are skipped above
-          // and no others are serialized.
-          $labels = [];
-          foreach ($value as $individualValue) {
-            $labels[] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $field, $individualValue);
-          }
-          $label = implode(', ', $labels);
-          // We serialize this due to historic handling but it's likely that if we just left it as an
-          // array all would be well & we would have less code.
-          $value = CRM_Core_DAO::serializeField($value, $fieldSpec['serialize']);
-        }
-        elseif (!empty($fieldSpec['type']) && $fieldSpec['type'] == CRM_Utils_Type::T_DATE) {
-          if ($value) {
-            $value = str_replace('-', '', $value);
-            $label = CRM_Utils_Date::customFormat($label);
-          }
-          else {
-            $value = "null";
-          }
-        }
-        elseif (!empty($fields[$field]['type']) && $fields[$field]['type'] == CRM_Utils_Type::T_BOOLEAN) {
-          if ($label === '0') {
-            $label = ts('[ ]');
-          }
-          if ($label === '1') {
-            $label = ts('[x]');
-          }
-        }
-        elseif (!empty($fieldSpec['pseudoconstant'])) {
-          $label = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $field, $value);
-        }
-        elseif ($field == 'current_employer_id' && !empty($value)) {
-          $label = "$value (" . CRM_Contact_BAO_Contact::displayName($value) . ")";
-        }
+        list($label, $value) = self::getFieldValueAndLabel($field, $contact);
         $rows["move_$field"][$moniker] = $label;
         if ($moniker == 'other') {
           //CRM-14334
@@ -2548,6 +2512,57 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       'hold_date',
     ];
     return $keysToIgnore;
+  }
+
+  /**
+   * Get the field value & label for the given field.
+   *
+   * @param $field
+   * @param $contact
+   *
+   * @return array
+   * @throws \Exception
+   */
+  private static function getFieldValueAndLabel($field, $contact): array {
+    $fields = self::getMergeFieldsMetadata();
+    $value = $label = CRM_Utils_Array::value($field, $contact);
+    $fieldSpec = $fields[$field];
+    if (!empty($fieldSpec['serialize']) && is_array($value)) {
+      // In practice this only applies to preferred_communication_method as the sub types are skipped above
+      // and no others are serialized.
+      $labels = [];
+      foreach ($value as $individualValue) {
+        $labels[] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $field, $individualValue);
+      }
+      $label = implode(', ', $labels);
+      // We serialize this due to historic handling but it's likely that if we just left it as an
+      // array all would be well & we would have less code.
+      $value = CRM_Core_DAO::serializeField($value, $fieldSpec['serialize']);
+    }
+    elseif (!empty($fieldSpec['type']) && $fieldSpec['type'] == CRM_Utils_Type::T_DATE) {
+      if ($value) {
+        $value = str_replace('-', '', $value);
+        $label = CRM_Utils_Date::customFormat($label);
+      }
+      else {
+        $value = "null";
+      }
+    }
+    elseif (!empty($fields[$field]['type']) && $fields[$field]['type'] == CRM_Utils_Type::T_BOOLEAN) {
+      if ($label === '0') {
+        $label = ts('[ ]');
+      }
+      if ($label === '1') {
+        $label = ts('[x]');
+      }
+    }
+    elseif (!empty($fieldSpec['pseudoconstant'])) {
+      $label = CRM_Core_PseudoConstant::getLabel('CRM_Contact_BAO_Contact', $field, $value);
+    }
+    elseif ($field == 'current_employer_id' && !empty($value)) {
+      $label = "$value (" . CRM_Contact_BAO_Contact::displayName($value) . ")";
+    }
+    return [$label, $value];
   }
 
 }
