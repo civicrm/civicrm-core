@@ -1,5 +1,7 @@
 {if $emailGreeting}{$emailGreeting},
-{/if}{if $isRefund}
+{/if}
+
+{if $isRefund}
 {ts}A refund has been issued based on changes in your registration selections.{/ts}
 {else}
 {ts}A payment has been received.{/ts}

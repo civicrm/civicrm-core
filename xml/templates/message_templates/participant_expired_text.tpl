@@ -1,4 +1,4 @@
-{ts 1=$contact.display_name}Dear %1{/ts},
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
 
 {ts 1=$event.event_title}Your pending event registration for %1 has expired
 because you did not confirm your registration.{/ts}

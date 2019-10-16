@@ -21,7 +21,7 @@
 
   <tr>
    <td>
-    <p>{ts 1=$contact.display_name}Dear %1{/ts},</p>
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
    </td>
   </tr>
   {if !$isAdditional and $participant.id}
@@ -33,13 +33,13 @@
    <tr>
     <td colspan="2" {$valueStyle}>
      {capture assign=confirmUrl}{crmURL p='civicrm/event/confirm' q="reset=1&participantId=`$participant.id`&cs=`$checksumValue`" a=true h=0 fe=1}{/capture}
-     <a href="{$confirmUrl}">Go to a web page where you can confirm your registration online</a>
+     <a href="{$confirmUrl}">{ts}Go to a web page where you can confirm your registration online{/ts}</a>
     </td>
    </tr>
   {/if}
   {if $event.allow_selfcancelxfer }
-  This event allows for self-cancel or transfer
-  {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participantID`&{contact.checksum}"  h=0 a=1 fe=1}{/capture}
+  {ts}This event allows for self-cancel or transfer{/ts}
+  {capture assign=selfService}{crmURL p='civicrm/event/selfsvcupdate' q="reset=1&pid=`$participantID`&{contact.checksum}" h=0 a=1 fe=1}{/capture}
        <a href="{$selfService}">{ts}Self service cancel transfer{/ts}</a>
   {/if}
 

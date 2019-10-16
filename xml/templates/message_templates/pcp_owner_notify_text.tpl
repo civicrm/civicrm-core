@@ -2,6 +2,8 @@
 {ts}Personal Campaign Page Owner Notification{/ts}
 
 ===========================================================
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
+
 {ts}You have received a donation at your personal page{/ts}: {$page_title}
 >> {$pcpInfoURL}
 

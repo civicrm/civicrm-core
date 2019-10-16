@@ -21,7 +21,7 @@
 
   <tr>
    <td>
-    <p>{ts}Dear supporter{/ts},</p>
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
     <p>{ts 1="$contribPageTitle"}Thanks for creating a personal campaign page in support of %1.{/ts}</p>
    </td>
   </tr>
