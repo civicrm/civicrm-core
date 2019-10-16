@@ -437,6 +437,7 @@ class CRM_Activity_Form_Activity extends CRM_Contact_Form_Task {
         || $path == 'civicrm/contact/search/advanced'
         || $path == 'civicrm/contact/search/custom'
         || $path == 'civicrm/group/search'
+        || $path == 'civicrm/contact/search/builder'
       ) {
         $urlString = $path;
       }
