@@ -503,11 +503,11 @@ describe('crmCaseType', function() {
               name: 'Homeless Services Coordinator',
               creator: '1',
               manager: '1',
-              displaylabel: 'Homeless Services Coordinator is'
+              displayLabel: 'Homeless Services Coordinator is'
             },
             {
               name: 'Case Coordinator',
-              displaylabel: 'Case Coordinator is'
+              displayLabel: 'Case Coordinator is'
             }
           ]
         );
@@ -522,11 +522,11 @@ describe('crmCaseType', function() {
               name: 'Homeless Services Coordinator',
               creator: '1',
               manager: '1',
-              displaylabel: 'Homeless Services Coordinator is'
+              displayLabel: 'Homeless Services Coordinator is'
             },
             {
               name: 'Homeless Services Coordinator is',
-              displaylabel: 'Homeless Services Coordinator'
+              displayLabel: 'Homeless Services Coordinator'
             }
           ]
         );
@@ -541,7 +541,7 @@ describe('crmCaseType', function() {
               name: 'Homeless Services Coordinator',
               creator: '1',
               manager: '1',
-              displaylabel: 'Homeless Services Coordinator is'
+              displayLabel: 'Homeless Services Coordinator is'
             }
           ]
         );
@@ -578,11 +578,11 @@ describe('crmCaseType', function() {
               name: 'Homeless Services Coordinator',
               creator: '1',
               manager: '1',
-              displaylabel: 'Homeless Services Coordinator is'
+              displayLabel: 'Homeless Services Coordinator is'
             },
             {
               name: 'Some New Type for',
-              displaylabel: 'Some New Type is'
+              displayLabel: 'Some New Type is'
             }
           ]
         );
@@ -626,11 +626,11 @@ describe('crmCaseType', function() {
               name: 'Homeless Services Coordinator',
               creator: '1',
               manager: '1',
-              displaylabel: 'Homeless Services Coordinator is'
+              displayLabel: 'Homeless Services Coordinator is'
             },
             {
               name: 'Friend of',
-              displaylabel: 'Friend of'
+              displayLabel: 'Friend of'
             }
           ]
         );
