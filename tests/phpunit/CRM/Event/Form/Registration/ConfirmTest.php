@@ -214,9 +214,10 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
   /**
    * Test for Tax amount for multiple participant.
    *
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function testTaxMultipleParticipant() {
+    $mut = new CiviMailUtils($this);
     $params = ['is_monetary' => 1, 'financial_type_id' => 1];
     $event = $this->eventCreate($params);
     CRM_Event_Form_Registration_Confirm::testSubmit([
@@ -232,8 +233,6 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'first_name' => 'Participant1',
           'last_name' => 'LastName',
           'email-Primary' => 'participant1@example.com',
-          'scriptFee' => '',
-          'scriptArray' => '',
           'additional_participants' => 2,
           'payment_processor_id' => 0,
           'bypass_payment' => '',
@@ -286,7 +285,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
         ],
       ],
     ]);
-    $this->callAPISuccessGetCount('Participant', [], 3);
+    $participants = $this->callAPISuccess('Participant', 'get', [])['values'];
+    $this->assertCount(3, $participants);
     $contribution = $this->callAPISuccessGetSingle(
       'Contribution',
       [
@@ -295,6 +295,8 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     );
     $this->assertEquals($contribution['tax_amount'], 40, 'Invalid Tax amount.');
     $this->assertEquals($contribution['total_amount'], 440, 'Invalid Tax amount.');
+    $mailSent = $mut->getAllMessages();
+    $this->assertCount(3, $mailSent, 'Three mails should have been sent to the 3 participants.');
   }
 
   /**
