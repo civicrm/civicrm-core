@@ -1517,7 +1517,9 @@ LEFT JOIN  civicrm_country ON (civicrm_address.country_id = civicrm_country.id)
       if ($type['contact_type_b'] == $targetContactType || empty($type['contact_type_b'])) {
         $relationshipType[$key . '_a_b'] = $type['label_a_b'];
       }
-      if ($type['contact_type_a'] == $targetContactType || empty($type['contact_type_a'])) {
+      //List all relationships, if the label for B > A is different
+      if (($type['contact_type_a'] == $targetContactType || empty($type['contact_type_a']))
+       && $type['label_a_b'] != $type['label_b_a']) {
         $relationshipType[$key . '_b_a'] = $type['label_b_a'];
       }
     }
