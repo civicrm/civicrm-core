@@ -100,6 +100,7 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
    */
   public function testPaidSubmit($thousandSeparator) {
     $this->setCurrencySeparators($thousandSeparator);
+    $mut = new CiviMailUtils($this);
     $paymentProcessorID = $this->processorCreate();
     /* @var \CRM_Core_Payment_Dummy $processor */
     $processor = Civi\Payment\System::singleton()->getById($paymentProcessorID);
@@ -136,15 +137,12 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
           'billing_state_province_id-5' => '1061',
           'billing_postal_code-5' => '7',
           'billing_country_id-5' => '1228',
-          'scriptFee' => '',
-          'scriptArray' => '',
           'priceSetId' => '6',
           'price_7' => [
             13 => 1,
           ],
           'payment_processor_id' => $paymentProcessorID,
           'bypass_payment' => '',
-          'MAX_FILE_SIZE' => '33554432',
           'is_primary' => 1,
           'is_pay_later' => 0,
           'campaign_id' => NULL,
@@ -209,6 +207,11 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
       'financial_trxn_id' => $financialTrxn['id'] + 1,
       'amount' => '1.67',
     ], $entityFinancialTrxns[2], ['id', 'entity_id']);
+    $mut->checkMailLog([
+      'Event Information and Location', 'Registration Confirmation - Annual CiviCRM meet',
+      'This letter is a confirmation that your registration has been received and your status has been updated to <strong> Registered</strong>',
+    ]);
+    $mut->clearMessages();
   }
 
   /**

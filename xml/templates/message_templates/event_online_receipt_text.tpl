@@ -6,8 +6,7 @@
   {ts}Thank you for your participation.{/ts}
   {if $participant_status}{ts 1=$participant_status}This letter is a confirmation that your registration has been received and your status has been updated to %1.{/ts}
   {else}{if $isOnWaitlist}{ts}This letter is a confirmation that your registration has been received and your status has been updated to waitlisted.{/ts}{else}{ts}This letter is a confirmation that your registration has been received and your status has been updated to registered.{/ts}{/if}
-  {/if}.
-
+  {/if}
 {/if}
 
 {if $isOnWaitlist}
