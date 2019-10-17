@@ -1172,6 +1172,7 @@ WHERE civicrm_event.is_active = 1
           'customPost' => $profilePost[0],
           'customPost_grouptitle' => $customPostTitles,
           'participantID' => $participantId,
+          'contactID' => $contactID,
           'conference_sessions' => $sessions,
           'credit_card_number' => CRM_Utils_System::mungeCreditCard(CRM_Utils_Array::value('credit_card_number', $participantParams)),
           'credit_card_exp_date' => CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format(CRM_Utils_Array::value('credit_card_exp_date', $participantParams))),
