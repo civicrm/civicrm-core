@@ -15,9 +15,16 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
     $this->setupContacts();
     $this->setupDefaultAssigneeOptions();
     $this->setupRelationships();
+    $this->setupMoreRelationshipTypes();
     $this->setupActivityDefinitions();
 
     $this->process = new CRM_Case_XMLProcessor_Process();
+  }
+
+  public function tearDown() {
+    $this->deleteMoreRelationshipTypes();
+
+    parent::tearDown();
   }
 
   /**
@@ -98,6 +105,67 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
           'relationship_type_id' => $relationship['type_id'],
         ]);
       }
+    }
+  }
+
+  /**
+   * Set up some additional relationship types for some specific tests.
+   */
+  protected function setupMoreRelationshipTypes() {
+    $this->moreRelationshipTypes = [
+      'unidirectional_name_label_different' => [
+        'type_id' => NULL,
+        'name_a_b' => 'jm7ab',
+        'label_a_b' => 'Jedi Master is',
+        'name_b_a' => 'jm7ba',
+        'label_b_a' => 'Jedi Master for',
+        'description' => 'Jedi Master',
+      ],
+      'unidirectional_name_label_same' => [
+        'type_id' => NULL,
+        'name_a_b' => 'Quilt Maker is',
+        'label_a_b' => 'Quilt Maker is',
+        'name_b_a' => 'Quilt Maker for',
+        'label_b_a' => 'Quilt Maker for',
+        'description' => 'Quilt Maker',
+      ],
+      'bidirectional_name_label_different' => [
+        'type_id' => NULL,
+        'name_a_b' => 'f12',
+        'label_a_b' => 'Friend of',
+        'name_b_a' => 'f12',
+        'label_b_a' => 'Friend of',
+        'description' => 'Friend',
+      ],
+      'bidirectional_name_label_same' => [
+        'type_id' => NULL,
+        'name_a_b' => 'Enemy of',
+        'label_a_b' => 'Enemy of',
+        'name_b_a' => 'Enemy of',
+        'label_b_a' => 'Enemy of',
+        'description' => 'Enemy',
+      ],
+    ];
+
+    foreach ($this->moreRelationshipTypes as &$relationship) {
+      $relationship['type_id'] = $this->relationshipTypeCreate([
+        'contact_type_a' => 'Individual',
+        'contact_type_b' => 'Individual',
+        'name_a_b' => $relationship['name_a_b'],
+        'label_a_b' => $relationship['label_a_b'],
+        'name_b_a' => $relationship['name_b_a'],
+        'label_b_a' => $relationship['label_b_a'],
+        'description' => $relationship['description'],
+      ]);
+    }
+  }
+
+  /**
+   * Clean up additional relationship types (tearDown).
+   */
+  protected function deleteMoreRelationshipTypes() {
+    foreach ($this->moreRelationshipTypes as $relationship) {
+      $this->callAPISuccess('relationship_type', 'delete', ['id' => $relationship['type_id']]);
     }
   }
 
@@ -240,30 +308,122 @@ class CRM_Case_XMLProcessor_ProcessTest extends CiviCaseTestCase {
   }
 
   /**
-   * Test that locateNameOrLabel does the right things.
+   * Test that caseRoles() doesn't have name and label mixed up.
    *
-   * @dataProvider xmlDataProvider
+   * @param $key string The array key in the moreRelationshipTypes array that
+   *   is the relationship type we're currently testing. So not necessarily
+   *   unique for each entry in the dataprovider since want to test a given
+   *   relationship type against multiple xml strings. It's not a test
+   *   identifier, it's an array key to use to look up something.
+   * @param $xmlString string
+   * @param $expected array
+   * @param $dontcare array We're re-using the data provider for two tests and
+   *   we don't care about those expected values.
+   *
+   * @dataProvider xmlCaseRoleDataProvider
    */
-  public function testLocateNameOrLabel($xmlString, $expected) {
+  public function testCaseRoles($key, $xmlString, $expected, $dontcare) {
     $xmlObj = new SimpleXMLElement($xmlString);
-    $this->assertEquals($expected, $this->process->locateNameOrLabel($xmlObj));
+
+    // element 0 is direction (a_b), 1 is the text we want
+    $expectedArray = empty($expected) ? [] : ["{$this->moreRelationshipTypes[$key]['type_id']}_{$expected[0]}" => $expected[1]];
+
+    $this->assertEquals($expectedArray, $this->process->caseRoles($xmlObj->CaseRoles, FALSE));
   }
 
   /**
-   * Data provider for testLocateNameOrLabel
+   * Test that locateNameOrLabel doesn't have name and label mixed up.
+   *
+   * @param $key string The array key in the moreRelationshipTypes array that
+   *   is the relationship type we're currently testing. So not necessarily
+   *   unique for each entry in the dataprovider since want to test a given
+   *   relationship type against multiple xml strings. It's not a test
+   *   identifier, it's an array key to use to look up something.
+   * @param $xmlString string
+   * @param $dontcare array We're re-using the data provider for two tests and
+   *   we don't care about those expected values.
+   * @param $expected array
+   *
+   * @dataProvider xmlCaseRoleDataProvider
+   */
+  public function testLocateNameOrLabel($key, $xmlString, $dontcare, $expected) {
+    $xmlObj = new SimpleXMLElement($xmlString);
+
+    // element 0 is direction (a_b), 1 is the text we want.
+    // In case of failure, the function is expected to return FALSE for the
+    // direction and then for the text it just gives us back the string we
+    // gave it.
+    $expectedArray = empty($expected[0])
+        ? [FALSE, $expected[1]]
+        : ["{$this->moreRelationshipTypes[$key]['type_id']}_{$expected[0]}", $expected[1]];
+
+    $this->assertEquals($expectedArray, $this->process->locateNameOrLabel($xmlObj->CaseRoles->RelationshipType));
+  }
+
+  /**
+   * Data provider for testCaseRoles and testLocateNameOrLabel
    * @return array
    */
-  public function xmlDataProvider() {
+  public function xmlCaseRoleDataProvider() {
     return [
-      ['<RelationshipType><name>Senior Services Coordinator</name><creator>1</creator><manager>1</manager></RelationshipType>', 'Senior Services Coordinator'],
-      ['<RelationshipType><name>Senior Services Coordinator</name></RelationshipType>', 'Senior Services Coordinator'],
-      ['<RelationshipType><name>Lion Tamer&#39;s Obituary Writer</name></RelationshipType>', "Lion Tamer's Obituary Writer"],
-      ['<RelationshipType><machineName>BP1234</machineName><name>Banana Peeler</name></RelationshipType>', 'BP1234'],
-      ['<RelationshipType><machineName>BP1234</machineName><name>Banana Peeler</name><creator>1</creator><manager>1</manager></RelationshipType>', 'BP1234'],
-      ['<RelationshipType><machineName>0</machineName><name>Assistant Level 0</name></RelationshipType>', '0'],
-      ['<RelationshipType><machineName></machineName><name>Banana Peeler</name></RelationshipType>', 'Banana Peeler'],
-      // hopefully nobody would do this
-      ['<RelationshipType><machineName>null</machineName><name>Annulled Relationship</name></RelationshipType>', 'null'],
+      // Simulate one that has been converted to the format it should be going
+      // forward, where name is the actual name, i.e. same as machineName.
+      [
+        // this is the array key in the $this->moreRelationshipTypes array
+        'unidirectional_name_label_different',
+        // some xml
+        '<CaseType><CaseRoles><RelationshipType><name>jm7ba</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
+        // this is the expected for testCaseRoles
+        ['a_b', 'Jedi Master is'],
+        // this is the expected for testLocateNameOrLabel
+        ['a_b', 'jm7ba'],
+      ],
+      // Simulate one that is still in label format, i.e. one that is still in
+      // xml files that haven't been updated, or in the db but upgrade script
+      // not run yet.
+      [
+        'unidirectional_name_label_different',
+        '<CaseType><CaseRoles><RelationshipType><name>Jedi Master for</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
+        ['a_b', 'Jedi Master is'],
+        ['a_b', 'jm7ba'],
+      ],
+      // Ditto but where we know name and label are the same in the db.
+      [
+        'unidirectional_name_label_same',
+        '<CaseType><CaseRoles><RelationshipType><name>Quilt Maker for</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
+        ['a_b', 'Quilt Maker is'],
+        ['a_b', 'Quilt Maker for'],
+      ],
+      // Simulate one that is messed up and should fail, e.g. like a typo
+      // in an xml file. Here we've made a typo on purpose.
+      [
+        'unidirectional_name_label_different',
+        '<CaseType><CaseRoles><RelationshipType><name>Jedi Masterrrr for</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
+        NULL,
+        [FALSE, 'Jedi Masterrrr for'],
+      ],
+      // Now some similar tests to above but for bidirectional relationships.
+      // Bidirectional relationship, name and label different, using machine name.
+      [
+        'bidirectional_name_label_different',
+        '<CaseType><CaseRoles><RelationshipType><name>f12</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
+        ['b_a', 'Friend of'],
+        ['b_a', 'f12'],
+      ],
+      // Bidirectional relationship, name and label different, using display label.
+      [
+        'bidirectional_name_label_different',
+        '<CaseType><CaseRoles><RelationshipType><name>Friend of</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
+        ['b_a', 'Friend of'],
+        ['b_a', 'f12'],
+      ],
+      // Bidirectional relationship, name and label same.
+      [
+        'bidirectional_name_label_same',
+        '<CaseType><CaseRoles><RelationshipType><name>Enemy of</name><creator>1</creator><manager>1</manager></RelationshipType></CaseRoles></CaseType>',
+        ['b_a', 'Enemy of'],
+        ['b_a', 'Enemy of'],
+      ],
     ];
   }
 

@@ -91,12 +91,10 @@ class CRM_Case_XMLProcessor {
   }
 
   /**
-   * Get all relationship type labels
-   *
-   * TODO: These should probably be names, but under legacy behavior this has
-   * been labels.
+   * Get all relationship type display labels (not machine names)
    *
    * @param bool $fromXML
+   *   TODO: This parameter is always FALSE now so no longer needed.
    *   Is this to be used for lookup of values from XML?
    *   Relationships are recorded in XML from the perspective of the non-client
    *   while relationships in the UI and everywhere else are from the
@@ -106,11 +104,24 @@ class CRM_Case_XMLProcessor {
    */
   public function &allRelationshipTypes($fromXML = FALSE) {
     if (!isset(Civi::$statics[__CLASS__]['reltypes'][$fromXML])) {
-      $relationshipInfo = CRM_Core_PseudoConstant::relationshipType('label', TRUE);
+      // Note this now includes disabled types too. The only place this
+      // function is being used is for comparison against a list, not
+      // displaying a dropdown list or something like that, so we need
+      // to include disabled.
+      $relationshipInfo = civicrm_api3('RelationshipType', 'get', [
+        'options' => ['limit' => 0],
+      ]);
 
       Civi::$statics[__CLASS__]['reltypes'][$fromXML] = [];
-      foreach ($relationshipInfo as $id => $info) {
+      foreach ($relationshipInfo['values'] as $id => $info) {
         Civi::$statics[__CLASS__]['reltypes'][$fromXML][$id . '_b_a'] = ($fromXML) ? $info['label_a_b'] : $info['label_b_a'];
+        /**
+         * Exclude if bidirectional
+         * (Why? I'm thinking this was for consistency with the dropdown
+         * in ang/crmCaseType.js where it would be needed to avoid seeing
+         * duplicates in the dropdown. Not sure if needed here but keeping
+         * as-is.)
+         */
         if ($info['label_b_a'] !== $info['label_a_b']) {
           Civi::$statics[__CLASS__]['reltypes'][$fromXML][$id . '_a_b'] = ($fromXML) ? $info['label_b_a'] : $info['label_a_b'];
         }

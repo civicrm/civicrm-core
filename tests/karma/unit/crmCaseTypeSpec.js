@@ -224,32 +224,6 @@ describe('crmCaseType', function() {
             }
           ]
         },
-        // Where is this used in the tests?
-        // It seems to be in the format for the activity assignee.
-        relTypesForm: {
-          values: [
-            {
-                "key": "14_b_a",
-                "value": "Benefits Specialist"
-            },
-            {
-                "key": "14_a_b",
-                "value": "Benefits Specialist is"
-            },
-            {
-                "key": "9_b_a",
-                "value": "Case Coordinator"
-            },
-            {
-                "key": "9_a_b",
-                "value": "Case Coordinator is"
-            },
-            {
-                "key": "2_b_a",
-                "value": "Spouse of"
-            }
-          ]
-        },
         caseType: {
           "id": "1",
           "name": "housing_support",
@@ -373,24 +347,58 @@ describe('crmCaseType', function() {
       expect(scope.defaultAssigneeTypeValues).toEqual(defaultAssigneeTypeValues);
     });
 
-    it('should store the default assignee relationship type options', function() {
-      var defaultRelationshipTypeOptions = _.transform(apiCalls.relTypes.values, function(result, relType) {
-        var isBidirectionalRelationship = relType.label_a_b === relType.label_b_a;
-
-        result.push({
-          label: relType.label_b_a,
-          value: relType.id + '_a_b'
-        });
-
-        if (!isBidirectionalRelationship) {
-          result.push({
-            label: relType.label_a_b,
-            value: relType.id + '_b_a'
-          });
+    it('should compute the relationship type options', function() {
+      var expectedRelationshipTypeOptions = [
+        {
+          "id": "14_a_b",
+          "text": "Benefits Specialist",
+          "xmlName": "Benefits Specialist is"
+        },
+        {
+          "id": "14_b_a",
+          "text": "Benefits Specialist is",
+          "xmlName": "Benefits Specialist"
+        },
+        {
+          "id": "9_a_b",
+          "text": "Case Coordinator",
+          "xmlName": "Case Coordinator is"
+        },
+        {
+          "id": "9_b_a",
+          "text": "Case Coordinator is",
+          "xmlName": "Case Coordinator"
+        },
+        {
+          "id": "10_a_b",
+          "text": "Homeless Services Coordinator",
+          "xmlName": "Homeless Services Coordinator is"
+        },
+        {
+          "id": "10_b_a",
+          "text": "Homeless Services Coordinator is",
+          "xmlName": "Homeless Services Coordinator"
+        },
+        // Bidirectional, so should only have the one direction in the list
+        {
+          "id": "2_a_b",
+          "text": "Spouse of",
+          "xmlName": "Spouse of"
+        },
+        // include one where name is different from label
+        {
+          "id": "27_a_b",
+          "text": "Guardian Angel for",
+          "xmlName": "GA123ab",
+        },
+        {
+          "id": "27_b_a",
+          "text": "Guardian Angel is",
+          "xmlName": "GA123ba",
         }
-      }, []);
+      ];
 
-      expect(scope.defaultRelationshipTypeOptions).toEqual(defaultRelationshipTypeOptions);
+      expect(scope.relationshipTypeOptions).toEqual(expectedRelationshipTypeOptions);
     });
 
     it('addActivitySet should add an activitySet to the case type', function() {
@@ -492,10 +500,13 @@ describe('crmCaseType', function() {
         // dropdown. It doesn't test that clicking picks the right value to
         // add, just that if it did then the function that gets called does
         // the right thing with it.
-        // Note the value returned by the dropdown is "backwards", e.g.
+        // Note the value returned by the dropdown is "backwards" to match
+        // historically what has been stored in the xml as name, e.g.
         // for the client perspective direction the dropdown returns the other
-        // direction, which is also what's stored in the xml.
-        scope.addRole(scope.caseType.definition.caseRoles, 'Case Coordinator');
+        // direction.
+        // So 9_b_a is "Case Coordinator", which means that they actually
+        // selected "Case Coordinator is".
+        scope.addRole(scope.caseType.definition.caseRoles, '9_b_a');
 
         expect(scope.caseType.definition.caseRoles).toEqual(
           [
@@ -513,9 +524,27 @@ describe('crmCaseType', function() {
         );
       });
 
+      it('updates case roles when name and label are different', function() {
+        scope.addRole(scope.caseType.definition.caseRoles, '27_b_a');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'GA123ba',
+              displayLabel: 'Guardian Angel is'
+            }
+          ]
+        );
+      });
+
       it('updates case roles if choose non-client-perspective direction', function() {
         // again, the dropdown returns the opposite direction
-        scope.addRole(scope.caseType.definition.caseRoles, 'Homeless Services Coordinator is');
+        scope.addRole(scope.caseType.definition.caseRoles, '10_a_b');
         expect(scope.caseType.definition.caseRoles).toEqual(
           [
             {
@@ -532,9 +561,8 @@ describe('crmCaseType', function() {
         );
       });
 
-      it("doesn't add the same role twice", function() {
-        // This is in the mock casetype to start, so check if can add twice.
-        scope.addRole(scope.caseType.definition.caseRoles, 'Homeless Services Coordinator');
+      it('updates case roles non-client-perspective direction name/label different', function() {
+        scope.addRole(scope.caseType.definition.caseRoles, '27_a_b');
         expect(scope.caseType.definition.caseRoles).toEqual(
           [
             {
@@ -542,6 +570,44 @@ describe('crmCaseType', function() {
               creator: '1',
               manager: '1',
               displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'GA123ab',
+              displayLabel: 'Guardian Angel for'
+            }
+          ]
+        );
+      });
+
+      it("doesn't add the same role twice", function() {
+        // This is in the mock casetype to start, so check if can add twice.
+        scope.addRole(scope.caseType.definition.caseRoles, '10_b_a');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            }
+          ]
+        );
+
+        // Try with name and label different. We already tested one time in
+        // another test so just go straight to twice.
+        scope.addRole(scope.caseType.definition.caseRoles, '27_b_a');
+        scope.addRole(scope.caseType.definition.caseRoles, '27_b_a');
+        expect(scope.caseType.definition.caseRoles).toEqual(
+          [
+            {
+              name: 'Homeless Services Coordinator',
+              creator: '1',
+              manager: '1',
+              displayLabel: 'Homeless Services Coordinator is'
+            },
+            {
+              name: 'GA123ba',
+              displayLabel: 'Guardian Angel is'
             }
           ]
         );
@@ -567,7 +633,6 @@ describe('crmCaseType', function() {
           "is_reserved": "0",
           "is_active": "1"
         };
-        apiCalls.relTypes.values.push(newType);
 
         // now let the real code do what it does with the new type
         scope.addRoleOnTheFly(scope.caseType.definition.caseRoles, newType);
@@ -590,11 +655,13 @@ describe('crmCaseType', function() {
         expect(scope.relationshipTypeOptions.slice(-2)).toEqual(
           [
             {
-              id: 'Some New Type is',
+              xmlName: 'Some New Type is',
+              id: '33_a_b',
               text: 'Some New Type for'
             },
             {
-              id: 'Some New Type for',
+              xmlName: 'Some New Type for',
+              id: '33_b_a',
               text: 'Some New Type is'
             }
           ]
@@ -615,7 +682,6 @@ describe('crmCaseType', function() {
           "is_reserved": "0",
           "is_active": "1"
         };
-        apiCalls.relTypes.values.push(newType);
 
         // now let the real code do what it does with the new type
         scope.addRoleOnTheFly(scope.caseType.definition.caseRoles, newType);
@@ -638,7 +704,8 @@ describe('crmCaseType', function() {
         expect(scope.relationshipTypeOptions.slice(-1)).toEqual(
           [
             {
-              id: 'Friend of',
+              xmlName: 'Friend of',
+              id: '34_a_b',
               text: 'Friend of'
             }
           ]
@@ -648,7 +715,8 @@ describe('crmCaseType', function() {
         expect(scope.relationshipTypeOptions.slice(-2,-1)).not.toEqual(
           [
             {
-              id: 'Friend of',
+              xmlName: 'Friend of',
+              id: '34_b_a',
               text: 'Friend of'
             }
           ]

@@ -162,4 +162,239 @@ class CRM_Utils_Check_Component_Case extends CRM_Utils_Check_Component {
     return $messages;
   }
 
+  /**
+   * Check that the relationship types aren't going to cause problems.
+   *
+   * @return array<CRM_Utils_Check_Message>
+   *   An empty array, or a list of warnings
+   */
+  public function checkRelationshipTypeProblems() {
+    $messages = [];
+
+    /**
+     * There's no use-case to have two different relationship types
+     * with the same machine name, and it will cause problems because the
+     * system might match up the wrong type when comparing to xml.
+     * A single bi-directional one CAN and probably does have the same
+     * name_a_b and name_b_a and that's ok.
+     */
+
+    $dao = CRM_Core_DAO::executeQuery("SELECT rt1.*, rt2.id AS id2, rt2.name_a_b AS nameab2, rt2.name_b_a AS nameba2 FROM civicrm_relationship_type rt1 INNER JOIN civicrm_relationship_type rt2 ON (rt1.name_a_b = rt2.name_a_b OR rt1.name_a_b = rt2.name_b_a) WHERE rt1.id <> rt2.id");
+    while ($dao->fetch()) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__ . $dao->id . "dupe1",
+        ts("Relationship type <em>%1</em> has the same internal machine name as another type.
+          <table>
+            <tr><th>ID</th><th>name_a_b</th><th>name_b_a</th></tr>
+            <tr><td>%2</td><td>%3</td><td>%4</td></tr>
+            <tr><td>%5</td><td>%6</td><td>%7</td></tr>
+          </table>", [
+            1 => htmlspecialchars($dao->label_a_b),
+            2 => $dao->id,
+            3 => htmlspecialchars($dao->name_a_b),
+            4 => htmlspecialchars($dao->name_b_a),
+            5 => $dao->id2,
+            6 => htmlspecialchars($dao->nameab2),
+            7 => htmlspecialchars($dao->nameba2),
+          ]) .
+          '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#relationship-type-internal-name-duplicates', TRUE) . '">' .
+          ts('Read more about this warning') .
+          '</a>',
+        ts('Relationship Type Internal Name Duplicates'),
+        \Psr\Log\LogLevel::ERROR,
+        'fa-exchange'
+      );
+    }
+
+    // Ditto for labels
+    $dao = CRM_Core_DAO::executeQuery("SELECT rt1.*, rt2.id AS id2, rt2.label_a_b AS labelab2, rt2.label_b_a AS labelba2 FROM civicrm_relationship_type rt1 INNER JOIN civicrm_relationship_type rt2 ON (rt1.label_a_b = rt2.label_a_b OR rt1.label_a_b = rt2.label_b_a) WHERE rt1.id <> rt2.id");
+    while ($dao->fetch()) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__ . $dao->id . "dupe2",
+        ts("Relationship type <em>%1</em> has the same display label as another type.
+          <table>
+            <tr><th>ID</th><th>label_a_b</th><th>label_b_a</th></tr>
+            <tr><td>%2</td><td>%3</td><td>%4</td></tr>
+            <tr><td>%5</td><td>%6</td><td>%7</td></tr>
+          </table>", [
+            1 => htmlspecialchars($dao->label_a_b),
+            2 => $dao->id,
+            3 => htmlspecialchars($dao->label_a_b),
+            4 => htmlspecialchars($dao->label_b_a),
+            5 => $dao->id2,
+            6 => htmlspecialchars($dao->labelab2),
+            7 => htmlspecialchars($dao->labelba2),
+          ]) .
+          '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#relationship-type-display-label-duplicates', TRUE) . '">' .
+          ts('Read more about this warning') .
+          '</a>',
+        ts('Relationship Type Display Label Duplicates'),
+        \Psr\Log\LogLevel::ERROR,
+        'fa-exchange'
+      );
+    }
+
+    /**
+     * If the name of one type matches the label of another type, there may
+     * also be problems. This can happen if for example you initially set
+     * it up and then keep changing your mind adding and deleting and renaming
+     * a couple times in a certain order.
+     */
+    $dao = CRM_Core_DAO::executeQuery("SELECT rt1.*, rt2.id AS id2, rt2.name_a_b AS nameab2, rt2.name_b_a AS nameba2, rt2.label_a_b AS labelab2, rt2.label_b_a AS labelba2 FROM civicrm_relationship_type rt1 INNER JOIN civicrm_relationship_type rt2 ON (rt1.name_a_b = rt2.label_a_b OR rt1.name_b_a = rt2.label_a_b OR rt1.name_a_b = rt2.label_b_a OR rt1.name_b_a = rt2.label_b_a) WHERE rt1.id <> rt2.id");
+    // No point displaying the same matching id twice, which can happen with
+    // the query.
+    $ids = [];
+    while ($dao->fetch()) {
+      if (isset($ids[$dao->id2])) {
+        continue;
+      }
+      $ids[$dao->id] = $dao->id;
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__ . $dao->id . "dupe3",
+        ts("Relationship type <em>%1</em> has an internal machine name that is the same as the display label as another type.
+          <table>
+            <tr><th>ID</th><th>name_a_b</th><th>name_b_a</th><th>label_a_b</th><th>label_b_a</th></tr>
+            <tr><td>%2</td><td>%3</td><td>%4</td><td>%5</td><td>%6</td></tr>
+            <tr><td>%7</td><td>%8</td><td>%9</td><td>%10</td><td>%11</td></tr>
+          </table>", [
+            1 => htmlspecialchars($dao->label_a_b),
+            2 => $dao->id,
+            3 => htmlspecialchars($dao->name_a_b),
+            4 => htmlspecialchars($dao->name_b_a),
+            5 => htmlspecialchars($dao->label_a_b),
+            6 => htmlspecialchars($dao->label_b_a),
+            7 => $dao->id2,
+            8 => htmlspecialchars($dao->nameab2),
+            9 => htmlspecialchars($dao->nameab2),
+            10 => htmlspecialchars($dao->labelab2),
+            11 => htmlspecialchars($dao->labelba2),
+          ]) .
+          '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#relationship-type-cross-duplication', TRUE) . '">' .
+          ts('Read more about this warning') .
+          '</a>',
+        ts('Relationship Type Cross-Duplication'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-exchange'
+      );
+    }
+
+    /**
+     * Check that ones that appear to be unidirectional don't have the same
+     * machine name for both a_b and b_a. This can happen for example if you
+     * forget to fill in the b_a label when creating, then go back and edit.
+     */
+    $dao = CRM_Core_DAO::executeQuery("SELECT rt1.* FROM civicrm_relationship_type rt1 WHERE rt1.name_a_b = rt1.name_b_a AND rt1.label_a_b <> rt1.label_b_a");
+    while ($dao->fetch()) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__ . $dao->id . "ambiguousname",
+        ts("Relationship type <em>%1</em> appears to be unidirectional, but has the same internal machine name for both sides.
+          <table>
+            <tr><th>ID</th><th>name_a_b</th><th>name_b_a</th><th>label_a_b</th><th>label_b_a</th></tr>
+            <tr><td>%2</td><td>%3</td><td>%4</td><td>%5</td><td>%6</td></tr>
+          </table>", [
+            1 => htmlspecialchars($dao->label_a_b),
+            2 => $dao->id,
+            3 => htmlspecialchars($dao->name_a_b),
+            4 => htmlspecialchars($dao->name_b_a),
+            5 => htmlspecialchars($dao->label_a_b),
+            6 => htmlspecialchars($dao->label_b_a),
+          ]) .
+          '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#relationship-type-ambiguity', TRUE) . '">' .
+          ts('Read more about this warning') .
+          '</a>',
+        ts('Relationship Type Ambiguity'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-exchange'
+      );
+    }
+
+    /**
+     * Check that ones that appear to be unidirectional don't have the same
+     * label for both a_b and b_a. This can happen for example if you
+     * created it as unidirectional, then edited it later trying to make it
+     * bidirectional.
+     */
+    $dao = CRM_Core_DAO::executeQuery("SELECT rt1.* FROM civicrm_relationship_type rt1 WHERE rt1.label_a_b = rt1.label_b_a AND rt1.name_a_b <> rt1.name_b_a");
+    while ($dao->fetch()) {
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__ . $dao->id . "ambiguouslabel",
+        ts("Relationship type <em>%1</em> appears to be unidirectional internally, but has the same display label for both sides. Possibly you created it initially as unidirectional and then made it bidirectional later.
+          <table>
+            <tr><th>ID</th><th>name_a_b</th><th>name_b_a</th><th>label_a_b</th><th>label_b_a</th></tr>
+            <tr><td>%2</td><td>%3</td><td>%4</td><td>%5</td><td>%6</td></tr>
+          </table>", [
+            1 => htmlspecialchars($dao->label_a_b),
+            2 => $dao->id,
+            3 => htmlspecialchars($dao->name_a_b),
+            4 => htmlspecialchars($dao->name_b_a),
+            5 => htmlspecialchars($dao->label_a_b),
+            6 => htmlspecialchars($dao->label_b_a),
+          ]) .
+          '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#relationship-type-ambiguity', TRUE) . '">' .
+          ts('Read more about this warning') .
+          '</a>',
+        ts('Relationship Type Ambiguity'),
+        \Psr\Log\LogLevel::WARNING,
+        'fa-exchange'
+      );
+    }
+
+    /**
+     * Check for missing roles listed in the xml but not defined as
+     * relationship types.
+     */
+
+    // Don't use database since might be in xml files.
+    $caseTypes = civicrm_api3('CaseType', 'get', [
+      'options' => ['limit' => 0],
+    ])['values'];
+    // Don't use pseudoconstant since want all and also name and label.
+    $relationshipTypes = civicrm_api3('RelationshipType', 'get', [
+      'options' => ['limit' => 0],
+    ])['values'];
+    $allConfigured = array_column($relationshipTypes, 'id', 'name_a_b')
+      + array_column($relationshipTypes, 'id', 'name_b_a')
+      + array_column($relationshipTypes, 'id', 'label_a_b')
+      + array_column($relationshipTypes, 'id', 'label_b_a');
+    $missing = [];
+    foreach ($caseTypes as $caseType) {
+      foreach ($caseType['definition']['caseRoles'] as $role) {
+        if (!isset($allConfigured[$role['name']])) {
+          $missing[$role['name']] = $role['name'];
+        }
+      }
+    }
+    if (!empty($missing)) {
+      $tableRows = [];
+      foreach ($relationshipTypes as $relationshipType) {
+        $tableRows[] = ts('<tr><td>%1</td><td>%2</td><td>%3</td><td>%4</td><td>%5</td></tr>', [
+          1 => $relationshipType['id'],
+          2 => htmlspecialchars($relationshipType['name_a_b']),
+          3 => htmlspecialchars($relationshipType['name_b_a']),
+          4 => htmlspecialchars($relationshipType['label_a_b']),
+          5 => htmlspecialchars($relationshipType['label_b_a']),
+        ]);
+      }
+      $messages[] = new CRM_Utils_Check_Message(
+        __FUNCTION__ . "missingroles",
+        ts("<p>The following roles listed in your case type definitions do not match any relationship type defined in the system: <em>%1</em>.</p>"
+          . "<p>This might be because of a mismatch if you are using external xml files to manage case types. If using xml files, then use either the name_a_b or name_b_a value from the following table. (Out of the box you would use name_b_a, which lists them on the case from the client perspective.) If you are not using xml files, you can edit your case types at Administer - CiviCase - Case Types.</p>"
+          . "<table>
+            <tr><th>ID</th><th>name_a_b</th><th>name_b_a</th><th>label_a_b</th><th>label_b_a</th></tr>"
+          . implode("\n", $tableRows)
+          . "</table>", [
+            1 => htmlspecialchars(implode(', ', $missing)),
+          ]) .
+          '<br /><a href="' . CRM_Utils_System::docURL2('user/case-management/what-you-need-to-know#missing-roles', TRUE) . '">' .
+          ts('Read more about this warning') .
+          '</a>',
+        ts('Missing Roles'),
+        \Psr\Log\LogLevel::ERROR,
+        'fa-exclamation'
+      );
+    }
+
+    return $messages;
+  }
+
 }

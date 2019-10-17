@@ -12,7 +12,7 @@ Required vars: caseType
 	  </tr>
   </thead>
   <tbody>
-	  <tr ng-repeat="relType in caseType.definition.caseRoles | orderBy:'name'" ng-class-even="'crm-entity even-row even'" ng-class-odd="'crm-entity odd-row odd'">
+	  <tr ng-repeat="relType in caseType.definition.caseRoles | orderBy:'displayLabel'" ng-class-even="'crm-entity even-row even'" ng-class-odd="'crm-entity odd-row odd'">
       <!-- display label (client-perspective) -->
 	    <td>{{relType.displayLabel}}</td>
 	    <td><input type="checkbox" ng-model="relType.creator" ng-true-value="'1'" ng-false-value="'0'"></td>
