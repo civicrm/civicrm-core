@@ -209,6 +209,9 @@ class CRM_Event_Form_Registration_ConfirmTest extends CiviUnitTestCase {
     ], $entityFinancialTrxns[2], ['id', 'entity_id']);
     $mut->checkMailLog([
       'Event Information and Location', 'Registration Confirmation - Annual CiviCRM meet',
+      'Expires: January 2019',
+      'Visa',
+      '************1111',
       'This letter is a confirmation that your registration has been received and your status has been updated to <strong> Registered</strong>',
     ]);
     $mut->clearMessages();
