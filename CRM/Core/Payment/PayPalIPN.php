@@ -336,7 +336,8 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
     Civi::log()->debug('PayPalIPN: Received (ContactID: ' . $ids['contact'] . '; trxn_id: ' . $input['trxn_id'] . ').');
 
-    if ($this->retrieve('membershipID', 'Integer', FALSE)) {
+    // Debugging related to possible missing membership linkage
+    if ($contributionRecurID && $this->retrieve('membershipID', 'Integer', FALSE)) {
       $templateContribution = CRM_Contribute_BAO_ContributionRecur::getTemplateContribution($contributionRecurID);
       $membershipPayment = civicrm_api3('MembershipPayment', 'get', [
         'contribution_id' => $templateContribution['id'],
