@@ -59,19 +59,17 @@ class CRM_Financial_BAO_Payment {
 
     $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount']);
 
+    $whiteList = ['check_number', 'payment_processor_id', 'fee_amount', 'total_amount', 'contribution_id', 'net_amount', 'card_type_id', 'pan_truncation', 'trxn_result_code', 'payment_instrument_id', 'order_reference'];
+    $paymentTrxnParams = array_intersect_key($params, array_fill_keys($whiteList, 1));
+
     if ($params['total_amount'] > 0) {
       $paymentTrxnParams['to_financial_account_id'] = CRM_Contribute_BAO_Contribution::getToFinancialAccount($contribution, $params);
       $paymentTrxnParams['from_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($contribution['financial_type_id'], 'Accounts Receivable Account is');
-      $paymentTrxnParams['total_amount'] = $params['total_amount'];
-      $paymentTrxnParams['contribution_id'] = $params['contribution_id'];
       $paymentTrxnParams['trxn_date'] = CRM_Utils_Array::value('trxn_date', $params, CRM_Utils_Array::value('contribution_receive_date', $params, date('YmdHis')));
-      $paymentTrxnParams['fee_amount'] = CRM_Utils_Array::value('fee_amount', $params);
-      $paymentTrxnParams['net_amount'] = CRM_Utils_Array::value('total_amount', $params);
       $paymentTrxnParams['currency'] = $contribution['currency'];
       $paymentTrxnParams['trxn_id'] = CRM_Utils_Array::value('contribution_trxn_id', $params, NULL);
       $paymentTrxnParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'status_id', 'Completed');
       $paymentTrxnParams['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $params, $contribution['payment_instrument_id']);
-      $paymentTrxnParams['check_number'] = CRM_Utils_Array::value('check_number', $params);
       $paymentTrxnParams['is_payment'] = 1;
 
       if (!empty($params['payment_processor'])) {
