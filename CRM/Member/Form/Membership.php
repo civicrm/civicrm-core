@@ -213,9 +213,7 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     // This string makes up part of the class names, differentiating them (not sure why) from the membership fields.
     $this->assign('formClass', 'membership');
     parent::preProcess();
-    if ($this->isUpdateToExistingRecurringMembership()) {
-      $this->entityFields['end_date']['is_freeze'] = TRUE;
-    }
+
     // get price set id.
     $this->_priceSetId = CRM_Utils_Array::value('priceSetId', $_GET);
     $this->set('priceSetId', $this->_priceSetId);
