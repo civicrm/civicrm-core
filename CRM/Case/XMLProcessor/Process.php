@@ -105,7 +105,7 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
       foreach ($xml->CaseRoles as $caseRoleXML) {
         foreach ($caseRoleXML->RelationshipType as $relationshipTypeXML) {
           if ((int ) $relationshipTypeXML->creator == 1) {
-            if (!$this->createRelationships($this->locateNameOrLabel($relationshipTypeXML),
+            if (!$this->createRelationships($relationshipTypeXML,
               $params
             )
             ) {
@@ -184,16 +184,12 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     // Look up relationship types according to the XML convention (described
     // from perspective of non-client) but return the labels according to the UI
     // convention (described from perspective of client)
-    $relationshipTypes = &$this->allRelationshipTypes(TRUE);
     $relationshipTypesToReturn = &$this->allRelationshipTypes(FALSE);
 
     $result = [];
     foreach ($caseRolesXML as $caseRoleXML) {
       foreach ($caseRoleXML->RelationshipType as $relationshipTypeXML) {
-        $relationshipTypeName = (string ) $relationshipTypeXML->name;
-        $relationshipTypeID = array_search($relationshipTypeName,
-          $relationshipTypes
-        );
+        list($relationshipTypeID,) = $this->locateNameOrLabel($relationshipTypeXML);
         if ($relationshipTypeID === FALSE) {
           continue;
         }
@@ -210,19 +206,16 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
   }
 
   /**
-   * @param string $relationshipTypeName
+   * @param SimpleXMLElement $relationshipTypeXML
    * @param array $params
    *
    * @return bool
    * @throws Exception
    */
-  public function createRelationships($relationshipTypeName, &$params) {
-    // The relationshipTypeName is coming from XML, so the argument should be
-    // `TRUE`
-    $relationshipTypes = &$this->allRelationshipTypes(TRUE);
-    // get the relationship
-    $relationshipType = array_search($relationshipTypeName, $relationshipTypes);
+  public function createRelationships($relationshipTypeXML, &$params) {
 
+    // get the relationship
+    list($relationshipType, $relationshipTypeName) = $this->locateNameOrLabel($relationshipTypeXML);
     if ($relationshipType === FALSE) {
       $docLink = CRM_Utils_System::docURL2("user/case-management/set-up");
       CRM_Core_Error::fatal(ts('Relationship type %1, found in case configuration file, is not present in the database %2',
@@ -367,7 +360,8 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
 
     if (!empty($caseTypeXML->CaseRoles) && $caseTypeXML->CaseRoles->RelationshipType) {
       foreach ($caseTypeXML->CaseRoles->RelationshipType as $relTypeXML) {
-        $result[] = (string) $relTypeXML->name;
+        list(, $relationshipTypeMachineName) = $this->locateNameOrLabel($relTypeXML);
+        $result[] = $relationshipTypeMachineName;
       }
     }
 
@@ -848,32 +842,67 @@ AND        a.is_deleted = 0
 
   /**
    * At some point name and label got mixed up for case roles.
-   * Check for higher priority tag <machineName> first which represents name, then fall back to the <name> tag which somehow became label.
-   * We do this to avoid requiring people to update their xml files which can be stored in external files.
-   *
-   * Note this is different than doing something like comparing the <name> tag against name in the database and then falling back to comparing label in the database, which is subject to an edge case where you would get the wrong one (where the label of one relationship type is the same as the name of another). Here there are two tags with explicit single meanings.
+   * Check against known machine name values, and then if no match check
+   * against labels.
+   * This is subject to some edge cases, but we catch those with a system
+   * status check.
+   * We do this to avoid requiring people to update their xml files which can
+   * be stored in external files we can't/don't want to edit.
    *
    * @param SimpleXMLElement $xml
    *
-   * @return string
+   * @return array[bool|string,string]
    */
   public function locateNameOrLabel($xml) {
-    /* While it's unlikely, it's possible somebody is using '0' as their machineName, so we should let them.
-     * Specifically if machineName is:
-     * missing - use name
-     * null - use name
-     * blank - use name
-     * the string '0' - use machineName
-     * the number 0 - use machineName (but can't really have number 0 in simplexml unless cast to number)
-     * the word 'null' - use machineName and best not to think about it
-     */
-    if (isset($xml->machineName)) {
-      $machineName = (string) $xml->machineName;
-      if ($machineName !== '') {
-        return $machineName;
-      }
+    $lookupString = (string) $xml->name;
+
+    // Don't use pseudoconstant because we need everything both name and
+    // label and disabled types.
+    $relationshipTypes = civicrm_api3('RelationshipType', 'get', [
+      'options' => ['limit' => 0],
+    ])['values'];
+
+    // First look and see if it matches a machine name in the system.
+    // There are some edge cases here where we've actually been passed in a
+    // display label and it happens to match the machine name for a different
+    // db entry, but we have a system status check.
+    // But, we do want to check against the a_b version first, because of the
+    // way direction matters and that for bidirectional only one is present in
+    // the list where this eventually gets used, so return that first.
+    $relationshipTypeMachineNames = array_column($relationshipTypes, 'id', 'name_a_b');
+    if (isset($relationshipTypeMachineNames[$lookupString])) {
+      return ["{$relationshipTypeMachineNames[$lookupString]}_b_a", $lookupString];
     }
-    return (string) $xml->name;
+    $relationshipTypeMachineNames = array_column($relationshipTypes, 'id', 'name_b_a');
+    if (isset($relationshipTypeMachineNames[$lookupString])) {
+      return ["{$relationshipTypeMachineNames[$lookupString]}_a_b", $lookupString];
+    }
+
+    // Now at this point assume we've been passed a display label, so find
+    // what it matches and return the associated machine name. This is a bit
+    // trickier because suppose somebody has changed the display labels so
+    // that they are now the same, but the machine names are different. We
+    // don't know which to return and so while it's the right relationship type
+    // it might be the backwards direction. We have to pick one to try first.
+
+    $relationshipTypeDisplayLabels = array_column($relationshipTypes, 'id', 'label_a_b');
+    if (isset($relationshipTypeDisplayLabels[$lookupString])) {
+      return [
+        "{$relationshipTypeDisplayLabels[$lookupString]}_b_a",
+        $relationshipTypes[$relationshipTypeDisplayLabels[$lookupString]]['name_a_b'],
+      ];
+    }
+    $relationshipTypeDisplayLabels = array_column($relationshipTypes, 'id', 'label_b_a');
+    if (isset($relationshipTypeDisplayLabels[$lookupString])) {
+      return [
+        "{$relationshipTypeDisplayLabels[$lookupString]}_a_b",
+        $relationshipTypes[$relationshipTypeDisplayLabels[$lookupString]]['name_b_a'],
+      ];
+    }
+
+    // Just go with what we were passed in, even though it doesn't seem
+    // to match *anything*. This was what it did before.
+    return [FALSE, $lookupString];
   }
 
 }

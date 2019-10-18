@@ -79,7 +79,6 @@
             }];
             reqs.relTypes = ['RelationshipType', 'get', {
               sequential: 1,
-              is_active: 1,
               options: {
                 sort: 'label_a_b',
                 limit: 0
@@ -264,8 +263,10 @@
       $scope.activityTypes = _.indexBy(apiCalls.actTypes.values, 'name');
       $scope.activityTypeOptions = _.map(apiCalls.actTypes.values, formatActivityTypeOption);
       $scope.defaultAssigneeTypes = apiCalls.defaultAssigneeTypes.values;
-      $scope.relationshipTypeOptions = getRelationshipTypeOptions(false);
-      $scope.defaultRelationshipTypeOptions = getRelationshipTypeOptions(true);
+      // for dropdown lists, only include enabled choices
+      $scope.relationshipTypeOptions = getRelationshipTypeOptions(true);
+      // for comparisons, include disabled
+      $scope.relationshipTypeOptionsAll = getRelationshipTypeOptions(false);
       // stores the default assignee values indexed by their option name:
       $scope.defaultAssigneeTypeValues = _.chain($scope.defaultAssigneeTypes)
         .indexBy('name').mapValues('value').value();
@@ -276,44 +277,66 @@
     // two options representing the relationship type directions (Ex: Employee
     // of, Employer of).
     //
-    // The default relationship field needs values that are IDs with direction,
-    // while the role field needs values that are names (with implicit
-    // direction).
+    // The relationship dropdown needs to be given IDs with direction,
+    // while the role name in the xml needs values that are names (with
+    // implicit direction).
     //
     // At any rate, the labels should follow the convention in the UI of
     // describing case roles from the perspective of the client, while the
-    // values must follow the convention in the XML of describing case roles
+    // names must follow the convention in the XML of describing case roles
     // from the perspective of the non-client.
-    function getRelationshipTypeOptions($isDefault) {
-      return _.transform(apiCalls.relTypes.values, function(result, relType) {
+    //
+    // @param onlyActive bool
+    //   If true, only include enabled relationship types.
+    // @return array[object]
+    //   object: {
+    //     xmlName: The name corresponding to what's stored in xml/caseRoles.
+    //     text: The text in dropdowns, i.e. <option value="id">text</option>
+    //       It's called text because that is what select2 is expecting.
+    //     id: The id value in dropdowns, i.e. <option value="id">text</option>
+    //       Is the concatenation of id+direction, e.g. 2_a_b.
+    //       It's called id because that is what select2 is expecting.
+    //   }
+    function getRelationshipTypeOptions(onlyActive) {
+      var relationshipTypesToUse;
+      if (onlyActive) {
+        relationshipTypesToUse = _.filter(apiCalls.relTypes.values, {is_active: "1"});
+      } else {
+        relationshipTypesToUse = apiCalls.relTypes.values;
+      }
+      return _.transform(relationshipTypesToUse, function(result, relType) {
         var isBidirectionalRelationship = relType.label_a_b === relType.label_b_a;
-        if ($isDefault) {
-          result.push({
-            label: relType.label_b_a,
-            value: relType.id + '_a_b'
-          });
 
-          if (!isBidirectionalRelationship) {
-            result.push({
-              label: relType.label_a_b,
-              value: relType.id + '_b_a'
-            });
-          }
-        }
-        // TODO The ids below really should use names not labels see
-        //  https://lab.civicrm.org/dev/core/issues/774
-        else {
-          result.push({
-            text: relType.label_b_a,
-            id: relType.label_a_b
-          });
+        // The order here of a's and b's here is important regarding
+        // unidirectional and bidirectional. Because the xml spec DOES support
+        // direction for activity auto-assignees, if this is changed you might
+        // end up with activity assignees in existing xml that then come
+        // through as blank in the dropdown on the timelines tab if it's a
+        // bidirectional relationship. E.g. if spouse is stored in an existing
+        // xml definition as 2_a_b, but we only push 2_b_a, then it won't match
+        // in the dropdown.
+        //
+        // This has some implications for when we add a new type on the fly
+        // later, but it works out ok as long as we also do it in the same
+        // direction there. See notes in addRoleOnTheFly().
+        result.push({
+          // This is what we want to store in the caseRoles.name field,
+          // which corresponds to the xml file, when we send it back to
+          // the server.
+          xmlName: relType.name_a_b,
+          // This has to be called text because select2 is expecting it.
+          // And yes it's the opposite direction from name.
+          text: relType.label_b_a,
+          // This has to be called id because select2 is expecting it.
+          id: relType.id + '_a_b'
+        });
 
-          if (!isBidirectionalRelationship) {
-            result.push({
-              text: relType.label_a_b,
-              id: relType.label_b_a
-            });
-          }
+        if (!isBidirectionalRelationship) {
+          result.push({
+            xmlName: relType.name_b_a,
+            text: relType.label_a_b,
+            id: relType.id + '_b_a'
+          });
         }
       }, []);
     }
@@ -352,12 +375,19 @@
         });
       });
 
-      // go lookup and add client-perspective labels for $scope.caseType.definition.caseRoles
+      // Go lookup and add client-perspective labels for
+      // $scope.caseType.definition.caseRoles, since the xml doesn't have them
+      // and we need to display them in the roles table.
       _.each($scope.caseType.definition.caseRoles, function (set) {
-        _.each($scope.relationshipTypeOptions, function (relationshipTypeOption) {
-          if (relationshipTypeOption.text == set.name) {
-            // relationshipTypeOption.id here corresponds to one of the civicrm_relationship_type.label database fields, not civicrm_relationship_type.id
-            set.displayLabel = relationshipTypeOption.id;
+        _.each($scope.relationshipTypeOptionsAll, function (relationshipTypeOption) {
+          if (relationshipTypeOption.xmlName == set.name) {
+            // relationshipTypeOption.text here corresponds to one of the
+            // apiCalls.relTypes label fields (i.e. civicrm_relationship_type
+            // label database fields). It has to be called text because
+            // it's used in select2 which expects it to be called text.
+            set.displayLabel = relationshipTypeOption.text;
+            // break out of inner `each` loop
+            return false;
           }
         });
       });
@@ -461,36 +491,95 @@
       activity.default_assignee_contact = null;
     };
 
-    // TODO roleName passed to addRole is a misnomer, its passed as the
-    // label HOWEVER it should be saved to xml as the name see
-    // https://lab.civicrm.org/dev/core/issues/774
-
-    /// Add a new role
-    $scope.addRole = function(roles, roleName) {
+    // Add a new role.
+    // Called from the select2 dropdown when a selection is made.
+    //
+    // @param roles array
+    //   The roles currently in the table.
+    // @param roleIdOrLabel string
+    //   The trick here is that since you can add roles on the fly, the
+    //   roleIdOrLabel parameter can be two different types of things. It can be
+    //   the id, like '2_a_b' if it's an existing choice that was selected, or
+    //   it can be a LABEL if they typed something that isn't in the list. If
+    //   the latter the select2 has no choice but to give us a label because
+    //   there is no id yet.
+    $scope.addRole = function(roles, roleIdOrLabel) {
+      var matchingRole;
+      // First check does what we've been given match up to any relationship
+      // type, based on id, which is the id from the select2 (i.e. html
+      // <option value="id">)
+      var matchingRoles = _.filter($scope.relationshipTypeOptions, {id: roleIdOrLabel});
+      if (matchingRoles.length) {
+        matchingRole = matchingRoles.shift();
+      }
+      // If found, is the corresponding machine name in the list of existing
+      // roles for the case type. Unfortunately, caseRoles only stores name,
+      // which doesn't indicate the id or direction, because the xml spec
+      // doesn't support those.
       var names = _.pluck($scope.caseType.definition.caseRoles, 'name');
-      if (!_.contains(names, roleName)) {
-        var matchingRoles = _.filter($scope.relationshipTypeOptions, {id: roleName});
-        if (matchingRoles.length) {
-          var matchingRole = matchingRoles.shift();
-          roles.push({name: roleName, displayLabel: matchingRole.text});
-        } else {
-           CRM.loadForm(CRM.url('civicrm/admin/reltype', {action: 'add', reset: 1, label_a_b: roleName}))
-            .on('crmFormSuccess', function(e, data) {
-              var newType = _.values(data.relationshipType)[0];
-              $scope.$apply(function() {
-                $scope.addRoleOnTheFly(roles, newType);
-              });
-            });
+      if (matchingRole) {
+        // If it's not in the table already, add it, otherwise do nothing since
+        // don't want to add it twice.
+        if (!_.contains(names, matchingRole.xmlName)) {
+          roles.push({name: matchingRole.xmlName, displayLabel: matchingRole.text});
         }
+      } else {
+         // Not a known relationship type, so create on-the-fly.
+         // At this point roleIdOrLabel must be the new label they just typed.
+         CRM.loadForm(CRM.url('civicrm/admin/reltype', {action: 'add', reset: 1, label_a_b: roleIdOrLabel}))
+          .on('crmFormSuccess', function(e, data) {
+            var newType = _.values(data.relationshipType)[0];
+            $scope.$apply(function() {
+              $scope.addRoleOnTheFly(roles, newType);
+            });
+          });
       }
     };
 
+    // Add a newly created relationship type as a role to the table and
+    // update the list of options.
+    //
+    // @param roles array
+    //   The roles currently in the table.
+    // @param newType array
+    //   The array returned from the api call that created the new type
+    //   earlier.
     $scope.addRoleOnTheFly = function(roles, newType) {
-      roles.push({name: newType.label_b_a, displayLabel: newType.label_a_b});
-      // Assume that the case role should be A-B but add both directions as options.
-      $scope.relationshipTypeOptions.push({id: newType.label_a_b, text: newType.label_b_a});
+      // Add it to the roles table. Assume they want the A-B direction since
+      // that's what they would have typed.
+      // Name and label are opposites here because name represents the value
+      // in the xml here which historically is the opposite.
+      roles.push({name: newType.name_b_a, displayLabel: newType.label_a_b});
+
+      // But now add both directions as option choices for future dropdown
+      // selections.
+      // Note that to keep in line with the original population on init,
+      // we're pushing a different direction here than we just added to the
+      // table, but there's only two possibilities:
+      // 1. Labels are the same, and since it's a new type name_a_b and
+      // name_b_a will therefore be the same, and so it doesn't matter which
+      // name is stored in caseRoles.
+      // 2. Labels are different, in which case we're also going to push the
+      // other direction below.
+      // So either way we're covered.
+      // See also note in getRelationshipTypeOptions().
+      var newRelTypeOption = {
+        xmlName: newType.name_a_b,
+        // Yes text is the opposite direction from name here.
+        text: newType.label_b_a,
+        id: newType.id + '_a_b'
+      };
+      $scope.relationshipTypeOptions.push(newRelTypeOption);
+      $scope.relationshipTypeOptionsAll.push(newRelTypeOption);
+      // Add the other direction if different.
       if (newType.label_a_b != newType.label_b_a) {
-        $scope.relationshipTypeOptions.push({id: newType.label_b_a, text: newType.label_a_b});
+        newRelTypeOption = {
+          xmlName: newType.name_b_a,
+          text: newType.label_a_b,
+          id: newType.id + '_b_a'
+        };
+        $scope.relationshipTypeOptions.push(newRelTypeOption);
+        $scope.relationshipTypeOptionsAll.push(newRelTypeOption);
       }
     };
 
