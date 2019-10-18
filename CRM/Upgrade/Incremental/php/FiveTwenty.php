@@ -29,6 +29,12 @@
 class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Base {
 
   /**
+   * @var $relationshipTypes array
+   *   api call result keyed on relationship_type.id
+   */
+  protected static $relationshipTypes;
+
+  /**
    * Compute any messages which should be displayed beforeupgrade.
    *
    * Note: This function is called iteratively for each upcoming
@@ -83,7 +89,101 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
       "tinyint(4) DEFAULT '0' COMMENT 'Shows this is a template for recurring contributions.'", FALSE, '5.20.alpha1');
     $this->addTask('Add order_reference field to civicrm_financial_trxn', 'addColumn', 'civicrm_financial_trxn', 'order_reference',
       "varchar(255) COMMENT 'Payment Processor external order reference'", FALSE, '5.20.alpha1');
+    $config = CRM_Core_Config::singleton();
+    if (in_array('CiviCase', $config->enableComponents)) {
+      $this->addTask('Change direction of autoassignees in case type xml', 'changeCaseTypeAutoassignee');
+    }
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+  }
+
+  /**
+   * Change direction of activity autoassignees in case type xml for
+   * bidirectional relationship types if they point the other way. This is
+   * mostly a visual issue on the case type edit screen and doesn't affect
+   * normal operation, but could lead to confusion and a future mixup.
+   * (dev/core#1046)
+   * ONLY for ones using database storage - don't want to "fork" case types
+   * that aren't currently forked.
+   *
+   * Earlier iterations of this used the api and array manipulation
+   * and then another iteration used SimpleXML manipulation, but both
+   * suffered from weirdnesses in how conversion back and forth worked.
+   *
+   * Here we use SQL and a regex. The thing we're changing is pretty
+   * well-defined and unique:
+   * <default_assignee_relationship>N_b_a</default_assignee_relationship>
+   *
+   * @return bool
+   */
+  public static function changeCaseTypeAutoassignee() {
+    self::$relationshipTypes = civicrm_api3('RelationshipType', 'get', [
+      'options' => ['limit' => 0],
+    ])['values'];
+
+    // Get all case types definitions that are using db storage
+    $dao = CRM_Core_DAO::executeQuery("SELECT id, definition FROM civicrm_case_type WHERE definition IS NOT NULL AND definition <> ''");
+    while ($dao->fetch()) {
+      self::processCaseTypeAutoassignee($dao->id, $dao->definition);
+    }
+    return TRUE;
+  }
+
+  /**
+   * Process a single case type
+   *
+   * @param $caseTypeId int
+   * @param $definition string
+   *   xml string
+   */
+  public static function processCaseTypeAutoassignee($caseTypeId, $definition) {
+    $isDirty = FALSE;
+    // find the autoassignees
+    preg_match_all('/<default_assignee_relationship>(.*?)<\/default_assignee_relationship>/', $definition, $matches);
+    // $matches[1][n] has the text inside the xml tag, e.g. 2_a_b
+    foreach ($matches[1] as $index => $match) {
+      if (empty($match)) {
+        continue;
+      }
+      // parse out existing id and direction
+      list($relationshipTypeId, $direction1) = explode('_', $match);
+      // we only care about ones that are b_a
+      if ($direction1 === 'b') {
+        // we only care about bidirectional
+        if (self::isBidirectionalRelationship($relationshipTypeId)) {
+          // flip it to be a_b
+          // $matches[0][n] has the whole match including the xml tag
+          $definition = str_replace($matches[0][$index], "<default_assignee_relationship>{$relationshipTypeId}_a_b</default_assignee_relationship>", $definition);
+          $isDirty = TRUE;
+        }
+      }
+    }
+
+    if ($isDirty) {
+      $sqlParams = [
+        1 => [$definition, 'String'],
+        2 => [$caseTypeId, 'Integer'],
+      ];
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_case_type SET definition = %1 WHERE id = %2", $sqlParams);
+      //echo "UPDATE civicrm_case_type SET definition = '" . CRM_Core_DAO::escapeString($sqlParams[1][0]) . "' WHERE id = {$sqlParams[2][0]}\n";
+    }
+  }
+
+  /**
+   * Check if this is bidirectional, based on label. In the situation where
+   * we're using this we don't care too much about the edge case where name
+   * might not also be bidirectional.
+   *
+   * @param $relationshipTypeId int
+   *
+   * @return bool
+   */
+  private static function isBidirectionalRelationship($relationshipTypeId) {
+    if (isset(self::$relationshipTypes[$relationshipTypeId])) {
+      if (self::$relationshipTypes[$relationshipTypeId]['label_a_b'] === self::$relationshipTypes[$relationshipTypeId]['label_b_a']) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
 }
