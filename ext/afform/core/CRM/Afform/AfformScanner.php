@@ -134,7 +134,7 @@ class CRM_Afform_AfformScanner {
 
     $defaults = [
       'name' => $name,
-      'requires' => explode(',', self::DEFAULT_REQUIRES),
+      'requires' => [],
       'title' => '',
       'description' => '',
       'is_public' => FALSE,
