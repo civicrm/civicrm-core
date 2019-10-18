@@ -188,7 +188,7 @@
         </div>
     {/if}
 
-    {if $contributeMode eq 'direct' and $paidEvent and ! $is_pay_later and !$isAmountzero and !$isOnWaitlist and !$isRequireApproval}
+    {if $credit_card_type}
       {crmRegion name="event-thankyou-billing-block"}
         <div class="crm-group credit_card-group">
           <div class="header-dark">
