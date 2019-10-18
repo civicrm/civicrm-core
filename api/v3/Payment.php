@@ -273,12 +273,9 @@ function _civicrm_api3_payment_cancel_spec(&$params) {
  */
 function civicrm_api3_payment_sendconfirmation($params) {
   $allowedParams = [
-    'receipt_from_email',
-    'receipt_from_name',
-    'cc_receipt',
-    'bcc_receipt',
-    'receipt_text',
+    'from',
     'id',
+    'check_permissions',
   ];
   $input = array_intersect_key($params, array_flip($allowedParams));
   // use either the contribution or membership receipt, based on whether it’s a membership-related contrib or not
@@ -306,5 +303,9 @@ function _civicrm_api3_payment_sendconfirmation_spec(&$params) {
     'api.required' => 1,
     'title' => ts('Payment ID'),
     'type' => CRM_Utils_Type::T_INT,
+  ];
+  $params['from_email_address'] = [
+    'title' => ts('From email; an email string or the id of a valid email'),
+    'type' => CRM_Utils_Type::T_STRING,
   ];
 }

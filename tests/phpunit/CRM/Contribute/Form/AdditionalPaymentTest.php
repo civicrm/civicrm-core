@@ -138,6 +138,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $this->checkResults([30, 70], 2);
     $mut->assertSubjects(['Payment Receipt -']);
     $mut->checkMailLog([
+      'From: site@something.com',
       'Dear Anthony,',
       'Payment Details',
       'Total Fees: $ 100.00',
