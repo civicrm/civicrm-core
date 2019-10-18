@@ -69,7 +69,7 @@ class CRM_Report_Form_Pledge_Detail extends CRM_Report_Form {
    */
   public function __construct() {
     $this->_pledgeStatuses = CRM_Core_OptionGroup::values('pledge_status',
-      FALSE, FALSE, FALSE, NULL, 'label'
+      FALSE, FALSE, FALSE, NULL, 'name'
     );
 
     $this->_columns = [
