@@ -585,7 +585,7 @@ WHERE  id IN ( $groupIDs )
         continue;
       }
       if (CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) {$contactQuery['from']}") > 0) {
-        CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTable (contact_id, group_id) {$contactQuery['select']} {$contactQuery['from']}");
+        CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTable (group_id, contact_id) {$contactQuery['select']} {$contactQuery['from']}");
       }
     }
 
