@@ -395,7 +395,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
 
       $completeStatus = CRM_Contribute_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Completed');
       $specialFields = [
-        'join_date' => date('Y-m-d'),
+        'membership_join_date' => date('Y-m-d'),
         'receive_date' => $currentDate,
         'contribution_status_id' => $completeStatus,
       ];
@@ -525,7 +525,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
           'payment_instrument' => 'payment_instrument_id',
           'contribution_source' => 'source',
           'contribution_note' => 'note',
-
+          'contribution_check_number' => 'check_number',
         ];
         foreach ($fieldTranslations as $formField => $baoField) {
           if (isset($value[$formField])) {
@@ -825,7 +825,7 @@ class CRM_Batch_Form_Entry extends CRM_Core_Form {
         }
         else {
           $dateTypes = [
-            'join_date' => 'joinDate',
+            'membership_join_date' => 'joinDate',
             'membership_start_date' => 'startDate',
             'membership_end_date' => 'endDate',
           ];

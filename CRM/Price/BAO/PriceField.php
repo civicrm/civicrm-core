@@ -116,6 +116,7 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
       ]);
       foreach ($fieldOptions['values'] as $option) {
         $optionsIds['id'] = $option['id'];
+        $params['option_id'] = [1 => $option['id']];
         // CRM-19741 If we are dealing with price fields that are Text only set the field value label to match
         if (!empty($params['id']) && $priceField->label != $option['label']) {
           $fieldValue = new CRM_Price_DAO_PriceFieldValue();
@@ -177,10 +178,10 @@ class CRM_Price_BAO_PriceField extends CRM_Price_DAO_PriceField {
         }
         if ($opIds = CRM_Utils_Array::value('option_id', $params)) {
           if ($opId = CRM_Utils_Array::value($index, $opIds)) {
-            $optionsIds['id'] = $opId;
+            $options['id'] = $opId;
           }
           else {
-            $optionsIds['id'] = NULL;
+            $options['id'] = NULL;
           }
         }
         try {

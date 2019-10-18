@@ -1132,20 +1132,21 @@ class CRM_Member_Form_Membership extends CRM_Member_Form {
     //take the required membership recur values.
     if ($this->_mode && !empty($formValues['auto_renew'])) {
       $params['is_recur'] = $formValues['is_recur'] = TRUE;
-      $mapping = [
-        'frequency_interval' => 'duration_interval',
-        'frequency_unit' => 'duration_unit',
-      ];
 
       $count = 0;
       foreach ($this->_memTypeSelected as $memType) {
         $recurMembershipTypeValues = CRM_Utils_Array::value($memType,
-          $this->_recurMembershipTypes, []
+          $this->allMembershipTypeDetails, []
         );
-        foreach ($mapping as $mapVal => $mapParam) {
-          $membershipTypeValues[$memType][$mapVal] = CRM_Utils_Array::value($mapParam,
-            $recurMembershipTypeValues
-          );
+        if (!$recurMembershipTypeValues['auto_renew']) {
+          continue;
+        }
+        foreach ([
+          'frequency_interval' => 'duration_interval',
+          'frequency_unit' => 'duration_unit',
+        ] as $mapVal => $mapParam) {
+          $membershipTypeValues[$memType][$mapVal] = $recurMembershipTypeValues[$mapParam];
+
           if (!$count) {
             $formValues[$mapVal] = CRM_Utils_Array::value($mapParam,
               $recurMembershipTypeValues

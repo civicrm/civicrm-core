@@ -35,12 +35,13 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
 
   protected $_individualId;
   protected $_pledge;
-  protected $_apiversion;
   protected $_params;
   protected $_entity;
   protected $scheduled_date;
-  public $DBResetRequired = TRUE;
 
+  /**
+   * @throws \CRM_Core_Exception
+   */
   public function setUp() {
     $this->_apiversion = 3;
     parent::setUp();
@@ -119,7 +120,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals($this->_pledge['id'], $pledge['pledge_id']);
     $this->assertEquals(date('Y-m-d') . ' 00:00:00', $pledge['pledge_create_date']);
     $this->assertEquals(100.00, $pledge['pledge_amount']);
-    $this->assertEquals('Pending', $pledge['pledge_status']);
+    $this->assertEquals('Pending Label**', $pledge['pledge_status']);
     $this->assertEquals(5, $pledge['pledge_frequency_interval']);
     $this->assertEquals('year', $pledge['pledge_frequency_unit']);
     $this->assertEquals(date('Y-m-d', strtotime($this->scheduled_date)) . ' 00:00:00', $pledge['pledge_next_pay_date']);
@@ -426,7 +427,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals($old_contact_id, $this->_individualId);
     $this->assertEquals($old_frequency_unit, 'year');
     $this->assertEquals($old_frequency_interval, 5);
-    $this->assertEquals($old_status_id, 'Pending');
+    $this->assertEquals($old_status_id, 'Pending Label**');
     $params = [
       'id' => $pledgeID,
       'contact_id' => $this->_individualId,
@@ -473,7 +474,7 @@ class api_v3_PledgeTest extends CiviUnitTestCase {
     $this->assertEquals($old_contact_id, $this->_individualId);
     $this->assertEquals($old_frequency_unit, 'year');
     $this->assertEquals($old_frequency_interval, 5);
-    $this->assertEquals($old_status_id, 'Pending');
+    $this->assertEquals($old_status_id, 'Pending Label**');
     $params = [
       'id' => $pledgeID,
       'contact_id' => $this->_individualId,

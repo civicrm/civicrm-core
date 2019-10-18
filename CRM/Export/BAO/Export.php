@@ -115,6 +115,7 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
     }
     $processor->setComponentTable($componentTable);
     $processor->setComponentClause($componentClause);
+    $processor->setIds($ids);
 
     list($query, $queryString) = $processor->runQuery($params, $order);
 
@@ -127,6 +128,9 @@ INSERT INTO {$componentTable} SELECT distinct gc.contact_id FROM civicrm_group_c
 
     if ($processor->isMergeSameAddress()) {
       foreach (array_keys($processor->getAdditionalFieldsForSameAddressMerge()) as $field) {
+        if ($field === 'id') {
+          $field = 'civicrm_primary_id';
+        }
         $processor->setColumnAsCalculationOnly($field);
       }
     }

@@ -160,24 +160,14 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       $quoteValue = "\"$value\"";
     }
 
-    // These are legacy names.
-    // @todo enotices when these are hit so we can start to elimnate them.
-    $fieldAliases = [
-      'financial_type' => 'financial_type_id',
-      'contribution_page' => 'contribution_page_id',
-      'payment_instrument' => 'payment_instrument_id',
-      // or payment_instrument_id?
-      'contribution_payment_instrument' => 'contribution_payment_instrument_id',
-      'contribution_status' => 'contribution_status_id',
-    ];
+    $fieldAliases = self::getLegacySupportedFields();
 
-    $name = isset($fieldAliases[$name]) ? $fieldAliases[$name] : $name;
+    $fieldName = $name = self::getFieldName($values);
     $qillName = $name;
     if (in_array($name, $fieldAliases)) {
       $qillName = array_search($name, $fieldAliases);
     }
     $pseudoExtraParam = [];
-    $fieldName = str_replace(['_high', '_low'], '', $name);
     $fieldSpec = CRM_Utils_Array::value($fieldName, $fields, []);
     $tableName = CRM_Utils_Array::value('table_name', $fieldSpec, 'civicrm_contribution');
     $dataType = CRM_Utils_Type::typeToString(CRM_Utils_Array::value('type', $fieldSpec));
@@ -933,7 +923,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
   }
 
   /**
-   * Add all the elements shared between contribute search and advnaced search.
+   * Add all the elements shared between contribute search and advanced search.
    *
    * @param \CRM_Contribute_Form_Search $form
    *
@@ -986,7 +976,7 @@ class CRM_Contribute_BAO_Query extends CRM_Core_BAO_Query {
       ts('Personal Campaign Page'),
       CRM_Contribute_PseudoConstant::pcPage(), FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple', 'placeholder' => ts('- any -')]);
 
-    $statusValues = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'contribution_status_id');
+    $statusValues = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search');
     $form->add('select', 'contribution_status_id',
       ts('Contribution Status'), $statusValues,
       FALSE, ['class' => 'crm-select2', 'multiple' => 'multiple']

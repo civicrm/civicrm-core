@@ -325,43 +325,6 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
   }
 
   /**
-   * Given a saved search compute the clause and the tables and store it for future use.
-   */
-  public function buildClause() {
-    $fv = unserialize($this->form_values);
-
-    if ($this->mapping_id) {
-      $params = CRM_Core_BAO_Mapping::formattedFields($fv);
-    }
-    else {
-      $params = CRM_Contact_BAO_Query::convertFormValues($fv);
-    }
-
-    if (!empty($params)) {
-      $tables = $whereTables = [];
-      $this->where_clause = CRM_Contact_BAO_Query::getWhereClause($params, NULL, $tables, $whereTables);
-      if (!empty($tables)) {
-        $this->select_tables = serialize($tables);
-      }
-      if (!empty($whereTables)) {
-        $this->where_tables = serialize($whereTables);
-      }
-    }
-  }
-
-  /**
-   * Save the search.
-   *
-   * @param bool $hook
-   */
-  public function save($hook = TRUE) {
-    // first build the computed fields
-    $this->buildClause();
-
-    parent::save($hook);
-  }
-
-  /**
    * Given an id, get the name of the saved search.
    *
    * @param int $id
@@ -437,9 +400,22 @@ LEFT JOIN civicrm_email ON (contact_a.id = civicrm_email.contact_id AND civicrm_
     // This is required only until all fields are converted to datepicker fields as the new format is truer to the
     // form format and simply saves (e.g) custom_3_relative => "this.year"
     $relativeDates = ['relative_dates' => []];
-    $specialDateFields = ['event_relative', 'case_from_relative', 'case_to_relative', 'participant_relative'];
+    $specialDateFields = [
+      'event_relative',
+      'case_from_relative',
+      'case_to_relative',
+      'participant_relative',
+      'log_date_relative',
+      'birth_date_relative',
+      'deceased_date_relative',
+      'mailing_date_relative',
+      'relation_date_relative',
+      'relation_start_date_relative',
+      'relation_end_date_relative',
+      'relation_action_date_relative',
+    ];
     foreach ($formValues as $id => $value) {
-      if ((preg_match('/_date$/', $id) || in_array($id, $specialDateFields)) && !empty($value)) {
+      if (in_array($id, $specialDateFields) && !empty($value)) {
         $entityName = strstr($id, '_date', TRUE);
         if (empty($entityName)) {
           $entityName = strstr($id, '_relative', TRUE);

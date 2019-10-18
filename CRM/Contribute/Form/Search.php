@@ -86,14 +86,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
 
     $this->loadStandardSearchOptionsFromUrl();
 
-    // get user submitted values
-    // get it from controller only if form has been submitted, else preProcess has set this
-    if (!empty($_POST)) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-    }
-    else {
-      $this->_formValues = $this->get('formValues');
-    }
+    $this->_formValues = $this->getFormValues();
 
     //membership ID
     $memberShipId = CRM_Utils_Request::retrieve('memberId', 'Positive', $this);
@@ -106,12 +99,7 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
     }
 
     if ($this->_force) {
-      // Search field metadata is normally added in buildForm but we are bypassing that in this flow
-      // (I've always found the flow kinda confusing & perhaps that is the problem but this mitigates)
-      $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
-      $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
-      $this->postProcess();
-      $this->set('force', 0);
+      $this->handleForcedSearch();
     }
 
     $sortID = NULL;
@@ -480,6 +468,16 @@ class CRM_Contribute_Form_Search extends CRM_Core_Form_Search {
    */
   public function getTitle() {
     return ts('Find Contributions');
+  }
+
+  /**
+   * Set the metadata for the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function setSearchMetadata() {
+    $this->addSearchFieldMetadata(['Contribution' => CRM_Contribute_BAO_Query::getSearchFieldMetadata()]);
+    $this->addSearchFieldMetadata(['ContributionRecur' => CRM_Contribute_BAO_ContributionRecur::getContributionRecurSearchFieldMetadata()]);
   }
 
 }

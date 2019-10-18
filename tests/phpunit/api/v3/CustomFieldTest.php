@@ -206,7 +206,7 @@ class api_v3_CustomFieldTest extends CiviUnitTestCase {
   {
 
   $customGroup = $this->customGroupCreate('Individual','date_test_group',3);
-  require_once 'api/v3/examples/CustomField/Create.php';
+  require_once 'api/v3/examples/CustomField/Create.ex.php';
   $result = custom_field_create_example();
   $expectedResult = custom_field_create_expectedresult();
   $this->assertEquals($result,$expectedResult);

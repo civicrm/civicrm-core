@@ -104,7 +104,7 @@ class CRM_Import_ImportProcessor {
    * @return string
    */
   public function getContactSubType(): string {
-    return $this->contactSubType;
+    return $this->contactSubType ?? '';
   }
 
   /**
@@ -112,8 +112,8 @@ class CRM_Import_ImportProcessor {
    *
    * @param string $contactSubType
    */
-  public function setContactSubType(string $contactSubType) {
-    $this->contactSubType = $contactSubType;
+  public function setContactSubType($contactSubType) {
+    $this->contactSubType = (string) $contactSubType;
   }
 
   /**
@@ -170,6 +170,8 @@ class CRM_Import_ImportProcessor {
   }
 
   /**
+   * Get the contact type for the import.
+   *
    * @return string
    */
   public function getContactType(): string {
@@ -212,9 +214,27 @@ class CRM_Import_ImportProcessor {
   }
 
   /**
+   * Set mapping fields.
+   *
+   * We do a little cleanup here too.
+   *
+   * We ensure that column numbers are set and that the fields are ordered by them.
+   *
+   * This would mean the fields could be loaded unsorted.
+   *
    * @param array $mappingFields
    */
   public function setMappingFields(array $mappingFields) {
+    $i = 0;
+    foreach ($mappingFields as &$mappingField) {
+      if (!isset($mappingField['column_number'])) {
+        $mappingField['column_number'] = $i;
+      }
+      if ($mappingField['column_number'] > $i) {
+        $i = $mappingField['column_number'];
+      }
+      $i++;
+    }
     $this->mappingFields = $this->rekeyBySortedColumnNumbers($mappingFields);
   }
 
@@ -418,6 +438,10 @@ class CRM_Import_ImportProcessor {
       }
       else {
         // Honour legacy chaos factor.
+        if ($field['name'] === ts('- do not import -')) {
+          // This is why we save names not labels people....
+          $field['name'] = 'do_not_import';
+        }
         $fields[$index]['name'] = strtolower(str_replace(" ", "_", $field['name']));
         // fix for edge cases, CRM-4954
         if ($fields[$index]['name'] === 'image_url') {
@@ -476,6 +500,71 @@ class CRM_Import_ImportProcessor {
    */
   protected function isValidRelationshipKey($key) {
     return !empty($this->getValidRelationships()[$key]) ? TRUE : FALSE;
+  }
+
+  /**
+   * Get the relevant js for quickform.
+   *
+   * @param int $column
+   *
+   * @return string
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getQuickFormJSForField($column) {
+    $columnNumbersToHide = [];
+    if ($this->getFieldName($column) === 'do_not_import') {
+      $columnNumbersToHide = [1, 2, 3];
+    }
+    elseif ($this->getRelationshipKey($column)) {
+      if (!$this->getWebsiteTypeID($column) && !$this->getLocationTypeID($column)) {
+        $columnNumbersToHide[] = 2;
+      }
+      if (!$this->getFieldName($column)) {
+        $columnNumbersToHide[] = 1;
+      }
+      if (!$this->getPhoneOrIMTypeID($column)) {
+        $columnNumbersToHide[] = 3;
+      }
+    }
+    else {
+      if (!$this->getLocationTypeID($column) && !$this->getWebsiteTypeID($column)) {
+        $columnNumbersToHide[] = 1;
+      }
+      if (!$this->getPhoneOrIMTypeID($column)) {
+        $columnNumbersToHide[] = 2;
+      }
+      $columnNumbersToHide[] = 3;
+    }
+
+    $jsClauses = [];
+    foreach ($columnNumbersToHide as $columnNumber) {
+      $jsClauses[] = $this->getFormName() . "['mapper[$column][" . $columnNumber . "]'].style.display = 'none';";
+    }
+    return empty($jsClauses) ? '' : implode("\n", $jsClauses) . "\n";
+  }
+
+  /**
+   * Get the defaults for the column from the saved mapping.
+   *
+   * @param int $column
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  public function getSavedQuickformDefaultsForColumn($column) {
+    if ($this->getFieldName($column) === 'do_not_import') {
+      return [];
+    }
+    if ($this->getValidRelationshipKey($column)) {
+      if ($this->getWebsiteTypeID($column)) {
+        return [$this->getValidRelationshipKey($column), $this->getFieldName($column), $this->getWebsiteTypeID($column)];
+      }
+      return [$this->getValidRelationshipKey($column), $this->getFieldName($column), $this->getLocationTypeID($column), $this->getPhoneOrIMTypeID($column)];
+    }
+    if ($this->getWebsiteTypeID($column)) {
+      return [$this->getFieldName($column), $this->getWebsiteTypeID($column)];
+    }
+    return [(string) $this->getFieldName($column), $this->getLocationTypeID($column), $this->getPhoneOrIMTypeID($column)];
   }
 
 }

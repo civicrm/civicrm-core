@@ -60,6 +60,7 @@
     <uniqueName>pledge_payment_scheduled_amount</uniqueName>
     <title>Scheduled Amount</title>
     <import>true</import>
+    <export>true</export>
     <type>decimal</type>
     <required>true</required>
     <comment>Pledged amount for this payment (the actual contribution amount might be different).</comment>
@@ -98,6 +99,7 @@
     <uniqueName>pledge_payment_scheduled_date</uniqueName>
     <title>Scheduled Date</title>
     <import>true</import>
+    <export>true</export>
     <type>datetime</type>
     <required>true</required>
     <comment>The date the pledge payment is supposed to happen.</comment>
@@ -106,6 +108,7 @@
       <type>Select Date</type>
       <formatType>activityDate</formatType>
     </html>
+    <uniqueTitle>Payment Scheduled</uniqueTitle>
   </field>
   <field>
     <name>reminder_date</name>

@@ -132,7 +132,7 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     // Note that the expected result should logically be CRM_Import_Parser::valid but writing test to reflect not fix here
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['contact_id' => $contactID]);
-    $this->assertEquals('Pending', $contribution['contribution_status']);
+    $this->assertEquals('Pending Label**', $contribution['contribution_status']);
 
     $this->callAPISuccess('OptionValue', 'create', [
       'option_group_id' => 'contribution_status',
@@ -148,6 +148,12 @@ class CRM_Contribute_Import_Parser_ContributionTest extends CiviUnitTestCase {
     $values['contribution_status_id'] = 'just say no';
     $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, CRM_Import_Parser::ERROR);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID], 2);
+
+    // Per https://lab.civicrm.org/dev/core/issues/1285 it's a bit arguable but Ok we can support id...
+    $values['contribution_status_id'] = 3;
+    $this->runImport($values, CRM_Import_Parser::DUPLICATE_UPDATE, NULL);
+    $this->callAPISuccessGetCount('Contribution', ['contact_id' => $contactID, 'contribution_status_id' => 3], 1);
+
   }
 
   /**

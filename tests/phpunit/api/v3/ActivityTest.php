@@ -458,7 +458,7 @@ class api_v3_ActivityTest extends CiviUnitTestCase {
    * Test civicrm_activity_create() using example code.
    */
   public function testActivityCreateExample() {
-    require_once 'api/v3/examples/Activity/Create.php';
+    require_once 'api/v3/examples/Activity/Create.ex.php';
     $result = activity_create_example();
     $expectedResult = activity_create_expectedresult();
     // Compare everything *except* timestamps.

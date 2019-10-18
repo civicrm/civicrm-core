@@ -265,8 +265,12 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
 
     if ($config->userFrameworkFrontend) {
       $script = 'index.php';
-      if (JRequest::getVar("Itemid") && (strpos($path, 'civicrm/payment/ipn') === FALSE)) {
-        $Itemid = "{$separator}Itemid=" . JRequest::getVar("Itemid");
+
+      // Get Itemid using JInput::get()
+      $input = Joomla\CMS\Factory::getApplication()->input;
+      $itemIdNum = $input->get("Itemid");
+      if ($itemIdNum && (strpos($path, 'civicrm/payment/ipn') === FALSE)) {
+        $Itemid = "{$separator}Itemid=" . $itemIdNum;
       }
     }
 
@@ -830,23 +834,6 @@ class CRM_Utils_System_Joomla extends CRM_Utils_System_Base {
   public function checkPermissionAddUser() {
     if (JFactory::getUser()->authorise('core.create', 'com_users')) {
       return TRUE;
-    }
-  }
-
-  /**
-   * Output code from error function.
-   * @param string $content
-   */
-  public function outputError($content) {
-    if (class_exists('JErrorPage')) {
-      $error = new Exception($content);
-      JErrorPage::render($error);
-    }
-    elseif (class_exists('JError')) {
-      JError::raiseError('CiviCRM-001', $content);
-    }
-    else {
-      parent::outputError($content);
     }
   }
 

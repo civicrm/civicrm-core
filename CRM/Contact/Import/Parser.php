@@ -578,6 +578,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
    * @return array
    */
   public function getColumnPatterns() {
+    CRM_Core_Error::deprecatedFunctionWarning('no  longer used- use   CRM_Contact_Import_MetadataTrait');
     $values = [];
     foreach ($this->_fields as $name => $field) {
       $values[$name] = $field->_columnPattern;
@@ -616,8 +617,6 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
     $store->set('fields', $this->getSelectValues());
     $store->set('fieldTypes', $this->getSelectTypes());
 
-    $store->set('columnPatterns', $this->getColumnPatterns());
-    $store->set('dataPatterns', $this->getDataPatterns());
     $store->set('columnCount', $this->_activeFieldCount);
 
     $store->set('totalRowCount', $this->_totalCount);
@@ -1207,6 +1206,7 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       if (!array_key_exists($blockFieldName, $values)) {
         continue;
       }
+      $blockIndex = $values['location_type_id'] . (!empty($values['phone_type_id']) ? '_' . $values['phone_type_id'] : '');
 
       // block present in value array.
       if (!array_key_exists($blockFieldName, $params) || !is_array($params[$blockFieldName])) {
@@ -1221,13 +1221,13 @@ abstract class CRM_Contact_Import_Parser extends CRM_Import_Parser {
       }
 
       _civicrm_api3_store_values($fields[$block], $values,
-        $params[$blockFieldName][$values['location_type_id']]
+        $params[$blockFieldName][$blockIndex]
       );
 
-      $this->fillPrimary($params[$blockFieldName][$values['location_type_id']], $values, $block, CRM_Utils_Array::value('id', $params));
+      $this->fillPrimary($params[$blockFieldName][$blockIndex], $values, $block, CRM_Utils_Array::value('id', $params));
 
       if (empty($params['id']) && (count($params[$blockFieldName]) == 1)) {
-        $params[$blockFieldName][$values['location_type_id']]['is_primary'] = TRUE;
+        $params[$blockFieldName][$blockIndex]['is_primary'] = TRUE;
       }
 
       // we only process single block at a time.

@@ -144,6 +144,10 @@ class CRM_Contact_Page_View_UserDashBoard extends CRM_Core_Page {
 
     // CRM-16512 - Hide related contact table if user lacks permission to view self
     if (!empty($dashboardOptions['Permissioned Orgs']) && CRM_Core_Permission::check('view my contact')) {
+      $columnHeaders = CRM_Contact_BAO_Relationship::getColumnHeaders();
+      $contactRelationships = $selector = NULL;
+      CRM_Utils_Hook::searchColumns('relationship.columns', $columnHeaders, $contactRelationships, $selector);
+      $this->assign('columnHeaders', $columnHeaders);
       $dashboardElements[] = [
         'class' => 'crm-dashboard-permissionedOrgs',
         'templatePath' => 'CRM/Contact/Page/View/RelationshipSelector.tpl',

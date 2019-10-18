@@ -28,9 +28,6 @@
     {else}
      <p>{ts}Thank you for your support.{/ts}</p>
     {/if}
-    {if ! $cancelled}
-     <p>{ts}Please print this receipt for your records.{/ts}</p>
-    {/if}
    </td>
   </tr>
   <tr>

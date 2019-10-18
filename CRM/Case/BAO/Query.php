@@ -481,7 +481,14 @@ class CRM_Case_BAO_Query extends CRM_Core_BAO_Query {
         $tags = CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', ['onlyActive' => FALSE]);
 
         if (!empty($value)) {
-          $val = explode(',', $value);
+          if (is_array($value)) {
+            // Search tag(s) are part of a tag set
+            $val = array_keys($value);
+          }
+          else {
+            // Search tag(s) are part of the tag tree
+            $val = explode(',', $value);
+          }
           foreach ($val as $v) {
             if ($v) {
               $names[] = $tags[$v];

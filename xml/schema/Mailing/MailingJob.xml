@@ -39,6 +39,8 @@
   </field>
   <field>
     <name>start_date</name>
+    <uniqueName>mailing_job_start_date</uniqueName>
+    <uniqueTitle>Mailing Start Date</uniqueTitle>
     <title>Mailing Job Start Date</title>
     <type>timestamp</type>
     <default>NULL</default>

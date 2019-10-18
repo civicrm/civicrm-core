@@ -466,17 +466,12 @@ class CRM_Core_Error extends PEAR_ErrorStack {
     $template = CRM_Core_Smarty::singleton();
     $template->assign($vars);
     $content = $template->fetch('CRM/common/fatal.tpl');
+
     if ($config->backtrace) {
       $content = self::formatHtmlException($exception) . $content;
     }
-    if ($config->userFramework == 'Joomla' &&
-      class_exists('JError')
-    ) {
-      JError::raiseError('CiviCRM-001', $content);
-    }
-    else {
-      echo CRM_Utils_System::theme($content);
-    }
+
+    echo CRM_Utils_System::theme($content);
 
     // fin
     self::abend(CRM_Core_Error::FATAL_ERROR);

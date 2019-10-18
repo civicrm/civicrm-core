@@ -7,9 +7,6 @@
 ===========================================================
 {$pay_later_receipt}
 ===========================================================
-{else}
-
-{ts}Please print this receipt for your records.{/ts}
 {/if}
 
 {if $membership_assign && !$useForMember}

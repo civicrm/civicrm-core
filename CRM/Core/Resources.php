@@ -933,7 +933,7 @@ class CRM_Core_Resources {
       }
     }
 
-    CRM_Utils_Hook::entityRefFilters($data['filters']);
+    CRM_Utils_Hook::entityRefFilters($data['filters'], $data['links']);
 
     return $data;
   }

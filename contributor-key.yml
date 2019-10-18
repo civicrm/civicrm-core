@@ -19,17 +19,16 @@
   organization: Agileware
   jira        : agileware
 
-- github      : agilewarealok
-  name        : Alok Patel
-  organization: Agileware
-  jira        : agilewarealok
-
 - github      : agileware-dev
   name        : Agileware Team
   organization: Agileware
 
 - github      : agileware-fj
   name        : Francis Whittle
+  organization: Agileware
+
+- github      : agileware-pengyi
+  name        : Pengyi Zhang
   organization: Agileware
 
 - github      : ajdavis
@@ -342,7 +341,7 @@
 - github      : Dawnthorn
   name        : Peter Haight
   organization: Giant Rabbit
-  
+
 - github      : dlobo
   name        : Donald Lobo
   jira        : lobo
@@ -350,6 +349,8 @@
 - github      : dkguru
   organization: Jesper Angelo
   jira        : dkguru
+
+- github      : don-alejandro-z
 
 - name        : Samuel Haskell
   jira        : dotsam
@@ -472,6 +473,9 @@
 - name        : Fernando Rodríguez
   organization: Amnistía Internacional España
   jira        : Fernando
+
+- github      : fkohrt
+  name        : Florian Kohrt
 
 - github      : fliespl
   name        : Arkadiusz Rzadkowolski
@@ -1548,7 +1552,7 @@
 
 - github      : wmortada
   name        : William Mortada
-  organization: Community IT Academy
+  organization: a-n The Artists Information Company
   jira        : wmortada
 
 - name        : Philipp Michael

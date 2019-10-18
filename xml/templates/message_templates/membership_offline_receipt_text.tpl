@@ -4,10 +4,6 @@
 {$formValues.receipt_text_renewal}
 {else}{ts}Thank you for your support.{/ts}{/if}
 
-{if ! $cancelled}{ts}Please print this receipt for your records.{/ts}
-
-
-{/if}
 {if !$lineItem}
 ===========================================================
 {ts}Membership Information{/ts}

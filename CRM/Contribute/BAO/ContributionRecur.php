@@ -428,14 +428,31 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
    * @throws \CiviCRM_API3_Exception
    */
   public static function getTemplateContribution($id, $overrides = []) {
-    $templateContribution = civicrm_api3('Contribution', 'get', [
-      'contribution_recur_id' => $id,
-      'options' => ['limit' => 1, 'sort' => ['id DESC']],
-      'sequential' => 1,
-      'contribution_test' => '',
+    // use api3 because api4 doesn't handle ContributionRecur yet...
+    $is_test = civicrm_api3('ContributionRecur', 'getvalue', [
+      'return' => "is_test",
+      'id' => $id,
     ]);
-    if ($templateContribution['count']) {
-      $result = array_merge($templateContribution['values'][0], $overrides);
+    // First look for new-style template contribution with is_template=1
+    $templateContributions = \Civi\Api4\Contribution::get()
+      ->addWhere('contribution_recur_id', '=', $id)
+      ->addWhere('is_template', '=', 1)
+      ->addWhere('is_test', '=', $is_test)
+      ->addOrderBy('id', 'DESC')
+      ->setLimit(1)
+      ->execute();
+    if (!$templateContributions->count()) {
+      // Fall back to old style template contributions
+      $templateContributions = \Civi\Api4\Contribution::get()
+        ->addWhere('contribution_recur_id', '=', $id)
+        ->addWhere('is_test', '=', $is_test)
+        ->addOrderBy('id', 'DESC')
+        ->setLimit(1)
+        ->execute();
+    }
+    if ($templateContributions->count()) {
+      $templateContribution = $templateContributions->first();
+      $result = array_merge($templateContribution, $overrides);
       $result['line_item'] = CRM_Contribute_BAO_ContributionRecur::calculateRecurLineItems($id, $result['total_amount'], $result['financial_type_id']);
       return $result;
     }
@@ -757,7 +774,7 @@ INNER JOIN civicrm_contribution       con ON ( con.id = mp.contribution_id )
 
     // Add field for contribution status
     $form->addSelect('contribution_recur_contribution_status_id',
-      ['entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search', 'options' => CRM_Contribute_PseudoConstant::contributionStatus()]
+      ['entity' => 'contribution', 'multiple' => 'multiple', 'context' => 'search', 'options' => CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'search')]
     );
 
     $form->addElement('text', 'contribution_recur_processor_id', ts('Processor ID'), CRM_Core_DAO::getAttribute('CRM_Contribute_DAO_ContributionRecur', 'processor_id'));

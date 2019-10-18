@@ -133,6 +133,16 @@ class api_v3_MailingTest extends CiviUnitTestCase {
   }
 
   /**
+   * Check that default header+footer are available.
+   */
+  public function testHeaderFooterOptions() {
+    $headers = $this->callAPISuccess('Mailing', 'getoptions', ['field' => 'header']);
+    $this->assertTrue(in_array('Mailing Header', $headers['values']));
+    $footers = $this->callAPISuccess('Mailing', 'getoptions', ['field' => 'footer']);
+    $this->assertTrue(in_array('Mailing Footer', $footers['values']));
+  }
+
+  /**
    * The `template_options` field should be treated a JSON object.
    *
    * This test will create, read, and update the field.

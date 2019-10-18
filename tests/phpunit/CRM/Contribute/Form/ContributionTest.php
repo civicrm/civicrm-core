@@ -592,6 +592,9 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
 
   /**
    * Test the submit function on the contribution page.
+   *
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public function testSubmitEmailReceipt() {
     $form = new CRM_Contribute_Form_Contribution();
@@ -606,7 +609,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
     $mut->checkMailLog([
-      '<p>Please print this receipt for your records.</p>',
+      'Contribution Information',
     ]);
     $mut->stop();
   }
@@ -631,7 +634,7 @@ class CRM_Contribute_Form_ContributionTest extends CiviUnitTestCase {
     ], CRM_Core_Action::ADD);
     $this->callAPISuccessGetCount('Contribution', ['contact_id' => $this->_individualId], 1);
     $mut->checkMailLog([
-      '<p>Please print this receipt for your records.</p>',
+      'Thank you for your support',
       '<testloggedin@example.com>',
     ]);
     $mut->stop();
@@ -1621,6 +1624,65 @@ Price Field - Price Field 1        1   $ 100.00      $ 100.00
       'membership_type_id' => $membershipTypeTwo['id'],
     ]);
     $this->assertEquals("Hello", $membership2["custom_{$membershipCustomField['id']}"]);
+  }
+
+  /**
+   * Test non-membership donation on a contribution page
+   * using membership priceset.
+   */
+  public function testDonationOnMembershipPagePriceset() {
+    $contactID = $this->individualCreate();
+    $this->createPriceSetWithPage();
+    $form = new CRM_Contribute_Form_Contribution_Confirm();
+    $form->controller = new CRM_Core_Controller();
+    $form->_params = [
+      'id' => $this->_ids['contribution_page'],
+      "qfKey" => "donotcare",
+      "priceSetId" => $this->_ids['price_set'],
+      'price_set_id' => $this->_ids['price_set'],
+      "price_" . $this->_ids['price_field'][0] => $this->_ids['price_field_value']['cont'],
+      "invoiceID" => "9a6f7b49358dc31c3604e463b225c5be",
+      "email" => "admin@example.com",
+      "currencyID" => "USD",
+      'description' => "Membership Contribution",
+      'contact_id' => $contactID,
+      'select_contact_id' => $contactID,
+      'useForMember' => 1,
+      'skipLineItem' => 0,
+      'email-5' => 'test@test.com',
+      'amount' => 10,
+      'tax_amount' => NULL,
+      'is_pay_later' => 1,
+      'is_quick_config' => 1,
+    ];
+    $form->submit($form->_params);
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contact_id' => $contactID,
+    ]);
+    //Check no membership is created.
+    $this->callAPIFailure('Membership', 'getsingle', [
+      'contact_id' => $contactID,
+    ]);
+    $this->contributionDelete($contribution['id']);
+
+    //Choose Membership Priceset
+    $form->_params["price_{$this->_ids['price_field'][0]}"] = $this->_ids['price_field_value'][0];
+    $form->_params["amount"] = 20;
+    $form->submit($form->_params);
+
+    $contribution = $this->callAPISuccessGetSingle('Contribution', [
+      'contact_id' => $contactID,
+    ]);
+    //Check membership is created for the contact.
+    $membership = $this->callAPISuccessGetSingle('Membership', [
+      'contact_id' => $contactID,
+    ]);
+    $membershipPayment = $this->callAPISuccessGetSingle('MembershipPayment', [
+      'contribution_id' => $contribution['id'],
+    ]);
+    $this->assertEquals($membershipPayment['membership_id'], $membership['id']);
+    $this->membershipDelete($membership['id']);
   }
 
 }

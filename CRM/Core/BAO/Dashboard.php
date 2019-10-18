@@ -109,6 +109,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       'contact_id' => $contactID,
       'is_active' => 1,
       'dashboard_id.is_active' => 1,
+      'dashboard_id.domain_id' => CRM_Core_Config::domainID(),
       'options' => ['sort' => 'weight', 'limit' => 0],
       'return' => [
         'id',
@@ -143,7 +144,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     // If empty, then initialize default dashlets for this user.
     if (!$results['count']) {
       // They may just have disabled all their dashlets. Check if any records exist for this contact.
-      if (!civicrm_api3('DashboardContact', 'getcount', ['contact_id' => $contactID])) {
+      if (!civicrm_api3('DashboardContact', 'getcount', ['contact_id' => $contactID, 'dashboard_id.domain_id' => CRM_Core_Config::domainID()])) {
         $dashlets = self::initializeDashlets();
       }
     }
@@ -356,13 +357,39 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
       }
     }
 
-    // Disable inactive widgets
-    $dashletClause = $dashletIDs ? "dashboard_id NOT IN  (" . implode(',', $dashletIDs) . ")" : '(1)';
+    // Find dashlets in this domain.
+    $domainDashlets = civicrm_api3('Dashboard', 'get', [
+      'return' => array('id'),
+      'domain_id' => CRM_Core_Config::domainID(),
+      'options' => ['limit' => 0],
+    ]);
+
+    // Get the array of IDs.
+    $domainDashletIDs = [];
+    if ($domainDashlets['is_error'] == 0) {
+      $domainDashletIDs = CRM_Utils_Array::collect('id', $domainDashlets['values']);
+    }
+
+    // Restrict query to Dashlets in this domain.
+    $domainDashletClause = !empty($domainDashletIDs) ? "dashboard_id IN (" . implode(',', $domainDashletIDs) . ")" : '(1)';
+
+    // Target only those Dashlets which are inactive.
+    $dashletClause = $dashletIDs ? "dashboard_id NOT IN (" . implode(',', $dashletIDs) . ")" : '(1)';
+
+    // Build params.
+    $params = [
+      1 => [$contactID, 'Integer'],
+    ];
+
+    // Build query.
     $updateQuery = "UPDATE civicrm_dashboard_contact
                     SET is_active = 0
-                    WHERE $dashletClause AND contact_id = {$contactID}";
+                    WHERE $domainDashletClause
+                    AND $dashletClause
+                    AND contact_id = %1";
 
-    CRM_Core_DAO::executeQuery($updateQuery);
+    // Disable inactive widgets.
+    CRM_Core_DAO::executeQuery($updateQuery, $params);
   }
 
   /**
@@ -388,7 +415,16 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
     $dashlet = new CRM_Core_DAO_Dashboard();
 
     if (!$dashboardID) {
-      // check url is same as exiting entries, if yes just update existing
+
+      // Assign domain before search to allow identical dashlets in different domains.
+      if (empty($params['domain_id'])) {
+        $dashlet->domain_id = CRM_Core_Config::domainID();
+      }
+      else {
+        $dashlet->domain_id = CRM_Utils_Array::value('domain_id', $params);
+      }
+
+      // Try and find an existing dashlet - it will be updated if found.
       if (!empty($params['name'])) {
         $dashlet->name = CRM_Utils_Array::value('name', $params);
         $dashlet->find(TRUE);
@@ -397,9 +433,7 @@ class CRM_Core_BAO_Dashboard extends CRM_Core_DAO_Dashboard {
         $dashlet->url = CRM_Utils_Array::value('url', $params);
         $dashlet->find(TRUE);
       }
-      if (empty($params['domain_id'])) {
-        $dashlet->domain_id = CRM_Core_Config::domainID();
-      }
+
     }
     else {
       $dashlet->id = $dashboardID;

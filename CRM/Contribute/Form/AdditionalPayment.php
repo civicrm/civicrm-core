@@ -108,18 +108,18 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->_fromEmails['from_email_id'] = CRM_Core_BAO_Email::getFromEmail();
     }
 
-    $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_id, $entityType);
     $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_id, $this->_component, FALSE, TRUE);
+    $paymentAmt = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_id);
 
     $this->_amtPaid = $paymentDetails['paid'];
     $this->_amtTotal = $paymentDetails['total'];
 
-    if (!empty($paymentInfo['refund_due'])) {
-      $paymentAmt = $this->_refund = $paymentInfo['refund_due'];
+    if ($paymentAmt < 0) {
+      $this->_refund = $paymentAmt;
       $this->_paymentType = 'refund';
     }
-    elseif (!empty($paymentInfo['amount_owed'])) {
-      $paymentAmt = $this->_owed = $paymentInfo['amount_owed'];
+    elseif ($paymentAmt > 0) {
+      $this->_owed = $paymentAmt;
       $this->_paymentType = 'owed';
     }
     else {
@@ -342,20 +342,6 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if ($this->_component == 'event') {
       $participantId = $this->_id;
     }
-    $contributionStatuses = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution',
-      'contribution_status_id',
-      ['labelColumn' => 'name']
-    );
-    $contributionStatusID = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Contribution', $this->_contributionId, 'contribution_status_id');
-    if ($contributionStatuses[$contributionStatusID] == 'Pending') {
-      civicrm_api3('Contribution', 'create',
-        [
-          'id' => $this->_contributionId,
-          'contribution_status_id' => array_search('Partially paid', $contributionStatuses),
-          'is_pay_later' => 0,
-        ]
-      );
-    }
 
     if ($this->_mode) {
       // process credit card
@@ -520,18 +506,18 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
     if (!empty($params['contribution_id'])) {
       $this->_contributionId = $params['contribution_id'];
 
-      $paymentInfo = CRM_Core_BAO_FinancialTrxn::getPartialPaymentWithType($this->_contributionId, $entityType);
       $paymentDetails = CRM_Contribute_BAO_Contribution::getPaymentInfo($this->_contributionId, $entityType, FALSE, TRUE);
 
+      $paymentAmount = CRM_Contribute_BAO_Contribution::getContributionBalance($this->_contributionId);
       $this->_amtPaid = $paymentDetails['paid'];
       $this->_amtTotal = $paymentDetails['total'];
 
-      if (!empty($paymentInfo['refund_due'])) {
-        $this->_refund = $paymentInfo['refund_due'];
+      if ($paymentAmount < 0) {
+        $this->_refund = $paymentAmount;
         $this->_paymentType = 'refund';
       }
-      elseif (!empty($paymentInfo['amount_owed'])) {
-        $this->_owed = $paymentInfo['amount_owed'];
+      elseif ($paymentAmount > 0) {
+        $this->_owed = $paymentAmount;
         $this->_paymentType = 'owed';
       }
     }

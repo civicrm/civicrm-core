@@ -218,7 +218,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
     $params = $this->getContributionData();
     $this->assertTrue($form->testProcessContribution($params));
     $result = $this->callAPISuccess('contribution', 'get', ['return' => 'total_amount']);
-    $this->assertEquals(2, $result['count']);
+    $this->assertEquals(3, $result['count']);
     foreach ($result['values'] as $contribution) {
       $this->assertEquals($this->callAPISuccess('line_item', 'getvalue', [
         'contribution_id' => $contribution['id'],
@@ -226,6 +226,11 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
 
       ]), $contribution['total_amount']);
     }
+    $checkResult = $this->callAPISuccess('Contribution', 'get', ['check_number' => ['IS NOT NULL' => 1]]);
+    $this->assertEquals(1, $checkResult['count']);
+    $entityFinancialTrxn = $this->callAPISuccess('EntityFinancialTrxn', 'get', ['entity_table' => 'civicrm_contribution', 'entity_id' => $checkResult['id']]);
+    $financialTrxn = $this->callAPISuccess('FinancialTrxn', 'get', ['id' => $entityFinancialTrxn['values'][$entityFinancialTrxn['id']]['financial_trxn_id']]);
+    $this->assertEquals('1234', $financialTrxn['values'][$financialTrxn['id']]['check_number']);
   }
 
   /**
@@ -289,7 +294,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
       'field' => [
         1 => [
           'membership_type' => [0 => $this->_orgContactID, 1 => $this->_membershipTypeID],
-          'join_date' => '2013-07-22',
+          'membership_join_date' => '2013-07-22',
           'membership_start_date' => NULL,
           'membership_end_date' => NULL,
           'membership_source' => NULL,
@@ -304,7 +309,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
         ],
         2 => [
           'membership_type' => [0 => $this->_orgContactID, 1 => $this->_membershipTypeID],
-          'join_date' => '2013-07-03',
+          'membership_join_date' => '2013-07-03',
           'membership_start_date' => '2013-02-03',
           'membership_end_date' => NULL,
           'membership_source' => NULL,
@@ -320,7 +325,7 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
         // no join date, coded end date
         3 => [
           'membership_type' => [0 => $this->_orgContactID, 1 => $this->_membershipTypeID],
-          'join_date' => NULL,
+          'membership_join_date' => NULL,
           'membership_start_date' => NULL,
           'membership_end_date' => '2013-12-01',
           'membership_source' => NULL,
@@ -373,8 +378,17 @@ class CRM_Batch_Form_EntryTest extends CiviUnitTestCase {
           'check_number' => NULL,
           'contribution_status_id' => 1,
         ],
+        3 => [
+          'financial_type' => 1,
+          'total_amount' => $this->formatMoneyInput(1500.15),
+          'receive_date' => '2013-07-24',
+          'receive_date_time' => NULL,
+          'payment_instrument' => 4,
+          'contribution_check_number' => '1234',
+          'contribution_status_id' => 1,
+        ],
       ],
-      'actualBatchTotal' => $this->formatMoneyInput(3000.30),
+      'actualBatchTotal' => $this->formatMoneyInput(4500.45),
 
     ];
   }

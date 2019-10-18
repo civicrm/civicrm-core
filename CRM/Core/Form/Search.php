@@ -129,7 +129,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    *
    * @return array|NULL
    *   reference to the array of default values
-   * @throws \Exception
+   * @throws \CRM_Core_Exception
    */
   public function setDefaultValues() {
     $defaults = (array) $this->_formValues;
@@ -145,12 +145,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
    * @throws \Exception
    */
   protected function setFormValues() {
-    if (!empty($_POST) && !$this->_force) {
-      $this->_formValues = $this->controller->exportValues($this->_name);
-    }
-    elseif ($this->_force) {
-      $this->_formValues = $this->setDefaultValues();
-    }
+    $this->_formValues = $this->getFormValues();
     $this->convertTextStringsToUseLikeOperator();
   }
 
@@ -321,7 +316,7 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
       foreach ($fields as $fieldName => $field) {
         if (!empty($this->_formValues[$fieldName]) && empty($field['options']) && empty($field['pseudoconstant'])) {
           if (in_array($field['type'], [CRM_Utils_Type::T_STRING, CRM_Utils_Type::T_TEXT])) {
-            $this->_formValues[$fieldName] = ['LIKE' => CRM_Contact_BAO_Query::getWildCardedValue(TRUE, 'LIKE', $this->_formValues[$fieldName])];
+            $this->_formValues[$fieldName] = ['LIKE' => CRM_Contact_BAO_Query::getWildCardedValue(TRUE, 'LIKE', trim($this->_formValues[$fieldName]))];
           }
         }
       }
@@ -475,6 +470,46 @@ class CRM_Core_Form_Search extends CRM_Core_Form {
         $this->_formValues = CRM_Contact_BAO_SavedSearch::getFormValues($this->_ssID);
       }
     }
+  }
+
+  /**
+   * Get the form values.
+   *
+   * @todo consolidate with loadFormValues()
+   *
+   * @return array
+   *
+   * @throws \CRM_Core_Exception
+   */
+  protected function getFormValues() {
+    if (!empty($_POST) && !$this->_force) {
+      return $this->controller->exportValues($this->_name);
+    }
+    if ($this->_force) {
+      return $this->setDefaultValues();
+    }
+    return (array) $this->get('formValues');
+  }
+
+  /**
+   * Set the metadata for the form.
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function setSearchMetadata() {}
+
+  /**
+   * Handle force=1 in the url.
+   *
+   * Search field metadata is normally added in buildForm but we are bypassing that in this flow
+   * (I've always found the flow kinda confusing & perhaps that is the problem but this mitigates)
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  protected function handleForcedSearch() {
+    $this->setSearchMetadata();
+    $this->postProcess();
+    $this->set('force', 0);
   }
 
 }

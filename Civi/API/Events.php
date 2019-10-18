@@ -33,8 +33,7 @@ namespace Civi\API;
  * event is dispatched.
  *
  * Event subscribers which are concerned about the order of execution should assign
- * a weight to their subscription (such as W_EARLY, W_MIDDLE, or W_LATE).
- * W_LATE).
+ * a priority to their subscription (such as W_EARLY, W_MIDDLE, or W_LATE).
  */
 class Events {
 
@@ -78,17 +77,17 @@ class Events {
   const EXCEPTION = 'civi.api.exception';
 
   /**
-   * Weight - Early
+   * Priority - Higher numbers execute earlier
    */
   const W_EARLY = 100;
 
   /**
-   * Weight - Middle
+   * Priority - Middle
    */
   const W_MIDDLE = 0;
 
   /**
-   * Weight - Late
+   * Priority - Lower numbers execute later
    */
   const W_LATE = -100;
 

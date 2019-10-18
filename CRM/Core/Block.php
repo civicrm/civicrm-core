@@ -531,19 +531,6 @@ class CRM_Core_Block {
   }
 
   /**
-   * Create the list of shortcuts for the application and format is as a block.
-   */
-  private static function setTemplateMenuValues() {
-    $config = CRM_Core_Config::singleton();
-
-    $path = 'navigation';
-    $values = CRM_Core_Menu::getNavigation();
-    if ($values) {
-      self::setProperty(self::MENU, 'templateValues', array('menu' => $values));
-    }
-  }
-
-  /**
    * Create the event blocks for upcoming events.
    */
   private static function setTemplateEventValues() {

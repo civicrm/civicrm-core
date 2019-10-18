@@ -271,6 +271,19 @@ WHERE cft.id = %1
   }
 
   /**
+   * Get the sales tax financial account id for the financial type id.
+   *
+   * This is a helper wrapper to make the function name more readable.
+   *
+   * @param int $financialAccountID
+   *
+   * @return int
+   */
+  public static function getSalesTaxFinancialAccount($financialAccountID) {
+    return self::getFinancialAccountForFinancialTypeByRelationship($financialAccountID, 'Sales Tax Account is');
+  }
+
+  /**
    * Get Financial Account type relations.
    *
    * @param $flip bool

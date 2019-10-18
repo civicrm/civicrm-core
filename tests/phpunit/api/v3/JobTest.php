@@ -1112,7 +1112,7 @@ class api_v3_JobTest extends CiviUnitTestCase {
    * @param $dataSet
    */
   public function testBatchMergeWorksCheckPermissionsTrue($dataSet) {
-    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'administer CiviCRM'];
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviCRM', 'administer CiviCRM', 'merge duplicate contacts', 'force merge duplicate contacts'];
     foreach ($dataSet['contacts'] as $params) {
       $this->callAPISuccess('Contact', 'create', $params);
     }

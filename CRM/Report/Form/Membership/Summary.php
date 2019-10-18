@@ -100,7 +100,7 @@ class CRM_Report_Form_Membership_Summary extends CRM_Report_Form {
           'membership_type_id' => ['title' => ts('Membership Type')],
         ],
         'filters' => [
-          'join_date' => ['type' => CRM_Utils_Type::T_DATE],
+          'membership_join_date' => ['type' => CRM_Utils_Type::T_DATE],
         ],
       ],
       'civicrm_address' => [
@@ -342,7 +342,7 @@ LEFT  JOIN civicrm_contribution  {$this->_aliases['civicrm_contribution']}
       }
 
       // build chart.
-      CRM_Utils_OpenFlashChart::chart($graphRows, $this->_params['charts'], $this->_interval);
+      CRM_Utils_Chart::chart($graphRows, $this->_params['charts'], $this->_interval);
     }
     parent::endPostProcess();
   }

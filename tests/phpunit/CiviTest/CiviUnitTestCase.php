@@ -334,12 +334,6 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     // disable any left-over test extensions
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_extension WHERE full_name LIKE "test.%"');
 
-    $extensions = \CRM_Extension_System::singleton()->getManager();
-    $api4Status = $extensions->getStatus('org.civicrm.api4');
-    if ($api4Status != $extensions::STATUS_INSTALLED && $api4Status != $extensions::STATUS_UNKNOWN) {
-      $extensions->enable(['org.civicrm.api4']);
-    }
-
     // reset all the caches
     CRM_Utils_System::flushCache();
 
@@ -365,6 +359,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
     $_REQUEST = $_GET = $_POST = [];
     error_reporting(E_ALL);
 
+    $this->renameLabels();
     $this->_sethtmlGlobals();
   }
 
@@ -457,6 +452,7 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    */
   protected function tearDown() {
     $this->_apiversion = 3;
+    $this->resetLabels();
 
     error_reporting(E_ALL & ~E_NOTICE);
     CRM_Utils_Hook::singleton()->reset();
@@ -812,9 +808,15 @@ class CiviUnitTestCase extends PHPUnit\Framework\TestCase {
    *
    * @return \CRM_Core_Payment_Dummy
    *   Instance of Dummy Payment Processor
+   *
+   * @throws \CiviCRM_API3_Exception
    */
-  public function dummyProcessorCreate($processorParams = array()) {
+  public function dummyProcessorCreate($processorParams = []) {
     $paymentProcessorID = $this->processorCreate($processorParams);
+    // For the tests we don't need a live processor, but as core ALWAYS creates a processor in live mode and one in test mode we do need to create both
+    //   Otherwise we are testing a scenario that only exists in tests (and some tests fail because the live processor has not been defined).
+    $processorParams['is_test'] = FALSE;
+    $this->processorCreate($processorParams);
     return System::singleton()->getById($paymentProcessorID);
   }
 
@@ -2729,17 +2731,18 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * Replace the template with a test-oriented template designed to show all the variables.
    *
    * @param string $templateName
+   * @param string $type
    */
-  protected function swapMessageTemplateForTestTemplate($templateName = 'contribution_online_receipt') {
-    $testTemplate = file_get_contents(__DIR__ . '/../../templates/message_templates/' . $templateName . '_html.tpl');
+  protected function swapMessageTemplateForTestTemplate($templateName = 'contribution_online_receipt', $type = 'html') {
+    $testTemplate = file_get_contents(__DIR__ . '/../../templates/message_templates/' . $templateName . '_' . $type . '.tpl');
     CRM_Core_DAO::executeQuery(
       "UPDATE civicrm_option_group og
       LEFT JOIN civicrm_option_value ov ON ov.option_group_id = og.id
       LEFT JOIN civicrm_msg_template m ON m.workflow_id = ov.id
-      SET m.msg_html = '{$testTemplate}'
-      WHERE og.name = 'msg_tpl_workflow_contribution'
+      SET m.msg_{$type} = %1
+      WHERE og.name LIKE 'msg_tpl_workflow_%'
       AND ov.name = '{$templateName}'
-      AND m.is_default = 1"
+      AND m.is_default = 1", [1 => [$testTemplate, 'String']]
     );
   }
 
@@ -2747,14 +2750,15 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
    * Reinstate the default template.
    *
    * @param string $templateName
+   * @param string $type
    */
-  protected function revertTemplateToReservedTemplate($templateName = 'contribution_online_receipt') {
+  protected function revertTemplateToReservedTemplate($templateName = 'contribution_online_receipt', $type = 'html') {
     CRM_Core_DAO::executeQuery(
       "UPDATE civicrm_option_group og
       LEFT JOIN civicrm_option_value ov ON ov.option_group_id = og.id
       LEFT JOIN civicrm_msg_template m ON m.workflow_id = ov.id
       LEFT JOIN civicrm_msg_template m2 ON m2.workflow_id = ov.id AND m2.is_reserved = 1
-      SET m.msg_html = m2.msg_html
+      SET m.msg_{$type} = m2.msg_{$type}
       WHERE og.name = 'msg_tpl_workflow_contribution'
       AND ov.name = '{$templateName}'
       AND m.is_default = 1"
@@ -3324,6 +3328,26 @@ AND    ( TABLE_NAME LIKE 'civicrm_value_%' )
     }
     ob_clean();
     return $csv;
+  }
+
+  /**
+   * Rename various labels to not match the names.
+   *
+   * Doing these mimics the fact the name != the label in international installs & triggers failures in
+   * code that expects it to.
+   */
+  protected function renameLabels() {
+    $replacements = ['Pending', 'Refunded'];
+    foreach ($replacements as $name) {
+      CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value SET label = '{$name} Label**' where label = '{$name}' AND name = '{$name}'");
+    }
+  }
+
+  /**
+   * Undo any label renaming.
+   */
+  protected function resetLabels() {
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value SET label = REPLACE(name, ' Label**', '') WHERE label LIKE '% Label**'");
   }
 
 }

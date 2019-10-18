@@ -64,7 +64,7 @@
     </tr>
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/mapping" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Mapping and Geocoding{/ts}</a></td>
-        <td>{ts}Configure a mapping provider (e.g. Google or Yahoo) to display maps for contact addresses and event locations.{/ts}</td>
+        <td>{ts}Configure a mapping provider (e.g. OpenStreetMap or Google) to display maps for contact addresses and event locations.{/ts}</td>
     </tr>
     <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/search" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Search Settings{/ts}</a></td>
@@ -83,12 +83,12 @@
         <td colspan="2">{ts}Sending Emails (includes contribution receipts and event confirmations){/ts}</td>
     </tr>
     <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/smtp" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Outbound Email{/ts}</a></td>
-        <td>{ts}Settings for outbound email - either SMTP server, port and authentication or Sendmail path and argument.{/ts}</td>
-    </tr>
-    <tr class="even">
         <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/options/from_email_address" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}From Email Addresses{/ts}</a></td>
         <td>{ts}Define general email address(es) that can be used as the FROM address when sending email to contacts from within CiviCRM (e.g. info@example.org){/ts}</td>
+    </tr>
+    <tr class="even">
+        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/smtp" q="reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}Outbound Email{/ts}</a></td>
+        <td>{ts}Settings for outbound email - either SMTP server, port and authentication or Sendmail path and argument.{/ts}</td>
     </tr>
 
     <tr class="columnheader">
@@ -105,13 +105,15 @@
             {else}
                 <td class="tasklist"><a href="{$config->userFrameworkBaseURL}?q=admin/user/permissions&civicrmDestination=civicrm/admin/configtask">{ts}Permissions for Anonymous Users{/ts}</a></td>
             {/if}
-            <td>{ts}You will also need to change Drupal permissions so anonymous users can make contributions, register for events and / or use profiles to enter contact information.{/ts} {docURL page="Default Permissions and Roles" resource="wiki"}</td>
+            <td>{ts}You will also need to change Drupal permissions so anonymous users can make contributions, register for events and / or use profiles to enter contact information.{/ts} {docURL page="user/en/latest/initial-set-up/permissions-and-access-control" text="(learn more...)"}</td>
         </tr>
     {/if}
-    <tr class="even">
-        <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/messageTemplates" q="selectedChild=workflow&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}System Workflow Templates{/ts}</a></td>
-        <td>{ts}Review and modify the templates used for system-generated emails, including contribution receipts and event registration confirmations.{/ts}</td>
-    </tr>
+    {if $enabledComponents.CiviContribute eq 1}
+      <tr class="even">
+          <td class="tasklist nowrap"><a href="{crmURL p="civicrm/admin/setting/preferences/contribute" q="selectedChild=workflow&reset=1&civicrmDestination=`$destination`"}" title="{$linkTitle|escape}">{ts}CiviContribute Component Settings{/ts}</a></td>
+          <td>{ts}Review and modify the CiviContribute Component settings such as Taxes and Invoicing, Deferred Revenue, and Access Control by Financial Type{/ts}</td>
+      </tr>
+    {/if}
 </table>
 <br />
 

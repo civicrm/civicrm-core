@@ -514,7 +514,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'import' => 1,
         'custom_field_id' => $this->getCustomFieldID('text'),
         'options_per_line' => NULL,
-        'text_length' => NULL,
+        'text_length' => 300,
         'data_type' => 'String',
         'html_type' => 'Text',
         'is_search_range' => '0',
@@ -537,6 +537,7 @@ class CRM_Core_BAO_CustomFieldTest extends CiviUnitTestCase {
         'where' => 'civicrm_value_custom_group_' . $customGroupID . '.enter_text_here_' . $this->getCustomFieldID('text'),
         'extends_table' => 'civicrm_contact',
         'search_table' => 'contact_a',
+        'maxlength' => 300,
       ],
       $this->getCustomFieldName('select_string') => [
         'name' => $this->getCustomFieldName('select_string'),

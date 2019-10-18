@@ -578,9 +578,7 @@ WHERE  contribution_id = {$id}
         $this->_params['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($this->_params);
       }
       $this->assign('credit_card_exp_date', CRM_Utils_Date::mysqlToIso(CRM_Utils_Date::format($this->_params['credit_card_exp_date'])));
-      $this->assign('credit_card_number',
-        CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number'])
-      );
+      $this->assign('credit_card_number', CRM_Utils_System::mungeCreditCard($this->_params['credit_card_number']));
       $this->assign('credit_card_type', CRM_Utils_Array::value('credit_card_type', $this->_params));
     }
     $this->_params['ip_address'] = CRM_Utils_System::ipAddress();

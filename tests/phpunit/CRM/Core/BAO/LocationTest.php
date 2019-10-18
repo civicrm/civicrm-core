@@ -148,9 +148,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
 
     $params['contact_id'] = $contactId;
 
-    $location = CRM_Core_BAO_Location::create($params);
-
-    $locBlockId = CRM_Utils_Array::value('id', $location);
+    $locBlockId = CRM_Core_BAO_Location::create($params);
 
     //Now check DB for contact
     $searchParams = [
@@ -201,8 +199,6 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     $compareParams = ['phone' => '9833910234'];
     $this->assertDBCompareValues('CRM_Core_DAO_Phone', $searchParams, $compareParams);
 
-    //delete the location block
-    CRM_Core_BAO_Location::deleteLocBlock($locBlockId);
     $this->contactDelete($contactId);
   }
 
@@ -267,8 +263,7 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     //create location block.
     //with various element of location block
     //like address, phone, email, im.
-    $location = CRM_Core_BAO_Location::create($params, NULL, TRUE);
-    $locBlockId = CRM_Utils_Array::value('id', $location);
+    $locBlockId = CRM_Core_BAO_Location::create($params, NULL, TRUE)['id'];
 
     //update event record with location block id
     $eventParams = [
@@ -354,100 +349,6 @@ class CRM_Core_BAO_LocationTest extends CiviUnitTestCase {
     CRM_Core_BAO_Location::deleteLocBlock($locBlockId);
     $this->eventDelete($event['id']);
     $this->contactDelete($this->_contactId);
-  }
-
-  /**
-   * DeleteLocBlock() method
-   * delete the location block
-   * created with various elements.
-   */
-  public function testDeleteLocBlock() {
-    $this->_contactId = $this->individualCreate();
-    //create test event record.
-    $event = $this->eventCreate();
-    $params['location'][1] = [
-      'location_type_id' => 1,
-      'is_primary' => 1,
-      'address' => [
-        'street_address' => 'Saint Helier St',
-        'supplemental_address_1' => 'Hallmark Ct',
-        'supplemental_address_2' => 'Jersey Village',
-        'supplemental_address_3' => 'My Town',
-        'city' => 'Newark',
-        'postal_code' => '01903',
-        'country_id' => 1228,
-        'state_province_id' => 1029,
-        'geo_code_1' => '18.219023',
-        'geo_code_2' => '-105.00973',
-      ],
-      'email' => [
-        '1' => ['email' => 'john.smith@example.org'],
-      ],
-      'phone' => [
-        '1' => [
-          'phone_type_id' => 1,
-          'phone' => '303443689',
-        ],
-        '2' => [
-          'phone_type_id' => 2,
-          'phone' => '9833910234',
-        ],
-      ],
-      'im' => [
-        '1' => [
-          'name' => 'jane.doe',
-          'provider_id' => 1,
-        ],
-      ],
-    ];
-    $params['entity_id'] = $event['id'];
-    $params['entity_table'] = 'civicrm_event';
-
-    //create location block.
-    //with various elements
-    //like address, phone, email, im.
-    $location = CRM_Core_BAO_Location::create($params, NULL, TRUE);
-    $locBlockId = CRM_Utils_Array::value('id', $location);
-    //update event record with location block id
-    $eventParams = [
-      'id' => $event['id'],
-      'loc_block_id' => $locBlockId,
-    ];
-    CRM_Event_BAO_Event::add($eventParams);
-
-    //delete the location block
-    CRM_Core_BAO_Location::deleteLocBlock($locBlockId);
-
-    //Now check DB for location elements.
-    //Now check DB for Address
-    $this->assertDBNull('CRM_Core_DAO_Address', 'Saint Helier St', 'id', 'street_address',
-      'Database check, Address deleted successfully.'
-    );
-    //Now check DB for Email
-    $this->assertDBNull('CRM_Core_DAO_Email', 'john.smith@example.org', 'id', 'email',
-      'Database check, Email deleted successfully.'
-    );
-    //Now check DB for Phone
-    $this->assertDBNull('CRM_Core_DAO_Phone', '303443689', 'id', 'phone',
-      'Database check, Phone deleted successfully.'
-    );
-    //Now check DB for Mobile
-    $this->assertDBNull('CRM_Core_DAO_Phone', '9833910234', 'id', 'phone',
-      'Database check, Mobile deleted successfully.'
-    );
-    //Now check DB for IM
-    $this->assertDBNull('CRM_Core_DAO_IM', 'jane.doe', 'id', 'name',
-      'Database check, IM deleted successfully.'
-    );
-
-    //cleanup DB by deleting the record.
-    $this->eventDelete($event['id']);
-    $this->contactDelete($this->_contactId);
-
-    //Now check DB for Event
-    $this->assertDBNull('CRM_Event_DAO_Event', $event['id'], 'id', 'id',
-      'Database check, Event deleted successfully.'
-    );
   }
 
   /**

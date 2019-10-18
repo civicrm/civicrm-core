@@ -626,7 +626,7 @@ MODIFY      {$columnName} varchar( $length )
       2 => [$table_name, 'String'],
       3 => [$constraint_name, 'String'],
     ];
-    $dao = CRM_Core_DAO::executeQuery($query, $params);
+    $dao = CRM_Core_DAO::executeQuery($query, $params, TRUE, NULL, FALSE, FALSE);
 
     if ($dao->fetch()) {
       return TRUE;
@@ -644,7 +644,7 @@ MODIFY      {$columnName} varchar( $length )
    */
   public static function safeRemoveFK($table_name, $constraint_name) {
     if (self::checkFKExists($table_name, $constraint_name)) {
-      CRM_Core_DAO::executeQuery("ALTER TABLE {$table_name} DROP FOREIGN KEY {$constraint_name}", []);
+      CRM_Core_DAO::executeQuery("ALTER TABLE {$table_name} DROP FOREIGN KEY {$constraint_name}", [], TRUE, NULL, FALSE, FALSE);
       return TRUE;
     }
     return FALSE;

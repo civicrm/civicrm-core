@@ -118,6 +118,45 @@ class CRM_Upgrade_Incremental_BaseTest extends CiviUnitTestCase {
   }
 
   /**
+   * Test Multiple Relative Date conversions
+   */
+  public function testSmartGroupMultipleRelatvieDateConversions() {
+    $this->callAPISuccess('SavedSearch', 'create', [
+      'form_values' => [
+        ['membership_join_date_low', '=', '20190903000000'],
+        ['membership_join_date_high', '=', '20190903235959'],
+        ['membership_start_date_low', '=' , '20190901000000'],
+        ['membership_start_date_high', '=', '20190907235959'],
+        ['membership_end_date_low', '=', '20190901000000'],
+        ['membership_end_date_high', '=', '20190907235959'],
+        'relative_dates' => [
+          'member_join' => 'this.day',
+          'member_start' => 'this.week',
+          'member_end' => 'this.week',
+        ],
+      ],
+    ]);
+    $smartGroupConversionObject = new CRM_Upgrade_Incremental_SmartGroups();
+    $smartGroupConversionObject->updateGroups([
+      'datepickerConversion' => [
+        'membership_join_date',
+        'membership_start_date',
+        'membership_end_date',
+      ],
+    ]);
+    $savedSearch = $this->callAPISuccessGetSingle('SavedSearch', []);
+    $this->assertContains('6', array_keys($savedSearch['form_values']));
+    $this->assertEquals('membership_join_date_relative', $savedSearch['form_values'][6][0]);
+    $this->assertEquals('this.day', $savedSearch['form_values'][6][2]);
+    $this->assertContains('7', array_keys($savedSearch['form_values']));
+    $this->assertEquals('membership_start_date_relative', $savedSearch['form_values'][7][0]);
+    $this->assertEquals('this.week', $savedSearch['form_values'][7][2]);
+    $this->assertContains('8', array_keys($savedSearch['form_values']));
+    $this->assertEquals('membership_end_date_relative', $savedSearch['form_values'][8][0]);
+    $this->assertEquals('this.week', $savedSearch['form_values'][8][2]);
+  }
+
+  /**
    * Test conversion of on hold group.
    */
   public function testOnHoldConversion() {

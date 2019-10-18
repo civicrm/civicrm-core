@@ -421,6 +421,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->callAPISuccess('membership_payment', 'getsingle', ['contribution_id' => $contribution['id']]);
     $mut->checkMailLog([
       'Membership Type: General',
+      'Test Frontend title',
     ]);
     $mut->stop();
     $mut->clearMessages();
@@ -541,7 +542,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $contributions = $this->callAPISuccess('contribution', 'get', ['contribution_page_id' => $this->_ids['contribution_page']]);
     $this->assertCount(2, $contributions['values']);
     foreach ($contributions['values'] as $val) {
-      $this->assertEquals('Pending', $val['contribution_status']);
+      $this->assertEquals(CRM_Core_PseudoConstant::getKey('CRM_Contribute_BAO_Contribution', 'contribution_status_id', 'Pending'), $val['contribution_status_id']);
     }
 
     //Membership should be in Pending state.
@@ -935,6 +936,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
     $this->assertEquals($membership['contact_id'], $contribution['contact_id']);
     $this->assertEquals($expectedMembershipStatus, $membership['status_id']);
     $this->callAPISuccess('contribution_recur', 'getsingle', ['id' => $contribution['contribution_recur_id']]);
+    $this->assertEquals($contribution['contribution_recur_id'], $membership['contribution_recur_id']);
 
     $this->callAPISuccess('line_item', 'getsingle', ['contribution_id' => $contribution['id'], 'entity_id' => $membership['id']]);
     //renew it with processor setting completed - should extend membership
@@ -1495,6 +1497,7 @@ class api_v3_ContributionPageTest extends CiviUnitTestCase {
       $this->params['is_recur'] = 1;
       $this->params['recur_frequency_unit'] = 'month';
     }
+    $this->params['frontend_title'] = 'Test Frontend title';
     $contributionPageResult = $this->callAPISuccess($this->_entity, 'create', $this->params);
     if (empty($this->_ids['price_set'])) {
       $priceSet = $this->callAPISuccess('price_set', 'create', $this->_priceSetParams);

@@ -165,6 +165,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
+    $this->add('hidden', 'id', $this->_campaignId);
     if ($this->_action & CRM_Core_Action::DELETE) {
 
       $this->addButtons([
@@ -186,7 +187,6 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     //lets assign custom data type and subtype.
     $this->assign('customDataType', 'Campaign');
     $this->assign('entityID', $this->_campaignId);
-    $this->assign('id', $this->_campaignId);
     $this->assign('customDataSubType', CRM_Utils_Array::value('campaign_type_id', $this->_values));
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Campaign');
@@ -292,14 +292,18 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
 
     $session = CRM_Core_Session::singleton();
     $params = $this->controller->exportValues($this->_name);
-    if (isset($this->_campaignId)) {
+    // To properly save the DAO we need to ensure we don't have a blank id key passed through.
+    if (empty($params['id'])) {
+      unset($params['id']);
+    }
+    if (!empty($params['id'])) {
       if ($this->_action & CRM_Core_Action::DELETE) {
-        CRM_Campaign_BAO_Campaign::del($this->_campaignId);
+        CRM_Campaign_BAO_Campaign::del($params['id']);
         CRM_Core_Session::setStatus(ts('Campaign has been deleted.'), ts('Record Deleted'), 'success');
         $session->replaceUserContext(CRM_Utils_System::url('civicrm/campaign', 'reset=1&subPage=campaign'));
         return;
       }
-      $params['id'] = $this->_campaignId;
+      $this->_campaignId = $params['id'];
     }
     else {
       $params['created_id'] = $session->get('userID');
@@ -328,7 +332,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
 
   public static function submit($params = [], $form) {
     $groups = [];
-    if (is_array($params['includeGroups'])) {
+    if (!empty($params['includeGroups']) && is_array($params['includeGroups'])) {
       foreach ($params['includeGroups'] as $key => $id) {
         if ($id) {
           $groups['include'][] = $id;
@@ -355,6 +359,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       $form->_campaignId,
       'Campaign'
     );
+
     // dev/core#1067 Clean Money before passing onto BAO to do the create.
     $params['goal_revenue'] = CRM_Utils_Rule::cleanMoney($params['goal_revenue']);
     $result = civicrm_api3('Campaign', 'create', $params);

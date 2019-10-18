@@ -971,10 +971,12 @@ class CRM_Core_Permission {
       'duplicatecheck' => [
         'access CiviCRM',
       ],
+      'merge' => ['merge duplicate contacts'],
     ];
 
     $permissions['dedupe'] = [
       'getduplicates' => ['access CiviCRM'],
+      'getstatistics' => ['access CiviCRM'],
     ];
 
     // CRM-16963 - Permissions for country.
@@ -1178,6 +1180,15 @@ class CRM_Core_Permission {
         'edit all events',
       ],
     ];
+    // Exception refers to dedupe_exception.
+    $permissions['exception'] = [
+      'default' => ['merge duplicate contacts'],
+    ];
+
+    $permissions['job'] = [
+      'process_batch_merge' => ['merge duplicate contacts'],
+    ];
+    $permissions['rule_group']['get'] = [['merge duplicate contacts', 'administer CiviCRM']];
     // Loc block is only used for events
     $permissions['loc_block'] = $permissions['event'];
 

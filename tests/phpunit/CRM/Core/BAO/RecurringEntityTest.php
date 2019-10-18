@@ -75,10 +75,10 @@ class CRM_Core_BAO_RecurringEntityTest extends CiviUnitTestCase {
     $this->assertEquals(5, count($generatedEntities['civicrm_activity']), "Cehck if number of iterations are 5");
     $expectedDates = [
       '20141025103000',
-      '20141227103000',
-      '20150328103000',
-      '20150627103000',
-      '20150926103000',
+      '20150124103000',
+      '20150425103000',
+      '20150725103000',
+      '20151024103000',
     ];
     foreach ($generatedEntities['civicrm_activity'] as $entityID) {
       $this->assertDBNotNull('CRM_Activity_DAO_Activity', $entityID, 'id',

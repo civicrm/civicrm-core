@@ -429,7 +429,7 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
    * @throws \CiviCRM_API3_Exception
    */
   public static function refillCache($rgid, $gid, $criteria, $checkPermissions, $searchLimit = 0) {
-    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions);
+    $cacheKeyString = CRM_Dedupe_Merger::getMergeCacheKeyString($rgid, $gid, $criteria, $checkPermissions, $searchLimit);
 
     // 1. Clear cache if any
     $sql = "DELETE FROM civicrm_prevnext_cache WHERE  cachekey LIKE %1";
@@ -450,15 +450,24 @@ WHERE (pn.cachekey $op %1 OR pn.cachekey $op %2)
       // would chain to a delete. Limiting to getfields for 'get' limits us to declared fields,
       // although we might wish to revisit later to allow joins.
       $validFieldsForRetrieval = civicrm_api3('Contact', 'getfields', ['action' => 'get'])['values'];
-      if (!empty($criteria)) {
+      $filteredCriteria = isset($criteria['contact']) ? array_intersect_key($criteria['contact'], $validFieldsForRetrieval) : [];
+
+      if (!empty($criteria) || !empty($searchLimit)) {
         $contacts = civicrm_api3('Contact', 'get', array_merge([
-          'options' => ['limit' => 0],
+          'options' => ['limit' => $searchLimit],
           'return' => 'id',
           'check_permissions' => TRUE,
-        ], array_intersect_key($criteria['contact'], $validFieldsForRetrieval)));
+          'contact_type' => civicrm_api3('RuleGroup', 'getvalue', ['id' => $rgid, 'return' => 'contact_type']),
+        ], $filteredCriteria));
         $contactIDs = array_keys($contacts['values']);
+
+        if (empty($contactIDs)) {
+          // If there is criteria but no contacts were found then we should return now
+          // since we have no contacts to match.
+          return [];
+        }
       }
-      $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs, $checkPermissions, $searchLimit);
+      $foundDupes = CRM_Dedupe_Finder::dupes($rgid, $contactIDs, $checkPermissions);
     }
 
     if (!empty($foundDupes)) {

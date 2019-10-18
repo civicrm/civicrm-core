@@ -212,7 +212,7 @@ class CRM_Member_Form_Task_Batch extends CRM_Member_Form_Task {
     // extend CRM_Event_Form_Task_BatchTest::testSubmit with a data provider to test
     // handling of custom data, specifically checkbox fields.
     $dates = [
-      'join_date',
+      'membership_join_date',
       'membership_start_date',
       'membership_end_date',
     ];

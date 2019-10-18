@@ -64,7 +64,8 @@
     "pear/log": "1.13.1",
     "katzien/php-mime-type": "2.1.0",
     "civicrm/composer-downloads-plugin": "^2.0",
-    "league/csv": "^9.2"
+    "league/csv": "^9.2",
+    "tplaner/when": "dev-master#c1ec099f421bff354cc5c929f83b94031423fc80"
   },
   "require-dev": {
     "cache/integration-tests": "dev-master"
@@ -198,6 +199,10 @@
       },
       "select2": {
         "url": "https://github.com/colemanw/select2/archive/v3.5-civicrm-1.0.zip"
+      },
+      "js-yaml": {
+        "url": "https://github.com/nodeca/js-yaml/archive/3.13.1.zip",
+        "ignore": ["benchmark", "bin", "demo", "examples", "lib", "support", "test"]
       },
       "smartmenus": {
         "url": "https://github.com/vadikom/smartmenus/archive/1.1.0.zip",

@@ -879,9 +879,14 @@ function _civicrm_api3_deprecated_activity_buildmailparams($result, $activityTyp
   $params['activity_date_time'] = $result['date'];
   $params['details'] = $result['body'];
 
-  for ($i = 1; $i <= 5; $i++) {
+  $numAttachments = Civi::settings()->get('max_attachments_backend') ?? CRM_Core_BAO_File::DEFAULT_MAX_ATTACHMENTS_BACKEND;
+  for ($i = 1; $i <= $numAttachments; $i++) {
     if (isset($result["attachFile_$i"])) {
       $params["attachFile_$i"] = $result["attachFile_$i"];
+    }
+    else {
+      // No point looping 100 times if there's only one attachment
+      break;
     }
   }
 

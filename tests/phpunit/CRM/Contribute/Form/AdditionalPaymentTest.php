@@ -359,6 +359,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
    *
    * @param string $typeofContribution
    *
+   * @throws \CRM_Core_Exception
    */
   public function createContribution($typeofContribution = 'Pending') {
     if ($typeofContribution == 'Partially paid') {
@@ -377,7 +378,7 @@ class CRM_Contribute_Form_AdditionalPaymentTest extends CiviUnitTestCase {
     $contribution = $this->callAPISuccess('Contribution', 'create', $contributionParams);
     $contribution = $this->callAPISuccessGetSingle('Contribution', ['id' => $contribution['id']]);
     $this->assertNotEmpty($contribution);
-    $this->assertEquals($typeofContribution, $contribution['contribution_status']);
+    $this->assertEquals($typeofContribution, CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contribution['contribution_status_id']));
     $this->_contributionId = $contribution['id'];
   }
 

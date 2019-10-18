@@ -90,21 +90,9 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     if (!$this->preProcessExpress()) {
       //process only primary participant params.
       $registerParams = $this->_params[0];
-      if (isset($registerParams["billing_state_province_id-{$this->_bltID}"])
-        && $registerParams["billing_state_province_id-{$this->_bltID}"]
-      ) {
-        $registerParams["billing_state_province-{$this->_bltID}"] = CRM_Core_PseudoConstant::stateProvinceAbbreviation($registerParams["billing_state_province_id-{$this->_bltID}"]);
-      }
+      $registerParams = $this->prepareParamsForPaymentProcessor($registerParams);
 
-      if (isset($registerParams["billing_country_id-{$this->_bltID}"]) && $registerParams["billing_country_id-{$this->_bltID}"]) {
-        $registerParams["billing_country-{$this->_bltID}"] = CRM_Core_PseudoConstant::countryIsoCode($registerParams["billing_country_id-{$this->_bltID}"]);
-      }
-      if (isset($registerParams['credit_card_exp_date'])) {
-        $registerParams['year'] = CRM_Core_Payment_Form::getCreditCardExpirationYear($registerParams);
-        $registerParams['month'] = CRM_Core_Payment_Form::getCreditCardExpirationMonth($registerParams);
-      }
       if ($this->_values['event']['is_monetary']) {
-        $registerParams['ip_address'] = CRM_Utils_System::ipAddress();
         $registerParams['currencyID'] = $this->_params[0]['currencyID'];
       }
       //assign back primary participant params.
@@ -472,7 +460,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     $payment = $registerByID = $primaryCurrencyID = $contribution = NULL;
     $paymentObjError = ts('The system did not record payment details for this payment and so could not process the transaction. Please report this error to the site administrator.');
 
-    $this->participantIDS = [];
     $fields = [];
     foreach ($params as $key => $value) {
       CRM_Event_Form_Registration_Confirm::fixLocationFields($value, $fields, $this);
@@ -674,7 +661,7 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
       $this->assign('register_date', $registerDate);
 
-      $this->confirmPostProcess($contactID, $contribution, $payment);
+      $this->confirmPostProcess($contactID, $contribution);
     }
 
     //handle if no additional participant.
@@ -744,6 +731,15 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       $isTest = TRUE;
     }
 
+    $primaryParticipant = $this->get('primaryParticipant');
+
+    if (empty($primaryParticipant['participantID'])) {
+      CRM_Core_Error::deprecatedFunctionWarning('This line is not logically reachable.');
+      $primaryParticipant['participantID'] = $registerByID;
+    }
+    //otherwise send mail Confirmation/Receipt
+    $primaryContactId = $this->get('primaryContactId');
+
     // for Transfer checkout.
     // The concept of contributeMode is deprecated.
     if (($this->_contributeMode == 'checkout' ||
@@ -752,12 +748,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       !$this->_allowWaitlist && !$this->_requireApproval &&
       $this->_totalAmount > 0
     ) {
-
-      $primaryParticipant = $this->get('primaryParticipant');
-
-      if (empty($primaryParticipant['participantID'])) {
-        $primaryParticipant['participantID'] = $registerByID;
-      }
 
       //build an array of custom profile and assigning it to template
       $customProfile = CRM_Event_BAO_Event::buildCustomProfile($registerByID, $this->_values, NULL, $isTest);
@@ -833,8 +823,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
       }
     }
     else {
-      //otherwise send mail Confirmation/Receipt
-      $primaryContactId = $this->get('primaryContactId');
 
       //build an array of cId/pId of participants
       $additionalIDs = CRM_Event_BAO_Event::buildCustomProfile($registerByID,
@@ -927,7 +915,6 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
         $this->_values['params']['isRequireApproval'] = $this->_requireApproval;
 
         //send mail to primary as well as additional participants.
-        $this->assign('contactID', $contactId);
         CRM_Event_BAO_Event::sendMail($contactId, $this->_values, $participantID, $isTest);
       }
     }
@@ -1196,13 +1183,13 @@ class CRM_Event_Form_Registration_Confirm extends CRM_Event_Form_Registration {
     }
 
     //get email primary first if exist
-    $subscribtionEmail = ['email' => CRM_Utils_Array::value('email-Primary', $params)];
-    if (!$subscribtionEmail['email']) {
-      $subscribtionEmail['email'] = CRM_Utils_Array::value("email-{$form->_bltID}", $params);
+    $subscriptionEmail = ['email' => CRM_Utils_Array::value('email-Primary', $params)];
+    if (!$subscriptionEmail['email']) {
+      $subscriptionEmail['email'] = CRM_Utils_Array::value("email-{$form->_bltID}", $params);
     }
     // subscribing contact to groups
-    if (!empty($subscribeGroupIds) && $subscribtionEmail['email']) {
-      CRM_Mailing_Event_BAO_Subscribe::commonSubscribe($subscribeGroupIds, $subscribtionEmail, $contactID);
+    if (!empty($subscribeGroupIds) && $subscriptionEmail['email']) {
+      CRM_Mailing_Event_BAO_Subscribe::commonSubscribe($subscribeGroupIds, $subscriptionEmail, $contactID);
     }
 
     return $contactID;
