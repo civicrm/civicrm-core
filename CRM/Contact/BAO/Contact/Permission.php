@@ -271,7 +271,7 @@ AND    $operationClause
 WHERE    $permission";
     $aclContactsTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('aclccache')->setMemory();
     $tempTable = $aclContactsTempTable->getName();
-    $aclContactsTempTable->createWithColumns('user_id int, contact_id int, operation varchar(255), UNIQUE UI_contact_group (contact_id,group_id)');
+    $aclContactsTempTable->createWithColumns('user_id int, contact_id int, operation varchar(255), UNIQUE UI_user_contact_operation (user_id,contact_id,operation)');
     CRM_Core_DAO::executeQuery("INSERT INTO {$tempTable} (user_id, contact_id, operation) {$sql}");
     CRM_Core_DAO::executeQuery("INSERT IGNORE INTO civicrm_acl_contact_cache (user_id, contact_id, operation) SELECT user_id, contact_id, operation FROM {$tempTable}");
     $aclContactsTempTable->drop();
