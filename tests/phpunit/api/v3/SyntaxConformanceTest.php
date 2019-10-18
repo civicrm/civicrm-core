@@ -469,6 +469,7 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       'ReportTemplate',
       'System',
       'Logging',
+      'Payment',
     ];
     if ($sequential === TRUE) {
       return $entitiesWithoutGet;
@@ -561,6 +562,8 @@ class api_v3_SyntaxConformanceTest extends CiviUnitTestCase {
       // fails on 5 limit - probably a set up problem
       'Setting',
       //a bit of a pseudoapi - keys by domain
+      'Payment',
+      // pseudoapi - problems with creating required sub  entities.
     ];
     return $entitiesWithout;
   }

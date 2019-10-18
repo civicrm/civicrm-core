@@ -59,27 +59,40 @@ class CRM_Financial_BAO_Payment {
 
     $isPaymentCompletesContribution = self::isPaymentCompletesContribution($params['contribution_id'], $params['total_amount']);
 
+    $whiteList = ['check_number', 'payment_processor_id', 'fee_amount', 'total_amount', 'contribution_id', 'net_amount', 'card_type_id', 'pan_truncation', 'trxn_result_code', 'payment_instrument_id', 'trxn_id'];
+    $paymentTrxnParams = array_intersect_key($params, array_fill_keys($whiteList, 1));
+    $paymentTrxnParams['is_payment'] = 1;
+    if (!empty($params['payment_processor'])) {
+      // I can't find evidence this is passed in - I was gonna just remove it but decided to deprecate  as I see getToFinancialAccount
+      // also anticipates it.
+      CRM_Core_Error::deprecatedFunctionWarning('passing payment_processor is deprecated - use payment_processor_id');
+      $paymentTrxnParams['payment_processor_id'] = $params['payment_processor'];
+    }
+    if (isset($paymentTrxnParams['payment_processor_id']) && empty($paymentTrxnParams['payment_processor_id'])) {
+      // Don't pass 0 - ie the Pay Later processor as it is  a pseudo-processor.
+      unset($paymentTrxnParams['payment_processor_id']);
+    }
+    if (empty($paymentTrxnParams['payment_instrument_id'])) {
+      if (!empty($params['payment_processor_id'])) {
+        $paymentTrxnParams['payment_instrument_id'] = civicrm_api3('PaymentProcessor', 'getvalue', ['return' => 'payment_instrument_id', 'id' => $paymentTrxnParams['payment_processor_id']]);
+      }
+      else {
+        // Fall back  on the payment instrument  already  used - should  we  deprecate  this?
+        $paymentTrxnParams['payment_instrument_id'] = $contribution['payment_instrument_id'];
+      }
+    }
+    if (empty($paymentTrxnParams['trxn_id']) && !empty($paymentTrxnParams['contribution_trxn_id'])) {
+      CRM_Core_Error::deprecatedFunctionWarning('contribution_trxn_id is deprecated - use trxn_id');
+      $paymentTrxnParams['trxn_id'] = $paymentTrxnParams['contribution_trxn_id'];
+    }
+
     if ($params['total_amount'] > 0) {
       $paymentTrxnParams['to_financial_account_id'] = CRM_Contribute_BAO_Contribution::getToFinancialAccount($contribution, $params);
       $paymentTrxnParams['from_financial_account_id'] = CRM_Financial_BAO_FinancialAccount::getFinancialAccountForFinancialTypeByRelationship($contribution['financial_type_id'], 'Accounts Receivable Account is');
-      $paymentTrxnParams['total_amount'] = $params['total_amount'];
-      $paymentTrxnParams['contribution_id'] = $params['contribution_id'];
       $paymentTrxnParams['trxn_date'] = CRM_Utils_Array::value('trxn_date', $params, CRM_Utils_Array::value('contribution_receive_date', $params, date('YmdHis')));
-      $paymentTrxnParams['fee_amount'] = CRM_Utils_Array::value('fee_amount', $params);
-      $paymentTrxnParams['net_amount'] = CRM_Utils_Array::value('total_amount', $params);
       $paymentTrxnParams['currency'] = $contribution['currency'];
-      $paymentTrxnParams['trxn_id'] = CRM_Utils_Array::value('contribution_trxn_id', $params, NULL);
       $paymentTrxnParams['status_id'] = CRM_Core_PseudoConstant::getKey('CRM_Core_BAO_FinancialTrxn', 'status_id', 'Completed');
-      $paymentTrxnParams['payment_instrument_id'] = CRM_Utils_Array::value('payment_instrument_id', $params, $contribution['payment_instrument_id']);
-      $paymentTrxnParams['check_number'] = CRM_Utils_Array::value('check_number', $params);
-      $paymentTrxnParams['is_payment'] = 1;
 
-      if (!empty($params['payment_processor'])) {
-        // I can't find evidence this is passed in - I was gonna just remove it but decided to deprecate  as I see getToFinancialAccount
-        // also anticipates it.
-        CRM_Core_Error::deprecatedFunctionWarning('passing payment_processor is deprecated - use payment_processor_id');
-        $paymentTrxnParams['payment_processor_id'] = $params['payment_processor'];
-      }
       $trxn = CRM_Core_BAO_FinancialTrxn::create($paymentTrxnParams);
 
       // @todo - this is just weird & historical & inconsistent - why 2 tracks?

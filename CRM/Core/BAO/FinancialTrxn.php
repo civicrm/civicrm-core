@@ -737,4 +737,23 @@ WHERE ceft.entity_id = %1";
     return TRUE;
   }
 
+  /**
+   * Generate and assign an arbitrary value to a field of a test object.
+   *
+   * Always set is_payment to 1 as this is used for Payment api as  well as FinancialTrxn.
+   *
+   * @param string $fieldName
+   * @param array $fieldDef
+   * @param int $counter
+   *   The globally-unique ID of the test object.
+   */
+  protected function assignTestValue($fieldName, &$fieldDef, $counter) {
+    if ($fieldName === 'is_payment') {
+      $this->is_payment = 1;
+    }
+    else {
+      parent::assignTestValue($fieldName, $fieldDef, $counter);
+    }
+  }
+
 }

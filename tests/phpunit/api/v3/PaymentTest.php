@@ -371,10 +371,13 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
 
   /**
    * Function to assert db values
+   *
+   * @throws \CRM_Core_Exception
    */
   public function checkPaymentResult($payment, $expectedResult) {
+    $refreshedPayment = $this->callAPISuccessGetSingle('Payment', ['financial_trxn_id' => $payment['id']]);
     foreach ($expectedResult[$payment['id']] as $key => $value) {
-      $this->assertEquals($payment['values'][$payment['id']][$key], $value, 'mismatch on ' . $key);
+      $this->assertEquals($refreshedPayment[$key], $value, 'mismatch on ' . $key);      $this->assertEquals($refreshedPayment[$key], $value, 'mismatch on ' . $key);
     }
   }
 
@@ -670,6 +673,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function testCreatePaymentPayLater() {
     $this->createLoggedInUser();
+    $processorID  = $this->paymentProcessorCreate();
     $contributionParams = [
       'total_amount' => 100,
       'currency' => 'USD',
@@ -683,6 +687,11 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $params = [
       'contribution_id' => $contribution['id'],
       'total_amount' => 100,
+      'card_type_id' => 'Visa',
+      'pan_truncation' => '1234',
+      'trxn_result_code' => 'Startling success',
+      'payment_instrument_id' => $processorID,
+      'trxn_id' => 1234,
     ];
     $payment = $this->callAPISuccess('Payment', 'create', $params);
     $expectedResult = [
@@ -692,6 +701,11 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
         'total_amount' => 100,
         'status_id' => 1,
         'is_payment' => 1,
+        'card_type_id' => 1,
+        'pan_truncation' => '1234',
+        'trxn_result_code' => 'Startling success',
+        'trxn_id' => 1234,
+        'payment_instrument_id' => 1,
       ],
     ];
     $this->checkPaymentResult($payment, $expectedResult);

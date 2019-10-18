@@ -390,6 +390,9 @@ function _civicrm_api3_get_BAO($name) {
     // not the other cache info like search results (which could in fact be in Redis or another cache engine)
     $name = 'PrevNextCache';
   }
+  if ($name === 'Payment') {
+    $name = 'FinancialTrxn';
+  }
   $dao = _civicrm_api3_get_DAO($name);
   if (!$dao) {
     return NULL;
