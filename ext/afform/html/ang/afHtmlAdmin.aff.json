@@ -1,5 +1,4 @@
 {
   "title": "Afform HTML Administration",
-  "server_route": "civicrm/admin/afform-html",
-  "requires":["afCore", "afMoncao", "afHtmlEditor", "afHtmlList"]
+  "server_route": "civicrm/admin/afform-html"
 }

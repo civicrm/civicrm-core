@@ -19,4 +19,7 @@ return array(
     ],
   ],
   'basePages' => [],
+  'exports' => [
+    'attr' => ['af-monaco'],
+  ],
 );
