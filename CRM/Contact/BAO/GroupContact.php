@@ -148,7 +148,16 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
     list($numContactsAdded, $numContactsNotAdded)
       = self::bulkAddContactsToGroup($contactIds, $groupId, $method, $status, $tracking);
 
-    CRM_Contact_BAO_Contact_Utils::clearContactCaches();
+    // Update group contact cache
+    $group = new CRM_Contact_BAO_Group();
+    $group->id = $groupId;
+    $group->find(TRUE);
+    CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
+
+    // Update contact ACL cache
+    foreach ($contactIds as $contactId) {
+      CRM_ACL_BAO_Cache::updateEntry($contactId);
+    }
 
     CRM_Utils_Hook::post('create', 'GroupContact', $groupId, $contactIds);
 
@@ -244,7 +253,16 @@ class CRM_Contact_BAO_GroupContact extends CRM_Contact_DAO_GroupContact {
       }
     }
 
-    CRM_Contact_BAO_Contact_Utils::clearContactCaches();
+    // Update group contact cache
+    $group = new CRM_Contact_BAO_Group();
+    $group->id = $groupId;
+    $group->find(TRUE);
+    CRM_Contact_BAO_GroupContactCache::load($group, TRUE);
+
+    // Update contact ACL cache
+    foreach ($contactIds as $contactId) {
+      CRM_ACL_BAO_Cache::updateEntry($contactId);
+    }
 
     CRM_Utils_Hook::post($op, 'GroupContact', $groupId, $contactIds);
 
