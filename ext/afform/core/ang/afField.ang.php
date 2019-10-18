@@ -17,4 +17,8 @@ return [
   ],
   'settings' => [],
   'basePages' => [],
+  'exports' => [
+    'el' => ['af-field'],
+    'attr' => ['af-field'],
+  ],
 ];

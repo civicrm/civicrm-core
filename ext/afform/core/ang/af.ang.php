@@ -14,4 +14,8 @@ return [
   'requires' => ['crmUtil'],
   'settings' => [],
   'basePages' => [],
+  'exports' => [
+    'el' => ['af-entity', 'af-fieldset', 'af-form'],
+    'attr' => ['af-entity', 'af-fieldset', 'af-form'],
+  ],
 ];
