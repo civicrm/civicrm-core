@@ -1,3 +1,5 @@
+{assign var="greeting" value="{contact.email_greeting}"}{if $greeting}{$greeting},{/if}
+
 {if $formValues.receipt_text}
 {$formValues.receipt_text}
 {else}{ts}Thank you for your support.{/ts}{/if}

@@ -21,6 +21,7 @@
 
   <tr>
    <td>
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
     {if $formValues.receipt_text_signup}
      <p>{$formValues.receipt_text_signup|htmlize}</p>
     {elseif $formValues.receipt_text_renewal}

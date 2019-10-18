@@ -20,9 +20,9 @@
   <!-- END HEADER -->
 
   <!-- BEGIN CONTENT -->
-   {if $emailGreeting}<tr><td>{$emailGreeting},</td></tr>{/if}
   <tr>
     <td>
+      {if $emailGreeting}<tr><td>{$emailGreeting},</td></tr>{/if}
       {if $isRefund}
       <p>{ts}A refund has been issued based on changes in your registration selections.{/ts}</p>
       {else}

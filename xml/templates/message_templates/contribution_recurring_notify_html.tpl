@@ -21,7 +21,7 @@
 
   <tr>
    <td>
-    <p>{ts 1=$displayName}Dear %1{/ts},</p>
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
    </td>
   </tr>
 

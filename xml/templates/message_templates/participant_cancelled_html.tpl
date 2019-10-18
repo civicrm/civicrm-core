@@ -21,7 +21,7 @@
 
   <tr>
    <td>
-    <p>{ts 1=$contact.display_name}Dear %1{/ts},</p>
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
     <p>{ts}Your Event Registration has been cancelled.{/ts}</p>
    </td>
   </tr>

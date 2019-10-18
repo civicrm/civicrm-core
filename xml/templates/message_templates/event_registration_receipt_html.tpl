@@ -9,7 +9,7 @@
     {capture assign=labelStyle }style="padding: 4px; border-bottom: 1px solid #999; background-color: #f7f7f7;"{/capture}
     {capture assign=valueStyle }style="padding: 4px; border-bottom: 1px solid #999;"{/capture}
 
-    <p>Dear {contact.display_name},</p>
+    {assign var="greeting" value="{contact.email_greeting}"}{if $greeting}<p>{$greeting},</p>{/if}
     {if $is_pay_later}
       <p>
         This is being sent to you as an acknowledgement that you have registered one or more members for the following workshop, event or purchase. Please note, however, that the status of your payment is pending, and the registration for this event will not be completed until your payment is received.
@@ -26,7 +26,6 @@
 
     <p>Your order number is #{$transaction_id}. {if $line_items && !$is_refund} Information about the workshops will be sent separately to each participant.{/if}
   Here's a summary of your transaction placed on {$transaction_date|date_format:"%D %I:%M %p %Z"}:</p>
-
 
 {if $billing_name}
   <table class="billing-info">
