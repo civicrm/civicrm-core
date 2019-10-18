@@ -1195,7 +1195,7 @@ function _civicrm_api3_contact_merge_spec(&$params) {
   $params['mode'] = [
     'title' => ts('Dedupe mode'),
     'description' => ts("In 'safe' mode conflicts will result in no merge. In 'aggressive' mode the merge will still proceed (hook dependent)"),
-    'api.default' => ['safe', 'aggressive'],
+    'api.default' => 'safe',
     'options' => ['safe' => ts('Abort on unhandled conflict'), 'aggressive' => ts('Proceed on unhandled conflict. Note hooks may change handling here.')],
   ];
 }
