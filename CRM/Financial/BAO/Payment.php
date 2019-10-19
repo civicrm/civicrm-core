@@ -196,7 +196,33 @@ class CRM_Financial_BAO_Payment {
       'toEmail' => $entities['contact']['email'],
       'tplParams' => self::getConfirmationTemplateParameters($entities),
     ];
+    if (!empty($params['from']) && !empty($params['check_permissions'])) {
+      // Filter from against permitted emails.
+      $validEmails = self::getValidFromEmailsForPayment($entities['event']['id'] ?? NULL);
+      if (!isset($validEmails[$params['from']])) {
+        // Ignore unpermitted parameter.
+        unset($params['from']);
+      }
+    }
+    $sendTemplateParams['from'] = $params['from'] ?? key(CRM_Core_BAO_Email::domainEmails());
     return CRM_Core_BAO_MessageTemplate::sendTemplate($sendTemplateParams);
+  }
+
+  /**
+   * Get valid from emails for payment.
+   *
+   * @param int $eventID
+   *
+   * @return array
+   */
+  public static function getValidFromEmailsForPayment($eventID = NULL) {
+    if ($eventID) {
+      $emails = CRM_Event_BAO_Event::getFromEmailIds($eventID);
+    }
+    else {
+      $emails['from_email_id'] = CRM_Core_BAO_Email::getFromEmail();
+    }
+    return $emails['from_email_id'];
   }
 
   /**
