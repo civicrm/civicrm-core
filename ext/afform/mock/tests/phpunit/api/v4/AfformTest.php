@@ -6,6 +6,8 @@
  * @group headless
  */
 class api_v4_AfformTest extends api_v4_AfformTestCase {
+  use \Civi\Test\Api3TestTrait;
+  use \Civi\Test\ContactTestTrait;
 
   public function getBasicDirectives() {
     return [
@@ -113,6 +115,47 @@ class api_v4_AfformTest extends api_v4_AfformTestCase {
     $this->assertEquals($readLayout, $result[0]['layout'], "Based on \"$exampleName\", writing content as \"$updateFormat\" and reading back as \"$readFormat\".");
 
     Civi\Api4\Afform::revert()->addWhere('name', '=', $directiveName)->execute();
+  }
+
+  public function testAutoRequires() {
+    $directiveName = 'mockPage';
+    $this->createLoggedInUser();
+
+    // The default mockPage has 1 explicit requirement + 2 automatic requirements.
+    Civi\Api4\Afform::revert()->addWhere('name', '=', $directiveName)->execute();
+    $angModule = Civi::service('angular')->getModule($directiveName);
+    $this->assertEquals(['afCore', 'extraMock', 'mockBareFile', 'mockFoo'], $angModule['requires']);
+    $storedRequires = Civi\Api4\Afform::get()->addWhere('name', '=', $directiveName)->addSelect('requires')->execute();
+    $this->assertEquals(['extraMock'], $storedRequires[0]['requires']);
+
+    // Knock down to 1 explicit + 1 automatic.
+    Civi\Api4\Afform::update()
+      ->addWhere('name', '=', $directiveName)
+      ->setLayoutFormat('html')
+      ->setValues(['layout' => '<div>The bare file says "<span mock-bare-file/>"</div>'])
+      ->execute();
+    $angModule = Civi::service('angular')->getModule($directiveName);
+    $this->assertEquals(['afCore', 'extraMock', 'mockBareFile'], $angModule['requires']);
+    $storedRequires = Civi\Api4\Afform::get()->addWhere('name', '=', $directiveName)->addSelect('requires')->execute();
+    $this->assertEquals(['extraMock'], $storedRequires[0]['requires']);
+
+    // Remove the last explict and implicit requirements.
+    Civi\Api4\Afform::update()
+      ->addWhere('name', '=', $directiveName)
+      ->setLayoutFormat('html')
+      ->setValues([
+        'layout' => '<div>The file has nothing! <strong>NOTHING!</strong> <em>JUST RANTING!</em></div>',
+        'requires' => [],
+      ])
+      ->execute();
+    $angModule = Civi::service('angular')->getModule($directiveName);
+    $this->assertEquals(['afCore'], $angModule['requires']);
+    $storedRequires = Civi\Api4\Afform::get()->addWhere('name', '=', $directiveName)->addSelect('requires')->execute();
+    $this->assertEquals([], $storedRequires[0]['requires']);
+
+    Civi\Api4\Afform::revert()->addWhere('name', '=', $directiveName)->execute();
+    $angModule = Civi::service('angular')->getModule($directiveName);
+    $this->assertEquals(['afCore', 'extraMock', 'mockBareFile', 'mockFoo'], $angModule['requires']);
   }
 
 }

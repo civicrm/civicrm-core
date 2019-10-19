@@ -56,7 +56,7 @@ class Update extends BasicUpdateAction {
     }
 
     // We may have changed list of files covered by the cache.
-    $scanner->clear();
+    _afform_clear();
 
     if (isset($updates['server_route']) && $updates['server_route'] !== $orig[0]['server_route']) {
       \CRM_Core_Menu::store();

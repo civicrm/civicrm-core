@@ -1,1 +1,1 @@
-{"server_route": "civicrm/mock-page", "requires":["mockFoo", "mockBareFile"]}
+{"server_route": "civicrm/mock-page", "requires":["extraMock"]}

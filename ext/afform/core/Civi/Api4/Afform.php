@@ -40,7 +40,7 @@ class Afform extends AbstractEntity {
       }
 
       // We may have changed list of files covered by the cache.
-      $scanner->clear();
+      _afform_clear();
 
       // FIXME if `server_route` changes, then flush the menu cache.
       // FIXME if asset-caching is enabled, then flush the asset cache

@@ -424,6 +424,18 @@ function afform_civicrm_alterMenu(&$items) {
 }
 
 /**
+ * Clear any local/in-memory caches based on afform data.
+ */
+function _afform_clear() {
+  $container = \Civi::container();
+  $container->get('afform_scanner')->clear();
+
+  // Civi\Angular\Manager doesn't currently have a way to clear its in-memory
+  // data, so we just reset the whole object.
+  $container->set('angular', NULL);
+}
+
+/**
  * @param string $fileBaseName
  *   Ex: foo-bar
  * @param string $format
