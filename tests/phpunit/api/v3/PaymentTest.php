@@ -181,6 +181,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
     $mut->assertSubjects(['Payment Receipt - Annual CiviCRM meet']);
     $mut->checkMailLog([
+      'From: "FIXME" <info@EXAMPLE.ORG>',
       'Dear Anthony,',
       'Total Fees: $ 300.00',
       'This Payment Amount: $ 50.00',
@@ -204,6 +205,7 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
    */
   public function testPaymentEmailReceiptFullyPaid() {
     $mut = new CiviMailUtils($this);
+    CRM_Core_Config::singleton()->userPermissionClass->permissions = ['access CiviContribute', 'edit contributions', 'access CiviCRM'];
     list($lineItems, $contribution) = $this->createParticipantWithContribution();
 
     $params = [
@@ -212,9 +214,12 @@ class api_v3_PaymentTest extends CiviUnitTestCase {
     ];
     $payment = $this->callAPISuccess('payment', 'create', $params);
 
-    $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id']]);
+    // Here we set the email to an  invalid email & use check_permissions, domain email should be used.
+    $email = $this->callAPISuccess('Email', 'create', ['contact_id' => 1, 'email' => 'bob@example.com']);
+    $this->callAPISuccess('Payment', 'sendconfirmation', ['id' => $payment['id'], 'from' => $email['id'], 'check_permissions' => 1]);
     $mut->assertSubjects(['Payment Receipt - Annual CiviCRM meet', 'Registration Confirmation - Annual CiviCRM meet']);
     $mut->checkMailLog([
+      'From: "FIXME" <info@EXAMPLE.ORG>',
       'Dear Anthony,',
       'A payment has been received.',
       'Total Fees: $ 300.00',
