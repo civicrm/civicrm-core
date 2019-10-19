@@ -631,4 +631,17 @@ class api_v3_OrderTest extends CiviUnitTestCase {
     $this->assertEquals(1, $order['count']);
   }
 
+  /**
+   * Test that a contribution can be added in pending mode with a chained payment.
+   *
+   * We have just deprecated creating an order with a status other than pending. It makes
+   * sense to support adding a payment straight away by chaining.
+   *
+   * @throws \CRM_Core_Exception
+   */
+  public function testCreateWithChainedPayment() {
+    $contributionID = $this->callAPISuccess('Order', 'create', ['contact_id' => $this->_individualId, 'total_amount' => 5, 'financial_type_id' => 2, 'contribution_status_id' => 'Pending', 'api.Payment.create' => ['total_amount' => 5]])['id'];
+    $this->assertEquals('Completed', $this->callAPISuccessGetValue('Contribution', ['id' => $contributionID, 'return' => 'contribution_status']));
+  }
+
 }

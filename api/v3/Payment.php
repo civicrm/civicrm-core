@@ -161,6 +161,9 @@ function _civicrm_api3_payment_create_spec(&$params) {
       'api.required' => 1,
       'title' => ts('Contribution ID'),
       'type' => CRM_Utils_Type::T_INT,
+      // We accept order_id as an alias so that we can chain like
+      // civicrm_api3('Order', 'create', ['blah' => 'blah', 'contribution_status_id' => 'Pending', 'api.Payment.create => ['total_amount' => 5]]
+      'api.aliases' => ['order_id'],
     ],
     'total_amount' => [
       'api.required' => 1,
