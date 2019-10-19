@@ -448,6 +448,7 @@ VALUES
   (@option_group_id_cs, '{ts escape="sql"}Partially paid{/ts}', 8, 'Partially paid', NULL, 0, NULL, 8, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_cs, '{ts escape="sql"}Pending refund{/ts}', 9, 'Pending refund', NULL, 0, NULL, 9, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_cs, '{ts escape="sql"}Chargeback{/ts}', 10, 'Chargeback', NULL, 0, NULL, 10, NULL, 0, 1, 1, NULL, NULL, NULL),
+  (@option_group_id_cs, '{ts escape="sql"}Template{/ts}'  , 11, 'Template',   NULL, 0, NULL, 11, '{ts escape="sql"}Status for contribution records which represent a template for a recurring contribution rather than an actual contribution. This status is transitional, to ensure that said contributions don\'t appear in reports. The is_template field is the preferred way to find and filter these contributions.{/ts}', 0, 1, 1, NULL, NULL, NULL),
 
   (@option_group_id_pcp, '{ts escape="sql"}Waiting Review{/ts}', 1, 'Waiting Review', NULL, 0, NULL, 1, NULL, 0, 1, 1, NULL, NULL, NULL),
   (@option_group_id_pcp, '{ts escape="sql"}Approved{/ts}'      , 2, 'Approved'      , NULL, 0, NULL, 2, NULL, 0, 1, 1, NULL, NULL, NULL),

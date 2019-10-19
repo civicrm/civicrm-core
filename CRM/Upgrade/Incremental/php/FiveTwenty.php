@@ -94,6 +94,18 @@ class CRM_Upgrade_Incremental_php_FiveTwenty extends CRM_Upgrade_Incremental_Bas
       $this->addTask('Change direction of autoassignees in case type xml', 'changeCaseTypeAutoassignee');
     }
     $this->addTask(ts('Upgrade DB to %1: SQL', [1 => $rev]), 'runSql', $rev);
+    $this->addTask('Add "Template" contribution status', 'templateStatus');
+  }
+
+  public static function templateStatus(CRM_Queue_TaskContext $ctx) {
+    CRM_Core_BAO_OptionValue::ensureOptionValueExists([
+      'option_group_id' => 'contribution_status',
+      'name' => 'Template',
+      'label' => ts('Template'),
+      'is_active' => TRUE,
+      'component_id' => 'CiviContribute',
+    ]);
+    return TRUE;
   }
 
   /**

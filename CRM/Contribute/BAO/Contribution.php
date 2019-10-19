@@ -3919,6 +3919,11 @@ INNER JOIN civicrm_activity ON civicrm_activity_contact.activity_id = civicrm_ac
         $fieldName = 'soft_credit_type_id';
         $params['condition'] = "v.name IN ('in_honor_of','in_memory_of')";
         break;
+
+      case 'contribution_status_id':
+        if ($context !== 'validate') {
+          $params['condition'] = "v.name <> 'Template'";
+        }
     }
     return CRM_Core_PseudoConstant::get($className, $fieldName, $params, $context);
   }

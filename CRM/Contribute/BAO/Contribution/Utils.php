@@ -545,14 +545,22 @@ LIMIT 1
       $statusNames = CRM_Contribute_BAO_Contribution::buildOptions('contribution_status_id', 'validate');
     }
 
-    $statusNamesToUnset = [];
+    $statusNamesToUnset = [
+      // For records which represent a data template for a recurring
+      // contribution that may not yet have a payment. This status should not
+      // be available from forms. 'Template' contributions should only be created
+      // in conjunction with a ContributionRecur record, and should have their
+      // is_template field set to 1. This status excludes them from reports
+      // that are still ignorant of the is_template field.
+      'Template',
+    ];
     // on create fetch statuses on basis of component
     if (!$id) {
-      $statusNamesToUnset = [
+      $statusNamesToUnset = array_merge($statusNamesToUnset, [
         'Refunded',
         'Chargeback',
         'Pending refund',
-      ];
+      ]);
 
       // Event registration and New Membership backoffice form support partially paid payment,
       //  so exclude this status only for 'New Contribution' form
