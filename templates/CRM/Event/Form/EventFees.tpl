@@ -73,16 +73,16 @@
         <tr class="crm-event-eventfees-form-block-record_contribution">
             <td class="label">{$form.record_contribution.label}</td>
             <td>{$form.record_contribution.html}<br />
-                <span class="description">{ts}Check this box to enter payment information. You will also be able to generate a customized receipt.{/ts}</span>
+                <span class="description">{ts}Check this box to enter contribution information. You will also be able to generate a customized receipt.{/ts}</span>
             </td>
         </tr>
-        <tr id="payment_information" class="crm-event-eventfees-form-block-payment_information">
+        <tr id="contribution_information" class="crm-event-eventfees-form-block-payment_information">
            <td class ='html-adjust' colspan=2>
-           <fieldset><legend>{ts}Payment Information{/ts}</legend>
+           <fieldset><legend>{ts}Contribution Information{/ts}</legend>
              <table id="recordContribution" class="form-layout" style="width:auto;">
                 <tr class="crm-event-eventfees-form-block-financial_type_id">
                     <td class="label">{$form.financial_type_id.label}<span class="crm-marker"> *</span></td>
-                    <td>{$form.financial_type_id.html}<br /><span class="description">{ts}Select the appropriate financial type for this payment.{/ts}</span></td>
+                    <td>{$form.financial_type_id.html}<br /><span class="description">{ts}Select the appropriate financial type for this contribution.{/ts}</span></td>
                 </tr>
                 <tr class="crm-event-eventfees-form-block-total_amount"><td class="label">{$form.total_amount.label}</td><td>{$form.total_amount.html|crmMoney:$currency}</td></tr>
                 <tr>

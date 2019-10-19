@@ -403,8 +403,8 @@ SELECT  id, html_type
 
       CRM_Core_Payment_Form::buildPaymentForm($form, $form->_paymentProcessor, FALSE, TRUE, self::getDefaultPaymentInstrumentId());
       if (!$form->_mode) {
-        $form->addElement('checkbox', 'record_contribution', ts('Record Payment?'), NULL,
-          ['onclick' => "return showHideByValue('record_contribution','','payment_information','table-row','radio',false);"]
+        $form->addElement('checkbox', 'record_contribution', ts('Record Contribution?'), NULL,
+          ['onclick' => "return showHideByValue('record_contribution','','contribution_information','table-row','radio',false);"]
         );
         // Check permissions for financial type first
         if (CRM_Financial_BAO_FinancialType::isACLFinancialTypeStatus()) {
@@ -438,7 +438,7 @@ SELECT  id, html_type
         }
 
         $form->add('select', 'contribution_status_id',
-          ts('Payment Status'), CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses('participant')
+          ts('Contribution Status'), CRM_Contribute_BAO_Contribution_Utils::getContributionStatuses('participant')
         );
 
         $form->add('text', 'check_number', ts('Check Number'),
