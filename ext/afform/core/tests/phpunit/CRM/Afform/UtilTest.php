@@ -18,7 +18,7 @@ class CRM_Afform_UtilTest extends \PHPUnit\Framework\TestCase implements Headles
   public function setUpHeadless() {
     return \Civi\Test::headless()
       ->installMe(__DIR__)
-      ->install(['org.civicrm.api4'])
+      ->install(version_compare(CRM_Utils_System::version(), '5.19', '<') ? ['org.civicrm.api4'] : [])
       ->apply();
   }
 
