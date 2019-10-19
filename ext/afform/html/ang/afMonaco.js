@@ -1,9 +1,9 @@
 (function(angular, $, _) {
-  angular.module('afMoncao', CRM.angRequires('afMoncao'));
+  angular.module('afMonaco', CRM.angRequires('afMonaco'));
 
   // "afMonaco" is a basic skeletal directive.
   // Example usage: <div af-monaco ng-model="my.content"></div>
-  angular.module('afMoncao').directive('afMonaco', function($timeout) {
+  angular.module('afMonaco').directive('afMonaco', function($timeout) {
     return {
       restrict: 'AE',
       require: 'ngModel',
@@ -11,7 +11,7 @@
       link: function($scope, $el, $attr, ngModel) {
         var heightPct = 0.70;
         var editor;
-        require.config({paths: CRM.afMoncao.paths});
+        require.config({paths: CRM.afMonaco.paths});
         require(['vs/editor/editor.main'], function() {
           var editorEl = $el.find('.af-monaco-container');
           editorEl.css({height: Math.round(heightPct * $(window).height())});

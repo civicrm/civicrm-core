@@ -6,12 +6,12 @@
 return array(
   'js' => [
     AFFORM_HTML_MONACO . '/loader.js',
-    'ang/afMoncao.js',
-    //    'ang/afMoncao/*.js',
-    //    'ang/afMoncao/*/*.js',
+    'ang/afMonaco.js',
+    //    'ang/afMonaco/*.js',
+    //    'ang/afMonaco/*/*.js',
   ],
-  'css' => ['ang/afMoncao.css'],
-  // 'partials' => ['ang/afMoncao'],
+  'css' => ['ang/afMonaco.css'],
+  // 'partials' => ['ang/afMonaco'],
   'requires' => ['crmUi', 'crmUtil'],
   'settings' => [
     'paths' => [
