@@ -18,7 +18,7 @@ return [
   'settings' => [],
   'basePages' => [],
   'exports' => [
-    'el' => ['af-block-contact-name', 'af-block-contact-email'],
-    'attr' => ['af-block-contact-name', 'af-block-contact-email'],
+    'af-block-contact-name' => 'AE',
+    'af-block-contact-email' => 'AE',
   ],
 ];

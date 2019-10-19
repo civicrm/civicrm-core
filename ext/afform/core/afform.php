@@ -174,9 +174,7 @@ function afform_civicrm_angularModules(&$angularModules) {
       'requires' => $meta['requires'],
       'basePages' => [],
       'exports' => [
-        // Each afform is an attribute and an element.
-        'el' => [_afform_angular_module_name($name, 'dash')],
-        'attr' => [_afform_angular_module_name($name, 'dash')],
+        _afform_angular_module_name($name, 'dash') => 'AE',
       ],
     ];
 
@@ -268,20 +266,31 @@ function _afform_civicrm_angularModules_autoReq($e) {
  *   'el': array(string $elementName => string $angModuleName)
  */
 function _afform_reverse_deps($angularModules) {
-  $revMap = [];
-  foreach (['attr', 'el'] as $exportType) {
-    $revMap[$exportType] = [];
-    foreach (array_keys($angularModules) as $module) {
-      if (isset($angularModules[$module]['exports'][$exportType])) {
-        foreach ($angularModules[$module]['exports'][$exportType] as $exportItem) {
-          $revMap[$exportType][$exportItem] = $module;
-        }
+  $revMap = ['attr' => [], 'el' => []];
+  foreach (array_keys($angularModules) as $module) {
+    if (!isset($angularModules[$module]['exports'])) {
+      continue;
+    }
+    foreach ($angularModules[$module]['exports'] as $symbolName => $symbolTypes) {
+      if (strpos($symbolTypes, 'A') !== FALSE) {
+        $revMap['attr'][$symbolName] = $module;
+      }
+      if (strpos($symbolTypes, 'E') !== FALSE) {
+        $revMap['el'][$symbolName] = $module;
       }
     }
   }
   return $revMap;
 }
 
+/**
+ * @param string $formName
+ * @param string $html
+ * @param array $revMap
+ *   The reverse-dependencies map from _afform_reverse_deps().
+ * @return array
+ * @see _afform_reverse_deps()
+ */
 function _afform_reverse_deps_find($formName, $html, $revMap) {
   $symbols = \Civi\Afform\Symbols::scan($html);
   $elems = array_intersect_key($revMap['el'], $symbols->elements);

@@ -15,7 +15,8 @@ return [
   'settings' => [],
   'basePages' => [],
   'exports' => [
-    'el' => ['af-entity', 'af-fieldset', 'af-form'],
-    'attr' => ['af-entity', 'af-fieldset', 'af-form'],
+    'af-entity' => 'AE',
+    'af-fieldset' => 'AE',
+    'af-form' => 'AE',
   ],
 ];
