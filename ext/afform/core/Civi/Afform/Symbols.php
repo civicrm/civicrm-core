@@ -50,12 +50,32 @@ class Symbols {
       self::increment($this->attributes, $node->nodeName);
 
       if ($node->nodeName === 'class') {
-        $classes = explode(' ', $node->nodeValue);
+        $classes = $this->parseClasses($node->nodeValue);
         foreach ($classes as $class) {
           self::increment($this->classes, $class);
         }
       }
     }
+  }
+
+  /**
+   * @param string $expr
+   *   Ex: 'crm-icon fa-mail'
+   * @return array
+   *   Ex: ['crm-icon', 'fa-mail']
+   */
+  protected function parseClasses($expr) {
+    if ($expr === '' || $expr === NULL || $expr === FALSE) {
+      return [];
+    }
+    if (strpos($expr, '{{') === FALSE) {
+      return explode(' ', $expr);
+    }
+    if (preg_match_all(';([a-zA-Z\-_]+|\{\{.*\}\}) ;U', "$expr ", $m)) {
+      return $m[1];
+    }
+    error_log("Failed to parse CSS classes: $expr");
+    return [];
   }
 
   private static function increment(&$arr, $key) {
