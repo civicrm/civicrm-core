@@ -219,7 +219,12 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
    */
   protected static function encodeXmlString($str) {
     // PHP 5.4: return htmlspecialchars($str, ENT_XML1, 'UTF-8')
-    return htmlspecialchars($str);
+    if (is_scalar($str)) {
+      return htmlspecialchars($str);
+    }
+    else {
+      return NULL;
+    }
   }
 
   /**
