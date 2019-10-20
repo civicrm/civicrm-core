@@ -139,6 +139,7 @@ class CRM_Report_Form_Contact_Detail extends CRM_Report_Form {
           ],
         ],
         'order_bys' => [
+          'street_address' => ['title' => ts('Street Address')],
           'state_province_id' => ['title' => ts('State/Province')],
           'city' => ['title' => ts('City')],
           'postal_code' => ['title' => ts('Postal Code')],
