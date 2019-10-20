@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<CaseType>
+  <name>Housing Support</name>
+  <ActivityTypes>
+    <ActivityType>
+      <name>First act</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Second act</name>
+    </ActivityType>
+  </ActivityTypes>
+  <ActivitySets>
+    <ActivitySet>
+      <name>set1</name>
+      <label>Label 1</label>
+      <timeline>true</timeline>
+      <ActivityTypes>
+        <ActivityType>
+          <name>Open Case</name>
+          <status>Completed</status>
+        </ActivityType>
+      </ActivityTypes>
+    </ActivitySet>
+    <ActivitySet>
+      <name>set2</name>
+      <label>Label 2</label>
+      <timeline>true</timeline>
+      <ActivityTypes>
+        <ActivityType>
+          <name>First act</name>
+          <status>Scheduled</status>
+          <reference_activity>Open Case</reference_activity>
+          <reference_offset>1</reference_offset>
+          <reference_select>newest</reference_select>
+          <default_assignee_type>2</default_assignee_type>
+          <default_assignee_relationship>2_b_a</default_assignee_relationship>
+          <default_assignee_contact></default_assignee_contact>
+        </ActivityType>
+      </ActivityTypes>
+    </ActivitySet>
+  </ActivitySets>
+  <CaseRoles>
+    <RelationshipType>
+      <name>First role</name>
+      <creator>1</creator>
+      <manager>1</manager>
+    </RelationshipType>
+  </CaseRoles>
+</CaseType>
