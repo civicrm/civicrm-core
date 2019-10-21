@@ -234,6 +234,12 @@ class CRM_Case_BAO_CaseType extends CRM_Case_DAO_CaseType {
 
     if (isset($xml->ActivityAsgmtGrps)) {
       $definition['activityAsgmtGrps'] = (array) $xml->ActivityAsgmtGrps->Group;
+      // Backwards compat - convert group ids to group names if ids are supplied
+      if (array_filter($definition['activityAsgmtGrps'], ['\CRM_Utils_Rule', 'integer']) === $definition['activityAsgmtGrps']) {
+        foreach ($definition['activityAsgmtGrps'] as $idx => $group) {
+          $definition['activityAsgmtGrps'][$idx] = CRM_Core_DAO::getFieldValue('CRM_Contact_BAO_Group', $group);
+        }
+      }
     }
 
     // set activity types
