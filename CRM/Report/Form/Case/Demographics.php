@@ -242,8 +242,6 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
       ];
     }
 
-    $this->_genders = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'gender_id');
-
     parent::__construct();
   }
 
@@ -414,14 +412,6 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
         $entryFound = TRUE;
       }
 
-      // handle gender
-      if (array_key_exists('civicrm_contact_gender_id', $row)) {
-        if ($value = $row['civicrm_contact_gender_id']) {
-          $rows[$rowNum]['civicrm_contact_gender_id'] = $this->_genders[$value];
-        }
-        $entryFound = TRUE;
-      }
-
       // handle custom fields
       foreach ($row as $k => $r) {
         if (substr($k, 0, 13) == 'civicrm_value' ||
@@ -436,6 +426,7 @@ where (cg.extends='Contact' OR cg.extends='Individual' OR cg.extends_entity_colu
         }
       }
 
+      $entryFound = $this->alterDisplayContactFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
       $entryFound = $this->alterDisplayAddressFields($row, $rows, $rowNum, NULL, NULL) ? TRUE : $entryFound;
 
       // skip looking further in rows, if first row itself doesn't
