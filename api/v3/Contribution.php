@@ -763,3 +763,13 @@ function _civicrm_api3_contribution_repeattransaction_spec(&$params) {
     'type' => CRM_Utils_Type::T_INT,
   ];
 }
+
+/**
+ * Declare deprecated functions.
+ *
+ * @return array
+ *   Array of deprecated actions
+ */
+function _civicrm_api3_contribution_deprecation() {
+  return ['transact' => 'Contribute.transact is ureliable & unsupported - see https://docs.civicrm.org/dev/en/latest/financial/OrderAPI/  for how to move on'];
+}
