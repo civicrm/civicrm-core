@@ -336,13 +336,8 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
       $this->add('text', 'total_amount', ts('Total Amount'), ['readonly' => TRUE], FALSE);
     }
     $pps = [];
-    //@todo - this should be replaced by a check as to whether billing fields are set
-    $onlinePaymentProcessorEnabled = FALSE;
     if (!empty($this->_paymentProcessors)) {
       foreach ($this->_paymentProcessors as $key => $name) {
-        if ($name['billing_mode'] == 1) {
-          $onlinePaymentProcessorEnabled = TRUE;
-        }
         $pps[$key] = $name['name'];
       }
     }
@@ -367,7 +362,7 @@ class CRM_Contribute_Form_Contribution_Main extends CRM_Contribute_Form_Contribu
 
     $contactID = $this->getContactID();
     if ($this->getContactID() === 0) {
-      $this->addCidZeroOptions($onlinePaymentProcessorEnabled);
+      $this->addCidZeroOptions();
     }
 
     //build pledge block.
