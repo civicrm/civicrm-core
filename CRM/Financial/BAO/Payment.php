@@ -239,6 +239,7 @@ class CRM_Financial_BAO_Payment {
    *   - event = [.... full event details......]
    *   - contribution = ['id' => x],
    *   - payment = [payment info + payment summary info]
+   * @throws \CiviCRM_API3_Exception
    */
   protected static function loadRelatedEntities($id) {
     $entities = [];
