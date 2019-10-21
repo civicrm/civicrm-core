@@ -371,23 +371,22 @@ class CRM_Financial_BAO_PaymentProcessor extends CRM_Financial_DAO_PaymentProces
     $testProcessors = in_array('TestMode', $capabilities) ? self::getAllPaymentProcessors('test') : [];
     if (is_array($ids)) {
       $processors = self::getAllPaymentProcessors('all', FALSE, FALSE);
-    }
-    else {
-      $processors = self::getAllPaymentProcessors('all');
-    }
-
-    if (in_array('TestMode', $capabilities) && is_array($ids)) {
-      $possibleLiveIDs = array_diff($ids, array_keys($testProcessors));
-      foreach ($possibleLiveIDs as $possibleLiveID) {
-        if (isset($processors[$possibleLiveID]) && ($liveProcessorName = $processors[$possibleLiveID]['name']) != FALSE) {
-          foreach ($testProcessors as $index => $testProcessor) {
-            if ($testProcessor['name'] == $liveProcessorName) {
-              $ids[] = $testProcessor['id'];
+      if (in_array('TestMode', $capabilities)) {
+        $possibleLiveIDs = array_diff($ids, array_keys($testProcessors));
+        foreach ($possibleLiveIDs as $possibleLiveID) {
+          if (isset($processors[$possibleLiveID]) && ($liveProcessorName = $processors[$possibleLiveID]['name']) != FALSE) {
+            foreach ($testProcessors as $index => $testProcessor) {
+              if ($testProcessor['name'] == $liveProcessorName) {
+                $ids[] = $testProcessor['id'];
+              }
             }
           }
         }
+        $processors = $testProcessors;
       }
-      $processors = $testProcessors;
+    }
+    else {
+      $processors = self::getAllPaymentProcessors('all');
     }
 
     foreach ($processors as $index => $processor) {
