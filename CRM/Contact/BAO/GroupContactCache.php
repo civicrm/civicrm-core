@@ -480,30 +480,17 @@ WHERE  id IN ( $groupIDs )
       return;
     }
 
-    // grab a lock so other processes don't compete and do the same query
-    $lock = Civi::lockManager()->acquire("data.core.group.{$groupID}");
-    if (!$lock->isAcquired()) {
-      // this can cause inconsistent results since we don't know if the other process
-      // will fill up the cache before our calling routine needs it.
-      // however this routine does not return the status either, so basically
-      // its a "lets return and hope for the best"
-      return;
-    }
-
     self::$_alreadyLoaded[$groupID] = 1;
 
-    // we now have the lock, but some other process could have actually done the work
-    // before we got here, so before we do any work, lets ensure that work needs to be
-    // done
+    // FIXME: some other process could have actually done the work before we got here,
+    // Ensure that work needs to be done before continuing
     // we allow hidden groups here since we dont know if the caller wants to evaluate an
     // hidden group
     if (!$force && !self::shouldGroupBeRefreshed($groupID, TRUE)) {
-      $lock->release();
       return;
     }
 
     $sql = NULL;
-    $idName = 'id';
     $customClass = NULL;
     if ($savedSearchID) {
       $ssParams = CRM_Contact_BAO_SavedSearch::getSearchParams($savedSearchID);
@@ -532,7 +519,10 @@ WHERE  id IN ( $groupIDs )
         if (!strstr($searchSQL, 'WHERE')) {
           $searchSQL .= " WHERE ( 1 ) ";
         }
-        $idName = 'contact_id';
+        $sql = [
+          'select' => substr($searchSQL, 0, strpos($searchSQL, 'FROM')),
+          'from' => substr($searchSQL, strpos($searchSQL, 'FROM')),
+        ];
       }
       else {
         $formValues = CRM_Contact_BAO_SavedSearch::getFormValues($savedSearchID);
@@ -560,56 +550,55 @@ WHERE  id IN ( $groupIDs )
             FALSE, FALSE,
             FALSE, TRUE
           );
-        $searchSQL = "{$sqlParts['select']} {$sqlParts['from']} {$sqlParts['where']} {$sqlParts['having']} {$sqlParts['group_by']}";
+        $sql = [
+          'select' => $sqlParts['select'],
+          'from' => "{$sqlParts['from']} {$sqlParts['where']} {$sqlParts['having']} {$sqlParts['group_by']}",
+        ];
       }
       $groupID = CRM_Utils_Type::escape($groupID, 'Integer');
-      $sql = $searchSQL . " AND contact_a.id NOT IN (
-                              SELECT contact_id FROM civicrm_group_contact
-                              WHERE civicrm_group_contact.status = 'Removed'
-                              AND   civicrm_group_contact.group_id = $groupID ) ";
+      $sql['from'] .= " AND contact_a.id NOT IN (
+                          SELECT contact_id FROM civicrm_group_contact
+                          WHERE civicrm_group_contact.status = 'Removed'
+                          AND   civicrm_group_contact.group_id = $groupID ) ";
     }
 
-    if ($sql) {
-      $sql = preg_replace("/^\s*SELECT/", "SELECT $groupID as group_id, ", $sql);
+    if (!empty($sql['select'])) {
+      $sql['select'] = preg_replace("/^\s*SELECT/", "SELECT $groupID as group_id, ", $sql['select']);
     }
 
+    $groupContactsTempTable = CRM_Utils_SQL_TempTable::build()->setCategory('gccache')->setMemory();
+    $tempTable = $groupContactsTempTable->getName();
+    $groupContactsTempTable->createWithColumns('contact_id int, group_id int, UNIQUE UI_contact_group (contact_id,group_id)');
+
+    $contactQueries[] = $sql;
     // lets also store the records that are explicitly added to the group
     // this allows us to skip the group contact LEFT JOIN
-    $sqlB = "
-SELECT $groupID as group_id, contact_id as $idName
-FROM   civicrm_group_contact
-WHERE  civicrm_group_contact.status = 'Added'
-  AND  civicrm_group_contact.group_id = $groupID ";
-
-    self::clearGroupContactCache($groupID);
-
-    $processed = FALSE;
-    $tempTable = 'civicrm_temp_group_contact_cache' . rand(0, 2000);
-    foreach ([$sql, $sqlB] as $selectSql) {
-      if (!$selectSql) {
+    $contactQueries[] = [
+      'select' => "SELECT $groupID as group_id, contact_id as contact_id",
+      'from' => "
+ FROM   civicrm_group_contact
+ WHERE  civicrm_group_contact.status = 'Added'
+  AND  civicrm_group_contact.group_id = $groupID ",
+    ];
+    foreach ($contactQueries as $contactQuery) {
+      if (empty($contactQuery['select']) || empty($contactQuery['from'])) {
         continue;
       }
-      $insertSql = "CREATE TEMPORARY TABLE $tempTable ($selectSql);";
-      $processed = TRUE;
-      CRM_Core_DAO::executeQuery($insertSql);
-      CRM_Core_DAO::executeQuery(
-        "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
-        SELECT DISTINCT $idName, group_id FROM $tempTable
-      ");
-      CRM_Core_DAO::executeQuery(" DROP TEMPORARY TABLE $tempTable");
+      if (CRM_Core_DAO::singleValueQuery("SELECT COUNT(*) {$contactQuery['from']}") > 0) {
+        CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTable (group_id, contact_id) {$contactQuery['select']} {$contactQuery['from']}");
+      }
     }
-
-    self::updateCacheTime([$groupID], $processed);
 
     if ($group->children) {
 
-      //Store a list of contacts who are removed from the parent group
-      $sql = "
+      // Store a list of contacts who are removed from the parent group
+      $sqlContactsRemovedFromGroup = "
 SELECT contact_id
 FROM civicrm_group_contact
 WHERE  civicrm_group_contact.status = 'Removed'
 AND  civicrm_group_contact.group_id = $groupID ";
-      $dao = CRM_Core_DAO::executeQuery($sql);
+      $dao = CRM_Core_DAO::executeQuery($sqlContactsRemovedFromGroup);
+
       $removed_contacts = [];
       while ($dao->fetch()) {
         $removed_contacts[] = $dao->contact_id;
@@ -618,18 +607,51 @@ AND  civicrm_group_contact.group_id = $groupID ";
       $childrenIDs = explode(',', $group->children);
       foreach ($childrenIDs as $childID) {
         $contactIDs = CRM_Contact_BAO_Group::getMember($childID, FALSE);
-        //Unset each contact that is removed from the parent group
+        // Unset each contact that is removed from the parent group
         foreach ($removed_contacts as $removed_contact) {
           unset($contactIDs[$removed_contact]);
+        }
+        if (empty($contactIDs)) {
+          // This child group has no contact IDs so we don't need to add them to
+          continue;
         }
         $values = [];
         foreach ($contactIDs as $contactID => $dontCare) {
           $values[] = "({$groupID},{$contactID})";
         }
-
-        self::store([$groupID], $values);
+        $str = implode(',', $values);
+        CRM_Core_DAO::executeQuery("INSERT IGNORE INTO $tempTable (group_id, contact_id) VALUES $str");
       }
     }
+
+    // grab a lock so other processes don't compete and do the same query
+    $lock = Civi::lockManager()->acquire("data.core.group.{$groupID}");
+    if (!$lock->isAcquired()) {
+      // this can cause inconsistent results since we don't know if the other process
+      // will fill up the cache before our calling routine needs it.
+      // however this routine does not return the status either, so basically
+      // its a "lets return and hope for the best"
+      return;
+    }
+
+    // Don't call clearGroupContactCache as we don't want to clear the cache dates
+    // The will get updated by updateCacheTime() below and not clearing the dates reduces
+    // the chance that loadAll() will try and rebuild at the same time.
+    $clearCacheQuery = "
+    DELETE  g
+      FROM  civicrm_group_contact_cache g
+      WHERE  g.group_id = %1 ";
+    $params = [
+      1 => [$groupID, 'Integer'],
+    ];
+    CRM_Core_DAO::executeQuery($clearCacheQuery, $params);
+
+    CRM_Core_DAO::executeQuery(
+      "INSERT IGNORE INTO civicrm_group_contact_cache (contact_id, group_id)
+        SELECT DISTINCT contact_id, group_id FROM $tempTable
+      ");
+    $groupContactsTempTable->drop();
+    self::updateCacheTime([$groupID], TRUE);
 
     $lock->release();
   }
