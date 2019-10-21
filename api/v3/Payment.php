@@ -129,9 +129,12 @@ function civicrm_api3_payment_cancel($params) {
  * @param array $params
  *   Input parameters.
  *
- * @throws API_Exception
  * @return array
  *   Api result array
+ *
+ * @throws \API_Exception
+ * @throws \CRM_Core_Exception
+ * @throws \CiviCRM_API3_Exception
  */
 function civicrm_api3_payment_create($params) {
   // Check if it is an update
@@ -168,9 +171,16 @@ function _civicrm_api3_payment_create_spec(&$params) {
       'type' => CRM_Utils_Type::T_FLOAT,
     ],
     'payment_processor_id' => [
-      'title' => ts('Payment Processor ID'),
+      'name' => 'payment_processor_id',
       'type' => CRM_Utils_Type::T_INT,
-      'description' => ts('Payment processor ID - required for payment processor payments'),
+      'title' => ts('Payment Processor'),
+      'description' => ts('Payment Processor for this payment'),
+      'where' => 'civicrm_financial_trxn.payment_processor_id',
+      'table_name' => 'civicrm_financial_trxn',
+      'entity' => 'FinancialTrxn',
+      'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+      'localizable' => 0,
+      'FKClassName' => 'CRM_Financial_DAO_PaymentProcessor',
     ],
     'id' => [
       'title' => ts('Payment ID'),
@@ -186,6 +196,103 @@ function _civicrm_api3_payment_create_spec(&$params) {
       'description' => ts('Most commonly this equates to emails relating to the contribution, event, etcwhen a payment completes a contribution'),
       'type' => CRM_Utils_Type::T_BOOLEAN,
       'api.default' => TRUE,
+    ],
+    'payment_instrument_id' => [
+      'name' => 'payment_instrument_id',
+      'type' => CRM_Utils_Type::T_INT,
+      'title' => ts('Payment Method'),
+      'description' => ts('FK to payment_instrument option group values'),
+      'where' => 'civicrm_financial_trxn.payment_instrument_id',
+      'table_name' => 'civicrm_financial_trxn',
+      'entity' => 'FinancialTrxn',
+      'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+      'localizable' => 0,
+      'html' => [
+        'type' => 'Select',
+      ],
+      'pseudoconstant' => [
+        'optionGroupName' => 'payment_instrument',
+        'optionEditPath' => 'civicrm/admin/options/payment_instrument',
+      ],
+    ],
+    'card_type_id' => [
+      'name' => 'card_type_id',
+      'type' => CRM_Utils_Type::T_INT,
+      'title' => ts('Card Type ID'),
+      'description' => ts('FK to accept_creditcard option group values'),
+      'where' => 'civicrm_financial_trxn.card_type_id',
+      'table_name' => 'civicrm_financial_trxn',
+      'entity' => 'FinancialTrxn',
+      'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+      'localizable' => 0,
+      'html' => [
+        'type' => 'Select',
+      ],
+      'pseudoconstant' => [
+        'optionGroupName' => 'accept_creditcard',
+        'optionEditPath' => 'civicrm/admin/options/accept_creditcard',
+      ],
+    ],
+    'trxn_result_code' => [
+      'name' => 'trxn_result_code',
+      'type' => CRM_Utils_Type::T_STRING,
+      'title' => ts('Transaction Result Code'),
+      'description' => ts('processor result code'),
+      'maxlength' => 255,
+      'size' => CRM_Utils_Type::HUGE,
+      'where' => 'civicrm_financial_trxn.trxn_result_code',
+      'table_name' => 'civicrm_financial_trxn',
+      'entity' => 'FinancialTrxn',
+      'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+      'localizable' => 0,
+    ],
+    'trxn_id' => [
+      'name' => 'trxn_id',
+      'type' => CRM_Utils_Type::T_STRING,
+      'title' => ts('Transaction ID'),
+      'description' => ts('Transaction id supplied by external processor. This may not be unique.'),
+      'maxlength' => 255,
+      'size' => 10,
+      'where' => 'civicrm_financial_trxn.trxn_id',
+      'table_name' => 'civicrm_financial_trxn',
+      'entity' => 'FinancialTrxn',
+      'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+      'localizable' => 0,
+      'html' => [
+        'type' => 'Text',
+      ],
+    ],
+    'check_number' => [
+      'name' => 'check_number',
+      'type' => CRM_Utils_Type::T_STRING,
+      'title' => ts('Check Number'),
+      'description' => ts('Check number'),
+      'maxlength' => 255,
+      'size' => 6,
+      'where' => 'civicrm_financial_trxn.check_number',
+      'table_name' => 'civicrm_financial_trxn',
+      'entity' => 'FinancialTrxn',
+      'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+      'localizable' => 0,
+      'html' => [
+        'type' => 'Text',
+      ],
+    ],
+    'pan_truncation' => [
+      'name' => 'pan_truncation',
+      'type' => CRM_Utils_Type::T_STRING,
+      'title' => ts('Pan Truncation'),
+      'description' => ts('Last 4 digits of credit card'),
+      'maxlength' => 4,
+      'size' => 4,
+      'where' => 'civicrm_financial_trxn.pan_truncation',
+      'table_name' => 'civicrm_financial_trxn',
+      'entity' => 'FinancialTrxn',
+      'bao' => 'CRM_Financial_DAO_FinancialTrxn',
+      'localizable' => 0,
+      'html' => [
+        'type' => 'Text',
+      ],
     ],
   ];
 }
