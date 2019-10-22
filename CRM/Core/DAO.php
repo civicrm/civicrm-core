@@ -1982,6 +1982,12 @@ SELECT contact_id
     // Prefer to instantiate BAO's instead of DAO's (when possible)
     // so that assignTestValue()/assignTestFK() can be overloaded.
     $baoName = str_replace('_DAO_', '_BAO_', $daoName);
+    if ($baoName === 'CRM_Financial_BAO_FinancialTrxn') {
+      // OMG OMG OMG this is so incredibly bad. The BAO is insanely named.
+      // @todo create a new class called what the BAO SHOULD be
+      // that extends BAO-crazy-name.... migrate.
+      $baoName = 'CRM_Core_BAO_FinancialTrxn';
+    }
     if (class_exists($baoName)) {
       $daoName = $baoName;
     }
