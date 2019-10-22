@@ -14,7 +14,7 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           stale-issue-message: 'Stale issue message'
-          stale-pr-message: 'Stale pull request message'
+          stale-pr-message: 'This PR has been marked as stale due to no activity for 60 days. We are still experimenting with the new workflow feature but please close the issue yourself & track it through gitlab if you are not actively engaged with it anymore so we can prioritise our reviewer resources. Stale PRs will be autoclosed after 60 days .... we think ... but we are still experimenting & testing this at the moment. See https://github.com/civicrm/civicrm-core/pull/15573 for latest...'
           stale-issue-label: 'no-issue-activity'
           stale-pr-label: 'no-pr-activity'
           days-before-stale: 60
