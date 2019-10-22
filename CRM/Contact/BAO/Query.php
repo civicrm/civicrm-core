@@ -1303,6 +1303,9 @@ class CRM_Contact_BAO_Query {
                   break;
 
                 default:
+                  if (isset($addressCustomFields[$elementName]['custom_field_id']) && !empty($addressCustomFields[$elementName]['custom_field_id'])) {
+                    $this->_tables[$tName] = "\nLEFT JOIN $tableName `$tName` ON `$tName`.id = $aName.id";
+                  }
                   if ($addWhere) {
                     $this->_whereTables["{$name}-address"] = $addressJoin;
                   }
