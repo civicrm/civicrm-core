@@ -92,8 +92,9 @@ function civicrm_api3_order_create($params) {
   $entityIds = [];
   $contributionStatus = CRM_Utils_Array::value('contribution_status_id', $params);
   if ($contributionStatus !== 'Pending' && 'Pending' !== CRM_Core_PseudoConstant::getName('CRM_Contribute_BAO_Contribution', 'contribution_status_id', $contributionStatus)) {
-    CRM_Core_Error::deprecatedFunctionWarning('Creating a Order with a status other than pending is deprecated. Currently empty defaults to "Completed" so as a transition not passing in "Pending" is deprecated');
+    CRM_Core_Error::deprecatedFunctionWarning("Creating a Order with a status other than pending is deprecated. Currently empty defaults to 'Completed' so as a transition not passing in 'Pending' is deprecated. You can chain payment creation e.g civicrm_api3('Order', 'create', ['blah' => 'blah', 'contribution_status_id' => 'Pending', 'api.Payment.create => ['total_amount' => 5]]");
   }
+
   if (!empty($params['line_items']) && is_array($params['line_items'])) {
     $priceSetID = NULL;
     CRM_Contribute_BAO_Contribution::checkLineItems($params);
@@ -131,7 +132,17 @@ function civicrm_api3_order_create($params) {
       $params['line_item'][$priceSetID] = array_merge($params['line_item'][$priceSetID], $lineItems['line_item']);
     }
   }
-  $contribution = civicrm_api3('Contribution', 'create', $params);
+  $contributionParams = $params;
+  foreach ($contributionParams as $key => $value) {
+    // Unset chained keys so the code does not attempt to do this chaining twice.
+    // e.g if calling 'api.Payment.create' We want to finish creating the order first.
+    // it would probably be better to have a full whitelist of contributionParams
+    if (substr($key, 0, 3) === 'api') {
+      unset($contributionParams[$key]);
+    }
+  }
+
+  $contribution = civicrm_api3('Contribution', 'create', $contributionParams);
   // add payments
   if ($entity && !empty($contribution['id'])) {
     foreach ($entityIds as $entityId) {
