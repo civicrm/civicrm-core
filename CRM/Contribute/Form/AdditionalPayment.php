@@ -265,11 +265,11 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       $this->addRule('net_amount', ts('Please enter a valid monetary value for Net Amount.'), 'money');
     }
 
-    $buttonName = $this->_refund ? 'Record Refund' : 'Record Payment';
+    $buttonName = $this->_refund ? ts('Record Refund') : ts('Record Payment');
     $this->addButtons([
       [
         'type' => 'upload',
-        'name' => ts('%1', [1 => $buttonName]),
+        'name' => $buttonName,
         'js' => $js,
         'isDefault' => TRUE,
       ],
