@@ -462,7 +462,7 @@ class CRM_Contribute_Form_AdditionalPayment extends CRM_Contribute_Form_Abstract
       catch (\Civi\Payment\Exception\PaymentProcessorException $e) {
         Civi::log()->error('Payment processor exception: ' . $e->getMessage());
         $urlParams = "action=add&cid={$this->_contactId}&id={$this->_contributionId}&component={$this->_component}&mode={$this->_mode}";
-        CRM_Core_Error::statusBounce(CRM_Utils_System::url($e->getMessage(), 'civicrm/payment/add', $urlParams));
+        CRM_Core_Error::statusBounce($e->getMessage(), CRM_Utils_System::url('civicrm/payment/add', $urlParams));
       }
     }
 
