@@ -120,21 +120,6 @@ class CRM_Utils_SQL {
   }
 
   /**
-   * Is the Database set up to handle acceents.
-   * @warning This function was introduced in attempt to determine the reason why the test getInternationalStrings was failing on ubu1604 but passing on ubu1204-5
-   * This function should not be used as the basis of further work as the reasoning is not perfact and is giving false failures.
-   * @return bool
-   */
-  public static function supportStorageOfAccents() {
-    $charSetDB = CRM_Core_DAO::executeQuery("SHOW VARIABLES LIKE 'character_set_database'")->fetchAll();
-    $charSet = $charSetDB[0]['Value'];
-    if ($charSet == 'utf8') {
-      return TRUE;
-    }
-    return FALSE;
-  }
-
-  /**
    * Does the DB version support mutliple locks per
    *
    * https://dev.mysql.com/doc/refman/5.7/en/miscellaneous-functions.html#function_get-lock
