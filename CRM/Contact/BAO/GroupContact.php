@@ -603,6 +603,7 @@ SELECT    *
    * TODO: use the 3rd $sqls param to append sql statements rather than executing them here
    */
   public static function mergeGroupContact($mainContactId, $otherContactId) {
+    $errorScope = CRM_Core_TemporaryErrorScope::useException();
     $params = [
       1 => [$mainContactId, 'Integer'],
       2 => [$otherContactId, 'Integer'],
@@ -695,6 +696,7 @@ AND       group_id IN ( $groupIDString )
   WHERE  contact_id = %2
   ";
     CRM_Core_DAO::executeQuery($sql, $params);
+    $errorScope = NULL;
   }
 
   /**
