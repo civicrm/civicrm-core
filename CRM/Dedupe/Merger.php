@@ -1130,52 +1130,14 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
     // Set up useful information about the location blocks
     $locationBlocks = self::getLocationBlockInfo();
 
-    $locations = [
-      'main' => [],
-      'other' => [],
-    ];
-
-    // @todo This could probably be defined and used earlier
-    $mergeTargets = [
-      'main' => $mainId,
-      'other' => $otherId,
-    ];
+    $locations = ['main' => [], 'other' => []];
 
     foreach ($locationBlocks as $blockName => $blockInfo) {
 
       // Collect existing fields from both 'main' and 'other' contacts first
       // This allows us to match up location/types when building the table rows
-      foreach ($mergeTargets as $moniker => $cid) {
-        $searchParams = [
-          'contact_id' => $cid,
-          // CRM-17556 Order by field-specific criteria
-          'options' => [
-            'sort' => $blockInfo['sortString'],
-          ],
-        ];
-        $values = civicrm_api3($blockName, 'get', $searchParams);
-        if ($values['count']) {
-          $cnt = 0;
-          foreach ($values['values'] as $value) {
-            $locations[$moniker][$blockName][$cnt] = $value;
-            // Fix address display
-            if ($blockName == 'address') {
-              // For performance avoid geocoding while merging https://issues.civicrm.org/jira/browse/CRM-21786
-              // we can expect existing geocode values to be retained.
-              $value['skip_geocode'] = TRUE;
-              CRM_Core_BAO_Address::fixAddress($value);
-              unset($value['skip_geocode']);
-              $locations[$moniker][$blockName][$cnt]['display'] = CRM_Utils_Address::format($value);
-            }
-            // Fix email display
-            elseif ($blockName == 'email') {
-              $locations[$moniker][$blockName][$cnt]['display'] = CRM_Utils_Mail::format($value);
-            }
-
-            $cnt++;
-          }
-        }
-      }
+      $locations['main'][$blockName] = self::buildLocationBlockForContact($mainId, $blockInfo, $blockName);
+      $locations['other'][$blockName] = self::buildLocationBlockForContact($otherId, $blockInfo, $blockName);
 
       // Now, build the table rows appropriately, based off the information on
       // the 'other' contact
@@ -2563,6 +2525,51 @@ INNER JOIN  civicrm_membership membership2 ON membership1.membership_type_id = m
       $label = "$value (" . CRM_Contact_BAO_Contact::displayName($value) . ")";
     }
     return [$label, $value];
+  }
+
+  /**
+   * Build up the location block for the contact in dedupe-screen display format.
+   *
+   * @param integer $cid
+   * @param array $blockInfo
+   * @param string $blockName
+   *
+   * @return array
+   *
+   * @throws \CiviCRM_API3_Exception
+   */
+  private static function buildLocationBlockForContact($cid, $blockInfo, $blockName): array {
+    $searchParams = [
+      'contact_id' => $cid,
+      // CRM-17556 Order by field-specific criteria
+      'options' => [
+        'sort' => $blockInfo['sortString'],
+      ],
+    ];
+    $locationBlock = [];
+    $values = civicrm_api3($blockName, 'get', $searchParams);
+    if ($values['count']) {
+      $cnt = 0;
+      foreach ($values['values'] as $value) {
+        $locationBlock[$cnt] = $value;
+        // Fix address display
+        if ($blockName == 'address') {
+          // For performance avoid geocoding while merging https://issues.civicrm.org/jira/browse/CRM-21786
+          // we can expect existing geocode values to be retained.
+          $value['skip_geocode'] = TRUE;
+          CRM_Core_BAO_Address::fixAddress($value);
+          unset($value['skip_geocode']);
+          $locationBlock[$cnt]['display'] = CRM_Utils_Address::format($value);
+        }
+        // Fix email display
+        elseif ($blockName == 'email') {
+          $locationBlock[$cnt]['display'] = CRM_Utils_Mail::format($value);
+        }
+
+        $cnt++;
+      }
+    }
+    return $locationBlock;
   }
 
 }
