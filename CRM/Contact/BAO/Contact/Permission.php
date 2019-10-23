@@ -189,7 +189,7 @@ WHERE contact_a.id = %1 AND $permission
   /**
    * Fill the acl contact cache for this contact id if empty.
    *
-   * @param int $userID
+   * @param int $userID contact id matching the ACLed user that we are filling the cache for
    * @param int|string $type the type of operation (view|edit)
    * @param bool $force
    *   Should we force a recompute.
@@ -204,6 +204,12 @@ WHERE contact_a.id = %1 AND $permission
         CRM_Core_Permission::VIEW => [],
         CRM_Core_Permission::EDIT => [],
       ];
+    }
+    // We may find ourselves here if a function has called CRM_ACL_BAO_Cache::updateEntry function. That function doesn't appropriately
+    // Check for view all contacts permission or similar which we don't need to cache.
+    if (CRM_Core_Permission::check('edit all contacts') || $type == CRM_ACL_API::VIEW && CRM_Core_Permission::check('view all contacts')) {
+      Civi::$statics[__CLASS__]['processed'][$type][$userID] = 1;
+      return;
     }
 
     if ($type == CRM_Core_Permission::VIEW) {

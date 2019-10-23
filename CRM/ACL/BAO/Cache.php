@@ -109,7 +109,8 @@ SELECT acl_id
   }
 
   /**
-   * @param int $id
+   * Delete entries from the civicrm_acl_cache for a specific contact.
+   * @param int $id contact_id
    */
   public static function deleteEntry($id) {
     if (self::$_cache &&
@@ -127,7 +128,8 @@ WHERE contact_id = %1
   }
 
   /**
-   * @param int $id
+   * Update civicrm_acl_contact_cache and civicrm_acl_cache for a specific user
+   * @param int $id contact_id for the user that ACLs apply to.
    */
   public static function updateEntry($id) {
     // rebuilds civicrm_acl_cache
